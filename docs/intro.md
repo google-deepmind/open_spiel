@@ -30,8 +30,8 @@ bindings.
 
 The methods names are in `CamelCase` in C++ and `snake_case` in Python (e.g.
 `state.ApplyAction` in C++ will be `state.apply_action` in Python). See the
-pybind11 definition in [open_spiel/python/pybind11/pyspiel.cc](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/pybind11/pyspiel.cc) for the full
-mapping between names.
+pybind11 definition in [open_spiel/python/pybind11/pyspiel.cc](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/pybind11/pyspiel.cc)
+for the full mapping between names.
 
 For algorithms, many are written in both languages, even if some are only
 available from Python.
@@ -40,3 +40,11 @@ available from Python.
 
 OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04), MacOS, and
 [Windows 10 (through Windows Subsystem for Linux)](windows.md).
+
+**Visualization of games**
+
+There is a basic visualizer based on graphviz, see
+[open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py).
+
+There is an interactive viewer for OpenSpiel games called
+[SpielViz](https://github.com/michalsustr/spielviz).

@@ -326,7 +326,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               })
       .method("information_state_as_normalized_vector",
               [](open_spiel::State& s, open_spiel::Player p,
-                 std::vector<double> data) {
+                 std::vector<float> data) {
                 return s.InformationStateTensor(p, &data);
               })
       .method("observation_string",
@@ -340,19 +340,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("observation_tensor",
               [](open_spiel::State& s, open_spiel::Player p) {
                 return s.ObservationTensor(p);
-              })
-      .method("observation_tensor",
-              [](open_spiel::State& s, open_spiel::Player p,
-                 std::vector<double> data) {
-                return s.ObservationTensor(p, &data);
-              })
-      .method("public_observation_string",
-              [](open_spiel::State& s) { return s.PublicObservationString(); })
-      .method("private_observation_string",
-              [](open_spiel::State& s) { return s.PrivateObservationString(); })
-      .method("private_observation_string",
-              [](open_spiel::State& s, open_spiel::Player p) {
-                return s.PrivateObservationString(p);
               })
       .method("clone", &open_spiel::State::Clone)
       .method("child", &open_spiel::State::Child)
@@ -369,7 +356,12 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
 
   mod.add_type<open_spiel::Game>("Game")
       .method("num_distinct_actions", &open_spiel::Game::NumDistinctActions)
-      .method("new_initial_state", &open_spiel::Game::NewInitialState)
+      .method("new_initial_state",
+              [](open_spiel::Game& g) { return g.NewInitialState(); })
+      .method("new_initial_state_from_string",
+              [](open_spiel::Game& g, const std::string& s) {
+                return g.NewInitialState(s);
+              })
       .method("max_chance_outcomes", &open_spiel::Game::MaxChanceOutcomes)
       .method("get_parameters", &open_spiel::Game::GetParameters)
       .method("num_players", &open_spiel::Game::NumPlayers)
@@ -634,14 +626,21 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
           const open_spiel::Game&, open_spiel::Player,
           const std::unordered_map<std::string, open_spiel::ActionsAndProbs>&>()
       .method("best_response_action",
-              &open_spiel::algorithms::TabularBestResponse::BestResponseAction)
+              [](open_spiel::algorithms::TabularBestResponse& t,
+                 const std::string& infostate) {
+                return t.BestResponseAction(infostate);
+              })
       .method(
           "get_best_response_actions",
           &open_spiel::algorithms::TabularBestResponse::GetBestResponseActions)
       .method(
           "get_best_response_policy",
           &open_spiel::algorithms::TabularBestResponse::GetBestResponsePolicy)
-      .method("value", &open_spiel::algorithms::TabularBestResponse::Value)
+      .method("value",
+              [](open_spiel::algorithms::TabularBestResponse& t,
+                 const std::string& history) {
+                return t.Value(history);
+              })
       .method("set_policy",
               [](open_spiel::algorithms::TabularBestResponse& t,
                  const open_spiel::Policy* p) { return t.SetPolicy(p); })

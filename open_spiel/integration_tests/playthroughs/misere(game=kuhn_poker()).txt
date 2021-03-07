@@ -46,9 +46,6 @@ InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = ""
 ObservationString(1) = ""
-PublicObservationString() = "start game"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333}]
@@ -72,9 +69,6 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = ""
-PublicObservationString() = "Deal to player 0"
-PrivateObservationString(0) = "Received card 1"
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
 ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
@@ -88,7 +82,7 @@ action: 2
 # 1 2
 IsTerminal() = False
 History() = [1, 2]
-HistoryString() = "1 2"
+HistoryString() = "1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -98,9 +92,6 @@ InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◯◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
-PublicObservationString() = "Deal to player 1"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = "Received card 2"
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
 Rewards() = [-0.0, -0.0]
@@ -115,7 +106,7 @@ action: 0
 # 1 2 p
 IsTerminal() = False
 History() = [1, 2, 0]
-HistoryString() = "1 2 0"
+HistoryString() = "1, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -125,9 +116,6 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◯◯◯
 ObservationString(0) = "111"
 ObservationString(1) = "211"
-PublicObservationString() = "Pass"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◉◉◉
 Rewards() = [-0.0, -0.0]
@@ -142,7 +130,7 @@ action: 1
 # 1 2 pb
 IsTerminal() = False
 History() = [1, 2, 0, 1]
-HistoryString() = "1 2 0 1"
+HistoryString() = "1, 2, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -152,9 +140,6 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◉◯◯
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◉◯◯
 ObservationString(0) = "112"
 ObservationString(1) = "212"
-PublicObservationString() = "Bet"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 2.0]
 Rewards() = [-0.0, -0.0]
@@ -169,7 +154,7 @@ action: 1
 # 1 2 pbb
 IsTerminal() = True
 History() = [1, 2, 0, 1, 1]
-HistoryString() = "1 2 0 1 1"
+HistoryString() = "1, 2, 0, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
@@ -179,9 +164,6 @@ InformationStateTensor(0): ◉◯◯◉◯◉◯◯◉◯◉
 InformationStateTensor(1): ◯◉◯◯◉◉◯◯◉◯◉
 ObservationString(0) = "122"
 ObservationString(1) = "222"
-PublicObservationString() = "Bet"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0) = [1.0, 0.0, 0.0, 1.0, 0.0, 2.0, 2.0]
 ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 1.0, 2.0, 2.0]
 Rewards() = [2.0, -2.0]

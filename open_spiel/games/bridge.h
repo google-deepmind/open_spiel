@@ -122,10 +122,9 @@ class BridgeState : public State {
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
   std::vector<double> Returns() const override { return returns_; }
   std::string ObservationString(Player player) const override;
-  template <typename T>
-  void WriteObservationTensor(Player player, absl::Span<T> values) const;
+  void WriteObservationTensor(Player player, absl::Span<float> values) const;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new BridgeState(*this));
   }
@@ -218,6 +217,7 @@ class BridgeGame : public Game {
   int NumDistinctActions() const override {
     return kBiddingActionBase + kNumCalls;
   }
+  int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new BridgeState(shared_from_this(), UseDoubleDummyResult(),
@@ -226,9 +226,6 @@ class BridgeGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -kMaxScore; }
   double MaxUtility() const override { return kMaxScore; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BridgeGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }
@@ -236,6 +233,8 @@ class BridgeGame : public Game {
     return UseDoubleDummyResult() ? kMaxAuctionLength
                                   : kMaxAuctionLength + kNumCards;
   }
+  int MaxChanceNodesInHistory() const override { return kNumCards; }
+
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
 

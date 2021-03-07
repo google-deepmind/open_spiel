@@ -32,13 +32,19 @@ namespace algorithms {
 //
 // The functions compute these metrics for extensive-form correlated equilibria
 // (EFCE) and extensive-form coarse-correlated equilibria (EFCCE). The
-// algorithms work by constructing an auxiliary game (described in Def 2.2 of
-// von Stengel and Forges 2008) where chance initially samples a joint policy,
-// then lets the players decide to follow or not follow the recommendations.
-// If they follow, they continue to receive recommendations. Otherwise, they
-// stop receiving recommendations. The incentive for a player to deviate toward
-// a best response can be computed by the existing best response algorithm in
-// this new game.
+// algorithms work by constructing an auxiliary game (similar to the one
+// described in Def 2.2 of von Stengel and Forges 2008) where chance initially
+// samples a joint policy, then lets the players decide to follow or not follow
+// the recommendations.
+//
+// The definition we use matches the common interpretation of EFCE's within AI
+// papers which are based on causal deviations described in (Gordon, Greenwald,
+// and Marks '08), (Dudik & Gordon '09), and (Farina & Sandholm '19).
+// Specifically: if players follow recommendations, they continue to receive
+// recommendations. If a player deviates, that player stops receiving
+// recommendations from then on. The incentive for a player to deviate toward a
+// best response can be computed by the existing best response algorithm in this
+// new game.
 //
 // In both cases of EFCE and EFCCE, the algorithms compute the normal-form
 // equivalents, and two wrapper functions are provided specifically for the
@@ -67,6 +73,11 @@ namespace algorithms {
 // Monte Carlo sampling of deterministic joint policies from the mixtures.
 using CorrelationDevice = std::vector<std::pair<double, TabularPolicy>>;
 
+// Helper function to return a correlation device that is a uniform distribution
+// over the vector of tabular policies.
+CorrelationDevice UniformCorrelationDevice(
+    std::vector<TabularPolicy>& policies);
+
 // Return a string representation of the correlation device.
 std::string ToString(const CorrelationDevice& corr_dev);
 
@@ -83,24 +94,15 @@ using NormalFormCorrelationDevice = std::vector<NormalFormJointPolicyWithProb>;
 
 // A configuration object for the metrics.
 struct CorrDistConfig {
-  // Are the underlying policies deterministic (pure)? If false, then a Monte
-  // Carlo approximation is done by sampling deterministic joint policies
-  // Only 'true' is currently supported.
+  // Are the underlying policies deterministic (pure)? Currently this is the
+  // only supported mode. To obtain the CorrDist metrics for distributions over
+  // mixed policies, see the helper functions in corr_dev_builder, with examples
+  // in corr_dev_builder_test.cc.
   bool deterministic = true;
-
-  // Should the distribution over mixed policies be converted to an equivalent
-  // one over determinstic policies before computing the metric?
-  // Only 'false' is currently supported.
-  bool convert_policy = false;
 
   // A tag used to delimit recommendation sequences from the normal part of the
   // information state string.
   std::string recommendation_delimiter = " R-*-=-*-R ";
-
-  // If determinstic is false, how many deterministic joint policies should be
-  // samples in order to assemble an approximate empirical joint distribution?
-  // Note: not yet implemented, but coming soon.
-  // int num_samples = 1000;
 };
 
 // Return the expected values (one per player) of a correlation device.
@@ -125,11 +127,50 @@ double EFCEDist(const Game& game, CorrDistConfig config,
 double EFCCEDist(const Game& game, CorrDistConfig config,
                  const CorrelationDevice& mu);
 
+// Agent-form variants: these are similar to EFCCE + EFCE distances above,
+// except that there is at most one deviation allowed, at a single information
+// set, but any information set. Other than this restriction, each one is
+// analogous to EFCCE or EFCE.
+// **Note: these have not yet been extensively tested.**
+double AFCEDist(const Game& game, CorrDistConfig config,
+                const CorrelationDevice& mu);
+double AFCCEDist(const Game& game, CorrDistConfig config,
+                 const CorrelationDevice& mu);
+
 // Analog to the functions above but for normal-form games. The game can be a
 // normal-form game *or* a TurnBasedSimultaneousGame wrapping a normal-form
 // game.
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
+
+struct CorrDistInfo {
+  double dist_value;
+  std::vector<double> on_policy_values;
+  std::vector<double> deviation_incentives;
+
+  // One per player
+  std::vector<TabularPolicy> best_response_policies;
+
+  // Several per player. Only used in the CE dist case.
+  std::vector<std::vector<TabularPolicy>> conditional_best_response_policies;
+};
+
+// Distance to coarse-correlated in an extensive-form game. Builds a simpler
+// auxiliary game similar to the *FCCE where there is one chance node that
+// determines which policies the opponents follow (never revealed). Note that
+// the policies in this correlation device *can* be mixed. If values is
+// non-null, then it is filled with the deviation incentive of each player.
+CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu);
+
+// Distance to a correlated equilibrium in an extensive-form game. Builds a
+// simpler auxiliary game similar to the *FCE ones where there is a chance node
+// that determines the joint recommendation strategies. The correlation device
+// must be a distribution over deterministic policies; if you have distribution
+// over mixed policies, then first convert the correlation device using the
+// helper functions DeterminizeCorrDev or SampledDeterminizeCorrDev in
+// corr_dev_builder.h. If values is non-null, then it is filled with the
+// deviation incentive of each player.
+CorrDistInfo CEDist(const Game& game, const CorrelationDevice& mu);
 
 }  // namespace algorithms
 }  // namespace open_spiel

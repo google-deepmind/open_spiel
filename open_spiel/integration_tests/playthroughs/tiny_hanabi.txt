@@ -82,7 +82,7 @@ action: 1
 # p0:d1 p1:d1
 IsTerminal() = False
 History() = [1, 1]
-HistoryString() = "1 1"
+HistoryString() = "1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -106,7 +106,7 @@ action: 2
 # p0:d1 p1:d1 p0:a2
 IsTerminal() = False
 History() = [1, 1, 2]
-HistoryString() = "1 1 2"
+HistoryString() = "1, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -130,7 +130,7 @@ action: 0
 # p0:d1 p1:d1 p0:a2 p1:a0
 IsTerminal() = True
 History() = [1, 1, 2, 0]
-HistoryString() = "1 1 2 0"
+HistoryString() = "1, 1, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

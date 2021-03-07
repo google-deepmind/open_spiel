@@ -79,7 +79,7 @@ class OwareState : public State {
   // training, although the given representation is not necessary the best
   // for that purpose.
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -170,9 +170,6 @@ class OwareGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new OwareGame(*this));
-  }
 
   int MaxGameLength() const override { return kMaxGameLength; }
   std::vector<int> ObservationTensorShape() const override;

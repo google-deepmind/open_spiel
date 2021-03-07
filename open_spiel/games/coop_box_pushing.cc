@@ -69,7 +69,7 @@ const GameType kGameType{
     /*short_name=*/"coop_box_pushing",
     /*long_name=*/"Cooperative Box Pushing",
     GameType::Dynamics::kSimultaneous,
-    GameType::ChanceMode::kDeterministic,
+    GameType::ChanceMode::kExplicitStochastic,
     GameType::Information::kImperfectInformation,
     GameType::Utility::kIdentical,
     GameType::RewardModel::kRewards,
@@ -366,6 +366,13 @@ std::vector<Action> CoopBoxPushingState::LegalActions(Player player) const {
     return LegalFlatJointActions();
   } else if (IsTerminal()) {
     return {};
+  } else if (IsChanceNode()) {
+    if (action_status_[0] == ActionStatusType::kUnresolved ||
+        action_status_[1] == ActionStatusType::kUnresolved) {
+      return {0, 1};
+    } else {
+      return {2, 3};
+    }
   }
   // All the actions are legal at every state.
   return {0, 1, 2, 3};
@@ -509,7 +516,7 @@ int CoopBoxPushingState::ObservationPlane(std::pair<int, int> coord,
 }
 
 void CoopBoxPushingState::ObservationTensor(Player player,
-                                            std::vector<double>* values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (fully_observable_) {
@@ -523,10 +530,10 @@ void CoopBoxPushingState::ObservationTensor(Player player,
       }
     }
   } else {
-    values->resize(kNumObservations);
-    std::fill(values->begin(), values->end(), 0);
+    SPIEL_CHECK_EQ(values.size(), kNumObservations);
+    std::fill(values.begin(), values.end(), 0);
     ObservationType obs = PartialObservation(player);
-    (*values)[obs] = 1;
+    values[obs] = 1;
   }
 }
 

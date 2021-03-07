@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_POLICY_H_
 #define OPEN_SPIEL_POLICY_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -23,6 +24,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/serialization.h"
 
 namespace open_spiel {
 
@@ -40,10 +42,17 @@ Action GetAction(const ActionsAndProbs& action_and_probs);
 // legal actions).
 ActionsAndProbs UniformStatePolicy(const State& state);
 
+// Returns a policy where the zeroth action has probability 1.
+ActionsAndProbs FirstActionStatePolicy(const State& state);
+
 // Return a new policy with all the same actions, but with probability 1 on the
 // specified action, and 0 on the others.
 ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
                                       Action action);
+
+// Returns a policy with probability 1 on a specific action, and 0 on others.
+ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
+                                       Action action);
 
 // A general policy object. A policy is a mapping from states to list of
 // (action, prob) pairs for all the legal actions at the state.
@@ -91,10 +100,19 @@ class Policy {
     return pmap;
   }
 
-  // Returns a list of (action, prob) pairs for the policy at this state.
-  // If the policy is not available at the state, returns and empty list.
+  // Returns a list of (action, prob) pairs for the policy for the current
+  // player at this state. If the policy is not available at the state, returns
+  // an empty list.
   virtual ActionsAndProbs GetStatePolicy(const State& state) const {
-    return GetStatePolicy(state.InformationStateString());
+    return GetStatePolicy(state, state.CurrentPlayer());
+  }
+
+  // Returns a list of (action, prob) pairs for the policy for the specified
+  // player at this state. If the policy is not available at the state, returns
+  // an empty list.
+  virtual ActionsAndProbs GetStatePolicy(
+      const State& state, Player player) const {
+    return GetStatePolicy(state.InformationStateString(player));
   }
 
   // Returns a list of (action, prob) pairs for the policy at this info state.
@@ -104,7 +122,22 @@ class Policy {
   virtual ActionsAndProbs GetStatePolicy(const std::string& info_state) const {
     SpielFatalError("GetStatePolicy(const std::string&) unimplemented.");
   }
+
+  // Each override must write out the class’s identity followed by ":" as the
+  // very first thing so that the DeserializePolicy method can then call the
+  // Deserialize method for the correct subclass. See TabularPolicy and
+  // DeserializePolicy below for an example. The double_precision parameter
+  // indicates the number of decimal places in floating point numbers
+  // formatting, value -1 formats doubles with lossless, non-portable bitwise
+  // representation hex strings.
+  virtual std::string Serialize(int double_precision = -1,
+                                std::string delimiter = "<~>") const {
+    SpielFatalError("Serialize(std::string delimiter) unimplemented.");
+  }
 };
+
+std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
+                                          std::string delimiter = "<~>");
 
 // A tabular policy represented internally as a map. Note that this
 // implementation is not directly compatible with the Python TabularPolicy
@@ -152,6 +185,54 @@ class TabularPolicy : public Policy {
     }
   }
 
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "<~>") const override {
+    SPIEL_CHECK_GE(double_precision, -1);
+    if (delimiter == "," || delimiter == "=") {
+      // The two delimiters are used for de/serialization of policy_table_
+      SpielFatalError(
+          "Please select a different delimiter,"
+          "invalid values are \",\" and \"=\".");
+    }
+    std::string str = "TabularPolicy:";
+    if (policy_table_.empty()) return str;
+
+    for (auto const& [info_state, policy] : policy_table_) {
+      if (info_state.find(delimiter) != std::string::npos) {
+        SpielFatalError(absl::StrCat(
+            "Info state contains delimiter \"", delimiter,
+            "\", please fix the info state or select a different delimiter."));
+      }
+
+      std::string policy_str;
+      if (double_precision == -1) {
+        policy_str =
+            absl::StrJoin(policy, ",",
+                          absl::PairFormatter(absl::AlphaNumFormatter(), "=",
+                                              HexDoubleFormatter()));
+      } else {
+        policy_str = absl::StrJoin(
+            policy, ",",
+            absl::PairFormatter(absl::AlphaNumFormatter(), "=",
+                                SimpleDoubleFormatter(double_precision)));
+      }
+      absl::StrAppend(&str, info_state, delimiter, policy_str, delimiter);
+    }
+    // Remove the trailing delimiter
+    str.erase(str.length() - delimiter.length());
+    return str;
+  }
+
+  // Set (overwrite) all the state policies contained in another policy within
+  // this policy. Does not change other state policies not contained in this
+  // policy.
+  void ImportPolicy(const TabularPolicy& other_policy) {
+    for (const auto& [info_state, actions_and_probs] :
+         other_policy.policy_table_) {
+      SetStatePolicy(info_state, actions_and_probs);
+    }
+  }
+
   // Set the probability for action at the info state. If the info state is not
   // in the policy, it is added. If the action is not in the info state policy,
   // it is added. Otherwise it is modified.
@@ -186,14 +267,69 @@ class TabularPolicy : public Policy {
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
 };
 
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
+    const std::string& serialized, std::string delimiter = "<~>");
+
 // Chooses all legal actions with equal probability. This is equivalent to the
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
  public:
-  ActionsAndProbs GetStatePolicy(const State& state) const override {
+  ActionsAndProbs GetStatePolicy(
+      const State& state, Player player) const override {
+    SPIEL_CHECK_TRUE(state.IsPlayerActing(player));
     return UniformStatePolicy(state);
   }
+
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "") const override {
+    return "UniformPolicy:";
+  }
 };
+
+// Chooses all legal actions with equal probability. This is equivalent to the
+// tabular version, except that this works for large games.
+class FirstActionPolicy : public Policy {
+ public:
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override {
+    SPIEL_CHECK_TRUE(state.IsPlayerActing(player));
+    return FirstActionStatePolicy(state);
+  }
+
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "") const override {
+    return "FirstActionPolicy:";
+  }
+};
+
+// A deterministic policy with which takes legal actions in order of
+// preference specified by pref_actions. The function will check-fail if none
+// of the pref_action elements are legal for a state.
+//
+// For example, PreferredActionPolicy(leduc, {kRaise, kCall}) constructs a
+// policy that always raises and only falls back to call if raise is not a legal
+// action. If it is possible for nethier raise nor call to be valid actions in a
+// state in leduc, the function will fail.
+class PreferredActionPolicy : public Policy {
+ public:
+  PreferredActionPolicy(const std::vector<Action>& preference_order)
+      : preference_order_(preference_order) {}
+
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
+
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "") const override {
+    SpielFatalError("Unimplemented.");
+  }
+
+ private:
+  std::vector<Action> preference_order_;
+};
+
+// Takes any policy and returns a tabular policy by traversing the game and
+// building a tabular policy for it.
+TabularPolicy ToTabularPolicy(const Game& game, const Policy* policy);
 
 // Helper functions that generate policies for testing.
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
@@ -202,7 +338,17 @@ TabularPolicy GetUniformPolicy(const Game& game);
 TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
+// Returns a preferred action policy as a tabular policy.
+TabularPolicy GetPrefActionPolicy(
+    const Game& game, const std::vector<Action>& pref_action);
+
 std::string PrintPolicy(const ActionsAndProbs& policy);
+
+// Takes many tabular policy and merges them into one. If check_no_overlap is
+// set, then a check is done to ensure that there is no intersection among the
+// policies (slow: involves iterating over each).
+TabularPolicy ToJointTabularPolicy(const std::vector<TabularPolicy>& policies,
+                                   bool check_no_overlap);
 
 }  // namespace open_spiel
 

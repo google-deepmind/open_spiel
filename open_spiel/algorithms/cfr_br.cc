@@ -27,20 +27,34 @@ CFRBRSolver::CFRBRSolver(const Game& game)
                     /*regret_matching_plus=*/false),
       policy_overrides_(game.NumPlayers(), nullptr),
       uniform_policy_(UniformPolicy()) {
-  for (int p = 0; p < game_.NumPlayers(); ++p) {
+  InitializeBestResponseComputers();
+}
+
+CFRBRSolver::CFRBRSolver(std::shared_ptr<const Game> game, int iteration)
+    : CFRSolverBase(game,
+                    /*alternating_updates=*/false,
+                    /*linear_averaging=*/false,
+                    /*regret_matching_plus=*/false, iteration),
+      policy_overrides_(game->NumPlayers(), nullptr),
+      uniform_policy_(UniformPolicy()) {
+  InitializeBestResponseComputers();
+}
+
+void CFRBRSolver::InitializeBestResponseComputers() {
+  for (int p = 0; p < game_->NumPlayers(); ++p) {
     best_response_computers_.push_back(std::unique_ptr<TabularBestResponse>(
-        new TabularBestResponse(game_, p, &uniform_policy_)));
+        new TabularBestResponse(*game_, p, &uniform_policy_)));
   }
 }
 
 void CFRBRSolver::EvaluateAndUpdatePolicy() {
   ++iteration_;
 
-  std::vector<TabularPolicy> br_policies(game_.NumPlayers());
-  std::unique_ptr<Policy> current_policy = CurrentPolicy();
+  std::vector<TabularPolicy> br_policies(game_->NumPlayers());
+  std::shared_ptr<Policy> current_policy = CurrentPolicy();
 
   // Set all the player's policies first.
-  for (int p = 0; p < game_.NumPlayers(); ++p) {
+  for (int p = 0; p < game_->NumPlayers(); ++p) {
     // Need to have an exception here because the CFR policy objects are
     // wrappers around information that is contained in a table, and those do
     // not exist until there's been a tree traversal to compute regrets below.
@@ -50,13 +64,13 @@ void CFRBRSolver::EvaluateAndUpdatePolicy() {
   }
 
   // Now, for each player compute a best response
-  for (int p = 0; p < game_.NumPlayers(); ++p) {
+  for (int p = 0; p < game_->NumPlayers(); ++p) {
     br_policies[p] = best_response_computers_[p]->GetBestResponsePolicy();
   }
 
-  for (int p = 0; p < game_.NumPlayers(); ++p) {
+  for (int p = 0; p < game_->NumPlayers(); ++p) {
     // Override every player except p.
-    for (int opp = 0; opp < game_.NumPlayers(); ++opp) {
+    for (int opp = 0; opp < game_->NumPlayers(); ++opp) {
       policy_overrides_[opp] = (opp == p ? nullptr : &br_policies[opp]);
     }
 
@@ -65,6 +79,18 @@ void CFRBRSolver::EvaluateAndUpdatePolicy() {
                                 &policy_overrides_);
   }
   ApplyRegretMatching();
+}
+
+std::unique_ptr<CFRBRSolver> DeserializeCFRBRSolver(
+    const std::string& serialized, std::string delimiter) {
+  auto partial = PartiallyDeserializeCFRSolver(serialized);
+  SPIEL_CHECK_EQ(partial.solver_type, "CFRBRSolver");
+  auto solver = std::make_unique<CFRBRSolver>(
+      partial.game, std::stoi(partial.solver_specific_state));
+  DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
+                                     &solver->InfoStateValuesTable(),
+                                     delimiter);
+  return solver;
 }
 
 }  // namespace algorithms

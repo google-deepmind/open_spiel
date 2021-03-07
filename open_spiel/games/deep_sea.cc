@@ -39,10 +39,10 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/1,
     /*min_num_players=*/1,
-    /*provides_information_state=*/true,
-    /*provides_information_state_as_normalized_vector=*/false,
-    /*provides_observation=*/true,
-    /*provides_observation_as_normalized_vector=*/true,
+    /*provides_information_state_string=*/false,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
         {"size", GameParameter(kDefaultSize)},
@@ -124,51 +124,26 @@ std::vector<double> DeepSeaState::Returns() const {
   return {reward_sum};
 }
 
-std::string DeepSeaState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  SPIEL_CHECK_EQ(history_.size(), player_row_);
-  SPIEL_CHECK_EQ(direction_history_.size(), player_row_);
-  std::string str;
-  for (int i = 0; i < player_row_; i++) {
-    absl::StrAppend(&str, history_[i].action ? "R" : "L", "->",
-                    direction_history_[i] ? "R" : "L", "\n");
-  }
-  return str;
-}
-
 std::string DeepSeaState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::string str(size_ * size_, '.');
+  // We need to account for the possibility that `player_row == size_` at
+  // terminal states, so that's why we add the +1.
+  std::string str((size_ + 1) * size_, '.');
   str[player_row_ * size_ + player_col_] = 'x';
   return str;
 }
 
 void DeepSeaState::ObservationTensor(Player player,
-                                     std::vector<double>* values) const {
+                                     absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(size_ * size_);
+  std::fill(values.begin(), values.end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), size_ * size_);
   if (player_row_ < size_ && player_col_ < size_)
-    (*values)[player_row_ * size_ + player_col_] = 1.0;
-}
-
-void DeepSeaState::InformationStateTensor(Player player,
-                                          std::vector<double>* values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  values->resize(2 * size_);
-  std::fill(values->begin(), values->end(), -1);
-  for (int i = 0; i < player_row_; i++) {
-    (*values)[2 * i] = history_[i].action;
-    (*values)[2 * i + 1] = direction_history_[i];
-  }
+    values[player_row_ * size_ + player_col_] = 1.0;
 }
 
 std::unique_ptr<State> DeepSeaState::Clone() const {

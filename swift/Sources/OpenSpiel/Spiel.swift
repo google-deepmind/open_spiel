@@ -312,6 +312,25 @@ public struct GameInfo {
   /// Which type of information state representations are supported?
   public let providesInformationStateString: Bool
   public let providesInformationStateTensor: Bool
+
+  /// Creates`GameInfo` struct from a full list of static game properties.
+  public init(shortName: String, longName: String, dynamics: GameInfo.Dynamics,
+              chanceMode: GameInfo.ChanceMode, information: GameInfo.Information,
+              utility: GameInfo.Utility, rewardModel: GameInfo.RewardModel,
+              maxPlayers: Int, minPlayers: Int, providesInformationStateString: Bool,
+              providesInformationStateTensor: Bool) {
+    self.shortName = shortName
+    self.longName = longName
+    self.dynamics = dynamics
+    self.chanceMode = chanceMode
+    self.information = information
+    self.utility = utility
+    self.rewardModel = rewardModel
+    self.maxPlayers = maxPlayers
+    self.minPlayers = minPlayers
+    self.providesInformationStateString = providesInformationStateString
+    self.providesInformationStateTensor = providesInformationStateTensor
+  }
 }
 
 /// Used to sample a policy. Can also sample from chance outcomes.

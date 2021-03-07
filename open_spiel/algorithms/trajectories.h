@@ -51,7 +51,7 @@ struct BatchedTrajectory {
   // calling State::InformationStateTensor. Only one of observations
   // and state_indices will be filled out for any given instance of
   // BatchedTrajectory.
-  std::vector<std::vector<std::vector<double>>> observations;
+  std::vector<std::vector<std::vector<float>>> observations;
 
   // The indices corresponding to the viewed state.
   std::vector<std::vector<int>> state_indices;
@@ -117,7 +117,7 @@ class TrajectoryRecorder {
   TrajectoryRecorder(const Game& game,
                      const std::unordered_map<std::string, int>& state_to_index,
                      int seed)
-      : game_(game.Clone()),
+      : game_(game.shared_from_this()),
         state_to_index_(state_to_index),
         rng_(std::mt19937(seed)) {}
 

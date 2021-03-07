@@ -224,7 +224,7 @@ class GamePublicTree(GameTree, pygraphviz.AGraph):
 
     if public_state.is_terminal():
       return
-    if public_state.get_depth() > depth_limit >= 0:
+    if public_state.move_number() > depth_limit >= 0:
       return
 
     for transition in public_state.legal_transitions():

@@ -53,7 +53,7 @@ namespace open_spiel {
 // A simple bot that can play moves and be restarted. The bot may be stateful,
 // thus, one should restart it to provide states from a different history line.
 //
-// For simulatenous games, or for bots playing as a single player, the
+// For simultaneous games, or for bots playing as a single player, the
 // implementation should take the player_id in the constructor.
 //
 // Optionally, the Bot can provide additional functionality (see
@@ -143,6 +143,20 @@ class Bot {
   }
 };
 
+class BotFactory {
+ public:
+  virtual ~BotFactory() = default;
+
+  // Asks the bot whether it can play the game as the given player.
+  virtual bool CanPlayGame(const Game& game, Player player_id) const = 0;
+
+  // Creates an instance of the bot for a given game and a player
+  // for which it should play.
+  virtual std::unique_ptr<Bot> Create(
+      std::shared_ptr<const Game> game, Player player_id,
+      const GameParameters& bot_params) const = 0;
+};
+
 // A uniform random bot, for test purposes.
 std::unique_ptr<Bot> MakeUniformRandomBot(Player player_id, int seed);
 
@@ -153,12 +167,72 @@ std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
 
 // A bot that samples from a policy.
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
-                                   std::unique_ptr<Policy> policy);
+                                   std::shared_ptr<Policy> policy);
 
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
 std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
     Player player_id, const std::vector<Action>& actions);
+
+#define REGISTER_SPIEL_BOT(info, factory) \
+  BotRegisterer CONCAT(bot, __COUNTER__)(info, std::make_unique<factory>());
+
+class BotRegisterer {
+ public:
+  BotRegisterer(const std::string& bot_name,
+                std::unique_ptr<BotFactory> factory);
+
+  static std::unique_ptr<Bot> CreateByName(const std::string& bot_name,
+                                           std::shared_ptr<const Game> game,
+                                           Player player_id,
+                                           const GameParameters& params);
+  static std::vector<std::string> BotsThatCanPlayGame(const Game& game,
+                                                      Player player_id);
+  static std::vector<std::string> BotsThatCanPlayGame(const Game& game);
+
+  static std::vector<std::string> RegisteredBots();
+  static bool IsBotRegistered(const std::string& bot_name);
+  static void RegisterBot(const std::string& bot_name,
+                          std::unique_ptr<BotFactory> factory);
+
+ private:
+  // Returns a "global" map of registrations (i.e. an object that lives from
+  // initialization to the end of the program). Note that we do not just use
+  // a static data member, as we want the map to be initialized before first
+  // use.
+  static std::map<std::string, std::unique_ptr<BotFactory>>& factories() {
+    static std::map<std::string, std::unique_ptr<BotFactory>> impl;
+    return impl;
+  }
+};
+
+// Returns true if the bot is registered, false otherwise.
+bool IsBotRegistered(const std::string& bot_name);
+
+// Returns a list of registered bots' short names.
+std::vector<std::string> RegisteredBots();
+
+// Returns a list of registered bots' short names that can play specified game
+// for a given player.
+std::vector<std::string> BotsThatCanPlayGame(const Game& game,
+                                             Player player_id);
+
+// Returns a list of registered bots' short names that can play specified game
+// for any player.
+std::vector<std::string> BotsThatCanPlayGame(const Game& game);
+
+// Returns a new bot from the specified string, which is the short
+// name plus optional parameters, e.g.
+// "fixed_action_preference(action_list=0;1;2;3)"
+std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+                             const std::shared_ptr<const Game>& game,
+                             Player player_id);
+
+// Returns a new bot with the specified parameters.
+std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+                             const std::shared_ptr<const Game>& game,
+                             Player player_id,
+                             const GameParameters& bot_params);
 
 }  // namespace open_spiel
 

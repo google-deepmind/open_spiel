@@ -51,8 +51,8 @@ from __future__ import print_function
 
 import collections
 
-from absl import logging
 import enum
+from absl import logging
 import numpy as np
 
 import pyspiel
@@ -150,6 +150,7 @@ class Environment(object):
                discount=1.0,
                chance_event_sampler=None,
                observation_type=None,
+               include_full_state=False,
                **kwargs):
     """Constructor.
 
@@ -160,22 +161,26 @@ class Environment(object):
         to sample chance events.
       observation_type: what kind of observation to use. If not specified, will
         default to INFORMATION_STATE unless the game doesn't provide it.
+      include_full_state: whether or not to include the full serialized
+        OpenSpiel state in the observations (sometimes useful for debugging).
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
+    self._include_full_state = include_full_state
 
-    if isinstance(game, pyspiel.Game):
+    if isinstance(game, str):
+      if kwargs:
+        game_settings = {
+            key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
+        }
+        logging.info("Using game settings: %s", game_settings)
+        self._game = pyspiel.load_game(game, game_settings)
+      else:
+        logging.info("Using game string: %s", game)
+        self._game = pyspiel.load_game(game)
+    else:  # pyspiel.Game or API-compatible object.
       logging.info("Using game instance: %s", game.get_type().short_name)
       self._game = game
-    elif kwargs:
-      game_settings = {
-          key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
-      }
-      logging.info("Using game settings: %s", game_settings)
-      self._game = pyspiel.load_game(game, game_settings)
-    else:
-      logging.info("Using game string: %s", game)
-      self._game = pyspiel.load_game(game)
 
     self._num_players = self._game.num_players()
     self._state = None
@@ -216,7 +221,12 @@ class Environment(object):
           `StepType.FIRST`.
         step_type: A `StepType` value.
     """
-    observations = {"info_state": [], "legal_actions": [], "current_player": []}
+    observations = {
+        "info_state": [],
+        "legal_actions": [],
+        "current_player": [],
+        "serialized_state": []
+    }
     rewards = []
     step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
     self._should_reset = step_type == StepType.LAST
@@ -234,6 +244,10 @@ class Environment(object):
     if step_type == StepType.LAST:
       # When the game is in a terminal state set the discount to 0.
       discounts = [0. for _ in discounts]
+
+    if self._include_full_state:
+      observations["serialized_state"] = pyspiel.serialize_game_and_state(
+          self._game, self._state)
 
     return TimeStep(
         observations=observations,
@@ -297,13 +311,22 @@ class Environment(object):
     self._state = self._game.new_initial_state()
     self._sample_external_events()
 
-    observations = {"info_state": [], "legal_actions": [], "current_player": []}
+    observations = {
+        "info_state": [],
+        "legal_actions": [],
+        "current_player": [],
+        "serialized_state": []
+    }
     for player_id in range(self.num_players):
       observations["info_state"].append(
           self._state.observation_tensor(player_id) if self._use_observation
           else self._state.information_state_tensor(player_id))
       observations["legal_actions"].append(self._state.legal_actions(player_id))
     observations["current_player"] = self._state.current_player()
+
+    if self._include_full_state:
+      observations["serialized_state"] = pyspiel.serialize_game_and_state(
+          self._game, self._state)
 
     return TimeStep(
         observations=observations,
@@ -321,7 +344,8 @@ class Environment(object):
     """Defines the observation per player provided by the environment.
 
     Each dict member will contain its expected structure and shape. E.g.: for
-    Kuhn Poker {"info_state": (6,), "legal_actions": (2,), "current_player": ()}
+    Kuhn Poker {"info_state": (6,), "legal_actions": (2,), "current_player": (),
+                "serialized_state": ()}
 
     Returns:
       A specification dict describing the observation fields and shapes.
@@ -333,6 +357,7 @@ class Environment(object):
         ]),
         legal_actions=(self._game.num_distinct_actions(),),
         current_player=(),
+        serialized_state=(),
     )
 
   def action_spec(self):
@@ -350,6 +375,15 @@ class Environment(object):
         max=self._game.num_distinct_actions() - 1,
         dtype=int,
     )
+
+  # Environment properties
+  @property
+  def use_observation(self):
+    """Returns whether the environment is using the game's observation.
+
+    If false, it is using the game's information state.
+    """
+    return self._use_observation
 
   # Game properties
   @property

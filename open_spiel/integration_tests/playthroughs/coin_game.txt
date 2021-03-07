@@ -18,7 +18,7 @@ GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 5
 PolicyTensorShape() = [5]
-MaxChanceOutcomes() = 0
+MaxChanceOutcomes() = 64
 GetParameters() = {columns=8,episode_length=20,num_coins_per_color=4,num_extra_coin_colors=1,players=2,rows=8}
 NumPlayers() = 2
 MinUtility() = -144.0
@@ -110,7 +110,7 @@ action: 2
 # +--------+
 IsTerminal() = False
 History() = [1, 2]
-HistoryString() = "1 2"
+HistoryString() = "1, 2"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -142,7 +142,7 @@ action: 62
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62]
-HistoryString() = "1 2 62"
+HistoryString() = "1, 2, 62"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -174,7 +174,7 @@ action: 50
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50]
-HistoryString() = "1 2 62 50"
+HistoryString() = "1, 2, 62, 50"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -206,7 +206,7 @@ action: 34
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34]
-HistoryString() = "1 2 62 50 34"
+HistoryString() = "1, 2, 62, 50, 34"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -238,7 +238,7 @@ action: 9
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9]
-HistoryString() = "1 2 62 50 34 9"
+HistoryString() = "1, 2, 62, 50, 34, 9"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -270,7 +270,7 @@ action: 49
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49]
-HistoryString() = "1 2 62 50 34 9 49"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -302,7 +302,7 @@ action: 25
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25]
-HistoryString() = "1 2 62 50 34 9 49 25"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -334,7 +334,7 @@ action: 60
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60]
-HistoryString() = "1 2 62 50 34 9 49 25 60"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -366,7 +366,7 @@ action: 42
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -398,7 +398,7 @@ action: 55
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -430,7 +430,7 @@ action: 19
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -462,7 +462,7 @@ action: 17
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -494,7 +494,7 @@ action: 44
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -526,7 +526,7 @@ action: 35
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -558,7 +558,7 @@ action: 47
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -591,7 +591,7 @@ action: 4
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -624,7 +624,7 @@ action: 0
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -657,7 +657,7 @@ action: 3
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -690,7 +690,7 @@ action: 3
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -723,7 +723,7 @@ action: 2
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -756,7 +756,7 @@ action: 1
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -789,7 +789,7 @@ action: 2
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -822,7 +822,7 @@ action: 1
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -855,7 +855,7 @@ action: 0
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -888,7 +888,7 @@ action: 0
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -921,7 +921,7 @@ action: 4
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -954,7 +954,7 @@ action: 4
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -987,7 +987,7 @@ action: 3
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1020,7 +1020,7 @@ action: 2
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1053,7 +1053,7 @@ action: 1
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1086,7 +1086,7 @@ action: 1
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1119,7 +1119,7 @@ action: 0
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1152,7 +1152,7 @@ action: 2
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0 2"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1185,7 +1185,7 @@ action: 0
 # +--------+
 IsTerminal() = False
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2, 0]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0 2 0"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1218,7 +1218,7 @@ action: 4
 # +--------+
 IsTerminal() = True
 History() = [1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2, 0, 4]
-HistoryString() = "1 2 62 50 34 9 49 25 60 42 55 19 17 44 35 47 4 0 3 3 2 1 2 1 0 0 4 4 3 2 1 1 0 2 0 4"
+HistoryString() = "1, 2, 62, 50, 34, 9, 49, 25, 60, 42, 55, 19, 17, 44, 35, 47, 4, 0, 3, 3, 2, 1, 2, 1, 0, 0, 4, 4, 3, 2, 1, 1, 0, 2, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

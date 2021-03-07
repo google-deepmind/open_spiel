@@ -126,7 +126,7 @@ void ShootTheMoonTest() {
 }
 
 std::string InformationStateTensorToString(Player player,
-                                           const std::vector<double>& tensor) {
+                                           const std::vector<float>& tensor) {
   PassDir pass_dir;
   std::array<absl::optional<Player>, kNumCards> dealt_hand;
   std::array<absl::optional<Player>, kNumCards> current_hand;
@@ -274,8 +274,7 @@ void InformationStateTensorTest(int num_games = 100) {
         state->ApplyAction(action);
       } else {
         auto player = state->CurrentPlayer();
-        std::vector<double> infostate;
-        state->InformationStateTensor(player, &infostate);
+        auto infostate = state->InformationStateTensor(player);
 
         std::string infostate_string = state->InformationStateString(player);
         std::string rebuilt_infostate_string =
@@ -283,7 +282,7 @@ void InformationStateTensorTest(int num_games = 100) {
         SPIEL_CHECK_EQ(infostate_string, rebuilt_infostate_string);
 
         std::vector<open_spiel::Action> actions = state->LegalActions();
-        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
+        std::uniform_int_distribution<> dis(0, actions.size() - 1);
         auto action = actions[dis(rng)];
         state->ApplyAction(action);
       }

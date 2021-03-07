@@ -173,6 +173,7 @@ class DeepCFRSolver(policy.Policy):
     self._reinitialize_advantage_networks = reinitialize_advantage_networks
     self._num_actions = game.num_distinct_actions()
     self._iteration = 1
+    self._environment_steps = 0
 
     # Create required TensorFlow placeholders to perform the Q-network updates.
     self._info_state_ph = tf.placeholder(
@@ -279,6 +280,9 @@ class DeepCFRSolver(policy.Policy):
     policy_loss = self._learn_strategy_network()
     return self._policy_network, advantage_losses, policy_loss
 
+  def get_environment_steps(self):
+    return self._environment_steps
+
   def _traverse_game_tree(self, state, player):
     """Performs a traversal of the game tree.
 
@@ -290,6 +294,7 @@ class DeepCFRSolver(policy.Policy):
     Returns:
       Recursively returns expected payoffs for each action.
     """
+    self._environment_steps += 1
     expected_payoff = collections.defaultdict(float)
     if state.is_terminal():
       # Terminal state get returns.
@@ -305,17 +310,19 @@ class DeepCFRSolver(policy.Policy):
       for action in state.legal_actions():
         expected_payoff[action] = self._traverse_game_tree(
             state.child(action), player)
+      cfv = 0
+      for a_ in state.legal_actions():
+        cfv += strategy[a_] * expected_payoff[a_]
       for action in state.legal_actions():
         sampled_regret[action] = expected_payoff[action]
-        for a_ in state.legal_actions():
-          sampled_regret[action] -= strategy[a_] * expected_payoff[a_]
+        sampled_regret[action] -= cfv
       sampled_regret_arr = [0] * self._num_actions
       for action in sampled_regret:
         sampled_regret_arr[action] = sampled_regret[action]
       self._advantage_memories[player].add(
           AdvantageMemory(state.information_state_tensor(), self._iteration,
                           sampled_regret_arr, action))
-      return max(expected_payoff.values())
+      return cfv
     else:
       other_player = state.current_player()
       _, strategy = self._sample_action_from_advantage(state, other_player)
@@ -341,17 +348,19 @@ class DeepCFRSolver(policy.Policy):
     """
     info_state = state.information_state_tensor(player)
     legal_actions = state.legal_actions(player)
-    advantages = self._session.run(
+    advantages_full = self._session.run(
         self._advantage_outputs[player],
         feed_dict={self._info_state_ph: np.expand_dims(info_state, axis=0)})[0]
-    advantages = [max(0., advantage) for advantage in advantages]
+    advantages = [max(0., advantage) for advantage in advantages_full]
     cumulative_regret = np.sum([advantages[action] for action in legal_actions])
     matched_regrets = np.array([0.] * self._num_actions)
-    for action in legal_actions:
-      if cumulative_regret > 0.:
+
+    if cumulative_regret > 0.:
+      for action in legal_actions:
         matched_regrets[action] = advantages[action] / cumulative_regret
-      else:
-        matched_regrets[action] = 1 / self._num_actions
+    else:
+      matched_regrets[max(legal_actions, key=lambda a: advantages_full[a])] = 1
+
     return advantages, matched_regrets
 
   def action_probabilities(self, state):

@@ -31,14 +31,14 @@ _TIC_TAC_TOE_STATES = [
         # ...
         # xoo
         # ..x
-        "state": "3 4 8 5",
+        "state": "3, 4, 8, 5",
         "legal_actions": (0, 1, 2, 6, 7)
     },
     {
         # xo.
         # oxx
         # o..
-        "state": "4 1 0 3 5 6",
+        "state": "4, 1, 0, 3, 5, 6",
         "legal_actions": (2, 7, 8)
     },
     {
@@ -249,9 +249,7 @@ class TabularPolicyTest(parameterized.TestCase):
   @parameterized.parameters((policy.FirstActionPolicy, "kuhn_poker"),
                             (policy.UniformRandomPolicy, "kuhn_poker"),
                             (policy.FirstActionPolicy, "leduc_poker"),
-                            (policy.UniformRandomPolicy, "leduc_poker"),
-                            (policy.FirstActionPolicy, "liars_dice"),
-                            (policy.UniformRandomPolicy, "liars_dice"))
+                            (policy.UniformRandomPolicy, "leduc_poker"))
   def test_can_turn_policy_into_tabular_policy(self, policy_class, game_name):
     game = pyspiel.load_game(game_name)
     realized_policy = policy_class(game)

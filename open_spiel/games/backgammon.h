@@ -134,7 +134,7 @@ class BackgammonState : public State {
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // Setter function used for debugging and tests. Note: this does not set the
@@ -260,18 +260,21 @@ class BackgammonGame : public Game {
         shared_from_this(), scoring_type_, hyper_backgammon_));
   }
 
-  int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
+  // On the first turn there are 30 outcomes: 15 for each player (rolls without
+  // the doubles).
+  int MaxChanceOutcomes() const override { return 30; }
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
+
+  // Upper bound: chance node per move, with an initial chance node for
+  // determining starting player.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength() + 1; }
 
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return -MaxUtility(); }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override;
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new BackgammonGame(*this));
-  }
 
   std::vector<int> ObservationTensorShape() const override {
     // Encode each point on the board as four doubles:

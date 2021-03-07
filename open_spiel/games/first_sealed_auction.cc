@@ -146,12 +146,12 @@ std::string FPSBAState::InformationStateString(Player player) const {
 }
 
 void FPSBAState::InformationStateTensor(Player player,
-                                        std::vector<double>* values) const {
+                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(2 * max_value_ + num_players_);
-  std::fill(values->begin(), values->end(), 0);
-  auto cursor = values->begin();
+  SPIEL_CHECK_EQ(values.size(), 2 * max_value_ + num_players_);
+  std::fill(values.begin(), values.end(), 0);
+  auto cursor = values.begin();
   cursor[player] = 1;
   cursor += num_players_;
   if (valuations_.size() > player) {
@@ -162,7 +162,7 @@ void FPSBAState::InformationStateTensor(Player player,
     cursor[bids_[player]] = 1;
   }
   cursor += max_value_;
-  SPIEL_CHECK_EQ(cursor - values->begin(), values->size());
+  SPIEL_CHECK_EQ(cursor - values.begin(), values.size());
 }
 
 std::string FPSBAState::ObservationString(Player player) const {
@@ -173,13 +173,13 @@ std::string FPSBAState::ObservationString(Player player) const {
 }
 
 void FPSBAState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
+                                   absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(max_value_);
-  std::fill(values->begin(), values->end(), 0);
+  SPIEL_CHECK_EQ(values.size(), max_value_);
+  std::fill(values.begin(), values.end(), 0);
   if (valuations_.size() > player) {
-    (*values)[valuations_[player] - 1] = 1;
+    values[valuations_[player] - 1] = 1;
   }
 }
 

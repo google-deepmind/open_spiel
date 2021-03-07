@@ -128,10 +128,6 @@ double OpenSpielHanabiGame::MaxUtility() const {
   return game_.NumColors() * game_.NumRanks();
 }
 
-std::shared_ptr<const Game> OpenSpielHanabiGame::Clone() const {
-  return std::shared_ptr<Game>(new OpenSpielHanabiGame(GetParameters()));
-}
-
 std::vector<int> OpenSpielHanabiGame::ObservationTensorShape() const {
   return encoder_.Shape();
 }
@@ -203,15 +199,15 @@ std::string OpenSpielHanabiState::ObservationString(Player player) const {
   return hanabi_learning_env::HanabiObservation(state_, player).ToString();
 }
 
-void OpenSpielHanabiState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void OpenSpielHanabiState::ObservationTensor(Player player,
+                                             absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   auto obs = game_->Encoder().Encode(
       hanabi_learning_env::HanabiObservation(state_, player));
-  values->resize(obs.size());
-  for (int i = 0; i < obs.size(); ++i) values->at(i) = obs[i];
+  SPIEL_CHECK_EQ(values.size(), obs.size());
+  for (int i = 0; i < obs.size(); ++i) values.at(i) = obs[i];
 }
 
 std::unique_ptr<State> OpenSpielHanabiState::Clone() const {

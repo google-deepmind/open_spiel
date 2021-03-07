@@ -22,6 +22,8 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -59,6 +61,112 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
+
+class KuhnObserver : public Observer {
+ public:
+  KuhnObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+        iig_obs_type_(iig_obs_type) {}
+
+  void WriteTensor(const State& observed_state, int player,
+                   Allocator* allocator) const override {
+    const KuhnState& state =
+        open_spiel::down_cast<const KuhnState&>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+    const int num_players = state.num_players_;
+    const int num_cards = num_players + 1;
+
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      {  // Observing player.
+        auto out = allocator->Get("player", {num_players});
+        out.at(player) = 1;
+      }
+      {  // The player's card, if one has been dealt.
+        auto out = allocator->Get("private_card", {num_cards});
+        if (state.history_.size() > player)
+          out.at(state.history_[player].action) = 1;
+      }
+    }
+
+    // Betting sequence.
+    if (iig_obs_type_.public_info) {
+      if (iig_obs_type_.perfect_recall) {
+        auto out = allocator->Get("betting", {2 * num_players - 1, 2});
+        for (int i = num_players; i < state.history_.size(); ++i) {
+          out.at(i - num_players, state.history_[i].action) = 1;
+        }
+      } else {
+        auto out = allocator->Get("pot_contribution", {num_players});
+        for (auto p = Player{0}; p < state.num_players_; p++) {
+          out.at(p) = state.ante_[p];
+        }
+      }
+    }
+  }
+
+  std::string StringFrom(const State& observed_state,
+                         int player) const override {
+    const KuhnState& state =
+        open_spiel::down_cast<const KuhnState&>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+    std::string result;
+
+    // Private card
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      if (iig_obs_type_.perfect_recall || iig_obs_type_.public_info) {
+        if (state.history_.size() > player) {
+          absl::StrAppend(&result, state.history_[player].action);
+        }
+      } else {
+        if (state.history_.size() == 1 + player) {
+          absl::StrAppend(&result, "Received card ",
+                          state.history_[player].action);
+        }
+      }
+    }
+
+    // Betting.
+    // TODO(author11) Make this more self-consistent.
+    if (iig_obs_type_.public_info) {
+      if (iig_obs_type_.perfect_recall) {
+        // Perfect recall public info.
+        for (int i = state.num_players_; i < state.history_.size(); ++i)
+          result.push_back(state.history_[i].action ? 'b' : 'p');
+      } else {
+        // Imperfect recall public info - two different formats.
+        if (iig_obs_type_.private_info == PrivateInfoType::kNone) {
+          if (state.history_.empty()) {
+            absl::StrAppend(&result, kStartOfGamePublicObservation);
+          } else if (state.history_.size() > state.num_players_) {
+            absl::StrAppend(&result,
+                            state.history_.back().action ? "Bet" : "Pass");
+          }
+        } else {
+          if (state.history_.size() > player) {
+            for (auto p = Player{0}; p < state.num_players_; p++) {
+              absl::StrAppend(&result, state.ante_[p]);
+            }
+          }
+        }
+      }
+    }
+
+    // Fact that we're dealing a card.
+    if (iig_obs_type_.public_info &&
+        iig_obs_type_.private_info == PrivateInfoType::kNone &&
+        !state.history_.empty() &&
+        state.history_.size() <= state.num_players_) {
+      int currently_dealing_to_player = state.history_.size() - 1;
+      absl::StrAppend(&result, "Deal to player ", currently_dealing_to_player);
+    }
+    return result;
+  }
+
+ private:
+  IIGObservationType iig_obs_type_;
+};
 
 KuhnState::KuhnState(std::shared_ptr<const Game> game)
     : State(game),
@@ -173,100 +281,28 @@ std::vector<double> KuhnState::Returns() const {
   return returns;
 }
 
-// Information state is card then bets, e.g. 1pb
 std::string KuhnState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  if (history_.size() <= player) return "";
-  std::string str = std::to_string(history_[player].action);
-  for (int i = num_players_; i < history_.size(); ++i)
-    str.push_back(history_[i].action ? 'b' : 'p');
-  return str;
+  const KuhnGame& game = open_spiel::down_cast<const KuhnGame&>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
 }
 
-// Observation is card then contributions to the pot, e.g. 111
 std::string KuhnState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  if (history_.size() <= player) return "";
-  std::string str = std::to_string(history_[player].action);
-
-  // Adding the contribution of each players to the pot. These values are not
-  // between 0 and 1.
-  for (auto p = Player{0}; p < num_players_; p++) {
-    str += std::to_string(ante_[p]);
-  }
-  return str;
-}
-
-std::string KuhnState::PublicObservationString() const {
-  if (history_.empty()) return kStartOfGamePublicObservation;
-  if (history_.size() <= num_players_) {
-    int currently_dealing_to_player = history_.size() - 1;
-    return absl::StrCat("Deal to player ", currently_dealing_to_player);
-  }
-  return history_.back().action ? "Bet" : "Pass";
-}
-
-std::string KuhnState::PrivateObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  // Returns private observation string if available.
-  if (history_.size() - 1 == player) {
-    return absl::StrCat("Received card ", history_[player].action);
-  }
-  return kNothingPrivateObservation;
+  const KuhnGame& game = open_spiel::down_cast<const KuhnGame&>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
 void KuhnState::InformationStateTensor(Player player,
-                                       std::vector<double>* values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  // Initialize the vector with zeroes.
-  values->resize(6 * num_players_ - 1);
-  std::fill(values->begin(), values->end(), 0.);
-
-  // The current player
-  (*values)[player] = 1;
-
-  // The player's card, if one has been dealt.
-  if (history_.size() > player)
-    (*values)[num_players_ + history_[player].action] = 1;
-
-  // Betting sequence.
-  for (int i = num_players_; i < history_.size(); ++i) {
-    (*values)[1 + 2 * i + history_[i].action] = 1;
-  }
+                                       absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const KuhnGame& game = open_spiel::down_cast<const KuhnGame&>(*game_);
+  game.info_state_observer_->WriteTensor(*this, player, &allocator);
 }
 
 void KuhnState::ObservationTensor(Player player,
-                                  std::vector<double>* values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  // The format is described in ObservationTensorShape
-  // The last elements of this vector contain the contribution to the pot of
-  // each player. These values are thus not normalized.
-
-  // Initialize the vector with zeroes.
-  values->resize(3 * num_players_ + 1);
-  std::fill(values->begin(), values->end(), 0.);
-
-  // The current player
-  (*values)[player] = 1;
-
-  // The player's card, if one has been dealt.
-  if (history_.size() > player)
-    (*values)[num_players_ + history_[player].action] = 1;
-
-  int offset = 2 * num_players_ + 1;
-  // Adding the contribution of each players to the pot. These values are not
-  // between 0 and 1.
-  for (auto p = Player{0}; p < num_players_; p++) {
-    (*values)[offset + p] = ante_[p];
-  }
+                                  absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const KuhnGame& game = open_spiel::down_cast<const KuhnGame&>(*game_);
+  game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 
 std::unique_ptr<State> KuhnState::Clone() const {
@@ -338,6 +374,16 @@ KuhnGame::KuhnGame(const GameParameters& params)
     : Game(kGameType, params), num_players_(ParameterValue<int>("players")) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
+  default_observer_ = std::make_shared<KuhnObserver>(kDefaultObsType);
+  info_state_observer_ = std::make_shared<KuhnObserver>(kInfoStateObsType);
+  private_observer_ = std::make_shared<KuhnObserver>(
+      IIGObservationType{.public_info = false,
+                         .perfect_recall = false,
+                         .private_info = PrivateInfoType::kSinglePlayer});
+  public_observer_ = std::make_shared<KuhnObserver>(
+      IIGObservationType{.public_info = true,
+                         .perfect_recall = false,
+                         .private_info = PrivateInfoType::kNone});
 }
 
 std::unique_ptr<State> KuhnGame::NewInitialState() const {
@@ -375,6 +421,25 @@ double KuhnGame::MinUtility() const {
   // In Kuhn, the most any one player can lose is the single chip they paid
   // to play and the single chip they paid to raise/call.
   return -2;
+}
+
+std::shared_ptr<Observer> KuhnGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
+  if (!params.empty()) SpielFatalError("Observation params not supported");
+  return std::make_shared<KuhnObserver>(iig_obs_type.value_or(kDefaultObsType));
+}
+
+TabularPolicy GetAlwaysPassPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<KuhnGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kPass});
+}
+
+TabularPolicy GetAlwaysBetPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<KuhnGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kBet});
 }
 
 }  // namespace kuhn_poker

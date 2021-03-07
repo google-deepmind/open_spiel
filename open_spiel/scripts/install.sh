@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
@@ -79,7 +78,7 @@ fi
 # the OpenSpiel team do not control.
 # Feel free to upgrade the version after having checked it works.
 
-[[ -d "./pybind11" ]] || git clone -b 'v2.2.4' --single-branch --depth 1 https://github.com/pybind/pybind11.git
+[[ -d "./pybind11" ]] || git clone -b 'v2.6.2' --single-branch --depth 1 https://github.com/pybind/pybind11.git
 # The official https://github.com/dds-bridge/dds.git seems to not accept PR,
 # so we have forked it.
 [[ -d open_spiel/games/bridge/double_dummy_solver ]] || \
@@ -87,7 +86,7 @@ fi
   open_spiel/games/bridge/double_dummy_solver
 
 if [[ ! -d open_spiel/abseil-cpp ]]; then
-  git clone -b '20200225.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+  git clone -b '20200923.1' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
 fi
 
 # Optional dependencies.
@@ -119,9 +118,15 @@ fi
 
 # This GitHub repository contains Nathan Sturtevant's state of the art
 # Hearts program xinxin.
-DIR="open_spiel/games/hearts/hearts"
+DIR="open_spiel/bots/xinxin/hearts"
 if [[ ${BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/nathansttt/hearts.git ${DIR}
+fi
+
+# This GitHub repository contains bots from the RoShamBo Programming Competition
+DIR="open_spiel/bots/roshambo/roshambo"
+if [[ ${BUILD_WITH_ROSHAMBO:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'open_spiel' --single-branch --depth 1  https://github.com/jhtschultz/roshambo.git ${DIR}
 fi
 
 # Add libtorch (PyTorch C++ API).
@@ -144,18 +149,29 @@ if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
+# Add OrTools
+# This downloads the precompiled binaries available from the official website.
+# https://developers.google.com/optimization/install/cpp/
+DIR="open_spiel/ortools"
+if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${BUILD_WITH_ORTOOLS_DOWNLOAD_URL}"
+  mkdir "$DIR"
+  tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
+fi
+
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
-  if [[ ! -x `which julia` ]]
+  if [[ ! -x `which julia` ]] || [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]
   then
-    echo -e "\e[33mWarning: julia not in your PATH. Trying \$HOME/.local/bin\e[0m"
-    PATH=${PATH}:${HOME}/.local/bin
+    echo -e "\e[33mWarning: julia not in your PATH or its too old. Trying \$HOME/.local/bin\e[0m"
+    PATH=${HOME}/.local/bin:${PATH}
   fi
 
-  if which julia >/dev/null; then
+  if which julia >/dev/null && [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ] ; then
     JULIA_VERSION_INFO=`julia --version`
     echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
   else
@@ -170,12 +186,12 @@ if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     # Now install Julia
     JULIA_INSTALLER="open_spiel/scripts/jill.sh"
     if [[ ! -f $JULIA_INSTALLER ]]; then
-    curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
-    mv jill.sh $JULIA_INSTALLER
+      curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
+      mv jill.sh $JULIA_INSTALLER
     fi
-    JULIA_VERSION=1.3.1 bash $JULIA_INSTALLER -y
+    JULIA_VERSION=1.6.0-rc1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
-    [[ -x `which julia` ]] || die "julia not found PATH after install."
+    [[ -x `which julia` ]] && [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ] || die "julia not found PATH after install."
   fi
 
   # Install dependencies.
@@ -202,18 +218,27 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo -e "\e[33mSystem wide packages already installed, skipping their installation.\e[0m"
   else
     echo "System wide packages missing. Installing them..."
-    sudo apt-get update
-    sudo apt-get install $EXT_DEPS
+    sudo apt-get -y update
+    sudo apt-get -y install $EXT_DEPS
   fi
 
   if [[ "$TRAVIS" ]]; then
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python${OS_PYTHON_VERSION} 10
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
+  brew search python
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
+  # On Github Actions, macOS 10.15 comes with Python 3.9.
+  # Only 3.8 is supported by Tensorflow 2.2, and only 3.7 currently runs on CI.
+  if [[ "$CI" ]]; then
+    brew install "python@${OS_PYTHON_VERSION}"
+    brew unlink python@3.9
+    brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
+  fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
+  python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
   [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py

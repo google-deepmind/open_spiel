@@ -143,21 +143,24 @@ class UncontestedBiddingState : public State {
   UncontestedBiddingState(std::shared_ptr<const Game> game,
                           std::vector<Contract> reference_contracts,
                           std::function<bool(const Deal&)> deal_filter,
-                          std::vector<Action> actions, int rng_seed)
+                          std::vector<Action> actions, int rng_seed,
+                          int num_redeals)
       : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         deal_filter_(deal_filter),
         rng_(rng_seed),
+        num_redeals_(num_redeals),
         dealt_(false) {}
   UncontestedBiddingState(std::shared_ptr<const Game> game,
                           std::vector<Contract> reference_contracts,
                           const Deal& deal, std::vector<Action> actions,
-                          int rng_seed)
+                          int rng_seed, int num_redeals)
       : State(game),
         reference_contracts_(std::move(reference_contracts)),
         actions_(std::move(actions)),
         rng_(rng_seed),
+        num_redeals_(num_redeals),
         deal_(deal),
         dealt_(true) {
     if (IsTerminal()) ScoreDeal();
@@ -172,7 +175,7 @@ class UncontestedBiddingState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -194,6 +197,7 @@ class UncontestedBiddingState : public State {
   // balanced hand with 20-21 HCP (a 2NT opener - see above).
   std::function<bool(const Deal&)> deal_filter_;
   mutable std::mt19937 rng_;
+  const int num_redeals_;
   mutable Deal deal_;
   bool dealt_;
   double score_;                          // score for the achieved contract
@@ -204,10 +208,11 @@ class UncontestedBiddingGame : public Game {
  public:
   explicit UncontestedBiddingGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumActions; }
+  int MaxChanceOutcomes() const override { return 1; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new UncontestedBiddingState(
+    return absl::make_unique<UncontestedBiddingState>(
         shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
-        ++rng_seed_));
+        ++rng_seed_, num_redeals_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -216,21 +221,22 @@ class UncontestedBiddingGame : public Game {
   double MaxUtility() const override {
     return reference_contracts_.empty() ? kMaxScore : 0;
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new UncontestedBiddingGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {kStateSize};
   }
   int MaxGameLength() const override { return kNumActions; }
+  int MaxChanceNodesInHistory() const override { return 1; }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
+  std::string GetRNGState() const;
+  void SetRNGState(const std::string& rng_state) const;
 
  private:
   std::vector<Contract> reference_contracts_;
   std::vector<Action> forced_actions_;
   std::function<bool(const Deal&)> deal_filter_;
   mutable int rng_seed_;
+  const int num_redeals_;
 };
 
 }  // namespace bridge_uncontested_bidding

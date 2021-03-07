@@ -69,12 +69,9 @@ class CatchState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
-  void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -100,14 +97,8 @@ class CatchGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CatchState(shared_from_this()));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new CatchGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {num_rows_, num_columns_};
-  }
-  std::vector<int> InformationStateTensorShape() const override {
-    return {num_columns_ + kNumActions * num_rows_};
   }
 
   int NumDistinctActions() const override { return kNumActions; }
@@ -116,6 +107,8 @@ class CatchGame : public Game {
   double MaxUtility() const override { return 1; }
   double MinUtility() const override { return -1; }
   int MaxGameLength() const override { return num_rows_; }
+  // There is only initial chance.
+  int MaxChanceNodesInHistory() const override { return 1; }
   int NumRows() const { return num_rows_; }
   int NumColumns() const { return num_columns_; }
 

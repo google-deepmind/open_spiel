@@ -89,7 +89,7 @@ action: 5
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5]
-HistoryString() = "2 5"
+HistoryString() = "2, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -114,7 +114,7 @@ action: 2
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2]
-HistoryString() = "2 5 2"
+HistoryString() = "2, 5, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -139,7 +139,7 @@ action: 1
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1]
-HistoryString() = "2 5 2 1"
+HistoryString() = "2, 5, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -164,7 +164,7 @@ action: 1
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1]
-HistoryString() = "2 5 2 1 1"
+HistoryString() = "2, 5, 2, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -189,7 +189,7 @@ action: 2
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2]
-HistoryString() = "2 5 2 1 1 2"
+HistoryString() = "2, 5, 2, 1, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -214,7 +214,7 @@ action: 2
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2]
-HistoryString() = "2 5 2 1 1 2 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -239,7 +239,7 @@ action: 3
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3]
-HistoryString() = "2 5 2 1 1 2 2 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -264,7 +264,7 @@ action: 5
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -289,7 +289,7 @@ action: 4
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -314,7 +314,7 @@ action: 2
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -339,7 +339,7 @@ action: 3
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -364,7 +364,7 @@ action: 3
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -389,7 +389,7 @@ action: 4
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -414,7 +414,7 @@ action: 0
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -439,7 +439,7 @@ action: 1
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -464,7 +464,7 @@ action: 3
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -489,7 +489,7 @@ action: 0
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -514,7 +514,7 @@ action: 2
 # Player 0 score = 0
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -539,7 +539,7 @@ action: 2
 # Player 0 score = 0 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -564,7 +564,7 @@ action: 4
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -589,7 +589,7 @@ action: 2
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -614,7 +614,7 @@ action: 2
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -639,7 +639,7 @@ action: 4
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -664,7 +664,7 @@ action: 3
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -689,7 +689,7 @@ action: 3
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -714,7 +714,7 @@ action: 0
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -739,7 +739,7 @@ action: 4
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -764,7 +764,7 @@ action: 5
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -789,7 +789,7 @@ action: 1
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -814,7 +814,7 @@ action: 0
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -839,7 +839,7 @@ action: 4
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -864,7 +864,7 @@ action: 4
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -889,7 +889,7 @@ action: 0
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -914,7 +914,7 @@ action: 5
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -939,7 +939,7 @@ action: 1
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -964,7 +964,7 @@ action: 1
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -989,7 +989,7 @@ action: 4
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1014,7 +1014,7 @@ action: 0
 # Player 0 score = 5
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1039,7 +1039,7 @@ action: 3
 # Player 0 score = 5 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1064,7 +1064,7 @@ action: 3
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1089,7 +1089,7 @@ action: 4
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1114,7 +1114,7 @@ action: 1
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1139,7 +1139,7 @@ action: 5
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1164,7 +1164,7 @@ action: 3
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1189,7 +1189,7 @@ action: 2
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1214,7 +1214,7 @@ action: 0
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1239,7 +1239,7 @@ action: 3
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1264,7 +1264,7 @@ action: 5
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1289,7 +1289,7 @@ action: 5
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1314,7 +1314,7 @@ action: 1
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1339,7 +1339,7 @@ action: 1
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1364,7 +1364,7 @@ action: 3
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1389,7 +1389,7 @@ action: 2
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1414,7 +1414,7 @@ action: 2
 # Player 0 score = 10
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1439,7 +1439,7 @@ action: 3
 # Player 0 score = 10 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1464,7 +1464,7 @@ action: 5
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1489,7 +1489,7 @@ action: 5
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1514,7 +1514,7 @@ action: 4
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1539,7 +1539,7 @@ action: 5
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1564,7 +1564,7 @@ action: 3
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1589,7 +1589,7 @@ action: 3
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1614,7 +1614,7 @@ action: 1
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1639,7 +1639,7 @@ action: 4
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1664,7 +1664,7 @@ action: 3
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1689,7 +1689,7 @@ action: 1
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1714,7 +1714,7 @@ action: 5
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1739,7 +1739,7 @@ action: 1
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1764,7 +1764,7 @@ action: 4
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1789,7 +1789,7 @@ action: 3
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1814,7 +1814,7 @@ action: 1
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1839,7 +1839,7 @@ action: 5
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1864,7 +1864,7 @@ action: 2
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1889,7 +1889,7 @@ action: 1
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1914,7 +1914,7 @@ action: 5
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1939,7 +1939,7 @@ action: 1
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1964,7 +1964,7 @@ action: 3
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1989,7 +1989,7 @@ action: 2
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2014,7 +2014,7 @@ action: 2
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2039,7 +2039,7 @@ action: 5
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2064,7 +2064,7 @@ action: 4
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2089,7 +2089,7 @@ action: 4
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2114,7 +2114,7 @@ action: 3
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2139,7 +2139,7 @@ action: 3
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2164,7 +2164,7 @@ action: 1
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2189,7 +2189,7 @@ action: 0
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2214,7 +2214,7 @@ action: 4
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2239,7 +2239,7 @@ action: 0
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2264,7 +2264,7 @@ action: 2
 # Player 0 score = 14
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2289,7 +2289,7 @@ action: 1
 # Player 0 score = 14 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2314,7 +2314,7 @@ action: 5
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2339,7 +2339,7 @@ action: 0
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2364,7 +2364,7 @@ action: 3
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2389,7 +2389,7 @@ action: 4
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2414,7 +2414,7 @@ action: 5
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2439,7 +2439,7 @@ action: 5
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2464,7 +2464,7 @@ action: 1
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2489,7 +2489,7 @@ action: 1
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2514,7 +2514,7 @@ action: 0
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2539,7 +2539,7 @@ action: 0
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2564,7 +2564,7 @@ action: 4
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2589,7 +2589,7 @@ action: 2
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2614,7 +2614,7 @@ action: 2
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2639,7 +2639,7 @@ action: 4
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2664,7 +2664,7 @@ action: 0
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2689,7 +2689,7 @@ action: 5
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2714,7 +2714,7 @@ action: 3
 # Player 0 score = 17
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2739,7 +2739,7 @@ action: 3
 # Player 0 score = 17 [PLAYING]
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -2764,7 +2764,7 @@ action: 5
 # Player 0 score = 19
 IsTerminal() = False
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -2790,7 +2790,7 @@ action: 5
 # Player 0 score = 21
 IsTerminal() = True
 History() = [2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5]
-HistoryString() = "2 5 2 1 1 2 2 3 5 4 2 3 3 4 0 1 3 0 2 2 4 2 2 4 3 3 0 4 5 1 0 4 4 0 5 1 1 4 0 3 3 4 1 5 3 2 0 3 5 5 1 1 3 2 2 3 5 5 4 5 3 3 1 4 3 1 5 1 4 3 1 5 2 1 5 1 3 2 2 5 4 4 3 3 1 0 4 0 2 1 5 0 3 4 5 5 1 1 0 0 4 2 2 4 0 5 3 3 5 5"
+HistoryString() = "2, 5, 2, 1, 1, 2, 2, 3, 5, 4, 2, 3, 3, 4, 0, 1, 3, 0, 2, 2, 4, 2, 2, 4, 3, 3, 0, 4, 5, 1, 0, 4, 4, 0, 5, 1, 1, 4, 0, 3, 3, 4, 1, 5, 3, 2, 0, 3, 5, 5, 1, 1, 3, 2, 2, 3, 5, 5, 4, 5, 3, 3, 1, 4, 3, 1, 5, 1, 4, 3, 1, 5, 2, 1, 5, 1, 3, 2, 2, 5, 4, 4, 3, 3, 1, 0, 4, 0, 2, 1, 5, 0, 3, 4, 5, 5, 1, 1, 0, 0, 4, 2, 2, 4, 0, 5, 3, 3, 5, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

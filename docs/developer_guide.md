@@ -14,7 +14,7 @@ Some top level directories are special:
 For example, we have for C++:
 
 *   `open_spiel/`: Contains the game abstract C++ API.
-*   `open_spiel/games`: Contains the games ++ implementations.
+*   `open_spiel/games`: Contains the games C++ implementations.
 *   `open_spiel/algorithms`: The C++ algorithms implemented in OpenSpiel.
 *   `open_spiel/examples`: The C++ examples.
 *   `open_spiel/tests`: The C++ common test utilities.
@@ -24,7 +24,7 @@ For Python you have:
 *   `open_spiel/python/examples`: The Python examples.
 *   `open_spiel/python/algorithms/`: The Python algorithms.
 
-## CPP and Python implementations.
+## C++ and Python implementations.
 
 Some objects (e.g. `Policy`, `CFRSolver`, `BestResponse`) are available both in
 C++ and Python. The goal is to be able to use C++ objects in place of Python
@@ -71,10 +71,13 @@ ideal to first be aware of the general API (see `spiel.h`).
 8.  Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
 9.  Update Python integration tests:
-    *   Run `./scripts/generate_new_playthrough.sh new_game` to generate some
-        random games, to be used by integration tests to prevent any regression.
-        `open_spiel/integration_tests/playthrough_test.py` will automatically
-        load the playthroughs and compare them to newly generated playthroughs.
+    *   Run `./open_spiel/scripts/generate_new_playthrough.sh new_game` to
+        generate a random game, to be used by integration tests to prevent any
+        regression. `open_spiel/integration_tests/playthrough_test.py` will
+        automatically load the playthroughs and compare them to newly generated
+        playthroughs.
+    *   If you have made a change that affects playthroughs, run
+        `./scripts/regenerate_playthroughs.sh` to update them.
 
 ## Conditional dependencies
 
@@ -103,3 +106,11 @@ When you add a new conditional dependency, you need to touch:
 -   change `install.sh` to make sure the dependency is installed
 -   use constructs like `if (${BUILD_WITH_HANABI})` in CMake to optionally add
     the targets to build.
+
+## Debugging tools
+
+For complex games it may be tricky to get all the details right. Reading through
+the playthrough You can visualize small game trees using
+[open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py) or for large
+games there is an interactive viewer for OpenSpiel games called
+[SpielViz](https://github.com/michalsustr/spielviz).

@@ -14,7 +14,6 @@
 
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -23,6 +22,7 @@
 #include <ostream>
 #include <sstream>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -30,11 +30,12 @@ namespace open_spiel {
 namespace universal_poker {
 namespace acpc_cpp {
 
-static const int STRING_BUFFERSIZE = 4096;
+constexpr int kStringBuffersize = 4096;
 
 namespace {
-RawACPCAction GetAction(ACPCState::ACPCActionType type, int32_t size) {
-  RawACPCAction acpc_action;
+project_acpc_server::Action GetAction(ACPCState::ACPCActionType type,
+                                      int32_t size) {
+  project_acpc_server::Action acpc_action;
 
   acpc_action.size = size;
   switch (type) {
@@ -54,14 +55,14 @@ RawACPCAction GetAction(ACPCState::ACPCActionType type, int32_t size) {
   return acpc_action;
 }
 
-void readGameToStruct(const std::string &gameDef, RawACPCGame *acpc_game) {
-  char buf[STRING_BUFFERSIZE];
-  gameDef.copy(buf, STRING_BUFFERSIZE);
+void readGameToStruct(const std::string &gameDef,
+                      project_acpc_server::Game *acpc_game) {
+  char buf[kStringBuffersize];
+  gameDef.copy(buf, kStringBuffersize);
 
-  FILE *f = fmemopen(&buf, STRING_BUFFERSIZE, "r");
+  FILE *f = fmemopen(&buf, kStringBuffersize, "r");
   project_acpc_server::Game *game = project_acpc_server::readGame(f);
-
-  memcpy(acpc_game, game, sizeof(RawACPCGame));
+  memcpy(acpc_game, game, sizeof(project_acpc_server::Game));
 
   free(game);
   fclose(f);
@@ -69,15 +70,12 @@ void readGameToStruct(const std::string &gameDef, RawACPCGame *acpc_game) {
 
 }  // namespace
 
-ACPCGame::ACPCGame(const std::string &gameDef)
-    // check this make unique.
-    : handId_(0), acpc_game_(std::make_unique<RawACPCGame>()) {
-  readGameToStruct(gameDef, acpc_game_.get());
+ACPCGame::ACPCGame(const std::string &gameDef) {
+  readGameToStruct(gameDef, &acpc_game_);
 }
 
 ACPCGame::ACPCGame(const ACPCGame &other)
-    : handId_(other.handId_),
-      acpc_game_(std::make_unique<RawACPCGame>(*other.acpc_game_)) {}
+    : handId_(other.handId_), acpc_game_(other.acpc_game_) {}
 
 // We compare the values for all the fields. For arrays, note that only the
 // first `numPlayers` or `numRounds` values are meaningful, the rest being
@@ -96,217 +94,198 @@ bool ACPCGame::operator==(const ACPCGame &other) const {
   // uint8_t numRanks;
   // uint8_t numHoleCards;
   // uint8_t numBoardCards[ MAX_ROUNDS ];
-  const RawACPCGame *first = acpc_game_.get();
-  const RawACPCGame *second = other.acpc_game_.get();
+  const project_acpc_server::Game *first = &acpc_game_;
+  const project_acpc_server::Game &second = other.Game();
   const int num_players = first->numPlayers;
   const int num_rounds = first->numRounds;
 
   // We check for `raiseSize` only for limit betting.
-  if (first->bettingType != second->bettingType) {
+  if (first->bettingType != second.bettingType) {
     return false;
   }
   if (first->bettingType == project_acpc_server::limitBetting) {
     if (!std::equal(first->raiseSize, first->raiseSize + num_rounds,
-                 second->raiseSize)) {
+                    second.raiseSize)) {
       return false;
     }
   }
   return (  // new line
-      first->numPlayers == second->numPlayers &&
-      first->numRounds == second->numRounds &&
-      std::equal(first->stack, first->stack + num_players, second->stack) &&
-      std::equal(first->blind, first->blind + num_players, second->blind) &&
+      first->numPlayers == second.numPlayers &&
+      first->numRounds == second.numRounds &&
+      std::equal(first->stack, first->stack + num_players, second.stack) &&
+      std::equal(first->blind, first->blind + num_players, second.blind) &&
       std::equal(first->firstPlayer, first->firstPlayer + num_rounds,
-                 second->firstPlayer) &&
+                 second.firstPlayer) &&
       std::equal(first->maxRaises, first->maxRaises + num_rounds,
-                 second->maxRaises) &&
-      first->numSuits == second->numSuits &&
-      first->numRanks == second->numRanks &&
-      first->numHoleCards == second->numHoleCards &&
+                 second.maxRaises) &&
+      first->numSuits == second.numSuits &&
+      first->numRanks == second.numRanks &&
+      first->numHoleCards == second.numHoleCards &&
       std::equal(first->numBoardCards, first->numBoardCards + num_rounds,
-                 second->numBoardCards));
+                 second.numBoardCards));
 }
 
 std::string ACPCGame::ToString() const {
-  char buf[STRING_BUFFERSIZE];
-  memset(buf, 0, STRING_BUFFERSIZE);
-  FILE *f = fmemopen(&buf, STRING_BUFFERSIZE, "w");
-  project_acpc_server::printGame(f, acpc_game_.get());
+  char buf[kStringBuffersize];
+  memset(buf, 0, kStringBuffersize);
+  FILE *f = fmemopen(&buf, kStringBuffersize, "w");
+  project_acpc_server::printGame(f, &acpc_game_);
   std::ostringstream result;
   rewind(f);
   result << buf;
   fclose(f);
-
   return result.str();
 }
 
-bool ACPCGame::IsLimitGame() const {
-  return acpc_game_->bettingType == project_acpc_server::limitBetting;
-}
-
-int ACPCGame::GetNbPlayers() const { return acpc_game_->numPlayers; }
-
-uint8_t ACPCGame::GetNbHoleCardsRequired() const {
-  return acpc_game_->numHoleCards;
-}
-
 uint8_t ACPCGame::GetNbBoardCardsRequired(uint8_t round) const {
-  SPIEL_CHECK_LT(round, acpc_game_->numRounds);
+  SPIEL_CHECK_LT(round, acpc_game_.numRounds);
 
   uint8_t nbCards = 0;
   for (int r = 0; r <= round; ++r) {
-    nbCards += acpc_game_->numBoardCards[r];
+    nbCards += acpc_game_.numBoardCards[r];
   }
   return nbCards;
 }
 
 uint8_t ACPCGame::GetTotalNbBoardCards() const {
   uint8_t nbCards = 0;
-  for (int r = 0; r < acpc_game_->numRounds; ++r) {
-    nbCards += acpc_game_->numBoardCards[r];
+  for (int r = 0; r < acpc_game_.numRounds; ++r) {
+    nbCards += acpc_game_.numBoardCards[r];
   }
 
   return nbCards;
 }
 
-uint8_t ACPCGame::NumSuitsDeck() const { return acpc_game_->numSuits; }
-
-uint8_t ACPCGame::NumRanksDeck() const { return acpc_game_->numRanks; }
 
 uint32_t ACPCGame::StackSize(uint8_t player) const {
   SPIEL_CHECK_LE(0, player);
-  SPIEL_CHECK_LT(player, acpc_game_->numPlayers);
-  return acpc_game_->stack[player];
+  SPIEL_CHECK_LT(player, GetNbPlayers());
+  return acpc_game_.stack[player];
 }
-
-int ACPCGame::NumRounds() const { return acpc_game_->numRounds; }
 
 uint32_t ACPCGame::BlindSize(uint8_t player) const {
   SPIEL_CHECK_LE(0, player);
-  SPIEL_CHECK_LT(player, acpc_game_->numPlayers);
-  return acpc_game_->blind[player];
+  SPIEL_CHECK_LT(player, GetNbPlayers());
+  return acpc_game_.blind[player];
 }
 
 std::string ACPCState::ToString() const {
-  char buf[STRING_BUFFERSIZE];
-  project_acpc_server::printState(game_->acpc_game_.get(), acpcState_.get(),
-                                  STRING_BUFFERSIZE, buf);
+  char buf[kStringBuffersize];
+  project_acpc_server::printState(game_->MutableGame(), &acpcState_,
+                                  kStringBuffersize, buf);
   std::ostringstream out;
 
   out << buf << std::endl << "Spent: [";
-  for (int p = 0; p < game_->acpc_game_->numPlayers; ++p) {
-    out << "P" << p << ": " << acpcState_->spent[p] << "  ";
+  for (int p = 0; p < game_->GetNbPlayers(); ++p) {
+    out << "P" << p << ": " << acpcState_.spent[p] << "  ";
   }
   out << "]" << std::endl;
 
   return out.str();
 }
 
-int ACPCState::RaiseIsValid(int32_t *minSize, int32_t *maxSize) const {
-  return raiseIsValid(game_->acpc_game_.get(), acpcState_.get(), minSize,
-                      maxSize);
-}
 
 double ACPCState::ValueOfState(const uint8_t player) const {
-  assert(stateFinished(acpcState_.get()));
-  return project_acpc_server::valueOfState(game_->acpc_game_.get(),
-                                           acpcState_.get(), player);
+  SPIEL_CHECK_TRUE(stateFinished(&acpcState_));
+  return project_acpc_server::valueOfState(game_->MutableGame(), &acpcState_,
+                                           player);
+}
+int ACPCState::RaiseIsValid(int32_t *minSize, int32_t *maxSize) const {
+  return raiseIsValid(game_->MutableGame(), &acpcState_, minSize, maxSize);
 }
 
-bool ACPCState::IsFinished() const { return stateFinished(acpcState_.get()); }
-
-uint32_t ACPCState::MaxSpend() const { return acpcState_->maxSpent; }
-
-int ACPCState::GetRound() const { return acpcState_->round; }
-
 uint8_t ACPCState::NumFolded() const {
-  return project_acpc_server::numFolded(game_->acpc_game_.get(),
-                                        acpcState_.get());
+  return project_acpc_server::numFolded(game_->MutableGame(), &acpcState_);
 }
 
 uint8_t ACPCState::CurrentPlayer() const {
-  return project_acpc_server::currentPlayer(game_->acpc_game_.get(),
-                                            acpcState_.get());
+  return project_acpc_server::currentPlayer(game_->MutableGame(), &acpcState_);
 }
 
 ACPCState::ACPCState(const ACPCGame *game)
-    : game_(game), acpcState_(std::make_unique<RawACPCState>()) {
-  project_acpc_server::initState(
-      game_->acpc_game_.get(),
-      game_->handId_ /*TODO this make a unit test fail++*/, acpcState_.get());
+    // This is necessary as we need to value-initialize acpcState_.
+    : game_(game), acpcState_() {
+  project_acpc_server::initState(game_->MutableGame(),
+                                 game_->HandId()
+                                 /*TODO this make a unit test fail++*/,
+                                 &acpcState_);
 }
-
-ACPCState::ACPCState(const ACPCState &other)
-    : game_(other.game_),
-      acpcState_(std::make_unique<RawACPCState>(*other.acpcState_)) {}
 
 void ACPCState::DoAction(const ACPCState::ACPCActionType actionType,
                          const int32_t size) {
-  RawACPCAction a = GetAction(actionType, size);
-  assert(project_acpc_server::isValidAction(game_->acpc_game_.get(),
-                                            acpcState_.get(), false, &a));
-  project_acpc_server::doAction(game_->acpc_game_.get(), &a, acpcState_.get());
+  project_acpc_server::Action a = GetAction(actionType, size);
+  SPIEL_CHECK_TRUE(project_acpc_server::isValidAction(game_->MutableGame(),
+                                                      &acpcState_, false, &a));
+  project_acpc_server::doAction(game_->MutableGame(), &a, &acpcState_);
 }
 
 int ACPCState::IsValidAction(const ACPCState::ACPCActionType actionType,
                              const int32_t size) const {
-  RawACPCAction a = GetAction(actionType, size);
-  return project_acpc_server::isValidAction(game_->acpc_game_.get(),
-                                            acpcState_.get(), false, &a);
+  project_acpc_server::Action a = GetAction(actionType, size);
+  return project_acpc_server::isValidAction(game_->MutableGame(), &acpcState_,
+                                            false, &a);
 }
 
 uint32_t ACPCState::Money(const uint8_t player) const {
-  assert(player < game_->acpc_game_->numPlayers);
-  return game_->acpc_game_->stack[player] - acpcState_->spent[player];
+  SPIEL_CHECK_LE(player, game_->GetNbPlayers());
+  return game_->StackSize(player) - acpcState_.spent[player];
 }
 
 uint32_t ACPCState::Ante(const uint8_t player) const {
-  assert(player < game_->acpc_game_->numPlayers);
-  return acpcState_->spent[player];
+  SPIEL_CHECK_LE(player, game_->GetNbPlayers());
+  return acpcState_.spent[player];
 }
 
 uint32_t ACPCState::TotalSpent() const {
-  return static_cast<uint32_t>(std::accumulate(std::begin(acpcState_->spent),
-                                               std::end(acpcState_->spent), 0));
+  return static_cast<uint32_t>(absl::c_accumulate(acpcState_.spent, 0));
 }
 
 uint32_t ACPCState::CurrentSpent(const uint8_t player) const {
-  assert(player < game_->acpc_game_->numPlayers);
-  return acpcState_->spent[player];
+  SPIEL_CHECK_LE(player, game_->GetNbPlayers());
+  return acpcState_.spent[player];
+}
+
+std::string ACPCState::ActionToString(
+    const project_acpc_server::Action &action) const {
+  switch (action.type) {
+    case ACPCState::ACPC_CALL:
+      return "c";
+    case ACPCState::ACPC_FOLD:
+      return "f";
+    case ACPCState::ACPC_RAISE:
+      if (game_->IsLimitGame()) return "r";
+      return absl::StrCat("r", action.size);
+    default:
+      SpielFatalError("Should never happen.");
+  }
 }
 
 std::string ACPCState::BettingSequence(uint8_t round) const {
-  assert(round < game_->acpc_game_->numRounds);
-  std::ostringstream out;
-  char buf[10];
-  for (int a = 0; a < acpcState_->numActions[round]; a++) {
-    project_acpc_server::Action *action = &acpcState_->action[round][a];
-    printAction(game_->acpc_game_.get(), action, 10, buf);
-    out << buf;
+  SPIEL_CHECK_LT(round, game_->NumRounds());
+  std::string out;
+  for (int a = 0; a < acpcState_.numActions[round]; a++) {
+    absl::StrAppend(&out, ActionToString(acpcState_.action[round][a]));
   }
-
-  return out.str();
+  return out;
 }
 
 void ACPCState::SetHoleAndBoardCards(uint8_t holeCards[10][3],
                                      uint8_t boardCards[7],
                                      uint8_t nbHoleCards[10],
-                                     uint8_t nbBoardCards) const {
+                                     uint8_t nbBoardCards) {
   for (int p = 0; p < game_->GetNbPlayers(); ++p) {
-    assert(nbHoleCards[p] == game_->GetNbHoleCardsRequired());
+    SPIEL_CHECK_EQ(nbHoleCards[p], game_->GetNbHoleCardsRequired());
     for (int c = 0; c < nbHoleCards[p]; ++c) {
-      acpcState_->holeCards[p][c] = holeCards[p][c];
+      acpcState_.holeCards[p][c] = holeCards[p][c];
     }
   }
 
-  assert(nbBoardCards == game_->GetNbBoardCardsRequired(GetRound()));
+  SPIEL_CHECK_EQ(nbBoardCards, game_->GetNbBoardCardsRequired(GetRound()));
   for (int c = 0; c < nbBoardCards; ++c) {
-    acpcState_->boardCards[c] = boardCards[c];
+    acpcState_.boardCards[c] = boardCards[c];
   }
 }
 
-ACPCState::~ACPCState() = default;
-ACPCGame::~ACPCGame() = default;
 }  // namespace acpc_cpp
 }  // namespace universal_poker
 }  // namespace open_spiel

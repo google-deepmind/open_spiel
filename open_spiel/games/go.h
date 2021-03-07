@@ -87,8 +87,7 @@ class GoState : public State {
 
   // Four planes: black, white, empty, and a bias plane of bits indicating komi
   // (whether white is to play).
-  void ObservationTensor(int player,
-                         std::vector<double>* values) const override;
+  void ObservationTensor(int player, absl::Span<float> values) const override;
 
   std::vector<double> Returns() const override;
 
@@ -153,9 +152,6 @@ class GoGame : public Game {
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return LossUtility() + WinUtility(); }
   double MaxUtility() const override { return WinUtility(); }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new GoGame(*this));
-  }
 
   int MaxGameLength() const override { return max_game_length_; }
 

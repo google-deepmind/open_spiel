@@ -87,10 +87,9 @@ class TinyHanabiGame : public Game {
   double MinUtility() const override { return payoff_.MinUtility(); }
   double MaxUtility() const override { return payoff_.MaxUtility(); }
   int MaxGameLength() const override { return payoff_.NumPlayers(); }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return payoff_.NumChance(); }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new TinyHanabiGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {payoff_.NumChance() + payoff_.NumActions() * payoff_.NumPlayers()};
   }
@@ -119,10 +118,10 @@ class TinyHanabiState : public State {
   std::vector<Action> LegalActions() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
 
  private:
   void DoApplyAction(Action action) override;

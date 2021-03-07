@@ -1,7 +1,61 @@
 # Installation
 
+## Python-only installation via pip
+
+If you plan to only use the Python API, then the easiest way to install
+OpenSpiel is to use pip. As only source distribution is currently supported,
+CMake, Clang and Python 3 development files are required to build the Python
+extension.
+
+E.g. on Ubuntu or Debian:
+
+```bash
+# Check to see if you have the necessary tools for building OpenSpiel:
+cmake --version        # Must be >= 3.12
+clang++ --version      # Must be >= 7.0.0
+python3-config --help
+
+# If not, run this line to install them.
+# On older Linux distros, the package might be called clang-9 or clang-10
+sudo apt-get install cmake clang python3-dev
+
+# On older Linux distros, the versions may be too old.
+# E.g. on Ubuntu 18.04, there are a few extra steps:
+# sudo apt-get install clang-10
+# pip3 install cmake  # You might need to relogin to get the new CMake version
+# export CXX=clang++-10
+
+# Recommended: Install pip dependencies and run under virtualenv.
+sudo apt-get install virtualenv python3-virtualenv
+virtualenv -p python3 venv
+source venv/bin/activate
+
+# Finally, install OpenSpiel and its dependencies:
+pip3 install --upgrade setuptools pip
+pip3 install open_spiel
+
+# To exit the virtual env
+deactivate
+
+## **IMPORTANT NOTE**. If the build fails, please first make sure you have the
+## required versions of the tools above and that you followed the recommended
+## option. Then, open an issue: https://github.com/deepmind/open_spiel/issues
+```
+
+Note that the build could take several minutes.
+
+On MacOS, you can install the dependencies via `brew install cmake python3`. For
+clang, you need to install or upgrade XCode and install the command-line
+developer tools.
+
+## Installation from Source
+
 The instructions here are for Linux and MacOS. For installation on Windows, see
-[these separate installation instructions](windows.md).
+[these separate installation instructions](windows.md). On Linux, we recommend
+Ubuntu 20.04 (or 19.10), Debian 10, or later versions. There are
+[known issues](https://github.com/deepmind/open_spiel/issues/407) with default
+compilers on Ubuntu on 18.04, and `clang-10` must be installed separately. On
+MacOS, we recommend XCode 11 or newer.
 
 Currently there are two installation methods:
 
@@ -92,13 +146,13 @@ Linux versions).
 Option 1 (Basic, 3.13GB):
 
 ```bash
-docker build --target base -t openspiel . --rm
+docker build --target base -t openspiel -f Dockerfile.base --rm
 ```
 
 Option 2 (Slim, 2.26GB):
 
 ```bash
-docker build --target python-slim -t openspiel . --rm
+docker build --target python-slim -t openspiel -f Dockerfile.base --rm
 ```
 
 If you are only interested in developing in Python, use the second image. You
@@ -114,6 +168,18 @@ Finally you can run examples using:
 docker run openspiel python3 python/examples/matrix_game_example.py
 docker run openspiel python3 python/examples/example.py
 ```
+
+
+Option 3 (Jupyter Notebook):
+
+Installs OpenSpiel with an additional Jupyter Notebook environment.
+
+```bash
+docker build -t openspiel-notebook -f Dockerfile.jupyter --rm
+docker run -it --rm -p 8888:8888 openspiel-notebook
+```
+
+_More info_: https://jupyter-docker-stacks.readthedocs.io/en/latest/
 
 ## Running the first examples
 
@@ -182,18 +248,14 @@ Build and run tests (Python 3):
 ```bash
 mkdir build
 cd build
-CXX=clang++ cmake -DPython_TARGET_VERSION=3.6 -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
+CXX=clang++ cmake -DPython3_EXECUTABLE=$(which python3) -DCMAKE_CXX_COMPILER=${CXX} ../open_spiel
 make -j$(nproc)
 ctest -j$(nproc)
 ```
 
-The CMake variable `Python_TARGET_VERSION` is used to specify a Python version.
-Any Python library found with CMake modules FindPython2/FindPython3 that agrees
-with the major version and is at least as high for minor version and patch
-number is accepted. If the variable is not set, the FindPython module is used:
-it builds for Python 3 if both Python 2 and Python 3 are available. In the two
-examples above, CMake will search for Python 2 and accept any version >= 2.7 or
-search for Python 3 and accept any version >= 3.6.
+The CMake variable `Python3_EXECUTABLE` is used to specify the Python
+interpreter. If the variable is not set, CMake's FindPython3 module will prefer
+the latest version installed. Note, Python >= 3.6.0 is required.
 
 One can run an example of a game running (in the `build/` folder):
 

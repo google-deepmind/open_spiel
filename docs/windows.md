@@ -71,20 +71,14 @@ This process has been written for Windows 10, and tested on Windows 10 build
     ```bash
     mkdir build
     cd build
-    # Note: Python version installed should be >= Python_TARGET_VERSION specified here
-    CXX=g++ cmake -DPython_TARGET_VERSION=3.6 -DCMAKE_CXX_COMPILER=g++ ../open_spiel
+    CXX=clang++ cmake -DPython3_EXECUTABLE=$(which python3) -DCMAKE_CXX_COMPILER=clang++ ../open_spiel
     make -j12 # The 12 here is the number of parallel processes used to build
     ctest -j12 # Run the tests to verify that the installation succeeded
     ```
 
-    The CMake variable `Python_TARGET_VERSION` is used to specify a Python
-    version. Any Python library found with CMake modules FindPython2/FindPython3
-    that agrees with the major version and is at least as high for minor version
-    and patch number is accepted. If the variable is not set, the FindPython
-    module is used: it builds for Python 3 if both Python 2 and Python 3 are
-    available. In the two examples above, CMake will search for Python 2 and
-    accept any version >= 2.7 or search for Python 3 and accept any version >=
-    3.6.
+    The CMake variable `Python3_EXECUTABLE` is used to specify the Python
+    interpreter. If the variable is not set, CMake's FindPython3 module will
+    prefer the latest version installed. Note, Python >= 3.6.0 is required.
 
     One can run an example of a game running (in the `build/` folder):
 

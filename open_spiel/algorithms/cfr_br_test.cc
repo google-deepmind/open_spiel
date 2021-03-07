@@ -40,7 +40,7 @@ void CFRBRTest_KuhnPoker() {
   for (int i = 0; i < 300; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   // 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
   CheckNashValues(*game, *average_policy, -1.0 / 18, 0.001);
   SPIEL_CHECK_LE(Exploitability(*game, *average_policy), 0.05);
@@ -53,10 +53,38 @@ void CFRBRTest_LeducPoker() {
   for (int i = 0; i < num_iters; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   double nash_conv = NashConv(*game, *average_policy);
   std::cout << "Iters " << num_iters << ", nash_conv = " << nash_conv
             << std::endl;
+}
+
+void CFRBRTest_CFRBRSolverSerialization() {
+  auto game = LoadGame("kuhn_poker");
+  CFRBRSolver solver = CFRBRSolver(*game);
+  double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
+
+  for (int i = 0; i < 50; i++) {
+    solver.EvaluateAndUpdatePolicy();
+  }
+  double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability0, exploitability1);
+
+  std::string serialized = solver.Serialize();
+  std::unique_ptr<CFRBRSolver> deserialized_solver =
+      DeserializeCFRBRSolver(serialized);
+  SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
+                 deserialized_solver->InfoStateValuesTable().size());
+  double exploitability2 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-4);
+
+  for (int i = 0; i < 50; i++) {
+    deserialized_solver->EvaluateAndUpdatePolicy();
+  }
+  double exploitability3 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_GT(exploitability2, exploitability3);
 }
 
 }  // namespace
@@ -68,4 +96,5 @@ namespace algorithms = open_spiel::algorithms;
 int main(int argc, char** argv) {
   algorithms::CFRBRTest_KuhnPoker();
   algorithms::CFRBRTest_LeducPoker();
+  algorithms::CFRBRTest_CFRBRSolverSerialization();
 }

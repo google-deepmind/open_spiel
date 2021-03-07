@@ -20,7 +20,7 @@ import time
 from absl.testing import absltest
 import numpy as np
 
-import pyspiel_eigen_test as eigen
+import pyspiel_eigen_test
 
 
 class PyEigenTest(absltest.TestCase):
@@ -28,7 +28,7 @@ class PyEigenTest(absltest.TestCase):
   def test_square_matrix_elements(self):
     x = np.array([[1, 2], [3, 4]]).astype(float)
     expected = np.array([[1, 2], [3, 4]]) ** 2
-    actual = eigen.square(x)
+    actual = pyspiel_eigen_test.square(x)
     np.testing.assert_array_equal(expected, actual)
 
   def test_transpose_and_square_matrix_elements(self):
@@ -37,24 +37,24 @@ class PyEigenTest(absltest.TestCase):
     expected = np.array(
         [[1, 9],
          [4, 16]])
-    actual = eigen.square(x)
+    actual = pyspiel_eigen_test.square(x)
     np.testing.assert_array_equal(expected, actual)
 
   def test_transpose_then_slice_and_square_matrix_elements(self):
     x = np.array([[1, 2], [3, 4]]).astype(float)
     x = x.transpose()
     expected = np.array([[9], [16]])
-    actual = eigen.square(x[0:, 1:])
+    actual = pyspiel_eigen_test.square(x[0:, 1:])
     np.testing.assert_array_equal(expected, actual)
 
   def test_square_vector_elements(self):
     x = np.array([1, 2, 3]).astype(float)
     expected = np.array([[1], [4], [9]])
-    actual = eigen.square(x)
+    actual = pyspiel_eigen_test.square(x)
     np.testing.assert_array_equal(expected, actual)
 
   def test_allocate_cxx(self):
-    actual = eigen.matrix()
+    actual = pyspiel_eigen_test.matrix()
     expected = np.array([[1, 2], [3, 4]])
     np.testing.assert_array_equal(expected, actual)
 
@@ -62,7 +62,7 @@ class PyEigenTest(absltest.TestCase):
     # A test implementing
     # https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#returning-values-to-python
     start = time.time()
-    a = eigen.BigMatrix()
+    a = pyspiel_eigen_test.BigMatrix()
     print("Alloc: ", time.time() - start)
 
     start = time.time()

@@ -52,7 +52,7 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(static_cast<std::string>(kDefaultObsType))}}};
+    {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PhantomTTTGame(params));
@@ -72,13 +72,12 @@ PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
 void PhantomTTTState::DoApplyAction(Action move) {
   // Current player's view.
   Player cur_player = CurrentPlayer();
-  auto& cur_view = cur_player == Player{0} ? x_view_ : o_view_;
+  auto& cur_view = cur_player == 0 ? x_view_ : o_view_;
 
   // Two cases: either there is a mark already there, or not.
   if (state_.BoardAt(move) == CellState::kEmpty) {
     // No mark on board, so play this normally.
     state_.ApplyAction(move);
-  } else {
   }
 
   // Update current player's view, and action sequence.
@@ -94,7 +93,7 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
   if (IsTerminal()) return {};
   std::vector<Action> moves;
   const Player player = CurrentPlayer();
-  const auto& cur_view = player == Player{0} ? x_view_ : o_view_;
+  const auto& cur_view = player == 0 ? x_view_ : o_view_;
 
   for (Action move = 0; move < kNumCells; ++move) {
     if (cur_view[move] == CellState::kEmpty) {
@@ -106,7 +105,7 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
 }
 
 std::string PhantomTTTState::ViewToString(Player player) const {
-  const auto& cur_view = player == Player{0} ? x_view_ : o_view_;
+  const auto& cur_view = player == 0 ? x_view_ : o_view_;
   std::string str;
   for (int r = 0; r < kNumRows; ++r) {
     for (int c = 0; c < kNumCols; ++c) {
@@ -127,15 +126,12 @@ std::string PhantomTTTState::ActionSequenceToString(Player player) const {
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
-      str.append(std::to_string(player_with_action.first));
-      str.push_back(',');
-      str.append(std::to_string(player_with_action.second));
-      str.push_back(' ');
+      absl::StrAppend(&str, player_with_action.first, ",");
+      absl::StrAppend(&str, player_with_action.second, " ");
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
-      str.append(std::to_string(player_with_action.first));
-      str.append(",? ");
+      absl::StrAppend(&str, player_with_action.first, ",? ");
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
@@ -147,13 +143,15 @@ std::string PhantomTTTState::ActionSequenceToString(Player player) const {
 std::string PhantomTTTState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return ViewToString(player) + "\n"
-      + std::to_string(history_.size()) + "\n"
-      + ActionSequenceToString(player);
+  std::string str;
+  absl::StrAppend(&str, ViewToString(player), "\n");
+  absl::StrAppend(&str, history_.size(), "\n");
+  absl::StrAppend(&str, ActionSequenceToString(player));
+  return str;
 }
 
-void PhantomTTTState::InformationStateTensor(
-    Player player, std::vector<double>* values) const {
+void PhantomTTTState::InformationStateTensor(Player player,
+                                             absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -161,12 +159,12 @@ void PhantomTTTState::InformationStateTensor(
   // Then the action sequence follows (one-hot encoded, per action).
   // Encoded in the same way as InformationStateAsString, so full sequences
   // which may contain action value 10 to represent "I don't know."
-  const auto& player_view = player == Player{0} ? x_view_ : o_view_;
-  values->resize(kNumCells * kCellStates +
-                 kLongestSequence * (1 + kBitsPerAction));
-  std::fill(values->begin(), values->end(), 0.);
+  const auto& player_view = player == 0 ? x_view_ : o_view_;
+  SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
+                                    kLongestSequence * (1 + kBitsPerAction));
+  std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
   }
 
   // Now encode the sequence. Each (player, action) pair uses 11 bits:
@@ -176,13 +174,13 @@ void PhantomTTTState::InformationStateTensor(
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
-      (*values)[offset] = player_with_action.first;  // Player 0 or 1
-      (*values)[offset + 1 + player_with_action.second] = 1.0;
+      values[offset] = player_with_action.first;  // Player 0 or 1
+      values[offset + 1 + player_with_action.second] = 1.0;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
-      (*values)[offset] = player_with_action.first;
-      (*values)[offset + 1 + 10] = 1.0;  // I don't know.
+      values[offset] = player_with_action.first;
+      values[offset + 1 + 10] = 1.0;  // I don't know.
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
@@ -203,21 +201,21 @@ std::string PhantomTTTState::ObservationString(Player player) const {
 }
 
 void PhantomTTTState::ObservationTensor(Player player,
-                                        std::vector<double>* values) const {
+                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  values->resize(game_->ObservationTensorSize());
-  std::fill(values->begin(), values->end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.);
 
   // First 27 bits encodes the player's view in the same way as TicTacToe.
-  const auto& player_view = player == Player{0} ? x_view_ : o_view_;
+  const auto& player_view = player == 0 ? x_view_ : o_view_;
   for (int cell = 0; cell < kNumCells; ++cell) {
-    (*values)[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
   }
 
   // Then a one-hot to represent total number of turns.
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    (*values)[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
+    values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
   }
 }
 
@@ -233,12 +231,10 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
     // If the board has a mark that is the undoing player, then this was
     // a successful move. Undo as normal.
     state_.UndoAction(player, move);
-  } else {
-    // Do not touch the board as this was a failure move.
   }
 
   // Undo the action from that player's view, and pop from the action seq
-  auto& player_view = player == Player{0} ? x_view_ : o_view_;
+  auto& player_view = player == 0 ? x_view_ : o_view_;
   player_view[move] = CellState::kEmpty;
   action_sequence_.pop_back();
 

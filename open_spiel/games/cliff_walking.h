@@ -88,9 +88,9 @@ class CliffWalkingState : public State {
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -120,9 +120,6 @@ class CliffWalkingGame : public Game {
   explicit CliffWalkingGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CliffWalkingState(shared_from_this()));
-  }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<Game>(new CliffWalkingGame(*this));
   }
   std::vector<int> ObservationTensorShape() const override {
     return {height_, width_};

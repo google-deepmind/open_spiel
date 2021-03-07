@@ -15,11 +15,14 @@
 #include "open_spiel/algorithms/cfr.h"
 
 #include <algorithm>
+#include <array>
 #include <random>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/strings/charconv.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/serialization.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -27,35 +30,72 @@ namespace {
 inline constexpr double kRandomInitialRegretsMagnitude = 0.001;
 }  // namespace
 
+constexpr const int kSerializationVersion = 1;
+
+// All CFR solvers support serialization. CFRSolver, CFRPlusSolver and
+// CFRBRSolver all rely on CFRSolverBase::Serialize() to provide the
+// functionality (each subtype only implements the SerializeThisType() method
+// which returns the name of the serialized subclass).
+// ExternalSamplingMCCFRSolver and OutcomeSamplingMCCFRSolver implement
+// their own versions of Serialize().
+//
+// During the serialization we store multiple different sections which are
+// described below:
+//   - [SolverType] is the name of the serialized class.
+//   - [SolverSpecificState] is a section to which different solvers write state
+//       that is specific to their own type. Note that serialization and
+//       deserialization of this section is left entirely to each of the
+//       subtypes.
+//   - [SolverValuesTable] is the section to which CFRInfoStateValuesTable is
+//       written.
+//
+// During deserialization all solvers rely on the
+// PartiallyDeserializeCFRSolver() method which deserializes common properties
+// but leaves deserialization of [SolverSpecificState] section to the caller.
+//
+// Note that there are some specifics that need to be taken into account when
+// reading the de/serialization code:
+//   - Each solver's Serialize() method has two parameters which are not exposed
+//       in Python, i.e. int double_precision and std::string delimiter.
+//   - We try to avoid copying/moving of CFRInfoStateValuesTable where possible
+//       due to its potentially large size (mainly due to memory concerns). For
+//       that reason the PartiallyDeserializeCFRSolver() method also returns a
+//       string_view of the table and leaves deserialization to the callers
+//       which then in turn call the efficient
+//       DeserializeCFRInfoStateValuesTable().
+
 CFRAveragePolicy::CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
 
-ActionsAndProbs CFRAveragePolicy::GetStatePolicy(const State& state) const {
-  ActionsAndProbs actions_and_probs;
-  auto entry = info_states_.find(state.InformationStateString());
+ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
+    const State& state, Player player) const {
+  auto entry = info_states_.find(state.InformationStateString(player));
   if (entry == info_states_.end()) {
     if (default_policy_) {
-      return default_policy_->GetStatePolicy(state);
+      return default_policy_->GetStatePolicy(state, player);
     } else {
-      return actions_and_probs;
+      // This should never get called.
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
+  ActionsAndProbs actions_and_probs;
   GetStatePolicyFromInformationStateValues(entry->second, &actions_and_probs);
   return actions_and_probs;
 }
 
 ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
     const std::string& info_state) const {
-  ActionsAndProbs actions_and_probs;
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     if (default_policy_) {
       return default_policy_->GetStatePolicy(info_state);
     } else {
-      return actions_and_probs;
+      // This should never get called.
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
+  ActionsAndProbs actions_and_probs;
   GetStatePolicyFromInformationStateValues(entry->second, &actions_and_probs);
   return actions_and_probs;
 }
@@ -87,33 +127,34 @@ CFRCurrentPolicy::CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
 
-ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(const State& state) const {
-  ActionsAndProbs actions_and_probs;
-  auto entry = info_states_.find(state.InformationStateString());
+ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
+    const State& state, Player player) const {
+  auto entry = info_states_.find(state.InformationStateString(player));
   if (entry == info_states_.end()) {
     if (default_policy_) {
-      return default_policy_->GetStatePolicy(state);
+      return default_policy_->GetStatePolicy(state, player);
     } else {
-      return actions_and_probs;
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
+  ActionsAndProbs actions_and_probs;
   return GetStatePolicyFromInformationStateValues(entry->second,
                                                   actions_and_probs);
 }
 
 ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
     const std::string& info_state) const {
-  ActionsAndProbs actions_and_probs;
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     if (default_policy_) {
       return default_policy_->GetStatePolicy(info_state);
     } else {
-      return actions_and_probs;
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
-  return GetStatePolicyFromInformationStateValues(entry->second,
-                                                  actions_and_probs);
+  ActionsAndProbs actions_and_probs;
+  GetStatePolicyFromInformationStateValues(entry->second, actions_and_probs);
+  return actions_and_probs;
 }
 
 ActionsAndProbs CFRCurrentPolicy::GetStatePolicyFromInformationStateValues(
@@ -138,23 +179,44 @@ TabularPolicy CFRCurrentPolicy::AsTabular() const {
 CFRSolverBase::CFRSolverBase(const Game& game, bool alternating_updates,
                              bool linear_averaging, bool regret_matching_plus,
                              bool random_initial_regrets, int seed)
-    : game_(game),
+    : game_(game.shared_from_this()),
       root_state_(game.NewInitialState()),
-      root_reach_probs_(game_.NumPlayers() + 1, 1.0),
+      root_reach_probs_(game_->NumPlayers() + 1, 1.0),
       regret_matching_plus_(regret_matching_plus),
       alternating_updates_(alternating_updates),
       linear_averaging_(linear_averaging),
       random_initial_regrets_(random_initial_regrets),
       chance_player_(game.NumPlayers()),
       rng_(seed) {
-  if (game_.GetType().dynamics != GameType::Dynamics::kSequential) {
+  if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError(
         "CFR requires sequential games. If you're trying to run it "
         "on a simultaneous (or normal-form) game, please first transform it "
         "using turn_based_simultaneous_game.");
   }
-
   InitializeInfostateNodes(*root_state_);
+}
+
+CFRSolverBase::CFRSolverBase(std::shared_ptr<const Game> game,
+                             bool alternating_updates, bool linear_averaging,
+                             bool regret_matching_plus, int iteration,
+                             bool random_initial_regrets, int seed)
+    : game_(game),
+      iteration_(iteration),
+      root_state_(game->NewInitialState()),
+      root_reach_probs_(game_->NumPlayers() + 1, 1.0),
+      regret_matching_plus_(regret_matching_plus),
+      alternating_updates_(alternating_updates),
+      linear_averaging_(linear_averaging),
+      random_initial_regrets_(random_initial_regrets),
+      chance_player_(game->NumPlayers()),
+      rng_(seed) {
+  if (game_->GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError(
+        "CFR requires sequential games. If you're trying to run it "
+        "on a simultaneous (or normal-form) game, please first transform it "
+        "using turn_based_simultaneous_game.");
+  }
 }
 
 void CFRSolverBase::InitializeInfostateNodes(const State& state) {
@@ -173,9 +235,8 @@ void CFRSolverBase::InitializeInfostateNodes(const State& state) {
   std::vector<Action> legal_actions = state.LegalActions();
 
   if (random_initial_regrets_) {
-    CFRInfoStateValues is_vals(
-        legal_actions,
-        kRandomInitialRegretsMagnitude * absl::Uniform<double>(rng_, 0.0, 1.0));
+    CFRInfoStateValues is_vals(legal_actions, &rng_,
+                               kRandomInitialRegretsMagnitude);
     info_states_[info_state] = is_vals;
   } else {
     CFRInfoStateValues is_vals(legal_actions);
@@ -190,7 +251,7 @@ void CFRSolverBase::InitializeInfostateNodes(const State& state) {
 void CFRSolverBase::EvaluateAndUpdatePolicy() {
   ++iteration_;
   if (alternating_updates_) {
-    for (int player = 0; player < game_.NumPlayers(); player++) {
+    for (int player = 0; player < game_->NumPlayers(); player++) {
       ComputeCounterFactualRegret(*root_state_, player, root_reach_probs_,
                                   nullptr);
       if (regret_matching_plus_) {
@@ -199,13 +260,38 @@ void CFRSolverBase::EvaluateAndUpdatePolicy() {
       ApplyRegretMatching();
     }
   } else {
-    ComputeCounterFactualRegret(*root_state_, std::nullopt, root_reach_probs_,
+    ComputeCounterFactualRegret(*root_state_, absl::nullopt, root_reach_probs_,
                                 nullptr);
     if (regret_matching_plus_) {
       ApplyRegretMatchingPlusReset();
     }
     ApplyRegretMatching();
   }
+}
+
+std::string CFRSolverBase::Serialize(int double_precision,
+                                     std::string delimiter) const {
+  SPIEL_CHECK_GE(double_precision, -1);
+  std::string str = "";
+  // Meta section
+  absl::StrAppend(&str,
+                  "# Automatically generated by OpenSpiel "
+                  "CFRSolverBase::Serialize\n");
+  absl::StrAppend(&str, kSerializeMetaSectionHeader, "\n");
+  absl::StrAppend(&str, "Version: ", kSerializationVersion, "\n");
+  absl::StrAppend(&str, "\n");
+  // Game section
+  absl::StrAppend(&str, kSerializeGameSectionHeader, "\n");
+  absl::StrAppend(&str, game_->Serialize(), "\n");
+  // Internal solver state section
+  absl::StrAppend(&str, kSerializeSolverTypeSectionHeader, "\n");
+  absl::StrAppend(&str, SerializeThisType(), "\n");
+  absl::StrAppend(&str, kSerializeSolverSpecificStateSectionHeader, "\n");
+  absl::StrAppend(&str, iteration_, "\n");
+  absl::StrAppend(&str, kSerializeSolverValuesTableSectionHeader, "\n");
+  SerializeCFRInfoStateValuesTable(info_states_, &str, double_precision,
+                                   delimiter);
+  return str;
 }
 
 static double CounterFactualReachProb(
@@ -253,7 +339,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegret(
     // The value returned is not used: if the reach probability for all players
     // is 0, then the last taken action has probability 0, so the
     // returned value is not impacting the parent node value.
-    return std::vector<double>(game_.NumPlayers(), 0.0);
+    return std::vector<double>(game_->NumPlayers(), 0.0);
   }
 
   int current_player = state.CurrentPlayer();
@@ -337,7 +423,7 @@ void CFRSolverBase::GetInfoStatePolicyFromPolicy(
 // - alternating_player: Optionally only update this player.
 // - reach_probabilities: The reach probabilities of this state.
 // - current_player: Either a player or chance_player_.
-// - action_probs: The action probabilities to use frp this state.
+// - action_probs: The action probabilities to use for this state.
 // - child_values_out: optional output parameter which is filled with the child
 //           utilities for each action, for current_player.
 // Returns:
@@ -349,7 +435,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegretForActionProbs(
     const std::vector<Action>& legal_actions,
     std::vector<double>* child_values_out,
     const std::vector<const Policy*>* policy_overrides) {
-  std::vector<double> state_value(game_.NumPlayers());
+  std::vector<double> state_value(game_->NumPlayers());
 
   for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
     const Action action = legal_actions[aidx];
@@ -372,7 +458,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegretForActionProbs(
 
 bool CFRSolverBase::AllPlayersHaveZeroReachProb(
     const std::vector<double>& reach_probabilities) const {
-  for (int i = 0; i < game_.NumPlayers(); i++) {
+  for (int i = 0; i < game_->NumPlayers(); i++) {
     if (reach_probabilities[i] != 0.0) {
       return false;
     }
@@ -406,6 +492,73 @@ std::string CFRInfoStateValues::ToString() const {
                   "Cumulative policy: ", absl::StrJoin(cumulative_policy, ", "),
                   "\n");
   return str;
+}
+
+std::string CFRInfoStateValues::Serialize(int double_precision) const {
+  std::string str = "";
+  std::string cumulative_regrets_str, cumulative_policy_str, current_policy_str;
+  if (double_precision == -1) {
+    cumulative_regrets_str =
+        absl::StrJoin(cumulative_regrets, ",", HexDoubleFormatter());
+    cumulative_policy_str =
+        absl::StrJoin(cumulative_policy, ",", HexDoubleFormatter());
+    current_policy_str =
+        absl::StrJoin(current_policy, ",", HexDoubleFormatter());
+  } else {
+    cumulative_regrets_str = absl::StrJoin(
+        cumulative_regrets, ",", SimpleDoubleFormatter(double_precision));
+    cumulative_policy_str = absl::StrJoin(
+        cumulative_policy, ",", SimpleDoubleFormatter(double_precision));
+    current_policy_str = absl::StrJoin(current_policy, ",",
+                                       SimpleDoubleFormatter(double_precision));
+  }
+  absl::StrAppend(&str, absl::StrJoin(legal_actions, ","), ";");
+  absl::StrAppend(&str, cumulative_regrets_str, ";");
+  absl::StrAppend(&str, cumulative_policy_str, ";");
+  absl::StrAppend(&str, current_policy_str);
+  return str;
+}
+
+CFRInfoStateValues DeserializeCFRInfoStateValues(absl::string_view serialized) {
+  CFRInfoStateValues res = CFRInfoStateValues();
+  if (serialized.empty()) return res;
+
+  std::vector<std::vector<absl::string_view>> str_values;
+  str_values.reserve(4);
+  for (absl::string_view sv : absl::StrSplit(serialized, ';')) {
+    str_values.push_back(absl::StrSplit(sv, ','));
+  }
+
+  int num_elements = str_values.at(0).size();
+  res.legal_actions.reserve(num_elements);
+  res.cumulative_regrets.reserve(num_elements);
+  res.cumulative_policy.reserve(num_elements);
+  res.current_policy.reserve(num_elements);
+
+  // Insert the actual values
+  int la_value;
+  double cumu_regret_value, cumu_policy_value, curr_policy_value;
+  for (int i = 0; i < num_elements; i++) {
+    SPIEL_CHECK_TRUE(absl::SimpleAtoi(str_values.at(0).at(i), &la_value));
+    absl::from_chars(
+        str_values.at(1).at(i).data(),
+        str_values.at(1).at(i).data() + str_values.at(1).at(i).size(),
+        cumu_regret_value);
+    absl::from_chars(
+        str_values.at(2).at(i).data(),
+        str_values.at(2).at(i).data() + str_values.at(2).at(i).size(),
+        cumu_policy_value);
+    absl::from_chars(
+        str_values.at(3).at(i).data(),
+        str_values.at(3).at(i).data() + str_values.at(3).at(i).size(),
+        curr_policy_value);
+
+    res.legal_actions.push_back(la_value);
+    res.cumulative_regrets.push_back(cumu_regret_value);
+    res.cumulative_policy.push_back(cumu_policy_value);
+    res.current_policy.push_back(curr_policy_value);
+  }
+  return res;
 }
 
 ActionsAndProbs CFRInfoStateValues::GetCurrentPolicy() const {
@@ -462,6 +615,51 @@ int CFRInfoStateValues::SampleActionIndex(double epsilon, double z) {
   SpielFatalError(absl::StrCat("SampleActionIndex: sum of probs is ", sum));
 }
 
+int CFRInfoStateValues::GetActionIndex(Action a) {
+  auto it = std::find(legal_actions.begin(), legal_actions.end(), a);
+  if (it != legal_actions.end()) {
+    return std::distance(legal_actions.begin(), it);
+  }
+  SpielFatalError(
+      absl::StrCat("GetActionIndex: the action was not found: ", a));
+}
+
+void SerializeCFRInfoStateValuesTable(
+    const CFRInfoStateValuesTable& info_states, std::string* result,
+    int double_precision, std::string delimiter) {
+  if (delimiter == "," || delimiter == ";") {
+    // The two delimiters are used for de/serialization of CFRInfoStateValues
+    SpielFatalError(
+        "Please select a different delimiter,"
+        "invalid values are \",\" and \";\".");
+  }
+  if (info_states.empty()) return;
+
+  for (auto const& [info_state, values] : info_states) {
+    if (info_state.find(delimiter) != std::string::npos) {
+      SpielFatalError(absl::StrCat(
+          "Info state contains delimiter \"", delimiter,
+          "\", please fix the info state or select a different delimiter."));
+    }
+    absl::StrAppend(result, info_state, delimiter,
+                    values.Serialize(double_precision), delimiter);
+  }
+  // Remove the trailing delimiter
+  result->erase(result->length() - delimiter.length());
+}
+
+void DeserializeCFRInfoStateValuesTable(absl::string_view serialized,
+                                        CFRInfoStateValuesTable* result,
+                                        std::string delimiter) {
+  if (serialized.empty()) return;
+
+  std::vector<absl::string_view> splits = absl::StrSplit(serialized, delimiter);
+  for (int i = 0; i < splits.size(); i += 2) {
+    result->insert({std::string(splits.at(i)),
+                    DeserializeCFRInfoStateValues(splits.at(i + 1))});
+  }
+}
+
 //  Resets negative cumulative regrets to 0.
 //
 //  Regret Matching+ corresponds to the following cumulative regrets update:
@@ -486,5 +684,86 @@ void CFRSolverBase::ApplyRegretMatching() {
   }
 }
 
+std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
+                                                std::string delimiter) {
+  auto partial = PartiallyDeserializeCFRSolver(serialized);
+  SPIEL_CHECK_EQ(partial.solver_type, "CFRSolver");
+  auto solver = std::make_unique<CFRSolver>(
+      partial.game, std::stoi(partial.solver_specific_state));
+  DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
+                                     &solver->InfoStateValuesTable(),
+                                     delimiter);
+  return solver;
+}
+
+std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
+    const std::string& serialized, std::string delimiter) {
+  auto partial = PartiallyDeserializeCFRSolver(serialized);
+  SPIEL_CHECK_EQ(partial.solver_type, "CFRPlusSolver");
+  auto solver = std::make_unique<CFRPlusSolver>(
+      partial.game, std::stoi(partial.solver_specific_state));
+  DeserializeCFRInfoStateValuesTable(partial.serialized_cfr_values_table,
+                                     &solver->InfoStateValuesTable(),
+                                     delimiter);
+  return solver;
+}
+
+PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
+    const std::string& serialized) {
+  // We don't copy the CFR values table section due to potential large size.
+  enum Section {
+    kInvalid = -1,
+    kMeta = 0,
+    kGame = 1,
+    kSolverType = 2,
+    kSolverSpecificState = 3
+  };
+  std::array<std::string, 4> section_strings = {"", "", "", ""};
+  Section current_section = kInvalid;
+
+  std::vector<absl::string_view> lines = absl::StrSplit(serialized, '\n');
+  for (int i = 0; i < lines.size(); i++) {
+    if (lines[i].length() == 0 || lines[i].at(0) == '#') {
+      // Skip comments and blank lines
+    } else if (lines[i] == kSerializeMetaSectionHeader) {
+      SPIEL_CHECK_EQ(current_section, kInvalid);
+      current_section = kMeta;
+    } else if (lines[i] == kSerializeGameSectionHeader) {
+      SPIEL_CHECK_EQ(current_section, kMeta);
+      current_section = kGame;
+    } else if (lines[i] == kSerializeSolverTypeSectionHeader) {
+      SPIEL_CHECK_EQ(current_section, kGame);
+      current_section = kSolverType;
+    } else if (lines[i] == kSerializeSolverSpecificStateSectionHeader) {
+      SPIEL_CHECK_EQ(current_section, kSolverType);
+      current_section = kSolverSpecificState;
+    } else if (lines[i] == kSerializeSolverValuesTableSectionHeader) {
+      SPIEL_CHECK_EQ(current_section, kSolverSpecificState);
+      break;
+    } else {
+      SPIEL_CHECK_NE(current_section, kInvalid);
+      if (current_section == kSolverSpecificState) {
+        absl::StrAppend(&section_strings[current_section], lines[i], "\n");
+      } else {
+        absl::StrAppend(&section_strings[current_section], lines[i]);
+      }
+    }
+  }
+
+  // We currently just ignore the meta section.
+  // In order to avod copying the CFR values table data we rather split it again
+  // and obtain a single string_view that can be deserialized later using the
+  // DeserializeCFRInfoStateValuesTable method.
+  std::pair<absl::string_view, absl::string_view> other_and_values_table_data =
+      absl::StrSplit(
+          serialized,
+          absl::StrCat(kSerializeSolverValuesTableSectionHeader, "\n"));
+  return PartiallyDeserializedCFRSolver(DeserializeGame(section_strings[kGame]),
+                                        section_strings[kSolverType],
+                                        section_strings[kSolverSpecificState],
+                                        other_and_values_table_data.second);
+}
+
 }  // namespace algorithms
 }  // namespace open_spiel
+

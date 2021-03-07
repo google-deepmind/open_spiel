@@ -15,6 +15,10 @@ add_library (algorithms OBJECT
   corr_dist/efcce.h
   corr_dist/efce.cc
   corr_dist/efce.h
+  corr_dist/cce.cc
+  corr_dist/cce.h
+  corr_dist/ce.cc
+  corr_dist/ce.h
   corr_dev_builder.cc
   corr_dev_builder.h
   deterministic_policy.cc
@@ -25,12 +29,18 @@ add_library (algorithms OBJECT
   expected_returns.h
   external_sampling_mccfr.cc
   external_sampling_mccfr.h
+  get_all_histories.cc
+  get_all_histories.h
+  get_all_infostates.cc
+  get_all_infostates.h
   get_all_states.cc
   get_all_states.h
   get_legal_actions_map.cc
   get_legal_actions_map.h
   history_tree.cc
   history_tree.h
+  infostate_tree.h
+  infostate_tree.cc
   is_mcts.cc
   is_mcts.h
   matrix_game_utils.cc
@@ -45,10 +55,16 @@ add_library (algorithms OBJECT
   oos.cc
   outcome_sampling_mccfr.cc
   outcome_sampling_mccfr.h
+  policy_iteration.cc
+  policy_iteration.h
   state_distribution.cc
   state_distribution.h
   tabular_exploitability.cc
   tabular_exploitability.h
+  tabular_q_learning.cc
+  tabular_q_learning.h
+  tabular_sarsa.cc
+  tabular_sarsa.h
   tensor_game_utils.cc
   tensor_game_utils.h
   trajectories.cc
@@ -57,6 +73,10 @@ add_library (algorithms OBJECT
   value_iteration.h
 )
 target_include_directories (algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+if (${BUILD_WITH_ORTOOLS})
+  add_subdirectory (ortools)
+endif()
 
 add_executable(best_response_test best_response_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
@@ -90,6 +110,10 @@ add_executable(external_sampling_mccfr_test external_sampling_mccfr_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(external_sampling_mccfr_test external_sampling_mccfr_test)
 
+add_executable(get_all_histories_test get_all_histories_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(get_all_histories_test get_all_histories_test)
+
 add_executable(get_all_states_test get_all_states_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(get_all_states_test get_all_states_test)
@@ -101,6 +125,10 @@ add_test(get_legal_actions_map_test get_legal_actions_map_test)
 add_executable(history_tree_test history_tree_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(history_tree_test history_tree_test)
+
+add_executable(infostate_tree_test   infostate_tree_test.cc
+        $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(infostate_tree_test infostate_tree_test)
 
 add_executable(is_mcts_test is_mcts_test.cc
         $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})

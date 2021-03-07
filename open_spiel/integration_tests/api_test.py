@@ -16,32 +16,40 @@
 """Tests for open_spiel.integration_tests.api."""
 
 import collections
-import logging
-import random
-import time
+import enum
+import re
+from typing import Callable, Dict, List, Tuple
 import unittest
 
+from absl import app
+from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
+from open_spiel.python.algorithms import sample_some_states
+from open_spiel.python.observation import make_observation
 import pyspiel
+
+FLAGS = flags.FLAGS
+flags.DEFINE_string("test_only_games", ".*",
+                    "Test only selected games (regex). Defaults to all.")
 
 _ALL_GAMES = pyspiel.registered_games()
 
-_GAMES_TO_TEST = [g.short_name for g in _ALL_GAMES if g.default_loadable]
+_GAMES_TO_TEST = set([g.short_name for g in _ALL_GAMES if g.default_loadable])
 
 _GAMES_NOT_UNDER_TEST = [
     g.short_name for g in _ALL_GAMES if not g.default_loadable
 ]
 
+_GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK = set(["bridge_uncontested_bidding"])
+
 # The list of game instances to test on the full tree as tuples
 # (name to display, string to pass to load_game).
 _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
-    ("catch", "catch(rows=6,columns=3)"),
     ("cliff_walking", "cliff_walking(horizon=7)"),
-    ("deep_sea", "deep_sea(size=3)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
     ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
@@ -64,9 +72,7 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS_NAMES = [
 
 TOTAL_NUM_STATES = {
     # This maps the game name to (chance, playable, terminal)
-    "catch": (1, 363, 729),
     "cliff_walking": (0, 2119, 6358),
-    "deep_sea": (0, 7, 8),
     "kuhn_poker": (4, 24, 30),
     "leduc_poker": (157, 3780, 5520),
     "liars_dice": (7, 147456, 147420),
@@ -81,9 +87,7 @@ TOTAL_NUM_STATES = {
 # This is kept to ensure non-regression, but we would like to remove that
 # when we can interpret what are these numbers.
 PERFECT_RECALL_NUM_STATES = {
-    "catch": 363,
     "cliff_walking": 2119,
-    "deep_sea": 7,
     "kuhn_poker": 12,
     "leduc_poker": 936,
     "liars_dice": 24576,
@@ -94,10 +98,6 @@ PERFECT_RECALL_NUM_STATES = {
     "tiny_hanabi": 8,
     "nf_auction": 2,
 }
-
-# Some tests run for a fixed time budget.
-# This specified approximately how many seconds they should run.
-TIMEABLE_TEST_RUNTIME = 10
 
 
 class EnforceAPIOnFullTreeBase(parameterized.TestCase):
@@ -261,483 +261,110 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       self.assertLen(union, sum([len(x) for x in information_sets_per_player]))
 
 
-# Assembles all states seen in a specified number of game playthroughs.
-def _get_some_states(game, num_plays=10, include_terminals=True):
-  states = dict()
-  for _ in range(num_plays):
-    state = game.new_initial_state()
-    while not state.is_terminal():
-      states[state.history_str()] = state.clone()
-      state.apply_action(random.choice(state.legal_actions()))
-    if include_terminals:
-      states[state.history_str()] = state
-  return states
+class Relation(enum.Enum):
+  SUBSET_OR_EQUALS = 1
+  EQUALS = 2
 
 
-def _run_until_timeout(callback, time_limit=TIMEABLE_TEST_RUNTIME):
-  is_time_out = lambda t: time.time() - t > time_limit
-  num_calls = 0
-  start = time.time()
-  while not is_time_out(start):
-    callback()
-    num_calls += 1
-  time_elapsed = time.time() - start
-  print(f"Timed test took {time_elapsed} seconds and made {num_calls} calls.")
-  return num_calls, time_elapsed
-
-
-def _rollout_and_callback(game, callback, give_up_after=100):
-  state = game.new_initial_state()
-  while not state.is_terminal():
-    if len(state.history()) > give_up_after:
-      break
-    action = random.choice(state.legal_actions(state.current_player()))
-    state.apply_action(action)
-    callback(state)
-
-
-def _rollout_callback_until_timeout(game, state_callback):
-  def timed_callback():
-    _rollout_and_callback(game, state_callback)
-  return _run_until_timeout(timed_callback)
-
-
-def _load_if_provides_factored_observation_string(game_name):
-  game = pyspiel.load_game(game_name)
-  game_type = game.get_type()
-  if game_type.provides_factored_observation_string:
-    return game
-
-  print(f"Skipping test for '{game_name}', as it doesn't provide "
-        "factored_observation_string.")
-  return None
-
-
-class PartialEnforceAPIConventionsTest(parameterized.TestCase):
+class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   """This only partially test some properties."""
 
-  # pylint: disable=g-unreachable-test-method
-  def _assert_observations_raises_error_on_invalid_player(self, game, state):
-    game_type = game.get_type()
-    game_name = game_type.short_name
+  @classmethod
+  def setUpClass(cls):
+    super(EnforceAPIOnPartialTreeBase, cls).setUpClass()
+
+    cls.some_states = sample_some_states.sample_some_states(cls.game,
+                                                            max_states=400)
+    cls.game_type = cls.game.get_type()
+
+  def test_sequence_lengths(self):
+    try:
+      max_history_len = self.game.max_history_length()
+      max_move_number = self.game.max_move_number()
+      max_chance_nodes_in_history = self.game.max_chance_nodes_in_history()
+    except RuntimeError:
+      return  # The function is likely not implemented, so skip the test.
+
+    self.assertGreater(max_history_len, 0)
+    self.assertGreater(max_move_number, 0)
+    if self.game_type.chance_mode == pyspiel.GameType.ChanceMode.DETERMINISTIC:
+      self.assertEqual(max_chance_nodes_in_history, 0)
+    else:
+      self.assertGreater(max_chance_nodes_in_history, 0)
+
+    for state in self.some_states:
+      self.assertLessEqual(len(state.full_history()), max_history_len)
+      self.assertLessEqual(state.move_number(), max_move_number)
+
+      chance_nodes_in_history = 0
+      for item in state.full_history():
+        if item.player == pyspiel.PlayerId.CHANCE:
+          chance_nodes_in_history += 1
+      self.assertLessEqual(chance_nodes_in_history, max_chance_nodes_in_history)
+
+  def test_observations_raises_error_on_invalid_player(self):
+    game = self.game
+    game_type = self.game_type
+    game_name = self.game_name
     num_players = game.num_players()
 
-    if game_type.provides_information_state_string:
-      for p in range(num_players):
-        state.information_state_string(p)
-      msg = f"information_state_string did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
-        state.information_state_string(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
-        state.information_state_string(num_players + 1)
-
-    if game_type.provides_information_state_tensor:
-      for p in range(num_players):
-        v = state.information_state_tensor(p)
-        self.assertLen(v, game.information_state_tensor_size())
-      msg = f"information_state_tensor did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", mgs=msg):
-        state.information_state_tensor(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", mgs=msg):
-        state.information_state_tensor(num_players + 1)
-
-    if game_type.provides_observation_tensor:
-      for p in range(num_players):
-        v = state.observation_tensor(p)
-        self.assertLen(v, game.observation_tensor_size())
-      msg = f"observation_tensor did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
-        state.observation_tensor(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
-        state.observation_tensor(num_players + 1)
-
-    if game_type.provides_observation_string:
-      for p in range(num_players):
-        state.observation_string(p)
-      msg = f"observation_string did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
-        state.observation_string(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
-        state.observation_string(num_players + 1)
-
-    if game_type.provides_factored_observation_string:
-      for p in range(num_players):
-        state.private_observation_string(p)
-      msg = f"private_observation_string did not raise an error for {game_name}"
-      with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
-        state.private_observation_string(-1)
-      with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
-        state.private_observation_string(num_players + 1)
-
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_private_information_contents(self, game_name):
-    game = _load_if_provides_factored_observation_string(game_name)
-    if game is None:
-      return
-
-    player_has_private_info = [False] * game.num_players()
-
-    def update_info(state):
-      nonlocal player_has_private_info
-      for i in range(game.num_players()):
-        if state.private_observation_string(i) != \
-            pyspiel.PrivateObservation.NOTHING:
-          player_has_private_info[i] = True
-
-    _rollout_callback_until_timeout(game, update_info)
-
-    if game.get_type().information == \
-        pyspiel.GameType.Information.IMPERFECT_INFORMATION:
-      self.assertTrue(any(player_has_private_info))
-    if game.get_type().information == \
-        pyspiel.GameType.Information.PERFECT_INFORMATION:
-      none_of = lambda x: not any(x)
-      self.assertTrue(none_of(player_has_private_info))
-
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_no_invalid_public_observations(self, game_name):
-    game = _load_if_provides_factored_observation_string(game_name)
-    if game is None:
-      return
-    def check_public_observation(state):
-      self.assertNotEqual(
-          state.public_observation_string(), pyspiel.PublicObservation.INVALID)
-    _rollout_callback_until_timeout(game, check_public_observation)
-
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_public_observations_start_game(self, game_name):
-    game = _load_if_provides_factored_observation_string(game_name)
-    if not game:
-      return
-    state = game.new_initial_state()
-    self.assertEqual(
-        state.public_observation_string(), pyspiel.PublicObservation.START_GAME)
-
-  def test_observations_are_consistent_with_info_states(self,
-                                                        game_name="kuhn_poker"):
-    # Right now we just test the consistency of observations with information
-    # state in kuhn_poker.
-    # TODO(author14): test the consistency of observations and
-    # information states in other games
-    print(f"Testing observation <-> info_state consistency for '{game_name}'")
-    game = pyspiel.load_game(game_name)
-    game_type = game.get_type()
-
-    if not game_type.provides_information_state_string \
-      or not game_type.provides_observation_string:
-      print(f"Skipping test for '{game_name}', as it doesn't provide both "
-            "information_state_string and observation_string")
-      return
-
-    if game_type.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
-      logging.warning(
-          "'%s' is not turn-based. Trying to reload game as turn-based.",
-          game_name)
-      game = pyspiel.load_game_as_turn_based(game_name)
-
-    # Idea of the test: make rollouts in the game, and collect both
-    # Action-Observation histories (AOH) and InformationState for different
-    # ground states. Check that there is a unique bijection between them.
-    #
-    # Of course, this test does not exclude the possibility the game might
-    # have a bug! But it is a fast way to discover a possible inconsistency
-    # in a new implementation.
-    aoh_is = dict()  # aoh -> info_state
-    is_aoh = dict()  # info_state -> aoh
-    aoh_histories = collections.defaultdict(set)  # aoh -> states
-    is_histories = collections.defaultdict(set)  # info_states -> states
-
-    # Some games have very long play-throughs.
-    give_up_after = 100  # actions
-
-    # Show a helpful error message for debugging the observations in a game.
-    def show_error(histories, player, dump_collections=True):
-      aohs = list()
-      info_states = list()
-      descriptions = list()
-      # Emulate the histories to collect relevant lists.
-      for history in histories:
-        state = game.new_initial_state()
-        aoh = [("obs", state.observation_string(player))]
-        for action in history:
-          state.apply_action(action)
-          if state.current_player() == player:
-            aoh.append(("action", action))
-          aoh.append(("obs", state.observation_string(player)))
-        aohs.append(aoh)
-        info_states.append(state.information_state_string(player))
-        descriptions.append(str(state))
-
-      histories_str = "\n".join([str(history) for history in histories])
-      descriptions_str = "\n".join(descriptions)
-      aohs_str = "\n".join([str(aoh) for aoh in aohs])
-      info_states_str = "\n".join([str(s) for s in info_states])
-
-      if dump_collections:
-        def format_dump(xs):
-          return "\n".join(
-              [f"{str(key)}  ->  {str(value)}" for key, value in xs.items()])
-
-        # pylint: disable=g-backslash-continuation
-        extras = "Dumping colections:\n" \
-                 f"aoh -> info_state:\n{format_dump(aoh_is)}\n\n" \
-                 f"info_state -> aoh:\n{format_dump(is_aoh)}\n\n" \
-                 f"aoh -> histories:\n{format_dump(aoh_histories)}\n\n" \
-                 f"info_state -> histories:\n{format_dump(is_histories)}\n\n"
-      else:
-        # pylint: disable=g-backslash-continuation
-        extras = "Rerun this test with dump_collections=True " \
-                 "for extra information."
-
-      # pylint: disable=g-backslash-continuation
-      msg = \
-        f"\n\n" \
-        f"The action-observation histories (AOH) are not consistent with " \
-        f"information states for player {player}.\n\n" \
-        f"The conflicting set of states (histories) is:\n{histories_str}\n\n" \
-        f"Their domain-specific descriptions are:\n{descriptions_str}\n\n" \
-        f"The corresponding AOH are:\n{aohs_str}\n\n" \
-        f"The corresponding info states are:\n{info_states_str}\n\n" \
-        f"{extras}\n" \
-        f"What to do to fix this? Consult the documentation to " \
-        f"State::InformationStateString and State::ObservationString."
-      return msg
-
-    def collect_and_test_rollouts(player):
-      nonlocal aoh_is, is_aoh, aoh_histories, is_histories
-      state = game.new_initial_state()
-      aoh = [("obs", state.observation_string(player))]
-
-      # TODO(author13): we want to check terminals for consistency too, but info
-      # state string is not defined there and neither are observations by
-      # design.
-      while not state.is_terminal():
-        if len(state.history()) > give_up_after:
-          break
-
-        # Do not collect over chance nodes.
+    for state in self.some_states:
+      if game_type.provides_information_state_string:
         if not state.is_chance_node():
-          info_state = state.information_state_string(player)
-          aoh_histories[str(aoh)].add(tuple(state.history()))
-          is_histories[info_state].add(tuple(state.history()))
+          for p in range(num_players):
+            state.information_state_string(p)
+        msg = f"information_state_string did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.information_state_string(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.information_state_string(num_players + 1)
 
-          states = {tuple(state.history())}
-          states = states.union(aoh_histories[str(aoh)])
-          states = states.union(is_histories[info_state])
-          if str(aoh) in aoh_is:
-            states = states.union(is_histories[aoh_is[str(aoh)]])
-            self.assertEqual(aoh_is[str(aoh)], info_state,
-                             show_error(states, player))
-          else:
-            aoh_is[str(aoh)] = info_state
-          if info_state in is_aoh:
-            states = states.union(aoh_histories[str(is_aoh[info_state])])
-            self.assertEqual(is_aoh[info_state], str(aoh),
-                             show_error(states, player))
-          else:
-            is_aoh[info_state] = str(aoh)
+      if game_type.provides_information_state_tensor:
+        if not state.is_chance_node():
+          for p in range(num_players):
+            v = state.information_state_tensor(p)
+            self.assertLen(v, game.information_state_tensor_size())
+        msg = f"information_state_tensor did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.information_state_tensor(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.information_state_tensor(num_players + 1)
 
-        # Make random actions.
-        action = random.choice(state.legal_actions(state.current_player()))
-        if state.current_player() == player:
-          aoh.append(("action", action))
-        state.apply_action(action)
-        aoh.append(("obs", state.observation_string(player)))
+      if game_type.provides_observation_tensor:
+        if not state.is_chance_node():
+          for p in range(num_players):
+            v = state.observation_tensor(p)
+            self.assertLen(v, game.observation_tensor_size())
+        msg = f"observation_tensor did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.observation_tensor(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.observation_tensor(num_players + 1)
 
-    # Run (very roughly!) for this many seconds. This very much depends on the
-    # machine the test runs on, as some games take a long time to produce
-    # a single rollout.
-    time_limit = TIMEABLE_TEST_RUNTIME / game.num_players()
-    is_time_out = lambda start: time.time() - start > time_limit
+      if game_type.provides_observation_string:
+        if not state.is_chance_node():
+          for p in range(num_players):
+            state.observation_string(p)
+        msg = f"observation_string did not raise an error for {game_name}"
+        with self.assertRaisesRegex(RuntimeError, "player >= 0", msg=msg):
+          state.observation_string(-1)
+        with self.assertRaisesRegex(RuntimeError, "player <", msg=msg):
+          state.observation_string(num_players + 1)
 
-    rollouts = 0
-    start = time.time()
-    for player in range(game.num_players()):
-      aoh_is.clear()
-      is_aoh.clear()
-      aoh_histories.clear()
-      is_histories.clear()
-      while not is_time_out(start):
-        collect_and_test_rollouts(player)
-        rollouts += 1
-      start = time.time()
-
-    print(f"Test for {game_name} took {time.time()-start} seconds "
-          f"to make {rollouts} rollouts.")
-
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_factored_observations_are_consistent_with_info_states(
-      self, game_name):
-    print(f"Testing info state <-> factored_observation consistency "
-          f"for {game_name}.")
-    game = pyspiel.load_game(game_name)
-    game_type = game.get_type()
-
-    if not game_type.provides_factored_observation_string \
-      or not game_type.provides_information_state_string:
-      print(f"Skipping test for '{game_name}', as it doesn't provide both "
-            "factored_observation_string and info_state_string")
+  def test_legal_actions_returns_empty_list_on_opponent(self):
+    if self.game_name in _GAMES_TO_OMIT_LEGAL_ACTIONS_CHECK:
       return
 
-    if game_type.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS:
-      logging.warning(
-          "'%s' is not turn-based. Trying to reload game as turn-based.",
-          game_name)
-      game = pyspiel.load_game_as_turn_based(game_name)
-
-    # Idea of the test: make rollouts in the game, and collect both
-    # Action-FactoredObservation histories (AFOH) and InformationState
-    # for different ground states. Check that there is a unique bijection
-    # between them.
-    #
-    # Of course, this test does not exclude the possibility the game might
-    # have a bug! But it is a fast way to discover a possible inconsistency
-    # in a new implementation.
-    afoh_is = dict()  # afoh -> info_state
-    is_afoh = dict()  # info_state -> afoh
-    afoh_histories = collections.defaultdict(set)  # afoh -> states
-    is_histories = collections.defaultdict(set)  # info_states -> states
-
-    # Some games have very long play-throughs.
-    give_up_after = 100  # actions
-
-    def show_error(histories, player, dump_collections=True):
-      """Returns a helpful error message for debugging purposes."""
-      afohs = list()
-      info_states = list()
-      descriptions = list()
-      # Emulate the histories to collect relevant lists.
-      for history in histories:
-        state = game.new_initial_state()
-        afoh = [(("private_obs", state.private_observation_string(player)),
-                 ("public_obs", state.public_observation_string()))]
-        for action in history:
-          state.apply_action(action)
-          if state.current_player() == player:
-            afoh.append(("action", action))
-          afoh.append(
-              (("private_obs", state.private_observation_string(player)),
-               ("public_obs", state.public_observation_string())))
-        afohs.append(afoh)
-        info_states.append(state.information_state_string(player))
-        descriptions.append(str(state))
-
-      histories_str = "\n".join([str(history) for history in histories])
-      descriptions_str = "\n".join(descriptions)
-      afohs_str = "\n".join([str(afoh) for afoh in afohs])
-      info_states_str = "\n".join([str(s) for s in info_states])
-
-      if dump_collections:
-        def format_dump(xs):
-          return "\n".join([f"{str(key)}  ->  {str(value)}"
-                            for key, value in xs.items()])
-        # pylint: disable=g-backslash-continuation
-        extras = "Dumping colections:\n" \
-                 f"afoh -> info_state:\n{format_dump(afoh_is)}\n\n" \
-                 f"info_state -> afoh:\n{format_dump(is_afoh)}\n\n" \
-                 f"afoh -> histories:\n{format_dump(afoh_histories)}\n\n" \
-                 f"info_state -> histories:\n{format_dump(is_histories)}\n\n"
-      else:
-        # pylint: disable=g-backslash-continuation
-        extras = ("Rerun this test with dump_collections=True for extra "
-                  "information.")
-
-      # pylint: disable=g-backslash-continuation
-      msg = \
-        (f"\n\nThe action-FactoredObservation histories (AFOH) are not "
-         f"consistent with information states for player {player}.\n\nThe "
-         f"conflicting set of states (histories) is:\n{histories_str}\n\nTheir "
-         f"domain-specific descriptions are:\n{descriptions_str}\n\nThe "
-         f"corresponding AFOH are:\n{afohs_str}\n\nThe corresponding info "
-         f"states are:\n{info_states_str}\n\n{extras}\nWhat to do to fix this? "
-         f"Consult the documentation to State::InformationStateString and "
-         f"State::PrivateObservationString and State::PublicObservationString.")
-      return msg
-
-    def collect_and_test_rollouts(player):
-      """Collect and tests rollouts."""
-      if game_name != "kuhn_poker":
-        random.seed(0)
-      nonlocal afoh_is, is_afoh, afoh_histories, is_histories
-      state = game.new_initial_state()
-      afoh = [(("private_obs", state.private_observation_string(player)),
-               ("public_obs", state.public_observation_string()))]
-
-      # state string is not defined there and neither are observations by
-      # design.
-      while not state.is_terminal():
-        if len(state.history()) > give_up_after:
-          break
-
-        # Do not collect over chance nodes.
-        if not state.is_chance_node():
-          info_state = state.information_state_string(player)
-          afoh_histories[str(afoh)].add(tuple(state.history()))
-          is_histories[info_state].add(tuple(state.history()))
-
-          states = {tuple(state.history())}
-          states = states.union(afoh_histories[str(afoh)])
-          states = states.union(is_histories[info_state])
-          if str(afoh) in afoh_is:
-            states = states.union(is_histories[afoh_is[str(afoh)]])
-            self.assertEqual(afoh_is[str(afoh)], info_state,
-                             show_error(states, player))
-          else:
-            afoh_is[str(afoh)] = info_state
-          if info_state in is_afoh:
-            states = states.union(afoh_histories[str(is_afoh[info_state])])
-            self.assertEqual(is_afoh[info_state], str(afoh),
-                             show_error(states, player))
-          else:
-            is_afoh[info_state] = str(afoh)
-
-        # Make random actions.
-        action = random.choice(state.legal_actions(state.current_player()))
-        if state.current_player() == player:
-          afoh.append(("action", action))
-        state.apply_action(action)
-        afoh.append((("private_obs", state.private_observation_string(player)),
-                     ("public_obs", state.public_observation_string())))
-
-    # Run (very roughly!) for this many seconds. This very much depends on the
-    # machine the test runs on, as some games take a long time to produce
-    # a single rollout.
-    time_limit = TIMEABLE_TEST_RUNTIME / game.num_players()
-    is_time_out = lambda start: time.time() - start > time_limit
-
-    rollouts = 0
-    start = time.time()
-    for player in range(game.num_players()):
-      afoh_is.clear()
-      is_afoh.clear()
-      afoh_histories.clear()
-      is_histories.clear()
-      while not is_time_out(start):
-        collect_and_test_rollouts(player)
-        rollouts += 1
-      start = time.time()
-    print(f"Test for {game_name} took {time.time()-start} seconds "
-          f"to make {rollouts} rollouts.")
-
-  @parameterized.parameters(_GAMES_TO_TEST)
-  def test_legal_actions_returns_empty_list_on_opponent(self, game_name):
-    game = pyspiel.load_game(game_name)
-
-    some_states = _get_some_states(game)
-    # We check we have some non-terminal non-random states
-    self.assertTrue(
-        any(not s.is_terminal() and not s.is_chance_node()
-            for s in some_states.values()))
-
-    for state in some_states.values():
+    for state in self.some_states:
       if state.is_terminal():
         # Empty on terminal
         msg = ("The game %s does not return an empty list on "
-               "legal_actions() for state %s" % (game, state))
+               "legal_actions() for state %s" % (self.game_name, state))
         self.assertEmpty(state.legal_actions(), msg=msg)
-        for player in range(game.num_players()):
+        for player in range(self.game.num_players()):
           msg = ("The game %s does not return an empty list on "
-                 "legal_actions(%i) for state %s" % (game, player, state))
+                 "legal_actions(%i) for state %s" %
+                 (self.game_name, player, state))
           self.assertEmpty(state.legal_actions(player), msg=msg)
       elif state.is_simultaneous_node():
         # No requirement for legal_actions to be empty, since all players act.
@@ -748,12 +375,164 @@ class PartialEnforceAPIConventionsTest(parameterized.TestCase):
       else:
         # Empty for players other than the current player
         current_player = state.current_player()
-        for player in range(game.num_players()):
+        for player in range(self.game.num_players()):
           if player != current_player:
             msg = ("The game {!r} does not return an empty list on "
                    "legal_actions(<not current player>) in state {}".format(
-                       game, state))
+                       self.game_name, state))
             self.assertEmpty(state.legal_actions(player), msg=msg)
+
+  def test_private_information_contents(self):
+    try:
+      private_observation = make_observation(
+          self.game,
+          pyspiel.IIGObservationType(
+              public_info=False,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
+    except (RuntimeError, ValueError):
+      return
+
+    player_has_private_info = [False] * self.game.num_players()
+
+    for state in self.some_states:
+      for i in range(self.game.num_players()):
+        if private_observation.string_from(state, i) != \
+            pyspiel.PrivateObservation.NOTHING:
+          player_has_private_info[i] = True
+
+    if self.game_type.information == \
+        pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+      self.assertTrue(any(player_has_private_info))
+    if self.game_type.information == \
+        pyspiel.GameType.Information.PERFECT_INFORMATION:
+      none_of = lambda x: not any(x)
+      self.assertTrue(none_of(player_has_private_info))
+
+  def test_no_invalid_public_observations(self):
+    try:
+      public_observation = make_observation(
+          self.game,
+          pyspiel.IIGObservationType(
+              public_info=True,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.NONE))
+    except (ValueError, RuntimeError):
+      return
+
+    for state in self.some_states:
+      self.assertNotEqual(
+          public_observation.string_from(state, 0),
+          pyspiel.PublicObservation.INVALID)
+
+  def _check_partition_consistency(
+      self, partition_callbacks: Dict[str, Callable[[int, pyspiel.State], str]],
+      partition_relations: List[Tuple[str, Relation, str]]):
+
+    for player in range(self.game.num_players()):
+      states_representations = collections.defaultdict(dict)
+      partitioned_sets = {
+          name: collections.defaultdict(set)
+          for name in partition_callbacks.keys()
+      }
+      for state in self.some_states:
+        history = state.history_str()
+        for name, callback in partition_callbacks.items():
+          representation = callback(player, state)
+          states_representations[history][name] = representation
+          partitioned_sets[name][representation].add(history)
+
+      for x, relation, y in partition_relations:
+        for state in self.some_states:
+          history = state.history_str()
+          rep_x = states_representations[history][x]
+          rep_y = states_representations[history][y]
+          histories_x = partitioned_sets[x][rep_x]
+          histories_y = partitioned_sets[y][rep_y]
+          if relation == Relation.EQUALS:
+            if histories_x != histories_y:
+              self.assertEqual(
+                  histories_x, histories_y,
+                  self._show_error(player, state, x, relation, y, rep_x, rep_y,
+                                   histories_x, histories_y))
+          elif relation == Relation.SUBSET_OR_EQUALS:
+            if not histories_x.issubset(histories_y):
+              self.assertTrue(
+                  histories_x.issubset(histories_y),
+                  self._show_error(player, state, x, relation, y, rep_x, rep_y,
+                                   histories_x, histories_y))
+          else:
+            raise RuntimeError(f"Unknown relation {relation}")
+
+  def _show_error(self, pl, state, x, relation, y, rep_x, rep_y, histories_x,
+                  histories_y):
+    s = "Observation consistency failed.\n"
+    s += f"It should hold that partition of '{x}' is {relation} of '{y}'\n"
+    s += "Problem occurred while evaluating action history "
+    s += f"'{state.history_str()}' for player {pl}.\n"
+    s += f"The state representation is:\n{state}\n"
+    s += "-" * 80
+    s += "\nDetailed information:\n"
+    s += f"The set of histories that have the same '{x}':\n{histories_x}\n"
+    s += f"The set of histories that have the same '{y}':\n{histories_y}\n"
+    s += f"The set difference is:\n{histories_y - histories_x}\n"
+    s += f"The problematic {x} is '{rep_x}'\n"
+    s += f"The problematic {y} is '{rep_y}'\n"
+    return s
+
+  def test_observation_consistency(self):
+    if self.game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
+      return  # TODO(author13): support also other types of games.
+
+    # TODO(author13): Following games need to be fixed -- they currently
+    # do not pass the observation consistency test.
+    broken_games = [
+        "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
+        "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
+        "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker",
+        "dark_hex"
+    ]
+    if self.game_name in broken_games:
+      return
+
+    callbacks = dict()
+    callbacks["move_number"] = lambda _, state: str(state.move_number())
+    # pylint: disable=g-long-lambda
+    if self.game_type.provides_information_state_string:
+      callbacks["information_state_string"] = lambda player, state: \
+        state.information_state_string(player)
+    if self.game_type.provides_observation_string:
+      callbacks["action_observation_history"] = lambda player, state: \
+        str(pyspiel.ActionObservationHistory(player, state))
+    if self.game_type.provides_factored_observation_string:
+      callbacks["public_observation_history"] = lambda player, state: \
+        str(pyspiel.PublicObservationHistory(state))
+
+    # TODO(author13): Add testing of tensor variants.
+
+    relations = []
+
+    def add_relation(x, relation, y):
+      if x in callbacks and y in callbacks:
+        relations.append((x, relation, y))
+
+    # All observations should be subsets of move_number.
+    add_relation("information_state_string", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+    add_relation("public_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+    add_relation("action_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "move_number")
+
+    # Other relations:
+    add_relation("information_state_string", Relation.EQUALS,
+                 "action_observation_history")
+    add_relation("information_state_string", Relation.SUBSET_OR_EQUALS,
+                 "public_observation_history")
+    add_relation("action_observation_history", Relation.SUBSET_OR_EQUALS,
+                 "public_observation_history")
+
+    self._check_partition_consistency(callbacks, relations)
 
 
 def _assert_properties_recursive(state, assert_functions):
@@ -934,9 +713,21 @@ def _assert_is_perfect_recall_recursive(state, current_history,
 def _create_test_case_classes():
   """Yields one Testing class per game to test."""
   for game_name, game_string in _GAMES_FULL_TREE_TRAVERSAL_TESTS:
+    if not re.match(FLAGS.test_only_games, game_string):
+      continue
     game = pyspiel.load_game(game_string)
     new_class = type("EnforceAPIFullTree_{}_Test".format(game_name),
                      (EnforceAPIOnFullTreeBase,), {})
+    new_class.game_name = game_name
+    new_class.game = game
+    yield new_class
+
+  for game_name in _GAMES_TO_TEST:
+    if not re.match(FLAGS.test_only_games, game_name):
+      continue
+    game = pyspiel.load_game(game_name)
+    new_class = type("EnforceAPIPartialTree_{}_Test".format(game_name),
+                     (EnforceAPIOnPartialTreeBase,), {})
     new_class.game_name = game_name
     new_class.game = game
     yield new_class
@@ -952,10 +743,14 @@ def load_tests(loader, tests, pattern):  # pylint: disable=invalid-name,g-doc-ar
   del pattern
   tests = tuple(
       loader.loadTestsFromTestCase(test_case_class)
-      for test_case_class in list(_create_test_case_classes()) +
-      [PartialEnforceAPIConventionsTest])
+      for test_case_class in _create_test_case_classes())
   return unittest.TestSuite(tests=tests)
 
 
-if __name__ == "__main__":
+def main(_):
   absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

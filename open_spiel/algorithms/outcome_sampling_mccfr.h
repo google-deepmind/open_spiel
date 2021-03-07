@@ -53,23 +53,40 @@ class OutcomeSamplingMCCFRSolver {
                              std::shared_ptr<Policy> default_policy,
                              double epsilon = kDefaultEpsilon, int seed = -1);
 
+  // The constructor below is meant mainly for deserialization purposes and
+  // should not be used directly.
+  OutcomeSamplingMCCFRSolver(std::shared_ptr<const Game> game,
+                             std::shared_ptr<Policy> default_policy,
+                             double epsilon, std::mt19937 rng);
+
   // Performs one iteration of outcome sampling.
   void RunIteration() { RunIteration(&rng_); }
 
   // Same as above, but uses the specified random number generator instead.
   void RunIteration(std::mt19937* rng);
 
+  CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
+
   // Computes the average policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
-  std::unique_ptr<Policy> AveragePolicy() const {
-    return std::unique_ptr<Policy>(
-        new CFRAveragePolicy(info_states_, default_policy_));
+  std::shared_ptr<Policy> AveragePolicy() const {
+    return std::make_shared<CFRAveragePolicy>(info_states_, default_policy_);
+  }
+  // Note: This can be quite large.
+  TabularPolicy TabularAveragePolicy() const {
+    CFRAveragePolicy policy(info_states_, nullptr);
+    return TabularPolicy(*game_, policy);
   }
 
+  // See comments above CFRInfoStateValues::Serialize(double_precision) for
+  // notes about the double_precision parameter.
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "<~>") const;
+
  private:
-  double SampleEpisode(State* state, std::mt19937* rng, double my_reach,
-                       double opp_reach, double sample_reach);
+  double SampleEpisode(State* state, Player update_player, std::mt19937* rng,
+                       double my_reach, double opp_reach, double sample_reach);
   std::vector<double> SamplePolicy(const CFRInfoStateValues& info_state) const;
 
   // The b_i function from  Schmid et al. '19.
@@ -83,15 +100,17 @@ class OutcomeSamplingMCCFRSolver {
                                      double child_value,
                                      double sample_prob) const;
 
-  const Game& game_;
+  std::shared_ptr<const Game> game_;
   double epsilon_;
   CFRInfoStateValuesTable info_states_;
-  int num_players_;
-  int update_player_;
   std::mt19937 rng_;
   absl::uniform_real_distribution<double> dist_;
   std::shared_ptr<Policy> default_policy_;
 };
+
+std::unique_ptr<OutcomeSamplingMCCFRSolver>
+DeserializeOutcomeSamplingMCCFRSolver(const std::string& serialized,
+                                      std::string delimiter = "<~>");
 
 }  // namespace algorithms
 }  // namespace open_spiel

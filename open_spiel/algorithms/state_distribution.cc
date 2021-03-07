@@ -27,69 +27,103 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel::algorithms {
 namespace {
 
-std::vector<double> Normalize(const std::vector<double>& weights) {
-  std::vector<double> probs(weights);
-  const double normalizer = absl::c_accumulate(weights, 0.);
-  absl::c_for_each(probs, [&probs, normalizer](double& w) {
-    w = (normalizer == 0.0 ? 1.0 / probs.size() : w / normalizer);
-  });
-  return probs;
+int GetBeliefHistorySize(const HistoryDistribution& beliefs) {
+  int belief_history_size = 0;
+  for (int i = 0; i < beliefs.first.size(); ++i) {
+    belief_history_size =
+        std::max(belief_history_size,
+                 static_cast<int>(beliefs.first[i]->FullHistory().size()));
+  }
+  return belief_history_size;
 }
 
-void AdvanceBeliefHistoryOneAction(HistoryDistribution* previous, Action action,
-                                   Player player_id,
-                                   const Policy* opponent_policy) {
+std::unique_ptr<HistoryDistribution> AdvanceBeliefHistoryOneAction(
+    std::unique_ptr<HistoryDistribution> previous, Action action,
+    Player player_id, const Policy& opponent_policy) {
+  auto dist = absl::make_unique<HistoryDistribution>();
   for (int i = 0; i < previous->first.size(); ++i) {
-    std::unique_ptr<State>& parent = previous->first[i];
-    double& prob = previous->second[i];
+    std::unique_ptr<State>& state = previous->first[i];
+    const double& prob = previous->second[i];
     if (Near(prob, 0.)) continue;
-    switch (parent->GetType()) {
+    switch (state->GetType()) {
       case StateType::kChance: {
-        open_spiel::ActionsAndProbs outcomes = parent->ChanceOutcomes();
-        double action_prob = GetProb(outcomes, action);
+        // If we can't find the action in the policy, then set it to 0.
+        const double action_prob = GetProb(state->ChanceOutcomes(), action);
+
+        // Then, skip all actions with 0 probability, as they don't matter
+        // moving forward.
+        if (Near(std::max(action_prob, 0.0), 0.0)) continue;
+        SPIEL_CHECK_PROB(action_prob);
 
         // If we don't find the chance outcome, then the state we're in is
         // impossible, so we set it to zero.
-        if (action_prob == -1) {
-          prob = 0;
-          continue;
-        }
-        SPIEL_CHECK_PROB(action_prob);
-        prob *= action_prob;
+        state->ApplyAction(action);
+
+        dist->first.push_back(std::move(state));
+        dist->second.push_back(prob * std::max(0.0, action_prob));
         break;
       }
       case StateType::kDecision: {
-        if (parent->CurrentPlayer() == player_id) break;
-        open_spiel::ActionsAndProbs policy =
-            opponent_policy->GetStatePolicy(*parent);
-        double action_prob = GetProb(policy, action);
-        SPIEL_CHECK_PROB(action_prob);
-        prob *= action_prob;
+        if (state->CurrentPlayer() == player_id) {
+          state->ApplyAction(action);
+          dist->first.push_back(std::move(state));
+          dist->second.push_back(prob);
+        } else {
+          // We have to add all actions as we don't know if the opponent is
+          // taking a private or public action.
+          // TODO(author1): Add method to open_spiel::State that lets us
+          // only loop over the actions that are consistent with a given private
+          // action.
+          for (const auto& [candidate, action_prob] :
+               opponent_policy.GetStatePolicy(*state)) {
+            if (Near(std::max(0.0, action_prob), 0.0)) continue;
+            SPIEL_CHECK_PROB(action_prob);
+            std::unique_ptr<State> child = state->Child(candidate);
+            if (child->IsTerminal()) continue;
+            dist->first.push_back(std::move(child));
+            dist->second.push_back(prob * action_prob);
+          }
+        }
         break;
       }
       case StateType::kTerminal:
-        ABSL_FALLTHROUGH_INTENDED;
+        // If the state is terminal, and we have to advance by an action, we
+        // discard the terminal histories from our beliefs.
+        continue;
+        // SpielFatalError("State is terminal, should not call
+        // AdvanceBeliefs.");
       default:
-        SpielFatalError("Unknown state type.");
+        SpielFatalError(absl::StrCat("Unknown state type: ", state->GetType(),
+                                     ", state: ", state->ToString()));
     }
-    if (prob == 0) continue;
-    parent->ApplyAction(action);
   }
-  previous->second = Normalize(previous->second);
+  return dist;
 }
 
-int GetBeliefHistorySize(HistoryDistribution* beliefs) {
-  int belief_history_size = 0;
-  for (int i = 0; i < beliefs->first.size(); ++i) {
-    belief_history_size =
-        std::max(belief_history_size,
-                 static_cast<int>(beliefs->first[i]->History().size()));
+// Filters out all beliefs that do not belong to infostate.
+std::unique_ptr<HistoryDistribution> FilterOutBeliefs(
+    const State& state, std::unique_ptr<HistoryDistribution> dist,
+    int player_id) {
+  const std::string infostate = state.InformationStateString(player_id);
+  auto new_dist = absl::make_unique<HistoryDistribution>();
+  std::vector<int> good_indices;
+  for (int i = 0; i < dist->first.size(); ++i) {
+    if (dist->first[i]->InformationStateString(player_id) == infostate) {
+      good_indices.push_back(i);
+    }
   }
-  return belief_history_size;
+  new_dist->first.reserve(good_indices.size());
+  new_dist->second.reserve(good_indices.size());
+  for (int i : good_indices) {
+    new_dist->first.push_back(std::move(dist->first[i]));
+    new_dist->second.push_back(dist->second[i]);
+  }
+  return new_dist;
 }
 
 }  // namespace
@@ -104,9 +138,8 @@ std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
   return beliefs_copy;
 }
 
-
 HistoryDistribution GetStateDistribution(const State& state,
-                                         const Policy* opponent_policy) {
+                                         const Policy& opponent_policy) {
   std::shared_ptr<const Game> game = state.GetGame();
   GameType game_type = game->GetType();
   if (game_type.information == GameType::Information::kPerfectInformation) {
@@ -174,7 +207,7 @@ HistoryDistribution GetStateDistribution(const State& state,
         // from the policy instead.
         std::string opp_infostate_str = states[idx]->InformationStateString();
         ActionsAndProbs state_policy =
-            opponent_policy->GetStatePolicy(*states[idx]);
+            opponent_policy.GetStatePolicy(*states[idx]);
         for (Action action : states[idx]->LegalActions()) {
           double action_prob = GetProb(state_policy, action);
           states.push_back(states[idx]->Child(action));
@@ -217,42 +250,104 @@ HistoryDistribution GetStateDistribution(const State& state,
   }
 
   // Now normalize the probs
+  Normalize(absl::MakeSpan(final_probs));
+  HistoryDistribution dist = {std::move(final_states), std::move(final_probs)};
 
-  return {std::move(final_states), Normalize(final_probs)};
+  // Note: We do not call CheckBeliefs here as the beliefs are _wrong_ until we
+  // perform the filter step.
+  return dist;
 }
 
 std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
-    const State& state, const Policy* opponent_policy, int player_id,
+    const State& state, const Policy& opponent_policy, int player_id,
     std::unique_ptr<HistoryDistribution> previous) {
-  if (previous == nullptr) previous = std::make_unique<HistoryDistribution>();
-  if (previous->first.empty()) {
-    // If the previous pair is empty, then we have to do a BFS to find all
-    // relevant nodes:
-    return std::make_unique<HistoryDistribution>(
-        GetStateDistribution(state, opponent_policy));
+  std::unique_ptr<HistoryDistribution> dist;
+  if (previous) {
+    dist = std::move(previous);
   }
-  // The current state must be one action ahead of the dist ones.
-  const std::vector<Action> history = state.History();
-  int belief_history_size = GetBeliefHistorySize(previous.get());
+  // If we don't have a previous set of beliefs, create it.
+  if (!dist || dist->first.empty()) {
+    // This allows for games to special case this scenario. It only works if
+    // this is only called at the first decision node after chance nodes. We
+    // leave it to the caller to verify this is the case.
+    dist = state.GetHistoriesConsistentWithInfostate();
+
+    // If the game didn't implement GetHistoriesConsistentWithInfostate, then
+    // this is empty, otherwise, we're good.
+    if (!dist || dist->first.empty()) {
+      // If the previous pair is empty, then we have to do a BFS to find all
+      // relevant nodes:
+      dist = absl::make_unique<HistoryDistribution>(
+          GetStateDistribution(state, opponent_policy));
+    }
+  }
+  // Now, we verify that the beliefs match the current infostate.
+  const std::vector<State::PlayerAction>& history = state.FullHistory();
+  int belief_history_size = GetBeliefHistorySize(*dist);
+  std::unique_ptr<State> new_state = state.GetGame()->NewInitialState();
+  for (int i = 0; i < belief_history_size; ++i) {
+    new_state->ApplyAction(history[i].action);
+  }
+  SPIEL_DCHECK_TRUE(CheckBeliefs(*new_state, *dist, player_id));
   while (belief_history_size < history.size()) {
-    AdvanceBeliefHistoryOneAction(previous.get(), history[belief_history_size],
-                                  player_id, opponent_policy);
-    belief_history_size = GetBeliefHistorySize(previous.get());
+    dist = AdvanceBeliefHistoryOneAction(std::move(dist),
+                                         history[belief_history_size].action,
+                                         player_id, opponent_policy);
+    new_state->ApplyAction(history[belief_history_size].action);
+    dist = FilterOutBeliefs(*new_state, std::move(dist), player_id);
+    SPIEL_CHECK_FALSE(dist->first.empty());
+    if (!new_state->IsChanceNode()) {
+      SPIEL_DCHECK_TRUE(CheckBeliefs(*new_state, *dist, player_id));
+    }
+    const int new_belief_history_size = GetBeliefHistorySize(*dist);
+    SPIEL_CHECK_LT(belief_history_size, new_belief_history_size);
+    belief_history_size = new_belief_history_size;
   }
-  return previous;
+  SPIEL_CHECK_EQ(belief_history_size, history.size());
+  SPIEL_CHECK_EQ(new_state->FullHistory(), state.FullHistory());
+  dist = FilterOutBeliefs(state, std::move(dist), player_id);
+  SPIEL_CHECK_FALSE(dist->first.empty());
+
+  // We only normalize after filtering out invalid infostates.
+  Normalize(absl::MakeSpan(dist->second));
+
+  SPIEL_DCHECK_TRUE(CheckBeliefs(state, *dist, player_id));
+  return dist;
 }
 
-std::string PrintBeliefs(const HistoryDistribution& beliefs) {
+std::string PrintBeliefs(const HistoryDistribution& beliefs, int player_id) {
   const int num_states = beliefs.first.size();
   SPIEL_CHECK_EQ(num_states, beliefs.second.size());
   std::string str;
   for (int i = 0; i < num_states; ++i) {
     absl::StrAppend(
-        &str, absl::StrFormat("(%s, %f)", beliefs.first[i]->HistoryString(),
-                              beliefs.second[i]));
-    if (i < num_states - 1) absl::StrAppend(&str, ", ");
+        &str,
+        absl::StrFormat("(%s, %f)",
+                        beliefs.first[i]->InformationStateString(player_id),
+                        beliefs.second[i]));
+    if (i < num_states - 1) absl::StrAppend(&str, "\n");
   }
   return str;
+}
+
+bool CheckBeliefs(const State& ground_truth_state,
+                  const HistoryDistribution& beliefs, int player_id) {
+  const std::string infostate =
+      ground_truth_state.InformationStateString(player_id);
+  for (int i = 0; i < beliefs.first.size(); ++i) {
+    if (Near(beliefs.second[i], 0.0, 1e-5)) {
+      continue;
+    }
+    SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
+                   beliefs.first[i]->FullHistory().size());
+    SPIEL_CHECK_EQ(infostate,
+                   beliefs.first[i]->InformationStateString(player_id));
+    SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
+                   beliefs.first[i]->FullHistory().size());
+    SPIEL_CHECK_EQ(ground_truth_state.IsTerminal(),
+                   beliefs.first[i]->IsTerminal());
+  }
+  return true;
 }
 
 }  // namespace open_spiel::algorithms

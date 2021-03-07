@@ -26,6 +26,7 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -117,23 +118,22 @@ void LegalActionsAreSorted(const Game& game, State& state) {
   }
 }
 
-void LegalActionsMaskTest(const Game& game, const State& state,
+void LegalActionsMaskTest(const Game& game, const State& state, int player,
                           const std::vector<Action>& legal_actions) {
-  std::vector<int> legal_actions_mask =
-      state.LegalActionsMask(state.CurrentPlayer());
-  SPIEL_CHECK_EQ(legal_actions_mask.size(), game.NumDistinctActions());
+  std::vector<int> legal_actions_mask = state.LegalActionsMask(player);
+  const int expected_length = state.IsChanceNode() ? game.MaxChanceOutcomes()
+                                             : game.NumDistinctActions();
+  SPIEL_CHECK_EQ(legal_actions_mask.size(), expected_length);
   for (Action action : legal_actions) {
     SPIEL_CHECK_GE(action, 0);
-    SPIEL_CHECK_LT(action, game.NumDistinctActions());
+    SPIEL_CHECK_LT(action, expected_length);
     SPIEL_CHECK_EQ(legal_actions_mask[action], 1);
   }
 
   int num_ones = 0;
-  for (int i = 0; i < game.NumDistinctActions(); ++i) {
+  for (int i = 0; i < expected_length; ++i) {
     SPIEL_CHECK_TRUE(legal_actions_mask[i] == 0 || legal_actions_mask[i] == 1);
-    if (legal_actions_mask[i] == 1) {
-      num_ones++;
-    }
+    num_ones += legal_actions_mask[i];
   }
 
   SPIEL_CHECK_EQ(num_ones, legal_actions.size());
@@ -225,20 +225,23 @@ void CheckReturnsSum(const Game& game, const State& state) {
 // The following functions should return valid outputs for valid player, even
 // on terminal states:
 // - std::string InformationStateString(Player player)
-// - std::vector<double> InformationStateTensor(Player player)
+// - std::vector<float> InformationStateTensor(Player player)
 // - std::string ObservationString(Player player)
-// - std::vector<double> ObservationTensor(Player player)
+// - std::vector<float> ObservationTensor(Player player)
 //
 // These functions should crash on invalid players: this is tested in
 // api_test.py as it's simpler to catch the error from Python.
-void CheckObservables(const Game& game, const State& state) {
+void CheckObservables(const Game& game,
+                      const State& state,
+                      Observation* observation  // Can be nullptr
+                     ) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {
-      std::vector<double> v = state.InformationStateTensor(p);
+      std::vector<float> v = state.InformationStateTensor(p);
       SPIEL_CHECK_EQ(v.size(), game.InformationStateTensorSize());
     }
     if (game.GetType().provides_observation_tensor) {
-      std::vector<double> v = state.ObservationTensor(p);
+      std::vector<float> v = state.ObservationTensor(p);
       SPIEL_CHECK_EQ(v.size(), game.ObservationTensorSize());
     }
     if (game.GetType().provides_information_state_string) {
@@ -249,39 +252,59 @@ void CheckObservables(const Game& game, const State& state) {
       // Checking it does not have errors.
       state.ObservationString(p);
     }
+
+    if (observation != nullptr) {
+      if (observation->HasString()) observation->StringFrom(state, p);
+      if (observation->HasTensor()) observation->SetFrom(state, p);
+    }
   }
 }
 
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
-                      bool serialize) {
+                      bool serialize, bool verbose,
+                      std::shared_ptr<Observer> observer  // Can be nullptr
+                     ) {
+  std::unique_ptr<Observation> observation =
+      observer == nullptr ? nullptr
+                          : std::make_unique<Observation>(game, observer);
   std::vector<HistoryItem> history;
   std::vector<double> episode_returns(game.NumPlayers(), 0);
 
   int infostate_vector_size = game.GetType().provides_information_state_tensor
                                   ? game.InformationStateTensorSize()
                                   : 0;
-  std::cout << "Information state vector size: " << infostate_vector_size
-            << std::endl;
+  if (verbose) {
+    std::cout << "Information state vector size: " << infostate_vector_size
+              << std::endl;
+  }
 
   int observation_vector_size = game.GetType().provides_observation_tensor
                                     ? game.ObservationTensorSize()
                                     : 0;
-  std::cout << "Observation vector size: " << observation_vector_size
-            << std::endl;
+  if (verbose) {
+    std::cout << "Observation vector size: " << observation_vector_size
+              << std::endl;
+  }
 
   SPIEL_CHECK_TRUE(game.MinUtility() < game.MaxUtility());
-  std::cout << "Utility range: " << game.MinUtility() << " "
-            << game.MaxUtility() << std::endl;
+  if (verbose) {
+    std::cout << "Utility range: " << game.MinUtility() << " "
+              << game.MaxUtility() << std::endl;
 
-  std::cout << "Starting new game.." << std::endl;
+    std::cout << "Starting new game.." << std::endl;
+  }
   std::unique_ptr<open_spiel::State> state = game.NewInitialState();
 
-  std::cout << "Initial state:" << std::endl;
-  std::cout << "State:" << std::endl << state->ToString() << std::endl;
+  if (verbose) {
+    std::cout << "Initial state:" << std::endl;
+    std::cout << "State:" << std::endl << state->ToString() << std::endl;
+  }
   int game_length = 0;
 
   while (!state->IsTerminal()) {
-    std::cout << "player " << state->CurrentPlayer() << std::endl;
+    if (verbose) {
+      std::cout << "player " << state->CurrentPlayer() << std::endl;
+    }
 
     LegalActionsIsEmptyForOtherPlayers(game, *state);
     LegalActionsAreSorted(game, *state);
@@ -296,13 +319,17 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
 
     if (state->IsChanceNode()) {
+      LegalActionsMaskTest(game, *state, kChancePlayerId,
+                           state->LegalActions());
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
       Action action = open_spiel::SampleAction(outcomes, *rng).first;
 
-      std::cout << "sampled outcome: "
-                << state->ActionToString(kChancePlayerId, action) << std::endl;
-
+      if (verbose) {
+        std::cout << "sampled outcome: "
+                  << state->ActionToString(kChancePlayerId, action)
+                  << std::endl;
+      }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
       state->ApplyAction(action);
 
@@ -312,7 +339,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
-      std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      if (verbose) {
+        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      }
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
@@ -323,6 +352,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions = state->LegalActions(p);
+        LegalActionsMaskTest(game, *state, p, actions);
         std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
@@ -331,10 +361,11 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
         } else {
           history.emplace_back(nullptr, kInvalidHistoryPlayer, action);
         }
-        std::cout << "player " << p << " chose "
-                  << state->ActionToString(p, action) << std::endl;
-
-        CheckObservables(game, *state);
+        if (verbose) {
+          std::cout << "player " << p << " chose "
+                    << state->ActionToString(p, action) << std::endl;
+        }
+        CheckObservables(game, *state, observation.get());
       }
 
       ApplyActionTestClone(game, state.get(), joint_action);
@@ -342,7 +373,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     } else {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
-      std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      if (verbose) {
+        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+      }
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
       }
@@ -350,11 +383,11 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Decision node.
       Player player = state->CurrentPlayer();
 
-      CheckObservables(game, *state);
+      CheckObservables(game, *state, observation.get());
 
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
-      LegalActionsMaskTest(game, *state, actions);
+      LegalActionsMaskTest(game, *state, state->CurrentPlayer(), actions);
       if (state->IsTerminal())
         SPIEL_CHECK_TRUE(actions.empty());
       else
@@ -362,9 +395,10 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
 
-      std::cout << "chose action: " << action << " ("
-                << state->ActionToString(player, action) << ")" << std::endl;
-
+      if (verbose) {
+        std::cout << "chose action: " << action << " ("
+                  << state->ActionToString(player, action) << ")" << std::endl;
+      }
       history.emplace_back(state->Clone(), player, action);
       ApplyActionTestClone(game, state.get(), action);
       game_length++;
@@ -374,15 +408,21 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       }
     }
 
-    std::cout << "State: " << std::endl << state->ToString() << std::endl;
+    if (verbose) {
+      std::cout << "State: " << std::endl << state->ToString() << std::endl;
+    }
   }
 
   SPIEL_CHECK_LE(game_length, game.MaxGameLength());
 
-  std::cout << "Reached a terminal state!" << std::endl;
+  if (verbose) {
+    std::cout << "Reached a terminal state!" << std::endl;
+  }
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kTerminalPlayerId);
   std::vector<double> rewards = state->Rewards();
-  std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+  if (verbose) {
+    std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+  }
 
   history.emplace_back(state->Clone(), kTerminalPlayerId,
                        kInvalidHistoryAction);
@@ -390,7 +430,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
   // Check the information state of the terminal, too. This is commonly needed,
   // for example, as a final observation in an RL environment.
-  CheckObservables(game, *state);
+  CheckObservables(game, *state, observation.get());
 
   // Check that the returns satisfy the constraints based on the game type.
   CheckReturnsSum(game, *state);
@@ -403,20 +443,26 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     SPIEL_CHECK_FLOAT_EQ(final_return, state->PlayerReturn(player));
     SPIEL_CHECK_GE(final_return, game.MinUtility());
     SPIEL_CHECK_LE(final_return, game.MaxUtility());
-    std::cout << "Final return to player " << player << " is " << final_return
-              << std::endl;
+    if (verbose) {
+      std::cout << "Final return to player " << player << " is " << final_return
+                << std::endl;
+    }
     episode_returns[player] += rewards[player];
     SPIEL_CHECK_TRUE(Near(episode_returns[player], final_return));
   }
 }
 
 // Perform sims random simulations of the specified game.
-void RandomSimTest(const Game& game, int num_sims) {
+void RandomSimTest(const Game& game, int num_sims, bool serialize,
+                   bool verbose) {
   std::mt19937 rng;
-  std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
-            << ", num_sims = " << num_sims << std::endl;
+  if (verbose) {
+    std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
+              << ", num_sims = " << num_sims << std::endl;
+  }
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/true);
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
+                     verbose, nullptr);
   }
 }
 
@@ -425,7 +471,8 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
   std::cout << "RandomSimTestWithUndo, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true);
+    RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true,
+                     /*verbose=*/true, nullptr);
   }
 }
 
@@ -434,8 +481,16 @@ void RandomSimTestNoSerialize(const Game& game, int num_sims) {
   std::cout << "RandomSimTestNoSerialize, game = " << game.GetType().short_name
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
-    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false);
+    RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
+                     /*verbose=*/true, nullptr);
   }
+}
+
+void RandomSimTestCustomObserver(const Game& game,
+                                 const std::shared_ptr<Observer> observer) {
+  std::mt19937 rng;
+  RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
+                   /*verbose=*/false, observer);
 }
 
 // Format chance outcomes as a string, for error messages.
@@ -542,6 +597,59 @@ void ResampleInfostateTest(const Game& game, int num_sims) {
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(rng)];
       state->ApplyAction(action);
+    }
+  }
+}
+
+void TestPoliciesCanPlay(TabularPolicyGenerator policy_generator,
+                         const Game& game, int numSims) {
+  TabularPolicy policy = policy_generator(game);
+  std::mt19937 rng(0);
+  for (int i = 0; i < numSims; ++i) {
+    std::unique_ptr<State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      ActionsAndProbs outcomes;
+      if (state->IsChanceNode()) {
+        outcomes = state->ChanceOutcomes();
+      } else {
+        outcomes = policy.GetStatePolicy(state->InformationStateString());
+      }
+      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
+    }
+  }
+}
+
+void TestPoliciesCanPlay(const Policy& policy, const Game& game, int numSims) {
+  std::mt19937 rng(0);
+  for (int i = 0; i < numSims; ++i) {
+    std::unique_ptr<State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      ActionsAndProbs outcomes;
+      if (state->IsChanceNode()) {
+        outcomes = state->ChanceOutcomes();
+      } else {
+        outcomes = policy.GetStatePolicy(*state);
+      }
+      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
+    }
+  }
+}
+
+void TestEveryInfostateInPolicy(TabularPolicyGenerator policy_generator,
+                                const Game& game) {
+  TabularPolicy policy = policy_generator(game);
+  std::vector<std::unique_ptr<State>> to_visit;
+  to_visit.push_back(game.NewInitialState());
+  while (!to_visit.empty()) {
+    std::unique_ptr<State> state = std::move(to_visit.back());
+    to_visit.pop_back();
+    for (Action action : state->LegalActions()) {
+      to_visit.push_back(state->Child(action));
+    }
+    if (!state->IsChanceNode() && !state->IsTerminal()) {
+      SPIEL_CHECK_EQ(
+          policy.GetStatePolicy(state->InformationStateString()).size(),
+          state->LegalActions().size());
     }
   }
 }

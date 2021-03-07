@@ -141,9 +141,9 @@ bool TicTacToeState::IsTerminal() const {
 }
 
 std::vector<double> TicTacToeState::Returns() const {
-  if (outcome_ == Player{0}) {
+  if (HasLine(Player{0})) {
     return {1.0, -1.0};
-  } else if (outcome_ == Player{1}) {
+  } else if (HasLine(Player{1})) {
     return {-1.0, 1.0};
   } else {
     return {0.0, 0.0};
@@ -163,7 +163,7 @@ std::string TicTacToeState::ObservationString(Player player) const {
 }
 
 void TicTacToeState::ObservationTensor(Player player,
-                                       std::vector<double>* values) const {
+                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

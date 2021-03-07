@@ -51,6 +51,9 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "  a b c d e f g h i\n 1 . . . . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . .\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . . . . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . .\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . . . . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . .\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◯
@@ -100,6 +103,9 @@ InformationStateString(0) = "1"
 InformationStateString(1) = "1"
 ObservationString(0) = "  a b c d e f g h i\n 1 .[O]. . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . .\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 .[O]. . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . .\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 .[O]. . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . .\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◯
@@ -141,14 +147,17 @@ action: 32
 #          9 .
 IsTerminal() = False
 History() = [1, 32]
-HistoryString() = "1 32"
+HistoryString() = "1, 32"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32"
-InformationStateString(1) = "1 32"
+InformationStateString(0) = "1, 32"
+InformationStateString(1) = "1, 32"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . .[@]\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . .[@]\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . . . . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . .[@]\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◯
@@ -190,14 +199,17 @@ action: 6
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6]
-HistoryString() = "1 32 6"
+HistoryString() = "1, 32, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6"
-InformationStateString(1) = "1 32 6"
+InformationStateString(0) = "1, 32, 6"
+InformationStateString(1) = "1, 32, 6"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . .[O]. .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . .[O]. .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . .[O]. .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◉◉◯◉◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◯
@@ -239,14 +251,17 @@ action: 5
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5]
-HistoryString() = "1 32 6 5"
+HistoryString() = "1, 32, 6, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5"
-InformationStateString(1) = "1 32 6 5"
+InformationStateString(0) = "1, 32, 6, 5"
+InformationStateString(1) = "1, 32, 6, 5"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . .[@]O . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . .[@]O . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . .[@]O . .\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◯◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◉◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◯
@@ -288,14 +303,17 @@ action: 7
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7]
-HistoryString() = "1 32 6 5 7"
+HistoryString() = "1, 32, 6, 5, 7"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7"
-InformationStateString(1) = "1 32 6 5 7"
+InformationStateString(0) = "1, 32, 6, 5, 7"
+InformationStateString(1) = "1, 32, 6, 5, 7"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O[O].\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O[O].\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O[O].\n  2 . . . . . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉◉◯
@@ -337,14 +355,17 @@ action: 11
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11]
-HistoryString() = "1 32 6 5 7 11"
+HistoryString() = "1, 32, 6, 5, 7, 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11"
-InformationStateString(1) = "1 32 6 5 7 11"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . .[@]. . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . .[@]. . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . .[@]. . . . .\n   3 . . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯◯  ◉◉◯◉◉◉◉◉◯
@@ -386,14 +407,17 @@ action: 18
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18]
-HistoryString() = "1 32 6 5 7 11 18"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18"
-InformationStateString(1) = "1 32 6 5 7 11 18"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3[O]. . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3[O]. . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3[O]. . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . .\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯◯  ◉◉◯◉◉◉◉◉◯
@@ -435,14 +459,17 @@ action: 64
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64]
-HistoryString() = "1 32 6 5 7 11 18 64"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64"
-InformationStateString(1) = "1 32 6 5 7 11 18 64"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 .[@]\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 .[@]\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . .\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 .[@]\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯◯  ◉◉◯◉◉◉◉◉◯
@@ -484,14 +511,17 @@ action: 24
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24]
-HistoryString() = "1 32 6 5 7 11 18 64 24"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . .[O]\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . .[O]\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . .[O]\n    4 . . . . . @\n     5 . . . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯◯  ◉◉◯◉◉◉◉◉◯
@@ -533,14 +563,17 @@ action: 37
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . O\n    4 . . . . . @\n     5 .[@]. . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . O\n    4 . . . . . @\n     5 .[@]. . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . O\n    4 . . . . . @\n     5 .[@]. . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯◯  ◉◉◯◉◉◉◉◉◯
@@ -582,14 +615,17 @@ action: 30
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . O\n    4 . . .[O]. @\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . O\n    4 . . .[O]. @\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 . . @ . . . . .\n   3 O . . . . . O\n    4 . . .[O]. @\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯◯◯  ◉◉◯◉◉◉◉◉◯
@@ -631,14 +667,17 @@ action: 9
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2[@]. @ . . . . .\n   3 O . . . . . O\n    4 . . . O . @\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2[@]. @ . . . . .\n   3 O . . . . . O\n    4 . . . O . @\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2[@]. @ . . . . .\n   3 O . . . . . O\n    4 . . . O . @\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -680,14 +719,17 @@ action: 31
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O[O]@\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O[O]@\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O[O]@\n     5 . @ . . .\n      6 . . . .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -729,14 +771,17 @@ action: 46
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5 . @ . . .\n      6 .[@]. .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5 . @ . . .\n      6 .[@]. .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5 . @ . . .\n      6 .[@]. .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -778,14 +823,17 @@ action: 36
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5[O]@ . . .\n      6 . @ . .\n       7 . . .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5[O]@ . . .\n      6 . @ . .\n       7 . . .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5[O]@ . . .\n      6 . @ . .\n       7 . . .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -827,14 +875,17 @@ action: 55
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5 O @ . . .\n      6 . @ . .\n       7 .[@].\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5 O @ . . .\n      6 . @ . .\n       7 .[@].\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . . . O O @\n     5 O @ . . .\n      6 . @ . .\n       7 .[@].\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -876,14 +927,17 @@ action: 28
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 .[O]. O O @\n     5 O @ . . .\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 .[O]. O O @\n     5 O @ . . .\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O .\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 .[O]. O O @\n     5 O @ . . .\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◉◯◯◯◉
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -925,14 +979,17 @@ action: 8
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O[@]\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . .\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O[@]\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . .\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O[@]\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . .\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◉◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -974,14 +1031,17 @@ action: 40
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O @\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . .[O]\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O @\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . .[O]\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O @\n  2 @ . @ . . . . .\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . .[O]\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◉◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◯◯  ◯◉◯◉◉◉◉◉◯
@@ -1023,14 +1083,17 @@ action: 16
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . . @ O O @\n  2 @ . @ . . . .[@]\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . . @ O O @\n  2 @ . @ . . . .[@]\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . . @ O O @\n  2 @ . @ . . . .[@]\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◯◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◉◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◉◯  ◯◉◯◉◉◉◉◯◯
@@ -1072,14 +1135,17 @@ action: 4
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . .[O]@ O O @\n  2 @ . @ . . . . @\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . .[O]@ O O @\n  2 @ . @ . . . . @\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . .[O]@ O O @\n  2 @ . @ . . . . @\n   3 O . . . . . O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◉◯  ◯◉◯◉◉◉◉◯◯
@@ -1121,14 +1187,17 @@ action: 22
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . .[@]. O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . .[@]. O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . .[@]. O\n    4 . O . O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◉◯  ◯◉◯◉◉◉◉◯◯
@@ -1170,14 +1239,17 @@ action: 29
 #          9 .
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O[O]O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O[O]O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O[O]O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9 .\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◉◯  ◯◉◯◉◉◉◉◯◯
@@ -1219,14 +1291,17 @@ action: 72
 #          9[@]
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9[@]\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9[@]\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 . @\n         9[@]\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◉◯  ◯◉◯◉◉◉◉◯◯
@@ -1268,14 +1343,17 @@ action: 63
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8[O]@\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8[O]@\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ . . . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8[O]@\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◯◯◯◯◉◯  ◯◉◯◉◉◉◉◯◯
@@ -1317,14 +1395,17 @@ action: 12
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @[@]. . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @[@]. . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @[@]. . . @\n   3 O . . . @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◯◯◯◉◯  ◯◉◯◯◉◉◉◯◯
@@ -1366,14 +1447,17 @@ action: 21
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . . @\n   3 O . .[O]@ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . . @\n   3 O . .[O]@ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . . @\n   3 O . .[O]@ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◯◯◯◉◯  ◯◉◯◯◉◉◉◯◯
@@ -1415,14 +1499,17 @@ action: 15
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . .[@]@\n   3 O . . O @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . .[@]@\n   3 O . . O @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . .[@]@\n   3 O . . O @ . O\n    4 . O O O O @\n     5 O @ . . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◉◯◯◯
@@ -1464,14 +1551,17 @@ action: 38
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . @ @\n   3 O . . O @ . O\n    4 . O O O O @\n     5 O @[O]. O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . @ @\n   3 O . . O @ . O\n    4 . O O O O @\n     5 O @[O]. O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . @ @\n   3 O . . O @ . O\n    4 . O O O O @\n     5 O @[O]. O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◉◯◯◯
@@ -1513,14 +1603,17 @@ action: 27
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . @ @\n   3 O . . O @ . O\n    4[@]O O O O @\n     5 O @ O . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . @ @\n   3 O . . O @ . O\n    4[@]O O O O @\n     5 O @ O . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . . @ @\n   3 O . . O @ . O\n    4[@]O O O O @\n     5 O @ O . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◯◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◉◯◯◯
@@ -1562,14 +1655,17 @@ action: 14
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ .[O]@ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ .[O]@ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ .[O]@ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 . @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◯◯◯◯
@@ -1611,14 +1707,17 @@ action: 45
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6[@]@ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6[@]@ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O . . O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6[@]@ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◯◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◉◉◯◯◯◯◯
 ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◯◯◯◯
@@ -1660,14 +1759,17 @@ action: 2
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O[O]. O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O[O]. O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O[O]. O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 . @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◉◯◯◯◯◯
 ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◯◯◯◯
@@ -1709,14 +1811,17 @@ action: 54
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O O . O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7[@]@ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O O . O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7[@]@ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O O . O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7[@]@ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◯◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◉◯◯◯◯◯
 ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◯◯◯◯
@@ -1758,14 +1863,17 @@ action: 3
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O O[O]O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ .\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O O[O]O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ .\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O O[O]O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ .\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◯◯◯◯
@@ -1807,14 +1915,17 @@ action: 56
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @[@]\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @[@]\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ . @ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @[@]\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◉◯◯◉◯◯◯◯
@@ -1856,14 +1967,17 @@ action: 10
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @[O]@ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ @\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @[O]@ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @[O]@ @ . O @ @\n   3 O . . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◯◯◯◉◯◯◯◯
@@ -1905,14 +2019,17 @@ action: 19
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O[@]. O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ @\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O[@]. O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O[@]. O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ . .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◯◯◯◉◯◯◯◯
@@ -1954,14 +2071,17 @@ action: 47
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47"
 ObservationString(0) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @[O].\n       7 @ @ @\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @[O].\n       7 @ @ @\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 . O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @[O].\n       7 @ @ @\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◯◯◯◯◯◉◯◯◉  ◉◯◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◯◯◯◉◯◯◯◯
@@ -2003,14 +2123,17 @@ action: 0
 #          9 @
 IsTerminal() = False
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47 0"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47 0"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47 0"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0"
 ObservationString(0) = "  a b c d e f g h i\n 1[@]O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ O .\n       7 @ @ @\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1[@]O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ O .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1[@]O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @ . O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ O .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◉◯◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◯◯◯◉◯◯◯◯
@@ -2052,14 +2175,17 @@ action: 23
 #          9 @
 IsTerminal() = True
 History() = [1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0, 23]
-HistoryString() = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47 0 23"
+HistoryString() = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0, 23"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47 0 23"
-InformationStateString(1) = "1 32 6 5 7 11 18 64 24 37 30 9 31 46 36 55 28 8 40 16 4 22 29 72 63 12 21 15 38 27 14 45 2 54 3 56 10 19 47 0 23"
+InformationStateString(0) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0, 23"
+InformationStateString(1) = "1, 32, 6, 5, 7, 11, 18, 64, 24, 37, 30, 9, 31, 46, 36, 55, 28, 8, 40, 16, 4, 22, 29, 72, 63, 12, 21, 15, 38, 27, 14, 45, 2, 54, 3, 56, 10, 19, 47, 0, 23"
 ObservationString(0) = "  a b c d e f g h i\n 1 @ O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @[O]O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ O .\n       7 @ @ @\n        8 O @\n         9 @\n"
 ObservationString(1) = "  a b c d e f g h i\n 1 @ O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @[O]O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ O .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PublicObservationString() = "  a b c d e f g h i\n 1 @ O O O O @ O O @\n  2 @ O @ @ . O @ @\n   3 O @ . O @[O]O\n    4 @ O O O O @\n     5 O @ O . O\n      6 @ @ O .\n       7 @ @ @\n        8 O @\n         9 @\n"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◯◉◉◯  ◉◯◯◯◯◉◯◯◉  ◯◯◯◯◯◯◯◯◯
 ◯◉◯◯◯◉◯◯◯  ◉◯◉◉◯◯◉◉◯  ◯◯◯◯◉◯◯◯◯

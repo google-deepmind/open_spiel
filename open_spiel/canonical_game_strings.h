@@ -25,12 +25,16 @@ namespace open_spiel {
 // Returns the "canonical" definition of Heads-up No-limit Texas Hold'em and
 // Heads-up Limit Texas Hold'em according to the ACPC:
 // http://www.computerpokercompetition.org/.
-// Valid values for betting_abstraction are "fc" for fold-call, and "fcpa" for
-// fold, call, pot, all-in. Use "fullgame" for the unabstracted game. These
-// indicate the actions that are allowed. Note that in limit poker, "fcpa" is
-// just the full game. The string returned can be passed directly to LoadGame.
+// Valid values for betting_abstraction are "fc" for fold-call,"fcpa" for
+// fold, call, pot, all-in, "fchpa" for fold, call, half-pot, pot, all-in, and
+// "fullgame" for the unabstracted game. These indicate the actions that are
+// allowed. Note that in limit poker, "fcpa" & "fcpha" are just the full game.
+// The string returned can be passed directly to LoadGame.
 std::string HunlGameString(const std::string &betting_abstraction);
 std::string HulhGameString(const std::string &betting_abstraction);
+
+// Turn based goofspiel w/ imperfect information and descending points order.
+std::string TurnBasedGoofspielGameString(int num_cards);
 
 }  // namespace open_spiel
 

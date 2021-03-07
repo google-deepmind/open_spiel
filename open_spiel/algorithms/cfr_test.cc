@@ -56,7 +56,7 @@ void CFRTest_KuhnPoker() {
   for (int i = 0; i < 300; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   CheckNashKuhnPoker(*game, *average_policy);
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
@@ -73,7 +73,7 @@ void CFRTest_IIGoof4() {
     solver.EvaluateAndUpdatePolicy();
   }
   // Values checked with Marc's thesis implementation.
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   SPIEL_CHECK_LE(Exploitability(*game, *average_policy), 0.1);
 
   // Fixed points order.
@@ -87,7 +87,7 @@ void CFRTest_IIGoof4() {
     solver2.EvaluateAndUpdatePolicy();
   }
   // Values checkes with Marc's thesis implementation.
-  const std::unique_ptr<Policy> average_policy2 = solver2.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy2 = solver2.AveragePolicy();
   SPIEL_CHECK_LE(Exploitability(*game, *average_policy2), 0.01);
 }
 
@@ -97,7 +97,7 @@ void CFRPlusTest_KuhnPoker() {
   for (int i = 0; i < 200; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  const std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  const std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   CheckNashKuhnPoker(*game, *average_policy);
   CheckExploitabilityKuhnPoker(*game, *average_policy);
 }
@@ -108,12 +108,12 @@ void CFRTest_KuhnPokerRunsWithThreePlayers(bool linear_averaging,
   int num_players = 3;
   std::shared_ptr<const Game> game =
       LoadGame("kuhn_poker", {{"players", GameParameter(num_players)}});
-  CFRSolverBase solver(*game, regret_matching_plus, alternating_updates,
-                       linear_averaging);
+  CFRSolverBase solver(*game, alternating_updates, linear_averaging,
+                       regret_matching_plus);
   for (int i = 0; i < 10; i++) {
     solver.EvaluateAndUpdatePolicy();
   }
-  std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+  std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
   // Value upper-bounds inspired by Fig 2 of (Srinivasan et al., Actor-Critic
   // Policy Optimization in Partially Observable Multiagent Environments, 2018)
   // https://arxiv.org/abs/1810.09026
@@ -136,7 +136,7 @@ void CFRTest_GeneralMultiplePlayerTest(const std::string& game_name,
   }
 
   if (nashconv_upper_bound > 0) {
-    std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+    std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
     SPIEL_CHECK_LE(NashConv(*game, *average_policy), nashconv_upper_bound);
   }
 }
@@ -156,9 +156,15 @@ void CFRTest_OneShotGameTest(int iterations, std::string one_shot_game,
   for (int i = 0; i < iterations; i++) {
     solver.EvaluateAndUpdatePolicy();
     if (i % 10 == 0) {
-      std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+      std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
       nash_conv = NashConv(*game, *average_policy);
       std::cout << "iter " << i << ", nashconv = " << nash_conv << std::endl;
+
+      if (game->GetType().utility == GameType::Utility::kConstantSum ||
+          game->GetType().utility == GameType::Utility::kZeroSum) {
+        double expl = Exploitability(*game, *average_policy);
+        SPIEL_CHECK_FLOAT_NEAR(expl, nash_conv / game->NumPlayers(), 1e-10);
+      }
     }
   }
   SPIEL_CHECK_LE(nash_conv, nashconv_upper_bound);
@@ -177,9 +183,76 @@ void CFRTest_TicTacToe(int num_iterations, double nashconv_upper_bound) {
   }
 
   if (nashconv_upper_bound > 0) {
-    std::unique_ptr<Policy> average_policy = solver.AveragePolicy();
+    std::shared_ptr<Policy> average_policy = solver.AveragePolicy();
     SPIEL_CHECK_LE(NashConv(*game, *average_policy), nashconv_upper_bound);
   }
+}
+
+void CFRTest_InfoStateValuesTableSerialization() {
+  // Check empty
+  CFRInfoStateValuesTable info_state_values_table = {};
+  std::string serialized0 = "";
+  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized0, -1);
+  CFRInfoStateValuesTable deserialized0;
+  DeserializeCFRInfoStateValuesTable(serialized0, &deserialized0);
+  SPIEL_CHECK_TRUE(deserialized0.empty());
+
+  // Check non-empty
+  info_state_values_table = {
+      {"", CFRInfoStateValues({0}, 1.0)},
+      {"0:0,0;0", CFRInfoStateValues({0, 1, 2}, 0.1)},
+      {"<->\n<->", CFRInfoStateValues({0, 1, 2}, 0.1)},
+      {"1:1,1;1", CFRInfoStateValues({0, 1, 2, 3}, 0.2)}};
+  std::string serialized1 = "";
+  SerializeCFRInfoStateValuesTable(info_state_values_table, &serialized1, -1);
+  CFRInfoStateValuesTable deserialized1;
+  DeserializeCFRInfoStateValuesTable(serialized1, &deserialized1);
+
+  SPIEL_CHECK_EQ(info_state_values_table.size(),
+                 info_state_values_table.size());
+  for (const auto& [info_state, values] : info_state_values_table) {
+    for (int i = 0; i < values.legal_actions.size(); i++) {
+      SPIEL_CHECK_EQ(values.legal_actions.at(i),
+                     deserialized1.at(info_state).legal_actions.at(i));
+      SPIEL_CHECK_FLOAT_NEAR(
+          values.cumulative_regrets.at(i),
+          deserialized1.at(info_state).cumulative_regrets.at(i), 1e-15);
+      SPIEL_CHECK_FLOAT_NEAR(
+          values.cumulative_policy.at(i),
+          deserialized1.at(info_state).cumulative_policy.at(i), 1e-15);
+      SPIEL_CHECK_FLOAT_NEAR(values.current_policy.at(i),
+                             deserialized1.at(info_state).current_policy.at(i),
+                             1e-15);
+    }
+  }
+}
+
+void CFRTest_CFRSolverSerialization() {
+  auto game = LoadGame("kuhn_poker");
+  CFRSolver solver = CFRSolver(*game);
+  double exploitability0 = Exploitability(*game, *solver.AveragePolicy());
+
+  for (int i = 0; i < 50; i++) {
+    solver.EvaluateAndUpdatePolicy();
+  }
+  double exploitability1 = Exploitability(*game, *solver.AveragePolicy());
+  SPIEL_CHECK_GT(exploitability0, exploitability1);
+
+  std::string serialized = solver.Serialize();
+  std::unique_ptr<CFRSolver> deserialized_solver =
+      DeserializeCFRSolver(serialized);
+  SPIEL_CHECK_EQ(solver.InfoStateValuesTable().size(),
+                 deserialized_solver->InfoStateValuesTable().size());
+  double exploitability2 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_FLOAT_NEAR(exploitability1, exploitability2, 1e-15);
+
+  for (int i = 0; i < 50; i++) {
+    deserialized_solver->EvaluateAndUpdatePolicy();
+  }
+  double exploitability3 =
+      Exploitability(*game, *deserialized_solver->AveragePolicy());
+  SPIEL_CHECK_GT(exploitability2, exploitability3);
 }
 
 }  // namespace
@@ -245,4 +318,7 @@ int main(int argc, char** argv) {
   // when we add a version that can handle safe imperfect recall information
   // states.
   // algorithms::CFRTest_TicTacToe(10, 2.0);
+
+  algorithms::CFRTest_InfoStateValuesTableSerialization();
+  algorithms::CFRTest_CFRSolverSerialization();
 }

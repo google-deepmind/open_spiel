@@ -65,12 +65,9 @@ class DeepSeaState : public State {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
-  void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
@@ -99,14 +96,8 @@ class DeepSeaGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new DeepSeaState(shared_from_this()));
   }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<Game>(new DeepSeaGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {size_, size_};
-  }
-  std::vector<int> InformationStateTensorShape() const override {
-    return {2 * size_};
   }
 
   int NumDistinctActions() const override { return kNumActions; }
@@ -130,4 +121,4 @@ class DeepSeaGame : public Game {
 }  // namespace deep_sea
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_CATCH_H_
+#endif  // OPEN_SPIEL_GAMES_DEEP_SEA_H_

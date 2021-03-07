@@ -28,11 +28,23 @@ namespace {
 // Default parameters.
 constexpr int kDefaultHorizon = 1000;
 
+// A valid state looks like:
+//
+//   .....
+//   ..Ab.
+//   .....
+//   .....
+//
+// In this case, the first player has the ball ('A') and the second player does
+// not ('b'). Upper case means that player has posession. When the ball is in
+// the field and neither player has posession, it is represented as an 'O' and
+// both players are lower-case.
+
 // Facts about the game
 const GameType kGameType{/*short_name=*/"markov_soccer",
                          /*long_name=*/"Markov Soccer",
                          GameType::Dynamics::kSimultaneous,
-                         GameType::ChanceMode::kDeterministic,
+                         GameType::ChanceMode::kExplicitStochastic,
                          GameType::Information::kPerfectInformation,
                          GameType::Utility::kZeroSum,
                          GameType::RewardModel::kTerminal,
@@ -347,7 +359,7 @@ int MarkovSoccerState::observation_plane(int r, int c) const {
 }
 
 void MarkovSoccerState::ObservationTensor(Player player,
-                                          std::vector<double>* values) const {
+                                          absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 

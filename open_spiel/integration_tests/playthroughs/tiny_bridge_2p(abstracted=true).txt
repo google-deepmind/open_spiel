@@ -83,7 +83,7 @@ action: 14
 # W:SKHJ E:SQSJ
 IsTerminal() = False
 History() = [15, 14]
-HistoryString() = "15 14"
+HistoryString() = "15, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -107,7 +107,7 @@ action: 5
 # W:SKHJ E:SQSJ 2S
 IsTerminal() = False
 History() = [15, 14, 5]
-HistoryString() = "15 14 5"
+HistoryString() = "15, 14, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -131,7 +131,7 @@ action: 6
 # W:SKHJ E:SQSJ 2S-2NT
 IsTerminal() = False
 History() = [15, 14, 5, 6]
-HistoryString() = "15 14 5 6"
+HistoryString() = "15, 14, 5, 6"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -155,7 +155,7 @@ action: 0
 # W:SKHJ E:SQSJ 2S-2NT-Pass
 IsTerminal() = True
 History() = [15, 14, 5, 6, 0]
-HistoryString() = "15 14 5 6 0"
+HistoryString() = "15, 14, 5, 6, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

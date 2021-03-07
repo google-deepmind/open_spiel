@@ -130,7 +130,7 @@ action: 620
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620]
-HistoryString() = "124 620"
+HistoryString() = "124, 620"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -174,7 +174,7 @@ action: 156
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156]
-HistoryString() = "124 620 156"
+HistoryString() = "124, 620, 156"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -218,7 +218,7 @@ action: 642
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642]
-HistoryString() = "124 620 156 642"
+HistoryString() = "124, 620, 156, 642"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -262,7 +262,7 @@ action: 16
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16]
-HistoryString() = "124 620 156 642 16"
+HistoryString() = "124, 620, 156, 642, 16"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -306,7 +306,7 @@ action: 596
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596]
-HistoryString() = "124 620 156 642 16 596"
+HistoryString() = "124, 620, 156, 642, 16, 596"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -350,7 +350,7 @@ action: 230
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230]
-HistoryString() = "124 620 156 642 16 596 230"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -394,7 +394,7 @@ action: 750
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750]
-HistoryString() = "124 620 156 642 16 596 230 750"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -438,7 +438,7 @@ action: 62
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62]
-HistoryString() = "124 620 156 642 16 596 230 750 62"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -482,7 +482,7 @@ action: 668
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -526,7 +526,7 @@ action: 108
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -570,7 +570,7 @@ action: 572
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -614,7 +614,7 @@ action: 132
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -658,7 +658,7 @@ action: 682
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -702,7 +702,7 @@ action: 170
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -746,7 +746,7 @@ action: 538
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -790,7 +790,7 @@ action: 148
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -834,7 +834,7 @@ action: 500
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -878,7 +878,7 @@ action: 48
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -922,7 +922,7 @@ action: 584
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -966,7 +966,7 @@ action: 266
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1010,7 +1010,7 @@ action: 656
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1054,7 +1054,7 @@ action: 84
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1098,7 +1098,7 @@ action: 402
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1142,7 +1142,7 @@ action: 124
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1186,7 +1186,7 @@ action: 762
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1230,7 +1230,7 @@ action: 170
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1274,7 +1274,7 @@ action: 475
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1318,7 +1318,7 @@ action: 228
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1362,7 +1362,7 @@ action: 367
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1406,7 +1406,7 @@ action: 316
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1450,7 +1450,7 @@ action: 258
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1494,7 +1494,7 @@ action: 158
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1538,7 +1538,7 @@ action: 562
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1582,7 +1582,7 @@ action: 254
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1626,7 +1626,7 @@ action: 522
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254 522"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -1670,7 +1670,7 @@ action: 424
 #  abcdefgh
 IsTerminal() = False
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254 522 424"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -1714,7 +1714,7 @@ action: 152
 #  abcdefgh
 IsTerminal() = True
 History() = [124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424, 152]
-HistoryString() = "124 620 156 642 16 596 230 750 62 668 108 572 132 682 170 538 148 500 48 584 266 656 84 402 124 762 170 475 228 367 316 258 158 562 254 522 424 152"
+HistoryString() = "124, 620, 156, 642, 16, 596, 230, 750, 62, 668, 108, 572, 132, 682, 170, 538, 148, 500, 48, 584, 266, 656, 84, 402, 124, 762, 170, 475, 228, 367, 316, 258, 158, 562, 254, 522, 424, 152"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

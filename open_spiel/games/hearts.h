@@ -137,7 +137,7 @@ class HeartsState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new HeartsState(*this));
   }
@@ -162,10 +162,12 @@ class HeartsState : public State {
   void ApplyPlayAction(int card);
 
   void ComputeScore();
-  Trick& CurrentTrick() { return tricks_[num_cards_played_ / kNumPlayers]; }
-  const Trick& CurrentTrick() const {
-    return tricks_[num_cards_played_ / kNumPlayers];
+  int CurrentTrickIndex() const {
+    return std::min(num_cards_played_ / kNumPlayers,
+                    static_cast<int>(tricks_.size()));
   }
+  Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
+  const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
   std::array<std::string, kNumSuits> FormatHand(int player,
                                                 bool mark_voids) const;
   std::string FormatPlay() const;
@@ -218,15 +220,14 @@ class HeartsGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinScore; }
   double MaxUtility() const override { return kMaxScore; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new HeartsGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override {
     return {kInformationStateTensorSize};
   }
   int MaxGameLength() const override {
     return (kNumCardsInPass * kNumPlayers) + kNumCards;
   }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   const bool pass_cards_;

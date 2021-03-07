@@ -16,13 +16,19 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
+#include <memory>
 #include <numeric>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/memory/memory.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/memory/memory.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -55,9 +61,195 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+std::string StatelessActionToString(Action action) {
+  if (action == ActionType::kFold) {
+    return "Fold";
+  } else if (action == ActionType::kCall) {
+    return "Call";
+  } else if (action == ActionType::kRaise) {
+    return "Raise";
+  } else {
+    SpielFatalError(absl::StrCat("Unknown action: ", action));
+    return "Will not return.";
+  }
+}
+
+// Provides the observations / infostates as defined on the state
+// as a single tensor.
+std::shared_ptr<Observer> MakeSingleTensorObserver(
+    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) {
+  return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
+}
+
+ObserverRegisterer single_tensor(
+    kGameType.short_name, "single_tensor", MakeSingleTensorObserver);
 }  // namespace
-LeducState::LeducState(std::shared_ptr<const Game> game,
-                       bool action_mapping, bool suit_isomorphism)
+
+// The Observer class is responsible for creating representations of the game
+// state for use in learning algorithms. It handles both string and tensor
+// representations, and any combination of public information and private
+// information (none, observing player only, or all players).
+//
+// If a perfect recall observation is requested, it must be possible to deduce
+// all previous observations for the same information type from the current
+// observation.
+
+class LeducObserver : public Observer {
+ public:
+  LeducObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+        iig_obs_type_(iig_obs_type) {}
+
+  //
+  // These helper methods each write a piece of the tensor observation.
+  //
+
+  // Identity of the observing player. One-hot vector of size num_players.
+  static void WriteObservingPlayer(const LeducState& state, int player,
+                                   Allocator* allocator) {
+    auto out = allocator->Get("player", {state.num_players_});
+    out.at(player) = 1;
+  }
+
+  // Private card of the observing player. One-hot vector of size num_cards.
+  static void WriteSinglePlayerCard(const LeducState& state, int player,
+                                    Allocator* allocator) {
+    auto out = allocator->Get("private_card", {state.NumObservableCards()});
+    int card = state.private_cards_[player];
+    if (card != kInvalidCard) out.at(card) = 1;
+  }
+
+  // Private cards of all players. Tensor of shape [num_players, num_cards].
+  static void WriteAllPlayerCards(const LeducState& state,
+                                  Allocator* allocator) {
+    auto out = allocator->Get("private_cards",
+                              {state.num_players_, state.NumObservableCards()});
+    for (int p = 0; p < state.num_players_; ++p) {
+      int card = state.private_cards_[p];
+      if (card != kInvalidCard) out.at(p, state.private_cards_[p]) = 1;
+    }
+  }
+
+  // Community card (if any). One-hot vector of size num_cards.
+  static void WriteCommunityCard(const LeducState& state,
+                                 Allocator* allocator) {
+    auto out = allocator->Get("community_card", {state.NumObservableCards()});
+    if (state.public_card_ != kInvalidCard) {
+      out.at(state.public_card_) = 1;
+    }
+  }
+
+  // Betting sequence; shape [num_rounds, bets_per_round, num_actions].
+  static void WriteBettingSequence(const LeducState& state,
+                                   Allocator* allocator) {
+    const int kNumRounds = 2;
+    const int kBitsPerAction = 2;
+    const int max_bets_per_round = state.MaxBetsPerRound();
+    auto out = allocator->Get("betting",
+                              {kNumRounds, max_bets_per_round, kBitsPerAction});
+    for (int round : {0, 1}) {
+      const auto& bets =
+          (round == 0) ? state.round1_sequence_ : state.round2_sequence_;
+      for (int i = 0; i < bets.size(); ++i) {
+        if (bets[i] == ActionType::kCall) {
+          out.at(round, i, 0) = 1;  // Encode call as 10.
+        } else if (bets[i] == ActionType::kRaise) {
+          out.at(round, i, 1) = 1;  // Encode raise as 01.
+        }
+      }
+    }
+  }
+
+  // Pot contribution per player (integer per player).
+  static void WritePotContribution(const LeducState& state,
+                                   Allocator* allocator) {
+    auto out = allocator->Get("pot_contribution", {state.num_players_});
+    for (auto p = Player{0}; p < state.num_players_; p++) {
+      out.at(p) = state.ante_[p];
+    }
+  }
+
+  // Writes the complete observation in tensor form.
+  // The supplied allocator is responsible for providing memory to write the
+  // observation into.
+  void WriteTensor(const State& observed_state, int player,
+                   Allocator* allocator) const override {
+    auto& state = open_spiel::down_cast<const LeducState&>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+
+    // Observing player.
+    WriteObservingPlayer(state, player, allocator);
+
+    // Private card(s).
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      WriteSinglePlayerCard(state, player, allocator);
+    } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
+      WriteAllPlayerCards(state, allocator);
+    }
+
+    // Public information.
+    if (iig_obs_type_.public_info) {
+      WriteCommunityCard(state, allocator);
+      iig_obs_type_.perfect_recall ? WriteBettingSequence(state, allocator)
+                                   : WritePotContribution(state, allocator);
+    }
+  }
+
+  // Writes an observation in string form. It would be possible just to
+  // turn the tensor observation into a string, but we prefer something
+  // somewhat human-readable.
+
+  std::string StringFrom(const State& observed_state,
+                         int player) const override {
+    auto& state = open_spiel::down_cast<const LeducState&>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+    std::string result;
+
+    // Private card(s).
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      absl::StrAppend(&result, "[Observer: ", player, "]");
+      absl::StrAppend(&result, "[Private: ", state.private_cards_[player], "]");
+    } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
+      absl::StrAppend(
+          &result, "[Privates: ", absl::StrJoin(state.private_cards_, ""), "]");
+    }
+
+    // Public info. Not all of this is strictly necessary, but it makes the
+    // string easier to understand.
+    if (iig_obs_type_.public_info) {
+      absl::StrAppend(&result, "[Round ", state.round_, "]");
+      absl::StrAppend(&result, "[Player: ", state.cur_player_, "]");
+      absl::StrAppend(&result, "[Pot: ", state.pot_, "]");
+      absl::StrAppend(&result, "[Money: ", absl::StrJoin(state.money_, " "),
+                      "]");
+      if (state.public_card_ != kInvalidCard) {
+        absl::StrAppend(&result, "[Public: ", state.public_card_, "]");
+      }
+      if (iig_obs_type_.perfect_recall) {
+        // Betting Sequence (for the perfect recall case)
+        absl::StrAppend(
+            &result, "[Round1: ", absl::StrJoin(state.round1_sequence_, " "),
+            "][Round2: ", absl::StrJoin(state.round2_sequence_, " "), "]");
+      } else {
+        // Pot contributions (imperfect recall)
+        absl::StrAppend(&result, "[Ante: ", absl::StrJoin(state.ante_, " "),
+                        "]");
+      }
+    }
+
+    // Done.
+    return result;
+  }
+
+ private:
+  IIGObservationType iig_obs_type_;
+};
+
+LeducState::LeducState(std::shared_ptr<const Game> game, bool action_mapping,
+                       bool suit_isomorphism)
     : State(game),
       cur_player_(kChancePlayerId),
       num_calls_(0),
@@ -81,7 +273,8 @@ LeducState::LeducState(std::shared_ptr<const Game> game,
       ante_(game->NumPlayers(), kAnte),
       // Flag for whether the player has folded, indexed by pid.
       folded_(game->NumPlayers(), false),
-      // Sequence of actions for each round. Needed to report information state.
+      // Sequence of actions for each round. Needed to report information
+      // state.
       round1_sequence_(),
       round2_sequence_(),
       // Always regard all actions as legal, and internally map otherwise
@@ -269,19 +462,7 @@ std::vector<Action> LeducState::LegalActions() const {
 }
 
 std::string LeducState::ActionToString(Player player, Action move) const {
-  if (player == kChancePlayerId)
-    return absl::StrCat("Chance outcome:", move);
-  else if (move == ActionType::kFold)
-    return "Fold";
-  else if (move == ActionType::kCall)
-    return "Call";
-  else if (move == ActionType::kRaise)
-    return "Raise";
-  else
-    SpielFatalError(
-        absl::StrCat("Error in LeducState::ActionToString(). Available actions "
-                     "are 0, 1, 2, not ",
-                     move));
+  return GetGame()->ActionToString(player, move);
 }
 
 std::string LeducState::ToString() const {
@@ -298,11 +479,17 @@ std::string LeducState::ToString() const {
   }
 
   absl::StrAppend(&result, "\nRound 1 sequence: ");
-  absl::StrAppend(&result, absl::StrJoin(round1_sequence_, " "));
-
+  for (int i = 0; i < round1_sequence_.size(); ++i) {
+    Action action = round1_sequence_[i];
+    if (i > 0) absl::StrAppend(&result, ", ");
+    absl::StrAppend(&result, StatelessActionToString(action));
+  }
   absl::StrAppend(&result, "\nRound 2 sequence: ");
-  absl::StrAppend(&result, absl::StrJoin(round2_sequence_, " "));
-
+  for (int i = 0; i < round2_sequence_.size(); ++i) {
+    Action action = round2_sequence_[i];
+    if (i > 0) absl::StrAppend(&result, ", ");
+    absl::StrAppend(&result, StatelessActionToString(action));
+  }
   absl::StrAppend(&result, "\n");
 
   return result;
@@ -328,154 +515,28 @@ std::vector<double> LeducState::Returns() const {
 
 // Information state is card then bets.
 std::string LeducState::InformationStateString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  // TODO(author1): Fix typos in InformationState string.
-  return absl::StrFormat(
-      "[Round %i][Player: %i][Pot: %i][Money: %s[Private: %i]][Round1]: "
-      "%s[Public: %i]\nRound 2 sequence: %s",
-      round_, cur_player_, pot_, absl::StrJoin(money_, " "),
-      private_cards_[player], absl::StrJoin(round1_sequence_, " "),
-      public_card_, absl::StrJoin(round2_sequence_, " "));
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
 }
 
 // Observation is card then contribution of each players to the pot.
 std::string LeducState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  std::string result;
-
-  absl::StrAppend(&result, "[Round ", round_, "][Player: ", cur_player_,
-                  "][Pot: ", pot_, "][Money:");
-  for (auto p = Player{0}; p < num_players_; p++) {
-    absl::StrAppend(&result, " ", money_[p]);
-  }
-  // Add the player's private cards
-  if (player != kChancePlayerId) {
-    absl::StrAppend(&result, "[Private: ", private_cards_[player], "]");
-  }
-  // Adding the contribution of each players to the pot
-  absl::StrAppend(&result, "[Ante:");
-  for (auto p = Player{0}; p < num_players_; p++) {
-    absl::StrAppend(&result, " ", ante_[p]);
-  }
-  absl::StrAppend(&result, "]");
-
-  // Add the public card
-  if (public_card_ != kInvalidCard) {
-    absl::StrAppend(&result, "[Public: ", public_card_, "]");
-  }
-
-  return result;
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
 void LeducState::InformationStateTensor(Player player,
-                                        std::vector<double>* values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  values->resize(game_->InformationStateTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
-
-  // Layout of observation:
-  //   my player number: num_players bits
-  //   my card: deck_.size() bits
-  //   public card: deck_.size() bits
-  //   first round sequence: (max round seq length)*2 bits
-  //   second round sequence: (max round seq length)*2 bits
-
-  int offset = 0;
-
-  // Mark who I am.
-  (*values)[player] = 1;
-  offset += num_players_;
-
-  if (private_cards_[player] >= 0) {
-    (*values)[offset + private_cards_[player]] = 1;
-  }
-  if (suit_isomorphism_) {
-    offset += deck_.size() / 2;
-  } else {
-    offset += deck_.size();
-  }
-
-  if (public_card_ >= 0) {
-    (*values)[offset + public_card_] = 1;
-  }
-  if (suit_isomorphism_) {
-    offset += deck_.size() / 2;
-  } else {
-    offset += deck_.size();
-  }
-
-  for (int r = 1; r <= 2; r++) {
-    const std::vector<int>& round_sequence =
-        (r == 1 ? round1_sequence_ : round2_sequence_);
-
-    for (int i = 0; i < round_sequence.size(); ++i) {
-      SPIEL_CHECK_LT(offset + i + 1, values->size());
-      if (round_sequence[i] == ActionType::kCall) {
-        // Encode call as 10.
-        (*values)[offset + (2 * i)] = 1;
-        (*values)[offset + (2 * i) + 1] = 0;
-      } else if (round_sequence[i] == ActionType::kRaise) {
-        // Encode raise as 01.
-        (*values)[offset + (2 * i)] = 0;
-        (*values)[offset + (2 * i) + 1] = 1;
-      } else {
-        // Encode fold as 00.
-        (*values)[offset + (2 * i)] = 0;
-        (*values)[offset + (2 * i) + 1] = 0;
-      }
-    }
-
-    // Move offset up to the next round: 2 bits per move.
-    offset += game_->MaxGameLength();
-  }
+                                        absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
+  game.info_state_observer_->WriteTensor(*this, player, &allocator);
 }
 
 void LeducState::ObservationTensor(Player player,
-                                   std::vector<double>* values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  values->resize(game_->ObservationTensorShape()[0]);
-  std::fill(values->begin(), values->end(), 0.);
-
-  // Layout of observation:
-  //   my player number: num_players bits
-  //   my card: deck_.size() bits
-  //   public card: deck_.size() bits
-  //   the contribution of each player to the pot. num_players integers.
-
-  int offset = 0;
-
-  // Mark who I am.
-  (*values)[player] = 1;
-  offset += num_players_;
-
-  if (private_cards_[player] >= 0) {
-    (*values)[offset + private_cards_[player]] = 1;
-  }
-  if (suit_isomorphism_) {
-    offset += deck_.size() / 2;
-  } else {
-    offset += deck_.size();
-  }
-
-  if (public_card_ >= 0) {
-    (*values)[offset + public_card_] = 1;
-  }
-  if (suit_isomorphism_) {
-    offset += deck_.size() / 2;
-  } else {
-    offset += deck_.size();
-  }
-
-  // Adding the contribution of each players to the pot.
-  for (auto p = Player{0}; p < num_players_; p++) {
-    (*values)[offset + p] = ante_[p];
-  }
+                                   absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const LeducGame& game = open_spiel::down_cast<const LeducGame&>(*game_);
+  game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 
 std::unique_ptr<State> LeducState::Clone() const {
@@ -492,7 +553,7 @@ std::vector<std::pair<Action, double>> LeducState::ChanceOutcomes() const {
     for (int card = 0; card < deck_.size() / 2; card++) {
       if (deck_[card * 2] != kInvalidCard &&
           deck_[card * 2 + 1] != kInvalidCard) {
-        outcomes.push_back({card, p*2});
+        outcomes.push_back({card, p * 2});
       } else if (deck_[card * 2] != kInvalidCard ||
                  deck_[card * 2 + 1] != kInvalidCard) {
         outcomes.push_back({card, p});
@@ -709,6 +770,12 @@ std::unique_ptr<State> LeducState::ResampleFromInfostate(
   return clone;
 }
 
+int LeducState::NumObservableCards() const {
+  return suit_isomorphism_ ? deck_.size() / 2 : deck_.size();
+}
+
+int LeducState::MaxBetsPerRound() const { return 3 * num_players_ - 2; }
+
 LeducGame::LeducGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
@@ -717,6 +784,8 @@ LeducGame::LeducGame(const GameParameters& params)
       suit_isomorphism_(ParameterValue<bool>("suit_isomorphism")) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
+  default_observer_ = std::make_shared<LeducObserver>(kDefaultObsType);
+  info_state_observer_ = std::make_shared<LeducObserver>(kInfoStateObsType);
 }
 
 std::unique_ptr<State> LeducGame::NewInitialState() const {
@@ -769,10 +838,47 @@ double LeducGame::MinUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
   // the game minus then money the player had before starting the game.
   // The most any single player can lose is the maximum number of raises per
-  // round times the amounts of each of the raises, plus the original chip they
-  // put in to play.
+  // round times the amounts of each of the raises, plus the original chip
+  // they put in to play.
   return -1 * (kTotalRaisesPerRound * kFirstRaiseAmount +
                kTotalRaisesPerRound * kSecondRaiseAmount + 1);
+}
+
+std::shared_ptr<Observer> LeducGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
+  if (params.empty()) {
+    return std::make_shared<LeducObserver>(
+        iig_obs_type.value_or(kDefaultObsType));
+  } else {
+    return MakeRegisteredObserver(iig_obs_type, params);
+  }
+}
+
+std::string LeducGame::ActionToString(Player player, Action action) const {
+  if (player == kChancePlayerId) {
+    return absl::StrCat("Chance outcome:", action);
+  } else {
+    return StatelessActionToString(action);
+  }
+}
+
+TabularPolicy GetAlwaysFoldPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<LeducGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kFold, ActionType::kCall});
+}
+
+TabularPolicy GetAlwaysCallPolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<LeducGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kCall});
+}
+
+TabularPolicy GetAlwaysRaisePolicy(const Game& game) {
+  SPIEL_CHECK_TRUE(
+      dynamic_cast<LeducGame*>(const_cast<Game*>(&game)) != nullptr);
+  return GetPrefActionPolicy(game, {ActionType::kRaise, ActionType::kCall});
 }
 
 }  // namespace leduc_poker

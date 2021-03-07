@@ -142,12 +142,10 @@ release!). Contributions are certainly not limited to these suggestions!
 -   **General Games Wrapper**. There are several general game engine languages
     and databases of general games that currently exist, for example within the
     [general game-playing project](http://www.ggp.org/) and the
-    [Ludii General Game System](http://www.ludii.games/index.html) or
-    [GAMUT](http://gamut.stanford.edu/) (a suite of normal-form game
-    generators). A very nice addition to OpenSpiel would be a game that
-    interprets games represented in these languages and presents them as
-    OpenSpiel games. This could lead to the potential of evaluating learning
-    agents on hundreds to thousands of games.
+    [Ludii General Game System](http://www.ludii.games/index.html). A very nice
+    addition to OpenSpiel would be a game that interprets games represented in
+    these languages and presents them as OpenSpiel games. This could lead to the
+    potential of evaluating learning agents on hundreds to thousands of games.
 
 -   **Go API**. We currently have a prototype [Go](https://golang.org/) API
     similar to the Python API. It is exposed using cgo via a C API much like the
@@ -217,14 +215,12 @@ release!). Contributions are certainly not limited to these suggestions!
     Harvest from [Ref3](https://arxiv.org/abs/1812.07019)
     [Ref4](https://arxiv.org/abs/1810.08647).
 
--   **Single-Agent Games and Environments**. There are currently no
-    single-player (i.e. solitaire) games or traditional RL environments
-    implemented (in C++, accessible to the entire code base) despite the API
-    supporting the use case. Games that fit into the category, such as
-    [Morpion](https://en.wikipedia.org/wiki/Join_Five) and
-    [Klondike](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)), and
-    traditional RL environments such as grid worlds, that have been used
-    commonly in AI research, would be welcome contributions.
+-   **Single-Agent Games and Environments**. There are only a few single-player
+    games or traditional RL environments (Klondike solitaire, catch, Deep Sea),
+    despite the API supporting the use case. Games that fit into the category,
+    such as [Morpion](https://en.wikipedia.org/wiki/Join_Five), Blackjack, and
+    traditional RL environments such as grid worlds and others used to learn RL
+    would be welcome contributions.
 
 -   **Structured Action Spaces**. Currently, actions are integers between 0 and
     some value. There is no easy way to interpret what each action means in a
@@ -239,3 +235,7 @@ release!). Contributions are certainly not limited to these suggestions!
     for running a batch of episodes using Tensorflow directly from C++ (in
     `contrib/`). It has not yet been tested with CMake and public Tensorflow. We
     would like to officially support this and move it into the core library.
+
+-   **Visualizations of games**. There exists an interactive viewer for
+    OpenSpiel games called [SpielViz](https://github.com/michalsustr/spielviz).
+    Contributions to this project are welcome.

@@ -77,7 +77,7 @@ class HexState : public State {
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   CellState BoardAt(int cell) const { return board_[cell]; }
@@ -107,9 +107,6 @@ class HexGame : public Game {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new HexGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, board_size_, board_size_};
   }
@@ -119,6 +116,7 @@ class HexGame : public Game {
   const int board_size_;
 };
 
+CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

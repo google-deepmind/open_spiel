@@ -464,8 +464,8 @@ int CoinGame::MaxGameLength() const { return (episode_length_); }
 // Chance nodes must not be considered in NumDistinctActions.
 int CoinGame::NumDistinctActions() const { return offsets.size(); }
 
-std::shared_ptr<const Game> CoinGame::Clone() const {
-  return std::shared_ptr<const Game>(new CoinGame(*this));
+int CoinGame::MaxChanceOutcomes() const {
+  return std::max(num_coin_colors_, num_rows_ * num_columns_);
 }
 
 std::unique_ptr<State> CoinGame::NewInitialState() const {

@@ -27,30 +27,48 @@ namespace {
 // Default Parameters.
 constexpr int kDefaultPlayers = 2;
 constexpr int kDefaultNumDice = 1;
-constexpr int kDiceSides = 6;  // Number of sides on the dice.
+constexpr int kDefaultDiceSides = 6;  // Number of sides on the dice.
+constexpr const char* kDefaultBiddingRule = "reset-face";
 constexpr int kInvalidOutcome = -1;
 constexpr int kInvalidBid = -1;
 
 // Facts about the game
-const GameType kGameType{/*short_name=*/"liars_dice",
-                         /*long_name=*/"Liars Dice",
-                         GameType::Dynamics::kSequential,
-                         GameType::ChanceMode::kExplicitStochastic,
-                         GameType::Information::kImperfectInformation,
-                         GameType::Utility::kZeroSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/kDefaultPlayers,
-                         /*min_num_players=*/kDefaultPlayers,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/true,
-                         /*provides_observation_string=*/false,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)},
-                          {"numdice", GameParameter(kDefaultNumDice)}}};
+const GameType kGameType{
+    /*short_name=*/"liars_dice",
+    /*long_name=*/"Liars Dice",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/kDefaultPlayers,
+    /*min_num_players=*/kDefaultPlayers,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"players", GameParameter(kDefaultPlayers)},
+     {"numdice", GameParameter(kDefaultNumDice)},
+     {"dice_sides", GameParameter(kDefaultDiceSides)},
+     {"bidding_rule", GameParameter(kDefaultBiddingRule)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LiarsDiceGame(params));
+}
+
+const BiddingRule ParseBiddingRule(const std::string& bidding_rule_str) {
+  SPIEL_CHECK_TRUE(bidding_rule_str == "reset-face" ||
+                   bidding_rule_str == "reset-quantity");
+  if (bidding_rule_str == "reset-face") {
+    return BiddingRule::kResetFace;
+  } else {
+    return BiddingRule::kResetQuantity;
+  }
+}
+
+const LiarsDiceGame* UnwrapGame(const Game* game) {
+  return down_cast<const LiarsDiceGame*>(game);
 }
 }  // namespace
 
@@ -84,14 +102,14 @@ LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
 std::string LiarsDiceState::ActionToString(Player player,
                                            Action action_id) const {
   if (player != kChancePlayerId) {
-    if (action_id == total_num_dice_ * kDiceSides) {
+    if (action_id == total_num_dice_ * dice_sides()) {
       return "Liar";
     } else {
-      auto bid = LiarsDiceGame::GetQuantityFace(action_id, total_num_dice_);
+      const std::pair<int, int> bid = UnrankBid(action_id);
       return absl::StrCat(bid.first, "-", bid.second);
     }
   }
-  return absl::StrCat("chance outcome ", action_id);
+  return absl::StrCat("Roll ", action_id + 1);
 }
 
 int LiarsDiceState::CurrentPlayer() const {
@@ -103,16 +121,16 @@ int LiarsDiceState::CurrentPlayer() const {
 }
 
 void LiarsDiceState::ResolveWinner() {
-  std::pair<int, int> bid =
-      LiarsDiceGame::GetQuantityFace(current_bid_, total_num_dice_);
+  const std::pair<int, int> bid = UnrankBid(current_bid_);
   int quantity = bid.first, face = bid.second;
   int matches = 0;
 
   // Count all the matches among all dice from all the players
-  // kDiceSides (e.g. 6) is wild, so it always matches.
+  // dice_sides_ (e.g. 6) is wild, so it always matches.
   for (auto p = Player{0}; p < num_players_; p++) {
     for (int d = 0; d < num_dice_[p]; d++) {
-      if (dice_outcomes_[p][d] == face || dice_outcomes_[p][d] == kDiceSides) {
+      if (dice_outcomes_[p][d] == face ||
+          dice_outcomes_[p][d] == dice_sides()) {
         matches++;
       }
     }
@@ -129,6 +147,14 @@ void LiarsDiceState::ResolveWinner() {
   }
 }
 
+const int LiarsDiceState::dice_sides() const {
+  return UnwrapGame(game_.get())->dice_sides();
+}
+
+const BiddingRule LiarsDiceState::bidding_rule() const {
+  return UnwrapGame(game_.get())->bidding_rule();
+}
+
 void LiarsDiceState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
     // Fill the next die roll for the current roller.
@@ -139,7 +165,7 @@ void LiarsDiceState::DoApplyAction(Action action) {
     int slot = num_dice_rolled_[cur_roller_];
 
     // Assign the roll.
-    dice_outcomes_[cur_roller_][slot] = action;
+    dice_outcomes_[cur_roller_][slot] = action + 1;
     num_dice_rolled_[cur_roller_]++;
 
     // Check to see if we must change the roller.
@@ -161,7 +187,7 @@ void LiarsDiceState::DoApplyAction(Action action) {
                                    " should be strictly higher than ",
                                    bidseq_.back()));
     }
-    if (action == total_num_dice_ * kDiceSides) {
+    if (action == total_num_dice_ * dice_sides()) {
       // This was the calling bid, game is over.
       bidseq_.push_back(action);
       calling_player_ = cur_player_;
@@ -182,9 +208,9 @@ std::vector<Action> LiarsDiceState::LegalActions() const {
   if (IsTerminal()) return {};
   // A chance node is a single die roll.
   if (IsChanceNode()) {
-    std::vector<Action> outcomes(kDiceSides);
-    for (int i = 0; i < kDiceSides; i++) {
-      outcomes[i] = 1 + i;
+    std::vector<Action> outcomes(dice_sides());
+    for (int i = 0; i < dice_sides(); i++) {
+      outcomes[i] = i;
     }
     return outcomes;
   }
@@ -192,13 +218,13 @@ std::vector<Action> LiarsDiceState::LegalActions() const {
   std::vector<Action> actions;
 
   // Any move higher than the current bid is allowed. (Bids start at 0)
-  for (int b = current_bid_ + 1; b < total_num_dice_ * kDiceSides; b++) {
+  for (int b = current_bid_ + 1; b < total_num_dice_ * dice_sides(); b++) {
     actions.push_back(b);
   }
 
   // Calling Liar is only available if at least one move has been made.
   if (total_moves_ > 0) {
-    actions.push_back(total_num_dice_ * kDiceSides);
+    actions.push_back(total_num_dice_ * dice_sides());
   }
 
   return actions;
@@ -210,9 +236,9 @@ std::vector<std::pair<Action, double>> LiarsDiceState::ChanceOutcomes() const {
   std::vector<std::pair<Action, double>> outcomes;
 
   // A chance node is a single die roll.
-  outcomes.reserve(kDiceSides);
-  for (int i = 0; i < kDiceSides; i++) {
-    outcomes.emplace_back(1 + i, 1.0 / kDiceSides);
+  outcomes.reserve(dice_sides());
+  for (int i = 0; i < dice_sides(); i++) {
+    outcomes.emplace_back(i, 1.0 / dice_sides());
   }
 
   return outcomes;
@@ -224,10 +250,10 @@ std::string LiarsDiceState::InformationStateString(Player player) const {
 
   std::string result = absl::StrJoin(dice_outcomes_[player], "");
   for (int b = 0; b < bidseq_.size(); b++) {
-    if (bidseq_[b] == total_num_dice_ * kDiceSides) {
+    if (bidseq_[b] == total_num_dice_ * dice_sides()) {
       absl::StrAppend(&result, " Liar");
     } else {
-      auto bid = LiarsDiceGame::GetQuantityFace(bidseq_[b], total_num_dice_);
+      const std::pair<int, int> bid = UnrankBid(bidseq_[b]);
       absl::StrAppend(&result, " ", bid.first, "-", bid.second);
     }
   }
@@ -250,10 +276,10 @@ std::string LiarsDiceState::ToString() const {
   }
 
   for (int b = 0; b < bidseq_.size(); b++) {
-    if (bidseq_[b] == total_num_dice_ * kDiceSides) {
+    if (bidseq_[b] == total_num_dice_ * dice_sides()) {
       absl::StrAppend(&result, " Liar");
     } else {
-      auto bid = LiarsDiceGame::GetQuantityFace(bidseq_[b], total_num_dice_);
+      const std::pair<int, int> bid = UnrankBid(bidseq_[b]);
       absl::StrAppend(&result, " ", bid.first, "-", bid.second);
     }
   }
@@ -277,7 +303,7 @@ std::vector<double> LiarsDiceState::Returns() const {
 }
 
 void LiarsDiceState::InformationStateTensor(Player player,
-                                            std::vector<double>* values) const {
+                                            absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -287,10 +313,11 @@ void LiarsDiceState::InformationStateTensor(Player player,
   // One slot(bit) for calling liar. (Necessary because observations and
   // information states need to be defined at terminals)
   int offset = 0;
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(num_players_ + (max_dice_per_player_ * kDiceSides) +
-                 (total_num_dice_ * kDiceSides) + 1);
-  (*values)[player] = 1;
+  std::fill(values.begin(), values.end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_players_ +
+                                    (max_dice_per_player_ * dice_sides()) +
+                                    (total_num_dice_ * dice_sides()) + 1);
+  values[player] = 1;
   offset += num_players_;
 
   int my_num_dice = num_dice_[player];
@@ -299,25 +326,25 @@ void LiarsDiceState::InformationStateTensor(Player player,
     int outcome = dice_outcomes_[player][d];
     if (outcome != kInvalidOutcome) {
       SPIEL_CHECK_GE(outcome, 1);
-      SPIEL_CHECK_LE(outcome, kDiceSides);
-      (*values)[offset + (outcome - 1)] = 1;
+      SPIEL_CHECK_LE(outcome, dice_sides());
+      values[offset + (outcome - 1)] = 1;
     }
-    offset += kDiceSides;
+    offset += dice_sides();
   }
 
   // Skip to bidding part. If current player has fewer dice than the other
   // players, all the remaining entries are 0 for those dice.
-  offset = num_players_ + max_dice_per_player_ * kDiceSides;
+  offset = num_players_ + max_dice_per_player_ * dice_sides();
 
   for (int b = 0; b < bidseq_.size(); b++) {
     SPIEL_CHECK_GE(bidseq_[b], 0);
-    SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * kDiceSides);
-    (*values)[offset + bidseq_[b]] = 1;
+    SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * dice_sides());
+    values[offset + bidseq_[b]] = 1;
   }
 }
 
-void LiarsDiceState::ObservationTensor(
-    Player player, std::vector<double>* values) const {
+void LiarsDiceState::ObservationTensor(Player player,
+                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -327,10 +354,11 @@ void LiarsDiceState::ObservationTensor(
   // One slot(bit) for calling liar. (Necessary because observations and
   // information states need to be defined at terminals)
   int offset = 0;
-  std::fill(values->begin(), values->end(), 0.);
-  values->resize(num_players_ + (max_dice_per_player_ * kDiceSides) +
-                 (total_num_dice_ * kDiceSides) + 1);
-  (*values)[player] = 1;
+  std::fill(values.begin(), values.end(), 0.);
+  SPIEL_CHECK_EQ(values.size(), num_players_ +
+                                    (max_dice_per_player_ * dice_sides()) +
+                                    (total_num_dice_ * dice_sides()) + 1);
+  values[player] = 1;
   offset += num_players_;
 
   int my_num_dice = num_dice_[player];
@@ -339,23 +367,23 @@ void LiarsDiceState::ObservationTensor(
     int outcome = dice_outcomes_[player][d];
     if (outcome != kInvalidOutcome) {
       SPIEL_CHECK_GE(outcome, 1);
-      SPIEL_CHECK_LE(outcome, kDiceSides);
-      (*values)[offset + (outcome - 1)] = 1;
+      SPIEL_CHECK_LE(outcome, dice_sides());
+      values[offset + (outcome - 1)] = 1;
     }
-    offset += kDiceSides;
+    offset += dice_sides();
   }
 
   // Skip to bidding part. If current player has fewer dice than the other
   // players, all the remaining entries are 0 for those dice.
-  offset = num_players_ + max_dice_per_player_ * kDiceSides;
+  offset = num_players_ + max_dice_per_player_ * dice_sides();
 
   // We only show the num_players_ last bids
   int size_bid = bidseq_.size();
   int bid_offset = std::max(0, size_bid - num_players_);
   for (int b = bid_offset; b < size_bid; b++) {
     SPIEL_CHECK_GE(bidseq_[b], 0);
-    SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * kDiceSides);
-    (*values)[offset + bidseq_[b]] = 1;
+    SPIEL_CHECK_LE(bidseq_[b], total_num_dice_ * dice_sides());
+    values[offset + bidseq_[b]] = 1;
   }
 }
 
@@ -363,11 +391,83 @@ std::unique_ptr<State> LiarsDiceState::Clone() const {
   return std::unique_ptr<State>(new LiarsDiceState(*this));
 }
 
+std::pair<int, int> LiarsDiceState::UnrankBid(int bidnum) const {
+  std::pair<int, int> bid;
+  SPIEL_CHECK_NE(bidnum, kInvalidBid);
+  SPIEL_CHECK_GE(bidnum, 0);
+  SPIEL_CHECK_LT(bidnum, dice_sides() * total_num_dice_);
+
+  if (bidding_rule() == BiddingRule::kResetFace) {
+    // Bids have the form <quantity>-<face>
+    //
+    // So, in a two-player game where each die has 6 faces, we have
+    //
+    // Bid ID    Quantity   Face
+    // 0         1          1
+    // 1         1          2
+    // ...
+    // 5         1          6
+    // 6         2          1
+    // ...
+    // 11        2          6
+    //
+    // Bid ID #dice * #num faces encodes the special "liar" action.
+
+    // The quantity occupies the higher bits, so it can be extracted using an
+    // integer division operation.
+    bid.first = bidnum / dice_sides() + 1;
+    // The face occupies the lower bits, so it can be extraced using a modulo
+    // operation.
+    bid.second = 1 + (bidnum % dice_sides());
+  } else {
+    SPIEL_CHECK_EQ(bidding_rule(), BiddingRule::kResetQuantity);
+    // Bids have the form <face>-<quantity>
+    //
+    // So, in a two-player game where each die has 6 faces, we have
+    //
+    // Bid ID    Quantity   Face
+    // 0         1          1
+    // 1         2          1
+    // 2         1          2
+    // 3         2          2
+    // ...
+    // 9         2          5
+    // 10        1          6
+    // 11        2          6
+    //
+    // Bid ID #dice * #num faces encodes the special "liar" action.
+    //
+    // This particular encoding scheme allows for very cheap comparison of bids:
+    // a bid is stronger if it is encoded to a higher ID.
+
+    // The quantity occupies the lower bits, so it can be extracted using a
+    // modulo operation.
+    bid.first = 1 + (bidnum % total_num_dice_);
+    // The face occupies the higher bits, so it can be extracted using an
+    // integer division.
+    bid.second = bidnum / total_num_dice_ + 1;
+  }
+
+  SPIEL_CHECK_GE(bid.first, 1);
+  // It doesn't make sense to bid more dice than the number of dice in the game.
+  SPIEL_CHECK_LE(bid.first, total_num_dice_);
+
+  SPIEL_CHECK_GE(bid.second, 1);
+  // It doesn't make sense to bid a face that does not exist.
+  SPIEL_CHECK_LE(bid.second, dice_sides());
+
+  return bid;
+}
+
 LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
-    : Game(kGameType, params) {
-  num_players_ = ParameterValue<int>("players");
+    : Game(kGameType, params),
+      num_players_(ParameterValue<int>("players")),
+      dice_sides_(ParameterValue<int>("dice_sides")),
+      bidding_rule_(ParseBiddingRule(
+          ParameterValue<std::string>("bidding_rule"))) {
   SPIEL_CHECK_GE(num_players_, kGameType.min_num_players);
   SPIEL_CHECK_LE(num_players_, kGameType.max_num_players);
+  SPIEL_CHECK_GE(dice_sides_, 1);
 
   int def_num_dice = ParameterValue<int>("numdice");
 
@@ -398,7 +498,7 @@ LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
 }
 
 int LiarsDiceGame::NumDistinctActions() const {
-  return total_num_dice_ * kDiceSides + 1;
+  return total_num_dice_ * dice_sides_ + 1;
 }
 
 std::unique_ptr<State> LiarsDiceGame::NewInitialState() const {
@@ -410,12 +510,13 @@ std::unique_ptr<State> LiarsDiceGame::NewInitialState() const {
   return state;
 }
 
-int LiarsDiceGame::MaxChanceOutcomes() const { return kDiceSides; }
+int LiarsDiceGame::MaxChanceOutcomes() const { return dice_sides_; }
 
 int LiarsDiceGame::MaxGameLength() const {
   // A bet for each side and number of total dice, plus "liar" action.
-  return total_num_dice_ * kDiceSides + 1;
+  return total_num_dice_ * dice_sides_ + 1;
 }
+int LiarsDiceGame::MaxChanceNodesInHistory() const { return total_num_dice_; }
 
 std::vector<int> LiarsDiceGame::InformationStateTensorShape() const {
   // One-hot encoding for the player number.
@@ -423,8 +524,8 @@ std::vector<int> LiarsDiceGame::InformationStateTensorShape() const {
   // One slot(bit) for each legal bid.
   // One slot(bit) for calling liar. (Necessary because observations and
   // information states need to be defined at terminals)
-  return {num_players_ + (max_dice_per_player_ * kDiceSides) +
-          (total_num_dice_ * kDiceSides) + 1};
+  return {num_players_ + (max_dice_per_player_ * dice_sides_) +
+          (total_num_dice_ * dice_sides_) + 1};
 }
 
 std::vector<int> LiarsDiceGame::ObservationTensorShape() const {
@@ -433,37 +534,8 @@ std::vector<int> LiarsDiceGame::ObservationTensorShape() const {
   // One slot(bit) for the num_players_ last legal bid.
   // One slot(bit) for calling liar. (Necessary because observations and
   // information states need to be defined at terminals)
-  return {num_players_ + (max_dice_per_player_ * kDiceSides) +
-          (total_num_dice_ * kDiceSides) + 1};
+  return {num_players_ + (max_dice_per_player_ * dice_sides_) +
+          (total_num_dice_ * dice_sides_) + 1};
 }
-
-std::pair<int, int> LiarsDiceGame::GetQuantityFace(int bidnum, int total_dice) {
-  std::pair<int, int> bid;
-  SPIEL_CHECK_NE(bidnum, kInvalidBid);
-  // Bids have the form <quantity>-<face>
-  //
-  // E.g. for 3 dice, order is:
-  // 1-1, 1-2, ... , 1-5, 1-*, 2-1, ... , 2-5, 2-*, 3-1, ... , 3-5, 3-*.
-  //
-  // So the mapping is:
-  //   bidnum = 0 -> 1-1
-  //   bidnum = 1 -> 1-2
-  //         .
-  //         .
-  //         .
-  //   bidnum = 17 -> 3-*
-  //   bidnum = 18 -> Liar
-  //
-  // The "*" is a 6 and means wild (matches any side).
-  // bidnum starts at 0.
-  bid.first = bidnum / kDiceSides + 1;
-  bid.second = 1 + (bidnum % kDiceSides);
-  if (bid.second == 0) {
-    bid.second = kDiceSides;
-  }
-
-  return bid;
-}
-
 }  // namespace liars_dice
 }  // namespace open_spiel

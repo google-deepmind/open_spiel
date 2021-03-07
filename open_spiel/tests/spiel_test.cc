@@ -68,11 +68,9 @@ class FlatJointActionTestGame : public SimMoveGame {
   int NumPlayers() const override { return 3; }
   double MinUtility() const override { return -10; }
   double MaxUtility() const override { return 10; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new FlatJointActionTestGame(*this));
-  }
   std::vector<int> InformationStateTensorShape() const override { return {}; }
   int MaxGameLength() const override { return 1; }
+  int MaxChanceNodesInHistory() const override { return 0; }
 };
 
 // Dummy state to test flat joint action logic.
@@ -133,60 +131,6 @@ void FlatJointactionTest() {
 
 using PolicyGenerator = std::function<TabularPolicy(const Game& game)>;
 
-constexpr int kNumSimulations = 10;
-
-void TestPoliciesCanPlay(PolicyGenerator policy_generator, const Game& game) {
-  TabularPolicy policy = policy_generator(game);
-  std::mt19937 rng(0);
-  for (int i = 0; i < kNumSimulations; ++i) {
-    std::unique_ptr<State> state = game.NewInitialState();
-    while (!state->IsTerminal()) {
-      ActionsAndProbs outcomes;
-      if (state->IsChanceNode()) {
-        outcomes = state->ChanceOutcomes();
-      } else {
-        outcomes = policy.GetStatePolicy(state->InformationStateString());
-      }
-      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
-    }
-  }
-}
-
-void TestPoliciesCanPlay(const Policy& policy, const Game& game) {
-  std::mt19937 rng(0);
-  for (int i = 0; i < kNumSimulations; ++i) {
-    std::unique_ptr<State> state = game.NewInitialState();
-    while (!state->IsTerminal()) {
-      ActionsAndProbs outcomes;
-      if (state->IsChanceNode()) {
-        outcomes = state->ChanceOutcomes();
-      } else {
-        outcomes = policy.GetStatePolicy(*state);
-      }
-      state->ApplyAction(open_spiel::SampleAction(outcomes, rng).first);
-    }
-  }
-}
-
-void TestEveryInfostateInPolicy(PolicyGenerator policy_generator,
-                                const Game& game) {
-  TabularPolicy policy = policy_generator(game);
-  std::vector<std::unique_ptr<State>> to_visit;
-  to_visit.push_back(game.NewInitialState());
-  while (!to_visit.empty()) {
-    std::unique_ptr<State> state = std::move(to_visit.back());
-    to_visit.pop_back();
-    for (Action action : state->LegalActions()) {
-      to_visit.push_back(state->Child(action));
-    }
-    if (!state->IsChanceNode() && !state->IsTerminal()) {
-      SPIEL_CHECK_EQ(
-          policy.GetStatePolicy(state->InformationStateString()).size(),
-          state->LegalActions().size());
-    }
-  }
-}
-
 void PolicyTest() {
   auto random_policy_default_seed = [](const Game& game) {
     return GetRandomPolicy(game);
@@ -244,8 +188,73 @@ void LeducPokerDeserializeTest() {
 }
 
 void GameParametersTest() {
+  // Basic types
+  SPIEL_CHECK_TRUE(GameParameter(1).has_int_value());
+  SPIEL_CHECK_TRUE(GameParameter(1.0).has_double_value());
+  SPIEL_CHECK_TRUE(GameParameter(true).has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameter(std::string("1")).has_string_value());
+  SPIEL_CHECK_TRUE(GameParameter("1").has_string_value());  // See issue #380.
+
+  // Writing to string
+  SPIEL_CHECK_EQ(GameParameter("1").ToString(), "1");
+  SPIEL_CHECK_EQ(GameParameter(1).ToString(), "1");
+  // -- Currently we serialize doubles with 10 digits after the point.
+  SPIEL_CHECK_EQ(GameParameter(1.0).ToString(), "1.0");
+  SPIEL_CHECK_EQ(GameParameter(1.).ToString(), "1.0");
+  SPIEL_CHECK_EQ(GameParameter(1.5).ToString(), "1.5");
+  SPIEL_CHECK_EQ(GameParameter(001.0485760000).ToString(), "1.048576");
+  SPIEL_CHECK_EQ(GameParameter(1e-9).ToString(), "0.000000001");
+
+  // Parsing from string
+  //
+  // XXX: Game parameter parsing from string is a bit quirky at the
+  //     moment. For example, the strings "+" or "-" make the parser
+  //     throw since the parses eagerly tries to parse those as integers and
+  //     passes them to std::stoi.
+  //
+  //     Similarly, "." would be parsed using std::stod with a similar outcome.
+  //
+  //     Doubles must contain a point . inside, or they would be parsed as
+  //     integer, and exponential notation is not allowed for now.
+  //
+  //     Leading or trailing whitespace is not stripped before parsing, so " 1"
+  //     would be parsed as a string instead of an integer.
+  //
+  //     See also: #382.
+  //
+  //
+  // The next few tests are not always intended to check the long term desired
+  // behavior, but rather that no accidental regression is introduced in the
+  // current behavior.
+
+  // -- Quirks
+  // TODO: find a way to test the failures. These four fail (on purpose).
+  // GameParameterFromString("+");
+  // GameParameterFromString("---");
+  // GameParameterFromString(".");
+  // GameParameterFromString("...");
+  SPIEL_CHECK_TRUE(GameParameterFromString("1.2e-1").has_string_value());
+
+  // -- Whitespace related
+  SPIEL_CHECK_TRUE(GameParameterFromString(" 1").has_string_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1 ").has_string_value());
+
+  // -- Intended behavior
+  SPIEL_CHECK_TRUE(GameParameterFromString("true").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("True").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("false").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("False").has_bool_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1").has_int_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1.0").has_double_value());
+  SPIEL_CHECK_TRUE(GameParameterFromString("1. 0").has_string_value());
+
+  // Tests for GameParametersFromString
+  // Empty string
+  auto params = GameParametersFromString("");
+  SPIEL_CHECK_TRUE(params.empty());
+
   // Bare name
-  auto params = GameParametersFromString("game_one");
+  params = GameParametersFromString("game_one");
   SPIEL_CHECK_EQ(params.size(), 1);
   SPIEL_CHECK_EQ(params["name"].string_value(), "game_one");
 
@@ -282,6 +291,37 @@ void GameParametersTest() {
   SPIEL_CHECK_EQ(game2["param"].string_value(), "val");
 }
 
+void PolicySerializationTest() {
+  // Check empty tabular policy
+  auto policy = std::make_unique<TabularPolicy>();
+  std::shared_ptr<Policy> deserialized_policy =
+      DeserializePolicy(policy->Serialize());
+  auto deserialized =
+      std::static_pointer_cast<TabularPolicy>(deserialized_policy);
+  SPIEL_CHECK_EQ(policy->PolicyTable().size(), 0);
+  SPIEL_CHECK_EQ(deserialized->PolicyTable().size(), 0);
+
+  // Check non-empty tabular policy
+  auto game = LoadGame("tic_tac_toe");
+  policy = std::make_unique<TabularPolicy>(*game);
+  deserialized_policy = DeserializePolicy(policy->Serialize(6));
+  deserialized = std::static_pointer_cast<TabularPolicy>(deserialized_policy);
+  SPIEL_CHECK_EQ(policy->PolicyTable().size(),
+                 deserialized->PolicyTable().size());
+  for (const auto& [info_state, policy] : policy->PolicyTable()) {
+    for (int i = 0; i < policy.size(); i++) {
+      auto original_val = policy.at(i);
+      auto deserialized_val = deserialized->PolicyTable().at(info_state).at(i);
+      SPIEL_CHECK_EQ(original_val.first, deserialized_val.first);
+      SPIEL_CHECK_FLOAT_NEAR(original_val.second, deserialized_val.second,
+                             1e-6);
+    }
+  }
+
+  // Check uniform policy
+  DeserializePolicy(std::make_unique<UniformPolicy>()->Serialize());
+}
+
 }  // namespace
 }  // namespace testing
 }  // namespace open_spiel
@@ -294,4 +334,5 @@ int main(int argc, char** argv) {
   open_spiel::testing::PolicyTest();
   open_spiel::testing::LeducPokerDeserializeTest();
   open_spiel::testing::GameParametersTest();
+  open_spiel::testing::PolicySerializationTest();
 }

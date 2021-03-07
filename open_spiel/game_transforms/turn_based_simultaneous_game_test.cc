@@ -126,7 +126,7 @@ void BasicTurnBasedSimultaneousTests() {
   std::mt19937 rng;
 
   for (const GameType& type : RegisteredGameTypes()) {
-    if (!type.ContainsRequiredParameters()) {
+    if (!type.ContainsRequiredParameters() && type.default_loadable) {
       std::string name = type.short_name;
       if (type.dynamics == GameType::Dynamics::kSimultaneous) {
         std::cout << "TurnBasedSimultaneous: Testing " << name << std::endl;

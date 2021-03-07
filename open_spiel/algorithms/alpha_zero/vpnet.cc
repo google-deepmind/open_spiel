@@ -30,7 +30,7 @@
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/run_python.h"
 #include "tensorflow/core/graph/default_device.h"
-#include "tensorflow/core/protobuf/saver.proto.h"
+#include "tensorflow/core/protobuf/saver.pb.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -71,7 +71,7 @@ VPNetModel::VPNetModel(const Game& game, const std::string& path,
   SPIEL_CHECK_EQ(game.GetType().utility, GameType::Utility::kZeroSum);
 
   std::string model_path = absl::StrCat(path, "/", file_name);
-  model_meta_graph_contents_ = file::File(model_path, "r").ReadContents();
+  model_meta_graph_contents_ = file::ReadContentsFromFile(model_path, "r");
 
   TF_CHECK_OK(
       ReadBinaryProto(tf::Env::Default(), model_path, &meta_graph_def_));

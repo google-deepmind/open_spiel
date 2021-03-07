@@ -170,9 +170,17 @@ The code lives at [open_spiel/algorithms/alpha_zero/](https://github.com/deepmin
 with an example executable at
 [open_spiel/examples/alpha_zero_example.cc](https://github.com/deepmind/open_spiel/blob/master/open_spiel/examples/alpha_zero_example.cc).
 
-Compiling it is currently challenging due to the tensorflow dependency.
+Compiling it is now possible with the help of the
+[tensorflow_cc](https://github.com/FloopCZ/tensorflow_cc) project. TensorflowCC
+allows the usage of the TensorFlow C++ API from outside the Tensorflow source
+directory.
+
+For build instructions, please see
+[open_spiel/algorithms/alpha_zero/README.md](https://github.com/deepmind/open_spiel/blob/master/open_spiel/algorithms/alpha_zero/README.md).
+
+Although targets are built successfully, there are still some runtime issues.
 [OpenSpiel Issue #172](https://github.com/deepmind/open_spiel/issues/172) has
-some information that may help figure out how to fix this. Contributions are
+some information that may help figure out how to fix them. Contributions are
 welcome.
 
 

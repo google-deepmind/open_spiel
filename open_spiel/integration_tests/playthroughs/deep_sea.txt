@@ -7,7 +7,7 @@ GameType.long_name = "DeepSea"
 GameType.max_num_players = 1
 GameType.min_num_players = 1
 GameType.parameter_specification = ["randomize_actions", "seed", "size", "unscaled_move_cost"]
-GameType.provides_information_state_string = True
+GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
@@ -43,8 +43,7 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = ""
-ObservationString(0) = "x........................"
+ObservationString(0) = "x............................."
 ObservationTensor(0): ◉◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -71,8 +70,7 @@ HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "L->L\n"
-ObservationString(0) = ".....x..................."
+ObservationString(0) = ".....x........................"
 ObservationTensor(0): ◯◯◯◯◯
                       ◉◯◯◯◯
                       ◯◯◯◯◯
@@ -95,12 +93,11 @@ action: 1
 # ......
 IsTerminal() = False
 History() = [0, 1]
-HistoryString() = "0 1"
+HistoryString() = "0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "L->L\nR->R\n"
-ObservationString(0) = "...........x............."
+ObservationString(0) = "...........x.................."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◉◯◯◯
@@ -123,12 +120,11 @@ action: 0
 # ......
 IsTerminal() = False
 History() = [0, 1, 0]
-HistoryString() = "0 1 0"
+HistoryString() = "0, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "L->L\nR->R\nL->L\n"
-ObservationString(0) = "...............x........."
+ObservationString(0) = "...............x.............."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -151,12 +147,11 @@ action: 1
 # ......
 IsTerminal() = False
 History() = [0, 1, 0, 1]
-HistoryString() = "0 1 0 1"
+HistoryString() = "0, 1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "L->L\nR->R\nL->L\nR->R\n"
-ObservationString(0) = ".....................x..."
+ObservationString(0) = ".....................x........"
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
@@ -179,12 +174,11 @@ action: 0
 # ..x...
 IsTerminal() = True
 History() = [0, 1, 0, 1, 0]
-HistoryString() = "0 1 0 1 0"
+HistoryString() = "0, 1, 0, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "L->L\nR->R\nL->L\nR->R\nL->R\n"
-ObservationString(0) = "........................."
+ObservationString(0) = "...........................x.."
 ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯

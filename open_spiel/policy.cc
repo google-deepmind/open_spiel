@@ -25,6 +25,8 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -71,6 +73,16 @@ ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
   return new_policy;
 }
 
+ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
+                                       Action action) {
+  ActionsAndProbs new_policy;
+  new_policy.reserve(legal_actions.size());
+  for (Action legal_action : legal_actions) {
+    new_policy.push_back({legal_action, legal_action == action ? 1.0 : 0.0});
+  }
+  return new_policy;
+}
+
 ActionsAndProbs UniformStatePolicy(const State& state) {
   ActionsAndProbs actions_and_probs;
   std::vector<Action> actions = state.LegalActions();
@@ -81,8 +93,67 @@ ActionsAndProbs UniformStatePolicy(const State& state) {
   return actions_and_probs;
 }
 
+ActionsAndProbs FirstActionStatePolicy(const State& state) {
+  return {{state.LegalActions()[0], 1.0}};
+}
+
+std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
+                                          std::string delimiter) {
+  // Class’s identity is the very first line, see Policy::Serialize
+  // for more info.
+  std::pair<std::string, absl::string_view> cls_and_content =
+      absl::StrSplit(serialized, absl::MaxSplits(':', 1));
+  std::string class_identity = cls_and_content.first;
+
+  if (class_identity == "TabularPolicy") {
+    return DeserializeTabularPolicy(serialized, delimiter);
+  } else if (class_identity == "UniformPolicy") {
+    return std::make_unique<UniformPolicy>();
+  } else {
+    SpielFatalError(absl::StrCat("Deserialization of ", class_identity,
+                                 " is not supported."));
+  }
+}
+
 TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
+
+std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
+    const std::string& serialized, std::string delimiter) {
+  // Class’s identity is the very first line, see Policy::Serialize
+  // for more info.
+  std::pair<std::string, absl::string_view> cls_and_content =
+      absl::StrSplit(serialized, absl::MaxSplits(':', 1));
+  SPIEL_CHECK_EQ(cls_and_content.first, "TabularPolicy");
+
+  std::unique_ptr<TabularPolicy> res = std::make_unique<TabularPolicy>();
+  if (cls_and_content.second.empty()) return res;
+
+  std::vector<absl::string_view> splits =
+      absl::StrSplit(cls_and_content.second, delimiter);
+
+  // Insert the actual values
+  Action action;
+  double prob;
+  for (int i = 0; i < splits.size(); i += 2) {
+    std::vector<absl::string_view> policy_values =
+        absl::StrSplit(splits.at(i + 1), ',');
+    ActionsAndProbs res_policy;
+    res_policy.reserve(policy_values.size());
+
+    for (absl::string_view policy_value : policy_values) {
+      std::pair<absl::string_view, absl::string_view> action_and_prob =
+          absl::StrSplit(policy_value, '=');
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(action_and_prob.first, &action));
+      absl::from_chars(
+          action_and_prob.second.data(),
+          action_and_prob.second.data() + action_and_prob.second.size(), prob);
+      res_policy.push_back({action, prob});
+    }
+    res->SetStatePolicy(std::string(splits.at(i)), res_policy);
+  }
+  return res;
+}
 
 const std::string TabularPolicy::ToString() const {
   std::string str = "";
@@ -207,7 +278,7 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
     SpielFatalError("Game is not sequential.");
     return TabularPolicy(policy);
   }
-  std::list<std::unique_ptr<State>> to_visit;
+  std::vector<std::unique_ptr<State>> to_visit;
   to_visit.push_back(game.NewInitialState());
   while (!to_visit.empty()) {
     std::unique_ptr<State> state = std::move(to_visit.back());
@@ -240,10 +311,59 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
       if (infostate_policy.empty()) {
         SpielFatalError("State has zero legal actions.");
       }
-      policy.insert({state->InformationStateString(), infostate_policy});
+      policy[state->InformationStateString()] = std::move(infostate_policy);
     }
   }
   return TabularPolicy(policy);
+}
+
+ActionsAndProbs PreferredActionPolicy::GetStatePolicy(const State& state,
+                                                      Player player) const {
+  std::vector<Action> legal_actions = state.LegalActions(player);
+  for (Action action : preference_order_) {
+    if (absl::c_find(legal_actions, action) != legal_actions.end()) {
+      return GetDeterministicPolicy(legal_actions, action);
+    }
+  }
+  SpielFatalError("No preferred action found in the legal actions!");
+}
+
+TabularPolicy ToTabularPolicy(const Game& game, const Policy* policy) {
+  TabularPolicy tabular_policy;
+  std::vector<std::unique_ptr<State>> to_visit;
+  to_visit.push_back(game.NewInitialState());
+  for (int idx = 0; idx < to_visit.size(); ++idx) {
+    const State* state = to_visit[idx].get();
+    if (state->IsTerminal()) {
+      continue;
+    }
+
+    if (!state->IsChanceNode()) {
+      std::vector<Player> players(game.NumPlayers());
+      if (state->IsSimultaneousNode()) {
+        absl::c_iota(players, 0);
+      } else {
+        players = {state->CurrentPlayer()};
+      }
+
+      for (Player player : players) {
+        ActionsAndProbs state_policy = policy->GetStatePolicy(*state);
+        tabular_policy.SetStatePolicy(state->InformationStateString(player),
+                                      state_policy);
+      }
+    }
+
+    for (Action action : state->LegalActions()) {
+      to_visit.push_back(state->Child(action));
+    }
+  }
+  return tabular_policy;
+}
+
+TabularPolicy GetPrefActionPolicy(const Game& game,
+                                  const std::vector<Action>& pref_actions) {
+  PreferredActionPolicy policy(pref_actions);
+  return ToTabularPolicy(game, &policy);
 }
 
 std::string PrintPolicy(const ActionsAndProbs& policy) {
@@ -252,6 +372,21 @@ std::string PrintPolicy(const ActionsAndProbs& policy) {
     absl::StrAppend(&policy_string, absl::StrFormat("(%i, %f), ", a, p));
   }
   return policy_string;
+}
+
+TabularPolicy ToJointTabularPolicy(const std::vector<TabularPolicy>& policies,
+                                   bool check_no_overlap) {
+  TabularPolicy joint_policy;
+  for (const TabularPolicy& policy : policies) {
+    if (check_no_overlap) {
+      for (const auto& key_and_val : policy.PolicyTable()) {
+        SPIEL_CHECK_TRUE(joint_policy.PolicyTable().find(key_and_val.first) ==
+                         joint_policy.PolicyTable().end());
+      }
+    }
+    joint_policy.ImportPolicy(policy);
+  }
+  return joint_policy;
 }
 
 }  // namespace open_spiel

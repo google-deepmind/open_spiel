@@ -22,16 +22,10 @@ import os
 import re
 import numpy as np
 
-from open_spiel.python.games import tic_tac_toe
+from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
+from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
+from open_spiel.python.observation import make_observation
 import pyspiel
-
-
-def _load_game(game_string):
-  """Loads a game, including special-cases for Python-implemented games."""
-  if game_string == "python_tic_tac_toe":
-    return tic_tac_toe.TicTacToeGame()
-  else:
-    return pyspiel.load_game(game_string)
 
 
 def _escape(x):
@@ -94,7 +88,8 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
     return lines
 
 
-def playthrough(game_string, action_sequence, alsologtostdout=False):
+def playthrough(game_string, action_sequence, alsologtostdout=False,
+                observation_params_string=None):
   """Returns a playthrough of the specified game as a single text.
 
   Actions are selected uniformly at random, including chance actions.
@@ -105,12 +100,24 @@ def playthrough(game_string, action_sequence, alsologtostdout=False):
     action_sequence: A (possibly partial) list of action choices to make.
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
+    observation_params_string: Optional observation parameters for constructing
+      an observer.
   """
-  lines = playthrough_lines(game_string, alsologtostdout, action_sequence)
+  lines = playthrough_lines(game_string, alsologtostdout, action_sequence,
+                            observation_params_string)
   return "\n".join(lines) + "\n"
 
 
-def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
+def format_shapes(d):
+  """Returns a string representing the shapes of a dict of tensors."""
+  if len(d) == 1:
+    return str(list(d[min(d)].shape))
+  else:
+    return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
+
+
+def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
+                      observation_params_string=None):
   """Returns a playthrough of the specified game as a list of lines.
 
   Actions are selected uniformly at random, including chance actions.
@@ -120,6 +127,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
     action_sequence: A (possibly partial) list of action choices to make.
+    observation_params_string: Optional observation parameters for constructing
+      an observer.
   """
   lines = []
   action_sequence = action_sequence or []
@@ -131,12 +140,57 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   else:
     add_line = lines.append
 
-  game = _load_game(game_string)
+  game = pyspiel.load_game(game_string)
   add_line("game: {}".format(game_string))
+  if observation_params_string:
+    add_line("observation_params: {}".format(observation_params_string))
   seed = np.random.randint(2**32 - 1)
+  game_type = game.get_type()
+
+  default_observation = None
+  try:
+    observation_params = pyspiel.game_parameters_from_string(
+        observation_params_string) if observation_params_string else None
+    default_observation = make_observation(
+        game,
+        imperfect_information_observation_type=None,
+        params=observation_params)
+  except (RuntimeError, ValueError):
+    pass
+
+  infostate_observation = None
+  # TODO(author11) reinstate this restriction
+  # if game_type.information in (pyspiel.IMPERFECT_INFORMATION,
+  #                              pyspiel.ONE_SHOT):
+  try:
+    infostate_observation = make_observation(
+        game, pyspiel.IIGObservationType(perfect_recall=True))
+  except (RuntimeError, ValueError):
+    pass
+
+  public_observation = None
+  try:
+    public_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=True,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.NONE))
+  except (RuntimeError, ValueError):
+    pass
+
+  private_observation = None
+  try:
+    private_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=False,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
+  except (RuntimeError, ValueError):
+    pass
 
   add_line("")
-  game_type = game.get_type()
   add_line("GameType.chance_mode = {}".format(game_type.chance_mode))
   add_line("GameType.dynamics = {}".format(game_type.dynamics))
   add_line("GameType.information = {}".format(game_type.information))
@@ -176,20 +230,20 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   except RuntimeError:
     utility_sum = None
   add_line("UtilitySum() = {}".format(utility_sum))
-  if game_type.provides_information_state_tensor:
+  if infostate_observation and infostate_observation.tensor is not None:
     add_line("InformationStateTensorShape() = {}".format(
-        game.information_state_tensor_shape()))
+        format_shapes(infostate_observation.dict)))
     add_line("InformationStateTensorLayout() = {}".format(
         game.information_state_tensor_layout()))
     add_line("InformationStateTensorSize() = {}".format(
-        game.information_state_tensor_size()))
-  if game_type.provides_observation_tensor:
+        len(infostate_observation.tensor)))
+  if default_observation and default_observation.tensor is not None:
     add_line("ObservationTensorShape() = {}".format(
-        game.observation_tensor_shape()))
+        format_shapes(default_observation.dict)))
     add_line("ObservationTensorLayout() = {}".format(
         game.observation_tensor_layout()))
     add_line("ObservationTensorSize() = {}".format(
-        game.observation_tensor_size()))
+        len(default_observation.tensor)))
   add_line("MaxGameLength() = {}".format(game.max_game_length()))
   add_line('ToString() = "{}"'.format(str(game)))
 
@@ -209,34 +263,38 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
     add_line("IsChanceNode() = {}".format(state.is_chance_node()))
     add_line("IsSimultaneousNode() = {}".format(state.is_simultaneous_node()))
     add_line("CurrentPlayer() = {}".format(state.current_player()))
-    if game.get_type().provides_information_state_string:
+    if infostate_observation:
       for player in players:
-        add_line('InformationStateString({}) = "{}"'.format(
-            player, _escape(state.information_state_string(player))))
-    if game.get_type().provides_information_state_tensor:
+        s = infostate_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'InformationStateString({player}) = "{_escape(s)}"')
+    if infostate_observation and infostate_observation.tensor is not None:
       for player in players:
-        label = "InformationStateTensor({})".format(player)
-        lines += _format_tensor(
-            np.reshape(
-                state.information_state_tensor(player),
-                game.information_state_tensor_shape()), label)
-    if game.get_type().provides_observation_string:
+        infostate_observation.set_from(state, player)
+        for name, tensor in infostate_observation.dict.items():
+          label = f"InformationStateTensor({player})"
+          label += f".{name}" if name != "info_state" else ""
+          lines += _format_tensor(tensor, label)
+    if default_observation:
       for player in players:
-        add_line('ObservationString({}) = "{}"'.format(
-            player, _escape(state.observation_string(player))))
-    if game.get_type().provides_factored_observation_string:
-      add_line('PublicObservationString() = "{}"'.format(
-          _escape(state.public_observation_string())))
+        s = default_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'ObservationString({player}) = "{_escape(s)}"')
+    if public_observation:
+      s = public_observation.string_from(state, 0)
+      if s is not None:
+        add_line('PublicObservationString() = "{}"'.format(_escape(s)))
       for player in players:
-        add_line('PrivateObservationString({}) = "{}"'.format(
-            player, _escape(state.private_observation_string(player))))
-    if game.get_type().provides_observation_tensor:
+        s = private_observation.string_from(state, player)
+        if s is not None:
+          add_line(f'PrivateObservationString({player}) = "{_escape(s)}"')
+    if default_observation and default_observation.tensor is not None:
       for player in players:
-        label = "ObservationTensor({})".format(player)
-        lines += _format_tensor(
-            np.reshape(
-                state.observation_tensor(player),
-                game.observation_tensor_shape()), label)
+        default_observation.set_from(state, player)
+        for name, tensor in default_observation.dict.items():
+          label = f"ObservationTensor({player})"
+          label += f".{name}" if name != "observation" else ""
+          lines += _format_tensor(tensor, label)
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
@@ -312,10 +370,13 @@ def _playthrough_params(lines):
   params = {"action_sequence": []}
   for line in lines:
     match_game = re.match(r"^game: (.*)$", line)
+    match_observation_params = re.match(r"^observation_params: (.*)$", line)
     match_action = re.match(r"^action: (.*)$", line)
     match_actions = re.match(r"^actions: \[(.*)\]$", line)
     if match_game:
       params["game_string"] = match_game.group(1)
+    if match_observation_params:
+      params["observation_params_string"] = match_observation_params.group(1)
     if match_action:
       params["action_sequence"].append(int(match_action.group(1)))
     if match_actions:
@@ -326,21 +387,35 @@ def _playthrough_params(lines):
   raise ValueError("Could not find params")
 
 
-def replay(filename):
-  """Re-runs the playthrough in the specified file. Returns (original, new)."""
+def _read_playthrough(filename):
+  """Returns the content and the parsed arguments of a playthrough file."""
   with open(filename, "r", encoding="utf-8") as f:
     original = f.read()
   kwargs = _playthrough_params(original.splitlines())
+  return original, kwargs
+
+
+def replay(filename):
+  """Re-runs the playthrough in the specified file. Returns (original, new)."""
+  original, kwargs = _read_playthrough(filename)
   return (original, playthrough(**kwargs))
 
 
-def update_path(path):
+def update_path(path, shard_index=0, num_shards=1):
   """Regenerates all playthroughs in the path."""
-  for filename in os.listdir(path):
+  for filename in sorted(os.listdir(path))[shard_index::num_shards]:
     try:
-      original, new = replay(os.path.join(path, filename))
+      original, kwargs = _read_playthrough(os.path.join(path, filename))
+      try:
+        pyspiel.load_game(kwargs["game_string"])
+      except pyspiel.SpielError as e:
+        if "Unknown game" in str(e):
+          print("[Skipped] Skipping game ", filename, " as ",
+                kwargs["game_string"], " is not available.")
+          continue
+      new = playthrough(**kwargs)
       if original == new:
-        print("        {}".format(filename))
+        print("          {}".format(filename))
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)

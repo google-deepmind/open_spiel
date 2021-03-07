@@ -176,12 +176,12 @@ std::vector<int> NegotiationGame::ObservationTensorShape() const {
 }
 
 void NegotiationState::ObservationTensor(Player player,
-                                         std::vector<double>* values) const {
+                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  values->resize(parent_game_.ObservationTensorSize());
-  std::fill(values->begin(), values->end(), 0);
+  SPIEL_CHECK_EQ(values.size(), parent_game_.ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0);
 
   // No observations at chance nodes.
   if (IsChanceNode()) {
@@ -202,39 +202,39 @@ void NegotiationState::ObservationTensor(Player player,
   // Current player.
   int offset = 0;
   if (!IsTerminal()) {
-    (*values)[offset + CurrentPlayer()] = 1;
+    values[offset + CurrentPlayer()] = 1;
   }
   offset += kNumPlayers;
 
   // Current turn type.
   if (turn_type_ == TurnType::kProposal) {
-    (*values)[offset] = 1;
+    values[offset] = 1;
   } else {
-    (*values)[offset + 1] = 1;
+    values[offset + 1] = 1;
   }
   offset += 2;
 
   // Terminal status: 2 bits
-  (*values)[offset] = IsTerminal() ? 1 : 0;
-  (*values)[offset + 1] = agreement_reached_ ? 1 : 0;
+  values[offset] = IsTerminal() ? 1 : 0;
+  values[offset + 1] = agreement_reached_ ? 1 : 0;
   offset += 2;
 
   // Item pool.
   for (int item = 0; item < num_items_; ++item) {
-    (*values)[offset + item_pool_[item]] = 1;
+    values[offset + item_pool_[item]] = 1;
     offset += kMaxQuantity + 1;
   }
 
   // Utilities.
   for (int item = 0; item < num_items_; ++item) {
-    (*values)[offset + agent_utils_[player][item]] = 1;
+    values[offset + agent_utils_[player][item]] = 1;
     offset += kMaxValue + 1;
   }
 
   // Last proposal.
   if (!proposals_.empty()) {
     for (int item = 0; item < num_items_; ++item) {
-      (*values)[offset + proposals_.back()[item]] = 1;
+      values[offset + proposals_.back()[item]] = 1;
       offset += kMaxQuantity + 1;
     }
   } else {
@@ -245,7 +245,7 @@ void NegotiationState::ObservationTensor(Player player,
   if (enable_utterances_) {
     if (!utterances_.empty()) {
       for (int dim = 0; dim < utterance_dim_; ++dim) {
-        (*values)[offset + utterances_.back()[dim]] = 1;
+        values[offset + utterances_.back()[dim]] = 1;
         offset += num_symbols_;
       }
     } else {
@@ -253,7 +253,7 @@ void NegotiationState::ObservationTensor(Player player,
     }
   }
 
-  SPIEL_CHECK_EQ(offset, values->size());
+  SPIEL_CHECK_EQ(offset, values.size());
 }
 
 NegotiationState::NegotiationState(std::shared_ptr<const Game> game)
@@ -511,18 +511,6 @@ NegotiationGame::NegotiationGame(const GameParameters& params)
   ConstructLegalUtterances();
 }
 
-// Need to provide a custom copy constructor to clone the RNG.
-NegotiationGame::NegotiationGame(const NegotiationGame& other)
-    : Game(other),
-      enable_proposals_(other.enable_proposals_),
-      enable_utterances_(other.enable_utterances_),
-      num_items_(other.num_items_),
-      num_symbols_(other.num_symbols_),
-      utterance_dim_(other.utterance_dim_),
-      seed_(other.seed_),
-      legal_utterances_(other.legal_utterances_),
-      rng_(new std::mt19937(*other.rng_)) {}
-
 void NegotiationGame::ConstructLegalUtterances() {
   if (enable_utterances_) {
     legal_utterances_.resize(NumDistinctUtterances());
@@ -584,8 +572,12 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
     std::unique_ptr<State> state = NewInitialState();
     SPIEL_CHECK_EQ(lines.size(), 5);
     NegotiationState& nstate = static_cast<NegotiationState&>(*state);
-    // Take the chance action, but then reset the quantities.
+    // Take the chance action, but then reset the quantities. Make sure game's
+    // RNG state is not advanced during deserialization so copy it beforehand
+    // in order to be able to restore after the chance action.
+    std::unique_ptr<std::mt19937> rng = std::make_unique<std::mt19937>(*rng_);
     nstate.ApplyAction(0);
+    rng_ = std::move(rng);
     nstate.ItemPool().clear();
     nstate.AgentUtils().clear();
     // Max steps
@@ -615,6 +607,18 @@ std::unique_ptr<State> NegotiationGame::DeserializeState(
     }
     return state;
   }
+}
+
+std::string NegotiationGame::GetRNGState() const {
+  std::ostringstream rng_stream;
+  rng_stream << *rng_;
+  return rng_stream.str();
+}
+
+void NegotiationGame::SetRNGState(const std::string& rng_state) const {
+  if (rng_state.empty()) return;
+  std::istringstream rng_stream(rng_state);
+  rng_stream >> *rng_;
 }
 
 }  // namespace negotiation

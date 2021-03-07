@@ -79,7 +79,7 @@ class MarkovSoccerState : public SimMoveState {
     return ToString();
   }
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
   }
@@ -126,11 +126,10 @@ class MarkovSoccerGame : public SimMoveGame {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return 1; }
   double UtilitySum() const override { return 0; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new MarkovSoccerGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
   Grid grid_;

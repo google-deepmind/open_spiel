@@ -19,11 +19,13 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
+from absl import app
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
-from open_spiel.python.games import tic_tac_toe
+from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
+from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
 import pyspiel
 from open_spiel.python.utils import file_utils
 
@@ -56,7 +58,7 @@ SPIEL_MULTIPLAYER_GAMES_LIST = [
     if g.max_num_players > 2 and g.max_num_players > g.min_num_players and
     g.short_name != "tiny_hanabi"  # default payoff only works for 2p
     # cannot change the number of players without changing other parameters
-    and g.short_name != "universal_poker"
+    and g.short_name != "universal_poker" and g.short_name != "scotland_yard"
 ]
 assert len(SPIEL_MULTIPLAYER_GAMES_LIST) >= 35, len(
     SPIEL_MULTIPLAYER_GAMES_LIST)
@@ -168,6 +170,9 @@ class GamesSimTest(parameterized.TestCase):
         self.assertEmpty(state.legal_actions(player))
       # Print utilities for each player.
       utilities = state.returns()
+      # Check that player returns are correct
+      for player in range(game.num_players()):
+        self.assertEqual(state.player_return(player), utilities[player])
       # Check that each one is in range
       for utility in utilities:
         self.assertGreaterEqual(utility, game.min_utility())
@@ -207,17 +212,6 @@ class GamesSimTest(parameterized.TestCase):
     game = pyspiel.load_game("pig(players=2,winscore=15)")
     self.sim_game(game)
 
-  def test_python_tic_tac_toe(self):
-    # run this test to a Python-only game
-    game = tic_tac_toe.TicTacToeGame()
-    for _ in range(0, 100):
-      # cannot use pyspiel's serialization since the python-only games don't
-      # implement them
-      self.sim_game(
-          game,
-          check_pyspiel_serialization=False,
-          check_pickle_serialization=True)
-
   def test_efg_game(self):
     game = pyspiel.load_efg_game(pyspiel.get_sample_efg_data())
     # EFG games loaded directly by string cannot serialize because the game's
@@ -247,6 +241,28 @@ class GamesSimTest(parameterized.TestCase):
       for _ in range(0, 100):
         self.sim_game(game)
 
+  def test_backgammon_checker_moves(self):
+    game = pyspiel.load_game("backgammon")
+    state = game.new_initial_state()
+    state.apply_action(0)  # Roll 12 and X starts
+    action = state.legal_actions()[0]  # First legal action
+    # X has player id 0.
+    checker_moves = state.spiel_move_to_checker_moves(0, action)
+    print("Checker moves:")
+    for i in range(2):
+      print("pos {}, num {}, hit? {}".format(checker_moves[i].pos,
+                                             checker_moves[i].num,
+                                             checker_moves[i].hit))
+    action2 = state.checker_moves_to_spiel_move(checker_moves)
+    self.assertEqual(action, action2)
+    action3 = state.translate_action(0, 0, True)  # 0->2, 0->1
+    self.assertEqual(action3, 0)
+
+
+def main(_):
+  absltest.main()
+
 
 if __name__ == "__main__":
-  absltest.main()
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)

@@ -18,11 +18,12 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -70,8 +71,9 @@ class HistoryNode {
 
   // Map from legal actions to transition probabilities. Uses a map as we need
   // to preserve the order of the actions.
-  std::unordered_set<Action> legal_actions_;
-  std::map<Action, std::pair<double, std::unique_ptr<HistoryNode>>> child_info_;
+  absl::flat_hash_set<Action> legal_actions_;
+  absl::btree_map<Action, std::pair<double, std::unique_ptr<HistoryNode>>>
+      child_info_;
 };
 
 // History here refers to the fact that we're using histories- i.e.
@@ -90,6 +92,9 @@ class HistoryTree {
   HistoryNode* Root() { return root_.get(); }
 
   HistoryNode* GetByHistory(const std::string& history);
+  HistoryNode* GetByHistory(const State& state) {
+    return GetByHistory(state.HistoryString());
+  }
 
   // For test use only.
   std::vector<std::string> GetHistories();
@@ -100,7 +105,7 @@ class HistoryTree {
   std::unique_ptr<HistoryNode> root_;
 
   // Maps histories to HistoryNodes.
-  std::unordered_map<std::string, HistoryNode*> state_to_node_;
+  absl::flat_hash_map<std::string, HistoryNode*> state_to_node_;
 };
 
 // Returns a map of infostate strings to a vector of history nodes with
@@ -110,7 +115,7 @@ class HistoryTree {
 // natural chance probabilty for all change actions. We return all infosets
 // (i.e. all sets of history nodes grouped by infostate) for the sub-game rooted
 // at state, from the perspective of the player with id best_responder.
-std::unordered_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
+absl::flat_hash_map<std::string, std::vector<std::pair<HistoryNode*, double>>>
 GetAllInfoSets(std::unique_ptr<State> state, Player best_responder,
                const Policy* policy, HistoryTree* tree);
 

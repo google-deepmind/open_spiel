@@ -152,7 +152,16 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
   std::vector<double> flat_col_utils = FlattenMatrix(col_player_utils);
   SPIEL_CHECK_EQ(flat_row_utils.size(), rows * columns);
   SPIEL_CHECK_EQ(flat_col_utils.size(), rows * columns);
+  return CreateMatrixGame(short_name, long_name, row_names, col_names,
+                          flat_row_utils, flat_col_utils);
+}
 
+std::shared_ptr<const MatrixGame> CreateMatrixGame(
+    const std::string& short_name, const std::string& long_name,
+    const std::vector<std::string>& row_names,
+    const std::vector<std::string>& col_names,
+    const std::vector<double>& flat_row_utils,
+    const std::vector<double>& flat_col_utils) {
   // Detect the utility type from the utilities.
   GameType::Utility utility = GetUtilityType(flat_row_utils, flat_col_utils);
 

@@ -36,7 +36,8 @@ class QLearner(rl_agent.AbstractAgent):
                num_actions,
                step_size=0.1,
                epsilon_schedule=rl_tools.ConstantSchedule(0.2),
-               discount_factor=1.0):
+               discount_factor=1.0,
+               centralized=False):
     """Initialize the Q-Learning agent."""
     self._player_id = player_id
     self._num_actions = num_actions
@@ -44,6 +45,7 @@ class QLearner(rl_agent.AbstractAgent):
     self._epsilon_schedule = epsilon_schedule
     self._epsilon = epsilon_schedule.value
     self._discount_factor = discount_factor
+    self._centralized = centralized
     self._q_values = collections.defaultdict(
         lambda: collections.defaultdict(float))
     self._prev_info_state = None
@@ -82,7 +84,10 @@ class QLearner(rl_agent.AbstractAgent):
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
     """
-    info_state = str(time_step.observations["info_state"][self._player_id])
+    if self._centralized:
+      info_state = str(time_step.observations["info_state"])
+    else:
+      info_state = str(time_step.observations["info_state"][self._player_id])
     legal_actions = time_step.observations["legal_actions"][self._player_id]
 
     # Prevent undefined errors if this agent never plays until terminal step

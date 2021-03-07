@@ -237,14 +237,14 @@ std::string HeartsState::FormatPoints() const {
 }
 
 void HeartsState::InformationStateTensor(Player player,
-                                         std::vector<double>* values) const {
+                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values->begin(), values->end(), 0.0);
-  values->resize(game_->InformationStateTensorSize());
-  if (phase_ != Phase::kPass && phase_ != Phase::kPlay) return;
-  auto ptr = values->begin();
+  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_EQ(values.size(), kInformationStateTensorSize);
+  if (phase_ == Phase::kPassDir || phase_ == Phase::kDeal) return;
+  auto ptr = values.begin();
   // Pass direction
   ptr[static_cast<int>(pass_dir_)] = 1;
   ptr += kNumPlayers;
@@ -276,7 +276,8 @@ void HeartsState::InformationStateTensor(Player player,
     ptr += kMaxScore;
   }
   // History of tricks, presented in the format: N E S W N E S
-  int current_trick = num_cards_played_ / kNumPlayers;
+  int current_trick = std::min(num_cards_played_ / kNumPlayers,
+                               static_cast<int>(tricks_.size() - 1));
   for (int i = 0; i < current_trick; ++i) {
     Player leader = tricks_[i].Leader();
     ptr += leader * kNumCards;
@@ -296,13 +297,14 @@ void HeartsState::InformationStateTensor(Player player,
     }
   }
   // Current trick may contain less than four cards.
-  ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
+  if (num_cards_played_ < kNumCards) {
+    ptr += (kNumPlayers - (num_cards_played_ % kNumPlayers)) * kNumCards;
+  }
   // Move to the end of current trick.
   ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
   // Skip over unplayed tricks.
   ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
-  SPIEL_CHECK_EQ(std::distance(values->begin(), ptr),
-                 kInformationStateTensorSize);
+  SPIEL_CHECK_EQ(ptr, values.end());
 }
 
 std::vector<Action> HeartsState::LegalActions() const {
@@ -739,7 +741,7 @@ std::unique_ptr<State> HeartsState::ResampleFromInfostate(
     clone->ApplyAction(history_.at(i).action);
   }
 
-  SPIEL_CHECK_EQ(History().size(), clone->History().size());
+  SPIEL_CHECK_EQ(FullHistory().size(), clone->FullHistory().size());
   SPIEL_CHECK_EQ(InformationStateString(player_id),
                  clone->InformationStateString(player_id));
   return clone;

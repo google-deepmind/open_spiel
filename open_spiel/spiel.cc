@@ -23,11 +23,15 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -37,6 +41,7 @@ namespace {
 constexpr const int kSerializationVersion = 1;
 constexpr const char* kSerializeMetaSectionHeader = "[Meta]";
 constexpr const char* kSerializeGameSectionHeader = "[Game]";
+constexpr const char* kSerializeGameRNGStateSectionHeader = "[GameRNGState]";
 constexpr const char* kSerializeStateSectionHeader = "[State]";
 
 // Returns the available parameter keys, to be used as a utility function.
@@ -61,8 +66,8 @@ void ValidateParams(const GameParameters& params,
     const auto it = param_spec.find(param.first);
     if (it == param_spec.end()) {
       SpielFatalError(absl::StrCat(
-          "Unknown parameter ", param.first,
-          ". Available parameters are: ", ListValidParameters(param_spec)));
+          "Unknown parameter '", param.first,
+          "'. Available parameters are: ", ListValidParameters(param_spec)));
     }
     if (it->second.type() != param.second.type()) {
       SpielFatalError(absl::StrCat(
@@ -174,6 +179,28 @@ std::vector<GameType> RegisteredGameTypes() {
   return GameRegisterer::RegisteredGames();
 }
 
+std::shared_ptr<const Game> DeserializeGame(const std::string& serialized) {
+  std::pair<std::string, std::string> game_and_rng_state =
+      absl::StrSplit(serialized, kSerializeGameRNGStateSectionHeader);
+
+  // Remove the trailing "\n" from the game section.
+  if (game_and_rng_state.first.length() > 0 &&
+      game_and_rng_state.first.back() == '\n') {
+    game_and_rng_state.first.pop_back();
+  }
+  std::shared_ptr<const Game> game = LoadGame(game_and_rng_state.first);
+
+  if (game_and_rng_state.second.length() > 0) {
+    // Game is implicitly stochastic.
+    // Remove the trailing "\n" from the RNG state section.
+    if (game_and_rng_state.second.back() == '\n') {
+      game_and_rng_state.second.pop_back();
+    }
+    game->SetRNGState(game_and_rng_state.second);
+  }
+  return game;
+}
+
 std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
   return LoadGame(GameParametersFromString(game_string));
 }
@@ -207,133 +234,13 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 State::State(std::shared_ptr<const Game> game)
     : num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
+      move_number_(0),
       game_(game) {}
 
-template <>
-GameParameters Game::ParameterValue<GameParameters>(
-    const std::string& key,
-    absl::optional<GameParameters> default_value) const {
-  auto iter = game_parameters_.find(key);
-  if (iter != game_parameters_.end()) {
-    return iter->second.game_value();
-  }
-
-  if (default_value == std::nullopt) {
-    std::vector<std::string> available_keys;
-    for (auto const& element : game_parameters_) {
-      available_keys.push_back(element.first);
-    }
-    SpielFatalError(absl::StrCat("The parameter for ", key,
-                                 " is missing. Available keys are: ",
-                                 absl::StrJoin(available_keys, " ")));
-  }
-  return default_value.value();
-}
-
-template <>
-int Game::ParameterValue<int>(const std::string& key,
-                              absl::optional<int> default_value) const {
-  auto iter = game_parameters_.find(key);
-  if (iter == game_parameters_.end()) {
-    GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
-      default_game_parameter = GameParameter(default_value.value());
-    } else {
-      auto default_iter = game_type_.parameter_specification.find(key);
-      if (default_iter == game_type_.parameter_specification.end()) {
-        SpielFatalError(absl::StrCat("No default parameter for ", key,
-                                     " and it was not provided as an argument. "
-                                     "It is likely it should be mandatory."));
-      }
-      default_game_parameter = default_iter->second;
-    }
-    defaulted_parameters_[key] = default_game_parameter;
-    return default_game_parameter.int_value();
-  } else {
-    return iter->second.int_value();
-  }
-}
-
-template <>
-double Game::ParameterValue<double>(
-    const std::string& key, absl::optional<double> default_value) const {
-  auto iter = game_parameters_.find(key);
-  if (iter == game_parameters_.end()) {
-    GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
-      default_game_parameter = GameParameter(default_value.value());
-    } else {
-      auto default_iter = game_type_.parameter_specification.find(key);
-      if (default_iter == game_type_.parameter_specification.end()) {
-        SpielFatalError(absl::StrCat("No default parameter for ", key,
-                                     " and it was not provided as an argument. "
-                                     "It is likely it should be mandatory."));
-      }
-      default_game_parameter = default_iter->second;
-    }
-    defaulted_parameters_[key] = default_game_parameter;
-    return default_game_parameter.double_value();
-  } else {
-    return iter->second.double_value();
-  }
-}
-
-template <>
-std::string Game::ParameterValue<std::string>(
-    const std::string& key, absl::optional<std::string> default_value) const {
-  auto iter = game_parameters_.find(key);
-  if (iter == game_parameters_.end()) {
-    GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
-      default_game_parameter = GameParameter(default_value.value());
-    } else {
-      auto default_iter = game_type_.parameter_specification.find(key);
-      if (default_iter == game_type_.parameter_specification.end()) {
-        SpielFatalError(absl::StrCat("No default parameter for ", key,
-                                     " and it was not provided as an argument. "
-                                     "It is likely it should be mandatory."));
-      }
-      default_game_parameter = default_iter->second;
-    }
-    defaulted_parameters_[key] = default_game_parameter;
-    return default_game_parameter.string_value();
-  } else {
-    return iter->second.string_value();
-  }
-}
-
-template <>
-bool Game::ParameterValue<bool>(const std::string& key,
-                                absl::optional<bool> default_value) const {
-  auto iter = game_parameters_.find(key);
-  if (iter == game_parameters_.end()) {
-    GameParameter default_game_parameter;
-    if (default_value != std::nullopt) {
-      default_game_parameter = GameParameter(default_value.value());
-    } else {
-      auto default_iter = game_type_.parameter_specification.find(key);
-      if (default_iter == game_type_.parameter_specification.end()) {
-        SpielFatalError(absl::StrCat("No default parameter for ", key,
-                                     " and it was not provided as an argument. "
-                                     "It is likely it should be mandatory."));
-      }
-      default_game_parameter = default_iter->second;
-    }
-    defaulted_parameters_[key] = default_game_parameter;
-    return default_game_parameter.bool_value();
-  } else {
-    return iter->second.bool_value();
-  }
-}
-
 void NormalizePolicy(ActionsAndProbs* policy) {
-  double sum = 0;
-  for (const std::pair<Action, double>& outcome : *policy) {
-    sum += outcome.second;
-  }
-  for (std::pair<Action, double>& outcome : *policy) {
-    outcome.second /= sum;
-  }
+  const double sum = absl::c_accumulate(
+      *policy, 0.0, [](double& a, auto& b) { return a + b.second; });
+  absl::c_for_each(*policy, [sum](auto& o) { o.second /= sum; });
 }
 
 std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
@@ -345,12 +252,17 @@ std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
   SPIEL_CHECK_GE(z, 0);
   SPIEL_CHECK_LT(z, 1);
 
+  // Special case for one-item lists.
+  if (outcomes.size() == 1) {
+    SPIEL_CHECK_FLOAT_EQ(outcomes[0].second, 1.0);
+    return outcomes[0];
+  }
+
   // First do a check that this is indeed a proper discrete distribution.
   double sum = 0;
   for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
-    SPIEL_CHECK_GE(prob, 0);
-    SPIEL_CHECK_LE(prob, 1);
+    SPIEL_CHECK_PROB(prob);
     sum += prob;
   }
   SPIEL_CHECK_FLOAT_EQ(sum, 1.0);
@@ -391,6 +303,37 @@ Action State::StringToAction(Player player,
   }
   SpielFatalError(
       absl::StrCat("Couldn't find an action matching ", action_str));
+}
+
+void State::ApplyAction(Action action_id) {
+  // history_ needs to be modified *after* DoApplyAction which could
+  // be using it.
+
+  // Cannot apply an invalid action.
+  SPIEL_CHECK_NE(action_id, kInvalidAction);
+  Player player = CurrentPlayer();
+  DoApplyAction(action_id);
+  history_.push_back({player, action_id});
+  ++move_number_;
+}
+
+void State::ApplyActions(const std::vector<Action>& actions) {
+  // history_ needs to be modified *after* DoApplyActions which could
+  // be using it.
+  DoApplyActions(actions);
+  history_.reserve(history_.size() + actions.size());
+  for (int player = 0; player < actions.size(); ++player) {
+    history_.push_back({player, actions[player]});
+  }
+  ++move_number_;
+}
+
+std::vector<int> State::LegalActionsMask(Player player) const {
+  int length = (player == kChancePlayerId) ? game_->MaxChanceOutcomes()
+                                           : num_distinct_actions_;
+  std::vector<int> mask(length, 0);
+  for (int action : LegalActions(player)) mask[action] = 1;
+  return mask;
 }
 
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
@@ -439,7 +382,7 @@ std::string SerializeGameAndState(const Game& game, const State& state) {
 
   // Game section.
   absl::StrAppend(&str, kSerializeGameSectionHeader, "\n");
-  absl::StrAppend(&str, game.ToString(), "\n");
+  absl::StrAppend(&str, game.Serialize(), "\n");
 
   // State section.
   absl::StrAppend(&str, kSerializeStateSectionHeader, "\n");
@@ -455,11 +398,6 @@ DeserializeGameAndState(const std::string& serialized_state) {
   enum Section { kInvalid = -1, kMeta = 0, kGame = 1, kState = 2 };
   std::vector<std::string> section_strings = {"", "", ""};
   Section cur_section = kInvalid;
-
-  std::string game_string = "";
-  std::string state_string = "";
-  std::shared_ptr<const Game> game = nullptr;
-  std::unique_ptr<State> state = nullptr;
 
   for (int i = 0; i < lines.size(); ++i) {
     if (lines[i].length() == 0 || lines[i].at(0) == '#') {
@@ -490,8 +428,9 @@ DeserializeGameAndState(const std::string& serialized_state) {
   }
 
   // We currently just ignore the meta section.
-  game = LoadGame(section_strings[kGame]);
-  state = game->DeserializeState(section_strings[kState]);
+  std::shared_ptr<const Game> game = DeserializeGame(section_strings[kGame]);
+  std::unique_ptr<State> state =
+      game->DeserializeState(section_strings[kState]);
 
   return std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>(
       game, std::move(state));
@@ -642,6 +581,15 @@ std::istream& operator>>(std::istream& stream, GameType::RewardModel& var) {
   return stream;
 }
 
+std::string Game::Serialize() const {
+  std::string str = ToString();
+  if (GetType().chance_mode == GameType::ChanceMode::kSampledStochastic) {
+    absl::StrAppend(&str, "\n", kSerializeGameRNGStateSectionHeader, "\n",
+                    GetRNGState());
+  }
+  return str;
+}
+
 std::string Game::ToString() const {
   GameParameters params = game_parameters_;
   params["name"] = GameParameter(game_type_.short_name);
@@ -688,15 +636,14 @@ std::string GameTypeToString(const GameType& game_type) {
   absl::StrAppend(&str, "provides_observation_tensor: ",
                   game_type.provides_observation_tensor ? "true" : "false",
                   "\n");
-  absl::StrAppend(&str, "provides_factored_observation_string: ",
-                  game_type.provides_factored_observation_string
-                  ? "true" : "false",
-                  "\n");
+  absl::StrAppend(
+      &str, "provides_factored_observation_string: ",
+      game_type.provides_factored_observation_string ? "true" : "false", "\n");
 
   // Check that there are no newlines in the serialized params.
   std::string serialized_params =
       SerializeGameParameters(game_type.parameter_specification);
-  SPIEL_CHECK_TRUE(serialized_params.find("\n") == std::string::npos);
+  SPIEL_CHECK_TRUE(!absl::StrContains(serialized_params, "\n"));
   absl::StrAppend(&str, "parameter_specification: ", serialized_params);
 
   return str;
@@ -747,6 +694,69 @@ GameType GameTypeFromString(const std::string& game_type_str) {
   game_type.parameter_specification =
       DeserializeGameParameters(game_type_values.at("parameter_specification"));
   return game_type;
+}
+
+std::vector<float> State::ObservationTensor(Player player) const {
+  // We add this player check, to prevent errors if the game implementation
+  // lacks that check (in particular as this function is the one used in
+  // Python). This can lead to doing this check twice.
+  // TODO(author2): Do we want to prevent executing this twice for games
+  // that implement it?
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<float> observation(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(observation));
+  return observation;
+}
+
+void State::ObservationTensor(Player player, std::vector<float>* values) const {
+  // Retained for backwards compatibility.
+  values->resize(game_->ObservationTensorSize());
+  ObservationTensor(player, absl::MakeSpan(*values));
+}
+
+std::vector<float> State::InformationStateTensor(Player player) const {
+  // We add this player check, to prevent errors if the game implementation
+  // lacks that check (in particular as this function is the one used in
+  // Python). This can lead to doing this check twice.
+  // TODO(author2): Do we want to prevent executing this twice for games
+  // that implement it?
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<float> info_state(game_->InformationStateTensorSize());
+  InformationStateTensor(player, absl::MakeSpan(info_state));
+  return info_state;
+}
+
+void State::InformationStateTensor(Player player,
+                                   std::vector<float>* values) const {
+  // Retained for backwards compatibility.
+  values->resize(game_->InformationStateTensorSize());
+  InformationStateTensor(player, absl::MakeSpan(*values));
+}
+
+bool State::PlayerAction::operator==(const PlayerAction& other) const {
+  return player == other.player && action == other.action;
+}
+
+std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action) {
+  os << absl::StreamFormat("PlayerAction(player=%i,action=%i)", action.player,
+                           action.action);
+  return os;
+}
+
+std::vector<std::string> ActionsToStrings(const State& state,
+                                          const std::vector<Action>& actions) {
+  std::vector<std::string> out;
+  out.reserve(actions.size());
+  for (Action action : actions) out.push_back(state.ActionToString(action));
+  return out;
+}
+
+std::string ActionsToString(const State& state,
+                            const std::vector<Action>& actions) {
+  return absl::StrCat(
+      "[", absl::StrJoin(ActionsToStrings(state, actions), ", "), "]");
 }
 
 }  // namespace open_spiel

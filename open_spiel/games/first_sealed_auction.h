@@ -28,8 +28,8 @@
 //
 // Each player has a valuation of the target object from 1 to K, according to a
 // uniform distribution, and places bids from 0 to (valuation - 1). The highest
-// bidder gets reward (valuation - bid); the others get 0. (The reward is split
-// in case of ties.)
+// bidder gets reward (valuation - bid); the others get 0. In the case of a
+// tie, the winner is randomly determined amongst the highest bidders.
 //
 // Parameters:
 //  "max_value"   int    maximum valuation (default = 10)
@@ -57,10 +57,10 @@ class FPSBAState : public State {
   std::unique_ptr<State> Clone() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override;
+                              absl::Span<float> values) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
 
  protected:
@@ -83,15 +83,15 @@ class FPSBAGame : public Game {
     return std::unique_ptr<State>(new FPSBAState(shared_from_this()));
   }
   int MaxChanceOutcomes() const override {
-    return std::max(max_value_, num_players_);
+    return std::max(max_value_ + 1, num_players_);
   }
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return max_value_; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new FPSBAGame(*this));
-  }
   int MaxGameLength() const override { return num_players_; }
+  // There is an additional chance node after all the bids to determine a winner
+  // in the case of a tie.
+  int MaxChanceNodesInHistory() const override { return num_players_ + 1; }
   std::vector<int> InformationStateTensorShape() const override {
     return {max_value_ * 2 + num_players_};
   };

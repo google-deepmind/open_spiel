@@ -56,10 +56,10 @@ set -e  # exit when any command fails
 MYDIR="$(dirname "$(realpath "$0")")"
 source "${MYDIR}/global_variables.sh"
 
-CXX=`which clang++`
+CXX=${CXX:-`which clang++`}
 if [ ! -x $CXX ]
 then
-  echo -n "clang++ not found in the path (the clang C++ compiler is needed to "
+  echo -n "clang++ not found (the clang C++ compiler is needed to "
   echo "compile OpenSpiel). Exiting..."
   exit 1
 fi
@@ -133,11 +133,11 @@ mkdir -p $BUILD_DIR
 # Configure Julia compilation if required.
 if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
-  if [[ ! -x `which julia` ]]
+  if [[ ! -x `which julia` ]] || [[ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]]
   then
-    echo -e "\e[33mWarning: julia not in your PATH. Trying \$HOME/.local/bin\e[0m"
-    PATH=${PATH}:${HOME}/.local/bin
-    [[ -x `which julia` ]] || die "could not find julia command. Please add it to PATH and rerun."
+    echo -e "\e[33mWarning: julia not in your PATH or it's too old. Trying \$HOME/.local/bin\e[0m"
+    PATH=${HOME}/.local/bin:${PATH}
+    [[ -x `which julia` ]] && [[ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ]] || die "could not find julia command. Please add it to PATH and rerun."
   fi
   LIBCXXWRAP_JULIA_DIR=`julia --project=${MYDIR}/../julia -e 'using CxxWrap; print(dirname(dirname(CxxWrap.CxxWrapCore.libcxxwrap_julia_jll.libcxxwrap_julia_path)))'`
   JULIA_VERSION_INFO=`julia --version`
@@ -159,6 +159,11 @@ function print_tests_failed {
 
 function print_skipping_tests {
   echo -e "\033[32m*** Skipping to run tests.\e[0m"
+}
+
+function execute_export_graph {
+  echo "Running tf_trajectories_example preliminary Python script"
+  python ../open_spiel/contrib/python/export_graph.py
 }
 
 # Build / install everything and run tests (C++, Python, optionally Julia).
@@ -183,7 +188,12 @@ else
   export PYTHONPATH=$PYTHONPATH:$pwd/../open_spiel
   export PYTHONPATH=$PYTHONPATH:$pwd/python  # For pyspiel bindings
 
-  cmake -DPython_TARGET_VERSION=${PYVERSION} -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR} ../open_spiel
+  # Build in testing, so that we can run tests fast.
+  cmake -DPython3_EXECUTABLE=${PYBIN} \
+        -DCMAKE_CXX_COMPILER=${CXX}                  \
+        -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR}  \
+        -DBUILD_TYPE=Testing                         \
+        ../open_spiel
 
   if [ "$ARG_test_only" != "all" ]
   then
@@ -202,8 +212,12 @@ else
     fi
 
     if [[ $ARG_build_only == "true" ]]; then
-      echo -e "\033[32m*** Skipping runing tests as build_only is $(ARG_build_only) \e[0m"
+      echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
     else
+      if [[ ${BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" && $ARG_test_only =~ "tf_trajectories_example" ]]; then
+        execute_export_graph
+      fi
+
       if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
         print_tests_passed
       else
@@ -216,10 +230,15 @@ else
     make -j$MAKE_NUM_PROCS
 
     if [[ $ARG_build_only == "true" ]]; then
-      echo -e "\033[32m*** Skipping runing tests as build_only is $(ARG_build_only) \e[0m"
+      echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
     else
       # Test everything
       echo "Running all tests"
+
+      if [[ ${BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" ]]; then
+        execute_export_graph
+      fi
+
       if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
         print_tests_passed
       else

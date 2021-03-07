@@ -106,16 +106,20 @@ void CFRShapleysCorrDistTest() {
     TabularPolicy current_policy =
         static_cast<CFRCurrentPolicy*>(solver.CurrentPolicy().get())
             ->AsTabular();
-    cd_builder.AddSampledJointPolicy(current_policy, 100);
+    cd_builder.AddMixedJointPolicy(current_policy);
     if (i % 10 == 0) {
       CorrelationDevice mu = cd_builder.GetCorrelationDevice();
+      double afcce_dist = AFCCEDist(*game, config, mu);
+      double afce_dist = AFCEDist(*game, config, mu);
       double efcce_dist = EFCCEDist(*game, config, mu);
       double efce_dist = EFCEDist(*game, config, mu);
       std::vector<double> values = ExpectedValues(*game, mu);
-      std::cout << absl::StrFormat("CFRTest %d %2.10lf %2.10lf %2.3lf %2.3lf",
-                                   i, efcce_dist, efce_dist, values[0],
-                                   values[1])
-                << std::endl;
+      std::cout
+          << absl::StrFormat(
+                 "CFRTest %d %2.10lf %2.10lf %2.10lf %2.10lf %2.3lf %2.3lf", i,
+                 afcce_dist, afce_dist, efcce_dist, efce_dist, values[0],
+                 values[1])
+          << std::endl;
     }
   }
 
@@ -143,11 +147,15 @@ void CFRGoofspielCorrDistTest() {
     cd_builder.AddSampledJointPolicy(current_policy, 100);
   }
   CorrelationDevice mu = cd_builder.GetCorrelationDevice();
+  double afcce_dist = AFCCEDist(*game, config, mu);
+  double afce_dist = AFCEDist(*game, config, mu);
   double efcce_dist = EFCCEDist(*game, config, mu);
   double efce_dist = EFCEDist(*game, config, mu);
   std::vector<double> values = ExpectedValues(*game, mu);
-  std::cout << absl::StrFormat("CFRTest %2.10lf %2.10lf %2.3lf %2.3lf",
-                               efcce_dist, efce_dist, values[0], values[1])
+  std::cout << absl::StrFormat(
+                   "CFRTest %2.10lf %2.10lf %2.10lf, %2.10lf %2.3lf %2.3lf",
+                   afcce_dist, afce_dist, efcce_dist, efce_dist, values[0],
+                   values[1])
             << std::endl;
 }
 

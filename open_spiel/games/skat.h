@@ -157,7 +157,7 @@ class SkatState : public State {
 
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
-                         std::vector<double>* values) const override;
+                         absl::Span<float> values) const override;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -218,10 +218,9 @@ class SkatGame : public Game {
   double MaxUtility() const override { return  1.0; }
   double UtilitySum() const override { return 0; }
   int MaxGameLength() const override { return kNumCards + kNumPlayers; }
+  // TODO: verify whether this bound is tight and/or tighten it.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
   int MaxChanceOutcomes() const override { return kNumCards; }
-  std::shared_ptr<const Game> Clone() const override {
-    return std::shared_ptr<const Game>(new SkatGame(*this));
-  }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

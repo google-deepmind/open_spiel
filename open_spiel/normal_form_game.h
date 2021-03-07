@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_NORMAL_FORM_GAME_H_
 
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -68,14 +69,14 @@ class NFGState : public SimMoveState {
   }
 
   void InformationStateTensor(Player player,
-                              std::vector<double>* values) const override {
+                              absl::Span<float> values) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-    values->resize(1);
+    SPIEL_CHECK_EQ(values.size(), 1);
     if (IsTerminal()) {
-      (*values)[0] = 1;
+      values[0] = 1;
     } else {
-      (*values)[0] = 0;
+      values[0] = 0;
     }
   }
 };
@@ -89,6 +90,34 @@ class NormalFormGame : public SimMoveGame {
 
   // Game lasts one turn.
   int MaxGameLength() const override { return 1; }
+  // There aren't chance nodes in these games.
+  int MaxChanceNodesInHistory() const override { return 0; }
+
+  // Direct access to utility. This is just a default implementation, which is
+  // overridden in subclasses for faster access.
+  virtual std::vector<double> GetUtilities(
+      const std::vector<Action>& joint_action) const {
+    std::unique_ptr<State> state = NewInitialState();
+    state->ApplyActions(joint_action);
+    return state->Returns();
+  }
+
+  virtual double GetUtility(Player player,
+                            const std::vector<Action>& joint_action) const {
+    return GetUtilities(joint_action)[player];
+  }
+
+  double UtilitySum() const override {
+    if (game_type_.utility == GameType::Utility::kZeroSum) {
+      return 0.0;
+    } else if (game_type_.utility == GameType::Utility::kConstantSum) {
+      std::vector<Action> joint_action(NumPlayers(), 0);
+      std::vector<double> utilities = GetUtilities(joint_action);
+      return std::accumulate(utilities.begin(), utilities.end(), 0.0);
+    }
+    SpielFatalError(absl::StrCat("No appropriate UtilitySum value for ",
+                                 "general-sum or identical utility games."));
+  }
 
  protected:
   NormalFormGame(GameType game_type, GameParameters game_parameters)
