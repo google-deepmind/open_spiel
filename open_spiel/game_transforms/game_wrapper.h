@@ -86,6 +86,11 @@ class WrappedState : public State {
 
   const State& GetWrappedState() const { return *state_; }
 
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return state_->ActionsConsistentWithInformationFrom(action);
+  }
+
  protected:
   void DoApplyAction(Action action_id) override {
     state_->ApplyAction(action_id);

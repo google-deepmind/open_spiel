@@ -18,8 +18,8 @@ This is intended to be the main way to get observations of states in Python.
 The usage pattern is as follows:
 
 0. Create the game we will be playing
-1. Create observation objects for each kind of observation required.
-2. Every time an observation is required, call:
+1. Create each kind of observation required, using `make_observation`
+2. Every time a new observation is required, call:
       `observation.set_from(state, player)`
    The tensor contained in the Observation class will be updated with an
    observation of the supplied state. This tensor is updated in-place, so if
@@ -100,3 +100,24 @@ def make_observation(game,
   else:
     return _Observation(game, imperfect_information_observation_type, params or
                         {})
+
+
+class IIGObserverForPublicInfoGame:
+  """Observer for imperfect information obvservations of public-info games."""
+
+  def __init__(self, iig_obs_type, params):
+    if params:
+      raise ValueError(f'Observation parameters not supported; passed {params}')
+    self._iig_obs_type = iig_obs_type
+    self.tensor = None
+    self.dict = {}
+
+  def set_from(self, state, player):
+    pass
+
+  def string_from(self, state, player):
+    del player
+    if self._iig_obs_type.public_info:
+      return state.history_str()
+    else:
+      return ''  # No private information to return

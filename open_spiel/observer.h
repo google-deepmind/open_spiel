@@ -19,6 +19,28 @@
 // Each Game object has a MakeObserver() method which returns an Observer
 // object given a specification of the required observation type.
 
+// To access observation from C++, first initialize an observer and observation
+// for the game (one time only).
+//
+//    auto observer = game->MakeObserver(iig_obs_type, params);
+//    Observation observation(*game, observer);
+//
+// Then for states in a trajectory, get a tensor observation using:
+//
+//    observation.SetFrom(state, player);   // populates observation.Tensor()
+//
+// The resultant tensor is accessible from observation.Tensor(). Note that
+// the decomposition of the tensor into named pieces is not currently available
+// through this API (it is available in Python).
+//
+// To obtain a string observation:
+//
+//    std::string string_obs = observation.StringFrom(state, player);
+//
+// Access from Python follows a similar pattern, with the addition of support
+// for accessing pieces of the observation tensor by name. See `observation.py`
+// and `observation_test.py`.
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -27,6 +49,7 @@
 #include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -35,13 +58,19 @@ namespace open_spiel {
 class Game;
 class State;
 
+using ObservationParams = GameParameters;
+
 // Viewing a span as a multi-dimensional tensor.
 struct DimensionedSpan {
   absl::InlinedVector<int, 4> shape;
   absl::Span<float> data;
 
   DimensionedSpan(absl::Span<float> data, absl::InlinedVector<int, 4> shape)
-      : shape(std::move(shape)), data(data) {}
+      : shape(std::move(shape)), data(data) {
+    int m = std::accumulate(
+        this->shape.begin(), this->shape.end(), 1, std::multiplies<int>());
+    SPIEL_CHECK_EQ(m, data.size());
+  }
 
   float& at(int idx) const {
     SPIEL_DCHECK_EQ(shape.size(), 1);
@@ -59,7 +88,7 @@ struct DimensionedSpan {
   }
 
   float& at(int idx1, int idx2, int idx3, int idx4) const {
-    SPIEL_DCHECK_EQ(shape.size(), 3);
+    SPIEL_DCHECK_EQ(shape.size(), 4);
     return data[((idx1 * shape[1] + idx2) * shape[2] + idx3) * shape[3] + idx4];
   }
 };
@@ -90,6 +119,32 @@ class ContiguousAllocator : public Allocator {
  private:
   absl::Span<float> data_;
   int offset_;
+};
+
+
+// Information about a tensor (shape and type).
+struct TensorInfo {
+  std::string name;
+  std::vector<int> shape;
+
+  std::string DebugString() const {
+    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
+                        absl::StrJoin(shape, ","), ")");
+  }
+};
+
+// Allocates new memory for each allocation request and keeps track
+// of tensor names and shapes. This is intended to use when it's not yet
+// known how much memory an observation consumes.
+class TrackingVectorAllocator : public Allocator {
+ public:
+  TrackingVectorAllocator() {}
+  DimensionedSpan Get(absl::string_view name,
+                      const absl::InlinedVector<int, 4>& shape);
+  bool IsNameUnique(absl::string_view name);
+
+  std::vector<TensorInfo> tensors;
+  std::vector<float> data;
 };
 
 // Specification of which players' private information we get to see.
@@ -233,17 +288,6 @@ class Observer {
   bool has_tensor_;
 };
 
-// Information about a tensor (shape and type).
-struct TensorInfo {
-  std::string name;
-  std::vector<int> shape;
-
-  std::string DebugString() const {
-    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), ")");
-  }
-};
-
 // Holds an Observer and a vector for it to write values into.
 class Observation {
  public:
@@ -283,6 +327,44 @@ class Observation {
   std::shared_ptr<Observer> observer_;
   std::vector<float> buffer_;
   std::vector<TensorInfo> tensors_;
+};
+
+// Allows to registers observers to a game. Usage:
+// ObserverRegisterer unused_name(game_name, observer_name, creator);
+//
+// Once an observer is registered, it can be created by
+// game.MakeObserver(iig_obs_type, observer_name)
+class ObserverRegisterer {
+ public:
+  // Function type which creates an observer. The game and params argument
+  // cannot be assumed to exist beyond the scope of this call.
+  using CreateFunc = std::function<std::shared_ptr<Observer>(
+      const Game& game, absl::optional<IIGObservationType> iig_obs_type,
+      const ObservationParams& params)>;
+
+  ObserverRegisterer(const std::string& game_name,
+                     const std::string& observer_name,
+                     CreateFunc creator);
+  static void RegisterObserver(const std::string& game_name,
+                               const std::string& observer_name,
+                               CreateFunc creator);
+
+  static std::shared_ptr<Observer> CreateByName(
+      const std::string& observer_name,
+      const Game& game,
+      absl::optional<IIGObservationType> iig_obs_type,
+      const ObservationParams& params);
+
+ private:
+  // Returns a "global" map of registrations (i.e. an object that lives from
+  // initialization to the end of the program). Note that we do not just use
+  // a static data member, as we want the map to be initialized before first
+  // use.
+  static std::map<std::pair<std::string, std::string>, CreateFunc>&
+  observers() {
+    static std::map<std::pair<std::string, std::string>, CreateFunc> impl;
+    return impl;
+  }
 };
 
 }  // namespace open_spiel

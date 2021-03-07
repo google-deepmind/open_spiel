@@ -116,6 +116,7 @@ class HexGame : public Game {
   const int board_size_;
 };
 
+CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {

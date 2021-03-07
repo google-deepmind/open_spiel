@@ -19,7 +19,6 @@
 #include <random>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/spiel_utils.h"
@@ -69,31 +68,34 @@ CFRAveragePolicy::CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
 
-ActionsAndProbs CFRAveragePolicy::GetStatePolicy(const State& state) const {
-  ActionsAndProbs actions_and_probs;
-  auto entry = info_states_.find(state.InformationStateString());
+ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
+    const State& state, Player player) const {
+  auto entry = info_states_.find(state.InformationStateString(player));
   if (entry == info_states_.end()) {
     if (default_policy_) {
-      return default_policy_->GetStatePolicy(state);
+      return default_policy_->GetStatePolicy(state, player);
     } else {
-      return actions_and_probs;
+      // This should never get called.
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
+  ActionsAndProbs actions_and_probs;
   GetStatePolicyFromInformationStateValues(entry->second, &actions_and_probs);
   return actions_and_probs;
 }
 
 ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
     const std::string& info_state) const {
-  ActionsAndProbs actions_and_probs;
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     if (default_policy_) {
       return default_policy_->GetStatePolicy(info_state);
     } else {
-      return actions_and_probs;
+      // This should never get called.
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
+  ActionsAndProbs actions_and_probs;
   GetStatePolicyFromInformationStateValues(entry->second, &actions_and_probs);
   return actions_and_probs;
 }
@@ -125,33 +127,34 @@ CFRCurrentPolicy::CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
 
-ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(const State& state) const {
-  ActionsAndProbs actions_and_probs;
-  auto entry = info_states_.find(state.InformationStateString());
+ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
+    const State& state, Player player) const {
+  auto entry = info_states_.find(state.InformationStateString(player));
   if (entry == info_states_.end()) {
     if (default_policy_) {
-      return default_policy_->GetStatePolicy(state);
+      return default_policy_->GetStatePolicy(state, player);
     } else {
-      return actions_and_probs;
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
+  ActionsAndProbs actions_and_probs;
   return GetStatePolicyFromInformationStateValues(entry->second,
                                                   actions_and_probs);
 }
 
 ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
     const std::string& info_state) const {
-  ActionsAndProbs actions_and_probs;
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     if (default_policy_) {
       return default_policy_->GetStatePolicy(info_state);
     } else {
-      return actions_and_probs;
+      SpielFatalError("No policy found, and no default policy.");
     }
   }
-  return GetStatePolicyFromInformationStateValues(entry->second,
-                                                  actions_and_probs);
+  ActionsAndProbs actions_and_probs;
+  GetStatePolicyFromInformationStateValues(entry->second, actions_and_probs);
+  return actions_and_probs;
 }
 
 ActionsAndProbs CFRCurrentPolicy::GetStatePolicyFromInformationStateValues(
@@ -232,9 +235,8 @@ void CFRSolverBase::InitializeInfostateNodes(const State& state) {
   std::vector<Action> legal_actions = state.LegalActions();
 
   if (random_initial_regrets_) {
-    CFRInfoStateValues is_vals(
-        legal_actions,
-        kRandomInitialRegretsMagnitude * absl::Uniform<double>(rng_, 0.0, 1.0));
+    CFRInfoStateValues is_vals(legal_actions, &rng_,
+                               kRandomInitialRegretsMagnitude);
     info_states_[info_state] = is_vals;
   } else {
     CFRInfoStateValues is_vals(legal_actions);
@@ -258,7 +260,7 @@ void CFRSolverBase::EvaluateAndUpdatePolicy() {
       ApplyRegretMatching();
     }
   } else {
-    ComputeCounterFactualRegret(*root_state_, std::nullopt, root_reach_probs_,
+    ComputeCounterFactualRegret(*root_state_, absl::nullopt, root_reach_probs_,
                                 nullptr);
     if (regret_matching_plus_) {
       ApplyRegretMatchingPlusReset();
@@ -421,7 +423,7 @@ void CFRSolverBase::GetInfoStatePolicyFromPolicy(
 // - alternating_player: Optionally only update this player.
 // - reach_probabilities: The reach probabilities of this state.
 // - current_player: Either a player or chance_player_.
-// - action_probs: The action probabilities to use frp this state.
+// - action_probs: The action probabilities to use for this state.
 // - child_values_out: optional output parameter which is filled with the child
 //           utilities for each action, for current_player.
 // Returns:
@@ -764,3 +766,4 @@ PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
 
 }  // namespace algorithms
 }  // namespace open_spiel
+

@@ -42,10 +42,17 @@ Action GetAction(const ActionsAndProbs& action_and_probs);
 // legal actions).
 ActionsAndProbs UniformStatePolicy(const State& state);
 
+// Returns a policy where the zeroth action has probability 1.
+ActionsAndProbs FirstActionStatePolicy(const State& state);
+
 // Return a new policy with all the same actions, but with probability 1 on the
 // specified action, and 0 on the others.
 ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
                                       Action action);
+
+// Returns a policy with probability 1 on a specific action, and 0 on others.
+ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
+                                       Action action);
 
 // A general policy object. A policy is a mapping from states to list of
 // (action, prob) pairs for all the legal actions at the state.
@@ -216,6 +223,16 @@ class TabularPolicy : public Policy {
     return str;
   }
 
+  // Set (overwrite) all the state policies contained in another policy within
+  // this policy. Does not change other state policies not contained in this
+  // policy.
+  void ImportPolicy(const TabularPolicy& other_policy) {
+    for (const auto& [info_state, actions_and_probs] :
+         other_policy.policy_table_) {
+      SetStatePolicy(info_state, actions_and_probs);
+    }
+  }
+
   // Set the probability for action at the info state. If the info state is not
   // in the policy, it is added. If the action is not in the info state policy,
   // it is added. Otherwise it is modified.
@@ -257,7 +274,9 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
  public:
-  ActionsAndProbs GetStatePolicy(const State& state) const override {
+  ActionsAndProbs GetStatePolicy(
+      const State& state, Player player) const override {
+    SPIEL_CHECK_TRUE(state.IsPlayerActing(player));
     return UniformStatePolicy(state);
   }
 
@@ -267,6 +286,51 @@ class UniformPolicy : public Policy {
   }
 };
 
+// Chooses all legal actions with equal probability. This is equivalent to the
+// tabular version, except that this works for large games.
+class FirstActionPolicy : public Policy {
+ public:
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override {
+    SPIEL_CHECK_TRUE(state.IsPlayerActing(player));
+    return FirstActionStatePolicy(state);
+  }
+
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "") const override {
+    return "FirstActionPolicy:";
+  }
+};
+
+// A deterministic policy with which takes legal actions in order of
+// preference specified by pref_actions. The function will check-fail if none
+// of the pref_action elements are legal for a state.
+//
+// For example, PreferredActionPolicy(leduc, {kRaise, kCall}) constructs a
+// policy that always raises and only falls back to call if raise is not a legal
+// action. If it is possible for nethier raise nor call to be valid actions in a
+// state in leduc, the function will fail.
+class PreferredActionPolicy : public Policy {
+ public:
+  PreferredActionPolicy(const std::vector<Action>& preference_order)
+      : preference_order_(preference_order) {}
+
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
+
+  std::string Serialize(int double_precision = -1,
+                        std::string delimiter = "") const override {
+    SpielFatalError("Unimplemented.");
+  }
+
+ private:
+  std::vector<Action> preference_order_;
+};
+
+// Takes any policy and returns a tabular policy by traversing the game and
+// building a tabular policy for it.
+TabularPolicy ToTabularPolicy(const Game& game, const Policy* policy);
+
 // Helper functions that generate policies for testing.
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
                                     bool initialize_to_uniform = false);
@@ -274,7 +338,17 @@ TabularPolicy GetUniformPolicy(const Game& game);
 TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
+// Returns a preferred action policy as a tabular policy.
+TabularPolicy GetPrefActionPolicy(
+    const Game& game, const std::vector<Action>& pref_action);
+
 std::string PrintPolicy(const ActionsAndProbs& policy);
+
+// Takes many tabular policy and merges them into one. If check_no_overlap is
+// set, then a check is done to ensure that there is no intersection among the
+// policies (slow: involves iterating over each).
+TabularPolicy ToJointTabularPolicy(const std::vector<TabularPolicy>& policies,
+                                   bool check_no_overlap);
 
 }  // namespace open_spiel
 

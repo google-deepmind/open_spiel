@@ -96,6 +96,7 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
 
   double error;
   double min_utility = game.MinUtility();
+  double max_utility = game.MaxUtility();
   do {
     error = 0;
     for (const auto& kv : states) {
@@ -108,8 +109,7 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
       // Initialize value to be the minimum utility if current player
       // is the maximizing player (i.e. player 0), and to maximum utility
       // if current player is the minimizing player (i.e. player 1).
-      double value = min_utility;
-      if (player == Player{1}) value = -value;
+      double value = (player == Player{0}) ? min_utility : max_utility;
       for (auto action : kv.second->LegalActions()) {
         auto possibilities = transitions[std::make_pair(key, action)];
         double q_value = 0;

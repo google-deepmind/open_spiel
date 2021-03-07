@@ -74,7 +74,7 @@ action: 27
 # QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D
 IsTerminal() = False
 History() = [0, 27]
-HistoryString() = "0 27"
+HistoryString() = "0, 27"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -95,7 +95,7 @@ action: 0
 # QT85.JT7.AKQ.AKQ 643.86.97642.T94 2N-6D-Pass Score:-200 2N N:-100 3C E:-200 3D N:-50 3D E:-50 3H N:-200 3H E:-200 3S N:-150 3S E:-150 3N N:-150 4C N:-250 4H N:-250 4H E:-250 4S N:-200 4S E:-200 5C N:-300 5C E:-300 5D N:-150 5D E:-150 6C N:-350 6C E:-350 6D N:-200 6D E:-200 6H N:-350 6H E:-350 6S N:-300 6S E:-300 6N N:-300 7C N:-400 7C E:-400 7D N:-250 7D E:-250 7H N:-400 7H E:-400 7S N:-350 7S E:-350 7N N:-350
 IsTerminal() = True
 History() = [0, 27, 0]
-HistoryString() = "0 27 0"
+HistoryString() = "0, 27, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

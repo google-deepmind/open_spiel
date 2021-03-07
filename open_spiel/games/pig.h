@@ -29,7 +29,7 @@
 //     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
 //     "horizon"       int    max number of moves before draw (default = 1000)
 //     "players"       int    number of players               (default = 2)
-//     "winscore"      int    number of point needed to win   (default = 100)
+//     "winscore"      int    number of points needed to win   (default = 100)
 
 namespace open_spiel {
 namespace pig {
@@ -70,7 +70,7 @@ class PigState : public State {
   int total_moves_ = -1;    // Total num moves taken during the game.
   Player cur_player_ = -1;  // Player to play.
   int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
-                            // to remember whose is playing for next turns
+                            // to remember whose is playing for next turn.
                             // (cur_player will be the chance player's id.)
   std::vector<int> scores_;  // Score for each player.
   int turn_total_ = -1;
