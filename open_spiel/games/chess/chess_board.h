@@ -131,10 +131,7 @@ inline constexpr std::array<Offset, 8> kKnightOffsets = {
 absl::optional<Square> SquareFromString(const std::string& s);
 
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
-template <uint32_t kBoardSize>
 class ChessBoard;
-
-using StandardChessBoard = ChessBoard<8>;
 
 struct Move {
   Square from;
@@ -206,7 +203,7 @@ struct Move {
   //              resulting in checkmate in a surprisingly good move)
   // * O-O-O!!N+/- (a surprisingly good long castle that is a theoretical
   //                novelty that gives white a clear but not winning advantage)
-  std::string ToSAN(const StandardChessBoard& board) const;
+  std::string ToSAN(const ChessBoard& board) const;
 
   bool operator==(const Move& other) const {
     return from == other.from && to == other.to && piece == other.piece &&
@@ -223,18 +220,29 @@ bool IsMoveCharacter(char c);
 
 std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
-template <uint32_t kBoardSize>
+inline constexpr int kMaxBoardSize = 8;
+inline constexpr int k2dMaxBoardSize = kMaxBoardSize * kMaxBoardSize;
+inline const std::string kDefaultStandardFEN =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
+
+using ObservationTable = std::array<bool, k2dMaxBoardSize>;
+
 class ChessBoard {
  public:
-  ChessBoard();
+  ChessBoard(int board_size = 8, bool king_in_check_allowed = false);
 
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen);
+  // Constructs a chess board at the given position in Forsyth-Edwards Notation.
+  // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen,
+                                                 int board_size = 8,
+                                                 bool king_in_check_allowed = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
   void set_square(Square sq, Piece p);
 
-  const std::array<Piece, kBoardSize * kBoardSize>& pieces() const {
+  const std::array<Piece, k2dMaxBoardSize>& pieces() const {
     return board_;
   }
 
@@ -261,8 +269,11 @@ class ChessBoard {
   // For performance reasons, we do not guarantee that no more moves will be
   // generated if yield returns false. It is only for optimization.
   using MoveYieldFn = std::function<bool(const Move&)>;
-  void GenerateLegalMoves(const MoveYieldFn& yield) const;
-  void GeneratePseudoLegalMoves(const MoveYieldFn& yield) const;
+  void GenerateLegalMoves(const MoveYieldFn& yield) const {
+    GenerateLegalMoves(yield, to_play_);
+  };
+  void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
+  void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color) const;
 
   bool HasLegalMoves() const {
     bool found = false;
@@ -308,8 +319,8 @@ class ChessBoard {
   // for actually applying the move.
   bool TestApplyMove(const Move& move);
 
-  static bool InBoardArea(const Square& sq) {
-    return sq.x >= 0 && sq.x < kBoardSize && sq.y >= 0 && sq.y < kBoardSize;
+  bool InBoardArea(const Square& sq) const {
+    return sq.x >= 0 && sq.x < board_size_ && sq.y >= 0 && sq.y < board_size_;
   }
 
   bool IsEmpty(const Square& sq) const {
@@ -333,15 +344,15 @@ class ChessBoard {
   }
 
   /* Whether the square is on the pawn starting rank for our_color. */
-  static bool IsPawnStartingRank(const Square& sq, Color our_color) {
+  bool IsPawnStartingRank(const Square& sq, Color our_color) const {
     return ((our_color == Color::kWhite && sq.y == 1) ||
-            (our_color == Color::kBlack && sq.y == (kBoardSize - 2)));
+            (our_color == Color::kBlack && sq.y == (board_size_ - 2)));
   }
 
-  static bool IsPawnPromotionRank(const Square& sq) {
+  bool IsPawnPromotionRank(const Square& sq) const {
     // No need to test for color here because a pawn can't be on the "wrong"
     // promotion rank.
-    return sq.y == 0 || sq.y == (kBoardSize - 1);
+    return sq.y == 0 || sq.y == (board_size_ - 1);
   }
 
   /* Whether the sq is under attack by the opponent. */
@@ -351,7 +362,9 @@ class ChessBoard {
     return UnderAttack(find(Piece{to_play_, PieceType::kKing}), to_play_);
   }
 
-  int BoardSize() const { return kBoardSize; }
+  int BoardSize() const { return board_size_; }
+
+  bool KingInCheckAllowed() const { return king_in_check_allowed_; }
 
   uint64_t HashValue() const { return zobrist_hash_; }
 
@@ -359,10 +372,27 @@ class ChessBoard {
 
   std::string ToUnicodeString() const;
 
+  // Constructs a string describing the chess board position in Forsyth-Edwards
+  // Notation. https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   std::string ToFEN() const;
 
+  /* Constructs a string describing the dark chess board position in a notation
+   * similar to Forsyth-Edwards Notation.
+   * https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+   *
+   * There are several key differences to FEN:
+   * 1) Only observable squares are shown. Squares invisible to the observer are
+   *    represented by the character '?'
+   * 2) Only observer's castling rights are shown
+   * 3) en passant square is only shown if the observer is capable of performing
+   *    an en passant capture
+   *
+   */
+  std::string ToDarkFEN(const ObservationTable& observability_table,
+                        Color color) const;
+
  private:
-  static size_t SquareToIndex_(Square sq) { return sq.y * kBoardSize + sq.x; }
+  size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }
 
   /* Generate*Destinations functions call yield(sq) for every potential
    * destination generated.
@@ -429,7 +459,10 @@ class ChessBoard {
   void SetIrreversibleMoveCounter(int c);
   void SetMovenumber(int move_number);
 
-  std::array<Piece, kBoardSize * kBoardSize> board_;
+  int board_size_;
+  bool king_in_check_allowed_;
+
+  std::array<Piece, k2dMaxBoardSize> board_;
   Color to_play_;
   Square ep_square_;
   int32_t irreversible_move_counter_;
@@ -446,9 +479,8 @@ class ChessBoard {
   uint64_t zobrist_hash_;
 };
 
-template <uint32_t kBoardSize>
 inline std::ostream& operator<<(std::ostream& stream,
-                                const ChessBoard<kBoardSize>& board) {
+                                const ChessBoard& board) {
   return stream << board.DebugString();
 }
 
@@ -456,7 +488,7 @@ inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
   return stream << PieceTypeToString(pt);
 }
 
-StandardChessBoard MakeDefaultBoard();
+ChessBoard MakeDefaultBoard();
 
 }  // namespace chess
 }  // namespace open_spiel

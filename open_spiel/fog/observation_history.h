@@ -128,6 +128,11 @@ class ActionObservationHistory {
   // of the Action-Observation history that we could construct from the State?
   bool IsExtensionOf(Player pl, const State& state) const;
 
+  void Extend(const std::optional<Action> action,
+              const std::string& observation_string);
+
+  void RemoveLast();
+
   std::string ToString() const;
 
   bool operator==(const ActionObservationHistory& other) const {
