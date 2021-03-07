@@ -122,13 +122,18 @@ TORCH_MODULE(ResTorsoBlock);
 // linear layers (LIN). The output activation function is tanh (TANH), the
 // rectified linear activation function (RELU) is within. The policy head
 // consists of one convolutional layer, batch normalization layer, and linear
-// layer. It's output activation function is softamx (SOFTMAX), while rectified
-// linear is used within the head.
+// layer. There is no softmax activation function in this layer. The softmax
+// on the output is applied in the forward function of the residual model.
+// This design was chosen because the loss function of the residual model
+// requires the policy logits, not the policy distribution. By providing the
+// policy logits as output, the residual model can either apply the softmax
+// activation function, or calculate the loss using Torch's log softmax
+// function.
 //
 // Illustration:
 //                    --> CONV --> BN --> RELU --> LIN --> RELU --> LIN --> TANH
 //   [Input Tensor] --
-//                    --> CONV --> BN --> RELU --> LIN --> SOFTMAX
+//                    --> CONV --> BN --> RELU --> LIN (no SOFTMAX here)
 //
 // There is only one output block per model.
 class ResOutputBlockImpl : public torch::nn::Module {
@@ -160,6 +165,7 @@ class ResModelImpl : public torch::nn::Module {
       torch::Tensor policy_targets, torch::Tensor value_targets);
 
  private:
+  std::vector<torch::Tensor> forward_(torch::Tensor x, torch::Tensor mask);
   torch::nn::ModuleList layers_;
   torch::Device device_;
   int num_torso_blocks_;

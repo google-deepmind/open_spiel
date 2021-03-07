@@ -216,15 +216,14 @@ std::vector<torch::Tensor> ResOutputBlockImpl::forward(
   value_output = torch::relu(value_linear1_(value_output));
   value_output = torch::tanh(value_linear2_(value_output));
 
-  torch::Tensor policy_output = torch::relu(
+  torch::Tensor policy_logits = torch::relu(
       policy_batch_norm_(policy_conv_(x)));
-  policy_output = policy_output.view({-1, policy_observation_size_});
-  policy_output = policy_linear_(policy_output);
-  policy_output = torch::where(
-      mask, policy_output, -(1 << 16) * torch::ones_like(policy_output));
-  policy_output = torch::softmax(policy_output, 1);
+  policy_logits = policy_logits.view({-1, policy_observation_size_});
+  policy_logits = policy_linear_(policy_logits);
+  policy_logits = torch::where(
+      mask, policy_logits, -(1 << 16) * torch::ones_like(policy_logits));
 
-  return {value_output, policy_output};
+  return {value_output, policy_logits};
 }
 
 ResModelImpl::ResModelImpl(const ModelConfig& config, const std::string& device)
@@ -275,33 +274,22 @@ ResModelImpl::ResModelImpl(const ModelConfig& config, const std::string& device)
 
 std::vector<torch::Tensor> ResModelImpl::forward(
     torch::Tensor x, torch::Tensor mask) {
-  std::vector<torch::Tensor> output;
-  for (int i = 0; i < num_torso_blocks_ + 2; i++) {
-    if (i == 0) {
-      x = layers_[i]->as<ResInputBlock>()->forward(x);
-    } else if (i >= num_torso_blocks_ + 1) {
-      output = layers_[i]->as<ResOutputBlock>()->forward(x, mask);
-    } else {
-      x = layers_[i]->as<ResTorsoBlock>()->forward(x);
-    }
-  }
-  return output;
+  std::vector<torch::Tensor> output = this->forward_(x, mask);
+  return {output[0], torch::softmax(output[1], 1)};
 }
 
 std::vector<torch::Tensor> ResModelImpl::losses(
     torch::Tensor inputs, torch::Tensor masks,
     torch::Tensor policy_targets, torch::Tensor value_targets) {
-  std::vector<torch::Tensor> output = this->forward(inputs, masks);
+  std::vector<torch::Tensor> output = this->forward_(inputs, masks);
 
   torch::Tensor value_predictions = output[0];
   torch::Tensor policy_predictions = output[1];
 
   // Policy loss (cross-entropy).
   torch::Tensor policy_loss = torch::sum(
-      -policy_targets * torch::log(policy_predictions + 1e-7), -1);
-  // Average over the number of actions available.
-  policy_loss /= torch::sum(masks, -1);
-  policy_loss = policy_loss.mean();
+      -policy_targets * torch::log_softmax(policy_predictions, 1), -1);
+  policy_loss = torch::mean(policy_loss);
 
   // Value loss (mean-squared error).
   torch::nn::MSELoss mse_loss;
@@ -328,6 +316,21 @@ std::vector<torch::Tensor> ResModelImpl::losses(
   }
 
   return {policy_loss, value_loss, l2_regularization_loss};
+}
+
+std::vector<torch::Tensor> ResModelImpl::forward_(
+    torch::Tensor x, torch::Tensor mask) {
+  std::vector<torch::Tensor> output;
+  for (int i = 0; i < num_torso_blocks_ + 2; i++) {
+    if (i == 0) {
+      x = layers_[i]->as<ResInputBlock>()->forward(x);
+    } else if (i >= num_torso_blocks_ + 1) {
+      output = layers_[i]->as<ResOutputBlock>()->forward(x, mask);
+    } else {
+      x = layers_[i]->as<ResTorsoBlock>()->forward(x);
+    }
+  }
+  return output;
 }
 
 }  // namespace torch_az
