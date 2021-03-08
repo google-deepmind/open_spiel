@@ -24,9 +24,10 @@ AVG_POLICY_INDEX = 1
 class AveragePolicy(policy.Policy):
   """A policy object representing the average policy for MCCFR algorithms."""
 
-  def __init__(self, infostates):
+  def __init__(self, game, player_ids, infostates):
     # Do not create a copy of the dictionary
     # but work on the same object
+    super().__init__(game, player_ids)
     self._infostates = infostates
 
   def action_probabilities(self, state, player_id=None):
@@ -107,7 +108,8 @@ class MCCFRSolverBase(object):
       An average policy instance that should only be used during
       the lifetime of solver object.
     """
-    return AveragePolicy(self._infostates)
+    return AveragePolicy(self._game, list(range(self._num_players)),
+                         self._infostates)
 
   def _regret_matching(self, regrets, num_legal_actions):
     """Applies regret matching to get a policy.
