@@ -28,10 +28,8 @@ add_executable(value_iteration_example value_iteration_example.cc ${OPEN_SPIEL_O
 add_test(value_iteration_example_test value_iteration_example)
 
 add_executable(tabular_sarsa_example tabular_sarsa_example.cc ${OPEN_SPIEL_OBJECTS})
-add_test(tabular_sarsa_example_test tabular_sarsa_example)
 
 add_executable(tabular_q_learning_example tabular_q_learning_example.cc ${OPEN_SPIEL_OBJECTS})
-add_test(tabular_q_learning_example_test tabular_q_learning_example)
 
 add_executable(count_all_states count_all_states.cc ${OPEN_SPIEL_OBJECTS})
 
