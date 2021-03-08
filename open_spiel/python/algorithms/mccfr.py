@@ -14,6 +14,7 @@
 
 """Python base module for the implementations of Monte Carlo Counterfactual Regret Minimization."""
 
+import numpy as np
 from open_spiel.python import policy
 
 REGRET_INDEX = 0
@@ -57,3 +58,72 @@ class AveragePolicy(policy.Policy):
         retrieved_infostate[AVG_POLICY_INDEX] /
         retrieved_infostate[AVG_POLICY_INDEX].sum())
     return {legal_actions[i]: avstrat[i] for i in range(len(legal_actions))}
+
+
+class MCCFRSolverBase(object):
+  """A base class for both outcome MCCFR and external MCCFR."""
+
+  def __init__(self, game):
+    self._game = game
+    self._infostates = {}  # infostate keys -> [regrets, avg strat]
+    self._num_players = game.num_players()
+
+  def _lookup_infostate_info(self, info_state_key, num_legal_actions):
+    """Looks up an information set table for the given key.
+
+    Args:
+      info_state_key: information state key (string identifier).
+      num_legal_actions: number of legal actions at this information state.
+
+    Returns:
+      A list of:
+        - the average regrets as a numpy array of shape [num_legal_actions]
+        - the average strategy as a numpy array of shape
+        [num_legal_actions].
+          The average is weighted using `my_reach`
+    """
+    retrieved_infostate = self._infostates.get(info_state_key, None)
+    if retrieved_infostate is not None:
+      return retrieved_infostate
+
+    # Start with a small amount of regret and total accumulation, to give a
+    # uniform policy: this will get erased fast.
+    self._infostates[info_state_key] = [
+        np.ones(num_legal_actions, dtype=np.float64) / 1e6,
+        np.ones(num_legal_actions, dtype=np.float64) / 1e6,
+    ]
+    return self._infostates[info_state_key]
+
+  def _add_regret(self, info_state_key, action_idx, amount):
+    self._infostates[info_state_key][REGRET_INDEX][action_idx] += amount
+
+  def _add_avstrat(self, info_state_key, action_idx, amount):
+    self._infostates[info_state_key][AVG_POLICY_INDEX][action_idx] += amount
+
+  def average_policy(self):
+    """Computes the average policy, containing the policy for all players.
+
+    Returns:
+      An average policy instance that should only be used during
+      the lifetime of solver object.
+    """
+    return AveragePolicy(self._infostates)
+
+  def _regret_matching(self, regrets, num_legal_actions):
+    """Applies regret matching to get a policy.
+
+    Args:
+      regrets: numpy array of regrets for each action.
+      num_legal_actions: number of legal actions at this state.
+
+    Returns:
+      numpy array of the policy indexed by the index of legal action in the
+      list.
+    """
+    positive_regrets = np.maximum(regrets,
+                                  np.zeros(num_legal_actions, dtype=np.float64))
+    sum_pos_regret = positive_regrets.sum()
+    if sum_pos_regret <= 0:
+      return np.ones(num_legal_actions, dtype=np.float64) / num_legal_actions
+    else:
+      return positive_regrets / sum_pos_regret
