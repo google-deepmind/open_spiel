@@ -18,6 +18,7 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -96,6 +97,14 @@ ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
   start_board_ = *maybe_board;
   current_board_ = start_board_;
   repetitions_[current_board_.HashValue()] = 1;
+}
+
+Action ChessState::ParseMoveToAction(const std::string& move_str) const {
+  absl::optional<Move> move = Board().ParseMove(move_str);
+  if (!move.has_value()) {
+    return kInvalidAction;
+  }
+  return MoveToAction(*move);
 }
 
 void ChessState::DoApplyAction(Action action) {
@@ -396,7 +405,7 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}
