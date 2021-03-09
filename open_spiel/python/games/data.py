@@ -38,24 +38,4 @@ def kuhn_nash_equilibrium(alpha):
   """
   if not 0 <= alpha <= 1 / 3:
     raise ValueError("alpha ({}) must be in [0, 1/3]".format(alpha))
-  bet_probability = {
-      # Player 0
-      "0": alpha,
-      "0pb": 0,
-      "1": 0,
-      "1pb": 1 / 3 + alpha,
-      "2": 3 * alpha,
-      "2pb": 1,
-      # Player 1
-      "0p": 1 / 3,
-      "0b": 0,
-      "1p": 0,
-      "1b": 1 / 3,
-      "2p": 1,
-      "2b": 1,
-  }
-  game = pyspiel.load_game("kuhn_poker")
-  tabular_policy = policy.TabularPolicy(game)
-  for state, p in bet_probability.items():
-    tabular_policy.policy_for_key(state)[:] = [1 - p, p]
-  return tabular_policy
+  return pyspiel.kuhn_poker.get_optimal_policy(alpha)

@@ -132,6 +132,10 @@ TabularPolicy GetAlwaysPassPolicy(const Game& game);
 // Returns policy that always bets.
 TabularPolicy GetAlwaysBetPolicy(const Game& game);
 
+// The optimal Kuhn policy as stated at https://en.wikipedia.org/wiki/Kuhn_poker
+// The Nash equilibrium is parametrized by alpha \in [0, 1/3].
+TabularPolicy GetOptimalPolicy(double alpha);
+
 }  // namespace kuhn_poker
 }  // namespace open_spiel
 
