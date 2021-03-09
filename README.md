@@ -42,7 +42,7 @@ including an overview of the algorithms and some results, please see
 
 For an overview of OpenSpiel and example uses of the core API, see the tutorial
 presentation slides:
-[Introduction to OpenSpiel](http://mlanctot.info/open_spiel-tutorial-kuleuven-mar11-2020.pdf).
+[Introduction to OpenSpiel](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
 
 If you use OpenSpiel in your research, please cite the paper using the following
 BibTeX:
