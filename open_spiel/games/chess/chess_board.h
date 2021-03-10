@@ -90,6 +90,10 @@ struct Piece {
 
   bool operator!=(const Piece& other) const { return !(*this == other); }
 
+  bool operator<(const Piece& other) const {
+    return color < other.color || (color == other.color && type < other.type);
+  }
+
   std::string ToUnicode() const;
   std::string ToString() const;
 
@@ -210,6 +214,13 @@ struct Move {
            promotion_type == other.promotion_type &&
            is_castling == other.is_castling;
   }
+
+  bool operator<(const Move& other) const {
+    if (from != other.from) return from < other.from;
+    else if (to != other.to) return to < other.to;
+    else if (piece != other.piece) return piece < other.piece;
+    else return promotion_type < other.promotion_type;
+  }
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Move& m) {
@@ -273,13 +284,26 @@ class ChessBoard {
     GenerateLegalMoves(yield, to_play_);
   };
   void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
-  void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color) const;
+  void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color,
+                                bool ignore_enemy_pieces = false) const;
 
   bool HasLegalMoves() const {
     bool found = false;
     GenerateLegalMoves([&found](const Move&) {
       found = true;
       return false;  // We don't need any more moves.
+    });
+    return found;
+  }
+
+  bool IsMoveLegal(const Move &tested_move) const {
+    bool found = false;
+    GenerateLegalMoves([&found, &tested_move](const Move &found_move) {
+      if (tested_move == found_move) {
+        found = true;
+        return false; // We don't need any more moves.
+      }
+      return true;
     });
     return found;
   }
@@ -423,18 +447,22 @@ class ChessBoard {
 
   template <typename YieldFn>
   void GenerateCastlingDestinations_(Square sq, Color color,
+                                     bool ignore_enemy_pieces,
                                      const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,
+                                  bool ignore_enemy_pieces,
                                   const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateRookDestinations_(Square sq, Color color,
+                                 bool ignore_enemy_pieces,
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateBishopDestinations_(Square sq, Color color,
+                                   bool ignore_enemy_pieces,
                                    const YieldFn& yield) const;
 
   template <typename YieldFn>
@@ -444,16 +472,20 @@ class ChessBoard {
   template <typename YieldFn>
   // Pawn moves without captures.
   void GeneratePawnDestinations_(Square sq, Color color,
+                                 bool ignore_enemy_pieces,
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
   // Pawn diagonal capture destinations, with or without en passant.
-  void GeneratePawnCaptureDestinations_(Square sq, Color color, bool include_ep,
+  void GeneratePawnCaptureDestinations_(Square sq, Color color,
+                                        bool ignore_enemy_pieces,
+                                        bool include_ep,
                                         const YieldFn& yield) const;
 
   // Helper function.
   template <typename YieldFn>
-  void GenerateRayDestinations_(Square sq, Color color, Offset offset_step,
+  void GenerateRayDestinations_(Square sq, Color color,
+                                bool ignore_enemy_pieces, Offset offset_step,
                                 const YieldFn& yield) const;
 
   void SetIrreversibleMoveCounter(int c);

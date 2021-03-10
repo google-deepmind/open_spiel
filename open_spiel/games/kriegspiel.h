@@ -55,6 +55,63 @@ inline constexpr int NumDistinctActions() { return 4672; }
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
 
+enum KriegspielCaptureType : int8_t {
+  kNoCapture = 0,
+  kPawn = 1,
+  kPiece = 2
+};
+
+std::string CaptureTypeToString(KriegspielCaptureType capture_type) {
+  if (capture_type == KriegspielCaptureType::kNoCapture) {
+    return "No Piece";
+  }
+  if (capture_type == KriegspielCaptureType::kPawn) {
+    return "Pawn";
+  }
+  return "Piece";
+}
+
+enum KriegspielCheckType : int8_t {
+  kNoCheck = 0,
+  kFile = 1,
+  kRank = 2,
+  kLongDiagonal = 3,
+  kShortDiagonal = 4,
+  kKnight = 5
+};
+
+std::string CheckTypeToString(KriegspielCheckType check_type) {
+  switch (check_type) {
+    case KriegspielCheckType::kNoCheck:
+      return "No";
+    case KriegspielCheckType::kFile:
+      return "File";
+    case KriegspielCheckType::kRank:
+      return "Rank";
+    case KriegspielCheckType::kLongDiagonal:
+      return "Long-diagonal";
+    case KriegspielCheckType::kShortDiagonal:
+      return "Short-diagonal";
+    case KriegspielCheckType::kKnight:
+      return "Knight";
+    default:
+      SpielFatalError("kNoCheck does not have a string representation");
+  }
+}
+
+struct KriegspielUmpireMessage {
+
+  bool illegal_ = false;
+  KriegspielCaptureType capture_type_ = KriegspielCaptureType::kNoCapture;
+  chess::Square square_ = chess::InvalidSquare();
+  std::pair<KriegspielCheckType, KriegspielCheckType> check_types_ =
+      {KriegspielCheckType::kNoCheck, KriegspielCheckType::kNoCheck};
+  chess::Color to_move_ = chess::Color::kEmpty;
+  int pawn_tries_ = 0;
+
+  std::string ToString() const;
+};
+
 class KriegspielGame;
 class KriegspielObserver;
 
@@ -98,9 +155,11 @@ class KriegspielState : public State {
   chess::ChessBoard& StartBoard() { return start_board_; }
   const chess::ChessBoard& StartBoard() const { return start_board_; }
 
-  std::vector<chess::Move>& MovesHistory() { return moves_history_; }
-  const std::vector<chess::Move>& MovesHistory() const {
-    return moves_history_;
+  std::vector<std::pair<chess::Move, KriegspielUmpireMessage>>& MoveMsgHistory() {
+    return move_msg_history_;
+  }
+  const std::vector<std::pair<chess::Move, KriegspielUmpireMessage>>& MoveMsgHistory() const {
+    return move_msg_history_;
   }
 
  protected:
@@ -124,7 +183,14 @@ class KriegspielState : public State {
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
-  std::vector<chess::Move> moves_history_;
+  std::vector<std::pair<chess::Move, KriegspielUmpireMessage>> move_msg_history_;
+  // We store this info as an optimisation so that we don't have to compute it
+  // from move_msg_history for observations
+  std::optional<KriegspielUmpireMessage> last_public_msg{};
+  std::optional<KriegspielUmpireMessage> before_last_public_msg{};
+  // Moves that the player tried and were illegal. We don't let player try them
+  // again on the same board because they are clearly still illegal;
+  std::set<chess::Move> illegal_tried_moves_;
   // We store the start board for history to support games not starting
   // from the start position.
   chess::ChessBoard start_board_;
