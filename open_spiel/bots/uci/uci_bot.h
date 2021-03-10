@@ -27,7 +27,7 @@ using Options = std::map<std::string, std::string>;
 
 class UCIBot : public Bot {
  public:
-  explicit UCIBot(const std::string &path,
+  explicit UCIBot(const std::string &bot_binary_path,
                   int move_time,
                   bool ponder,
                   const Options &options);
@@ -41,7 +41,7 @@ class UCIBot : public Bot {
 
  private:
 
-  void StartProcess(const std::string& path);
+  void StartProcess(const std::string& bot_binary_path);
   void Uci();
   void SetOption(const std::string& name, const std::string& value);
   void UciNewGame();
@@ -68,7 +68,22 @@ class UCIBot : public Bot {
   bool ponder_;
 };
 
-std::unique_ptr<Bot> MakeUCIBot(const std::string &path,
+/**
+* @param bot_binary_path Path to the uci engine executable that is going to be
+ * run in a new process.
+* @param move_time Time limit per move in millis. Right now chess lacks any kind
+ * of time control so it is needed to provide at least this. Without any time
+ * control, the uci engine behaviour is undefined (e.g. Ethereal searches
+ * to depth 1, but Stockfish searches until explicitly stopped)
+* @param ponder Boolean indicating whether this bot should make the uci engine
+ * ponder (think even when it's opponent's turn). In some engines, this should
+ * be accompanied with an options (see param options) so that the engine can
+ * adapt time control.
+* @param options Additional options to set in the engine. There might be
+ * different options available for each engine.
+* @return unique_ptr to a UCIBot
+*/
+std::unique_ptr<Bot> MakeUCIBot(const std::string &bot_binary_path,
                                 int move_time,
                                 bool ponder = false,
                                 const Options &options = {});

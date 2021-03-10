@@ -23,17 +23,17 @@
 namespace open_spiel {
 namespace uci {
 
-UCIBot::UCIBot(const std::string &path,
+UCIBot::UCIBot(const std::string &bot_binary_path,
                int move_time,
                bool ponder,
                const Options &options) :
     ponder_(ponder) {
 
   SPIEL_CHECK_GT(move_time, 0);
-  SPIEL_CHECK_GT(path.size(), 0);
+  SPIEL_CHECK_GT(bot_binary_path.size(), 0);
   move_time_ = move_time;
 
-  StartProcess(path);
+  StartProcess(bot_binary_path);
   Uci();
   for (auto const& [name, value] : options)
   {
@@ -107,7 +107,7 @@ void UCIBot::InformAction(const State &state,
   }
 }
 
-void UCIBot::StartProcess(const std::string &path) {
+void UCIBot::StartProcess(const std::string &bot_binary_path) {
 
   int output_pipe[2];
   int input_pipe[2];
@@ -137,7 +137,7 @@ void UCIBot::StartProcess(const std::string &path) {
     close(input_pipe[0]);
 
     std::cerr << "neco" << std::endl;
-    execlp(path.c_str(), path.c_str(), (char*) nullptr);
+    execlp(bot_binary_path.c_str(), bot_binary_path.c_str(), (char*) nullptr);
     std::cerr << "neco" << std::endl;
     SpielFatalError("Executing uci bot sub-process failed");
   }
@@ -286,11 +286,11 @@ std::string UCIBot::Read(bool wait) const {
   return response;
 }
 
-std::unique_ptr<Bot> uci::MakeUCIBot(const std::string &path,
+std::unique_ptr<Bot> uci::MakeUCIBot(const std::string &bot_binary_path,
                                      int move_time,
                                      bool ponder,
                                      const Options &options) {
-  return std::make_unique<UCIBot>(path, move_time, ponder, options);
+  return std::make_unique<UCIBot>(bot_binary_path, move_time, ponder, options);
 }
 }  // namespace uci
 }  // namespace open_spiel
