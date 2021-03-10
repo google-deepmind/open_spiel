@@ -114,8 +114,6 @@ openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
   "Build against xinxin Hearts program.")
 openspiel_optional_dependency(BUILD_WITH_ROSHAMBO       OFF
   "Build against RoShamBo bots.")
-openspiel_optional_dependency(BUILD_WITH_STOCKFISH      OFF
-  "Build against Stockfish program.")
 openspiel_optional_dependency(BUILD_WITH_GAMUT          OFF
   "Build with GAMUT generator integration.")
 openspiel_optional_dependency(BUILD_WITH_ORTOOLS        OFF
@@ -222,9 +220,6 @@ if (BUILD_WITH_XINXIN)
 endif()
 if (BUILD_WITH_ROSHAMBO)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
-endif()
-if (BUILD_WITH_STOCKFISH)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:stockfish>)
 endif()
 if (BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
