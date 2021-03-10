@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -69,7 +70,7 @@ absl::optional<PieceType> PieceTypeFromChar(char c) {
       return PieceType::kKing;
     default:
       std::cerr << "Invalid piece type: " << c << std::endl;
-      return std::nullopt;
+      return absl::nullopt;
   }
 }
 
@@ -157,7 +158,7 @@ absl::optional<Square> SquareFromString(const std::string &s) {
   auto file = ParseFile(s[0]);
   auto rank = ParseRank(s[1]);
   if (file && rank) return Square{*file, *rank};
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 std::string Move::ToString() const {
@@ -349,7 +350,7 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
 
   if (fen_parts.size() != 6 && fen_parts.size() != 4) {
     std::cerr << "Invalid FEN: " << fen << std::endl;
-    return std::nullopt;
+    return absl::nullopt;
   }
 
   std::string &piece_configuration = fen_parts[0];
@@ -375,7 +376,7 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
     for (char c : rank) {
       if (current_x >= kBoardSize) {
         std::cerr << "Too many things on FEN rank: " << rank << std::endl;
-        return std::nullopt;
+        return absl::nullopt;
       }
 
       if (c >= '1' && c <= '8') {
@@ -384,7 +385,7 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
         auto piece_type = PieceTypeFromChar(c);
         if (!piece_type) {
           std::cerr << "Invalid piece type in FEN: " << c << std::endl;
-          return std::nullopt;
+          return absl::nullopt;
         }
 
         Color color = isupper(c) ? Color::kWhite : Color::kBlack;
@@ -402,7 +403,7 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
     board.SetToPlay(Color::kWhite);
   } else {
     std::cerr << "Invalid side to move in FEN: " << side_to_move << std::endl;
-    return std::nullopt;
+    return absl::nullopt;
   }
 
   if (castling_rights.find('K') != std::string::npos) {
@@ -426,7 +427,7 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
     if (!maybe_ep_square) {
       std::cerr << "Invalid en passant square in FEN: " << ep_square
                 << std::endl;
-      return std::nullopt;
+      return absl::nullopt;
     }
     board.SetEpSquare(*maybe_ep_square);
   }
@@ -663,7 +664,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseMove(
     return san_move;
   }
 
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 template <uint32_t kBoardSize>
@@ -671,7 +672,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
     const std::string &move_str) const {
   std::string move = move_str;
 
-  if (move.empty()) return std::nullopt;
+  if (move.empty()) return absl::nullopt;
 
   if (absl::StartsWith(move, "O-O-O")) {
     // Queenside / left castling.
@@ -684,7 +685,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
     });
     if (candidates.size() == 1) return candidates[0];
     std::cerr << "Invalid O-O-O" << std::endl;
-    return std::nullopt;
+    return absl::nullopt;
   }
 
   if (absl::StartsWith(move, "O-O")) {
@@ -698,12 +699,12 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
     });
     if (candidates.size() == 1) return candidates[0];
     std::cerr << "Invalid O-O" << std::endl;
-    return std::nullopt;
+    return absl::nullopt;
   }
 
   auto move_annotation = SplitAnnotations(move);
   move = move_annotation.first;
-  SPIEL_CHECK_FALSE(move.empty());
+  if (move.empty()) { return absl::nullopt; }
 
   auto annotation = move_annotation.second;
 
@@ -711,11 +712,11 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   // omitted for pawns.
   PieceType piece_type = PieceType::kPawn;
   std::string pieces = "PNBRQK";
-  if (pieces.find(move[0]) != std::string::npos) {
+  if (absl::StrContains(pieces, move[0])) {
     auto maybe_piece_type = PieceTypeFromChar(move[0]);
     if (!maybe_piece_type) {
       std::cerr << "Invalid piece type: " << move[0] << std::endl;
-      return std::nullopt;
+      return absl::nullopt;
     }
     piece_type = *maybe_piece_type;
     move = std::string(absl::ClippedSubstr(move, 1));
@@ -724,7 +725,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   // A move always ends with the destination square.
   if (move.size() < 2) {
     std::cerr << "Missing destination square" << std::endl;
-    return std::nullopt;
+    return absl::nullopt;
   }
   auto destination = std::string(absl::ClippedSubstr(move, move.size() - 2));
   move = move.substr(0, move.size() - 2);
@@ -735,7 +736,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   if (!dest_file || !dest_rank) {
     std::cerr << "Failed to parse destination square: " << destination
               << std::endl;
-    return std::nullopt;
+    return absl::nullopt;
   }
 
   Square destination_square{*dest_file, *dest_rank};
@@ -762,12 +763,12 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
     }
   }
 
-  SPIEL_CHECK_TRUE(move.empty());
+  if (!move.empty()) { return absl::nullopt; }
 
   // Pawn promations are annotated with =Q to indicate the promotion type.
   absl::optional<PieceType> promotion_type;
   if (!annotation.empty() && annotation[0] == '=') {
-    SPIEL_CHECK_GE(annotation.size(), 2);
+    if (annotation.size() < 2) { return absl::nullopt; }
     auto maybe_piece = PieceTypeFromChar(annotation[1]);
     if (!maybe_piece) return absl::optional<Move>();
     promotion_type = maybe_piece;
@@ -795,7 +796,8 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
 template <uint32_t kBoardSize>
 absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
     const std::string &move) const {
-  SPIEL_CHECK_FALSE(move.empty());
+
+  if (move.empty()) { return absl::nullopt; }
 
   // Long algebraic notation moves (of the variant we care about) are in one of
   // two forms -
@@ -805,12 +807,12 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
         move[1] >= ('1' + kBoardSize) || move[2] < 'a' ||
         move[2] >= ('a' + kBoardSize) || move[3] < '1' ||
         move[3] >= ('1' + kBoardSize)) {
-      return std::nullopt;
+      return absl::nullopt;
     }
 
     if (move.size() == 5 && move[4] != 'q' && move[4] != 'r' &&
         move[4] != 'b' && move[4] != 'n') {
-      return std::nullopt;
+      return absl::nullopt;
     }
 
     auto from = SquareFromString(move.substr(0, 2));
@@ -821,7 +823,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
         promotion_type = PieceTypeFromChar(move[4]);
         if (!promotion_type) {
           std::cerr << "Invalid promotion type" << std::endl;
-          return std::nullopt;
+          return absl::nullopt;
         }
       }
 
@@ -848,10 +850,8 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseLANMove(
       return candidates[0];
     }
   } else {
-    return std::nullopt;
+    return absl::nullopt;
   }
-  SpielFatalError("All conditionals failed; this is a bug.");
-  return std::nullopt;
 }
 
 template <uint32_t kBoardSize>

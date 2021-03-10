@@ -106,12 +106,12 @@ inline std::ostream& operator<<(std::ostream& stream, const Piece& p) {
 
 inline absl::optional<int8_t> ParseRank(char c) {
   if (c >= '1' && c <= '8') return c - '1';
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 inline absl::optional<int8_t> ParseFile(char c) {
   if (c >= 'a' && c <= 'h') return c - 'a';
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 // Maps y = [0, 7] to rank ["1", "8"].
@@ -288,17 +288,19 @@ class ChessBoard {
   bool HasSufficientMaterial() const;
 
   // Parses a move in standard algebraic notation or long algebraic notation (
-  // see below).
+  // see below). Returns absl::nullopt on failure.
   absl::optional<Move> ParseMove(const std::string& move) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.
-  // https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
+  // https://en.wikipedia.org/wiki/Algebraic_notation_(chess).
+  // Returns absl::nullopt on failure.
   absl::optional<Move> ParseSANMove(const std::string& move) const;
 
   // Parses a move in long algebraic notation.
   // Long algebraic notation is not standardized and there are many variants,
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
+  // Returns absl::nullopt on failure.
   absl::optional<Move> ParseLANMove(const std::string& move) const;
 
   void ApplyMove(const Move& move);
