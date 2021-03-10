@@ -30,7 +30,7 @@ void TestTensorView() {
   SPIEL_CHECK_EQ(view2.size(), 6);
   SPIEL_CHECK_EQ(values.size(), 6);
   SPIEL_CHECK_EQ(view2.rank(), 2);
-  SPIEL_CHECK_EQ(view2.shape(), (std::array{2, 3}));
+  SPIEL_CHECK_EQ(view2.shape(), (std::array<int, 2>{2, 3}));
   SPIEL_CHECK_EQ(view2.shape(0), 2);
   SPIEL_CHECK_EQ(view2.shape(1), 3);
 
@@ -68,7 +68,7 @@ void TestTensorView() {
   SPIEL_CHECK_EQ(view3.size(), 24);
   SPIEL_CHECK_EQ(values.size(), 24);
   SPIEL_CHECK_EQ(view3.rank(), 3);
-  SPIEL_CHECK_EQ(view3.shape(), (std::array{4, 2, 3}));
+  SPIEL_CHECK_EQ(view3.shape(), (std::array<int, 3>{4, 2, 3}));
   SPIEL_CHECK_EQ(view3.shape(0), 4);
   SPIEL_CHECK_EQ(view3.shape(1), 2);
   SPIEL_CHECK_EQ(view3.shape(2), 3);
@@ -101,7 +101,7 @@ void TestTensorView() {
   SPIEL_CHECK_EQ(view1.size(), 8);
   SPIEL_CHECK_EQ(values.size(), 8);
   SPIEL_CHECK_EQ(view1.rank(), 1);
-  SPIEL_CHECK_EQ(view1.shape(), (std::array{8}));
+  SPIEL_CHECK_EQ(view1.shape(), (std::array<int, 1>{8}));
   SPIEL_CHECK_EQ(view1.shape(0), 8);
 
   // All 0 initialized
@@ -122,7 +122,7 @@ void TestTensorView() {
   SPIEL_CHECK_EQ(view_keep.size(), 8);
   SPIEL_CHECK_EQ(values.size(), 8);
   SPIEL_CHECK_EQ(view_keep.rank(), 2);
-  SPIEL_CHECK_EQ(view_keep.shape(), (std::array{2, 4}));
+  SPIEL_CHECK_EQ(view_keep.shape(), (std::array<int, 2>{2, 4}));
   SPIEL_CHECK_EQ(view_keep.shape(0), 2);
   SPIEL_CHECK_EQ(view_keep.shape(1), 4);
 

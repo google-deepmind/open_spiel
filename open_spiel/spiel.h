@@ -137,6 +137,38 @@ struct GameType {
   bool provides_factored_observation_string = false;
 };
 
+// Information about a concrete Game instantiation.
+// This information may depend on the game parameters, and hence cannot
+// be part of `GameType`.
+struct GameInfo {
+  // The size of the action space. See `Game` for a full description.
+  int num_distinct_actions;
+
+  // Maximum number of distinct chance outcomes for chance nodes in the game.
+  int max_chance_outcomes;
+
+  // The number of players in this instantiation of the game.
+  // Does not include the chance-player.
+  int num_players;
+
+  // Utility range. These functions define the lower and upper bounds on the
+  // values returned by State::PlayerReturn(Player player) over all valid player
+  // numbers. This range should be as tight as possible; the intention is to
+  // give some information to algorithms that require it, and so their
+  // performance may suffer if the range is not tight. Loss/draw/win outcomes
+  // are common among games and should use the standard values of {-1,0,1}.
+  double min_utility;
+  double max_utility;
+
+  // The total utility for all players, if this is a constant-sum-utility game.
+  // Should be zero if the game is zero-sum.
+  double utility_sum;
+
+  // The maximum number of player decisions in a game. Does not include chance
+  // events.
+  int max_game_length;
+};
+
 std::ostream& operator<<(std::ostream& os, const StateType& type);
 
 std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value);
@@ -236,7 +268,7 @@ class State {
   // The representation may depend on the current state of the game, e.g.
   // for chess the string "Nf3" would correspond to different starting squares
   // in different states (and hence probably different action ids).
-  // This method will format chance outcomes if player == kChancePlayer
+  // This method will format chance outcomes if player == kChancePlayerId
   virtual std::string ActionToString(Player player, Action action_id) const = 0;
   std::string ActionToString(Action action_id) const {
     return ActionToString(CurrentPlayer(), action_id);
@@ -357,7 +389,7 @@ class State {
   // A string representation for the history. There should be a one to one
   // mapping between histories (i.e. sequences of actions for all players,
   // including chance) and the `State` objects.
-  std::string HistoryString() const { return absl::StrJoin(History(), " "); }
+  std::string HistoryString() const { return absl::StrJoin(History(), ", "); }
 
   // Return how many moves have been done so far in the game.
   // When players make simultaneous moves, this counts only as a one move.
@@ -374,7 +406,7 @@ class State {
   // Different ground states can yield the same information state for a player
   // when the only part of the state that differs is not observable by that
   // player (e.g. opponents' cards in Poker.)
-
+  //
   // The identifiers must be unique across all players.
   // This allows an algorithm to maintain a single table of identifiers
   // instead of maintaining a table per player to avoid name collisions.
@@ -384,37 +416,37 @@ class State {
   // well, like P1Jack and P2Jack. However prefixing by player number is not
   // a requirement. The only thing that is necessary is that it is unambiguous
   // who is the observer.
-
+  //
   // Games that do not have imperfect information do not need to implement
   // these methods, but most algorithms intended for imperfect information
   // games will work on perfect information games provided the InformationState
   // is returned in a form they support. For example, InformationState()
   // could simply return the history for a perfect information game.
-
-  // The InformationState must be returned at terminal states, since this is
-  // required in some applications (e.g. final observation in an RL
+  //
+  // A valid InformationStateString must be returned at terminal states, since
+  // this is required in some applications (e.g. final observation in an RL
   // environment).
-
+  //
   // The information state should be perfect-recall, i.e. if two states
   // have a different InformationState, then all successors of one must have
   // a different InformationState to all successors of the other.
   // For example, in tic-tac-toe, the current state of the board would not be
   // a perfect-recall representation, but the sequence of moves played would
   // be.
-
+  //
   // If you implement both InformationState and Observation, the two must be
   // consistent for all the players (even the non-acting player(s)).
   // By consistency we mean that when you maintain an Action-Observation
   // history (AOH) for different ground states, the (in)equality of two AOHs
-  // implies the (in)equality of two InformationStates.
-  // In other words, AOH is a factored representation of InformationState.
+  // implies the (in)equality of two InformationStates. In other words, AOH is a
+  // factored representation of InformationState.
   //
   // For details, see Section 3.1 of https://arxiv.org/abs/1908.09453
   // or Section 2.1 of https://arxiv.org/abs/1906.11110
 
   // There are currently no use-case for calling this function with
-  // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
-  // an error in those cases using (and it's tested in api_test.py):
+  // `kChancePlayerId`. Thus, games are expected to raise an error in those
+  // cases using (and it's tested in api_test.py). Use this:
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
   virtual std::string InformationStateString(Player player) const {
@@ -429,10 +461,14 @@ class State {
   // with values in lexicographic order. E.g. for 2x4x3, order would be:
   // (0,0,0), (0,0,1), (0,0,2), (0,1,0), ... , (1,3,2).
   // This function should resize the supplied vector if required.
-
+  //
+  // A valid InformationStateTensor must be returned at terminal states, since
+  // this is required in some applications (e.g. final observation in an RL
+  // environment).
+  //
   // There are currently no use-case for calling this function with
-  // `kChancePlayerId` or `kTerminalPlayerId`. Thus, games are expected to raise
-  // an error in those cases.
+  // `kChancePlayerId`. Thus, games are expected to raise an error in those
+  // cases.
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -464,6 +500,10 @@ class State {
   // Observations should cover all observations: a combination of both public
   // and private observations. They are not factored into these individual
   // constituent parts.
+  //
+  // A valid observation must be returned at terminal states, since this is
+  // required in some applications (e.g. final observation in an RL
+  // environment).
   //
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
@@ -600,6 +640,18 @@ class State {
     return GetHistoriesConsistentWithInfostate(CurrentPlayer());
   }
 
+  // Returns a vector of all actions that are consistent with the information
+  // revealed by taking action. E.g. in Poker, this does nothing but return the
+  // current action as poker only has public actions. In a game like Battleship,
+  // where the placement phase is hidden, this would return all possible
+  // placements.
+  virtual std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const {
+    SpielFatalError(
+        "ActionsConsistentWithInformationFrom has not been implemented.");
+    return {};
+  }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -707,8 +759,7 @@ class Game : public std::enable_shared_from_this<Game> {
   int InformationStateTensorSize() const {
     std::vector<int> shape = InformationStateTensorShape();
     return shape.empty() ? 0
-                         : std::accumulate(shape.begin(), shape.end(), 1,
-                                           std::multiplies<double>());
+                         : absl::c_accumulate(shape, 1, std::multiplies<int>());
   }
 
   // Describes the structure of the observation representation in a
@@ -728,8 +779,7 @@ class Game : public std::enable_shared_from_this<Game> {
   int ObservationTensorSize() const {
     std::vector<int> shape = ObservationTensorShape();
     return shape.empty() ? 0
-                         : std::accumulate(shape.begin(), shape.end(), 1,
-                                           std::multiplies<double>());
+                         : absl::c_accumulate(shape, 1, std::multiplies<int>());
   }
 
   // Describes the structure of the policy representation in a
@@ -829,13 +879,22 @@ class Game : public std::enable_shared_from_this<Game> {
     return absl::StrCat("Action(id=", action_id, ", player=", player, ")");
   }
 
+  // Returns an observer that was registered, based on its name.
+  std::shared_ptr<Observer> MakeRegisteredObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const;
+  // Returns an observer that uses the observation or informationstate tensor
+  // or string as defined directly on the state.
+  std::shared_ptr<Observer> MakeBuiltInObserver(
+      absl::optional<IIGObservationType> iig_obs_type) const;
+
  protected:
   Game(GameType game_type, GameParameters game_parameters)
       : game_type_(game_type), game_parameters_(game_parameters) {}
 
   // Access to game parameters. Returns the value provided by the user. If not:
   // - Defaults to the value stored as the default in
-  // game_type.parameter_specification if the `default_value` is std::nullopt
+  // game_type.parameter_specification if the `default_value` is absl::nullopt
   // - Returns `default_value` if provided.
   template <typename T>
   T ParameterValue(const std::string& key,

@@ -52,7 +52,10 @@ void init_pyspiel_policy(py::module& m) {
                     const std::unordered_map<std::string,
                                              open_spiel::ActionsAndProbs>&>())
       .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*>())
-      .def("value", &TabularBestResponse::Value)
+      .def("value",
+           py::overload_cast<const std::string&>(&TabularBestResponse::Value))
+      .def("value_from_state", py::overload_cast<const open_spiel::State&>(
+                                   &TabularBestResponse::Value))
       .def("get_best_response_policy",
            &TabularBestResponse::GetBestResponsePolicy)
       .def("get_best_response_actions",
@@ -97,6 +100,13 @@ void init_pyspiel_policy(py::module& m) {
       m, "UniformPolicy")
       .def(py::init<>())
       .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
+
+  py::class_<open_spiel::PreferredActionPolicy,
+             std::shared_ptr<open_spiel::PreferredActionPolicy>,
+             open_spiel::Policy>(m, "PreferredActionPolicy")
+      .def(py::init<const std::vector<Action>&>())
+      .def("get_state_policy",
+           &open_spiel::PreferredActionPolicy::GetStatePolicy);
 
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
       .def(py::init<const Game&>())
@@ -216,13 +226,18 @@ void init_pyspiel_policy(py::module& m) {
       "games, and raises a SpielFatalError if an incompatible game is passed "
       "to it.");
 
-  m.def("nash_conv", py::overload_cast<const Game&, const Policy&>(&NashConv),
-        "Returns the sum of the utility that a best responder wins when when "
-        "playing against 1) the player 0 policy contained in `policy` and 2) "
-        "the player 1 policy contained in `policy`."
-        "This only works for two player, zero- or constant-sum sequential "
-        "games, and raises a SpielFatalError if an incompatible game is passed "
-        "to it.");
+  m.def("nash_conv",
+        py::overload_cast<const Game&, const Policy&, bool>(&NashConv),
+        "Calculates a measure of how far the given policy is from a Nash "
+        "equilibrium by returning the sum of the improvements in the value "
+        "that each player could obtain by unilaterally changing their strategy "
+        "while the opposing player maintains their current strategy (which "
+        "for a Nash equilibrium, this value is 0). The third parameter is to "
+        "indicate whether to use the Policy::GetStatePolicy(const State&) "
+        "instead of Policy::GetStatePolicy(const std::string& info_state) for "
+        "computation of the on-policy expected values.",
+        py::arg("game"), py::arg("policy"),
+        py::arg("use_state_get_policy") = false);
 
   m.def(
       "nash_conv",
@@ -236,8 +251,13 @@ void init_pyspiel_policy(py::module& m) {
       "for a Nash equilibrium, this value is 0).");
 
   m.def("num_deterministic_policies",
-        open_spiel::algorithms::NumDeterministicPolicies,
+        &open_spiel::algorithms::NumDeterministicPolicies,
         "Returns number of determinstic policies in this game for a player, "
         "or -1 if there are more than 2^64 - 1 policies.");
+
+  m.def("to_joint_tabular_policy", &open_spiel::ToJointTabularPolicy,
+        "Returns a merged tabular policy from a list of TabularPolicy. The "
+        "second argument is a bool which, if true, checks that there is no "
+        "overlap among all the policies.");
 }
 }  // namespace open_spiel

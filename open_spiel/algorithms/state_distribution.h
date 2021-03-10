@@ -44,7 +44,7 @@ namespace algorithms {
 // Note: currently only works for turn-based games of imperfect information,
 // and does not work with kSampledStochastic chance modes.
 HistoryDistribution GetStateDistribution(const State& state,
-                                         const Policy* opponent_policy);
+                                         const Policy& opponent_policy);
 
 // Clones a HistoryDistribution.
 std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
@@ -59,10 +59,10 @@ std::unique_ptr<open_spiel::HistoryDistribution> CloneBeliefs(
 // wrong.
 // Takes ownership of previous.
 std::unique_ptr<HistoryDistribution> UpdateIncrementalStateDistribution(
-    const State& state, const Policy* opponent_policy, int player_id,
+    const State& state, const Policy& opponent_policy, int player_id,
     std::unique_ptr<HistoryDistribution> previous);
 
-std::string PrintBeliefs(const HistoryDistribution& beliefs);
+std::string PrintBeliefs(const HistoryDistribution& beliefs, int player_id);
 
 // Runs a bunch of sanity checks on the beliefs verifying that they hold certain
 // properties that we want. Returns true if the checks pass; otherwise, dies

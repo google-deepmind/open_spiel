@@ -376,6 +376,15 @@ class Environment(object):
         dtype=int,
     )
 
+  # Environment properties
+  @property
+  def use_observation(self):
+    """Returns whether the environment is using the game's observation.
+
+    If false, it is using the game's information state.
+    """
+    return self._use_observation
+
   # Game properties
   @property
   def name(self):

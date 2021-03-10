@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -124,6 +125,12 @@ class KuhnGame : public Game {
   // Number of players.
   int num_players_;
 };
+
+// Returns policy that always passes.
+TabularPolicy GetAlwaysPassPolicy(const Game& game);
+
+// Returns policy that always bets.
+TabularPolicy GetAlwaysBetPolicy(const Game& game);
 
 }  // namespace kuhn_poker
 }  // namespace open_spiel

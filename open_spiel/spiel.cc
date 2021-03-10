@@ -25,6 +25,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -251,12 +252,17 @@ std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
   SPIEL_CHECK_GE(z, 0);
   SPIEL_CHECK_LT(z, 1);
 
+  // Special case for one-item lists.
+  if (outcomes.size() == 1) {
+    SPIEL_CHECK_FLOAT_EQ(outcomes[0].second, 1.0);
+    return outcomes[0];
+  }
+
   // First do a check that this is indeed a proper discrete distribution.
   double sum = 0;
   for (const std::pair<Action, double>& outcome : outcomes) {
     double prob = outcome.second;
-    SPIEL_CHECK_GE(prob, 0);
-    SPIEL_CHECK_LE(prob, 1);
+    SPIEL_CHECK_PROB(prob);
     sum += prob;
   }
   SPIEL_CHECK_FLOAT_EQ(sum, 1.0);
@@ -637,7 +643,7 @@ std::string GameTypeToString(const GameType& game_type) {
   // Check that there are no newlines in the serialized params.
   std::string serialized_params =
       SerializeGameParameters(game_type.parameter_specification);
-  SPIEL_CHECK_TRUE(serialized_params.find("\n") == std::string::npos);
+  SPIEL_CHECK_TRUE(!absl::StrContains(serialized_params, "\n"));
   absl::StrAppend(&str, "parameter_specification: ", serialized_params);
 
   return str;

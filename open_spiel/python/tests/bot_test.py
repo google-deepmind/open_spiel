@@ -25,6 +25,12 @@ import numpy as np
 from open_spiel.python.bots import uniform_random
 import pyspiel
 
+# Specify bot names in alphabetical order, to make it easier to read.
+SPIEL_BOTS_LIST = [
+    "fixed_action_preference",
+    "uniform_random",
+]
+
 
 class BotTest(absltest.TestCase):
 
@@ -40,6 +46,30 @@ class BotTest(absltest.TestCase):
     ])
     average_results = np.mean(results, axis=0)
     np.testing.assert_allclose(average_results, [0.125, -0.125], atol=0.1)
+
+  def test_registered_bots(self):
+    self.assertCountEqual(pyspiel.registered_bots(), SPIEL_BOTS_LIST)
+
+  def test_can_play_game(self):
+    game = pyspiel.load_game("kuhn_poker")
+    self.assertIn("uniform_random", pyspiel.bots_that_can_play_game(game))
+
+  def test_passing_params(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    bots = [
+        pyspiel.load_bot(
+            "fixed_action_preference",
+            game,
+            player=0,
+            params={"actions": pyspiel.GameParameter("0:1:2")}),
+        pyspiel.load_bot(
+            "fixed_action_preference",
+            game,
+            player=1,
+            params={"actions": pyspiel.GameParameter("3:4")}),
+    ]
+    result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
+    self.assertEqual(result, [1, -1])  # Player 0 wins.
 
 
 if __name__ == "__main__":

@@ -148,7 +148,7 @@ action: 2
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2]
-HistoryString() = "2 2"
+HistoryString() = "2, 2"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -193,7 +193,7 @@ action: 19
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19]
-HistoryString() = "2 2 19"
+HistoryString() = "2, 2, 19"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -238,7 +238,7 @@ action: 12
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12]
-HistoryString() = "2 2 19 12"
+HistoryString() = "2, 2, 19, 12"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -283,7 +283,7 @@ action: 31
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31]
-HistoryString() = "2 2 19 12 31"
+HistoryString() = "2, 2, 19, 12, 31"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -328,7 +328,7 @@ action: 20
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20]
-HistoryString() = "2 2 19 12 31 20"
+HistoryString() = "2, 2, 19, 12, 31, 20"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -373,7 +373,7 @@ action: 26
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26]
-HistoryString() = "2 2 19 12 31 20 26"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -418,7 +418,7 @@ action: 28
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28]
-HistoryString() = "2 2 19 12 31 20 26 28"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -464,7 +464,7 @@ action: 3
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3]
-HistoryString() = "2 2 19 12 31 20 26 28 3"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -511,7 +511,7 @@ action: 53
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -558,7 +558,7 @@ action: 54
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -605,7 +605,7 @@ action: 53
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -655,7 +655,7 @@ action: 19
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53 19"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -705,7 +705,7 @@ action: 12
 # Tricks Won:    0 0 0
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53 19 12"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -755,7 +755,7 @@ action: 31
 # Tricks Won:    0 0 1
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53 19 12 31"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
@@ -806,7 +806,7 @@ action: 28
 # Tricks Won:    0 0 1
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31, 28]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53 19 12 31 28"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31, 28"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -857,7 +857,7 @@ action: 20
 # Tricks Won:    0 0 1
 IsTerminal() = False
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31, 28, 20]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53 19 12 31 28 20"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31, 28, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -909,7 +909,7 @@ action: 26
 # Score:        0 0 2
 IsTerminal() = True
 History() = [2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31, 28, 20, 26]
-HistoryString() = "2 2 19 12 31 20 26 28 3 53 54 53 19 12 31 28 20 26"
+HistoryString() = "2, 2, 19, 12, 31, 20, 26, 28, 3, 53, 54, 53, 19, 12, 31, 28, 20, 26"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

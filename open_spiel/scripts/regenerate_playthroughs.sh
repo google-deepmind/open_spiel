@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Regenerates playthroughs for all the existing playthroughts.
-# Run this from openspiel/ when you changes an element of the public API.
+# Regenerates playthroughs for all the existing playthroughs.
+# Run this from open_spiel/ (scripts/regenerate_playthroughs.sh) whenever
+# a change is made to the public API.
 
 python3 python/examples/playthrough.py \
 --update_path integration_tests/playthroughs

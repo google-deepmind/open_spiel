@@ -44,6 +44,7 @@
 #include <vector>
 
 #include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -51,8 +52,6 @@ namespace leduc_poker {
 
 // Default parameters.
 
-// TODO(b/127425075): Use std::optional instead of sentinel values once absl is
-// added as a dependency.
 inline constexpr int kInvalidCard = -10000;
 inline constexpr int kDefaultPlayers = 2;
 inline constexpr int kNumSuits = 2;
@@ -61,8 +60,9 @@ inline constexpr int kSecondRaiseAmount = 4;
 inline constexpr int kTotalRaisesPerRound = 2;
 inline constexpr int kMaxRaises = 2;
 inline constexpr int kStartingMoney = 100;
-inline constexpr int kNumInfoStates =
-    936;  // Number of info states in the 2P game with default params.
+
+// Number of info states in the 2P game with default params.
+inline constexpr int kNumInfoStates = 936;
 
 class LeducGame;
 class LeducObserver;
@@ -103,6 +103,11 @@ class LeducState : public State {
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
 
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return {action};
+  }
+
  protected:
   // The meaning of `action_id` varies:
   // - At decision nodes, one of ActionType::{kFold, kCall, kRaise}.
@@ -134,6 +139,7 @@ class LeducState : public State {
   void Ante(Player player, int amount);
   void SetPrivate(Player player, Action move);
   int NumObservableCards() const;
+  int MaxBetsPerRound() const;
 
   // Fields sets to bad/invalid values. Use Game::NewInitialState().
   Player cur_player_;
@@ -221,6 +227,15 @@ class LeducGame : public Game {
   // rank.
   bool suit_isomorphism_;
 };
+
+// Returns policy that always folds.
+TabularPolicy GetAlwaysFoldPolicy(const Game& game);
+
+// Returns policy that always calls.
+TabularPolicy GetAlwaysCallPolicy(const Game& game);
+
+// Returns policy that always raises.
+TabularPolicy GetAlwaysRaisePolicy(const Game& game);
 
 }  // namespace leduc_poker
 }  // namespace open_spiel

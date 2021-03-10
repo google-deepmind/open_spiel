@@ -40,9 +40,6 @@ IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = ""
 ObservationString(1) = ""
-PublicObservationString() = ""
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
@@ -62,15 +59,12 @@ actions: [0, 0]
 # Total Returns: 0 0
 IsTerminal() = False
 History() = [0, 0]
-HistoryString() = "0 0"
+HistoryString() = "0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Rock "
 ObservationString(1) = "Rock Rock "
-PublicObservationString() = "Rock Rock "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◉◯◯
 Rewards() = [0.0, 0.0]
@@ -93,15 +87,12 @@ actions: [2, 2]
 # Total Returns: 0 0
 IsTerminal() = False
 History() = [0, 0, 2, 2]
-HistoryString() = "0 0 2 2"
+HistoryString() = "0, 0, 2, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Scissors Scissors "
 ObservationString(1) = "Scissors Scissors "
-PublicObservationString() = "Scissors Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◯◉◯◯◉
 ObservationTensor(1): ◯◯◉◯◯◉
 Rewards() = [0.0, 0.0]
@@ -127,15 +118,12 @@ actions: [1, 0]
 # Total Returns: 1 -1
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0]
-HistoryString() = "0 0 2 2 1 0"
+HistoryString() = "0, 0, 2, 2, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Paper Rock "
 ObservationString(1) = "Paper Rock "
-PublicObservationString() = "Paper Rock "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◉◯◯
 ObservationTensor(1): ◯◉◯◉◯◯
 Rewards() = [1.0, -1.0]
@@ -164,15 +152,12 @@ actions: [1, 1]
 # Total Returns: 1 -1
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0, 1, 1]
-HistoryString() = "0 0 2 2 1 0 1 1"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Paper Paper "
 ObservationString(1) = "Paper Paper "
-PublicObservationString() = "Paper Paper "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◯◉◯
 ObservationTensor(1): ◯◉◯◯◉◯
 Rewards() = [0.0, 0.0]
@@ -204,15 +189,12 @@ actions: [1, 1]
 # Total Returns: 1 -1
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1]
-HistoryString() = "0 0 2 2 1 0 1 1 1 1"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Paper Paper "
 ObservationString(1) = "Paper Paper "
-PublicObservationString() = "Paper Paper "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◯◉◯◯◉◯
 ObservationTensor(1): ◯◉◯◯◉◯
 Rewards() = [0.0, 0.0]
@@ -247,15 +229,12 @@ actions: [0, 1]
 # Total Returns: 0 0
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1]
-HistoryString() = "0 0 2 2 1 0 1 1 1 1 0 1"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Paper "
 ObservationString(1) = "Rock Paper "
-PublicObservationString() = "Rock Paper "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◉◯
 ObservationTensor(1): ◉◯◯◯◉◯
 Rewards() = [-1.0, 1.0]
@@ -293,15 +272,12 @@ actions: [0, 2]
 # Total Returns: 1 -1
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2]
-HistoryString() = "0 0 2 2 1 0 1 1 1 1 0 1 0 2"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
-PublicObservationString() = "Rock Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [1.0, -1.0]
@@ -342,15 +318,12 @@ actions: [0, 2]
 # Total Returns: 2 -2
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2]
-HistoryString() = "0 0 2 2 1 0 1 1 1 1 0 1 0 2 0 2"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
-PublicObservationString() = "Rock Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [1.0, -1.0]
@@ -394,15 +367,12 @@ actions: [0, 0]
 # Total Returns: 2 -2
 IsTerminal() = False
 History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2, 0, 0]
-HistoryString() = "0 0 2 2 1 0 1 1 1 1 0 1 0 2 0 2 0 0"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = -2
 ObservationString(0) = "Rock Rock "
 ObservationString(1) = "Rock Rock "
-PublicObservationString() = "Rock Rock "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◉◯◯
 Rewards() = [0.0, 0.0]
@@ -449,15 +419,12 @@ actions: [0, 2]
 # Total Returns: 3 -3
 IsTerminal() = True
 History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2, 0, 0, 0, 2]
-HistoryString() = "0 0 2 2 1 0 1 1 1 1 0 1 0 2 0 2 0 0 0 2"
+HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2, 0, 0, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
-PublicObservationString() = "Rock Scissors "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
 Rewards() = [1.0, -1.0]

@@ -22,17 +22,10 @@ import os
 import re
 import numpy as np
 
-from open_spiel.python.games import tic_tac_toe
+from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
+from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
-
-
-def _load_game(game_string):
-  """Loads a game, including special-cases for Python-implemented games."""
-  if game_string == "python_tic_tac_toe":
-    return tic_tac_toe.TicTacToeGame()
-  else:
-    return pyspiel.load_game(game_string)
 
 
 def _escape(x):
@@ -95,7 +88,8 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
     return lines
 
 
-def playthrough(game_string, action_sequence, alsologtostdout=False):
+def playthrough(game_string, action_sequence, alsologtostdout=False,
+                observation_params_string=None):
   """Returns a playthrough of the specified game as a single text.
 
   Actions are selected uniformly at random, including chance actions.
@@ -106,8 +100,11 @@ def playthrough(game_string, action_sequence, alsologtostdout=False):
     action_sequence: A (possibly partial) list of action choices to make.
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
+    observation_params_string: Optional observation parameters for constructing
+      an observer.
   """
-  lines = playthrough_lines(game_string, alsologtostdout, action_sequence)
+  lines = playthrough_lines(game_string, alsologtostdout, action_sequence,
+                            observation_params_string)
   return "\n".join(lines) + "\n"
 
 
@@ -119,7 +116,8 @@ def format_shapes(d):
     return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
 
 
-def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
+def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
+                      observation_params_string=None):
   """Returns a playthrough of the specified game as a list of lines.
 
   Actions are selected uniformly at random, including chance actions.
@@ -129,6 +127,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
     alsologtostdout: Whether to also print the trace to stdout. This can be
       useful when an error occurs, to still be able to get context information.
     action_sequence: A (possibly partial) list of action choices to make.
+    observation_params_string: Optional observation parameters for constructing
+      an observer.
   """
   lines = []
   action_sequence = action_sequence or []
@@ -140,14 +140,21 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None):
   else:
     add_line = lines.append
 
-  game = _load_game(game_string)
+  game = pyspiel.load_game(game_string)
   add_line("game: {}".format(game_string))
+  if observation_params_string:
+    add_line("observation_params: {}".format(observation_params_string))
   seed = np.random.randint(2**32 - 1)
   game_type = game.get_type()
 
   default_observation = None
   try:
-    default_observation = make_observation(game)
+    observation_params = pyspiel.game_parameters_from_string(
+        observation_params_string) if observation_params_string else None
+    default_observation = make_observation(
+        game,
+        imperfect_information_observation_type=None,
+        params=observation_params)
   except (RuntimeError, ValueError):
     pass
 
@@ -363,10 +370,13 @@ def _playthrough_params(lines):
   params = {"action_sequence": []}
   for line in lines:
     match_game = re.match(r"^game: (.*)$", line)
+    match_observation_params = re.match(r"^observation_params: (.*)$", line)
     match_action = re.match(r"^action: (.*)$", line)
     match_actions = re.match(r"^actions: \[(.*)\]$", line)
     if match_game:
       params["game_string"] = match_game.group(1)
+    if match_observation_params:
+      params["observation_params_string"] = match_observation_params.group(1)
     if match_action:
       params["action_sequence"].append(int(match_action.group(1)))
     if match_actions:
@@ -377,11 +387,17 @@ def _playthrough_params(lines):
   raise ValueError("Could not find params")
 
 
-def replay(filename):
-  """Re-runs the playthrough in the specified file. Returns (original, new)."""
+def _read_playthrough(filename):
+  """Returns the content and the parsed arguments of a playthrough file."""
   with open(filename, "r", encoding="utf-8") as f:
     original = f.read()
   kwargs = _playthrough_params(original.splitlines())
+  return original, kwargs
+
+
+def replay(filename):
+  """Re-runs the playthrough in the specified file. Returns (original, new)."""
+  original, kwargs = _read_playthrough(filename)
   return (original, playthrough(**kwargs))
 
 
@@ -389,9 +405,17 @@ def update_path(path, shard_index=0, num_shards=1):
   """Regenerates all playthroughs in the path."""
   for filename in sorted(os.listdir(path))[shard_index::num_shards]:
     try:
-      original, new = replay(os.path.join(path, filename))
+      original, kwargs = _read_playthrough(os.path.join(path, filename))
+      try:
+        pyspiel.load_game(kwargs["game_string"])
+      except pyspiel.SpielError as e:
+        if "Unknown game" in str(e):
+          print("[Skipped] Skipping game ", filename, " as ",
+                kwargs["game_string"], " is not available.")
+          continue
+      new = playthrough(**kwargs)
       if original == new:
-        print("        {}".format(filename))
+        print("          {}".format(filename))
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)

@@ -626,14 +626,21 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
           const open_spiel::Game&, open_spiel::Player,
           const std::unordered_map<std::string, open_spiel::ActionsAndProbs>&>()
       .method("best_response_action",
-              &open_spiel::algorithms::TabularBestResponse::BestResponseAction)
+              [](open_spiel::algorithms::TabularBestResponse& t,
+                 const std::string& infostate) {
+                return t.BestResponseAction(infostate);
+              })
       .method(
           "get_best_response_actions",
           &open_spiel::algorithms::TabularBestResponse::GetBestResponseActions)
       .method(
           "get_best_response_policy",
           &open_spiel::algorithms::TabularBestResponse::GetBestResponsePolicy)
-      .method("value", &open_spiel::algorithms::TabularBestResponse::Value)
+      .method("value",
+              [](open_spiel::algorithms::TabularBestResponse& t,
+                 const std::string& history) {
+                return t.Value(history);
+              })
       .method("set_policy",
               [](open_spiel::algorithms::TabularBestResponse& t,
                  const open_spiel::Policy* p) { return t.SetPolicy(p); })

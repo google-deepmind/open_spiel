@@ -58,12 +58,12 @@ actions: [54, 58]
 # P1 action: [7,2,1]
 IsTerminal() = True
 History() = [54, 58]
-HistoryString() = "54 58"
+HistoryString() = "54, 58"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "Observing player: 0. Terminal. History string: 54 58"
-InformationStateString(1) = "Observing player: 1. Terminal. History string: 54 58"
+InformationStateString(0) = "Observing player: 0. Terminal. History string: 54, 58"
+InformationStateString(1) = "Observing player: 1. Terminal. History string: 54, 58"
 InformationStateTensor(0): ◉
 InformationStateTensor(1): ◉
 Rewards() = [0.0, 0.0]

@@ -22,7 +22,6 @@
 #include <cstdint>
 #include <limits>
 #include <locale>
-#include <optional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -61,8 +60,8 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v);
 template <typename T, std::size_t N>
 std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v);
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v);
-std::ostream& operator<<(std::ostream& stream, const std::nullopt_t& v);
+std::ostream& operator<<(std::ostream& stream, const absl::optional<T>& v);
+std::ostream& operator<<(std::ostream& stream, const absl::nullopt_t& v);
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, absl::Span<T> v);
 
@@ -94,7 +93,7 @@ std::ostream& operator<<(std::ostream& stream, const std::unique_ptr<T>& v) {
   return stream << *v;
 }
 template <typename T>
-std::ostream& operator<<(std::ostream& stream, const std::optional<T>& v) {
+std::ostream& operator<<(std::ostream& stream, const absl::optional<T>& v) {
   return stream << *v;
 }
 template <typename T, typename U>
@@ -161,7 +160,7 @@ int PreviousPlayerRoundRobin(Player player, int nplayers);
 
 // Finds a file by looking up a number of directories. For example: if levels is
 // 3 and filename is my.txt, it will look for ./my.txt, ../my.txt, ../../my.txt,
-// and ../../../my.txt, return the first file found or std::nullopt if not
+// and ../../../my.txt, return the first file found or absl::nullopt if not
 // found.
 absl::optional<std::string> FindFile(const std::string& filename, int levels);
 
@@ -172,6 +171,9 @@ void Normalize(absl::Span<double> weights);
 // adding ".0" for integer values, and removing any additional trailing zeroes
 // after the first decimal place.
 std::string FormatDouble(double value);
+
+// Converts a bool to either "true" or "false".
+std::string BoolToStr(bool b);
 
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).

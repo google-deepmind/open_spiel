@@ -5,12 +5,13 @@ we verified against known values and/or reproduced results from papers.
 
 <font color="orange"><b>~</b></font>: implemented but lightly tested.
 
-<font color="red"<b>X</b></font>: known issues (see code for details).
+<font color="red"><b>X</b></font>: known issues (see code for details).
 
 Status                                       | Game
 -------------------------------------------- | ----
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
+<font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
@@ -38,7 +39,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
-<font color="red"><b>X</b></font>            | [Oh Hell](#oh-hell)
+<font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
@@ -46,6 +47,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
+<font color="orange"><b>~</b></font>         | [Sheriff](#sheriff)
 <font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
 <font color="orange"><b>~</b></font>         | [Solitaire (K+)](#solitaire-k)
@@ -81,6 +83,15 @@ Status                                       | Game
     Benchmarks](https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf).
     Based on the original game
     [(wikipedia)](https://en.wikipedia.org/wiki/Battleship_\(game\))
+
+### Blackjack
+
+*   Simplified version of blackjack, with only HIT/STAND moves.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   1 player.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Blackjack)
 
 ### Breakthrough
 
@@ -227,7 +238,7 @@ Status                                       | Game
 *   Players place tokens on the board with the goal of encircling territory.
 *   Tokens on a grid.
 *   Traditional game.
-*   Non-deterministic.
+*   Deterministic.
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Go_\(game\))
@@ -462,6 +473,19 @@ Status                                       | Game
 *   Perfect information.
 *   2-4 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
+
+### Sheriff
+
+*   Bargaining game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   Good for correlated equilibria.
+*   [Farina et al. '19, Correlation in Extensive-Form Games: Saddle-Point
+    Formulation and
+    Benchmarks](https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf).
+*   Based on the board game "Sheriff of Nottingham"
+    [(bbg)](https://boardgamegeek.com/boardgame/157969/sheriff-nottingham)
 
 ### Slovenian Tarok
 

@@ -28,6 +28,18 @@ namespace {
 // Default parameters.
 constexpr int kDefaultHorizon = 1000;
 
+// A valid state looks like:
+//
+//   .....
+//   ..Ab.
+//   .....
+//   .....
+//
+// In this case, the first player has the ball ('A') and the second player does
+// not ('b'). Upper case means that player has posession. When the ball is in
+// the field and neither player has posession, it is represented as an 'O' and
+// both players are lower-case.
+
 // Facts about the game
 const GameType kGameType{/*short_name=*/"markov_soccer",
                          /*long_name=*/"Markov Soccer",

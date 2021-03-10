@@ -30,7 +30,9 @@ from open_spiel.python.environments import catch
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("num_episodes", int(3e3), "Number of train episodes.")
+flags.DEFINE_integer("num_episodes", int(1e5), "Number of train episodes.")
+flags.DEFINE_integer("eval_every", int(1e3),
+                     "How often to evaluate the policy.")
 flags.DEFINE_enum("algorithm", "dqn", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
                   "Algorithms to run.")
 
@@ -56,7 +58,6 @@ def main_loop(unused_arg):
   num_actions = env.action_spec()["num_actions"]
 
   train_episodes = FLAGS.num_episodes
-  eval_interval = 50
 
   with tf.Session() as sess:
     if FLAGS.algorithm in {"rpg", "qpg", "rm", "a2c"}:
@@ -66,19 +67,19 @@ def main_loop(unused_arg):
           info_state_size=info_state_size,
           num_actions=num_actions,
           loss_str=FLAGS.algorithm,
-          hidden_layers_sizes=[32, 32],
-          batch_size=32,
-          entropy_cost=0.001,
-          critic_learning_rate=0.01,
-          pi_learning_rate=0.01,
-          num_critic_before_pi=5)
+          hidden_layers_sizes=[128, 128],
+          batch_size=128,
+          entropy_cost=0.01,
+          critic_learning_rate=0.1,
+          pi_learning_rate=0.1,
+          num_critic_before_pi=3)
     elif FLAGS.algorithm == "dqn":
       agent = dqn.DQN(
           sess,
           player_id=0,
           state_representation_size=info_state_size,
           num_actions=num_actions,
-          learning_rate=1e-3,
+          learning_rate=0.1,
           replay_buffer_capacity=10000,
           hidden_layers_sizes=[32, 32],
           epsilon_decay_duration=2000,  # 10% total data
@@ -113,7 +114,7 @@ def main_loop(unused_arg):
       # Episode is over, step agent with final info state.
       agent.step(time_step)
 
-      if ep and ep % eval_interval == 0:
+      if ep and ep % FLAGS.eval_every == 0:
         logging.info("-" * 80)
         logging.info("Episode %s", ep)
         logging.info("Loss: %s", agent.loss)

@@ -198,7 +198,6 @@ class RLOracle(optimization_oracle.AbstractOracle):
           # If we are indeed doing self-play on that round, sample among the
           # trained strategies of current_player, with priority given to less-
           # selected agents.
-          assert not episode_policies[player].is_frozen()
           agent_index = random_count_weighted_choice(
               episodes_per_oracle[player])
           self_play_agent = new_policies[player][agent_index]
@@ -234,6 +233,7 @@ class RLOracle(optimization_oracle.AbstractOracle):
         else:
           new_pol = self._best_response_class(self._env, player,
                                               **self._best_response_kwargs)
+          new_pol.unfreeze()
         new_pols.append(new_pol)
       new_policies.append(new_pols)
     return new_policies

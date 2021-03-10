@@ -73,6 +73,11 @@ namespace algorithms {
 // Monte Carlo sampling of deterministic joint policies from the mixtures.
 using CorrelationDevice = std::vector<std::pair<double, TabularPolicy>>;
 
+// Helper function to return a correlation device that is a uniform distribution
+// over the vector of tabular policies.
+CorrelationDevice UniformCorrelationDevice(
+    std::vector<TabularPolicy>& policies);
+
 // Return a string representation of the correlation device.
 std::string ToString(const CorrelationDevice& corr_dev);
 
@@ -137,6 +142,35 @@ double AFCCEDist(const Game& game, CorrDistConfig config,
 // game.
 double CEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
+
+struct CorrDistInfo {
+  double dist_value;
+  std::vector<double> on_policy_values;
+  std::vector<double> deviation_incentives;
+
+  // One per player
+  std::vector<TabularPolicy> best_response_policies;
+
+  // Several per player. Only used in the CE dist case.
+  std::vector<std::vector<TabularPolicy>> conditional_best_response_policies;
+};
+
+// Distance to coarse-correlated in an extensive-form game. Builds a simpler
+// auxiliary game similar to the *FCCE where there is one chance node that
+// determines which policies the opponents follow (never revealed). Note that
+// the policies in this correlation device *can* be mixed. If values is
+// non-null, then it is filled with the deviation incentive of each player.
+CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu);
+
+// Distance to a correlated equilibrium in an extensive-form game. Builds a
+// simpler auxiliary game similar to the *FCE ones where there is a chance node
+// that determines the joint recommendation strategies. The correlation device
+// must be a distribution over deterministic policies; if you have distribution
+// over mixed policies, then first convert the correlation device using the
+// helper functions DeterminizeCorrDev or SampledDeterminizeCorrDev in
+// corr_dev_builder.h. If values is non-null, then it is filled with the
+// deviation incentive of each player.
+CorrDistInfo CEDist(const Game& game, const CorrelationDevice& mu);
 
 }  // namespace algorithms
 }  // namespace open_spiel

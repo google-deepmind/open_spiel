@@ -15,6 +15,7 @@
 #include "open_spiel/games/kuhn_poker.h"
 
 #include "open_spiel/algorithms/get_all_states.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -43,6 +44,20 @@ void CountStates() {
   SPIEL_CHECK_EQ(states.size(), 54);
 }
 
+void PolicyTest() {
+  using PolicyGenerator = std::function<TabularPolicy(const Game& game)>;
+  std::vector<PolicyGenerator> policy_generators = {
+      GetAlwaysPassPolicy,
+      GetAlwaysBetPolicy,
+  };
+
+  std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
+  for (const auto& policy_generator : policy_generators) {
+    testing::TestEveryInfostateInPolicy(policy_generator, *game);
+    testing::TestPoliciesCanPlay(policy_generator, *game);
+  }
+}
+
 }  // namespace
 }  // namespace kuhn_poker
 }  // namespace open_spiel
@@ -50,6 +65,7 @@ void CountStates() {
 int main(int argc, char **argv) {
   open_spiel::kuhn_poker::BasicKuhnTests();
   open_spiel::kuhn_poker::CountStates();
+  open_spiel::kuhn_poker::PolicyTest();
   open_spiel::testing::CheckChanceOutcomes(*open_spiel::LoadGame(
       "kuhn_poker", {{"players", open_spiel::GameParameter(3)}}));
   open_spiel::testing::RandomSimTest(*open_spiel::LoadGame("kuhn_poker"),

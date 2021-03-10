@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Liars Dice"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["numdice", "players"]
+GameType.parameter_specification = ["bidding_rule", "dice_sides", "numdice", "players"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 13
 PolicyTensorShape() = [13]
 MaxChanceOutcomes() = 6
-GetParameters() = {numdice=1,players=2}
+GetParameters() = {bidding_rule=reset-face,dice_sides=6,numdice=1,players=2}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -79,7 +79,7 @@ action: 4
 # 2 5
 IsTerminal() = False
 History() = [1, 4]
-HistoryString() = "1 4"
+HistoryString() = "1, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -101,7 +101,7 @@ action: 1
 # 2 5 1-2
 IsTerminal() = False
 History() = [1, 4, 1]
-HistoryString() = "1 4 1"
+HistoryString() = "1, 4, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -123,7 +123,7 @@ action: 4
 # 2 5 1-2 1-5
 IsTerminal() = False
 History() = [1, 4, 1, 4]
-HistoryString() = "1 4 1 4"
+HistoryString() = "1, 4, 1, 4"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -145,7 +145,7 @@ action: 8
 # 2 5 1-2 1-5 2-3
 IsTerminal() = False
 History() = [1, 4, 1, 4, 8]
-HistoryString() = "1 4 1 4 8"
+HistoryString() = "1, 4, 1, 4, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -167,7 +167,7 @@ action: 12
 # 2 5 1-2 1-5 2-3 Liar
 IsTerminal() = True
 History() = [1, 4, 1, 4, 8, 12]
-HistoryString() = "1 4 1 4 8 12"
+HistoryString() = "1, 4, 1, 4, 8, 12"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4

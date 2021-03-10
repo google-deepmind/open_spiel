@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/policy.h"
@@ -46,6 +47,17 @@ struct CFRInfoStateValues {
         cumulative_policy(la.size(), init_value),
         current_policy(la.size(), 1.0 / la.size()) {}
   CFRInfoStateValues(std::vector<Action> la) : CFRInfoStateValues(la, 0) {}
+
+  // For randomized initial regrets.
+  CFRInfoStateValues(std::vector<Action> la,
+                     std::mt19937* rng,
+                     double magnitude_scale) : CFRInfoStateValues(la, 0) {
+    for (int i = 0; i < cumulative_policy.size(); ++i) {
+      cumulative_regrets[i] = magnitude_scale *
+          absl::Uniform<double>(*rng, 0.0, 1.0);
+    }
+    ApplyRegretMatching();
+  }
 
   // Fills current_policy according to the standard application of the
   // regret-matching algorithm in the CFR papers.
@@ -117,12 +129,16 @@ class CFRAveragePolicy : public Policy {
   // return a uniform policy.
   CFRAveragePolicy(const CFRInfoStateValuesTable& info_states,
                    std::shared_ptr<Policy> default_policy);
-  ActionsAndProbs GetStatePolicy(const State& state) const override;
+  ActionsAndProbs GetStatePolicy(const State& state) const override {
+    return GetStatePolicy(state, state.CurrentPlayer());
+  };
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
 
  private:
   const CFRInfoStateValuesTable& info_states_;
-  bool default_to_uniform_;
+  UniformPolicy uniform_policy_;
   std::shared_ptr<Policy> default_policy_;
   void GetStatePolicyFromInformationStateValues(
       const CFRInfoStateValues& is_vals,
@@ -137,7 +153,11 @@ class CFRCurrentPolicy : public Policy {
   // to not use a default policy).
   CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
                    std::shared_ptr<Policy> default_policy);
-  ActionsAndProbs GetStatePolicy(const State& state) const override;
+  ActionsAndProbs GetStatePolicy(const State& state) const override {
+    return GetStatePolicy(state, state.CurrentPlayer());
+  };
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
   TabularPolicy AsTabular() const;
 
@@ -182,14 +202,19 @@ class CFRSolverBase {
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
   std::shared_ptr<Policy> AveragePolicy() const {
-    return std::shared_ptr<Policy>(new CFRAveragePolicy(info_states_, nullptr));
+    return std::make_shared<CFRAveragePolicy>(info_states_, nullptr);
+  }
+  // Note: This can be quite large.
+  TabularPolicy TabularAveragePolicy() const {
+    CFRAveragePolicy policy(info_states_, nullptr);
+    return TabularPolicy(*game_, policy);
   }
 
   // Computes the current policy, containing the policy for all players.
   // The returned policy instance should only be used during the lifetime of
   // the CFRSolver object.
   std::shared_ptr<Policy> CurrentPolicy() const {
-    return std::shared_ptr<Policy>(new CFRCurrentPolicy(info_states_, nullptr));
+    return std::make_shared<CFRCurrentPolicy>(info_states_, nullptr);
   }
 
   CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
@@ -332,7 +357,7 @@ struct PartiallyDeserializedCFRSolver {
   PartiallyDeserializedCFRSolver(std::shared_ptr<const Game> game,
                                  std::string solver_type,
                                  std::string solver_specific_state,
-                                 std::string_view serialized_cfr_values_table)
+                                 absl::string_view serialized_cfr_values_table)
       : game(game),
         solver_type(solver_type),
         solver_specific_state(solver_specific_state),

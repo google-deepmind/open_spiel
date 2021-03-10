@@ -19,7 +19,9 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import os
 import random
+from absl import logging
 import numpy as np
 import tensorflow.compat.v1 as tf
 
@@ -199,6 +201,10 @@ class DQN(rl_agent.AbstractAgent):
         [tf.range(tf.shape(self._q_values)[0]), self._action_ph], axis=-1)
     predictions = tf.gather_nd(self._q_values, action_indices)
 
+    self._savers = [("q_network", tf.train.Saver(self._q_network.variables)),
+                    ("target_q_network",
+                     tf.train.Saver(self._target_q_network.variables))]
+
     if loss_str == "mse":
       loss_class = tf.losses.mean_squared_error
     elif loss_str == "huber":
@@ -219,6 +225,9 @@ class DQN(rl_agent.AbstractAgent):
 
     self._learn_step = self._optimizer.minimize(self._loss)
     self._initialize()
+
+  def get_step_counter(self):
+    return self._step_counter
 
   def step(self, time_step, is_evaluation=False, add_transition_record=True):
     """Returns the action to be taken and updates the Q-network if needed.
@@ -382,6 +391,53 @@ class DQN(rl_agent.AbstractAgent):
             self._legal_actions_mask_ph: legal_actions_mask,
         })
     return loss
+
+  def _full_checkpoint_name(self, checkpoint_dir, name):
+    checkpoint_filename = "_".join([name, "pid" + str(self.player_id)])
+    return os.path.join(checkpoint_dir, checkpoint_filename)
+
+  def _latest_checkpoint_filename(self, name):
+    checkpoint_filename = "_".join([name, "pid" + str(self.player_id)])
+    return checkpoint_filename + "_latest"
+
+  def save(self, checkpoint_dir):
+    """Saves the q network and the target q-network.
+
+    Note that this does not save the experience replay buffers and should
+    only be used to restore the agent's policy, not resume training.
+
+    Args:
+      checkpoint_dir: directory where checkpoints will be saved.
+    """
+    for name, saver in self._savers:
+      path = saver.save(
+          self._session,
+          self._full_checkpoint_name(checkpoint_dir, name),
+          latest_filename=self._latest_checkpoint_filename(name))
+      logging.info("Saved to path: %s", path)
+
+  def has_checkpoint(self, checkpoint_dir):
+    for name, _ in self._savers:
+      if tf.train.latest_checkpoint(
+          self._full_checkpoint_name(checkpoint_dir, name),
+          os.path.join(checkpoint_dir,
+                       self._latest_checkpoint_filename(name))) is None:
+        return False
+    return True
+
+  def restore(self, checkpoint_dir):
+    """Restores the q network and the target q-network.
+
+    Note that this does not restore the experience replay buffers and should
+    only be used to restore the agent's policy, not resume training.
+
+    Args:
+      checkpoint_dir: directory from which checkpoints will be restored.
+    """
+    for name, saver in self._savers:
+      full_checkpoint_dir = self._full_checkpoint_name(checkpoint_dir, name)
+      logging.info("Restoring checkpoint: %s", full_checkpoint_dir)
+      saver.restore(self._session, full_checkpoint_dir)
 
   @property
   def q_values(self):

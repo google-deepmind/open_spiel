@@ -76,6 +76,10 @@ class ConnectFourState : public State {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
+  std::vector<Action> ActionsConsistentWithInformationFrom(
+      Action action) const override {
+    return {action};
+  }
 
  protected:
   void DoApplyAction(Action move) override;

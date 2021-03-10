@@ -260,13 +260,16 @@ class BackgammonGame : public Game {
         shared_from_this(), scoring_type_, hyper_backgammon_));
   }
 
-  int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
+  // On the first turn there are 30 outcomes: 15 for each player (rolls without
+  // the doubles).
+  int MaxChanceOutcomes() const override { return 30; }
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
-  // It is possible to have only chance nodes in the game. As the game
-  // is limited, apply the same limit.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+
+  // Upper bound: chance node per move, with an initial chance node for
+  // determining starting player.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength() + 1; }
 
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return -MaxUtility(); }

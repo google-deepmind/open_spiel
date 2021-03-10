@@ -83,7 +83,7 @@ action: 10
 # 9,10;
 IsTerminal() = False
 History() = [9, 10]
-HistoryString() = "9 10"
+HistoryString() = "9, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
@@ -107,7 +107,7 @@ action: 3
 # 9,10;3
 IsTerminal() = False
 History() = [9, 10, 3]
-HistoryString() = "9 10 3"
+HistoryString() = "9, 10, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
@@ -131,7 +131,7 @@ action: 5
 # 9,10;3,5
 IsTerminal() = False
 History() = [9, 10, 3, 5]
-HistoryString() = "9 10 3 5"
+HistoryString() = "9, 10, 3, 5"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -154,7 +154,7 @@ action: 1
 # 9,10;3,5;1
 IsTerminal() = True
 History() = [9, 10, 3, 5, 1]
-HistoryString() = "9 10 3 5 1"
+HistoryString() = "9, 10, 3, 5, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
