@@ -59,10 +59,8 @@ DOWNLOAD_CACHE_DIR=${DOWNLOAD_CACHE_DIR:-$DEFAULT_DOWNLOAD_CACHE_DIR}
 # metadata and we do not use Git within DeepMind, so it's hard to maintain.
 
 # Note that this needs Git intalled, so we check for that.
-
-git --version 2>&1 >/dev/null
-GIT_IS_AVAILABLE=$?
-if [ $GIT_IS_AVAILABLE -ne 0 ]; then #...
+if [[ ! -x `which git` ]]; then
+  echo "Did not find git, attempting to install it."
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get install git
   elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
