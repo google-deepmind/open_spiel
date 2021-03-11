@@ -406,19 +406,19 @@ ChessBoard<kBoardSize>::BoardFromFEN(const std::string &fen) {
     return absl::nullopt;
   }
 
-  if (castling_rights.find('K') != std::string::npos) {
+  if (castling_rights.find('K') != std::string::npos) {  // NOLINT
     board.SetCastlingRight(Color::kWhite, CastlingDirection::kRight, true);
   }
 
-  if (castling_rights.find('Q') != std::string::npos) {
+  if (castling_rights.find('Q') != std::string::npos) {  // NOLINT
     board.SetCastlingRight(Color::kWhite, CastlingDirection::kLeft, true);
   }
 
-  if (castling_rights.find('k') != std::string::npos) {
+  if (castling_rights.find('k') != std::string::npos) {  // NOLINT
     board.SetCastlingRight(Color::kBlack, CastlingDirection::kRight, true);
   }
 
-  if (castling_rights.find('q') != std::string::npos) {
+  if (castling_rights.find('q') != std::string::npos) {  // NOLINT
     board.SetCastlingRight(Color::kBlack, CastlingDirection::kLeft, true);
   }
 
@@ -712,7 +712,7 @@ absl::optional<Move> ChessBoard<kBoardSize>::ParseSANMove(
   // omitted for pawns.
   PieceType piece_type = PieceType::kPawn;
   std::string pieces = "PNBRQK";
-  if (absl::StrContains(pieces, move[0])) {
+  if (pieces.find(move[0]) != std::string::npos) {  // NOLINT
     auto maybe_piece_type = PieceTypeFromChar(move[0]);
     if (!maybe_piece_type) {
       std::cerr << "Invalid piece type: " << move[0] << std::endl;
