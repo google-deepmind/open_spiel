@@ -21,7 +21,6 @@ extensions.
 
 *   C++17
 *   Python 3
-*   A subset of the features are available in Swift.
 
 The games and utility functions (e.g. exploitability computation) are written in
 C++. These are also available using

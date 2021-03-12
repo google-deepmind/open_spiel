@@ -20,11 +20,6 @@ Welcome to OpenSpiel's documentation!
 
    Alpha-Rank<alpha_rank>
 
-.. toctree:: :caption: Swift OpenSpiel
-   :maxdepth: 2
-
-   OpenSpiel on Swift for TensorFlow<swift>
-
 .. toctree:: :caption: Julia OpenSpiel
    :maxdepth: 2
 
