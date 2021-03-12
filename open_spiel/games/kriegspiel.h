@@ -232,13 +232,22 @@ class KriegspielGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
     std::vector<int> shape{
-        (13 + // public boards:  piece types * colours + empty
-         14 ) // private boards: piece types * colours + empty + unknown
+        14 // private boards: piece types * colours + empty + unknown
          * board_size_ * board_size_ +
         3 + // public: repetitions count, one-hot encoding
         2 + // public: side to play
         1 + // public: irreversible move counter -- a fraction of $n over 100
-        2*2 // private: left/right castling rights, one-hot encoded.
+        2 * ( // public: last two umpire messages
+            3 + // capture type
+            6 + // check type one
+            6 + // check type two
+            3 + // player to move
+            16 + // pawn tries
+            board_size_ * board_size_) + // capture square
+        2*2 + // private: left/right castling rights, one-hot encoded.
+        2 + // private: whether last move was illegal
+        2 * (board_size_ * board_size_)// private: last move (from, two)
+          + 6 // private: last move (promotion type)
     };
     return shape;
   }

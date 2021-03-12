@@ -28,7 +28,7 @@ void BasicKriegspielTests(int board_size) {
 
   testing::LoadGameTest("kriegspiel");
   testing::NoChanceOutcomesTest(*LoadGame("kriegspiel", params));
-  testing::RandomSimTest(*LoadGame("kriegspiel", params), 100);
+  testing::RandomSimTest(*LoadGame("kriegspiel", params), 20);
 }
 
 }  // namespace

@@ -226,6 +226,25 @@ class KriegspielObserver : public Observer {
     }
   }
 
+  void WriteMove(const chess::Move &move,
+                 const chess::ChessBoard &board,
+                 const std::string &prefix,
+                 Allocator *allocator) const {
+
+    const int board_size = board.BoardSize();
+    auto from_out = allocator->Get(prefix + "_from", {board_size, board_size});
+    auto to_out = allocator->Get(prefix + "_to", {board_size, board_size});
+    for (int8_t y = 0; y < board_size; ++y) {
+      for (int8_t x = 0; x < board_size; ++x) {
+        const chess::Square square{x, y};
+        from_out.at(x, y) = square == move.from ? 1.0f : 0.0f;
+        to_out.at(x, y) = square == move.to ? 1.0f : 0.0f;
+      }
+    }
+    // 5 is maximum because we can't promote to a pawn.
+    WriteScalar((int8_t) move.promotion_type, 0, 5, prefix + "_promotion", allocator);
+  }
+
   void WriteUmpireMessage(const KriegspielUmpireMessage &msg,
                           const chess::ChessBoard& board,
                           const std::string &prefix,
@@ -243,7 +262,7 @@ class KriegspielObserver : public Observer {
     WriteScalar(msg.check_types_.first, 0, 5, "_check_one", allocator);
     WriteScalar(msg.check_types_.second, 0, 5, "_check_two", allocator);
     WriteScalar((int8_t) msg.to_move_, 0, 2, "_to_move", allocator);
-    WriteScalar(msg.pawn_tries_, 0, 16, "pawn_tries", allocator);
+    WriteScalar(msg.pawn_tries_, 0, 15, "pawn_tries", allocator);
   }
 
   void WriteScalar(int val, int min, int max, const std::string& field_name,
@@ -292,9 +311,23 @@ class KriegspielObserver : public Observer {
     if (!state.MoveMsgHistory().empty()) {
       auto last_msg = state.MoveMsgHistory().back();
       illegal = last_msg.first.piece.color == color &&
-                     last_msg.second.illegal_;
+                last_msg.second.illegal_;
     }
     WriteBinary(illegal, prefix + "_last_illegal", allocator);
+
+    // Write observer's last move
+    chess::Move last_move = {chess::InvalidSquare(),
+                             chess::InvalidSquare(),
+                             chess::kEmptyPiece};
+
+    for (auto move_msg = state.MoveMsgHistory().rbegin();
+         move_msg != state.MoveMsgHistory().rend(); ++move_msg) {
+      if (move_msg->first.piece.color == color) {
+        last_move = move_msg->first;
+        break;
+      }
+    }
+    WriteMove(last_move, state.Board(), prefix + "last_move", allocator);
   }
 
   void WritePublicInfoTensor(const KriegspielState &state,
