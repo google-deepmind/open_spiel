@@ -24,6 +24,8 @@ namespace open_spiel {
 namespace algorithms {
 namespace {
 
+// See also the examples/minimax_example.cc for example usage.
+
 void AlphaBetaSearchTest_TicTacToe() {
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::pair<double, Action> value_and_action =
