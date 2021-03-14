@@ -134,6 +134,10 @@ inline constexpr std::array<Offset, 8> kKnightOffsets = {
 
 absl::optional<Square> SquareFromString(const std::string& s);
 
+bool IsLongDiagonal(const chess::Square &from_sq,
+                    const chess::Square &to_sq,
+                    int board_size);
+
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
 class ChessBoard;
 

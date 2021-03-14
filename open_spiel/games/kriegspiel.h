@@ -112,6 +112,82 @@ struct KriegspielUmpireMessage {
   std::string ToString() const;
 };
 
+KriegspielUmpireMessage GetUmpireMessage(const chess::ChessBoard &chess_board,
+                                         const chess::Move &move) {
+  KriegspielUmpireMessage msg {};
+  if (!chess_board.IsMoveLegal(move)) {
+    // If the move is illegal, the player is notified about it and can play again
+    msg.illegal_ = true;
+    return msg;
+  }
+  msg.illegal_ = false;
+
+  chess::PieceType capture_type = chess_board.at(move.to).type;
+  switch (capture_type) {
+    case chess::PieceType::kEmpty:
+      msg.capture_type_ = KriegspielCaptureType::kNoCapture;
+      msg.square_ = chess::InvalidSquare();
+      break;
+    case chess::PieceType::kPawn:
+      msg.capture_type_ = KriegspielCaptureType::kPawn;
+      msg.square_ = move.to;
+      break;
+    default:
+      msg.capture_type_ = KriegspielCaptureType::kPiece;
+      msg.square_ = move.to;
+  }
+
+  // todo optimze when undo is optimized
+  chess::ChessBoard board_copy = chess_board;
+  board_copy.ApplyMove(move);
+
+  chess::Square king_sq = board_copy.find(
+      chess::Piece{board_copy.ToPlay(), chess::PieceType::kKing});
+
+  std::pair<KriegspielCheckType, KriegspielCheckType> check_type_pair =
+      {KriegspielCheckType::kNoCheck, KriegspielCheckType::kNoCheck};
+
+  board_copy.GeneratePseudoLegalMoves([&king_sq, &check_type_pair, &board_copy](const chess::Move &move) {
+    if (move.to != king_sq) {
+      return true;
+    }
+    KriegspielCheckType check_type;
+    if (move.piece.type == chess::PieceType::kKnight)
+      check_type = KriegspielCheckType::kKnight;
+    else if (move.from.x == move.to.x)
+      check_type = KriegspielCheckType::kFile;
+    else if (move.from.y == move.to.y)
+      check_type = KriegspielCheckType::kRank;
+    else if (chess::IsLongDiagonal(move.from, move.to, board_copy.BoardSize()))
+      check_type = KriegspielCheckType::kLongDiagonal;
+    else
+      check_type = KriegspielCheckType::kShortDiagonal;
+
+    if (check_type_pair.first != KriegspielCheckType::kNoCheck) {
+      // There cannot be more than two checks at the same time
+      check_type_pair.second = check_type;
+      return false;
+    }
+    else check_type_pair.first = check_type;
+
+    return true;
+  }, chess_board.ToPlay(), false);
+  msg.check_types_ = check_type_pair;
+
+  int pawnTries = 0;
+  board_copy.GenerateLegalMoves([&board_copy, &pawnTries](const chess::Move &move) {
+    if (move.piece.type == chess::PieceType::kPawn
+        && board_copy.at(move.to).type != chess::PieceType::kEmpty) {
+      pawnTries++;
+    }
+    return true;
+  });
+  msg.pawn_tries_ = pawnTries;
+  msg.to_move_ = board_copy.ToPlay();
+
+  return msg;
+}
+
 class KriegspielGame;
 class KriegspielObserver;
 

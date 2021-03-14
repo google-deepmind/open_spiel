@@ -81,14 +81,6 @@ bool ObserverHasTensor(IIGObservationType iig_obs_type) {
   return !iig_obs_type.perfect_recall;
 }
 
-bool IsLongDiagonal(const chess::Square from_sq, const chess::Square to_sq) {
-  if ((to_sq.y <= 3 && to_sq.x <= 3) || (to_sq.y > 3 && to_sq.x > 3)) {
-    return from_sq.y - to_sq.y == from_sq.x - to_sq.x;
-  } else {
-    return from_sq.y - to_sq.y != from_sq.x - to_sq.x;
-  }
-}
-
 }  // namespace
 
 
@@ -423,91 +415,33 @@ KriegspielState::KriegspielState(std::shared_ptr<const Game> game,
 }
 
 void KriegspielState::DoApplyAction(Action action) {
-  Player current_player = CurrentPlayer();
-  chess::Move move = ActionToMove(action, Board());
-  KriegspielUmpireMessage msg {};
   cached_legal_actions_.reset();
-  if (!Board().IsMoveLegal(move)) {
+
+  chess::Move move = ActionToMove(action, Board());
+
+  KriegspielUmpireMessage msg = GetUmpireMessage(Board(), move);
+
+  if (msg.illegal_) {
     // If the move is illegal, the player is notified about it and can play again
-    msg.illegal_ = true;
     move_msg_history_.emplace_back(move, msg);
     illegal_tried_moves_.insert(move);
     return;
-  }
-
-  msg.illegal_ = false;
-  chess::PieceType capture_type = Board().at(move.to).type;
-  switch (capture_type) {
-    case chess::PieceType::kEmpty:
-      msg.capture_type_ = KriegspielCaptureType::kNoCapture;
-      msg.square_ = chess::InvalidSquare();
-      break;
-    case chess::PieceType::kPawn:
-      msg.capture_type_ = KriegspielCaptureType::kPawn;
-      msg.square_ = move.to;
-      break;
-    default:
-      msg.capture_type_ = KriegspielCaptureType::kPiece;
-      msg.square_ = move.to;
   }
 
   Board().ApplyMove(move);
   illegal_tried_moves_.clear();
   ++repetitions_[current_board_.HashValue()];
 
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    std::optional<Action> a = {};
-    if (current_player == player) a = action;
-    aohs_[player].Extend(a, ObservationString(player));
-  }
-
-  chess::Square king_sq = Board().find(
-      chess::Piece{Board().ToPlay(), chess::PieceType::kKing});
-
-  std::pair<KriegspielCheckType, KriegspielCheckType> check_type_pair =
-    {KriegspielCheckType::kNoCheck, KriegspielCheckType::kNoCheck};
-
-  Board().GeneratePseudoLegalMoves([&king_sq, &check_type_pair](const chess::Move &move) {
-    if (move.to != king_sq) {
-      return true;
-    }
-    KriegspielCheckType check_type;
-    if (move.piece.type == chess::PieceType::kKnight)
-        check_type = KriegspielCheckType::kKnight;
-    else if (move.from.x == move.to.x)
-      check_type = KriegspielCheckType::kFile;
-    else if (move.from.y == move.to.y)
-      check_type = KriegspielCheckType::kRank;
-    else if (IsLongDiagonal(move.from, move.to))
-      check_type = KriegspielCheckType::kLongDiagonal;
-    else check_type = KriegspielCheckType::kShortDiagonal;
-
-    if (check_type_pair.first != KriegspielCheckType::kNoCheck) {
-      // There cannot be more than two checks at the same time
-      check_type_pair.second = check_type;
-      return false;
-    }
-    else check_type_pair.first = check_type;
-
-    return true;
-  }, chess::OppColor(Board().ToPlay()), false);
-  msg.check_types_ = check_type_pair;
-
-  int pawnTries = 0;
-  Board().GenerateLegalMoves([this, &pawnTries](const chess::Move &move) {
-    if (move.piece.type == chess::PieceType::kPawn
-        && Board().at(move.to).type != chess::PieceType::kEmpty) {
-      pawnTries++;
-    }
-    return true;
-  });
-  msg.pawn_tries_ = pawnTries;
-  msg.to_move_ = Board().ToPlay();
-
   move_msg_history_.emplace_back(move, msg);
   before_last_public_msg = last_public_msg;
   last_public_msg = msg;
 
+  Player current_player = CurrentPlayer();
+  for (Player player = 0; player < NumPlayers(); ++player) {
+    std::optional<Action> a = std::nullopt;
+    if (current_player == player) a = action;
+    aohs_[player].Extend(a, ObservationString(player));
+  }
 }
 
 void KriegspielState::MaybeGenerateLegalActions() const {

@@ -160,6 +160,21 @@ absl::optional<Square> SquareFromString(const std::string &s) {
   return std::nullopt;
 }
 
+bool IsLongDiagonal(const chess::Square &from_sq,
+                    const chess::Square &to_sq,
+                    int board_size) {
+  if (from_sq == to_sq) {
+    return false;
+  }
+  int half_board_size = board_size / 2;
+  if ((to_sq.y < half_board_size && to_sq.x < half_board_size) ||
+      (to_sq.y >= half_board_size && to_sq.x >= half_board_size)) {
+    return from_sq.y - to_sq.y == from_sq.x - to_sq.x;
+  } else {
+    return from_sq.y - to_sq.y == to_sq.x - from_sq.x;
+  }
+}
+
 std::string Move::ToString() const {
   std::string extra;
   if (promotion_type != PieceType::kEmpty) {
@@ -465,7 +480,7 @@ void ChessBoard::GenerateLegalMoves(
     auto king_square = find(Piece{color, PieceType::kKing});
 
     GeneratePseudoLegalMoves([this, &king_square, &yield, color]
-                             (const Move &move) {
+                                 (const Move &move) {
       // See if the move is legal by applying, checking whether the king is
       // under attack, and undoing the move.
       // TODO: Optimize this.
@@ -1185,9 +1200,9 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
   // Whether all squares between sq1 and sq2 exclusive are empty, and
   // optionally safe (not under attack).
   const auto check_squares_between = [this, &color, &ignore_enemy_pieces]
-                                     (const Square &sq1,
-                                      const Square &sq2,
-                                      bool check_safe) -> bool {
+      (const Square &sq1,
+       const Square &sq2,
+       bool check_safe) -> bool {
     SPIEL_CHECK_EQ(sq1.y, sq2.y);
 
     if (sq1.x <= sq2.x) {
@@ -1215,46 +1230,48 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
 
   const auto check_castling_conditions =
       [this, &sq, &color, &ignore_enemy_pieces, &check_squares_between]
-      (int8_t direction) -> bool {
-    // First we need to find the rook.
-    Square rook_sq = sq + Offset{direction, 0};
-    bool rook_found = false;
+          (int8_t direction) -> bool {
+        // First we need to find the rook.
+        Square rook_sq = sq + Offset{direction, 0};
+        bool rook_found = false;
 
-    // Yes, we do actually have to check colour -
-    // https://github.com/official-stockfish/Stockfish/issues/356
-    for (; InBoardArea(rook_sq); rook_sq.x += direction) {
-      if (at(rook_sq) == Piece{color, PieceType::kRook}) {
-        rook_found = true;
-        break;
-      }
-    }
+        // Yes, we do actually have to check colour -
+        // https://github.com/official-stockfish/Stockfish/issues/356
+        for (; InBoardArea(rook_sq); rook_sq.x += direction) {
+          if (at(rook_sq) == Piece{color, PieceType::kRook}) {
+            rook_found = true;
+            break;
+          }
+        }
 
-    if (!rook_found) {
-      std::cerr << "Where did our rook go?" << *this << "\n"
-                << "Square: " << SquareToString(sq) << std::endl;
-      SpielFatalError("Rook not found");
-    }
+        if (!rook_found) {
+          std::cerr << "Where did our rook go?" << *this << "\n"
+                    << "Square: " << SquareToString(sq) << std::endl;
+          SpielFatalError("Rook not found");
+        }
 
-    int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
-    Square rook_final_sq = Square{rook_final_x, sq.y};
-    int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
-    Square king_final_sq = Square{king_final_x, sq.y};
+        int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
+        Square rook_final_sq = Square{rook_final_x, sq.y};
+        int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
+        Square king_final_sq = Square{king_final_x, sq.y};
 
-    // 4. 5. 6. All squares the king and rook jump over, including the final
-    // squares, must be empty. Squares king jumps over must additionally be
-    // safe.
-    if (IsFriendly(rook_final_sq, color) ||
-        (IsEnemy(rook_final_sq, color) && !ignore_enemy_pieces) ||
-        IsFriendly(king_final_sq, color) ||
-        (IsEnemy(king_final_sq, color) && !ignore_enemy_pieces) ||
-        !check_squares_between(rook_sq, rook_final_sq, false) ||
-        !check_squares_between(sq, king_final_sq, !(king_in_check_allowed_ ||
-                                                    ignore_enemy_pieces))) {
-      return false;
-    }
+        // 4. 5. 6. All squares the king and rook jump over, including the final
+        // squares, must be empty. Squares king jumps over must additionally be
+        // safe.
+        if (IsFriendly(rook_final_sq, color) ||
+            (IsEnemy(rook_final_sq, color) && !ignore_enemy_pieces) ||
+            IsFriendly(king_final_sq, color) ||
+            (IsEnemy(king_final_sq, color) && !ignore_enemy_pieces) ||
+            !check_squares_between(rook_sq, rook_final_sq, false) ||
+            !check_squares_between(sq,
+                                   king_final_sq,
+                                   !(king_in_check_allowed_ ||
+                                     ignore_enemy_pieces))) {
+          return false;
+        }
 
-    return true;
-  };
+        return true;
+      };
 
   // 1. 2. 3. Moving the king, moving the rook, or the rook getting captured
   // will reset the flag.
@@ -1266,7 +1283,7 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
   if (can_left_castle || can_right_castle) {
     // 7. No castling to escape from check.
     if (UnderAttack(sq, color) &&
-       !(king_in_check_allowed_ || ignore_enemy_pieces)) {
+        !(king_in_check_allowed_ || ignore_enemy_pieces)) {
       return;
     }
     if (can_left_castle) {
@@ -1349,7 +1366,7 @@ void ChessBoard::GeneratePawnCaptureDestinations_(Square sq, Color color,
   Square dest = sq + Offset{1, y_direction};
   if (InBoardArea(dest) &&
       (IsEnemy(dest, color) || (include_ep && dest == EpSquare()) ||
-      (IsEmpty(dest) && ignore_enemy_pieces))) {
+       (IsEmpty(dest) && ignore_enemy_pieces))) {
     yield(dest);
   }
 
@@ -1459,7 +1476,7 @@ std::string ChessBoard::ToFEN() const {
   return fen;
 }
 
-std::string ChessBoard::ToDarkFEN(const ObservationTable& observability_table,
+std::string ChessBoard::ToDarkFEN(const ObservationTable &observability_table,
                                   Color color) const {
   std::string fen;
 
@@ -1498,7 +1515,7 @@ std::string ChessBoard::ToDarkFEN(const ObservationTable& observability_table,
 
   // 2. color to play.
   fen += " " + (ToPlay() == chess::Color::kWhite
-      ? std::string("w") : std::string("b"));
+                ? std::string("w") : std::string("b"));
 
   // 3. by castling rights.
   fen += " ";
@@ -1554,11 +1571,11 @@ void ChessBoard::set_square(Square sq, Piece piece) {
   auto current_piece = at(sq);
   zobrist_hash_ ^=
       kZobristValues[position][static_cast<int>(current_piece.color)]
-                    [static_cast<int>(current_piece.type)];
+      [static_cast<int>(current_piece.type)];
 
   // Then add the new piece
   zobrist_hash_ ^= kZobristValues[position][static_cast<int>(piece.color)]
-                                 [static_cast<int>(piece.type)];
+  [static_cast<int>(piece.type)];
 
   board_[position] = piece;
 }
@@ -1595,7 +1612,7 @@ void ChessBoard::SetCastlingRight(Color side,
 
   // Remove old value from hash.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)]
-                                 [CastlingRight(side, direction)];
+  [CastlingRight(side, direction)];
 
   // Then add the new value.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)][can_castle];
