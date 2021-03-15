@@ -44,6 +44,7 @@ EXPECTED_GAMES = set([
     "coop_to_1p",
     "coordinated_mp",
     "cursor_go",
+    "dark_chess",
     "dark_hex",
     "deep_sea",
     "efg_game",

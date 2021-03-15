@@ -147,7 +147,7 @@ void GinRummyState::ApplyFirstUpcardAction(Action action) {
     SPIEL_CHECK_TRUE(pass_on_first_upcard_[0] && pass_on_first_upcard_[1]);
     prev_upcard_ = upcard_;
     discard_pile_.push_back(upcard_.value());
-    upcard_ = std::nullopt;
+    upcard_ = absl::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -179,7 +179,7 @@ void GinRummyState::ApplyDrawAction(Action action) {
     // longer in play and goes to the top of the discard pile.
     prev_upcard_ = upcard_;
     if (upcard_.has_value()) discard_pile_.push_back(upcard_.value());
-    upcard_ = std::nullopt;
+    upcard_ = absl::nullopt;
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     phase_ = Phase::kDeal;
@@ -552,7 +552,7 @@ void GinRummyState::StockToUpcard(Action card) {
 void GinRummyState::UpcardToHand(Player player) {
   SPIEL_CHECK_TRUE(upcard_.has_value());
   hands_[player].push_back(upcard_.value());
-  upcard_ = std::nullopt;
+  upcard_ = absl::nullopt;
 }
 
 void GinRummyState::RemoveFromHand(Player player, Action card) {
