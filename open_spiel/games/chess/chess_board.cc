@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -1384,55 +1385,55 @@ std::string ChessBoard::ToFEN() const {
         ++num_empty;
       } else {
         if (num_empty > 0) {
-          fen += std::to_string(num_empty);
+          absl::StrAppend(&fen, num_empty);
           num_empty = 0;
         }
-        fen += piece.ToString();
+        absl::StrAppend(&fen, piece.ToString());
       }
     }
     if (num_empty > 0) {
-      fen += std::to_string(num_empty);
+      absl::StrAppend(&fen, num_empty);
     }
     if (rank > 0) {
-      fen += "/";
+      fen.push_back('/');
     }
   }
 
   // 2. color to play.
-  fen +=
-      " " + (to_play_ == Color::kWhite ? std::string("w") : std::string("b"));
+  absl::StrAppend(&fen, " ", to_play_ == Color::kWhite ? "w" : "b");
 
   // 3. by castling rights.
-  fen += " ";
+  absl::StrAppend(&fen, " ");
   std::string castling_rights;
   if (CastlingRight(Color::kWhite, CastlingDirection::kRight)) {
-    castling_rights += "K";
+    castling_rights.push_back('K');
   }
   if (CastlingRight(Color::kWhite, CastlingDirection::kLeft)) {
-    castling_rights += "Q";
+    castling_rights.push_back('Q');
   }
   if (CastlingRight(Color::kBlack, CastlingDirection::kRight)) {
-    castling_rights += "k";
+    castling_rights.push_back('k');
   }
   if (CastlingRight(Color::kBlack, CastlingDirection::kLeft)) {
-    castling_rights += "q";
+    castling_rights.push_back('q');
   }
-  fen += castling_rights.empty() ? std::string("-") : castling_rights;
+  absl::StrAppend(&fen, castling_rights.empty() ? "-" : castling_rights);
 
   // 4. en passant square
-  fen += " ";
-  fen += (EpSquare() == kInvalidSquare) ? std::string("-")
-                                        : SquareToString(EpSquare());
+  absl::StrAppend(&fen, " ");
+  absl::StrAppend(
+      &fen, EpSquare() == kInvalidSquare ? "-" : SquareToString(EpSquare()));
 
   // 5. half-move clock for 50-move rule
-  fen += " " + std::to_string(irreversible_move_counter_);
+  absl::StrAppend(&fen, " ", irreversible_move_counter_);
 
   // 6. full-move clock
-  fen += " " + std::to_string(move_number_);
+  absl::StrAppend(&fen, " ", move_number_);
 
   return fen;
 }
 
+// Used in Dark Chess (see games/dark_chess.{h,cc})
 std::string ChessBoard::ToDarkFEN(const ObservationTable &observability_table,
                                   Color color) const {
   std::string fen;
@@ -1447,9 +1448,9 @@ std::string ChessBoard::ToDarkFEN(const ObservationTable &observability_table,
           fen += std::to_string(num_empty);
           num_empty = 0;
         }
-        fen += '?';
+        fen.push_back('?');
       } else {
-        auto piece = at(chess::Square{file, rank});
+        const Piece &piece = at(chess::Square{file, rank});
         if (piece == chess::kEmptyPiece) {
           ++num_empty;
         } else {
@@ -1457,63 +1458,64 @@ std::string ChessBoard::ToDarkFEN(const ObservationTable &observability_table,
             fen += std::to_string(num_empty);
             num_empty = 0;
           }
-          fen += piece.ToString();
+          absl::StrAppend(&fen, piece.ToString());
         }
       }
     }
     if (num_empty > 0) {
-      fen += std::to_string(num_empty);
+      absl::StrAppend(&fen, num_empty);
     }
     if (rank > 0) {
-      fen += "/";
+      fen.push_back('/');
     }
   }
 
   // 2. color to play.
-  fen += " " + (ToPlay() == chess::Color::kWhite ? std::string("w")
-                                                 : std::string("b"));
+  absl::StrAppend(&fen, " ", ToPlay() == chess::Color::kWhite ? "w" : "b");
 
   // 3. by castling rights.
-  fen += " ";
+  absl::StrAppend(&fen, " ");
   std::string castling_rights;
   if (color == chess::Color::kWhite) {
     if (CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kRight)) {
-      castling_rights += "K";
+      castling_rights.push_back('K');
     }
     if (CastlingRight(chess::Color::kWhite, chess::CastlingDirection::kLeft)) {
-      castling_rights += "Q";
+      castling_rights.push_back('Q');
     }
   } else {
     if (CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kRight)) {
-      castling_rights += "k";
+      castling_rights.push_back('k');
     }
     if (CastlingRight(chess::Color::kBlack, chess::CastlingDirection::kLeft)) {
-      castling_rights += "q";
+      castling_rights.push_back('q');
     }
   }
-  fen += castling_rights.empty() ? std::string("-") : castling_rights;
+  absl::StrAppend(&fen, castling_rights.empty() ? "-" : castling_rights);
 
   // 4. en passant square
   std::string ep_square = "-";
-  int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
-  Square from = EpSquare() + Offset{1, reversed_y_direction};
-  Piece piece = at(from);
-  if (piece.color == color && piece.type == PieceType::kPawn) {
-    ep_square = SquareToString(EpSquare());
-  } else {
-    from = EpSquare() + Offset{-1, reversed_y_direction};
-    piece = at(from);
+  if (EpSquare() != kInvalidSquare) {
+    int8_t reversed_y_direction = color == Color::kWhite ? -1 : 1;
+    Square from = EpSquare() + Offset{1, reversed_y_direction};
+    Piece piece = at(from);
     if (piece.color == color && piece.type == PieceType::kPawn) {
       ep_square = SquareToString(EpSquare());
+    } else {
+      from = EpSquare() + Offset{-1, reversed_y_direction};
+      piece = at(from);
+      if (piece.color == color && piece.type == PieceType::kPawn) {
+        ep_square = SquareToString(EpSquare());
+      }
     }
   }
-  fen += " " + ep_square;
+  absl::StrAppend(&fen, " ", ep_square);
 
   // 5. half-move clock for 50-move rule
-  fen += " " + std::to_string(IrreversibleMoveCounter());
+  absl::StrAppend(&fen, " ", IrreversibleMoveCounter());
 
   // 6. full-move clock
-  fen += " " + std::to_string(move_number_);
+  absl::StrAppend(&fen, " ", move_number_);
 
   return fen;
 }
