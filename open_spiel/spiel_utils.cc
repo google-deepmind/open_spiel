@@ -104,7 +104,8 @@ std::string FormatDouble(double value) {
   // the .0 if necessary (to clarify that it's a double value).
   std::string double_str = absl::StrFormat("%.15f", value);
   size_t idx = double_str.find('.');
-  if (!absl::StrContains(double_str, '.')) {
+
+  if (double_str.find('.') == std::string::npos) {  // NOLINT
     absl::StrAppend(&double_str, ".0");
   } else {
     // Remove the extra trailing zeros, if there are any.
