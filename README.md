@@ -38,9 +38,10 @@ For a longer introduction to the core concepts, formalisms, and terminology,
 including an overview of the algorithms and some results, please see
 [OpenSpiel: A Framework for Reinforcement Learning in Games](https://arxiv.org/abs/1908.09453).
 
-For an overview of OpenSpiel and example uses of the core API, see the tutorial
-presentation slides:
-[Introduction to OpenSpiel](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
+For an overview of OpenSpiel and example uses of the core API, please see the
+[Introduction to OpenSpiel tutorial](https://www.youtube.com/watch?v=YE0E0F39lac),
+and the
+[corresponding slides](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
 
 If you use OpenSpiel in your research, please cite the paper using the following
 BibTeX:
