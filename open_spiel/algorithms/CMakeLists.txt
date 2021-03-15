@@ -167,3 +167,4 @@ add_executable(trajectories_test trajectories_test.cc
 add_test(trajectories_test trajectories_test)
 
 add_subdirectory (alpha_zero)
+add_subdirectory (alpha_zero_torch)

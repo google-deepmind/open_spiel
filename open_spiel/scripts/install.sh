@@ -142,6 +142,9 @@ if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   # # CUDA 10.2
   # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.1.zip"
 
+  # For C++ Libtorch AlphaZero on macOS we recommend this URL:
+  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.8.0.zip"
+
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/libtorch.zip"
   [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
