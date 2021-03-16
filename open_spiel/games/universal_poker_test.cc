@@ -19,6 +19,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
@@ -497,6 +498,58 @@ void CanConvertActionsCorrectly() {
   }
 }
 
+void TestFCHPA() {
+  std::shared_ptr<const Game> game = LoadGame(HunlGameString("fchpa"));
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (Action action : {30, 37, 32, 28}) state->ApplyAction(action);
+  Action converted_action = ACPCActionToOpenSpielAction(
+      {project_acpc_server::ActionType::a_raise, 200},
+      static_cast<const UniversalPokerState&>(*state));
+  SPIEL_CHECK_EQ(converted_action, kHalfPot);
+  state->ApplyAction(converted_action);
+  converted_action = ACPCActionToOpenSpielAction(
+      {project_acpc_server::ActionType::a_raise, 400},
+      static_cast<const UniversalPokerState&>(*state));
+  SPIEL_CHECK_EQ(converted_action, kHalfPot);
+  state->ApplyAction(converted_action);
+  converted_action = ACPCActionToOpenSpielAction(
+      {project_acpc_server::ActionType::a_raise, 1800},
+      static_cast<const UniversalPokerState&>(*state));
+  std::cout << "converted action: " << converted_action;
+
+  // Test that r300 is a half-pot bet.
+  state = game->NewInitialState();
+  for (Action action : {43, 41, 8, 25, 1, 2, 4, 2, 4, 3})
+    state->ApplyAction(action);
+  auto* up_state = static_cast<UniversalPokerState*>(state.get());
+  SPIEL_CHECK_EQ(
+      ACPCActionToOpenSpielAction(
+          {project_acpc_server::ActionType::a_raise, 40000}, *up_state),
+      ActionType::kCall);
+
+  state = game->NewInitialState();
+  for (Action action : {14, 36, 49, 45, 4, 2, 2, 4, 3})
+    state->ApplyAction(action);
+  up_state = static_cast<UniversalPokerState*>(state.get());
+  SPIEL_CHECK_EQ(
+      ACPCActionToOpenSpielAction(
+          {project_acpc_server::ActionType::a_raise, 40000}, *up_state),
+      ActionType::kCall);
+  state = game->NewInitialState();
+  for (Action action : {48, 47, 0, 32, 1, 2, 2, 2, 4, 3})
+    state->ApplyAction(action);
+  up_state = static_cast<UniversalPokerState*>(state.get());
+  SPIEL_CHECK_EQ(
+      ACPCActionToOpenSpielAction(
+          {project_acpc_server::ActionType::a_raise, 40000}, *up_state),
+      ActionType::kCall);
+
+  state = game->NewInitialState();
+  for (Action action : {42, 27, 22, 41, 0}) {
+    state->ApplyAction(action);
+  }
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -517,4 +570,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::FullNLBettingTest3();
   open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
   open_spiel::universal_poker::CanConvertActionsCorrectly();
+  open_spiel::universal_poker::TestFCHPA();
 }

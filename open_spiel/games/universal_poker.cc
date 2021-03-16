@@ -247,8 +247,10 @@ std::string UniversalPokerState::ActionToString(Player player,
   } else if (static_cast<ActionType>(move) == ActionType::kBet) {
     move_str = "Bet";
   } else if (static_cast<ActionType>(move) == ActionType::kAllIn) {
-    SPIEL_CHECK_EQ(betting_abstraction_, BettingAbstraction::kFCPA);
     move_str = "AllIn";
+  } else if (move > kBet) {
+    SPIEL_CHECK_EQ(betting_abstraction_, BettingAbstraction::kFCHPA);
+    move_str = absl::StrCat("r", move);
   } else {
     SpielFatalError(absl::StrCat("Unknown action: ", move));
   }
@@ -503,6 +505,8 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
 
     // For legacy reasons, kHalfPot is the biggest action (in terms of the
     // action representation).
+    // Note that FCHPA only tells the players about HalfPot + FCPA, but it will
+    // accept most of the other ones.
     if (betting_abstraction_ == kFCHPA) {
       legal_actions.push_back(kHalfPot);
     }
@@ -607,12 +611,19 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
         ApplyChoiceAction(ACTION_ALL_IN, AllInSize());
         return;
       }
+      // FCHPA allows for arbitrary bets.
+      if (betting_abstraction_ == BettingAbstraction::kFCHPA) {
+        SPIEL_CHECK_LE(action_int, acpc_game_->Game().stack[0]);
+        ApplyChoiceAction(ACTION_BET, action_int);
+        return;
+      }
     }
     if (betting_abstraction_ != BettingAbstraction::kFULLGAME) {
       SpielFatalError(absl::StrCat(
           "Tried to apply action that was not allowed by the betting "
           "abstraction. Action: ",
-          State::ActionToString(action_id)));
+          State::ActionToString(action_id),
+          ", abstraction: ", betting_abstraction_));
     }
     if (action_int >= static_cast<int>(kBet) &&
         action_int <= NumDistinctActions()) {
@@ -769,6 +780,9 @@ int UniversalPokerGame::NumDistinctActions() const {
   if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
     // 0 -> fold, 1 -> check/call, N -> bet size
     return max_stack_size_ + 1;
+  } else if (betting_abstraction_ == BettingAbstraction::kFCHPA) {
+    // Deal is always the biggest action in the enum.
+    return static_cast<int>(kDeal);
   } else {
     return GetMaxBettingActions(acpc_game_);
   }
@@ -893,6 +907,14 @@ const char *actions = "0df0c000p0000000a";
 void UniversalPokerState::ApplyChoiceAction(StateActionType action_type,
                                             int size) {
   SPIEL_CHECK_GE(cur_player_, 0);  // No chance not terminal.
+  const auto &up_game = static_cast<const UniversalPokerGame &>(*game_);
+
+  // We redirect these actions to check/call, as they are semantically a
+  // check/call action. For some reason, ACPC prefers it this way.
+  if (size == up_game.MaxCommitment() * up_game.NumPlayers()) {
+    action_type = StateActionType::ACTION_CHECK_CALL;
+    size = 0;
+  }
 
   actionSequence_ += (char)actions[action_type];
   if (action_type == ACTION_DEAL) SpielFatalError("Cannot apply deal action.");
@@ -986,6 +1008,10 @@ const int UniversalPokerState::GetPossibleActionCount() const {
 open_spiel::Action ACPCActionToOpenSpielAction(
     const project_acpc_server::Action &action,
     const UniversalPokerState &state) {
+  // We assign this here as we cannot initialize a variable within a switch
+  // statement.
+  const auto &up_game =
+      static_cast<const UniversalPokerGame &>(*state.GetGame());
   switch (action.type) {
     case project_acpc_server::ActionType::a_fold:
       return ActionType::kFold;
@@ -993,16 +1019,26 @@ open_spiel::Action ACPCActionToOpenSpielAction(
       return ActionType::kCall;
     case project_acpc_server::ActionType::a_raise:
       SPIEL_CHECK_NE(state.betting(), BettingAbstraction::kFC);
+      // The maximum utility is exactly equal to the all-in amount for both
+      // players.
+      if (action.size == up_game.MaxCommitment() * up_game.NumPlayers()) {
+        return ActionType::kCall;
+      }
       if (action.size == state.PotSize(0.5)) {
         return ActionType::kHalfPot;
       }
       if (action.size == state.PotSize()) return ActionType::kBet;
       if (action.size == state.AllInSize()) return ActionType::kAllIn;
+      if (state.betting() == BettingAbstraction::kFCHPA) {
+        return action.size;
+      }
       if (state.betting() != BettingAbstraction::kFULLGAME) {
         SpielFatalError(absl::StrCat(
             "Unsupported bet size: ", action.size, ", pot: ", state.PotSize(),
             ", all_in: ", state.AllInSize(),
-            ", max_commitment: ", state.acpc_state().raw_state().maxSpent));
+            ", max_commitment: ", state.acpc_state().raw_state().maxSpent,
+            ", state: ", state.ToString(),
+            ", history: ", state.HistoryString()));
       }
       SPIEL_CHECK_EQ(state.betting(), BettingAbstraction::kFULLGAME);
       return ActionType::kBet + action.size;

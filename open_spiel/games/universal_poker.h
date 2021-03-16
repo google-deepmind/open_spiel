@@ -50,8 +50,10 @@ enum ActionType {
   kCall = 1,
   kBet = 2,
   kAllIn = 3,
-  kDeal = 4,
-  kHalfPot = 5
+  kHalfPot = 4,
+  // When modifying ActionType, keep kDeal as the biggest action, and ensure
+  // that it is equal to the number of other bets.
+  kDeal = 5,
 };
 
 enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2, kFCHPA = 3 };
@@ -107,6 +109,7 @@ class UniversalPokerState : public State {
 
   // Returns the raise-to size of the current player going all-in.
   int AllInSize() const;
+  void ApplyChoiceAction(StateActionType action_type, int size);
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -119,7 +122,6 @@ class UniversalPokerState : public State {
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
   const int GetPossibleActionCount() const;
 
-  void ApplyChoiceAction(StateActionType action_type, int size);
   const std::string &GetActionSequence() const { return actionSequence_; }
 
   void AddHoleCard(uint8_t card) {
@@ -206,9 +208,9 @@ class UniversalPokerGame : public Game {
   }
 
   int big_blind() const { return big_blind_; }
+  double MaxCommitment() const;
 
  private:
-  double MaxCommitment() const;
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
   absl::optional<int> max_game_length_;
