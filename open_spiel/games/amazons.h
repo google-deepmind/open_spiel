@@ -115,8 +115,8 @@ class AmazonsGame : public Game {
  public:
   explicit AmazonsGame(const GameParameters& params);
 
-  // ??
-  int NumDistinctActions() const override { return 2048; }
+  // 4 8 9 8 9
+  int NumDistinctActions() const override { return 20736; }
   
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new AmazonsState(shared_from_this()));
