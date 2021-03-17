@@ -781,8 +781,7 @@ int UniversalPokerGame::NumDistinctActions() const {
     // 0 -> fold, 1 -> check/call, N -> bet size
     return max_stack_size_ + 1;
   } else if (betting_abstraction_ == BettingAbstraction::kFCHPA) {
-    // Deal is always the biggest action in the enum.
-    return static_cast<int>(kDeal);
+    return kNumActionsFCHPA;
   } else {
     return GetMaxBettingActions(acpc_game_);
   }

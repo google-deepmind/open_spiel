@@ -45,19 +45,15 @@ constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 // This is the mapping from int to action. E.g. the legal action "0" is fold,
 // the legal action "1" is check/call, etc.
-enum ActionType {
-  kFold = 0,
-  kCall = 1,
-  kBet = 2,
-  kAllIn = 3,
-  kHalfPot = 4,
-  // When modifying ActionType, keep kDeal as the biggest action, and ensure
-  // that it is equal to the number of other bets.
-  kDeal = 5,
-};
+enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3, kHalfPot = 4 };
+
+// There are 5 actions: Fold, Call, Half-Pot bet, Pot Bet, and all-in.
+inline constexpr int kNumActionsFCHPA =
+    static_cast<int>(ActionType::kHalfPot) + 1;
 
 enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2, kFCHPA = 3 };
 
+// TODO(author1): Remove StateActionType and use ActionType instead.
 enum StateActionType {
   ACTION_DEAL = 1,
   ACTION_FOLD = 2,
