@@ -23,7 +23,7 @@ namespace testing = open_spiel::testing;
 
 void BasicAmazonsTests() {
   testing::LoadGameTest("amazons");
-  testing::RandomSimTest(*LoadGame("amazons"), 5);
+  testing::RandomSimTestWithUndo(*LoadGame("amazons"), 5);
   // testing::Check
 }
 
