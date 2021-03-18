@@ -49,16 +49,15 @@ enum class CellState {
   kBlock
 };
 
+
 // State of an in-play game.
 class AmazonsState : public State {
  public:
   AmazonsState(std::shared_ptr<const Game> game);
   AmazonsState(const AmazonsState&) = default;
 
-  //??
   AmazonsState& operator=(const AmazonsState&) = default;
 
-  // Is this okay?
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
@@ -70,13 +69,10 @@ class AmazonsState : public State {
 
   std::vector<double> Returns() const override;
   
-  //?
   std::string InformationStateString(Player player) const override;
 
-  //?
   std::string ObservationString(Player player) const override;
 
-  //?
   void ObservationTensor(Player player, absl::Span<float> values) const override;
 
   std::unique_ptr<State> Clone() const override;
@@ -97,13 +93,24 @@ class AmazonsState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-  std::vector<unsigned char> GetAllMoves(unsigned char, std::array<CellState, kNumCells>) const;
-  std::vector<unsigned char> GetDiagonalMoves(unsigned char, std::array<CellState, kNumCells>) const;
-  std::vector<unsigned char> GetVerticalMoves(unsigned char, std::array<CellState, kNumCells>) const;
-  std::vector<unsigned char> GetHorizontalMoves(unsigned char, std::array<CellState, kNumCells>) const;
 
-  Action EncodeAction(std::vector<unsigned char>) const;
-  std::vector<unsigned char> DecodeAction(Action) const;
+  enum MoveState {
+    amazon_select,
+    destination_select,
+    shot_select
+  };
+
+  MoveState state_ = amazon_select;
+  int from_ = 0;
+  int to_ = 0;
+  int shoot_ = 0;
+
+  std::vector<Action> GetAllMoves(Action) const;
+  std::vector<Action> GetDiagonalMoves(Action) const;
+  std::vector<Action> GetVerticalMoves(Action) const;
+  std::vector<Action> GetHorizontalMoves(Action) const;
+
+  bool IsGameOver() const;
 
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;   // Outcome unclear at init
@@ -115,8 +122,7 @@ class AmazonsGame : public Game {
  public:
   explicit AmazonsGame(const GameParameters& params);
 
-  // 4 8 9 8 9
-  int NumDistinctActions() const override { return 20736; }
+  int NumDistinctActions() const override { return kNumCells; }
   
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new AmazonsState(shared_from_this()));
@@ -128,13 +134,11 @@ class AmazonsGame : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
 
-  // ??
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kNumRows, kNumCols};
   }
 
-  // ???
-  int MaxGameLength() const override { return kNumCells * 2; }
+  int MaxGameLength() const override { return 3 * kNumCells; }
 };
 
 CellState PlayerToState(Player player);
