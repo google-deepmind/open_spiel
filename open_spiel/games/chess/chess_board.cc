@@ -480,7 +480,7 @@ void ChessBoard::GenerateLegalMoves(
     auto king_square = find(Piece{color, PieceType::kKing});
 
     GeneratePseudoLegalMoves([this, &king_square, &yield, color]
-                                 (const Move &move) {
+                             (const Move &move) {
       // See if the move is legal by applying, checking whether the king is
       // under attack, and undoing the move.
       // TODO: Optimize this.
@@ -1541,7 +1541,7 @@ std::string ChessBoard::ToFEN() const {
   return fen;
 }
 
-std::string ChessBoard::ToDarkFEN(const ObservationTable &observability_table,
+std::string ChessBoard::ToDarkFEN(const ObservationTable& observability_table,
                                   Color color) const {
   std::string fen;
 
@@ -1580,7 +1580,7 @@ std::string ChessBoard::ToDarkFEN(const ObservationTable &observability_table,
 
   // 2. color to play.
   fen += " " + (ToPlay() == chess::Color::kWhite
-                ? std::string("w") : std::string("b"));
+      ? std::string("w") : std::string("b"));
 
   // 3. by castling rights.
   fen += " ";
@@ -1636,11 +1636,11 @@ void ChessBoard::set_square(Square sq, Piece piece) {
   auto current_piece = at(sq);
   zobrist_hash_ ^=
       kZobristValues[position][static_cast<int>(current_piece.color)]
-      [static_cast<int>(current_piece.type)];
+                    [static_cast<int>(current_piece.type)];
 
   // Then add the new piece
   zobrist_hash_ ^= kZobristValues[position][static_cast<int>(piece.color)]
-  [static_cast<int>(piece.type)];
+                                 [static_cast<int>(piece.type)];
 
   board_[position] = piece;
 }
@@ -1677,7 +1677,7 @@ void ChessBoard::SetCastlingRight(Color side,
 
   // Remove old value from hash.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)]
-  [CastlingRight(side, direction)];
+                                 [CastlingRight(side, direction)];
 
   // Then add the new value.
   zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)][can_castle];
