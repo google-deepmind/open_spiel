@@ -12,22 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import XCTest
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_
 
-#if !os(macOS)
-  public func allTests() -> [XCTestCaseEntry] {
-    return [
-      testCase(BreakthroughTests.allTests),
-      testCase(FastBreakthroughTests.allTests),
-      testCase(KuhnPokerTests.allTests),
-      testCase(LeducPokerTests.allTests),
-      testCase(PokerDeckTests.allTests),
-      testCase(TexasHoldemTests.allTests),
-      testCase(ExploitabilityTests.allTests),
-      testCase(TicTacToeTests.allTests),
-      testCase(GoPointTests.allTests),
-      testCase(GoBoardTests.allTests),
-      testCase(ExploitabilityDescentTests.allTests)
-    ]
-  }
-#endif
+#include "pybind11/include/pybind11/pybind11.h"
+
+// Initialze the Python interface for games/negotiation.
+namespace open_spiel {
+void init_pyspiel_games_chess(::pybind11::module &m);
+}
+
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_CHESS_H_

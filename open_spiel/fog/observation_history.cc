@@ -142,7 +142,7 @@ bool ActionObservationHistory::IsExtensionOf(Player pl,
   return CheckStateCorrespondenceInSimulation(pl, state, state.MoveNumber());
 }
 
-void ActionObservationHistory::Extend(const std::optional<Action> action,
+void ActionObservationHistory::Extend(const absl::optional<Action> action,
                                       const std::string& observation_string) {
   history_.push_back({action, observation_string});
 }

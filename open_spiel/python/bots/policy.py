@@ -22,7 +22,12 @@ import pyspiel
 
 
 class PolicyBot(pyspiel.Bot):
-  """Samples an action from action probabilities based on a policy."""
+  """Samples an action from action probabilities based on a policy.
+
+  This bot plays actions as specified by the underlying Policy. Problems may
+  occur if the policy assigns non-zero probability to invalid actions, or if the
+  policy is not complete, or if probabilities don't sum to 1.
+  """
 
   def __init__(self, player_id, rng, policy):
     """Initializes a policy bot.
@@ -56,13 +61,14 @@ class PolicyBot(pyspiel.Bot):
       `(action, probability)` pairs for each legal action, with
       `probability` defined by the policy action probabilities.
       The `action` is sampled from the distribution,
-      or `pyspiel.INVALID_ACTION` if there are no legal actions available.
+      or `pyspiel.INVALID_ACTION` if there are no actions available.
     """
-    legal_actions = state.legal_actions(self._player_id)
-    if not legal_actions:
-      return [], pyspiel.INVALID_ACTION
     policy = self._policy.action_probabilities(state, self._player_id)
-    action = self._rng.choice(legal_actions, p=list(policy.values()))
+    action_list = list(policy.keys())
+    if not any(action_list):
+      return [], pyspiel.INVALID_ACTION
+
+    action = self._rng.choice(action_list, p=list(policy.values()))
     return list(policy.items()), action
 
   def step(self, state):

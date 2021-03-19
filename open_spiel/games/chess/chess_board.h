@@ -30,10 +30,10 @@
 namespace open_spiel {
 namespace chess {
 
-using chess_common::InvalidSquare;
+using chess_common::kInvalidSquare;  // NOLINT
 using chess_common::Offset;
 using chess_common::Square;
-using chess_common::SquareToString;
+using chess_common::SquareToString;  // NOLINT
 
 template <std::size_t... Dims>
 using ZobristTableU64 = chess_common::ZobristTable<uint64_t, Dims...>;
@@ -110,12 +110,12 @@ inline std::ostream& operator<<(std::ostream& stream, const Piece& p) {
 
 inline absl::optional<int8_t> ParseRank(char c) {
   if (c >= '1' && c <= '8') return c - '1';
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 inline absl::optional<int8_t> ParseFile(char c) {
   if (c >= 'a' && c <= 'h') return c - 'a';
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 // Maps y = [0, 7] to rank ["1", "8"].
@@ -236,6 +236,7 @@ bool IsMoveCharacter(char c);
 std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
 
 inline constexpr int kMaxBoardSize = 8;
+inline constexpr int kDefaultBoardSize = 8;
 inline constexpr int k2dMaxBoardSize = kMaxBoardSize * kMaxBoardSize;
 inline const std::string kDefaultStandardFEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -245,21 +246,20 @@ using ObservationTable = std::array<bool, k2dMaxBoardSize>;
 
 class ChessBoard {
  public:
-  ChessBoard(int board_size = 8, bool king_in_check_allowed = false);
+  ChessBoard(int board_size = kDefaultBoardSize,
+             bool king_in_check_allowed = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  static absl::optional<ChessBoard> BoardFromFEN(const std::string& fen,
-                                                 int board_size = 8,
-                                                 bool king_in_check_allowed = false);
+  static absl::optional<ChessBoard> BoardFromFEN(
+      const std::string& fen, int board_size = 8,
+      bool king_in_check_allowed = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
   void set_square(Square sq, Piece p);
 
-  const std::array<Piece, k2dMaxBoardSize>& pieces() const {
-    return board_;
-  }
+  const std::array<Piece, k2dMaxBoardSize>& pieces() const { return board_; }
 
   Color ToPlay() const { return to_play_; }
   void SetToPlay(Color c);
@@ -274,7 +274,7 @@ class ChessBoard {
   void SetCastlingRight(Color side, CastlingDirection direction,
                         bool can_castle);
 
-  // Find the location of any one piece of the given type, or InvalidSquare().
+  // Find the location of any one piece of the given type, or kInvalidSquare.
   Square find(const Piece& piece) const;
 
   // Pseudo-legal moves are moves that may leave the king in check, but are
@@ -286,7 +286,7 @@ class ChessBoard {
   using MoveYieldFn = std::function<bool(const Move&)>;
   void GenerateLegalMoves(const MoveYieldFn& yield) const {
     GenerateLegalMoves(yield, to_play_);
-  };
+  }
   void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
   void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color,
                                 bool ignore_enemy_pieces = false) const;
@@ -332,17 +332,19 @@ class ChessBoard {
   bool HasSufficientMaterial() const;
 
   // Parses a move in standard algebraic notation or long algebraic notation (
-  // see below).
+  // see below). Returns absl::nullopt on failure.
   absl::optional<Move> ParseMove(const std::string& move) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.
-  // https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
+  // https://en.wikipedia.org/wiki/Algebraic_notation_(chess).
+  // Returns absl::nullopt on failure.
   absl::optional<Move> ParseSANMove(const std::string& move) const;
 
   // Parses a move in long algebraic notation.
   // Long algebraic notation is not standardized and there are many variants,
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
+  // Returns absl::nullopt on failure.
   absl::optional<Move> ParseLANMove(const std::string& move) const;
 
   void ApplyMove(const Move& move);
@@ -520,8 +522,7 @@ class ChessBoard {
   uint64_t zobrist_hash_;
 };
 
-inline std::ostream& operator<<(std::ostream& stream,
-                                const ChessBoard& board) {
+inline std::ostream& operator<<(std::ostream& stream, const ChessBoard& board) {
   return stream << board.DebugString();
 }
 

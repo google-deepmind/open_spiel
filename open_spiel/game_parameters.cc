@@ -221,6 +221,7 @@ GameParameters GameParametersFromString(const std::string& game_string) {
       equals = -1;
     }
   }
+  if (parens > 0) SpielFatalError("Missing closing bracket ')'.");
   return params;
 }
 

@@ -18,6 +18,7 @@
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -72,8 +73,7 @@ template <typename T>
 void AddScalarPlane(T val, T min, T max,
                     absl::Span<float>::iterator& value_it) {
   double normalized_val = static_cast<double>(val - min) / (max - min);
-  for (int i = 0; i < k2dMaxBoardSize; ++i)
-    *value_it++ = normalized_val;
+  for (int i = 0; i < k2dMaxBoardSize; ++i) *value_it++ = normalized_val;
 }
 
 // Adds a binary scalar plane.
@@ -96,6 +96,14 @@ ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
   start_board_ = *maybe_board;
   current_board_ = start_board_;
   repetitions_[current_board_.HashValue()] = 1;
+}
+
+Action ChessState::ParseMoveToAction(const std::string& move_str) const {
+  absl::optional<Move> move = Board().ParseMove(move_str);
+  if (!move.has_value()) {
+    return kInvalidAction;
+  }
+  return MoveToAction(*move, BoardSize());
 }
 
 void ChessState::DoApplyAction(Action action) {
@@ -397,7 +405,7 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}

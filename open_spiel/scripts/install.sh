@@ -59,10 +59,8 @@ DOWNLOAD_CACHE_DIR=${DOWNLOAD_CACHE_DIR:-$DEFAULT_DOWNLOAD_CACHE_DIR}
 # metadata and we do not use Git within DeepMind, so it's hard to maintain.
 
 # Note that this needs Git intalled, so we check for that.
-
-git --version 2>&1 >/dev/null
-GIT_IS_AVAILABLE=$?
-if [ $GIT_IS_AVAILABLE -ne 0 ]; then #...
+if [[ ! -x `which git` ]]; then
+  echo "Did not find git, attempting to install it."
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get install git
   elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
@@ -143,6 +141,9 @@ if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip"
   # # CUDA 10.2
   # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.1.zip"
+
+  # For C++ Libtorch AlphaZero on macOS we recommend this URL:
+  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.8.0.zip"
 
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/libtorch.zip"
   [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"

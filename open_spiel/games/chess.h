@@ -129,7 +129,7 @@ int8_t ReflectRank(Color to_play, int board_size, int8_t rank);
 
 Color PlayerToColor(Player p);
 
-Action MoveToAction(const Move& move, int board_size);
+Action MoveToAction(const Move& move, int board_size = kDefaultBoardSize);
 
 std::pair<Square, int> ActionToDestination(int action, int board_size,
                                            int num_actions_destinations);
@@ -179,6 +179,14 @@ class ChessState : public State {
 
   std::vector<Move>& MovesHistory() { return moves_history_; }
   const std::vector<Move>& MovesHistory() const { return moves_history_; }
+
+  // A prettier board string.
+  std::string DebugString() { return current_board_.DebugString(); }
+
+  // Returns an action parsed from standard algebraic notation or long
+  // algebraic notation (using ChessBoard::ParseMove), or kInvalidAction if
+  // the parsing fails.
+  Action ParseMoveToAction(const std::string& move_str) const;
 
  protected:
   void DoApplyAction(Action action) override;

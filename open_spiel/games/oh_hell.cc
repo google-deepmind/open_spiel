@@ -386,7 +386,7 @@ void OhHellState::ApplyBiddingAction(int bid) {
 void OhHellState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
 
-  holder_[card] = std::nullopt;
+  holder_[card] = absl::nullopt;
   if (num_cards_played_ % num_players_ == 0) {
     CurrentTrick() = Trick(current_player_, deck_props_.CardSuit(trump_),
                            card, deck_props_);

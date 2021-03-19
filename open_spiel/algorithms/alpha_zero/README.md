@@ -1,4 +1,4 @@
-# C++ AlphaZero
+# C++ Tensorflow-based AlphaZero
 
 This is a C++ implementation of the AlphaZero algorithm.
 

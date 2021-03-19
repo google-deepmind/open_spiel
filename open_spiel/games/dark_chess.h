@@ -21,12 +21,12 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <open_spiel/fog/observation_history.h>
 
-#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/games/chess.h"
+#include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -61,11 +61,10 @@ class DarkChessObserver;
 // State of an in-play game.
 class DarkChessState : public State {
  public:
-
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  DarkChessState(std::shared_ptr<const Game> game,
-                 int board_size, const std::string& fen);
+  DarkChessState(std::shared_ptr<const Game> game, int board_size,
+                 const std::string& fen);
   DarkChessState(const DarkChessState&) = default;
 
   DarkChessState& operator=(const DarkChessState&) = default;
@@ -107,7 +106,6 @@ class DarkChessState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-
   friend class DarkChessObserver;
 
   // Draw can be claimed under the FIDE 3-fold repetition rule (the current
@@ -157,8 +155,8 @@ class DarkChessGame : public Game {
     return chess::NumDistinctActions();
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<DarkChessState>(shared_from_this(),
-                                             board_size_, fen_);
+    return absl::make_unique<DarkChessState>(shared_from_this(), board_size_,
+                                             fen_);
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
@@ -166,13 +164,13 @@ class DarkChessGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
     std::vector<int> shape{
-        (13 + // public boards:  piece types * colours + empty
-         14 ) // private boards: piece types * colours + empty + unknown
-         * board_size_ * board_size_ +
-        3 + // public: repetitions count, one-hot encoding
-        2 + // public: side to play
-        1 + // public: irreversible move counter -- a fraction of $n over 100
-        2*2 // private: left/right castling rights, one-hot encoded.
+        (13 +  // public boards:  piece types * colours + empty
+         14)   // private boards: piece types * colours + empty + unknown
+            * board_size_ * board_size_ +
+        3 +    // public: repetitions count, one-hot encoding
+        2 +    // public: side to play
+        1 +    // public: irreversible move counter -- a fraction of $n over 100
+        2 * 2  // private: left/right castling rights, one-hot encoded.
     };
     return shape;
   }
@@ -180,7 +178,6 @@ class DarkChessGame : public Game {
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const;
-
 
   std::shared_ptr<DarkChessObserver> default_observer_;
   std::shared_ptr<DarkChessObserver> info_state_observer_;

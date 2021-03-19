@@ -236,8 +236,8 @@ void MoveConversionTests() {
         fresh_board.ApplyMove(move);
       }
       SPIEL_CHECK_EQ(board.ToFEN(), fresh_board.ToFEN());
-      Action action_from_lan = MoveToAction(*board.ParseLANMove(move.ToLAN()),
-                                            board.BoardSize());
+      Action action_from_lan =
+          MoveToAction(*board.ParseLANMove(move.ToLAN()), board.BoardSize());
       SPIEL_CHECK_EQ(action, action_from_lan);
       state->ApplyAction(action);
     }

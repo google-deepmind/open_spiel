@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "open_spiel/games/chess/chess_board.h"
 
 namespace open_spiel {
 namespace dark_chess {
@@ -32,22 +32,22 @@ void BasicDarkChessTests(int board_size) {
 }
 
 void ChessBoardFlagPropagationTest(bool flag_king_in_check_allowed) {
-  auto tested_move = chess::Move(/*from=*/{3, 0}, /*to=*/{2, 0},
-                                 {chess::Color::kWhite,
-                                  chess::PieceType::kKing});
+  auto tested_move =
+      chess::Move(/*from=*/{3, 0}, /*to=*/{2, 0},
+                  {chess::Color::kWhite, chess::PieceType::kKing});
 
   auto board = chess::ChessBoard::BoardFromFEN("1kr1/4/4/3K w - - 0 1",
                                                /*board_size=*/4,
                                                flag_king_in_check_allowed);
   bool move_allowed = false;
-  board->GenerateLegalMoves([&move_allowed, tested_move]
-                                (const chess::Move&found_move) {
-    if (found_move == tested_move) {
-      move_allowed = true;
-      return false;
-    }
-    return true;
-  });
+  board->GenerateLegalMoves(
+      [&move_allowed, tested_move](const chess::Move& found_move) {
+        if (found_move == tested_move) {
+          move_allowed = true;
+          return false;
+        }
+        return true;
+      });
 
   SPIEL_CHECK_EQ(move_allowed, flag_king_in_check_allowed);
 }

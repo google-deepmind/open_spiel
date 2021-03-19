@@ -39,6 +39,7 @@ namespace open_spiel {
 namespace {
 
 using ::open_spiel::algorithms::Evaluator;
+using ::open_spiel::algorithms::SearchNode;
 
 namespace py = ::pybind11;
 
@@ -210,6 +211,18 @@ void init_pyspiel_bots(py::module& m) {
   py::enum_<algorithms::ChildSelectionPolicy>(m, "ChildSelectionPolicy")
       .value("UCT", algorithms::ChildSelectionPolicy::UCT)
       .value("PUCT", algorithms::ChildSelectionPolicy::PUCT);
+
+  py::class_<SearchNode> search_node(m, "SearchNode");
+  search_node.def_readonly("action", &SearchNode::action)
+      .def_readonly("prior", &SearchNode::prior)
+      .def_readonly("player", &SearchNode::player)
+      .def_readonly("explore_count", &SearchNode::explore_count)
+      .def_readonly("total_reward", &SearchNode::total_reward)
+      .def_readonly("outcome", &SearchNode::outcome)
+      .def_readonly("children", &SearchNode::children)
+      .def("best_child", &SearchNode::BestChild)
+      .def("to_string", &SearchNode::ToString)
+      .def("children_str", &SearchNode::ChildrenStr);
 
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
       .def(py::init<const Game&, std::shared_ptr<Evaluator>, double, int,

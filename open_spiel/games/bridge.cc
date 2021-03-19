@@ -775,7 +775,7 @@ void BridgeState::ApplyBiddingAction(int call) {
 
 void BridgeState::ApplyPlayAction(int card) {
   SPIEL_CHECK_TRUE(holder_[card] == current_player_);
-  holder_[card] = std::nullopt;
+  holder_[card] = absl::nullopt;
   if (num_cards_played_ % kNumPlayers == 0) {
     CurrentTrick() = Trick(current_player_, contract_.trumps, card);
   } else {
