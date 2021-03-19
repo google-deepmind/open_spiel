@@ -590,6 +590,71 @@ void ChessBoard::GeneratePseudoLegalMoves(const MoveYieldFn &yield, Color color,
 #undef YIELD
 }
 
+void ChessBoard::GenerateLegalPawnCaptures(const MoveYieldFn& yield, Color color) const {
+
+  // We do not need to filter moves that would result for King to move / stay
+  // in check, so we can yield all pseudo legal moves
+  if (king_in_check_allowed_) {
+    GeneratePseudoLegalPawnCaptures(yield, color);
+  } else {
+    auto king_square = find(Piece{color, PieceType::kKing});
+
+    GeneratePseudoLegalPawnCaptures([this, &king_square, &yield, color]
+                                        (const Move &move) {
+      // See if the move is legal by applying, checking whether the king is
+      // under attack, and undoing the move.
+      // TODO: Optimize this.
+      auto board_copy = *this;
+      board_copy.ApplyMove(move);
+
+      auto ks = at(move.from).type == PieceType::kKing ? move.to : king_square;
+
+      if (board_copy.UnderAttack(ks, color)) {
+        return true;
+      } else {
+        return yield(move);
+      }
+    }, color);
+  }
+}
+
+
+void ChessBoard::GeneratePseudoLegalPawnCaptures(const MoveYieldFn& yield,
+                                                 Color color,
+                                                 bool ignore_enemy_pieces) const {
+  bool generating = true;
+
+#define YIELD(move)     \
+  if (!yield(move)) {   \
+    generating = false; \
+  }
+
+  for (int8_t y = 0; y < board_size_ && generating; ++y) {
+    for (int8_t x = 0; x < board_size_ && generating; ++x) {
+      Square sq{x, y};
+      auto &piece = at(sq);
+      if (piece.type == PieceType::kPawn && piece.color == color) {
+
+        GeneratePawnCaptureDestinations_(
+            sq, color, ignore_enemy_pieces, true, /* include enpassant */
+            [&yield, &sq, &piece, &generating, this](const Square &to) {
+              if (IsPawnPromotionRank(to)) {
+                YIELD(Move(sq, to, piece, PieceType::kQueen));
+                YIELD(Move(sq, to, piece, PieceType::kRook));
+                YIELD(Move(sq, to, piece, PieceType::kBishop));
+                YIELD(Move(sq, to, piece, PieceType::kKnight));
+              } else {
+                YIELD(Move(sq, to, piece));
+              }
+            });
+      }
+    }
+  }
+
+#undef YIELD
+
+}
+
 bool ChessBoard::HasSufficientMaterial() const {
   // Try to detect these 4 conditions.
   // 1. K vs K

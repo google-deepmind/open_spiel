@@ -493,13 +493,10 @@ KriegspielUmpireMessage GetUmpireMessage(const chess::ChessBoard &chess_board,
   msg.check_types_= GetCheckType(board_copy);
 
   int pawnTries = 0;
-  board_copy.GenerateLegalMoves([&board_copy, &pawnTries](const chess::Move &move) {
-    if (move.piece.type == chess::PieceType::kPawn
-        && board_copy.at(move.to).type != chess::PieceType::kEmpty) {
-      pawnTries++;
-    }
+  board_copy.GenerateLegalPawnCaptures([&board_copy, &pawnTries](const chess::Move &move) {
+    pawnTries++;
     return true;
-  });
+  }, board_copy.ToPlay());
   msg.pawn_tries_ = pawnTries;
   msg.to_move_ = board_copy.ToPlay();
 
@@ -534,7 +531,7 @@ bool GeneratesUmpireMessage(const chess::ChessBoard &chess_board,
       }
   }
 
-  // todo optimze when undo is optimized
+  // todo optimize when undo is optimized
   chess::ChessBoard board_copy = chess_board;
   board_copy.ApplyMove(move);
 
@@ -543,14 +540,10 @@ bool GeneratesUmpireMessage(const chess::ChessBoard &chess_board,
   }
 
   int pawnTries = 0;
-  // todo optimize by generating only pawn captures
-  board_copy.GenerateLegalMoves([&board_copy, &pawnTries](const chess::Move &move) {
-    if (move.piece.type == chess::PieceType::kPawn
-        && board_copy.at(move.to).type != chess::PieceType::kEmpty) {
-      pawnTries++;
-    }
+  board_copy.GenerateLegalPawnCaptures([&pawnTries](const chess::Move &move) {
+    pawnTries++;
     return true;
-  });
+  }, board_copy.ToPlay());
   if (orig_msg.pawn_tries_ != pawnTries) {
     return false;
   }

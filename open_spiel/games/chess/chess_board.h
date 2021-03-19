@@ -291,6 +291,11 @@ class ChessBoard {
   void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color,
                                 bool ignore_enemy_pieces = false) const;
 
+  // Optimization for computing number of pawn tries for kriegspiel
+  void GenerateLegalPawnCaptures(const MoveYieldFn& yield, Color color) const;
+  void GeneratePseudoLegalPawnCaptures(const MoveYieldFn& yield, Color color,
+                                       bool ignore_enemy_pieces = false) const;
+
   bool HasLegalMoves() const {
     bool found = false;
     GenerateLegalMoves([&found](const Move&) {
