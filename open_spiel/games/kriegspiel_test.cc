@@ -14,7 +14,6 @@
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "open_spiel/games/chess/chess_board.h"
 
 namespace open_spiel {
 namespace kriegspiel {
@@ -25,6 +24,8 @@ namespace testing = open_spiel::testing;
 void BasicKriegspielTests(int board_size) {
   GameParameters params;
   params["board_size"] = GameParameter(board_size);
+  params["3_fold_repetition"] = GameParameter(true);
+  params["50_move_rule"] = GameParameter(true);
 
   testing::LoadGameTest("kriegspiel");
   testing::NoChanceOutcomesTest(*LoadGame("kriegspiel", params));

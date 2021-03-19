@@ -34,11 +34,16 @@
 // https://en.wikipedia.org/wiki/Kriegspiel
 //
 // Parameters:
-//   "board_size"  int     Number of squares in each row and column (default: 8)
-//   "fen"         string  String describing the chess board position in
-//                         Forsyth-Edwards Notation. The FEN has to match
-//                         the board size. Default values are available for
-//                         board sizes 4 and 8.
+//   "board_size"         int     Number of squares in each row and column
+//                                (default: 8)
+//   "fen"                string  String describing the chess board position in
+//                                Forsyth-Edwards Notation. The FEN has to match
+//                                the board size. Default values are available
+//                                for board sizes 4 and 8.
+//   "3_fold_repetition"  bool    Whether 3-fold repetition rule should be
+//                                automatically enforced (default: false)
+//   "50_move_rule"       bool    Whether 50 move rule should be automatically
+//                                enforced (default: false)
 
 namespace open_spiel {
 namespace kriegspiel {
@@ -61,15 +66,7 @@ enum KriegspielCaptureType : int8_t {
   kPiece = 2
 };
 
-std::string CaptureTypeToString(KriegspielCaptureType capture_type) {
-  if (capture_type == KriegspielCaptureType::kNoCapture) {
-    return "No Piece";
-  }
-  if (capture_type == KriegspielCaptureType::kPawn) {
-    return "Pawn";
-  }
-  return "Piece";
-}
+std::string CaptureTypeToString(KriegspielCaptureType capture_type);
 
 enum KriegspielCheckType : int8_t {
   kNoCheck = 0,
@@ -80,24 +77,9 @@ enum KriegspielCheckType : int8_t {
   kKnight = 5
 };
 
-std::string CheckTypeToString(KriegspielCheckType check_type) {
-  switch (check_type) {
-    case KriegspielCheckType::kNoCheck:
-      return "No";
-    case KriegspielCheckType::kFile:
-      return "File";
-    case KriegspielCheckType::kRank:
-      return "Rank";
-    case KriegspielCheckType::kLongDiagonal:
-      return "Long-diagonal";
-    case KriegspielCheckType::kShortDiagonal:
-      return "Short-diagonal";
-    case KriegspielCheckType::kKnight:
-      return "Knight";
-    default:
-      SpielFatalError("kNoCheck does not have a string representation");
-  }
-}
+std::string CheckTypeToString(KriegspielCheckType check_type);
+
+std::pair<KriegspielCheckType, KriegspielCheckType> GetCheckType(const chess::ChessBoard &board);
 
 struct KriegspielUmpireMessage {
 
@@ -110,83 +92,23 @@ struct KriegspielUmpireMessage {
   int pawn_tries_ = 0;
 
   std::string ToString() const;
+
+  bool operator==(KriegspielUmpireMessage &other) const {
+    return illegal_ == other.illegal_ &&
+           capture_type_ == other.capture_type_ &&
+           square_ == other.square_ &&
+           check_types_ == other.check_types_ &&
+           to_move_ == other.to_move_ &&
+           pawn_tries_ == other.pawn_tries_;
+  }
 };
 
 KriegspielUmpireMessage GetUmpireMessage(const chess::ChessBoard &chess_board,
-                                         const chess::Move &move) {
-  KriegspielUmpireMessage msg {};
-  if (!chess_board.IsMoveLegal(move)) {
-    // If the move is illegal, the player is notified about it and can play again
-    msg.illegal_ = true;
-    return msg;
-  }
-  msg.illegal_ = false;
+                                         const chess::Move &move);
 
-  chess::PieceType capture_type = chess_board.at(move.to).type;
-  switch (capture_type) {
-    case chess::PieceType::kEmpty:
-      msg.capture_type_ = KriegspielCaptureType::kNoCapture;
-      msg.square_ = chess::InvalidSquare();
-      break;
-    case chess::PieceType::kPawn:
-      msg.capture_type_ = KriegspielCaptureType::kPawn;
-      msg.square_ = move.to;
-      break;
-    default:
-      msg.capture_type_ = KriegspielCaptureType::kPiece;
-      msg.square_ = move.to;
-  }
-
-  // todo optimze when undo is optimized
-  chess::ChessBoard board_copy = chess_board;
-  board_copy.ApplyMove(move);
-
-  chess::Square king_sq = board_copy.find(
-      chess::Piece{board_copy.ToPlay(), chess::PieceType::kKing});
-
-  std::pair<KriegspielCheckType, KriegspielCheckType> check_type_pair =
-      {KriegspielCheckType::kNoCheck, KriegspielCheckType::kNoCheck};
-
-  board_copy.GeneratePseudoLegalMoves([&king_sq, &check_type_pair, &board_copy](const chess::Move &move) {
-    if (move.to != king_sq) {
-      return true;
-    }
-    KriegspielCheckType check_type;
-    if (move.piece.type == chess::PieceType::kKnight)
-      check_type = KriegspielCheckType::kKnight;
-    else if (move.from.x == move.to.x)
-      check_type = KriegspielCheckType::kFile;
-    else if (move.from.y == move.to.y)
-      check_type = KriegspielCheckType::kRank;
-    else if (chess::IsLongDiagonal(move.from, move.to, board_copy.BoardSize()))
-      check_type = KriegspielCheckType::kLongDiagonal;
-    else
-      check_type = KriegspielCheckType::kShortDiagonal;
-
-    if (check_type_pair.first != KriegspielCheckType::kNoCheck) {
-      // There cannot be more than two checks at the same time
-      check_type_pair.second = check_type;
-      return false;
-    }
-    else check_type_pair.first = check_type;
-
-    return true;
-  }, chess_board.ToPlay(), false);
-  msg.check_types_ = check_type_pair;
-
-  int pawnTries = 0;
-  board_copy.GenerateLegalMoves([&board_copy, &pawnTries](const chess::Move &move) {
-    if (move.piece.type == chess::PieceType::kPawn
-        && board_copy.at(move.to).type != chess::PieceType::kEmpty) {
-      pawnTries++;
-    }
-    return true;
-  });
-  msg.pawn_tries_ = pawnTries;
-  msg.to_move_ = board_copy.ToPlay();
-
-  return msg;
-}
+bool GeneratesUmpireMessage(const chess::ChessBoard &chess_board,
+                            const chess::Move &move,
+                            const KriegspielUmpireMessage &orig_msg);
 
 class KriegspielGame;
 class KriegspielObserver;
@@ -198,7 +120,8 @@ class KriegspielState : public State {
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   KriegspielState(std::shared_ptr<const Game> game,
-                 int board_size, const std::string& fen);
+                 int board_size, const std::string& fen, bool repetition_3_fold,
+                 bool rule_50_move);
   KriegspielState(const KriegspielState&) = default;
 
   KriegspielState& operator=(const KriegspielState&) = default;
@@ -247,7 +170,7 @@ class KriegspielState : public State {
 
   // Draw can be claimed under the FIDE 3-fold repetition rule (the current
   // board position has already appeared twice in the history).
-  bool IsRepetitionDraw() const;
+  bool Is3FoldRepetitionDraw() const;
 
   // Calculates legal actions and caches them. This is separate from
   // LegalActions() as there are a number of other methods that need the value
@@ -276,6 +199,9 @@ class KriegspielState : public State {
   // cached ActionObservationHistory for each player
   std::vector<open_spiel::ActionObservationHistory> aohs_;
 
+  bool repetition_3_fold;
+  bool rule_50_move;
+
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
   // We are already indexing by board hash, so there is no need to hash that
@@ -300,7 +226,8 @@ class KriegspielGame : public Game {
   }
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<KriegspielState>(shared_from_this(),
-                                             board_size_, fen_);
+                                             board_size_, fen_,
+                                             repetition_3_fold, rule_50_move);
   }
   int NumPlayers() const override { return kriegspiel::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
@@ -339,6 +266,8 @@ class KriegspielGame : public Game {
  private:
   const int board_size_;
   const std::string fen_;
+  const bool repetition_3_fold;
+  const bool rule_50_move;
 };
 
 }  // namespace kriegspiel

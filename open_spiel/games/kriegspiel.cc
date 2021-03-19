@@ -26,9 +26,6 @@ namespace open_spiel {
 namespace kriegspiel {
 namespace {
 
-constexpr int kNumReversibleMovesToDraw = 100;
-constexpr int kNumRepetitionsToDraw = 3;
-
 // Facts about the game.
 const GameType kGameType{
     /*short_name=*/"kriegspiel",
@@ -46,7 +43,9 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{
       {"board_size", GameParameter(8)},
-      {"fen", GameParameter(GameParameter::Type::kString, false)}}
+      {"fen", GameParameter(GameParameter::Type::kString, false)},
+      {"3_fold_repetition", GameParameter(false)},
+      {"50_move_rule", GameParameter(false)}}
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -362,6 +361,71 @@ class KriegspielObserver : public Observer {
   IIGObservationType iig_obs_type_;
 };
 
+std::string CaptureTypeToString(KriegspielCaptureType capture_type) {
+  if (capture_type == KriegspielCaptureType::kNoCapture) {
+    return "No Piece";
+  }
+  if (capture_type == KriegspielCaptureType::kPawn) {
+    return "Pawn";
+  }
+  return "Piece";
+}
+
+std::string CheckTypeToString(KriegspielCheckType check_type) {
+  switch (check_type) {
+    case KriegspielCheckType::kNoCheck:
+      return "No";
+    case KriegspielCheckType::kFile:
+      return "File";
+    case KriegspielCheckType::kRank:
+      return "Rank";
+    case KriegspielCheckType::kLongDiagonal:
+      return "Long-diagonal";
+    case KriegspielCheckType::kShortDiagonal:
+      return "Short-diagonal";
+    case KriegspielCheckType::kKnight:
+      return "Knight";
+    default:
+      SpielFatalError("kNoCheck does not have a string representation");
+  }
+}
+
+std::pair<KriegspielCheckType, KriegspielCheckType> GetCheckType(const chess::ChessBoard &board) {
+  chess::Square king_sq = board.find(
+      chess::Piece{board.ToPlay(), chess::PieceType::kKing});
+
+  std::pair<KriegspielCheckType, KriegspielCheckType> check_type_pair =
+      {KriegspielCheckType::kNoCheck, KriegspielCheckType::kNoCheck};
+
+  board.GeneratePseudoLegalMoves([&king_sq, &check_type_pair, &board](const chess::Move &move) {
+    if (move.to != king_sq) {
+      return true;
+    }
+    KriegspielCheckType check_type;
+    if (move.piece.type == chess::PieceType::kKnight)
+      check_type = KriegspielCheckType::kKnight;
+    else if (move.from.x == move.to.x)
+      check_type = KriegspielCheckType::kFile;
+    else if (move.from.y == move.to.y)
+      check_type = KriegspielCheckType::kRank;
+    else if (chess::IsLongDiagonal(move.from, move.to, board.BoardSize()))
+      check_type = KriegspielCheckType::kLongDiagonal;
+    else
+      check_type = KriegspielCheckType::kShortDiagonal;
+
+    if (check_type_pair.first != KriegspielCheckType::kNoCheck) {
+      // There cannot be more than two checks at the same time
+      check_type_pair.second = check_type;
+      return false;
+    }
+    else check_type_pair.first = check_type;
+
+    return true;
+  }, board.ToPlay(), false);
+
+  return check_type_pair;
+}
+
 std::string KriegspielUmpireMessage::ToString() const {
   if (illegal_) {
     return "Illegal move.";
@@ -391,18 +455,121 @@ std::string KriegspielUmpireMessage::ToString() const {
     msg += ", ";
     msg +=  pawn_tries_ == 1
             ?  "1 pawn try"
-            : std::to_string(pawn_tries_) + " pawn try";
+            : std::to_string(pawn_tries_) + " pawn tries";
   }
   msg += ".";
   return msg;
 }
 
+KriegspielUmpireMessage GetUmpireMessage(const chess::ChessBoard &chess_board,
+                                         const chess::Move &move) {
+  KriegspielUmpireMessage msg {};
+  if (!chess_board.IsMoveLegal(move)) {
+    // If the move is illegal, the player is notified about it and can play again
+    msg.illegal_ = true;
+    return msg;
+  }
+  msg.illegal_ = false;
+
+  chess::PieceType capture_type = chess_board.at(move.to).type;
+  switch (capture_type) {
+    case chess::PieceType::kEmpty:
+      msg.capture_type_ = KriegspielCaptureType::kNoCapture;
+      msg.square_ = chess::InvalidSquare();
+      break;
+    case chess::PieceType::kPawn:
+      msg.capture_type_ = KriegspielCaptureType::kPawn;
+      msg.square_ = move.to;
+      break;
+    default:
+      msg.capture_type_ = KriegspielCaptureType::kPiece;
+      msg.square_ = move.to;
+  }
+
+  // todo optimze when undo is optimized
+  chess::ChessBoard board_copy = chess_board;
+  board_copy.ApplyMove(move);
+
+  msg.check_types_= GetCheckType(board_copy);
+
+  int pawnTries = 0;
+  board_copy.GenerateLegalMoves([&board_copy, &pawnTries](const chess::Move &move) {
+    if (move.piece.type == chess::PieceType::kPawn
+        && board_copy.at(move.to).type != chess::PieceType::kEmpty) {
+      pawnTries++;
+    }
+    return true;
+  });
+  msg.pawn_tries_ = pawnTries;
+  msg.to_move_ = board_copy.ToPlay();
+
+  return msg;
+}
+
+
+
+bool GeneratesUmpireMessage(const chess::ChessBoard &chess_board,
+                            const chess::Move &move,
+                            const KriegspielUmpireMessage &orig_msg) {
+  if (!chess_board.IsMoveLegal(move)) {
+    // If the move is illegal, the player is notified about it and can play again
+    return orig_msg.illegal_;
+  }
+
+  chess::PieceType capture_type = chess_board.at(move.to).type;
+  switch (capture_type) {
+    case chess::PieceType::kEmpty:
+      if (orig_msg.capture_type_ != KriegspielCaptureType::kNoCapture) {
+        return false;
+      }
+      break;
+    case chess::PieceType::kPawn:
+      if (orig_msg.capture_type_ != KriegspielCaptureType::kPawn) {
+        return false;
+      }
+      break;
+    default:
+      if (orig_msg.capture_type_ != KriegspielCaptureType::kPiece) {
+        return false;
+      }
+  }
+
+  // todo optimze when undo is optimized
+  chess::ChessBoard board_copy = chess_board;
+  board_copy.ApplyMove(move);
+
+  if (orig_msg.check_types_ != GetCheckType(board_copy)) {
+    return false;
+  }
+
+  int pawnTries = 0;
+  // todo optimize by generating only pawn captures
+  board_copy.GenerateLegalMoves([&board_copy, &pawnTries](const chess::Move &move) {
+    if (move.piece.type == chess::PieceType::kPawn
+        && board_copy.at(move.to).type != chess::PieceType::kEmpty) {
+      pawnTries++;
+    }
+    return true;
+  });
+  if (orig_msg.pawn_tries_ != pawnTries) {
+    return false;
+  }
+  if (orig_msg.to_move_ != board_copy.ToPlay()) {
+    return false;
+  }
+
+  return true;
+}
+
 KriegspielState::KriegspielState(std::shared_ptr<const Game> game,
-                               int boardSize,
-                               const std::string &fen)
+                                 int boardSize, const std::string &fen,
+                                 bool repetition_3_fold, bool rule_50_move)
     : State(game),
       start_board_(*chess::ChessBoard::BoardFromFEN(fen, boardSize, false)),
-      current_board_(start_board_) {
+      current_board_(start_board_),
+      repetition_3_fold(repetition_3_fold),
+      rule_50_move(rule_50_move) {
+
   SPIEL_CHECK_TRUE(&current_board_);
   repetitions_[current_board_.HashValue()] = 1;
 
@@ -515,57 +682,41 @@ void KriegspielState::UndoAction(Player player, Action action) {
   }
 }
 
-bool KriegspielState::IsRepetitionDraw() const {
+bool KriegspielState::Is3FoldRepetitionDraw() const {
   const auto entry = repetitions_.find(Board().HashValue());
   SPIEL_CHECK_FALSE(entry == repetitions_.end());
-  return entry->second >= kNumRepetitionsToDraw;
+  return entry->second >= 3;
 }
 
 absl::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
-
-  const auto to_play_color = Board().ToPlay();
-  const auto opp_color = chess::OppColor(to_play_color);
-
-  const auto to_play_king =
-      chess::Piece{to_play_color, chess::PieceType::kKing};
-  const auto opp_king =
-      chess::Piece{opp_color, chess::PieceType::kKing};
-
-  if (Board().find(to_play_king) == chess::InvalidSquare()) {
-
-    std::vector<double> returns(NumPlayers());
-    returns[chess::ColorToPlayer(to_play_color)] = LossUtility();
-    returns[chess::ColorToPlayer(opp_color)] = WinUtility();
-    return returns;
-
-  } else if (Board().find(opp_king) == chess::InvalidSquare()) {
-
-    std::vector<double> returns(NumPlayers());
-    returns[chess::ColorToPlayer(to_play_color)] = WinUtility();
-    returns[chess::ColorToPlayer(opp_color)] = LossUtility();
-    return returns;
-  }
 
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
-  if (IsRepetitionDraw()) {
+  if (repetition_3_fold && Is3FoldRepetitionDraw()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
+
   // Compute and cache the legal actions.
   MaybeGenerateLegalActions();
   SPIEL_CHECK_TRUE(cached_legal_actions_);
   const bool have_legal_moves = !cached_legal_actions_->empty();
 
-  // If we don't have legal moves we are stalemated
+  // If we don't have legal moves we are stalemated or mated
   if (!have_legal_moves) {
-    return std::vector<double>{DrawUtility(), DrawUtility()};
+    if (!Board().InCheck()) {
+      return std::vector<double>{DrawUtility(), DrawUtility()};
+    } else {
+      std::vector<double> returns(NumPlayers());
+      auto next_to_play = ColorToPlayer(Board().ToPlay());
+      returns[next_to_play] = LossUtility();
+      returns[chess::OtherPlayer(next_to_play)] = WinUtility();
+      return returns;
+    }
   }
 
-  if (Board().IrreversibleMoveCounter() >= kNumReversibleMovesToDraw) {
-    // This is theoretically a draw that needs to be claimed, but we implement
-    // it as a forced draw for now.
+  if (rule_50_move && Board().IrreversibleMoveCounter() >= 50) {
     return std::vector<double>{DrawUtility(), DrawUtility()};
   }
 
@@ -584,7 +735,9 @@ std::string DefaultFen(int board_size) {
 KriegspielGame::KriegspielGame(const GameParameters &params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size")),
-      fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))) {
+      fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))),
+      repetition_3_fold(ParameterValue<bool>("3_fold_repetition")),
+      rule_50_move(ParameterValue<bool>("50_move_rule")){
   default_observer_ = std::make_shared<KriegspielObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<KriegspielObserver>(kInfoStateObsType);
 }
