@@ -90,10 +90,6 @@ struct Piece {
 
   bool operator!=(const Piece& other) const { return !(*this == other); }
 
-  bool operator<(const Piece& other) const {
-    return color < other.color || (color == other.color && type < other.type);
-  }
-
   std::string ToUnicode() const;
   std::string ToString() const;
 
@@ -217,13 +213,6 @@ struct Move {
     return from == other.from && to == other.to && piece == other.piece &&
            promotion_type == other.promotion_type &&
            is_castling == other.is_castling;
-  }
-
-  bool operator<(const Move& other) const {
-    if (from != other.from) return from < other.from;
-    else if (to != other.to) return to < other.to;
-    else if (piece != other.piece) return piece < other.piece;
-    else return promotion_type < other.promotion_type;
   }
 };
 

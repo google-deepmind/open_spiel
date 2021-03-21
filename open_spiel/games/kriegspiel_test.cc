@@ -24,7 +24,7 @@ namespace testing = open_spiel::testing;
 void BasicKriegspielTests(int board_size) {
   GameParameters params;
   params["board_size"] = GameParameter(board_size);
-  params["3_fold_repetition"] = GameParameter(true);
+  params["threefold_repetition"] = GameParameter(true);
   params["50_move_rule"] = GameParameter(true);
 
   testing::LoadGameTest("kriegspiel");

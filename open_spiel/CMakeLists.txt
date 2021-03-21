@@ -110,7 +110,7 @@ openspiel_optional_dependency(BUILD_WITH_TENSORFLOW_CC  OFF
   "Build with support for Tensorflow C++ API.")
 openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
   "Build with support for public states in C++.")
-openspiel_optional_dependency(BUILD_WITH_PYTHON         OFF
+openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
   "Build binary for Python.")
 openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
   "Build against xinxin Hearts program.")

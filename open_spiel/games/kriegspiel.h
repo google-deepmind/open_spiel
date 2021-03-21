@@ -30,20 +30,26 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-// Kriegpsiel - imperfect information version of chess:
+// Kriegspiel - imperfect information version of chess:
 // https://en.wikipedia.org/wiki/Kriegspiel
+// The implementation follows ICC rules (with a few exceptions):
+// https://www.chessclub.com/help/Kriegspiel
+// The exceptions are 50-move rule and threefold repetition, which under ICC
+// rules are not automatically enforced, but can be claimed by the player. This
+// implementation does not support claiming or offering draws so these rules'
+// automatic enforcement can be turned on and off
 //
 // Parameters:
-//   "board_size"         int     Number of squares in each row and column
-//                                (default: 8)
-//   "fen"                string  String describing the chess board position in
-//                                Forsyth-Edwards Notation. The FEN has to match
-//                                the board size. Default values are available
-//                                for board sizes 4 and 8.
-//   "3_fold_repetition"  bool    Whether 3-fold repetition rule should be
-//                                automatically enforced (default: false)
-//   "50_move_rule"       bool    Whether 50 move rule should be automatically
-//                                enforced (default: false)
+//   "board_size"           int     Number of squares in each row and column
+//                                  (default: 8)
+//   "fen"                  string  String describing the chess board position
+//                                  in Forsyth-Edwards Notation. The FEN has to
+//                                  match the board size. Default values are
+//                                  available for board sizes 4 and 8.
+//   "threefold_repetition" bool    Whether threefold repetition rule should be
+//                                  automatically enforced (default: false)
+//   "50_move_rule"         bool    Whether 50 move rule should be automatically
+//                                  enforced (default: false)
 
 namespace open_spiel {
 namespace kriegspiel {
@@ -83,23 +89,24 @@ std::pair<KriegspielCheckType, KriegspielCheckType> GetCheckType(const chess::Ch
 
 struct KriegspielUmpireMessage {
 
-  bool illegal_ = false;
-  KriegspielCaptureType capture_type_ = KriegspielCaptureType::kNoCapture;
-  chess::Square square_ = chess::InvalidSquare();
-  std::pair<KriegspielCheckType, KriegspielCheckType> check_types_ =
+  bool illegal = false;
+  KriegspielCaptureType capture_type = KriegspielCaptureType::kNoCapture;
+  chess::Square square = chess::kInvalidSquare;
+  // there can be max two checks at a time so a pair is enough
+  std::pair<KriegspielCheckType, KriegspielCheckType> check_types =
       {KriegspielCheckType::kNoCheck, KriegspielCheckType::kNoCheck};
-  chess::Color to_move_ = chess::Color::kEmpty;
-  int pawn_tries_ = 0;
+  chess::Color to_move = chess::Color::kEmpty;
+  int pawn_tries = 0;
 
   std::string ToString() const;
 
   bool operator==(KriegspielUmpireMessage &other) const {
-    return illegal_ == other.illegal_ &&
-           capture_type_ == other.capture_type_ &&
-           square_ == other.square_ &&
-           check_types_ == other.check_types_ &&
-           to_move_ == other.to_move_ &&
-           pawn_tries_ == other.pawn_tries_;
+    return illegal == other.illegal &&
+           capture_type == other.capture_type &&
+           square == other.square &&
+           check_types == other.check_types &&
+           to_move == other.to_move &&
+           pawn_tries == other.pawn_tries;
   }
 };
 
@@ -120,7 +127,7 @@ class KriegspielState : public State {
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   KriegspielState(std::shared_ptr<const Game> game,
-                 int board_size, const std::string& fen, bool repetition_3_fold,
+                 int board_size, const std::string& fen, bool threefold_repetition,
                  bool rule_50_move);
   KriegspielState(const KriegspielState&) = default;
 
@@ -168,9 +175,9 @@ class KriegspielState : public State {
 
   friend class KriegspielObserver;
 
-  // Draw can be claimed under the FIDE 3-fold repetition rule (the current
+  // Draw can be claimed under the FIDE threefold repetition rule (the current
   // board position has already appeared twice in the history).
-  bool Is3FoldRepetitionDraw() const;
+  bool IsThreefoldRepetitionDraw() const;
 
   // Calculates legal actions and caches them. This is separate from
   // LegalActions() as there are a number of other methods that need the value
@@ -185,11 +192,11 @@ class KriegspielState : public State {
   std::vector<std::pair<chess::Move, KriegspielUmpireMessage>> move_msg_history_;
   // We store this info as an optimisation so that we don't have to compute it
   // from move_msg_history for observations
-  std::optional<KriegspielUmpireMessage> last_public_msg{};
-  std::optional<KriegspielUmpireMessage> before_last_public_msg{};
+  std::optional<KriegspielUmpireMessage> last_public_msg_{};
+  std::optional<KriegspielUmpireMessage> before_last_public_msg_{};
   // Moves that the player tried and were illegal. We don't let player try them
   // again on the same board because they are clearly still illegal;
-  std::set<chess::Move> illegal_tried_moves_;
+  std::vector<chess::Move> illegal_tried_moves_;
   // We store the start board for history to support games not starting
   // from the start position.
   chess::ChessBoard start_board_;
@@ -199,8 +206,8 @@ class KriegspielState : public State {
   // cached ActionObservationHistory for each player
   std::vector<open_spiel::ActionObservationHistory> aohs_;
 
-  bool repetition_3_fold;
-  bool rule_50_move;
+  bool threefold_repetition_;
+  bool rule_50_move_;
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
@@ -227,7 +234,7 @@ class KriegspielGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<KriegspielState>(shared_from_this(),
                                              board_size_, fen_,
-                                             repetition_3_fold, rule_50_move);
+                                             threefold_repetition_, rule_50_move_);
   }
   int NumPlayers() const override { return kriegspiel::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
@@ -266,8 +273,8 @@ class KriegspielGame : public Game {
  private:
   const int board_size_;
   const std::string fen_;
-  const bool repetition_3_fold;
-  const bool rule_50_move;
+  const bool threefold_repetition_;
+  const bool rule_50_move_;
 };
 
 }  // namespace kriegspiel

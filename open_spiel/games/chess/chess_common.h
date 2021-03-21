@@ -49,10 +49,6 @@ struct Square {
 
   bool operator!=(const Square& other) const { return !(*this == other); }
 
-  bool operator<(const Square& other) const {
-    return x < other.x || (x == other.x && y < other.y);
-  }
-
   int8_t x;
   int8_t y;
 };
