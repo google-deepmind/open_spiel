@@ -194,6 +194,11 @@ struct Move {
   // intact, or double queen promotions with original queen still intact), both
   // are used.
   //
+  // This method also supports Kriegspiel SAN
+  // http://w01fe.com/berkeley/kriegspiel/notation.html
+  // When using Kriegspiel SAN, we have to disambiguate also between illegal
+  // moves because they might seem legal to players.
+  //
   // Examples:
   // * e4 (pawn to e4)
   // * exd5 (pawn on file e capture the piece on d5)
@@ -207,7 +212,7 @@ struct Move {
   //              resulting in checkmate in a surprisingly good move)
   // * O-O-O!!N+/- (a surprisingly good long castle that is a theoretical
   //                novelty that gives white a clear but not winning advantage)
-  std::string ToSAN(const ChessBoard& board) const;
+  std::string ToSAN(const ChessBoard& board, bool kriegspiel_SAN = false) const;
 
   bool operator==(const Move& other) const {
     return from == other.from && to == other.to && piece == other.piece &&
@@ -232,6 +237,7 @@ inline const std::string kDefaultStandardFEN =
 inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 using ObservationTable = std::array<bool, k2dMaxBoardSize>;
+using MoveYieldFn = std::function<bool(const Move&)>;
 
 class ChessBoard {
  public:
@@ -272,7 +278,6 @@ class ChessBoard {
   // The yield function should return whether generation should continue.
   // For performance reasons, we do not guarantee that no more moves will be
   // generated if yield returns false. It is only for optimization.
-  using MoveYieldFn = std::function<bool(const Move&)>;
   void GenerateLegalMoves(const MoveYieldFn& yield) const {
     GenerateLegalMoves(yield, to_play_);
   }

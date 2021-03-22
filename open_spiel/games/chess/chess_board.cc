@@ -198,7 +198,8 @@ std::string Move::ToLAN() const {
   return absl::StrCat(SquareToString(from), SquareToString(to), promotion);
 }
 
-std::string Move::ToSAN(const ChessBoard &board) const {
+std::string Move::ToSAN(const ChessBoard &board, bool kriegspiel_SAN) const {
+
   std::string move_text;
   PieceType piece_type = board.at(from).type;
   if (is_castling) {
@@ -228,8 +229,13 @@ std::string Move::ToSAN(const ChessBoard &board) const {
     bool file_unique = true;
     bool rank_unique = true;
     bool disambiguation_required = false;
+    bool move_found = false;
 
-    board.GenerateLegalMoves([&](const Move &move) -> bool {
+    MoveYieldFn move_yield_fn = [&](const Move &move) -> bool {
+      if (move == *this) {
+      move_found = true;
+      return true;
+    }
       if (move.to != to) {
         return true;
       }
@@ -245,7 +251,17 @@ std::string Move::ToSAN(const ChessBoard &board) const {
         rank_unique = false;
       }
       return true;
-    });
+    };
+
+    if (kriegspiel_SAN) {
+      board.GeneratePseudoLegalMoves(move_yield_fn, board.ToPlay(), true);
+    } else {
+      board.GenerateLegalMoves(move_yield_fn);
+    }
+
+    if (!move_found) {
+      SpielFatalError("Illegal move cannot have a SAN representation");
+    }
 
     bool file_required = false;
     bool rank_required = false;
@@ -308,22 +324,19 @@ std::string Move::ToSAN(const ChessBoard &board) const {
   }
 
   // Figure out if this is a check / checkmating move or not.
-  if (!board.KingInCheckAllowed()) {
-    auto board_copy = board;
-    board_copy.ApplyMove(*this);
-    if (board_copy.InCheck()) {
-      bool has_escape = false;
-      board_copy.GenerateLegalMoves([&](const Move &) -> bool {
-        has_escape = true;
-        return false;  // No need to keep generating moves.
-      });
-
-      if (has_escape) {
-        // Check.
-        absl::StrAppend(&move_text, "+");
-      } else {
-        // Checkmate.
-        absl::StrAppend(&move_text, "#");
+  // It cannot be either, if it is illegal.
+  if (!kriegspiel_SAN || board.IsMoveLegal(*this)) {
+    if (!board.KingInCheckAllowed()) {
+      auto board_copy = board;
+      board_copy.ApplyMove(*this);
+      if (board_copy.InCheck()) {
+        if (board_copy.HasLegalMoves()) {
+          // Check.
+          absl::StrAppend(&move_text, "+");
+        } else {
+          // Checkmate.
+          absl::StrAppend(&move_text, "#");
+        }
       }
     }
   }

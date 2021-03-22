@@ -25,6 +25,8 @@ set(GAME_SOURCES
   chess/chess_board.h
   chess/chess_common.cc
   chess/chess_common.h
+  chess/pgn.cc
+  chess/pgn.h
   cliff_walking.cc
   cliff_walking.h
   clobber.cc
@@ -398,6 +400,10 @@ add_test(oware_test oware_test)
 add_executable(pentago_test pentago_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(pentago_test pentago_test)
+
+add_executable(pgn_test chess/pgn_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>)
+add_test(pgn_test pgn_test)
 
 add_executable(phantom_ttt_test phantom_ttt_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
