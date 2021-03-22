@@ -347,8 +347,14 @@ class KriegspielObserver : public Observer {
       if (state.before_last_public_msg_) {
         WriteUmpireMessage(*state.before_last_public_msg_, state.Board(), "first", allocator);
       }
+      else {
+        WriteUmpireMessage({}, state.Board(), "first", allocator);
+      }
       if (state.last_public_msg_) {
         WriteUmpireMessage(*state.last_public_msg_, state.Board(), "second", allocator);
+      }
+      else {
+        WriteUmpireMessage({}, state.Board(), "second", allocator);
       }
     } else {
       if (state.last_public_msg_) {
