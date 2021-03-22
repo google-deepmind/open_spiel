@@ -54,11 +54,35 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
 
+// Facts about the game.
+const GameType kImperfectRecallGameType{
+    /*short_name=*/"phantom_ttt_ir",
+    /*long_name=*/"Phantom Tic Tac Toe with Imperfect Recall",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
+
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PhantomTTTGame(params));
 }
 
+std::shared_ptr<const Game> ImperfectRecallFactory(
+    const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ImperfectRecallPTTTGame(params));
+}
+
 REGISTER_SPIEL_GAME(kGameType, Factory);
+REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
 
 }  // namespace
 
