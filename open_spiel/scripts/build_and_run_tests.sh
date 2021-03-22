@@ -206,6 +206,9 @@ else
     elif [[ $ARG_test_only == julia_test ]]; then
       echo "Building Julia API"
       make -j$MAKE_NUM_PROCS spieljl
+    elif [[ $ARG_test_only == gospiel_test ]]; then
+      echo "Building Go API"
+      make -j$MAKE_NUM_PROCS gospiel
     else
       echo "Building $ARG_test_only"
       make -j$MAKE_NUM_PROCS $ARG_test_only

@@ -100,6 +100,8 @@ openspiel_optional_dependency(BUILD_WITH_ACPC           OFF
   "Build against the Universal Poker library.")
 openspiel_optional_dependency(BUILD_WITH_EIGEN          OFF
   "Build with support for Eigen in C++.")
+openspiel_optional_dependency(BUILD_WITH_GO             OFF
+  "Build with support for Golang API.")
 openspiel_optional_dependency(BUILD_WITH_HANABI         OFF
   "Build against the Hanabi game.")
 openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
@@ -270,6 +272,10 @@ add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (contrib)
+
+if (BUILD_WITH_GO)
+  add_subdirectory(go)
+endif()
 
 if (BUILD_WITH_PYTHON)
   add_subdirectory (python)

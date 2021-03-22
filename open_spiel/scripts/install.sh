@@ -202,6 +202,10 @@ fi
 # Install other system-wide packages.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   EXT_DEPS="virtualenv clang cmake curl python3 python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
+  if [[ ${BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
+    EXT_DEPS="${EXT_DEPS} golang"
+  fi
+
   APT_GET=`which apt-get`
   if [ "$APT_GET" = "" ]
   then
@@ -242,6 +246,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
   [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
+  if [[ ${BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
+    [[ -x `which go` ]] || brew install golang || echo "** Warning: failed 'brew install golang' -- continuing"
+  fi
+
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
   pip3 install virtualenv
