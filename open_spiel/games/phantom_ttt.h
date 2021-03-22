@@ -129,6 +129,8 @@ class ImperfectRecallPTTTState : public PhantomTTTState {
                            ObservationType obs_type)
       : PhantomTTTState(game, obs_type) {}
   std::string InformationStateString(Player player) const override {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
     return ViewToString(player);
   }
 };
