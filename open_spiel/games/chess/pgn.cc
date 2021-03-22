@@ -31,7 +31,7 @@ namespace {
 template <typename T>
 void WriteTag(
     std::ostream& os, const std::string& key, const T& value) {
-  os << "[" << key << " \"" << value << "\']" << std::endl;
+  os << "[" << key << " \"" << value << "\"]" << std::endl;
 }
 
 void WriteComment(std::ostream& os, const std::string& comment) {
