@@ -57,11 +57,38 @@ const GameType kGameType{
         {"board_size", GameParameter(hex::kDefaultBoardSize)},
     }};
 
+const GameType kImperfectRecallGameType{
+    /*short_name=*/"dark_hex_ir",
+    /*long_name=*/"Dark Hex with Imperfect Recall",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {
+      {"obstype", GameParameter(std::string(kDefaultObsType))},
+      {"gameversion", GameParameter(std::string(kDefaultGameVersion))},
+      {"board_size", GameParameter(hex::kDefaultBoardSize)}
+    }};
+
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new DarkHexGame(params));
 }
 
+std::shared_ptr<const Game> ImperfectRecallFactory(
+     const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ImperfectRecallDarkHexGame(params));
+}
+
 REGISTER_SPIEL_GAME(kGameType, Factory);
+REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
 
 }  // namespace
 

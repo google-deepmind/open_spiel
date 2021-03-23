@@ -107,9 +107,9 @@ class DarkHexState : public State {
 
  protected:
   void DoApplyAction(Action move) override;
+  std::string ViewToString(Player player) const;
 
  private:
-  std::string ViewToString(Player player) const;
   std::string ActionSequenceToString(Player player) const;
 
   hex::HexState state_;
@@ -147,6 +147,9 @@ class DarkHexGame : public Game {
   int MaxGameLength() const override {
     return board_size_ * board_size_ * 2 - 1;
   }
+  ObservationType obs_type() const { return obs_type_; }
+  GameVersion game_version() const { return game_version_; }
+  int board_size() const { return board_size_; }
 
  private:
   std::shared_ptr<const hex::HexGame> game_;
@@ -157,6 +160,30 @@ class DarkHexGame : public Game {
   const int bits_per_action_;
   const int longest_sequence_;
 };
+
+class ImperfectRecallDarkHexState : public DarkHexState {
+  public:
+   ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int board_size,
+                               GameVersion game_version,
+                               ObservationType obs_type)
+       : DarkHexState(game, board_size, game_version, obs_type) {}
+   std::string InformationStateString(Player player) const override {
+     SPIEL_CHECK_GE(player, 0);
+     SPIEL_CHECK_LT(player, num_players_);
+     return ViewToString(player);
+   }
+ };
+
+ class ImperfectRecallDarkHexGame : public DarkHexGame {
+  public:
+   explicit ImperfectRecallDarkHexGame(const GameParameters& params)
+       : DarkHexGame(params) {}
+   std::unique_ptr<State> NewInitialState() const override {
+     return std::unique_ptr<State>(
+         new ImperfectRecallDarkHexState(shared_from_this(), board_size(), 
+                                         game_version(), obs_type()));
+   }
+ };
 
 inline std::ostream& operator<<(std::ostream& stream,
                                 const ObservationType& obs_type) {

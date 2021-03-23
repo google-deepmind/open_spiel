@@ -46,6 +46,7 @@ EXPECTED_GAMES = set([
     "cursor_go",
     "dark_chess",
     "dark_hex",
+    "dark_hex_ir",
     "deep_sea",
     "efg_game",
     "first_sealed_auction",
