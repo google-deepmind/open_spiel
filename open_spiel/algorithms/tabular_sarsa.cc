@@ -89,6 +89,29 @@ TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game)
                  GameType::Information::kPerfectInformation);
 }
 
+TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game,
+                                       double depth_limit, double epsilon,
+                                       double learning_rate,
+                                       double discount_factor, double lambda)
+    : game_(game),
+      depth_limit_(depth_limit),
+      epsilon_(epsilon),
+      learning_rate_(learning_rate),
+      discount_factor_(discount_factor),
+      lambda_(lambda) {
+  // Currently only supports 1-player or 2-player zero sum games
+  SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
+  if (game_->NumPlayers() == 2) {
+    SPIEL_CHECK_EQ(game_->GetType().utility, GameType::Utility::kZeroSum);
+  }
+
+  // No support for simultaneous games (needs an LP solver). And so also must
+  // be a perfect information game.
+  SPIEL_CHECK_EQ(game_->GetType().dynamics, GameType::Dynamics::kSequential);
+  SPIEL_CHECK_EQ(game_->GetType().information,
+                 GameType::Information::kPerfectInformation);
+}
+
 const absl::flat_hash_map<std::pair<std::string, Action>, double>&
 TabularSarsaSolver::GetQValueTable() const {
   return values_;
@@ -100,10 +123,16 @@ void TabularSarsaSolver::RunIteration() {
   std::unique_ptr<State> curr_state = game_->NewInitialState();
   SampleUntilNextStateOrTerminal(curr_state.get());
 
+  // Store the values for the update at the end of the episode using the
+  // offline lambda-return algorithm, using eligibility trace
+  vector<std::string> path;
+  vector<Action> actions;
+  vector<double> updated_values;
+
   Player player = curr_state->CurrentPlayer();
   // Sample action from the state using an epsilon-greedy policy
   Action curr_action =
-      SampleActionFromEpsilonGreedyPolicy(*(curr_state.get()), min_utility);
+      SampleActionFromEpsilonGreedyPolicy(*curr_state, min_utility);
 
   while (!curr_state->IsTerminal()) {
     std::unique_ptr<State> next_state = curr_state->Child(curr_action);
@@ -111,25 +140,42 @@ void TabularSarsaSolver::RunIteration() {
     const double reward = next_state->Rewards()[player];
 
     const Action next_action =
-        SampleActionFromEpsilonGreedyPolicy(*(next_state.get()), min_utility);
+        SampleActionFromEpsilonGreedyPolicy(*next_state, min_utility);
 
-    // Update action value
+    // Store the value for an offline update at the end of the episode
     std::string key = curr_state->ToString();
-    const double prev_q_val = values_[{key, curr_action}];
     // Next q-value in perspective of player to play at curr_state (important
     // note: exploits property of two-player zero-sum)
     const double next_q_value =
         (player != next_state->CurrentPlayer() ? -1 : 1) *
         values_[{next_state->ToString(), next_action}];
-    double new_q_val =
-        prev_q_val +
-        learning_rate_ *
-            (reward + discount_factor_ * next_q_value - prev_q_val);
+    double one_step_return = reward + discount_factor_ * next_q_value;
 
-    values_[{key, curr_action}] = new_q_val;
-
+    path.push_back(key);
+    actions.push_back(curr_action);
+    updated_values.push_back(one_step_return);
     curr_state = next_state->Clone();
     curr_action = next_action;
+  }
+
+  // Update the q values using the offline lambda-return algorithm
+  int sz = path.size();
+  double lambda_return_of_next_state = 0;
+  double lambda_series_sum = 1;
+  for (int i = sz - 1; i >= 0; i--) {
+    std::string state_key = path[i];
+    Action action = actions[i];
+    // 1 step return, G(t, t+1)
+    double one_step_return = updated_values[i];
+
+    double lambda_return = lambda_return_of_next_state * lambda_ +
+                           one_step_return * lambda_series_sum;
+    double prev_q_val = values_[{state_key, action}];
+    double new_q_val =
+        prev_q_val + learning_rate_ * (lambda_return - prev_q_val);
+    values_[{state_key, action}] = new_q_val;
+
+    lambda_series_sum = lambda_series_sum * lambda_ + 1;
   }
 }
 }  // namespace algorithms
