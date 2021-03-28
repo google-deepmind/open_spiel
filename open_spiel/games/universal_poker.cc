@@ -159,6 +159,9 @@ const GameType kGameType{
      // ------------------------------------------------------------------------
      // Following parameters are used to specify specific subgame.
      {"potSize", GameParameter(0)},
+     // Board cards that have been revealed. Must be in the format
+     // of logic::CardSet -- kSuitChars, kRankChars
+     {"boardCards", GameParameter("")},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -193,7 +196,12 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
   if (pot_size > 0) {
     acpc_state_.SetPotSize(pot_size);
   }
-
+  const std::string board_cards =
+      game->GetParameters().at("boardCards").string_value();
+  if (board_cards != "") {
+    logic::CardSet cs(board_cards);
+    for(uint8_t card : cs.ToCardArray()) AddBoardCard(card);
+  }
 }
 
 std::string UniversalPokerState::ToString() const {
@@ -705,7 +713,8 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     : Game(kGameType, params),
       gameDesc_(parseParameters(params)),
       acpc_game_(gameDesc_),
-      potSize_(ParameterValue<int>("potSize")) {
+      potSize_(ParameterValue<int>("potSize")),
+      boardCards_(ParameterValue<std::string>("boardCards")) {
   max_game_length_ = MaxGameLength();
   SPIEL_CHECK_TRUE(max_game_length_.has_value());
   std::string betting_abstraction =
