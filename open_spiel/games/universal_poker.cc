@@ -162,6 +162,9 @@ const GameType kGameType{
      // Board cards that have been revealed. Must be in the format
      // of logic::CardSet -- kSuitChars, kRankChars
      {"boardCards", GameParameter("")},
+     // A space separated list of fixed chance probabilities that should
+     // be used instead of uniform probabilities.
+     {"chanceOutcomes", GameParameter("")},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -201,6 +204,15 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
   if (board_cards != "") {
     logic::CardSet cs(board_cards);
     for(uint8_t card : cs.ToCardArray()) AddBoardCard(card);
+  }
+  const std::string chanceOutcomes =
+      game->GetParameters().at("chanceOutcomes").string_value();
+  if (chanceOutcomes != "") {
+    std::stringstream iss( chanceOutcomes );
+    double number;
+    while ( iss >> number ) {
+      chanceOutcomes_.push_back(number);
+    }
   }
 }
 
@@ -490,15 +502,22 @@ std::unique_ptr<State> UniversalPokerState::Clone() const {
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  auto available_cards = LegalActions();
+  const std::vector<Action> available_cards = LegalActions();
   const int num_cards = available_cards.size();
-  const double p = 1.0 / num_cards;
-
-  // We need to convert std::vector<uint8_t> into std::vector<Action>.
   std::vector<std::pair<Action, double>> outcomes;
   outcomes.reserve(num_cards);
-  for (const auto &card : available_cards) {
-    outcomes.push_back({Action{card}, p});
+
+  if (chance_outcome_idx_ == chanceOutcomes_.size()) {
+    // No specific outcomes set: distribute cards uniformly.
+    const double p = 1.0 / num_cards;
+    for (const auto& card : available_cards) outcomes.push_back({card, p});
+  } else {
+    // Distribute cards according to a specific distribution.
+    SPIEL_CHECK_LE(chance_outcome_idx_ + num_cards, chanceOutcomes_.size());
+    for (int i = 0; i < num_cards; ++i) {
+      const Action& card = available_cards[i];
+      outcomes.push_back({card, chanceOutcomes_[chance_outcome_idx_ + i]});
+    }
   }
   return outcomes;
 }
@@ -714,7 +733,8 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
       gameDesc_(parseParameters(params)),
       acpc_game_(gameDesc_),
       potSize_(ParameterValue<int>("potSize")),
-      boardCards_(ParameterValue<std::string>("boardCards")) {
+      boardCards_(ParameterValue<std::string>("boardCards")),
+      chanceOutcomes_(ParameterValue<std::string>("chanceOutcomes")) {
   max_game_length_ = MaxGameLength();
   SPIEL_CHECK_TRUE(max_game_length_.has_value());
   std::string betting_abstraction =

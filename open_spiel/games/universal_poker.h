@@ -181,6 +181,14 @@ class UniversalPokerState : public State {
   std::string actionSequence_;
 
   BettingAbstraction betting_abstraction_;
+
+  // Used for custom implementation of chance outcomes.
+  //
+  // Following invariant must always hold at chance nodes,
+  // for chance_outcome_idx_ < chanceOutcomes_.size():
+  // chance_idx_ + legal_actions.size() <= chanceOutcomes_.size()
+  std::vector<double> chanceOutcomes_;
+  int chance_outcome_idx_ = 0;
 };
 
 class UniversalPokerGame : public Game {
@@ -211,6 +219,7 @@ class UniversalPokerGame : public Game {
   const acpc_cpp::ACPCGame acpc_game_;
   const int potSize_;
   const std::string boardCards_;
+  const std::string chanceOutcomes_;
   absl::optional<int> max_game_length_;
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
   int big_blind_;
