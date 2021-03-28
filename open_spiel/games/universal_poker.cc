@@ -133,7 +133,7 @@ const GameType kGameType{
      // The size of the blinds for each player (relative to the dealer)
      {"blind", GameParameter(std::string("100 100"))},
      // The size of raises on each round (for limit games only) as numrounds
-     // integers. It will be ignored for nolimite games.
+     // integers. It will be ignored for nolimit games.
      {"raiseSize", GameParameter(std::string("100 100"))},
      // Number of betting rounds per hand of the game
      {"numRounds", GameParameter(2)},
@@ -837,7 +837,7 @@ std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
           absl::StrCat("When loading a 'universal_poker' game, the 'gamedef' "
                        "field was present, but other fields were present too: ",
                        absl::StrJoin(game_parameter_keys, ", "),
-                       "gamedef is exclusive with other paraemters."));
+                       "gamedef is exclusive with other parameters."));
     }
     return ParameterValue<std::string>("gamedef");
   }
