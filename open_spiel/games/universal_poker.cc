@@ -189,7 +189,10 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
                                ->betting_abstraction()) {
 
   // Optionally apply subgame parameters.
-  acpc_state_.SetPotSize(game->GetParameters().at("potSize").int_value());
+  const int pot_size = game->GetParameters().at("potSize").int_value();
+  if (pot_size > 0) {
+    acpc_state_.SetPotSize(pot_size);
+  }
 
 }
 
@@ -701,7 +704,8 @@ UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
 UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     : Game(kGameType, params),
       gameDesc_(parseParameters(params)),
-      acpc_game_(gameDesc_) {
+      acpc_game_(gameDesc_),
+      potSize_(ParameterValue<int>("potSize")) {
   max_game_length_ = MaxGameLength();
   SPIEL_CHECK_TRUE(max_game_length_.has_value());
   std::string betting_abstraction =

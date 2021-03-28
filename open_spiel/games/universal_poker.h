@@ -209,6 +209,7 @@ class UniversalPokerGame : public Game {
  private:
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
+  const int potSize_;
   absl::optional<int> max_game_length_;
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
   int big_blind_;
