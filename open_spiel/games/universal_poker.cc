@@ -154,7 +154,12 @@ const GameType kGameType{
      // nolimit games. Available options are: "fc" for fold and check/call.
      // "fcpa" for fold, check/call, bet pot and all in (default).
      // Use "fullgame" for the unabstracted game.
-     {"bettingAbstraction", GameParameter(std::string("fcpa"))}}};
+     {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+
+     // ------------------------------------------------------------------------
+     // Following parameters are used to specify specific subgame.
+     {"potSize", GameParameter(0)},
+    }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return absl::make_unique<UniversalPokerGame>(params);
@@ -181,7 +186,12 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
       cur_player_(kChancePlayerId),
       possibleActions_(ACTION_DEAL),
       betting_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
-                               ->betting_abstraction()) {}
+                               ->betting_abstraction()) {
+
+  // Optionally apply subgame parameters.
+  acpc_state_.SetPotSize(game->GetParameters().at("potSize").int_value());
+
+}
 
 std::string UniversalPokerState::ToString() const {
   std::string str =
