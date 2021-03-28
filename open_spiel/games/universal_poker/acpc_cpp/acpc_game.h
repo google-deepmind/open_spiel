@@ -52,6 +52,8 @@ class ACPCGame {
   uint8_t NumSuitsDeck() const { return acpc_game_.numSuits; }
   uint8_t NumRanksDeck() const { return acpc_game_.numRanks; }
   uint32_t StackSize(uint8_t player) const;
+  // Returns the money amount that is used in the game (sum of all stacks).
+  uint32_t TotalMoney() const;
   uint32_t BlindSize(uint8_t player) const;
   uint8_t GetTotalNbBoardCards() const;
 
