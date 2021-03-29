@@ -342,5 +342,11 @@ std::shared_ptr<Observer> ObserverRegisterer::CreateByName(
   return it->second(game, iig_obs_type, params);
 }
 
+std::vector<float> TensorFromObserver(const State& state,
+                                      const Observer& observer) {
+  TrackingVectorAllocator allocator;
+  observer.WriteTensor(state, /*player=*/state.CurrentPlayer(), &allocator);
+  return std::move(allocator.data);
+}
 
 }  // namespace open_spiel
