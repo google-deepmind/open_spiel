@@ -51,6 +51,7 @@ class ACPCGame {
   uint8_t GetNbBoardCardsRequired(uint8_t round) const;
   uint8_t NumSuitsDeck() const { return acpc_game_.numSuits; }
   uint8_t NumRanksDeck() const { return acpc_game_.numRanks; }
+  uint8_t NumBoardCards(int round) const { return acpc_game_.numBoardCards[round]; }
   uint32_t StackSize(uint8_t player) const;
   // Returns the money amount that is used in the game (sum of all stacks).
   uint32_t TotalMoney() const;
@@ -142,6 +143,7 @@ class ACPCState {
 
   const ACPCGame* game() const { return game_; }
   const RawACPCState& raw_state() const { return acpcState_; }
+  RawACPCState* mutable_state() { return &acpcState_; }
 
  private:
   std::string ActionToString(const project_acpc_server::Action& action) const;

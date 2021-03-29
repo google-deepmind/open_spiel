@@ -194,17 +194,29 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
       betting_abstraction_(static_cast<const UniversalPokerGame *>(game.get())
                                ->betting_abstraction()) {
 
-  // Optionally apply subgame parameters.
+  // -- Optionally apply subgame parameters. -----------------------------------
+  // Pot size.
   const int pot_size = game->GetParameters().at("potSize").int_value();
   if (pot_size > 0) {
     acpc_state_.SetPotSize(pot_size);
   }
+  // Board cards.
   const std::string board_cards =
       game->GetParameters().at("boardCards").string_value();
   if (board_cards != "") {
+    // Add the cards.
     logic::CardSet cs(board_cards);
     for(uint8_t card : cs.ToCardArray()) AddBoardCard(card);
+    // Advance the round according to the number of board cards.
+    int num_cards = cs.NumCards();
+    int round = 0;
+    do  {
+      num_cards -= acpc_game_->NumBoardCards(round);
+      round++;
+    } while(round < acpc_game_->NumRounds() && num_cards > 0);
+    acpc_state_.mutable_state()->round = round - 1;
   }
+  // Set specific probabilities.
   const std::string chanceOutcomes =
       game->GetParameters().at("chanceOutcomes").string_value();
   if (chanceOutcomes != "") {
@@ -507,7 +519,7 @@ std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
   std::vector<std::pair<Action, double>> outcomes;
   outcomes.reserve(num_cards);
 
-  if (chance_outcome_idx_ == chanceOutcomes_.size()) {
+  if (chance_outcome_idx_ >= chanceOutcomes_.size()) {
     // No specific outcomes set: distribute cards uniformly.
     const double p = 1.0 / num_cards;
     for (const auto& card : available_cards) outcomes.push_back({card, p});
@@ -596,6 +608,9 @@ int UniversalPokerState::AllInSize() const {
 // cards.
 void UniversalPokerState::DoApplyAction(Action action_id) {
   if (IsChanceNode()) {
+    // Seek forward chance outcomes.
+    chance_outcome_idx_ += LegalActions().size();
+
     // In chance nodes, the action_id is an index into the full deck.
     uint8_t card =
         logic::CardSet(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck())
