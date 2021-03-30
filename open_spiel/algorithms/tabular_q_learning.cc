@@ -31,22 +31,24 @@ using std::vector;
 Action TabularQLearningSolver::GetBestAction(const State& state,
                                              double min_utility) {
   vector<Action> legal_actions = state.LegalActions();
-  Action optimal_action = kInvalidAction;
+  SPIEL_CHECK_GT(legal_actions.size(), 0);
+  Action best_action = legal_actions[0];
 
   double value = min_utility;
   for (const Action& action : legal_actions) {
     double q_val = values_[{state.ToString(), action}];
     if (q_val >= value) {
       value = q_val;
-      optimal_action = action;
+      best_action = action;
     }
   }
-  return optimal_action;
+  return best_action;
 }
 
 double TabularQLearningSolver::GetBestActionValue(const State& state,
                                                   double min_utility) {
   if (state.IsTerminal()) {
+    // q(s,a) is 0 when s is terminal.
     return 0;
   }
   return values_[{state.ToString(), GetBestAction(state, min_utility)}];
@@ -70,9 +72,8 @@ Action TabularQLearningSolver::SampleActionFromEpsilonGreedyPolicy(
 void TabularQLearningSolver::SampleUntilNextStateOrTerminal(State* state) {
   // Repeatedly sample while chance node, so that we end up at a decision node
   while (state->IsChanceNode() && !state->IsTerminal()) {
-    vector<Action> legal_actions = state->LegalActions();
-    state->ApplyAction(
-        legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())]);
+    std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+    state->ApplyAction(SampleAction(outcomes, rng_).first);
   }
 }
 
@@ -83,6 +84,9 @@ TabularQLearningSolver::TabularQLearningSolver(std::shared_ptr<const Game> game)
       learning_rate_(kDefaultLearningRate),
       discount_factor_(kDefaultDiscountFactor),
       lambda_(kDefaultLambda) {
+  // Only support lambda=0 for now.
+  SPIEL_CHECK_EQ(lambda_, 0);
+
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
   if (game_->NumPlayers() == 2) {
@@ -105,6 +109,9 @@ TabularQLearningSolver::TabularQLearningSolver(
       learning_rate_(learning_rate),
       discount_factor_(discount_factor),
       lambda_(lambda) {
+  // Only support lambda=0 for now.
+  SPIEL_CHECK_EQ(lambda_, 0);
+
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
   if (game_->NumPlayers() == 2) {
@@ -129,12 +136,6 @@ void TabularQLearningSolver::RunIteration() {
   std::unique_ptr<State> curr_state = game_->NewInitialState();
   SampleUntilNextStateOrTerminal(curr_state.get());
 
-  // Store the values for the update at the end of the episode using the
-  // offline lambda-return algorithm, using eligibility trace
-  vector<std::string> path;
-  vector<Action> actions;
-  vector<double> updated_values;
-
   while (!curr_state->IsTerminal()) {
     const Player player = curr_state->CurrentPlayer();
 
@@ -143,7 +144,7 @@ void TabularQLearningSolver::RunIteration() {
         SampleActionFromEpsilonGreedyPolicy(*curr_state, min_utility);
 
     std::unique_ptr<State> next_state = curr_state->Child(curr_action);
-    SampleUntilNextStateOrTerminal(curr_state.get());
+    SampleUntilNextStateOrTerminal(next_state.get());
 
     const double reward = next_state->Rewards()[player];
     // Next q-value in perspective of player to play at curr_state (important
@@ -156,30 +157,11 @@ void TabularQLearningSolver::RunIteration() {
     std::string key = curr_state->ToString();
     double one_step_return = reward + discount_factor_ * next_q_value;
 
-    path.push_back(key);
-    actions.push_back(curr_action);
-    updated_values.push_back(one_step_return);
-    curr_state = next_state->Clone();
-  }
+    double prev_q_val = values_[{key, curr_action}];
+    values_[{key, curr_action}] +=
+        learning_rate_ * (one_step_return - prev_q_val);
 
-  // Update the q values using the offline lambda-return algorithm
-  int sz = path.size();
-  double lambda_return_of_next_state = 0;
-  double lambda_series_sum = 1;
-  for (int i = sz - 1; i >= 0; i--) {
-    std::string state_key = path[i];
-    Action action = actions[i];
-    // 1 step return, G(t, t+1)
-    double one_step_return = updated_values[i];
-
-    double lambda_return = lambda_return_of_next_state * lambda_ +
-                           one_step_return * lambda_series_sum;
-    double prev_q_val = values_[{state_key, action}];
-    double new_q_val =
-        prev_q_val + learning_rate_ * (lambda_return - prev_q_val);
-    values_[{state_key, action}] = new_q_val;
-
-    lambda_series_sum = lambda_series_sum * lambda_ + 1;
+    curr_state = std::move(next_state);
   }
 }
 }  // namespace algorithms

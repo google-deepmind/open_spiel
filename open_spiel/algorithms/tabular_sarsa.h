@@ -34,8 +34,8 @@ namespace algorithms {
 // Currently works for sequential 1-player or 2-player zero-sum games.
 //
 // Based on the implementation in Sutton and Barto, Intro to RL. Second Edition,
-// 2018. Section 6.4. Offline lambda-return algorithm is used for eligibility
-// trace, as per the implementation in Chapter 12.
+// 2018. Section 6.4.
+// Note: current implementation only supports full bootstrapping (lambda = 0).
 
 class TabularSarsaSolver {
   static inline constexpr double kDefaultDepthLimit = -1;
