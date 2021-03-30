@@ -38,7 +38,7 @@ void NoChanceOutcomesTest(const Game& game);
 
 // Perform num_sims random simulations of the specified game.
 void RandomSimTest(const Game& game, int num_sims, bool serialize = true,
-                   bool verbose = true);
+                   bool verbose = true, bool mask_test = true);
 
 // Perform num_sims random simulations of the specified game. Also tests the
 // Undo function. Note: for every step in the simulation, the entire simulation

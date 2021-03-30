@@ -261,7 +261,7 @@ void CheckObservables(const Game& game,
 }
 
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
-                      bool serialize, bool verbose,
+                      bool serialize, bool verbose, bool mask_test,
                       std::shared_ptr<Observer> observer  // Can be nullptr
                      ) {
   std::unique_ptr<Observation> observation =
@@ -319,15 +319,16 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
 
     if (state->IsChanceNode()) {
-      LegalActionsMaskTest(game, *state, kChancePlayerId,
-                           state->LegalActions());
+      if (mask_test) LegalActionsMaskTest(game, *state, kChancePlayerId,
+                                          state->LegalActions());
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
-      Action action = open_spiel::SampleAction(outcomes, *rng).first;
+      auto [action, prob] = open_spiel::SampleAction(outcomes, *rng);
 
       if (verbose) {
         std::cout << "sampled outcome: "
                   << state->ActionToString(kChancePlayerId, action)
+                  << "with prob " << prob
                   << std::endl;
       }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
@@ -352,7 +353,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions = state->LegalActions(p);
-        LegalActionsMaskTest(game, *state, p, actions);
+        if (mask_test) LegalActionsMaskTest(game, *state, p, actions);
         std::uniform_int_distribution<int> dis(0, actions.size() - 1);
         Action action = actions[dis(*rng)];
         joint_action.push_back(action);
@@ -387,7 +388,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
-      LegalActionsMaskTest(game, *state, state->CurrentPlayer(), actions);
+      if (mask_test) LegalActionsMaskTest(game, *state, state->CurrentPlayer(),
+                                          actions);
       if (state->IsTerminal())
         SPIEL_CHECK_TRUE(actions.empty());
       else
@@ -454,7 +456,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
 // Perform sims random simulations of the specified game.
 void RandomSimTest(const Game& game, int num_sims, bool serialize,
-                   bool verbose) {
+                   bool verbose, bool mask_test) {
   std::mt19937 rng;
   if (verbose) {
     std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
@@ -462,7 +464,7 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize,
   }
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
-                     verbose, nullptr);
+                     verbose, mask_test, nullptr);
   }
 }
 
@@ -472,7 +474,7 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true,
-                     /*verbose=*/true, nullptr);
+                     /*verbose=*/true, /*mask_test=*/true, nullptr);
   }
 }
 
@@ -482,7 +484,7 @@ void RandomSimTestNoSerialize(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                     /*verbose=*/true, nullptr);
+                     /*verbose=*/true, /*mask_test=*/true, nullptr);
   }
 }
 
@@ -490,7 +492,7 @@ void RandomSimTestCustomObserver(const Game& game,
                                  const std::shared_ptr<Observer> observer) {
   std::mt19937 rng;
   RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                   /*verbose=*/false, observer);
+                   /*verbose=*/false, /*mask_test=*/true, observer);
 }
 
 // Format chance outcomes as a string, for error messages.
