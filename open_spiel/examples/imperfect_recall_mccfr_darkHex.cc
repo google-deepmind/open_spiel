@@ -23,6 +23,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
+ABSL_FLAG(int, board_size, 2, "The size of the board.");
 ABSL_FLAG(int, num_iters, 1000000, "How many iters to run for.");
 ABSL_FLAG(int, report_every, 1000, "How often to report.");
 
@@ -30,15 +31,13 @@ namespace open_spiel {
 namespace {
 
 void ImperfectRecallMCCFR_DH() {
-    std::cout<<"here"<<std::endl;
 std::shared_ptr<const open_spiel::Game> game =
-    open_spiel::LoadGame("dark_hex_ir",{{"board_size", GameParameter(2)}});
+    open_spiel::LoadGame("dark_hex_ir",{{"board_size", 
+                                        GameParameter(absl::GetFlag(FLAGS_board_size))}});
 // algorithms::ExternalSamplingMCCFRSolver solver(*game);
 algorithms::OutcomeSamplingMCCFRSolver solver(*game);
-std::cout<<"here"<<std::endl;
 for (int i = 0; i < absl::GetFlag(FLAGS_num_iters); ++i) {
     solver.RunIteration();
-    std::cout << "Iter " << i << std::endl;
     if (i % absl::GetFlag(FLAGS_report_every) == 0 ||
         i == absl::GetFlag(FLAGS_num_iters) - 1) {
     std::cerr << "Iteration " << i << " average policy is " << std::endl;

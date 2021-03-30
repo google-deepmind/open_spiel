@@ -162,7 +162,6 @@ void HexState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
   board_[move] = move_cell_state;
-
   if (move_cell_state == CellState::kBlackWin) {
     result_black_perspective_ = 1;
   } else if (move_cell_state == CellState::kWhiteWin) {
@@ -216,18 +215,37 @@ std::string HexState::ActionToString(Player player, Action action_id) const {
 }
 
 std::vector<int> HexState::AdjacentCells(int cell) const {
-  std::vector<int> neighbours = {
+  std::vector<int> neighbours = {};
+  if (board_size_ == 2) {
+    switch(cell) {
+      case 0:
+        neighbours = {1, 2};
+        break;
+      case 1:
+        neighbours = {0, 2, 3};
+        break;
+      case 2:
+        neighbours = {0, 1, 3};
+        break;
+      case 3:
+        neighbours = {1, 2};
+        break;
+    }
+  }
+  else {
+    neighbours = {
       cell - board_size_, cell - board_size_ + 1, cell - 1,
       cell + 1,           cell + board_size_ - 1, cell + board_size_};
-  for (int i = kMaxNeighbours - 1; i >= 0; i--) {
-    // Check for invalid neighbours and remove
-    // Iterating in reverse to avoid changing the index of a candidate neighbour
-    if (neighbours[i] < 0 || (neighbours[i] >= board_size_ * board_size_) ||
-        (neighbours[i] % board_size_ == 0 &&
-         cell % board_size_ == board_size_ - 1) ||
-        (neighbours[i] % board_size_ == board_size_ - 1 &&
-         cell % board_size_ == 0)) {
-      neighbours.erase(neighbours.begin() + i);
+    for (int i = kMaxNeighbours - 1; i >= 0; i--) {
+      // Check for invalid neighbours and remove
+      // Iterating in reverse to avoid changing the index of a candidate neighbour
+      if (neighbours[i] < 0 || (neighbours[i] >= board_size_ * board_size_) ||
+          (neighbours[i] % board_size_ == 0 &&
+          cell % board_size_ == board_size_ - 1) ||
+          (neighbours[i] % board_size_ == board_size_ - 1 &&
+          cell % board_size_ == 0)) {
+        neighbours.erase(neighbours.begin() + i);
+      }
     }
   }
   return neighbours;
