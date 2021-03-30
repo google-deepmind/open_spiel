@@ -15,6 +15,7 @@
 #include "open_spiel/games/universal_poker.h"
 
 #include <memory>
+#include <utils/file.h>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -550,6 +551,86 @@ void TestFCHPA() {
   }
 }
 
+void TestHoleIndexCalculation() {
+  auto check_index = [](std::string card_a, std::string card_b,
+                        int expected_index) {
+    int a = logic::CardSet(card_a).ToCardArray()[0];
+    int b = logic::CardSet(card_b).ToCardArray()[0];
+    int actual_index = GetHoleCardsReachIndex(a, b,
+        /*num_suits=*/4, /*num_ranks=*/13);
+    SPIEL_CHECK_EQ(actual_index, expected_index);
+  };
+
+  // Suit order is "shdc"
+  check_index("2s", "2h", 0);
+  check_index("2s", "2d", 1);
+  check_index("2s", "2c", 2);
+  check_index("2s", "3s", 3);
+  check_index("2s", "3h", 4);
+  // ...
+  check_index("2s", "Ac", 50);
+  check_index("2h", "2d", 51);
+  check_index("2h", "2c", 52);
+  // ...
+  check_index("Ad", "Ac", 1325);
+}
+
+std::string ReadSubgameReachProbs(const std::string& file_name) {
+  // FIXME: may need to update the path, not sure what is the relative root...
+  return file::ReadContentsFromFile(
+      absl::StrCat("open_spiel/games/universal_poker/endgames/",
+                   file_name, ".txt"), "r");
+}
+
+void TestSubgameCreation() {
+  auto test_game = [](
+      int pot_size,
+      const std::string& board_cards,
+      const std::string& hand_reach) {
+
+    constexpr const char* base_game =
+      "universal_poker("
+        "betting=nolimit,"
+        "numPlayers=2,"
+        "numRounds=4,"
+        "blind=100 50,"
+        "firstPlayer=2 1 1 1,"
+        "numSuits=4,"
+        "numRanks=13,"
+        "numHoleCards=2,"
+        "numBoardCards=0 3 1 1,"
+        "stack=20000 20000,"
+        "bettingAbstraction=fcpa,"
+        "potSize=%d,"
+        "boardCards=%s,"
+        "handReaches=%s"
+      ")";
+
+    std::shared_ptr <const Game> with_reach =
+        LoadGame(absl::StrFormat(base_game, pot_size, board_cards, hand_reach));
+    testing::RandomSimTest(*with_reach,
+                           /*num_sims=*/5,
+                           /*serialize=*/true,
+                           /*verbose=*/true,
+                           /*mask_test=*/false);
+  };
+
+  // Build uniform reaches as a string.
+  std::stringstream ss;
+  for (int i = 0; i < 2 * kSubgameUniqueHands; ++i)
+    ss << 1. / (2 * kSubgameUniqueHands) << ' ';
+  std::string uniform_reaches = ss.str();
+
+  test_game(500,  "7s9h9cTc",   uniform_reaches);
+  test_game(500,  "7s9h9cTc",   ReadSubgameReachProbs("subgame1"));
+  test_game(4780, "Ts6hAh7c",   uniform_reaches);
+  test_game(4780, "Ts6hAh7c",   ReadSubgameReachProbs("subgame2"));
+  test_game(500,  "4s8hTc9h2s", uniform_reaches);
+  test_game(500,  "4s8hTc9h2s", ReadSubgameReachProbs("subgame3"));
+  test_game(3750, "JsKs5cQs7d", uniform_reaches);
+  test_game(3750, "JsKs5cQs7d", ReadSubgameReachProbs("subgame4"));
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -571,4 +652,6 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
   open_spiel::universal_poker::CanConvertActionsCorrectly();
   open_spiel::universal_poker::TestFCHPA();
+  open_spiel::universal_poker::TestHoleIndexCalculation();
+  open_spiel::universal_poker::TestSubgameCreation();
 }
