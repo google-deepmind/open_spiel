@@ -217,10 +217,9 @@ std::string HexState::ActionToString(Player player, Action action_id) const {
 std::vector<int> HexState::AdjacentCells(int cell) const {
   std::vector<int> neighbours = {};
   if (board_size_ == 2) {
-    if cell == 0 || cell == 3) neighbours = {1, 2};
+    if (cell == 0 || cell == 3) neighbours = {1, 2};
     else if (cell == 1) neighbours = {0, 2, 3};
     else if (cell == 2) neighbours = {0, 1, 3};
-    }
   }
   else {
     neighbours = {
