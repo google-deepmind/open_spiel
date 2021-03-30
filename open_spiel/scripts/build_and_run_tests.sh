@@ -43,6 +43,8 @@ ArgsLibAddArg system_wide_packages bool false 'Whether to use --system-site-pack
 ArgsLibAddArg build_with_pip bool false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
 ArgsLibAddArg build_only bool false 'Builds only the library, without running tests.'
 ArgsLibAddArg test_only string "all" 'Builds and runs the specified test only (use "all" to run all tests)'
+ArgsLibAddArg build_dir string "build" 'Location of the build directory.'
+ArgsLibAddArg num_threads int -1 'Number of threads to use when paralellizing build / tests.'
 ArgsLibParse $@
 
 function die() {
@@ -64,13 +66,18 @@ then
   exit 1
 fi
 
-NPROC=nproc
-if [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
-  NPROC="sysctl -n hw.physicalcpu"
-fi
+if [ "$ARG_num_threads" -eq -1 ]; then
+  NPROC=nproc
+  if [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
+    NPROC="sysctl -n hw.physicalcpu"
+  fi
 
-MAKE_NUM_PROCS=$(${NPROC})
-let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
+  MAKE_NUM_PROCS=$(${NPROC})
+  let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
+else
+  MAKE_NUM_PROCS=$ARG_num_threads
+  TEST_NUM_PROCS=$ARG_num_threads
+fi
 
 # if we are in a virtual_env, we will not create a new one inside.
 if [[ "$VIRTUAL_ENV" != "" ]]
@@ -127,7 +134,7 @@ else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
-BUILD_DIR="build"
+BUILD_DIR="$ARG_build_dir"
 mkdir -p $BUILD_DIR
 
 # Configure Julia compilation if required.
