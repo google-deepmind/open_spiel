@@ -692,6 +692,7 @@ bool UniversalPokerState::IsDistributingSingleCard() const {
   return handReaches_.empty() || MoveNumber() > 0;
 }
 
+
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
@@ -1318,6 +1319,68 @@ open_spiel::Action ACPCActionToOpenSpielAction(
   // Will never get called.
   return kInvalidAction;
 }
+
+std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937& rng,
+                                              int pot_size,
+                                              std::string board_cards,
+                                              std::vector <int> hand_reach) {
+
+  constexpr const char* base_game =
+      "universal_poker("
+      "betting=nolimit,"
+      "numPlayers=2,"
+      "numRounds=4,"
+      "blind=100 50,"
+      "firstPlayer=2 1 1 1,"
+      "numSuits=4,"
+      "numRanks=13,"
+      "numHoleCards=2,"
+      "numBoardCards=0 3 1 1,"
+      "stack=20000 20000,"
+      "bettingAbstraction=fcpa,"
+      "potSize=%d,"
+      "boardCards=%s,"
+      "handReaches=%s"
+    ")";
+
+  if (pot_size == -1) {
+    // Multiples of 50, from 0 to 40000
+    // FIXME maybe there are other possible pot sizes?
+    std::uniform_int_distribution<int> dist(0, 800);
+    pot_size = dist(rng) * 50;
+  }
+  if (board_cards == "") {
+    // Pick a round, i.e. 3/4/5 cards.
+    std::uniform_int_distribution<int> rnd_cards(3, 5);
+    std::uniform_int_distribution<int> rnd_rank(0, MAX_RANKS);
+    std::uniform_int_distribution<int> rnd_suit(0, MAX_SUITS);
+    // Populate random non-repeating cards.
+    int num_cards = rnd_cards(rng);
+    std::vector<int> cards;
+    cards.reserve(num_cards);
+    while(cards.size() != num_cards) {
+      int rank = rnd_rank(rng);
+      int suit = rnd_suit(rng);
+      int card = makeCard(rank, suit);
+      if (std::find(cards.begin(), cards.end(), card) == cards.end()) {
+        cards.push_back(card);
+      }
+    }
+    logic::CardSet set(cards);
+    board_cards = set.ToString();
+  }
+  if (hand_reach.empty()) {
+    // FIXME open interval [0, 1) -> closed interval [0, 1]
+    // Can be done using a bijection of 2^24 int to float
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    for (int i = 0; i < 2*kSubgameUniqueHands; ++i) {
+      hand_reach.push_back(dist(rng));
+    }
+  }
+  std::string reach = absl::StrJoin(hand_reach.begin(), hand_reach.end(), " ");
+  return LoadGame(absl::StrFormat(base_game, pot_size, board_cards, reach));
+}
+
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting) {
   os << BettingAbstractionToString(betting);

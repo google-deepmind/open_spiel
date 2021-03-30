@@ -630,6 +630,18 @@ void TestSubgameCreation() {
   test_game(3750, "JsKs5cQs7d", uniform_reaches);
   test_game(3750, "JsKs5cQs7d", ReadSubgameReachProbs("subgame4"));
 }
+void TestRandomSubgameCreation() {
+  std::mt19937 rng;
+  MakeRandomSubgame(rng);
+  MakeRandomSubgame(rng, 100);
+  MakeRandomSubgame(rng, 100, "7s9h9cTc");
+
+  std::vector<int>  uniform_reaches;
+  for (int i = 0; i < 2 * kSubgameUniqueHands; ++i) {
+    uniform_reaches.push_back(1. / (2 * kSubgameUniqueHands));
+  }
+  MakeRandomSubgame(rng, 100, "7s9h9cTc", uniform_reaches);
+}
 
 }  // namespace
 }  // namespace universal_poker
@@ -654,4 +666,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::TestFCHPA();
   open_spiel::universal_poker::TestHoleIndexCalculation();
   open_spiel::universal_poker::TestSubgameCreation();
+  open_spiel::universal_poker::TestRandomSubgameCreation();
 }
