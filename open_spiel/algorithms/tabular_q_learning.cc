@@ -153,13 +153,12 @@ void TabularQLearningSolver::RunIteration() {
         (player != next_state->CurrentPlayer() ? -1 : 1) *
         GetBestActionValue(*next_state, min_utility);
 
-    // Store the value for an offline update at the end of the episode
+    // Update the q value
     std::string key = curr_state->ToString();
-    double one_step_return = reward + discount_factor_ * next_q_value;
+    double new_q_value = reward + discount_factor_ * next_q_value;
 
     double prev_q_val = values_[{key, curr_action}];
-    values_[{key, curr_action}] +=
-        learning_rate_ * (one_step_return - prev_q_val);
+    values_[{key, curr_action}] += learning_rate_ * (new_q_value - prev_q_val);
 
     curr_state = std::move(next_state);
   }
