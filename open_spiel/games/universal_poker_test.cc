@@ -576,10 +576,10 @@ void TestHoleIndexCalculation() {
 }
 
 std::string ReadSubgameReachProbs(const std::string& file_name) {
-  // FIXME: may need to update the path, not sure what is the relative root...
+  std::string dir = __FILE__;
+  dir.resize(dir.rfind("/"));
   return file::ReadContentsFromFile(
-      absl::StrCat("open_spiel/games/universal_poker/endgames/",
-                   file_name, ".txt"), "r");
+      absl::StrCat(dir, "/universal_poker/endgames/", file_name, ".txt"), "r");
 }
 
 void TestSubgameCreation() {
