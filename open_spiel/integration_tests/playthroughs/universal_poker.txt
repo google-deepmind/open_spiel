@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Universal Poker"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["betting", "bettingAbstraction", "blind", "firstPlayer", "gamedef", "maxRaises", "numBoardCards", "numHoleCards", "numPlayers", "numRanks", "numRounds", "numSuits", "raiseSize", "stack"]
+GameType.parameter_specification = ["betting", "bettingAbstraction", "blind", "boardCards", "firstPlayer", "gamedef", "handReaches", "maxRaises", "numBoardCards", "numHoleCards", "numPlayers", "numRanks", "numRounds", "numSuits", "potSize", "raiseSize", "stack"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 4
 PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 24
-GetParameters() = {betting=nolimit,bettingAbstraction=fcpa,blind=100 100,firstPlayer=1 1,maxRaises=,numBoardCards=0 1,numHoleCards=1,numPlayers=2,numRanks=6,numRounds=2,numSuits=4,stack=1200 1200}
+GetParameters() = {betting=nolimit,bettingAbstraction=fcpa,blind=100 100,boardCards=,firstPlayer=1 1,handReaches=,maxRaises=,numBoardCards=0 1,numHoleCards=1,numPlayers=2,numRanks=6,numRounds=2,numSuits=4,potSize=0,stack=1200 1200}
 NumPlayers() = 2
 MinUtility() = -1200.0
 MaxUtility() = 1200.0
