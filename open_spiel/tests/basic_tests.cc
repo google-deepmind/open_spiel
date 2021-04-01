@@ -14,6 +14,7 @@
 
 #include "open_spiel/tests/basic_tests.h"
 
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <numeric>
@@ -237,12 +238,14 @@ void CheckObservables(const Game& game,
                      ) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {
-      std::vector<float> v = state.InformationStateTensor(p);
-      SPIEL_CHECK_EQ(v.size(), game.InformationStateTensorSize());
+      std::vector<float> tensor = state.InformationStateTensor(p);
+      for (float val : tensor) SPIEL_CHECK_TRUE(std::isfinite(val));
+      SPIEL_CHECK_EQ(tensor.size(), game.InformationStateTensorSize());
     }
     if (game.GetType().provides_observation_tensor) {
-      std::vector<float> v = state.ObservationTensor(p);
-      SPIEL_CHECK_EQ(v.size(), game.ObservationTensorSize());
+      std::vector<float> tensor = state.ObservationTensor(p);
+      for (float val : tensor) SPIEL_CHECK_TRUE(std::isfinite(val));
+      SPIEL_CHECK_EQ(tensor.size(), game.ObservationTensorSize());
     }
     if (game.GetType().provides_information_state_string) {
       // Checking it does not raise errors.
