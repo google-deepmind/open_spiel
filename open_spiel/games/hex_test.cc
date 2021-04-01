@@ -26,6 +26,7 @@ void BasicHexTests() {
   testing::NoChanceOutcomesTest(*LoadGame("hex(board_size=5)"));
   testing::RandomSimTest(*LoadGame("hex(board_size=5)"), 100);
   testing::RandomSimTest(*LoadGame("hex"), 5);
+  testing::RandomSimTest(*LoadGame("hex(board_size=2)"), 10);
 }
 
 }  // namespace

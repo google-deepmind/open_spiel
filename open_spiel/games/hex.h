@@ -80,7 +80,9 @@ class HexState : public State {
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
+
   CellState BoardAt(int cell) const { return board_[cell]; }
+  void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
 
  protected:
   std::vector<CellState> board_;
@@ -91,6 +93,8 @@ class HexState : public State {
   Player current_player_ = 0;                      // Player zero goes first
   double result_black_perspective_ = 0;            // 1 if Black (player 0) wins
   std::vector<int> AdjacentCells(int cell) const;  // Cells adjacent to cell
+  // Same function as above when board size is 2.
+  std::vector<int> AdjacentCellsBoardSize2(int cell) const;
   const int board_size_;
 };
 

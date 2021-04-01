@@ -162,7 +162,6 @@ void HexState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
   board_[move] = move_cell_state;
-
   if (move_cell_state == CellState::kBlackWin) {
     result_black_perspective_ = 1;
   } else if (move_cell_state == CellState::kWhiteWin) {
@@ -215,13 +214,31 @@ std::string HexState::ActionToString(Player player, Action action_id) const {
                       action_id / board_size_, ")");
 }
 
+std::vector<int> HexState::AdjacentCellsBoardSize2(int cell) const {
+  if (cell == 0 || cell == 3) {
+    return {1, 2};
+  } else if (cell == 1) {
+    return {0, 2, 3};
+  } else if (cell == 2) {
+    return {0, 1, 3};
+  } else {
+    SpielFatalError(absl::StrCat("Unexpected cell value: ", cell));
+  }
+}
+
 std::vector<int> HexState::AdjacentCells(int cell) const {
-  std::vector<int> neighbours = {
+  if (board_size_ == 2) {
+    // Special case for board size 2 where connections can form between the two
+    // edges of the board.
+    return AdjacentCellsBoardSize2(cell);
+  }
+  std::vector<int> neighbours = {};
+  neighbours = {
       cell - board_size_, cell - board_size_ + 1, cell - 1,
       cell + 1,           cell + board_size_ - 1, cell + board_size_};
   for (int i = kMaxNeighbours - 1; i >= 0; i--) {
     // Check for invalid neighbours and remove
-    // Iterating in reverse to avoid changing the index of a candidate neighbour
+    // Iterate in reverse to avoid changing the index of a candidate neighbour
     if (neighbours[i] < 0 || (neighbours[i] >= board_size_ * board_size_) ||
         (neighbours[i] % board_size_ == 0 &&
          cell % board_size_ == board_size_ - 1) ||
