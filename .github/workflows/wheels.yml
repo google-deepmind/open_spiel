@@ -1,0 +1,46 @@
+Name: wheels
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macOS-10.15]
+      env:
+        BUILD_WITH_ACPC: ON
+        BUILD_WITH_HANABI: ON
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+
+      - name: Install
+        run: |
+          pwd
+          chmod +x install.sh
+          ./install.sh
+          python3 -m pip install twine build
+          python3 -m pip install cibuildwheel==1.10.0
+
+      - name: Build sdist
+        run: |
+          python3 -m build -s
+          twine check dist/*
+
+      - name: Build bdist_wheel
+        run: |
+          ./open_spiel/scripts/build_and_run_tests.sh
+          python3 -m cibuildwheel --output-dir wheelhouse
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: |
+            dist/*.tar.gz
+            ./wheelhouse/*.whl
