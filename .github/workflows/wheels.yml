@@ -16,6 +16,7 @@ jobs:
       env:
         BUILD_WITH_ACPC: ON
         BUILD_WITH_HANABI: ON
+        CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
 
     steps:
       - uses: actions/checkout@v2
