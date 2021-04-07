@@ -57,7 +57,193 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+bool ObserverHasString(IIGObservationType iig_obs_type) {
+  return !iig_obs_type.perfect_recall;
+}
+
+bool ObserverHasTensor(IIGObservationType iig_obs_type) {
+  return !iig_obs_type.perfect_recall;
+}
+
 }  // namespace
+
+
+class GinRummyObserver : public Observer {
+ public:
+  GinRummyObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/ObserverHasString(iig_obs_type),
+                 /*has_tensor=*/ObserverHasTensor(iig_obs_type)),
+        iig_obs_type_(iig_obs_type) {}
+
+
+  void WriteTensor(const State& observed_state, int player,
+                   Allocator* allocator) const override {
+    auto& state = open_spiel::down_cast<const GinRummyState&>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+
+    // TODO(Michal) Should we implement perfect recall?
+    if (iig_obs_type_.perfect_recall) {
+      SpielFatalError(
+          "GinRummyObserver: tensor with perfect recall not implemented.");
+    }
+
+    // Observing player.
+    WriteObservingPlayer(state, player, allocator);
+
+    // Private hand(s).
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      WriteSinglePlayerHand(state, player, allocator);
+    } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
+      WriteAllPlayerHands(state, allocator);
+    }
+
+    // Public information.
+    if (iig_obs_type_.public_info) {
+      WriteKnockCard(state, allocator);
+      WriteUpcard(state, allocator);
+      WriteDiscardPile(state, allocator);
+      WriteStockSize(state, allocator);
+      WriteLayedMelds(state, allocator);
+    }
+  }
+
+  std::string StringFrom(const State& observed_state,
+                         int player) const override {
+    auto& state = open_spiel::down_cast<const GinRummyState&>(observed_state);
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, state.num_players_);
+
+    // TODO(Michal) Should we implement perfect recall?
+    if (iig_obs_type_.perfect_recall) {
+      SpielFatalError(
+          "GinRummyObserver: string with perfect recall not implemented.");
+    }
+
+    std::string rv;
+    absl::StrAppend(&rv, "\nKnock card: ", state.knock_card_);
+    absl::StrAppend(&rv, "\nPrev upcard: ", CardString(state.prev_upcard_));
+    absl::StrAppend(&rv, "\nRepeated move: ", state.repeated_move_);
+    absl::StrAppend(&rv, "\nPlayer turn: ", state.cur_player_);
+    absl::StrAppend(&rv, "\nPhase: ",
+                    GinRummyState::kPhaseString[static_cast<int>(state.phase_)],
+                    "\n");
+    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
+        player == 1)) {
+      absl::StrAppend(&rv, "\nPlayer1: Deadwood=", state.deadwood_[1]);
+    } else {
+      absl::StrAppend(&rv, "\nPlayer1:");
+    }
+    if (state.knocked_[0] && !state.layoffs_.empty()) {
+      absl::StrAppend(&rv, "\nLayoffs: ");
+      for (int card : state.layoffs_) absl::StrAppend(&rv, CardString(card));
+    }
+    if (!state.layed_melds_[1].empty()) {
+      absl::StrAppend(&rv, "\nLayed melds:");
+      for (int meld_id : state.layed_melds_[1]) {
+        absl::StrAppend(&rv, " ");
+        std::vector<int> meld = int_to_meld.at(meld_id);
+        for (int card : meld) absl::StrAppend(&rv, CardString(card));
+      }
+    }
+    
+    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
+        player == 1)) {
+      absl::StrAppend(&rv, "\n", HandToString(state.hands_[1]));
+    } else {
+      absl::StrAppend(&rv, "\n", HandToString(std::vector<int>()));
+    }
+    
+    absl::StrAppend(&rv, "\nStock size: ", state.stock_size_);
+    absl::StrAppend(&rv, "  Upcard: ", CardString(state.upcard_));
+    absl::StrAppend(&rv, "\nDiscard pile: ");
+    for (int card : state.discard_pile_) absl::StrAppend(&rv, CardString(card));
+    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
+        player == 0)) {
+      absl::StrAppend(&rv, "\n\nPlayer0: Deadwood=", state.deadwood_[0]);
+    } else {
+      absl::StrAppend(&rv, "\n\nPlayer0:");
+    }
+    if (state.knocked_[1] && !state.layoffs_.empty()) {
+      absl::StrAppend(&rv, "\nLayoffs: ");
+      for (int card : state.layoffs_) absl::StrAppend(&rv, CardString(card));
+    }
+    if (!state.layed_melds_[0].empty()) {
+      absl::StrAppend(&rv, "\nLayed melds:");
+      for (int meld_id : state.layed_melds_[0]) {
+        absl::StrAppend(&rv, " ");
+        std::vector<int> meld = int_to_meld.at(meld_id);
+        for (int card : meld) absl::StrAppend(&rv, CardString(card));
+      }
+    }
+    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
+        player == 0)) {
+      absl::StrAppend(&rv, "\n", HandToString(state.hands_[0]));
+    } else {
+      absl::StrAppend(&rv, "\n", HandToString(std::vector<int>()));
+    }
+    return rv;
+  }
+
+ private:
+  static void WriteObservingPlayer(const GinRummyState& state, int player,
+                                   Allocator* allocator) {
+    auto out = allocator->Get("player", {kNumPlayers});
+    out.at(player) = 1;
+  }
+
+  static void WriteSinglePlayerHand(const GinRummyState& state, int player,
+                                    Allocator* allocator) {
+    auto out = allocator->Get("private_hand", {kNumCards});
+    for (auto card : state.hands_[player]) out.at(card) = 1;
+  }
+
+  static void WriteAllPlayerHands(const GinRummyState& state,
+                                  Allocator* allocator) {
+    auto out = allocator->Get("private_hands", {kNumPlayers, kNumCards});
+    for (int p = 0; p < kNumPlayers; ++p) {
+      for (auto card : state.hands_[p]) out.at(p, card) = 1;
+    }
+  }
+
+  static void WriteKnockCard(const GinRummyState& state,
+                             Allocator* allocator) {
+    auto out = allocator->Get("knock_card", {kDefaultKnockCard});
+    for (int i = 0; i < state.knock_card_; ++i) out.at(i) = 1;
+  }
+
+  static void WriteUpcard(const GinRummyState& state, Allocator* allocator) {
+    auto out = allocator->Get("upcard", {kNumCards});
+    if (state.upcard_.has_value()) out.at(state.upcard_.value()) = 1;
+  }
+
+  static void WriteDiscardPile(const GinRummyState& state,
+                               Allocator* allocator) {
+    auto out = allocator->Get("discard_pile", {kNumCards});
+    for (auto card : state.discard_pile_) out.at(card) = 1;
+  }
+
+  static void WriteStockSize(const GinRummyState& state,
+                             Allocator* allocator) {
+    auto out = allocator->Get("stock_size", {kMaxStockSize});
+    for (int i = 0; i < std::min(state.stock_size_, kMaxStockSize); ++i)
+      out.at(i) = 1;
+  }
+
+  static void WriteLayedMelds(const GinRummyState& state,
+                              Allocator* allocator) {
+    auto out = allocator->Get("layed_melds", {kNumPlayers, kNumMeldActions});
+    for (int p = 0; p < kNumPlayers; ++p) {
+      for (auto meld : state.layed_melds_[p]) out.at(p, meld) = 1;
+    }
+  }
+
+  IIGObservationType iig_obs_type_;
+};
 
 GinRummyState::GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
                              int knock_card, int gin_bonus, int undercut_bonus)
@@ -566,95 +752,15 @@ std::unique_ptr<State> GinRummyState::Clone() const {
 }
 
 std::string GinRummyState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  // Built from ObservationTensor to provide an extra check.
-  std::vector<float> tensor(game_->ObservationTensorSize());
-  ObservationTensor(player, absl::MakeSpan(tensor));
-  std::vector<int> hand;
-  std::vector<int> discard_pile;
-  std::vector<int> layed_melds;
-  absl::optional<int> upcard;
-  int knock_card = 0;
-  int stock_size = 0;
-
-  auto ptr = tensor.begin();
-  ptr += 2;
-  for (int i = 0; i < kDefaultKnockCard; ++i) {
-    if (ptr[i] == 1) ++knock_card;
-  }
-  ptr += kDefaultKnockCard;
-  for (int i = 0; i < kNumCards; ++i) {
-    if (ptr[i] == 1) hand.push_back(i);
-  }
-  ptr += kNumCards;
-  for (int i = 0; i < kNumCards; ++i) {
-    if (ptr[i] == 1) upcard = i;
-  }
-  ptr += kNumCards;
-  for (int i = 0; i < kNumCards; ++i) {
-    if (ptr[i] == 1) discard_pile.push_back(i);
-  }
-  ptr += kNumCards;
-  for (int i = 0; i < kMaxStockSize; ++i) {
-    if (ptr[i] == 1) ++stock_size;
-  }
-  ptr += kMaxStockSize;
-  for (int i = 0; i < kNumMeldActions; ++i) {
-    if (ptr[i] == 1) layed_melds.push_back(i);
-  }
-
-  std::string rv;
-  absl::StrAppend(&rv, "Player: ", player);
-  if (!layed_melds.empty()) {
-    absl::StrAppend(&rv, "\nOpponent melds: ");
-    for (int meld_id : layed_melds) {
-      std::vector<int> meld = int_to_meld.at(meld_id);
-      for (int card : meld) absl::StrAppend(&rv, CardString(card));
-      absl::StrAppend(&rv, " ");
-    }
-  }
-  absl::StrAppend(&rv, "\nStock size: ", stock_size);
-  absl::StrAppend(&rv, "  Upcard: ", CardString(upcard));
-  absl::StrAppend(&rv, "  Knock card: ", knock_card);
-  absl::StrAppend(&rv, "\nDiscard pile: ");
-  for (int card : discard_pile) absl::StrAppend(&rv, CardString(card));
-  absl::StrAppend(&rv, "\n", HandToString(hand));
-  return rv;
+  const GinRummyGame& game = open_spiel::down_cast<const GinRummyGame&>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
 void GinRummyState::ObservationTensor(Player player,
                                       absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, kNumPlayers);
-
-  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
-  std::fill(values.begin(), values.end(), 0.);
-  if (phase_ == Phase::kGameOver) return;
-  auto ptr = values.begin();
-
-  ptr[player] = 1;
-  ptr += kNumPlayers;
-
-  for (int i = 0; i < knock_card_; ++i) ptr[i] = 1;
-  ptr += kDefaultKnockCard;
-
-  for (int card : hands_[player]) ptr[card] = 1;
-  ptr += kNumCards;
-
-  if (upcard_.has_value()) ptr[upcard_.value()] = 1;
-  ptr += kNumCards;
-
-  for (int card : discard_pile_) ptr[card] = 1;
-  ptr += kNumCards;
-
-  for (int i = 0; i < std::min(stock_size_, kMaxStockSize); ++i) ptr[i] = 1;
-  ptr += kMaxStockSize;
-
-  if (knocked_[Opponent(player)]) {
-    for (int meld : layed_melds_[Opponent(player)]) ptr[meld] = 1;
-  }
+  ContiguousAllocator allocator(values);
+  const GinRummyGame& game = open_spiel::down_cast<const GinRummyGame&>(*game_);
+  game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 
 GinRummyGame::GinRummyGame(const GameParameters& params)
@@ -665,6 +771,28 @@ GinRummyGame::GinRummyGame(const GameParameters& params)
       undercut_bonus_(ParameterValue<int>("undercut_bonus")) {
   SPIEL_CHECK_GE(knock_card_, 0);
   SPIEL_CHECK_LE(knock_card_, kDefaultKnockCard);
+  default_observer_ = std::make_shared<GinRummyObserver>(kDefaultObsType);
+  // TODO(Michal) Should we implement perfect recall?
+  //info_state_observer_ = std::make_shared<GinRummyObserver>(kInfoStateObsType);
+}
+
+// TODO(Michal) This is how it's implemented in dark chess. The commented out
+// code below is how it's implemented in leduc. Is there a reason to prefer
+// one to the other?
+std::shared_ptr<Observer> GinRummyGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
+
+  if (!params.empty()) SpielFatalError("Observation params not supported");
+  return std::make_shared<GinRummyObserver>(
+      iig_obs_type.value_or(kDefaultObsType));
+
+  //if (params.empty()) {
+  //  return std::make_shared<GinRummyObserver>(
+  //      iig_obs_type.value_or(kDefaultObsType));
+  //} else {
+  //  return MakeRegisteredObserver(iig_obs_type, params);
+  //}
 }
 
 }  // namespace gin_rummy

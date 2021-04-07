@@ -43,6 +43,7 @@
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -65,13 +66,16 @@ inline constexpr int kMeldActionBase = 56;  // First lay meld action
 inline constexpr int kNumMeldActions = 185;
 inline constexpr int kNumDistinctActions = kMeldActionBase + kNumMeldActions;
 inline constexpr int kObservationTensorSize =
-    kNumPlayers          // Player turn
-    + kDefaultKnockCard  // Knock card
-    + kNumCards          // Player hand
-    + kNumCards          // Upcard
-    + kNumCards          // Discard pile
-    + kMaxStockSize      // Stock size
-    + kNumMeldActions;   // Opponent's layed melds
+    kNumPlayers             // Player turn
+    + kDefaultKnockCard     // Knock card
+    + kNumCards             // Player hand
+    + kNumCards             // Upcard
+    + kNumCards             // Discard pile
+    + kMaxStockSize         // Stock size
+    + kNumMeldActions * 2;  // Layed melds of both players
+
+class GinRummyGame;
+class GinRummyObserver;
 
 class GinRummyState : public State {
  public:
@@ -93,6 +97,8 @@ class GinRummyState : public State {
   void DoApplyAction(Action action) override;
 
  private:
+  friend class GinRummyObserver;
+
   enum class Phase {
     kDeal,
     kFirstUpcard,
@@ -204,6 +210,11 @@ class GinRummyGame : public Game {
   int MaxGameLength() const override { return 300; }
   // TODO: verify whether this bound is tight and/or tighten it.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+  std::shared_ptr<Observer> MakeObserver(
+      absl::optional<IIGObservationType> iig_obs_type,
+      const GameParameters& params) const override;
+
+  std::shared_ptr<GinRummyObserver> default_observer_;
 
  private:
   const bool oklahoma_;
