@@ -149,7 +149,6 @@ void PlayerOneTrappedByBlocksTest() {
   std::cout << "Success!" << "\n\n";
 }
 
-
 }  // namespace
 }  // namespace amazons
 }  // namespace open_spiel
