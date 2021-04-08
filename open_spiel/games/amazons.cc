@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// testing 
 #include "open_spiel/games/amazons.h"
 
 #include <algorithm>
@@ -330,14 +332,17 @@ namespace open_spiel
           shoot_ = action;          
           board_[shoot_] = CellState::kBlock;
           
-          if (IsGameOver())
-          {
-            outcome_ = 1 - current_player_;
-          }
-
           current_player_ = 1 - current_player_;
+
           state_ = amazon_select;
 
+          // Check if game is over
+          if (LegalActions().size() == 0)
+          { 
+            // outcome  = winner
+            outcome_ = 1 -current_player_;
+          }
+          
           break;
       }
       
@@ -443,12 +448,14 @@ namespace open_spiel
       std::fill(begin(board_), end(board_), CellState::kEmpty);
       switch (kNumRows)
       {
-      case 8:
+        case 6:
+        board_[1] = board_[4] = board_[6] = board_[11] = CellState::kCross;
+        board_[24] = board_[29] = board_[31] = board_[34] = CellState::kNought;
+        break;
+        
+        case 8:
         board_[2] = board_[5] = board_[16] = board_[23] = CellState::kCross;
         board_[40] = board_[47] = board_[58] = board_[61] = CellState::kNought;
-        break;
-      
-      default:
         break;
       }
 
@@ -469,19 +476,6 @@ namespace open_spiel
         }
       }
       return str;
-    }
-
-    bool AmazonsState::IsGameOver() const{
-
-      int num_moves = 0;
-
-      for(int i = 0; i < board_.size(); i++){
-        if(board_[i] == PlayerToState(1 - CurrentPlayer())){
-          num_moves += GetAllMoves(i).size();
-        }
-      }
-
-      return num_moves == 0;
     }
 
     bool AmazonsState::IsTerminal() const
