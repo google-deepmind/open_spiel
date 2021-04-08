@@ -177,7 +177,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   get_filename_component(py_test ${py_test_file} NAME_WE)
-  add_test(NAME python_${py_test} COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+  add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
   # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
   # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
