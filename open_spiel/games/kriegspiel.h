@@ -34,7 +34,11 @@
 // https://en.wikipedia.org/wiki/Kriegspiel
 // The implementation follows ICC rules (with a few exceptions):
 // https://www.chessclub.com/help/Kriegspiel
-// The exceptions are 50-move rule and threefold repetition, which under ICC
+// One of the exceptions is that ICC does not notify opponent about player's
+// illegal move. Here he has to be notified about it because tests don't allow
+// player to not recognise the difference between states with different move
+// number. And Illegal attempt is considered a move.
+// Other exceptions are 50-move rule and threefold repetition, which under ICC
 // rules are not automatically enforced, but can be claimed by the player. This
 // implementation does not support claiming or offering draws so these rules'
 // automatic enforcement can be turned on and off
@@ -192,8 +196,7 @@ class KriegspielState : public State {
   std::vector<std::pair<chess::Move, KriegspielUmpireMessage>> move_msg_history_;
   // We store this info as an optimisation so that we don't have to compute it
   // from move_msg_history for observations
-  std::optional<KriegspielUmpireMessage> last_public_msg_{};
-  std::optional<KriegspielUmpireMessage> before_last_public_msg_{};
+  std::optional<KriegspielUmpireMessage> last_umpire_msg_{};
   // Moves that the player tried and were illegal. We don't let player try them
   // again on the same board because they are clearly still illegal;
   std::vector<chess::Move> illegal_tried_moves_;

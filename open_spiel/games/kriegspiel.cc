@@ -141,28 +141,9 @@ class KriegspielObserver : public Observer {
       if (state.MoveMsgHistory().empty()) {
         return std::string();
       }
-      chess::Color color = chess::PlayerToColor(player);
-      chess::Color to_play = state.Board().ToPlay();
-      std::string msg;
 
-      // Write public umpire messages since the last turn of the observing player.
-      if (color == to_play && state.before_last_public_msg_) {
-        msg += state.before_last_public_msg_->ToString();
-      }
-      if (state.last_public_msg_) {
-        if (!msg.empty()) msg += "\n";
-        msg += state.last_public_msg_->ToString();
-      }
-
-      // Write if the observing player's last move was illegal
-      auto last_msg = state.MoveMsgHistory().back();
-      bool illegal = last_msg.first.piece.color == to_play &&
-                     last_msg.second.illegal;
-      if (illegal) {
-        if (!msg.empty()) msg += "\n";
-        msg += last_msg.second.ToString();
-      }
-      return msg;
+      // Write last umpire message
+      return state.last_umpire_msg_->ToString();
     } else {
       SpielFatalError(
           "KriegspielObserver: string with imperfect recall is implemented only"
@@ -241,6 +222,7 @@ class KriegspielObserver : public Observer {
                           const std::string &prefix,
                           Allocator *allocator) const {
     int board_size = board.BoardSize();
+    WriteBinary(msg.illegal, prefix + "_illegal", allocator);
     WriteScalar(msg.capture_type, 0, 2, prefix + "_capture_type", allocator);
     auto square_out = allocator->Get(prefix + "_captured_square",
                                      {board_size, board_size});
@@ -297,15 +279,6 @@ class KriegspielObserver : public Observer {
         state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
         prefix + "_right_castling", allocator);
 
-    // Write if the observing player's last move was illegal
-    bool illegal = false;
-    if (!state.MoveMsgHistory().empty()) {
-      auto last_msg = state.MoveMsgHistory().back();
-      illegal = last_msg.first.piece.color == color &&
-                last_msg.second.illegal;
-    }
-    WriteBinary(illegal, prefix + "_last_illegal", allocator);
-
     // Write observer's last move
     chess::Move last_move = {chess::kInvalidSquare,
                              chess::kInvalidSquare,
@@ -339,29 +312,10 @@ class KriegspielObserver : public Observer {
 
     // Irreversible move counter.
     auto out = allocator->Get("irreversible_move_counter", {1});
-    out.at(0) = state.Board().IrreversibleMoveCounter() / 100.;
+    out.at(0) = state.Board().IrreversibleMoveCounter() / 100.f;
 
-    // Write public umpire messages since the last turn of the observing player.
-    chess::Color to_play = state.Board().ToPlay();
-    if (to_play == color) {
-      if (state.before_last_public_msg_) {
-        WriteUmpireMessage(*state.before_last_public_msg_, state.Board(), "first", allocator);
-      }
-      else {
-        WriteUmpireMessage({}, state.Board(), "first", allocator);
-      }
-      if (state.last_public_msg_) {
-        WriteUmpireMessage(*state.last_public_msg_, state.Board(), "second", allocator);
-      }
-      else {
-        WriteUmpireMessage({}, state.Board(), "second", allocator);
-      }
-    } else {
-      if (state.last_public_msg_) {
-        WriteUmpireMessage(*state.last_public_msg_, state.Board(), "first", allocator);
-      }
-      WriteUmpireMessage({}, state.Board(), "second", allocator);
-    }
+    // Write last umpire message
+    WriteUmpireMessage(*state.last_umpire_msg_, state.Board(), std::string(), allocator);
   }
 
   IIGObservationType iig_obs_type_;
@@ -585,9 +539,12 @@ void KriegspielState::DoApplyAction(Action action) {
 
   KriegspielUmpireMessage msg = GetUmpireMessage(Board(), move);
 
+  move_msg_history_.emplace_back(move, msg);
+  last_umpire_msg_ = msg;
+
   if (msg.illegal) {
-    // If the move is illegal, the player is notified about it and can play again
-    move_msg_history_.emplace_back(move, msg);
+    // If the move is illegal, the player is notified about it and can play
+    // again
     illegal_tried_moves_.emplace_back(move);
     return;
   }
@@ -595,10 +552,6 @@ void KriegspielState::DoApplyAction(Action action) {
   Board().ApplyMove(move);
   illegal_tried_moves_.clear();
   ++repetitions_[current_board_.HashValue()];
-
-  move_msg_history_.emplace_back(move, msg);
-  before_last_public_msg_ = last_public_msg_;
-  last_public_msg_ = msg;
 
   Player current_player = CurrentPlayer();
   for (Player player = 0; player < NumPlayers(); ++player) {

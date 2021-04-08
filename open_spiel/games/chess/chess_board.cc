@@ -1434,7 +1434,8 @@ void ChessBoard::GeneratePawnCaptureDestinations_(Square sq, Color color,
 
   dest = sq + Offset{-1, y_direction};
   if (InBoardArea(dest) &&
-      (IsEnemy(dest, color) || (include_ep && dest == EpSquare()))) {
+      (IsEnemy(dest, color) || (include_ep && dest == EpSquare()) ||
+       (IsEmpty(dest) && ignore_enemy_pieces))) {
     yield(dest);
   }
 }
