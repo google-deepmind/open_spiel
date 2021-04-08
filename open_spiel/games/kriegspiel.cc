@@ -542,6 +542,13 @@ void KriegspielState::DoApplyAction(Action action) {
   move_msg_history_.emplace_back(move, msg);
   last_umpire_msg_ = msg;
 
+  Player current_player = CurrentPlayer();
+  for (Player player = 0; player < NumPlayers(); ++player) {
+    std::optional<Action> a = std::nullopt;
+    if (current_player == player) a = action;
+    aohs_[player].Extend(a, ObservationString(player));
+  }
+
   if (msg.illegal) {
     // If the move is illegal, the player is notified about it and can play
     // again
@@ -552,13 +559,6 @@ void KriegspielState::DoApplyAction(Action action) {
   Board().ApplyMove(move);
   illegal_tried_moves_.clear();
   ++repetitions_[current_board_.HashValue()];
-
-  Player current_player = CurrentPlayer();
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    std::optional<Action> a = std::nullopt;
-    if (current_player == player) a = action;
-    aohs_[player].Extend(a, ObservationString(player));
-  }
 }
 
 void KriegspielState::MaybeGenerateLegalActions() const {
