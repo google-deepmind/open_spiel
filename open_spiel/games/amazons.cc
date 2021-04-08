@@ -461,6 +461,12 @@ namespace open_spiel
 
     }
 
+    void AmazonsState::setState(int cur_player, MoveState move_state, const std::array<CellState, kNumCells>& board){
+      current_player_ = cur_player;
+      state_ = move_state;
+      board_ = board;
+    }
+
     std::string AmazonsState::ToString() const
     {
       std::string str;

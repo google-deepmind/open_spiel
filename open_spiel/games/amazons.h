@@ -26,12 +26,13 @@
 // The "Game of Amazons":
 // https://en.wikipedia.org/wiki/Game_of_the_Amazons
 //
-// Parameters: none
+// Parameters: TODO: let the user choose the dimension
 
 namespace open_spiel {
 namespace amazons {
 
 // Constants.
+
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumRows = 6;
 inline constexpr int kNumCols = 6;
@@ -49,11 +50,20 @@ enum class CellState {
   kBlock
 };
 
+class AmazonsGame;
 
 // State of an in-play game.
 class AmazonsState : public State {
  public:
+  
+  enum MoveState {
+    amazon_select,
+    destination_select,
+    shot_select
+  };
+
   AmazonsState(std::shared_ptr<const Game> game);
+
   AmazonsState(const AmazonsState&) = default;
 
   AmazonsState& operator=(const AmazonsState&) = default;
@@ -66,6 +76,8 @@ class AmazonsState : public State {
   std::string ToString() const override;
 
   bool IsTerminal() const override;
+
+  void setState(int current_player, MoveState move_state, const std::array<CellState, kNumCells>& board);
 
   std::vector<double> Returns() const override;
   
@@ -93,13 +105,6 @@ class AmazonsState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-
-  enum MoveState {
-    amazon_select,
-    destination_select,
-    shot_select
-  };
-
   MoveState state_ = amazon_select;
   int from_ = 0;
   int to_ = 0;

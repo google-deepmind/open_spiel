@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/games/amazons.h"
+
+
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
+
+#include <algorithm>
+#include <random>
 
 namespace open_spiel {
 namespace amazons {
@@ -21,16 +27,141 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
-void BasicAmazonsTests() {
+
+void BasicSpielTests() {
   testing::LoadGameTest("amazons");
   testing::RandomSimTestWithUndo(*LoadGame("amazons"), 5);
-  // testing::Check
 }
+
+
+// Test the given configuration for player 1 win:
+// Player 1 = Cross, Player 2 = Nought
+// |O # X _ ### ...|
+void PlayerOneSimpleWinTest() {
+  std::shared_ptr<const Game> game = LoadGame("amazons");
+  std::unique_ptr<State> state = game->NewInitialState();
+  AmazonsState* astate = static_cast<AmazonsState*>(state.get());
+
+
+  std::array<CellState, kNumCells> board = {};
+  for(int i = 0; i < board.size(); i++){
+    board[i] = CellState::kBlock;
+  }
+  board[0] = CellState::kNought;
+  board[2] = CellState::kCross;
+  board[3] = CellState::kEmpty;
+
+  astate->setState(1, AmazonsState::MoveState::amazon_select, board);
+
+  std::cout << "PlayerOneWinTest: \n"<< astate->ToString() << "\n";
+
+  SPIEL_CHECK_TRUE(astate->LegalActions().size() == 0);
+
+  std::cout << "Success!" << "\n\n";
+
+}
+
+// Test the given configuration for player 2 win:
+// Player 1 = Cross, Player 2 = Nought
+// |X # O _ ### ...|
+void PlayerTwoSimpleWinTest() {
+  std::shared_ptr<const Game> game = LoadGame("amazons");
+  std::unique_ptr<State> state = game->NewInitialState();
+  AmazonsState* astate = static_cast<AmazonsState*>(state.get());
+
+
+  std::array<CellState, kNumCells> board = {};
+  for(int i = 0; i < board.size(); i++){
+    board[i] = CellState::kBlock;
+  }
+  board[0] = CellState::kCross;
+  board[2] = CellState::kNought;
+  board[3] = CellState::kEmpty;
+
+  astate->setState(0, AmazonsState::MoveState::amazon_select, board);
+
+  std::cout << "PlayerTwoWinTest: \n" << astate->ToString() << "\n";
+
+  SPIEL_CHECK_TRUE(astate->LegalActions().size() == 0);
+
+  std::cout << "Success!" << "\n\n";
+
+}
+
+// Test given configuration for player 1 no moves
+// .......
+// ..OOO..
+// ..OXO..
+// ..OOO..
+// .......
+void PlayerOneTrappedByAmazonsTest() {
+  std::shared_ptr<const Game> game = LoadGame("amazons");
+  std::unique_ptr<State> state = game->NewInitialState();
+  AmazonsState* astate = static_cast<AmazonsState*>(state.get());
+
+
+  std::array<CellState, kNumCells> board = {};
+  for(int i = 0; i < board.size(); i++){
+    board[i] = CellState::kEmpty;
+  }
+  int center = kNumCells / 2 + kNumRows / 2;
+  board[center] = CellState::kCross;
+  board[center-1] = board[center+1] = CellState::kNought;
+  board[center-kNumRows] = board[center-kNumRows-1] = board[center-kNumRows+ 1] = CellState::kNought;
+  board[center+kNumRows] = board[center+kNumRows-1] = board[center+kNumRows+ 1] = CellState::kNought;
+  
+  astate->setState(0, AmazonsState::MoveState::amazon_select, board);
+
+  std::cout << "PlayerOneTrappedByAmazonsTest: \n" << astate->ToString() << "\n";
+
+  SPIEL_CHECK_TRUE(astate->LegalActions().size() == 0);
+
+  std::cout << "Success!" << "\n\n";
+}
+// Test given configuration for player 1 no moves
+// .......
+// ..###..
+// ..#X#..
+// ..###..
+// .......
+void PlayerOneTrappedByBlocksTest() {
+  std::shared_ptr<const Game> game = LoadGame("amazons");
+  std::unique_ptr<State> state = game->NewInitialState();
+  AmazonsState* astate = static_cast<AmazonsState*>(state.get());
+
+
+  std::array<CellState, kNumCells> board = {};
+  for(int i = 0; i < board.size(); i++){
+    board[i] = CellState::kEmpty;
+  }
+  int center = kNumCells / 2 + kNumRows / 2;
+  board[center] = CellState::kCross;
+  board[center-1] = board[center+1] = CellState::kBlock;
+  board[center-kNumRows] = board[center-kNumRows-1] = board[center-kNumRows+ 1] = CellState::kBlock;
+  board[center+kNumRows] = board[center+kNumRows-1] = board[center+kNumRows+ 1] = CellState::kBlock;
+  
+  astate->setState(0, AmazonsState::MoveState::amazon_select, board);
+
+  std::cout << "PlayerOneTrappedByBlocksTest: \n" << astate->ToString() << "\n";
+
+  SPIEL_CHECK_TRUE(astate->LegalActions().size() == 0);
+
+  std::cout << "Success!" << "\n\n";
+}
+
 
 }  // namespace
 }  // namespace amazons
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::amazons::BasicAmazonsTests();
+  open_spiel::amazons::BasicSpielTests();
+
+  // These tests check whether certain board configurations indicate the correct number of moves
+  open_spiel::amazons::PlayerOneSimpleWinTest();
+  open_spiel::amazons::PlayerTwoSimpleWinTest();
+  open_spiel::amazons::PlayerOneTrappedByAmazonsTest();
+  open_spiel::amazons::PlayerOneTrappedByBlocksTest();
+
+
 }
