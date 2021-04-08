@@ -250,7 +250,8 @@ class KriegspielGame : public Game {
         3 + // public: repetitions count, one-hot encoding
         2 + // public: side to play
         1 + // public: irreversible move counter -- a fraction of $n over 100
-        2 * ( // public: last two umpire messages
+        ( // public: last umpire message
+            2 + // illegal
             3 + // capture type
             6 + // check type one
             6 + // check type two
@@ -258,8 +259,7 @@ class KriegspielGame : public Game {
             16 + // pawn tries
             board_size_ * board_size_) + // capture square
         2*2 + // private: left/right castling rights, one-hot encoded.
-        2 + // private: whether last move was illegal
-        2 * (board_size_ * board_size_)// private: last move (from, two)
+        2 * (board_size_ * board_size_)// private: last move (from, to)
           + 6 // private: last move (promotion type)
     };
     return shape;
