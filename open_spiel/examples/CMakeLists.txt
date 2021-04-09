@@ -44,4 +44,9 @@ if (BUILD_WITH_LIBTORCH)
                 ${OPEN_SPIEL_OBJECTS}
                 $<TARGET_OBJECTS:alpha_zero_torch>)
   target_link_libraries (alpha_zero_torch_example ${TORCH_LIBRARIES})
+
+  add_executable(alpha_zero_torch_game_example alpha_zero_torch_game_example.cc
+                ${OPEN_SPIEL_OBJECTS}
+                $<TARGET_OBJECTS:alpha_zero_torch>)
+  target_link_libraries (alpha_zero_torch_game_example ${TORCH_LIBRARIES})
 endif ()

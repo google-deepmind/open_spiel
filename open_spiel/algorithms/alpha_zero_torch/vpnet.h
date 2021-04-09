@@ -96,7 +96,7 @@ class VPNetModel {
 
   VPNetModel(const Game& game, const std::string& path,
              const std::string& file_name,
-             const std::string& device = "/cpu:0");
+             const std::string& device = "/cpu:0", int step = -2);
 
   // Move only, not copyable.
   VPNetModel(VPNetModel&& other) = default;
