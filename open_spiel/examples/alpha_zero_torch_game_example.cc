@@ -29,6 +29,7 @@
 #include "open_spiel/algorithms/alpha_zero_torch/vpevaluator.h"
 #include "open_spiel/algorithms/alpha_zero_torch/vpnet.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/bots/human/human_bot.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -83,8 +84,12 @@ std::unique_ptr<open_spiel::Bot> InitBot(
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));
   }
+
+  if (type == "human") {
+    return std::make_unique<open_spiel::HumanBot>();
+  }
   open_spiel::SpielFatalError(
-      "Bad player type. Known types: az_torch, mcts, random");
+      "Bad player type. Known types: az_torch, human, mcts, random");
 }
 
 open_spiel::Action GetAction(const open_spiel::State& state,

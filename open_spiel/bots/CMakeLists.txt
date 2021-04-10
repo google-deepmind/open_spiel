@@ -1,3 +1,4 @@
+add_subdirectory(human)
 if (BUILD_WITH_ROSHAMBO)
   add_subdirectory(roshambo)
 endif()
