@@ -14,36 +14,82 @@
 
 #include "open_spiel/bots/human/human_bot.h"
 
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
+
 namespace open_spiel {
 namespace {
 
-void TestEndGameAction() {
-
+Action GetActionFromString(const State& state,
+                           const std::string& action_string) {
+  for (Action action : state.LegalActions(state.CurrentPlayer())) {
+    if (action_string == state.ActionToString(action)) {
+      return action;
+    }
+  }
+  return kInvalidAction;
 }
 
-void TestEmptyAction() {
+void TerminalActionTest() {
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
 
+  // Apply actions to get a terminal state.
+  state->ApplyAction(0);
+  state->ApplyAction(3);
+  state->ApplyAction(1);
+  state->ApplyAction(4);
+  state->ApplyAction(2);
+
+  HumanBot human_bot;
+  Action action = human_bot.Step(*state);
+
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_TRUE(action == kInvalidAction);
 }
 
-void TestLegalStringAction() {
+void LegalStringActionTest() {
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::string action_string = "x(0,0)";
 
+  // Put action_string in cin stream so that the bot can receive it as input.
+  std::istringstream action_string_stream(action_string);
+  std::cin.rdbuf(action_string_stream.rdbuf());
+
+  HumanBot human_bot;
+  Action bot_action = human_bot.Step(*state);
+  Action action = GetActionFromString(*state, action_string);
+
+  SPIEL_CHECK_TRUE(bot_action == action);
 }
 
-void TestLegalIntAction() {
+void LegalIntActionTest() {
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::string action_string = "0";
 
-}
+  // Put action_string in cin stream so that the bot can receive it as input.
+  std::istringstream action_string_stream(action_string);
+  std::cin.rdbuf(action_string_stream.rdbuf());
 
-void TestIllegalAction() {
+  HumanBot human_bot;
+  Action bot_action = human_bot.Step(*state);
+  Action action = std::stoi(action_string);
 
+  SPIEL_CHECK_TRUE(bot_action == action);
 }
 
 }  // namespace
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  open_spiel::TestEndGameAction();
-  open_spiel::TestEmptyAction();
-  open_spiel::TestLegalStringAction();
-  open_spiel::TestLegalIntAction();
-  open_spiel::TestIllegalAction();
+  open_spiel::TerminalActionTest();
+  open_spiel::LegalStringActionTest();
+  open_spiel::LegalIntActionTest();
 }
