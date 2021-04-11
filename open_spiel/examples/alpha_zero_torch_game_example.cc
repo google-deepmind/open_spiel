@@ -33,6 +33,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
+// TODO: Change flags and logic so that an AlphaZero player is required to be
+//       one of the two players.
 ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
 ABSL_FLAG(std::string, player1, "mcts", "Who controls player1.");
 ABSL_FLAG(std::string, player2, "random", "Who controls player2.");
@@ -171,6 +173,8 @@ int main(int argc, char** argv) {
   std::cerr << "game: " << game_name << std::endl;
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name);
+
+  // TODO: Do more checking for AlphaZero-compatible games.
 
   // MCTS supports arbitrary number of players, but this example assumes
   // 2-player games.

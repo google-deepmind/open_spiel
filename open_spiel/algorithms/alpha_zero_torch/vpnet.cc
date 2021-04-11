@@ -109,7 +109,7 @@ bool CreateGraphDef(const Game& game, double learning_rate, double weight_decay,
 
 VPNetModel::VPNetModel(const Game& game, const std::string& path,
                        const std::string& file_name, const std::string& device,
-                       int step)
+                       int checkpoint_step)
     : device_(device),
       path_(path),
       flat_input_size_(game.ObservationTensorSize()),
@@ -125,10 +125,9 @@ VPNetModel::VPNetModel(const Game& game, const std::string& path,
   SPIEL_CHECK_EQ(game.NumPlayers(), 2);
   SPIEL_CHECK_EQ(game.GetType().utility, GameType::Utility::kZeroSum);
 
-  // TODO: Make constant for -2.
-  // Load from specified checkpoint if step is given.
-  if (step > -2) {
-    LoadCheckpoint(absl::StrCat(path, "/checkpoint-", step));
+  // Load from specified checkpoint if a checkpoint step is given.
+  if (checkpoint_step != kInvalidCheckpointStep) {
+    LoadCheckpoint(absl::StrCat(path, "/checkpoint-", checkpoint_step));
   }
 
   // Put this model on the specified device.
