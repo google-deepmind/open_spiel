@@ -130,7 +130,7 @@ class DarkHexState : public State {
 
 class DarkHexGame : public Game {
  public:
-  explicit DarkHexGame(const GameParameters& params);
+  DarkHexGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new DarkHexState(
         shared_from_this(), board_size_, game_version_, obs_type_));
@@ -177,8 +177,7 @@ class ImperfectRecallDarkHexState : public DarkHexState {
 
 class ImperfectRecallDarkHexGame : public DarkHexGame {
  public:
-  explicit ImperfectRecallDarkHexGame(const GameParameters& params)
-      : DarkHexGame(params) {}
+  explicit ImperfectRecallDarkHexGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ImperfectRecallDarkHexState(
         shared_from_this(), board_size(), game_version(), obs_type()));

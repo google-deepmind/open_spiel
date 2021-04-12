@@ -73,7 +73,7 @@ const GameType kImperfectRecallGameType{
     {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new PhantomTTTGame(params));
+  return std::shared_ptr<const Game>(new PhantomTTTGame(params, kGameType));
 }
 
 std::shared_ptr<const Game> ImperfectRecallFactory(
@@ -85,6 +85,9 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
 
 }  // namespace
+
+ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
+    : PhantomTTTGame(params, kImperfectRecallGameType) {}
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  ObservationType obs_type)
@@ -267,8 +270,8 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   // if necessary.
 }
 
-PhantomTTTGame::PhantomTTTGame(const GameParameters& params)
-    : Game(kGameType, params),
+PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
+    : Game(game_type, params),
       game_(std::static_pointer_cast<const tic_tac_toe::TicTacToeGame>(
           LoadGame("tic_tac_toe"))) {
   std::string obs_type = ParameterValue<std::string>("obstype");

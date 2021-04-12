@@ -77,7 +77,7 @@ const GameType kImperfectRecallGameType{
      {"board_size", GameParameter(hex::kDefaultBoardSize)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new DarkHexGame(params));
+  return std::shared_ptr<const Game>(new DarkHexGame(params, kGameType));
 }
 
 std::shared_ptr<const Game> ImperfectRecallFactory(
@@ -89,6 +89,10 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
 
 }  // namespace
+
+ImperfectRecallDarkHexGame::ImperfectRecallDarkHexGame(
+    const GameParameters& params)
+    : DarkHexGame(params, kImperfectRecallGameType) {}
 
 DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
                            GameVersion game_version, ObservationType obs_type)
@@ -272,8 +276,8 @@ void DarkHexState::UndoAction(Player player, Action move) {
   history_.pop_back();
 }
 
-DarkHexGame::DarkHexGame(const GameParameters& params)
-    : Game(kGameType, params),
+DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
+    : Game(game_type, params),
       game_(std::static_pointer_cast<const hex::HexGame>(LoadGame(
           "hex",
           {{"board_size", GameParameter(ParameterValue<int>("board_size"))}}))),

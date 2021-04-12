@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import re
 
 from absl import logging
 from absl.testing import absltest
@@ -30,6 +31,15 @@ _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 _OPTIONAL_GAMES = frozenset(["hanabi", "universal_poker"])
 _AVAILABLE_GAMES = set(pyspiel.registered_names())
+
+# Games for which we do not have playthroughs. Please don't add new games
+# here if you can avoid it. Adding a playthrough is easy and very useful!
+# Run `generate_new_playthrough.sh $GAME` to add a playthrough.
+_MISSING_GAMES = set(["nfg_game", "efg_game"])
+
+# Regex to find the game name in a playthrough. This will return the name of the
+# transform for wrapped games, e.g. goofspiel --> turn_based_simultaneous_game
+_SHORTNAME = r'^GameType\.short_name = "(.*)"$'
 
 
 def _is_optional_game(basename):
@@ -43,6 +53,13 @@ def _is_optional_game(basename):
     if basename.startswith(game_name):
       return True, game_name
   return False, None
+
+
+def _playthrough_match(filename, regex):
+  """Returns the specified value fromm the playthrough."""
+  with open(filename, "r", encoding="utf-8") as f:
+    data = f.read()
+  return re.search(regex, data, re.MULTILINE)
 
 
 class PlaythroughTest(absltest.TestCase):
@@ -61,11 +78,26 @@ class PlaythroughTest(absltest.TestCase):
 
     file_path = os.path.join(path, basename)
     expected, actual = generate_playthrough.replay(file_path)
-    for line_num, (expected_line, actual_line) in enumerate(zip(
-        expected.split("\n"), actual.split("\n"))):
-      self.assertEqual(expected_line, actual_line,
-                       msg="Wrong line {} in {}".format(line_num, basename))
+    for line_num, (expected_line, actual_line) in enumerate(
+        zip(expected.split("\n"), actual.split("\n"))):
+      self.assertEqual(
+          expected_line,
+          actual_line,
+          msg="Wrong line {} in {}".format(line_num, basename))
     self.assertMultiLineEqual(expected, actual)
+
+  def test_all_games_tested(self):
+    """Verify that every game is present in the playthroughs."""
+    test_srcdir = os.environ.get("TEST_SRCDIR", "")
+    path = os.path.join(test_srcdir, _DATA_DIR)
+    basenames = set(os.listdir(path))
+    missing_games = set(_AVAILABLE_GAMES) - set(_MISSING_GAMES) - set(
+        _playthrough_match(os.path.join(path, basename), _SHORTNAME)[1]
+        for basename in basenames)
+    self.assertEmpty(
+        missing_games,
+        msg="These games do not have playthroughs."
+        "Create playthroughs using generate_new_playthrough.sh")
 
 
 def _add_tests():
@@ -85,6 +117,3 @@ def _add_tests():
 if __name__ == "__main__":
   _add_tests()
   absltest.main()
-
-
-
