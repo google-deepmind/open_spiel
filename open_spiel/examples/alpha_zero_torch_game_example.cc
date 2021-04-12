@@ -33,10 +33,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-// TODO: Change flags and logic so that an AlphaZero player is required to be
-//       one of the two players.
 ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
-ABSL_FLAG(std::string, player1, "mcts", "Who controls player1.");
+ABSL_FLAG(std::string, player1, "az", "Who controls player1.");
 ABSL_FLAG(std::string, player2, "random", "Who controls player2.");
 ABSL_FLAG(std::string, az_path, "", "Path to AZ experiment.");
 ABSL_FLAG(std::string, az_graph_def, 
@@ -67,10 +65,16 @@ std::unique_ptr<open_spiel::Bot> InitBot(
     std::shared_ptr<open_spiel::algorithms::Evaluator> evaluator,
     std::shared_ptr<
         open_spiel::algorithms::torch_az::VPNetEvaluator> az_evaluator) {
-  if (type == "random") {
-    return open_spiel::MakeUniformRandomBot(player, Seed());
+  if (type == "az") {
+    return std::make_unique<open_spiel::algorithms::MCTSBot>(
+        game, std::move(az_evaluator), absl::GetFlag(FLAGS_uct_c),
+        absl::GetFlag(FLAGS_max_simulations),
+        absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
+        absl::GetFlag(FLAGS_verbose));
   }
-
+  if (type == "human") {
+    return std::make_unique<open_spiel::HumanBot>();
+  }
   if (type == "mcts") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
         game, std::move(evaluator), absl::GetFlag(FLAGS_uct_c),
@@ -78,20 +82,12 @@ std::unique_ptr<open_spiel::Bot> InitBot(
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));
   }
-
-  if (type == "az_torch") {
-    return std::make_unique<open_spiel::algorithms::MCTSBot>(
-        game, std::move(az_evaluator), absl::GetFlag(FLAGS_uct_c),
-        absl::GetFlag(FLAGS_max_simulations),
-        absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
-        absl::GetFlag(FLAGS_verbose));
+  if (type == "random") {
+    return open_spiel::MakeUniformRandomBot(player, Seed());
   }
 
-  if (type == "human") {
-    return std::make_unique<open_spiel::HumanBot>();
-  }
   open_spiel::SpielFatalError(
-      "Bad player type. Known types: az_torch, human, mcts, random");
+      "Bad player type. Known types: az, human, mcts, random");
 }
 
 open_spiel::Action GetAction(const open_spiel::State& state,
@@ -111,77 +107,97 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
   std::unique_ptr<open_spiel::State> state = game.NewInitialState();
   std::vector<std::string> history;
 
+  if (!quiet)
+    std::cerr << "Initial state:\n" << state << std::endl;
+
+  // Play the initial actions (if there are any).
   for (const auto& action_str : initial_actions) {
+    open_spiel::Player player = state->CurrentPlayer();
     open_spiel::Action action = GetAction(*state, action_str);
+
     if (action == open_spiel::kInvalidAction)
       open_spiel::SpielFatalError(absl::StrCat("Invalid action: ", action_str));
 
     history.push_back(action_str);
     state->ApplyAction(action);
+
     if (!quiet) {
-      std::cerr << "Forced action" << action_str << std::endl;
+      std::cerr << "Player " << player << " forced action: " << action_str
+                << std::endl;
       std::cerr << "Next state:\n" << state->ToString() << std::endl;
     }
   }
 
   while (!state->IsTerminal()) {
     open_spiel::Player player = state->CurrentPlayer();
-    if (!quiet) std::cerr << "player turn: " << player << std::endl;
-
     open_spiel::Action action;
+
+    // Perform an action.
     if (state->IsChanceNode()) {
       // Chance node; sample one according to underlying distribution.
       open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
       action = open_spiel::SampleAction(outcomes, rng).first;
       if (!quiet)
-        std::cerr << "Sampled action: " << state->ActionToString(player, action)
-                  << std::endl;
+        std::cerr << "Player " << player << " sampled action: "
+                  << state->ActionToString(player, action) << std::endl;
     } else if (state->IsSimultaneousNode()) {
       open_spiel::SpielFatalError(
           "MCTS not supported for games with simultaneous actions.");
     } else {
-      // Decision node, ask the right bot to make its action
+      // Decision node, ask the right bot to make its action.
       action = bots[player]->Step(*state);
       if (!quiet)
-        std::cerr << "Chose action: " << state->ActionToString(player, action)
-                  << std::endl;
+        std::cerr << "Player " << player << " chose action: "
+                  << state->ActionToString(player, action) << std::endl;
     }
+
+    // Inform the other bot(s) of the action performed.
     for (open_spiel::Player p = 0; p < bots.size(); ++p) {
       if (p != player) {
         bots[p]->InformAction(*state, player, action);
       }
     }
+
+    // Update history and get the next state.
     history.push_back(state->ActionToString(player, action));
     state->ApplyAction(action);
 
     if (!quiet)
-      std::cerr << "State: " << std::endl << state->ToString() << std::endl;
+      std::cerr << "Next state:\n" << state->ToString() << std::endl;
   }
 
-  std::cerr << "Returns: " << absl::StrJoin(state->Returns(), ",")
-            << " Game actions: " << absl::StrJoin(history, " ") << std::endl;
+  std::cerr << "Returns: " << absl::StrJoin(state->Returns(), ", ")
+            << std::endl;
+  std::cerr << "Game actions: " << absl::StrJoin(history, ", ") << std::endl;
+
   return {state->Returns(), history};
 }
 
-// Example code for using MCTS agent to play a game
 int main(int argc, char** argv) {
   std::vector<char*> positional_args = absl::ParseCommandLine(argc, argv);
   std::mt19937 rng(Seed());  // Random number generator.
 
-  // Create the game
+  // Create the game.
   std::string game_name = absl::GetFlag(FLAGS_game);
-  std::cerr << "game: " << game_name << std::endl;
+  std::cerr << "Game: " << game_name << std::endl;
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name);
 
-  // TODO: Do more checking for AlphaZero-compatible games.
-
-  // MCTS supports arbitrary number of players, but this example assumes
-  // 2-player games.
-  SPIEL_CHECK_TRUE(game->NumPlayers() <= 2);
-
-  // Ensure a path to a Libtorch AZ experiment was provided.
-  SPIEL_CHECK_TRUE(!absl::GetFlag(FLAGS_az_path).empty());
+  // Ensure the game is AlphaZero-compatible and arguments are compatible.
+  open_spiel::GameType game_type = game->GetType();
+  if (game->NumPlayers() != 2)
+    open_spiel::SpielFatalError("AlphaZero can only handle 2-player games.");
+  if (game_type.reward_model != open_spiel::GameType::RewardModel::kTerminal)
+    open_spiel::SpielFatalError("Game must have terminal rewards.");
+  if (game_type.dynamics != open_spiel::GameType::Dynamics::kSequential)
+    open_spiel::SpielFatalError("Game must have sequential turns.");
+  if (game_type.chance_mode != open_spiel::GameType::ChanceMode::kDeterministic)
+    open_spiel::SpielFatalError("Game must be deterministic.");
+  if (absl::GetFlag(FLAGS_az_path).empty())
+    open_spiel::SpielFatalError("AlphaZero path must be specified.");
+  if (absl::GetFlag(FLAGS_player1) != "az" &&
+      absl::GetFlag(FLAGS_player2) != "az")
+    open_spiel::SpielFatalError("One of the players must be AlphaZero.");
 
   open_spiel::algorithms::torch_az::DeviceManager device_manager;
   device_manager.AddDevice(
@@ -230,9 +246,11 @@ int main(int argc, char** argv) {
   std::cerr << "Number of games played: " << num_games << std::endl;
   std::cerr << "Number of distinct games played: " << histories.size()
             << std::endl;
-  std::cerr << "Overall wins: " << absl::StrJoin(overall_wins, ",")
+  std::cerr << "Players: " << absl::GetFlag(FLAGS_player1) << ", "
+            << absl::GetFlag(FLAGS_player2) << std::endl;
+  std::cerr << "Overall wins: " << absl::StrJoin(overall_wins, ", ")
             << std::endl;
-  std::cerr << "Overall returns: " << absl::StrJoin(overall_returns, ",")
+  std::cerr << "Overall returns: " << absl::StrJoin(overall_returns, ", ")
             << std::endl;
 
   return 0;
