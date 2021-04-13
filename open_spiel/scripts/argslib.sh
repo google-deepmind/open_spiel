@@ -107,7 +107,7 @@ function _check_parse_value {
 
 function _parse_arg {
   # one argment: --name=value
-  IFS="=" read -ra parts <<< $@
+  IFS="=" read -ra parts <<< "$@"
   [ ${#parts[@]} -eq 2 ] || _die "Incorrect syntax: $@"
   for (( i=0; i<$argslib_n; i++ ))
   do
