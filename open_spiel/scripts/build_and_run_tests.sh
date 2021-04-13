@@ -87,7 +87,8 @@ then
 fi
 
 echo -e "\e[33mRunning ${0} from $PWD\e[0m"
-PYBIN=`which python3`
+PYBIN=${PYBIN:-"python3"}
+PYBIN=`which ${PYBIN}`
 if [ ! -x $PYBIN ]
 then
   echo -e "\e[1m\e[93m$PYBIN not found! Skip build and test.\e[0m"
@@ -126,10 +127,9 @@ function cleanup {
 }
 trap cleanup EXIT
 
-
 if [[ $ARG_install == "true" ]]; then
   echo -e "\e[33mInstalling the requirements (use --noinstall to skip).\e[0m"
-  pip3 install --upgrade -r ./requirements.txt
+  ${PYBIN} -m pip install --upgrade -r ./requirements.txt
 else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
@@ -158,7 +158,7 @@ function print_tests_passed {
 function print_tests_failed {
   echo -e "\033[31mAt least one test failed.\e[0m"
   echo "If this is the first time you have run these tests, try:"
-  echo "pip3 install -r requirements.txt"
+  echo "python3 -m pip install -r requirements.txt"
   echo "Note that outside a virtualenv, you will need to install the system "
   echo "wide matplotlib: sudo apt-get install python-matplotlib"
   exit 1
@@ -177,7 +177,7 @@ function execute_export_graph {
 if [[ $ARG_build_with_pip == "true" ]]; then
   # TODO(author2): We probably want to use `python3 -m pip install .` directly
   # and skip the usage of nox.
-  pip3 install nox
+  ${PYBIN} -m pip install nox
 
   if nox -s tests; then
     echo -e "\033[32mAll tests passed. Nicely done!\e[0m"

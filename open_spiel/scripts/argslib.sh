@@ -107,7 +107,7 @@ function _check_parse_value {
 
 function _parse_arg {
   # one argment: --name=value
-  IFS="=" read -ra parts <<< "$@"
+  IFS="=" read -ra parts <<< $@
   [ ${#parts[@]} -eq 2 ] || _die "Incorrect syntax: $@"
   for (( i=0; i<$argslib_n; i++ ))
   do
@@ -157,12 +157,10 @@ function ArgsLibParse {
   fi
 
   # Parse arguments in the form --name=value
-  read -r -a arguments <<< $@
-  for (( i=0; i<${#arguments[@]}; i++ ))
+  for arg in $@
   do
-    # Arguments must start with --
-    [[ ${arguments[$i]} == --* ]] || _die "Invalid syntax for argument name: ${arguments[$i]}"
-    _parse_arg ${arguments[$i]}
+    [[ $arg == --* ]] || _die "Invalid syntax for argument name: $arg"
+    _parse_arg $arg
   done
 }
 
