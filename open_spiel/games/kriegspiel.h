@@ -67,6 +67,8 @@ inline constexpr double WinUtility() { return 1; }
 // See action encoding below.
 inline constexpr int NumDistinctActions() { return 4672; }
 
+// This is max length of a FIDE chess game. Kriegspiel can be longer. It can
+// last forever when the three fold repetition and 50-move rule are turned off.
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
 inline constexpr int MaxGameLength() { return 17695; }
 

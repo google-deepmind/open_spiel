@@ -234,7 +234,7 @@ class KriegspielObserver : public Observer {
     }
     WriteScalar(msg.check_types.first, 0, 5, prefix + "_check_one", allocator);
     WriteScalar(msg.check_types.second, 0, 5, prefix + "_check_two", allocator);
-    WriteScalar((int8_t) msg.to_move, 0, 2, prefix + "_to_move", allocator);
+    WriteScalar(msg.to_move == chess::Color::kBlack ? 0 : 1, 0, 1, prefix + "_to_move", allocator);
     WriteScalar(msg.pawn_tries, 0, 15, prefix + "_pawn_tries", allocator);
   }
 
@@ -680,19 +680,10 @@ absl::optional<std::vector<double>> KriegspielState::MaybeFinalReturns() const {
   return std::nullopt;
 }
 
-std::string DefaultFen(int board_size) {
-  if (board_size == 8) return chess::kDefaultStandardFEN;
-  else if (board_size == 4) return chess::kDefaultSmallFEN;
-  else
-    SpielFatalError(
-        "Only board sizes 4 and 8 have their default chessboards. "
-        "For other sizes, you have to pass your own FEN.");
-}
-
 KriegspielGame::KriegspielGame(const GameParameters &params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size")),
-      fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))),
+      fen_(ParameterValue<std::string>("fen", chess::DefaultFen(board_size_))),
       threefold_repetition_(ParameterValue<bool>("threefold_repetition")),
       rule_50_move_(ParameterValue<bool>("50_move_rule")){
   default_observer_ = std::make_shared<KriegspielObserver>(kDefaultObsType);

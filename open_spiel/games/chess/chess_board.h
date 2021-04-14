@@ -520,6 +520,7 @@ inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
 }
 
 ChessBoard MakeDefaultBoard();
+std::string DefaultFen(int board_size);
 
 }  // namespace chess
 }  // namespace open_spiel

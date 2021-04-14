@@ -1723,5 +1723,14 @@ ChessBoard MakeDefaultBoard() {
   return *maybe_board;
 }
 
+std::string DefaultFen(int board_size) {
+  if (board_size == 8) return chess::kDefaultStandardFEN;
+  else if (board_size == 4) return chess::kDefaultSmallFEN;
+  else
+    SpielFatalError(
+        "Only board sizes 4 and 8 have their default chessboards. "
+        "For other sizes, you have to pass your own FEN.");
+}
+
 }  // namespace chess
 }  // namespace open_spiel
