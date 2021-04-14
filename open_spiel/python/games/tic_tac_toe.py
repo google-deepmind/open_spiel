@@ -116,10 +116,8 @@ class TicTacToeState(pyspiel.State):
     else:
       self._cur_player = 1 - self._cur_player
 
-  def action_to_string(self, arg0, arg1=None):
-    """Action -> string. Args either (player, action) or (action)."""
-    player = self.current_player() if arg1 is None else arg0
-    action = arg0 if arg1 is None else arg1
+  def _action_to_string(self, player, action):
+    """Action -> string."""
     row, col = _coord(action)
     return "{}({},{})".format("x" if player == 0 else "o", row, col)
 

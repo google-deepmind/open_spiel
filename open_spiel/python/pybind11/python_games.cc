@@ -156,7 +156,7 @@ std::vector<Action> PyState::LegalActions() const {
 }
 
 std::string PyState::ActionToString(Player player, Action action_id) const {
-  PYSPIEL_OVERRIDE_PURE(std::string, State, "action_to_string", ActionToString,
+  PYSPIEL_OVERRIDE_PURE(std::string, State, "_action_to_string", ActionToString,
                         player, action_id);
 }
 

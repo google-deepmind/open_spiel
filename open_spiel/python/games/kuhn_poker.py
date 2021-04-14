@@ -129,10 +129,8 @@ class KuhnPokerState(pyspiel.State):
                                   self.bets[-1] == 0) or len(self.bets) == 3:
         self._game_over = True
 
-  def action_to_string(self, arg0, arg1=None):
-    """Action -> string. Args either (player, action) or (action)."""
-    player = self._next_player if arg1 is None else arg0
-    action = arg0 if arg1 is None else arg1
+  def _action_to_string(self, player, action):
+    """Action -> string."""
     if player == pyspiel.PlayerId.CHANCE:
       return f"Deal:{action}"
     elif action == 0:
