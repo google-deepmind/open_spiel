@@ -57,6 +57,27 @@ export BUILD_WITH_GO=${BUILD_WITH_GO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 # You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
 export BUILD_WITH_LIBTORCH="${BUILD_WITH_LIBTORCH:-"OFF"}"
 
+# You may want to replace this URL according to your system.
+# You can find all of these (and more) URLs at https://pytorch.org/
+# Select LibTorch from the PyTorch build menu.
+#
+# Nvidia GPU card setup: You will need to install
+# 1) CUDA drivers via toolkit https://developer.nvidia.com/cuda-toolkit-archive
+#    Local runfile installer is quite friendly. If your system already comes
+#    with drivers you may want to skip over that option in the installer.
+# 2) CUDNN https://developer.nvidia.com/cudnn
+#    (Nvidia developer program membership required)
+#
+# Then use one of the following with appropriate CUDA version (or use the
+# website build menu):
+# CUDA 9.2   https://download.pytorch.org/libtorch/cu92/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu92.zip
+# CUDA 10.1  https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip
+# CUDA 10.2  https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.1.zip
+#
+# For C++ Libtorch AlphaZero on macOS we recommend this URL:
+# https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.8.0.zip
+export BUILD_WITH_LIBTORCH_DOWNLOAD_URL="${BUILD_WITH_LIBTORCH_DOWNLOAD_URL:-"https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcpu.zip"}"
+
 # TensorflowCC is a CMake interface to the Tensorflow C++ API. It is used in
 # C++ AlphaZero. See: https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md
 export BUILD_WITH_TENSORFLOW_CC="${BUILD_WITH_TENSORFLOW_CC:-"OFF"}"

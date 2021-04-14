@@ -131,22 +131,8 @@ fi
 # This downloads the precompiled binaries available from the pytorch website.
 DIR="open_spiel/libtorch/libtorch"
 if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  # CPU-only
-  DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcpu.zip"
-
-  # Uncomment one of the following if you want GPU support with CUDA:
-  # # CUDA 9.2
-  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu92/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu92.zip"
-  # # CUDA 10.1
-  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip"
-  # # CUDA 10.2
-  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.1.zip"
-
-  # For C++ Libtorch AlphaZero on macOS we recommend this URL:
-  # DOWNLOAD_URL="https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.8.0.zip"
-
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/libtorch.zip"
-  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "$DOWNLOAD_URL"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${BUILD_WITH_LIBTORCH_DOWNLOAD_URL}"
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
