@@ -27,7 +27,8 @@ namespace dark_hex {
 namespace {
 
 using hex::kCellStates;
-using hex::kDefaultBoardSize;
+using hex::kDefaultBoardCols;
+using hex::kDefaultBoardRows;
 
 using hex::CellState;
 using hex::kMinValueCellState;
@@ -51,11 +52,11 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {
-        {"obstype", GameParameter(std::string(kDefaultObsType))},
-        {"gameversion", GameParameter(std::string(kDefaultGameVersion))},
-        {"board_size", GameParameter(hex::kDefaultBoardSize)},
-    }};
+    {{"obstype", GameParameter(kDefaultObsType)},
+     {"gameversion", GameParameter(kDefaultGameVersion)},
+     {"row_size", GameParameter(kDefaultBoardRows)},
+     {"col_size", GameParameter(kDefaultBoardCols)}}
+    };
 
 const GameType kImperfectRecallGameType{
     /*short_name=*/"dark_hex_ir",
@@ -72,9 +73,11 @@ const GameType kImperfectRecallGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(std::string(kDefaultObsType))},
-     {"gameversion", GameParameter(std::string(kDefaultGameVersion))},
-     {"board_size", GameParameter(hex::kDefaultBoardSize)}}};
+    {{"obstype", GameParameter(kDefaultObsType)},
+     {"gameversion", GameParameter(kDefaultGameVersion)},
+     {"row_size", GameParameter(kDefaultBoardRows)},
+     {"col_size", GameParameter(kDefaultBoardCols)}}
+    };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new DarkHexGame(params, kGameType));
@@ -94,18 +97,19 @@ ImperfectRecallDarkHexGame::ImperfectRecallDarkHexGame(
     const GameParameters& params)
     : DarkHexGame(params, kImperfectRecallGameType) {}
 
-DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
+DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int row_size, int col_size,
                            GameVersion game_version, ObservationType obs_type)
     : State(game),
-      state_(game, board_size),
+      state_(game, row_size, col_size),
       obs_type_(obs_type),
       game_version_(game_version),
-      board_size_(board_size),
-      num_cells_(board_size * board_size),
+      row_size_(row_size),
+      col_size_(col_size),
+      num_cells_(row_size * col_size),
       bits_per_action_(num_cells_ + 1),
       longest_sequence_(num_cells_ * 2 - 1) {
-  black_view_.resize(board_size * board_size, CellState::kEmpty);
-  white_view_.resize(board_size * board_size, CellState::kEmpty);
+  black_view_.resize(row_size * col_size, CellState::kEmpty);
+  white_view_.resize(row_size * col_size, CellState::kEmpty);
 }
 
 void DarkHexState::DoApplyAction(Action move) {
@@ -151,15 +155,11 @@ std::string DarkHexState::ViewToString(Player player) const {
   const auto& cur_view = (player == 0 ? black_view_ : white_view_);
   std::string str;
 
-  // TODO: Hex - Dark-Hex Research sometimes experiments on different sized
-  // columns and rows for the game board. Therefore we need to add c-r option
-  // instead of board_size only.
-  int num_rows = board_size_, num_cols = board_size_;
-  for (int r = 0; r < num_rows; ++r) {
-    for (int c = 0; c < num_cols; ++c) {
-      absl::StrAppend(&str, StateToString(cur_view[r * num_cols + c]));
+  for (int r = 0; r < col_size_; ++r) {
+    for (int c = 0; c < row_size_; ++c) {
+      absl::StrAppend(&str, StateToString(cur_view[r * row_size_ + c]));
     }
-    if (r < (num_rows - 1)) {
+    if (r < (col_size_ - 1)) {
       absl::StrAppend(&str, "\n");
     }
   }
@@ -281,9 +281,11 @@ DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
     : Game(game_type, params),
       game_(std::static_pointer_cast<const hex::HexGame>(LoadGame(
           "hex",
-          {{"board_size", GameParameter(ParameterValue<int>("board_size"))}}))),
-      board_size_(ParameterValue<int>("board_size")),
-      num_cells_(board_size_ * board_size_),
+          {{"row_size", GameParameter(ParameterValue<int>("row_size"))},
+           {"col_size", GameParameter(ParameterValue<int>("col_size"))}}))),
+      row_size_(ParameterValue<int>("row_size")),
+      col_size_(ParameterValue<int>("col_size")),
+      num_cells_(row_size_ * col_size_),
       bits_per_action_(num_cells_ + 1),
       longest_sequence_(num_cells_ * 2 - 1) {
   std::string obs_type = ParameterValue<std::string>("obstype");

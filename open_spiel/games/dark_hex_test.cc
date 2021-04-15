@@ -23,7 +23,8 @@ namespace testing = open_spiel::testing;
 
 void GameBlackWinWithCollisionAndObs() {
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"board_size", GameParameter(3)},
+      LoadGame("dark_hex", {{"row_size", GameParameter(3)},
+                            {"col_size", GameParameter(3)},
                             {"obstype", GameParameter("reveal-numturns")}});
   std::unique_ptr<State> state = game->NewInitialState();
   std::vector<Action> lm = state->LegalActions();  // initial legal moves
@@ -78,7 +79,8 @@ void GameBlackWinsMaximumCollisions() {
   //  . . .   . . .   . . .   . . .   . . .    ...
   //   . . .   . . .   . . .   . . .   . . .
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"board_size", GameParameter(3)}});
+      LoadGame("dark_hex", {{"row_size", GameParameter(3)},
+                            {"col_size", GameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   std::array play_seq = {0, 1, 4, 2, 7, 5, 8, 6};  // 3 is the terminal move
   for (int i = 0; i < play_seq.size(); ++i) {
@@ -92,18 +94,60 @@ void GameBlackWinsMaximumCollisions() {
   SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
 }
 
+void GameUnevenBoardBlackWin() {
+  std::shared_ptr<const Game> game =
+      LoadGame("dark_hex", {{"row_size", GameParameter(4)},
+                            {"col_size", GameParameter(3)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(8);
+  state->ApplyAction(5);
+  state->ApplyAction(4);
+  state->ApplyAction(1);
+  state->ApplyAction(0);
+  std::cout << state->ObservationString(0) << std::endl;
+  std::cout << state->ObservationString(1) << std::endl;
+  // Black wins
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), 1.0);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
+}
+
+void GameUnevenBoardWhiteWin() {
+  std::shared_ptr<const Game> game =
+      LoadGame("dark_hex", {{"row_size", GameParameter(4)},
+                            {"col_size", GameParameter(3)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(8);
+  state->ApplyAction(5);
+  state->ApplyAction(9);
+  state->ApplyAction(4);
+  state->ApplyAction(10);
+  state->ApplyAction(6);
+  state->ApplyAction(11);
+  state->ApplyAction(7);
+  std::cout << state->ObservationString(0) << std::endl;
+  std::cout << state->ObservationString(1) << std::endl;
+  // White wins
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), -1.0);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), 1.0);
+}
+
 void ClassicalDarkHexTests() {
   testing::LoadGameTest("dark_hex");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex"));
-  testing::RandomSimTest(*LoadGame("dark_hex(board_size=5)"), 10);
+  testing::RandomSimTest(*LoadGame("dark_hex(row_size=5,col_size=5)"), 10);
   testing::LoadGameTest("dark_hex(obstype=reveal-numturns)");
   GameBlackWinWithCollisionAndObs();
   GameBlackWinsMaximumCollisions();
+  GameUnevenBoardBlackWin();
+  GameUnevenBoardWhiteWin();
 }
 
 void AbruptDHCustomTest() {
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"board_size", GameParameter(2)},
+      LoadGame("dark_hex", {{"row_size", GameParameter(2)},
+                            {"col_size", GameParameter(2)},
                             {"gameversion", GameParameter("adh")}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(0);
@@ -118,7 +162,7 @@ void AbruptDHCustomTest() {
 void AbruptDarkHexTests() {
   testing::LoadGameTest("dark_hex(gameversion=adh)");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex(gameversion=adh)"));
-  testing::RandomSimTest(*LoadGame("dark_hex(board_size=3,gameversion=adh)"),
+  testing::RandomSimTest(*LoadGame("dark_hex(row_size=3,col_size=3,gameversion=adh)"),
                          3);
   AbruptDHCustomTest();
 }
