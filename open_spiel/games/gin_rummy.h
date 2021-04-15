@@ -42,6 +42,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -86,6 +87,7 @@ class GinRummyState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
   std::vector<double> Returns() const override;
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
@@ -182,6 +184,8 @@ class GinRummyState : public State {
       std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
   // Cards that have been layed off onto knocking player's layed melds.
   std::vector<int> layoffs_{};
+  // cached ActionObservationHistory for each player
+  std::vector<open_spiel::ActionObservationHistory> aohs_;
 };
 
 class GinRummyGame : public Game {
@@ -215,6 +219,7 @@ class GinRummyGame : public Game {
       const GameParameters& params) const override;
 
   std::shared_ptr<GinRummyObserver> default_observer_;
+  std::shared_ptr<GinRummyObserver> info_state_observer_;
 
  private:
   const bool oklahoma_;

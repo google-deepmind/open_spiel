@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel_utils.h"
@@ -58,7 +59,9 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 bool ObserverHasString(IIGObservationType iig_obs_type) {
-  return !iig_obs_type.perfect_recall;
+  return !iig_obs_type.perfect_recall ||
+         (iig_obs_type.public_info &&
+          iig_obs_type.private_info == PrivateInfoType::kSinglePlayer);
 }
 
 bool ObserverHasTensor(IIGObservationType iig_obs_type) {
@@ -70,7 +73,7 @@ bool ObserverHasTensor(IIGObservationType iig_obs_type) {
 
 class GinRummyObserver : public Observer {
  public:
-  GinRummyObserver(IIGObservationType iig_obs_type)
+  explicit GinRummyObserver(IIGObservationType iig_obs_type)
       : Observer(/*has_string=*/ObserverHasString(iig_obs_type),
                  /*has_tensor=*/ObserverHasTensor(iig_obs_type)),
         iig_obs_type_(iig_obs_type) {}
@@ -82,7 +85,6 @@ class GinRummyObserver : public Observer {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, state.num_players_);
 
-    // TODO(Michal) Should we implement perfect recall?
     if (iig_obs_type_.perfect_recall) {
       SpielFatalError(
           "GinRummyObserver: tensor with perfect recall not implemented.");
@@ -114,10 +116,15 @@ class GinRummyObserver : public Observer {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, state.num_players_);
 
-    // TODO(Michal) Should we implement perfect recall?
     if (iig_obs_type_.perfect_recall) {
-      SpielFatalError(
-          "GinRummyObserver: string with perfect recall not implemented.");
+      if (iig_obs_type_.public_info &&
+          iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+        return state.aohs_[player].ToString();
+      } else {
+        SpielFatalError(
+            "GinRummyObserver: string with perfect recall is implemented only"
+            " for the (default) info state observation type.");
+      }
     }
 
     std::string rv;
@@ -147,7 +154,7 @@ class GinRummyObserver : public Observer {
         for (int card : meld) absl::StrAppend(&rv, CardString(card));
       }
     }
-    
+
     if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
         (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
         player == 1)) {
@@ -155,7 +162,7 @@ class GinRummyObserver : public Observer {
     } else {
       absl::StrAppend(&rv, "\n", HandToString(std::vector<int>()));
     }
-    
+
     absl::StrAppend(&rv, "\nStock size: ", state.stock_size_);
     absl::StrAppend(&rv, "  Upcard: ", CardString(state.upcard_));
     absl::StrAppend(&rv, "\nDiscard pile: ");
@@ -252,7 +259,14 @@ GinRummyState::GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
       knock_card_(knock_card),
       gin_bonus_(gin_bonus),
       undercut_bonus_(undercut_bonus),
-      deck_(kNumCards, true) {}
+      deck_(kNumCards, true) {
+  aohs_.reserve(kNumPlayers);
+  for (Player player = 0; player < kNumPlayers; ++player) {
+    std::vector<std::pair<absl::optional<Action>, std::string>> aoh;
+    aoh.push_back({{}, ObservationString(player)});
+    aohs_.push_back(open_spiel::ActionObservationHistory(player, aoh));
+  }
+}
 
 int GinRummyState::CurrentPlayer() const {
   if (IsTerminal()) {
@@ -263,23 +277,39 @@ int GinRummyState::CurrentPlayer() const {
 }
 
 void GinRummyState::DoApplyAction(Action action) {
+  Player current_player = CurrentPlayer();
   switch (phase_) {
     case Phase::kDeal:
-      return ApplyDealAction(action);
+      ApplyDealAction(action);
+      break;
     case Phase::kFirstUpcard:
-      return ApplyFirstUpcardAction(action);
+      ApplyFirstUpcardAction(action);
+      break;
     case Phase::kDraw:
-      return ApplyDrawAction(action);
+      ApplyDrawAction(action);
+      break;
     case Phase::kDiscard:
-      return ApplyDiscardAction(action);
+      ApplyDiscardAction(action);
+      break;
     case Phase::kKnock:
-      return ApplyKnockAction(action);
+      ApplyKnockAction(action);
+      break;
     case Phase::kLayoff:
-      return ApplyLayoffAction(action);
+      ApplyLayoffAction(action);
+      break;
     case Phase::kWall:
-      return ApplyWallAction(action);
+      ApplyWallAction(action);
+      break;
     case Phase::kGameOver:
-      SpielFatalError("Cannot act in terminal states");
+      SpielFatalError("Cannot act in terminal states.");
+      break;
+    default:
+      SpielFatalError("Invalid game phase.");
+  }
+  for (Player player = 0; player < NumPlayers(); ++player) {
+    absl::optional<Action> a = {};
+    if (current_player == player) a = action;
+    aohs_[player].Extend(a, ObservationString(player));
   }
 }
 
@@ -751,6 +781,11 @@ std::unique_ptr<State> GinRummyState::Clone() const {
   return std::unique_ptr<State>(new GinRummyState(*this));
 }
 
+std::string GinRummyState::InformationStateString(Player player) const {
+  const auto& game = open_spiel::down_cast<const GinRummyGame&>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
+}
+
 std::string GinRummyState::ObservationString(Player player) const {
   const GinRummyGame& game = open_spiel::down_cast<const GinRummyGame&>(*game_);
   return game.default_observer_->StringFrom(*this, player);
@@ -772,8 +807,7 @@ GinRummyGame::GinRummyGame(const GameParameters& params)
   SPIEL_CHECK_GE(knock_card_, 0);
   SPIEL_CHECK_LE(knock_card_, kDefaultKnockCard);
   default_observer_ = std::make_shared<GinRummyObserver>(kDefaultObsType);
-  // TODO(Michal) Should we implement perfect recall?
-  //info_state_observer_ = std::make_shared<GinRummyObserver>(kInfoStateObsType);
+  info_state_observer_ = std::make_shared<GinRummyObserver>(kInfoStateObsType);
 }
 
 // TODO(Michal) This is how it's implemented in dark chess. The commented out

@@ -539,7 +539,8 @@ void ObserverTest() {
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("gin_rummy", params);
 
-  std::shared_ptr<Observer> observer = game->MakeObserver(kDefaultObsType, params);
+  std::shared_ptr<Observer> observer = game->MakeObserver(kDefaultObsType,
+                                                          params);
   Observation observation = Observation(*game, observer);
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
@@ -549,14 +550,13 @@ void ObserverTest() {
   for (auto action : initial_actions) state->ApplyAction(action);
   std::cout << state->ToString() << std::endl;
 
-  std::cout << observation.StringFrom(*state, 0) << std::endl;
-  observation.SetFrom(*state, 0);
-  std::cout << observation.Tensor() << std::endl;
-  std::cout << observation.StringFrom(*state, 1) << std::endl;
-  observation.SetFrom(*state, 1);
-  std::cout << observation.Tensor() << std::endl;
-  std::cout << state->ObservationTensor(1) << std::endl;
-  SPIEL_CHECK_EQ(observation.Tensor(), state->ObservationTensor(1));
+  for (Player player = 0; player < kNumPlayers; ++player) {
+    std::cout << observation.StringFrom(*state, player) << std::endl;
+    observation.SetFrom(*state, player);
+    std::cout << observation.Tensor() << std::endl;
+    SPIEL_CHECK_EQ(observation.Tensor(), state->ObservationTensor(player));
+    std::cout << state->InformationStateString(player) << std::endl;
+  }
 }
 
 }  // namespace
