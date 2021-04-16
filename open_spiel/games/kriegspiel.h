@@ -51,9 +51,9 @@
 //                                  match the board size. Default values are
 //                                  available for board sizes 4 and 8.
 //   "threefold_repetition" bool    Whether threefold repetition rule should be
-//                                  automatically enforced (default: false)
+//                                  automatically enforced (default: true)
 //   "50_move_rule"         bool    Whether 50 move rule should be automatically
-//                                  enforced (default: false)
+//                                  enforced (default: true)
 
 namespace open_spiel {
 namespace kriegspiel {

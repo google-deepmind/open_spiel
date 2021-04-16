@@ -44,8 +44,8 @@ const GameType kGameType{
     /*parameter_specification=*/{
       {"board_size", GameParameter(8)},
       {"fen", GameParameter(GameParameter::Type::kString, false)},
-      {"threefold_repetition", GameParameter(false)},
-      {"50_move_rule", GameParameter(false)}}
+      {"threefold_repetition", GameParameter(true)},
+      {"50_move_rule", GameParameter(true)}}
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
