@@ -12,25 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/spiel.h"
-#include "open_spiel/tests/basic_tests.h"
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_KUHN_POKER_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_KUHN_POKER_H_
 
+#include "pybind11/include/pybind11/pybind11.h"
+
+// Initialze the Python interface for games/negotiation.
 namespace open_spiel {
-namespace hex {
-namespace {
-
-namespace testing = open_spiel::testing;
-
-void BasicHexTests() {
-  testing::LoadGameTest("hex(board_size=5)");
-  testing::NoChanceOutcomesTest(*LoadGame("hex(board_size=5)"));
-  testing::RandomSimTest(*LoadGame("hex(board_size=5)"), 100);
-  testing::RandomSimTest(*LoadGame("hex"), 5);
-  testing::RandomSimTest(*LoadGame("hex(board_size=2)"), 10);
+void init_pyspiel_games_kuhn_poker(::pybind11::module &m);
 }
 
-}  // namespace
-}  // namespace hex
-}  // namespace open_spiel
-
-int main(int argc, char** argv) { open_spiel::hex::BasicHexTests(); }
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_KUHN_POKER_H_

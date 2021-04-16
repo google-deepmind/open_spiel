@@ -273,8 +273,8 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
   def setUpClass(cls):
     super(EnforceAPIOnPartialTreeBase, cls).setUpClass()
 
-    cls.some_states = sample_some_states.sample_some_states(cls.game,
-                                                            max_states=400)
+    cls.some_states = sample_some_states.sample_some_states(
+        cls.game, max_states=400)
     cls.game_type = cls.game.get_type()
 
   def test_sequence_lengths(self):
@@ -397,17 +397,16 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
 
     for state in self.some_states:
       for i in range(self.game.num_players()):
-        if private_observation.string_from(state, i) != \
-            pyspiel.PrivateObservation.NOTHING:
+        if (private_observation.string_from(state, i) !=
+            pyspiel.PrivateObservation.NOTHING):
           player_has_private_info[i] = True
 
-    if self.game_type.information == \
-        pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+    if (self.game_type.information ==
+        pyspiel.GameType.Information.IMPERFECT_INFORMATION):
       self.assertTrue(any(player_has_private_info))
-    if self.game_type.information == \
-        pyspiel.GameType.Information.PERFECT_INFORMATION:
-      none_of = lambda x: not any(x)
-      self.assertTrue(none_of(player_has_private_info))
+    if (self.game_type.information ==
+        pyspiel.GameType.Information.PERFECT_INFORMATION):
+      self.assertFalse(any(player_has_private_info))
 
   def test_no_invalid_public_observations(self):
     try:
@@ -490,7 +489,7 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
         "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
         "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
         "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker",
-        "dark_hex"
+        "dark_hex", "phantom_ttt_ir", "dark_hex_ir"
     ]
     if self.game_name in broken_games:
       return
@@ -499,14 +498,14 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
     callbacks["move_number"] = lambda _, state: str(state.move_number())
     # pylint: disable=g-long-lambda
     if self.game_type.provides_information_state_string:
-      callbacks["information_state_string"] = lambda player, state: \
-        state.information_state_string(player)
+      callbacks["information_state_string"] = (
+          lambda player, state: state.information_state_string(player))
     if self.game_type.provides_observation_string:
-      callbacks["action_observation_history"] = lambda player, state: \
-        str(pyspiel.ActionObservationHistory(player, state))
+      callbacks["action_observation_history"] = (lambda player, state: str(
+          pyspiel.ActionObservationHistory(player, state)))
     if self.game_type.provides_factored_observation_string:
-      callbacks["public_observation_history"] = lambda player, state: \
-        str(pyspiel.PublicObservationHistory(state))
+      callbacks["public_observation_history"] = (
+          lambda player, state: str(pyspiel.PublicObservationHistory(state)))
 
     # TODO(author13): Add testing of tensor variants.
 

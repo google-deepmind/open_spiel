@@ -12,25 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/spiel.h"
-#include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/python/pybind11/games_kuhn_poker.h"
 
-namespace open_spiel {
-namespace hex {
-namespace {
+#include "open_spiel/games/kuhn_poker.h"
+#include "pybind11/include/pybind11/pybind11.h"
 
-namespace testing = open_spiel::testing;
+namespace py = ::pybind11;
 
-void BasicHexTests() {
-  testing::LoadGameTest("hex(board_size=5)");
-  testing::NoChanceOutcomesTest(*LoadGame("hex(board_size=5)"));
-  testing::RandomSimTest(*LoadGame("hex(board_size=5)"), 100);
-  testing::RandomSimTest(*LoadGame("hex"), 5);
-  testing::RandomSimTest(*LoadGame("hex(board_size=2)"), 10);
+void open_spiel::init_pyspiel_games_kuhn_poker(py::module& m) {
+  py::module sub = m.def_submodule("kuhn_poker");
+  sub.def("get_optimal_policy", &kuhn_poker::GetOptimalPolicy);
 }
-
-}  // namespace
-}  // namespace hex
-}  // namespace open_spiel
-
-int main(int argc, char** argv) { open_spiel::hex::BasicHexTests(); }

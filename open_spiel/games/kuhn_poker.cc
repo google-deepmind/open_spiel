@@ -442,5 +442,30 @@ TabularPolicy GetAlwaysBetPolicy(const Game& game) {
   return GetPrefActionPolicy(game, {ActionType::kBet});
 }
 
+TabularPolicy GetOptimalPolicy(double alpha) {
+  SPIEL_CHECK_GE(alpha, 0.);
+  SPIEL_CHECK_LE(alpha, 1. / 3);
+  const double three_alpha = 3 * alpha;
+  std::unordered_map<std::string, ActionsAndProbs> policy;
+
+  // All infostates have two actions: Pass (0) and Bet (1).
+  // Player 0
+  policy["0"] = {{0, 1 - alpha}, {1, alpha}};
+  policy["0pb"] = {{0, 1}, {1, 0}};
+  policy["1"] = {{0, 1}, {1, 0}};
+  policy["1pb"] = {{0, 2. / 3. - alpha}, {1, 1. / 3. + alpha}};
+  policy["2"] = {{0, 1 - three_alpha}, {1, three_alpha}};
+  policy["2pb"] = {{0, 0}, {1, 1}};
+
+  // Player 1
+  policy["0p"] = {{0, 2. / 3.}, {1, 1. / 3.}};
+  policy["0b"] = {{0, 1}, {1, 0}};
+  policy["1p"] = {{0, 1}, {1, 0}};
+  policy["1b"] = {{0, 2. / 3.}, {1, 1. / 3.}};
+  policy["2p"] = {{0, 0}, {1, 1}};
+  policy["2b"] = {{0, 0}, {1, 1}};
+  return TabularPolicy(policy);
+}
+
 }  // namespace kuhn_poker
 }  // namespace open_spiel

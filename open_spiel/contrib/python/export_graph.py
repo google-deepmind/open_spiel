@@ -92,7 +92,8 @@ def main(_):
         policy_cost, name="train")
 
     # pylint: disable=unused-variable
-    init = tf.initialize_variables(tf.all_variables(), name="init_all_vars_op")
+    init = tf.variables_initializer(tf.global_variables(),
+                                    name="init_all_vars_op")
 
     print("Writing file: {}/{}".format(FLAGS.dir, FLAGS.filename))
     tf.train.write_graph(

@@ -80,9 +80,9 @@ class PhantomTTTState : public State {
 
  protected:
   void DoApplyAction(Action move) override;
+  std::string ViewToString(Player player) const;
 
  private:
-  std::string ViewToString(Player player) const;
   std::string ActionSequenceToString(Player player) const;
 
   tic_tac_toe::TicTacToeState state_;
@@ -96,7 +96,7 @@ class PhantomTTTState : public State {
 // Game object.
 class PhantomTTTGame : public Game {
  public:
-  explicit PhantomTTTGame(const GameParameters& params);
+  PhantomTTTGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new PhantomTTTState(shared_from_this(), obs_type_));
@@ -114,9 +114,34 @@ class PhantomTTTGame : public Game {
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return kLongestSequence; }
 
+  ObservationType obs_type() const { return obs_type_; }
+
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
   ObservationType obs_type_;
+};
+
+// Implements the FOE abstraction from Lanctot et al. '12
+// http://mlanctot.info/files/papers/12icml-ir.pdf
+class ImperfectRecallPTTTState : public PhantomTTTState {
+ public:
+  ImperfectRecallPTTTState(std::shared_ptr<const Game> game,
+                           ObservationType obs_type)
+      : PhantomTTTState(game, obs_type) {}
+  std::string InformationStateString(Player player) const override {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
+    return ViewToString(player);
+  }
+};
+
+class ImperfectRecallPTTTGame : public PhantomTTTGame {
+ public:
+  explicit ImperfectRecallPTTTGame(const GameParameters& params);
+  std::unique_ptr<State> NewInitialState() const override {
+    return std::unique_ptr<State>(
+        new ImperfectRecallPTTTState(shared_from_this(), obs_type()));
+  }
 };
 
 inline std::ostream& operator<<(std::ostream& stream,

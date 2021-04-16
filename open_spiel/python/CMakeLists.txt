@@ -1,4 +1,5 @@
 find_package(Python3 COMPONENTS Interpreter Development)
+message(NOTICE "Python executable: ${Python3_EXECUTABLE}")
 message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
@@ -21,6 +22,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_bridge.h
   pybind11/games_chess.cc
   pybind11/games_chess.h
+  pybind11/games_kuhn_poker.cc
+  pybind11/games_kuhn_poker.h
   pybind11/games_negotiation.cc
   pybind11/games_negotiation.h
   pybind11/games_tarok.cc
@@ -175,7 +178,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   get_filename_component(py_test ${py_test_file} NAME_WE)
-  add_test(NAME python_${py_test} COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+  add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
   # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
   # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
@@ -191,7 +194,7 @@ endforeach(py_test_file)
 # We don't generate these automatically because we may want custom parameters.
 
 add_test(NAME python_examples_bridge_supervised_learning
-         COMMAND python3
+         COMMAND ${Python3_EXECUTABLE}
          ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
          --iterations 10
          --eval_every 5
