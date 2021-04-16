@@ -637,6 +637,8 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("random_sim_test", testing::RandomSimTest, py::arg("game"),
         py::arg("num_sims"), py::arg("serialize"), py::arg("verbose"),
+        py::arg("state_checker_fn") =
+            py::cpp_function(&testing::DefaultStateChecker),
         "Run the C++ tests on a game");
 
   // Set an error handler that will raise exceptions. These exceptions are for
