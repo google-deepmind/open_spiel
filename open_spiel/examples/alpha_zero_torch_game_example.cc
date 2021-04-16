@@ -112,7 +112,7 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
 
   // Play the initial actions (if there are any).
   for (const auto& action_str : initial_actions) {
-    open_spiel::Player player = state->CurrentPlayer();
+    open_spiel::Player current_player = state->CurrentPlayer();
     open_spiel::Action action = GetAction(*state, action_str);
 
     if (action == open_spiel::kInvalidAction)
@@ -122,44 +122,28 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
     state->ApplyAction(action);
 
     if (!quiet) {
-      std::cerr << "Player " << player << " forced action: " << action_str
-                << std::endl;
+      std::cerr << "Player " << current_player << " forced action: "
+                << action_str << std::endl;
       std::cerr << "Next state:\n" << state->ToString() << std::endl;
     }
   }
 
   while (!state->IsTerminal()) {
-    open_spiel::Player player = state->CurrentPlayer();
-    open_spiel::Action action;
+    open_spiel::Player current_player = state->CurrentPlayer();
+    open_spiel::Player opponent_player = 1 - current_player;
 
-    // Perform an action.
-    if (state->IsChanceNode()) {
-      // Chance node; sample one according to underlying distribution.
-      open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
-      action = open_spiel::SampleAction(outcomes, rng).first;
-      if (!quiet)
-        std::cerr << "Player " << player << " sampled action: "
-                  << state->ActionToString(player, action) << std::endl;
-    } else if (state->IsSimultaneousNode()) {
-      open_spiel::SpielFatalError(
-          "MCTS not supported for games with simultaneous actions.");
-    } else {
-      // Decision node, ask the right bot to make its action.
-      action = bots[player]->Step(*state);
-      if (!quiet)
-        std::cerr << "Player " << player << " chose action: "
-                  << state->ActionToString(player, action) << std::endl;
-    }
+    // The state must be a decision node, ask the right bot to make its action.
+    open_spiel::Action action = bots[current_player]->Step(*state);
 
-    // Inform the other bot(s) of the action performed.
-    for (open_spiel::Player p = 0; p < bots.size(); ++p) {
-      if (p != player) {
-        bots[p]->InformAction(*state, player, action);
-      }
-    }
+    if (!quiet)
+      std::cerr << "Player " << current_player << " chose action: "
+                << state->ActionToString(current_player, action) << std::endl;
+
+    // Inform the other bot of the action performed.
+    bots[opponent_player]->InformAction(*state, current_player, action);
 
     // Update history and get the next state.
-    history.push_back(state->ActionToString(player, action));
+    history.push_back(state->ActionToString(current_player, action));
     state->ApplyAction(action);
 
     if (!quiet)
