@@ -49,7 +49,7 @@ void PrintColumns(const std::vector<std::string>& strings) {
                   << padding_string << strings[index];
       }
     }
-    std::cout << "\n";
+    std::cout << std::endl;
   }
 }
 
@@ -76,7 +76,7 @@ Action HumanBot::Step(const State& state) {
 
     // Print the legal actions if no action is given.
     if (action_string.empty()) {
-      std::cout << "Legal action(s):\n";
+      std::cout << "Legal action(s):" << std::endl;
 
       std::vector<std::string> legal_action_strings;
       std::vector<std::pair<std::string, Action>> sorted_action_map(
@@ -118,7 +118,7 @@ Action HumanBot::Step(const State& state) {
     try {
       action = std::stoi(action_string);
     } catch (const std::exception& e) {
-      std::cout << "Could not parse the action: " << action_string << "\n";
+      std::cout << "Could not parse the action: " << action_string << std::endl;
       continue;
     }
 
@@ -129,7 +129,7 @@ Action HumanBot::Step(const State& state) {
     }
 
     // The input was not valid.
-    std::cout << "Illegal action selected: " << action_string << "\n";
+    std::cout << "Illegal action selected: " << action_string << std::endl;
   }
 }
 
