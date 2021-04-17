@@ -32,58 +32,60 @@ void BasicGameTests() {
 }
 
 void MeldTests() {
+  GinRummyUtils utils = GinRummyUtils(kDefaultNumRanks, kDefaultNumSuits,
+                                      kDefaultHandSize);
   // There are 185 melds of length between 3 and 5 cards. All melds of
   // length greater than 5 can be expressed as two or more smaller melds.
   std::vector<int> full_deck;
-  for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
-  std::vector<std::vector<int>> all_melds = AllMelds(full_deck);
+  for (int i = 0; i < utils.num_cards; ++i) full_deck.push_back(i);
+  std::vector<std::vector<int>> all_melds = utils.AllMelds(full_deck);
   SPIEL_CHECK_EQ(all_melds.size(), kNumMeldActions);
 
   // Some simple meld tests
   std::vector<std::string> cards;
   cards = {"As", "2s", "3s"};
-  SPIEL_CHECK_TRUE(IsSuitMeld(CardStringsToCardInts(cards)));
-  SPIEL_CHECK_FALSE(IsRankMeld(CardStringsToCardInts(cards)));
+  SPIEL_CHECK_TRUE(utils.IsSuitMeld(utils.CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsRankMeld(utils.CardStringsToCardInts(cards)));
   cards = {"As", "Ac", "Ad"};
-  SPIEL_CHECK_TRUE(IsRankMeld(CardStringsToCardInts(cards)));
-  SPIEL_CHECK_FALSE(IsSuitMeld(CardStringsToCardInts(cards)));
+  SPIEL_CHECK_TRUE(utils.IsRankMeld(utils.CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsSuitMeld(utils.CardStringsToCardInts(cards)));
   cards = {"As", "Ac", "Ad", "2s"};
-  SPIEL_CHECK_FALSE(IsRankMeld(CardStringsToCardInts(cards)));
-  SPIEL_CHECK_FALSE(IsSuitMeld(CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsRankMeld(utils.CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsSuitMeld(utils.CardStringsToCardInts(cards)));
 
   // No "around the corner" melds
   cards = {"As", "2s", "3s", "Ks"};
-  SPIEL_CHECK_FALSE(IsRankMeld(CardStringsToCardInts(cards)));
-  SPIEL_CHECK_FALSE(IsSuitMeld(CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsRankMeld(utils.CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsSuitMeld(utils.CardStringsToCardInts(cards)));
 
   // These cards are represented internally as consecutive ints
   // but are not a meld.
   cards = {"Js", "Qs", "Ks", "Ac"};
-  SPIEL_CHECK_FALSE(IsRankMeld(CardStringsToCardInts(cards)));
-  SPIEL_CHECK_FALSE(IsSuitMeld(CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsRankMeld(utils.CardStringsToCardInts(cards)));
+  SPIEL_CHECK_FALSE(utils.IsSuitMeld(utils.CardStringsToCardInts(cards)));
 
   // Check that the meld_to_int and int_to_meld maps work correctly.
   int meld_id;
   cards = {"Ks", "Kc", "Kd", "Kh"};
-  meld_id = meld_to_int.at(CardStringsToCardInts(cards));
+  meld_id = utils.meld_to_int.at(utils.CardStringsToCardInts(cards));
   SPIEL_CHECK_EQ(meld_id, 64);
-  SPIEL_CHECK_EQ(meld_to_int.at(int_to_meld.at(64)), 64);
+  SPIEL_CHECK_EQ(utils.meld_to_int.at(utils.int_to_meld.at(64)), 64);
   cards = {"As", "2s", "3s"};
-  meld_id = meld_to_int.at(CardStringsToCardInts(cards));
+  meld_id = utils.meld_to_int.at(utils.CardStringsToCardInts(cards));
   SPIEL_CHECK_EQ(meld_id, 65);
-  SPIEL_CHECK_EQ(meld_to_int.at(int_to_meld.at(65)), 65);
+  SPIEL_CHECK_EQ(utils.meld_to_int.at(utils.int_to_meld.at(65)), 65);
   cards = {"As", "2s", "3s", "4s"};
-  meld_id = meld_to_int.at(CardStringsToCardInts(cards));
+  meld_id = utils.meld_to_int.at(utils.CardStringsToCardInts(cards));
   SPIEL_CHECK_EQ(meld_id, 109);
-  SPIEL_CHECK_EQ(meld_to_int.at(int_to_meld.at(109)), 109);
+  SPIEL_CHECK_EQ(utils.meld_to_int.at(utils.int_to_meld.at(109)), 109);
   cards = {"As", "2s", "3s", "4s", "5s"};
-  meld_id = meld_to_int.at(CardStringsToCardInts(cards));
+  meld_id = utils.meld_to_int.at(utils.CardStringsToCardInts(cards));
   SPIEL_CHECK_EQ(meld_id, 149);
-  SPIEL_CHECK_EQ(meld_to_int.at(int_to_meld.at(149)), 149);
+  SPIEL_CHECK_EQ(utils.meld_to_int.at(utils.int_to_meld.at(149)), 149);
   cards = {"9h", "Th", "Jh", "Qh", "Kh"};
-  meld_id = meld_to_int.at(CardStringsToCardInts(cards));
+  meld_id = utils.meld_to_int.at(utils.CardStringsToCardInts(cards));
   SPIEL_CHECK_EQ(meld_id, 184);
-  SPIEL_CHECK_EQ(meld_to_int.at(int_to_meld.at(184)), 184);
+  SPIEL_CHECK_EQ(utils.meld_to_int.at(utils.int_to_meld.at(184)), 184);
 
   // Should find five rank melds and one suit meld.
   // +--------------------------+
@@ -93,8 +95,8 @@ void MeldTests() {
   // |Ah                        |
   // +--------------------------+
   cards = {"As", "Ac", "Ad", "Ah", "2s", "3s"};
-  std::vector<int> card_ints = CardStringsToCardInts(cards);
-  all_melds = AllMelds(card_ints);
+  std::vector<int> card_ints = utils.CardStringsToCardInts(cards);
+  all_melds = utils.AllMelds(card_ints);
   SPIEL_CHECK_EQ(all_melds.size(), 6);
 
   // More complicated example with 14 possible melds.
@@ -105,8 +107,8 @@ void MeldTests() {
   // |      4h5h                |
   // +--------------------------+
   cards = {"4s", "4c", "4d", "4h", "5s", "5c", "5d", "5h", "6s", "6c", "6d"};
-  card_ints = CardStringsToCardInts(cards);
-  all_melds = AllMelds(card_ints);
+  card_ints = utils.CardStringsToCardInts(cards);
+  all_melds = utils.AllMelds(card_ints);
   SPIEL_CHECK_EQ(all_melds.size(), 14);
 
   // +--------------------------+
@@ -117,12 +119,12 @@ void MeldTests() {
   // +--------------------------+
   // Should find the best meld group 4s4d4h, 5s5c5d, 2c3c4c with 3 deadwood.
   cards = {"4s", "4c", "4d", "4h", "5s", "5c", "5d", "6s", "2c", "3s", "3c"};
-  card_ints = CardStringsToCardInts(cards);
-  std::vector<std::vector<int>> meld_group = BestMeldGroup(card_ints);
+  card_ints = utils.CardStringsToCardInts(cards);
+  std::vector<std::vector<int>> meld_group = utils.BestMeldGroup(card_ints);
   std::cout << meld_group << std::endl;
   for (auto meld : meld_group)
-    std::cout << CardIntsToCardStrings(meld) << std::endl;
-  int deadwood = MinDeadwood(card_ints);
+    std::cout << utils.CardIntsToCardStrings(meld) << std::endl;
+  int deadwood = utils.MinDeadwood(card_ints);
   SPIEL_CHECK_EQ(deadwood, 3);
 }
 
@@ -327,6 +329,8 @@ void GameplayTest3() {
 // Tests action on the 50th card, and tests that layoffs are not allowed when
 // the knocking player has gin.
 void WallTest() {
+  GinRummyUtils utils = GinRummyUtils(kDefaultNumRanks, kDefaultNumSuits,
+                                      kDefaultHandSize);
   GameParameters params;
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("gin_rummy", params);
@@ -385,7 +389,7 @@ void WallTest() {
   state->ApplyAction(54);
   // Player1 made gin, so Player0 cannot layoff the Th on JhQhKh
   legal_actions = state->LegalActions();
-  SPIEL_CHECK_FALSE(absl::c_linear_search(legal_actions, CardInt("Th")));
+  SPIEL_CHECK_FALSE(absl::c_linear_search(legal_actions, utils.CardInt("Th")));
   // Player0 lays melds.
   state->ApplyAction(213);
   state->ApplyAction(132);
@@ -559,6 +563,33 @@ void ObserverTest() {
   }
 }
 
+// TODO(jhtschultz) Add more extensive testing of parameterized deck size.
+void DeckSizeTests() {
+  const int kNumRanks = 10;
+  const int kNumSuits = 3;
+  const int kHandSize = 7;
+  GinRummyUtils utils = GinRummyUtils(kNumRanks, kNumSuits, kHandSize);
+  std::vector<int> full_deck;
+  for (int i = 0; i < 30; ++i) full_deck.push_back(i);
+  std::vector<std::vector<int>> all_melds = utils.AllMelds(full_deck);
+  SPIEL_CHECK_EQ(all_melds.size(), 73);  // 73 melds in a 10x3 deck.
+  // Check string representation of hand.
+  SPIEL_CHECK_EQ(utils.HandToString(full_deck),
+                 "+--------------------+\n"
+                 "|As2s3s4s5s6s7s8s9sTs|\n"
+                 "|Ac2c3c4c5c6c7c8c9cTc|\n"
+                 "|Ad2d3d4d5d6d7d8d9dTd|\n"
+                 "+--------------------+\n");
+  // Random sims with 10x3 deck size.
+  GameParameters params;
+  params["num_ranks"] = GameParameter(10);
+  params["num_suits"] = GameParameter(3);
+  params["hand_size"] = GameParameter(7);
+  std::shared_ptr<const open_spiel::Game> game =
+      open_spiel::LoadGame("gin_rummy", params);
+  testing::RandomSimTest(*game, 10);
+}
+
 }  // namespace
 }  // namespace gin_rummy
 }  // namespace open_spiel
@@ -573,5 +604,6 @@ int main(int argc, char** argv) {
   open_spiel::gin_rummy::WallTest();
   open_spiel::gin_rummy::OklahomaTest();
   open_spiel::gin_rummy::ObserverTest();
+  open_spiel::gin_rummy::DeckSizeTests();
   std::cout << "Gin rummy tests passed!" << std::endl;
 }

@@ -35,6 +35,9 @@
 //  "knock_card"      int    set a specific knock card     (default = 10)
 //  "gin_bonus"       int    bonus for getting gin         (default = 25)
 //  "undercut_bonus"  int    bonus for an undercut         (default = 25)
+//  "num_ranks"       int    num ranks in deck             (default = 13)
+//  "num_suits"       int    num suits in deck             (default = 4)
+//  "hand_size"       int    num cards in player hand      (default = 10)
 
 #include <memory>
 #include <string>
@@ -50,15 +53,22 @@
 namespace open_spiel {
 namespace gin_rummy {
 
+// Game constants
+inline constexpr int kDefaultNumRanks = 13;
+inline constexpr int kDefaultNumSuits = 4;
+inline constexpr int kDefaultNumCards = 52;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kMaxPossibleDeadwood = 98;  // E.g. KsKcQdQhJsJcTdTh9s9c
 inline constexpr int kMaxNumDrawUpcardActions = 50;
-inline constexpr int kHandSize = 10;
+inline constexpr int kDefaultHandSize = 10;
+// TODO(jhtschultz) should kMaxStockSize be a tight upper bound for nonstandard
+// deck size?
 inline constexpr int kMaxStockSize = 31;  // Stock size when play begins
 inline constexpr int kWallStockSize = 2;
 inline constexpr int kDefaultKnockCard = 10;
 inline constexpr int kDefaultGinBonus = 25;
 inline constexpr int kDefaultUndercutBonus = 25;
+// Action constants
 inline constexpr int kDrawUpcardAction = 52;
 inline constexpr int kDrawStockAction = 53;
 inline constexpr int kPassAction = 54;
@@ -66,12 +76,13 @@ inline constexpr int kKnockAction = 55;
 inline constexpr int kMeldActionBase = 56;  // First lay meld action
 inline constexpr int kNumMeldActions = 185;
 inline constexpr int kNumDistinctActions = kMeldActionBase + kNumMeldActions;
+// Observer constants
 inline constexpr int kObservationTensorSize =
     kNumPlayers             // Player turn
     + kDefaultKnockCard     // Knock card
-    + kNumCards             // Player hand
-    + kNumCards             // Upcard
-    + kNumCards             // Discard pile
+    + kDefaultNumCards      // Player hand
+    + kDefaultNumCards      // Upcard
+    + kDefaultNumCards      // Discard pile
     + kMaxStockSize         // Stock size
     + kNumMeldActions * 2;  // Layed melds of both players
 
@@ -81,7 +92,8 @@ class GinRummyObserver;
 class GinRummyState : public State {
  public:
   explicit GinRummyState(std::shared_ptr<const Game> game, bool oklahoma,
-                         int knock_card, int gin_bonus, int undercut_bonus);
+                         int knock_card, int gin_bonus, int undercut_bonus,
+                         int num_ranks, int num_suits, int hand_size);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -140,10 +152,17 @@ class GinRummyState : public State {
 
   int Opponent(int player) const { return 1 - player; }
 
+  // Game params
   const bool oklahoma_;  // If true, will override the knock card value.
   int knock_card_;       // The maximum deadwood total for a legal knock.
   const int gin_bonus_;
   const int undercut_bonus_;
+  const int num_ranks_;
+  const int num_suits_;
+  const int num_cards_;
+  const int hand_size_;
+
+  const GinRummyUtils utils_;
 
   Phase phase_ = Phase::kDeal;
   Player cur_player_ = kChancePlayerId;
@@ -151,7 +170,7 @@ class GinRummyState : public State {
   bool finished_layoffs_ = false;
   absl::optional<int> upcard_;
   absl::optional<int> prev_upcard_;  // Used to track repeated moves.
-  int stock_size_ = kNumCards;      // Number of cards remaining in stock.
+  int stock_size_;                   // Number of cards remaining in stock.
   // True if the prev player drew the upcard only to immediately discard it.
   // If both players do this in succession the game is declared a draw.
   bool repeated_move_ = false;
@@ -192,8 +211,13 @@ class GinRummyGame : public Game {
  public:
   explicit GinRummyGame(const GameParameters& params);
 
+  // TODO(Michal) Do we want the number of actions to change depending on game
+  // size params? Keeping it fixed means there will be unused action ints for
+  // small versions of the game, but there won't be many unused actions (< 52)
+  // and fixed action values for drawing a card, knocking, etc... is clearer
+  // and less likely to produce bugs.
   int NumDistinctActions() const override { return kNumDistinctActions; }
-  int MaxChanceOutcomes() const override { return kNumCards; }
+  int MaxChanceOutcomes() const override { return num_ranks_ * num_suits_; }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
     return -(kMaxPossibleDeadwood + gin_bonus_);
@@ -205,15 +229,20 @@ class GinRummyGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new GinRummyState(shared_from_this(), oklahoma_, knock_card_,
-                          gin_bonus_, undercut_bonus_));
+                          gin_bonus_, undercut_bonus_, num_ranks_, num_suits_,
+                          hand_size_));
   }
+  // TODO(Michal) Do we want the obs tensor to change shape depending on game
+  // size params? Similar to above.
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }
   // All games should terminate before reaching this upper bound.
   int MaxGameLength() const override { return 300; }
-  // TODO: verify whether this bound is tight and/or tighten it.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+  // Only chance nodes are the deal.
+  int MaxChanceNodesInHistory() const override {
+    return num_ranks_ * num_suits_;
+  }
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const override;
@@ -226,6 +255,9 @@ class GinRummyGame : public Game {
   const int knock_card_;
   const int gin_bonus_;
   const int undercut_bonus_;
+  const int num_ranks_;
+  const int num_suits_;
+  const int hand_size_;
 };
 
 }  // namespace gin_rummy

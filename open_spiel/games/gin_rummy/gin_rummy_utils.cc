@@ -24,28 +24,40 @@
 namespace open_spiel {
 namespace gin_rummy {
 
-int CardSuit(int card) { return card / kNumRanks; }
-int CardRank(int card) { return card % kNumRanks; }
+GinRummyUtils::GinRummyUtils(int num_ranks, int num_suits, int hand_size) :
+      num_ranks(num_ranks),
+      num_suits(num_suits),
+      num_cards(num_ranks * num_suits),
+      hand_size(hand_size),
+      rank_comp(RankComparator(num_ranks)),
+      suit_comp(SuitComparator(num_ranks)),
+      int_to_meld(BuildIntToMeldMap()),
+      meld_to_int(BuildMeldToIntMap()) {
+}
+
+int GinRummyUtils::CardSuit(int card) const { return card / num_ranks; }
+int GinRummyUtils::CardRank(int card) const { return card % num_ranks; }
 
 // All suits are of equal value and suit ordering never factors into gameplay.
 constexpr char kRankChar[] = "A23456789TJQK";
 constexpr char kSuitChar[] = "scdh";
 
-std::string CardString(absl::optional<int> card) {
+std::string GinRummyUtils::CardString(absl::optional<int> card) const {
   if (!card.has_value()) return "XX";
   SPIEL_CHECK_GE(card.value(), 0);
-  SPIEL_CHECK_LT(card.value(), kNumCards);
+  SPIEL_CHECK_LT(card.value(), num_cards);
   return {kRankChar[CardRank(card.value())], kSuitChar[CardSuit(card.value())]};
 }
 
-int CardInt(std::string card) {
+int GinRummyUtils::CardInt(std::string card) const {
   SPIEL_CHECK_EQ(card.length(), 2);
   int rank = strchr(kRankChar, card[0]) - kRankChar;
   int suit = strchr(kSuitChar, card[1]) - kSuitChar;
-  return suit * kNumRanks + rank;
+  return suit * num_ranks + rank;
 }
 
-std::vector<std::string> CardIntsToCardStrings(const VecInt &cards) {
+std::vector<std::string> GinRummyUtils::CardIntsToCardStrings(
+    const VecInt &cards) const {
   std::vector<std::string> rv;
   for (int card : cards) {
     rv.push_back(CardString(card));
@@ -53,7 +65,8 @@ std::vector<std::string> CardIntsToCardStrings(const VecInt &cards) {
   return rv;
 }
 
-VecInt CardStringsToCardInts(const std::vector<std::string> &cards) {
+VecInt GinRummyUtils::CardStringsToCardInts(
+    const std::vector<std::string> &cards) const {
   VecInt rv;
   for (const std::string &card : cards) {
     rv.push_back(CardInt(card));
@@ -61,34 +74,44 @@ VecInt CardStringsToCardInts(const std::vector<std::string> &cards) {
   return rv;
 }
 
-std::string HandToString(const VecInt &cards) {
+// TODO(jhtschultz) should kHandStringSize depend on deck size?
+std::string GinRummyUtils::HandToString(const VecInt &cards) const {
   std::string rv;
   constexpr int kHandStringSize = 174;
   rv.reserve(kHandStringSize);
-  absl::StrAppend(&rv, "+--------------------------+\n");
-  for (int i = 0; i < kNumSuits; ++i) {
+  // Top border
+  absl::StrAppend(&rv, "+");
+  for (int i = 0; i < num_ranks; ++i)
+    absl::StrAppend(&rv, "--");
+  absl::StrAppend(&rv, "+\n");
+  // One row for each suit
+  for (int i = 0; i < num_suits; ++i) {
     absl::StrAppend(&rv, "|");
-    for (int j = 0; j < kNumRanks; ++j) {
-      if (absl::c_linear_search(cards, (i * kNumRanks) + j)) {
-        absl::StrAppend(&rv, CardString((i * kNumRanks) + j));
+    for (int j = 0; j < num_ranks; ++j) {
+      if (absl::c_linear_search(cards, (i * num_ranks) + j)) {
+        absl::StrAppend(&rv, CardString((i * num_ranks) + j));
       } else {
         absl::StrAppend(&rv, "  ");
       }
     }
     absl::StrAppend(&rv, "|\n");
   }
-  absl::StrAppend(&rv, "+--------------------------+\n");
+  // Bottom border
+  absl::StrAppend(&rv, "+");
+  for (int i = 0; i < num_ranks; ++i)
+    absl::StrAppend(&rv, "--");
+  absl::StrAppend(&rv, "+\n");
   return rv;
 }
 
 // Ace = 1, deuce = 2, ... , face cards = 10.
-int CardValue(int card_index) {
+int GinRummyUtils::CardValue(int card_index) const {
   int value = CardRank(card_index) + 1;
   return std::min(10, value);
 }
 
 // Sums point total over all cards.
-int TotalCardValue(const VecInt &cards) {
+int GinRummyUtils::TotalCardValue(const VecInt &cards) const {
   int total_value = 0;
   for (int card : cards) {
     total_value += CardValue(card);
@@ -97,7 +120,7 @@ int TotalCardValue(const VecInt &cards) {
 }
 
 // Sums point total over all cards.
-int TotalCardValue(const VecVecInt &meld_group) {
+int GinRummyUtils::TotalCardValue(const VecVecInt &meld_group) const {
   int total_value = 0;
   for (const auto &meld : meld_group) {
     for (auto card : meld) {
@@ -107,30 +130,14 @@ int TotalCardValue(const VecVecInt &meld_group) {
   return total_value;
 }
 
-// Use suits to break ties.
-bool CompareRanks(int card_1, int card_2) {
-  if (CardRank(card_1) == CardRank(card_2)) {
-    return card_1 < card_2;
-  }
-  return CardRank(card_1) < CardRank(card_2);
-}
-
-// Use ranks to break ties.
-bool CompareSuits(int card_1, int card_2) {
-  if (CardSuit(card_1) == CardSuit(card_2)) {
-    return CompareRanks(card_1, card_2);
-  }
-  return CardSuit(card_1) < CardSuit(card_2);
-}
-
-bool IsConsecutive(const VecInt &v) {
+bool GinRummyUtils::IsConsecutive(const VecInt &v) const {
   for (int i = 1; i < v.size(); ++i) {
     if (v[i] != v[i - 1] + 1) return false;
   }
   return true;
 }
 
-bool IsRankMeld(const VecInt &cards) {
+bool GinRummyUtils::IsRankMeld(const VecInt &cards) const {
   if (cards.size() != 3 && cards.size() != 4) {
     return false;
   }
@@ -142,7 +149,7 @@ bool IsRankMeld(const VecInt &cards) {
   return true;
 }
 
-bool IsSuitMeld(const VecInt &cards) {
+bool GinRummyUtils::IsSuitMeld(const VecInt &cards) const {
   if (cards.size() < 3) {
     return false;
   }
@@ -162,12 +169,12 @@ bool IsSuitMeld(const VecInt &cards) {
 }
 
 // Returns all possible rank melds that can be formed from cards.
-VecVecInt RankMelds(VecInt cards) {
+VecVecInt GinRummyUtils::RankMelds(VecInt cards) const {
   VecVecInt melds;
   if (cards.size() < 3) {
     return melds;
   }
-  absl::c_sort(cards, CompareRanks);
+  absl::c_sort(cards, rank_comp);
   // First do a sweep for 4 card melds.
   for (int i = 0; i < cards.size() - 3; ++i) {
     // Found 4 card meld - implies there are four 3 card melds as well.
@@ -189,12 +196,12 @@ VecVecInt RankMelds(VecInt cards) {
 }
 
 // Returns all possible suit melds that can be formed from cards.
-VecVecInt SuitMelds(VecInt cards) {
+VecVecInt GinRummyUtils::SuitMelds(VecInt cards) const {
   VecVecInt melds;
   if (cards.size() < 3) {
     return melds;
   }
-  absl::c_sort(cards, CompareSuits);
+  absl::c_sort(cards, suit_comp);
   // Find all suit melds of length 5.
   if (cards.size() >= 5) {
     for (int i = 0; i < cards.size() - 4; ++i) {
@@ -225,14 +232,14 @@ VecVecInt SuitMelds(VecInt cards) {
 
 // Returns all melds of length 5 or less. Any meld of length 6 or more can
 // be expressed as two or more melds of shorter length.
-VecVecInt AllMelds(const VecInt &cards) {
+VecVecInt GinRummyUtils::AllMelds(const VecInt &cards) const {
   VecVecInt rank_melds = RankMelds(cards);
   VecVecInt suit_melds = SuitMelds(cards);
   rank_melds.insert(rank_melds.end(), suit_melds.begin(), suit_melds.end());
   return rank_melds;
 }
 
-bool VectorsIntersect(VecInt *v1, VecInt *v2) {
+bool GinRummyUtils::VectorsIntersect(VecInt *v1, VecInt *v2) const {
   absl::c_sort(*v1);
   absl::c_sort(*v2);
   VecInt::iterator first1 = v1->begin();
@@ -253,7 +260,8 @@ bool VectorsIntersect(VecInt *v1, VecInt *v2) {
 }
 
 // Returns melds which do not share any common cards with given meld.
-VecVecInt NonOverlappingMelds(VecInt *meld, VecVecInt *melds) {
+VecVecInt GinRummyUtils::NonOverlappingMelds(VecInt *meld,
+                                             VecVecInt *melds) const {
   VecVecInt rv;
   for (int i = 0; i < melds->size(); ++i) {
     if (!VectorsIntersect(meld, &(*melds)[i])) {
@@ -264,8 +272,8 @@ VecVecInt NonOverlappingMelds(VecInt *meld, VecVecInt *melds) {
 }
 
 // Depth first search used by AllMeldGroups.
-void AllPaths(VecInt *meld, VecVecInt *all_melds, VecVecInt *path,
-              VecVecVecInt *all_paths) {
+void GinRummyUtils::AllPaths(VecInt *meld, VecVecInt *all_melds,
+                             VecVecInt *path, VecVecVecInt *all_paths) const {
   path->push_back(*meld);
   VecVecInt child_melds = NonOverlappingMelds(meld, all_melds);
   if (child_melds.empty()) {
@@ -280,7 +288,7 @@ void AllPaths(VecInt *meld, VecVecInt *all_melds, VecVecInt *path,
 
 // A meld group is an arrangement of cards into distinct melds.
 // Accordingly, no two melds in a meld group can share the same card.
-VecVecVecInt AllMeldGroups(const VecInt &cards) {
+VecVecVecInt GinRummyUtils::AllMeldGroups(const VecInt &cards) const {
   VecVecInt all_melds = AllMelds(cards);
   VecVecVecInt all_meld_groups;
   for (VecInt meld : all_melds) {
@@ -292,7 +300,7 @@ VecVecVecInt AllMeldGroups(const VecInt &cards) {
 
 // "Best" means any meld group that achieves the lowest possible deadwood
 // count for the given cards. In general this is non-unique.
-VecVecInt BestMeldGroup(const VecInt &cards) {
+VecVecInt GinRummyUtils::BestMeldGroup(const VecInt &cards) const {
   int best_meld_group_total_value = 0;
   VecVecInt best_meld_group;
   VecVecVecInt all_meld_groups = AllMeldGroups(cards);
@@ -307,13 +315,13 @@ VecVecInt BestMeldGroup(const VecInt &cards) {
 }
 
 // Minimum deadwood count over all meld groups.
-int MinDeadwood(VecInt hand, absl::optional<int> card) {
+int GinRummyUtils::MinDeadwood(VecInt hand, absl::optional<int> card) const {
   if (card.has_value()) hand.push_back(card.value());
   return MinDeadwood(hand);
 }
 
 // Minimum deadwood count over all meld groups.
-int MinDeadwood(const VecInt &hand) {
+int GinRummyUtils::MinDeadwood(const VecInt &hand) const {
   VecInt deadwood = hand;
   VecVecInt best_melds = BestMeldGroup(hand);
 
@@ -323,9 +331,9 @@ int MinDeadwood(const VecInt &hand) {
                      deadwood.end());
     }
   }
-  // If we have 11 cards we can discard one.
-  if (hand.size() == kMaxHandSize && !deadwood.empty()) {
-    absl::c_sort(deadwood, CompareRanks);
+  // If we have just drawn a card, we can discard the one worth the most points.
+  if (hand.size() == hand_size + 1 && !deadwood.empty()) {
+    absl::c_sort(deadwood, rank_comp);
     deadwood.pop_back();
   }
   int deadwood_total = 0;
@@ -333,8 +341,8 @@ int MinDeadwood(const VecInt &hand) {
   return deadwood_total;
 }
 
-// Returns the one card that can be layed off on a three card rank meld.
-int RankMeldLayoff(const VecInt &meld) {
+// Returns the unique card that can be layed off on a given 3-card rank meld.
+int GinRummyUtils::RankMeldLayoff(const VecInt &meld) const {
   SPIEL_CHECK_EQ(meld.size(), 3);
   SPIEL_CHECK_TRUE(IsRankMeld(meld));
   VecInt suits = {0, 1, 2, 3};
@@ -342,18 +350,18 @@ int RankMeldLayoff(const VecInt &meld) {
     suits.erase(std::remove(suits.begin(), suits.end(), CardSuit(card)),
                 suits.end());
   }
-  return CardRank(meld[0]) + suits[0] * kNumRanks;
+  return CardRank(meld[0]) + suits[0] * num_ranks;
 }
 
 // Suit melds have two layoffs, except if the meld ends in an ace or king.
-VecInt SuitMeldLayoffs(const VecInt &meld) {
+VecInt GinRummyUtils::SuitMeldLayoffs(const VecInt &meld) const {
   VecInt layoffs;
   int min_card_index = *std::min_element(meld.begin(), meld.end());
   if (CardRank(min_card_index) > 0) {
     layoffs.push_back(min_card_index - 1);
   }
   int max_card_index = *std::max_element(meld.begin(), meld.end());
-  if (CardRank(max_card_index) < kNumRanks - 1) {
+  if (CardRank(max_card_index) < num_ranks - 1) {
     layoffs.push_back(max_card_index + 1);
   }
   return layoffs;
@@ -364,7 +372,7 @@ VecInt SuitMeldLayoffs(const VecInt &meld) {
 // the 6's and 7's in melds, leaving us with 26 points. Laying the two suit
 // melds leaves only the 8d for 8 points.
 // Returns vector of meld_ids (see MeldToInt).
-VecInt LegalMelds(const VecInt &hand, int knock_card) {
+VecInt GinRummyUtils::LegalMelds(const VecInt &hand, int knock_card) const {
   int total_hand_value = TotalCardValue(hand);
   std::set<int> meld_set;
   VecInt hand_(hand);
@@ -384,7 +392,7 @@ VecInt LegalMelds(const VecInt &hand, int knock_card) {
 // discard any card in their hand. When a player knocks, however, they must
 // discard a card that preseves the ability to arrange the hand so that the
 // total deadwood is less than the knock card.
-VecInt LegalDiscards(const VecInt &hand, int knock_card) {
+VecInt GinRummyUtils::LegalDiscards(const VecInt &hand, int knock_card) const {
   std::set<int> legal_discards;
   for (int i = 0; i < hand.size(); ++i) {
     VecInt hand_(hand);
@@ -397,7 +405,8 @@ VecInt LegalDiscards(const VecInt &hand, int knock_card) {
   return VecInt(legal_discards.begin(), legal_discards.end());
 }
 
-VecInt AllLayoffs(const VecInt &layed_melds, const VecInt &previous_layoffs) {
+VecInt GinRummyUtils::AllLayoffs(const VecInt &layed_melds,
+                         const VecInt &previous_layoffs) const {
   std::set<int> layoffs;
   for (int meld_id : layed_melds) {
     VecInt meld = int_to_meld.at(meld_id);
@@ -422,10 +431,10 @@ VecInt AllLayoffs(const VecInt &layed_melds, const VecInt &previous_layoffs) {
 // This mapping should not depend on the order of melds returned by
 // AllMelds, which is subject to change.
 // See MeldToInt for a description of the mapping.
-std::map<VecInt, int> BuildMeldToIntMap() {
+std::map<VecInt, int> GinRummyUtils::BuildMeldToIntMap() const {
   std::map<VecInt, int> rv;
   VecInt full_deck;
-  for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
+  for (int i = 0; i < num_cards; ++i) full_deck.push_back(i);
   VecVecInt all_melds = AllMelds(full_deck);
   for (int i = 0; i < all_melds.size(); ++i) {
     int meld_id = MeldToInt(all_melds[i]);
@@ -436,7 +445,8 @@ std::map<VecInt, int> BuildMeldToIntMap() {
 
 // Builds the reverse map [0, 185] -> meld.
 // May not be fast but only gets run once.
-std::map<int, VecInt> BuildIntToMeldMap() {
+std::map<int, VecInt> GinRummyUtils::BuildIntToMeldMap() const {
+  const int kNumCards = 52;
   std::map<int, VecInt> rv;
   VecInt full_deck;
   for (int i = 0; i < kNumCards; ++i) full_deck.push_back(i);
@@ -461,7 +471,9 @@ std::map<int, VecInt> BuildIntToMeldMap() {
 // The fifth rank meld is the unique meld containing all four cards of a
 // given rank.
 // Suit melds are ordered first by size, then by suit (scdh), then by rank.
-int MeldToInt(VecInt meld) {
+int GinRummyUtils::MeldToInt(VecInt meld) const {
+  const int kNumRanks = 13;
+  const int kNumSuits = 4;
   if (IsRankMeld(meld)) {
     if (meld.size() == 3) {
       VecInt suits;
@@ -476,18 +488,21 @@ int MeldToInt(VecInt meld) {
     }
     SpielFatalError("Impossible meld size");
   } else if (IsSuitMeld(meld)) {
-    absl::c_sort(meld, CompareRanks);
+    absl::c_sort(meld, rank_comp);
     int offset = 65;  // 65 rank melds
     if (meld.size() == 3) {
-      return offset + (CardSuit(meld[0]) * (kNumRanks - 2)) + CardRank(meld[0]);
+      return offset + (CardSuit(meld[0]) * (kNumRanks - 2)) +
+             CardRank(meld[0]);
     }
     offset += 44;  // 44 suit melds of size three
     if (meld.size() == 4) {
-      return offset + (CardSuit(meld[0]) * (kNumRanks - 3)) + CardRank(meld[0]);
+      return offset + (CardSuit(meld[0]) * (kNumRanks - 3)) +
+             CardRank(meld[0]);
     }
     offset += 40;  // 40 suit melds of size four
     if (meld.size() == 5) {
-      return offset + (CardSuit(meld[0]) * (kNumRanks - 4)) + CardRank(meld[0]);
+      return offset + (CardSuit(meld[0]) * (kNumRanks - 4)) +
+             CardRank(meld[0]);
     }
     SpielFatalError("Impossible meld size");
   } else {
