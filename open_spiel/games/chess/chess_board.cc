@@ -500,7 +500,7 @@ void ChessBoard::GenerateLegalMoves(const MoveYieldFn &yield,
 }
 
 void ChessBoard::GeneratePseudoLegalMoves(const MoveYieldFn &yield,Color color,
-                                          bool ignore_enemy_pieces) const {
+                                          PseudoLegalMoveSettings settings) const {
   bool generating = true;
 
 #define YIELD(move)     \
@@ -521,28 +521,28 @@ void ChessBoard::GeneratePseudoLegalMoves(const MoveYieldFn &yield,Color color,
                   YIELD(Move(sq, to, piece));
                 });
             GenerateCastlingDestinations_(
-                sq, color, ignore_enemy_pieces,
+                sq, color, settings,
                 [&yield, &piece, &sq, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece, PieceType::kEmpty, true));
                 });
             break;
           case PieceType::kQueen:
             GenerateQueenDestinations_(
-                sq, color, ignore_enemy_pieces,
+                sq, color, settings,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kRook:
             GenerateRookDestinations_(
-                sq, color, ignore_enemy_pieces,
+                sq, color, settings,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
             break;
           case PieceType::kBishop:
             GenerateBishopDestinations_(
-                sq, color, ignore_enemy_pieces,
+                sq, color, settings,
                 [&yield, &sq, &piece, &generating](const Square &to) {
                   YIELD(Move(sq, to, piece));
                 });
@@ -556,7 +556,7 @@ void ChessBoard::GeneratePseudoLegalMoves(const MoveYieldFn &yield,Color color,
             break;
           case PieceType::kPawn:
             GeneratePawnDestinations_(
-                sq, color, ignore_enemy_pieces,
+                sq, color, settings,
                 [&yield, &sq, &piece, &generating, this](const Square &to) {
                   if (IsPawnPromotionRank(to)) {
                     YIELD(Move(sq, to, piece, PieceType::kQueen));
@@ -568,7 +568,7 @@ void ChessBoard::GeneratePseudoLegalMoves(const MoveYieldFn &yield,Color color,
                   }
                 });
             GeneratePawnCaptureDestinations_(
-                sq, color, ignore_enemy_pieces, true, /* include enpassant */
+                sq, color, settings, true, /* include enpassant */
                 [&yield, &sq, &piece, &generating, this](const Square &to) {
                   if (IsPawnPromotionRank(to)) {
                     YIELD(Move(sq, to, piece, PieceType::kQueen));
@@ -620,9 +620,10 @@ void ChessBoard::GenerateLegalPawnCaptures(const MoveYieldFn& yield, Color color
 }
 
 
-void ChessBoard::GeneratePseudoLegalPawnCaptures(const MoveYieldFn& yield,
-                                                 Color color,
-                                                 bool ignore_enemy_pieces) const {
+void ChessBoard::GeneratePseudoLegalPawnCaptures(
+    const MoveYieldFn& yield, Color color,
+    PseudoLegalMoveSettings settings) const {
+
   bool generating = true;
 
 #define YIELD(move)     \
@@ -637,7 +638,7 @@ void ChessBoard::GeneratePseudoLegalPawnCaptures(const MoveYieldFn& yield,
       if (piece.type == PieceType::kPawn && piece.color == color) {
 
         GeneratePawnCaptureDestinations_(
-            sq, color, ignore_enemy_pieces, true, /* include enpassant */
+            sq, color, settings, true, /* include enpassant */
             [&yield, &sq, &piece, &generating, this](const Square &to) {
               if (IsPawnPromotionRank(to)) {
                 YIELD(Move(sq, to, piece, PieceType::kQueen));
@@ -1116,7 +1117,7 @@ bool ChessBoard::UnderAttack(const Square &sq, Color our_color) const {
 
   // Rook moves (for rooks and queens)
   GenerateRookDestinations_(
-      sq, our_color, false,
+      sq, our_color, PseudoLegalMoveSettings::kAcknowledgeEnemyPieces,
       [this, &under_attack, &opponent_color](const Square &to) {
         if ((at(to) == Piece{opponent_color, PieceType::kRook}) ||
             (at(to) == Piece{opponent_color, PieceType::kQueen})) {
@@ -1129,7 +1130,7 @@ bool ChessBoard::UnderAttack(const Square &sq, Color our_color) const {
 
   // Bishop moves (for bishops and queens)
   GenerateBishopDestinations_(
-      sq, our_color, false,
+      sq, our_color, PseudoLegalMoveSettings::kAcknowledgeEnemyPieces,
       [this, &under_attack, &opponent_color](const Square &to) {
         if ((at(to) == Piece{opponent_color, PieceType::kBishop}) ||
             (at(to) == Piece{opponent_color, PieceType::kQueen})) {
@@ -1153,7 +1154,7 @@ bool ChessBoard::UnderAttack(const Square &sq, Color our_color) const {
 
   // Pawn captures.
   GeneratePawnCaptureDestinations_(
-      sq, our_color, false, false /* no ep */,
+      sq, our_color, PseudoLegalMoveSettings::kAcknowledgeEnemyPieces, false /* no ep */,
       [this, &under_attack, &opponent_color](const Square &to) {
         if (at(to) == Piece{opponent_color, PieceType::kPawn}) {
           under_attack = true;
@@ -1228,7 +1229,7 @@ void ChessBoard::GenerateKingDestinations_(Square sq, Color color,
 
 template <typename YieldFn>
 void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
-                                               bool ignore_enemy_pieces,
+                                               PseudoLegalMoveSettings settings,
                                                const YieldFn &yield) const {
   // There are 8 conditions for castling -
   // 1. The rook involved must not have moved.
@@ -1261,7 +1262,7 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
 
   // Whether all squares between sq1 and sq2 exclusive are empty, and
   // optionally safe (not under attack).
-  const auto check_squares_between = [this, &color, &ignore_enemy_pieces]
+  const auto check_squares_between = [this, &color, &settings]
       (const Square &sq1,
        const Square &sq2,
        bool check_safe) -> bool {
@@ -1271,7 +1272,8 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
       for (Square test_square = sq1 + Offset{1, 0}; test_square != sq2;
            test_square += Offset{1, 0}) {
         if (IsFriendly(test_square, color) ||
-            (IsEnemy(test_square, color) && !ignore_enemy_pieces) ||
+            (IsEnemy(test_square, color) &&
+            settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
             (check_safe && UnderAttack(test_square, color))) {
           return false;
         }
@@ -1280,7 +1282,8 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
       for (Square test_square = sq1 + Offset{-1, 0}; test_square != sq2;
            test_square += Offset{-1, 0}) {
         if (IsFriendly(test_square, color) ||
-            (IsEnemy(test_square, color) && !ignore_enemy_pieces) ||
+            (IsEnemy(test_square, color) &&
+            settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
             (check_safe && UnderAttack(test_square, color))) {
           return false;
         }
@@ -1291,7 +1294,7 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
   };
 
   const auto check_castling_conditions =
-      [this, &sq, &color, &ignore_enemy_pieces, &check_squares_between]
+      [this, &sq, &color, &settings, &check_squares_between]
           (int8_t direction) -> bool {
         // First we need to find the rook.
         Square rook_sq = sq + Offset{direction, 0};
@@ -1321,14 +1324,16 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
         // squares, must be empty. Squares king jumps over must additionally be
         // safe.
         if (IsFriendly(rook_final_sq, color) ||
-            (IsEnemy(rook_final_sq, color) && !ignore_enemy_pieces) ||
+            (IsEnemy(rook_final_sq, color) &&
+            settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
             IsFriendly(king_final_sq, color) ||
-            (IsEnemy(king_final_sq, color) && !ignore_enemy_pieces) ||
+            (IsEnemy(king_final_sq, color) &&
+            settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
             !check_squares_between(rook_sq, rook_final_sq, false) ||
             !check_squares_between(sq,
                                    king_final_sq,
                                    !(king_in_check_allowed_ ||
-                                     ignore_enemy_pieces))) {
+                                   settings == PseudoLegalMoveSettings::kBreachEnemyPieces))) {
           return false;
         }
 
@@ -1345,7 +1350,8 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
   if (can_left_castle || can_right_castle) {
     // 7. No castling to escape from check.
     if (UnderAttack(sq, color) &&
-        !(king_in_check_allowed_ || ignore_enemy_pieces)) {
+        !(king_in_check_allowed_ ||
+        settings == PseudoLegalMoveSettings::kBreachEnemyPieces)) {
       return;
     }
     if (can_left_castle) {
@@ -1360,30 +1366,30 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
 
 template <typename YieldFn>
 void ChessBoard::GenerateQueenDestinations_(Square sq, Color color,
-                                            bool ignore_enemy_pieces,
+                                            PseudoLegalMoveSettings settings,
                                             const YieldFn &yield) const {
-  GenerateRookDestinations_(sq, color, ignore_enemy_pieces, yield);
-  GenerateBishopDestinations_(sq, color, ignore_enemy_pieces, yield);
+  GenerateRookDestinations_(sq, color, settings, yield);
+  GenerateBishopDestinations_(sq, color, settings, yield);
 }
 
 template <typename YieldFn>
 void ChessBoard::GenerateRookDestinations_(Square sq, Color color,
-                                           bool ignore_enemy_pieces,
+                                           PseudoLegalMoveSettings settings,
                                            const YieldFn &yield) const {
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {1, 0}, yield);
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {-1, 0}, yield);
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {0, 1}, yield);
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {0, -1}, yield);
+  GenerateRayDestinations_(sq, color, settings, {1, 0}, yield);
+  GenerateRayDestinations_(sq, color, settings, {-1, 0}, yield);
+  GenerateRayDestinations_(sq, color, settings, {0, 1}, yield);
+  GenerateRayDestinations_(sq, color, settings, {0, -1}, yield);
 }
 
 template <typename YieldFn>
 void ChessBoard::GenerateBishopDestinations_(Square sq, Color color,
-                                             bool ignore_enemy_pieces,
+                                             PseudoLegalMoveSettings settings,
                                              const YieldFn &yield) const {
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {1, 1}, yield);
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {-1, 1}, yield);
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {1, -1}, yield);
-  GenerateRayDestinations_(sq, color, ignore_enemy_pieces, {-1, -1}, yield);
+  GenerateRayDestinations_(sq, color, settings, {1, 1}, yield);
+  GenerateRayDestinations_(sq, color, settings, {-1, 1}, yield);
+  GenerateRayDestinations_(sq, color, settings, {1, -1}, yield);
+  GenerateRayDestinations_(sq, color, settings, {-1, -1}, yield);
 }
 
 template <typename YieldFn>
@@ -1400,18 +1406,20 @@ void ChessBoard::GenerateKnightDestinations_(Square sq, Color color,
 // Pawn moves without captures.
 template <typename YieldFn>
 void ChessBoard::GeneratePawnDestinations_(Square sq, Color color,
-                                           bool ignore_enemy_pieces,
+                                           PseudoLegalMoveSettings settings,
                                            const YieldFn &yield) const {
   int8_t y_direction = color == Color::kWhite ? 1 : -1;
   Square dest = sq + Offset{0, y_direction};
   if (InBoardArea(dest) &&
-      (IsEmpty(dest) || (IsEnemy(dest, color) && ignore_enemy_pieces))) {
+      (IsEmpty(dest) || (IsEnemy(dest, color) &&
+      settings == PseudoLegalMoveSettings::kBreachEnemyPieces))) {
     yield(dest);
 
     // Test for double move. Only defined on standard board
     if (board_size_ == 8 && IsPawnStartingRank(sq, color)) {
       dest = sq + Offset{0, static_cast<int8_t>(2 * y_direction)};
-      if (IsEmpty(dest) || (IsEnemy(dest, color) && ignore_enemy_pieces)) {
+      if (IsEmpty(dest) || (IsEnemy(dest, color) &&
+      settings == PseudoLegalMoveSettings::kBreachEnemyPieces)) {
         yield(dest);
       }
     }
@@ -1421,28 +1429,30 @@ void ChessBoard::GeneratePawnDestinations_(Square sq, Color color,
 // Pawn capture destinations, with or without en passant.
 template <typename YieldFn>
 void ChessBoard::GeneratePawnCaptureDestinations_(Square sq, Color color,
-                                                  bool ignore_enemy_pieces,
+                                                  PseudoLegalMoveSettings settings,
                                                   bool include_ep,
                                                   const YieldFn &yield) const {
   int8_t y_direction = color == Color::kWhite ? 1 : -1;
   Square dest = sq + Offset{1, y_direction};
   if (InBoardArea(dest) &&
       (IsEnemy(dest, color) || (include_ep && dest == EpSquare()) ||
-       (IsEmpty(dest) && ignore_enemy_pieces))) {
+       (IsEmpty(dest) &&
+       settings == PseudoLegalMoveSettings::kBreachEnemyPieces))) {
     yield(dest);
   }
 
   dest = sq + Offset{-1, y_direction};
   if (InBoardArea(dest) &&
       (IsEnemy(dest, color) || (include_ep && dest == EpSquare()) ||
-       (IsEmpty(dest) && ignore_enemy_pieces))) {
+       (IsEmpty(dest) &&
+       settings == PseudoLegalMoveSettings::kBreachEnemyPieces))) {
     yield(dest);
   }
 }
 
 template <typename YieldFn>
 void ChessBoard::GenerateRayDestinations_(Square sq, Color color,
-                                          bool ignore_enemy_pieces,
+                                          PseudoLegalMoveSettings settings,
                                           Offset offset_step,
                                           const YieldFn &yield) const {
   for (Square dest = sq + offset_step; InBoardArea(dest); dest += offset_step) {
@@ -1450,7 +1460,7 @@ void ChessBoard::GenerateRayDestinations_(Square sq, Color color,
       yield(dest);
     } else if (IsEnemy(dest, color)) {
       yield(dest);
-      if (!ignore_enemy_pieces) {
+      if (settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) {
         break;
       }
     } else {

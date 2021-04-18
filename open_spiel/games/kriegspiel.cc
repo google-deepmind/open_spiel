@@ -379,7 +379,7 @@ std::pair<KriegspielCheckType, KriegspielCheckType> GetCheckType(const chess::Ch
     else check_type_pair.first = check_type;
 
     return true;
-  }, board.ToPlay(), false);
+  }, board.ToPlay(), chess::PseudoLegalMoveSettings::kAcknowledgeEnemyPieces);
 
   return check_type_pair;
 }
@@ -576,7 +576,8 @@ void KriegspielState::MaybeGenerateLegalActions() const {
         cached_legal_actions_->push_back(MoveToAction(move, BoardSize()));
       }
       return true;
-    }, Board().ToPlay(), true);
+    }, Board().ToPlay(),
+    chess::PseudoLegalMoveSettings::kBreachEnemyPieces);
     absl::c_sort(*cached_legal_actions_);
   }
 }

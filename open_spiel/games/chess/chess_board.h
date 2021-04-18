@@ -233,6 +233,11 @@ inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 using ObservationTable = std::array<bool, k2dMaxBoardSize>;
 
+enum PseudoLegalMoveSettings {
+  kBreachEnemyPieces,
+  kAcknowledgeEnemyPieces,
+};
+
 class ChessBoard {
  public:
   ChessBoard(int board_size = kDefaultBoardSize,
@@ -277,13 +282,17 @@ class ChessBoard {
     GenerateLegalMoves(yield, to_play_);
   }
   void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
-  void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color,
-                                bool ignore_enemy_pieces = false) const;
+  void GeneratePseudoLegalMoves(
+      const MoveYieldFn& yield, Color color,
+      PseudoLegalMoveSettings settings =
+          PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
 
   // Optimization for computing number of pawn tries for kriegspiel
   void GenerateLegalPawnCaptures(const MoveYieldFn& yield, Color color) const;
-  void GeneratePseudoLegalPawnCaptures(const MoveYieldFn& yield, Color color,
-                                       bool ignore_enemy_pieces = false) const;
+  void GeneratePseudoLegalPawnCaptures(
+      const MoveYieldFn& yield, Color color,
+      PseudoLegalMoveSettings settings =
+          PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
 
   bool HasLegalMoves() const {
     bool found = false;
@@ -447,22 +456,22 @@ class ChessBoard {
 
   template <typename YieldFn>
   void GenerateCastlingDestinations_(Square sq, Color color,
-                                     bool ignore_enemy_pieces,
+                                     PseudoLegalMoveSettings settings,
                                      const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,
-                                  bool ignore_enemy_pieces,
+                                  PseudoLegalMoveSettings settings,
                                   const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateRookDestinations_(Square sq, Color color,
-                                 bool ignore_enemy_pieces,
+                                 PseudoLegalMoveSettings settings,
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateBishopDestinations_(Square sq, Color color,
-                                   bool ignore_enemy_pieces,
+                                   PseudoLegalMoveSettings settings,
                                    const YieldFn& yield) const;
 
   template <typename YieldFn>
@@ -472,20 +481,21 @@ class ChessBoard {
   template <typename YieldFn>
   // Pawn moves without captures.
   void GeneratePawnDestinations_(Square sq, Color color,
-                                 bool ignore_enemy_pieces,
+                                 PseudoLegalMoveSettings settings,
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
   // Pawn diagonal capture destinations, with or without en passant.
   void GeneratePawnCaptureDestinations_(Square sq, Color color,
-                                        bool ignore_enemy_pieces,
+                                        PseudoLegalMoveSettings settings,
                                         bool include_ep,
                                         const YieldFn& yield) const;
 
   // Helper function.
   template <typename YieldFn>
   void GenerateRayDestinations_(Square sq, Color color,
-                                bool ignore_enemy_pieces, Offset offset_step,
+                                PseudoLegalMoveSettings settings,
+                                Offset offset_step,
                                 const YieldFn& yield) const;
 
   void SetIrreversibleMoveCounter(int c);
