@@ -17,7 +17,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -35,26 +37,36 @@ Action GetActionFromString(const State& state,
   return kInvalidAction;
 }
 
+Action StepHumanBotWithInputs(HumanBot& human_bot,
+                             const std::vector<std::string>& inputs,
+                             const State& state) {
+  // Add a newline character to each input.
+  std::string human_bot_inputs = absl::StrJoin(inputs, "\n") + "\n";
+  std::istringstream human_bot_input_stream(human_bot_inputs);
+
+  // Allow the human bot to access the input through std::cin.
+  std::cin.rdbuf(human_bot_input_stream.rdbuf());
+
+  return human_bot.Step(state);
+}
+
 void EmptyActionTest() {
+  HumanBot human_bot;
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
-  std::string empty_action_string = "\n";
+  std::string empty_action_string = "";
   std::string legal_action_string = "0";
 
-  // Put the empty_action_string and legal_action_string in cin stream so that
-  // the bot can first receive the empty action, then the legal action.
-  std::istringstream action_string_stream(
-      empty_action_string + legal_action_string);
-  std::cin.rdbuf(action_string_stream.rdbuf());
+  // Have the human bot receive a empty action, then a legal action.
+  Action human_bot_action = StepHumanBotWithInputs(
+      human_bot, {empty_action_string, legal_action_string}, *state);
+  Action legal_action = std::stoi(legal_action_string);
 
-  HumanBot human_bot;
-  Action bot_action = human_bot.Step(*state);
-  Action action = std::stoi(legal_action_string);
-
-  SPIEL_CHECK_TRUE(bot_action == action);
+  SPIEL_CHECK_TRUE(human_bot_action == legal_action);
 }
 
 void TerminalActionTest() {
+  HumanBot human_bot;
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
 
@@ -65,81 +77,73 @@ void TerminalActionTest() {
   state->ApplyAction(4);
   state->ApplyAction(2);
 
-  HumanBot human_bot;
-  Action action = human_bot.Step(*state);
+  // Ensure the human bot handles the terminal state case before trying to parse
+  // an action.
+  Action human_bot_action = StepHumanBotWithInputs(
+      human_bot, {""}, *state);
 
   SPIEL_CHECK_TRUE(state->IsTerminal());
-  SPIEL_CHECK_TRUE(action == kInvalidAction);
+  SPIEL_CHECK_TRUE(human_bot_action == kInvalidAction);
 }
 
 void LegalStringActionTest() {
+  HumanBot human_bot;
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
-  std::string action_string = "x(0,0)";
+  std::string legal_action_string = "x(0,0)";
 
-  // Put action_string in cin stream so that the bot can receive it as input.
-  std::istringstream action_string_stream(action_string);
-  std::cin.rdbuf(action_string_stream.rdbuf());
+  // Have the human bot receive a legal string action.
+  Action human_bot_action = StepHumanBotWithInputs(
+      human_bot, {legal_action_string}, *state);
+  Action legal_action = GetActionFromString(*state, legal_action_string);
 
-  HumanBot human_bot;
-  Action bot_action = human_bot.Step(*state);
-  Action action = GetActionFromString(*state, action_string);
-
-  SPIEL_CHECK_TRUE(bot_action == action);
+  SPIEL_CHECK_TRUE(human_bot_action == legal_action);
 }
 
 void LegalIntActionTest() {
+  HumanBot human_bot;
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
-  std::string action_string = "0";
+  std::string legal_action_string = "0";
 
-  // Put action_string in cin stream so that the bot can receive it as input.
-  std::istringstream action_string_stream(action_string);
-  std::cin.rdbuf(action_string_stream.rdbuf());
+  // Have the human bot receive a legal integer action.
+  Action human_bot_action = StepHumanBotWithInputs(
+      human_bot, {legal_action_string}, *state);
+  Action legal_action = std::stoi(legal_action_string);
 
-  HumanBot human_bot;
-  Action bot_action = human_bot.Step(*state);
-  Action action = std::stoi(action_string);
-
-  SPIEL_CHECK_TRUE(bot_action == action);
+  SPIEL_CHECK_TRUE(human_bot_action == legal_action);
 }
 
 void IllegalStringActionTest() {
+  HumanBot human_bot;
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
-  std::string illegal_action_string = "x(42,42)";
+  std::string illegal_action_string = "illegal_action_string";
   std::string legal_action_string = "x(0,0)";
 
-  // Put the illegal_action_string and legal_action_string in cin stream so that
-  // the bot can first receive the illegal action, then the legal action.
-  std::istringstream action_string_stream(
-      illegal_action_string + "\n" + legal_action_string);
-  std::cin.rdbuf(action_string_stream.rdbuf());
+  // Have the human bot first receive an illegal string action, then a legal
+  // string action.
+  Action human_bot_action = StepHumanBotWithInputs(
+      human_bot, {illegal_action_string, legal_action_string}, *state);
+  Action legal_action = GetActionFromString(*state, legal_action_string);
 
-  HumanBot human_bot;
-  Action bot_action = human_bot.Step(*state);
-  Action action = GetActionFromString(*state, legal_action_string);
-
-  SPIEL_CHECK_TRUE(bot_action == action);
+  SPIEL_CHECK_TRUE(human_bot_action == legal_action);
 }
 
 void IllegalIntActionTest() {
+  HumanBot human_bot;
   std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
-  std::string illegal_action_string = "42";
+  std::string illegal_action_string = "12345";
   std::string legal_action_string = "0";
 
-  // Put the illegal_action_string and legal_action_string in cin stream so that
-  // the bot can first receive the illegal action, then the legal action.
-  std::istringstream action_string_stream(
-      illegal_action_string + "\n" + legal_action_string);
-  std::cin.rdbuf(action_string_stream.rdbuf());
+  // Have the human bot first receive an illegal integer action, then a legal
+  // integer action.
+  Action human_bot_action = StepHumanBotWithInputs(
+      human_bot, {illegal_action_string, legal_action_string}, *state);
+  Action legal_action = std::stoi(legal_action_string);
 
-  HumanBot human_bot;
-  Action bot_action = human_bot.Step(*state);
-  Action action = std::stoi(legal_action_string);
-
-  SPIEL_CHECK_TRUE(bot_action == action);
+  SPIEL_CHECK_TRUE(human_bot_action == legal_action);
 }
 
 }  // namespace
