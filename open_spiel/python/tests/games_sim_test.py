@@ -258,6 +258,35 @@ class GamesSimTest(parameterized.TestCase):
     action3 = state.translate_action(0, 0, True)  # 0->2, 0->1
     self.assertEqual(action3, 0)
 
+  def test_backgammon_checker_moves_with_hit_info(self):
+    game = pyspiel.load_game("backgammon")
+    state = game.new_initial_state()
+    while not state.is_terminal():
+      if state.is_chance_node():
+        outcomes_with_probs = state.chance_outcomes()
+        action_list, prob_list = zip(*outcomes_with_probs)
+        action = np.random.choice(action_list, p=prob_list)
+        state.apply_action(action)
+      else:
+        legal_actions = state.legal_actions()
+        player = state.current_player()
+        for action in legal_actions:
+          action_str = state.action_to_string(player, action)
+          checker_moves = (
+              state.augment_with_hit_info(
+                  player, state.spiel_move_to_checker_moves(player, action)))
+          if checker_moves[0].hit or checker_moves[1].hit:
+            self.assertGreaterEqual(action_str.find("*"), 0)
+          else:
+            self.assertLess(action_str.find("*"), 0)
+          if action_str.find("*") > 0:
+            self.assertTrue(checker_moves[0].hit or checker_moves[1].hit)
+          else:
+            self.assertTrue(not checker_moves[0].hit and
+                            not checker_moves[1].hit)
+        action = np.random.choice(legal_actions)
+        state.apply_action(action)
+
 
 def main(_):
   absltest.main()

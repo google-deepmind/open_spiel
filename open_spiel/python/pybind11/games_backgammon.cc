@@ -32,6 +32,8 @@ void open_spiel::init_pyspiel_games_backgammon(py::module& m) {
       .def_readwrite("hit", &CheckerMove::hit);
 
   py::class_<BackgammonState, State>(m, "BackgammonState")
+      .def("augment_with_hit_info", &BackgammonState::AugmentWithHitInfo)
+      .def("board", &BackgammonState::board)
       .def("checker_moves_to_spiel_move",
            &BackgammonState::CheckerMovesToSpielMove)
       .def("spiel_move_to_checker_moves",
@@ -39,13 +41,13 @@ void open_spiel::init_pyspiel_games_backgammon(py::module& m) {
       .def("translate_action", &BackgammonState::TranslateAction)
       // Pickle support
       .def(py::pickle(
-          [](const BackgammonState& state) {  // __getstate__
-            return SerializeGameAndState(*state.GetGame(), state);
-          },
-          [](const std::string& data) {  // __setstate__
-            std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
-                game_and_state = DeserializeGameAndState(data);
-            return dynamic_cast<BackgammonState*>(
-                game_and_state.second.release());
-          }));
+           [](const BackgammonState& state) {  // __getstate__
+             return SerializeGameAndState(*state.GetGame(), state);
+           },
+           [](const std::string& data) {  // __setstate__
+             std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+                 game_and_state = DeserializeGameAndState(data);
+             return dynamic_cast<BackgammonState *>(
+                 game_and_state.second.release());
+           }));
 }

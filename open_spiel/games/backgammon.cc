@@ -512,29 +512,22 @@ void BackgammonState::UndoAction(int player, Action action) {
   history_.pop_back();
 }
 
+bool BackgammonState::IsHit(Player player, int from_pos, int num) const {
+  if (from_pos != kPassPos) {
+    int to = PositionFrom(player, from_pos, num);
+    return to != kScorePos && board(Opponent(player), to) == 1;
+  } else {
+    return false;
+  }
+}
+
 Action BackgammonState::TranslateAction(int from1, int from2,
                                         bool use_high_die_first) const {
   int player = CurrentPlayer();
-  int opponent = Opponent(player);
   int num1 = use_high_die_first ? dice_.at(1) : dice_.at(0);
   int num2 = use_high_die_first ? dice_.at(0) : dice_.at(1);
-  bool hit1 = false;
-  bool hit2 = false;
-
-  if (from1 != kPassPos) {
-    int to1 = PositionFrom(player, from1, num1);
-    if (to1 != kScorePos && board(opponent, to1) == 1) {
-      hit1 = true;
-    }
-  }
-
-  if (from2 != kPassPos) {
-    int to2 = PositionFrom(player, from2, num2);
-    if (to2 != kScorePos && board(opponent, to2) == 1) {
-      hit2 = true;
-    }
-  }
-
+  bool hit1 = IsHit(player, from1, num1);
+  bool hit2 = IsHit(player, from2, num2);
   std::vector<CheckerMove> moves = {{from1, num1, hit1}, {from2, num2, hit2}};
   return CheckerMovesToSpielMove(moves);
 }
@@ -617,7 +610,17 @@ std::vector<CheckerMove> BackgammonState::SpielMoveToCheckerMoves(
           digits[i] == EncodedBarMove() ? kBarPos : digits[i], num, false));
     }
   }
+
   return cmoves;
+}
+
+std::vector<CheckerMove> BackgammonState::AugmentWithHitInfo(
+    int player, const std::vector<CheckerMove> &cmoves) const {
+  std::vector<CheckerMove> new_cmoves = cmoves;
+  for (int i = 0; i < 2; ++i) {
+    new_cmoves[i].hit = IsHit(player, cmoves[i].pos, cmoves[i].num);
+  }
+  return new_cmoves;
 }
 
 bool BackgammonState::IsPosInHome(int player, int pos) const {
