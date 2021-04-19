@@ -23,10 +23,10 @@ PYTHON_TENSORFLOW_DEPS="tensorflow==2.4.1 tensorflow-probability<0.8.0,>=0.7.0"
 
 if [ ! $TRAVIS_USE_NOX -eq 0 ]; then
   # Build and run tests using nox
+  [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_JAX_DEPS
+  [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_PYTORCH_DEPS
+  [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_TENSORFLOW_DEPS
   sudo -H pip3 install nox
-  [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_JAX_DEPS -q
-  [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_PYTORCH_DEPS -q
-  [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_TENSORFLOW_DEPS -q
   PWD=`pwd`  # normally defined, but just in case!
   PYTHONPATH="$PYTHONPATH:$PWD:$PWD/build:$PWD/build/python" nox -s tests
   exit 0
@@ -41,11 +41,11 @@ source ./venv/bin/activate
 
 python3 --version
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $PYTHON_JAX_DEPS -q
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $PYTHON_PYTORCH_DEPS -q
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $PYTHON_TENSORFLOW_DEPS -q
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $PYTHON_TENSORFLOW_DEPS
 
-pip3 install --upgrade -r requirements.txt -q
+pip3 install --upgrade -r requirements.txt
 
 ./open_spiel/scripts/build_and_run_tests.sh
 
