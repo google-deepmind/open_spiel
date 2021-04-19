@@ -51,14 +51,11 @@ def tests(session):
   child_env = os.environ.copy()
   child_env["OPEN_SPIEL_BUILD_ALL"] = "ON"
   if child_env["OPEN_SPIEL_ENABLE_JAX"] == "ON":
-    for dep in PYTHON_JAX_DEPS.split():
-      session.install(dep)
+    session.install(*PYTHON_JAX_DEPS.split())
   if child_env["OPEN_SPIEL_ENABLE_PYTORCH"] == "ON":
-    for dep in PYTHON_PYTORCH_DEPS.split():
-      session.install(dep)
+    session.install(*PYTHON_PYTORCH_DEPS.split())
   if child_env["OPEN_SPIEL_ENABLE_TENSORFLOW"] == "ON":
-    for dep in PYTHON_TENSORFLOW_DEPS.split():
-      session.install(dep)
+    session.install(*PYTHON_TENSORFLOW_DEPS.split())
   session.run("python3", "setup.py", "build", env=child_env)
   session.run("python3", "setup.py", "install", env=child_env)
   session.cd(os.path.join("build", get_distutils_tempdir()))
