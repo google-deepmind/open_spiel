@@ -43,7 +43,7 @@ fi
 if [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]]
 then
   echo "PyTorch enabled, installing PyTorch dependencies..."
-  pip3 install --upgrade pytorch==1.7.0 -q
+  pip3 install --upgrade torch==1.7.0 -q
 fi
 
 if [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]]
