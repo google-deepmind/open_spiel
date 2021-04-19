@@ -31,15 +31,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl import app
 from absl import logging
+from absl.testing import absltest
 from absl.testing import parameterized
-import tensorflow.compat.v1 as tf
 
 from open_spiel.python import policy
 import pyspiel
 from open_spiel.python.pytorch import deep_cfr
-
-tf.disable_v2_behavior()
 
 
 class DeepCFRPyTorchTest(parameterized.TestCase):
@@ -80,5 +79,10 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
     logging.info('Deep CFR in Matching Pennies 3p. NashConv: %.2f', conv)
 
 
-if __name__ == '__main__':
-  tf.test.main()
+def main(_):
+  absltest.main()
+
+
+if __name__ == "__main__":
+  # Necessary to run main via app.run for internal tests.
+  app.run(main)
