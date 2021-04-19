@@ -291,7 +291,7 @@ class KriegspielObserver : public Observer {
         break;
       }
     }
-    WriteMove(last_move, state.Board(), prefix + "last_move", allocator);
+    WriteMove(last_move, state.Board(), prefix + "_last_move", allocator);
   }
 
   void WritePublicInfoTensor(const KriegspielState &state,
