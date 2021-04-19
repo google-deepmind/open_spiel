@@ -104,7 +104,7 @@ When you add a new conditional dependency, you need to touch:
 -   the root CMakeLists.txt to add the option, with an OFF default
 -   add the option to `scripts/global_variables.sh`
 -   change `install.sh` to make sure the dependency is installed
--   use constructs like `if (${BUILD_WITH_HANABI})` in CMake to optionally add
+-   use constructs like `if (${OPEN_SPIEL_OPEN_SPIEL_BUILD_WITH_HANABI})` in CMake to optionally add
     the targets to build.
 
 ## Debugging tools

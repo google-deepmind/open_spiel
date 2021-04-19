@@ -89,7 +89,7 @@ fi
 
 # Optional dependencies.
 DIR="open_spiel/games/hanabi/hanabi-learning-environment"
-if [[ ${BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 15 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
   # We checkout a specific CL to prevent future breakage due to changes upstream
   # The repository is very infrequently updated, thus the last 15 commits should
@@ -103,36 +103,36 @@ fi
 # http://www.computerpokercompetition.org/downloads/code/competition_server/project_acpc_server_v1.0.42.tar.bz2
 # with the code compiled as C++ within a namespace.
 DIR="open_spiel/games/universal_poker/acpc"
-if [[ ${BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
 # Add EIGEN template library for linear algebra.
 # http://eigen.tuxfamily.org/index.php?title=Main_Page
 DIR="open_spiel/eigen/libeigen"
-if [[ ${BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b '3.3.7' --single-branch --depth 1  https://gitlab.com/libeigen/eigen.git ${DIR}
 fi
 
 # This GitHub repository contains Nathan Sturtevant's state of the art
 # Hearts program xinxin.
 DIR="open_spiel/bots/xinxin/hearts"
-if [[ ${BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_XINXIN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'master' --single-branch --depth 1  https://github.com/nathansttt/hearts.git ${DIR}
 fi
 
 # This GitHub repository contains bots from the RoShamBo Programming Competition
 DIR="open_spiel/bots/roshambo/roshambo"
-if [[ ${BUILD_WITH_ROSHAMBO:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_ROSHAMBO:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   git clone -b 'open_spiel' --single-branch --depth 1  https://github.com/jhtschultz/roshambo.git ${DIR}
 fi
 
 # Add libtorch (PyTorch C++ API).
 # This downloads the precompiled binaries available from the pytorch website.
 DIR="open_spiel/libtorch/libtorch"
-if [[ ${BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_LIBTORCH:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/libtorch.zip"
-  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${BUILD_WITH_LIBTORCH_DOWNLOAD_URL}"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL}"
   unzip "${DOWNLOAD_FILE}" -d "open_spiel/libtorch/"
 fi
 
@@ -140,9 +140,9 @@ fi
 # This downloads the precompiled binaries available from the official website.
 # https://developers.google.com/optimization/install/cpp/
 DIR="open_spiel/ortools"
-if [[ ${BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   DOWNLOAD_FILE="${DOWNLOAD_CACHE_DIR}/ortools.tar.gz"
-  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${BUILD_WITH_ORTOOLS_DOWNLOAD_URL}"
+  [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL}"
   mkdir "$DIR"
   tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
 fi
@@ -150,7 +150,7 @@ fi
 # 2. Install other required system-wide dependencies
 
 # Install Julia if required and not present already.
-if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
   if [[ ! -x `which julia` ]] || [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]
   then
@@ -188,7 +188,7 @@ fi
 # Install other system-wide packages.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
   EXT_DEPS="virtualenv clang cmake curl python3 python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
-  if [[ ${BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
+  if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi
 
@@ -232,7 +232,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
   [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
-  if [[ ${BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
+  if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     [[ -x `which go` ]] || brew install golang || echo "** Warning: failed 'brew install golang' -- continuing"
   fi
 

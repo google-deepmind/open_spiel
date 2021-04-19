@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // To use public states you must enable building with both
-// BUILD_WITH_PUBLIC_STATES=ON and BUILD_WITH_EIGEN=ON env vars.
+// OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES=ON and OPEN_SPIEL_BUILD_WITH_EIGEN=ON env vars.
 
 #ifndef OPEN_SPIEL_PUBLIC_STATES_H_
 #define OPEN_SPIEL_PUBLIC_STATES_H_

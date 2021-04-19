@@ -56,7 +56,7 @@ def main(_):
 
   # Make sure poker is compiled into the library, as it requires an optional
   # dependency: the ACPC poker code. To ensure it is compiled in, prepend both
-  # the install.sh and build commands with BUILD_WITH_ACPC=ON. See here:
+  # the install.sh and build commands with OPEN_SPIEL_BUILD_WITH_ACPC=ON. See here:
   # https://github.com/deepmind/open_spiel/blob/master/docs/install.md#configuration-conditional-dependencies
   # for more details on optional dependencies.
   games_list = pyspiel.registered_names()

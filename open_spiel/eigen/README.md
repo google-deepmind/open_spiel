@@ -5,7 +5,7 @@ This is an integration with the
 the documentation of
 [pybind](https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#)
 
-This is an optional dependency and it can be enabled by `BUILD_WITH_EIGEN`
+This is an optional dependency and it can be enabled by `OPEN_SPIEL_BUILD_WITH_EIGEN`
 global variable (see `install.sh`).
 
 Use the header `eigen/pyeig.h` to get basic `Matrix` and `Vector` types. The
