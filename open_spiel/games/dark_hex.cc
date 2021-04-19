@@ -270,6 +270,7 @@ void DarkHexState::UndoAction(Player player, Action move) {
   action_sequence_.pop_back();
 
   history_.pop_back();
+  --move_number_;
 }
 
 DarkHexGame::DarkHexGame(const GameParameters& params)

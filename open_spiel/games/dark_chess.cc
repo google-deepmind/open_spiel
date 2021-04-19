@@ -539,6 +539,7 @@ void DarkChessState::UndoAction(Player player, Action action) {
   --repetitions_[current_board_.HashValue()];
   moves_history_.pop_back();
   history_.pop_back();
+  --move_number_;
   current_board_ = start_board_;
   for (const chess::Move& move : moves_history_) {
     current_board_.ApplyMove(move);

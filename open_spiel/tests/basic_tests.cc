@@ -171,6 +171,8 @@ void TestUndo(std::unique_ptr<State> state,
     SPIEL_CHECK_EQ(state->ToString(), prev->state->ToString());
     // We also check that UndoActions correctly updates history_.
     SPIEL_CHECK_EQ(state->History(), prev->state->History());
+    // And correctly updates move_number_.
+    SPIEL_CHECK_EQ(state->MoveNumber(), prev->state->MoveNumber());
   }
 }
 
