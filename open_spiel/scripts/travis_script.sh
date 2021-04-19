@@ -17,20 +17,16 @@
 set -e
 set -x
 
-# Note: version maintained here and noxfile.py.
-# TODO: Remove nox tests and this comment when we have wheels built in a CI workflow.
-PYTHON_JAX_DEPS="jax==0.2.7 jaxlib==0.1.57 dm-haiku==0.0.3 optax==0.0.2 chex==0.0.3"
-PYTHON_PYTORCH_DEPS="torch==1.7.0"
-PYTHON_TENSORFLOW_DEPS="tensorflow==2.4.1 tensorflow-probability<0.8.0,>=0.7.0"
+source ./open_spiel/scripts/python_extra_deps.sh
 
 sudo -H pip3 install --upgrade pip
 sudo -H pip3 install --upgrade setuptools
 
 if [ ! $TRAVIS_USE_NOX -eq 0 ]; then
   # Build and run tests using nox
-  [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_JAX_DEPS
-  [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_PYTORCH_DEPS
-  [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && sudo -H pip3 install --upgrade $PYTHON_TENSORFLOW_DEPS
+  [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+  [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+  [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
   sudo -H pip3 install nox
   PWD=`pwd`  # normally defined, but just in case!
   PYTHONPATH="$PYTHONPATH:$PWD:$PWD/build:$PWD/build/python" nox -s tests
@@ -44,9 +40,9 @@ source ./venv/bin/activate
 
 python3 --version
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
 
 pip3 install --upgrade -r requirements.txt
 
