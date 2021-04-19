@@ -49,7 +49,7 @@ fi
 if [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]]
 then
   echo "Tensorflow enabled, installing Tensorflow dependencies..."
-  pip3 install --upgrade tensorflow==2.4.1 tensorflow-probability\<0.8.0 tensorflow-probability\>=0.7.0 -q
+  pip3 install --upgrade tensorflow==2.4.1 tensorflow-probability\<0.8.0,\>=0.7.0 -q
 fi
 
 pip3 install --upgrade -r requirements.txt -q
