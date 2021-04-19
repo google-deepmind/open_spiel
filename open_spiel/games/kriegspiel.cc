@@ -105,7 +105,7 @@ class KriegspielObserver : public Observer {
     }
 
     if (iig_obs_type_.public_info) {
-      WritePublicInfoTensor(state, color, allocator);
+      WritePublicInfoTensor(state, "public", allocator);
     }
     if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
       std::string prefix = "private";
@@ -295,7 +295,7 @@ class KriegspielObserver : public Observer {
   }
 
   void WritePublicInfoTensor(const KriegspielState &state,
-                             chess::Color color,
+                             const std::string &prefix,
                              Allocator *allocator) const {
 
     const auto entry = state.repetitions_.find(state.Board().HashValue());
@@ -303,19 +303,19 @@ class KriegspielObserver : public Observer {
     int repetitions = entry->second;
 
     // Num repetitions for the current board.
-    WriteScalar(/*val=*/repetitions, /*min=*/1, /*max=*/3, "repetitions",
+    WriteScalar(/*val=*/repetitions, /*min=*/1, /*max=*/3, prefix + "_repetitions",
                 allocator);
 
     // Side to play.
     WriteScalar(/*val=*/ColorToPlayer(state.Board().ToPlay()),
-                /*min=*/0, /*max=*/1, "side_to_play", allocator);
+                /*min=*/0, /*max=*/1, prefix + "_side_to_play", allocator);
 
     // Irreversible move counter.
-    auto out = allocator->Get("irreversible_move_counter", {1});
+    auto out = allocator->Get(prefix + "_irreversible_move_counter", {1});
     out.at(0) = state.Board().IrreversibleMoveCounter() / 100.f;
 
     // Write last umpire message
-    WriteUmpireMessage(*state.last_umpire_msg_, state.Board(), std::string(), allocator);
+    WriteUmpireMessage(*state.last_umpire_msg_, state.Board(), prefix, allocator);
   }
 
   IIGObservationType iig_obs_type_;
