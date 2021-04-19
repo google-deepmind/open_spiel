@@ -54,10 +54,10 @@ def tests(session):
     for dep in PYTHON_JAX_DEPS.split():
       session.install(dep)
   if child_env["OPEN_SPIEL_ENABLE_PYTORCH"] == "ON":
-    for dep in PYTHON_PYTORCH_DEPS.split()
+    for dep in PYTHON_PYTORCH_DEPS.split():
       session.install(dep)
   if child_env["OPEN_SPIEL_ENABLE_TENSORFLOW"] == "ON":
-    for dep in PYTHON_TENSORFLOW_DEPS.split()
+    for dep in PYTHON_TENSORFLOW_DEPS.split():
       session.install(dep)
   session.run("python3", "setup.py", "build", env=child_env)
   session.run("python3", "setup.py", "install", env=child_env)
