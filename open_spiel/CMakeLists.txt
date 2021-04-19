@@ -123,6 +123,13 @@ openspiel_optional_dependency(BUILD_WITH_GAMUT          OFF
 openspiel_optional_dependency(BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
 
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX               AUTO
+  "Enable JAX.")
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH           AUTO
+  "Enable PyTorch.")
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW        AUTO
+  "Enable Tensorflow.")
+
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
 
