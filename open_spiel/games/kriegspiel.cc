@@ -214,7 +214,7 @@ class KriegspielObserver : public Observer {
       }
     }
     // 5 is maximum because we can't promote to a pawn.
-    WriteScalar((int8_t) move.promotion_type, 0, 5, prefix + "_promotion", allocator);
+    WriteScalar(static_cast<int8_t>(move.promotion_type), 0, 5, prefix + "_promotion", allocator);
   }
 
   void WriteUmpireMessage(const KriegspielUmpireMessage &msg,
@@ -234,7 +234,7 @@ class KriegspielObserver : public Observer {
     }
     WriteScalar(msg.check_types.first, 0, 5, prefix + "_check_one", allocator);
     WriteScalar(msg.check_types.second, 0, 5, prefix + "_check_two", allocator);
-    WriteScalar(msg.to_move == chess::Color::kBlack ? 0 : 1, 0, 1, prefix + "_to_move", allocator);
+    WriteScalar(chess::ColorToPlayer(msg.to_move), 0, 1, prefix + "_to_move", allocator);
     WriteScalar(msg.pawn_tries, 0, 15, prefix + "_pawn_tries", allocator);
   }
 
@@ -425,6 +425,7 @@ KriegspielUmpireMessage GetUmpireMessage(const chess::ChessBoard &chess_board,
   if (!chess_board.IsMoveLegal(move)) {
     // If the move is illegal, the player is notified about it and can play again
     msg.illegal = true;
+    msg.to_move = chess_board.ToPlay();
     return msg;
   }
   msg.illegal = false;
