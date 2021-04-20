@@ -8,7 +8,7 @@ if(Python3_VERSION VERSION_LESS "3.6.0")
     "Python found ${Python3_VERSION} < 3.6.0")
 endif()
 
-# Detext the Python ML frameworks.
+# Detect the Python ML frameworks.
 if (OPEN_SPIEL_ENABLE_JAX STREQUAL AUTO)
   message(NOTICE "OPEN_SPIEL_ENABLE_JAX set to AUTO. Detecting Jax...")
   execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/find_jax.sh ${Python3_EXECUTABLE}
@@ -142,7 +142,8 @@ if (BUILD_WITH_GAMUT)
 endif()
 
 
-# Python tests to run.
+# Python tests to run. Start with all the core tests here first, then
+# conditionally add other tests based on what has been enabled/detected.
 set(PYTHON_TESTS ${PYTHON_TESTS}
   ../integration_tests/api_test.py
   ../integration_tests/playthrough_test.py
