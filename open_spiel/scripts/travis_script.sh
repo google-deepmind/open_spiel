@@ -27,6 +27,7 @@ if [ ! $TRAVIS_USE_NOX -eq 0 ]; then
   [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
   [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
   [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+  [[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && sudo -H pip3 install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
   sudo -H pip3 install nox
   PWD=`pwd`  # normally defined, but just in case!
   PYTHONPATH="$PYTHONPATH:$PWD:$PWD/build:$PWD/build/python" nox -s tests
@@ -43,6 +44,7 @@ python3 --version
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
 [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
 [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 pip3 install --upgrade -r requirements.txt
 
