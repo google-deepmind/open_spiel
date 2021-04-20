@@ -151,7 +151,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/best_response_test.py
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
-  algorithms/double_oracle_test.py
   algorithms/evaluate_bots_test.py
   algorithms/expected_game_score_test.py
   algorithms/external_sampling_mccfr_test.py
@@ -159,7 +158,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
-  algorithms/lp_solver_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
   algorithms/noisy_policy_test.py
@@ -169,27 +167,20 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/policy_gradient_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
-  algorithms/sequence_form_lp_test.py
-  algorithms/value_iteration_test.py
   bots/bluechip_bridge_test.py
   bots/bluechip_bridge_uncontested_bidding_test.py
   bots/is_mcts_test.py
   bots/uniform_random_test.py
-  egt/alpharank_test.py
-  egt/alpharank_visualizer_test.py
   egt/dynamics_test.py
   egt/heuristic_payoff_table_test.py
   egt/utils_test.py
-  egt/visualization_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/data_test.py
-  games/kuhn_poker_test.py
   games/tic_tac_toe_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
-  tests/matrix_game_utils_test.py
   tests/observation_history_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
@@ -235,9 +226,29 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/masked_softmax_test.py
       algorithms/neurd_test.py
       algorithms/nfsp_test.py
-      algorithms/psro_v2/best_response_oracle_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
+  )
+  if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
+    set(PYTHON_TESTS ${PYTHON_TESTS}
+        algorithms/psro_v2/best_response_oracle_test.py
+    )
+  endif()
+endif()
+
+# Add miscellaneous Python tests if enabled.
+# These require extra dependencies like cvxopt, nashpy, or matplotlib
+if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
+  set(PYTHON_TESTS ${PYTHON_TESTS}
+      algorithms/double_oracle_test.py
+      algorithms/lp_solver_test.py
+      algorithms/sequence_form_lp_test.py
+      algorithms/value_iteration_test.py
+      egt/alpharank_test.py
+      egt/alpharank_visualizer_test.py
+      egt/visualization_test.py
+      games/kuhn_poker_test.py
+      tests/matrix_game_utils_test.py
   )
 endif()
 
