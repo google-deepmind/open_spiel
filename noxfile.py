@@ -51,6 +51,8 @@ def tests(session):
     session.install(*child_env["OPEN_SPIEL_PYTHON_PYTORCH_DEPS"].split())
   if child_env["OPEN_SPIEL_ENABLE_TENSORFLOW"] == "ON":
     session.install(*child_env["OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS"].split())
+  if child_env["OPEN_SPIEL_ENABLE_PYTHON_MISC"] == "ON":
+    session.install(*child_env["OPEN_SPIEL_PYTHON_MISC_DEPS"].split())
   session.run("python3", "setup.py", "build", env=child_env)
   session.run("python3", "setup.py", "install", env=child_env)
   session.cd(os.path.join("build", get_distutils_tempdir()))
