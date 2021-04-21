@@ -258,7 +258,7 @@ class KriegspielGame : public Game {
             6 + // check type one
             6 + // check type two
             3 + // player to move
-            16 + // pawn tries
+            17 + // pawn tries
             board_size_ * board_size_) + // capture square
         2*2 + // private: left/right castling rights, one-hot encoded.
         2 * (board_size_ * board_size_)// private: last move (from, to)
