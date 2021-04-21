@@ -223,7 +223,7 @@ class KriegspielObserver : public Observer {
                           Allocator *allocator) const {
     int board_size = board.BoardSize();
     WriteBinary(msg.illegal, prefix + "_illegal", allocator);
-    WriteScalar(msg.capture_type, 0, 2, prefix + "_capture_type", allocator);
+    WriteScalar(static_cast<int8_t>(msg.capture_type), 0, 2, prefix + "_capture_type", allocator);
     auto square_out = allocator->Get(prefix + "_captured_square",
                                      {board_size, board_size});
     for (int8_t y = 0; y < board_size; ++y) {
@@ -232,8 +232,8 @@ class KriegspielObserver : public Observer {
         square_out.at(x, y) = square == msg.square ? 1.0f : 0.0f;
       }
     }
-    WriteScalar(msg.check_types.first, 0, 5, prefix + "_check_one", allocator);
-    WriteScalar(msg.check_types.second, 0, 5, prefix + "_check_two", allocator);
+    WriteScalar(static_cast<int8_t>(msg.check_types.first), 0, 5, prefix + "_check_one", allocator);
+    WriteScalar(static_cast<int8_t>(msg.check_types.second), 0, 5, prefix + "_check_two", allocator);
     WriteScalar(chess::ColorToPlayer(msg.to_move), 0, 1, prefix + "_to_move", allocator);
     WriteScalar(msg.pawn_tries, 0, 15, prefix + "_pawn_tries", allocator);
   }
