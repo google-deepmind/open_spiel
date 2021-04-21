@@ -510,6 +510,7 @@ void BackgammonState::UndoAction(int player, Action action) {
   }
   turn_history_info_.pop_back();
   history_.pop_back();
+  --move_number_;
 }
 
 bool BackgammonState::IsHit(Player player, int from_pos, int num) const {

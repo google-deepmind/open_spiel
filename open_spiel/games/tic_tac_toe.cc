@@ -180,6 +180,7 @@ void TicTacToeState::UndoAction(Player player, Action move) {
   outcome_ = kInvalidPlayer;
   num_moves_ -= 1;
   history_.pop_back();
+  --move_number_;
 }
 
 std::unique_ptr<State> TicTacToeState::Clone() const {

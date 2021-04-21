@@ -266,6 +266,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   action_sequence_.pop_back();
 
   history_.pop_back();
+  --move_number_;
   // Note, do not change the player.. this will already have been done above
   // if necessary.
 }

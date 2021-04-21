@@ -175,6 +175,7 @@ void CatchState::UndoAction(Player player, Action move) {
       std::min(std::max(paddle_col_ - direction, 0), num_columns_ - 1);
   --ball_row_;
   history_.pop_back();
+  --move_number_;
 }
 
 std::unique_ptr<State> CatchState::Clone() const {
