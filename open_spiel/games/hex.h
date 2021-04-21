@@ -27,10 +27,9 @@
 // Does not implement pie rule to balance the game
 //
 // Parameters:
-//       "board_size"    int     size of the board (row, col) (default = 11)
-//       "col_size"      int     number of columns on the board. board_size
-//                               will be used as the row_size if specified.
-//                               (default = -1)
+//       "row_size"      int     size of the rows (default = 11)
+//       "col_size"      int     number of columns on the board. 
+//                               (default = 11)
 
 namespace open_spiel {
 namespace hex {

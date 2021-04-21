@@ -41,7 +41,6 @@ const GameType kGameType{/*short_name=*/"hex",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"board_size", GameParameter(kDefaultBoardRows)},
                              {"row_size", GameParameter(kDefaultBoardRows)},
                              {"col_size", GameParameter(kDefaultBoardCols)},
                          }};
@@ -313,12 +312,8 @@ std::unique_ptr<State> HexState::Clone() const {
   return std::unique_ptr<State>(new HexState(*this));
 }
 
-// HexGame::HexGame(const GameParameters& params)
-//     : Game(kGameType, params), row_size_(ParameterValue<int>("board_size")),
-//                                col_size_(ParameterValue<int>("board_size")) {}
-
 HexGame::HexGame(const GameParameters& params)
-    : Game(kGameType, params), row_size_(ParameterValue<int>("board_size")),
+    : Game(kGameType, params), row_size_(ParameterValue<int>("row_size")),
                                col_size_(ParameterValue<int>("col_size")) {}
 }  // namespace hex
 }  // namespace open_spiel

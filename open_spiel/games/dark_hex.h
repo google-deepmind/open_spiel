@@ -58,7 +58,9 @@
 //                                number of moves attempted
 //    (default "reveal-nothing")  ['reveal-nothing', 'reveal-numturns']
 //
-//    "board_size"    int         Size of the board
+//    "row_size"    int           Size of the rows on the hex board
+//    (default 11)
+//    "col_size"    int           Size of the columns on the hex board
 //    (default 11)
 
 namespace open_spiel {
