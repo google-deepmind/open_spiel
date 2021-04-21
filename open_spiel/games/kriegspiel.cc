@@ -234,7 +234,7 @@ class KriegspielObserver : public Observer {
     }
     WriteScalar(static_cast<int8_t>(msg.check_types.first), 0, 5, prefix + "_check_one", allocator);
     WriteScalar(static_cast<int8_t>(msg.check_types.second), 0, 5, prefix + "_check_two", allocator);
-    WriteScalar(chess::ColorToPlayer(msg.to_move), 0, 1, prefix + "_to_move", allocator);
+    WriteScalar(static_cast<int8_t>(msg.to_move), 0, 2, prefix + "_to_move", allocator);
     WriteScalar(msg.pawn_tries, 0, 15, prefix + "_pawn_tries", allocator);
   }
 
