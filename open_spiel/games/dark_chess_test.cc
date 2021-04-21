@@ -29,6 +29,7 @@ void BasicDarkChessTests(int board_size) {
   testing::LoadGameTest("dark_chess");
   testing::NoChanceOutcomesTest(*LoadGame("dark_chess", params));
   testing::RandomSimTest(*LoadGame("dark_chess", params), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("dark_chess", params), 1);
 }
 
 void ChessBoardFlagPropagationTest(bool flag_king_in_check_allowed) {

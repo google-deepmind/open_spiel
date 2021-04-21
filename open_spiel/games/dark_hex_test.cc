@@ -96,6 +96,7 @@ void ClassicalDarkHexTests() {
   testing::LoadGameTest("dark_hex");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex"));
   testing::RandomSimTest(*LoadGame("dark_hex(board_size=5)"), 10);
+  testing::RandomSimTestWithUndo(*LoadGame("dark_hex(board_size=5)"), 1);
   testing::LoadGameTest("dark_hex(obstype=reveal-numturns)");
   GameBlackWinWithCollisionAndObs();
   GameBlackWinsMaximumCollisions();

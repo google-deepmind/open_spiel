@@ -25,6 +25,7 @@ void BasicPhantomTTTTests() {
   testing::LoadGameTest("phantom_ttt");
   testing::NoChanceOutcomesTest(*LoadGame("phantom_ttt"));
   testing::RandomSimTest(*LoadGame("phantom_ttt"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("phantom_ttt"), 1);
 }
 
 }  // namespace

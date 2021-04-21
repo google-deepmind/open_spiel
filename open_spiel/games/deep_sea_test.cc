@@ -29,6 +29,7 @@ void BasicDeepSeaTests() {
   testing::LoadGameTest("deep_sea(size=5)");
   testing::ChanceOutcomesTest(*LoadGame("deep_sea(size=5)"));
   testing::RandomSimTest(*LoadGame("deep_sea(size=5)"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("deep_sea(size=5)"), 1);
 }
 
 }  // namespace

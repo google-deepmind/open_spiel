@@ -34,6 +34,7 @@ void BasicBreakthroughTests() {
   testing::LoadGameTest("breakthrough");
   testing::NoChanceOutcomesTest(*LoadGame("breakthrough"));
   testing::RandomSimTest(*LoadGame("breakthrough"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("breakthrough"), 1);
 }
 
 }  // namespace
