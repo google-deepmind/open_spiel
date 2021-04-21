@@ -315,7 +315,11 @@ class KriegspielObserver : public Observer {
     out.at(0) = state.Board().IrreversibleMoveCounter() / 100.f;
 
     // Write last umpire message
-    WriteUmpireMessage(*state.last_umpire_msg_, state.Board(), prefix, allocator);
+    if (state.last_umpire_msg_) {
+      WriteUmpireMessage(*state.last_umpire_msg_, state.Board(), prefix, allocator);
+    } else {
+      WriteUmpireMessage(KriegspielUmpireMessage(), state.Board(), prefix, allocator);
+    }
   }
 
   IIGObservationType iig_obs_type_;
