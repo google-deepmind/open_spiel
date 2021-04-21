@@ -30,8 +30,6 @@ import sys
 from absl import app
 from absl import flags
 import numpy as np
-from six.moves import input
-from six.moves import range
 
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import random_agent

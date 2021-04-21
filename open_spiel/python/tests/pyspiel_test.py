@@ -20,7 +20,6 @@ from __future__ import print_function
 
 import os
 from absl.testing import absltest
-import six
 
 from open_spiel.python import policy
 import pyspiel
@@ -249,8 +248,8 @@ class PyspielTest(absltest.TestCase):
                      pyspiel.GameType.ChanceMode.DETERMINISTIC)
 
   def test_error_handling(self):
-    with six.assertRaisesRegex(self, RuntimeError,
-                               "Unknown game 'invalid_game_name'"):
+    with self.assertRaisesRegex(RuntimeError,
+                                "Unknown game 'invalid_game_name'"):
       unused_game = pyspiel.load_game("invalid_game_name")
 
   def test_can_create_cpp_tabular_policy(self):
