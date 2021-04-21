@@ -138,7 +138,7 @@ BUILD_DIR="$ARG_build_dir"
 mkdir -p $BUILD_DIR
 
 # Configure Julia compilation if required.
-if [[ ${BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
+if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
   if [[ ! -x `which julia` ]] || [[ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]]
   then
@@ -224,7 +224,7 @@ else
     if [[ $ARG_build_only == "true" ]]; then
       echo -e "\033[32m*** Skipping runing tests as build_only is ${ARG_build_only} \e[0m"
     else
-      if [[ ${BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" && $ARG_test_only =~ "tf_trajectories_example" ]]; then
+      if [[ ${OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" && $ARG_test_only =~ "tf_trajectories_example" ]]; then
         execute_export_graph
       fi
 
@@ -245,7 +245,7 @@ else
       # Test everything
       echo "Running all tests"
 
-      if [[ ${BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" ]]; then
+      if [[ ${OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC:-"OFF"} == "ON" ]]; then
         execute_export_graph
       fi
 

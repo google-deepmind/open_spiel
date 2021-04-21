@@ -1,7 +1,7 @@
 # This is an optional dependency. Currently it is only tested with the binary
 # release of OR-Tools v8 on Linux x86_64 (Debian 10).
 #
-# You need to set BUILD_WITH_ORTOOLS to ON to include C++ Linear Programming.
+# You need to set OPEN_SPIEL_BUILD_WITH_ORTOOLS to ON to include C++ Linear Programming.
 # See the main ../../CMakeLists for more instructions for setup, and
 # https://github.com/deepmind/open_spiel/issues/398 for details and discussion
 # of C++ optimization in OpenSpiel.

@@ -27,7 +27,7 @@
 //
 // Since Hanabi relies on an (optional) external dependency, it is not included
 // in the list of compiled games by default. To enable it, read `install.md`
-// (TLDR: Set the environment variable BUILD_WITH_HANABI to ON).
+// (TLDR: Set the environment variable OPEN_SPIEL_BUILD_WITH_HANABI to ON).
 
 #include <memory>
 

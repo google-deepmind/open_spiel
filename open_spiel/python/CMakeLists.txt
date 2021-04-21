@@ -42,19 +42,19 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   )
 
 # Optional pyspiel sub-modules, which can specify their python bindings.
-if (BUILD_WITH_GAMUT)
+if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../games/gamut/gamut_pybind11.h
       ../games/gamut/gamut_pybind11.cc
       )
 endif()
-if (BUILD_WITH_PUBLIC_STATES)
+if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../public_states/pybind11/public_states.h
       ../public_states/pybind11/public_states.cc
       )
 endif()
-if (BUILD_WITH_XINXIN)
+if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../bots/xinxin/xinxin_pybind11.h
       ../bots/xinxin/xinxin_pybind11.cc
@@ -67,7 +67,7 @@ add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
 set_target_properties(pyspiel PROPERTIES PREFIX "")
 
 # Optional pyspiel-related modules, which can specify their own python tests.
-if (BUILD_WITH_EIGEN)
+if (OPEN_SPIEL_BUILD_WITH_EIGEN)
   add_library(pyspiel_eigen_test MODULE
     ../eigen/eigen_test_support.h
     ../eigen/pyeig.h
@@ -80,14 +80,14 @@ if (BUILD_WITH_EIGEN)
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../eigen/eigen_binding_test.py)
 endif()
-if (BUILD_WITH_PUBLIC_STATES)
+if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../integration_tests/public_states_api_test.py)
 endif()
-if (BUILD_WITH_XINXIN)
+if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
 endif()
-if (BUILD_WITH_GAMUT)
+if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)
 endif()
 

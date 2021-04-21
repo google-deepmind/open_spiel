@@ -130,10 +130,10 @@ set(GAME_SOURCES
   y.h
 )
 
-if (${BUILD_WITH_HANABI})
+if (${OPEN_SPIEL_BUILD_WITH_HANABI})
   set(GAME_SOURCES ${GAME_SOURCES} hanabi.cc hanabi.h)
 endif()
-if (${BUILD_WITH_ACPC})
+if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   set(GAME_SOURCES ${GAME_SOURCES} universal_poker.cc universal_poker.h)
 endif()
 
@@ -141,13 +141,13 @@ add_library (games OBJECT ${GAME_SOURCES})
 
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (${BUILD_WITH_HANABI})
+if (${OPEN_SPIEL_BUILD_WITH_HANABI})
   add_subdirectory(hanabi)
 endif()
-if (${BUILD_WITH_ACPC})
+if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   add_subdirectory(universal_poker)
 endif()
-if (${BUILD_WITH_GAMUT})
+if (${OPEN_SPIEL_BUILD_WITH_GAMUT})
   add_subdirectory(gamut)
 endif()
 
@@ -448,7 +448,7 @@ add_executable(trade_comm_test trade_comm_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(trade_comm_test trade_comm_test)
 
-if (${BUILD_WITH_ACPC})
+if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   add_executable(universal_poker_test universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}
           $<TARGET_OBJECTS:tests>
           $<TARGET_OBJECTS:algorithms>)
