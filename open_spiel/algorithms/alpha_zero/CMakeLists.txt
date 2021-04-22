@@ -1,6 +1,6 @@
-# To enable C++ AlphaZero, you will need to set BUILD_WITH_TENSORFLOW_CC. See:
+# To enable C++ AlphaZero, you will need to set OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC. See:
 # https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md
-if (BUILD_WITH_TENSORFLOW_CC)
+if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   add_library (alpha_zero OBJECT
     alpha_zero.h
     alpha_zero.cc

@@ -27,6 +27,9 @@ namespace testing {
 
 constexpr int kDefaultNumSimsForPolicyTests = 10;
 
+// Default state checker function (does nothing).
+void DefaultStateChecker(const State& state);
+
 // Checks that the game can be loaded.
 void LoadGameTest(const std::string& game_name);
 
@@ -36,9 +39,14 @@ void ChanceOutcomesTest(const Game& game);
 // Test to ensure that there are no chance outcomes.
 void NoChanceOutcomesTest(const Game& game);
 
-// Perform num_sims random simulations of the specified game.
-void RandomSimTest(const Game& game, int num_sims, bool serialize = true,
-                   bool verbose = true);
+// Perform num_sims random simulations of the specified game. The optional
+// state_checker_fn is called at every state (including chance nodes and
+// terminals), and is intended to be an easy way to pass context-specific
+// testing functions to the simulation tests.
+void RandomSimTest(
+    const Game& game, int num_sims, bool serialize = true, bool verbose = true,
+    const std::function<void(const State&)>& state_checker_fn
+        = &DefaultStateChecker);
 
 // Perform num_sims random simulations of the specified game. Also tests the
 // Undo function. Note: for every step in the simulation, the entire simulation

@@ -1,5 +1,5 @@
-# To enable C++ Torch AlphaZero, you will need to set BUILD_WITH_LIBTORCH.
-if (BUILD_WITH_LIBTORCH)
+# To enable C++ Torch AlphaZero, you will need to set OPEN_SPIEL_BUILD_WITH_LIBTORCH.
+if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   add_library (alpha_zero_torch OBJECT
     alpha_zero.h
     alpha_zero.cc

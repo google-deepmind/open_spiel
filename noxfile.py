@@ -43,9 +43,18 @@ def get_distutils_tempdir():
 
 @nox.session(python="3")
 def tests(session):
+  """Run the tests via nox."""
   session.install("-r", "requirements.txt")
   child_env = os.environ.copy()
   child_env["OPEN_SPIEL_BUILD_ALL"] = "ON"
+  if child_env["OPEN_SPIEL_ENABLE_JAX"] == "ON":
+    session.install(*child_env["OPEN_SPIEL_PYTHON_JAX_DEPS"].split())
+  if child_env["OPEN_SPIEL_ENABLE_PYTORCH"] == "ON":
+    session.install(*child_env["OPEN_SPIEL_PYTHON_PYTORCH_DEPS"].split())
+  if child_env["OPEN_SPIEL_ENABLE_TENSORFLOW"] == "ON":
+    session.install(*child_env["OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS"].split())
+  if child_env["OPEN_SPIEL_ENABLE_PYTHON_MISC"] == "ON":
+    session.install(*child_env["OPEN_SPIEL_PYTHON_MISC_DEPS"].split())
   session.run("python3", "setup.py", "build", env=child_env)
   session.run("python3", "setup.py", "install", env=child_env)
   session.cd(os.path.join("build", get_distutils_tempdir()))

@@ -14,6 +14,7 @@
 
 #include "open_spiel/tests/basic_tests.h"
 
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <numeric>
@@ -143,6 +144,8 @@ bool IsPowerOfTwo(int n) { return n == 0 || (n & (n - 1)) == 0; }
 
 }  // namespace
 
+void DefaultStateChecker(const State& state) {}
+
 // Checks that the game can be loaded.
 void LoadGameTest(const std::string& game_name) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
@@ -171,6 +174,8 @@ void TestUndo(std::unique_ptr<State> state,
     SPIEL_CHECK_EQ(state->ToString(), prev->state->ToString());
     // We also check that UndoActions correctly updates history_.
     SPIEL_CHECK_EQ(state->History(), prev->state->History());
+    // And correctly updates move_number_.
+    SPIEL_CHECK_EQ(state->MoveNumber(), prev->state->MoveNumber());
   }
 }
 
@@ -237,12 +242,14 @@ void CheckObservables(const Game& game,
                      ) {
   for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
     if (game.GetType().provides_information_state_tensor) {
-      std::vector<float> v = state.InformationStateTensor(p);
-      SPIEL_CHECK_EQ(v.size(), game.InformationStateTensorSize());
+      std::vector<float> tensor = state.InformationStateTensor(p);
+      for (float val : tensor) SPIEL_CHECK_TRUE(std::isfinite(val));
+      SPIEL_CHECK_EQ(tensor.size(), game.InformationStateTensorSize());
     }
     if (game.GetType().provides_observation_tensor) {
-      std::vector<float> v = state.ObservationTensor(p);
-      SPIEL_CHECK_EQ(v.size(), game.ObservationTensorSize());
+      std::vector<float> tensor = state.ObservationTensor(p);
+      for (float val : tensor) SPIEL_CHECK_TRUE(std::isfinite(val));
+      SPIEL_CHECK_EQ(tensor.size(), game.ObservationTensorSize());
     }
     if (game.GetType().provides_information_state_string) {
       // Checking it does not raise errors.
@@ -262,7 +269,8 @@ void CheckObservables(const Game& game,
 
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
                       bool serialize, bool verbose,
-                      std::shared_ptr<Observer> observer  // Can be nullptr
+                      std::shared_ptr<Observer> observer,  // Can be nullptr
+                      std::function<void(const State&)> state_checker_fn
                      ) {
   std::unique_ptr<Observation> observation =
       observer == nullptr ? nullptr
@@ -302,6 +310,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   int game_length = 0;
 
   while (!state->IsTerminal()) {
+    state_checker_fn(*state);
+
     if (verbose) {
       std::cout << "player " << state->CurrentPlayer() << std::endl;
     }
@@ -413,6 +423,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
   }
 
+  state_checker_fn(*state);
   SPIEL_CHECK_LE(game_length, game.MaxGameLength());
 
   if (verbose) {
@@ -454,7 +465,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
 // Perform sims random simulations of the specified game.
 void RandomSimTest(const Game& game, int num_sims, bool serialize,
-                   bool verbose) {
+                   bool verbose,
+                   const std::function<void(const State&)>& state_checker_fn) {
   std::mt19937 rng;
   if (verbose) {
     std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
@@ -462,7 +474,7 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize,
   }
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
-                     verbose, nullptr);
+                     verbose, nullptr, state_checker_fn);
   }
 }
 
@@ -472,7 +484,7 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true,
-                     /*verbose=*/true, nullptr);
+                     /*verbose=*/true, nullptr, &DefaultStateChecker);
   }
 }
 
@@ -482,7 +494,7 @@ void RandomSimTestNoSerialize(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                     /*verbose=*/true, nullptr);
+                     /*verbose=*/true, nullptr, &DefaultStateChecker);
   }
 }
 
@@ -490,7 +502,7 @@ void RandomSimTestCustomObserver(const Game& game,
                                  const std::shared_ptr<Observer> observer) {
   std::mt19937 rng;
   RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                   /*verbose=*/false, observer);
+                   /*verbose=*/false, observer, &DefaultStateChecker);
 }
 
 // Format chance outcomes as a string, for error messages.

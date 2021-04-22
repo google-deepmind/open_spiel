@@ -1,0 +1,82 @@
+game: matrix_shapleys_game
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.ONE_SHOT
+GameType.long_name = "Shapley's Game"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "matrix_shapleys_game"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 3
+PolicyTensorShape() = [3]
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = 0.0
+MaxUtility() = 1.0
+UtilitySum() = None
+InformationStateTensorShape() = [1]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 1
+MaxGameLength() = 1
+ToString() = "matrix_shapleys_game()"
+
+# State 0
+# Terminal? false
+# Row actions: Rock Paper Scissors
+# Col actions: Rock Paper Scissors
+# Utility matrix:
+# 0,0 0,1 1,0
+# 1,0 0,0 0,1
+# 0,1 1,0 0,0
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+InformationStateString(0) = "Observing player: 0. Non-terminal"
+InformationStateString(1) = "Observing player: 1. Non-terminal"
+InformationStateTensor(0): ◯
+InformationStateTensor(1): ◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions(0) = [0, 1, 2]
+LegalActions(1) = [0, 1, 2]
+StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
+StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
+
+# Apply joint action ["Paper", "Rock"]
+actions: [1, 0]
+
+# State 1
+# Terminal? true
+# History: 1, 0
+# Returns: 1,0
+# Row actions:
+# Col actions:
+# Utility matrix:
+# 0,0 0,1 1,0
+# 1,0 0,0 0,1
+# 0,1 1,0 0,0
+IsTerminal() = True
+History() = [1, 0]
+HistoryString() = "1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Observing player: 0. Terminal. History string: 1, 0"
+InformationStateString(1) = "Observing player: 1. Terminal. History string: 1, 0"
+InformationStateTensor(0): ◉
+InformationStateTensor(1): ◉
+Rewards() = [1.0, 0.0]
+Returns() = [1.0, 0.0]

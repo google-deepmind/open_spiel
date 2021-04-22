@@ -31,20 +31,25 @@ namespace algorithms {
 // initial state (so if depth_limit is 0, only the root is considered).
 // If depth limit is negative, all states are considered.
 //
-// Currently works for sequential 1-player or 2-player zero-sum games,
-// with or without chance nodes.
+// Currently works for sequential 1-player or 2-player zero-sum games.
 //
 // Based on the implementation in Sutton and Barto, Intro to RL. Second Edition,
 // 2018. Section 6.4.
+// Note: current implementation only supports full bootstrapping (lambda = 0).
 
 class TabularSarsaSolver {
   static inline constexpr double kDefaultDepthLimit = -1;
   static inline constexpr double kDefaultEpsilon = 0.1;
   static inline constexpr double kDefaultLearningRate = 0.01;
   static inline constexpr double kDefaultDiscountFactor = 0.99;
+  static inline constexpr double kDefaultLambda = 0;
 
  public:
   TabularSarsaSolver(std::shared_ptr<const Game> game);
+
+  TabularSarsaSolver(std::shared_ptr<const Game> game, double depth_limit,
+                     double epsilon, double learning_rate,
+                     double discount_factor, double lambda);
 
   void RunIteration();
 
@@ -69,6 +74,7 @@ class TabularSarsaSolver {
   double epsilon_;
   double learning_rate_;
   double discount_factor_;
+  double lambda_;
   std::mt19937 rng_;
   absl::flat_hash_map<std::pair<std::string, Action>, double> values_;
 };

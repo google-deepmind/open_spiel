@@ -20,10 +20,18 @@
 
 namespace open_spiel {
 
+inline constexpr const char* kDefaultPythonCommand = "python3";
+
 // Spawn a python interpreter and run the python script referenced by a module
-// path, with args. This is equivalent to `python3 -m module <args>`.
+// path, with args. This is equivalent to `<python command> -m module <args>`.
 // Returns true on success, false on failure.
-bool RunPython(const std::string& module, const std::vector<std::string>& args);
+bool RunPython(const std::string& python_command,
+               const std::string& module,
+               const std::vector<std::string>& args);
+
+// Same as above using the default python command,.
+bool RunPython(const std::string& module,
+               const std::vector<std::string>& args);
 
 }  // namespace open_spiel
 

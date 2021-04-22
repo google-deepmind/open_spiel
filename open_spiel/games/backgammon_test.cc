@@ -31,6 +31,43 @@ bool ActionsContains(const std::vector<Action>& legal_actions, Action action) {
          legal_actions.end();
 }
 
+void CheckHits(const State &state) {
+  if (state.IsChanceNode() || state.IsTerminal()) {
+    return;
+  }
+  Player player = state.CurrentPlayer();
+  const auto &bstate = down_cast<const BackgammonState &>(state);
+  for (Action action : bstate.LegalActions()) {
+    std::vector<CheckerMove> cmoves = bstate.AugmentWithHitInfo(
+        player, bstate.SpielMoveToCheckerMoves(player, action));
+    std::cout << bstate.ActionToString(player, action) << std::endl;
+    for (CheckerMove cmove : cmoves) {
+      const int to_pos = bstate.GetToPos(player, cmove.pos, cmove.num);
+      // If the to position is on the board and there is only 1 checker, this
+      // has to be a hit.
+      if (cmove.pos != kPassPos && !bstate.IsOff(player, to_pos) &&
+          bstate.board(bstate.Opponent(player), to_pos) == 1) {
+        SPIEL_CHECK_TRUE(cmove.hit);
+      }
+
+      // Now, check the converse.
+      if (cmove.hit) {
+        SPIEL_CHECK_TRUE(cmove.pos != kPassPos &&
+                         !bstate.IsOff(player, to_pos) &&
+                         bstate.board(bstate.Opponent(player), to_pos) == 1);
+      }
+
+      // No need to apply the intermediate checker move, as it does not make
+      // any difference for what we're checking.
+    }
+  }
+}
+
+void BasicBackgammonTestsCheckHits() {
+  std::shared_ptr<const Game> game = LoadGame("backgammon");
+  testing::RandomSimTest(*game, 10, true, true, &CheckHits);
+}
+
 void BasicBackgammonTestsVaryScoring() {
   for (std::string scoring :
        {"winloss_scoring", "enable_gammons", "full_scoring"}) {
@@ -550,6 +587,7 @@ void BasicHyperBackgammonTest() {
 
 int main(int argc, char** argv) {
   open_spiel::testing::LoadGameTest("backgammon");
+  open_spiel::backgammon::BasicBackgammonTestsCheckHits();
   open_spiel::backgammon::BasicBackgammonTestsDoNotStartWithDoubles();
   open_spiel::backgammon::BasicBackgammonTestsVaryScoring();
   open_spiel::backgammon::BasicHyperBackgammonTestsVaryScoring();

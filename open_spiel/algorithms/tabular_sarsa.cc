@@ -33,17 +33,18 @@ using std::vector;
 Action TabularSarsaSolver::GetBestAction(const State& state,
                                          double min_utility) {
   vector<Action> legal_actions = state.LegalActions();
-  Action optimal_action = kInvalidAction;
+  SPIEL_CHECK_GT(legal_actions.size(), 0);
+  Action best_action = legal_actions[0];
 
   double value = min_utility;
   for (const Action& action : legal_actions) {
     double q_val = values_[{state.ToString(), action}];
     if (q_val >= value) {
       value = q_val;
-      optimal_action = action;
+      best_action = action;
     }
   }
-  return optimal_action;
+  return best_action;
 }
 
 Action TabularSarsaSolver::SampleActionFromEpsilonGreedyPolicy(
@@ -64,9 +65,8 @@ Action TabularSarsaSolver::SampleActionFromEpsilonGreedyPolicy(
 void TabularSarsaSolver::SampleUntilNextStateOrTerminal(State* state) {
   // Repeatedly sample while chance node, so that we end up at a decision node
   while (state->IsChanceNode() && !state->IsTerminal()) {
-    vector<Action> legal_actions = state->LegalActions();
-    state->ApplyAction(
-        legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())]);
+    std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+    state->ApplyAction(SampleAction(outcomes, rng_).first);
   }
 }
 
@@ -75,7 +75,37 @@ TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game)
       depth_limit_(kDefaultDepthLimit),
       epsilon_(kDefaultEpsilon),
       learning_rate_(kDefaultLearningRate),
-      discount_factor_(kDefaultDiscountFactor) {
+      discount_factor_(kDefaultDiscountFactor),
+      lambda_(kDefaultLambda) {
+  // Only support lambda=0 for now.
+  SPIEL_CHECK_EQ(lambda_, 0);
+
+  // Currently only supports 1-player or 2-player zero sum games
+  SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
+  if (game_->NumPlayers() == 2) {
+    SPIEL_CHECK_EQ(game_->GetType().utility, GameType::Utility::kZeroSum);
+  }
+
+  // No support for simultaneous games (needs an LP solver). And so also must
+  // be a perfect information game.
+  SPIEL_CHECK_EQ(game_->GetType().dynamics, GameType::Dynamics::kSequential);
+  SPIEL_CHECK_EQ(game_->GetType().information,
+                 GameType::Information::kPerfectInformation);
+}
+
+TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game,
+                                       double depth_limit, double epsilon,
+                                       double learning_rate,
+                                       double discount_factor, double lambda)
+    : game_(game),
+      depth_limit_(depth_limit),
+      epsilon_(epsilon),
+      learning_rate_(learning_rate),
+      discount_factor_(discount_factor),
+      lambda_(lambda) {
+  // Only support lambda=0 for now.
+  SPIEL_CHECK_EQ(lambda_, 0);
+
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
   if (game_->NumPlayers() == 2) {
@@ -103,32 +133,39 @@ void TabularSarsaSolver::RunIteration() {
   Player player = curr_state->CurrentPlayer();
   // Sample action from the state using an epsilon-greedy policy
   Action curr_action =
-      SampleActionFromEpsilonGreedyPolicy(*(curr_state.get()), min_utility);
+      SampleActionFromEpsilonGreedyPolicy(*curr_state, min_utility);
+  std::unique_ptr<State> next_state;
+  SPIEL_CHECK_NE(curr_action, kInvalidAction);
 
   while (!curr_state->IsTerminal()) {
-    std::unique_ptr<State> next_state = curr_state->Child(curr_action);
-    SampleUntilNextStateOrTerminal(curr_state.get());
+    player = curr_state->CurrentPlayer();
+
+    next_state = curr_state->Child(curr_action);
+    SampleUntilNextStateOrTerminal(next_state.get());
     const double reward = next_state->Rewards()[player];
 
     const Action next_action =
-        SampleActionFromEpsilonGreedyPolicy(*(next_state.get()), min_utility);
+        next_state->IsTerminal()
+            ? kInvalidAction
+            : SampleActionFromEpsilonGreedyPolicy(*next_state, min_utility);
 
-    // Update action value
+    // Update the new q value
     std::string key = curr_state->ToString();
-    const double prev_q_val = values_[{key, curr_action}];
     // Next q-value in perspective of player to play at curr_state (important
-    // note: exploits property of two-player zero-sum)
+    // note: exploits property of two-player zero-sum). Define the value of
+    // q(s', a') to be 0 if s' is terminal.
+    const double future_value =
+        next_state->IsTerminal()
+            ? 0
+            : values_[{next_state->ToString(), next_action}];
     const double next_q_value =
-        (player != next_state->CurrentPlayer() ? -1 : 1) *
-        values_[{next_state->ToString(), next_action}];
-    double new_q_val =
-        prev_q_val +
-        learning_rate_ *
-            (reward + discount_factor_ * next_q_value - prev_q_val);
+        (player != next_state->CurrentPlayer() ? -1 : 1) * future_value;
+    double new_q_value = reward + discount_factor_ * next_q_value;
 
-    values_[{key, curr_action}] = new_q_val;
+    double prev_q_val = values_[{key, curr_action}];
+    values_[{key, curr_action}] += learning_rate_ * (new_q_value - prev_q_val);
 
-    curr_state = next_state->Clone();
+    curr_state = std::move(next_state);
     curr_action = next_action;
   }
 }

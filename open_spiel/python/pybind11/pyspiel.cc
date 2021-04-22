@@ -34,6 +34,7 @@
 #include "open_spiel/python/pybind11/games_backgammon.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_chess.h"
+#include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
 #include "open_spiel/python/pybind11/observation_history.h"
@@ -52,13 +53,13 @@
 #include "pybind11/include/pybind11/stl.h"
 
 // List of optional python submodules.
-#if BUILD_WITH_GAMUT
+#if OPEN_SPIEL_BUILD_WITH_GAMUT
 #include "open_spiel/games/gamut/gamut_pybind11.h"
 #endif
-#if BUILD_WITH_PUBLIC_STATES
+#if OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES
 #include "open_spiel/public_states/pybind11/public_states.h"
 #endif
-#if BUILD_WITH_XINXIN
+#if OPEN_SPIEL_BUILD_WITH_XINXIN
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
 
@@ -636,6 +637,8 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("random_sim_test", testing::RandomSimTest, py::arg("game"),
         py::arg("num_sims"), py::arg("serialize"), py::arg("verbose"),
+        py::arg("state_checker_fn") =
+            py::cpp_function(&testing::DefaultStateChecker),
         "Run the C++ tests on a game");
 
   // Set an error handler that will raise exceptions. These exceptions are for
@@ -655,18 +658,19 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_backgammon(m);         // Backgammon game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
   init_pyspiel_games_chess(m);   // Chess game.
+  init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
   init_pyspiel_games_negotiation(m);  // Negotiation game.
   init_pyspiel_games_tarok(m);   // Game-specific functions for tarok.
   init_pyspiel_observer(m);      // Observers and observations.
 
   // List of optional python submodules.
-#if BUILD_WITH_GAMUT
+#if OPEN_SPIEL_BUILD_WITH_GAMUT
   init_pyspiel_gamut(m);
 #endif
-#if BUILD_WITH_PUBLIC_STATES
+#if OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES
   init_pyspiel_public_states(m);
 #endif
-#if BUILD_WITH_XINXIN
+#if OPEN_SPIEL_BUILD_WITH_XINXIN
   init_pyspiel_xinxin(m);
 #endif
 }

@@ -45,17 +45,15 @@ constexpr uint8_t kMaxUniversalPokerPlayers = 10;
 
 // This is the mapping from int to action. E.g. the legal action "0" is fold,
 // the legal action "1" is check/call, etc.
-enum ActionType {
-  kFold = 0,
-  kCall = 1,
-  kBet = 2,
-  kAllIn = 3,
-  kDeal = 4,
-  kHalfPot = 5
-};
+enum ActionType { kFold = 0, kCall = 1, kBet = 2, kAllIn = 3, kHalfPot = 4 };
+
+// There are 5 actions: Fold, Call, Half-Pot bet, Pot Bet, and all-in.
+inline constexpr int kNumActionsFCHPA =
+    static_cast<int>(ActionType::kHalfPot) + 1;
 
 enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2, kFCHPA = 3 };
 
+// TODO(author1): Remove StateActionType and use ActionType instead.
 enum StateActionType {
   ACTION_DEAL = 1,
   ACTION_FOLD = 2,
@@ -107,6 +105,7 @@ class UniversalPokerState : public State {
 
   // Returns the raise-to size of the current player going all-in.
   int AllInSize() const;
+  void ApplyChoiceAction(StateActionType action_type, int size);
 
  protected:
   void DoApplyAction(Action action_id) override;
@@ -119,7 +118,6 @@ class UniversalPokerState : public State {
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
   const int GetPossibleActionCount() const;
 
-  void ApplyChoiceAction(StateActionType action_type, int size);
   const std::string &GetActionSequence() const { return actionSequence_; }
 
   void AddHoleCard(uint8_t card) {
@@ -206,9 +204,9 @@ class UniversalPokerGame : public Game {
   }
 
   int big_blind() const { return big_blind_; }
+  double MaxCommitment() const;
 
  private:
-  double MaxCommitment() const;
   std::string gameDesc_;
   const acpc_cpp::ACPCGame acpc_game_;
   absl::optional<int> max_game_length_;

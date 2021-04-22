@@ -371,6 +371,7 @@ void BreakthroughState::UndoAction(Player player, Action action) {
     }
   }
   history_.pop_back();
+  --move_number_;
 }
 
 std::unique_ptr<State> BreakthroughState::Clone() const {

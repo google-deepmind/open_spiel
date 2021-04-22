@@ -21,7 +21,6 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 from absl import logging
-import six
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import deep_cfr_tf2
@@ -55,7 +54,7 @@ def main(unused_argv):
       infer_device="cpu",
       train_device="cpu")
   _, advantage_losses, policy_loss = deep_cfr_solver.solve()
-  for player, losses in six.iteritems(advantage_losses):
+  for player, losses in advantage_losses.items():
     logging.info("Advantage for player %d: %s", player,
                  losses[:2] + ["..."] + losses[-2:])
     logging.info("Advantage Buffer Size for player %s: '%s'", player,

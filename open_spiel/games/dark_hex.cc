@@ -53,22 +53,53 @@ const GameType kGameType{
     /*parameter_specification=*/
     {
         {"obstype", GameParameter(std::string(kDefaultObsType))},
+        {"gameversion", GameParameter(std::string(kDefaultGameVersion))},
         {"board_size", GameParameter(hex::kDefaultBoardSize)},
     }};
 
+const GameType kImperfectRecallGameType{
+    /*short_name=*/"dark_hex_ir",
+    /*long_name=*/"Dark Hex with Imperfect Recall",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"obstype", GameParameter(std::string(kDefaultObsType))},
+     {"gameversion", GameParameter(std::string(kDefaultGameVersion))},
+     {"board_size", GameParameter(hex::kDefaultBoardSize)}}};
+
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new DarkHexGame(params));
+  return std::shared_ptr<const Game>(new DarkHexGame(params, kGameType));
+}
+
+std::shared_ptr<const Game> ImperfectRecallFactory(
+    const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ImperfectRecallDarkHexGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
 
 }  // namespace
 
+ImperfectRecallDarkHexGame::ImperfectRecallDarkHexGame(
+    const GameParameters& params)
+    : DarkHexGame(params, kImperfectRecallGameType) {}
+
 DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int board_size,
-                           ObservationType obs_type)
+                           GameVersion game_version, ObservationType obs_type)
     : State(game),
       state_(game, board_size),
       obs_type_(obs_type),
+      game_version_(game_version),
       board_size_(board_size),
       num_cells_(board_size * board_size),
       bits_per_action_(num_cells_ + 1),
@@ -82,8 +113,18 @@ void DarkHexState::DoApplyAction(Action move) {
   auto& cur_view = (cur_player == 0 ? black_view_ : white_view_);
 
   // Either occupied or not
-  if (state_.BoardAt(move) == CellState::kEmpty) {
-    state_.ApplyAction(move);
+  if (game_version_ == GameVersion::kClassicalDarkHex) {
+    if (state_.BoardAt(move) == CellState::kEmpty) {
+      state_.ApplyAction(move);
+    }
+  } else {
+    SPIEL_CHECK_EQ(game_version_, GameVersion::kAbruptDarkHex);
+    if (state_.BoardAt(move) == CellState::kEmpty) {
+      state_.ApplyAction(move);
+    } else {
+      // switch the current player
+      state_.ChangePlayer();
+    }
   }
 
   SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
@@ -226,7 +267,6 @@ void DarkHexState::UndoAction(Player player, Action move) {
 
   if (state_.BoardAt(move) == PlayerToState(player)) {
     state_.UndoAction(player, move);
-  } else {
   }
 
   auto& player_view = (player == 0 ? black_view_ : white_view_);
@@ -234,10 +274,11 @@ void DarkHexState::UndoAction(Player player, Action move) {
   action_sequence_.pop_back();
 
   history_.pop_back();
+  --move_number_;
 }
 
-DarkHexGame::DarkHexGame(const GameParameters& params)
-    : Game(kGameType, params),
+DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
+    : Game(game_type, params),
       game_(std::static_pointer_cast<const hex::HexGame>(LoadGame(
           "hex",
           {{"board_size", GameParameter(ParameterValue<int>("board_size"))}}))),
@@ -252,6 +293,15 @@ DarkHexGame::DarkHexGame(const GameParameters& params)
     obs_type_ = ObservationType::kRevealNumTurns;
   } else {
     SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
+  }
+
+  std::string game_version = ParameterValue<std::string>("gameversion");
+  if (game_version == "cdh") {
+    game_version_ = GameVersion::kClassicalDarkHex;
+  } else if (game_version == "adh") {
+    game_version_ = GameVersion::kAbruptDarkHex;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized game version: ", game_version));
   }
 }
 

@@ -224,6 +224,7 @@ void SheriffState::UndoAction(Player player, Action action_id) {
   SPIEL_CHECK_TRUE(!history_.empty() &&
                    (history_.back() == PlayerAction{player, action_id}));
   history_.pop_back();
+  --move_number_;
 
   if (!bribes_.empty()) {
     if (bribes_.size() == inspection_feedback_.size()) {
