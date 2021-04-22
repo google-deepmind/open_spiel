@@ -24,16 +24,9 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/pytypes.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
 namespace {

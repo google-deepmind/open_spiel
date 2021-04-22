@@ -15,17 +15,18 @@
 #include "open_spiel/python/pybind11/games_negotiation.h"
 
 #include "open_spiel/games/negotiation.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::negotiation::NegotiationState;
 
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(NegotiationState);
+
 void open_spiel::init_pyspiel_games_negotiation(py::module& m) {
-  py::class_<NegotiationState, State>(m, "NegotiationState")
+  py::classh<NegotiationState, State>(m, "NegotiationState")
       .def("item_pool",
            (const std::vector<int>& (NegotiationState::*)() const) &
                NegotiationState::ItemPool)

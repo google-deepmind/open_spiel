@@ -65,7 +65,7 @@ class TicTacToeGame(pyspiel.Game):
   """A Python version of the Tic-Tac-Toe game."""
 
   def __init__(self, params=None):
-    super().__init__(self, _GAME_TYPE, _GAME_INFO, params or dict())
+    super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
@@ -85,7 +85,7 @@ class TicTacToeState(pyspiel.State):
 
   def __init__(self, game):
     """Constructor; should only be called by Game.new_initial_state."""
-    super().__init__(self, game)
+    super().__init__(game)
     self._cur_player = 0
     self._player0_score = 0.0
     self._is_terminal = False
@@ -105,7 +105,7 @@ class TicTacToeState(pyspiel.State):
     else:
       return [a for a in range(_NUM_CELLS) if self.board[_coord(a)] == "."]
 
-  def do_apply_action(self, action):
+  def _apply_action(self, action):
     """Applies the specified action to the state."""
     self.board[_coord(action)] = "x" if self._cur_player == 0 else "o"
     if _line_exists(self.board):
@@ -133,14 +133,6 @@ class TicTacToeState(pyspiel.State):
     """String for debug purposes. No particular semantics are required."""
     return _board_to_string(self.board)
 
-  def __setstate__(self, data):
-    """Support for unpickling."""
-    # TODO(author11) It should be possible to do this in the C++ layer instead
-    game, state = pyspiel.deserialize_game_and_state(data)
-    self.__init__(game)
-    for h in state.full_history():
-      self.apply_action(h.action)
-
 
 class BoardObserver:
   """Observer, conforming to the PyObserver interface (see observation.py)."""
@@ -151,9 +143,10 @@ class BoardObserver:
       raise ValueError(f"Observation parameters not supported; passed {params}")
     # The observation should contain a 1-D tensor in `self.tensor` and a
     # dictionary of views onto the tensor, which may be of any shape.
-    # Here the observation is indexed `(row, column, cell type)`.
-    self.tensor = np.zeros(3 * 3 * 3, np.float32)
-    self.dict = {"observation": np.reshape(self.tensor, (3, 3, 3))}
+    # Here the observation is indexed `(cell state, row, column)`.
+    shape = (1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS)
+    self.tensor = np.zeros(np.prod(shape), np.float32)
+    self.dict = {"observation": np.reshape(self.tensor, shape)}
 
   def set_from(self, state, player):
     """Updates `tensor` and `dict` to reflect `state` from PoV of `player`."""
@@ -161,11 +154,11 @@ class BoardObserver:
     # We update the observation via the shaped tensor since indexing is more
     # convenient than with the 1-D tensor. Both are views onto the same memory.
     obs = self.dict["observation"]
-    obs[:] = 0
+    obs.fill(0)
     for row in range(_NUM_ROWS):
       for col in range(_NUM_COLS):
-        index = ".ox".index(state.board[row, col])
-        obs[index, row, col] = 1.0
+        cell_state = ".ox".index(state.board[row, col])
+        obs[cell_state, row, col] = 1
 
   def string_from(self, state, player):
     """Observation of `state` from the PoV of `player`, as a string."""

@@ -27,14 +27,8 @@
 #include "open_spiel/algorithms/outcome_sampling_mccfr.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/detail/common.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
 namespace {

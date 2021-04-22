@@ -54,14 +54,14 @@ _GAME_INFO = pyspiel.GameInfo(
     min_utility=-2.0,
     max_utility=2.0,
     utility_sum=0.0,
-    max_game_length=3)  # Pass, Bet, Bet/Pass
+    max_game_length=3)  # e.g. Pass, Bet, Bet
 
 
 class KuhnPokerGame(pyspiel.Game):
   """A Python version of Kuhn poker."""
 
   def __init__(self, params=None):
-    super().__init__(self, _GAME_TYPE, _GAME_INFO, params or dict())
+    super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
@@ -79,7 +79,7 @@ class KuhnPokerState(pyspiel.State):
 
   def __init__(self, game):
     """Constructor; should only be called by Game.new_initial_state."""
-    super().__init__(self, game)
+    super().__init__(game)
     self.cards = []
     self.bets = []
     self.pot = [1.0, 1.0]
@@ -111,15 +111,15 @@ class KuhnPokerState(pyspiel.State):
 
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
-    if len(self.cards) == _NUM_PLAYERS:
+    if not self.is_chance_node():
       raise ValueError("chance_outcomes called on a non-chance state.")
     outcomes = sorted({0, 1, 2} - set(self.cards))
     p = 1.0 / len(outcomes)
     return [(o, p) for o in outcomes]
 
-  def do_apply_action(self, action):
+  def _apply_action(self, action):
     """Applies the specified action to the state."""
-    if len(self.cards) < _NUM_PLAYERS:
+    if self.is_chance_node():
       self.cards.append(action)
     else:
       self.bets.append(action)
@@ -160,14 +160,6 @@ class KuhnPokerState(pyspiel.State):
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
     return "".join([str(c) for c in self.cards] + ["pb"[b] for b in self.bets])
-
-  def __setstate__(self, data):
-    """Support for unpickling."""
-    # TODO(author11) It should be possible to do this in the C++ layer instead
-    game, state = pyspiel.deserialize_game_and_state(data)
-    self.__init__(game)
-    for h in state.full_history():
-      self.apply_action(h.action)
 
 
 class KuhnPokerObserver:

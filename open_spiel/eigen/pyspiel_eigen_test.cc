@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/eigen/eigen_test_support.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 // Make sure that we can convert Eigen types to proper bindings.
 #include "pybind11/include/pybind11/eigen.h"
 

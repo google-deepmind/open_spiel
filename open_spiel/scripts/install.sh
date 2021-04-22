@@ -76,7 +76,7 @@ fi
 # the OpenSpiel team do not control.
 # Feel free to upgrade the version after having checked it works.
 
-[[ -d "./pybind11" ]] || git clone -b 'v2.6.2' --single-branch --depth 1 https://github.com/pybind/pybind11.git
+[[ -d "./pybind11" ]] || git clone -b smart_holder --single-branch --depth 1 https://github.com/pybind/pybind11.git
 # The official https://github.com/dds-bridge/dds.git seems to not accept PR,
 # so we have forked it.
 [[ -d open_spiel/games/bridge/double_dummy_solver ]] || \

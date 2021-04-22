@@ -86,6 +86,7 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/observer.h
   pybind11/policy.cc
   pybind11/policy.h
+  pybind11/pybind11.h
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h

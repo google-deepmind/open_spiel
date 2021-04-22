@@ -40,17 +40,12 @@
 #include "open_spiel/python/pybind11/observation_history.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_games.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/pytypes.h"
-#include "pybind11/include/pybind11/stl.h"
 
 // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
@@ -302,8 +297,10 @@ PYBIND11_MODULE(pyspiel, m) {
   player_action.def_readonly("player", &State::PlayerAction::player)
       .def_readonly("action", &State::PlayerAction::action);
 
-  py::class_<State, PyState> state(m, "State");
-  state.def(py::init<py::object, std::shared_ptr<const Game>>())
+  // TODO(author11) Remove py::dynamic_attr when
+  // https://github.com/pybind/pybind11/pull/2972 is submitted
+  py::classh<State, PyState> state(m, "State", py::dynamic_attr());
+  state.def(py::init<std::shared_ptr<const Game>>())
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
       .def("legal_actions",
@@ -357,9 +354,8 @@ PYBIND11_MODULE(pyspiel, m) {
            (std::vector<float>(State::*)(int) const) & State::ObservationTensor)
       .def("observation_tensor",
            (std::vector<float>(State::*)() const) & State::ObservationTensor)
-      .def("clone", [](State* self) { return ToPython(self->Clone()); })
-      .def("child", [](State* self,
-                       int action) { return ToPython(self->Child(action)); })
+      .def("clone", &State::Clone)
+      .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
       .def("apply_actions", &State::ApplyActions)
       .def("num_distinct_actions", &State::NumDistinctActions)
@@ -374,19 +370,19 @@ PYBIND11_MODULE(pyspiel, m) {
             return SerializeGameAndState(*state.GetGame(), state);
           },
           [](const std::string& data) {  // __setstate__
-            std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
-                game_and_state = DeserializeGameAndState(data);
-            return std::move(game_and_state.second);
+            auto state = DeserializeGameAndState(data).second;
+            auto pydict = PyDict(*state);
+            return std::make_pair(std::move(state), pydict);
           }));
 
-  py::class_<Game, PyGame, std::shared_ptr<Game>> game(m, "Game");
-  game.def(py::init<py::object, GameType, GameInfo, GameParameters>())
+  py::classh<Game, PyGame> game(m, "Game");
+  game.def(py::init<GameType, GameInfo, GameParameters>())
       .def("num_distinct_actions", &Game::NumDistinctActions)
       .def("new_initial_state",
-           [](const Game* self) { return ToPython(self->NewInitialState()); })
+           [](const Game* self) { return self->NewInitialState(); })
       .def("new_initial_state",
            [](const Game* self, const std::string& s) {
-             return ToPython(self->NewInitialState(s));
+             return self->NewInitialState(s);
            })
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
       .def("get_parameters", &Game::GetParameters)
@@ -423,14 +419,12 @@ PYBIND11_MODULE(pyspiel, m) {
             return game->Serialize();
           },
           [](const std::string& data) {  // __setstate__
-            // Have to remove the const here for this to compile, presumably
-            // because the holder type is non-const. But seems like you can't
-            // set the holder type to std::shared_ptr<const Game> either.
-            return std::const_pointer_cast<Game>(DeserializeGame(data));
+            // We must remove the const for this to compile.
+            return std::shared_ptr<Game>(
+                std::const_pointer_cast<Game>(DeserializeGame(data)));
           }));
 
-  py::class_<NormalFormGame, std::shared_ptr<NormalFormGame>> normal_form_game(
-      m, "NormalFormGame", game);
+  py::classh<NormalFormGame> normal_form_game(m, "NormalFormGame", game);
   normal_form_game.def("get_utilities", &NormalFormGame::GetUtilities)
       .def("get_utility", &NormalFormGame::GetUtility)
       .def(py::pickle(                      // Pickle support
@@ -445,8 +439,7 @@ PYBIND11_MODULE(pyspiel, m) {
                 std::static_pointer_cast<const NormalFormGame>(LoadGame(data)));
           }));
 
-  py::class_<MatrixGame, std::shared_ptr<MatrixGame>> matrix_game(
-      m, "MatrixGame", normal_form_game);
+  py::classh<MatrixGame> matrix_game(m, "MatrixGame", normal_form_game);
   matrix_game
       .def(py::init<GameType, GameParameters, std::vector<std::string>,
                     std::vector<std::string>, std::vector<double>,
@@ -493,8 +486,7 @@ PYBIND11_MODULE(pyspiel, m) {
                 algorithms::LoadMatrixGame(data));
           }));
 
-  py::class_<TensorGame, std::shared_ptr<TensorGame>> tensor_game(
-      m, "TensorGame", normal_form_game);
+  py::classh<TensorGame> tensor_game(m, "TensorGame", normal_form_game);
   tensor_game
       .def(py::init<GameType, GameParameters,
                     std::vector<std::vector<std::string>>,
@@ -627,7 +619,7 @@ PYBIND11_MODULE(pyspiel, m) {
       "deserialize_game_and_state",
       [](const std::string& data) {
         auto rv = open_spiel::DeserializeGameAndState(data);
-        return std::make_pair(rv.first, ToPython(std::move(rv.second)));
+        return std::make_pair(rv.first, std::move(rv.second));
       },
       "A general implementation of deserialization of a game and state "
       "string serialized by serialize_game_and_state.");
