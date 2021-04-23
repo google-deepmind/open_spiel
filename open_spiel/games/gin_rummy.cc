@@ -219,8 +219,8 @@ class GinRummyObserver : public Observer {
 
   static void WriteSinglePlayerHand(const GinRummyState& state, int player,
                                     Allocator* allocator) {
-    auto out = allocator->Get("private_hand", {kDefaultNumCards});
-    for (auto card : state.hands_[player]) out.at(card) = 1;
+    auto out = allocator->Get("private_hand", {kNumPlayers, kDefaultNumCards});
+    for (auto card : state.hands_[player]) out.at(player, card) = 1;
   }
 
   static void WriteAllPlayerHands(const GinRummyState& state,
