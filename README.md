@@ -44,11 +44,12 @@ our tutorials:
 *   [Motivation, Core API, Brief Intro to Replictor Dynamics and Imperfect
     Information Games](https://www.youtube.com/watch?v=YE0E0F39lac) by Marc
     Lanctot.
-    [(corresponding slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
+    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
 *   [Motivation, Core API, Implementing CFR and REINFORCE on Kuhn poker, Leduc
     poker, and Goofspiel](https://www.youtube.com/watch?v=o6JNHoGUXCo) by Edward
     Lockhart.
-    [(corresponding slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-comarl.pdf)
+    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-comarl.pdf)
+    [(colab)](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/CFR_and_REINFORCE.ipynb)
 
 If you use OpenSpiel in your research, please cite the paper using the following
 BibTeX:
