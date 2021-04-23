@@ -832,6 +832,18 @@ GinRummyGame::GinRummyGame(const GameParameters& params)
       hand_size_(ParameterValue<int>("hand_size")) {
   SPIEL_CHECK_GE(knock_card_, 0);
   SPIEL_CHECK_LE(knock_card_, kDefaultKnockCard);
+  // Check that the game size makes sense.
+  SPIEL_CHECK_GE(num_ranks_, 1);
+  SPIEL_CHECK_LE(num_ranks_, kDefaultNumRanks);
+  SPIEL_CHECK_GE(num_suits_, 1);
+  SPIEL_CHECK_LE(num_suits_, kDefaultNumSuits);
+  SPIEL_CHECK_GE(hand_size_, 1);
+  SPIEL_CHECK_LE(hand_size_, kDefaultHandSize);
+  // Must be able to deal both hands and have enough cards left over for one
+  // round of play.
+  SPIEL_CHECK_GE(num_ranks_ * num_suits_,
+                 kNumPlayers * hand_size_ + kWallStockSize + 1);
+
   default_observer_ = std::make_shared<GinRummyObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<GinRummyObserver>(kInfoStateObsType);
 }
