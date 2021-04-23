@@ -248,12 +248,10 @@ class GinRummyObserver : public Observer {
     for (auto card : state.discard_pile_) out.at(card) = 1;
   }
 
-  // TODO(jhtschultz) should kMaxStockSize be a variable dependent on num_cards_?
   static void WriteStockSize(const GinRummyState& state,
                              Allocator* allocator) {
-    auto out = allocator->Get("stock_size", {kMaxStockSize});
-    for (int i = 0; i < std::min(state.stock_size_, kMaxStockSize); ++i)
-      out.at(i) = 1;
+    auto out = allocator->Get("stock_size", {kDefaultNumCards});
+    for (int i = 0; i < state.stock_size_; ++i) out.at(i) = 1;
   }
 
   static void WriteLayedMelds(const GinRummyState& state,

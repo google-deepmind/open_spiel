@@ -61,9 +61,6 @@ inline constexpr int kNumPlayers = 2;
 inline constexpr int kMaxPossibleDeadwood = 98;  // E.g. KsKcQdQhJsJcTdTh9s9c
 inline constexpr int kMaxNumDrawUpcardActions = 50;
 inline constexpr int kDefaultHandSize = 10;
-// TODO(jhtschultz) should kMaxStockSize be a tight upper bound for nonstandard
-// deck size?
-inline constexpr int kMaxStockSize = 31;  // Stock size when play begins
 inline constexpr int kWallStockSize = 2;
 inline constexpr int kDefaultKnockCard = 10;
 inline constexpr int kDefaultGinBonus = 25;
@@ -83,7 +80,7 @@ inline constexpr int kObservationTensorSize =
     + kDefaultNumCards      // Player hand
     + kDefaultNumCards      // Upcard
     + kDefaultNumCards      // Discard pile
-    + kMaxStockSize         // Stock size
+    + kDefaultNumCards      // Stock size
     + kNumMeldActions * 2;  // Layed melds of both players
 
 class GinRummyGame;
