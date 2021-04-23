@@ -226,7 +226,7 @@ class GinRummyObserver : public Observer {
   static void WriteAllPlayerHands(const GinRummyState& state,
                                   Allocator* allocator) {
     auto out = allocator->Get("private_hands", {kNumPlayers, kDefaultNumCards});
-    for (int p = 0; p < kNumPlayers; ++p) {
+    for (Player p = 0; p < kNumPlayers; ++p) {
       for (auto card : state.hands_[p]) out.at(p, card) = 1;
     }
   }
@@ -257,7 +257,7 @@ class GinRummyObserver : public Observer {
   static void WriteLayedMelds(const GinRummyState& state,
                               Allocator* allocator) {
     auto out = allocator->Get("layed_melds", {kNumPlayers, kNumMeldActions});
-    for (int p = 0; p < kNumPlayers; ++p) {
+    for (Player p = 0; p < kNumPlayers; ++p) {
       for (auto meld : state.layed_melds_[p]) out.at(p, meld) = 1;
     }
   }
@@ -337,14 +337,14 @@ void GinRummyState::ApplyDealAction(Action action) {
   SPIEL_CHECK_TRUE(IsChanceNode());
   SPIEL_CHECK_GE(action, 0);
   SPIEL_CHECK_LT(action, num_cards_);
-  // Deal 10 cards to player 0.
+  // Deal cards to player 0.
   if (stock_size_ > num_cards_ - hand_size_) {
     StockToHand(0, action);
   } else if (stock_size_ > num_cards_ - 2 * hand_size_) {
-    // Next deal 10 cards to player 1.
+    // Next deal to player 1.
     StockToHand(1, action);
   } else if (stock_size_ == num_cards_ - 2 * hand_size_) {
-    // Set upcard
+    // Set upcard.
     StockToUpcard(action);
     for (int i = 0; i < kNumPlayers; ++i) {
       deadwood_[i] = utils_.MinDeadwood(hands_[i]);

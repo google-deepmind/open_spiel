@@ -66,6 +66,8 @@ inline constexpr int kDefaultKnockCard = 10;
 inline constexpr int kDefaultGinBonus = 25;
 inline constexpr int kDefaultUndercutBonus = 25;
 // Action constants
+// {0, ..., 51} are reserved for card-specific deal and discard actions
+// corresponding to a standard deck size.
 inline constexpr int kDrawUpcardAction = 52;
 inline constexpr int kDrawStockAction = 53;
 inline constexpr int kPassAction = 54;
@@ -208,11 +210,6 @@ class GinRummyGame : public Game {
  public:
   explicit GinRummyGame(const GameParameters& params);
 
-  // TODO(Michal) Do we want the number of actions to change depending on game
-  // size params? Keeping it fixed means there will be unused action ints for
-  // small versions of the game, but there won't be many unused actions (< 52)
-  // and fixed action values for drawing a card, knocking, etc... is clearer
-  // and less likely to produce bugs.
   int NumDistinctActions() const override { return kNumDistinctActions; }
   int MaxChanceOutcomes() const override { return num_ranks_ * num_suits_; }
   int NumPlayers() const override { return kNumPlayers; }
@@ -229,8 +226,6 @@ class GinRummyGame : public Game {
                           gin_bonus_, undercut_bonus_, num_ranks_, num_suits_,
                           hand_size_));
   }
-  // TODO(Michal) Do we want the obs tensor to change shape depending on game
-  // size params? Similar to above.
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }
