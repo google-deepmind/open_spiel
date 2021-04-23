@@ -580,8 +580,10 @@ std::vector<int> BridgeState::ScoreForContracts(
   for (int contract_index : contracts) {
     const Contract& contract = kAllContracts[contract_index];
     const int declarer_score =
-        Score(contract, dd_tricks[contract.trumps][contract.declarer],
-              is_vulnerable_[Partnership(contract.declarer)]);
+        (contract.level == 0)
+            ? 0
+            : Score(contract, dd_tricks[contract.trumps][contract.declarer],
+                    is_vulnerable_[Partnership(contract.declarer)]);
     scores.push_back(Partnership(contract.declarer) == Partnership(player)
                          ? declarer_score
                          : -declarer_score);
