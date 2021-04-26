@@ -94,9 +94,14 @@ class VPNetModel {
     double value;
   };
 
-  VPNetModel(const Game& game, const std::string& path,
-             const std::string& file_name,
-             const std::string& device = "/cpu:0");
+  enum CheckpointStep {
+    kMostRecentCheckpointStep = -1,
+    kInvalidCheckpointStep = -2
+  };
+
+  VPNetModel(const Game &game, const std::string &path,
+             const std::string &file_name, const std::string &device = "/cpu:0",
+             int checkpoint_step = kInvalidCheckpointStep);
 
   // Move only, not copyable.
   VPNetModel(VPNetModel&& other) = default;
