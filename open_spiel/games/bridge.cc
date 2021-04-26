@@ -801,6 +801,8 @@ void BridgeState::ApplyPlayAction(int card) {
 Player BridgeState::CurrentPlayer() const {
   if (phase_ == Phase::kDeal) {
     return kChancePlayerId;
+  } else if (phase_ == Phase::kGameOver) {
+    return kTerminalPlayerId;
   } else if (phase_ == Phase::kPlay &&
              Partnership(current_player_) == Partnership(contract_.declarer)) {
     // Declarer chooses cards for both players.
