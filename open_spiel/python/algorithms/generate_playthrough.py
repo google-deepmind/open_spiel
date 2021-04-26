@@ -274,7 +274,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         for name, tensor in infostate_observation.dict.items():
           label = f"InformationStateTensor({player})"
           label += f".{name}" if name != "info_state" else ""
-          lines += _format_tensor(tensor, label)
+          for line in _format_tensor(tensor, label):
+            add_line(line)
     if default_observation:
       for player in players:
         s = default_observation.string_from(state, player)
@@ -294,7 +295,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         for name, tensor in default_observation.dict.items():
           label = f"ObservationTensor({player})"
           label += f".{name}" if name != "observation" else ""
-          lines += _format_tensor(tensor, label)
+          for line in _format_tensor(tensor, label):
+            add_line(line)
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
@@ -413,9 +415,11 @@ def update_path(path, shard_index=0, num_shards=1):
           print("[Skipped] Skipping game ", filename, " as ",
                 kwargs["game_string"], " is not available.")
           continue
+        else:
+          raise
       new = playthrough(**kwargs)
       if original == new:
-        print("          {}".format(filename))
+        print("        {}".format(filename))
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)
