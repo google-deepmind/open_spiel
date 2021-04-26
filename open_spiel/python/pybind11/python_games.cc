@@ -76,6 +76,10 @@ std::vector<double> PyState::Returns() const {
   PYBIND11_OVERRIDE_PURE_NAME(std::vector<double>, State, "returns", Returns);
 }
 
+std::vector<double> PyState::Rewards() const {
+  PYBIND11_OVERRIDE_NAME(std::vector<double>, State, "rewards", Rewards);
+}
+
 void PyState::DoApplyAction(Action action_id) {
   PYBIND11_OVERLOAD_PURE_NAME(void, State, "_apply_action", DoApplyAction,
                               action_id);

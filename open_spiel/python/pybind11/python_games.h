@@ -70,6 +70,7 @@ class PyState : public State, public py::trampoline_self_life_support {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
+  std::vector<double> Rewards() const override;
   std::unique_ptr<State> Clone() const override;
   void DoApplyAction(Action action_id) override;
   void DoApplyActions(const std::vector<Action>& actions) override;
