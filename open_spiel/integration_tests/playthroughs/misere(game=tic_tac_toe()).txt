@@ -229,68 +229,10 @@ StringLegalActions() = ["o(0,0)", "o(1,0)", "o(1,1)", "o(2,0)"]
 action: 6
 
 # State 6
-# .xo
-# ..x
-# oxo
-IsTerminal() = False
-History() = [1, 2, 7, 8, 5, 6]
-HistoryString() = "1, 2, 7, 8, 5, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "1, 2, 7, 8, 5, 6"
-InformationStateString(1) = "1, 2, 7, 8, 5, 6"
-ObservationString(0) = ".xo\n..x\noxo"
-ObservationString(1) = ".xo\n..x\noxo"
-PublicObservationString() = ".xo\n..x\noxo"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◉◯◯  ◯◯◉  ◯◉◯
-◉◉◯  ◯◯◯  ◯◯◉
-◯◯◯  ◉◯◉  ◯◉◯
-ObservationTensor(1):
-◉◯◯  ◯◯◉  ◯◉◯
-◉◉◯  ◯◯◯  ◯◯◉
-◯◯◯  ◉◯◉  ◯◉◯
-Rewards() = [-0.0, -0.0]
-Returns() = [-0.0, -0.0]
-LegalActions() = [0, 3, 4]
-StringLegalActions() = ["x(0,0)", "x(1,0)", "x(1,1)"]
-
 # Apply action "x(1,0)"
 action: 3
 
 # State 7
-# .xo
-# x.x
-# oxo
-IsTerminal() = False
-History() = [1, 2, 7, 8, 5, 6, 3]
-HistoryString() = "1, 2, 7, 8, 5, 6, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "1, 2, 7, 8, 5, 6, 3"
-InformationStateString(1) = "1, 2, 7, 8, 5, 6, 3"
-ObservationString(0) = ".xo\nx.x\noxo"
-ObservationString(1) = ".xo\nx.x\noxo"
-PublicObservationString() = ".xo\nx.x\noxo"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◉◯◯  ◯◯◉  ◯◉◯
-◯◉◯  ◯◯◯  ◉◯◉
-◯◯◯  ◉◯◉  ◯◉◯
-ObservationTensor(1):
-◉◯◯  ◯◯◉  ◯◉◯
-◯◉◯  ◯◯◯  ◉◯◉
-◯◯◯  ◉◯◉  ◯◉◯
-Rewards() = [-0.0, -0.0]
-Returns() = [-0.0, -0.0]
-LegalActions() = [0, 4]
-StringLegalActions() = ["o(0,0)", "o(1,1)"]
-
 # Apply action "o(1,1)"
 action: 4
 

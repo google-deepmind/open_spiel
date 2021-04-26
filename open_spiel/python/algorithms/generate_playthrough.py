@@ -16,8 +16,12 @@
 """Functions to manipulate game playthoughs.
 
 Used by examples/playthrough.py and tests/playthrough_test.py.
+
+Note that not all states are fully represented in the playthrough.
+See the logic in ShouldDisplayStateTracker for details.
 """
 
+import collections
 import os
 import re
 import numpy as np
@@ -88,7 +92,9 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
     return lines
 
 
-def playthrough(game_string, action_sequence, alsologtostdout=False,
+def playthrough(game_string,
+                action_sequence,
+                alsologtostdout=False,
                 observation_params_string=None):
   """Returns a playthrough of the specified game as a single text.
 
@@ -116,6 +122,28 @@ def format_shapes(d):
     return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
 
 
+class ShouldDisplayStateTracker:
+  """Determines whether a state is interesting enough to display."""
+
+  def __init__(self):
+    self.states_by_player = collections.defaultdict(int)
+
+  def __call__(self, state) -> bool:
+    """Returns True if a state is sufficiently interesting to display."""
+    player = state.current_player()
+    count = self.states_by_player[player]
+    self.states_by_player[player] += 1
+    if count == 0:
+      # Always display the first state for a player
+      return True
+    elif player == -1:
+      # For chance moves, display the first two only
+      return count < 2
+    else:
+      # For regular player moves, display the first three and selected others
+      return (count < 3) or (count % 10 == 0)
+
+
 def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
                       observation_params_string=None):
   """Returns a playthrough of the specified game as a list of lines.
@@ -130,15 +158,16 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     observation_params_string: Optional observation parameters for constructing
       an observer.
   """
+  should_display_state_fn = ShouldDisplayStateTracker()
   lines = []
   action_sequence = action_sequence or []
-  if alsologtostdout:
+  should_display = True
 
-    def add_line(v):
-      print(v)
+  def add_line(v, force=False):
+    if force or should_display:
+      if alsologtostdout:
+        print(v)
       lines.append(v)
-  else:
-    add_line = lines.append
 
   game = pyspiel.load_game(game_string)
   add_line("game: {}".format(game_string))
@@ -253,8 +282,9 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   rng = np.random.RandomState(seed)
 
   while True:
-    add_line("")
-    add_line("# State {}".format(state_idx))
+    should_display = should_display_state_fn(state)
+    add_line("", force=True)
+    add_line("# State {}".format(state_idx), force=True)
     for line in str(state).splitlines():
       add_line("# {}".format(line).rstrip())
     add_line("IsTerminal() = {}".format(state.is_terminal()))
@@ -326,9 +356,9 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       add_line("# Apply joint action [{}]".format(
           format(", ".join(
               '"{}"'.format(state.action_to_string(player, action))
-              for player, action in enumerate(actions)))))
+              for player, action in enumerate(actions)))), force=True)
       add_line("actions: [{}]".format(", ".join(
-          str(action) for action in actions)))
+          str(action) for action in actions)), force=True)
       state.apply_actions(actions)
     else:
       add_line("LegalActions() = [{}]".format(", ".join(
@@ -342,8 +372,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         action = rng.choice(state.legal_actions())
       add_line("")
       add_line('# Apply action "{}"'.format(
-          state.action_to_string(state.current_player(), action)))
-      add_line("action: {}".format(action))
+          state.action_to_string(state.current_player(), action)), force=True)
+      add_line("action: {}".format(action), force=True)
       state.apply_action(action)
     state_idx += 1
   return lines

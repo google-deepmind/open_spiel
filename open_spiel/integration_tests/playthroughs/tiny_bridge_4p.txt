@@ -96,64 +96,10 @@ StringLegalActions() = ["HKHQ", "HAHQ", "SJHQ", "SQHQ", "SKHQ", "HAHK", "SJHK", 
 action: 4
 
 # State 2
-# W:SAHJ N:HAHQ E:?? S:??
-IsTerminal() = False
-History() = [21, 4]
-HistoryString() = "21, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "SAHJ"
-InformationStateString(1) = "HAHQ"
-InformationStateString(2) = "??"
-InformationStateString(3) = "??"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "SAHJ"
-ObservationString(1) = "HAHQ"
-ObservationString(2) = "??"
-ObservationString(3) = "??"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{8, 0.166666666667}, {12, 0.166666666667}, {17, 0.166666666667}, {14, 0.166666666667}, {19, 0.166666666667}, {20, 0.166666666667}]
-LegalActions() = [8, 12, 17, 14, 19, 20]
-StringLegalActions() = ["SJHK", "SQHK", "SKHK", "SQSJ", "SKSJ", "SKSQ"]
-
 # Apply action "SKHK"
 action: 17
 
 # State 3
-# W:SAHJ N:HAHQ E:SKHK S:??
-IsTerminal() = False
-History() = [21, 4, 17]
-HistoryString() = "21, 4, 17"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "SAHJ"
-InformationStateString(1) = "HAHQ"
-InformationStateString(2) = "SKHK"
-InformationStateString(3) = "??"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "SAHJ"
-ObservationString(1) = "HAHQ"
-ObservationString(2) = "SKHK"
-ObservationString(3) = "??"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{14, 1.000000000000}]
-LegalActions() = [14]
-StringLegalActions() = ["SQSJ"]
-
 # Apply action "SQSJ"
 action: 14
 

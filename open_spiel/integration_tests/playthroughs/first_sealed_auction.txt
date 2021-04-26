@@ -128,25 +128,6 @@ StringLegalActions() = ["Player 1 bid: 0", "Player 1 bid: 1", "Player 1 bid: 2",
 action: 5
 
 # State 4
-# 9,10;3,5
-IsTerminal() = False
-History() = [9, 10, 3, 5]
-HistoryString() = "9, 10, 3, 5"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "p0 val 9 bid 3"
-InformationStateString(1) = "p1 val 10 bid 5"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯
-ObservationString(0) = "9"
-ObservationString(1) = "10"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◉
-ChanceOutcomes() = [{1, 1.000000000000}]
-LegalActions() = [1]
-StringLegalActions() = ["Chose winner 1"]
-
 # Apply action "Chose winner 1"
 action: 1
 

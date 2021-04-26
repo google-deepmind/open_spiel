@@ -174,218 +174,26 @@ StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
 action: 0
 
 # State 4
-# .....
-# .....
-# .....
-# .o...
-# .....
-# .....
-# .....
-# .....
-# .....
-# x....
-IsTerminal() = False
-History() = [1, 1, 0, 0]
-HistoryString() = "1, 1, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\n.....\nx....\n"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
-
 # Apply action "STAY"
 action: 1
 
 # State 5
-# .....
-# .....
-# .....
-# .....
-# .o...
-# .....
-# .....
-# .....
-# .....
-# x....
-IsTerminal() = False
-History() = [1, 1, 0, 0, 1]
-HistoryString() = "1, 1, 0, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\n.....\nx....\n"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
-
 # Apply action "STAY"
 action: 1
 
 # State 6
-# .....
-# .....
-# .....
-# .....
-# .....
-# .o...
-# .....
-# .....
-# .....
-# x....
-IsTerminal() = False
-History() = [1, 1, 0, 0, 1, 1]
-HistoryString() = "1, 1, 0, 0, 1, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\n.....\nx....\n"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
-
 # Apply action "LEFT"
 action: 0
 
 # State 7
-# .....
-# .....
-# .....
-# .....
-# .....
-# .....
-# .o...
-# .....
-# .....
-# x....
-IsTerminal() = False
-History() = [1, 1, 0, 0, 1, 1, 0]
-HistoryString() = "1, 1, 0, 0, 1, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\n.....\nx....\n"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
-
 # Apply action "LEFT"
 action: 0
 
 # State 8
-# .....
-# .....
-# .....
-# .....
-# .....
-# .....
-# .....
-# .o...
-# .....
-# x....
-IsTerminal() = False
-History() = [1, 1, 0, 0, 1, 1, 0, 0]
-HistoryString() = "1, 1, 0, 0, 1, 1, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.....\nx....\n"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-                      ◯◯◯◯◯
-                      ◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
-
 # Apply action "RIGHT"
 action: 2
 
 # State 9
-# .....
-# .....
-# .....
-# .....
-# .....
-# .....
-# .....
-# .....
-# .o...
-# .x...
-IsTerminal() = False
-History() = [1, 1, 0, 0, 1, 1, 0, 0, 2]
-HistoryString() = "1, 1, 0, 0, 1, 1, 0, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....\n.....\n.....\n.....\n.....\n.....\n.....\n.....\n.o...\n.x...\n"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-                      ◯◉◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
-
 # Apply action "STAY"
 action: 1
 
