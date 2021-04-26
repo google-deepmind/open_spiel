@@ -64,7 +64,7 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{2, 0.250000000000}, {3, 0.250000000000}, {4, 0.250000000000}, {5, 0.250000000000}]
+ChanceOutcomes() = [(2, 0.25), (3, 0.25), (4, 0.25), (5, 0.25)]
 LegalActions() = [2, 3, 4, 5]
 StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", "(spawned at location #2)", "(spawned at location #3)"]
 
@@ -105,7 +105,7 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{2, 0.250000000000}, {3, 0.250000000000}, {4, 0.250000000000}, {5, 0.250000000000}]
+ChanceOutcomes() = [(2, 0.25), (3, 0.25), (4, 0.25), (5, 0.25)]
 LegalActions() = [2, 3, 4, 5]
 StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", "(spawned at location #2)", "(spawned at location #3)"]
 

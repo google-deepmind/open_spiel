@@ -351,11 +351,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     if state.is_terminal():
       break
     if state.is_chance_node():
-      # In Python 2 and Python 3, the default number of decimal places displayed
-      # is different. Thus, we hardcode a ".12" which is Python 2 behaviour.
-      add_line("ChanceOutcomes() = [{}]".format(", ".join(
-          "{{{}, {:.12f}}}".format(outcome, prob)
-          for outcome, prob in state.chance_outcomes())))
+      add_line("ChanceOutcomes() = {}".format(state.chance_outcomes()))
     if state.is_simultaneous_node():
       for player in players:
         add_line("LegalActions({}) = [{}]".format(

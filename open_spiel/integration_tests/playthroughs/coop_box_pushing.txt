@@ -84,7 +84,7 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
+ChanceOutcomes() = [(0, 0.9), (1, 0.1)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
 
@@ -113,7 +113,7 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-ChanceOutcomes() = [{0, 0.900000000000}, {1, 0.100000000000}]
+ChanceOutcomes() = [(0, 0.9), (1, 0.1)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["turn left", "turn right"]
 
