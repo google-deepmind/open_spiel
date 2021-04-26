@@ -602,21 +602,10 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
   return absl::nullopt;
 }
 
-std::string DefaultFen(int board_size) {
-  if (board_size == 8)
-    return chess::kDefaultStandardFEN;
-  else if (board_size == 4)
-    return chess::kDefaultSmallFEN;
-  else
-    SpielFatalError(
-        "Only board sizes 4 and 8 have their default chessboards. "
-        "For other sizes, you have to pass your own FEN.");
-}
-
 DarkChessGame::DarkChessGame(const GameParameters& params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size")),
-      fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))) {
+      fen_(ParameterValue<std::string>("fen", chess::DefaultFen(board_size_))) {
   default_observer_ = std::make_shared<DarkChessObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<DarkChessObserver>(kInfoStateObsType);
 }

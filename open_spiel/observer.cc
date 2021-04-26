@@ -349,4 +349,15 @@ std::vector<float> TensorFromObserver(const State& state,
   return std::move(allocator.data);
 }
 
+std::vector<int> ObserverTensorShape(const State& state,
+                                     const Observer& observer) {
+  TrackingVectorAllocator allocator;
+  observer.WriteTensor(state, /*player=*/0, &allocator);
+  if (allocator.tensors.size() == 1) {
+    return allocator.tensors.front().shape;
+  } else {
+    return {static_cast<int>(allocator.data.size())};
+  }
+}
+
 }  // namespace open_spiel

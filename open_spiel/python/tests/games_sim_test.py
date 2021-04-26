@@ -184,19 +184,23 @@ class GamesSimTest(parameterized.TestCase):
           "Sim of game {} terminated after maximum number of actions {}".format(
               game, MAX_ACTIONS_PER_GAME))
 
-  @parameterized.parameters(*SPIEL_LOADABLE_GAMES_LIST)
+  @parameterized.named_parameters((game_info.short_name, game_info)
+                                  for game_info in SPIEL_LOADABLE_GAMES_LIST)
   def test_game_sim(self, game_info):
     game = pyspiel.load_game(game_info.short_name)
     self.assertLessEqual(game_info.min_num_players, game.num_players())
     self.assertLessEqual(game.num_players(), game_info.max_num_players)
     self.sim_game(game)
 
-  @parameterized.parameters(*SPIEL_SIMULTANEOUS_GAMES_LIST)
+  @parameterized.named_parameters(
+      (game_info.short_name, game_info)
+      for game_info in SPIEL_SIMULTANEOUS_GAMES_LIST)
   def test_simultaneous_game_as_turn_based(self, game_info):
     converted_game = pyspiel.load_game_as_turn_based(game_info.short_name)
     self.sim_game(converted_game)
 
-  @parameterized.parameters(*SPIEL_MULTIPLAYER_GAMES_LIST)
+  @parameterized.named_parameters((f"{p}p_{g.short_name}", g, p)
+                                  for g, p in SPIEL_MULTIPLAYER_GAMES_LIST)
   def test_multiplayer_game(self, game_info, num_players):
     game = pyspiel.load_game(game_info.short_name,
                              {"players": pyspiel.GameParameter(num_players)})
