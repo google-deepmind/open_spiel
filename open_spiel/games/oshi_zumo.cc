@@ -144,6 +144,9 @@ std::string OshiZumoState::ActionToString(Player player,
 }
 
 std::string OshiZumoState::ToString() const {
+
+  // WARNING The original state string representation doesnt have perfect recall
+
   std::string result = "Coins: ";
 
   absl::StrAppend(&result, coins_[0]);
@@ -160,6 +163,10 @@ std::string OshiZumoState::ToString() const {
       result += kOpenPos;
     }
   }
+
+  // Add current timestep
+  absl::StrAppend(&result, ", Timestep: ");
+  absl::StrAppend(&result, total_moves_);
 
   absl::StrAppend(&result, "\n");
   return result;
@@ -225,6 +232,9 @@ void OshiZumoState::ObservationTensor(Player player,
 
   offset += (starting_coins_ + 1);
   values[offset + wrestler_pos_] = 1;
+
+  SPIEL_CHECK_LE(total_moves_, horizon_);
+  values[values.size()-1] = (float)total_moves_ / (float)horizon_;
 }
 
 std::unique_ptr<State> OshiZumoState::Clone() const {
@@ -250,7 +260,8 @@ std::vector<int> OshiZumoGame::ObservationTensorShape() const {
   // 1 bit per coin value of player 1. { 0, 1, ..., starting_coins_ }
   // 1 bit per coin value of player 2. { 0, 1, ..., starting_coins_ }
   // 1 bit per position of the field. { 0, 1, ... , 2*size_+2 }
-  return {(2 * (starting_coins_ + 1)) + (2 * size_ + 3)};
+  // (ADDED by JB) 1 float in range [0.0, 1.0] for fraction of timesteps left in game
+  return {(2 * (starting_coins_ + 1)) + (2 * size_ + 3) + 1};
 }
 
 }  // namespace oshi_zumo
