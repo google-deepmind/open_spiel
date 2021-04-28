@@ -231,6 +231,8 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::enum_<GameType::Dynamics>(game_type, "Dynamics")
       .value("SEQUENTIAL", GameType::Dynamics::kSequential)
+      .value("MEAN_FIELD",
+             GameType::Dynamics::kMeanField)
       .value("SIMULTANEOUS", GameType::Dynamics::kSimultaneous);
 
   py::enum_<GameType::ChanceMode>(game_type, "ChanceMode")
@@ -258,6 +260,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("INVALID", open_spiel::kInvalidPlayer)
       .value("TERMINAL", open_spiel::kTerminalPlayerId)
       .value("CHANCE", open_spiel::kChancePlayerId)
+      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayer)
       .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId);
 
   py::class_<GameInfo> game_info(m, "GameInfo");

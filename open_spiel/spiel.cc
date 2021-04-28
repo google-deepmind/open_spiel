@@ -89,6 +89,10 @@ void ValidateParams(const GameParameters& params,
 
 std::ostream& operator<<(std::ostream& os, const StateType& type) {
   switch (type) {
+    case StateType::kMeanField: {
+      os << "MEAN_FIELD";
+      break;
+    }
     case StateType::kChance: {
       os << "CHANCE";
       break;

@@ -57,8 +57,9 @@ struct GameType {
 
   // Is the game one-player-at-a-time or do players act simultaneously?
   enum class Dynamics {
-    kSimultaneous,  // In some or all nodes every player acts.
-    kSequential,    // Turn-based games.
+    kSimultaneous,           // In some or all nodes every player acts.
+    kSequential,             // Turn-based games.
+    kMeanField,              // Is a Mean Field Game
   };
   Dynamics dynamics;
 
