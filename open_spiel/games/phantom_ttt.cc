@@ -54,7 +54,6 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
 
-// Facts about the game.
 const GameType kImperfectRecallGameType{
     /*short_name=*/"phantom_ttt_ir",
     /*long_name=*/"Phantom Tic Tac Toe with Imperfect Recall",
@@ -66,9 +65,9 @@ const GameType kImperfectRecallGameType{
     /*max_num_players=*/2,
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
 

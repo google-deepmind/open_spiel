@@ -489,7 +489,7 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
         "first_sealed_auction", "hearts", "kuhn_poker", "leduc_poker",
         "lewis_signaling", "liars_dice", "pentago", "phantom_ttt",
         "tiny_bridge_2p", "tiny_bridge_4p", "tiny_hanabi", "universal_poker",
-        "dark_hex", "phantom_ttt_ir", "dark_hex_ir"
+        "dark_hex", "phantom_ttt_ir", "dark_hex_ir", "liars_dice_ir"
     ]
     if self.game_name in broken_games:
       return

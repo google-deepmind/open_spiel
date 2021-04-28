@@ -53,7 +53,7 @@ struct Node {
   int id;
   std::string name;
   int infoset_number;  // Must starting at 1 for each player.
-  int player_number;
+  int player_number;   // The EFG player numbers (starting at 1 rather than 0).
   std::string infoset_name;
   std::string outcome_name;
   int outcome_number;
