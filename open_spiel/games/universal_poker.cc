@@ -579,7 +579,8 @@ void DistributeHands(const logic::CardSet& full_deck,
     p += (1 << i);
   }
   // Enumerates all the uint64_t integers that with nbCards 1-bits.
-  // The final n is ignored. It is fine as long as the rank < 16.
+  // The final n is ignored. It is fine as long as the rank < 16 (a property
+  // satisfied by CardSet, as ranks >= 16 are not representable).
   int n_choose_k = 0;
   for (uint64_t n = logic::bit_twiddle_permute(p); n > p;
        p = n, n = logic::bit_twiddle_permute(p)) {
@@ -1344,10 +1345,11 @@ std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937& rng,
     ")";
 
   if (pot_size == -1) {
-    // Multiples of 50, from 0 to 40000
-    // FIXME maybe there are other possible pot sizes?
-    std::uniform_int_distribution<int> dist(0, 800);
-    pot_size = dist(rng) * 50;
+    // 40k is total money in the game -- sum of the players stacks (20k+20k).
+    // 50 is the size of the small blind, 2*50 is big blind = minimum pot size.
+    // As both players need to match bets, the pot size must be divisible by 2.
+    std::uniform_int_distribution<int> dist(50, 20000);
+    pot_size = dist(rng) * 2;
   }
   if (board_cards == "") {
     // Pick a round, i.e. 3/4/5 cards.
@@ -1370,9 +1372,9 @@ std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937& rng,
     board_cards = set.ToString();
   }
   if (hand_reach.empty()) {
-    // FIXME open interval [0, 1) -> closed interval [0, 1]
-    // Can be done using a bijection of 2^24 int to float
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    // Normally uniform_real_distribution is defined on open interval [0, 1)
+    // We make it into a closed interval [0, 1] thanks to std::nextafter.
+    std::uniform_real_distribution<> dis(0.0, std::nextafter(1.0, DBL_MAX));
     for (int i = 0; i < 2*kSubgameUniqueHands; ++i) {
       hand_reach.push_back(dist(rng));
     }
