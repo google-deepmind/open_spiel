@@ -78,8 +78,8 @@ inline constexpr int kNumDistinctActions = kMeldActionBase + kNumMeldActions;
 // Observer constants
 inline constexpr int kObservationTensorSize =
     kNumPlayers             // Player turn
-    + kDefaultKnockCard     // Knock card
     + kDefaultNumCards * 2  // Player hands
+    + kDefaultKnockCard     // Knock card
     + kDefaultNumCards      // Upcard
     + kDefaultNumCards      // Discard pile
     + kDefaultNumCards      // Stock size
