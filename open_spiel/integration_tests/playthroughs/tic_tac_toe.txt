@@ -229,35 +229,6 @@ StringLegalActions() = ["o(0,1)", "o(1,1)", "o(1,2)", "o(2,1)"]
 action: 1
 
 # State 6
-# oox
-# o..
-# x.x
-IsTerminal() = False
-History() = [8, 3, 6, 0, 2, 1]
-HistoryString() = "8, 3, 6, 0, 2, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "8, 3, 6, 0, 2, 1"
-InformationStateString(1) = "8, 3, 6, 0, 2, 1"
-ObservationString(0) = "oox\no..\nx.x"
-ObservationString(1) = "oox\no..\nx.x"
-PublicObservationString() = "oox\no..\nx.x"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◯◯  ◉◉◯  ◯◯◉
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-ObservationTensor(1):
-◯◯◯  ◉◉◯  ◯◯◉
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [4, 5, 7]
-StringLegalActions() = ["x(1,1)", "x(1,2)", "x(2,1)"]
-
 # Apply action "x(1,2)"
 action: 5
 

@@ -190,132 +190,22 @@ StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,0)", "x(1,1)", "x(1,2
 action: 3
 
 # State 6
-# ..o
-# x..
-# xox
-IsTerminal() = False
-History() = [6, 7, 8, 8, 2, 3]
-HistoryString() = "6, 7, 8, 8, 2, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "...\nx..\nx.x\n6\n0,6 0,8 0,3 "
-InformationStateString(1) = "..o\n...\n.ox\n6\n1,7 1,8 1,2 "
-InformationStateTensor(0): ◉◉◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◉◉◯◉◉◉◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "...\nx..\nx.x"
-ObservationString(1) = "..o\n...\n.ox"
-ObservationTensor(0): ◉◉◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◉
-ObservationTensor(1): ◉◉◯◉◉◉◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 3, 4, 5, 6]
-StringLegalActions() = ["o(0,0)", "o(0,1)", "o(1,0)", "o(1,1)", "o(1,2)", "o(2,0)"]
-
 # Apply action "o(2,0)"
 action: 6
 
 # State 7
-# ..o
-# x..
-# xox
-IsTerminal() = False
-History() = [6, 7, 8, 8, 2, 3, 6]
-HistoryString() = "6, 7, 8, 8, 2, 3, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "...\nx..\nx.x\n7\n0,6 0,8 0,3 "
-InformationStateString(1) = "..o\n...\nxox\n7\n1,7 1,8 1,2 1,6 "
-InformationStateTensor(0): ◉◉◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◉◉◯◉◉◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "...\nx..\nx.x"
-ObservationString(1) = "..o\n...\nxox"
-ObservationTensor(0): ◉◉◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◉
-ObservationTensor(1): ◉◉◯◉◉◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 3, 4, 5]
-StringLegalActions() = ["o(0,0)", "o(0,1)", "o(1,0)", "o(1,1)", "o(1,2)"]
-
 # Apply action "o(1,2)"
 action: 5
 
 # State 8
-# ..o
-# x.o
-# xox
-IsTerminal() = False
-History() = [6, 7, 8, 8, 2, 3, 6, 5]
-HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "...\nx..\nx.x\n8\n0,6 0,8 0,3 "
-InformationStateString(1) = "..o\n..o\nxox\n8\n1,7 1,8 1,2 1,6 1,5 "
-InformationStateTensor(0): ◉◉◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◉◉◯◉◉◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "...\nx..\nx.x"
-ObservationString(1) = "..o\n..o\nxox"
-ObservationTensor(0): ◉◉◉◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◉
-ObservationTensor(1): ◉◉◯◉◉◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 4, 5, 7]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,1)", "x(1,2)", "x(2,1)"]
-
 # Apply action "x(2,1)"
 action: 7
 
 # State 9
-# ..o
-# x.o
-# xox
-IsTerminal() = False
-History() = [6, 7, 8, 8, 2, 3, 6, 5, 7]
-HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5, 7"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "...\nx..\nxox\n9\n0,6 0,8 0,3 0,7 "
-InformationStateString(1) = "..o\n..o\nxox\n9\n1,7 1,8 1,2 1,6 1,5 "
-InformationStateTensor(0): ◉◉◉◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◉◉◯◉◉◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "...\nx..\nxox"
-ObservationString(1) = "..o\n..o\nxox"
-ObservationTensor(0): ◉◉◉◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◉
-ObservationTensor(1): ◉◉◯◉◉◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 4, 5]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,1)", "x(1,2)"]
-
 # Apply action "x(0,2)"
 action: 2
 
 # State 10
-# ..o
-# x.o
-# xox
-IsTerminal() = False
-History() = [6, 7, 8, 8, 2, 3, 6, 5, 7, 2]
-HistoryString() = "6, 7, 8, 8, 2, 3, 6, 5, 7, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "..o\nx..\nxox\n10\n0,6 0,8 0,3 0,7 0,2 "
-InformationStateString(1) = "..o\n..o\nxox\n10\n1,7 1,8 1,2 1,6 1,5 "
-InformationStateTensor(0): ◉◉◯◯◉◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◉◉◯◉◉◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationString(0) = "..o\nx..\nxox"
-ObservationString(1) = "..o\n..o\nxox"
-ObservationTensor(0): ◉◉◯◯◉◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◉
-ObservationTensor(1): ◉◉◯◉◉◯◯◯◯◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 4, 5]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(1,1)", "x(1,2)"]
-
 # Apply action "x(0,0)"
 action: 0
 

@@ -19,8 +19,7 @@
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/fog/observation_history.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace open_spiel {
 

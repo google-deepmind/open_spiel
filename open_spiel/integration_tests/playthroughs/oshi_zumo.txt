@@ -112,56 +112,10 @@ StringLegalActions(1) = ["[P1]Bid: 0"]
 actions: [1, 0]
 
 # State 3
-# Coins: 2 0, Field: #....W..#
-IsTerminal() = False
-History() = [6, 10, 1, 0, 1, 0]
-HistoryString() = "6, 10, 1, 0, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-InformationStateString(0) = "6, 10, 1, 0, 1, 0"
-InformationStateString(1) = "6, 10, 1, 0, 1, 0"
-ObservationString(0) = "Coins: 2 0, Field: #....W..#\n"
-ObservationString(1) = "Coins: 2 0, Field: #....W..#\n"
-PublicObservationString() = "Coins: 2 0, Field: #....W..#\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0]
-StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2"]
-StringLegalActions(1) = ["[P1]Bid: 0"]
-
 # Apply joint action ["[P0]Bid: 1", "[P1]Bid: 0"]
 actions: [1, 0]
 
 # State 4
-# Coins: 1 0, Field: #.....W.#
-IsTerminal() = False
-History() = [6, 10, 1, 0, 1, 0, 1, 0]
-HistoryString() = "6, 10, 1, 0, 1, 0, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-InformationStateString(0) = "6, 10, 1, 0, 1, 0, 1, 0"
-InformationStateString(1) = "6, 10, 1, 0, 1, 0, 1, 0"
-ObservationString(0) = "Coins: 1 0, Field: #.....W.#\n"
-ObservationString(1) = "Coins: 1 0, Field: #.....W.#\n"
-PublicObservationString() = "Coins: 1 0, Field: #.....W.#\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
-ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1]
-LegalActions(1) = [0]
-StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1"]
-StringLegalActions(1) = ["[P1]Bid: 0"]
-
 # Apply joint action ["[P0]Bid: 1", "[P1]Bid: 0"]
 actions: [1, 0]
 

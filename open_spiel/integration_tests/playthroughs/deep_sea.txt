@@ -112,56 +112,10 @@ StringLegalActions() = ["LEFT", "RIGHT"]
 action: 0
 
 # State 3
-# R.....
-# RR....
-# RRL...
-# xLRL..
-# RLLRL.
-# ......
-IsTerminal() = False
-History() = [0, 1, 0]
-HistoryString() = "0, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "...............x.............."
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◉◯◯◯◯
-                      ◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [-0.002]
-LegalActions() = [0, 1]
-StringLegalActions() = ["LEFT", "RIGHT"]
-
 # Apply action "RIGHT"
 action: 1
 
 # State 4
-# R.....
-# RR....
-# RRL...
-# RLRL..
-# RxLRL.
-# ......
-IsTerminal() = False
-History() = [0, 1, 0, 1]
-HistoryString() = "0, 1, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = ".....................x........"
-ObservationTensor(0): ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◯◯◯◯
-                      ◯◉◯◯◯
-Rewards() = [-0.002]
-Returns() = [-0.004]
-LegalActions() = [0, 1]
-StringLegalActions() = ["LEFT", "RIGHT"]
-
 # Apply action "LEFT"
 action: 0
 

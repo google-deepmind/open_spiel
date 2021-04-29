@@ -367,6 +367,17 @@ class ObserverRegisterer {
   }
 };
 
+// Pure function that creates a tensor from an observer. Slower than using an
+// Observation, but threadsafe. This is useful when you cannot keep an
+// Observation around to use multiple times.
+std::vector<float> TensorFromObserver(const State& state,
+                                      const Observer& observer);
+
+// Pure function that gets the tensor shape from an observer.
+// Any valid state may be supplied.
+std::vector<int> ObserverTensorShape(const State& state,
+                                     const Observer& observer);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_OBSERVER_H_

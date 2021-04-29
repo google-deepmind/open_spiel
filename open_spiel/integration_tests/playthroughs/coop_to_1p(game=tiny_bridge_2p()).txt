@@ -39,8 +39,8 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.035714285714}, {1, 0.035714285714}, {3, 0.035714285714}, {6, 0.035714285714}, {10, 0.035714285714}, {15, 0.035714285714}, {21, 0.035714285714}, {2, 0.035714285714}, {4, 0.035714285714}, {7, 0.035714285714}, {11, 0.035714285714}, {16, 0.035714285714}, {22, 0.035714285714}, {5, 0.035714285714}, {8, 0.035714285714}, {12, 0.035714285714}, {17, 0.035714285714}, {23, 0.035714285714}, {9, 0.035714285714}, {13, 0.035714285714}, {18, 0.035714285714}, {24, 0.035714285714}, {14, 0.035714285714}, {19, 0.035714285714}, {25, 0.035714285714}, {20, 0.035714285714}, {26, 0.035714285714}, {27, 0.035714285714}]
+ObservationTensor(0): zeros(287)
+ChanceOutcomes() = [(0, 0.03571428571428571), (1, 0.03571428571428571), (3, 0.03571428571428571), (6, 0.03571428571428571), (10, 0.03571428571428571), (15, 0.03571428571428571), (21, 0.03571428571428571), (2, 0.03571428571428571), (4, 0.03571428571428571), (7, 0.03571428571428571), (11, 0.03571428571428571), (16, 0.03571428571428571), (22, 0.03571428571428571), (5, 0.03571428571428571), (8, 0.03571428571428571), (12, 0.03571428571428571), (17, 0.03571428571428571), (23, 0.03571428571428571), (9, 0.03571428571428571), (13, 0.03571428571428571), (18, 0.03571428571428571), (24, 0.03571428571428571), (14, 0.03571428571428571), (19, 0.03571428571428571), (25, 0.03571428571428571), (20, 0.03571428571428571), (26, 0.03571428571428571), (27, 0.03571428571428571)]
 LegalActions() = [0, 1, 3, 6, 10, 15, 21, 2, 4, 7, 11, 16, 22, 5, 8, 12, 17, 23, 9, 13, 18, 24, 14, 19, 25, 20, 26, 27]
 StringLegalActions() = ["HQHJ", "HKHJ", "HAHJ", "SJHJ", "SQHJ", "SKHJ", "SAHJ", "HKHQ", "HAHQ", "SJHQ", "SQHQ", "SKHQ", "SAHQ", "HAHK", "SJHK", "SQHK", "SKHK", "SAHK", "SJHA", "SQHA", "SKHA", "SAHA", "SQSJ", "SKSJ", "SASJ", "SKSQ", "SASQ", "SASK"]
 
@@ -57,8 +57,8 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.066666666667}, {1, 0.066666666667}, {3, 0.066666666667}, {15, 0.066666666667}, {21, 0.066666666667}, {2, 0.066666666667}, {4, 0.066666666667}, {16, 0.066666666667}, {22, 0.066666666667}, {5, 0.066666666667}, {17, 0.066666666667}, {23, 0.066666666667}, {18, 0.066666666667}, {24, 0.066666666667}, {27, 0.066666666667}]
+ObservationTensor(0): zeros(287)
+ChanceOutcomes() = [(0, 0.06666666666666667), (1, 0.06666666666666667), (3, 0.06666666666666667), (15, 0.06666666666666667), (21, 0.06666666666666667), (2, 0.06666666666666667), (4, 0.06666666666666667), (16, 0.06666666666666667), (22, 0.06666666666666667), (5, 0.06666666666666667), (17, 0.06666666666666667), (23, 0.06666666666666667), (18, 0.06666666666666667), (24, 0.06666666666666667), (27, 0.06666666666666667)]
 LegalActions() = [0, 1, 3, 15, 21, 2, 4, 16, 22, 5, 17, 23, 18, 24, 27]
 StringLegalActions() = ["HQHJ", "HKHJ", "HAHJ", "SKHJ", "SAHJ", "HKHQ", "HAHQ", "SKHQ", "SAHQ", "HAHK", "SKHK", "SAHK", "SKHA", "SAHA", "SASK"]
 
@@ -83,7 +83,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: none\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: none\nPlayer 0 2NT: none\nPlayer 0 unassigned: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0xffffffffffffff00000000000000000000000000000000000000000000000008000000)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
@@ -110,7 +110,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: none\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: HQHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0xffffffffffffff00000000000000000000000000000000000800000000000004000000)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
@@ -137,7 +137,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: none\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0xffffffffffffff00000000000000000000000000000000000c00000000000002000000)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
@@ -147,191 +147,30 @@ StringLegalActions() = ["HKHQ->Pass", "HKHQ->1H", "HKHQ->1S", "HKHQ->1NT", "HKHQ
 action: 0
 
 # State 5
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ
-# Player 0 1H: none
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: none
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: none
-# Player 0 unassigned: HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0]
-HistoryString() = "14, 18, 5, 5, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["HAHJ->Pass", "HAHJ->1H", "HAHJ->1S", "HAHJ->1NT", "HAHJ->2H", "HAHJ->2S", "HAHJ->2NT"]
-
 # Apply action "HAHJ->2H"
 action: 4
 
 # State 6
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ
-# Player 0 1H: none
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: HAHJ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: none
-# Player 0 unassigned: HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4]
-HistoryString() = "14, 18, 5, 5, 0, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: HAHJ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["HAHQ->Pass", "HAHQ->1H", "HAHQ->1S", "HAHQ->1NT", "HAHQ->2H", "HAHQ->2S", "HAHQ->2NT"]
-
 # Apply action "HAHQ->2H"
 action: 4
 
 # State 7
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ
-# Player 0 1H: none
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: none
-# Player 0 unassigned: HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["HAHK->Pass", "HAHK->1H", "HAHK->1S", "HAHK->1NT", "HAHK->2H", "HAHK->2S", "HAHK->2NT"]
-
 # Apply action "HAHK->Pass"
 action: 0
 
 # State 8
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK
-# Player 0 1H: none
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: none
-# Player 0 unassigned: SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SJHJ->Pass", "SJHJ->1H", "SJHJ->1S", "SJHJ->1NT", "SJHJ->2H", "SJHJ->2S", "SJHJ->2NT"]
-
 # Apply action "SJHJ->1H"
 action: 1
 
 # State 9
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK
-# Player 0 1H: SJHJ
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: none
-# Player 0 unassigned: SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK\nPlayer 0 1H: SJHJ\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SJHQ->Pass", "SJHQ->1H", "SJHQ->1S", "SJHQ->1NT", "SJHQ->2H", "SJHQ->2S", "SJHQ->2NT"]
-
 # Apply action "SJHQ->2NT"
 action: 6
 
 # State 10
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK
-# Player 0 1H: SJHJ
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ
-# Player 0 unassigned: SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK\nPlayer 0 1H: SJHJ\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SJHK->Pass", "SJHK->1H", "SJHK->1S", "SJHK->1NT", "SJHK->2H", "SJHK->2S", "SJHK->2NT"]
-
 # Apply action "SJHK->Pass"
 action: 0
 
 # State 11
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK
-# Player 0 1H: SJHJ
-# Player 0 1S: none
-# Player 0 1NT: none
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ
-# Player 0 unassigned: SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK\nPlayer 0 1H: SJHJ\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SJHA->Pass", "SJHA->1H", "SJHA->1S", "SJHA->1NT", "SJHA->2H", "SJHA->2S", "SJHA->2NT"]
-
 # Apply action "SJHA->1NT"
 action: 3
 
@@ -353,7 +192,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK\nPlayer 0 1H: SJHJ\nPlayer 0 1S: none\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0xffffffffffffff24800000200000000000000400001800000c00000001000000020000)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
@@ -363,245 +202,38 @@ StringLegalActions() = ["SQHJ->Pass", "SQHJ->1H", "SQHJ->1S", "SQHJ->1NT", "SQHJ
 action: 0
 
 # State 13
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ
-# Player 0 1H: SJHJ
-# Player 0 1S: none
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ
-# Player 0 unassigned: SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: none\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SQHQ->Pass", "SQHQ->1H", "SQHQ->1S", "SQHQ->1NT", "SQHQ->2H", "SQHQ->2S", "SQHQ->2NT"]
-
 # Apply action "SQHQ->1S"
 action: 2
 
 # State 14
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ
-# Player 0 1H: SJHJ
-# Player 0 1S: SQHQ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ
-# Player 0 unassigned: SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: SQHQ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SQHK->Pass", "SQHK->1H", "SQHK->1S", "SQHK->1NT", "SQHK->2H", "SQHK->2S", "SQHK->2NT"]
-
 # Apply action "SQHK->2H"
 action: 4
 
 # State 15
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ
-# Player 0 1H: SJHJ
-# Player 0 1S: SQHQ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ
-# Player 0 unassigned: SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: SQHQ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SQHA->Pass", "SQHA->1H", "SQHA->1S", "SQHA->1NT", "SQHA->2H", "SQHA->2S", "SQHA->2NT"]
-
 # Apply action "SQHA->2NT"
 action: 6
 
 # State 16
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ
-# Player 0 1H: SJHJ
-# Player 0 1S: SQHQ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA
-# Player 0 unassigned: SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: SQHQ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA\nPlayer 0 unassigned: SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SQSJ->Pass", "SQSJ->1H", "SQSJ->1S", "SQSJ->1NT", "SQSJ->2H", "SQSJ->2S", "SQSJ->2NT"]
-
 # Apply action "SQSJ->2NT"
 action: 6
 
 # State 17
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ
-# Player 0 1H: SJHJ
-# Player 0 1S: SQHQ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA SQSJ
-# Player 0 unassigned: SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: SQHQ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SKHJ->Pass", "SKHJ->1H", "SKHJ->1S", "SKHJ->1NT", "SKHJ->2H", "SKHJ->2S", "SKHJ->2NT"]
-
 # Apply action "SKHJ->1S"
 action: 2
 
 # State 18
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ
-# Player 0 1H: SJHJ
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA SQSJ
-# Player 0 unassigned: SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SKHQ->Pass", "SKHQ->1H", "SKHQ->1S", "SKHQ->1NT", "SKHQ->2H", "SKHQ->2S", "SKHQ->2NT"]
-
 # Apply action "SKHQ->Pass"
 action: 0
 
 # State 19
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA SQSJ
-# Player 0 unassigned: SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SKHK->Pass", "SKHK->1H", "SKHK->1S", "SKHK->1NT", "SKHK->2H", "SKHK->2S", "SKHK->2NT"]
-
 # Apply action "SKHK->1H"
 action: 1
 
 # State 20
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA SQSJ
-# Player 0 unassigned: SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SKHA->Pass", "SKHA->1H", "SKHA->1S", "SKHA->1NT", "SKHA->2H", "SKHA->2S", "SKHA->2NT"]
-
 # Apply action "SKHA->1NT"
 action: 3
 
 # State 21
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA SKHA
-# Player 0 2H: HAHJ HAHQ SQHK
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA SQSJ
-# Player 0 unassigned: SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SKSJ->Pass", "SKSJ->1H", "SKSJ->1S", "SKSJ->1NT", "SKSJ->2H", "SKSJ->2S", "SKSJ->2NT"]
-
 # Apply action "SKSJ->2H"
 action: 4
 
@@ -623,7 +255,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0xffffffffffffff24a08000200400001100000402001808100c00000001060000000080)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
@@ -633,233 +265,38 @@ StringLegalActions() = ["SKSQ->Pass", "SKSQ->1H", "SKSQ->1S", "SKSQ->1NT", "SKSQ
 action: 6
 
 # State 23
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA SKHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ
-# Player 0 unassigned: SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ\nPlayer 0 unassigned: SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SAHJ->Pass", "SAHJ->1H", "SAHJ->1S", "SAHJ->1NT", "SAHJ->2H", "SAHJ->2S", "SAHJ->2NT"]
-
 # Apply action "SAHJ->2S"
 action: 5
 
 # State 24
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA SKHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ SAHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ
-# Player 0 unassigned: SAHQ SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ SAHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ\nPlayer 0 unassigned: SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SAHQ->Pass", "SAHQ->1H", "SAHQ->1S", "SAHQ->1NT", "SAHQ->2H", "SAHQ->2S", "SAHQ->2NT"]
-
 # Apply action "SAHQ->1H"
 action: 1
 
 # State 25
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK SAHQ
-# Player 0 1S: SQHQ SKHJ
-# Player 0 1NT: SJHA SKHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ SAHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ
-# Player 0 unassigned: SAHK SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK SAHQ\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ SAHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ\nPlayer 0 unassigned: SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SAHK->Pass", "SAHK->1H", "SAHK->1S", "SAHK->1NT", "SAHK->2H", "SAHK->2S", "SAHK->2NT"]
-
 # Apply action "SAHK->1S"
 action: 2
 
 # State 26
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK SAHQ
-# Player 0 1S: SQHQ SKHJ SAHK
-# Player 0 1NT: SJHA SKHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ SAHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ
-# Player 0 unassigned: SAHA SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK SAHQ\nPlayer 0 1S: SQHQ SKHJ SAHK\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ SAHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ\nPlayer 0 unassigned: SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SAHA->Pass", "SAHA->1H", "SAHA->1S", "SAHA->1NT", "SAHA->2H", "SAHA->2S", "SAHA->2NT"]
-
 # Apply action "SAHA->1NT"
 action: 3
 
 # State 27
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK SAHQ
-# Player 0 1S: SQHQ SKHJ SAHK
-# Player 0 1NT: SJHA SKHA SAHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ SAHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ
-# Player 0 unassigned: SASJ SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK SAHQ\nPlayer 0 1S: SQHQ SKHJ SAHK\nPlayer 0 1NT: SJHA SKHA SAHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ SAHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ\nPlayer 0 unassigned: SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SASJ->Pass", "SASJ->1H", "SASJ->1S", "SASJ->1NT", "SASJ->2H", "SASJ->2S", "SASJ->2NT"]
-
 # Apply action "SASJ->1H"
 action: 1
 
 # State 28
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK SAHQ SASJ
-# Player 0 1S: SQHQ SKHJ SAHK
-# Player 0 1NT: SJHA SKHA SAHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ SAHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ
-# Player 0 unassigned: SASQ SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK SAHQ SASJ\nPlayer 0 1S: SQHQ SKHJ SAHK\nPlayer 0 1NT: SJHA SKHA SAHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ SAHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ\nPlayer 0 unassigned: SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SASQ->Pass", "SASQ->1H", "SASQ->1S", "SASQ->1NT", "SASQ->2H", "SASQ->2S", "SASQ->2NT"]
-
 # Apply action "SASQ->2NT"
 action: 6
 
 # State 29
-# W:SQSJ E:SKHA
-# Player 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ
-# Player 0 1H: SJHJ SKHK SAHQ SASJ
-# Player 0 1S: SQHQ SKHJ SAHK
-# Player 0 1NT: SJHA SKHA SAHA
-# Player 0 2H: HAHJ HAHQ SQHK SKSJ
-# Player 0 2S: HQHJ HKHJ SAHJ
-# Player 0 2NT: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 0 unassigned: SASK
-# Player 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK SAHQ SASJ\nPlayer 0 1S: SQHQ SKHJ SAHK\nPlayer 0 1NT: SJHA SKHA SAHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ SAHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 0 unassigned: SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◉◯◯◉◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["SASK->Pass", "SASK->1H", "SASK->1S", "SASK->1NT", "SASK->2H", "SASK->2S", "SASK->2NT"]
-
 # Apply action "SASK->1NT"
 action: 3
 
 # State 30
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: none
-# Player 1 unassigned: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: none\nPlayer 1 unassigned: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["HQHJ->Pass"]
-
 # Apply action "HQHJ->Pass"
 action: 0
 
 # State 31
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ
-# Player 1 unassigned: HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ\nPlayer 1 unassigned: HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["HKHJ->Pass"]
-
 # Apply action "HKHJ->Pass"
 action: 0
 
@@ -875,7 +312,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ\nPlayer 1 unassigned: HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0x10106082fffffffc0000000000000000000000000000000000000000000000002000000)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0]
@@ -885,191 +322,38 @@ StringLegalActions() = ["HKHQ->Pass"]
 action: 0
 
 # State 33
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ
-# Player 1 unassigned: HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ\nPlayer 1 unassigned: HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["HAHJ->Pass"]
-
 # Apply action "HAHJ->Pass"
 action: 0
 
 # State 34
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ
-# Player 1 unassigned: HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ\nPlayer 1 unassigned: HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["HAHQ->Pass"]
-
 # Apply action "HAHQ->Pass"
 action: 0
 
 # State 35
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ
-# Player 1 unassigned: HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ\nPlayer 1 unassigned: HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["HAHK->Pass"]
-
 # Apply action "HAHK->Pass"
 action: 0
 
 # State 36
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK
-# Player 1 unassigned: SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK\nPlayer 1 unassigned: SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SJHJ->Pass"]
-
 # Apply action "SJHJ->Pass"
 action: 0
 
 # State 37
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ
-# Player 1 unassigned: SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ\nPlayer 1 unassigned: SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SJHQ->Pass"]
-
 # Apply action "SJHQ->Pass"
 action: 0
 
 # State 38
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ
-# Player 1 unassigned: SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ\nPlayer 1 unassigned: SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SJHK->Pass"]
-
 # Apply action "SJHK->Pass"
 action: 0
 
 # State 39
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK
-# Player 1 unassigned: SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK\nPlayer 1 unassigned: SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SJHA->Pass"]
-
 # Apply action "SJHA->Pass"
 action: 0
 
 # State 40
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA
-# Player 1 unassigned: SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA\nPlayer 1 unassigned: SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SQHJ->Pass"]
-
 # Apply action "SQHJ->Pass"
 action: 0
 
 # State 41
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ
-# Player 1 unassigned: SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ\nPlayer 1 unassigned: SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SQHQ->Pass"]
-
 # Apply action "SQHQ->Pass"
 action: 0
 
@@ -1085,7 +369,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ\nPlayer 1 unassigned: SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0x10106082ffffffffff00000000000000000000000000000000000000000000000008000)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0]
@@ -1095,191 +379,38 @@ StringLegalActions() = ["SQHK->Pass"]
 action: 0
 
 # State 43
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK
-# Player 1 unassigned: SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK\nPlayer 1 unassigned: SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SQHA->Pass"]
-
 # Apply action "SQHA->Pass"
 action: 0
 
 # State 44
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA
-# Player 1 unassigned: SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA\nPlayer 1 unassigned: SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SQSJ->Pass"]
-
 # Apply action "SQSJ->Pass"
 action: 0
 
 # State 45
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ
-# Player 1 unassigned: SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ\nPlayer 1 unassigned: SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SKHJ->Pass"]
-
 # Apply action "SKHJ->Pass"
 action: 0
 
 # State 46
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ
-# Player 1 unassigned: SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ\nPlayer 1 unassigned: SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SKHQ->Pass"]
-
 # Apply action "SKHQ->Pass"
 action: 0
 
 # State 47
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ
-# Player 1 unassigned: SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ\nPlayer 1 unassigned: SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SKHK->Pass"]
-
 # Apply action "SKHK->Pass"
 action: 0
 
 # State 48
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK
-# Player 1 unassigned: SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK\nPlayer 1 unassigned: SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SKHA->Pass"]
-
 # Apply action "SKHA->Pass"
 action: 0
 
 # State 49
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA
-# Player 1 unassigned: SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA\nPlayer 1 unassigned: SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SKSJ->Pass"]
-
 # Apply action "SKSJ->Pass"
 action: 0
 
 # State 50
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ
-# Player 1 unassigned: SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ\nPlayer 1 unassigned: SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SKSQ->Pass"]
-
 # Apply action "SKSQ->Pass"
 action: 0
 
 # State 51
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ
-# Player 1 unassigned: SAHJ SAHQ SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ\nPlayer 1 unassigned: SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SAHJ->Pass"]
-
 # Apply action "SAHJ->Pass"
 action: 0
 
@@ -1295,7 +426,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ\nPlayer 1 unassigned: SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0x10106082ffffffffffffc00000000000000000000000000000000000000000000000020)
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0]
@@ -1305,107 +436,22 @@ StringLegalActions() = ["SAHQ->Pass"]
 action: 0
 
 # State 53
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ
-# Player 1 unassigned: SAHK SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ\nPlayer 1 unassigned: SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SAHK->Pass"]
-
 # Apply action "SAHK->Pass"
 action: 0
 
 # State 54
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK
-# Player 1 unassigned: SAHA SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK\nPlayer 1 unassigned: SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SAHA->Pass"]
-
 # Apply action "SAHA->Pass"
 action: 0
 
 # State 55
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA
-# Player 1 unassigned: SASJ SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA\nPlayer 1 unassigned: SASJ SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SASJ->Pass"]
-
 # Apply action "SASJ->Pass"
 action: 0
 
 # State 56
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ
-# Player 1 unassigned: SASQ SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ\nPlayer 1 unassigned: SASQ SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SASQ->Pass"]
-
 # Apply action "SASQ->Pass"
 action: 0
 
 # State 57
-# W:SQSJ E:SKHA 2NT
-# Player 0 possible: SJHQ SQHA SQSJ SKSQ SASQ
-# Player 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ
-# Player 1 unassigned: SASK
-IsTerminal() = False
-History() = [14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-HistoryString() = "14, 18, 5, 5, 0, 4, 4, 0, 1, 6, 0, 3, 0, 2, 4, 6, 6, 2, 0, 1, 3, 4, 6, 5, 1, 2, 3, 1, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ\nPlayer 1 unassigned: SASK\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0]
-StringLegalActions() = ["SASK->Pass"]
-
 # Apply action "SASK->Pass"
 action: 0
 
@@ -1420,6 +466,6 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "Player 0\nPass\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0): binvec(287, 0x400106082fffffff00000000000000000000000000000000000000000000000000000000)
 Rewards() = [-19.999999999999996]
 Returns() = [-19.999999999999996]

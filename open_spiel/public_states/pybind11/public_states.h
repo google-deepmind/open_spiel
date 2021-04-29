@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_PUBLIC_STATES_PYTHON_PYBIND11_PUBLIC_STATES_H_
 #define OPEN_SPIEL_PUBLIC_STATES_PYTHON_PYBIND11_PUBLIC_STATES_H_
 
-#include "pybind11/include/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace open_spiel {
 void init_pyspiel_public_states(::pybind11::module& m);

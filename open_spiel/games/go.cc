@@ -195,6 +195,7 @@ void GoState::UndoAction(Player player, Action action) {
   // We don't have direct undo functionality, but copying the board and
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();
+  --move_number_;
   ResetBoard();
   for (auto [_, action] : history_) {
     DoApplyAction(action);

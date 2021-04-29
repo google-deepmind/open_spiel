@@ -130,6 +130,9 @@ inline constexpr std::array<Offset, 8> kKnightOffsets = {
 
 absl::optional<Square> SquareFromString(const std::string& s);
 
+bool IsLongDiagonal(const chess::Square& from_sq, const chess::Square& to_sq,
+                    int board_size);
+
 // Forward declare ChessBoard here because it's needed in Move::ToSAN.
 class ChessBoard;
 
@@ -229,6 +232,11 @@ inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 using ObservationTable = std::array<bool, k2dMaxBoardSize>;
 
+enum PseudoLegalMoveSettings {
+  kBreachEnemyPieces,
+  kAcknowledgeEnemyPieces,
+};
+
 class ChessBoard {
  public:
   ChessBoard(int board_size = kDefaultBoardSize,
@@ -273,13 +281,35 @@ class ChessBoard {
     GenerateLegalMoves(yield, to_play_);
   }
   void GenerateLegalMoves(const MoveYieldFn& yield, Color color) const;
-  void GeneratePseudoLegalMoves(const MoveYieldFn& yield, Color color) const;
+  void GeneratePseudoLegalMoves(
+      const MoveYieldFn& yield, Color color,
+      PseudoLegalMoveSettings settings =
+          PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
+
+  // Optimization for computing number of pawn tries for kriegspiel
+  void GenerateLegalPawnCaptures(const MoveYieldFn& yield, Color color) const;
+  void GeneratePseudoLegalPawnCaptures(
+      const MoveYieldFn& yield, Color color,
+      PseudoLegalMoveSettings settings =
+          PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) const;
 
   bool HasLegalMoves() const {
     bool found = false;
     GenerateLegalMoves([&found](const Move&) {
       found = true;
       return false;  // We don't need any more moves.
+    });
+    return found;
+  }
+
+  bool IsMoveLegal(const Move& tested_move) const {
+    bool found = false;
+    GenerateLegalMoves([&found, &tested_move](const Move& found_move) {
+      if (tested_move == found_move) {
+        found = true;
+        return false;  // We don't need any more moves.
+      }
+      return true;
     });
     return found;
   }
@@ -425,18 +455,22 @@ class ChessBoard {
 
   template <typename YieldFn>
   void GenerateCastlingDestinations_(Square sq, Color color,
+                                     PseudoLegalMoveSettings settings,
                                      const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,
+                                  PseudoLegalMoveSettings settings,
                                   const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateRookDestinations_(Square sq, Color color,
+                                 PseudoLegalMoveSettings settings,
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
   void GenerateBishopDestinations_(Square sq, Color color,
+                                   PseudoLegalMoveSettings settings,
                                    const YieldFn& yield) const;
 
   template <typename YieldFn>
@@ -446,17 +480,21 @@ class ChessBoard {
   template <typename YieldFn>
   // Pawn moves without captures.
   void GeneratePawnDestinations_(Square sq, Color color,
+                                 PseudoLegalMoveSettings settings,
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
   // Pawn diagonal capture destinations, with or without en passant.
-  void GeneratePawnCaptureDestinations_(Square sq, Color color, bool include_ep,
+  void GeneratePawnCaptureDestinations_(Square sq, Color color,
+                                        PseudoLegalMoveSettings settings,
+                                        bool include_ep,
                                         const YieldFn& yield) const;
 
   // Helper function.
   template <typename YieldFn>
-  void GenerateRayDestinations_(Square sq, Color color, Offset offset_step,
-                                const YieldFn& yield) const;
+  void GenerateRayDestinations_(Square sq, Color color,
+                                PseudoLegalMoveSettings settings,
+                                Offset offset_step, const YieldFn& yield) const;
 
   void SetIrreversibleMoveCounter(int c);
   void SetMovenumber(int move_number);
@@ -490,6 +528,7 @@ inline std::ostream& operator<<(std::ostream& stream, const PieceType& pt) {
 }
 
 ChessBoard MakeDefaultBoard();
+std::string DefaultFen(int board_size);
 
 }  // namespace chess
 }  // namespace open_spiel

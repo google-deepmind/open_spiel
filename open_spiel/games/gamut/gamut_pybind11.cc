@@ -13,11 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/games/gamut/gamut.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace open_spiel {
 

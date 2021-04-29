@@ -322,6 +322,7 @@ void KuhnState::UndoAction(Player player, Action move) {
     winner_ = kInvalidPlayer;
   }
   history_.pop_back();
+  --move_number_;
 }
 
 std::vector<std::pair<Action, double>> KuhnState::ChanceOutcomes() const {

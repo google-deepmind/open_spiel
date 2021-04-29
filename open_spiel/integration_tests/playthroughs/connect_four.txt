@@ -283,464 +283,46 @@ StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
 action: 1
 
 # State 6
-# .......
-# .......
-# .......
-# .......
-# .o.....
-# xox.x.o
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1]
-HistoryString() = "0, 1, 2, 6, 4, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0, 1, 2, 6, 4, 1"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1"
-ObservationString(0) = ".......\n.......\n.......\n.......\n.o.....\nxox.x.o\n"
-ObservationString(1) = ".......\n.......\n.......\n.......\n.o.....\nxox.x.o\n"
-PublicObservationString() = ".......\n.......\n.......\n.......\n.o.....\nxox.x.o\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◉◯
-◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◉◯◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
-
 # Apply action "x0"
 action: 0
 
 # State 7
-# .......
-# .......
-# .......
-# .......
-# xo.....
-# xox.x.o
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0"
-ObservationString(0) = ".......\n.......\n.......\n.......\nxo.....\nxox.x.o\n"
-ObservationString(1) = ".......\n.......\n.......\n.......\nxo.....\nxox.x.o\n"
-PublicObservationString() = ".......\n.......\n.......\n.......\nxo.....\nxox.x.o\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◉◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◯  ◯◉◯◯◯◯◯  ◯◯◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
-
 # Apply action "o2"
 action: 2
 
 # State 8
-# .......
-# .......
-# .......
-# .......
-# xoo....
-# xox.x.o
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2"
-ObservationString(0) = ".......\n.......\n.......\n.......\nxoo....\nxox.x.o\n"
-ObservationString(1) = ".......\n.......\n.......\n.......\nxoo....\nxox.x.o\n"
-PublicObservationString() = ".......\n.......\n.......\n.......\nxoo....\nxox.x.o\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◉◉◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◯◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◯  ◯◉◉◯◯◯◯  ◯◯◯◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
-
 # Apply action "x6"
 action: 6
 
 # State 9
-# .......
-# .......
-# .......
-# .......
-# xoo...x
-# xox.x.o
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6"
-ObservationString(0) = ".......\n.......\n.......\n.......\nxoo...x\nxox.x.o\n"
-ObservationString(1) = ".......\n.......\n.......\n.......\nxoo...x\nxox.x.o\n"
-PublicObservationString() = ".......\n.......\n.......\n.......\nxoo...x\nxox.x.o\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◉◉◯◯◯◯  ◉◯◯◯◯◯◉  ◯◯◯◉◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◉  ◯◉◉◯◯◯◯  ◯◯◯◉◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
-
 # Apply action "o0"
 action: 0
 
 # State 10
-# .......
-# .......
-# .......
-# o......
-# xoo...x
-# xox.x.o
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0"
-ObservationString(0) = ".......\n.......\n.......\no......\nxoo...x\nxox.x.o\n"
-ObservationString(1) = ".......\n.......\n.......\no......\nxoo...x\nxox.x.o\n"
-PublicObservationString() = ".......\n.......\n.......\no......\nxoo...x\nxox.x.o\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◉◉◯◯◯◯  ◉◯◯◯◯◯◉  ◯◯◯◉◉◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◯◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◉  ◯◉◉◯◯◯◯  ◯◯◯◉◉◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
-
 # Apply action "x5"
 action: 5
 
 # State 11
-# .......
-# .......
-# .......
-# o......
-# xoo...x
-# xox.xxo
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5"
-ObservationString(0) = ".......\n.......\n.......\no......\nxoo...x\nxox.xxo\n"
-ObservationString(1) = ".......\n.......\n.......\no......\nxoo...x\nxox.xxo\n"
-PublicObservationString() = ".......\n.......\n.......\no......\nxoo...x\nxox.xxo\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◉◯  ◯◯◯◉◯◯◯
-◯◉◉◯◯◯◯  ◉◯◯◯◯◯◉  ◯◯◯◉◉◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◉◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◯◉  ◯◉◉◯◯◯◯  ◯◯◯◉◉◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
-
 # Apply action "o4"
 action: 4
 
 # State 12
-# .......
-# .......
-# .......
-# o......
-# xoo.o.x
-# xox.xxo
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4"
-ObservationString(0) = ".......\n.......\n.......\no......\nxoo.o.x\nxox.xxo\n"
-ObservationString(1) = ".......\n.......\n.......\no......\nxoo.o.x\nxox.xxo\n"
-PublicObservationString() = ".......\n.......\n.......\no......\nxoo.o.x\nxox.xxo\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◉◯  ◯◯◯◉◯◯◯
-◯◉◉◯◉◯◯  ◉◯◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◉◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◯◉  ◯◉◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
-
 # Apply action "x0"
 action: 0
 
 # State 13
-# .......
-# .......
-# x......
-# o......
-# xoo.o.x
-# xox.xxo
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0"
-ObservationString(0) = ".......\n.......\nx......\no......\nxoo.o.x\nxox.xxo\n"
-ObservationString(1) = ".......\n.......\nx......\no......\nxoo.o.x\nxox.xxo\n"
-PublicObservationString() = ".......\n.......\nx......\no......\nxoo.o.x\nxox.xxo\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◉◯  ◯◯◯◉◯◯◯
-◯◉◉◯◉◯◯  ◉◯◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◉◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◯◉  ◯◉◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
-
 # Apply action "o6"
 action: 6
 
 # State 14
-# .......
-# .......
-# x......
-# o.....o
-# xoo.o.x
-# xox.xxo
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6"
-ObservationString(0) = ".......\n.......\nx......\no.....o\nxoo.o.x\nxox.xxo\n"
-ObservationString(1) = ".......\n.......\nx......\no.....o\nxoo.o.x\nxox.xxo\n"
-PublicObservationString() = ".......\n.......\nx......\no.....o\nxoo.o.x\nxox.xxo\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◉◯  ◯◯◯◉◯◯◯
-◯◉◉◯◉◯◯  ◉◯◯◯◯◯◉  ◯◯◯◉◯◉◯
-◉◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◉◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◯◉  ◯◉◉◯◉◯◯  ◯◯◯◉◯◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◉◉◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
-
 # Apply action "x5"
 action: 5
 
 # State 15
-# .......
-# .......
-# x......
-# o.....o
-# xoo.oxx
-# xox.xxo
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5"
-ObservationString(0) = ".......\n.......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
-ObservationString(1) = ".......\n.......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
-PublicObservationString() = ".......\n.......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◉◯  ◯◯◯◉◯◯◯
-◯◉◉◯◉◯◯  ◉◯◯◯◯◉◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◉◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◉◉  ◯◉◉◯◉◯◯  ◯◯◯◉◯◯◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◉◉◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
-
 # Apply action "o0"
 action: 0
 
 # State 16
-# .......
-# o......
-# x......
-# o.....o
-# xoo.oxx
-# xox.xxo
-IsTerminal() = False
-History() = [0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5, 0]
-HistoryString() = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5, 0"
-InformationStateString(1) = "0, 1, 2, 6, 4, 1, 0, 2, 6, 0, 5, 4, 0, 6, 5, 0"
-ObservationString(0) = ".......\no......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
-ObservationString(1) = ".......\no......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
-PublicObservationString() = ".......\no......\nx......\no.....o\nxoo.oxx\nxox.xxo\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-ObservationTensor(0):
-◯◉◯◯◯◯◉  ◉◯◉◯◉◉◯  ◯◯◯◉◯◯◯
-◯◉◉◯◉◯◯  ◉◯◯◯◯◉◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-ObservationTensor(1):
-◉◯◉◯◉◉◯  ◯◉◯◯◯◯◉  ◯◯◯◉◯◯◯
-◉◯◯◯◯◉◉  ◯◉◉◯◉◯◯  ◯◯◯◉◯◯◯
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉  ◯◉◉◉◉◉◯
-◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6]
-StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
-
 # Apply action "x3"
 action: 3
 

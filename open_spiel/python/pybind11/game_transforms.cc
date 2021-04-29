@@ -21,13 +21,7 @@
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
 #include "open_spiel/game_transforms/repeated_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
-#include "pybind11/include/pybind11/detail/common.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace open_spiel {
 namespace py = ::pybind11;

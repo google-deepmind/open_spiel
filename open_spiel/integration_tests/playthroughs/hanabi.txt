@@ -51,7 +51,7 @@ ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.250000000000}, {1, 0.166666666667}, {2, 0.083333333333}, {3, 0.250000000000}, {4, 0.166666666667}, {5, 0.083333333333}]
+ChanceOutcomes() = [(0, 0.25), (1, 0.16666666666666666), (2, 0.08333333333333333), (3, 0.25), (4, 0.16666666666666666), (5, 0.08333333333333333)]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal R3)", "(Deal Y1)", "(Deal Y2)", "(Deal Y3)"]
 
@@ -80,7 +80,7 @@ ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.272727272727}, {1, 0.181818181818}, {2, 0.090909090909}, {3, 0.181818181818}, {4, 0.181818181818}, {5, 0.090909090909}]
+ChanceOutcomes() = [(0, 0.2727272727272727), (1, 0.18181818181818182), (2, 0.09090909090909091), (3, 0.18181818181818182), (4, 0.18181818181818182), (5, 0.09090909090909091)]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal R3)", "(Deal Y1)", "(Deal Y2)", "(Deal Y3)"]
 
@@ -88,233 +88,30 @@ StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal R3)", "(Deal Y1)", "(De
 action: 1
 
 # State 2
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# -----
-# -----
-# Deck size: 10
-# Discards:
-IsTerminal() = False
-History() = [3, 1]
-HistoryString() = "3, 1"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\n-----\n-----\nDeck size: 10\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nDeck size: 10\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\nY1 || XX|RY123\nR2 || XX|RY123\n-----\nDeck size: 10\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.300000000000}, {1, 0.100000000000}, {2, 0.100000000000}, {3, 0.200000000000}, {4, 0.200000000000}, {5, 0.100000000000}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal R3)", "(Deal Y1)", "(Deal Y2)", "(Deal Y3)"]
-
 # Apply action "(Deal Y2)"
 action: 4
 
 # State 3
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# Y2 || XX|RY123
-# -----
-# -----
-# Deck size: 9
-# Discards:
-IsTerminal() = False
-History() = [3, 1, 4]
-HistoryString() = "3, 1, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\n-----\nDeck size: 9\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\nDeck size: 9\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\n-----\nDeck size: 9\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.111111111111}, {2, 0.111111111111}, {3, 0.222222222222}, {4, 0.111111111111}, {5, 0.111111111111}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal R3)", "(Deal Y1)", "(Deal Y2)", "(Deal Y3)"]
-
 # Apply action "(Deal Y2)"
 action: 4
 
 # State 4
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# Y2 || XX|RY123
-# -----
-# Y2 || XX|RY123
-# -----
-# Deck size: 8
-# Discards:
-IsTerminal() = False
-History() = [3, 1, 4, 4]
-HistoryString() = "3, 1, 4, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nY2 || XX|RY123\n-----\nDeck size: 8\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\n-----\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\nDeck size: 8\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\n-----\nY2 || XX|RY123\nDeck size: 8\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◉◯◉◉◉◉◉◉◉◉◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◉◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.375000000000}, {1, 0.125000000000}, {2, 0.125000000000}, {3, 0.250000000000}, {5, 0.125000000000}]
-LegalActions() = [0, 1, 2, 3, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal R3)", "(Deal Y1)", "(Deal Y3)"]
-
 # Apply action "(Deal R3)"
 action: 2
 
 # State 5
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# Y2 || XX|RY123
-# -----
-# Y2 || XX|RY123
-# R3 || XX|RY123
-# -----
-# Deck size: 7
-# Discards:
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2]
-HistoryString() = "3, 1, 4, 4, 2"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\n-----\nDeck size: 7\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\n-----\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\nDeck size: 7\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nDeck size: 7\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◉◉◯◉◉◉◉◉◉◉◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◉◉◉◉◉◉◉◉◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.428571428571}, {1, 0.142857142857}, {3, 0.285714285714}, {5, 0.142857142857}]
-LegalActions() = [0, 1, 3, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal Y1)", "(Deal Y3)"]
-
 # Apply action "(Deal Y1)"
 action: 3
 
 # State 6
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# Y2 || XX|RY123
-# -----
-# Y2 || XX|RY123
-# R3 || XX|RY123
-# Y1 || XX|RY123
-# -----
-# Deck size: 6
-# Discards:
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3]
-HistoryString() = "3, 1, 4, 4, 2, 3"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nY1 || XX|RY123\n-----\nDeck size: 6\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\nDeck size: 6\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nY1 || XX|RY123\nDeck size: 6\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◉◉◉◉◉◉◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◉◉◉◉◉◉◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.166666666667}, {3, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 3, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal Y1)", "(Deal Y3)"]
-
 # Apply action "(Deal R1)"
 action: 0
 
 # State 7
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# Y2 || XX|RY123
-# -----
-# Y2 || XX|RY123
-# R3 || XX|RY123
-# Y1 || XX|RY123
-# -----
-# R1 || XX|RY123
-# Deck size: 5
-# Discards:
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3, 0]
-HistoryString() = "3, 1, 4, 4, 2, 3, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nY1 || XX|RY123\n-----\nR1 || XX|RY123\nDeck size: 5\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nR1 || XX|RY123\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\nDeck size: 5\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nY1 || XX|RY123\nDeck size: 5\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◉◉◉◉◉◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◉◉◉◉◉◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.400000000000}, {1, 0.200000000000}, {3, 0.200000000000}, {5, 0.200000000000}]
-LegalActions() = [0, 1, 3, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal R2)", "(Deal Y1)", "(Deal Y3)"]
-
 # Apply action "(Deal R2)"
 action: 1
 
 # State 8
-# Life tokens: 3
-# Info tokens: 8
-# Fireworks: R0 Y0
-# Hands:
-# Y1 || XX|RY123
-# R2 || XX|RY123
-# Y2 || XX|RY123
-# -----
-# Y2 || XX|RY123
-# R3 || XX|RY123
-# Y1 || XX|RY123
-# -----
-# R1 || XX|RY123
-# R2 || XX|RY123
-# Deck size: 4
-# Discards:
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3, 0, 1]
-HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nY1 || XX|RY123\n-----\nR1 || XX|RY123\nR2 || XX|RY123\nDeck size: 4\nDiscards:"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\nXX || XX|RY123\n-----\nR1 || XX|RY123\nR2 || XX|RY123\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\nDeck size: 4\nDiscards:"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 8\nFireworks: R0 Y0 \nHands:\nXX || XX|RY123\nXX || XX|RY123\n-----\nY1 || XX|RY123\nR2 || XX|RY123\nY2 || XX|RY123\n-----\nY2 || XX|RY123\nR3 || XX|RY123\nY1 || XX|RY123\nDeck size: 4\nDiscards:"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {3, 0.250000000000}, {5, 0.250000000000}]
-LegalActions() = [0, 3, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal Y1)", "(Deal Y3)"]
-
 # Apply action "(Deal Y1)"
 action: 3
 
@@ -475,38 +272,6 @@ StringLegalActions() = ["(Discard 0)", "(Discard 1)", "(Discard 2)", "(Play 0)",
 action: 0
 
 # State 13
-# Life tokens: 3
-# Info tokens: 6
-# Fireworks: R0 Y0
-# Hands:
-# R2 || XX|RY23
-# Y2 || XX|RY23
-# -----
-# Y2 || XX|RY12
-# R3 || X3|RY3
-# Y1 || XX|RY12
-# -----
-# R1 || XX|RY13
-# R2 || X2|RY2
-# Y1 || XX|RY13
-# Deck size: 3
-# Discards: Y1
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0]
-HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 6\nFireworks: R0 Y0 \nHands:\nXX || XX|RY23\nXX || XX|RY23\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nY1 || XX|RY13\nDeck size: 3\nDiscards: Y1"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 6\nFireworks: R0 Y0 \nHands:\nXX || XX|RY12\nXX || X3|RY3\nXX || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nY1 || XX|RY13\n-----\nR2 || XX|RY23\nY2 || XX|RY23\nDeck size: 3\nDiscards: Y1"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 6\nFireworks: R0 Y0 \nHands:\nXX || XX|RY13\nXX || X2|RY2\nXX || XX|RY13\n-----\nR2 || XX|RY23\nY2 || XX|RY23\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\nDeck size: 3\nDiscards: Y1"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◉◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◯◉◉◯◉◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◯◉◉◯◉◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◉◉◯◯◯◯◯◯◉◉◉◉◉◉◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◯◉◉◯◉◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.666666666667}, {5, 0.333333333333}]
-LegalActions() = [0, 5]
-StringLegalActions() = ["(Deal R1)", "(Deal Y3)"]
-
 # Apply action "(Deal Y3)"
 action: 5
 
@@ -589,38 +354,6 @@ StringLegalActions() = ["(Discard 0)", "(Discard 1)", "(Discard 2)", "(Play 0)",
 action: 5
 
 # State 16
-# Life tokens: 3
-# Info tokens: 5
-# Fireworks: R0 Y1
-# Hands:
-# R2 || RX|R23
-# Y2 || XX|Y23
-# Y3 || XX|Y123
-# -----
-# Y2 || XX|RY12
-# R3 || X3|RY3
-# Y1 || XX|RY12
-# -----
-# R1 || XX|RY13
-# R2 || X2|RY2
-# Deck size: 2
-# Discards: Y1
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5]
-HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 5\nFireworks: R0 Y1 \nHands:\nXX || RX|R23\nXX || XX|Y23\nXX || XX|Y123\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nDeck size: 2\nDiscards: Y1"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 5\nFireworks: R0 Y1 \nHands:\nXX || XX|RY12\nXX || X3|RY3\nXX || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\n-----\nR2 || RX|R23\nY2 || XX|Y23\nY3 || XX|Y123\nDeck size: 2\nDiscards: Y1"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 5\nFireworks: R0 Y1 \nHands:\nXX || XX|RY13\nXX || X2|RY2\n-----\nR2 || RX|R23\nY2 || XX|Y23\nY3 || XX|Y123\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\nDeck size: 2\nDiscards: Y1"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◉◯◯◉◉◉◉◉◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◉◯◉◉◯◯◯◯◉◯◯◉◉◉◉◉◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◉◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯
-ObservationTensor(2): ◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◉◉◯◯◯◯◉◯◯◉◉◉◉◉◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◉◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 1.000000000000}]
-LegalActions() = [0]
-StringLegalActions() = ["(Deal R1)"]
-
 # Apply action "(Deal R1)"
 action: 0
 
@@ -664,38 +397,6 @@ StringLegalActions() = ["(Discard 0)", "(Discard 1)", "(Discard 2)", "(Play 0)",
 action: 4
 
 # State 18
-# Life tokens: 3
-# Info tokens: 5
-# Fireworks: R0 Y2
-# Hands:
-# R2 || RX|R23
-# Y3 || XX|Y123
-# -----
-# Y2 || XX|RY12
-# R3 || X3|RY3
-# Y1 || XX|RY12
-# -----
-# R1 || XX|RY13
-# R2 || X2|RY2
-# R1 || XX|RY123
-# Deck size: 1
-# Discards: Y1
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4]
-HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 5\nFireworks: R0 Y2 \nHands:\nXX || RX|R23\nXX || XX|Y123\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nR1 || XX|RY123\nDeck size: 1\nDiscards: Y1"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 5\nFireworks: R0 Y2 \nHands:\nXX || XX|RY12\nXX || X3|RY3\nXX || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nR1 || XX|RY123\n-----\nR2 || RX|R23\nY3 || XX|Y123\nDeck size: 1\nDiscards: Y1"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 5\nFireworks: R0 Y2 \nHands:\nXX || XX|RY13\nXX || X2|RY2\nXX || XX|RY123\n-----\nR2 || RX|R23\nY3 || XX|Y123\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\nDeck size: 1\nDiscards: Y1"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◉◉◉◉◉◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◉◉◉◉◉◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◉◉◉◉◉◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◉◉◉◉◉◯◯◯◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 1.000000000000}]
-LegalActions() = [0]
-StringLegalActions() = ["(Deal R1)"]
-
 # Apply action "(Deal R1)"
 action: 0
 
@@ -778,41 +479,6 @@ StringLegalActions() = ["(Discard 0)", "(Discard 1)", "(Discard 2)", "(Play 0)",
 action: 11
 
 # State 21
-# Life tokens: 3
-# Info tokens: 3
-# Fireworks: R0 Y2
-# Hands:
-# Cur player
-# R2 || R2|R2
-# Y3 || YX|Y13
-# R1 || XX|R13
-# -----
-# Y2 || XX|RY12
-# R3 || X3|RY3
-# Y1 || XX|RY12
-# -----
-# R1 || XX|RY13
-# R2 || X2|RY2
-# R1 || XX|RY123
-# Deck size: 0
-# Discards: Y1
-IsTerminal() = False
-History() = [3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9, 11]
-HistoryString() = "3, 1, 4, 4, 2, 3, 0, 1, 3, 14, 13, 15, 0, 5, 8, 5, 0, 4, 0, 9, 11"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Life tokens: 3\nInfo tokens: 3\nFireworks: R0 Y2 \nHands:\nCur player\nXX || R2|R2\nXX || YX|Y13\nXX || XX|R13\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nR1 || XX|RY123\nDeck size: 0\nDiscards: Y1"
-ObservationString(1) = "Life tokens: 3\nInfo tokens: 3\nFireworks: R0 Y2 \nHands:\nXX || XX|RY12\nXX || X3|RY3\nXX || XX|RY12\n-----\nR1 || XX|RY13\nR2 || X2|RY2\nR1 || XX|RY123\n-----\nCur player\nR2 || R2|R2\nY3 || YX|Y13\nR1 || XX|R13\nDeck size: 0\nDiscards: Y1"
-ObservationString(2) = "Life tokens: 3\nInfo tokens: 3\nFireworks: R0 Y2 \nHands:\nXX || XX|RY13\nXX || X2|RY2\nXX || XX|RY123\n-----\nCur player\nR2 || R2|R2\nY3 || YX|Y13\nR1 || XX|R13\n-----\nY2 || XX|RY12\nR3 || X3|RY3\nY1 || XX|RY12\nDeck size: 0\nDiscards: Y1"
-ObservationTensor(0): ◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◉◉◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◉◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◯◉◯◯◯◉◯◉◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◉◉◉◉◉◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◉◉◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◉◉◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◯◉◯◯◯◉◯◉◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◉◉◯◯◯◯◯◉◉◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◉◉◉◉◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◉◯◉◯◯◯◉◯◉◯◯◯◯◯◯◯◯◉◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [2.0, 2.0, 2.0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14]
-StringLegalActions() = ["(Discard 0)", "(Discard 1)", "(Discard 2)", "(Play 0)", "(Play 1)", "(Play 2)", "(Reveal player +1 color R)", "(Reveal player +1 color Y)", "(Reveal player +2 color R)", "(Reveal player +1 rank 1)", "(Reveal player +1 rank 2)", "(Reveal player +1 rank 3)", "(Reveal player +2 rank 1)", "(Reveal player +2 rank 2)"]
-
 # Apply action "(Discard 2)"
 action: 2
 

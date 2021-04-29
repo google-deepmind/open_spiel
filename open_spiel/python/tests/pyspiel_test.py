@@ -20,7 +20,6 @@ from __future__ import print_function
 
 import os
 from absl.testing import absltest
-import six
 
 from open_spiel.python import policy
 import pyspiel
@@ -46,6 +45,7 @@ EXPECTED_GAMES = set([
     "cursor_go",
     "dark_chess",
     "dark_hex",
+    "dark_hex_ir",
     "deep_sea",
     "efg_game",
     "first_sealed_auction",
@@ -55,6 +55,7 @@ EXPECTED_GAMES = set([
     "havannah",
     "hex",
     "hearts",
+    "kriegspiel",
     "kuhn_poker",
     "laser_tag",
     "lewis_signaling",
@@ -106,9 +107,9 @@ class PyspielTest(absltest.TestCase):
     game_names = pyspiel.registered_names()
 
     expected = EXPECTED_GAMES
-    if os.environ.get("BUILD_WITH_HANABI", "OFF") == "ON":
+    if os.environ.get("OPEN_SPIEL_BUILD_WITH_HANABI", "OFF") == "ON":
       expected.add("hanabi")
-    if os.environ.get("BUILD_WITH_ACPC", "OFF") == "ON":
+    if os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON":
       expected.add("universal_poker")
     expected = sorted(list(expected))
     self.assertCountEqual(game_names, expected)
@@ -248,8 +249,8 @@ class PyspielTest(absltest.TestCase):
                      pyspiel.GameType.ChanceMode.DETERMINISTIC)
 
   def test_error_handling(self):
-    with six.assertRaisesRegex(self, RuntimeError,
-                               "Unknown game 'invalid_game_name'"):
+    with self.assertRaisesRegex(RuntimeError,
+                                "Unknown game 'invalid_game_name'"):
       unused_game = pyspiel.load_game("invalid_game_name")
 
   def test_can_create_cpp_tabular_policy(self):

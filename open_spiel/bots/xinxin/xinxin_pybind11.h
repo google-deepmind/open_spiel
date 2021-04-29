@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_BOTS_XINXIN_XINXIN_PYBIND11_H_
 #define OPEN_SPIEL_BOTS_XINXIN_XINXIN_PYBIND11_H_
 
-#include "pybind11/include/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace open_spiel {
 void init_pyspiel_xinxin(::pybind11::module& m);

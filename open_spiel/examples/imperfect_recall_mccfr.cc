@@ -23,21 +23,25 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
+// E.g. another choice: dark_hex_ir(board_size=2)
+ABSL_FLAG(std::string, game, "phantom_ttt_ir", "Game string");
 ABSL_FLAG(int, num_iters, 1000000, "How many iters to run for.");
 ABSL_FLAG(int, report_every, 1000, "How often to report.");
 
 namespace open_spiel {
 namespace {
 
-void ImperfectRecallMCCFR_PTTT() {
+void ImperfectRecallMCCFR() {
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("phantom_ttt_ir");
+      open_spiel::LoadGame(absl::GetFlag(FLAGS_game));
   // algorithms::ExternalSamplingMCCFRSolver solver(*game);
   algorithms::OutcomeSamplingMCCFRSolver solver(*game);
 
   for (int i = 0; i < absl::GetFlag(FLAGS_num_iters); ++i) {
     solver.RunIteration();
-    std::cout << "Iter " << i << std::endl;
+
+    // Do not run exploitability or NashConv, as it does not support imperfect
+    // recall games. Simply print out the average strategy.
     if (i % absl::GetFlag(FLAGS_report_every) == 0 ||
         i == absl::GetFlag(FLAGS_num_iters) - 1) {
       std::cerr << "Iteration " << i << " average policy is " << std::endl;
@@ -50,11 +54,10 @@ void ImperfectRecallMCCFR_PTTT() {
     }
   }
 }
-
 }  // namespace
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
-  open_spiel::ImperfectRecallMCCFR_PTTT();
+  open_spiel::ImperfectRecallMCCFR();
 }

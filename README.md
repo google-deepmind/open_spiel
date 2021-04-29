@@ -38,10 +38,18 @@ For a longer introduction to the core concepts, formalisms, and terminology,
 including an overview of the algorithms and some results, please see
 [OpenSpiel: A Framework for Reinforcement Learning in Games](https://arxiv.org/abs/1908.09453).
 
-For an overview of OpenSpiel and example uses of the core API, please see the
-[Introduction to OpenSpiel tutorial](https://www.youtube.com/watch?v=YE0E0F39lac),
-and the
-[corresponding slides](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
+For an overview of OpenSpiel and example uses of the core API, please check out
+our tutorials:
+
+*   [Motivation, Core API, Brief Intro to Replictor Dynamics and Imperfect
+    Information Games](https://www.youtube.com/watch?v=YE0E0F39lac) by Marc
+    Lanctot.
+    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
+*   [Motivation, Core API, Implementing CFR and REINFORCE on Kuhn poker, Leduc
+    poker, and Goofspiel](https://www.youtube.com/watch?v=o6JNHoGUXCo) by Edward
+    Lockhart.
+    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-comarl.pdf)
+    [(colab)](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/CFR_and_REINFORCE.ipynb)
 
 If you use OpenSpiel in your research, please cite the paper using the following
 BibTeX:

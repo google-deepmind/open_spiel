@@ -155,6 +155,7 @@ void DeepSeaState::UndoAction(Player player, Action move) {
   --player_row_;
   direction_history_.pop_back();
   history_.pop_back();
+  --move_number_;
 }
 
 void DeepSeaState::DoApplyAction(Action move) {

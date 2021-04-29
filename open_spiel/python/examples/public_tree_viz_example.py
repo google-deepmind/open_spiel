@@ -54,10 +54,12 @@ def main(argv):
   game = pyspiel.load_game_with_public_states(FLAGS.game)
   base_game = game.get_base_game()
   game_type = base_game.get_type()
-  two_pl_zero_sum = game_type.utility == pyspiel.GameType.Utility.ZERO_SUM \
-    and base_game.num_players() == 2
-  node_decorator = _zero_sum_node_decorator if two_pl_zero_sum \
-    else treeviz.default_node_decorator
+  two_pl_zero_sum = (
+      game_type.utility == pyspiel.GameType.Utility.ZERO_SUM and
+      base_game.num_players() == 2)
+  node_decorator = (
+      _zero_sum_node_decorator
+      if two_pl_zero_sum else treeviz.default_node_decorator)
 
   gametree = public_tree_viz.GamePublicTree(
       public_game=game,

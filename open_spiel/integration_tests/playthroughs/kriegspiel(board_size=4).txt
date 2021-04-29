@@ -1,0 +1,1514 @@
+game: kriegspiel(board_size=4)
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Kriegspiel"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["50_move_rule", "board_size", "fen", "threefold_repetition"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "kriegspiel"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 4672
+PolicyTensorShape() = [4672]
+MaxChanceOutcomes() = 0
+GetParameters() = {50_move_rule=True,board_size=4,fen=r1kr/pppp/PPPP/R1KR w - - 0 1,threefold_repetition=True}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = public_repetitions: [3], public_side_to_play: [2], public_irreversible_move_counter: [1], public_illegal: [2], public_capture_type: [3], public_captured_square: [4, 4], public_check_one: [6], public_check_two: [6], public_to_move: [3], public_pawn_tries: [17], private_K_pieces: [4, 4], private_k_pieces: [4, 4], private_Q_pieces: [4, 4], private_q_pieces: [4, 4], private_R_pieces: [4, 4], private_r_pieces: [4, 4], private_B_pieces: [4, 4], private_b_pieces: [4, 4], private_N_pieces: [4, 4], private_n_pieces: [4, 4], private_P_pieces: [4, 4], private_p_pieces: [4, 4], private_empty_pieces: [4, 4], private_unknown_squares: [4, 4], private_left_castling: [2], private_right_castling: [2], private_last_move_from: [4, 4], private_last_move_to: [4, 4], private_last_move_promotion: [6]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 325
+MaxGameLength() = 17695
+ToString() = "kriegspiel(board_size=4)"
+
+# State 0
+# r1kr/pppp/PPPP/R1KR w - - 0 1
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "(action=None, observation="")"
+InformationStateString(1) = "(action=None, observation="")"
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◯◉
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◉◯
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◯◯◉
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◯◉
+                                              ◉◉◯◯
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◯◉
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◉◯
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◯◯◉
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◯◉◉
+                                              ◉◯◉◉
+                                              ◯◯◉◉
+                                              ◯◯◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2d3", "d2c3"]
+
+# Apply action "d2d3"
+action: 1841
+
+# State 1
+# r1kr/pppp/PPPP/R1KR w - - 0 1
+IsTerminal() = False
+History() = [1841]
+HistoryString() = "1841"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move.")"
+ObservationString(0) = "Illegal move."
+ObservationString(1) = "Illegal move."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◯◉
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◯◉
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◯◉◯
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◯◉
+                                              ◉◉◯◯
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◯◉
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◯◉
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◯◉◯
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◯◉◉
+                                              ◉◯◉◉
+                                              ◯◯◉◉
+                                              ◯◯◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◉◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◉◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2d3", "d2c3"]
+
+# Apply action "a2b3"
+action: 117
+
+# State 2
+# r1kr/pPpp/1PPP/R1KR b - - 0 1
+IsTerminal() = False
+History() = [1841, 117]
+HistoryString() = "1841, 117"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move.")"
+ObservationString(0) = "Pawn at b3 captured, black's move."
+ObservationString(1) = "Pawn at b3 captured, black's move."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◉◯
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◉◯
+ObservationTensor(0).public_capture_type: ◯◉◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◉◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◉◯◯
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◉◉
+                                              ◉◉◯◯
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◉◯
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◉◯
+ObservationTensor(1).public_capture_type: ◯◉◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◉◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◉◯◯
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◉◉◉
+                                              ◉◯◯◉
+                                              ◯◯◉◉
+                                              ◯◯◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◉◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◉◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1882]
+StringLegalActions() = ["a4b4", "a3a2", "a3b2", "b3b2", "b3c2", "b3a2", "c4b4", "c3c2", "c3d2", "c3b2", "d3c2"]
+
+# Apply action "c3d2"
+action: 1285
+
+# State 3
+# r1kr/pPpp/1PPP/R1KR b - - 0 1
+IsTerminal() = False
+History() = [1841, 117, 1285]
+HistoryString() = "1841, 117, 1285"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move.")"
+ObservationString(0) = "Illegal move."
+ObservationString(1) = "Illegal move."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◉◯
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◯◉
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◉◯◯
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◉◉
+                                              ◉◉◯◯
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◉◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◉◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◉◯
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◯◉
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◉◯◯
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◉◉◉
+                                              ◉◯◯◉
+                                              ◯◯◉◉
+                                              ◯◯◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◉◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◉◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3d2", "c3b2", "d3d2", "d3c2"]
+
+# Apply action "d3d2"
+action: 1841
+
+# State 4
+# r1kr/pPpp/1PPP/R1KR b - - 0 1
+IsTerminal() = False
+History() = [1841, 117, 1285, 1841]
+HistoryString() = "1841, 117, 1285, 1841"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move."), (action=1841, observation="Illegal move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move.")"
+ObservationString(0) = "Illegal move."
+ObservationString(1) = "Illegal move."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◉◯
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◯◉
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◉◯◯
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◉◉
+                                              ◉◉◯◯
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◉◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◉◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◉◯
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◯◉
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◉◯◯
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◉◉◉
+                                              ◉◯◯◉
+                                              ◯◯◉◉
+                                              ◯◯◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◉◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◉◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1841, 1882]
+StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3b2", "d3d2", "d3c2"]
+
+# Apply action "c4b4"
+action: 1197
+
+# State 5
+# rk1r/pPpp/1PPP/R1KR w - - 1 2
+IsTerminal() = False
+History() = [1841, 117, 1285, 1841, 1197]
+HistoryString() = "1841, 117, 1285, 1841, 1197"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=1197, observation="white's move, 8 pawn tries.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="white's move, 8 pawn tries.")"
+ObservationString(0) = "white's move, 8 pawn tries."
+ObservationString(1) = "white's move, 8 pawn tries."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◯◉
+ObservationTensor(0).public_irreversible_move_counter = [0.01]
+ObservationTensor(0).public_illegal: ◉◯
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◯◉◯
+ObservationTensor(0).public_pawn_tries: ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◉◯
+                                              ◉◉◯◉
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◉
+                                             ◯◯◯◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◉
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◯◉
+ObservationTensor(1).public_irreversible_move_counter = [0.01]
+ObservationTensor(1).public_illegal: ◉◯
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◯◉◯
+ObservationTensor(1).public_pawn_tries: ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◉◉◉
+                                              ◉◯◯◉
+                                              ◯◯◉◉
+                                              ◯◯◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◉◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◉◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1882]
+StringLegalActions() = ["a1b1", "a2a3", "a2b3", "c1b1", "c1b2", "c2c3", "c2b3", "d2c3"]
+
+# Apply action "d2c3"
+action: 1882
+
+# State 6
+# Apply action "b2a1r"
+action: 732
+
+# State 7
+# Apply action "b4c3"
+action: 628
+
+# State 8
+# Apply action "b4b3"
+action: 600
+
+# State 9
+# Apply action "b4b3"
+action: 600
+
+# State 10
+# Apply action "b4c4"
+action: 614
+
+# State 11
+# Apply action "d3c2"
+action: 1882
+
+# State 12
+# Apply action "a3a2"
+action: 89
+
+# State 13
+# rk1r/pPPp/1PP1/R1KR b - - 0 2
+IsTerminal() = False
+History() = [1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89]
+HistoryString() = "1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=1197, observation="white's move, 8 pawn tries."), (action=None, observation="Pawn at c3 captured, black's move."), (action=732, observation="Illegal move."), (action=628, observation="Illegal move."), (action=600, observation="Illegal move."), (action=600, observation="Illegal move."), (action=614, observation="Illegal move."), (action=1882, observation="Illegal move."), (action=89, observation="Illegal move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="white's move, 8 pawn tries."), (action=1882, observation="Pawn at c3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move.")"
+ObservationString(0) = "Illegal move."
+ObservationString(1) = "Illegal move."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◉◯
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◯◉
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◉◯◯
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◉◯
+                                              ◉◉◉◉
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◉◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_last_move_to: ◯◉◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◉◯
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◯◉
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◉◯◯
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◉◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◉◉◉
+                                              ◉◯◯◉
+                                              ◯◯◯◉
+                                              ◯◉◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◉◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◉◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [89, 117, 1781, 1841]
+StringLegalActions() = ["a3a2", "a3b2", "d4c4", "d3d2"]
+
+# Apply action "a3a2"
+action: 89
+
+# State 14
+# Apply action "d4c4"
+action: 1781
+
+# State 15
+# Apply action "a3b2"
+action: 117
+
+# State 16
+# Apply action "a3b2"
+action: 117
+
+# State 17
+# Apply action "d3d2"
+action: 1841
+
+# State 18
+# Apply action "d3d2"
+action: 1841
+
+# State 19
+# rk1r/pPPp/1PP1/R1KR b - - 0 2
+IsTerminal() = True
+History() = [1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89, 89, 1781, 117, 117, 1841, 1841]
+HistoryString() = "1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89, 89, 1781, 117, 117, 1841, 1841"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=1197, observation="white's move, 8 pawn tries."), (action=None, observation="Pawn at c3 captured, black's move."), (action=732, observation="Illegal move."), (action=628, observation="Illegal move."), (action=600, observation="Illegal move."), (action=600, observation="Illegal move."), (action=614, observation="Illegal move."), (action=1882, observation="Illegal move."), (action=89, observation="Illegal move."), (action=89, observation="Illegal move."), (action=1781, observation="Illegal move."), (action=117, observation="Illegal move."), (action=117, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=None, observation="Illegal move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="white's move, 8 pawn tries."), (action=1882, observation="Pawn at c3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move.")"
+ObservationString(0) = "Illegal move."
+ObservationString(1) = "Illegal move."
+ObservationTensor(0).public_repetitions: ◉◯◯
+ObservationTensor(0).public_side_to_play: ◉◯
+ObservationTensor(0).public_irreversible_move_counter: ◯
+ObservationTensor(0).public_illegal: ◯◉
+ObservationTensor(0).public_capture_type: ◉◯◯
+ObservationTensor(0).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(0).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(0).public_to_move: ◉◯◯
+ObservationTensor(0).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_R_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_P_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(0).private_unknown_squares: ◉◉◯◯
+                                              ◉◉◉◯
+                                              ◉◉◉◉
+                                              ◉◉◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◉◯
+ObservationTensor(0).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◉◯◯
+ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).public_repetitions: ◉◯◯
+ObservationTensor(1).public_side_to_play: ◉◯
+ObservationTensor(1).public_irreversible_move_counter: ◯
+ObservationTensor(1).public_illegal: ◯◉
+ObservationTensor(1).public_capture_type: ◉◯◯
+ObservationTensor(1).public_captured_square: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).public_check_one: ◉◯◯◯◯◯
+ObservationTensor(1).public_check_two: ◉◯◯◯◯◯
+ObservationTensor(1).public_to_move: ◉◯◯
+ObservationTensor(1).public_pawn_tries: ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).private_K_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_Q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_R_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_B_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_N_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_P_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◉◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_empty_pieces: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_unknown_squares: ◯◉◉◉
+                                              ◉◯◯◉
+                                              ◯◯◯◉
+                                              ◯◉◉◉
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_last_move_from: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◉◯◯
+ObservationTensor(1).private_last_move_to: ◯◯◯◯
+                                           ◯◯◯◯
+                                           ◯◯◉◯
+                                           ◯◯◯◯
+ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+Rewards() = [-1.0, 1.0]
+Returns() = [-1.0, 1.0]

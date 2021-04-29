@@ -101,8 +101,11 @@ class TicTacToeTest(absltest.TestCase):
     np.testing.assert_array_equal(py_obs.tensor, cc_obs)
 
   def test_pickle(self):
-    """Checks pickling and unpickling works."""
+    """Checks pickling and unpickling of game and state."""
     game = pyspiel.load_game("python_tic_tac_toe")
+    pickled_game = pickle.dumps(game)
+    unpickled_game = pickle.loads(pickled_game)
+    self.assertEqual(str(game), str(unpickled_game))
     state = game.new_initial_state()
     for a in [4, 2, 3, 7]:
       state.apply_action(a)

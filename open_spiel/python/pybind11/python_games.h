@@ -18,8 +18,8 @@
 // Interface and supporting functions for defining games in Python and using
 // them from C++.
 
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/pybind11.h"
 
 namespace open_spiel {
 
@@ -28,7 +28,7 @@ namespace py = ::pybind11;
 // Trampoline for using Python-defined games from C++.
 class PyGame : public Game {
  public:
-  PyGame(py::object py_game, GameType game_type, GameInfo game_info,
+  PyGame(GameType game_type, GameInfo game_info,
          GameParameters game_parameters);
 
   // Implementation of the Game API.
@@ -46,26 +46,22 @@ class PyGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
 
-  // Access to the backing Python object.
-  py::object py_handle() const { return py_handle_; }
-
   // Observers for the old observation API.
-  const Observer& default_observer() const { return *default_observer_; }
-  const Observer& info_state_observer() const { return *info_state_observer_; }
+  const Observer& default_observer() const;
+  const Observer& info_state_observer() const;
 
  private:
-  py::object py_handle_;
   GameInfo info_;
 
   // Used to implement the old observation API.
-  std::shared_ptr<Observer> default_observer_;
-  std::shared_ptr<Observer> info_state_observer_;
+  mutable std::shared_ptr<Observer> default_observer_;
+  mutable std::shared_ptr<Observer> info_state_observer_;
 };
 
 // Trampoline for using Python-defined states from C++.
-class PyState : public State {
+class PyState : public State, public py::trampoline_self_life_support {
  public:
-  PyState(py::handle py_state, std::shared_ptr<const Game> game);
+  PyState(std::shared_ptr<const Game> game);
 
   // Implementation of the State API.
   Player CurrentPlayer() const override;
@@ -74,6 +70,7 @@ class PyState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
+  std::vector<double> Rewards() const override;
   std::unique_ptr<State> Clone() const override;
   void DoApplyAction(Action action_id) override;
   void DoApplyActions(const std::vector<Action>& actions) override;
@@ -84,29 +81,13 @@ class PyState : public State {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
-
-  // Handle the ownership of the Python object.
-  void RelinquishOwnership();
-  void TakeOwnership();
-  ~PyState() override { RelinquishOwnership(); }
-  py::handle py_handle() const { return py_handle_; }
-
- private:
-  py::handle py_handle_;
-  bool own_;
 };
-
-// Returning a std::unique_ptr<State> to Python. Some cleverness is needed in
-// the Python game case, but in the regular C++ game case this makes no
-// difference.
-struct StateDeleter {
-  void operator()(State* state);
-};
-using StateRetPtr = std::unique_ptr<State, StateDeleter>;
-StateRetPtr ToPython(std::unique_ptr<State> state);
 
 // Register a Python game.
 void RegisterPyGame(const GameType& game_type, py::function creator);
+
+// Get the dict for a Python state implementation.
+py::dict PyDict(const State& state);
 
 }  // namespace open_spiel
 

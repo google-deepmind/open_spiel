@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_PYTHON_PYBIND11_ALGORITHMS_CORR_DIST_H_
 #define OPEN_SPIEL_PYTHON_PYBIND11_ALGORITHMS_CORR_DIST_H_
 
-#include "pybind11/include/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 // Initialze the Python interface for trajectories.
 namespace open_spiel {

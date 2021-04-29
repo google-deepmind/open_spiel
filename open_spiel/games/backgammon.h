@@ -174,6 +174,9 @@ class BackgammonState : public State {
   // bar, and have borne off). Should be 15 for the standard game.
   int CountTotalCheckers(int player) const;
 
+  // Returns if moving from the position for the number of spaces is a hit.
+  bool IsHit(Player player, int from_pos, int num) const;
+
   // Accessor functions for some of the specific data.
   int player_turns() const { return turns_; }
   int player_turns(int player) const {
@@ -190,11 +193,18 @@ class BackgammonState : public State {
   // of checkers born off).
   int board(int player, int pos) const;
 
-  // Action encoding / decoding functions.
+  // Action encoding / decoding functions. Note, the converted checker moves
+  // do not contain the hit information; use the AddHitInfo function to get the
+  // hit information.
   Action CheckerMovesToSpielMove(const std::vector<CheckerMove>& moves) const;
   std::vector<CheckerMove> SpielMoveToCheckerMoves(int player,
                                                    Action spiel_move) const;
   Action TranslateAction(int from1, int from2, bool use_high_die_first) const;
+
+  // Return checker moves with extra hit information.
+  std::vector<CheckerMove>
+  AugmentWithHitInfo(Player player,
+                     const std::vector<CheckerMove> &cmoves) const;
 
  protected:
   void DoApplyAction(Action move_id) override;

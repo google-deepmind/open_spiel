@@ -788,6 +788,7 @@ std::unique_ptr<State> TinyBridgePlayState::Clone() const {
 void TinyBridgePlayState::UndoAction(Player player, Action action) {
   actions_.pop_back();
   history_.pop_back();
+  --move_number_;
 }
 
 std::string TinyBridgePlayState::ToString() const {

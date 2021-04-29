@@ -42,8 +42,6 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from six.moves import range
-from six.moves import zip
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

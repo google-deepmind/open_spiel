@@ -49,7 +49,7 @@ ObservationString(0) = "ChanceNode -- no observation"
 ObservationString(1) = "ChanceNode -- no observation"
 ObservationTensor(0): ◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333}]
+ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["State 0", "State 1", "State 2"]
 

@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_PYTHON_PYBIND11_OBSERVATION_HISTORIES_H_
 #define OPEN_SPIEL_PYTHON_PYBIND11_OBSERVATION_HISTORIES_H_
 
-#include "pybind11/include/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 // Initialize the Python interface for observation histories.
 namespace open_spiel {

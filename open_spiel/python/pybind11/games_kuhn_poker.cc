@@ -15,7 +15,7 @@
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 
 #include "open_spiel/games/kuhn_poker.h"
-#include "pybind11/include/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace py = ::pybind11;
 

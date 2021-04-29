@@ -74,7 +74,7 @@ add_library (algorithms OBJECT
 )
 target_include_directories (algorithms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (${BUILD_WITH_ORTOOLS})
+if (${OPEN_SPIEL_BUILD_WITH_ORTOOLS})
   add_subdirectory (ortools)
 endif()
 
