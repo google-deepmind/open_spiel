@@ -26,6 +26,7 @@
 namespace open_spiel {
 namespace algorithms {
 namespace {
+constexpr int kNumLiarsDiceCFRIterations = 1;
 constexpr double kFloatTolerance = 1e-12;
 
 double NashConvTest(const std::string &game_string, const Policy &policy,
@@ -57,7 +58,8 @@ void LeducNashConvTests() {
 void KuhnLeduc3pTests() {
   UniformPolicy uniform_policy;
   NashConvTest("kuhn_poker(players=3)", uniform_policy, 2.0625);
-  NashConvTest("leduc_poker(players=3)", uniform_policy, 12.611221340388003);
+  // Disabled, as it makes the test take a very long time.
+  // NashConvTest("leduc_poker(players=3)", uniform_policy, 12.611221340388003);
 }
 
 void TicTacToeTests() {
@@ -173,7 +175,7 @@ void ImperfectRecallLiarsDiceGameTests() {
   // http://mlanctot.info/files/papers/12icml-ir.pdf
   CFRSolver pr_solver(*pr_game);
   CFRSolver ir_solver(*ir_game);
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < kNumLiarsDiceCFRIterations; i++) {
     pr_solver.EvaluateAndUpdatePolicy();
     ir_solver.EvaluateAndUpdatePolicy();
     if (i % 10 == 0) {
