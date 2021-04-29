@@ -663,14 +663,17 @@ class State {
     SpielFatalError("DoApplyActions is not implemented.");
   }
 
-  // Fields common to every game state.
-  int num_distinct_actions_;
-  int num_players_;
-  std::vector<PlayerAction> history_;  // Actions taken so far.
-  int move_number_;
+  // The game that created this state, plus some static information about it,
+  // cached here for efficient access.
+  const std::shared_ptr<const Game> game_;
+  const int num_distinct_actions_;
+  const int num_players_;
 
-  // A pointer to the game that created this state.
-  std::shared_ptr<const Game> game_;
+  // Information that changes over the course of the game.
+  // LINT.IfChange
+  std::vector<PlayerAction> history_;
+  int move_number_;
+  // LINT.ThenChange(//depot/google3/third_party/open_spiel/python/pybind11/python_games.cc)
 };
 
 std::ostream& operator<<(std::ostream& stream, const State& state);

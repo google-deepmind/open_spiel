@@ -236,10 +236,10 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 }
 
 State::State(std::shared_ptr<const Game> game)
-    : num_distinct_actions_(game->NumDistinctActions()),
+    : game_(game),
+      num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
-      move_number_(0),
-      game_(game) {}
+      move_number_(0) {}
 
 void NormalizePolicy(ActionsAndProbs* policy) {
   const double sum = absl::c_accumulate(

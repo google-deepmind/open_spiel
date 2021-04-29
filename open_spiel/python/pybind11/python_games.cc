@@ -96,11 +96,25 @@ ActionsAndProbs PyState::ChanceOutcomes() const {
 }
 
 std::unique_ptr<State> PyState::Clone() const {
-  auto state = game_->NewInitialState();
-  for (auto [p, a] : FullHistory()) {
-    state->ApplyAction(a);
+  // Create a new State of the right type.
+  auto rv = game_->NewInitialState();
+
+  // Copy the Python-side properties of the state.
+  py::function deepcopy = py::module::import("copy").attr("deepcopy");
+  py::object py_state = py::cast(*rv);
+  for (auto [k, v] : PyDict(*this)) {
+    py_state.attr(k) = deepcopy(v);
   }
-  return state;
+
+  // Copy the C++-side properties of the state (all on the parent class).
+  // Since we started with a valid initial state, we only need to copy
+  // properties that change during the life of the state - hence num_players,
+  // num_distinct_actions are omitted.
+  PyState* state = open_spiel::down_cast<PyState*>(rv.get());
+  state->history_ = history_;
+  state->move_number_ = move_number_;
+
+  return rv;
 }
 
 // Register a Python game.

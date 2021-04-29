@@ -31,14 +31,29 @@ _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 class TicTacToeTest(absltest.TestCase):
 
-  def test_create(self):
-    """Checks we can create the game and clone states."""
+  def test_can_create_game_and_state(self):
+    """Checks we can create the game and a state."""
     game = tic_tac_toe.TicTacToeGame()
-    print(game.num_distinct_actions())
     state = game.new_initial_state()
+    self.assertEqual(str(state), "...\n...\n...")
+
+  def test_cloned_state_matches_original_state(self):
+    """Check we can clone states successfully."""
+    game = tic_tac_toe.TicTacToeGame()
+    state = game.new_initial_state()
+    state.apply_action(1)
+    state.apply_action(2)
     clone = state.clone()
-    print(state)
-    print(clone)
+
+    self.assertEqual(state.history(), clone.history())
+    self.assertEqual(state.num_players(), clone.num_players())
+    self.assertEqual(state.move_number(), clone.move_number())
+    self.assertEqual(state.num_distinct_actions(), clone.num_distinct_actions())
+
+    self.assertEqual(state._cur_player, clone._cur_player)
+    self.assertEqual(state._player0_score, clone._player0_score)
+    self.assertEqual(state._is_terminal, clone._is_terminal)
+    np.testing.assert_array_equal(state.board, clone.board)
 
   def test_random_game(self):
     """Tests basic API functions."""
