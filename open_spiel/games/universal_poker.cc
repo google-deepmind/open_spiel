@@ -1374,7 +1374,7 @@ std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937& rng,
   if (hand_reach.empty()) {
     // Normally uniform_real_distribution is defined on open interval [0, 1)
     // We make it into a closed interval [0, 1] thanks to std::nextafter.
-    std::uniform_real_distribution<> dis(0.0, std::nextafter(1.0, DBL_MAX));
+    std::uniform_real_distribution<> dist(0.0, std::nextafter(1.0, DBL_MAX));
     for (int i = 0; i < 2*kSubgameUniqueHands; ++i) {
       hand_reach.push_back(dist(rng));
     }
