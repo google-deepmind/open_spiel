@@ -670,10 +670,8 @@ class State {
   const int num_players_;
 
   // Information that changes over the course of the game.
-  // LINT.IfChange
   std::vector<PlayerAction> history_;
   int move_number_;
-  // LINT.ThenChange(//depot/google3/third_party/open_spiel/python/pybind11/python_games.cc)
 };
 
 std::ostream& operator<<(std::ostream& stream, const State& state);
