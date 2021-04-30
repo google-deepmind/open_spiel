@@ -148,6 +148,7 @@ Action SimpleBot::Step(const State& state) {
     if (stock_size == kWallStockSize) {
       // Special rules apply when we've reached the wall.
       if (legal_actions.back() == kKnockAction) {
+        knocked_ = true;
         return kKnockAction;
       } else {
         return kPassAction;
