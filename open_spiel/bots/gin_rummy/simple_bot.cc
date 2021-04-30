@@ -88,10 +88,10 @@ Action SimpleBot::Step(const State& state) {
     Action action = next_actions_.back();
     if (std::find(legal_actions.begin(), legal_actions.end(), action) ==
         legal_actions.end()) {
-      std::cout << "Game state:" << std::endl;
-      std::cout << state.ToString() << std::endl;
-      std::cout << "Legal actions: " << legal_actions << std::endl;
-      std::cout << "Bot next actions: " << next_actions_ << std::endl;
+      std::cerr << "Game state:" << std::endl;
+      std::cerr << state.ToString() << std::endl;
+      std::cerr << "Legal actions: " << legal_actions << std::endl;
+      std::cerr << "Bot next actions: " << next_actions_ << std::endl;
       SpielFatalError("Previously determined next action is illegal.");
     }
     next_actions_.pop_back();
@@ -125,10 +125,10 @@ Action SimpleBot::Step(const State& state) {
   } else if (!upcard.has_value()) {
     // MoveType kDiscard
     if (hand.size() != hand_size_ + 1) {
-      std::cout << "Game state:" << std::endl;
-      std::cout << state.ToString() << std::endl;
-      std::cout << "Bot hand:" << std::endl;
-      std::cout << utils_.HandToString(hand);
+      std::cerr << "Game state:" << std::endl;
+      std::cerr << state.ToString() << std::endl;
+      std::cerr << "Bot hand:" << std::endl;
+      std::cerr << utils_.HandToString(hand);
       SpielFatalError("Discarding with an insufficient number of cards.");
     }
     int deadwood = utils_.MinDeadwood(hand);
