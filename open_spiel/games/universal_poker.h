@@ -292,7 +292,7 @@ int GetHoleCardsReachIndex(int card_a, int card_b,
 std::shared_ptr <const Game> MakeRandomSubgame(std::mt19937& rng,
                                                int pot_size = -1,
                                                std::string board_cards = "",
-                                               std::vector <int> reach_probs = {});
+                                               std::vector<double> hand_reach = {});
 
 // Number of unique hands in no-limit poker.
 constexpr int kSubgameUniqueHands = 1326;  // = (52*51) / 2

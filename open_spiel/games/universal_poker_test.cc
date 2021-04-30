@@ -636,7 +636,7 @@ void TestRandomSubgameCreation() {
   MakeRandomSubgame(rng, 100);
   MakeRandomSubgame(rng, 100, "7s9h9cTc");
 
-  std::vector<int>  uniform_reaches;
+  std::vector<double> uniform_reaches;
   for (int i = 0; i < 2 * kSubgameUniqueHands; ++i) {
     uniform_reaches.push_back(1. / (2 * kSubgameUniqueHands));
   }
