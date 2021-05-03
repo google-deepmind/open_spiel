@@ -221,13 +221,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
-  # On Github Actions, macOS 10.15 comes with Python 3.9.
-  # Only 3.8 is supported by Tensorflow 2.2, and only 3.7 currently runs on CI.
-  if [[ "$CI" ]]; then
-    brew install "python@${OS_PYTHON_VERSION}"
-    brew unlink python@3.9
-    brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
-  fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
   python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"

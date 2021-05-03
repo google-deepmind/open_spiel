@@ -21,7 +21,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: "ubuntu-20.04"
-          OS_PYTHON_VERSION: 3.8
+          OS_PYTHON_VERSION: 3.9
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -37,7 +37,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-20.04_v8.0.8283.tar.gz"
          # macOS Catalina 10.15
         - os: macos-10.15
-          OS_PYTHON_VERSION: 3.7
+          OS_PYTHON_VERSION: 3.9
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -47,7 +47,7 @@ jobs:
          # Build and run tests without all optional dependencies (default behavior) and
          # use nox
         - os: ubuntu-20.04
-          OS_PYTHON_VERSION: 3.8
+          OS_PYTHON_VERSION: 3.9
           TRAVIS_USE_NOX: 1
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -61,7 +61,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: "macos-10.15"
-          OS_PYTHON_VERSION: 3.7
+          OS_PYTHON_VERSION: 3.9
           TRAVIS_USE_NOX: 1
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
