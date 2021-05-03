@@ -34,6 +34,12 @@ import queue
 
 Empty = queue.Empty
 
+# Without this line, this fails on latest MacOS with Python 3.8. See
+# https://github.com/pytest-dev/pytest-flask/issues/104#issuecomment-577908228
+# and for more details see
+# https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods
+multiprocessing.set_start_method("fork")
+
 
 # For compatibility so that it works inside Google.
 @contextlib.contextmanager
