@@ -113,10 +113,12 @@ py::object GameParameterToPython(const GameParameter& gp) {
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
 
-  // Needed for default parameters, e.g. of Game::MakeObserver,
-  // otherwise we get a runtime error at load time on MacOS,
-  // when loading the wheel.
+  // These are needed for default parameters, e.g. of Game::MakeObserver,
+  // otherwise we get a runtime error at load time on MacOS building &
+  // loading the bdist_wheel.
   py::class_<absl::nullopt_t> null_opt(m, "absl_nullopt_t");
+  py::class_<absl::optional<open_spiel::IIGObservationType>>
+      opt_iig_obs_type(m, "absl_opt_iig_obs_type");
 
   py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
       .value("UNSET", open_spiel::GameParameter::Type::kUnset)
