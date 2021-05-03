@@ -34,16 +34,6 @@ void init_pyspiel_observer(py::module& m) {
       .def_readonly("name", &TensorInfo::name)
       .def_readonly("shape", &TensorInfo::shape)
       .def("__str__", &TensorInfo::DebugString);
-  
-  py::enum_<PrivateInfoType>(m, "PrivateInfoType")
-      .value("NONE", PrivateInfoType::kNone)
-      .value("SINGLE_PLAYER", PrivateInfoType::kSinglePlayer)
-      .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers);
-
-  py::class_<IIGObservationType>(m, "IIGObservationType")
-      .def_readonly("public_info", &IIGObservationType::public_info)
-      .def_readonly("perfect_recall", &IIGObservationType::perfect_recall)
-      .def_readonly("private_info", &IIGObservationType::private_info);
 
   // C++ Observation, intended only for the Python Observation class, not
   // for general Python code.
