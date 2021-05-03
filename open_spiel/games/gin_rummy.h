@@ -231,9 +231,9 @@ class GinRummyGame : public Game {
   }
   // All games should terminate before reaching this upper bound.
   int MaxGameLength() const override { return 300; }
-  // Only chance nodes are the deal.
+  // Chance nodes occur on the deal and when drawing from the stock.
   int MaxChanceNodesInHistory() const override {
-    return num_ranks_ * num_suits_;
+    return num_ranks_ * num_suits_ - kWallStockSize;
   }
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
