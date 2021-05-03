@@ -848,23 +848,12 @@ GinRummyGame::GinRummyGame(const GameParameters& params)
   info_state_observer_ = std::make_shared<GinRummyObserver>(kInfoStateObsType);
 }
 
-// TODO(Michal) This is how it's implemented in dark chess. The commented out
-// code below is how it's implemented in leduc. Is there a reason to prefer
-// one to the other?
 std::shared_ptr<Observer> GinRummyGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-
   if (!params.empty()) SpielFatalError("Observation params not supported");
   return std::make_shared<GinRummyObserver>(
       iig_obs_type.value_or(kDefaultObsType));
-
-  //if (params.empty()) {
-  //  return std::make_shared<GinRummyObserver>(
-  //      iig_obs_type.value_or(kDefaultObsType));
-  //} else {
-  //  return MakeRegisteredObserver(iig_obs_type, params);
-  //}
 }
 
 }  // namespace gin_rummy
