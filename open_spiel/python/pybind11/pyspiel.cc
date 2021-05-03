@@ -117,8 +117,6 @@ PYBIND11_MODULE(pyspiel, m) {
   // otherwise we get a runtime error at load time on MacOS building &
   // loading the bdist_wheel.
   py::class_<absl::nullopt_t> null_opt(m, "absl_nullopt_t");
-  py::class_<absl::optional<open_spiel::IIGObservationType>>
-      opt_iig_obs_type(m, "absl_opt_iig_obs_type");
 
   py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
       .value("UNSET", open_spiel::GameParameter::Type::kUnset)
@@ -157,6 +155,9 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("public_info", &IIGObservationType::public_info)
       .def_readonly("perfect_recall", &IIGObservationType::perfect_recall)
       .def_readonly("private_info", &IIGObservationType::private_info);
+
+  py::class_<absl::optional<open_spiel::IIGObservationType>>
+      opt_iig_obs_type(m, "absl_opt_iig_obs_type");
 
   py::class_<UniformProbabilitySampler> uniform_sampler(
       m, "UniformProbabilitySampler");
