@@ -19,7 +19,7 @@ set -x
 
 # Python 3.9 not default on Ubuntu yet.
 OS=`uname -a | awk '{print $1}'`
-if [[ "$OS" = "Linux" -a "$OS_PYTHON_VERSION" = "3.9" ]]; then
+if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
   sudo apt-get install python3.9 python3.9-dev
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9
