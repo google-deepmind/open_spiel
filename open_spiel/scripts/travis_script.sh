@@ -22,8 +22,8 @@ OS=`uname -a | awk '{print $1}'`
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
   sudo apt-get install python3.9 python3.9-dev
-  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9
-  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 fi
 
 source ./open_spiel/scripts/python_extra_deps.sh
