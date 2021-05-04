@@ -1,4 +1,4 @@
-# To enable C++ Torch DQN, you will need to set BUILD_WITH_LIBTORCH. 
+# To enable C++ Torch DQN, you will need to set OPEN_SPIEL_BUILD_WITH_LIBTORCH. 
 if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   add_library (dqn_torch OBJECT
     dqn.h

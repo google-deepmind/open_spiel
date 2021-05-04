@@ -35,20 +35,23 @@ void TestSimpleGame() {
   std::shared_ptr<const Game> game = efg_game::LoadEFGGame(
       efg_game::GetSimpleForkEFGData());
   SPIEL_CHECK_TRUE(game != nullptr);
-  DQN dqn(/*use_observation*/game->GetType().provides_observation_tensor,
-          /*player_id*/0,
-          /*state_representation_size*/game->InformationStateTensorSize(),
-          /*num_actions*/game->NumDistinctActions(),
-          /*hidden_layers_sizes*/{16},
-          /*replay_buffer_capacity*/100,
-          /*batch_size*/5,
-          /*learning_rate*/0.01,
-          /*update_target_network_every*/20,
-          /*learn_every*/5,
-          /*discount_factor*/1.0,
-          /*min_buffer_size_to_learn*/5,
-          /*epsilon_start*/0.02,
-          /*epsilon_end*/0.01);
+  DQNSettings settings = {
+    /*use_observation*/game->GetType().provides_observation_tensor,
+    /*player_id*/0,
+    /*state_representation_size*/game->InformationStateTensorSize(),
+    /*num_actions*/game->NumDistinctActions(),
+    /*hidden_layers_sizes*/{16},
+    /*replay_buffer_capacity*/100,
+    /*batch_size*/5,
+    /*learning_rate*/0.01,
+    /*update_target_network_every*/20,
+    /*learn_every*/5,
+    /*discount_factor*/1.0,
+    /*min_buffer_size_to_learn*/5,
+    /*epsilon_start*/0.02,
+    /*epsilon_end*/0.01
+  };
+  DQN dqn(settings);
   int total_reward = 0;
   std::unique_ptr<State> state;
   for (int i = 0; i < 100; i++) {
@@ -70,19 +73,21 @@ void TestTicTakToe() {
   std::vector<std::unique_ptr<DQN>> agents;
   std::vector<int> hidden_layers = {16};
   for (int i = 0; i < 2; i++) {
-    agents.push_back(std::make_unique<DQN>(
-        /*use_observation*/game->GetType().provides_observation_tensor,
-        /*player_id*/i,
-        /*state_representation_size*/game->ObservationTensorSize(),
-        /*num_actions*/game->NumDistinctActions(),
-        /*hidden_layers_sizes*/hidden_layers,
-        /*replay_buffer_capacity*/10,
-        /*batch_size*/5,
-        /*learning_rate*/0.01,
-        /*update_target_network_every*/20,
-        /*learn_every*/5,
-        /*discount_factor*/1.0,
-        /*min_buffer_size_to_learn*/5));
+    DQNSettings settings = {
+      /*use_observation*/game->GetType().provides_observation_tensor,
+      /*player_id*/i,
+      /*state_representation_size*/game->ObservationTensorSize(),
+      /*num_actions*/game->NumDistinctActions(),
+      /*hidden_layers_sizes*/hidden_layers,
+      /*replay_buffer_capacity*/10,
+      /*batch_size*/5,
+      /*learning_rate*/0.01,
+      /*update_target_network_every*/20,
+      /*learn_every*/5,
+      /*discount_factor*/1.0,
+      /*min_buffer_size_to_learn*/5
+    };
+    agents.push_back(std::make_unique<DQN>(settings));
   }
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
@@ -101,19 +106,21 @@ void TestHanabi() {
   std::vector<std::unique_ptr<DQN>> agents;
   std::vector<int> hidden_layers = {16};
   for (int i = 0; i < 2; i++) {
-    agents.push_back(std::make_unique<DQN>(
-        /*use_observation*/game->GetType().provides_observation_tensor,
-        /*player_id*/i,
-        /*state_representation_size*/game->InformationStateTensorSize(),
-        /*num_actions*/game->NumDistinctActions(),
-        /*hidden_layers_sizes*/hidden_layers,
-        /*replay_buffer_capacity*/10,
-        /*batch_size*/5,
-        /*learning_rate*/0.01,
-        /*update_target_network_every*/20,
-        /*learn_every*/5,
-        /*discount_factor*/1.0,
-        /*min_buffer_size_to_learn*/5));
+    DQNSettings settings = {
+      /*use_observation*/game->GetType().provides_observation_tensor,
+      /*player_id*/i,
+      /*state_representation_size*/game->InformationStateTensorSize(),
+      /*num_actions*/game->NumDistinctActions(),
+      /*hidden_layers_sizes*/hidden_layers,
+      /*replay_buffer_capacity*/10,
+      /*batch_size*/5,
+      /*learning_rate*/0.01,
+      /*update_target_network_every*/20,
+      /*learn_every*/5,
+      /*discount_factor*/1.0,
+      /*min_buffer_size_to_learn*/5
+    };
+    agents.push_back(std::make_unique<DQN>(settings));
   }
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {

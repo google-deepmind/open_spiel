@@ -24,18 +24,19 @@ namespace open_spiel {
 namespace algorithms {
 namespace torch_dqn {
 
-static constexpr double kSqrt2 = 1.4142135623730950488;
+constexpr double kSqrt2 = 1.4142135623730950488;
+constexpr int kSeed = 93879211;
 
 SonnetLinearImpl::SonnetLinearImpl(const int& input_size,
                                    const int& output_size,
                                    bool activate_relu = false)
-  :sonnet_linear_(torch::nn::LinearOptions(/*in_features*/input_size,
-                                           /*out_features*/output_size)),
-     activate_relu_(activate_relu) {
+    : sonnet_linear_(torch::nn::LinearOptions(/*in_features*/input_size,
+                                              /*out_features*/output_size)),
+      activate_relu_(activate_relu) {
+  torch::manual_seed(kSeed);
   double stddev = 1.0 / std::sqrt(input_size);
   double lower = -2.0 * stddev;
   double upper = 2.0 * stddev;
-
   for (auto& named_parameter : sonnet_linear_->named_parameters()) {
     if (named_parameter.key().find("weight") != std::string::npos) {
       torch::Tensor uniform_param = torch::nn::init::uniform_(

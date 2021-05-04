@@ -33,41 +33,26 @@ namespace torch_dqn {
 
 constexpr const int kIllegalActionLogitsPenalty = -1e9;
 
-DQN::DQN(bool use_observation,
-         Player player_id,
-         int state_representation_size,
-         int num_actions,
-         std::vector<int> hidden_layers_sizes,
-         int replay_buffer_capacity,
-         int batch_size,
-         double learning_rate,
-         int update_target_network_every,
-         int learn_every,
-         double discount_factor,
-         int min_buffer_size_to_learn,
-         double epsilon_start,
-         double epsilon_end,
-         int epsilon_decay_duration,
-         std::string loss_str)
-    : use_observation_(use_observation),
-      player_id_(player_id),
-      input_size_(state_representation_size),
-      num_actions_(num_actions),
-      hidden_layers_sizes_(hidden_layers_sizes),
-      batch_size_(batch_size),
-      update_target_network_every_(update_target_network_every),
-      learn_every_(learn_every),
-      min_buffer_size_to_learn_(min_buffer_size_to_learn),
-      discount_factor_(discount_factor),
-      epsilon_start_(epsilon_start),
-      epsilon_end_(epsilon_end),
-      epsilon_decay_duration_(epsilon_decay_duration),
-      replay_buffer_(replay_buffer_capacity),
+DQN::DQN(const DQNSettings& settings)
+    : use_observation_(settings.use_observation),
+      player_id_(settings.player_id),
+      input_size_(settings.state_representation_size),
+      num_actions_(settings.num_actions),
+      hidden_layers_sizes_(settings.hidden_layers_sizes),
+      batch_size_(settings.batch_size),
+      update_target_network_every_(settings.update_target_network_every),
+      learn_every_(settings.learn_every),
+      min_buffer_size_to_learn_(settings.min_buffer_size_to_learn),
+      discount_factor_(settings.discount_factor),
+      epsilon_start_(settings.epsilon_start),
+      epsilon_end_(settings.epsilon_end),
+      epsilon_decay_duration_(settings.epsilon_decay_duration),
+      replay_buffer_(settings.replay_buffer_capacity),
       q_network_(input_size_, hidden_layers_sizes_, num_actions_),
       target_q_network_(input_size_, hidden_layers_sizes_, num_actions_),
       optimizer_(q_network_->parameters(),
-                 torch::optim::SGDOptions(learning_rate)),
-      loss_str_(loss_str),
+                 torch::optim::SGDOptions(settings.learning_rate)),
+      loss_str_(settings.loss_str),
       exists_prev_(false),
       prev_state_(nullptr),
       step_counter_(0) {
@@ -163,6 +148,7 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
         {info_state.size()},
         torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
     torch::Tensor q_value = q_network_->forward(info_state_tensor);
+    std::cout << q_value << std::endl;
     torch::Tensor legal_actions_mask = torch::empty({legal_actions.size()});
     for (Action a : legal_actions) {
       legal_actions_mask[a] = 1;

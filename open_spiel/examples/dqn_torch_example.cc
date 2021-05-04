@@ -44,11 +44,13 @@ float EvalAgent(std::shared_ptr<const open_spiel::Game> game,
 
 void SolveCatch() {
   std::shared_ptr<const open_spiel::Game> game = open_spiel::LoadGame("catch");
-  auto dqn = std::make_unique<open_spiel::algorithms::torch_dqn::DQN>(
-      /*use_observation*/game->GetType().provides_observation_tensor,
-      /*player_id*/0,
-      /*state_representation_size*/game->ObservationTensorSize(),
-      /*num_actions*/game->NumDistinctActions());
+  open_spiel::algorithms::torch_dqn::DQNSettings settings = {
+    /*use_observation*/game->GetType().provides_observation_tensor,
+    /*player_id*/0,
+    /*state_representation_size*/game->ObservationTensorSize(),
+    /*num_actions*/game->NumDistinctActions()
+  };
+  auto dqn = std::make_unique<open_spiel::algorithms::torch_dqn::DQN>(settings);
   int iter = absl::GetFlag(FLAGS_iter);
   int eval_every = absl::GetFlag(FLAGS_eval_every);
   int total_reward = 0;

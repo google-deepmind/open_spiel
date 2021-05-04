@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/algorithms/dqn_torch/simple_nets.h"
+#include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -43,25 +43,29 @@ struct Transition {
   std::vector<int> legal_actions_mask;
 };
 
+struct DQNSettings {
+  bool use_observation;
+  Player player_id;
+  int state_representation_size;
+  int num_actions;
+  std::vector<int> hidden_layers_sizes = {128};
+  int replay_buffer_capacity = 10000;
+  int batch_size = 128;
+  double learning_rate = 0.01;
+  int update_target_network_every = 1000;
+  int learn_every = 10;
+  double discount_factor = 1.0;
+  int min_buffer_size_to_learn = 1000;
+  double epsilon_start = 1.0;
+  double epsilon_end = 0.1;
+  int epsilon_decay_duration = 1000000;
+  std::string loss_str = "mse";
+};
+
 // DQN Agent implementation in LibTorch.
 class DQN {
   public:
-    DQN(bool use_observation,
-        Player player_id,
-        int state_representation_size,
-        int num_actions,
-        std::vector<int> hidden_layers_sizes = {128},
-        int replay_buffer_capacity = 10000,
-        int batch_size = 128,
-        double learning_rate = 0.01,
-        int update_target_network_every = 1000,
-        int learn_every = 10,
-        double discount_factor = 1.0,
-        int min_buffer_size_to_learn = 1000,
-        double epsilon_start = 1.0,
-        double epsilon_end = 0.1,
-        int epsilon_decay_duration = 1000000,
-        std::string loss_str = "mse");
+    DQN(const DQNSettings& settings);
     virtual ~DQN() = default;
     Action Step(const std::unique_ptr<State>& state,
                 bool is_evaluation = false,
