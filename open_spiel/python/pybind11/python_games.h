@@ -45,6 +45,8 @@ class PyGame : public Game {
       const GameParameters& params) const override;
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
+  std::unique_ptr<State> DeserializeState(
+      const std::string& str) const override;
 
   // Observers for the old observation API.
   const Observer& default_observer() const;
@@ -81,6 +83,10 @@ class PyState : public State, public py::trampoline_self_life_support {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
+  std::string Serialize() const override;
+
+  // Python-specific details.
+  void Deserialize(const std::string& str);
 };
 
 // Register a Python game.

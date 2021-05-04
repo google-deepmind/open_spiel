@@ -18,6 +18,9 @@
 
 // Interface code for using Python Games and States from C++.
 
+#include "open_spiel/abseil-cpp/absl/strings/escaping.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
@@ -246,6 +249,74 @@ py::dict PyDict(const State& state) {
   } else {
     return py::dict();
   }
+}
+
+std::unique_ptr<State> PyGame::DeserializeState(const std::string& str) const {
+  std::unique_ptr<State> state = NewInitialState();
+  open_spiel::down_cast<PyState*>(state.get())->Deserialize(str);
+  return state;
+}
+
+// Serialization form for the Python-side attributes is a b64-encoded pickled
+// Python dict (the __dict__ member of the Python object).
+
+py::dict decode_dict(const absl::string_view str) {
+  std::string bytes;
+  SPIEL_CHECK_TRUE(absl::Base64Unescape(str, &bytes));
+  py::function pickle_loads = py::module::import("pickle").attr("loads");
+  return pickle_loads(py::bytes(bytes));
+}
+
+std::string encode_dict(py::dict dict) {
+  py::function pickle_dumps = py::module::import("pickle").attr("dumps");
+  py::bytes bytes = pickle_dumps(dict);
+  return absl::Base64Escape(std::string(bytes));
+}
+
+inline constexpr const absl::string_view kTagHistory = "history=";
+inline constexpr const absl::string_view kTagMoveNumber = "move_number=";
+inline constexpr const absl::string_view kTagDict = "__dict__=";
+
+void PyState::Deserialize(const std::string& str) {
+  std::vector<absl::string_view> pieces =
+      absl::StrSplit(str, absl::MaxSplits('\n', 2));
+  SPIEL_CHECK_EQ(pieces.size(), 3);
+
+  SPIEL_CHECK_EQ(pieces[0].substr(0, kTagHistory.size()), kTagHistory);
+  auto history_str = pieces[0].substr(kTagHistory.size());
+  if (!history_str.empty()) {
+    for (auto& h : absl::StrSplit(history_str, ',')) {
+      std::vector<absl::string_view> p = absl::StrSplit(h, ':');
+      SPIEL_CHECK_EQ(p.size(), 2);
+      int player, action;
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(p[0], &player));
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(p[1], &action));
+      history_.push_back({player, action});
+    }
+  }
+
+  SPIEL_CHECK_EQ(pieces[1].substr(0, kTagMoveNumber.size()), kTagMoveNumber);
+  SPIEL_CHECK_TRUE(
+      absl::SimpleAtoi(pieces[1].substr(kTagMoveNumber.size()), &move_number_));
+
+  SPIEL_CHECK_EQ(pieces[2].substr(0, kTagDict.size()), kTagDict);
+  py::object py_state = py::cast(*this);
+  for (const auto& [k, v] : decode_dict(pieces[2].substr(kTagDict.size()))) {
+    py_state.attr(k) = v;
+  }
+}
+
+std::string PyState::Serialize() const {
+  return absl::StrCat(
+      // C++ Attributes
+      kTagHistory,
+      absl::StrJoin(history_, ",",
+                    [](std::string* out, const PlayerAction& pa) {
+                      absl::StrAppend(out, pa.player, ":", pa.action);
+                    }),
+      "\n", kTagMoveNumber, move_number_, "\n",
+      // Python attributes
+      kTagDict, encode_dict(PyDict(*this)));
 }
 
 }  // namespace open_spiel
