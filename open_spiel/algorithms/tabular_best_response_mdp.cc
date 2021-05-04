@@ -39,7 +39,7 @@ MDPNode::MDPNode(const std::string& node_key)
       node_key_(node_key) {}
 
 void MDPNode::IncTransitionWeight(Action a, MDPNode *child, double weight) {
-  SPIEL_CHECK_NE(child, nullptr);
+  SPIEL_CHECK_TRUE(child != nullptr);
   children_[a][child] += weight;
 }
 
@@ -94,7 +94,7 @@ double MDP::Solve(double tolerance, TabularPolicy *br_policy) {
         for (auto &child_value : node->children()[action]) {
           MDPNode *child = child_value.first;
           double transition_weight = child_value.second;
-          SPIEL_CHECK_NE(child, nullptr);
+          SPIEL_CHECK_TRUE(child != nullptr);
           double prob = transition_weight / node_weight;
           if (std::isnan(prob)) {
             // When transition_weight = node_weight = 0, set to 0
@@ -159,7 +159,7 @@ void TabularBestResponseMDP::BuildMDPs(
       // it to keep the semantics of the values consistent across the ISMDP.
       node->add_weight(opponent_reach);
       MDPNode *parent_node = parent_nodes[p];
-      SPIEL_CHECK_NE(parent_node, nullptr);
+      SPIEL_CHECK_TRUE(parent_node != nullptr);
       parent_node->IncTransitionWeight(parent_actions[p], node, opponent_reach);
     }
   } else if (state.IsChanceNode()) {
@@ -197,7 +197,7 @@ void TabularBestResponseMDP::BuildMDPs(
       nodes[player]->add_weight(opponent_reaches[player]);
 
       MDPNode* parent_node = parent_nodes[player];
-      SPIEL_CHECK_NE(parent_node, nullptr);
+      SPIEL_CHECK_TRUE(parent_node != nullptr);
       parent_node->IncTransitionWeight(parent_actions[player], nodes[player],
                                        opponent_reaches[player]);
     }
@@ -242,7 +242,7 @@ void TabularBestResponseMDP::BuildMDPs(
     SPIEL_CHECK_LE(opponent_reach, 1.0);
     node->add_weight(opponent_reach);
     MDPNode *parent_node = parent_nodes[player];
-    SPIEL_CHECK_NE(parent_node, nullptr);
+    SPIEL_CHECK_TRUE(parent_node != nullptr);
     parent_node->IncTransitionWeight(parent_actions[player], node,
                                      opponent_reach);
 
