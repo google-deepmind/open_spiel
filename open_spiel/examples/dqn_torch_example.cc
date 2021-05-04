@@ -25,23 +25,22 @@
 ABSL_FLAG(int, iter, 1000, "How many learn steps to run.");
 ABSL_FLAG(int, eval_every, 300, "How often to evaluate the policy.");
 
-float EvalAgent(std::shared_ptr<const open_spiel::Game> game, 
-                std::unique_ptr<open_spiel::algorithms::torch_dqn::DQN> &agent, 
+float EvalAgent(std::shared_ptr<const open_spiel::Game> game,
+                const std::unique_ptr<open_spiel::algorithms::torch_dqn::DQN>& agent,
                 int num_episodes) {
   float rewards = 0.0;
-  for (int i=0;i<num_episodes;i++) {
+  for (int i = 0; i < num_episodes; i++) {
     std::unique_ptr<open_spiel::State> state = game->NewInitialState();
     float episode_reward = 0.0;
     while (!state->IsTerminal()) {
       open_spiel::Action action = agent->Step(state, true);
       state->ApplyAction(action);
       episode_reward += state->Rewards()[0];
-    };
+    }
     rewards += episode_reward;
-  };
-  return rewards / (float)num_episodes;
-};
-
+  }
+  return rewards / static_cast<float>(num_episodes);
+}
 
 void SolveCatch() {
   std::shared_ptr<const open_spiel::Game> game = open_spiel::LoadGame("catch");
@@ -58,14 +57,13 @@ void SolveCatch() {
     while (!state->IsTerminal()) {
       open_spiel::Action action = dqn->Step(state);
       state->ApplyAction(action);
-    };
+    }
     if (iter % eval_every == 0) {
       float reward = EvalAgent(game, dqn, 100);
       std::cout << reward << std::endl;
-    };
-  };
-  
-};
+    }
+  }
+}
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);

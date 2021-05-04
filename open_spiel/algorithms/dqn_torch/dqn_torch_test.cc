@@ -32,7 +32,8 @@ namespace torch_dqn {
 namespace {
 
 void TestSimpleGame() {
-  std::shared_ptr<const Game> game = efg_game::LoadEFGGame(efg_game::GetSimpleForkEFGData());
+  std::shared_ptr<const Game> game = efg_game::LoadEFGGame(
+      efg_game::GetSimpleForkEFGData());
   SPIEL_CHECK_TRUE(game != nullptr);
   DQN dqn(/*use_observation*/game->GetType().provides_observation_tensor,
           /*player_id*/0,
@@ -50,26 +51,25 @@ void TestSimpleGame() {
           /*epsilon_end*/0.01);
   int total_reward = 0;
   std::unique_ptr<State> state;
-  for (int i=0;i<100;i++) {
+  for (int i = 0; i < 100; i++) {
     state = game->NewInitialState();
     while (!state->IsTerminal()) {
       open_spiel::Action action = dqn.Step(state);
       state->ApplyAction(action);
       total_reward += state->PlayerReward(0);
-    };
+    }
     dqn.Step(state);
-  };
+  }
 
   SPIEL_CHECK_GE(total_reward, 75);
-
 }
- 
+
 void TestTicTakToe() {
   std::shared_ptr<const Game> game = open_spiel::LoadGame("tic_tac_toe");
   SPIEL_CHECK_TRUE(game != nullptr);
   std::vector<std::unique_ptr<DQN>> agents;
   std::vector<int> hidden_layers = {16};
-  for (int i=0;i<2;i++){
+  for (int i = 0; i < 2; i++) {
     agents.push_back(std::make_unique<DQN>(
         /*use_observation*/game->GetType().provides_observation_tensor,
         /*player_id*/i,
@@ -83,16 +83,16 @@ void TestTicTakToe() {
         /*learn_every*/5,
         /*discount_factor*/1.0,
         /*min_buffer_size_to_learn*/5));
-  };
+  }
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
     Player current_player = state->CurrentPlayer();
     open_spiel::Action action = agents[current_player]->Step(state);
     state->ApplyAction(action);
-  };
-  for (int i=0;i<2;i++){
+  }
+  for (int i = 0; i < 2; i++) {
     agents[i]->Step(state);
-  };
+  }
 }
 
 void TestHanabi() {
@@ -100,7 +100,7 @@ void TestHanabi() {
   SPIEL_CHECK_TRUE(game != nullptr);
   std::vector<std::unique_ptr<DQN>> agents;
   std::vector<int> hidden_layers = {16};
-  for (int i=0;i<2;i++){
+  for (int i = 0; i < 2; i++) {
     agents.push_back(std::make_unique<DQN>(
         /*use_observation*/game->GetType().provides_observation_tensor,
         /*player_id*/i,
@@ -114,23 +114,23 @@ void TestHanabi() {
         /*learn_every*/5,
         /*discount_factor*/1.0,
         /*min_buffer_size_to_learn*/5));
-  };
+  }
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
     Player current_player = state->CurrentPlayer();
     open_spiel::Action action;
-    for (int i=0;i<2;i++){
+    for (int i = 0; i < 2; i++) {
       if (i == current_player) {
         action = agents[i]->Step(state);
       } else {
         agents[i]->Step(state);
-      };
-    };
+      }
+    }
     state->ApplyAction(action);
-  };
-  for (int i=0;i<2;i++){
+  }
+  for (int i = 0; i < 2; i++) {
     agents[i]->Step(state);
-  };
+  }
 }
 
 }  // namespace

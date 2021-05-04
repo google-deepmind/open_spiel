@@ -18,6 +18,8 @@
 #include <torch/torch.h>
 
 #include <iostream>
+#include <vector>
+#include <utility>
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -30,9 +32,11 @@ namespace torch_dqn {
 // Always includes biases and only supports ReLU activations.
 class SonnetLinearImpl : public torch::nn::Module {
   public :
-    SonnetLinearImpl(const int& input_size, const int& output_size, bool activate_relu);
+    SonnetLinearImpl(const int& input_size,
+                     const int& output_size,
+                     bool activate_relu);
     torch::Tensor forward(torch::Tensor x);
-  
+
   private:
     bool activate_relu_;
     torch::nn::Linear sonnet_linear_;
@@ -45,8 +49,8 @@ class MLPImpl : public torch::nn::Module {
     MLPImpl(const int& input_size,
             const std::vector<int>& hidden_layers_sizes,
             const int& output_size,
-            bool activate_final=false);
-    torch::Tensor forward(torch::Tensor x);    
+            bool activate_final = false);
+    torch::Tensor forward(torch::Tensor x);
 
   private:
     int input_size_;
@@ -54,7 +58,6 @@ class MLPImpl : public torch::nn::Module {
     int output_size_;
     bool activate_final_;
     torch::nn::ModuleList layers_;
-    
 };
 TORCH_MODULE(MLP);
 
