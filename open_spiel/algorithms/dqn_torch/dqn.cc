@@ -59,7 +59,8 @@ DQN::DQN(const DQNSettings& settings)
 }
 
 std::vector<float> DQN::GetInfoState(const std::unique_ptr<State>& state,
-                                     Player player_id, bool use_observation) {
+                                     Player player_id,
+                                     bool use_observation) {
   if (use_observation) {
     return state->ObservationTensor(player_id);
   } else {
@@ -148,7 +149,6 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
         {info_state.size()},
         torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
     torch::Tensor q_value = q_network_->forward(info_state_tensor);
-    std::cout << q_value << std::endl;
     torch::Tensor legal_actions_mask = torch::empty({legal_actions.size()});
     for (Action a : legal_actions) {
       legal_actions_mask[a] = 1;
