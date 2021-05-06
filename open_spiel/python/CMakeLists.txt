@@ -197,6 +197,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
+  jax/dqn_jax_test.py
+  jax/nfsp_jax_test.py
 endif()
 
 # Add PyTorch tests if is enabled.
