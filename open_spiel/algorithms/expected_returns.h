@@ -25,7 +25,9 @@ namespace algorithms {
 
 // Computes the (undiscounted) expected returns from a depth-limited search
 // starting at the state and following each player's policy. Using a negative
-// depth will do a full tree traversal (from the specified state).
+// depth will do a full tree traversal (from the specified state). Using a
+// prob_cut_threshold > 0 will cut the tree search if the reach probability
+// goes below this value resulting in an approximate return.
 //
 // The second overloaded function acts the same way, except assumes that all of
 // the players' policies are encapsulated in one joint policy.
@@ -37,10 +39,12 @@ namespace algorithms {
 std::vector<double> ExpectedReturns(const State& state,
                                     const std::vector<const Policy*>& policies,
                                     int depth_limit,
-                                    bool use_infostate_get_policy = true);
+                                    bool use_infostate_get_policy = true,
+                                    float prob_cut_threshold = 0.0);
 std::vector<double> ExpectedReturns(const State& state,
                                     const Policy& joint_policy, int depth_limit,
-                                    bool use_infostate_get_policy = true);
+                                    bool use_infostate_get_policy = true,
+                                    float prob_cut_threshold = 0.0);
 
 }  // namespace algorithms
 }  // namespace open_spiel
