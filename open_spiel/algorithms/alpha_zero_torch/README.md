@@ -21,3 +21,5 @@ several of the same components. If you have any questions, feel free to ask the
 original author Christian Jans directly by following up on the PR linked above.
 The PR also includes some results of experiments run using this implementation
 that may be useful.
+
+**Add instructions for training, and resuming training from a checkpoint**

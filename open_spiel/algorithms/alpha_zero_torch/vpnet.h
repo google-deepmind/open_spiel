@@ -117,6 +117,7 @@ class VPNetModel {
   LossInfo Learn(const std::vector<TrainInputs>& inputs);
 
   std::string SaveCheckpoint(int step);
+  void LoadCheckpoint(int step);
   void LoadCheckpoint(const std::string& path);
 
   const std::string Device() const { return device_; }

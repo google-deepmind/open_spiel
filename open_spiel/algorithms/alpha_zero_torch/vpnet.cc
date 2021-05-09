@@ -142,6 +142,11 @@ std::string VPNetModel::SaveCheckpoint(int step) {
   return full_path;
 }
 
+void VPNetModel::LoadCheckpoint(int step) {
+  // Load checkpoint from the path given at its initialization.
+  LoadCheckpoint(absl::StrCat(path_, "/checkpoint-", step))
+}
+
 void VPNetModel::LoadCheckpoint(const std::string& path) {
   torch::load(model_, absl::StrCat(path, ".pt"), torch_device_);
   torch::load(model_optimizer_, absl::StrCat(path, "-optimizer.pt"),
