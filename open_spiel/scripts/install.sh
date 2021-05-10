@@ -222,8 +222,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
   # On Github Actions, macOS 10.15 comes with Python 3.9.
-  # Only 3.8 is supported by Tensorflow 2.2, and only 3.7 currently runs on CI.
-  if [[ "$CI" ]]; then
+  # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
+  if [[ "$CI" && "${OS_PYTHON_VERSION}" != "3.9" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
     brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
