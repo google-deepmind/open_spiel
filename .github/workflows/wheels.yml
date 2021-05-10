@@ -21,7 +21,7 @@ jobs:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
-      OS_TARGET_VERSION: 3.9
+      OS_PYTHON_VERSION: 3.9
       # While testing, try specific versions
       CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
       CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
