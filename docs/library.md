@@ -41,7 +41,7 @@ export LD_LIBRARY_PATH="${HOME}/open_spiel/build"
 
 You might want to add this line to your `$HOME/.bash_profile` to avoid having to
 do it every time you load the library. Of course, if you are already using
-`LD_LIBRARY_PATH` something else, then you need to add
+`LD_LIBRARY_PATH` for something else, then you need to add
 `${HOME}/open_spiel/build` to it (space-separated paths).
 
 ## Compiling and Running the Example
