@@ -38,14 +38,13 @@ ${PYBIN} -m pip install --force-reinstall virtualenv==20.0.23
 virtualenv -p ${PYBIN} ./venv
 source ./venv/bin/activate
 
-${PYBIN} --version
+python3 --version
+pip3 install --upgrade -r requirements.txt
 
-${PYBIN} -m pip install --upgrade -r requirements.txt
-
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 ./open_spiel/scripts/build_and_run_tests.sh
 
