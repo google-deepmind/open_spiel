@@ -33,19 +33,19 @@ source ./open_spiel/scripts/python_extra_deps.sh
 
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
-${PYBIN} -m install --force-reinstall virtualenv==20.0.233
+${PYBIN} -m pip install --force-reinstall virtualenv==20.0.233
 
 virtualenv -p ${PYBIN} ./venv
 source ./venv/bin/activate
 
 ${PYBIN} --version
 
+${PYBIN} -m pip install --upgrade -r requirements.txt
+
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
 [[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
 [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
 [[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
-
-${PYBIN} -m pip install --upgrade -r requirements.txt
 
 ./open_spiel/scripts/build_and_run_tests.sh
 
