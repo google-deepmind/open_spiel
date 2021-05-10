@@ -308,11 +308,15 @@ if(NOT DEFINED ENV{BUILD_SHARED_LIB})
 endif()
 set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
 if (BUILD_SHARED_LIB)
-  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
-    # Optionally include files that use external dependencies, for example
-    # linear program specification for finding Nash equilibria.
-    $<TARGET_OBJECTS:open_spiel_ortools>
-  )
+  if (OPEN_SPIEL_BUILD_WITH_ORTOOLS)
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
+      # Optionally include files that use external dependencies, for example
+      # linear program specification for finding Nash equilibria.
+      $<TARGET_OBJECTS:open_spiel_ortools>
+    )
+  else()
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  endif()
   target_include_directories(open_spiel PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
   target_link_libraries(open_spiel PUBLIC
