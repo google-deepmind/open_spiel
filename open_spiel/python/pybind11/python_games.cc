@@ -182,7 +182,8 @@ std::shared_ptr<Observer> PyGame::MakeObserver(
   py::object h = py::cast(this);
   py::function f = h.attr("make_py_observer");
   if (!f) SpielFatalError("make_py_observer not implemented");
-  py::object observer = f(iig_obs_type, params);
+  py::object observer = (iig_obs_type.has_value() ?
+      f(iig_obs_type.value(), params) : f(params));
   return std::make_shared<PyObserver>(observer);
 }
 

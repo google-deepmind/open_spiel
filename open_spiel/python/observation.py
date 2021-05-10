@@ -64,7 +64,10 @@ class _Observation:
   """Contains an observation from a game."""
 
   def __init__(self, game, imperfect_information_observation_type, params):
-    obs = game.make_observer(imperfect_information_observation_type, params)
+    if imperfect_information_observation_type is not None:
+      obs = game.make_observer(imperfect_information_observation_type, params)
+    else:
+      obs = game.make_observer(params)
     self._observation = pyspiel._Observation(game, obs)
     self.dict = {}
     if self._observation.has_tensor():
