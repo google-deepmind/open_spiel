@@ -48,6 +48,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade -r requirements.txt -q
+          source ./open_spiel/scripts/python_extra_deps.sh
+          python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine build
           python -m pip install cibuildwheel==1.10.0
       - name: Build sdist
