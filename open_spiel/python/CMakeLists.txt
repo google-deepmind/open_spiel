@@ -1,4 +1,19 @@
-find_package(Python3 COMPONENTS Interpreter Development)
+if (OPEN_SPIEL_BUILDING_WHEEL)
+  # When building a wheel, need to use this. See:
+  # https://github.com/joerick/cibuildwheel/issues/639#issuecomment-817872369
+  message(NOTICE "Building Wheel Detected. Finding Python Interpeter Development.Module")
+  find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+  # find_package(Python3 COMPONENTS Interpreter Development)
+  unset(OPEN_SPIEL_PYTHONPATH)
+  if(DEFINED ENV{PYTHONPATH})
+    set (OPEN_SPIEL_PYTHONPATH $ENV{PYTHONPATH})
+  endif()
+else()
+  message(NOTICE "Not building wheel. Finding Python normally...")
+  find_package(Python3 COMPONENTS Interpreter Development)
+  set(OPEN_SPIEL_PYTHONPATH ${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;)
+endif()
+
 message(NOTICE "Python executable: ${Python3_EXECUTABLE}")
 message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
@@ -259,30 +274,39 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   )
 endif()
 
+# Tests that are excluded when running via the installed wheel.
+# Some bundle data not shipped with the wheel (e.g. playthroughs)
+set(WHEEL_EXCLUDED_PYTHON_TESTS
+  algorithms/response_graph_ucb_test.py
+  games/tic_tac_toe_test.py
+  ../integration_tests/playthrough_test.py)
+
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
-  get_filename_component(py_test ${py_test_file} NAME_WE)
-  add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+  if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))
+    get_filename_component(py_test ${py_test_file} NAME_WE)
+    add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
-  # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
-  # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
-  # CURRENT_SOURCE_DIR/../.. so that the Python module imports are of the form:
-  #  from open_spiel.python import rl_environment.
-  set_property(TEST python_${py_test}
-      PROPERTY ENVIRONMENT
-      PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
-      TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
+    # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
+    # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
+    # CURRENT_SOURCE_DIR/../.. so that the Python module imports are of the form:
+    #  from open_spiel.python import rl_environment.
+    set_property(TEST python_${py_test}
+        PROPERTY ENVIRONMENT
+        PYTHONPATH=${OPEN_SPIEL_PYTHONPATH}
+        TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
+  endif()
 endforeach(py_test_file)
 
 # Additional tests (running examples as tests)
 # We don't generate these automatically because we may want custom parameters.
-if (OPEN_SPIEL_ENABLE_JAX)
+if (OPEN_SPIEL_ENABLE_JAX AND NOT OPEN_SPIEL_BUILDING_WHEEL)
   add_test(NAME python_examples_bridge_supervised_learning
            COMMAND ${Python3_EXECUTABLE}
            ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
            --iterations 10
            --eval_every 5
-          --data_path ${CMAKE_CURRENT_SOURCE_DIR}/examples/data/bridge)
+           --data_path ${CMAKE_CURRENT_SOURCE_DIR}/examples/data/bridge)
   set_property(TEST python_examples_bridge_supervised_learning
       PROPERTY ENVIRONMENT
       PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;

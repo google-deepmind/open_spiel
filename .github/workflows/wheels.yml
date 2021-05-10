@@ -1,0 +1,67 @@
+name: wheels
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-20.04
+          CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
+        - os: macOS-10.15
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
+    env:
+      OPEN_SPIEL_BUILDING_WHEEL: ON
+      OPEN_SPIEL_BUILD_WITH_ACPC: ON
+      OPEN_SPIEL_BUILD_WITH_HANABI: ON
+      # While testing, try specific versions
+      CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
+      CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
+      CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+      CIBW_MANYLINUX_I686_IMAGE: manylinux2014
+      CIBW_SKIP: cp27-* pp*
+      CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
+      CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+
+      - name: Install
+        run: |
+          pwd
+          uname -a
+          which python
+          which g++
+          g++ --version
+          python --version
+          chmod +x install.sh
+          ./install.sh
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade -r requirements.txt -q
+          python -m pip install twine build
+          python -m pip install cibuildwheel==1.10.0
+      - name: Build sdist
+        run: |
+          python -m build -s
+          twine check dist/*.tar.gz
+          
+      - name: Build bdist_wheel
+        run: python -m cibuildwheel --output-dir wheelhouse
+
+      - name: Install and test bdist_wheel
+        run: ./open_spiel/scripts/test_wheel.sh
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: |
+            dist/*.tar.gz
+            ./wheelhouse/*.whl

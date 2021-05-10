@@ -13,14 +13,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 set -e
 set -x
 
-PYBIN=${PYBIN:-"python3"}
-PYBIN=`which $PYBIN`
+uname -a
 
-# Python 3.9 not default on Ubuntu yet.
 OS=`uname -a | awk '{print $1}'`
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
@@ -29,24 +26,28 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 fi
 
-source ./open_spiel/scripts/python_extra_deps.sh
+PYBIN=${PYBIN:-"python"}
+PYBIN=`which $PYBIN`
 
-${PYBIN} -m pip install --upgrade pip
-${PYBIN} -m pip install --upgrade setuptools
-${PYBIN} -m install --force-reinstall virtualenv==20.0.233
+if [[ "$OS" = "Linux" ]]; then
+  ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-manylinux2014_x86_64.whl
+else
+  ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-macosx_10_9_x86_64.whl
+fi
 
-virtualenv -p ${PYBIN} ./venv
-source ./venv/bin/activate
+export OPEN_SPIEL_BUILDING_WHEEL="ON"
+export OPEN_SPIEL_BUILD_WITH_HANABI="ON"
+export OPEN_SPIEL_BUILD_WITH_ACPC="ON"
 
-${PYBIN} --version
+rm -rf build && mkdir build && cd build
+cmake -DPython3_EXECUTABLE=${PYBIN} ../open_spiel
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+NPROC="nproc"
+if [[ "$OS" == "darwin"* ]]; then
+  NPROC="sysctl -n hw.physicalcpu"
+fi
 
-${PYBIN} -m pip install --upgrade -r requirements.txt
+MAKE_NUM_PROCS=$(${NPROC})
+let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
 
-./open_spiel/scripts/build_and_run_tests.sh
-
-deactivate
+ctest -j$TEST_NUM_PROCS --output-on-failure -R "^python_*" ../open_spiel
