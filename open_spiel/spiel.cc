@@ -114,6 +114,8 @@ StateType State::GetType() const {
     return StateType::kChance;
   } else if (IsTerminal()) {
     return StateType::kTerminal;
+  } else if (CurrentPlayer() == kMeanFieldPlayerId) {
+    return StateType::kMeanField;
   } else {
     return StateType::kDecision;
   }

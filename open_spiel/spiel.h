@@ -59,6 +59,8 @@ struct GameType {
   enum class Dynamics {
     kSimultaneous,           // In some or all nodes every player acts.
     kSequential,             // Turn-based games.
+    // Mean field game. In particular, this adds mean field nodes. Support for
+    // mean field games is experimental. See details in games/mfg/README.md.
     kMeanField,              // Is a Mean Field Game
   };
   Dynamics dynamics;
@@ -651,6 +653,24 @@ class State {
     SpielFatalError(
         "ActionsConsistentWithInformationFrom has not been implemented.");
     return {};
+  }
+
+  // These functions only apply to mean field games and should only be called
+  // when CurrentPlayer() == kMeanFieldPlayerId.
+  // Mean field game support in open_spiel is experimental, and these functions
+  // are subject to change.
+
+  // At the current mean field node, the support of the state distribution that
+  // needs to be updated. States are identified by their corresponding string
+  // representation.
+  virtual std::vector<std::string> DistributionSupport() {
+    SpielFatalError("UpdateDistribution has not been implemented");
+  }
+  // Update the state distribution. `distribution[i]` must correspond to
+  // `DistributionSupport()[i]`. After this is called, the state will be of
+  // Chance type.
+  virtual void UpdateDistribution(const std::vector<double>& distribution) {
+    SpielFatalError("UpdateDistribution has not been implemented");
   }
 
  protected:

@@ -255,7 +255,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("INVALID", open_spiel::kInvalidPlayer)
       .value("TERMINAL", open_spiel::kTerminalPlayerId)
       .value("CHANCE", open_spiel::kChancePlayerId)
-      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayer)
+      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayerId)
       .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId);
 
   py::class_<GameInfo> game_info(m, "GameInfo");
@@ -376,7 +376,9 @@ PYBIND11_MODULE(pyspiel, m) {
             auto state = DeserializeGameAndState(data).second;
             auto pydict = PyDict(*state);
             return std::make_pair(std::move(state), pydict);
-          }));
+          }))
+      .def("distribution_support", &State::DistributionSupport)
+      .def("update_distribution", &State::UpdateDistribution);
 
   py::classh<Game, PyGame> game(m, "Game");
   game.def(py::init<GameType, GameInfo, GameParameters>())

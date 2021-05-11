@@ -83,6 +83,9 @@ void TestPoliciesCanPlay(
 void TestEveryInfostateInPolicy(TabularPolicyGenerator policy_generator,
     const Game& game);
 
+// Checks that the legal actions list is sorted.
+void CheckLegalActionsAreSorted(const Game& game, State& state);
+
 }  // namespace testing
 }  // namespace open_spiel
 
