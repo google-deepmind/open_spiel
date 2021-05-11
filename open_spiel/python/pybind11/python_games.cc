@@ -62,6 +62,11 @@ std::vector<Action> PyState::LegalActions() const {
                               LegalActions);
 }
 
+std::vector<Action> PyState::LegalActions(Player player) const {
+  PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "legal_actions",
+                              LegalActions, player);
+}
+
 std::string PyState::ActionToString(Player player, Action action_id) const {
   PYBIND11_OVERLOAD_PURE_NAME(std::string, State, "_action_to_string",
                               ActionToString, player, action_id);
