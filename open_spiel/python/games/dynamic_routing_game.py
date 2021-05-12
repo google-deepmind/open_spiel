@@ -43,8 +43,8 @@ import pyspiel
 RoadSection = NewType("RoadSection", str)
 
 _GAME_TYPE = pyspiel.GameType(
-    short_name="python_markov_dynamic_routing_game",
-    long_name="Python Markov Dynamic Routing Game",
+    short_name="python_dynamic_routing_game",
+    long_name="Python Dynamic Routing Game",
     dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS,
     chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC,
     information=pyspiel.GameType.Information.PERFECT_INFORMATION,
@@ -57,7 +57,7 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_string=True,
     provides_observation_tensor=True,
     parameter_specification={})
-_NETWORK_ADJACENCY_LIST = {"O": ["A"], "A": ["D"]}
+_NETWORK_ADJACENCY_LIST = {"O": ["A"], "A": ["D"], "D": []}
 
 
 # movement to actions and action to road section can be created from
@@ -105,7 +105,7 @@ _MOVEMENT_TO_ACTION, _ACTION_TO_ROAD_SECTION =\
 class DynamicRoutingGame(pyspiel.Game):
     """TODO(theo): write docstring.
     """
-    def __init__(self, params=None, num_players: int = 2):
+    def __init__(self, params=None, num_players: int = 3):
         max_number_time_step = 2
         game_info = pyspiel.GameInfo(
             num_distinct_actions=len(_ACTION_TO_ROAD_SECTION),
@@ -116,9 +116,9 @@ class DynamicRoutingGame(pyspiel.Game):
             max_game_length=max_number_time_step)
         super().__init__(_GAME_TYPE, game_info, dict())
 
-    def new_initial_state(self) -> "DynamicRoutingGame":
+    def new_initial_state(self) -> "DynamicRoutingGameState":
         """Returns a state corresponding to the start of a game."""
-        return DynamicRoutingGame(self)
+        return DynamicRoutingGameState(self)
 
     def make_py_observer(self, iig_obs_type=None, params=None):
         """Returns an object used for observing game state."""
@@ -161,8 +161,9 @@ class DynamicRoutingGameState(pyspiel.State):
         self._num_distinct_actions = game.num_distinct_actions()
         self._num_players = game.num_players()
         self._vehicle_at_destination = set()
-        self._vehicle_destinations = ["D" for _ in self._num_players]
-        self._vehicle_final_travel_times = [0.0 for _ in self._num_players]
+        self._vehicle_destinations = ["D" for _ in range(self._num_players)]
+        self._vehicle_final_travel_times = [0.0 for _ in range(
+            self._num_players)]
         if self._num_players == 2:
             self._vehicle_locations = ["O", "O"]
         elif self._num_players == 3:
@@ -176,14 +177,14 @@ class DynamicRoutingGameState(pyspiel.State):
                 else pyspiel.PlayerId.SIMULTANEOUS)
 
     def assert_valid_action(self, action: int, location: str = ""):
-        assert isinstance(action, int)
+        assert isinstance(action, int), f"{action} is not a int."
         assert action >= 0
         assert action < self._num_distinct_actions
         if location:
             successors = _NETWORK_ADJACENCY_LIST[location]
-        assert action in successors, (
-              f"Invalid action {action}. It is not a successors of "
-              f"{location}: {successors}.")
+            assert _ACTION_TO_ROAD_SECTION[action] in successors, (
+                  f"Invalid action {_ACTION_TO_ROAD_SECTION[action]}. It is "
+                  f"not a successors of {location}: {successors}.")
 
     def assert_valid_player(self, player: int):
         assert isinstance(player, int)
@@ -203,10 +204,11 @@ class DynamicRoutingGameState(pyspiel.State):
         successors = _NETWORK_ADJACENCY_LIST[location]
         if successors:
             assert isinstance(successors, Iterable)
-            assert all([self.assert_valid_action(s) for s in successors])
-            return sorted([_MOVEMENT_TO_ACTION[_movement_to_string(location,
-                                                                   successor)]
-                           for successor in successors])
+            actions = [_MOVEMENT_TO_ACTION[_movement_to_string(location,
+                                                               successor)]
+                       for successor in successors]
+            map(self.assert_valid_action, actions)
+            return sorted(actions)
         return [pyspiel.INVALID_ACTION]
 
     def _apply_actions(self, actions: List[int]):
@@ -231,7 +233,7 @@ class DynamicRoutingGameState(pyspiel.State):
                 # TODO(Theo): Enable mix strategies.
         self._current_time_step += 1
         # Is the game finished?
-        if (self._current_time_step >= self._max_time_step or
+        if (self._current_time_step > self._max_time_step or
                 all(map(lambda a: a == pyspiel.INVALID_ACTION, actions))):
             self._is_terminal = True
             for vehicle_id in range(self._num_players):
