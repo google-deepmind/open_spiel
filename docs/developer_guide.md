@@ -37,19 +37,21 @@ that both the C++ and the Python implementation behave the same.
 We describe here only the simplest and fastest way to add a new game. It is
 ideal to first be aware of the general API (see `spiel.h`).
 
-1.  Choose a game to copy from in `games/`. Suggested games: Tic-Tac-Toe and
-    Breakthrough for perfect information without chance events, Backgammon or
-    Pig for perfect information games with chance events, Goofspiel and
-    Oshi-Zumo for simultaneous move games, and Leduc poker and Liar’s dice for
-    imperfect information games. For the rest of these steps, we assume
+1.  Choose a game to copy from in `games/` (or `python/games/`). Suggested games:
+    Tic-Tac-Toe and Breakthrough for perfect information without chance events,
+    Backgammon or Pig for perfect information games with chance events, Goofspiel
+    and Oshi-Zumo for simultaneous move games, and Leduc poker and Liar’s dice
+    for imperfect information games. For the rest of these steps, we assume
     Tic-Tac-Toe.
 2.  Copy the header and source: `tic_tac_toe.h`, `tic_tac_toe.cc`, and
     `tic_tac_toe_test.cc` to `new_game.h`, `new_game.cc`, and
-    `new_game_test.cc`.
-3.  Configure CMake:
+    `new_game_test.cc` (or `tic_tac_toe.py` and `tic_tac_toe_test.py`).
+3.  Configure CMake (if you are working with C++):
     *   Add the new game’s source files to `games/CMakeLists.txt`.
     *   Add the new game’s test target to `games/CMakeLists.txt`.
-4.  Update boilerplate C++ code:
+    If you are working with Python, add the test ot `python/CMakeLists.txt`
+    and import it in `python/algorithms/generate_playthrough.py`
+4.  Update boilerplate C++/Python code:
     *   In `new_game.h`, rename the header guard at the the top and bottom of
         the file.
     *   In the new files, rename the inner-most namespace from `tic_tac_toe` to
@@ -60,7 +62,8 @@ ideal to first be aware of the general API (see `spiel.h`).
         include the new game’s header.
 5.  Update Python integration tests:
     *   Add the short name to the list of expected games in
-        `python/tests/pyspiel_test.py`.
+        `python/tests/pyspiel_test.py` (in case of python game, this can be skip
+        or the game should be imported in `python/tests/pyspiel_test.py`).
 6.  You should now have a duplicate game of Tic-Tac-Toe under a different name.
     It should build and the test should run, and can be verified by rebuilding
     and running the example `examples/example --game=new_game`.
