@@ -166,7 +166,9 @@ struct GameInfo {
   double utility_sum;
 
   // The maximum number of player decisions in a game. Does not include chance
-  // events.
+  // events. For a simultaneous action game, this is the maximum number of joint
+  // decisions. In a turn-based game, this is the maximum number of individual
+  // decisions summed over all players.
   int max_game_length;
 };
 
