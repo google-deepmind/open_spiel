@@ -557,6 +557,7 @@ void KriegspielState::DoApplyAction(Action action) {
     // If the move is illegal, the player is notified about it and can play
     // again
     illegal_tried_moves_.emplace_back(move);
+    cached_legal_actions_.reset();
     return;
   }
 

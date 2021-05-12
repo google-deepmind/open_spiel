@@ -384,8 +384,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
-StringLegalActions() = ["a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2d3", "d2c3"]
+LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1882]
+StringLegalActions() = ["a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2c3"]
 
 # Apply action "a2b3"
 action: 117
@@ -744,8 +744,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
-StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3d2", "c3b2", "d3d2", "d3c2"]
+LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1841, 1882]
+StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3b2", "d3d2", "d3c2"]
 
 # Apply action "d3d2"
 action: 1841
@@ -924,8 +924,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1841, 1882]
-StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3b2", "d3d2", "d3c2"]
+LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1882]
+StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3b2", "d3c2"]
 
 # Apply action "c4b4"
 action: 1197
@@ -1312,8 +1312,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [89, 117, 1781, 1841]
-StringLegalActions() = ["a3a2", "a3b2", "d4c4", "d3d2"]
+LegalActions() = [117, 1781, 1841]
+StringLegalActions() = ["a3b2", "d4c4", "d3d2"]
 
 # Apply action "a3a2"
 action: 89
@@ -1335,19 +1335,15 @@ action: 117
 action: 1841
 
 # State 18
-# Apply action "d3d2"
-action: 1841
-
-# State 19
 # rk1r/pPPp/1PP1/R1KR b - - 0 2
 IsTerminal() = True
-History() = [1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89, 89, 1781, 117, 117, 1841, 1841]
-HistoryString() = "1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89, 89, 1781, 117, 117, 1841, 1841"
+History() = [1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89, 89, 1781, 117, 117, 1841]
+HistoryString() = "1841, 117, 1285, 1841, 1197, 1882, 732, 628, 600, 600, 614, 1882, 89, 89, 1781, 117, 117, 1841"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=1197, observation="white's move, 8 pawn tries."), (action=None, observation="Pawn at c3 captured, black's move."), (action=732, observation="Illegal move."), (action=628, observation="Illegal move."), (action=600, observation="Illegal move."), (action=600, observation="Illegal move."), (action=614, observation="Illegal move."), (action=1882, observation="Illegal move."), (action=89, observation="Illegal move."), (action=89, observation="Illegal move."), (action=1781, observation="Illegal move."), (action=117, observation="Illegal move."), (action=117, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=None, observation="Illegal move.")"
-InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="white's move, 8 pawn tries."), (action=1882, observation="Pawn at c3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move.")"
+InformationStateString(0) = "(action=None, observation=""), (action=None, observation="Illegal move."), (action=None, observation="Pawn at b3 captured, black's move."), (action=1285, observation="Illegal move."), (action=1841, observation="Illegal move."), (action=1197, observation="white's move, 8 pawn tries."), (action=None, observation="Pawn at c3 captured, black's move."), (action=732, observation="Illegal move."), (action=628, observation="Illegal move."), (action=600, observation="Illegal move."), (action=600, observation="Illegal move."), (action=614, observation="Illegal move."), (action=1882, observation="Illegal move."), (action=89, observation="Illegal move."), (action=89, observation="Illegal move."), (action=1781, observation="Illegal move."), (action=117, observation="Illegal move."), (action=117, observation="Illegal move."), (action=1841, observation="Illegal move.")"
+InformationStateString(1) = "(action=None, observation=""), (action=1841, observation="Illegal move."), (action=117, observation="Pawn at b3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="white's move, 8 pawn tries."), (action=1882, observation="Pawn at c3 captured, black's move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move."), (action=None, observation="Illegal move.")"
 ObservationString(0) = "Illegal move."
 ObservationString(1) = "Illegal move."
 ObservationTensor(0).public_repetitions: ◉◯◯
