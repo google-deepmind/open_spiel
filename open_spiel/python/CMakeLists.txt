@@ -168,8 +168,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/cliff_walking_test.py
   games/data_test.py
   games/tic_tac_toe_test.py
-  mfg/algorithms/best_response_value_test.py
-  mfg/algorithms/policy_value_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
