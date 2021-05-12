@@ -188,17 +188,23 @@ std::shared_ptr<Observer> PyGame::MakeObserver(
 }
 
 std::string PyState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.info_state_observer().StringFrom(*this, player);
 }
 
 std::string PyState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.default_observer().StringFrom(*this, player);
 }
 
 void PyState::InformationStateTensor(Player player,
                                      absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.info_state_observer().WriteTensor(*this, player, &allocator);
@@ -231,6 +237,8 @@ std::vector<int> PyGame::InformationStateTensorShape() const {
 }
 
 void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.default_observer().WriteTensor(*this, player, &allocator);
