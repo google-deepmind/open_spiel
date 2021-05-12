@@ -268,7 +268,7 @@ class DynamicRoutingGameState(pyspiel.State):
                 self._vehicle_at_destination.add(vehicle_id)
         self._current_time_step += 1
         # Is the game finished?
-        if (self._current_time_step > self._max_time_step or
+        if (self._current_time_step >= self._max_time_step or
                 all(map(lambda a: a == pyspiel.INVALID_ACTION, actions))):
             self._is_terminal = True
             for vehicle_id in range(self._num_players):
