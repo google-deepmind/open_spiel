@@ -17,6 +17,7 @@
 
 from absl.testing import absltest
 
+from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import generate_playthrough
 from open_spiel.python.games import dynamic_routing_game  # pylint: disable=unused-import
 import pyspiel
@@ -49,6 +50,12 @@ class DynamicRoutingGameTest(absltest.TestCase):
             state.legal_actions(seq_state.current_player()),
             seq_state.legal_actions(),
             msg="The sequential actions are not correct.")
+
+    def test_cfr_on_turn_based_game(self):
+        """Check if CFR can be applied to the sequential game."""
+        game = pyspiel.load_game("python_dynamic_routing_game")
+        seq_game = pyspiel.convert_to_turn_based(game)
+        cfr.CFRSolver(seq_game)
 
 
 if __name__ == "__main__":
