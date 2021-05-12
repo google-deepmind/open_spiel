@@ -103,7 +103,13 @@ _MOVEMENT_TO_ACTION, _ACTION_TO_ROAD_SECTION =\
 
 
 class DynamicRoutingGame(pyspiel.Game):
-    """TODO(theo): write docstring.
+    """Simple implementation of dynamic routing game to test API.
+
+    At each time, each vehicle/player choose on which successor link they would
+    like to go. Their travel time is equald to the time step when they first
+    reach their destination. Therefore the game is simultaneous, deterministic,
+    is a general sum game with a terminal reward model.
+    See file docstring for more information.
     """
     def __init__(self, params=None, num_players: int = 2):
         max_number_time_step = 2
@@ -126,19 +132,26 @@ class DynamicRoutingGame(pyspiel.Game):
 
 
 class DynamicRoutingGameState(pyspiel.State):
-    """TODO(theo): write docstring.
+    """State of the DynamicRoutingGame.
+
+    See docstring of the game class and of the file for more information.
 
     Attributes:
-      _current_time_step:
-      _is_terminal:
-      _max_time_step:
-      _max_travel_time:
-      _num_distinct_actions:
-      _num_players:
-      _vehicle_at_destination:
-      _vehicle_destinations:
-      _vehicle_final_travel_times:
-      _vehicle_locations:
+      _current_time_step: current time step of the game.
+      _is_terminal: bool that encodes is the game is over.
+      _max_time_step: maximum number of time step played.
+      _max_travel_time: travel time given to vehicles that have not reached
+        their destination when the game is over. Current set to min_utility.
+      _num_distinct_actions: from Game.
+      _num_players: from Game.
+      _vehicle_at_destination: Set of vehicles that have reached their
+        destinations. When a vehicle has reached its destination but the game
+        is not finished, it cannot do anything.
+      _vehicle_destinations: a list of the destination of each vehicle/player.
+      _vehicle_final_travel_times: the travel times of each vehicle, the travel
+        is either 0 if the vehicle is still in the network or its travel time
+        if the vehicle has reached its destination.
+      _vehicle_locations: current location of the vehicles.
     """
     _current_time_step: int
     _is_terminal: bool
@@ -177,6 +190,7 @@ class DynamicRoutingGameState(pyspiel.State):
                 else pyspiel.PlayerId.SIMULTANEOUS)
 
     def assert_valid_action(self, action: int, location: str = ""):
+        """Assert that an action as a int is valid."""
         assert isinstance(action, int), f"{action} is not a int."
         assert action >= 0
         assert action < self._num_distinct_actions
@@ -187,12 +201,22 @@ class DynamicRoutingGameState(pyspiel.State):
                   f"not a successors of {location}: {successors}.")
 
     def assert_valid_player(self, player: int):
+        """Assert that an player as a int is valid."""
         assert isinstance(player, int)
         assert player >= 0
         assert player < self._num_players
 
     def legal_actions(self, player: int = None) -> List[int]:
-        """TODO(Theo): write docstring.
+        """Return the legal actions of the player.
+
+        Args:
+            player: the player id.
+        Returns:
+            list_legal_actions: a list of legal actions. If the game is
+                finished then the list is empty. If the player is at its
+                destination or on a node without successors then INVALID_ACTION
+                is returned. Otherwise the list of successors nodes of the
+                current player location is returned.
         """
         if self._is_terminal:
             return []
@@ -212,7 +236,17 @@ class DynamicRoutingGameState(pyspiel.State):
         return [pyspiel.INVALID_ACTION]
 
     def _apply_actions(self, actions: List[int]):
-        """TODO(Theo): Applies the specified action to the state."""
+        """Applies the specified action to the state.
+
+        For each player's action, if the player is not at destination or has
+        not an invalid action and if the action is valid, then the player will
+        move to the successor link corresponding to its action.
+        This function also detectors if a player has reached its destination at
+        the previous time step. The function evolves the time and check if the
+        game is finished.
+        Args:
+            actions: the action choosen by each player.
+        """
         assert len(actions) == self._num_players, (
           f"Each player does not have an actions. Actions has {len(actions)} "
           f"elements, it should have {self._num_players}.")
@@ -221,16 +255,17 @@ class DynamicRoutingGameState(pyspiel.State):
             if vehicle_id in self._vehicle_at_destination:
                 continue
             location = self._vehicle_locations[vehicle_id]
-            # Has the vehicle just reached its destination?
-            if (location == self._vehicle_destinations[vehicle_id]):
-                self._vehicle_final_travel_times[vehicle_id] =\
-                  self._current_time_step
-                self._vehicle_at_destination.add(vehicle_id)
             if action != pyspiel.INVALID_ACTION:
                 self.assert_valid_action(action, location)
                 self._vehicle_locations[vehicle_id] =\
                     _ACTION_TO_ROAD_SECTION[action]
                 # TODO(Theo): Enable mix strategies.
+            # If the action was invalid, has the vehicle just reached its
+            # destination?
+            elif (location == self._vehicle_destinations[vehicle_id]):
+                self._vehicle_final_travel_times[vehicle_id] =\
+                  self._current_time_step
+                self._vehicle_at_destination.add(vehicle_id)
         self._current_time_step += 1
         # Is the game finished?
         if (self._current_time_step > self._max_time_step or
@@ -271,17 +306,17 @@ class NetworkObserver:
     """Dummy observer for algorithm to work."""
 
     def __init__(self, shape: int = 1):
-        """TODO(Theo): docstring."""
+        """Dummy function for debugging."""
         self.tensor = np.zeros(np.prod(shape), np.float32)
         self.dict = {"observation": np.reshape(self.tensor, shape)}
 
     def set_from(self, state, player):
-        """TODO(Theo): docstring."""
+        """Dummy function for debugging."""
         obs = self.dict["observation"]
         obs.fill(0)
 
     def string_from(self, state, player):
-        """TODO(Theo): docstring."""
+        """Dummy function for debugging."""
         return ""
 
 
