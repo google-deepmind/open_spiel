@@ -1,0 +1,169 @@
+game: python_dynamic_routing_game
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Python Dynamic Routing Game"
+GameType.max_num_players = 3
+GameType.min_num_players = 0
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "python_dynamic_routing_game"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 3
+MinUtility() = -3.0
+MaxUtility() = 0.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = [1]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 1
+ObservationTensorShape() = [1]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 1
+MaxGameLength() = 2
+ToString() = "python_dynamic_routing_game()"
+
+# State 0
+# Vehicle locations: ['O', 'O', 'A'], time: 0.
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+InformationStateTensor(0).observation: ◯
+InformationStateTensor(1).observation: ◯
+InformationStateTensor(2).observation: ◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+PublicObservationString() = ""
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0): ◯
+ObservationTensor(1): ◯
+ObservationTensor(2): ◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [-0.0, -0.0, -0.0]
+LegalActions(0) = [0]
+LegalActions(1) = [0]
+LegalActions(2) = [1]
+StringLegalActions(0) = ["Vehicle 0 would like to move to A."]
+StringLegalActions(1) = ["Vehicle 1 would like to move to A."]
+StringLegalActions(2) = ["Vehicle 2 would like to move to D."]
+
+# Apply joint action ["Vehicle 0 would like to move to A.", "Vehicle 1 would like to move to A.", "Vehicle 2 would like to move to D."]
+actions: [0, 0, 1]
+
+# State 1
+# Vehicle locations: ['A', 'A', 'D'], time: 1.
+IsTerminal() = False
+History() = [0, 0, 1]
+HistoryString() = "0, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+InformationStateTensor(0).observation: ◯
+InformationStateTensor(1).observation: ◯
+InformationStateTensor(2).observation: ◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+PublicObservationString() = ""
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0): ◯
+ObservationTensor(1): ◯
+ObservationTensor(2): ◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [-0.0, -0.0, -0.0]
+LegalActions(0) = [1]
+LegalActions(1) = [1]
+LegalActions(2) = [-1]
+StringLegalActions(0) = ["Vehicle 0 would like to move to D."]
+StringLegalActions(1) = ["Vehicle 1 would like to move to D."]
+StringLegalActions(2) = ["Vehicle 2 reach a sink node or its destination."]
+
+# Apply joint action ["Vehicle 0 would like to move to D.", "Vehicle 1 would like to move to D.", "Vehicle 2 reach a sink node or its destination."]
+actions: [1, 1, -1]
+
+# State 2
+# Vehicle locations: ['D', 'D', 'D'], time: 2.
+IsTerminal() = False
+History() = [0, 0, 1, 1, 1, -1]
+HistoryString() = "0, 0, 1, 1, 1, -1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+InformationStateTensor(0).observation: ◯
+InformationStateTensor(1).observation: ◯
+InformationStateTensor(2).observation: ◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+PublicObservationString() = ""
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0): ◯
+ObservationTensor(1): ◯
+ObservationTensor(2): ◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [-0.0, -0.0, -1]
+LegalActions(0) = [-1]
+LegalActions(1) = [-1]
+LegalActions(2) = [-1]
+StringLegalActions(0) = ["Vehicle 0 reach a sink node or its destination."]
+StringLegalActions(1) = ["Vehicle 1 reach a sink node or its destination."]
+StringLegalActions(2) = ["Vehicle 2 reach a sink node or its destination."]
+
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 reach a sink node or its destination."]
+actions: [-1, -1, -1]
+
+# State 3
+# Vehicle locations: ['D', 'D', 'D'], time: 3.
+IsTerminal() = True
+History() = [0, 0, 1, 1, 1, -1, -1, -1, -1]
+HistoryString() = "0, 0, 1, 1, 1, -1, -1, -1, -1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.TERMINAL
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+InformationStateTensor(0).observation: ◯
+InformationStateTensor(1).observation: ◯
+InformationStateTensor(2).observation: ◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+PublicObservationString() = ""
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0): ◯
+ObservationTensor(1): ◯
+ObservationTensor(2): ◯
+Rewards() = [-2.0, -2.0, -1.0]
+Returns() = [-2, -2, -1]
