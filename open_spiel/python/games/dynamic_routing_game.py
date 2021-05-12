@@ -105,7 +105,7 @@ _MOVEMENT_TO_ACTION, _ACTION_TO_ROAD_SECTION =\
 class DynamicRoutingGame(pyspiel.Game):
     """TODO(theo): write docstring.
     """
-    def __init__(self, params=None, num_players: int = 3):
+    def __init__(self, params=None, num_players: int = 2):
         max_number_time_step = 2
         game_info = pyspiel.GameInfo(
             num_distinct_actions=len(_ACTION_TO_ROAD_SECTION),
