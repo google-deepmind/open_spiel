@@ -22,6 +22,8 @@ import os
 from absl.testing import absltest
 
 from open_spiel.python import policy
+from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
+from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
 import pyspiel
 
 # Specify game names in alphabetical order, to make the test easier to read.
@@ -84,6 +86,8 @@ EXPECTED_GAMES = set([
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",
+    "python_kuhn_poker",
+    "python_tic_tac_toe",
     "quoridor",
     "repeated_game",
     "sheriff",
