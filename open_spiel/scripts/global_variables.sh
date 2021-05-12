@@ -82,9 +82,6 @@ export OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_LIBT
 # C++ AlphaZero. See: https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md
 export OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC="${OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC:-"OFF"}"
 
-# Turn off public states as it is Work-In-Progress.
-export OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES="${OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES:-"OFF"}"
-
 # Enable integration with GAMUT game generator (see games/gamut).
 # Requires java and GAMUT, so disabled by default.
 export OPEN_SPIEL_BUILD_WITH_GAMUT="${OPEN_SPIEL_BUILD_WITH_GAMUT:-"OFF"}"

@@ -7,7 +7,7 @@ GameType.long_name = "Dark Chess"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
 GameType.parameter_specification = ["board_size", "fen"]
-GameType.provides_information_state_string = True
+GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
@@ -38,8 +38,6 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "(action=None, observation="r1kr/pppp/PPPP/???? w - - 0 1")"
-InformationStateString(1) = "(action=None, observation="????/pppp/PPPP/R1KR w - - 0 1")"
 ObservationString(0) = "r1kr/pppp/PPPP/???? w - - 0 1"
 ObservationString(1) = "????/pppp/PPPP/R1KR w - - 0 1"
 ObservationTensor(0).public_K_pieces: ◯◯◯◯
@@ -284,8 +282,6 @@ HistoryString() = "117"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "(action=None, observation="r1kr/pppp/PPPP/???? w - - 0 1"), (action=None, observation="r1kr/pPpp/1PPP/???? b - - 0 1")"
-InformationStateString(1) = "(action=None, observation="????/pppp/PPPP/R1KR w - - 0 1"), (action=117, observation="r1k?/pPpp/1PPP/R1KR b - - 0 1")"
 ObservationString(0) = "r1kr/pPpp/1PPP/???? b - - 0 1"
 ObservationString(1) = "r1k?/pPpp/1PPP/R1KR b - - 0 1"
 ObservationTensor(0).public_K_pieces: ◯◯◯◯
@@ -530,8 +526,6 @@ HistoryString() = "117, 1285"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "(action=None, observation="r1kr/pppp/PPPP/???? w - - 0 1"), (action=None, observation="r1kr/pPpp/1PPP/???? b - - 0 1"), (action=1285, observation="r1kr/pP1p/1PPp/??K? w - - 0 2")"
-InformationStateString(1) = "(action=None, observation="????/pppp/PPPP/R1KR w - - 0 1"), (action=117, observation="r1k?/pPpp/1PPP/R1KR b - - 0 1"), (action=None, observation="r1k?/pP1p/1PPp/R1KR w - - 0 2")"
 ObservationString(0) = "r1kr/pP1p/1PPp/??K? w - - 0 2"
 ObservationString(1) = "r1k?/pP1p/1PPp/R1KR w - - 0 2"
 ObservationTensor(0).public_K_pieces: ◯◯◯◯
@@ -776,8 +770,6 @@ HistoryString() = "117, 1285, 1285"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "(action=None, observation="r1kr/pppp/PPPP/???? w - - 0 1"), (action=None, observation="r1kr/pPpp/1PPP/???? b - - 0 1"), (action=1285, observation="r1kr/pP1p/1PPp/??K? w - - 0 2"), (action=None, observation="r1kr/pP1P/1P?p/??K? b - - 0 2")"
-InformationStateString(1) = "(action=None, observation="????/pppp/PPPP/R1KR w - - 0 1"), (action=117, observation="r1k?/pPpp/1PPP/R1KR b - - 0 1"), (action=None, observation="r1k?/pP1p/1PPp/R1KR w - - 0 2"), (action=1285, observation="r1k?/pP?P/1P1p/R1KR b - - 0 2")"
 ObservationString(0) = "r1kr/pP1P/1P?p/??K? b - - 0 2"
 ObservationString(1) = "r1k?/pP?P/1P1p/R1KR b - - 0 2"
 ObservationTensor(0).public_K_pieces: ◯◯◯◯
@@ -1022,8 +1014,6 @@ HistoryString() = "117, 1285, 1285, 1955"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "(action=None, observation="r1kr/pppp/PPPP/???? w - - 0 1"), (action=None, observation="r1kr/pPpp/1PPP/???? b - - 0 1"), (action=1285, observation="r1kr/pP1p/1PPp/??K? w - - 0 2"), (action=None, observation="r1kr/pP1P/1P?p/??K? b - - 0 2"), (action=1955, observation="r1kr/pP1P/1P2/R1qR w - - 0 3")"
-InformationStateString(1) = "(action=None, observation="????/pppp/PPPP/R1KR w - - 0 1"), (action=117, observation="r1k?/pPpp/1PPP/R1KR b - - 0 1"), (action=None, observation="r1k?/pP1p/1PPp/R1KR w - - 0 2"), (action=1285, observation="r1k?/pP?P/1P1p/R1KR b - - 0 2"), (action=None, observation="r1k?/pP?P/1P?1/R1qR w - - 0 3")"
 ObservationString(0) = "r1kr/pP1P/1P2/R1qR w - - 0 3"
 ObservationString(1) = "r1k?/pP?P/1P?1/R1qR w - - 0 3"
 ObservationTensor(0).public_K_pieces: ◯◯◯◯

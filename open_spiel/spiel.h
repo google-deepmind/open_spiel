@@ -32,7 +32,6 @@
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -136,7 +135,6 @@ struct GameType {
   // Can we factorize observations into public and private parts?
   // This is similar to observation fields before, but adds additional
   // distinction between public and private observations.
-  // See fog_constants.h for more details.
   bool provides_factored_observation_string = false;
 };
 

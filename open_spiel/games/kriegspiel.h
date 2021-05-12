@@ -24,7 +24,6 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/games/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
@@ -141,7 +140,6 @@ class KriegspielState : public State {
   bool IsTerminal() const override { return MaybeFinalReturns().has_value(); }
 
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
@@ -196,9 +194,6 @@ class KriegspielState : public State {
   // We store the current board position as an optimization.
   chess::ChessBoard current_board_;
 
-  // cached ActionObservationHistory for each player
-  std::vector<open_spiel::ActionObservationHistory> aohs_;
-
   bool threefold_repetition_;
   bool rule_50_move_;
 
@@ -238,7 +233,6 @@ class KriegspielGame : public Game {
       const GameParameters& params) const;
 
   std::shared_ptr<KriegspielObserver> default_observer_;
-  std::shared_ptr<KriegspielObserver> info_state_observer_;
 
  private:
   mutable std::vector<int> observation_tensor_shape_;

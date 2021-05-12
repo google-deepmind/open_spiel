@@ -24,7 +24,6 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/games/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
@@ -81,7 +80,6 @@ class DarkChessState : public State {
   }
 
   std::vector<double> Returns() const override;
-  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
@@ -128,9 +126,6 @@ class DarkChessState : public State {
   chess::ChessBoard start_board_;
   // We store the current board position as an optimization.
   chess::ChessBoard current_board_;
-
-  // cached ActionObservationHistory for each player
-  std::vector<open_spiel::ActionObservationHistory> aohs_;
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
@@ -180,7 +175,6 @@ class DarkChessGame : public Game {
       const GameParameters& params) const;
 
   std::shared_ptr<DarkChessObserver> default_observer_;
-  std::shared_ptr<DarkChessObserver> info_state_observer_;
 
  private:
   const int board_size_;

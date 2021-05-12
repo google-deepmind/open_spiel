@@ -117,7 +117,7 @@ class NoPrivateObserver : public Observer {
   void WriteTensor(const State& state, int player,
                    Allocator* allocator) const override {}
   std::string StringFrom(const State& state, int player) const override {
-    return kNothingPrivateObservation;
+    return "";
   }
 };
 }  // namespace

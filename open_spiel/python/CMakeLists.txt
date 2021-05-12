@@ -80,8 +80,6 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_tarok.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
-  pybind11/observation_history.cc
-  pybind11/observation_history.h
   pybind11/observer.cc
   pybind11/observer.h
   pybind11/policy.cc
@@ -97,12 +95,6 @@ if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../games/gamut/gamut_pybind11.h
       ../games/gamut/gamut_pybind11.cc
-      )
-endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      ../public_states/pybind11/public_states.h
-      ../public_states/pybind11/public_states.cc
       )
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
@@ -130,10 +122,6 @@ if (OPEN_SPIEL_BUILD_WITH_EIGEN)
 
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../eigen/eigen_binding_test.py)
-endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set(PYTHON_TESTS ${PYTHON_TESTS}
-    ../integration_tests/public_states_api_test.py)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
@@ -185,7 +173,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
-  tests/observation_history_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py

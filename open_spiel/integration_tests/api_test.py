@@ -391,12 +391,14 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
     except (RuntimeError, ValueError):
       return
 
+    if private_observation.string_from(self.some_states[0], 0) is None:
+      return
+
     player_has_private_info = [False] * self.game.num_players()
 
     for state in self.some_states:
       for i in range(self.game.num_players()):
-        if (private_observation.string_from(state, i) !=
-            pyspiel.PrivateObservation.NOTHING):
+        if private_observation.string_from(state, i):
           player_has_private_info[i] = True
 
     if (self.game_type.information ==
@@ -417,10 +419,11 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
     except (ValueError, RuntimeError):
       return
 
+    if public_observation.string_from(self.some_states[0], 0) is None:
+      return
+
     for state in self.some_states:
-      self.assertNotEqual(
-          public_observation.string_from(state, 0),
-          pyspiel.PublicObservation.INVALID)
+      self.assertTrue(public_observation.string_from(state, 0))
 
 
 def _assert_properties_recursive(state, assert_functions):

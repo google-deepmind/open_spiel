@@ -19,7 +19,6 @@
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
@@ -37,7 +36,6 @@
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
-#include "open_spiel/python/pybind11/observation_history.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -50,9 +48,6 @@
 // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
 #include "open_spiel/games/gamut/gamut_pybind11.h"
-#endif
-#if OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES
-#include "open_spiel/public_states/pybind11/public_states.h"
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
@@ -275,22 +270,6 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("max_game_length", &GameInfo::max_game_length);
 
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
-
-  // We cannot have these as enums on C++ side, but we can encode it for Python.
-  // Technically it is a submodule, but a Python user will not typically
-  // need to tell these apart. The pybind11 API does not provide a way
-  // for constructing arbitrary (enum) classes, so we do it this way.
-  auto public_observation = m.def_submodule("PublicObservation");
-  public_observation.attr("CLOCK_TICK") =
-      py::str(open_spiel::kClockTickPublicObservation);
-  public_observation.attr("START_GAME") =
-      py::str(open_spiel::kStartOfGamePublicObservation);
-  public_observation.attr("INVALID") =
-      py::str(open_spiel::kInvalidPublicObservation);
-
-  auto private_observation = m.def_submodule("PrivateObservation");
-  private_observation.attr("NOTHING") =
-      py::str(open_spiel::kNothingPrivateObservation);
 
   py::enum_<open_spiel::TensorLayout>(m, "TensorLayout")
       .value("HWC", open_spiel::TensorLayout::kHWC)
@@ -653,7 +632,6 @@ PYBIND11_MODULE(pyspiel, m) {
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
-  init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
@@ -669,9 +647,6 @@ PYBIND11_MODULE(pyspiel, m) {
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
   init_pyspiel_gamut(m);
-#endif
-#if OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES
-  init_pyspiel_public_states(m);
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
   init_pyspiel_xinxin(m);
