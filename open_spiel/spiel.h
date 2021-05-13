@@ -555,8 +555,9 @@ class State {
   // Change the state of the game by applying the specified actions, one per
   // player, for simultaneous action games. This function encodes the logic of
   // the game rules. Element i of the vector is the action for player i.
-  // Every player must submit a action; if one of the players has no actions at
-  // this node, then kInvalidAction should be passed instead.
+  //
+  // Every player must submit a action. If some of the players have no legal
+  // actions at this node, then 0 should be passed instead.
   //
   // Simultaneous games should implement DoApplyActions.
   void ApplyActions(const std::vector<Action>& actions);
