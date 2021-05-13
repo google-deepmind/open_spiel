@@ -164,7 +164,7 @@ class TabularPolicy(Policy):
       the tabular policy.
   """
 
-  def __init__(self, game, players=None):
+  def __init__(self, game, players=None, to_string=lambda s: s.history_str()):
     """Initializes a uniform random policy for all players in the game."""
     players = sorted(players or range(game.num_players()))
     super(TabularPolicy, self).__init__(game, players)
@@ -175,7 +175,9 @@ class TabularPolicy(Policy):
         game,
         depth_limit=-1,
         include_terminals=False,
-        include_chance_states=False)
+        include_chance_states=False,
+        include_mean_field_states=False,
+        to_string=to_string)
 
     # Assemble legal actions for every valid (state, player) pair, keyed by
     # information state string.
