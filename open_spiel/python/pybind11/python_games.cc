@@ -58,8 +58,20 @@ Player PyState::CurrentPlayer() const {
 }
 
 std::vector<Action> PyState::LegalActions() const {
-  PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "legal_actions",
-                              LegalActions);
+  return LegalActions(CurrentPlayer());
+}
+
+std::vector<Action> PyState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
+  if ((player == CurrentPlayer()) || (player >= 0 && IsSimultaneousNode())) {
+    PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "_legal_actions",
+                                LegalActions, player);
+  } else if (player < 0) {
+    SpielFatalError(
+        absl::StrCat("Called LegalActions for psuedo-player ", player));
+  } else {
+    return {};
+  }
 }
 
 std::string PyState::ActionToString(Player player, Action action_id) const {

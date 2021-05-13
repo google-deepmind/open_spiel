@@ -68,6 +68,7 @@ class PyState : public State, public py::trampoline_self_life_support {
   // Implementation of the State API.
   Player CurrentPlayer() const override;
   std::vector<Action> LegalActions() const override;
+  std::vector<Action> LegalActions(Player player) const override;
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
   bool IsTerminal() const override;

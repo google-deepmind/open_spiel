@@ -26,8 +26,7 @@ import os
 import re
 import numpy as np
 
-from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
-from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
+from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
 

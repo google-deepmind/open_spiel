@@ -98,12 +98,9 @@ class TicTacToeState(pyspiel.State):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     return pyspiel.PlayerId.TERMINAL if self._is_terminal else self._cur_player
 
-  def legal_actions(self, player=None):
+  def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
-    if self._is_terminal or (player is not None and player != self._cur_player):
-      return []
-    else:
-      return [a for a in range(_NUM_CELLS) if self.board[_coord(a)] == "."]
+    return [a for a in range(_NUM_CELLS) if self.board[_coord(a)] == "."]
 
   def _apply_action(self, action):
     """Applies the specified action to the state."""
