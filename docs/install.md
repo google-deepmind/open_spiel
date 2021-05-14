@@ -148,6 +148,11 @@ Linux versions).
 
 ## Installing via Docker
 
+Please note that we don't regularly test the Docker installation. As such, it
+may not work at any given time. We are investigating enabling tests and proper
+longer-term support, but it may take some time. Until then, if you encounter a
+problem, please [open an issue](https://github.com/deepmind/open_spiel/issues).
+
 Option 1 (Basic, 3.13GB):
 
 ```bash
