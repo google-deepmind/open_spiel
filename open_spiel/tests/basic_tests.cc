@@ -350,9 +350,12 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
         std::vector<Action> actions = state->LegalActions(p);
-        LegalActionsMaskTest(game, *state, p, actions);
-        std::uniform_int_distribution<int> dis(0, actions.size() - 1);
-        Action action = actions[dis(*rng)];
+        Action action = 0;
+        if (!actions.empty()) {
+          LegalActionsMaskTest(game, *state, p, actions);
+          std::uniform_int_distribution<int> dis(0, actions.size() - 1);
+          action = actions[dis(*rng)];
+        }
         joint_action.push_back(action);
         if (p == 0) {
           history.emplace_back(state->Clone(), kInvalidHistoryPlayer, action);

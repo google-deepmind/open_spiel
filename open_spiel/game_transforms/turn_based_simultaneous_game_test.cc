@@ -25,10 +25,13 @@
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
+#include "open_spiel/tests/basic_tests.h"
 #include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace {
+
+namespace testing = open_spiel::testing;
 
 // An n-player version of (repeated) matching pennies with n rounds. On round
 // j, the j^th player has no legal moves, and every other player can play heads
@@ -132,6 +135,13 @@ class MissingPlayerRepeatedMatchingPenniesGame : public SimMoveGame {
  private:
   const int num_players_;
 };
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
+      new MissingPlayerRepeatedMatchingPenniesGame(params));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
 
 void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
                    State* turn_based_state) {
@@ -254,10 +264,15 @@ void BasicTurnBasedSimultaneousTests() {
   }
 }
 
-void SomePlayersHaveNoLegalActionsCFRTest() {
+void SomePlayersHaveNoLegalActionsTests() {
   std::shared_ptr<const Game> game(
       new MissingPlayerRepeatedMatchingPenniesGame({}));
+  testing::RandomSimTest(*game, 10);
+
   std::shared_ptr<const Game> turn_based_game = ConvertToTurnBased(*game);
+  testing::RandomSimTest(*turn_based_game, 10);
+
+  // Hey, while we're here, why not try CFR?
   algorithms::CFRSolverBase solver(*turn_based_game,
                                    /*alternating_updates*/true,
                                    /*linear_averaging*/false,
@@ -283,6 +298,6 @@ void SomePlayersHaveNoLegalActionsCFRTest() {
 
 int main(int argc, char** argv) {
   open_spiel::Init("", &argc, &argv, true);
-  open_spiel::BasicTurnBasedSimultaneousTests();
-  open_spiel::SomePlayersHaveNoLegalActionsCFRTest();
+  // open_spiel::BasicTurnBasedSimultaneousTests();
+  open_spiel::SomePlayersHaveNoLegalActionsTests();
 }
