@@ -256,7 +256,7 @@ void CheckObservables(const Game& game,
 }
 
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
-                      bool serialize, bool verbose,
+                      bool serialize, bool verbose, bool mask_test,
                       std::shared_ptr<Observer> observer,  // Can be nullptr
                       std::function<void(const State&)> state_checker_fn
                      ) {
@@ -317,15 +317,16 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     }
 
     if (state->IsChanceNode()) {
-      LegalActionsMaskTest(game, *state, kChancePlayerId,
-                           state->LegalActions());
+      if (mask_test) LegalActionsMaskTest(game, *state, kChancePlayerId,
+                                          state->LegalActions());
       // Chance node; sample one according to underlying distribution
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
-      Action action = open_spiel::SampleAction(outcomes, *rng).first;
+      auto [action, prob] = open_spiel::SampleAction(outcomes, *rng);
 
       if (verbose) {
         std::cout << "sampled outcome: "
                   << state->ActionToString(kChancePlayerId, action)
+                  << "with prob " << prob
                   << std::endl;
       }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
@@ -352,7 +353,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
         std::vector<Action> actions = state->LegalActions(p);
         Action action = 0;
         if (!actions.empty()) {
-          LegalActionsMaskTest(game, *state, p, actions);
+          if (mask_test) LegalActionsMaskTest(game, *state, p, actions);
           std::uniform_int_distribution<int> dis(0, actions.size() - 1);
           action = actions[dis(*rng)];
         }
@@ -388,7 +389,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       // Sample an action uniformly.
       std::vector<Action> actions = state->LegalActions();
-      LegalActionsMaskTest(game, *state, state->CurrentPlayer(), actions);
+      if (mask_test) LegalActionsMaskTest(game, *state, state->CurrentPlayer(),
+                                          actions);
       if (state->IsTerminal())
         SPIEL_CHECK_TRUE(actions.empty());
       else
@@ -456,7 +458,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
 // Perform sims random simulations of the specified game.
 void RandomSimTest(const Game& game, int num_sims, bool serialize,
-                   bool verbose,
+                   bool verbose, bool mask_test,
                    const std::function<void(const State&)>& state_checker_fn) {
   std::mt19937 rng;
   if (verbose) {
@@ -465,7 +467,7 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize,
   }
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
-                     verbose, nullptr, state_checker_fn);
+                     verbose, mask_test, nullptr, state_checker_fn);
   }
 }
 
@@ -475,7 +477,8 @@ void RandomSimTestWithUndo(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/true, /*serialize=*/true,
-                     /*verbose=*/true, nullptr, &DefaultStateChecker);
+                     /*verbose=*/true, /*mask_test=*/true, nullptr,
+                     &DefaultStateChecker);
   }
 }
 
@@ -485,7 +488,8 @@ void RandomSimTestNoSerialize(const Game& game, int num_sims) {
             << ", num_sims = " << num_sims << std::endl;
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                     /*verbose=*/true, nullptr, &DefaultStateChecker);
+                     /*verbose=*/true, /*mask_test=*/true, nullptr,
+                     &DefaultStateChecker);
   }
 }
 
@@ -493,7 +497,8 @@ void RandomSimTestCustomObserver(const Game& game,
                                  const std::shared_ptr<Observer> observer) {
   std::mt19937 rng;
   RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/false,
-                   /*verbose=*/false, observer, &DefaultStateChecker);
+                   /*verbose=*/false, /*mask_test=*/true, observer,
+                   &DefaultStateChecker);
 }
 
 // Format chance outcomes as a string, for error messages.

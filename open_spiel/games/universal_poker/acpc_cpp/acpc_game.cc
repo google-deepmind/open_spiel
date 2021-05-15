@@ -168,6 +168,13 @@ uint32_t ACPCGame::BlindSize(uint8_t player) const {
   SPIEL_CHECK_LT(player, GetNbPlayers());
   return acpc_game_.blind[player];
 }
+uint32_t ACPCGame::TotalMoney() const {
+  int money_pool = 0;
+  for (int pl = 0; pl < acpc_game_.numPlayers; ++pl) {
+    money_pool += acpc_game_.stack[pl];
+  }
+  return money_pool;
+}
 
 std::string ACPCState::ToString() const {
   char buf[kStringBuffersize];
