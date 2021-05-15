@@ -19,6 +19,8 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
@@ -27,13 +29,11 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "file/base/helpers.h"
-#include "file/base/file.h"
-#include "file/base/path.h"
-#include "file/base/options.h"
-#include "open_spiel/abseil-cpp/absl/flags/flag.h"
-#include "testing/base/public/gmock.h"
-#include "testing/base/public/gunit.h"
+#include "open_spiel/utils/init.h"
+#include "open_spiel/utils/file.h"
+
+ABSL_FLAG(std::string, subgames_data_dir, "universal_poker/endgames",
+          "Directory containing the subgames data.");
 
 namespace open_spiel {
 namespace universal_poker {
@@ -582,30 +582,13 @@ void TestHoleIndexCalculation() {
   check_index("Ad", "Ac", 1325);
 }
 
-// std::string ReadSubgameReachProbs(const std::string& file_name) {
-//   std::string dir = __FILE__;
-//   dir.resize(dir.rfind('/'));
-//   return file::ReadContentsFromFile(
-//       absl::StrCat(dir, "/universal_poker/endgames/", file_name, ".txt"),
-//       "r");
-// }
-
 std::string ReadSubgameReachProbs(const std::string& file_name) {
-  // std::string dir = __FILE__;
-  // dir.resize(dir.rfind('/'));
-
-  std::string contents;
-  // const std::string data_file =
-  //     absl::StrCat("/universal_poker/endgames/", file_name, ".txt");
-  // std::string game_file = absl::StrCat(dir, data_file);
-  absl::Status status = file::GetContents(
-      file::JoinPath(
-          absl::GetFlag(FLAGS_test_srcdir),
-          absl::StrCat(
-              "google3/third_party/open_spiel/games/universal_poker/endgames/",
-              file_name, ".txt")),
-      &contents, file::Defaults());
-  return contents;
+  std::string dir = absl::GetFlag(FLAGS_subgames_data_dir);
+  if (dir.back() == '/') {
+    dir.pop_back();
+  }
+  return file::ReadContentsFromFile(absl::StrCat(dir, "/", file_name, ".txt"),
+                                    "r");
 }
 
 void TestSubgameCreation() {
@@ -674,6 +657,8 @@ void TestRandomSubgameCreation() {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
+  open_spiel::Init("", &argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
   open_spiel::universal_poker::ChanceDealRegressionTest();
   open_spiel::universal_poker::LoadKuhnLimitWithAndWithoutGameDef();
   open_spiel::universal_poker::LoadHoldemNoLimit6PWithAndWithoutGameDef();
