@@ -156,13 +156,13 @@ problem, please [open an issue](https://github.com/deepmind/open_spiel/issues).
 Option 1 (Basic, 3.13GB):
 
 ```bash
-docker build --target base -t openspiel -f Dockerfile.base --rm
+docker build --target base -t openspiel -f Dockerfile.base .
 ```
 
 Option 2 (Slim, 2.26GB):
 
 ```bash
-docker build --target python-slim -t openspiel -f Dockerfile.base --rm
+docker build --target python-slim -t openspiel -f Dockerfile.base .
 ```
 
 If you are only interested in developing in Python, use the second image. You
