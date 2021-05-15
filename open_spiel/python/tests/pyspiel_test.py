@@ -21,8 +21,10 @@ from __future__ import print_function
 import os
 from absl.testing import absltest
 
+from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python import policy
 import pyspiel
+
 
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = set([
@@ -84,6 +86,9 @@ EXPECTED_GAMES = set([
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",
+    "python_iterated_prisoners_dilemma",
+    "python_kuhn_poker",
+    "python_tic_tac_toe",
     "quoridor",
     "repeated_game",
     "sheriff",
@@ -141,16 +146,16 @@ class PyspielTest(absltest.TestCase):
     self.assertCountEqual(games_with_mandatory_parameters, expected)
 
   def test_registered_game_attributes(self):
-    games = {game.short_name: game for game in pyspiel.registered_games()}
-    self.assertEqual(games["kuhn_poker"].dynamics,
+    game_list = {game.short_name: game for game in pyspiel.registered_games()}
+    self.assertEqual(game_list["kuhn_poker"].dynamics,
                      pyspiel.GameType.Dynamics.SEQUENTIAL)
-    self.assertEqual(games["kuhn_poker"].chance_mode,
+    self.assertEqual(game_list["kuhn_poker"].chance_mode,
                      pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC)
-    self.assertEqual(games["kuhn_poker"].information,
+    self.assertEqual(game_list["kuhn_poker"].information,
                      pyspiel.GameType.Information.IMPERFECT_INFORMATION)
-    self.assertEqual(games["kuhn_poker"].utility,
+    self.assertEqual(game_list["kuhn_poker"].utility,
                      pyspiel.GameType.Utility.ZERO_SUM)
-    self.assertEqual(games["kuhn_poker"].min_num_players, 2)
+    self.assertEqual(game_list["kuhn_poker"].min_num_players, 2)
 
   def test_create_game(self):
     game = pyspiel.load_game("kuhn_poker")
