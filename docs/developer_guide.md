@@ -49,8 +49,8 @@ ideal to first be aware of the general API (see `spiel.h`).
 3.  Configure CMake (if you are working with C++):
     *   Add the new game’s source files to `games/CMakeLists.txt`.
     *   Add the new game’s test target to `games/CMakeLists.txt`.
-    If you are working with Python, add the test ot `python/CMakeLists.txt`
-    and import it in `python/algorithms/generate_playthrough.py`
+    If you are working with Python, add the test to `python/CMakeLists.txt`
+    and import it in `python/games/__init__.py`
 4.  Update boilerplate C++/Python code:
     *   In `new_game.h`, rename the header guard at the the top and bottom of
         the file.
@@ -62,8 +62,7 @@ ideal to first be aware of the general API (see `spiel.h`).
         include the new game’s header.
 5.  Update Python integration tests:
     *   Add the short name to the list of expected games in
-        `python/tests/pyspiel_test.py` (in case of python game, this can be skip
-        or the game should be imported in `python/tests/pyspiel_test.py`).
+        `python/tests/pyspiel_test.py`.
 6.  You should now have a duplicate game of Tic-Tac-Toe under a different name.
     It should build and the test should run, and can be verified by rebuilding
     and running the example `examples/example --game=new_game`.
