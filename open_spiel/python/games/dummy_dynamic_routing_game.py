@@ -104,6 +104,13 @@ _MOVEMENT_TO_ACTION, _ACTION_TO_ROAD_SECTION =\
         _NETWORK_ADJACENCY_LIST)
 
 
+# Hold a list of created games to stop them being garbage-collected
+# Without this, pyspiel.load_game("turn_based_simultaneous_game(...)")
+# will return an unusable game (the Python class will be deleted).
+# TODO(author11) Fix the underlying issue and remove this
+_games = []
+
+
 class DummyDynamicRoutingGame(pyspiel.Game):
     """Simple implementation of dynamic routing game to test API.
 
@@ -124,6 +131,7 @@ class DummyDynamicRoutingGame(pyspiel.Game):
             max_utility=0,
             max_game_length=max_number_time_step)
         super().__init__(_GAME_TYPE, game_info, dict())
+        _games.append(self)
 
     def new_initial_state(self) -> "DummyDynamicRoutingGameState":
         """Returns a state corresponding to the start of a game."""
