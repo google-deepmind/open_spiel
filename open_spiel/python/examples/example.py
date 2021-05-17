@@ -81,10 +81,11 @@ def main(_):
 
     elif state.is_simultaneous_node():
       # Simultaneous node: sample actions for all players.
-      chosen_actions = [
-          random.choice(state.legal_actions(pid))
-          for pid in range(game.num_players())
-      ]
+      def get_random_action(player):
+        legal_actions_player = state.legal_actions(player)
+        return (0 if not legal_actions_player else
+                random.choice(legal_actions_player))
+      chosen_actions = map(get_random_action, range(game.num_players())
       print("Chosen actions: ", [
           state.action_to_string(pid, action)
           for pid, action in enumerate(chosen_actions)
