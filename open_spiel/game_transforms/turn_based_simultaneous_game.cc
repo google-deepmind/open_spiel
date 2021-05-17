@@ -76,7 +76,7 @@ void TurnBasedSimultaneousState::DetermineWhoseTurn() {
     // If the rollout mode is used, then at least one player should have a valid
     // action. This prevents having current_player_ equal to num_players_ and
     // raising unexpected behaviorr.
-    SPIEL_CHECK_LT(current_player_, num_players_)
+    SPIEL_CHECK_LT(current_player_, num_players_);
   } else {
     // Otherwise, just execute it normally.
     current_player_ = state_->CurrentPlayer();
