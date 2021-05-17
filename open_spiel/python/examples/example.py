@@ -83,9 +83,9 @@ def main(_):
       # Simultaneous node: sample actions for all players.
       random_choice = lambda a: np.random.choice(a) if a else [0]
       chosen_actions = [
-           random_choice(state.legal_actions(pid))
-           for pid in range(game.num_players())
-       ]
+          random_choice(state.legal_actions(pid))
+          for pid in range(game.num_players())
+      ]
       print("Chosen actions: ", [
           state.action_to_string(pid, action)
           for pid, action in enumerate(chosen_actions)
