@@ -262,6 +262,7 @@ class DummyDynamicRoutingGameState(pyspiel.State):
         assert len(actions) == self._num_players, (
           f"Each player does not have an actions. Actions has {len(actions)} "
           f"elements, it should have {self._num_players}.")
+        self._current_time_step += 1
         for vehicle_id, action in enumerate(actions):
             # Has the vehicle already reached its destination?
             if vehicle_id in self._vehicle_at_destination:
@@ -279,7 +280,6 @@ class DummyDynamicRoutingGameState(pyspiel.State):
                 self._vehicle_final_travel_times[vehicle_id] =\
                   self._current_time_step
                 self._vehicle_at_destination.add(vehicle_id)
-        self._current_time_step += 1
         # Is the game finished?
         if (self._current_time_step >= self._max_time_step or
                 all(map(lambda a: a == _NO_POSSIBLE_ACTION, actions))):

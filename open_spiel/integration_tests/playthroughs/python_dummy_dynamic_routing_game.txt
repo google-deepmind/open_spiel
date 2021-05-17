@@ -94,7 +94,7 @@ ObservationTensor(0): ◯
 ObservationTensor(1): ◯
 ObservationTensor(2): ◯
 Rewards() = [0.0, 0.0, 0.0]
-Returns() = [-0.0, -0.0, -0.0]
+Returns() = [-0.0, -0.0, -1]
 LegalActions(0) = [2]
 LegalActions(1) = [2]
 LegalActions(2) = []
@@ -107,45 +107,9 @@ actions: [2, 2, 0]
 
 # State 2
 # Vehicle locations: ['D', 'D', 'D'], time: 2.
-IsTerminal() = False
+IsTerminal() = True
 History() = [1, 1, 2, 2, 2, 0]
 HistoryString() = "1, 1, 2, 2, 2, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = PlayerId.SIMULTANEOUS
-InformationStateString(0) = ""
-InformationStateString(1) = ""
-InformationStateString(2) = ""
-InformationStateTensor(0).observation: ◯
-InformationStateTensor(1).observation: ◯
-InformationStateTensor(2).observation: ◯
-ObservationString(0) = ""
-ObservationString(1) = ""
-ObservationString(2) = ""
-PublicObservationString() = ""
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
-ObservationTensor(0): ◯
-ObservationTensor(1): ◯
-ObservationTensor(2): ◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [-0.0, -0.0, -1]
-LegalActions(0) = []
-LegalActions(1) = []
-LegalActions(2) = []
-StringLegalActions(0) = []
-StringLegalActions(1) = []
-StringLegalActions(2) = []
-
-# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 reach a sink node or its destination."]
-actions: [0, 0, 0]
-
-# State 3
-# Vehicle locations: ['D', 'D', 'D'], time: 3.
-IsTerminal() = True
-History() = [1, 1, 2, 2, 2, 0, 0, 0, 0]
-HistoryString() = "1, 1, 2, 2, 2, 0, 0, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
