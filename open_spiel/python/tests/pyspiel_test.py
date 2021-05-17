@@ -86,6 +86,7 @@ EXPECTED_GAMES = set([
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",
+    "python_dummy_dynamic_routing_game",
     "python_iterated_prisoners_dilemma",
     "python_kuhn_poker",
     "python_tic_tac_toe",
