@@ -53,12 +53,12 @@ _GAME_TYPE = pyspiel.GameType(
     utility=pyspiel.GameType.Utility.GENERAL_SUM,
     reward_model=pyspiel.GameType.RewardModel.TERMINAL,
     max_num_players=3,
-    min_num_players=0,
+    min_num_players=2,
     provides_information_state_string=True,
     provides_information_state_tensor=True,
     provides_observation_string=True,
     provides_observation_tensor=True,
-    parameter_specification={})
+    parameter_specification={"players": pyspiel.GameParameter(3)})
 _NETWORK_ADJACENCY_LIST = {"O": ["A"], "A": ["D"], "D": []}
 
 
@@ -120,7 +120,8 @@ class DummyDynamicRoutingGame(pyspiel.Game):
     is a general sum game with a terminal reward model.
     See file docstring for more information.
     """
-    def __init__(self, params=None, num_players: int = 3):
+    def __init__(self, params=None):
+        num_players = params.get("players", pyspiel.GameParameter(3)).value()
         max_number_time_step = 5
         game_info = pyspiel.GameInfo(
             num_distinct_actions=(
@@ -130,7 +131,7 @@ class DummyDynamicRoutingGame(pyspiel.Game):
             min_utility=-max_number_time_step-1,
             max_utility=0,
             max_game_length=max_number_time_step)
-        super().__init__(_GAME_TYPE, game_info, dict())
+        super().__init__(_GAME_TYPE, game_info, params)
         _games.append(self)
 
     def new_initial_state(self) -> "DummyDynamicRoutingGameState":
