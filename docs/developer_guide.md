@@ -46,11 +46,10 @@ ideal to first be aware of the general API (see `spiel.h`).
 2.  Copy the header and source: `tic_tac_toe.h`, `tic_tac_toe.cc`, and
     `tic_tac_toe_test.cc` to `new_game.h`, `new_game.cc`, and
     `new_game_test.cc` (or `tic_tac_toe.py` and `tic_tac_toe_test.py`).
-3.  Configure CMake (if you are working with C++):
-    *   Add the new game’s source files to `games/CMakeLists.txt`.
-    *   Add the new game’s test target to `games/CMakeLists.txt`.
-    If you are working with Python, add the test to `python/CMakeLists.txt`
-    and import it in `python/games/__init__.py`
+3.  Configure CMake:
+    *   If you are working with C++: add the new game’s source files to `games/CMakeLists.txt`.
+    *   If you are working with C++: add the new game’s test target to `games/CMakeLists.txt`.
+    *   If you are working with Python: add the test to `python/CMakeLists.txt` and import it in `python/games/__init__.py`
 4.  Update boilerplate C++/Python code:
     *   In `new_game.h`, rename the header guard at the the top and bottom of
         the file.
