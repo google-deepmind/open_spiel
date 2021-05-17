@@ -114,7 +114,7 @@ class DummyDynamicRoutingGame(pyspiel.Game):
     See file docstring for more information.
     """
     def __init__(self, params=None, num_players: int = 3):
-        max_number_time_step = 2
+        max_number_time_step = 5
         game_info = pyspiel.GameInfo(
             num_distinct_actions=(
                 len(_ACTION_TO_ROAD_SECTION) + _INDEX_FIRST_ACTION),
