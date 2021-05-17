@@ -176,7 +176,7 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
       curl https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh -o jill.sh
       mv jill.sh $JULIA_INSTALLER
     fi
-    JULIA_VERSION=1.6.0-rc1 bash $JULIA_INSTALLER -y
+    JULIA_VERSION=1.6.1 bash $JULIA_INSTALLER -y
     # Should install in $HOME/.local/bin which was added to the path above
     [[ -x `which julia` ]] && [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ] || die "julia not found PATH after install."
   fi
