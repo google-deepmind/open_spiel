@@ -232,7 +232,9 @@ class State {
   // actions should be returned in ascending order.
   //
   // This default implementation is fine for turn-based games, but should
-  // be overridden by simultaneous-move games.
+  // be overridden by simultaneous-move games. For simultaneous-move games, at
+  // least one player should have a valid actions or the game should be in
+  // terminal mode.
   //
   // Since games mostly override LegalActions(), this method will not be visible
   // in derived classes unless a using directive is added.
