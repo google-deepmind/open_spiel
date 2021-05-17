@@ -266,15 +266,16 @@ class DummyDynamicRoutingGameState(pyspiel.State):
             # Has the vehicle already reached its destination?
             if vehicle_id in self._vehicle_at_destination:
                 continue
-            location = self._vehicle_locations[vehicle_id]
             if action != _NO_POSSIBLE_ACTION:
-                self.assert_valid_action(action, location)
+                self.assert_valid_action(
+                    action, self._vehicle_locations[vehicle_id])
                 self._vehicle_locations[vehicle_id] =\
                     _ACTION_TO_ROAD_SECTION[action]
                 # TODO(Theo): Enable mix strategies.
             # If the player has no actions, has it just reached its
             # destination?
-            elif (location == self._vehicle_destinations[vehicle_id]):
+            if (self._vehicle_locations[vehicle_id] ==
+                    self._vehicle_destinations[vehicle_id]):
                 self._vehicle_final_travel_times[vehicle_id] =\
                   self._current_time_step
                 self._vehicle_at_destination.add(vehicle_id)
