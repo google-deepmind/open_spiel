@@ -207,7 +207,8 @@ class DummyDynamicRoutingGameState(pyspiel.State):
         """Assert that an player as a int is valid."""
         assert isinstance(player, int)
         assert player >= 0
-        assert player < self._num_players
+        assert player < self._num_players, (
+            f"Player {player} >= num players {self._num_players}")
 
     def _legal_actions(self, player: int) -> List[int]:
         """Return the legal actions of the player.
@@ -222,11 +223,11 @@ class DummyDynamicRoutingGameState(pyspiel.State):
                 successors nodes of the current player location is returned.
         """
         if self._is_terminal:
-            return [_NO_POSSIBLE_ACTION]
+            return []
         self.assert_valid_player(player)
         if player in self._vehicle_at_destination:
             # If the vehicle is at destination it cannot do anything.
-            return [_NO_POSSIBLE_ACTION]
+            return []
         location = self._vehicle_locations[player]
         successors = _NETWORK_ADJACENCY_LIST[location]
         if successors:
@@ -236,7 +237,7 @@ class DummyDynamicRoutingGameState(pyspiel.State):
                        for successor in successors]
             map(self.assert_valid_action, actions)
             return sorted(actions)
-        return [_NO_POSSIBLE_ACTION]
+        return []
 
     def _apply_actions(self, actions: List[int]):
         """Applies the specified action to the state.

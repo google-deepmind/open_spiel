@@ -24,6 +24,7 @@ from absl import flags
 import numpy as np
 
 import pyspiel
+import open_spiel.python.games
 
 FLAGS = flags.FLAGS
 
@@ -81,8 +82,13 @@ def main(_):
 
     elif state.is_simultaneous_node():
       # Simultaneous node: sample actions for all players.
+      def get_random_action(pid):
+        try:
+          return random.choice(state.legal_actions(pid))
+        except IndexError:
+          return 0
       chosen_actions = [
-          random.choice(state.legal_actions(pid))
+          get_random_action(pid)
           for pid in range(game.num_players())
       ]
       print("Chosen actions: ", [
