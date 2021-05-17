@@ -145,10 +145,11 @@ double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu);
 
 struct CorrDistInfo {
   double dist_value;
-  std::vector<double> on_policy_values;
-  std::vector<double> deviation_incentives;
 
-  // One per player
+  // One per player.
+  std::vector<double> on_policy_values;
+  std::vector<double> best_response_values;
+  std::vector<double> deviation_incentives;
   std::vector<TabularPolicy> best_response_policies;
 
   // Several per player. Only used in the CE dist case.
@@ -161,6 +162,7 @@ struct CorrDistInfo {
 // the policies in this correlation device *can* be mixed. If values is
 // non-null, then it is filled with the deviation incentive of each player.
 CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu);
+CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu, int player);
 
 // Distance to a correlated equilibrium in an extensive-form game. Builds a
 // simpler auxiliary game similar to the *FCE ones where there is a chance node

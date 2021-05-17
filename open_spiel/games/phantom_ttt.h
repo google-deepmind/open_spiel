@@ -133,6 +133,9 @@ class ImperfectRecallPTTTState : public PhantomTTTState {
     SPIEL_CHECK_LT(player, num_players_);
     return ViewToString(player);
   }
+  std::unique_ptr<State> Clone() const override {
+    return std::unique_ptr<State>(new ImperfectRecallPTTTState(*this));
+  }
 };
 
 class ImperfectRecallPTTTGame : public PhantomTTTGame {

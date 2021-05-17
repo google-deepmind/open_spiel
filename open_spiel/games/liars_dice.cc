@@ -32,6 +32,9 @@ constexpr const char* kDefaultBiddingRule = "reset-face";
 constexpr int kInvalidOutcome = -1;
 constexpr int kInvalidBid = -1;
 
+// Only relevant for the imperfect recall version.
+constexpr int kDefaultRecallLength = 4;
+
 // Facts about the game
 const GameType kGameType{
     /*short_name=*/"liars_dice",
@@ -53,8 +56,35 @@ const GameType kGameType{
      {"dice_sides", GameParameter(kDefaultDiceSides)},
      {"bidding_rule", GameParameter(kDefaultBiddingRule)}}};
 
+const GameType kImperfectRecallGameType{
+    /*short_name=*/"liars_dice_ir",
+    /*long_name=*/"Liars Dice with Imperfect Recall",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/kDefaultPlayers,
+    /*min_num_players=*/kDefaultPlayers,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
+    /*parameter_specification=*/
+    {{"players", GameParameter(kDefaultPlayers)},
+     {"numdice", GameParameter(kDefaultNumDice)},
+     {"dice_sides", GameParameter(kDefaultDiceSides)},
+     {"bidding_rule", GameParameter(kDefaultBiddingRule)},
+     {"recall_length", GameParameter(kDefaultRecallLength)}}};
+
+
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new LiarsDiceGame(params));
+  return std::shared_ptr<const Game>(new LiarsDiceGame(params, kGameType));
+}
+
+std::shared_ptr<const Game> ImperfectRecallFactory(
+    const GameParameters& params) {
+  return std::shared_ptr<const Game>(new ImperfectRecallLiarsDiceGame(params));
 }
 
 const BiddingRule ParseBiddingRule(const std::string& bidding_rule_str) {
@@ -73,11 +103,14 @@ const LiarsDiceGame* UnwrapGame(const Game* game) {
 }  // namespace
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
 
 LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
                                int total_num_dice, int max_dice_per_player,
                                const std::vector<int>& num_dice)
     : State(game),
+      dice_outcomes_(),
+      bidseq_(),
       cur_player_(kChancePlayerId),  // chance starts
       cur_roller_(0),                // first player starts rolling
       winner_(kInvalidPlayer),
@@ -88,10 +121,8 @@ LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
       calling_player_(0),
       bidding_player_(0),
       max_dice_per_player_(max_dice_per_player),
-      dice_outcomes_(),
       num_dice_(num_dice),
       num_dice_rolled_(game->NumPlayers(), 0),
-      bidseq_(),
       bidseq_str_() {
   for (int const& num_dices : num_dice_) {
     std::vector<int> initial_outcomes(num_dices, kInvalidOutcome);
@@ -459,8 +490,8 @@ std::pair<int, int> LiarsDiceState::UnrankBid(int bidnum) const {
   return bid;
 }
 
-LiarsDiceGame::LiarsDiceGame(const GameParameters& params)
-    : Game(kGameType, params),
+LiarsDiceGame::LiarsDiceGame(const GameParameters& params, GameType game_type)
+    : Game(game_type, params),
       num_players_(ParameterValue<int>("players")),
       dice_sides_(ParameterValue<int>("dice_sides")),
       bidding_rule_(ParseBiddingRule(
@@ -537,5 +568,42 @@ std::vector<int> LiarsDiceGame::ObservationTensorShape() const {
   return {num_players_ + (max_dice_per_player_ * dice_sides_) +
           (total_num_dice_ * dice_sides_) + 1};
 }
+
+ImperfectRecallLiarsDiceGame::ImperfectRecallLiarsDiceGame(
+    const GameParameters& params)
+    : LiarsDiceGame(params, kImperfectRecallGameType),
+      recall_length_(
+          ParameterValue<int>("rollout_length", kDefaultRecallLength)) {}
+
+std::unique_ptr<State> ImperfectRecallLiarsDiceGame::NewInitialState() const {
+  return absl::make_unique<ImperfectRecallLiarsDiceState>(shared_from_this(),
+      /*total_num_dice=*/total_num_dice(),
+      /*max_dice_per_player=*/max_dice_per_player(),
+      /*num_dice=*/num_dice());
+}
+
+std::string ImperfectRecallLiarsDiceState::InformationStateString(
+    Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  const auto* parent_game = down_cast<const ImperfectRecallLiarsDiceGame*>(
+      game_.get());
+
+  std::string result = absl::StrJoin(dice_outcomes_[player], "");
+
+  // Imperfect recall. Show only the last recall_length bids.
+  int start_index = std::max<int>(bidseq_.size() - parent_game->recall_length(),
+                                  0);
+  for (int b = start_index; b < bidseq_.size(); b++) {
+    if (bidseq_[b] == parent_game->total_num_dice() * dice_sides()) {
+      absl::StrAppend(&result, " Liar");
+    } else {
+      const std::pair<int, int> bid = UnrankBid(bidseq_[b]);
+      absl::StrAppend(&result, " ", bid.first, "-", bid.second);
+    }
+  }
+  return result;
+}
+
 }  // namespace liars_dice
 }  // namespace open_spiel

@@ -19,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -37,7 +36,7 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
+    /*provides_information_state_string=*/false,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
@@ -72,7 +71,8 @@ chess::ObservationTable ComputePrivateInfoTable(const chess::ChessBoard &board,
 
 bool ObserverHasString(IIGObservationType iig_obs_type) {
   return iig_obs_type.public_info &&
-         iig_obs_type.private_info == PrivateInfoType::kSinglePlayer;
+         iig_obs_type.private_info == PrivateInfoType::kSinglePlayer &&
+         !iig_obs_type.perfect_recall;
 }
 bool ObserverHasTensor(IIGObservationType iig_obs_type) {
   return !iig_obs_type.perfect_recall;
@@ -128,14 +128,8 @@ class KriegspielObserver : public Observer {
     SPIEL_CHECK_LT(player, game.NumPlayers());
 
     if (iig_obs_type_.perfect_recall) {
-      if (iig_obs_type_.public_info &&
-          iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-        return state.aohs_[player].ToString();
-      } else {
-        SpielFatalError(
-            "KriegspielObserver: string with perfect recall is implemented only"
-            " for the (default) info state observation type.");
-      }
+      SpielFatalError(
+          "KriegspielObserver: string with perfect recall is unimplemented");
     }
 
     if (iig_obs_type_.public_info &&
@@ -527,13 +521,6 @@ KriegspielState::KriegspielState(std::shared_ptr<const Game> game,
       rule_50_move_(rule_50_move) {
   SPIEL_CHECK_TRUE(&current_board_);
   repetitions_[current_board_.HashValue()] = 1;
-
-  aohs_.reserve(2);
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    std::vector<std::pair<absl::optional<Action>, std::string>> aoh;
-    aoh.push_back({{}, ObservationString(player)});
-    aohs_.push_back(open_spiel::ActionObservationHistory(player, aoh));
-  }
 }
 
 void KriegspielState::DoApplyAction(Action action) {
@@ -546,17 +533,11 @@ void KriegspielState::DoApplyAction(Action action) {
   move_msg_history_.emplace_back(move, msg);
   last_umpire_msg_ = msg;
 
-  Player current_player = CurrentPlayer();
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    absl::optional<Action> a = absl::nullopt;
-    if (current_player == player) a = action;
-    aohs_[player].Extend(a, ObservationString(player));
-  }
-
   if (msg.illegal) {
     // If the move is illegal, the player is notified about it and can play
     // again
     illegal_tried_moves_.emplace_back(move);
+    cached_legal_actions_.reset();
     return;
   }
 
@@ -605,11 +586,6 @@ std::vector<double> KriegspielState::Returns() const {
   return MaybeFinalReturns().value_or(std::vector<double>{0., 0.});
 }
 
-std::string KriegspielState::InformationStateString(Player player) const {
-  const auto &game = open_spiel::down_cast<const KriegspielGame &>(*game_);
-  return game.info_state_observer_->StringFrom(*this, player);
-}
-
 std::string KriegspielState::ObservationString(Player player) const {
   const auto &game = open_spiel::down_cast<const KriegspielGame &>(*game_);
   return game.default_observer_->StringFrom(*this, player);
@@ -636,9 +612,6 @@ void KriegspielState::UndoAction(Player player, Action action) {
   for (const std::pair<chess::Move, KriegspielUmpireMessage> &move_msg_pair :
        move_msg_history_) {
     current_board_.ApplyMove(move_msg_pair.first);
-  }
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    aohs_[player].RemoveLast();
   }
 }
 
@@ -689,8 +662,6 @@ KriegspielGame::KriegspielGame(const GameParameters &params)
       threefold_repetition_(ParameterValue<bool>("threefold_repetition")),
       rule_50_move_(ParameterValue<bool>("50_move_rule")) {
   default_observer_ = std::make_shared<KriegspielObserver>(kDefaultObsType);
-  info_state_observer_ =
-      std::make_shared<KriegspielObserver>(kInfoStateObsType);
 }
 
 std::vector<int> KriegspielGame::ObservationTensorShape() const {

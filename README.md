@@ -31,6 +31,7 @@ Please choose among the following options:
 *   [Overview of Implemented Games](docs/games.md)
 *   [Overview of Implemented Algorithms](docs/algorithms.md)
 *   [Developer Guide](docs/developer_guide.md)
+*   [Using OpenSpiel as a C++ Library](docs/library.md)
 *   [Guidelines and Contributing](docs/contributing.md)
 *   [Authors](docs/authors.md)
 

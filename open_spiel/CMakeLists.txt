@@ -110,8 +110,6 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC  OFF
   "Build with support for Tensorflow C++ API.")
-openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES  OFF
-  "Build with support for public states in C++.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_PYTHON         ON
   "Build binary for Python.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_XINXIN         OFF
@@ -144,9 +142,6 @@ set (OPEN_SPIEL_CORE_FILES
   action_view.cc
   canonical_game_strings.cc
   canonical_game_strings.h
-  fog/fog_constants.h
-  fog/observation_history.cc
-  fog/observation_history.h
   game_parameters.cc
   game_parameters.h
   matrix_game.cc
@@ -218,19 +213,6 @@ if (OPEN_SPIEL_BUILD_WITH_EIGEN)
   include_directories(eigen/libeigen)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
 endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  if (NOT OPEN_SPIEL_BUILD_WITH_EIGEN)
-    message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable OPEN_SPIEL_BUILD_WITH_EIGEN=ON")
-  endif()
-  add_compile_definitions(OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set(OPEN_SPIEL_OBJECTS
-    $<TARGET_OBJECTS:public_states_core>
-    $<TARGET_OBJECTS:public_states_games>
-    $<TARGET_OBJECTS:public_states_algorithms>
-    $<TARGET_OBJECTS:public_states_game_transforms>
-    ${OPEN_SPIEL_OBJECTS})
-  add_subdirectory(public_states)
-endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
@@ -278,7 +260,6 @@ include_directories(..)
 add_subdirectory (algorithms)
 add_subdirectory (bots)
 add_subdirectory (examples)
-add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (contrib)
@@ -308,11 +289,15 @@ if(NOT DEFINED ENV{BUILD_SHARED_LIB})
 endif()
 set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
 if (BUILD_SHARED_LIB)
-  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
-    # Optionally include files that use external dependencies, for example
-    # linear program specification for finding Nash equilibria.
-    $<TARGET_OBJECTS:open_spiel_ortools>
-  )
+  if (OPEN_SPIEL_BUILD_WITH_ORTOOLS)
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
+      # Optionally include files that use external dependencies, for example
+      # linear program specification for finding Nash equilibria.
+      $<TARGET_OBJECTS:open_spiel_ortools>
+    )
+  else()
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  endif()
   target_include_directories(open_spiel PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
   target_link_libraries(open_spiel PUBLIC

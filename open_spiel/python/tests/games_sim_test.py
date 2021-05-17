@@ -24,8 +24,7 @@ from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
-from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
-from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
+from open_spiel.python import games  # pylint: disable=unused-import
 import pyspiel
 from open_spiel.python.utils import file_utils
 
@@ -146,10 +145,11 @@ class GamesSimTest(parameterized.TestCase):
         state.apply_action(action)
       elif state.is_simultaneous_node():
         # Simultaneous node: sample actions for all players
-        chosen_actions = [
-            np.random.choice(state.legal_actions(pid))
-            for pid in range(game.num_players())
-        ]
+        chosen_actions = []
+        for pid in range(game.num_players()):
+          legal_actions = state.legal_actions(pid)
+          action = 0 if not legal_actions else np.random.choice(legal_actions)
+          chosen_actions.append(action)
         # Apply the joint action and test cloning states.
         self.apply_action_test_clone(state, chosen_actions)
       else:

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/fog/observation_history.h"
+#include "open_spiel/algorithms/observation_history.h"
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -20,8 +20,6 @@
 namespace open_spiel {
 namespace {
 
-// This is a similar test to the one done in Python:
-// python/tests/observation_history_test.py
 void CheckKuhnPokerObservationHistory() {
   using AOH = ActionObservationHistory;
   using POH = PublicObservationHistory;
@@ -32,30 +30,28 @@ void CheckKuhnPokerObservationHistory() {
 
   std::unique_ptr<State> s = game->NewInitialState();
   SPIEL_CHECK_TRUE(s->IsChanceNode());
-  SPIEL_CHECK_EQ(POH(*s), POH({kStartOfGamePublicObservation}));
+  SPIEL_CHECK_EQ(POH(*s), POH({"start game"}));
   SPIEL_CHECK_EQ(AOH(0, *s), AOH(0, {{NONE, ""}}));
   SPIEL_CHECK_EQ(AOH(1, *s), AOH(1, {{NONE, ""}}));
 
   s->ApplyAction(2);
   SPIEL_CHECK_TRUE(s->IsChanceNode());
-  SPIEL_CHECK_EQ(POH(*s),
-                 POH({kStartOfGamePublicObservation, "Deal to player 0"}));
+  SPIEL_CHECK_EQ(POH(*s), POH({"start game", "Deal to player 0"}));
   SPIEL_CHECK_EQ(AOH(0, *s), AOH(0, {{NONE, ""}, {NONE, "211"}}));
   SPIEL_CHECK_EQ(AOH(1, *s), AOH(1, {{NONE, ""}, {NONE, ""}}));
 
   s->ApplyAction(1);
   SPIEL_CHECK_TRUE(s->IsPlayerNode());
-  SPIEL_CHECK_EQ(POH(*s), POH({kStartOfGamePublicObservation,
-                               "Deal to player 0", "Deal to player 1"}));
+  SPIEL_CHECK_EQ(POH(*s),
+                 POH({"start game", "Deal to player 0", "Deal to player 1"}));
   SPIEL_CHECK_EQ(AOH(0, *s),
                  AOH(0, {{NONE, ""}, {NONE, "211"}, {NONE, "211"}}));
   SPIEL_CHECK_EQ(AOH(1, *s), AOH(1, {{NONE, ""}, {NONE, ""}, {NONE, "111"}}));
 
   s->ApplyAction(0);
   SPIEL_CHECK_TRUE(s->IsPlayerNode());
-  SPIEL_CHECK_EQ(POH(*s),
-                 POH({kStartOfGamePublicObservation, "Deal to player 0",
-                      "Deal to player 1", "Pass"}));
+  SPIEL_CHECK_EQ(POH(*s), POH({"start game", "Deal to player 0",
+                               "Deal to player 1", "Pass"}));
   SPIEL_CHECK_EQ(
       AOH(0, *s),
       AOH(0, {{NONE, ""}, {NONE, "211"}, {NONE, "211"}, {0, "211"}}));
@@ -65,9 +61,8 @@ void CheckKuhnPokerObservationHistory() {
 
   s->ApplyAction(1);
   SPIEL_CHECK_TRUE(s->IsPlayerNode());
-  SPIEL_CHECK_EQ(POH(*s),
-                 POH({kStartOfGamePublicObservation, "Deal to player 0",
-                      "Deal to player 1", "Pass", "Bet"}));
+  SPIEL_CHECK_EQ(POH(*s), POH({"start game", "Deal to player 0",
+                               "Deal to player 1", "Pass", "Bet"}));
   SPIEL_CHECK_EQ(AOH(0, *s), AOH(0, {{NONE, ""},
                                      {NONE, "211"},
                                      {NONE, "211"},
@@ -80,9 +75,8 @@ void CheckKuhnPokerObservationHistory() {
 
   s->ApplyAction(1);
   SPIEL_CHECK_TRUE(s->IsTerminal());
-  SPIEL_CHECK_EQ(POH(*s),
-                 POH({kStartOfGamePublicObservation, "Deal to player 0",
-                      "Deal to player 1", "Pass", "Bet", "Bet"}));
+  SPIEL_CHECK_EQ(POH(*s), POH({"start game", "Deal to player 0",
+                               "Deal to player 1", "Pass", "Bet", "Bet"}));
   SPIEL_CHECK_EQ(AOH(0, *s), AOH(0, {{NONE, ""},
                                      {NONE, "211"},
                                      {NONE, "211"},

@@ -43,11 +43,17 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
   py::class_<CorrDistInfo> corr_dist_info(m, "CorrDistInfo");
   corr_dist_info.def_readonly("dist_value", &CorrDistInfo::dist_value)
       .def_readonly("on_policy_values", &CorrDistInfo::on_policy_values)
+      .def_readonly("best_response_values", &CorrDistInfo::best_response_values)
       .def_readonly("deviation_incentives", &CorrDistInfo::deviation_incentives)
       .def_readonly("best_response_policies",
                     &CorrDistInfo::best_response_policies)
       .def_readonly("conditional_best_response_policies",
                     &CorrDistInfo::conditional_best_response_policies);
+
+  m.def("cce_dist",
+        py::overload_cast<const Game&, const CorrelationDevice&, int>(
+            &open_spiel::algorithms::CCEDist),
+        "Returns a player's distance to a coarse-correlated equilibrium.");
 
   m.def("cce_dist",
         py::overload_cast<const Game&, const CorrelationDevice&>(

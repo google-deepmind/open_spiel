@@ -46,6 +46,9 @@ uint64_t bit_twiddle_permute(uint64_t v) {
 }
 
 CardSet::CardSet(std::string cardString) : cs() {
+  SPIEL_CHECK_LE(cardString.size(), 10);  // Max 5 cards.
+  SPIEL_CHECK_EQ(cardString.size() % 2, 0);  // Each cards is 2 chars: RankSuit.
+
   for (int i = 0; i < cardString.size(); i += 2) {
     char rankChr = cardString[i];
     char suitChr = cardString[i + 1];

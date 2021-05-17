@@ -44,7 +44,8 @@ void NoChanceOutcomesTest(const Game& game);
 // terminals), and is intended to be an easy way to pass context-specific
 // testing functions to the simulation tests.
 void RandomSimTest(
-    const Game& game, int num_sims, bool serialize = true, bool verbose = true,
+    const Game& game, int num_sims,
+    bool serialize = true, bool verbose = true, bool mask_test = true,
     const std::function<void(const State&)>& state_checker_fn
         = &DefaultStateChecker);
 
@@ -82,6 +83,9 @@ void TestPoliciesCanPlay(
     int numSims = kDefaultNumSimsForPolicyTests);
 void TestEveryInfostateInPolicy(TabularPolicyGenerator policy_generator,
     const Game& game);
+
+// Checks that the legal actions list is sorted.
+void CheckLegalActionsAreSorted(const Game& game, State& state);
 
 }  // namespace testing
 }  // namespace open_spiel

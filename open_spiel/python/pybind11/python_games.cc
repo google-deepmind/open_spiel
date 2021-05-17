@@ -18,6 +18,9 @@
 
 // Interface code for using Python Games and States from C++.
 
+#include "open_spiel/abseil-cpp/absl/strings/escaping.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
@@ -55,8 +58,20 @@ Player PyState::CurrentPlayer() const {
 }
 
 std::vector<Action> PyState::LegalActions() const {
-  PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "legal_actions",
-                              LegalActions);
+  return LegalActions(CurrentPlayer());
+}
+
+std::vector<Action> PyState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
+  if ((player == CurrentPlayer()) || (player >= 0 && IsSimultaneousNode())) {
+    PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "_legal_actions",
+                                LegalActions, player);
+  } else if (player < 0) {
+    SpielFatalError(
+        absl::StrCat("Called LegalActions for psuedo-player ", player));
+  } else {
+    return {};
+  }
 }
 
 std::string PyState::ActionToString(Player player, Action action_id) const {
@@ -96,11 +111,25 @@ ActionsAndProbs PyState::ChanceOutcomes() const {
 }
 
 std::unique_ptr<State> PyState::Clone() const {
-  auto state = game_->NewInitialState();
-  for (auto [p, a] : FullHistory()) {
-    state->ApplyAction(a);
+  // Create a new State of the right type.
+  auto rv = game_->NewInitialState();
+
+  // Copy the Python-side properties of the state.
+  py::function deepcopy = py::module::import("copy").attr("deepcopy");
+  py::object py_state = py::cast(*rv);
+  for (auto [k, v] : PyDict(*this)) {
+    py_state.attr(k) = deepcopy(v);
   }
-  return state;
+
+  // Copy the C++-side properties of the state (all on the parent class).
+  // Since we started with a valid initial state, we only need to copy
+  // properties that change during the life of the state - hence num_players,
+  // num_distinct_actions are omitted.
+  PyState* state = open_spiel::down_cast<PyState*>(rv.get());
+  state->history_ = history_;
+  state->move_number_ = move_number_;
+
+  return rv;
 }
 
 // Register a Python game.
@@ -165,22 +194,29 @@ std::shared_ptr<Observer> PyGame::MakeObserver(
   py::object h = py::cast(this);
   py::function f = h.attr("make_py_observer");
   if (!f) SpielFatalError("make_py_observer not implemented");
-  py::object observer = f(iig_obs_type, params);
+  py::object observer = (iig_obs_type.has_value() ?
+      f(iig_obs_type.value(), params) : f(params));
   return std::make_shared<PyObserver>(observer);
 }
 
 std::string PyState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.info_state_observer().StringFrom(*this, player);
 }
 
 std::string PyState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.default_observer().StringFrom(*this, player);
 }
 
 void PyState::InformationStateTensor(Player player,
                                      absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.info_state_observer().WriteTensor(*this, player, &allocator);
@@ -213,6 +249,8 @@ std::vector<int> PyGame::InformationStateTensorShape() const {
 }
 
 void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.default_observer().WriteTensor(*this, player, &allocator);
@@ -232,6 +270,74 @@ py::dict PyDict(const State& state) {
   } else {
     return py::dict();
   }
+}
+
+std::unique_ptr<State> PyGame::DeserializeState(const std::string& str) const {
+  std::unique_ptr<State> state = NewInitialState();
+  open_spiel::down_cast<PyState*>(state.get())->Deserialize(str);
+  return state;
+}
+
+// Serialization form for the Python-side attributes is a b64-encoded pickled
+// Python dict (the __dict__ member of the Python object).
+
+py::dict decode_dict(const absl::string_view str) {
+  std::string bytes;
+  SPIEL_CHECK_TRUE(absl::Base64Unescape(str, &bytes));
+  py::function pickle_loads = py::module::import("pickle").attr("loads");
+  return pickle_loads(py::bytes(bytes));
+}
+
+std::string encode_dict(py::dict dict) {
+  py::function pickle_dumps = py::module::import("pickle").attr("dumps");
+  py::bytes bytes = pickle_dumps(dict);
+  return absl::Base64Escape(std::string(bytes));
+}
+
+inline constexpr const absl::string_view kTagHistory = "history=";
+inline constexpr const absl::string_view kTagMoveNumber = "move_number=";
+inline constexpr const absl::string_view kTagDict = "__dict__=";
+
+void PyState::Deserialize(const std::string& str) {
+  std::vector<absl::string_view> pieces =
+      absl::StrSplit(str, absl::MaxSplits('\n', 2));
+  SPIEL_CHECK_EQ(pieces.size(), 3);
+
+  SPIEL_CHECK_EQ(pieces[0].substr(0, kTagHistory.size()), kTagHistory);
+  auto history_str = pieces[0].substr(kTagHistory.size());
+  if (!history_str.empty()) {
+    for (auto& h : absl::StrSplit(history_str, ',')) {
+      std::vector<absl::string_view> p = absl::StrSplit(h, ':');
+      SPIEL_CHECK_EQ(p.size(), 2);
+      int player, action;
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(p[0], &player));
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(p[1], &action));
+      history_.push_back({player, action});
+    }
+  }
+
+  SPIEL_CHECK_EQ(pieces[1].substr(0, kTagMoveNumber.size()), kTagMoveNumber);
+  SPIEL_CHECK_TRUE(
+      absl::SimpleAtoi(pieces[1].substr(kTagMoveNumber.size()), &move_number_));
+
+  SPIEL_CHECK_EQ(pieces[2].substr(0, kTagDict.size()), kTagDict);
+  py::object py_state = py::cast(*this);
+  for (const auto& [k, v] : decode_dict(pieces[2].substr(kTagDict.size()))) {
+    py_state.attr(k) = v;
+  }
+}
+
+std::string PyState::Serialize() const {
+  return absl::StrCat(
+      // C++ Attributes
+      kTagHistory,
+      absl::StrJoin(history_, ",",
+                    [](std::string* out, const PlayerAction& pa) {
+                      absl::StrAppend(out, pa.player, ":", pa.action);
+                    }),
+      "\n", kTagMoveNumber, move_number_, "\n",
+      // Python attributes
+      kTagDict, encode_dict(PyDict(*this)));
 }
 
 }  // namespace open_spiel

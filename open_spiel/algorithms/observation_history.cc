@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/fog/observation_history.h"
+#include "open_spiel/algorithms/observation_history.h"
 
 #include <string>
 
@@ -219,12 +219,10 @@ PublicObservationHistory::PublicObservationHistory(
     std::vector<std::string> history)
     : history_(std::move(history)) {
   SPIEL_CHECK_FALSE(history_.empty());
-  SPIEL_CHECK_EQ(history_.at(0), kStartOfGamePublicObservation);
 }
 
 int PublicObservationHistory::MoveNumber() const {
   SPIEL_CHECK_FALSE(history_.empty());
-  SPIEL_CHECK_EQ(history_.at(0), kStartOfGamePublicObservation);
   return history_.size() - 1;
 }
 
@@ -287,9 +285,7 @@ std::string PublicObservationHistory::ToString() const {
 }
 
 void PublicObservationHistory::push_back(const std::string& observation) {
-  SPIEL_CHECK_TRUE(!history_.empty() ||
-                   observation == kStartOfGamePublicObservation);
-  SPIEL_CHECK_NE(observation, kInvalidPublicObservation);
+  SPIEL_CHECK_FALSE(observation.empty());
   history_.push_back(observation);
 }
 
@@ -297,8 +293,6 @@ bool PublicObservationHistory::CheckStateCorrespondenceInSimulation(
     const State& state, int until_time) const {
   const std::vector<State::PlayerAction>& state_history = state.FullHistory();
   std::unique_ptr<State> simulation = state.GetGame()->NewInitialState();
-  SPIEL_CHECK_EQ(observer_->StringFrom(*simulation, kDefaultPlayerId),
-                 kStartOfGamePublicObservation);
 
   int i = 0;  // The index for state_history access.
   int j = 1;  // The index for history_ access.

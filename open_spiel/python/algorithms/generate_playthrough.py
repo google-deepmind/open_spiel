@@ -26,8 +26,7 @@ import os
 import re
 import numpy as np
 
-from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
-from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
+from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -363,7 +362,10 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       if state_idx < len(action_sequence):
         actions = action_sequence[state_idx]
       else:
-        actions = [rng.choice(state.legal_actions(pl)) for pl in players]
+        actions = []
+        for pl in players:
+          legal_actions = state.legal_actions(pl)
+          actions.append(0 if not legal_actions else rng.choice(legal_actions))
       add_line("")
       add_line("# Apply joint action [{}]".format(
           format(", ".join(

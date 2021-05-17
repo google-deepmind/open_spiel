@@ -89,6 +89,10 @@ void ValidateParams(const GameParameters& params,
 
 std::ostream& operator<<(std::ostream& os, const StateType& type) {
   switch (type) {
+    case StateType::kMeanField: {
+      os << "MEAN_FIELD";
+      break;
+    }
     case StateType::kChance: {
       os << "CHANCE";
       break;
@@ -110,6 +114,8 @@ StateType State::GetType() const {
     return StateType::kChance;
   } else if (IsTerminal()) {
     return StateType::kTerminal;
+  } else if (CurrentPlayer() == kMeanFieldPlayerId) {
+    return StateType::kMeanField;
   } else {
     return StateType::kDecision;
   }
@@ -232,10 +238,10 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 }
 
 State::State(std::shared_ptr<const Game> game)
-    : num_distinct_actions_(game->NumDistinctActions()),
+    : game_(game),
+      num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
-      move_number_(0),
-      game_(game) {}
+      move_number_(0) {}
 
 void NormalizePolicy(ActionsAndProbs* policy) {
   const double sum = absl::c_accumulate(

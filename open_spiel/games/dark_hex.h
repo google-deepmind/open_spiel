@@ -173,6 +173,9 @@ class ImperfectRecallDarkHexState : public DarkHexState {
     SPIEL_CHECK_LT(player, num_players_);
     return ViewToString(player);
   }
+  std::unique_ptr<State> Clone() const override {
+    return std::unique_ptr<State>(new ImperfectRecallDarkHexState(*this));
+  }
 };
 
 class ImperfectRecallDarkHexGame : public DarkHexGame {

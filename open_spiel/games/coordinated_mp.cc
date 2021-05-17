@@ -103,9 +103,9 @@ class PenniesObserver : public Observer {
     if (iig_obs_type_.public_info &&
         iig_obs_type_.private_info == PrivateInfoType::kNone) {
       if (state.IsInitialState())
-        absl::StrAppend(&str, kStartOfGamePublicObservation);
+        absl::StrAppend(&str, "start game");
       else
-        absl::StrAppend(&str, kClockTickPublicObservation);
+        absl::StrAppend(&str, "clock tick");
     }
 
     return str;

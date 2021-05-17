@@ -1,0 +1,175 @@
+game: turn_based_simultaneous_game(game=python_iterated_prisoners_dilemma())
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Turn-based Python Iterated Prisoner's Dilemma"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["game"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "turn_based_simultaneous_game"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
+MaxChanceOutcomes() = 2
+GetParameters() = {game=python_iterated_prisoners_dilemma()}
+NumPlayers() = 2
+MinUtility() = 0.0
+MaxUtility() = inf
+UtilitySum() = 0.0
+MaxGameLength() = 19998
+ToString() = "turn_based_simultaneous_game(game=python_iterated_prisoners_dilemma())"
+
+# State 0
+# Partial joint action:
+# p0: p1:
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["COOPERATE", "DEFECT"]
+
+# Apply action "COOPERATE"
+action: 0
+
+# State 1
+# Partial joint action: 0
+# p0: p1:
+IsTerminal() = False
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["COOPERATE", "DEFECT"]
+
+# Apply action "DEFECT"
+action: 1
+
+# State 2
+# p0:C p1:D
+IsTerminal() = False
+History() = [0, 1]
+HistoryString() = "0, 1"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+ChanceOutcomes() = [(0, 0.875), (1, 0.125)]
+LegalActions() = [0, 1]
+StringLegalActions() = ["CONTINUE", "STOP"]
+
+# Apply action "CONTINUE"
+action: 0
+
+# State 3
+# Partial joint action:
+# p0:C p1:D
+IsTerminal() = False
+History() = [0, 1, 0]
+HistoryString() = "0, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 10.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["COOPERATE", "DEFECT"]
+
+# Apply action "COOPERATE"
+action: 0
+
+# State 4
+# Partial joint action: 0
+# p0:C p1:D
+IsTerminal() = False
+History() = [0, 1, 0, 0]
+HistoryString() = "0, 1, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 10.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["COOPERATE", "DEFECT"]
+
+# Apply action "COOPERATE"
+action: 0
+
+# State 5
+# p0:CC p1:DC
+IsTerminal() = False
+History() = [0, 1, 0, 0, 0]
+HistoryString() = "0, 1, 0, 0, 0"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+ChanceOutcomes() = [(0, 0.875), (1, 0.125)]
+LegalActions() = [0, 1]
+StringLegalActions() = ["CONTINUE", "STOP"]
+
+# Apply action "CONTINUE"
+action: 0
+
+# State 6
+# Partial joint action:
+# p0:CC p1:DC
+IsTerminal() = False
+History() = [0, 1, 0, 0, 0, 0]
+HistoryString() = "0, 1, 0, 0, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+Rewards() = [0.0, 0.0]
+Returns() = [5.0, 15.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["COOPERATE", "DEFECT"]
+
+# Apply action "COOPERATE"
+action: 0
+
+# State 7
+# Partial joint action: 0
+# p0:CC p1:DC
+IsTerminal() = False
+History() = [0, 1, 0, 0, 0, 0, 0]
+HistoryString() = "0, 1, 0, 0, 0, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+Rewards() = [0.0, 0.0]
+Returns() = [5.0, 15.0]
+LegalActions() = [0, 1]
+StringLegalActions() = ["COOPERATE", "DEFECT"]
+
+# Apply action "COOPERATE"
+action: 0
+
+# State 8
+# Apply action "STOP"
+action: 1
+
+# State 9
+# p0:CCC p1:DCC
+IsTerminal() = True
+History() = [0, 1, 0, 0, 0, 0, 0, 0, 1]
+HistoryString() = "0, 1, 0, 0, 0, 0, 0, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+Rewards() = [10.0, 20.0]
+Returns() = [10.0, 20.0]

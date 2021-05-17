@@ -165,6 +165,9 @@ double TabularBestResponse::Value(const std::string& history) {
       cache_value = HandleChanceCase(node);
       break;
     }
+    case StateType::kMeanField: {
+      SpielFatalError("kMeanField not supported.");
+    }
   }
   value_cache_[history] = cache_value;
   return value_cache_[history];

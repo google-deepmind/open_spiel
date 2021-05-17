@@ -458,7 +458,8 @@ if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   add_executable(universal_poker_test universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}
           $<TARGET_OBJECTS:tests>
           $<TARGET_OBJECTS:algorithms>)
-  add_test(universal_poker_test.cc universal_poker_test)
+  add_test(universal_poker_test universal_poker_test
+           --subgames_data_dir=${CMAKE_CURRENT_SOURCE_DIR}/universal_poker/endgames)
 endif()
 
 add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
