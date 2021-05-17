@@ -23,6 +23,7 @@ from absl import app
 from absl import flags
 import numpy as np
 
+from open_spiel.python import games  # pylint: disable=unused-import
 import pyspiel
 
 FLAGS = flags.FLAGS
