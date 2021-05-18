@@ -22,6 +22,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
+<font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
@@ -201,6 +202,16 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
+
+### Dark Hex
+
+*   Hex, except the opponent's tokens are hidden. (Imperfect-information
+    version)
+*   Uses tokens on a hex grid.
+*   Research game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
 
 ### Deep Sea
 
