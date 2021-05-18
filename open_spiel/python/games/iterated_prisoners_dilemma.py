@@ -113,7 +113,7 @@ class IteratedPrisonersDilemmaState(pyspiel.State):
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
     if player == pyspiel.PlayerId.CHANCE:
-      return [Chance.CONTINUE, Chance.STOP]
+      return self.legal_chance_outcomes()
     else:
       return [Action.COOPERATE, Action.DEFECT]
 

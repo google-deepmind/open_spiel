@@ -110,7 +110,7 @@ class KuhnPokerState(pyspiel.State):
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
     if player == pyspiel.PlayerId.CHANCE:
-      return sorted(_DECK - set(self.cards))
+      return self.legal_chance_outcomes()
     else:
       return [Action.PASS, Action.BET]
 
