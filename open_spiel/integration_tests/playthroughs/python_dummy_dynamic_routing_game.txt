@@ -77,19 +77,19 @@ HistoryString() = "1, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = PlayerId.SIMULTANEOUS
-InformationStateString(0) = ""
-InformationStateString(1) = ""
-InformationStateString(2) = ""
+InformationStateString(0) = "1, 1, 2"
+InformationStateString(1) = "1, 1, 2"
+InformationStateString(2) = "1, 1, 2"
 InformationStateTensor(0).observation: ◯
 InformationStateTensor(1).observation: ◯
 InformationStateTensor(2).observation: ◯
-ObservationString(0) = ""
-ObservationString(1) = ""
-ObservationString(2) = ""
-PublicObservationString() = ""
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
+ObservationString(0) = "1, 1, 2"
+ObservationString(1) = "1, 1, 2"
+ObservationString(2) = "1, 1, 2"
+PublicObservationString() = "1, 1, 2"
+PrivateObservationString(0) = "1, 1, 2"
+PrivateObservationString(1) = "1, 1, 2"
+PrivateObservationString(2) = "1, 1, 2"
 ObservationTensor(0): ◯
 ObservationTensor(1): ◯
 ObservationTensor(2): ◯
@@ -113,19 +113,19 @@ HistoryString() = "1, 1, 2, 2, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
-InformationStateString(0) = ""
-InformationStateString(1) = ""
-InformationStateString(2) = ""
+InformationStateString(0) = "1, 1, 2, 2, 2, 0"
+InformationStateString(1) = "1, 1, 2, 2, 2, 0"
+InformationStateString(2) = "1, 1, 2, 2, 2, 0"
 InformationStateTensor(0).observation: ◯
 InformationStateTensor(1).observation: ◯
 InformationStateTensor(2).observation: ◯
-ObservationString(0) = ""
-ObservationString(1) = ""
-ObservationString(2) = ""
-PublicObservationString() = ""
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
+ObservationString(0) = "1, 1, 2, 2, 2, 0"
+ObservationString(1) = "1, 1, 2, 2, 2, 0"
+ObservationString(2) = "1, 1, 2, 2, 2, 0"
+PublicObservationString() = "1, 1, 2, 2, 2, 0"
+PrivateObservationString(0) = "1, 1, 2, 2, 2, 0"
+PrivateObservationString(1) = "1, 1, 2, 2, 2, 0"
+PrivateObservationString(2) = "1, 1, 2, 2, 2, 0"
 ObservationTensor(0): ◯
 ObservationTensor(1): ◯
 ObservationTensor(2): ◯

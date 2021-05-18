@@ -331,7 +331,7 @@ class NetworkObserver:
 
     def string_from(self, state, player):
         """Dummy function for debugging."""
-        return ""
+        return state.history_str()
 
 
 # Register the game with the OpenSpiel library
