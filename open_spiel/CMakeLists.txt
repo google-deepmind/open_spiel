@@ -34,20 +34,20 @@ if(NOT BUILD_TYPE)
 endif()
 message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
 
-if(${BUILD_TYPE} EQUAL "Debug")
+if(${BUILD_TYPE} STREQUAL "Debug")
   # Basic build for debugging (default).
   # -Og enables optimizations that do not interfere with debugging.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
 endif()
 
-if(${BUILD_TYPE} EQUAL "Testing")
+if(${BUILD_TYPE} STREQUAL "Testing")
   # A build used for running tests: keep all runtime checks (assert,
   # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
   # otherwise tests run for too long.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 endif()
 
-if(${BUILD_TYPE} EQUAL "Release")
+if(${BUILD_TYPE} STREQUAL "Release")
   # Optimized release build: turn off debug runtime checks (assert,
   # SPIEL_DCHECK_*) and turn on highest speed optimizations.
   # The difference in perfomance can be up to 10x higher.
