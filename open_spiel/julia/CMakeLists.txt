@@ -14,11 +14,5 @@ install(TARGETS spieljl
     LIBRARY DESTINATION lib
 )
 
-# This is failing now too (in addition to thread_test). Temporarily disabling.
-# See https://github.com/deepmind/open_spiel/pull/593 and
-# https://github.com/deepmind/open_spiel/pull/596 for discussion.
-# add_test(NAME julia_test COMMAND julia --project=${CMAKE_CURRENT_SOURCE_DIR}
-#                                        -e "using Pkg; Pkg.build(); Pkg.test()")
-
-
-
+add_test(NAME julia_test COMMAND julia --project=${CMAKE_CURRENT_SOURCE_DIR}
+                                       -e "using Pkg; Pkg.build(); Pkg.test()")
