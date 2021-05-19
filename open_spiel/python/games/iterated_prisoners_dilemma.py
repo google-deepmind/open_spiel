@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python implementation of iterated prisoner's dilemma. 
+"""Python implementation of iterated prisoner's dilemma.
 
 This is primarily here to demonstrate simultaneous-move games in Python.
 """
