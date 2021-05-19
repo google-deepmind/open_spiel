@@ -210,7 +210,7 @@ class State {
 
   // Returns current player. Player numbers start from 0.
   // Negative numbers are for chance (-1) or simultaneous (-2).
-  // kTerminalState should be returned on a TerminalNode().
+  // kTerminalPlayerId should be returned on a TerminalNode().
   virtual Player CurrentPlayer() const = 0;
 
   // Change the state of the game by applying the specified action in turn-based
