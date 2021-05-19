@@ -134,6 +134,9 @@ void CrowdModellingState::DoApplyAction(Action action) {
 
 std::string CrowdModellingState::ActionToString(Player player,
                                                 Action action) const {
+  if (IsChanceNode() && is_chance_init_) {
+    return absl::Substitute("init_state=$0", action);
+  }
   return std::to_string(kActionToMove.at(action));
 }
 
