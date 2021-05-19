@@ -369,7 +369,19 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       break
     if state.is_chance_node():
       add_line("ChanceOutcomes() = {}".format(state.chance_outcomes()))
-    if state.is_simultaneous_node():
+    if state.is_mean_field_node():
+      add_line("DistributionSupport() = {}".format(
+          state.distribution_support()))
+      num_states = len(state.distribution_support())
+      state.update_distribution([1. / num_states] * num_states)
+      if state_idx < len(action_sequence):
+        assert action_sequence[state_idx] == "update_distribution", (
+            f"Unexpected action at MFG node: {action_sequence[state_idx]}, "
+            f"state: {state}, action_sequence: {action_sequence}")
+      add_line("")
+      add_line("# Set mean field distribution to be uniform", force=True)
+      add_line("action: update_distribution", force=True)
+    elif state.is_simultaneous_node():
       for player in players:
         add_line("LegalActions({}) = [{}]".format(
             player, ", ".join(str(x) for x in state.legal_actions(player))))
@@ -442,7 +454,9 @@ def _playthrough_params(lines):
     if match_observation_params:
       params["observation_params_string"] = match_observation_params.group(1)
     if match_action:
-      params["action_sequence"].append(int(match_action.group(1)))
+      matched = match_action.group(1)
+      params["action_sequence"].append(matched if matched ==
+                                       "update_distribution" else int(matched))
     if match_actions:
       params["action_sequence"].append(
           [int(x) for x in match_actions.group(1).split(", ")])

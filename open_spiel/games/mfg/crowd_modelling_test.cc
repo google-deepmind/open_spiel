@@ -44,6 +44,36 @@ void TestLoadWithParams() {
   SPIEL_CHECK_EQ(game->ObservationTensorShape()[0], 1000 + 100);
 }
 
+std::vector<double> RandomDistribution(int num_states, std::mt19937& rng) {
+  std::uniform_real_distribution<double> rand(0, 1);
+  std::vector<double> distrib;
+  for (int i = 0; i < num_states; ++i) {
+    distrib.push_back(rand(rng));
+  }
+  double sum = std::accumulate(distrib.begin(), distrib.end(), 0.);
+  for (int i = 0; i < num_states; ++i) {
+    distrib[i] /= sum;
+  }
+  return distrib;
+}
+
+void CheckStatesEqual(const State& a, const State& b) {
+  const CrowdModellingState& left =
+      open_spiel::down_cast<const CrowdModellingState&>(a);
+  const CrowdModellingState& right =
+      open_spiel::down_cast<const CrowdModellingState&>(b);
+  SPIEL_CHECK_EQ(left.ToString(), right.ToString());
+  SPIEL_CHECK_FLOAT_EQ(left.Rewards()[0], right.Rewards()[0]);
+  SPIEL_CHECK_FLOAT_EQ(left.Returns()[0], right.Returns()[0]);
+  SPIEL_CHECK_EQ(left.CurrentPlayer(), right.CurrentPlayer());
+  auto left_distrib = left.Distribution();
+  auto right_distrib = right.Distribution();
+  SPIEL_CHECK_EQ(left_distrib.size(), right_distrib.size());
+  for (int i = 0; i < left_distrib.size(); ++i) {
+    SPIEL_CHECK_FLOAT_EQ(left_distrib[i], right_distrib[i]);
+  }
+}
+
 void TestRandomPlay() {
   std::mt19937 rng(7);
   // TODO(author15): Should we adapt and use testing::RandomSimTest instead?
@@ -54,21 +84,19 @@ void TestRandomPlay() {
   while (!state->IsTerminal()) {
     SPIEL_CHECK_LT(state->MoveNumber(), game->MaxMoveNumber());
     SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
+    CheckStatesEqual(*game->DeserializeState(state->Serialize()), *state);
+    auto cloned = state->Clone();
+    CheckStatesEqual(*state, *cloned);
     if (state->CurrentPlayer() == kChancePlayerId) {
-      auto cloned = state->Clone();
-      SPIEL_CHECK_EQ(state->ToString(), cloned->ToString());
       ActionsAndProbs outcomes = state->ChanceOutcomes();
       Action action = open_spiel::SampleAction(outcomes, rng).first;
       state->ApplyAction(action);
       ++num_moves;
     } else if (state->CurrentPlayer() == kMeanFieldPlayerId) {
       auto support = state->DistributionSupport();
-      state->UpdateDistribution(
-          std::vector<double>(support.size(), 1. / support.size()));
+      state->UpdateDistribution(RandomDistribution(support.size(), rng));
     } else {
       SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
-      auto cloned = state->Clone();
-      SPIEL_CHECK_EQ(state->ToString(), cloned->ToString());
       testing::CheckLegalActionsAreSorted(*game, *state);
       std::vector<Action> actions = state->LegalActions();
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);

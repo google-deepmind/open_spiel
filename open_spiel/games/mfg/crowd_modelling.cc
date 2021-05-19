@@ -20,6 +20,10 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/strings/substitute.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -79,6 +83,23 @@ CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
       size_(size),
       horizon_(horizon),
       distribution_(size_, 1. / size_) {}
+
+CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
+                                         int size, int horizon,
+                                         Player current_player,
+                                         bool is_chance_init, int x, int t,
+                                         int last_action, double return_value,
+                                         std::vector<double> distribution)
+    : State(game),
+      size_(size),
+      horizon_(horizon),
+      current_player_(current_player),
+      is_chance_init_(is_chance_init),
+      x_(x),
+      t_(t),
+      last_action_(last_action),
+      return_value_(return_value),
+      distribution_(std::move(distribution)) {}
 
 std::vector<Action> CrowdModellingState::LegalActions() const {
   if (IsTerminal()) return {};
@@ -207,11 +228,58 @@ std::unique_ptr<State> CrowdModellingState::Clone() const {
   return std::unique_ptr<State>(new CrowdModellingState(*this));
 }
 
+std::string CrowdModellingState::Serialize() const {
+  std::string out =
+      absl::StrCat(current_player_, ",", is_chance_init_, ",", x_, ",", t_, ",",
+                   last_action_, ",", return_value_, "\n");
+  absl::StrAppend(&out, absl::StrJoin(distribution_, ","));
+  return out;
+}
+
 CrowdModellingGame::CrowdModellingGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
 std::vector<int> CrowdModellingGame::ObservationTensorShape() const {
   return {ParameterValue<int>("size") + ParameterValue<int>("horizon")};
+}
+
+std::unique_ptr<State> CrowdModellingGame::DeserializeState(
+    const std::string& str) const {
+  std::vector<std::string> lines = absl::StrSplit(str, '\n');
+  if (lines.size() != 2) {
+    SpielFatalError(absl::StrCat("Expected 2 lines in serialized state, got: ",
+                                 lines.size()));
+  }
+  Player current_player;
+  int is_chance_init;
+  int x;
+  int t;
+  int last_action;
+  double return_value;
+  std::vector<std::string> properties = absl::StrSplit(lines[0], ',');
+  if (properties.size() != 6) {
+    SpielFatalError(
+        absl::StrCat("Expected 6 properties for serialized state, got: ",
+                     properties.size()));
+  }
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[0], &current_player));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[1], &is_chance_init));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[2], &x));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[3], &t));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[4], &last_action));
+  SPIEL_CHECK_TRUE(absl::SimpleAtod(properties[5], &return_value));
+  std::vector<std::string> serialized_distrib = absl::StrSplit(lines[1], ',');
+  std::vector<double> distribution;
+  distribution.reserve(serialized_distrib.size());
+  for (std::string& v : serialized_distrib) {
+    double parsed_weight;
+    SPIEL_CHECK_TRUE(absl::SimpleAtod(v, &parsed_weight));
+    distribution.push_back(parsed_weight);
+  }
+  return absl::make_unique<CrowdModellingState>(
+      shared_from_this(), ParameterValue<int>("size"),
+      ParameterValue<int>("horizon"), current_player, is_chance_init, x, t,
+      last_action, return_value, std::move(distribution));
 }
 
 }  // namespace crowd_modelling

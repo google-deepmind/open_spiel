@@ -354,6 +354,13 @@ class State {
     return CurrentPlayer() == kChancePlayerId;
   }
 
+  // Is this a mean field node? In that case, no action should be performed, but
+  // instead the global state distribution should be updated with
+  // UpdateDistribution(). See more details in games/mfg/README.md.
+  virtual bool IsMeanFieldNode() const {
+    return CurrentPlayer() == kMeanFieldPlayerId;
+  }
+
   // Is this state a player node, with a single player acting?
   virtual bool IsPlayerNode() const { return CurrentPlayer() >= 0; }
 

@@ -276,6 +276,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("player_reward", &State::PlayerReward)
       .def("player_return", &State::PlayerReturn)
       .def("is_chance_node", &State::IsChanceNode)
+      .def("is_mean_field_node", &State::IsMeanFieldNode)
       .def("is_simultaneous_node", &State::IsSimultaneousNode)
       .def("is_player_node", &State::IsPlayerNode)
       .def("history", &State::History)

@@ -61,6 +61,10 @@ inline constexpr int kNeutralAction = 1;
 class CrowdModellingState : public State {
  public:
   CrowdModellingState(std::shared_ptr<const Game> game, int size, int horizon);
+  CrowdModellingState(std::shared_ptr<const Game> game, int size, int horizon,
+                      Player current_player, bool is_chance_init_, int x, int t,
+                      int last_action, double return_value,
+                      std::vector<double> distribution);
 
   CrowdModellingState(const CrowdModellingState&) = default;
   CrowdModellingState& operator=(const CrowdModellingState&) = default;
@@ -83,20 +87,23 @@ class CrowdModellingState : public State {
 
   std::vector<std::string> DistributionSupport() override;
   void UpdateDistribution(const std::vector<double>& distribution) override;
+  std::vector<double> Distribution() const { return distribution_; }
+
+  std::string Serialize() const override;
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
+  // Size of the circle.
+  const int size_ = -1;
+  const int horizon_ = -1;
   Player current_player_ = kChancePlayerId;
   bool is_chance_init_ = true;
   // Position on the circle [0, size_) when valid.
   int x_ = -1;
   // Current time, in [0, horizon_].
   int t_ = 0;
-  // Size of the circle.
-  const int size_ = -1;
-  const int horizon_ = -1;
   int last_action_ = kNeutralAction;
   double return_value_ = 0.;
 
@@ -135,6 +142,8 @@ class CrowdModellingGame : public Game {
   int MaxChanceOutcomes() const override {
     return std::max(ParameterValue<int>("size"), kNumChanceActions);
   }
+  std::unique_ptr<State> DeserializeState(
+      const std::string& str) const override;
 };
 
 }  // namespace crowd_modelling
