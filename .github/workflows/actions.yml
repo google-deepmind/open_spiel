@@ -75,10 +75,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: julia-actions/setup-julia@v1
+    - name: Ad-hoc fix
+      if: ${{ matrix.os == 'ubuntu-20.04' }}
+      run: |
+        # workaround for https://github.com/deepmind/open_spiel/issues/606
+        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -E 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
     - name: Install
       run: |
         pwd
-        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia -e 'print(joinpath(Sys.BINDIR, "..", "lib", "julia"))')
         chmod +x install.sh
         ./install.sh
     - name: Build and test
