@@ -43,7 +43,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         # Build and run tests with all optional dependencies, including building a
         # shared library with linkable third party dependencies in place.
-        - os: ubuntu-20.04
+        - os: ubuntu-21.04
           OS_PYTHON_VERSION: 3.9
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           TRAVIS_USE_NOX: 0
@@ -77,7 +77,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: julia-actions/setup-julia@v1
     - name: Ad-hoc fix
-      if: ${{ matrix.os == 'ubuntu-20.04' }}
+      if: ${{ matrix.os == 'ubuntu-21.04' }}
       run: |
         # workaround for https://github.com/deepmind/open_spiel/issues/606
         sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -E 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
