@@ -19,13 +19,13 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 2
 PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 2
-GetParameters() = {game=python_iterated_prisoners_dilemma()}
+GetParameters() = {game=python_iterated_prisoners_dilemma(termination_probability=0.125)}
 NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = inf
 UtilitySum() = 0.0
 MaxGameLength() = 19998
-ToString() = "turn_based_simultaneous_game(game=python_iterated_prisoners_dilemma())"
+ToString() = "turn_based_simultaneous_game(game=python_iterated_prisoners_dilemma(termination_probability=0.125))"
 
 # State 0
 # Partial joint action:
