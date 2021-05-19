@@ -349,12 +349,14 @@ std::vector<int> State::LegalActionsMask(Player player) const {
 }
 
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
-  // This simple deserialization doesn't work for games with sampled chance
-  // nodes, since the history doesn't give us enough information to reconstruct
-  // the state. If you wish to serialize states in such games, you must
-  // implement custom serialization and deserialization for the state.
+  // This does not work for games with sampled chance nodes and for mean field
+  //  games. See comments in State::Serialize() for the explanation. If you wish
+  //  to serialize states in such games, you must implement custom serialization
+  //  and deserialization for the state.
   SPIEL_CHECK_NE(game_type_.chance_mode,
                  GameType::ChanceMode::kSampledStochastic);
+  SPIEL_CHECK_NE(game_type_.dynamics,
+                 GameType::Dynamics::kMeanField);
 
   std::unique_ptr<State> state = NewInitialState();
   if (str.length() == 0) {

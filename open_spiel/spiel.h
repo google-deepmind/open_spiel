@@ -247,9 +247,12 @@ class State {
 
   // `LegalActions()` returns the actions for the current player (including at
   // chance nodes). All games should implement this function.
-  // For any action `a`, it must hold that 0 <= `a` < NumDistinctActions().
+  // At a player node, all returned actions should be in
+  // [0, NumDistinctActions()). For a chance node, they should all be in
+  // [0, MaxChanceOutcomes()).
   // The actions should be returned in ascending order.
-  // If the state is non-terminal, there must be at least one legal action.
+  // If the state is non-terminal (and not a mean field node), there must be at
+  // least one legal action.
   //
   // In simultaneous-move games, the abstract base class implements it in
   // terms of LegalActions(player) and LegalChanceOutcomes(), and so derived
