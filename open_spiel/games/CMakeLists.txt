@@ -84,6 +84,8 @@ set(GAME_SOURCES
   matching_pennies_3p.cc
   matching_pennies_3p.h
   matrix_games.cc
+  mfg/crowd_modelling.cc
+  mfg/crowd_modelling.h
   negotiation.cc
   negotiation.h
   nfg_game.cc
@@ -465,3 +467,7 @@ endif()
 add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(y_test y_test)
+
+add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crowd_modelling_test crowd_modelling_test)

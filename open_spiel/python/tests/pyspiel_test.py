@@ -73,6 +73,7 @@ EXPECTED_GAMES = set([
     "matrix_rpsw",
     "matrix_sh",
     "matrix_shapleys_game",
+    "mfg_crowd_modelling",
     "misere",
     "negotiation",
     "nfg_game",
