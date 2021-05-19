@@ -64,8 +64,7 @@ flags.DEFINE_boolean(
 
 
 def main(_):
-  game = pyspiel.load_game(FLAGS.game,
-                           {"players": pyspiel.GameParameter(FLAGS.players)})
+  game = pyspiel.load_game(FLAGS.game, {"players": FLAGS.players})
 
   models = []
   for _ in range(game.num_players()):

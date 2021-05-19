@@ -43,8 +43,7 @@ def main(_):
 
   print("Creating game: " + FLAGS.game)
   if FLAGS.players is not None:
-    game = pyspiel.load_game(FLAGS.game,
-                             {"players": pyspiel.GameParameter(FLAGS.players)})
+    game = pyspiel.load_game(FLAGS.game, {"players": FLAGS.players})
   else:
     game = pyspiel.load_game(FLAGS.game)
 
