@@ -80,7 +80,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         # workaround for https://github.com/deepmind/open_spiel/issues/606
-        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -E 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
+        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/hostedtoolcache/julia/1.6.1/x64/lib/julia 
     - name: Install
       run: |
         pwd
