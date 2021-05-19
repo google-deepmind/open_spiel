@@ -15,5 +15,5 @@ install(TARGETS spieljl
 )
 
 # Disabled until we can properly fix it.
-#add_test(NAME julia_test COMMAND julia --project=${CMAKE_CURRENT_SOURCE_DIR}
-#                                       -e "using Pkg; Pkg.build(); Pkg.test()")
+add_test(NAME julia_test COMMAND julia --project=${CMAKE_CURRENT_SOURCE_DIR}
+                                       -e "using Pkg; Pkg.build(); Pkg.test()")
