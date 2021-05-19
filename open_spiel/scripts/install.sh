@@ -180,7 +180,7 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
     # This is needed on Ubuntu 19.10 and above, see:
     # https://github.com/deepmind/open_spiel/issues/201
     if [[ -f /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ]]; then
-      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $HOME/packages/julias/julia-1.6.1/lib/julia
+      cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia -e 'print(joinpath(Sys.BINDIR, "..", "lib", "julia"))')
     fi
     # Should install in $HOME/.local/bin which was added to the path above
     [[ -x `which julia` ]] && [ "$(julia -e 'println(VERSION >= v"1.6.1")')" == "true" ] || die "julia not found PATH after install."

@@ -78,6 +78,7 @@ jobs:
     - name: Install
       run: |
         pwd
+        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia -e 'print(joinpath(Sys.BINDIR, "..", "lib", "julia"))')
         chmod +x install.sh
         ./install.sh
     - name: Build and test
