@@ -137,6 +137,26 @@ def format_shapes(d):
     return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
 
 
+def _format_params(d, as_game=False):
+  """Format a collection of params."""
+
+  def fmt(val):
+    if isinstance(val, dict):
+      return _format_params(val, as_game=True)
+    else:
+      return _escape(str(val))
+
+  if as_game:
+    return d["name"] + "(" + ",".join(
+        "{}={}".format(key, fmt(value))
+        for key, value in sorted(d.items())
+        if key != "name") + ")"
+  else:
+    return "{" + ",".join(
+        "{}={}".format(key, fmt(value))
+        for key, value in sorted(d.items())) + "}"
+
+
 class ShouldDisplayStateTracker:
   """Determines whether a state is interesting enough to display."""
 
@@ -263,9 +283,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line("NumDistinctActions() = {}".format(game.num_distinct_actions()))
   add_line("PolicyTensorShape() = {}".format(game.policy_tensor_shape()))
   add_line("MaxChanceOutcomes() = {}".format(game.max_chance_outcomes()))
-  add_line("GetParameters() = {{{}}}".format(",".join(
-      "{}={}".format(key, _escape(str(value)))
-      for key, value in sorted(game.get_parameters().items()))))
+  add_line("GetParameters() = {}".format(_format_params(game.get_parameters())))
   add_line("NumPlayers() = {}".format(game.num_players()))
   add_line("MinUtility() = {:.5}".format(game.min_utility()))
   add_line("MaxUtility() = {:.5}".format(game.max_utility()))

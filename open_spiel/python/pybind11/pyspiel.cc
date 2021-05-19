@@ -81,53 +81,14 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
-// Python representation of GameParameter objects
-namespace {
-py::object GameParameterToPython(const GameParameter& gp) {
-  if (gp.has_bool_value()) {
-    return py::bool_(gp.bool_value());
-  } else if (gp.has_double_value()) {
-    return py::float_(gp.double_value());
-  } else if (gp.has_string_value()) {
-    return py::str(gp.string_value());
-  } else if (gp.has_int_value()) {
-    return py::int_(gp.int_value());
-  } else if (gp.has_game_value()) {
-    py::dict dict;
-    for (const auto& [k, v] : gp.game_value()) {
-      dict[py::str(k)] = GameParameterToPython(v);
-    }
-    return dict;
-  } else {
-    return py::none();
-  }
-}
-}  // namespace
-
 // Definintion of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
 
-  py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
-      .value("UNSET", open_spiel::GameParameter::Type::kUnset)
-      .value("INT", open_spiel::GameParameter::Type::kInt)
-      .value("DOUBLE", open_spiel::GameParameter::Type::kDouble)
-      .value("STRING", open_spiel::GameParameter::Type::kString)
-      .value("BOOL", open_spiel::GameParameter::Type::kBool);
-
-  py::class_<GameParameter> game_parameter(m, "GameParameter");
-  game_parameter.def(py::init<double>())
-      .def(py::init<std::string>())
-      .def(py::init<bool>())
-      .def(py::init<int>())
-      .def(py::init<GameParameters>())
-      .def("is_mandatory", &GameParameter::is_mandatory)
-      .def("value", &GameParameterToPython)
-      .def("__str__", &GameParameter::ToString)
-      .def("__repr__", &GameParameter::ToReprString)
-      .def("__eq__", [](const GameParameter& value, GameParameter* value2) {
-        return value2 && value.ToReprString() == value2->ToReprString();
-      });
+  // The GameParameter type is now removed from the interface. This definition
+  // is here so that pyspiel.GameParameter(x) still works.
+  // TODO(author11) Remove this definition
+  m.def("GameParameter", [](py::handle h) { return h; });
 
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");

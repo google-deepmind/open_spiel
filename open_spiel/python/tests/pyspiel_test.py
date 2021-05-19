@@ -25,7 +25,6 @@ from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python import policy
 import pyspiel
 
-
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = set([
     "backgammon",
@@ -120,30 +119,27 @@ class PyspielTest(absltest.TestCase):
     expected = sorted(list(expected))
     self.assertCountEqual(game_names, expected)
 
-  def test_no_mandatory_parameters(self):
-    # Games with mandatory parameters will be skipped by several standard
-    # tests. Mandatory parameters should therefore be avoided if at all
-    # possible. We make a list of such games here in order to make implementors
-    # think twice about adding mandatory parameters.
-    def has_mandatory_params(game):
-      return any(param.is_mandatory()
-                 for param in game.parameter_specification.values())
-
-    games_with_mandatory_parameters = [
+  def teste_default_loadable(self):
+    # Games which cannmot be loaded with default parameters will be skipped by
+    # several standard tests. We make a list of such games here in order to make
+    # implementors think twice about making new games non-default-loadable
+    non_default_loadable = [
         game.short_name
         for game in pyspiel.registered_games()
-        if has_mandatory_params(game)
+        if not game.default_loadable
     ]
     expected = [
-        # Mandatory parameters prevent various sorts of automated testing.
+        # Being non-default-loadable prevents various automated tests.
         # Only add games here if there is no sensible default for a parameter.
+        "efg_game",
+        "nfg_game",
         "misere",
         "turn_based_simultaneous_game",
         "normal_form_extensive_game",
         "repeated_game",
         "start_at",
     ]
-    self.assertCountEqual(games_with_mandatory_parameters, expected)
+    self.assertCountEqual(non_default_loadable, expected)
 
   def test_registered_game_attributes(self):
     game_list = {game.short_name: game for game in pyspiel.registered_games()}
@@ -195,53 +191,33 @@ class PyspielTest(absltest.TestCase):
     self.assertFalse(state.is_terminal())
     self.assertEqual(state.legal_actions(), [0, 1, 2, 3, 4, 5, 6, 7, 8])
 
-  def test_game_parameter_representation(self):
-    param = pyspiel.GameParameter(True)
-    self.assertEqual(repr(param), "GameParameter(bool_value=True)")
-    param = pyspiel.GameParameter(False)
-    self.assertEqual(repr(param), "GameParameter(bool_value=False)")
-    param = pyspiel.GameParameter("one")
-    self.assertEqual(repr(param), "GameParameter(string_value='one')")
-    param = pyspiel.GameParameter(1)
-    self.assertEqual(repr(param), "GameParameter(int_value=1)")
-    param = pyspiel.GameParameter(1.0)
-    self.assertEqual(repr(param), "GameParameter(double_value=1)")
-    param = pyspiel.GameParameter(1.2)
-    self.assertEqual(repr(param), "GameParameter(double_value=1.2)")
-
-  def test_game_parameter_equality(self):
-    param1 = pyspiel.GameParameter("one")
-    param1_again = pyspiel.GameParameter("one")
-    param2 = pyspiel.GameParameter("two")
-    self.assertEqual(param1, param1_again)
-    self.assertNotEqual(param1, param2)
-
-  def test_game_parameter_can_access_value(self):
-    self.assertEqual(pyspiel.GameParameter(True).value(), True)
-    self.assertEqual(pyspiel.GameParameter(42).value(), 42)
-    self.assertEqual(pyspiel.GameParameter(3.141).value(), 3.141)
-    self.assertEqual(pyspiel.GameParameter("spqr").value(), "spqr")
-    self.assertEqual(
-        pyspiel.GameParameter({
-            "a": pyspiel.GameParameter(1.23),
-            "b": pyspiel.GameParameter(True)
-        }).value(), {
-            "a": 1.23,
-            "b": True
-        })
-
   def test_game_parameters_from_string_empty(self):
     self.assertEqual(pyspiel.game_parameters_from_string(""), {})
 
   def test_game_parameters_from_string_simple(self):
-    self.assertEqual(pyspiel.game_parameters_from_string("foo"),
-                     {"name": pyspiel.GameParameter("foo")})
+    self.assertEqual(
+        pyspiel.game_parameters_from_string("foo"), {"name": "foo"})
 
   def test_game_parameters_from_string_with_options(self):
-    self.assertEqual(pyspiel.game_parameters_from_string("foo(x=2,y=true)"),
-                     {"name": pyspiel.GameParameter("foo"),
-                      "x": pyspiel.GameParameter(2),
-                      "y": pyspiel.GameParameter(True)})
+    self.assertEqual(
+        pyspiel.game_parameters_from_string("foo(x=2,y=true)"), {
+            "name": "foo",
+            "x": 2,
+            "y": True
+        })
+
+  def test_game_parameters_from_string_with_subgame(self):
+    self.assertEqual(
+        pyspiel.game_parameters_from_string(
+            "foo(x=2,y=true,subgame=bar(z=False))"), {
+                "name": "foo",
+                "x": 2,
+                "y": True,
+                "subgame": {
+                    "name": "bar",
+                    "z": False
+                }
+            })
 
   def test_game_type(self):
     game_type = pyspiel.GameType(
