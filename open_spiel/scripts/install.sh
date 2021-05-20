@@ -152,13 +152,13 @@ fi
 # Install Julia if required and not present already.
 if [[ ${OPEN_SPIEL_BUILD_WITH_JULIA:-"OFF"} == "ON" ]]; then
   # Check that Julia is in the path.
-  if [[ ! -x `which julia` ]] || [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "false" ]
+  if [[ ! -x `which julia` ]] || [ "$(julia -e 'println(VERSION >= v"1.6.1")')" == "false" ]
   then
     echo -e "\e[33mWarning: julia not in your PATH or its too old. Trying \$HOME/.local/bin\e[0m"
     PATH=${HOME}/.local/bin:${PATH}
   fi
 
-  if which julia >/dev/null && [ "$(julia -e 'println(VERSION >= v"1.6.0-rc1")')" == "true" ] ; then
+  if which julia >/dev/null && [ "$(julia -e 'println(VERSION >= v"1.6.1")')" == "true" ] ; then
     JULIA_VERSION_INFO=`julia --version`
     echo -e "\e[33m$JULIA_VERSION_INFO is already installed.\e[0m"
   else
