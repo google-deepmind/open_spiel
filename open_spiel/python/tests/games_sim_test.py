@@ -210,8 +210,7 @@ class GamesSimTest(parameterized.TestCase):
   @parameterized.named_parameters((f"{p}p_{g.short_name}", g, p)
                                   for g, p in SPIEL_MULTIPLAYER_GAMES_LIST)
   def test_multiplayer_game(self, game_info, num_players):
-    game = pyspiel.load_game(game_info.short_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_info.short_name, {"players": num_players})
     self.sim_game(game)
 
   def test_breakthrough(self):

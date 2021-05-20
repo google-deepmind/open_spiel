@@ -70,9 +70,8 @@ A game can be created from its name and its arguments (which usually have
 defaults). There are 2 ways to create a game:
 
 *   Using the game name and a structured `GameParameters` object (which, in
-    Python, is a dictionary from argument name to
-    `pyspiel.GameParameter`-wrapped values e.g. `{"players":
-    pyspiel.GameParameter(3)}`), with `LoadGame`.
+    Python, is a dictionary from argument name to compatible types (int, bool,
+    str or a further dict). e.g. `{"players": 3}` with `LoadGame`.
 *   Using a string representation such as `kuhn_poker(players=3)`, giving
     `LoadGame(kuhn_poker(players=3))`. See `open_spiel/game_parameters.cc` for
     the exact syntax.

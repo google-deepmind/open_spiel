@@ -81,8 +81,7 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
   @parameterized.parameters(("kuhn_poker", 2))
   def test_cpp_and_python_best_response_are_identical(self, game_name,
                                                       num_players):
-    game = pyspiel.load_game(game_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_name, {"players": num_players})
 
     test_policy = policy.TabularPolicy(game)
     for i_player in range(num_players):
@@ -104,8 +103,7 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(("kuhn_poker", 2), ("kuhn_poker", 3))
   def test_cpp_and_python_value_are_identical(self, game_name, num_players):
-    game = pyspiel.load_game(game_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_name, {"players": num_players})
     test_policy = policy.TabularPolicy(game)
     root_state = game.new_initial_state()
     for i_player in range(num_players):
