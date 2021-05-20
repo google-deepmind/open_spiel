@@ -185,10 +185,10 @@ int main(int argc, char **argv) {
     open_spiel::SpielFatalError("One of the players must be AlphaZero.");
 
   open_spiel::algorithms::torch_az::DeviceManager device_manager;
-  // TODO(christianjans): Use LoadCheckpoint method of VPNetModel.
   device_manager.AddDevice(open_spiel::algorithms::torch_az::VPNetModel(
       *game, absl::GetFlag(FLAGS_az_path), absl::GetFlag(FLAGS_az_graph_def),
-      "/cpu:0", absl::GetFlag(FLAGS_az_checkpoint)));
+      "/cpu:0"));
+  device_manager.Get(0, 0)->LoadCheckpoint(absl::GetFlag(FLAGS_az_checkpoint));
   auto az_evaluator =
       std::make_shared<open_spiel::algorithms::torch_az::VPNetEvaluator>(
           /*device_manager=*/&device_manager,

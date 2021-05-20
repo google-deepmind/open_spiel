@@ -100,8 +100,8 @@ class VPNetModel {
   };
 
   VPNetModel(const Game &game, const std::string &path,
-             const std::string &file_name, const std::string &device = "/cpu:0",
-             int checkpoint_step = kInvalidCheckpointStep);
+             const std::string &file_name,
+             const std::string &device = "/cpu:0");
 
   // Move only, not copyable.
   VPNetModel(VPNetModel&& other) = default;
