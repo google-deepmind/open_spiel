@@ -77,12 +77,11 @@ StartInfo StartInfoFromLearnerJson(const std::string& path) {
       last_learner_line).value().GetObject();
 
   start_info.start_time = absl::Now() - absl::Seconds(
-      std::stod(json::ToString(last_learner_json["time_rel"])));
-  start_info.start_step =
-      std::stoi(json::ToString(last_learner_json["step"])) + 1;
+      last_learner_json["time_rel"].GetDouble());
+  start_info.start_step = last_learner_json["step"].GetInt() + 1;
   start_info.model_checkpoint_step = VPNetModel::kMostRecentCheckpointStep;
-  start_info.total_trajectories = std::stoll(json::ToString(
-      last_learner_json["total_trajectories"]));
+  start_info.total_trajectories =
+      last_learner_json["total_trajectories"].GetInt();
 
   return start_info;
 }
