@@ -247,18 +247,8 @@ CrowdModellingState::CrowdModellingState(
 
 std::vector<Action> CrowdModellingState::LegalActions() const {
   if (IsTerminal()) return {};
-  if (current_player_ == kChancePlayerId) {
-    ActionsAndProbs outcomes = ChanceOutcomes();
-    std::vector<Action> actions;
-    actions.reserve(outcomes.size());
-    for (const auto& action_prob : outcomes) {
-      actions.push_back(action_prob.first);
-    }
-    return actions;
-  }
-  if (current_player_ == kMeanFieldPlayerId) {
-    return {};
-  }
+  if (IsChanceNode()) return LegalChanceOutcomes();
+  if (IsMeanFieldNode()) return {};
   SPIEL_CHECK_TRUE(IsPlayerNode());
   return {0, 1, 2, 3, 4};
 }

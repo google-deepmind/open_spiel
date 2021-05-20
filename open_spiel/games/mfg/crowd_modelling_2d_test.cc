@@ -63,10 +63,12 @@ void TestRandomPlay() {
   while (!state->IsTerminal()) {
     SPIEL_CHECK_LT(state->MoveNumber(), game->MaxMoveNumber());
     SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
+    testing::CheckLegalActionsAreSorted(*game, *state);
     if (state->CurrentPlayer() == kChancePlayerId) {
       auto cloned = state->Clone();
       SPIEL_CHECK_EQ(state->ToString(), cloned->ToString());
       ActionsAndProbs outcomes = state->ChanceOutcomes();
+      SPIEL_CHECK_EQ(state->LegalActions().size(), outcomes.size());
       Action action = open_spiel::SampleAction(outcomes, rng).first;
       state->ApplyAction(action);
       ++num_moves;
@@ -78,7 +80,6 @@ void TestRandomPlay() {
       SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
       auto cloned = state->Clone();
       SPIEL_CHECK_EQ(state->ToString(), cloned->ToString());
-      testing::CheckLegalActionsAreSorted(*game, *state);
       std::vector<Action> actions = state->LegalActions();
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(rng)];

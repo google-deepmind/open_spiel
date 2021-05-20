@@ -87,9 +87,11 @@ void TestRandomPlay() {
     CheckStatesEqual(*game->DeserializeState(state->Serialize()), *state);
     auto cloned = state->Clone();
     CheckStatesEqual(*state, *cloned);
+    testing::CheckLegalActionsAreSorted(*game, *state);
     if (state->CurrentPlayer() == kChancePlayerId) {
       ActionsAndProbs outcomes = state->ChanceOutcomes();
       Action action = open_spiel::SampleAction(outcomes, rng).first;
+      SPIEL_CHECK_EQ(state->LegalActions().size(), outcomes.size());
       state->ApplyAction(action);
       ++num_moves;
     } else if (state->CurrentPlayer() == kMeanFieldPlayerId) {
@@ -97,7 +99,6 @@ void TestRandomPlay() {
       state->UpdateDistribution(RandomDistribution(support.size(), rng));
     } else {
       SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
-      testing::CheckLegalActionsAreSorted(*game, *state);
       std::vector<Action> actions = state->LegalActions();
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(rng)];
