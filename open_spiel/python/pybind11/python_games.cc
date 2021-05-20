@@ -63,6 +63,7 @@ std::vector<Action> PyState::LegalActions() const {
 
 std::vector<Action> PyState::LegalActions(Player player) const {
   if (IsTerminal()) return {};
+  if (IsChanceNode()) return LegalChanceOutcomes();
   if ((player == CurrentPlayer()) || (player >= 0 && IsSimultaneousNode())) {
     PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "_legal_actions",
                                 LegalActions, player);
