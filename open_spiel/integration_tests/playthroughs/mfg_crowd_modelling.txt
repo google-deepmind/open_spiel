@@ -28,7 +28,7 @@ MaxGameLength() = 10
 ToString() = "mfg_crowd_modelling()"
 
 # State 0
-# None
+# initial
 IsTerminal() = False
 History() = []
 HistoryString() = ""

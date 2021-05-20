@@ -70,7 +70,7 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 std::string StateToString(int x, int y, int t, Player player_id,
                           bool is_chance_init) {
   if (is_chance_init) {
-    return "None";
+    return "initial";
   }
   if (player_id == 0) {
     return absl::Substitute("($0, $1, $2)", x, y, t);

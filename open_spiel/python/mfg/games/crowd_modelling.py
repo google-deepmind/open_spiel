@@ -128,7 +128,7 @@ class MFGCrowdModellingState(pyspiel.State):
   def state_to_str(self, x, t, player_id=0):
     """A string that uniquely identify a triplet x, t, player_id."""
     if self._is_chance_init:
-      return str(x)
+      return "initial"
     elif player_id == 0:
       return str((x, t))
     elif player_id == pyspiel.PlayerId.MEAN_FIELD:
