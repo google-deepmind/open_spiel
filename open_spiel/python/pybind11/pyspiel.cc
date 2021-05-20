@@ -85,11 +85,6 @@ class SpielException : public std::exception {
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
 
-  // The GameParameter type is now removed from the interface. This definition
-  // is here so that pyspiel.GameParameter(x) still works.
-  // TODO(author11) Remove this definition
-  m.def("GameParameter", [](py::handle h) { return h; });
-
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
 
