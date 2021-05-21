@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -1190,30 +1191,24 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(
   Grid grid;
   int steps_remaining, magic_wall_steps, blob_max_size, blob_size, blob_chance,
       gems_required, gems_collected, current_reward, sum_reward, id_counter,
-      cur_player;
-  bool magic_active, blob_enclosed, obs_show_ids;
-  Element blob_swap;
-  try {
-    grid.num_cols = std::stoi(property_line[0]);
-    grid.num_rows = std::stoi(property_line[1]);
-    steps_remaining = std::stoi(property_line[2]);
-    magic_wall_steps = std::stoi(property_line[3]);
-    magic_active = std::stoi(property_line[4]);
-    blob_max_size = std::stoi(property_line[5]);
-    blob_size = std::stoi(property_line[6]);
-    blob_chance = std::stoi(property_line[7]);
-    blob_swap = kCellTypeToElement.at(std::stoi(property_line[8]));
-    blob_enclosed = std::stoi(property_line[9]);
-    gems_required = std::stoi(property_line[10]);
-    gems_collected = std::stoi(property_line[11]);
-    current_reward = std::stoi(property_line[12]);
-    sum_reward = std::stoi(property_line[13]);
-    obs_show_ids = std::stoi(property_line[14]);
-    id_counter = std::stoi(property_line[15]);
-    cur_player = std::stoi(property_line[16]);
-  } catch (...) {
-    SpielFatalError("Invalid grid properties2 ");
-  }
+      cur_player, magic_active, blob_enclosed, obs_show_ids, blob_swap;
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[0], &grid.num_cols));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[1], &grid.num_rows));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[2], &steps_remaining));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[3], &magic_wall_steps));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[4], &magic_active));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[5], &blob_max_size));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[6], &blob_size));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[7], &blob_chance));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[8], &blob_swap));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[9], &blob_enclosed));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[10], &gems_required));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[11], &gems_collected));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[12], &current_reward));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[13], &sum_reward));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[14], &obs_show_ids));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[15], &id_counter));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[16], &cur_player));
   // Set grid elements
   for (std::size_t i = 1; i < lines.size(); ++i) {
     std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
@@ -1246,9 +1241,9 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(
 
   return std::unique_ptr<State>(new StonesNGemsState(
       shared_from_this(), steps_remaining, magic_wall_steps, magic_active,
-      blob_max_size, blob_size, blob_chance, blob_swap, blob_enclosed,
-      gems_required, gems_collected, current_reward, sum_reward, grid,
-      obs_show_ids, id_counter, cur_player));
+      blob_max_size, blob_size, blob_chance, kCellTypeToElement.at(blob_swap),
+      blob_enclosed, gems_required, gems_collected, current_reward, sum_reward,
+      grid, obs_show_ids, id_counter, cur_player));
 }
 
 std::string StonesNGemsGame::GetRNGState() const {
@@ -1318,16 +1313,11 @@ Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
   }
   // Parse first line which contains level properties
   std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
-  try {
-    grid.num_cols = std::stoi(property_line[0]);
-    grid.num_rows = std::stoi(property_line[1]);
-    max_steps_ = std::stoi(property_line[2]);
-    gems_required_ = std::stoi(property_line[3]);
-  } catch (...) {
-    SpielFatalError(
-        "Missing width, height, maximum steps, and/or gems required on first "
-        "line");
-  }
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[0], &grid.num_cols));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[1], &grid.num_rows));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[2], &max_steps_));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[3], &gems_required_));
+
   // Parse grid contents
   for (std::size_t i = 1; i < lines.size(); ++i) {
     // Check for proper number of columns
