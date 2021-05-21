@@ -67,8 +67,8 @@ function simulate_game(game)
             next_serialize_check *= 2
         end
 
-        # The state can be three different types: chance node,
-        # simultaneous node, or decision node
+        # The state can be of four different types: chance node,
+        # simultaneous node, decision node or mean field node.
         if is_chance_node(state)
             # Chance node: sample an outcome
             outcomes = chance_outcomes(state)
@@ -83,7 +83,12 @@ function simulate_game(game)
             ]  # in julia, index starts with 1
             # Apply the joint action and test cloning states.
             apply_action_test_clone(state, chosen_actions)
+        elseif is_mean_field_node(state)
+            num_states = length(distribution_support(state))
+            update_distribution(
+                state, StdVector([1. / num_states for _ in 1:num_states]))
         else
+            @test is_player_node(state)
             # Decision node: sample action for the single current player
             action = rand(legal_actions(state, current_player(state)))
             # Apply action and test state cloning.
