@@ -21,10 +21,10 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-#if BUILD_WITH_ORTOOLS
+#if OPEN_SPIEL_BUILD_WITH_ORTOOLS
 #include "open_spiel/algorithms/ortools/lp_solver.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
-#endif  // BUILD_WITH_ORTOOLS
+#endif  // OPEN_SPIEL_BUILD_WITH_ORTOOLS
 
 namespace {
 
@@ -35,7 +35,7 @@ void TestLinkingWithOpenSpielCore() {
   SPIEL_CHECK_EQ(game->GetType().short_name, "kuhn_poker");
 }
 
-#if BUILD_WITH_ORTOOLS
+#if OPEN_SPIEL_BUILD_WITH_ORTOOLS
 void TestLinkingWithOpenSpielOrtools() {
   std::cout << "Running open_spiel_ortools" << '\n';
   std::shared_ptr<const open_spiel::matrix_game::MatrixGame> game =
@@ -44,13 +44,13 @@ void TestLinkingWithOpenSpielOrtools() {
       open_spiel::algorithms::ortools::SolveZeroSumMatrixGame(*game);
   SPIEL_CHECK_FLOAT_NEAR(solution.values[0], 0., 1e-10);
 }
-#endif  // BUILD_WITH_ORTOOLS
+#endif  // OPEN_SPIEL_BUILD_WITH_ORTOOLS
 
 }  // namespace
 
 int main() {
   TestLinkingWithOpenSpielCore();
-#if BUILD_WITH_ORTOOLS
+#if OPEN_SPIEL_BUILD_WITH_ORTOOLS
   TestLinkingWithOpenSpielOrtools();
 #endif
 }

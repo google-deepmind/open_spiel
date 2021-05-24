@@ -34,20 +34,20 @@ if(NOT BUILD_TYPE)
 endif()
 message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
 
-if(${BUILD_TYPE} EQUAL "Debug")
+if(${BUILD_TYPE} STREQUAL "Debug")
   # Basic build for debugging (default).
   # -Og enables optimizations that do not interfere with debugging.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
 endif()
 
-if(${BUILD_TYPE} EQUAL "Testing")
+if(${BUILD_TYPE} STREQUAL "Testing")
   # A build used for running tests: keep all runtime checks (assert,
   # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
   # otherwise tests run for too long.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 endif()
 
-if(${BUILD_TYPE} EQUAL "Release")
+if(${BUILD_TYPE} STREQUAL "Release")
   # Optimized release build: turn off debug runtime checks (assert,
   # SPIEL_DCHECK_*) and turn on highest speed optimizations.
   # The difference in perfomance can be up to 10x higher.
@@ -89,39 +89,47 @@ macro(openspiel_optional_dependency DEP_NAME DEP_DEFAULT DEP_DESCRIPTION)
   set (${DEP_NAME} $ENV{${DEP_NAME}})
   message("${BoldYellow}${DEP_NAME}: ${${DEP_NAME}} ${ColourReset}")
   # If the dependency is on, pass in compiler flags to enable conditional code,
-  # e.g. #if BUILD_WITH_...
+  # e.g. #if OPEN_SPIEL_BUILD_WITH_...
   if (${DEP_NAME})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${DEP_NAME}")
   endif()
 endmacro()
 
 # List of all optional dependencies:
-openspiel_optional_dependency(BUILD_WITH_ACPC           OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ACPC           OFF
   "Build against the Universal Poker library.")
-openspiel_optional_dependency(BUILD_WITH_EIGEN          OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_EIGEN          OFF
   "Build with support for Eigen in C++.")
-openspiel_optional_dependency(BUILD_WITH_GO             OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GO             OFF
   "Build with support for Golang API.")
-openspiel_optional_dependency(BUILD_WITH_HANABI         OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HANABI         OFF
   "Build against the Hanabi game.")
-openspiel_optional_dependency(BUILD_WITH_JULIA          OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
-openspiel_optional_dependency(BUILD_WITH_LIBTORCH       OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
-openspiel_optional_dependency(BUILD_WITH_TENSORFLOW_CC  OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC  OFF
   "Build with support for Tensorflow C++ API.")
-openspiel_optional_dependency(BUILD_WITH_PUBLIC_STATES  OFF
-  "Build with support for public states in C++.")
-openspiel_optional_dependency(BUILD_WITH_PYTHON         ON
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_PYTHON         ON
   "Build binary for Python.")
-openspiel_optional_dependency(BUILD_WITH_XINXIN         OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_XINXIN         OFF
   "Build against xinxin Hearts program.")
-openspiel_optional_dependency(BUILD_WITH_ROSHAMBO       OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ROSHAMBO       OFF
   "Build against RoShamBo bots.")
-openspiel_optional_dependency(BUILD_WITH_GAMUT          OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GAMUT          OFF
   "Build with GAMUT generator integration.")
-openspiel_optional_dependency(BUILD_WITH_ORTOOLS        OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
+
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX               AUTO
+  "Enable JAX.")
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH           AUTO
+  "Enable PyTorch.")
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW        AUTO
+  "Enable Tensorflow.")
+openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
+  "Enable miscellaneous Python dependencies.")
+
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -134,9 +142,6 @@ set (OPEN_SPIEL_CORE_FILES
   action_view.cc
   canonical_game_strings.cc
   canonical_game_strings.h
-  fog/fog_constants.h
-  fog/observation_history.cc
-  fog/observation_history.h
   game_parameters.cc
   game_parameters.h
   matrix_game.cc
@@ -191,17 +196,17 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:utils>
   $<TARGET_OBJECTS:tests>
 )
-if (BUILD_WITH_HANABI)
+if (OPEN_SPIEL_BUILD_WITH_HANABI)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
       $<TARGET_OBJECTS:hanabi_learning_environment>)
 endif()
-if (BUILD_WITH_ACPC)
+if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
       $<TARGET_OBJECTS:universal_poker_clib>
       $<TARGET_OBJECTS:universal_poker_lib>)
 endif()
-if (BUILD_WITH_EIGEN)
-  add_compile_definitions(BUILD_WITH_EIGEN)
+if (OPEN_SPIEL_BUILD_WITH_EIGEN)
+  add_compile_definitions(OPEN_SPIEL_BUILD_WITH_EIGEN)
   # Add Eigen dependency.
   add_subdirectory(eigen/)
   # Now we can use #include "Eigen/Dense"
@@ -209,26 +214,13 @@ if (BUILD_WITH_EIGEN)
   include_directories(eigen/libeigen)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
 endif()
-if (BUILD_WITH_PUBLIC_STATES)
-  if (NOT BUILD_WITH_EIGEN)
-    message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable BUILD_WITH_EIGEN=ON")
-  endif()
-  add_compile_definitions(BUILD_WITH_PUBLIC_STATES)
-  set(OPEN_SPIEL_OBJECTS
-    $<TARGET_OBJECTS:public_states_core>
-    $<TARGET_OBJECTS:public_states_games>
-    $<TARGET_OBJECTS:public_states_algorithms>
-    $<TARGET_OBJECTS:public_states_game_transforms>
-    ${OPEN_SPIEL_OBJECTS})
-  add_subdirectory(public_states)
-endif()
-if (BUILD_WITH_XINXIN)
+if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
-if (BUILD_WITH_ROSHAMBO)
+if (OPEN_SPIEL_BUILD_WITH_ROSHAMBO)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
 endif()
-if (BUILD_WITH_LIBTORCH)
+if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
   find_package(Torch REQUIRED)
   add_subdirectory(libtorch)
@@ -236,10 +228,10 @@ if (BUILD_WITH_LIBTORCH)
   # Use following to link your_target_executable with torch libraries:
   # target_link_libraries(your_target_executable ${TORCH_LIBRARIES})
 endif()
-if (BUILD_WITH_GAMUT)
+if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:gamut>)
 endif()
-if (BUILD_WITH_ORTOOLS)
+if (OPEN_SPIEL_BUILD_WITH_ORTOOLS)
   # Compile with OR-Tools headers and link against binary distribution,
   # downloaded from https://developers.google.com/optimization/install/cpp/linux
   # and assumed to be in $HOME/or-tools.
@@ -256,8 +248,8 @@ if (BUILD_WITH_ORTOOLS)
   # Use following to link your_target_executable with OrTools libraries:
   # target_link_libraries(your_target_executable ${ORTOOLS_LIBS})
 endif()
-if (BUILD_WITH_TENSORFLOW_CC)
-  add_compile_definitions(BUILD_WITH_TENSORFLOW_CC)
+if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
+  add_compile_definitions(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   find_package(TensorflowCC REQUIRED)
 endif()
 
@@ -269,22 +261,21 @@ include_directories(..)
 add_subdirectory (algorithms)
 add_subdirectory (bots)
 add_subdirectory (examples)
-add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (contrib)
 
-if (BUILD_WITH_GO)
+if (OPEN_SPIEL_BUILD_WITH_GO)
   add_subdirectory(go)
 endif()
 
-if (BUILD_WITH_PYTHON)
+if (OPEN_SPIEL_BUILD_WITH_PYTHON)
   add_subdirectory (python)
 endif()
 
 add_subdirectory (utils)
 
-if (BUILD_WITH_JULIA)
+if (OPEN_SPIEL_BUILD_WITH_JULIA)
   add_subdirectory (julia)
 endif()
 
@@ -299,11 +290,15 @@ if(NOT DEFINED ENV{BUILD_SHARED_LIB})
 endif()
 set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
 if (BUILD_SHARED_LIB)
-  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
-    # Optionally include files that use external dependencies, for example
-    # linear program specification for finding Nash equilibria.
-    $<TARGET_OBJECTS:open_spiel_ortools>
-  )
+  if (OPEN_SPIEL_BUILD_WITH_ORTOOLS)
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
+      # Optionally include files that use external dependencies, for example
+      # linear program specification for finding Nash equilibria.
+      $<TARGET_OBJECTS:open_spiel_ortools>
+    )
+  else()
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  endif()
   target_include_directories(open_spiel PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
   target_link_libraries(open_spiel PUBLIC

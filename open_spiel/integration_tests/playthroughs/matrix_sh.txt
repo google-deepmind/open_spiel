@@ -1,0 +1,80 @@
+game: matrix_sh
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.ONE_SHOT
+GameType.long_name = "Stag Hunt"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = False
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "matrix_sh"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = 0.0
+MaxUtility() = 2.0
+UtilitySum() = None
+InformationStateTensorShape() = [1]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 1
+MaxGameLength() = 1
+ToString() = "matrix_sh()"
+
+# State 0
+# Terminal? false
+# Row actions: Stag Hare
+# Col actions: Stag Hare
+# Utility matrix:
+# 2,2 0,1
+# 1,0 1,1
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+InformationStateString(0) = "Observing player: 0. Non-terminal"
+InformationStateString(1) = "Observing player: 1. Non-terminal"
+InformationStateTensor(0): ◯
+InformationStateTensor(1): ◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+StringLegalActions(0) = ["Stag", "Hare"]
+StringLegalActions(1) = ["Stag", "Hare"]
+
+# Apply joint action ["Stag", "Stag"]
+actions: [0, 0]
+
+# State 1
+# Terminal? true
+# History: 0, 0
+# Returns: 2,2
+# Row actions:
+# Col actions:
+# Utility matrix:
+# 2,2 0,1
+# 1,0 1,1
+IsTerminal() = True
+History() = [0, 0]
+HistoryString() = "0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Observing player: 0. Terminal. History string: 0, 0"
+InformationStateString(1) = "Observing player: 1. Terminal. History string: 0, 0"
+InformationStateTensor(0): ◉
+InformationStateTensor(1): ◉
+Rewards() = [2.0, 2.0]
+Returns() = [2.0, 2.0]

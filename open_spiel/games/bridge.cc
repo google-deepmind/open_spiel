@@ -580,8 +580,10 @@ std::vector<int> BridgeState::ScoreForContracts(
   for (int contract_index : contracts) {
     const Contract& contract = kAllContracts[contract_index];
     const int declarer_score =
-        Score(contract, dd_tricks[contract.trumps][contract.declarer],
-              is_vulnerable_[Partnership(contract.declarer)]);
+        (contract.level == 0)
+            ? 0
+            : Score(contract, dd_tricks[contract.trumps][contract.declarer],
+                    is_vulnerable_[Partnership(contract.declarer)]);
     scores.push_back(Partnership(contract.declarer) == Partnership(player)
                          ? declarer_score
                          : -declarer_score);
@@ -799,6 +801,8 @@ void BridgeState::ApplyPlayAction(int card) {
 Player BridgeState::CurrentPlayer() const {
   if (phase_ == Phase::kDeal) {
     return kChancePlayerId;
+  } else if (phase_ == Phase::kGameOver) {
+    return kTerminalPlayerId;
   } else if (phase_ == Phase::kPlay &&
              Partnership(current_player_) == Partnership(contract_.declarer)) {
     // Declarer chooses cards for both players.

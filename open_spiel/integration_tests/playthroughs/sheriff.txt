@@ -126,22 +126,6 @@ StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFee
 action: 0
 
 # State 5
-# Num illegal items in cargo: 1
-# Bribes  : [3,3]
-# Feedback: [1,0]
-IsTerminal() = False
-History() = [3, 9, 1, 9, 0]
-HistoryString() = "3, 9, 1, 9, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "T=5 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0"
-InformationStateString(1) = "T=5 /bribe:3/feedback:1/bribe:3/feedback:0"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [6, 7, 8, 9]
-StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
-
 # Apply action "Bribe(amount=2)"
 action: 8
 
@@ -166,42 +150,10 @@ StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFee
 action: 0
 
 # State 7
-# Num illegal items in cargo: 1
-# Bribes  : [3,3,2]
-# Feedback: [1,0,0]
-IsTerminal() = False
-History() = [3, 9, 1, 9, 0, 8, 0]
-HistoryString() = "3, 9, 1, 9, 0, 8, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "T=7 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0"
-InformationStateString(1) = "T=7 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [6, 7, 8, 9]
-StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
-
 # Apply action "Bribe(amount=3)"
 action: 9
 
 # State 8
-# Num illegal items in cargo: 1
-# Bribes  : [3,3,2,3]
-# Feedback: [1,0,0]
-IsTerminal() = False
-History() = [3, 9, 1, 9, 0, 8, 0, 9]
-HistoryString() = "3, 9, 1, 9, 0, 8, 0, 9"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "T=8 num_illegal_items:1/bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3"
-InformationStateString(1) = "T=8 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFeedback(will_inspect=True)"]
-
 # Apply action "InspectionFeedback(will_inspect=True)"
 action: 1
 

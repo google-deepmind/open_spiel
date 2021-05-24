@@ -385,8 +385,10 @@ class DQN(rl_agent.AbstractAgent):
     max_next_q = torch.max(self._target_q_values + illegal_logits, dim=1)[0]
     target = (
         rewards + (1 - are_final_steps) * self._discount_factor * max_next_q)
-    action_indices = torch.stack(
-        [torch.arange(self._q_values.shape[0]), actions], dim=0)
+    action_indices = torch.stack([
+        torch.arange(self._q_values.shape[0], dtype=torch.long), actions
+    ],
+                                 dim=0)
     predictions = self._q_values[list(action_indices)]
 
     loss = self.loss_class(predictions, target)

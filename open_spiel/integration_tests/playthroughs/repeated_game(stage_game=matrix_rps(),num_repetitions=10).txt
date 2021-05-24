@@ -106,282 +106,30 @@ StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
 actions: [1, 0]
 
 # State 3
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Total Returns: 1 -1
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0]
-HistoryString() = "0, 0, 2, 2, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Paper Rock "
-ObservationString(1) = "Paper Rock "
-ObservationTensor(0): ◯◉◯◉◯◯
-ObservationTensor(1): ◯◉◯◉◯◯
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Paper", "Paper"]
 actions: [1, 1]
 
 # State 4
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Round 3:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Total Returns: 1 -1
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0, 1, 1]
-HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Paper Paper "
-ObservationString(1) = "Paper Paper "
-ObservationTensor(0): ◯◉◯◯◉◯
-ObservationTensor(1): ◯◉◯◯◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [1.0, -1.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Paper", "Paper"]
 actions: [1, 1]
 
 # State 5
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Round 3:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 4:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Total Returns: 1 -1
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1]
-HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Paper Paper "
-ObservationString(1) = "Paper Paper "
-ObservationTensor(0): ◯◉◯◯◉◯
-ObservationTensor(1): ◯◉◯◯◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [1.0, -1.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Rock", "Paper"]
 actions: [0, 1]
 
 # State 6
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Round 3:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 4:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 5:
-# Actions: Rock Paper
-# Rewards: -1 1
-# Total Returns: 0 0
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1]
-HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Rock Paper "
-ObservationString(1) = "Rock Paper "
-ObservationTensor(0): ◉◯◯◯◉◯
-ObservationTensor(1): ◉◯◯◯◉◯
-Rewards() = [-1.0, 1.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Rock", "Scissors"]
 actions: [0, 2]
 
 # State 7
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Round 3:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 4:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 5:
-# Actions: Rock Paper
-# Rewards: -1 1
-# Round 6:
-# Actions: Rock Scissors
-# Rewards: 1 -1
-# Total Returns: 1 -1
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2]
-HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Rock Scissors "
-ObservationString(1) = "Rock Scissors "
-ObservationTensor(0): ◉◯◯◯◯◉
-ObservationTensor(1): ◉◯◯◯◯◉
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Rock", "Scissors"]
 actions: [0, 2]
 
 # State 8
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Round 3:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 4:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 5:
-# Actions: Rock Paper
-# Rewards: -1 1
-# Round 6:
-# Actions: Rock Scissors
-# Rewards: 1 -1
-# Round 7:
-# Actions: Rock Scissors
-# Rewards: 1 -1
-# Total Returns: 2 -2
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2]
-HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Rock Scissors "
-ObservationString(1) = "Rock Scissors "
-ObservationTensor(0): ◉◯◯◯◯◉
-ObservationTensor(1): ◉◯◯◯◯◉
-Rewards() = [1.0, -1.0]
-Returns() = [2.0, -2.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Rock", "Rock"]
 actions: [0, 0]
 
 # State 9
-# Round 0:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Round 1:
-# Actions: Scissors Scissors
-# Rewards: 0 0
-# Round 2:
-# Actions: Paper Rock
-# Rewards: 1 -1
-# Round 3:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 4:
-# Actions: Paper Paper
-# Rewards: 0 0
-# Round 5:
-# Actions: Rock Paper
-# Rewards: -1 1
-# Round 6:
-# Actions: Rock Scissors
-# Rewards: 1 -1
-# Round 7:
-# Actions: Rock Scissors
-# Rewards: 1 -1
-# Round 8:
-# Actions: Rock Rock
-# Rewards: 0 0
-# Total Returns: 2 -2
-IsTerminal() = False
-History() = [0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2, 0, 0]
-HistoryString() = "0, 0, 2, 2, 1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 2, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = "Rock Rock "
-ObservationString(1) = "Rock Rock "
-ObservationTensor(0): ◉◯◯◉◯◯
-ObservationTensor(1): ◉◯◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [2.0, -2.0]
-LegalActions(0) = [0, 1, 2]
-LegalActions(1) = [0, 1, 2]
-StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
-StringLegalActions(1) = ["Rock", "Paper", "Scissors"]
-
 # Apply joint action ["Rock", "Scissors"]
 actions: [0, 2]
 

@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/policy.h"
@@ -138,7 +137,7 @@ class KuhnObserver : public Observer {
         // Imperfect recall public info - two different formats.
         if (iig_obs_type_.private_info == PrivateInfoType::kNone) {
           if (state.history_.empty()) {
-            absl::StrAppend(&result, kStartOfGamePublicObservation);
+            absl::StrAppend(&result, "start game");
           } else if (state.history_.size() > state.num_players_) {
             absl::StrAppend(&result,
                             state.history_.back().action ? "Bet" : "Pass");
@@ -322,6 +321,7 @@ void KuhnState::UndoAction(Player player, Action move) {
     winner_ = kInvalidPlayer;
   }
   history_.pop_back();
+  --move_number_;
 }
 
 std::vector<std::pair<Action, double>> KuhnState::ChanceOutcomes() const {

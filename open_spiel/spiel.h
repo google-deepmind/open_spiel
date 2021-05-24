@@ -32,7 +32,6 @@
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -57,8 +56,11 @@ struct GameType {
 
   // Is the game one-player-at-a-time or do players act simultaneously?
   enum class Dynamics {
-    kSimultaneous,  // In some or all nodes every player acts.
-    kSequential,    // Turn-based games.
+    kSimultaneous,           // In some or all nodes every player acts.
+    kSequential,             // Turn-based games.
+    // Mean field game. In particular, this adds mean field nodes. Support for
+    // mean field games is experimental. See details in games/mfg/README.md.
+    kMeanField,              // Is a Mean Field Game
   };
   Dynamics dynamics;
 
@@ -133,7 +135,6 @@ struct GameType {
   // Can we factorize observations into public and private parts?
   // This is similar to observation fields before, but adds additional
   // distinction between public and private observations.
-  // See fog_constants.h for more details.
   bool provides_factored_observation_string = false;
 };
 
@@ -165,7 +166,9 @@ struct GameInfo {
   double utility_sum;
 
   // The maximum number of player decisions in a game. Does not include chance
-  // events.
+  // events. For a simultaneous action game, this is the maximum number of joint
+  // decisions. In a turn-based game, this is the maximum number of individual
+  // decisions summed over all players.
   int max_game_length;
 };
 
@@ -229,7 +232,8 @@ class State {
   // actions should be returned in ascending order.
   //
   // This default implementation is fine for turn-based games, but should
-  // be overridden by simultaneous-move games.
+  // be overridden by simultaneous-move games. At least one player should have a
+  // legal action or the game should be terminal.
   //
   // Since games mostly override LegalActions(), this method will not be visible
   // in derived classes unless a using directive is added.
@@ -552,8 +556,9 @@ class State {
   // Change the state of the game by applying the specified actions, one per
   // player, for simultaneous action games. This function encodes the logic of
   // the game rules. Element i of the vector is the action for player i.
-  // Every player must submit a action; if one of the players has no actions at
-  // this node, then kInvalidAction should be passed instead.
+  //
+  // Every player must submit a action. If some of the players have no legal
+  // actions at this node, then 0 should be passed instead.
   //
   // Simultaneous games should implement DoApplyActions.
   void ApplyActions(const std::vector<Action>& actions);
@@ -652,6 +657,24 @@ class State {
     return {};
   }
 
+  // These functions only apply to mean field games and should only be called
+  // when CurrentPlayer() == kMeanFieldPlayerId.
+  // Mean field game support in open_spiel is experimental, and these functions
+  // are subject to change.
+
+  // At the current mean field node, the support of the state distribution that
+  // needs to be updated. States are identified by their corresponding string
+  // representation.
+  virtual std::vector<std::string> DistributionSupport() {
+    SpielFatalError("UpdateDistribution has not been implemented");
+  }
+  // Update the state distribution. `distribution[i]` must correspond to
+  // `DistributionSupport()[i]`. After this is called, the state will be of
+  // Chance type.
+  virtual void UpdateDistribution(const std::vector<double>& distribution) {
+    SpielFatalError("UpdateDistribution has not been implemented");
+  }
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -662,14 +685,15 @@ class State {
     SpielFatalError("DoApplyActions is not implemented.");
   }
 
-  // Fields common to every game state.
-  int num_distinct_actions_;
-  int num_players_;
-  std::vector<PlayerAction> history_;  // Actions taken so far.
-  int move_number_;
+  // The game that created this state, plus some static information about it,
+  // cached here for efficient access.
+  const std::shared_ptr<const Game> game_;
+  const int num_distinct_actions_;
+  const int num_players_;
 
-  // A pointer to the game that created this state.
-  std::shared_ptr<const Game> game_;
+  // Information that changes over the course of the game.
+  std::vector<PlayerAction> history_;
+  int move_number_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const State& state);

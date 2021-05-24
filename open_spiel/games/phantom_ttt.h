@@ -96,7 +96,7 @@ class PhantomTTTState : public State {
 // Game object.
 class PhantomTTTGame : public Game {
  public:
-  explicit PhantomTTTGame(const GameParameters& params);
+  PhantomTTTGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new PhantomTTTState(shared_from_this(), obs_type_));
@@ -133,12 +133,14 @@ class ImperfectRecallPTTTState : public PhantomTTTState {
     SPIEL_CHECK_LT(player, num_players_);
     return ViewToString(player);
   }
+  std::unique_ptr<State> Clone() const override {
+    return std::unique_ptr<State>(new ImperfectRecallPTTTState(*this));
+  }
 };
 
 class ImperfectRecallPTTTGame : public PhantomTTTGame {
  public:
-  explicit ImperfectRecallPTTTGame(const GameParameters& params)
-      : PhantomTTTGame(params) {}
+  explicit ImperfectRecallPTTTGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new ImperfectRecallPTTTState(shared_from_this(), obs_type()));

@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "open_spiel/algorithms/cfr.h"
-#include "open_spiel/fog/observation_history.h"
+#include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/utils/random.h"
 

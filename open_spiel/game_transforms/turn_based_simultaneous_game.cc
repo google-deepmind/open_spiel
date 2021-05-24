@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 
 namespace open_spiel {
 
@@ -56,9 +57,9 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 TurnBasedSimultaneousState::TurnBasedSimultaneousState(
     std::shared_ptr<const Game> game, std::unique_ptr<State> state)
-    : State(game), state_(std::move(state)), rollout_mode_(false) {
+    : State(game), state_(std::move(state)), action_vector_(game->NumPlayers()),
+      rollout_mode_(false) {
   DetermineWhoseTurn();
-  action_vector_.resize(game->NumPlayers());
 }
 
 Player TurnBasedSimultaneousState::CurrentPlayer() const {
@@ -69,8 +70,12 @@ void TurnBasedSimultaneousState::DetermineWhoseTurn() {
   if (state_->CurrentPlayer() == kSimultaneousPlayerId) {
     // When the underlying game's node is at a simultaneous move node, they get
     // rolled out as turn-based, starting with player 0.
-    current_player_ = Player{0};
+    current_player_ = -1;
     rollout_mode_ = true;
+    RolloutModeIncrementCurrentPlayer();
+    // If the rollout mode is used, then at least one player should have a valid
+    // action.
+    SPIEL_CHECK_LT(current_player_, num_players_);
   } else {
     // Otherwise, just execute it normally.
     current_player_ = state_->CurrentPlayer();

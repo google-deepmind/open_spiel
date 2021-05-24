@@ -18,9 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import pyspiel
+
 
 def _get_subgames_states(state, all_states, depth_limit, depth,
-                         include_terminals, include_chance_states, to_string,
+                         include_terminals, include_chance_states,
+                         include_mean_field_states, to_string,
                          stop_if_encountered):
   """Extract non-chance states for a subgame into the all_states dict."""
   if state.is_terminal():
@@ -33,8 +36,11 @@ def _get_subgames_states(state, all_states, depth_limit, depth,
 
   if depth > depth_limit >= 0:
     return
-
-  if not state.is_chance_node() or include_chance_states:
+  is_mean_field = state.current_player() == pyspiel.PlayerId.MEAN_FIELD
+  if (state.is_chance_node() and
+      include_chance_states) or (is_mean_field and
+                                 include_mean_field_states) or not (
+                                     state.is_chance_node() or is_mean_field):
     # Add only if not already present
     state_str = to_string(state)
     if state_str not in all_states:
@@ -44,17 +50,31 @@ def _get_subgames_states(state, all_states, depth_limit, depth,
       if stop_if_encountered:
         return
 
-  for action in state.legal_actions():
-    state_for_search = state.child(action)
+  if is_mean_field:
+    support = state.distribution_support()
+    state_for_search = state.clone()
+    support_length = len(support)
+    # update with a dummy distribution
+    state_for_search.update_distribution(
+        [1.0 / support_length for _ in range(support_length)])
     _get_subgames_states(state_for_search, all_states, depth_limit, depth + 1,
-                         include_terminals, include_chance_states, to_string,
+                         include_terminals, include_chance_states,
+                         include_mean_field_states, to_string,
                          stop_if_encountered)
+  else:
+    for action in state.legal_actions():
+      state_for_search = state.child(action)
+      _get_subgames_states(state_for_search, all_states, depth_limit, depth + 1,
+                           include_terminals, include_chance_states,
+                           include_mean_field_states, to_string,
+                           stop_if_encountered)
 
 
 def get_all_states(game,
                    depth_limit=-1,
                    include_terminals=True,
                    include_chance_states=False,
+                   include_mean_field_states=False,
                    to_string=lambda s: s.history_str(),
                    stop_if_encountered=True):
   """Gets all states in the game, indexed by their string representation.
@@ -72,6 +92,7 @@ def get_all_states(game,
       means root-only, etc.
     include_terminals: If True, include terminal states.
     include_chance_states: If True, include chance node states.
+    include_mean_field_states: If True, include mean field node states.
     to_string: The serialization function. We expect this to be
       `lambda s: s.history_str()` as this enforces perfect recall, but for
         historical reasons, using `str` is also supported, but the goal is to
@@ -96,6 +117,7 @@ def get_all_states(game,
       depth=0,
       include_terminals=include_terminals,
       include_chance_states=include_chance_states,
+      include_mean_field_states=include_mean_field_states,
       to_string=to_string,
       stop_if_encountered=stop_if_encountered)
 

@@ -5,7 +5,7 @@
 If you plan to only use the Python API, then the easiest way to install
 OpenSpiel is to use pip. As only source distribution is currently supported,
 CMake, Clang and Python 3 development files are required to build the Python
-extension.
+extension. Note that we recommend Clang but g++ >= 9.2 should also work.
 
 E.g. on Ubuntu or Debian:
 
@@ -56,6 +56,11 @@ Ubuntu 20.04 (or 19.10), Debian 10, or later versions. There are
 [known issues](https://github.com/deepmind/open_spiel/issues/407) with default
 compilers on Ubuntu on 18.04, and `clang-10` must be installed separately. On
 MacOS, we recommend XCode 11 or newer.
+
+For the Python API: our tests run using Python 3.8 and 3.9 on Ubuntu 20.04 and
+MacOS 10.15. We also test using Ubuntu 18.04 LTS with Python 3.6. So, we
+recommend one of these setups. If you encounter any problems on other setups,
+please let us know by opening an issue.
 
 Currently there are two installation methods:
 
@@ -143,16 +148,21 @@ Linux versions).
 
 ## Installing via Docker
 
+Please note that we don't regularly test the Docker installation. As such, it
+may not work at any given time. We are investigating enabling tests and proper
+longer-term support, but it may take some time. Until then, if you encounter a
+problem, please [open an issue](https://github.com/deepmind/open_spiel/issues).
+
 Option 1 (Basic, 3.13GB):
 
 ```bash
-docker build --target base -t openspiel -f Dockerfile.base --rm
+docker build --target base -t openspiel -f Dockerfile.base .
 ```
 
 Option 2 (Slim, 2.26GB):
 
 ```bash
-docker build --target python-slim -t openspiel -f Dockerfile.base --rm
+docker build --target python-slim -t openspiel -f Dockerfile.base .
 ```
 
 If you are only interested in developing in Python, use the second image. You

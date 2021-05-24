@@ -178,7 +178,7 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
+ChanceOutcomes() = [(0, 0.16666666666666666), (1, 0.16666666666666666), (2, 0.16666666666666666), (3, 0.16666666666666666), (4, 0.16666666666666666), (5, 0.16666666666666666)]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
 
@@ -437,7 +437,7 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
+ChanceOutcomes() = [(0, 0.16666666666666666), (1, 0.16666666666666666), (2, 0.16666666666666666), (3, 0.16666666666666666), (4, 0.16666666666666666), (5, 0.16666666666666666)]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
 
@@ -497,53 +497,6 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 9
-# Scores: 0 2 0 0 0, Turn total: 2
-# Current player: 4 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 2\nCurrent player: 4 (rolling)\n"
-ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 3"
 action: 2
 
@@ -600,53 +553,6 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 11
-# Scores: 0 2 0 0 0, Turn total: 5
-# Current player: 4 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 5\nCurrent player: 4 (rolling)\n"
-ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 1"
 action: 0
 
@@ -807,53 +713,6 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 15
-# Scores: 0 2 0 0 0, Turn total: 0
-# Current player: 2 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 0\nCurrent player: 2 (rolling)\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 6"
 action: 5
 
@@ -910,105 +769,10 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 17
-# Scores: 0 2 0 0 0, Turn total: 6
-# Current player: 2 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 6\nCurrent player: 2 (rolling)\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 2"
 action: 1
 
 # State 18
-# Scores: 0 2 0 0 0, Turn total: 8
-# Current player: 2
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-ObservationString(0) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-ObservationString(1) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-ObservationString(2) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-ObservationString(3) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-ObservationString(4) = "Scores: 0 2 0 0 0, Turn total: 8\nCurrent player: 2\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "stop"
 action: 1
 
@@ -1065,53 +829,6 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 20
-# Scores: 0 2 8 0 0, Turn total: 0
-# Current player: 3 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 8 0 0, Turn total: 0\nCurrent player: 3 (rolling)\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 4"
 action: 3
 
@@ -1168,363 +885,30 @@ StringLegalActions() = ["roll", "stop"]
 action: 1
 
 # State 22
-# Scores: 0 2 8 4 0, Turn total: 0
-# Current player: 4
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 4
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "roll"
 action: 0
 
 # State 23
-# Scores: 0 2 8 4 0, Turn total: 0
-# Current player: 4 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 0\nCurrent player: 4 (rolling)\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 3"
 action: 2
 
 # State 24
-# Scores: 0 2 8 4 0, Turn total: 3
-# Current player: 4
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 4
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4\n"
-ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "roll"
 action: 0
 
 # State 25
-# Scores: 0 2 8 4 0, Turn total: 3
-# Current player: 4 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 3\nCurrent player: 4 (rolling)\n"
-ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 5"
 action: 4
 
 # State 26
-# Scores: 0 2 8 4 0, Turn total: 8
-# Current player: 4
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 4
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "roll"
 action: 0
 
 # State 27
-# Scores: 0 2 8 4 0, Turn total: 8
-# Current player: 4 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 8\nCurrent player: 4 (rolling)\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 3"
 action: 2
 
 # State 28
-# Scores: 0 2 8 4 0, Turn total: 11
-# Current player: 4
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 4
-ObservationString(0) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-ObservationString(1) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-ObservationString(2) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-ObservationString(3) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-ObservationString(4) = "Scores: 0 2 8 4 0, Turn total: 11\nCurrent player: 4\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "stop"
 action: 1
 
@@ -1581,466 +965,38 @@ StringLegalActions() = ["roll", "stop"]
 action: 0
 
 # State 30
-# Scores: 0 2 8 4 11, Turn total: 0
-# Current player: 0 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-ObservationString(1) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-ObservationString(2) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-ObservationString(3) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-ObservationString(4) = "Scores: 0 2 8 4 11, Turn total: 0\nCurrent player: 0 (rolling)\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 5"
 action: 4
 
 # State 31
-# Scores: 0 2 8 4 11, Turn total: 5
-# Current player: 0
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-ObservationString(1) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-ObservationString(2) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-ObservationString(3) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-ObservationString(4) = "Scores: 0 2 8 4 11, Turn total: 5\nCurrent player: 0\n"
-ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "stop"
 action: 1
 
 # State 32
-# Scores: 5 2 8 4 11, Turn total: 0
-# Current player: 1
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "roll"
 action: 0
 
 # State 33
-# Scores: 5 2 8 4 11, Turn total: 0
-# Current player: 1 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 0\nCurrent player: 1 (rolling)\n"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 6"
 action: 5
 
 # State 34
-# Scores: 5 2 8 4 11, Turn total: 6
-# Current player: 1
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "roll"
 action: 0
 
 # State 35
-# Scores: 5 2 8 4 11, Turn total: 6
-# Current player: 1 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 6\nCurrent player: 1 (rolling)\n"
-ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 5"
 action: 4
 
 # State 36
-# Scores: 5 2 8 4 11, Turn total: 11
-# Current player: 1
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["roll", "stop"]
-
 # Apply action "roll"
 action: 0
 
 # State 37
-# Scores: 5 2 8 4 11, Turn total: 11
-# Current player: 1 (rolling)
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 11\nCurrent player: 1 (rolling)\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {2, 0.166666666667}, {3, 0.166666666667}, {4, 0.166666666667}, {5, 0.166666666667}]
-LegalActions() = [0, 1, 2, 3, 4, 5]
-StringLegalActions() = ["Roll 1", "Roll 2", "Roll 3", "Roll 4", "Roll 5", "Roll 6"]
-
 # Apply action "Roll 4"
 action: 3
 
 # State 38
-# Scores: 5 2 8 4 11, Turn total: 15
-# Current player: 1
-IsTerminal() = False
-History() = [1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0, 3]
-HistoryString() = "1, 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 0, 1, 1, 0, 5, 0, 1, 1, 0, 3, 1, 0, 2, 0, 4, 0, 2, 1, 0, 4, 1, 0, 5, 0, 4, 0, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-ObservationString(1) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-ObservationString(2) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-ObservationString(3) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-ObservationString(4) = "Scores: 5 2 8 4 11, Turn total: 15\nCurrent player: 1\n"
-ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(3): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-ObservationTensor(4): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-                      ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
-                      ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
-LegalActions() = [1]
-StringLegalActions() = ["stop"]
-
 # Apply action "stop"
 action: 1
 

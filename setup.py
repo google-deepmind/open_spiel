@@ -85,8 +85,8 @@ class BuildExt(build_ext):
     # users download the source and build the pip package. Leave them commented
     # out for non-releases because we use nox in our CI testing scripts, which
     # don't use optional dependencies.
-    # env["BUILD_WITH_ACPC"] = "ON"
-    # env["BUILD_WITH_HANABI"] = "ON"
+    # env["OPEN_SPIEL_BUILD_WITH_ACPC"] = "ON"
+    # env["OPEN_SPIEL_BUILD_WITH_HANABI"] = "ON"
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
         f"-DCMAKE_CXX_COMPILER={cxx}",

@@ -117,7 +117,7 @@ class NoPrivateObserver : public Observer {
   void WriteTensor(const State& state, int player,
                    Allocator* allocator) const override {}
   std::string StringFrom(const State& state, int player) const override {
-    return kNothingPrivateObservation;
+    return "";
   }
 };
 }  // namespace
@@ -347,6 +347,17 @@ std::vector<float> TensorFromObserver(const State& state,
   TrackingVectorAllocator allocator;
   observer.WriteTensor(state, /*player=*/state.CurrentPlayer(), &allocator);
   return std::move(allocator.data);
+}
+
+std::vector<int> ObserverTensorShape(const State& state,
+                                     const Observer& observer) {
+  TrackingVectorAllocator allocator;
+  observer.WriteTensor(state, /*player=*/0, &allocator);
+  if (allocator.tensors.size() == 1) {
+    return allocator.tensors.front().shape;
+  } else {
+    return {static_cast<int>(allocator.data.size())};
+  }
 }
 
 }  // namespace open_spiel

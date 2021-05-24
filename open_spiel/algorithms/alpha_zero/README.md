@@ -23,4 +23,4 @@ should be installed on your machine. Please see
 for instructions on building and installing.
 
 After having a working TensorflowCC API, you just need to set
-`BUILD_WITH_TENSORFLOW_CC` flag to `ON` before building OpenSpiel.
+`OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC` flag to `ON` before building OpenSpiel.

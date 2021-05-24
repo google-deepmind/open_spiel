@@ -4,8 +4,8 @@ This is a C++ implementation of the AlphaZero algorithm based on LibTorch,
 similar to the C++ TF-based AlphaZero.
 
 To build and use this implementation, you must set the optional global variable
-`BUILD_WITH_LIBTORCH` to `ON` when installing dependencies and building
-OpenSpiel.
+`OPEN_SPIEL_BUILD_WITH_LIBTORCH` to `ON` when installing dependencies and
+building OpenSpiel.
 
 Then, to get started, see `examples/alpha_zero_torch_example.cc`.
 

@@ -22,6 +22,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
+<font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
@@ -31,6 +32,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Havannah](#havannah)
 <font color="orange"><b>~</b></font>         | [Hearts](#hearts)
 <font color="orange"><b>~</b></font>         | [Hex](#hex)
+<font color="orange"><b>~</b></font>         | [Kriegspiel](#Kriegspiel)
 ![](_static/green_circ10.png "green circle") | [Kuhn poker](#kuhn-poker)
 <font color="orange"><b>~</b></font>         | [Laser Tag](#laser-tag)
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
@@ -201,6 +203,16 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
 
+### Dark Hex
+
+*   Hex, except the opponent's tokens are hidden. (Imperfect-information
+    version)
+*   Uses tokens on a hex grid.
+*   Research game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+
 ### Deep Sea
 
 *   Agent must explore to find reward (first version) or penalty (second
@@ -300,6 +312,18 @@ Status                                       | Game
 *   [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))
 *   [Hex, the full story by Ryan Hayward and Bjarne Toft](https://webdocs.cs.ualberta.ca/~hayward/hexbook/hex.html)
 
+### Kriegspiel
+
+*   Chess with opponent's pieces unknown. Illegal moves have no effect - it
+    remains the same player's turn until they make a legal move.
+*   Traditional chess variant, invented by Henry Michael Temple in 1899.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Kriegspiel_\(chess\))
+*   [Monte Carlo tree search in Kriegspiel](https://www.ics.uci.edu/~dechter/courses/ics-295/fall-2019/papers/2010-mtc-aij.pdf)
+*   [Game-Tree Search with Combinatorially Large Belief States, Parker 2005](https://www.cs.umd.edu/~nau/papers/parker2005game-tree.pdf)
+
 ### Kuhn poker
 
 *   Simplified poker amenable to game-theoretic analysis.
@@ -312,7 +336,7 @@ Status                                       | Game
 
 ### Laser Tag
 
-*   Agents see a local part of the grid, and attempt to tag eachother with
+*   Agents see a local part of the grid, and attempt to tag each other with
     beams.
 *   Agents on a grid.
 *   Research game.

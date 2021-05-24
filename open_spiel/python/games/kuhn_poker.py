@@ -27,11 +27,20 @@ works with that (e.g. CFR algorithms). It is likely to be poor if the algorithm
 relies on processing and updating states as it goes, e.g. MCTS.
 """
 
+import enum
+
 import numpy as np
 
 import pyspiel
 
+
+class Action(enum.IntEnum):
+  PASS = 0
+  BET = 1
+
+
 _NUM_PLAYERS = 2
+_DECK = frozenset([0, 1, 2])
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_kuhn_poker",
     long_name="Python Kuhn Poker",
@@ -48,20 +57,20 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_tensor=True,
     provides_factored_observation_string=True)
 _GAME_INFO = pyspiel.GameInfo(
-    num_distinct_actions=2,  # 0 = Pass, 1 = Bet
-    max_chance_outcomes=3,  # The deck has 3 cards
-    num_players=2,
+    num_distinct_actions=len(Action),
+    max_chance_outcomes=len(_DECK),
+    num_players=_NUM_PLAYERS,
     min_utility=-2.0,
     max_utility=2.0,
     utility_sum=0.0,
-    max_game_length=3)  # Pass, Bet, Bet/Pass
+    max_game_length=3)  # e.g. Pass, Bet, Bet
 
 
 class KuhnPokerGame(pyspiel.Game):
   """A Python version of Kuhn poker."""
 
   def __init__(self, params=None):
-    super().__init__(self, _GAME_TYPE, _GAME_INFO, params or dict())
+    super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
@@ -79,7 +88,7 @@ class KuhnPokerState(pyspiel.State):
 
   def __init__(self, game):
     """Constructor; should only be called by Game.new_initial_state."""
-    super().__init__(self, game)
+    super().__init__(game)
     self.cards = []
     self.bets = []
     self.pot = [1.0, 1.0]
@@ -98,44 +107,40 @@ class KuhnPokerState(pyspiel.State):
     else:
       return self._next_player
 
-  def legal_actions(self, player=None):
+  def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
-    if self._game_over:
-      return []
-    elif player is not None and player != self._next_player:
-      return []
-    elif len(self.cards) < _NUM_PLAYERS:
-      return sorted({0, 1, 2} - set(self.cards))
+    if player == pyspiel.PlayerId.CHANCE:
+      return sorted(_DECK - set(self.cards))
     else:
-      return [0, 1]
+      return [Action.PASS, Action.BET]
 
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
-    if len(self.cards) == _NUM_PLAYERS:
+    if not self.is_chance_node():
       raise ValueError("chance_outcomes called on a non-chance state.")
-    outcomes = sorted({0, 1, 2} - set(self.cards))
+    outcomes = sorted(_DECK - set(self.cards))
     p = 1.0 / len(outcomes)
     return [(o, p) for o in outcomes]
 
-  def do_apply_action(self, action):
+  def _apply_action(self, action):
     """Applies the specified action to the state."""
-    if len(self.cards) < _NUM_PLAYERS:
+    if self.is_chance_node():
       self.cards.append(action)
     else:
       self.bets.append(action)
-      self.pot[self._next_player] += action
+      if action == Action.BET:
+        self.pot[self._next_player] += 1
       self._next_player = 1 - self._next_player
-      if (min(self.pot) == 2) or (len(self.bets) == 2 and
-                                  self.bets[-1] == 0) or len(self.bets) == 3:
+      if ((min(self.pot) == 2) or
+          (len(self.bets) == 2 and action == Action.PASS) or
+          (len(self.bets) == 3)):
         self._game_over = True
 
-  def action_to_string(self, arg0, arg1=None):
-    """Action -> string. Args either (player, action) or (action)."""
-    player = self._next_player if arg1 is None else arg0
-    action = arg0 if arg1 is None else arg1
+  def _action_to_string(self, player, action):
+    """Action -> string."""
     if player == pyspiel.PlayerId.CHANCE:
       return f"Deal:{action}"
-    elif action == 0:
+    elif action == Action.PASS:
       return "Pass"
     else:
       return "Bet"
@@ -162,14 +167,6 @@ class KuhnPokerState(pyspiel.State):
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
     return "".join([str(c) for c in self.cards] + ["pb"[b] for b in self.bets])
-
-  def __setstate__(self, data):
-    """Support for unpickling."""
-    # TODO(author11) It should be possible to do this in the C++ layer instead
-    game, state = pyspiel.deserialize_game_and_state(data)
-    self.__init__(game)
-    for h in state.full_history():
-      self.apply_action(h.action)
 
 
 class KuhnPokerObserver:

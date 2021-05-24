@@ -63,7 +63,8 @@ void ConsumeWhitespace(absl::string_view* str) {
 absl::nullopt_t ParseError(absl::string_view error, absl::string_view str) {
   // Comment out this check if you want parse errors to return nullopt instead
   // of crash with an error message of where the problem is.
-  SPIEL_CHECK_EQ(error, str.substr(0, std::min(30ul, str.size())));
+  SPIEL_CHECK_EQ(error, str.substr(0,
+                                   std::min(30, static_cast<int>(str.size()))));
 
   // TODO(author7): Maybe return a variant of error string or Value?
   return absl::nullopt;

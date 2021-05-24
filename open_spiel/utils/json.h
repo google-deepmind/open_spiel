@@ -22,8 +22,10 @@
 #include <variant>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel::json {
 
@@ -55,17 +57,48 @@ class Value : public std::variant<Null, bool, int64_t, double, std::string,
   bool IsString() const { return std::holds_alternative<std::string>(*this); }
   bool IsArray() const { return std::holds_alternative<Array>(*this); }
   bool IsObject() const { return std::holds_alternative<Object>(*this); }
-  bool GetBool() const { return std::get<bool>(*this); }
-  int64_t GetInt() const { return std::get<int64_t>(*this); }
-  int64_t& GetInt() { return std::get<int64_t>(*this); }
-  double GetDouble() const { return std::get<double>(*this); }
-  double& GetDouble() { return std::get<double>(*this); }
-  const std::string& GetString() const { return std::get<std::string>(*this); }
-  std::string& GetString() { return std::get<std::string>(*this); }
-  const Array& GetArray() const { return std::get<Array>(*this); }
-  Array& GetArray() { return std::get<Array>(*this); }
-  const Object& GetObject() const { return std::get<Object>(*this); }
-  Object& GetObject() { return std::get<Object>(*this); }
+
+  // Do not use std::get here, as it causes compilation problems on on older
+  // MacOS. For details, see:
+  // https://stackoverflow.com/questions/52521388/stdvariantget-does-not-compile-with-apple-llvm-10-0
+  template <class T> T get_val() const {
+    if (auto *val = std::get_if<T>(this)) {
+      return *val;
+    } else {
+      SpielFatalError(absl::StrCat(
+          "Value does not contain the specified type: ", typeid(T).name()));
+    }
+  }
+
+  template <class T> T &get_ref() {
+    if (auto *val = std::get_if<T>(this)) {
+      return *val;
+    } else {
+      SpielFatalError(absl::StrCat(
+          "Value does not contain the specified type: ", typeid(T).name()));
+    }
+  }
+
+  template <class T> const T &get_const_ref() const {
+    if (auto *val = std::get_if<T>(this)) {
+      return *val;
+    } else {
+      SpielFatalError(absl::StrCat(
+          "Value does not contain the specified type: ", typeid(T).name()));
+    }
+  }
+
+  bool GetBool() const { return get_val<bool>(); }
+  int64_t GetInt() const { return get_val<int64_t>(); }
+  int64_t &GetInt() { return get_ref<int64_t>(); }
+  double GetDouble() const { return get_val<double>(); }
+  double &GetDouble() { return get_ref<double>(); }
+  const std::string &GetString() const { return get_const_ref<std::string>(); }
+  std::string &GetString() { return get_ref<std::string>(); }
+  const Array &GetArray() const { return get_const_ref<Array>(); }
+  Array &GetArray() { return get_ref<Array>(); }
+  const Object &GetObject() const { return get_const_ref<Object>(); }
+  Object &GetObject() { return get_ref<Object>(); }
 
   bool operator==(const Null& o) const { return IsNull(); }
   bool operator==(const bool& o) const { return IsBool() && GetBool() == o; }

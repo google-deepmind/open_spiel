@@ -36,6 +36,9 @@ void BasicGameTests() {
   testing::LoadGameTest("bridge_uncontested_bidding(num_redeals=1)");
   testing::RandomSimTest(*LoadGame("bridge_uncontested_bidding(num_redeals=1)"),
                          3);
+  testing::LoadGameTest("bridge");
+  testing::RandomSimTest(*LoadGame("bridge"), 3);
+  testing::RandomSimTest(*LoadGame("bridge(use_double_dummy_result=false)"), 3);
 }
 
 void DeserializeStateTest() {

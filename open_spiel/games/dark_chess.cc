@@ -19,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/fog/observation_history.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -40,7 +39,7 @@ const GameType kGameType{
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
+    /*provides_information_state_string=*/false,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
@@ -249,7 +248,8 @@ chess::ObservationTable ComputePublicInfoTable(const chess::ChessBoard& board) {
 
 bool ObserverHasString(IIGObservationType iig_obs_type) {
   return iig_obs_type.public_info &&
-         iig_obs_type.private_info == PrivateInfoType::kSinglePlayer;
+         iig_obs_type.private_info == PrivateInfoType::kSinglePlayer &&
+         !iig_obs_type.perfect_recall;
 }
 bool ObserverHasTensor(IIGObservationType iig_obs_type) {
   return !iig_obs_type.perfect_recall;
@@ -302,14 +302,8 @@ class DarkChessObserver : public Observer {
     SPIEL_CHECK_LT(player, game.NumPlayers());
 
     if (iig_obs_type_.perfect_recall) {
-      if (iig_obs_type_.public_info &&
-          iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-        return state.aohs_[player].ToString();
-      } else {
-        SpielFatalError(
-            "DarkChessObserver: string with perfect recall is implemented only"
-            " for the (default) info state observation type.");
-      }
+      SpielFatalError(
+          "DarkChessObserver: string with perfect recall is not supported");
     }
 
     if (iig_obs_type_.public_info &&
@@ -455,28 +449,14 @@ DarkChessState::DarkChessState(std::shared_ptr<const Game> game, int board_size,
       current_board_(start_board_) {
   SPIEL_CHECK_TRUE(&current_board_);
   repetitions_[current_board_.HashValue()] = 1;
-
-  aohs_.reserve(2);
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    std::vector<std::pair<absl::optional<Action>, std::string>> aoh;
-    aoh.push_back({{}, ObservationString(player)});
-    aohs_.push_back(open_spiel::ActionObservationHistory(player, aoh));
-  }
 }
 
 void DarkChessState::DoApplyAction(Action action) {
-  Player current_player = CurrentPlayer();
   chess::Move move = ActionToMove(action, Board());
   moves_history_.push_back(move);
   Board().ApplyMove(move);
   ++repetitions_[current_board_.HashValue()];
   cached_legal_actions_.reset();
-
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    absl::optional<Action> a = {};
-    if (current_player == player) a = action;
-    aohs_[player].Extend(a, ObservationString(player));
-  }
 }
 
 void DarkChessState::MaybeGenerateLegalActions() const {
@@ -512,11 +492,6 @@ std::vector<double> DarkChessState::Returns() const {
   }
 }
 
-std::string DarkChessState::InformationStateString(Player player) const {
-  const auto& game = open_spiel::down_cast<const DarkChessGame&>(*game_);
-  return game.info_state_observer_->StringFrom(*this, player);
-}
-
 std::string DarkChessState::ObservationString(Player player) const {
   const auto& game = open_spiel::down_cast<const DarkChessGame&>(*game_);
   return game.default_observer_->StringFrom(*this, player);
@@ -539,12 +514,10 @@ void DarkChessState::UndoAction(Player player, Action action) {
   --repetitions_[current_board_.HashValue()];
   moves_history_.pop_back();
   history_.pop_back();
+  --move_number_;
   current_board_ = start_board_;
   for (const chess::Move& move : moves_history_) {
     current_board_.ApplyMove(move);
-  }
-  for (Player player = 0; player < NumPlayers(); ++player) {
-    aohs_[player].RemoveLast();
   }
 }
 
@@ -601,23 +574,11 @@ absl::optional<std::vector<double>> DarkChessState::MaybeFinalReturns() const {
   return absl::nullopt;
 }
 
-std::string DefaultFen(int board_size) {
-  if (board_size == 8)
-    return chess::kDefaultStandardFEN;
-  else if (board_size == 4)
-    return chess::kDefaultSmallFEN;
-  else
-    SpielFatalError(
-        "Only board sizes 4 and 8 have their default chessboards. "
-        "For other sizes, you have to pass your own FEN.");
-}
-
 DarkChessGame::DarkChessGame(const GameParameters& params)
     : Game(kGameType, params),
       board_size_(ParameterValue<int>("board_size")),
-      fen_(ParameterValue<std::string>("fen", DefaultFen(board_size_))) {
+      fen_(ParameterValue<std::string>("fen", chess::DefaultFen(board_size_))) {
   default_observer_ = std::make_shared<DarkChessObserver>(kDefaultObsType);
-  info_state_observer_ = std::make_shared<DarkChessObserver>(kInfoStateObsType);
 }
 
 std::shared_ptr<Observer> DarkChessGame::MakeObserver(

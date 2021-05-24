@@ -99,7 +99,7 @@ ObservationTensor(1).win_sequence: ◯◯
                                    ◯◯
                                    ◯◯
                                    ◯◯
-ChanceOutcomes() = [{0, 0.250000000000}, {1, 0.250000000000}, {2, 0.250000000000}, {3, 0.250000000000}]
+ChanceOutcomes() = [(0, 0.25), (1, 0.25), (2, 0.25), (3, 0.25)]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Deal 1", "Deal 2", "Deal 3", "Deal 4"]
 
@@ -248,7 +248,7 @@ ObservationTensor(1).win_sequence: ◯◯
                                    ◯◯
                                    ◯◯
                                    ◯◯
-ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333}]
+ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Deal 1", "Deal 2", "Deal 3"]
 
@@ -332,75 +332,6 @@ StringLegalActions(1) = ["[P1]Bid: 2", "[P1]Bid: 3", "[P1]Bid: 4"]
 actions: [2, 1]
 
 # State 4
-# P0 hand: 2 4
-# P1 hand: 3 4
-# P0 actions: 0 2
-# P1 actions: 0 1
-# Point card sequence: 4 2
-# Points: 2 0
-IsTerminal() = False
-History() = [3, 0, 0, 1, 2, 1]
-HistoryString() = "3, 0, 0, 1, 2, 1"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "P0 hand: 2 4 \nP0 action sequence: 0 2 \nPoint card sequence: 4 2 \nWin sequence: -3 0 \nPoints: 2 0 \nTerminal?: 0\n"
-InformationStateString(1) = "P1 hand: 3 4 \nP1 action sequence: 0 1 \nPoint card sequence: 4 2 \nWin sequence: -3 0 \nPoints: 2 0 \nTerminal?: 0\n"
-InformationStateTensor(0).point_totals: ◯◯◉◯◯◯◯◯◯◯◯
-                                        ◉◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(0).player_hand: ◯◉◯◉
-InformationStateTensor(0).win_sequence: ◯◯
-                                        ◉◯
-                                        ◯◯
-                                        ◯◯
-InformationStateTensor(0).point_card_sequence: ◯◯◯◉
-                                               ◯◉◯◯
-                                               ◯◯◯◯
-                                               ◯◯◯◯
-InformationStateTensor(0).player_action_sequence: ◉◯◯◯
-                                                  ◯◯◉◯
-                                                  ◯◯◯◯
-                                                  ◯◯◯◯
-InformationStateTensor(1).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
-                                        ◯◯◉◯◯◯◯◯◯◯◯
-InformationStateTensor(1).player_hand: ◯◯◉◉
-InformationStateTensor(1).win_sequence: ◯◯
-                                        ◉◯
-                                        ◯◯
-                                        ◯◯
-InformationStateTensor(1).point_card_sequence: ◯◯◯◉
-                                               ◯◉◯◯
-                                               ◯◯◯◯
-                                               ◯◯◯◯
-InformationStateTensor(1).player_action_sequence: ◉◯◯◯
-                                                  ◯◉◯◯
-                                                  ◯◯◯◯
-                                                  ◯◯◯◯
-ObservationString(0) = "Current point card: 0\nPoints: 2 0 \nP0 hand: 2 4 \nWin sequence: -3 0 \n"
-ObservationString(1) = "Current point card: 0\nPoints: 2 0 \nP1 hand: 3 4 \nWin sequence: -3 0 \n"
-PublicObservationString() = "Current point card: 0\nWin sequence: -3 0 \nPoints: 2 0 \n"
-PrivateObservationString(0) = "Current point card: 0\nPoints: 2 0 \nP0 hand: 2 4 \nWin sequence: -3 0 \n"
-PrivateObservationString(1) = "Current point card: 0\nPoints: 2 0 \nP1 hand: 3 4 \nWin sequence: -3 0 \n"
-ObservationTensor(0).current_point_card: ◯◉◯◯
-ObservationTensor(0).point_totals: ◯◯◉◯◯◯◯◯◯◯◯
-                                   ◉◯◯◯◯◯◯◯◯◯◯
-ObservationTensor(0).player_hand: ◯◉◯◉
-ObservationTensor(0).win_sequence: ◯◯
-                                   ◉◯
-                                   ◯◯
-                                   ◯◯
-ObservationTensor(1).current_point_card: ◯◉◯◯
-ObservationTensor(1).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
-                                   ◯◯◉◯◯◯◯◯◯◯◯
-ObservationTensor(1).player_hand: ◯◯◉◉
-ObservationTensor(1).win_sequence: ◯◯
-                                   ◉◯
-                                   ◯◯
-                                   ◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
-LegalActions() = [0, 2]
-StringLegalActions() = ["Deal 1", "Deal 3"]
-
 # Apply action "Deal 1"
 action: 0
 
