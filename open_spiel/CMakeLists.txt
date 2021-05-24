@@ -106,6 +106,8 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HANABI         OFF
   "Build against the Hanabi game.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBNOP         OFF
+  "Build with support for libnop.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC  OFF
@@ -218,6 +220,10 @@ if (OPEN_SPIEL_BUILD_WITH_XINXIN)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_ROSHAMBO)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
+endif()
+if (OPEN_SPIEL_BUILD_WITH_LIBNOP)
+  include_directories(libnop/libnop/include)
+  add_subdirectory(libnop)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
