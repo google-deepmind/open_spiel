@@ -154,7 +154,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
-  algorithms/policy_gradient_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
   bots/bluechip_bridge_test.py
@@ -227,6 +226,7 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/masked_softmax_test.py
       algorithms/neurd_test.py
       algorithms/nfsp_test.py
+      algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
   )

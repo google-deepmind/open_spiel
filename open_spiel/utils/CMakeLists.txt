@@ -67,6 +67,10 @@ if (OPEN_SPIEL_BUILD_WITH_PYTHON)
                  $<TARGET_OBJECTS:tests>)
   add_test(run_python_test run_python_test
            --python_command=${Python3_EXECUTABLE})
+  set_property(TEST run_python_test
+      PROPERTY ENVIRONMENT
+      PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/../..;
+      TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
 endif()
 
 add_executable(stats_test stats_test.cc ${OPEN_SPIEL_OBJECTS}
