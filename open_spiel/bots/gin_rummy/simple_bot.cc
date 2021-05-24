@@ -31,6 +31,15 @@ void SimpleBot::Restart() {
   next_actions_ = {};
 }
 
+ActionsAndProbs SimpleBot::GetPolicy(const State& state) {
+  ActionsAndProbs policy;
+  auto legal_actions = state.LegalActions(player_id_);
+  auto chosen_action = Step(state);
+  for (auto action : legal_actions)
+    policy.emplace_back(action, action == chosen_action ? 1.0 : 0.0);
+  return policy;
+}
+
 Action SimpleBot::Step(const State& state) {
   std::vector<float> observation;
   state.ObservationTensor(player_id_, &observation);

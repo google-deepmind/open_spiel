@@ -71,6 +71,8 @@ class SimpleBot : public Bot {
 
   void Restart() override;
   Action Step(const State& state) override;
+  bool ProvidesPolicy() override { return true; }
+  ActionsAndProbs GetPolicy(const State& state) override;
 
  private:
   GameParameters params_;

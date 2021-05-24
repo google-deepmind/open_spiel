@@ -38,6 +38,8 @@ ABSL_FLAG(uint_fast32_t, seed, 0, "Seed for rng.");
 ABSL_FLAG(bool, verbose, false, "Log gameplay.");
 ABSL_FLAG(bool, show_legals, false, "Sets verbose=true & shows legal actions.");
 ABSL_FLAG(bool, log_histories, false, "Log action histories.");
+ABSL_FLAG(bool, log_returns, false, "Log returns.");
+ABSL_FLAG(bool, log_reach_probs, false, "Log reach probabilities.");
 ABSL_FLAG(std::string, path, "/tmp/gin_rummy_logs.txt",
           "Where to output the logs.");
 
@@ -62,10 +64,12 @@ std::unique_ptr<open_spiel::Bot> InitBot(
 std::vector<double> PlayGame(const open_spiel::Game& game,
     const std::vector<std::unique_ptr<open_spiel::Bot>>& bots,
     std::mt19937* rng, std::ostream& os, bool verbose, bool show_legals,
-    bool log_histories) {
+    bool log_histories, bool log_returns, bool log_reach_probs) {
   std::unique_ptr<open_spiel::State> state = game.NewInitialState();
   for (open_spiel::Player p = 0; p < open_spiel::gin_rummy::kNumPlayers; ++p)
     bots[p]->Restart();
+  std::vector<double> players_reach(2, 1.0);
+  double chance_reach = 1.0;
 
   while (!state->IsTerminal()) {
     open_spiel::Player player = state->CurrentPlayer();
@@ -79,14 +83,25 @@ std::vector<double> PlayGame(const open_spiel::Game& game,
 
     open_spiel::Action action;
     if (state->IsChanceNode()) {
-      open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
-      action = open_spiel::SampleAction(outcomes, *rng).first;
+      std::pair<open_spiel::Action, double> outcome_and_prob =
+          open_spiel::SampleAction(state->ChanceOutcomes(), *rng);
+      action = outcome_and_prob.first;
+      SPIEL_CHECK_PROB(outcome_and_prob.second);
+      SPIEL_CHECK_GT(outcome_and_prob.second, 0);
+      SPIEL_CHECK_PROB(chance_reach);
+      chance_reach *= outcome_and_prob.second;
       if (verbose) {
         os << "Sampled action: " << state->ActionToString(player, action)
            << std::endl;
       }
     } else {
-      action = bots[player]->Step(*state);
+      std::pair<open_spiel::Action, double> outcome_and_prob =
+          open_spiel::SampleAction(bots[player]->GetPolicy(*state), *rng);
+      action = outcome_and_prob.first;
+      SPIEL_CHECK_PROB(outcome_and_prob.second);
+      SPIEL_CHECK_GT(outcome_and_prob.second, 0);
+      SPIEL_CHECK_PROB(players_reach[player]);
+      players_reach[player] *= outcome_and_prob.second;
       if (verbose) {
         os << "Chose action: " << state->ActionToString(player, action)
            << std::endl;
@@ -107,6 +122,12 @@ std::vector<double> PlayGame(const open_spiel::Game& game,
        << "History: " << absl::StrJoin(state->History(), " ") << std::endl;
   } else if (log_histories) {
     os << absl::StrJoin(state->History(), " ") << std::endl;
+  } else if (log_returns) {
+    os << absl::StrJoin(state->Returns(), " ") << " ";
+    if (log_reach_probs) {
+      os << absl::StrJoin(players_reach, " ") << " " << chance_reach;
+    }
+    os << std::endl;
   }
   return state->Returns();
 }
@@ -128,6 +149,8 @@ int main(int argc, char** argv) {
   bool show_legals = absl::GetFlag(FLAGS_show_legals);
   bool verbose = absl::GetFlag(FLAGS_verbose) || show_legals;
   bool log_histories = absl::GetFlag(FLAGS_log_histories);
+  bool log_returns = absl::GetFlag(FLAGS_log_returns);
+  bool log_reach_probs = absl::GetFlag(FLAGS_log_reach_probs);
   std::string path = absl::GetFlag(FLAGS_path);
 
   std::ofstream os(path);
@@ -148,7 +171,7 @@ int main(int argc, char** argv) {
       ++refresh_threshold;
     }
     std::vector<double> returns = PlayGame(*game, bots, &rng, os, verbose,
-                                           show_legals, log_histories);
+        show_legals, log_histories, log_returns, log_reach_probs);
     for (int i = 0; i < returns.size(); ++i) {
       double v = returns[i];
       overall_returns[i] += v;
@@ -162,6 +185,6 @@ int main(int argc, char** argv) {
             << "Overall wins: " << absl::StrJoin(overall_wins, ",") << std::endl
             << "Overall returns: " << absl::StrJoin(overall_returns, ",")
             << std::endl << "Seconds: " << seconds << std::endl;
-  if (verbose || log_histories)
+  if (verbose || log_histories || log_returns)
     std::cout << "Game histories logged to " << path << std::endl;
 }
