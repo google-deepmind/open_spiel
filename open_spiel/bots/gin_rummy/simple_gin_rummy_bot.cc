@@ -19,19 +19,19 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel_bots.h"
 
-#include "open_spiel/bots/gin_rummy/simple_bot.h"
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 #include "open_spiel/games/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
 
-void SimpleBot::Restart() {
+void SimpleGinRummyBot::Restart() {
   knocked_ = false;
   next_actions_ = {};
 }
 
-ActionsAndProbs SimpleBot::GetPolicy(const State& state) {
+ActionsAndProbs SimpleGinRummyBot::GetPolicy(const State& state) {
   ActionsAndProbs policy;
   auto legal_actions = state.LegalActions(player_id_);
   auto chosen_action = Step(state);
@@ -40,7 +40,7 @@ ActionsAndProbs SimpleBot::GetPolicy(const State& state) {
   return policy;
 }
 
-Action SimpleBot::Step(const State& state) {
+Action SimpleGinRummyBot::Step(const State& state) {
   std::vector<float> observation;
   state.ObservationTensor(player_id_, &observation);
 
@@ -112,7 +112,7 @@ Action SimpleBot::Step(const State& state) {
   if (knocked_) {
     if (layed_melds.size() > 0) {
       // Opponent knocked.
-      next_actions_.push_back(kPassAction);  // SimpleBot never lays off.
+      next_actions_.push_back(kPassAction);  // Bot never lays off.
       for (int meld_id : GetMelds(hand)) {
         next_actions_.push_back(kMeldActionBase + meld_id);
       }
@@ -171,13 +171,13 @@ Action SimpleBot::Step(const State& state) {
       return legal_actions.back();  // Draw from stock or pass.
     }
   }
-  SpielFatalError("SimpleBot.Step() did not return an action.");
+  SpielFatalError("SimpleGinRummyBot.Step() did not return an action.");
 }
 
 // Returns the "best" deadwood, i.e. the cards that do not belong to one of the
 // "best" melds. Here "best" means any meld group that achieves the lowest
 // possible deadwood count for the given hand. In general this is non-unique.
-std::vector<int> SimpleBot::GetBestDeadwood(std::vector<int> hand,
+std::vector<int> SimpleGinRummyBot::GetBestDeadwood(std::vector<int> hand,
     const absl::optional<int> card) const {
   if (card.has_value()) hand.push_back(card.value());
   for (auto meld : utils_.BestMeldGroup(hand)) {
@@ -188,7 +188,7 @@ std::vector<int> SimpleBot::GetBestDeadwood(std::vector<int> hand,
   return hand;
 }
 
-int SimpleBot::GetDiscard(const std::vector<int> &hand) const {
+int SimpleGinRummyBot::GetDiscard(const std::vector<int> &hand) const {
   std::vector<int> deadwood = GetBestDeadwood(hand);
   if (deadwood.size() > 0) {
     std::sort(deadwood.begin(), deadwood.end(),
@@ -210,7 +210,7 @@ int SimpleBot::GetDiscard(const std::vector<int> &hand) const {
   }
 }
 
-std::vector<int> SimpleBot::GetMelds(std::vector<int> hand) const {
+std::vector<int> SimpleGinRummyBot::GetMelds(std::vector<int> hand) const {
   if (hand.size() == hand_size_ + 1 && utils_.MinDeadwood(hand) == 0) {
     // 11 card gin. Must select discard that preserves gin. See GetDiscard().
     hand.erase(remove(hand.begin(), hand.end(), GetDiscard(hand)), hand.end());

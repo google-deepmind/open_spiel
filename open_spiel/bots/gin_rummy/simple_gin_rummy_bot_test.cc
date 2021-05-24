@@ -16,7 +16,7 @@
 #include <memory>
 #include <vector>
 
-#include "open_spiel/bots/gin_rummy/simple_bot.h"
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 #include "open_spiel/games/gin_rummy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -25,14 +25,15 @@ namespace open_spiel {
 namespace gin_rummy {
 namespace {
 
-void SimpleBotSelfPlayTest() {
+void SimpleGinRummyBotSelfPlayTest() {
   const int num_games = 3;
   std::mt19937 rng(time(nullptr));
   auto game = LoadGame("gin_rummy");
   std::vector<std::unique_ptr<Bot>> bots;
 
   for (Player p = 0; p < kNumPlayers; ++p) {
-    bots.push_back(std::make_unique<SimpleBot>(game->GetParameters(), p));
+    bots.push_back(
+        std::make_unique<SimpleGinRummyBot>(game->GetParameters(), p));
   }
 
   for (int i = 0; i < num_games; i++) {
@@ -58,5 +59,5 @@ void SimpleBotSelfPlayTest() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::gin_rummy::SimpleBotSelfPlayTest();
+  open_spiel::gin_rummy::SimpleGinRummyBotSelfPlayTest();
 }

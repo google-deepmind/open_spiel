@@ -22,7 +22,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
-#include "open_spiel/bots/gin_rummy/simple_bot.h"
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 #include "open_spiel/games/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
@@ -31,7 +31,8 @@
 
 ABSL_FLAG(std::string, game_string, "gin_rummy",
           "Short name plus optional params.");
-ABSL_FLAG(std::string, player0, "simple_bot", "Who controls player 0.");
+ABSL_FLAG(std::string, player0, "simple_gin_rummy_bot",
+          "Who controls player 0.");
 ABSL_FLAG(std::string, player1, "random", "Who controls player 1.");
 ABSL_FLAG(int, num_games, 1, "How many games to play.");
 ABSL_FLAG(uint_fast32_t, seed, 0, "Seed for rng.");
@@ -53,12 +54,12 @@ std::unique_ptr<open_spiel::Bot> InitBot(
   if (type == "random") {
     return open_spiel::MakeUniformRandomBot(player, Seed());
   }
-  if (type == "simple_bot") {
-    return std::make_unique<open_spiel::gin_rummy::SimpleBot>(
+  if (type == "simple_gin_rummy_bot") {
+    return std::make_unique<open_spiel::gin_rummy::SimpleGinRummyBot>(
         game.GetParameters(), player);
   }
   open_spiel::SpielFatalError(
-      "Bad player type. Known types: simple_bot, random");
+      "Bad player type. Known types: simple_gin_rummy_bot, random");
 }
 
 std::vector<double> PlayGame(const open_spiel::Game& game,

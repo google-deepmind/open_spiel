@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_BOT_H_
-#define OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_BOT_H_
+#ifndef OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_GIN_RUMMY_BOT_H_
+#define OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_GIN_RUMMY_BOT_H_
 
 // This bot plays about the simplest possible strategy that performs reasonably
 // well and effectively explores the game tree. It's useful both as a test
@@ -59,9 +59,9 @@
 namespace open_spiel {
 namespace gin_rummy {
 
-class SimpleBot : public Bot {
+class SimpleGinRummyBot : public Bot {
  public:
-  SimpleBot(GameParameters params, const Player player_id)
+  SimpleGinRummyBot(GameParameters params, const Player player_id)
       : params_(params),
         player_id_(player_id),
         hand_size_(params["hand_size"].int_value()),
@@ -92,5 +92,5 @@ class SimpleBot : public Bot {
 }  // namespace gin_rummy
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_BOT_H_
+#endif  // OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_GIN_RUMMY_BOT_H_
 
