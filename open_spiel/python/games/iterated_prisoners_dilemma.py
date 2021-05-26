@@ -24,7 +24,7 @@ import numpy as np
 import pyspiel
 
 _NUM_PLAYERS = 2
-_TERMINATION_PROBABILITY = 0.125
+_DEFAULT_PARAMS = {"termination_probability": 0.125}
 _PAYOFF = [[5, 0], [10, 1]]
 
 _GAME_TYPE = pyspiel.GameType(
@@ -41,7 +41,8 @@ _GAME_TYPE = pyspiel.GameType(
     provides_information_state_tensor=False,
     provides_observation_string=False,
     provides_observation_tensor=False,
-    provides_factored_observation_string=False)
+    provides_factored_observation_string=False,
+    parameter_specification=_DEFAULT_PARAMS)
 _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=2,
     max_chance_outcomes=2,
@@ -72,13 +73,15 @@ _games = []
 class IteratedPrisonersDilemmaGame(pyspiel.Game):
   """The game, from which states and observers can be made."""
 
-  def __init__(self, params=None):
-    super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
+  # pylint:disable=dangerous-default-value
+  def __init__(self, params=_DEFAULT_PARAMS):
+    super().__init__(_GAME_TYPE, _GAME_INFO, params)
     _games.append(self)
+    self._termination_probability = params["termination_probability"]
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
-    return IteratedPrisonersDilemmaState(self)
+    return IteratedPrisonersDilemmaState(self, self._termination_probability)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns an object used for observing game state."""
@@ -90,9 +93,10 @@ class IteratedPrisonersDilemmaGame(pyspiel.Game):
 class IteratedPrisonersDilemmaState(pyspiel.State):
   """Current state of the game."""
 
-  def __init__(self, game):
+  def __init__(self, game, termination_probability):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
+    self._termination_probability = termination_probability
     self._is_chance = False
     self._game_over = False
     self._rewards = np.zeros(_NUM_PLAYERS)
@@ -112,16 +116,14 @@ class IteratedPrisonersDilemmaState(pyspiel.State):
 
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
-    if player == pyspiel.PlayerId.CHANCE:
-      return [Chance.CONTINUE, Chance.STOP]
-    else:
-      return [Action.COOPERATE, Action.DEFECT]
+    assert player >= 0
+    return [Action.COOPERATE, Action.DEFECT]
 
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
     assert self._is_chance
-    return [(Chance.CONTINUE, 1 - _TERMINATION_PROBABILITY),
-            (Chance.STOP, _TERMINATION_PROBABILITY)]
+    return [(Chance.CONTINUE, 1 - self._termination_probability),
+            (Chance.STOP, self._termination_probability)]
 
   def _apply_action(self, action):
     """Applies the specified action to the state."""

@@ -100,10 +100,12 @@ class GamesSimTest(parameterized.TestCase):
       unpickled_state = pickle.loads(pickled_state)
       self.assertEqual(str(state), str(unpickled_state))
 
-  def sim_game(self,
-               game,
-               check_pyspiel_serialization=True,
-               check_pickle_serialization=True):
+  def sim_game(
+      self,
+      game,
+      check_pyspiel_serialization=True,
+      check_pickle_serialization=True,
+      make_distribution_fn=lambda states: [1 / len(states)] * len(states)):
     min_utility = game.min_utility()
     max_utility = game.max_utility()
     self.assertLess(min_utility, max_utility)
@@ -134,8 +136,8 @@ class GamesSimTest(parameterized.TestCase):
                                    check_pickle_serialization)
         next_serialize_check *= 2
 
-      # The state can be three different types: chance node,
-      # simultaneous node, or decision node
+      # The state can be four different types: chance node,
+      # mean-field-game node, simultaneous node, or decision node
       if state.is_chance_node():
         # Chance node: sample an outcome
         outcomes = state.chance_outcomes()
@@ -152,7 +154,13 @@ class GamesSimTest(parameterized.TestCase):
           chosen_actions.append(action)
         # Apply the joint action and test cloning states.
         self.apply_action_test_clone(state, chosen_actions)
+      elif state.is_mean_field_node():
+        self.assertEqual(game.get_type().dynamics,
+                         pyspiel.GameType.Dynamics.MEAN_FIELD)
+        state.update_distribution(
+            make_distribution_fn(state.distribution_support()))
       else:
+        self.assertTrue(state.is_player_node())
         # Decision node: sample action for the single current player
         action = np.random.choice(state.legal_actions(state.current_player()))
         # Apply action and test state cloning.
@@ -202,8 +210,7 @@ class GamesSimTest(parameterized.TestCase):
   @parameterized.named_parameters((f"{p}p_{g.short_name}", g, p)
                                   for g, p in SPIEL_MULTIPLAYER_GAMES_LIST)
   def test_multiplayer_game(self, game_info, num_players):
-    game = pyspiel.load_game(game_info.short_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_info.short_name, {"players": num_players})
     self.sim_game(game)
 
   def test_breakthrough(self):

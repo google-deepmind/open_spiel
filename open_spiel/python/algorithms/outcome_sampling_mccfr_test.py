@@ -63,8 +63,7 @@ class OutcomeSamplingMCCFRTest(absltest.TestCase):
 
   def test_outcome_sampling_kuhn_3p(self):
     np.random.seed(SEED)
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(3)})
+    game = pyspiel.load_game("kuhn_poker", {"players": 3})
     os_solver = outcome_sampling_mccfr.OutcomeSamplingSolver(game)
     for _ in range(10000):
       os_solver.iteration()

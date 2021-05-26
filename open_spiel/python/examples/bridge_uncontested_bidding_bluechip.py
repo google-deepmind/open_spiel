@@ -58,11 +58,10 @@ def _run_once(state, bots):
 def main(argv):
   if len(argv) > 1:
     raise app.UsageError("Too many command-line arguments.")
-  game = pyspiel.load_game(
-      "bridge_uncontested_bidding", {
-          "relative_scoring": pyspiel.GameParameter(True),
-          "rng_seed": pyspiel.GameParameter(FLAGS.rng_seed),
-      })
+  game = pyspiel.load_game("bridge_uncontested_bidding", {
+      "relative_scoring": True,
+      "rng_seed": FLAGS.rng_seed,
+  })
   bots = [
       bluechip_bridge_uncontested_bidding.BlueChipBridgeBot(
           game, 0, _WBridge5Client(FLAGS.bot_cmd)),

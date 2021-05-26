@@ -39,8 +39,7 @@ class SampledStochasticGamesTest(parameterized.TestCase):
 
   @parameterized.parameters(*SPIEL_SAMPLED_STOCHASTIC_GAMES_LIST)
   def test_stateful_game_serialization(self, game_info):
-    game = pyspiel.load_game(game_info.short_name,
-                             {"rng_seed": pyspiel.GameParameter(0)})
+    game = pyspiel.load_game(game_info.short_name, {"rng_seed": 0})
 
     for seed in range(NUM_RUNS):
       # Mutate game's internal RNG state by doing a full playout.

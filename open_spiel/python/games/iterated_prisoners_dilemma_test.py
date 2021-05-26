@@ -22,6 +22,23 @@ import pyspiel
 
 class IteratedPrisonersDilemmaTest(absltest.TestCase):
 
+  def test_default_param(self):
+    """Check the game can be converted to a turn-based game."""
+    game = pyspiel.load_game("python_iterated_prisoners_dilemma")
+    self.assertEqual(game._termination_probability, 0.125)
+
+  def test_non_default_param_from_string(self):
+    """Check the game can be converted to a turn-based game."""
+    game = pyspiel.load_game(
+        "python_iterated_prisoners_dilemma(termination_probability=0.5)")
+    self.assertEqual(game._termination_probability, 0.5)
+
+  def test_non_default_param_from_dict(self):
+    """Check the game can be converted to a turn-based game."""
+    game = pyspiel.load_game("python_iterated_prisoners_dilemma",
+                             {"termination_probability": 0.75})
+    self.assertEqual(game._termination_probability, 0.75)
+
   def test_game_as_turn_based(self):
     """Check the game can be converted to a turn-based game."""
     game = pyspiel.load_game("python_iterated_prisoners_dilemma")
@@ -34,8 +51,7 @@ class IteratedPrisonersDilemmaTest(absltest.TestCase):
     game = pyspiel.load_game(
         "turn_based_simultaneous_game(game=python_iterated_prisoners_dilemma())"
     )
-    pyspiel.random_sim_test(
-        game, num_sims=10, serialize=False, verbose=True)
+    pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=True)
 
   def test_game_from_cc(self):
     """Runs our standard game tests, checking API consistency."""

@@ -78,5 +78,5 @@ BibTeX:
 
 ## Versioning
 
-We use [Semantic Versioning](https://semver.org/)
+We use [Semantic Versioning](https://semver.org/).
 

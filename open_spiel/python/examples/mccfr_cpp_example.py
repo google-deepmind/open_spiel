@@ -47,7 +47,7 @@ MODEL_FILE_NAME = "{}_sampling_mccfr_solver.pickle"
 def main(_):
   game = pyspiel.load_game(
       FLAGS.game,
-      {"players": pyspiel.GameParameter(FLAGS.players)},
+      {"players": FLAGS.players},
   )
 
   if FLAGS.sampling == "external":

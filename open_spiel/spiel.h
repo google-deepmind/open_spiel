@@ -210,7 +210,7 @@ class State {
 
   // Returns current player. Player numbers start from 0.
   // Negative numbers are for chance (-1) or simultaneous (-2).
-  // kTerminalState should be returned on a TerminalNode().
+  // kTerminalPlayerId should be returned on a TerminalNode().
   virtual Player CurrentPlayer() const = 0;
 
   // Change the state of the game by applying the specified action in turn-based
@@ -247,9 +247,12 @@ class State {
 
   // `LegalActions()` returns the actions for the current player (including at
   // chance nodes). All games should implement this function.
-  // For any action `a`, it must hold that 0 <= `a` < NumDistinctActions().
+  // At a player node, all returned actions should be in
+  // [0, NumDistinctActions()). For a chance node, they should all be in
+  // [0, MaxChanceOutcomes()).
   // The actions should be returned in ascending order.
-  // If the state is non-terminal, there must be at least one legal action.
+  // If the state is non-terminal (and not a mean field node), there must be at
+  // least one legal action.
   //
   // In simultaneous-move games, the abstract base class implements it in
   // terms of LegalActions(player) and LegalChanceOutcomes(), and so derived
@@ -352,6 +355,13 @@ class State {
   // player with a fixed (randomized) policy.
   virtual bool IsChanceNode() const {
     return CurrentPlayer() == kChancePlayerId;
+  }
+
+  // Is this a mean field node? In that case, no action should be performed, but
+  // instead the global state distribution should be updated with
+  // UpdateDistribution(). See more details in games/mfg/README.md.
+  virtual bool IsMeanFieldNode() const {
+    return CurrentPlayer() == kMeanFieldPlayerId;
   }
 
   // Is this state a player node, with a single player acting?

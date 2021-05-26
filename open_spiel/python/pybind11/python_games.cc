@@ -63,6 +63,7 @@ std::vector<Action> PyState::LegalActions() const {
 
 std::vector<Action> PyState::LegalActions(Player player) const {
   if (IsTerminal()) return {};
+  if (IsChanceNode()) return LegalChanceOutcomes();
   if ((player == CurrentPlayer()) || (player >= 0 && IsSimultaneousNode())) {
     PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "_legal_actions",
                                 LegalActions, player);
@@ -136,7 +137,13 @@ std::unique_ptr<State> PyState::Clone() const {
 void RegisterPyGame(const GameType& game_type, py::function creator) {
   GameRegisterer::RegisterGame(
       game_type, [game_type, creator](const GameParameters& game_parameters) {
-        auto py_game = creator(game_parameters);
+        py::dict params = py::cast(game_parameters);
+        for (const auto& [k, v] : game_type.parameter_specification) {
+          if (game_parameters.count(k) == 0) {
+            params[pybind11::str(k)] = v;
+          }
+        }
+        auto py_game = creator(params);
         return py::cast<std::shared_ptr<Game>>(py_game);
       });
 }

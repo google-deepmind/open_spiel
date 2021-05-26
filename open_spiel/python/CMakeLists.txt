@@ -154,7 +154,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
-  algorithms/policy_gradient_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
   bots/bluechip_bridge_test.py
@@ -168,6 +167,12 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/cliff_walking_test.py
   games/data_test.py
   games/tic_tac_toe_test.py
+  mfg/algorithms/best_response_value_test.py
+  mfg/algorithms/fictitious_play_test.py
+  mfg/algorithms/greedy_policy_test.py
+  mfg/algorithms/nash_conv_test.py
+  mfg/algorithms/policy_value_test.py
+  mfg/games/crowd_modelling_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
@@ -221,6 +226,7 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/masked_softmax_test.py
       algorithms/neurd_test.py
       algorithms/nfsp_test.py
+      algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
   )
@@ -248,16 +254,15 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   )
 endif()
 
-# Create a python test.
+# Create python tests.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
-  get_filename_component(py_test ${py_test_file} NAME_WE)
-  add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+  add_test(NAME ${py_test_file} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
   # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
   # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
   # CURRENT_SOURCE_DIR/../.. so that the Python module imports are of the form:
   #  from open_spiel.python import rl_environment.
-  set_property(TEST python_${py_test}
+  set_property(TEST ${py_test_file}
       PROPERTY ENVIRONMENT
       PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
       TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)

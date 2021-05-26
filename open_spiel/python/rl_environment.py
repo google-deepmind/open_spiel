@@ -170,9 +170,7 @@ class Environment(object):
 
     if isinstance(game, str):
       if kwargs:
-        game_settings = {
-            key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
-        }
+        game_settings = {key: val for (key, val) in kwargs.items()}
         logging.info("Using game settings: %s", game_settings)
         self._game = pyspiel.load_game(game, game_settings)
       else:

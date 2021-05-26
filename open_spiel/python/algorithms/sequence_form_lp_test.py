@@ -56,12 +56,11 @@ class SFLPTest(absltest.TestCase):
     self.assertAlmostEqual(val2, 0.085606424078, places=6)
 
   def test_iigoofspiel4(self):
-    game = pyspiel.load_game_as_turn_based(
-        "goofspiel", {
-            "imp_info": pyspiel.GameParameter(True),
-            "num_cards": pyspiel.GameParameter(4),
-            "points_order": pyspiel.GameParameter("descending"),
-        })
+    game = pyspiel.load_game_as_turn_based("goofspiel", {
+        "imp_info": True,
+        "num_cards": 4,
+        "points_order": "descending",
+    })
     val1, val2, _, _ = sequence_form_lp.solve_zero_sum_game(game)
     # symmetric game, should be 0
     self.assertAlmostEqual(val1, 0)
