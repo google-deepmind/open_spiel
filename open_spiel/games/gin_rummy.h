@@ -45,7 +45,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/fog/observation_history.h"
+#include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"

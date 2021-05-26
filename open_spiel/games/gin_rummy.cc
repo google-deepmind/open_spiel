@@ -21,7 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/fog/observation_history.h"
+#include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel_utils.h"
