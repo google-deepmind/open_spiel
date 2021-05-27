@@ -105,6 +105,7 @@ class GinRummyObserver : public Observer {
 
     // Public information.
     if (iig_obs_type_.public_info) {
+      WriteCurrentPlayer(state, allocator);
       WriteKnockCard(state, allocator);
       WriteUpcard(state, allocator);
       WriteDiscardPile(state, allocator);
@@ -229,6 +230,12 @@ class GinRummyObserver : public Observer {
     for (Player p = 0; p < kNumPlayers; ++p) {
       for (auto card : state.hands_[p]) out.at(p, card) = 1;
     }
+  }
+
+  static void WriteCurrentPlayer(const GinRummyState& state,
+                                 Allocator* allocator) {
+    auto out = allocator->Get("current_player", {kNumPlayers});
+    if (state.cur_player_ >= 0) out.at(state.cur_player_) = 1;
   }
 
   static void WriteKnockCard(const GinRummyState& state,

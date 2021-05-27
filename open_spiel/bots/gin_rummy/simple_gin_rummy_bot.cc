@@ -62,6 +62,9 @@ Action SimpleGinRummyBot::Step(const State& state) {
   }
   offset += kDefaultNumCards;
   if (player_id_ == 0) offset += kDefaultNumCards;
+  // Current player.
+  SPIEL_CHECK_EQ(observation[offset + player_id_], 1);
+  offset += kNumPlayers;
   // Knock card.
   for (int i = 0; i < kDefaultKnockCard; ++i) {
     if (observation[offset + i] == 1) knock_card += 1;
