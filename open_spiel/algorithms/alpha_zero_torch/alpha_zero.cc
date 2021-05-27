@@ -43,6 +43,7 @@
 #include "open_spiel/utils/json.h"
 #include "open_spiel/utils/logger.h"
 #include "open_spiel/utils/lru_cache.h"
+#include "open_spiel/utils/serializable_circular_buffer.h"
 #include "open_spiel/utils/stats.h"
 #include "open_spiel/utils/thread.h"
 #include "open_spiel/utils/threaded_queue.h"
@@ -299,7 +300,7 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
                device_manager->Get(0, device_id)->Device());
 
   // TODO(christianjans): Need to load circular buffer if resuming training.
-  CircularBuffer<VPNetModel::TrainInputs> replay_buffer(
+  SerializableCircularBuffer<VPNetModel::TrainInputs> replay_buffer(
       config.replay_buffer_size);
   if (start_info.start_step > 1) {
     replay_buffer.LoadBuffer(config.path + "/replay_buffer.data");

@@ -15,18 +15,9 @@
 #ifndef OPEN_SPIEL_UTILS_CIRCULAR_BUFFER_H_
 #define OPEN_SPIEL_UTILS_CIRCULAR_BUFFER_H_
 
-#include <nop/serializer.h>
-#include <nop/utility/stream_reader.h>
-#include <nop/utility/stream_writer.h>
-
 #include <algorithm>
-#include <fstream>
 #include <random>
-#include <string>
 #include <vector>
-
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
@@ -70,33 +61,7 @@ class CircularBuffer {
   // How many elements have ever been added to the buffer.
   int64_t TotalAdded() const { return total_added_; }
 
-  // Serialize the data of the buffer to a file.
-  void SaveBuffer(const std::string& path) const {
-    nop::Serializer<nop::StreamWriter<std::ofstream>> serializer{path};
-    serializer.Write(max_size_);
-    serializer.Write(total_added_);
-    serializer.Write(data_);
-  }
-
-  // Populate the buffer with data from a saved buffer's file.
-  void LoadBuffer(const std::string& path) {
-    nop::Deserializer<nop::StreamReader<std::ifstream>> deserializer{path};
-
-    // Ensure this buffer's max size equals the max size of the saved buffer.
-    int max_size;
-    deserializer.Read(&max_size);
-    if (max_size != max_size_) {
-      SpielFatalError(absl::StrFormat("Cannot load data from a buffer with max"
-                                      "size %d into a buffer with max size %d.",
-                                      max_size,
-                                      max_size_));
-    }
-
-    deserializer.Read(&total_added_);
-    deserializer.Read(&data_);
-  }
-
- private:
+ protected:
   const int max_size_;
   int64_t total_added_;
   std::vector<T> data_;
