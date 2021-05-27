@@ -301,6 +301,9 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
   // TODO(christianjans): Need to load circular buffer if resuming training.
   CircularBuffer<VPNetModel::TrainInputs> replay_buffer(
       config.replay_buffer_size);
+  if (start_info.start_step > 1) {
+    replay_buffer.LoadBuffer(config.path + "/replay_buffer.data");
+  }
   int learn_rate = config.replay_buffer_size / config.replay_buffer_reuse;
   int64_t total_trajectories = start_info.total_trajectories;
 
@@ -381,6 +384,7 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
     last = now;
 
     // TODO(christianjans): Save replay buffer here perhaps?
+    replay_buffer.SaveBuffer(config.path + "/replay_buffer.data");
 
     VPNetModel::LossInfo losses;
     {  // Extra scope to return the device for use for inference asap.

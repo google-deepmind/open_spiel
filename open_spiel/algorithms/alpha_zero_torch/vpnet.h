@@ -17,6 +17,8 @@
 
 #include <torch/torch.h>
 
+#include <nop/structure.h>
+
 #include "open_spiel/algorithms/alpha_zero_torch/model.h"
 #include "open_spiel/spiel.h"
 
@@ -92,6 +94,8 @@ class VPNetModel {
     std::vector<float> observations;
     ActionsAndProbs policy;
     double value;
+
+    NOP_STRUCTURE(TrainInputs, legal_actions, observations, policy, value);
   };
 
   enum CheckpointStep {
