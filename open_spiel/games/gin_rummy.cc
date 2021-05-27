@@ -136,16 +136,53 @@ class GinRummyObserver : public Observer {
     absl::StrAppend(&rv, "\nPrev upcard: ",
                     state.utils_.CardString(state.prev_upcard_));
     absl::StrAppend(&rv, "\nRepeated move: ", state.repeated_move_);
-    absl::StrAppend(&rv, "\nPlayer turn: ", state.cur_player_);
+    absl::StrAppend(&rv, "\nCurrent player: ", state.cur_player_);
     absl::StrAppend(&rv, "\nPhase: ",
                     GinRummyState::kPhaseString[static_cast<int>(state.phase_)],
                     "\n");
     if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
         (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
-        player == 1)) {
-      absl::StrAppend(&rv, "\nPlayer1: Deadwood=", state.deadwood_[1]);
+        player == 0)) {
+      absl::StrAppend(&rv, "\nPlayer0: Deadwood=", state.deadwood_[0]);
     } else {
-      absl::StrAppend(&rv, "\nPlayer1:");
+      absl::StrAppend(&rv, "\nPlayer0:");
+    }
+    if (state.knocked_[1] && !state.layoffs_.empty()) {
+      absl::StrAppend(&rv, "\nLayoffs: ");
+      for (int card : state.layoffs_) {
+        absl::StrAppend(&rv, state.utils_.CardString(card));
+      }
+    }
+    if (!state.layed_melds_[0].empty()) {
+      absl::StrAppend(&rv, "\nLayed melds:");
+      for (int meld_id : state.layed_melds_[0]) {
+        absl::StrAppend(&rv, " ");
+        std::vector<int> meld = state.utils_.int_to_meld.at(meld_id);
+        for (int card : meld) {
+          absl::StrAppend(&rv, state.utils_.CardString(card));
+        }
+      }
+    }
+    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
+        player == 0)) {
+      absl::StrAppend(&rv, "\n", state.utils_.HandToString(state.hands_[0]));
+    } else {
+      absl::StrAppend(&rv, "\n", state.utils_.HandToString(std::vector<int>()));
+    }
+
+    absl::StrAppend(&rv, "\nStock size: ", state.stock_size_);
+    absl::StrAppend(&rv, "  Upcard: ", state.utils_.CardString(state.upcard_));
+    absl::StrAppend(&rv, "\nDiscard pile: ");
+    for (int card : state.discard_pile_) {
+      absl::StrAppend(&rv, state.utils_.CardString(card));
+    }
+    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
+        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
+        player == 1)) {
+      absl::StrAppend(&rv, "\n\nPlayer1: Deadwood=", state.deadwood_[1]);
+    } else {
+      absl::StrAppend(&rv, "\n\nPlayer1:");
     }
     if (state.knocked_[0] && !state.layoffs_.empty()) {
       absl::StrAppend(&rv, "\nLayoffs: ");
@@ -168,43 +205,6 @@ class GinRummyObserver : public Observer {
         (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
         player == 1)) {
       absl::StrAppend(&rv, "\n", state.utils_.HandToString(state.hands_[1]));
-    } else {
-      absl::StrAppend(&rv, "\n", state.utils_.HandToString(std::vector<int>()));
-    }
-
-    absl::StrAppend(&rv, "\nStock size: ", state.stock_size_);
-    absl::StrAppend(&rv, "  Upcard: ", state.utils_.CardString(state.upcard_));
-    absl::StrAppend(&rv, "\nDiscard pile: ");
-    for (int card : state.discard_pile_) {
-      absl::StrAppend(&rv, state.utils_.CardString(card));
-    }
-    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
-        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
-        player == 0)) {
-      absl::StrAppend(&rv, "\n\nPlayer0: Deadwood=", state.deadwood_[0]);
-    } else {
-      absl::StrAppend(&rv, "\n\nPlayer0:");
-    }
-    if (state.knocked_[1] && !state.layoffs_.empty()) {
-      absl::StrAppend(&rv, "\nLayoffs: ");
-      for (int card : state.layoffs_) {
-        absl::StrAppend(&rv, state.utils_.CardString(card));
-      }
-    }
-    if (!state.layed_melds_[0].empty()) {
-      absl::StrAppend(&rv, "\nLayed melds:");
-      for (int meld_id : state.layed_melds_[0]) {
-        absl::StrAppend(&rv, " ");
-        std::vector<int> meld = state.utils_.int_to_meld.at(meld_id);
-        for (int card : meld) {
-          absl::StrAppend(&rv, state.utils_.CardString(card));
-        }
-      }
-    }
-    if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers ||
-        (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer &&
-        player == 0)) {
-      absl::StrAppend(&rv, "\n", state.utils_.HandToString(state.hands_[0]));
     } else {
       absl::StrAppend(&rv, "\n", state.utils_.HandToString(std::vector<int>()));
     }
@@ -715,28 +715,10 @@ std::string GinRummyState::ToString() const {
   absl::StrAppend(&rv, "\nKnock card: ", knock_card_);
   absl::StrAppend(&rv, "\nPrev upcard: ", utils_.CardString(prev_upcard_));
   absl::StrAppend(&rv, "\nRepeated move: ", repeated_move_);
-  absl::StrAppend(&rv, "\nPlayer turn: ", cur_player_);
+  absl::StrAppend(&rv, "\nCurrent player: ", cur_player_);
   absl::StrAppend(&rv, "\nPhase: ", kPhaseString[static_cast<int>(phase_)],
                   "\n");
-  absl::StrAppend(&rv, "\nPlayer1: Deadwood=", deadwood_[1]);
-  if (knocked_[0] && !layoffs_.empty()) {
-    absl::StrAppend(&rv, "\nLayoffs: ");
-    for (int card : layoffs_) absl::StrAppend(&rv, utils_.CardString(card));
-  }
-  if (!layed_melds_[1].empty()) {
-    absl::StrAppend(&rv, "\nLayed melds:");
-    for (int meld_id : layed_melds_[1]) {
-      absl::StrAppend(&rv, " ");
-      std::vector<int> meld = utils_.int_to_meld.at(meld_id);
-      for (int card : meld) absl::StrAppend(&rv, utils_.CardString(card));
-    }
-  }
-  absl::StrAppend(&rv, "\n", utils_.HandToString(hands_[1]));
-  absl::StrAppend(&rv, "\nStock size: ", stock_size_);
-  absl::StrAppend(&rv, "  Upcard: ", utils_.CardString(upcard_));
-  absl::StrAppend(&rv, "\nDiscard pile: ");
-  for (int card : discard_pile_) absl::StrAppend(&rv, utils_.CardString(card));
-  absl::StrAppend(&rv, "\n\nPlayer0: Deadwood=", deadwood_[0]);
+  absl::StrAppend(&rv, "\nPlayer0: Deadwood=", deadwood_[0]);
   if (knocked_[1] && !layoffs_.empty()) {
     absl::StrAppend(&rv, "\nLayoffs: ");
     for (int card : layoffs_) absl::StrAppend(&rv, utils_.CardString(card));
@@ -750,6 +732,24 @@ std::string GinRummyState::ToString() const {
     }
   }
   absl::StrAppend(&rv, "\n", utils_.HandToString(hands_[0]));
+  absl::StrAppend(&rv, "\nStock size: ", stock_size_);
+  absl::StrAppend(&rv, "  Upcard: ", utils_.CardString(upcard_));
+  absl::StrAppend(&rv, "\nDiscard pile: ");
+  for (int card : discard_pile_) absl::StrAppend(&rv, utils_.CardString(card));
+  absl::StrAppend(&rv, "\n\nPlayer1: Deadwood=", deadwood_[1]);
+  if (knocked_[0] && !layoffs_.empty()) {
+    absl::StrAppend(&rv, "\nLayoffs: ");
+    for (int card : layoffs_) absl::StrAppend(&rv, utils_.CardString(card));
+  }
+  if (!layed_melds_[1].empty()) {
+    absl::StrAppend(&rv, "\nLayed melds:");
+    for (int meld_id : layed_melds_[1]) {
+      absl::StrAppend(&rv, " ");
+      std::vector<int> meld = utils_.int_to_meld.at(meld_id);
+      for (int card : meld) absl::StrAppend(&rv, utils_.CardString(card));
+    }
+  }
+  absl::StrAppend(&rv, "\n", utils_.HandToString(hands_[1]));
   return rv;
 }
 
