@@ -299,7 +299,6 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
   logger.Print("Running the learner on device %d: %s", device_id,
                device_manager->Get(0, device_id)->Device());
 
-  // TODO(christianjans): Need to load circular buffer if resuming training.
   SerializableCircularBuffer<VPNetModel::TrainInputs> replay_buffer(
       config.replay_buffer_size);
   if (start_info.start_step > 1) {
@@ -384,7 +383,6 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
 
     last = now;
 
-    // TODO(christianjans): Save replay buffer here perhaps?
     replay_buffer.SaveBuffer(config.path + "/replay_buffer.data");
 
     VPNetModel::LossInfo losses;
