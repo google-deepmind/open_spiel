@@ -17,6 +17,8 @@
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/algorithms/alpha_zero_torch/alpha_zero.h"
+#include "open_spiel/utils/file.h"
+#include "open_spiel/utils/json.h"
 #include "open_spiel/utils/thread.h"
 
 ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
@@ -110,7 +112,12 @@ int main(int argc, char** argv) {
           "Specify only a path to a config.json to resume training.");
     }
 
-    config.FromFile(positional_args[1]);
+    open_spiel::file::File config_file(positional_args[1], "r");
+    std::string config_string = config_file.ReadContents();
+    open_spiel::json::Object config_json = open_spiel::json::FromString(
+        config_string).value().GetObject();
+
+    config.FromJson(config_json);
   } else {
     // Start training from scratch.
     resuming = false;
