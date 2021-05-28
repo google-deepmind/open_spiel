@@ -27,7 +27,7 @@
 export DEFAULT_OPTIONAL_DEPENDENCY=${DEFAULT_OPTIONAL_DEPENDENCY:-"OFF"}
 
 # Building the Python API can be disabled by setting this to OFF.
-export OPEN_SPIEL_BUILD_WITH_PYTHON=${OPEN_SPIEL_BUILD_WITH_PYTHON:-"OFF"}
+export OPEN_SPIEL_BUILD_WITH_PYTHON=${OPEN_SPIEL_BUILD_WITH_PYTHON:-"ON"}
 
 # Each optional dependency has their own flag, that defaults to the global
 # "$DEFAULT_OPTIONAL_DEPENDENCY" if undefined. To enable an optional dependency,
@@ -43,7 +43,7 @@ export OPEN_SPIEL_BUILD_WITH_GO=${OPEN_SPIEL_BUILD_WITH_GO:-$DEFAULT_OPTIONAL_DE
 
 # Download the header-only library, libnop (https://github.com/google/libnop),
 # to support the serialization and deserialization of C++ data types.
-export OPEN_SPIEL_BUILD_WITH_LIBNOP="${OPEN_SPIEL_BUILD_WITH_LIBNOP:-"ON"}"
+export OPEN_SPIEL_BUILD_WITH_LIBNOP="${OPEN_SPIEL_BUILD_WITH_LIBNOP:-"OFF"}"
 
 # Download precompiled binaries for libtorch (PyTorch C++ API).
 # See https://pytorch.org/cppdocs/ for C++ documentation.
@@ -59,7 +59,7 @@ export OPEN_SPIEL_BUILD_WITH_LIBNOP="${OPEN_SPIEL_BUILD_WITH_LIBNOP:-"ON"}"
 # > as its Python counterpart.
 #
 # You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
-export OPEN_SPIEL_BUILD_WITH_LIBTORCH="${OPEN_SPIEL_BUILD_WITH_LIBTORCH:-"ON"}"
+export OPEN_SPIEL_BUILD_WITH_LIBTORCH="${OPEN_SPIEL_BUILD_WITH_LIBTORCH:-"OFF"}"
 
 # You may want to replace this URL according to your system.
 # You can find all of these (and more) URLs at https://pytorch.org/
