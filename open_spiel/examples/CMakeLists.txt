@@ -53,4 +53,9 @@ if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
                 $<TARGET_OBJECTS:alpha_zero_torch>
                 $<TARGET_OBJECTS:human_bot>)
   target_link_libraries (alpha_zero_torch_game_example ${TORCH_LIBRARIES})
+
+  add_executable(dqn_torch_example dqn_torch_example.cc
+                ${OPEN_SPIEL_OBJECTS}
+                $<TARGET_OBJECTS:dqn_torch>)
+  target_link_libraries (dqn_torch_example ${TORCH_LIBRARIES})
 endif ()
