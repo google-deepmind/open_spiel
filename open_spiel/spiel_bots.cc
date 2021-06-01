@@ -192,9 +192,12 @@ REGISTER_SPIEL_BOT("uniform_random", UniformRandomBotFactory);
 }  // namespace
 
 // A bot that samples from a policy.
+std::unique_ptr<Bot> MakePolicyBot(int seed, std::shared_ptr<Policy> policy) {
+  return std::make_unique<PolicyBot>(seed, std::move(policy));
+}
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
                                    std::shared_ptr<Policy> policy) {
-  return std::make_unique<PolicyBot>(seed, std::move(policy));
+  return MakePolicyBot(seed, std::move(policy));
 }
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
