@@ -41,7 +41,7 @@ void TestLoad() {
 void TestLoadWithParams() {
   auto game = LoadGame("mfg_crowd_modelling(size=100,horizon=1000)");
   auto state = game->NewInitialState();
-  SPIEL_CHECK_EQ(game->ObservationTensorShape()[0], 1000 + 100);
+  SPIEL_CHECK_EQ(game->ObservationTensorShape()[0], 1000 + 100 + 1);
 }
 
 std::vector<double> RandomDistribution(int num_states, std::mt19937& rng) {

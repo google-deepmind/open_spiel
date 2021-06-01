@@ -24,6 +24,9 @@ NumPlayers() = 1
 MinUtility() = -inf
 MaxUtility() = inf
 UtilitySum() = 0.0
+ObservationTensorShape() = [21]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 21
 MaxGameLength() = 10
 ToString() = "mfg_crowd_modelling()"
 
@@ -36,6 +39,10 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = ""
+ObservationString(0) = "initial"
+PublicObservationString() = "initial"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions() = ["init_state=0", "init_state=1", "init_state=2", "init_state=3", "init_state=4", "init_state=5", "init_state=6", "init_state=7", "init_state=8", "init_state=9"]
@@ -52,6 +59,10 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "4"
+ObservationString(0) = "(4, 0)"
+PublicObservationString() = "(4, 0)"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
 Rewards() = [3.1025850929940457]
 Returns() = [3.1025850929940457]
 LegalActions() = [0, 1, 2]
@@ -69,6 +80,10 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -5
 InformationStateString(0) = "4, 1"
+ObservationString(0) = "(4, 0)_a"
+PublicObservationString() = "(4, 0)_a"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0.0]
 Returns() = [3.1025850929940457]
 DistributionSupport() = ['(0, 0)', '(1, 0)', '(2, 0)', '(3, 0)', '(4, 0)', '(5, 0)', '(6, 0)', '(7, 0)', '(8, 0)', '(9, 0)']
@@ -85,6 +100,10 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "4, 1"
+ObservationString(0) = "(4, 0)_a_mu"
+PublicObservationString() = "(4, 0)_a_mu"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["-1", "0", "1"]
@@ -101,6 +120,10 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "4, 1, 0"
+ObservationString(0) = "(3, 1)"
+PublicObservationString() = "(3, 1)"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
 Rewards() = [2.9025850929940455]
 Returns() = [6.005170185988091]
 LegalActions() = [0, 1, 2]
@@ -118,6 +141,10 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -5
 InformationStateString(0) = "4, 1, 0, 2"
+ObservationString(0) = "(4, 1)_a"
+PublicObservationString() = "(4, 1)_a"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
 Rewards() = [0.0]
 Returns() = [6.005170185988091]
 DistributionSupport() = ['(0, 1)', '(1, 1)', '(2, 1)', '(3, 1)', '(4, 1)', '(5, 1)', '(6, 1)', '(7, 1)', '(8, 1)', '(9, 1)']
@@ -138,6 +165,10 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "4, 1, 0, 2, 1"
+ObservationString(0) = "(4, 2)"
+PublicObservationString() = "(4, 2)"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [3.0025850929940456]
 Returns() = [9.007755278982136]
 LegalActions() = [0, 1, 2]
@@ -155,6 +186,10 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -5
 InformationStateString(0) = "4, 1, 0, 2, 1, 1"
+ObservationString(0) = "(4, 2)_a"
+PublicObservationString() = "(4, 2)_a"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0.0]
 Returns() = [9.007755278982136]
 DistributionSupport() = ['(0, 2)', '(1, 2)', '(2, 2)', '(3, 2)', '(4, 2)', '(5, 2)', '(6, 2)', '(7, 2)', '(8, 2)', '(9, 2)']
@@ -259,5 +294,9 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "4, 1, 0, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 0, 0, 1, 1, 1, 0, 2, 1"
+ObservationString(0) = "(5, 10)"
+PublicObservationString() = "(5, 10)"
+PrivateObservationString(0) = ""
+ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 Rewards() = [3.2025850929940454]
 Returns() = [34.3284360229345]

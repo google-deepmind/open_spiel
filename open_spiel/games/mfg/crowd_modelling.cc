@@ -203,13 +203,17 @@ void CrowdModellingState::ObservationTensor(Player player,
                                             absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), size_ + horizon_);
-  SPIEL_CHECK_GE(x_, 0);
+  SPIEL_CHECK_EQ(values.size(), size_ + horizon_ + 1);
   SPIEL_CHECK_LT(x_, size_);
   SPIEL_CHECK_GE(t_, 0);
-  SPIEL_CHECK_LT(t_, horizon_);
+  // Allow t_ == horizon_.
+  SPIEL_CHECK_LE(t_, horizon_);
   std::fill(values.begin(), values.end(), 0.);
-  values[x_] = 1.;
+  if (x_ >= 0) {
+    values[x_] = 1.;
+  }
+  // x_ equals -1 for the initial (blank) state, don't set any
+  // position bit in that case.
   values[size_ + t_] = 1.;
 }
 
@@ -229,7 +233,8 @@ CrowdModellingGame::CrowdModellingGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
 std::vector<int> CrowdModellingGame::ObservationTensorShape() const {
-  return {ParameterValue<int>("size") + ParameterValue<int>("horizon")};
+  // +1 to allow for t_ == horizon.
+  return {ParameterValue<int>("size") + ParameterValue<int>("horizon") + 1};
 }
 
 std::unique_ptr<State> CrowdModellingGame::DeserializeState(

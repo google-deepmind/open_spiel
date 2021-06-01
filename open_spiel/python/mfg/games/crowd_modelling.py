@@ -268,16 +268,25 @@ class Observer:
 
     self.size = game.size
     self.horizon = game.horizon
-    self.tensor = np.zeros(self.size + self.horizon, np.float32)
+    # +1 to allow t == horizon.
+    self.tensor = np.zeros(self.size + self.horizon + 1, np.float32)
     self.dict = {"x": self.tensor[:self.size], "t": self.tensor[self.size:]}
 
-  def set_from(self, state, player):
+  def set_from(self, state: MFGCrowdModellingState, player: int):
     """Updates `tensor` and `dict` to reflect `state` from PoV of `player`."""
     del player
     # We update the observation via the shaped tensor since indexing is more
     # convenient than with the 1-D tensor. Both are views onto the same memory.
     self.tensor.fill(0)
-    self.dict["x"][state.x] = 1
+    # state.x is None for the initial (blank) state, don't set any
+    # position bit in that case.
+    if state.x is not None:
+      if not 0 <= state.x < self.size:
+        raise ValueError(
+            f"Expected {state} x position to be in [0, {self.size})")
+      self.dict["x"][state.x] = 1
+    if not 0 <= state.t <= self.horizon:
+      raise ValueError(f"Expected {state} time to be in [0, {self.horizon}]")
     self.dict["t"][state.t] = 1
 
   def string_from(self, state, player):
