@@ -253,8 +253,10 @@ void init_pyspiel_bots(py::module& m) {
       .def("restart", &algorithms::ISMCTSBot::Restart)
       .def("restart_at", &algorithms::ISMCTSBot::RestartAt);
 
-  m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),
-        py::arg("bots"), py::arg("seed"),
+  m.def("evaluate_bots",
+        py::overload_cast<State*, const std::vector<Bot*>&, int>(
+            open_spiel::EvaluateBots),
+        py::arg("state"), py::arg("bots"), py::arg("seed"),
         "Plays a single game with the given bots and returns the final "
         "utilities.");
 
@@ -263,8 +265,9 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
         "A stateful random bot, for test purposes.");
-
-  m.def("make_policy_bot", open_spiel::MakePolicyBot,
+  m.def("make_policy_bot",
+        py::overload_cast<const Game&, Player, int, std::shared_ptr<Policy>>(
+            open_spiel::MakePolicyBot),
         "A bot that samples from a policy.");
 }
 }  // namespace open_spiel

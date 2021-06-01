@@ -14,6 +14,7 @@
 
 #include "open_spiel/algorithms/evaluate_bots.h"
 
+#include <limits>
 #include <vector>
 
 #include "open_spiel/spiel.h"
@@ -59,6 +60,20 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
 
   // Return terminal utility.
   return state->Returns();
+}
+
+std::vector<double> EvaluateBots(const Game& game,
+                                 const std::vector<Bot*>& bots, int seed) {
+  std::unique_ptr<State> state = game.NewInitialState();
+  return EvaluateBots(state.get(), bots, seed);
+}
+
+std::vector<double> EvaluateBots(const Game& game,
+                                 const std::vector<Bot*>& bots) {
+  absl::BitGen gen;
+  const int seed = absl::Uniform<int>(gen, std::numeric_limits<int>::min(),
+                                      std::numeric_limits<int>::max());
+  return EvaluateBots(game, bots, seed);
 }
 
 }  // namespace open_spiel

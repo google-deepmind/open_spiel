@@ -29,6 +29,14 @@ namespace open_spiel {
 std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
                                  int seed);
 
+// As above, but creates a new state at the root of the game.
+std::vector<double> EvaluateBots(const Game& game,
+                                 const std::vector<Bot*>& bots, int seed);
+
+// As above, but calculates a random seed.
+std::vector<double> EvaluateBots(const Game& game,
+                                 const std::vector<Bot*>& bots);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_ALGORITHMS_EVALUATE_BOTS_H_
