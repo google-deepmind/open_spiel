@@ -122,7 +122,7 @@ struct GameType {
   bool provides_observation_string;
   bool provides_observation_tensor;
 
-  std::map<std::string, GameParameter> parameter_specification;
+  GameParameters parameter_specification;
   bool ContainsRequiredParameters() const;
 
   // A number of optional values that have defaults, whose values can be

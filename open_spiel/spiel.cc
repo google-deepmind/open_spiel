@@ -46,7 +46,7 @@ constexpr const char* kSerializeStateSectionHeader = "[State]";
 
 // Returns the available parameter keys, to be used as a utility function.
 std::string ListValidParameters(
-    const std::map<std::string, GameParameter>& param_spec) {
+    const GameParameters& param_spec) {
   std::vector<std::string> available_keys;
   available_keys.reserve(param_spec.size());
   for (const auto& item : param_spec) {
@@ -60,7 +60,7 @@ std::string ListValidParameters(
 // Issues a SpielFatalError if any are missing, of the wrong type, or
 // unexpectedly present.
 void ValidateParams(const GameParameters& params,
-                    const std::map<std::string, GameParameter>& param_spec) {
+                    const GameParameters& param_spec) {
   // Check all supplied parameters are supported and of the right type.
   for (const auto& param : params) {
     const auto it = param_spec.find(param.first);
