@@ -37,7 +37,7 @@ that both the C++ and the Python implementation behave the same.
 We describe here only the simplest and fastest way to add a new game. It is
 ideal to first be aware of the general API (see `spiel.h`).
 
-1.  Choose a game to copy from in `games/` (or `python/games/`). Suggested games:
+1.  Choose a game to copy from in `games/` (or `python/games/` or `python/mfg/games/`). Suggested games:
     Tic-Tac-Toe and Breakthrough for perfect information without chance events,
     Backgammon or Pig for perfect information games with chance events, Goofspiel
     and Oshi-Zumo for simultaneous move games, and Leduc poker and Liar’s dice
@@ -49,7 +49,7 @@ ideal to first be aware of the general API (see `spiel.h`).
 3.  Configure CMake:
     *   If you are working with C++: add the new game’s source files to `games/CMakeLists.txt`.
     *   If you are working with C++: add the new game’s test target to `games/CMakeLists.txt`.
-    *   If you are working with Python: add the test to `python/CMakeLists.txt` and import it in `python/games/__init__.py`
+    *   If you are working with Python: add the test to `python/CMakeLists.txt` and import it in `python/games/__init__.py` (or `python/mfg/games/__init__.py` if you are working with mean field games).
 4.  Update boilerplate C++/Python code:
     *   In `new_game.h`, rename the header guard at the the top and bottom of
         the file.

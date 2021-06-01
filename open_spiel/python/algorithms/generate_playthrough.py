@@ -28,6 +28,7 @@ import numpy as np
 
 from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
+from open_spiel.python.mfg import games  # pylint: disable=unused-import,reimported
 import pyspiel
 
 
