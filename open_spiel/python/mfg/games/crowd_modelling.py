@@ -278,7 +278,7 @@ class Observer:
     # convenient than with the 1-D tensor. Both are views onto the same memory.
     self.tensor.fill(0)
     self.dict["x"][state.x] = 1
-    self.dict["t"][state.t] = 1
+    # self.dict["t"][state.t] = 1
 
   def string_from(self, state, player):
     """Observation of `state` from the PoV of `player`, as a string."""
