@@ -27,6 +27,7 @@ import re
 import numpy as np
 
 from open_spiel.python import games  # pylint: disable=unused-import
+from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -219,8 +220,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         game,
         imperfect_information_observation_type=None,
         params=observation_params)
-  except (RuntimeError, ValueError):
-    pass
+  except (RuntimeError, ValueError) as e:
+    print("Warning: unable to build an observation: ", e)
 
   infostate_observation = None
   # TODO(author11) reinstate this restriction

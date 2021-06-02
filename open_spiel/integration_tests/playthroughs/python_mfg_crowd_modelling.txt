@@ -1,0 +1,311 @@
+game: python_mfg_crowd_modelling
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.MEAN_FIELD
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Python Mean Field Crowd Modelling"
+GameType.max_num_players = 1
+GameType.min_num_players = 1
+GameType.parameter_specification = ["horizon", "size"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "python_mfg_crowd_modelling"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 3
+PolicyTensorShape() = [3]
+MaxChanceOutcomes() = 10
+GetParameters() = {horizon=10,size=10}
+NumPlayers() = 1
+MinUtility() = -inf
+MaxUtility() = inf
+UtilitySum() = 0.0
+ObservationTensorShape() = x: [10], t: [11]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 21
+MaxGameLength() = 10
+ToString() = "python_mfg_crowd_modelling(horizon=10,size=10)"
+
+# State 0
+# initial
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = ""
+ObservationString(0) = "initial"
+PublicObservationString() = "initial"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+StringLegalActions() = ["init_state=0", "init_state=1", "init_state=2", "init_state=3", "init_state=4", "init_state=5", "init_state=6", "init_state=7", "init_state=8", "init_state=9"]
+
+# Apply action "init_state=7"
+action: 7
+
+# State 1
+# (7, 0)
+IsTerminal() = False
+History() = [7]
+HistoryString() = "7"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "7"
+ObservationString(0) = "(7, 0)"
+PublicObservationString() = "(7, 0)"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+Rewards() = [2.9025850929940455]
+Returns() = [2.9025850929940455]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["-1", "0", "1"]
+
+# Apply action "-1"
+action: 0
+
+# State 2
+# (6, 0)_a
+IsTerminal() = False
+History() = [7, 0]
+HistoryString() = "7, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.MEAN_FIELD
+InformationStateString(0) = "7, 0"
+ObservationString(0) = "(6, 0)_a"
+PublicObservationString() = "(6, 0)_a"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◉◯◯◯
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0]
+Returns() = [2.9025850929940455]
+DistributionSupport() = ['(0, 0)', '(1, 0)', '(2, 0)', '(3, 0)', '(4, 0)', '(5, 0)', '(6, 0)', '(7, 0)', '(8, 0)', '(9, 0)']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 3
+# (6, 0)_a_mu
+IsTerminal() = False
+History() = [7, 0]
+HistoryString() = "7, 0"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = "7, 0"
+ObservationString(0) = "(6, 0)_a_mu"
+PublicObservationString() = "(6, 0)_a_mu"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◉◯◯◯
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["-1", "0", "1"]
+
+# Apply action "1"
+action: 2
+
+# State 4
+# (7, 1)
+IsTerminal() = False
+History() = [7, 0, 2]
+HistoryString() = "7, 0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "7, 0, 2"
+ObservationString(0) = "(7, 1)"
+PublicObservationString() = "(7, 1)"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
+Rewards() = [2.8025850929940455]
+Returns() = [5.7051701859880914]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["-1", "0", "1"]
+
+# Apply action "0"
+action: 1
+
+# State 5
+# (7, 1)_a
+IsTerminal() = False
+History() = [7, 0, 2, 1]
+HistoryString() = "7, 0, 2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.MEAN_FIELD
+InformationStateString(0) = "7, 0, 2, 1"
+ObservationString(0) = "(7, 1)_a"
+PublicObservationString() = "(7, 1)_a"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0]
+Returns() = [5.7051701859880914]
+DistributionSupport() = ['(0, 1)', '(1, 1)', '(2, 1)', '(3, 1)', '(4, 1)', '(5, 1)', '(6, 1)', '(7, 1)', '(8, 1)', '(9, 1)']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 6
+# Apply action "-1"
+action: 0
+
+# State 7
+# (6, 2)
+IsTerminal() = False
+History() = [7, 0, 2, 1, 0]
+HistoryString() = "7, 0, 2, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "7, 0, 2, 1, 0"
+ObservationString(0) = "(6, 2)"
+PublicObservationString() = "(6, 2)"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◉◯◯◯
+ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [3.1025850929940457]
+Returns() = [8.807755278982137]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["-1", "0", "1"]
+
+# Apply action "0"
+action: 1
+
+# State 8
+# (6, 2)_a
+IsTerminal() = False
+History() = [7, 0, 2, 1, 0, 1]
+HistoryString() = "7, 0, 2, 1, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.MEAN_FIELD
+InformationStateString(0) = "7, 0, 2, 1, 0, 1"
+ObservationString(0) = "(6, 2)_a"
+PublicObservationString() = "(6, 2)_a"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◯◯◯◯◉◯◯◯
+ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0.0]
+Returns() = [8.807755278982137]
+DistributionSupport() = ['(0, 2)', '(1, 2)', '(2, 2)', '(3, 2)', '(4, 2)', '(5, 2)', '(6, 2)', '(7, 2)', '(8, 2)', '(9, 2)']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 9
+# Apply action "0"
+action: 1
+
+# State 10
+# Apply action "-1"
+action: 0
+
+# State 11
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 12
+# Apply action "-1"
+action: 0
+
+# State 13
+# Apply action "-1"
+action: 0
+
+# State 14
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 15
+# Apply action "0"
+action: 1
+
+# State 16
+# Apply action "1"
+action: 2
+
+# State 17
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 18
+# Apply action "-1"
+action: 0
+
+# State 19
+# Apply action "-1"
+action: 0
+
+# State 20
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 21
+# Apply action "-1"
+action: 0
+
+# State 22
+# Apply action "-1"
+action: 0
+
+# State 23
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 24
+# Apply action "1"
+action: 2
+
+# State 25
+# Apply action "0"
+action: 1
+
+# State 26
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 27
+# Apply action "1"
+action: 2
+
+# State 28
+# Apply action "-1"
+action: 0
+
+# State 29
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 30
+# Apply action "1"
+action: 2
+
+# State 31
+# (2, 10)
+IsTerminal() = True
+History() = [7, 0, 2, 1, 0, 1, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 1, 2, 0, 2]
+HistoryString() = "7, 0, 2, 1, 0, 1, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 1, 2, 0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.TERMINAL
+InformationStateString(0) = "7, 0, 2, 1, 0, 1, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 1, 2, 0, 2"
+ObservationString(0) = "(2, 10)"
+PublicObservationString() = "(2, 10)"
+PrivateObservationString(0) = ""
+ObservationTensor(0).x: ◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(0).t: ◯◯◯◯◯◯◯◯◯◯◉
+Rewards() = [2.6025850929940457]
+Returns() = [30.6284360229345]

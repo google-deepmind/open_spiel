@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Games implemented in Python.
+"""Mean field games implemented in Python.
 
 These games are registered as they are imported. It's perfectly possible to
 import just a single game if you prefer. There is no need to add new games here,
@@ -25,7 +25,4 @@ Registration looks like this:
 pyspiel.register_game(_GAME_TYPE, KuhnPokerGame)
 ```
 """
-
-from open_spiel.python.games import iterated_prisoners_dilemma
-from open_spiel.python.games import kuhn_poker
-from open_spiel.python.games import tic_tac_toe
+from open_spiel.python.mfg.games import crowd_modelling
