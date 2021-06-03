@@ -127,6 +127,12 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_ROSHAMBO:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; t
   git clone -b 'open_spiel' --single-branch --depth 1  https://github.com/jhtschultz/roshambo.git ${DIR}
 fi
 
+# This GitHub repository allows for serialization of custom C++ objects.
+DIR="open_spiel/libnop/libnop"
+if [[ ${OPEN_SPIEL_BUILD_WITH_LIBNOP:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
+  git clone -b 'master' --single-branch --depth 1  https://github.com/google/libnop.git ${DIR}
+fi
+
 # Add libtorch (PyTorch C++ API).
 # This downloads the precompiled binaries available from the pytorch website.
 DIR="open_spiel/libtorch/libtorch"

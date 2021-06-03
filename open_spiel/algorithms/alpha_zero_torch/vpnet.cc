@@ -108,8 +108,7 @@ bool CreateGraphDef(const Game& game, double learning_rate, double weight_decay,
 }
 
 VPNetModel::VPNetModel(const Game &game, const std::string &path,
-                       const std::string &file_name, const std::string &device,
-                       int checkpoint_step)
+                       const std::string &file_name, const std::string &device)
     : device_(device), path_(path),
       flat_input_size_(game.ObservationTensorSize()),
       num_actions_(game.NumDistinctActions()),
@@ -124,11 +123,6 @@ VPNetModel::VPNetModel(const Game &game, const std::string &path,
   SPIEL_CHECK_EQ(game.NumPlayers(), 2);
   SPIEL_CHECK_EQ(game.GetType().utility, GameType::Utility::kZeroSum);
 
-  // Load from specified checkpoint if a checkpoint step is given.
-  if (checkpoint_step != kInvalidCheckpointStep) {
-    LoadCheckpoint(absl::StrCat(path, "/checkpoint-", checkpoint_step));
-  }
-
   // Put this model on the specified device.
   model_->to(torch_device_);
 }
@@ -140,6 +134,11 @@ std::string VPNetModel::SaveCheckpoint(int step) {
   torch::save(model_optimizer_, absl::StrCat(full_path, "-optimizer.pt"));
 
   return full_path;
+}
+
+void VPNetModel::LoadCheckpoint(int step) {
+  // Load checkpoint from the path given at its initialization.
+  LoadCheckpoint(absl::StrCat(path_, "/checkpoint-", step));
 }
 
 void VPNetModel::LoadCheckpoint(const std::string& path) {

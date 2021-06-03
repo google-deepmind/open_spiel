@@ -41,6 +41,10 @@ export OPEN_SPIEL_BUILD_WITH_XINXIN=${OPEN_SPIEL_BUILD_WITH_XINXIN:-$DEFAULT_OPT
 export OPEN_SPIEL_BUILD_WITH_ROSHAMBO=${OPEN_SPIEL_BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export OPEN_SPIEL_BUILD_WITH_GO=${OPEN_SPIEL_BUILD_WITH_GO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 
+# Download the header-only library, libnop (https://github.com/google/libnop),
+# to support the serialization and deserialization of C++ data types.
+export OPEN_SPIEL_BUILD_WITH_LIBNOP="${OPEN_SPIEL_BUILD_WITH_LIBNOP:-"OFF"}"
+
 # Download precompiled binaries for libtorch (PyTorch C++ API).
 # See https://pytorch.org/cppdocs/ for C++ documentation.
 # This dependency is currently not supported by Travis CI test.
