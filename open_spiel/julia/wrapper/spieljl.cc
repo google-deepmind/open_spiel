@@ -687,7 +687,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .constructor<const open_spiel::Game&,
                    const std::unordered_map<std::string, int>&, int>();
 
-  mod.method("evaluate_bots", &open_spiel::EvaluateBots);
+  mod.method("evaluate_bots", [](open_spiel::State* state,
+                                 const std::vector<open_spiel::Bot*>& bots,
+                                 int seed) {
+    return open_spiel::EvaluateBots(state, bots, seed);
+  });
   mod.method("exploitability", [](const open_spiel::Game& game,
                                   const open_spiel::Policy& policy) {
     return open_spiel::algorithms::Exploitability(game, policy);
