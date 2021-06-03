@@ -185,7 +185,7 @@ Option 3 (Jupyter Notebook):
 Installs OpenSpiel with an additional Jupyter Notebook environment.
 
 ```bash
-docker build -t openspiel-notebook -f Dockerfile.jupyter --rm
+docker build -t openspiel-notebook -f Dockerfile.jupyter --rm .
 docker run -it --rm -p 8888:8888 openspiel-notebook
 ```
 
