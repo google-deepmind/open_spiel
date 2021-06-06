@@ -43,7 +43,7 @@ def main(_):
   print("Creating game:", FLAGS.game)
   params = {}
   if FLAGS.players is not None:
-    params["players"] = pyspiel.GameParameter(FLAGS.players)
+    params["players"] = FLAGS.players
   game = pyspiel.load_game(FLAGS.game, params)
 
   print("Getting all states; depth_limit = {}".format(FLAGS.depth_limit))

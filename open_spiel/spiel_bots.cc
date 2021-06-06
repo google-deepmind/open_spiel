@@ -192,9 +192,12 @@ REGISTER_SPIEL_BOT("uniform_random", UniformRandomBotFactory);
 }  // namespace
 
 // A bot that samples from a policy.
+std::unique_ptr<Bot> MakePolicyBot(int seed, std::shared_ptr<Policy> policy) {
+  return std::make_unique<PolicyBot>(seed, std::move(policy));
+}
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
                                    std::shared_ptr<Policy> policy) {
-  return std::make_unique<PolicyBot>(seed, std::move(policy));
+  return MakePolicyBot(seed, std::move(policy));
 }
 // A bot with a fixed action preference, for test purposes.
 // Picks the first legal action found in the list of actions.
@@ -312,7 +315,13 @@ bool IsBotRegistered(const std::string& bot_name) {
 std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
                              const std::shared_ptr<const Game>& game,
                              Player player_id) {
-  return LoadBot(bot_name, game, player_id, GameParametersFromString(bot_name));
+  GameParameters params = GameParametersFromString(bot_name);
+
+  // We use the "name" parameter, as that is the "short_name", which is what we
+  // want. Otherwise, this will use the "long name", which includes the config.
+  // e.g. if the bot_name is "my_bot(parameter=value)", then we want the
+  // bot_name here to be "my_bot", not "my_bot(parameter=value)".
+  return LoadBot(params["name"].string_value(), game, player_id, params);
 }
 
 std::unique_ptr<Bot> LoadBot(const std::string& bot_name,

@@ -58,7 +58,9 @@
 //                                number of moves attempted
 //    (default "reveal-nothing")  ['reveal-nothing', 'reveal-numturns']
 //
-//    "board_size"    int         Size of the board
+//    "row_size"    int           Size of the rows on the hex board
+//    (default 11)
+//    "col_size"    int           Size of the columns on the hex board
 //    (default 11)
 
 namespace open_spiel {
@@ -83,7 +85,7 @@ enum class GameVersion {
 
 class DarkHexState : public State {
  public:
-  DarkHexState(std::shared_ptr<const Game> game, int board_size,
+  DarkHexState(std::shared_ptr<const Game> game, int row_size, int col_size,
                GameVersion game_version, ObservationType obs_type);
 
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
@@ -117,7 +119,8 @@ class DarkHexState : public State {
   hex::HexState state_;
   ObservationType obs_type_;
   GameVersion game_version_;
-  const int board_size_;
+  const int row_size_;  // x
+  const int col_size_;  // y
   const int num_cells_;
   const int bits_per_action_;
   const int longest_sequence_;
@@ -133,7 +136,7 @@ class DarkHexGame : public Game {
   DarkHexGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new DarkHexState(
-        shared_from_this(), board_size_, game_version_, obs_type_));
+        shared_from_this(), row_size_, col_size_, game_version_, obs_type_));
   }
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
@@ -145,18 +148,18 @@ class DarkHexGame : public Game {
 
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
-  int MaxGameLength() const override {
-    return board_size_ * board_size_ * 2 - 1;
-  }
+  int MaxGameLength() const override { return row_size_ * col_size_ * 2 - 1; }
   ObservationType obs_type() const { return obs_type_; }
   GameVersion game_version() const { return game_version_; }
-  int board_size() const { return board_size_; }
+  int row_size() const { return row_size_; }
+  int col_size() const { return col_size_; }
 
  private:
   std::shared_ptr<const hex::HexGame> game_;
   ObservationType obs_type_;
   GameVersion game_version_;
-  const int board_size_;
+  const int row_size_;
+  const int col_size_;
   const int num_cells_;
   const int bits_per_action_;
   const int longest_sequence_;
@@ -164,10 +167,10 @@ class DarkHexGame : public Game {
 
 class ImperfectRecallDarkHexState : public DarkHexState {
  public:
-  ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int board_size,
-                              GameVersion game_version,
+  ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int row_size_,
+                              int col_size_, GameVersion game_version,
                               ObservationType obs_type)
-      : DarkHexState(game, board_size, game_version, obs_type) {}
+      : DarkHexState(game, row_size_, col_size_, game_version, obs_type) {}
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
@@ -183,7 +186,8 @@ class ImperfectRecallDarkHexGame : public DarkHexGame {
   explicit ImperfectRecallDarkHexGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ImperfectRecallDarkHexState(
-        shared_from_this(), board_size(), game_version(), obs_type()));
+        shared_from_this(), row_size(), col_size(), game_version(),
+        obs_type()));
   }
 };
 

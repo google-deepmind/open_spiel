@@ -46,7 +46,7 @@ constexpr const char* kSerializeStateSectionHeader = "[State]";
 
 // Returns the available parameter keys, to be used as a utility function.
 std::string ListValidParameters(
-    const std::map<std::string, GameParameter>& param_spec) {
+    const GameParameters& param_spec) {
   std::vector<std::string> available_keys;
   available_keys.reserve(param_spec.size());
   for (const auto& item : param_spec) {
@@ -60,7 +60,7 @@ std::string ListValidParameters(
 // Issues a SpielFatalError if any are missing, of the wrong type, or
 // unexpectedly present.
 void ValidateParams(const GameParameters& params,
-                    const std::map<std::string, GameParameter>& param_spec) {
+                    const GameParameters& param_spec) {
   // Check all supplied parameters are supported and of the right type.
   for (const auto& param : params) {
     const auto it = param_spec.find(param.first);
@@ -114,6 +114,8 @@ StateType State::GetType() const {
     return StateType::kChance;
   } else if (IsTerminal()) {
     return StateType::kTerminal;
+  } else if (CurrentPlayer() == kMeanFieldPlayerId) {
+    return StateType::kMeanField;
   } else {
     return StateType::kDecision;
   }
@@ -291,12 +293,18 @@ std::pair<Action, double> SampleAction(const ActionsAndProbs& outcomes,
 }
 
 std::string State::Serialize() const {
-  // This simple serialization doesn't work for games with sampled chance
-  // nodes, since the history doesn't give us enough information to reconstruct
-  // the state. If you wish to serialize states in such games, you must
-  // implement custom serialization and deserialization for the state.
+  // This simple serialization doesn't work for the following games:
+  // - games with sampled chance nodes, since the history doesn't give us enough
+  //   information to reconstruct the state.
+  // - Mean field games, since this base class does not store the history of
+  //   state distributions passed in UpdateDistribution() (and it would be
+  //   very expensive to do so for games with many possible states and a long
+  //   time horizon).
+  // If you wish to serialize states in such games, you must implement custom
+  // serialization and deserialization for the state.
   SPIEL_CHECK_NE(game_->GetType().chance_mode,
                  GameType::ChanceMode::kSampledStochastic);
+  SPIEL_CHECK_NE(game_->GetType().dynamics, GameType::Dynamics::kMeanField);
   return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
 }
 
@@ -341,12 +349,14 @@ std::vector<int> State::LegalActionsMask(Player player) const {
 }
 
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
-  // This simple deserialization doesn't work for games with sampled chance
-  // nodes, since the history doesn't give us enough information to reconstruct
-  // the state. If you wish to serialize states in such games, you must
-  // implement custom serialization and deserialization for the state.
+  // This does not work for games with sampled chance nodes and for mean field
+  //  games. See comments in State::Serialize() for the explanation. If you wish
+  //  to serialize states in such games, you must implement custom serialization
+  //  and deserialization for the state.
   SPIEL_CHECK_NE(game_type_.chance_mode,
                  GameType::ChanceMode::kSampledStochastic);
+  SPIEL_CHECK_NE(game_type_.dynamics,
+                 GameType::Dynamics::kMeanField);
 
   std::unique_ptr<State> state = NewInitialState();
   if (str.length() == 0) {
@@ -446,9 +456,10 @@ std::ostream& operator<<(std::ostream& stream, GameType::Dynamics value) {
       return stream << "Simultaneous";
     case GameType::Dynamics::kSequential:
       return stream << "Sequential";
+    case GameType::Dynamics::kMeanField:
+      return stream << "MeanField";
     default:
-      SpielFatalError("Unknown dynamics.");
-      return stream << "This will never return.";
+      SpielFatalError(absl::StrCat("Unknown dynamics: ", value));
   }
 }
 
@@ -459,6 +470,8 @@ std::istream& operator>>(std::istream& stream, GameType::Dynamics& var) {
     var = GameType::Dynamics::kSimultaneous;
   } else if (str == "Sequential") {
     var = GameType::Dynamics::kSequential;
+  } else if (str == "MeanField") {
+    var = GameType::Dynamics::kMeanField;
   } else {
     SpielFatalError(absl::StrCat("Unknown dynamics ", str, "."));
   }
@@ -475,7 +488,6 @@ std::ostream& operator<<(std::ostream& stream, GameType::ChanceMode value) {
       return stream << "SampledStochastic";
     default:
       SpielFatalError("Unknown mode.");
-      return stream << "This will never return.";
   }
 }
 
@@ -508,7 +520,6 @@ std::ostream& operator<<(std::ostream& stream, GameType::Information value) {
       return stream << "ImperfectInformation";
     default:
       SpielFatalError("Unknown value.");
-      return stream << "This will never return.";
   }
 }
 
@@ -539,7 +550,6 @@ std::ostream& operator<<(std::ostream& stream, GameType::Utility value) {
       return stream << "Identical";
     default:
       SpielFatalError("Unknown value.");
-      return stream << "This will never return.";
   }
 }
 
@@ -568,7 +578,6 @@ std::ostream& operator<<(std::ostream& stream, GameType::RewardModel value) {
       return stream << "Terminal";
     default:
       SpielFatalError("Unknown value.");
-      return stream << "This will never return.";
   }
 }
 

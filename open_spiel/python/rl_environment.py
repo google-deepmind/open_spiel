@@ -170,9 +170,7 @@ class Environment(object):
 
     if isinstance(game, str):
       if kwargs:
-        game_settings = {
-            key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
-        }
+        game_settings = {key: val for (key, val) in kwargs.items()}
         logging.info("Using game settings: %s", game_settings)
         self._game = pyspiel.load_game(game, game_settings)
       else:
@@ -199,10 +197,10 @@ class Environment(object):
     # Check the requested observation type is supported.
     if observation_type == ObservationType.OBSERVATION:
       if not self._game.get_type().provides_observation_tensor:
-        raise ValueError("observation_tensor not supported by " + game)
+        raise ValueError(f"observation_tensor not supported by {game}")
     elif observation_type == ObservationType.INFORMATION_STATE:
       if not self._game.get_type().provides_information_state_tensor:
-        raise ValueError("information_state_tensor not supported by " + game)
+        raise ValueError(f"information_state_tensor not supported by {game}")
     self._use_observation = (observation_type == ObservationType.OBSERVATION)
 
   def seed(self, seed=None):

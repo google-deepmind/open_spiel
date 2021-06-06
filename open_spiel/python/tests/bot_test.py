@@ -81,12 +81,12 @@ class BotTest(absltest.TestCase):
             "fixed_action_preference",
             game,
             player=0,
-            params={"actions": pyspiel.GameParameter("0:1:2")}),
+            params={"actions": "0:1:2"}),
         pyspiel.load_bot(
             "fixed_action_preference",
             game,
             player=1,
-            params={"actions": pyspiel.GameParameter("3:4")}),
+            params={"actions": "3:4"}),
     ]
     result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
     self.assertEqual(result, [1, -1])  # Player 0 wins.

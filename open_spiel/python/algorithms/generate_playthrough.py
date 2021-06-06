@@ -26,8 +26,8 @@ import os
 import re
 import numpy as np
 
-from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
-from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
+from open_spiel.python import games  # pylint: disable=unused-import
+from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -138,6 +138,26 @@ def format_shapes(d):
     return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
 
 
+def _format_params(d, as_game=False):
+  """Format a collection of params."""
+
+  def fmt(val):
+    if isinstance(val, dict):
+      return _format_params(val, as_game=True)
+    else:
+      return _escape(str(val))
+
+  if as_game:
+    return d["name"] + "(" + ",".join(
+        "{}={}".format(key, fmt(value))
+        for key, value in sorted(d.items())
+        if key != "name") + ")"
+  else:
+    return "{" + ",".join(
+        "{}={}".format(key, fmt(value))
+        for key, value in sorted(d.items())) + "}"
+
+
 class ShouldDisplayStateTracker:
   """Determines whether a state is interesting enough to display."""
 
@@ -200,8 +220,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         game,
         imperfect_information_observation_type=None,
         params=observation_params)
-  except (RuntimeError, ValueError):
-    pass
+  except (RuntimeError, ValueError) as e:
+    print("Warning: unable to build an observation: ", e)
 
   infostate_observation = None
   # TODO(author11) reinstate this restriction
@@ -264,9 +284,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line("NumDistinctActions() = {}".format(game.num_distinct_actions()))
   add_line("PolicyTensorShape() = {}".format(game.policy_tensor_shape()))
   add_line("MaxChanceOutcomes() = {}".format(game.max_chance_outcomes()))
-  add_line("GetParameters() = {{{}}}".format(",".join(
-      "{}={}".format(key, _escape(str(value)))
-      for key, value in sorted(game.get_parameters().items()))))
+  add_line("GetParameters() = {}".format(_format_params(game.get_parameters())))
   add_line("NumPlayers() = {}".format(game.num_players()))
   add_line("MinUtility() = {:.5}".format(game.min_utility()))
   add_line("MaxUtility() = {:.5}".format(game.max_utility()))
@@ -352,7 +370,19 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       break
     if state.is_chance_node():
       add_line("ChanceOutcomes() = {}".format(state.chance_outcomes()))
-    if state.is_simultaneous_node():
+    if state.is_mean_field_node():
+      add_line("DistributionSupport() = {}".format(
+          state.distribution_support()))
+      num_states = len(state.distribution_support())
+      state.update_distribution([1. / num_states] * num_states)
+      if state_idx < len(action_sequence):
+        assert action_sequence[state_idx] == "update_distribution", (
+            f"Unexpected action at MFG node: {action_sequence[state_idx]}, "
+            f"state: {state}, action_sequence: {action_sequence}")
+      add_line("")
+      add_line("# Set mean field distribution to be uniform", force=True)
+      add_line("action: update_distribution", force=True)
+    elif state.is_simultaneous_node():
       for player in players:
         add_line("LegalActions({}) = [{}]".format(
             player, ", ".join(str(x) for x in state.legal_actions(player))))
@@ -363,7 +393,10 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       if state_idx < len(action_sequence):
         actions = action_sequence[state_idx]
       else:
-        actions = [rng.choice(state.legal_actions(pl)) for pl in players]
+        actions = []
+        for pl in players:
+          legal_actions = state.legal_actions(pl)
+          actions.append(0 if not legal_actions else rng.choice(legal_actions))
       add_line("")
       add_line("# Apply joint action [{}]".format(
           format(", ".join(
@@ -422,7 +455,9 @@ def _playthrough_params(lines):
     if match_observation_params:
       params["observation_params_string"] = match_observation_params.group(1)
     if match_action:
-      params["action_sequence"].append(int(match_action.group(1)))
+      matched = match_action.group(1)
+      params["action_sequence"].append(matched if matched ==
+                                       "update_distribution" else int(matched))
     if match_actions:
       params["action_sequence"].append(
           [int(x) for x in match_actions.group(1).split(", ")])

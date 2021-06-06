@@ -145,7 +145,7 @@ void OshiZumoGameTests() {
       "oshi_zumo(coins=10,size=3,min_bid=1)");
   TabularBestResponseMDP tbr1(*game, uniform_policy);
   TabularBestResponseMDPInfo br_info = tbr1.NashConv();
-  SPIEL_CHECK_FLOAT_NEAR(br_info.nash_conv, 1.997891313932980, kFloatTolerance);
+  SPIEL_CHECK_FLOAT_NEAR(br_info.nash_conv, 1.988311287477953, kFloatTolerance);
 
   TabularBestResponseMDP tbr2(*game, first_action_policy);
   TabularBestResponseMDPInfo br_info2 = tbr2.NashConv();

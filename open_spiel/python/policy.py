@@ -104,7 +104,21 @@ class Policy(object):
 
   def to_tabular(self):
     """Returns a new `TabularPolicy` equivalent to this policy."""
-    tabular_policy = TabularPolicy(self.game, self.player_ids)
+    if self.game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
+      # TODO(perolat): We use s.observation_string(DEFAULT_MFG_PLAYER) here as
+      # the number of history is exponential on the depth of the MFG. What we
+      # really need is a representation of the state.
+      # For many player Mean Field games, the state will be
+      # (x0, x1, x2, ..., xn) and the observation_string(0) will output the
+      # string of x0. In that case we would need something like
+      # str([observation_string(i) for i in range(num_player)])
+      tabular_policy = TabularPolicy(
+          self.game,
+          self.player_ids,
+          to_string=lambda s: s.observation_string(pyspiel.PlayerId.
+                                                   DEFAULT_PLAYER_ID))
+    else:
+      tabular_policy = TabularPolicy(self.game, self.player_ids)
     for index, state in enumerate(tabular_policy.states):
       tabular_policy.action_probability_array[index, :] = 0
       for action, probability in self.action_probabilities(state).items():
@@ -164,7 +178,7 @@ class TabularPolicy(Policy):
       the tabular policy.
   """
 
-  def __init__(self, game, players=None):
+  def __init__(self, game, players=None, to_string=lambda s: s.history_str()):
     """Initializes a uniform random policy for all players in the game."""
     players = sorted(players or range(game.num_players()))
     super(TabularPolicy, self).__init__(game, players)
@@ -175,7 +189,9 @@ class TabularPolicy(Policy):
         game,
         depth_limit=-1,
         include_terminals=False,
-        include_chance_states=False)
+        include_chance_states=False,
+        include_mean_field_states=False,
+        to_string=to_string)
 
     # Assemble legal actions for every valid (state, player) pair, keyed by
     # information state string.
@@ -448,4 +464,3 @@ def merge_tabular_policies(tabular_policies, game):
         merged_policy.action_probability_array[to_index] = (
             tabular_policies[p].action_probability_array[from_index])
   return merged_policy
-

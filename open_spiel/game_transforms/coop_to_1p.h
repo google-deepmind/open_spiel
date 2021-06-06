@@ -32,8 +32,6 @@
 //
 // These assumptions hold for tiny_hanabi and tiny_bridge_2p, but are unlikely
 // to hold in other games.
-//
-// TODO(author11) Define public / private info interfaces (FOG?) and use them.
 
 namespace open_spiel {
 namespace coop_to_1p {

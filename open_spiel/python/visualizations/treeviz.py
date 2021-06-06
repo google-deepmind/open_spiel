@@ -225,8 +225,8 @@ class GameTree(pygraphviz.AGraph):
       self.add_edge(state_str, child_str,
                     **self._edge_decorator(state, child, action))
 
-      if self._group_infosets and not child.is_chance_node() \
-          and not child.is_terminal():
+      if (self._group_infosets and not child.is_chance_node() and
+          not child.is_terminal()):
         player = child.current_player()
         info_state = child.information_state_string()
         self._infosets[(player, info_state)].append(child_str)

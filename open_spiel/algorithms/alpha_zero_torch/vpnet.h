@@ -17,6 +17,8 @@
 
 #include <torch/torch.h>
 
+#include <nop/structure.h>
+
 #include "open_spiel/algorithms/alpha_zero_torch/model.h"
 #include "open_spiel/spiel.h"
 
@@ -92,6 +94,8 @@ class VPNetModel {
     std::vector<float> observations;
     ActionsAndProbs policy;
     double value;
+
+    NOP_STRUCTURE(TrainInputs, legal_actions, observations, policy, value);
   };
 
   enum CheckpointStep {
@@ -100,8 +104,8 @@ class VPNetModel {
   };
 
   VPNetModel(const Game &game, const std::string &path,
-             const std::string &file_name, const std::string &device = "/cpu:0",
-             int checkpoint_step = kInvalidCheckpointStep);
+             const std::string &file_name,
+             const std::string &device = "/cpu:0");
 
   // Move only, not copyable.
   VPNetModel(VPNetModel&& other) = default;
@@ -117,6 +121,7 @@ class VPNetModel {
   LossInfo Learn(const std::vector<TrainInputs>& inputs);
 
   std::string SaveCheckpoint(int step);
+  void LoadCheckpoint(int step);
   void LoadCheckpoint(const std::string& path);
 
   const std::string Device() const { return device_; }

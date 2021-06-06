@@ -75,6 +75,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: julia-actions/setup-julia@v1
+    - name: Ad-hoc fix
+      if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
+      run: |
+        # workaround for https://github.com/deepmind/open_spiel/issues/606
+        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
     - name: Install
       run: |
         pwd

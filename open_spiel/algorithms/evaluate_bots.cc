@@ -14,8 +14,12 @@
 
 #include "open_spiel/algorithms/evaluate_bots.h"
 
+#include <limits>
+#include <random>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/time/time.h"
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 
@@ -59,6 +63,21 @@ std::vector<double> EvaluateBots(State* state, const std::vector<Bot*>& bots,
 
   // Return terminal utility.
   return state->Returns();
+}
+
+std::vector<double> EvaluateBots(const Game& game,
+                                 const std::vector<Bot*>& bots, int seed) {
+  std::unique_ptr<State> state = game.NewInitialState();
+  return EvaluateBots(state.get(), bots, seed);
+}
+
+std::vector<double> EvaluateBots(const Game& game,
+                                 const std::vector<Bot*>& bots) {
+  absl::Duration time_gap = absl::Now() - absl::UnixEpoch();
+  std::mt19937 rng(absl::ToInt64Nanoseconds(time_gap));
+  const int seed = absl::Uniform<int>(rng, std::numeric_limits<int>::min(),
+                                      std::numeric_limits<int>::max());
+  return EvaluateBots(game, bots, seed);
 }
 
 }  // namespace open_spiel

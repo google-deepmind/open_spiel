@@ -95,8 +95,6 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_tarok.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
-  pybind11/observation_history.cc
-  pybind11/observation_history.h
   pybind11/observer.cc
   pybind11/observer.h
   pybind11/policy.cc
@@ -112,12 +110,6 @@ if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../games/gamut/gamut_pybind11.h
       ../games/gamut/gamut_pybind11.cc
-      )
-endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      ../public_states/pybind11/public_states.h
-      ../public_states/pybind11/public_states.cc
       )
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
@@ -145,10 +137,6 @@ if (OPEN_SPIEL_BUILD_WITH_EIGEN)
 
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../eigen/eigen_binding_test.py)
-endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set(PYTHON_TESTS ${PYTHON_TESTS}
-    ../integration_tests/public_states_api_test.py)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
@@ -181,7 +169,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
-  algorithms/policy_gradient_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
   bots/bluechip_bridge_test.py
@@ -195,10 +182,15 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/cliff_walking_test.py
   games/data_test.py
   games/tic_tac_toe_test.py
+  mfg/algorithms/best_response_value_test.py
+  mfg/algorithms/fictitious_play_test.py
+  mfg/algorithms/greedy_policy_test.py
+  mfg/algorithms/nash_conv_test.py
+  mfg/algorithms/policy_value_test.py
+  mfg/games/crowd_modelling_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
-  tests/observation_history_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
@@ -214,7 +206,9 @@ if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
     jax/dqn_jax_test.py
-    jax/nfsp_jax_test.py
+    # This test is flaky. TODO(perolat): fix this.
+    # See https://github.com/deepmind/open_spiel/issues/602
+    # jax/nfsp_jax_test.py
   )
 endif()
 
@@ -247,6 +241,7 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/masked_softmax_test.py
       algorithms/neurd_test.py
       algorithms/nfsp_test.py
+      algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
   )

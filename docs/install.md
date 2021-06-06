@@ -148,16 +148,21 @@ Linux versions).
 
 ## Installing via Docker
 
+Please note that we don't regularly test the Docker installation. As such, it
+may not work at any given time. We are investigating enabling tests and proper
+longer-term support, but it may take some time. Until then, if you encounter a
+problem, please [open an issue](https://github.com/deepmind/open_spiel/issues).
+
 Option 1 (Basic, 3.13GB):
 
 ```bash
-docker build --target base -t openspiel -f Dockerfile.base --rm
+docker build --target base -t openspiel -f Dockerfile.base .
 ```
 
 Option 2 (Slim, 2.26GB):
 
 ```bash
-docker build --target python-slim -t openspiel -f Dockerfile.base --rm
+docker build --target python-slim -t openspiel -f Dockerfile.base .
 ```
 
 If you are only interested in developing in Python, use the second image. You
@@ -180,7 +185,7 @@ Option 3 (Jupyter Notebook):
 Installs OpenSpiel with an additional Jupyter Notebook environment.
 
 ```bash
-docker build -t openspiel-notebook -f Dockerfile.jupyter --rm
+docker build -t openspiel-notebook -f Dockerfile.jupyter --rm .
 docker run -it --rm -p 8888:8888 openspiel-notebook
 ```
 

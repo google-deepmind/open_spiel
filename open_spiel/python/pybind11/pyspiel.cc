@@ -19,7 +19,6 @@
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
@@ -37,7 +36,6 @@
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
-#include "open_spiel/python/pybind11/observation_history.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -50,9 +48,6 @@
 // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
 #include "open_spiel/games/gamut/gamut_pybind11.h"
-#endif
-#if OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES
-#include "open_spiel/public_states/pybind11/public_states.h"
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
@@ -86,53 +81,9 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
-// Python representation of GameParameter objects
-namespace {
-py::object GameParameterToPython(const GameParameter& gp) {
-  if (gp.has_bool_value()) {
-    return py::bool_(gp.bool_value());
-  } else if (gp.has_double_value()) {
-    return py::float_(gp.double_value());
-  } else if (gp.has_string_value()) {
-    return py::str(gp.string_value());
-  } else if (gp.has_int_value()) {
-    return py::int_(gp.int_value());
-  } else if (gp.has_game_value()) {
-    py::dict dict;
-    for (const auto& [k, v] : gp.game_value()) {
-      dict[py::str(k)] = GameParameterToPython(v);
-    }
-    return dict;
-  } else {
-    return py::none();
-  }
-}
-}  // namespace
-
 // Definintion of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
-
-  py::enum_<open_spiel::GameParameter::Type>(m, "GameParameterType")
-      .value("UNSET", open_spiel::GameParameter::Type::kUnset)
-      .value("INT", open_spiel::GameParameter::Type::kInt)
-      .value("DOUBLE", open_spiel::GameParameter::Type::kDouble)
-      .value("STRING", open_spiel::GameParameter::Type::kString)
-      .value("BOOL", open_spiel::GameParameter::Type::kBool);
-
-  py::class_<GameParameter> game_parameter(m, "GameParameter");
-  game_parameter.def(py::init<double>())
-      .def(py::init<std::string>())
-      .def(py::init<bool>())
-      .def(py::init<int>())
-      .def(py::init<GameParameters>())
-      .def("is_mandatory", &GameParameter::is_mandatory)
-      .def("value", &GameParameterToPython)
-      .def("__str__", &GameParameter::ToString)
-      .def("__repr__", &GameParameter::ToReprString)
-      .def("__eq__", [](const GameParameter& value, GameParameter* value2) {
-        return value2 && value.ToReprString() == value2->ToReprString();
-      });
 
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
@@ -168,7 +119,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool, std::map<std::string, GameParameter>,
+                    bool, bool, bool, GameParameters,
                     bool, bool>(),
            py::arg("short_name"), py::arg("long_name"), py::arg("dynamics"),
            py::arg("chance_mode"), py::arg("information"), py::arg("utility"),
@@ -179,7 +130,7 @@ PYBIND11_MODULE(pyspiel, m) {
            py::arg("provides_observation_string"),
            py::arg("provides_observation_tensor"),
            py::arg("parameter_specification") =
-               std::map<std::string, GameParameter>(),
+               GameParameters(),
            py::arg("default_loadable") = true,
            py::arg("provides_factored_observation_string") = false)
       .def(py::init<const GameType&>())
@@ -252,10 +203,11 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("TERMINAL", GameType::RewardModel::kTerminal);
 
   py::enum_<open_spiel::PlayerId>(m, "PlayerId")
+      .value("DEFAULT_PLAYER_ID", open_spiel::kDefaultPlayerId)
       .value("INVALID", open_spiel::kInvalidPlayer)
       .value("TERMINAL", open_spiel::kTerminalPlayerId)
       .value("CHANCE", open_spiel::kChancePlayerId)
-      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayer)
+      .value("MEAN_FIELD", open_spiel::kMeanFieldPlayerId)
       .value("SIMULTANEOUS", open_spiel::kSimultaneousPlayerId);
 
   py::class_<GameInfo> game_info(m, "GameInfo");
@@ -263,7 +215,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<int, int, int, double, double, double, int>(),
            py::arg("num_distinct_actions"), py::arg("max_chance_outcomes"),
            py::arg("num_players"), py::arg("min_utility"),
-           py::arg("max_utility"), py::arg("utility_sum"),
+           py::arg("max_utility"), py::arg("utility_sum") = 0,
            py::arg("max_game_length"))
       .def(py::init<const GameInfo&>())
       .def_readonly("num_distinct_actions", &GameInfo::num_distinct_actions)
@@ -275,22 +227,6 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("max_game_length", &GameInfo::max_game_length);
 
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
-
-  // We cannot have these as enums on C++ side, but we can encode it for Python.
-  // Technically it is a submodule, but a Python user will not typically
-  // need to tell these apart. The pybind11 API does not provide a way
-  // for constructing arbitrary (enum) classes, so we do it this way.
-  auto public_observation = m.def_submodule("PublicObservation");
-  public_observation.attr("CLOCK_TICK") =
-      py::str(open_spiel::kClockTickPublicObservation);
-  public_observation.attr("START_GAME") =
-      py::str(open_spiel::kStartOfGamePublicObservation);
-  public_observation.attr("INVALID") =
-      py::str(open_spiel::kInvalidPublicObservation);
-
-  auto private_observation = m.def_submodule("PrivateObservation");
-  private_observation.attr("NOTHING") =
-      py::str(open_spiel::kNothingPrivateObservation);
 
   py::enum_<open_spiel::TensorLayout>(m, "TensorLayout")
       .value("HWC", open_spiel::TensorLayout::kHWC)
@@ -335,6 +271,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("player_reward", &State::PlayerReward)
       .def("player_return", &State::PlayerReturn)
       .def("is_chance_node", &State::IsChanceNode)
+      .def("is_mean_field_node", &State::IsMeanFieldNode)
       .def("is_simultaneous_node", &State::IsSimultaneousNode)
       .def("is_player_node", &State::IsPlayerNode)
       .def("history", &State::History)
@@ -376,7 +313,9 @@ PYBIND11_MODULE(pyspiel, m) {
             auto state = DeserializeGameAndState(data).second;
             auto pydict = PyDict(*state);
             return std::make_pair(std::move(state), pydict);
-          }));
+          }))
+      .def("distribution_support", &State::DistributionSupport)
+      .def("update_distribution", &State::UpdateDistribution);
 
   py::classh<Game, PyGame> game(m, "Game");
   game.def(py::init<GameType, GameInfo, GameParameters>())
@@ -638,6 +577,7 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("random_sim_test", testing::RandomSimTest, py::arg("game"),
         py::arg("num_sims"), py::arg("serialize"), py::arg("verbose"),
+        py::arg("mask_test") = true,
         py::arg("state_checker_fn") =
             py::cpp_function(&testing::DefaultStateChecker),
         "Run the C++ tests on a game");
@@ -651,7 +591,6 @@ PYBIND11_MODULE(pyspiel, m) {
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
-  init_pyspiel_observation_histories(m);  // Histories related to observations.
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
@@ -667,9 +606,6 @@ PYBIND11_MODULE(pyspiel, m) {
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
   init_pyspiel_gamut(m);
-#endif
-#if OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES
-  init_pyspiel_public_states(m);
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
   init_pyspiel_xinxin(m);

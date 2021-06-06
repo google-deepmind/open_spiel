@@ -346,8 +346,7 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
   def test_identity(self):
     num_players = 2
-    game = pyspiel.load_game(
-        "kuhn_poker", {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
 
     tabular_policies = [  # Policy limited to player.
         policy.TabularPolicy(game, players=(player,))
@@ -364,8 +363,7 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
   def test_identity_redundant(self):
     num_players = 2
-    game = pyspiel.load_game(
-        "kuhn_poker", {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
 
     tabular_policies = [  # Policy for all players.
         policy.TabularPolicy(game, players=None)
@@ -382,8 +380,7 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
   def test_identity_missing(self):
     num_players = 2
-    game = pyspiel.load_game(
-        "kuhn_poker", {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
 
     tabular_policies = [  # Only first player (repeated).
         policy.TabularPolicy(game, players=(0,))

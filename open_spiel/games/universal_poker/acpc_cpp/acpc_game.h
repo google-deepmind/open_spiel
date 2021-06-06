@@ -51,7 +51,12 @@ class ACPCGame {
   uint8_t GetNbBoardCardsRequired(uint8_t round) const;
   uint8_t NumSuitsDeck() const { return acpc_game_.numSuits; }
   uint8_t NumRanksDeck() const { return acpc_game_.numRanks; }
+  uint8_t NumBoardCards(int round) const {
+    return acpc_game_.numBoardCards[round];
+  }
   uint32_t StackSize(uint8_t player) const;
+  // Returns the money amount that is used in the game (sum of all stacks).
+  uint32_t TotalMoney() const;
   uint32_t BlindSize(uint8_t player) const;
   uint8_t GetTotalNbBoardCards() const;
 
@@ -122,12 +127,25 @@ class ACPCState {
     acpcState_.boardCards[card_index] = card;
   }
 
+  // Set the spent amounts uniformly for each player.
+  // Must be divisible by the number of players!
+  void SetPotSize(int pot_size) {
+    SPIEL_CHECK_GE(pot_size, 0);
+    SPIEL_CHECK_LE(pot_size, game_->TotalMoney());
+    SPIEL_CHECK_EQ(pot_size % game_->GetNbPlayers(), 0);
+    const int num_players = game_->GetNbPlayers();
+    for (int pl = 0; pl < num_players; ++pl) {
+      acpcState_.spent[pl] = pot_size / num_players;
+    }
+  }
+
   // Returns the current round 0-indexed round id (<= game.NumRounds() - 1).
   // A showdown is still in game.NumRounds()-1, not a separate round
   int GetRound() const { return acpcState_.round; }
 
   const ACPCGame* game() const { return game_; }
   const RawACPCState& raw_state() const { return acpcState_; }
+  RawACPCState* mutable_state() { return &acpcState_; }
 
  private:
   std::string ActionToString(const project_acpc_server::Action& action) const;

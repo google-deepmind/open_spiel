@@ -58,8 +58,21 @@ Player PyState::CurrentPlayer() const {
 }
 
 std::vector<Action> PyState::LegalActions() const {
-  PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "legal_actions",
-                              LegalActions);
+  return LegalActions(CurrentPlayer());
+}
+
+std::vector<Action> PyState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
+  if (IsChanceNode()) return LegalChanceOutcomes();
+  if ((player == CurrentPlayer()) || (player >= 0 && IsSimultaneousNode())) {
+    PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "_legal_actions",
+                                LegalActions, player);
+  } else if (player < 0) {
+    SpielFatalError(
+        absl::StrCat("Called LegalActions for psuedo-player ", player));
+  } else {
+    return {};
+  }
 }
 
 std::string PyState::ActionToString(Player player, Action action_id) const {
@@ -124,7 +137,13 @@ std::unique_ptr<State> PyState::Clone() const {
 void RegisterPyGame(const GameType& game_type, py::function creator) {
   GameRegisterer::RegisterGame(
       game_type, [game_type, creator](const GameParameters& game_parameters) {
-        auto py_game = creator(game_parameters);
+        py::dict params = py::cast(game_parameters);
+        for (const auto& [k, v] : game_type.parameter_specification) {
+          if (game_parameters.count(k) == 0) {
+            params[pybind11::str(k)] = v;
+          }
+        }
+        auto py_game = creator(params);
         return py::cast<std::shared_ptr<Game>>(py_game);
       });
 }
@@ -188,17 +207,23 @@ std::shared_ptr<Observer> PyGame::MakeObserver(
 }
 
 std::string PyState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.info_state_observer().StringFrom(*this, player);
 }
 
 std::string PyState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.default_observer().StringFrom(*this, player);
 }
 
 void PyState::InformationStateTensor(Player player,
                                      absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.info_state_observer().WriteTensor(*this, player, &allocator);
@@ -231,6 +256,8 @@ std::vector<int> PyGame::InformationStateTensorShape() const {
 }
 
 void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.default_observer().WriteTensor(*this, player, &allocator);

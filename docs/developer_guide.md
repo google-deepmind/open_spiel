@@ -37,19 +37,20 @@ that both the C++ and the Python implementation behave the same.
 We describe here only the simplest and fastest way to add a new game. It is
 ideal to first be aware of the general API (see `spiel.h`).
 
-1.  Choose a game to copy from in `games/`. Suggested games: Tic-Tac-Toe and
-    Breakthrough for perfect information without chance events, Backgammon or
-    Pig for perfect information games with chance events, Goofspiel and
-    Oshi-Zumo for simultaneous move games, and Leduc poker and Liar’s dice for
-    imperfect information games. For the rest of these steps, we assume
+1.  Choose a game to copy from in `games/` (or `python/games/`). Suggested games:
+    Tic-Tac-Toe and Breakthrough for perfect information without chance events,
+    Backgammon or Pig for perfect information games with chance events, Goofspiel
+    and Oshi-Zumo for simultaneous move games, and Leduc poker and Liar’s dice
+    for imperfect information games. For the rest of these steps, we assume
     Tic-Tac-Toe.
 2.  Copy the header and source: `tic_tac_toe.h`, `tic_tac_toe.cc`, and
     `tic_tac_toe_test.cc` to `new_game.h`, `new_game.cc`, and
-    `new_game_test.cc`.
+    `new_game_test.cc` (or `tic_tac_toe.py` and `tic_tac_toe_test.py`).
 3.  Configure CMake:
-    *   Add the new game’s source files to `games/CMakeLists.txt`.
-    *   Add the new game’s test target to `games/CMakeLists.txt`.
-4.  Update boilerplate C++ code:
+    *   If you are working with C++: add the new game’s source files to `games/CMakeLists.txt`.
+    *   If you are working with C++: add the new game’s test target to `games/CMakeLists.txt`.
+    *   If you are working with Python: add the test to `python/CMakeLists.txt` and import it in `python/games/__init__.py`
+4.  Update boilerplate C++/Python code:
     *   In `new_game.h`, rename the header guard at the the top and bottom of
         the file.
     *   In the new files, rename the inner-most namespace from `tic_tac_toe` to
