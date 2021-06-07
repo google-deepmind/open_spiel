@@ -41,6 +41,12 @@ that may be useful.
     ```bash
     $ ./open_spiel/scripts/build_and_run_tests.sh
     ```
+    
+
+**Note:** If you are building from CentOS and/or encounter missing symbol errors
+(e.g. undefined reference to `memcpy@GLIBC_2.14`, `lgamma@GLIBC_2.23`, etc.),
+see solution steps described in
+[this issue](https://github.com/deepmind/open_spiel/issues/619#issuecomment-854126238).
 
 ## Starting LibTorch AlphaZero Training
 
