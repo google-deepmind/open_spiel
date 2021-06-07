@@ -50,4 +50,4 @@ fi
 MAKE_NUM_PROCS=$(${NPROC})
 let TEST_NUM_PROCS=4*${MAKE_NUM_PROCS}
 
-ctest -j$TEST_NUM_PROCS --output-on-failure -R "^python_*" ../open_spiel
+ctest -j$TEST_NUM_PROCS --output-on-failure -R "^python/*" ../open_spiel

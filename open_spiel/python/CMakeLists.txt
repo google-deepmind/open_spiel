@@ -279,14 +279,13 @@ set(WHEEL_EXCLUDED_PYTHON_TESTS
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))
-    get_filename_component(py_test ${py_test_file} NAME_WE)
-    add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+    add_test(NAME python/${py_test_file} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
     # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
     # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
     # CURRENT_SOURCE_DIR/../.. so that the Python module imports are of the form:
     #  from open_spiel.python import rl_environment.
-    set_property(TEST python_${py_test}
+    set_property(TEST python/${py_test_file}
         PROPERTY ENVIRONMENT
         PYTHONPATH=${OPEN_SPIEL_PYTHONPATH}
         TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
