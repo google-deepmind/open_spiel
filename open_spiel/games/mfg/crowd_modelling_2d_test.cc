@@ -127,10 +127,10 @@ void TestProcess() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::crowd_modelling::TestLoad();
-  open_spiel::crowd_modelling::TestLoadWithParams();
-  open_spiel::crowd_modelling::TestLoadWithParams2();
-  open_spiel::crowd_modelling::TestRandomPlay();
-  open_spiel::crowd_modelling::TestReward();
-  open_spiel::crowd_modelling::TestProcess();
+  open_spiel::crowd_modelling_2d::TestLoad();
+  open_spiel::crowd_modelling_2d::TestLoadWithParams();
+  open_spiel::crowd_modelling_2d::TestLoadWithParams2();
+  open_spiel::crowd_modelling_2d::TestRandomPlay();
+  open_spiel::crowd_modelling_2d::TestReward();
+  open_spiel::crowd_modelling_2d::TestProcess();
 }

@@ -33,6 +33,27 @@
 
 namespace open_spiel {
 namespace crowd_modelling_2d {
+
+std::vector<absl::string_view> ProcessStringParam(
+    const std::string& string_param_str, int max_size) {
+  // ProcessStringParam takes a parameter string and split it is a sequence of
+  // substring. Example:
+  // "" -> {}
+  // "[0|0;0|1]" -> {"0|0", "0|1"}
+  // "[0.5;0.5]" -> {"0.5", "0.5"}
+  absl::string_view string_param = absl::StripAsciiWhitespace(string_param_str);
+  SPIEL_CHECK_TRUE(absl::ConsumePrefix(&string_param, "["));
+  SPIEL_CHECK_TRUE(absl::ConsumeSuffix(&string_param, "]"));
+
+  std::vector<absl::string_view> split_string_list;
+  if (!string_param.empty()) {
+    split_string_list = absl::StrSplit(string_param, ';');
+  }
+  SPIEL_CHECK_GE(split_string_list.size(), 0);
+  SPIEL_CHECK_LE(split_string_list.size(), max_size * max_size);
+  return split_string_list;
+}
+
 namespace {
 
 // Facts about the game.
