@@ -112,13 +112,13 @@ void TestReward() {
 }
 
 void TestProcess() {
-  auto split_string_list0 = ProcessStringParam("[]", 5)
+  auto split_string_list0 = ProcessStringParam("[]", 5);
   SPIEL_CHECK_EQ(split_string_list0.size(), 0);
-  auto split_string_list1 = ProcessStringParam("[0|0;0|1]", 5)
+  auto split_string_list1 = ProcessStringParam("[0|0;0|1]", 5);
   SPIEL_CHECK_EQ(split_string_list1.size(), 2);
-  auto split_string_list2 = ProcessStringParam("[0|2;0|3;0|4]", 5)
+  auto split_string_list2 = ProcessStringParam("[0|2;0|3;0|4]", 5);
   SPIEL_CHECK_EQ(split_string_list2.size(), 3);
-  auto split_string_list3 = ProcessStringParam("[0.5;0.5]", 5)
+  auto split_string_list3 = ProcessStringParam("[0.5;0.5]", 5);
   SPIEL_CHECK_EQ(split_string_list3.size(), 2);
 }
 

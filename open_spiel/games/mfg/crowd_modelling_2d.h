@@ -51,6 +51,26 @@ inline constexpr const char* kInitialDistributionValue = "[]";  // "[0.5;0.5]"
 // Action that leads to no displacement on the torus of the game.
 inline constexpr int kNeutralAction = 2;
 
+std::vector<absl::string_view> ProcessStringParam(
+    const std::string& string_param_str, int max_size) {
+  // ProcessStringParam takes a parameter string and split it is a sequence of
+  // substring. Example:
+  // "" -> {}
+  // "[0|0;0|1]" -> {"0|0", "0|1"}
+  // "[0.5;0.5]" -> {"0.5", "0.5"}
+  absl::string_view string_param = absl::StripAsciiWhitespace(string_param_str);
+  SPIEL_CHECK_TRUE(absl::ConsumePrefix(&string_param, "["));
+  SPIEL_CHECK_TRUE(absl::ConsumeSuffix(&string_param, "]"));
+
+  std::vector<absl::string_view> split_string_list;
+  if (!string_param.empty()) {
+    split_string_list = absl::StrSplit(string_param, ';');
+  }
+  SPIEL_CHECK_GE(split_string_list.size(), 0);
+  SPIEL_CHECK_LE(split_string_list.size(), max_size * max_size);
+  return split_string_list;
+}
+
 // Game state.
 // The high-level state transitions are as follows:
 // - First game state is a chance node where the initial position on the
