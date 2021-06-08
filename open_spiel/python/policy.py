@@ -248,6 +248,8 @@ class TabularPolicy(Policy):
     probability = self.policy_for_key(self._state_key(state, player_id))
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
+    if not legal_actions:
+      return {0: 1.0}
     return {action: probability[action] for action in legal_actions}
 
   def state_index(self, state):
@@ -356,6 +358,8 @@ class UniformRandomPolicy(Policy):
     """
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
+    if not legal_actions:
+      return {0: 1.0}
     probability = 1 / len(legal_actions)
     return {action: probability for action in legal_actions}
 
@@ -370,6 +374,8 @@ class FirstActionPolicy(Policy):
   def action_probabilities(self, state, player_id=None):
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
+    if not legal_actions:
+      return {0: 1.0}
     min_action = min(legal_actions)
     return {action: 1.0 if action == min_action else 0.0
             for action in legal_actions}
