@@ -5,8 +5,11 @@ MAX_ACTIONS_PER_GAME = 1000
 SPIEL_GAMES_LIST = registered_games()
 
 SPIEL_LOADABLE_GAMES_LIST = [
-    g for g in SPIEL_GAMES_LIST if default_loadable(g)
+    g for g in SPIEL_GAMES_LIST 
+    if default_loadable(g) &&
+    (short_name(g) != "mfg_crowd_modelling_2d")
 ]
+# TODO(perolat): enable mfg_crowd_modelling_2d test
 
 @test length(SPIEL_LOADABLE_GAMES_LIST) >= 38
 
