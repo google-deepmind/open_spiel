@@ -326,7 +326,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       if (verbose) {
         std::cout << "sampled outcome: "
                   << state->ActionToString(kChancePlayerId, action)
-                  << "with prob " << prob
+                  << " with prob " << prob
                   << std::endl;
       }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
