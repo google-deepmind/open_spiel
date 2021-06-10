@@ -110,6 +110,8 @@ set(GAME_SOURCES
   pig.h
   quoridor.cc
   quoridor.h
+  rbc.cc
+  rbc.h
   sheriff.cc
   sheriff.h
   skat.cc
@@ -422,6 +424,11 @@ add_test(pig_test pig_test)
 add_executable(quoridor_test quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(quoridor_test quoridor_test)
+
+add_executable(rbc_test rbc_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(rbc_test rbc_test)
+
 
 add_executable(sheriff_test sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
