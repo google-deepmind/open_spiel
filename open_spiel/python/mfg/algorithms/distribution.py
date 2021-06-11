@@ -79,9 +79,7 @@ class DistributionPolicy(distribution.Distribution):
             if new_mfg_state_str not in new_distribution_over_states:
               new_listing_states.append(new_mfg_state)
             new_distribution_over_states[
-                new_mfg_state_str] += prob * self.distribution_over_states[
-                    mfg_state.observation_string(
-                        pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+                new_mfg_state_str] += prob * self.value(mfg_state)
 
       elif self.player_id_from_states(
           listing_states) == pyspiel.PlayerId.MEAN_FIELD:
@@ -96,8 +94,7 @@ class DistributionPolicy(distribution.Distribution):
           new_listing_states.append(new_mfg_state)
           new_distribution_over_states[new_mfg_state.observation_string(
               pyspiel.PlayerId.DEFAULT_PLAYER_ID
-          )] = self.distribution_over_states[mfg_state.observation_string(
-              pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+          )] = self.value(mfg_state)
 
       else:
         assert self.player_id_from_states(
@@ -115,9 +112,7 @@ class DistributionPolicy(distribution.Distribution):
             if new_mfg_state_str not in new_distribution_over_states:
               new_listing_states.append(new_mfg_state)
             new_distribution_over_states[
-                new_mfg_state_str] += prob * self.distribution_over_states[
-                    mfg_state.observation_string(
-                        pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+                new_mfg_state_str] += prob * self.value(mfg_state)
 
       assert all(state_str not in self.distribution_over_states
                  for state_str in new_distribution_over_states), (
