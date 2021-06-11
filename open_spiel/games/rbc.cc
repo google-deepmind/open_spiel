@@ -248,9 +248,6 @@ chess::ObservationTable ComputePrivateInfoTable(
   return observability_table;
 }
 
-
-
-
 bool ObserverHasString(IIGObservationType iig_obs_type) {
   return iig_obs_type.public_info &&
       iig_obs_type.private_info == PrivateInfoType::kSinglePlayer &&
@@ -282,20 +279,17 @@ class RbcObserver : public Observer {
           "RbcObserver: tensor with perfect recall not implemented.");
     }
 
-    const auto public_info_table = ComputePublicInfoTable(state.Board());
-
     if (iig_obs_type_.public_info) {
-      WritePublicInfoTensor(state, public_info_table, allocator);
+      WritePublicInfoTensor(state, allocator);
     }
     if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
       std::string prefix = "private";
-      WritePrivateInfoTensor(state, public_info_table, player, prefix,
-                             allocator);
+      WritePrivateInfoTensor(state, player, prefix, allocator);
     } else if (iig_obs_type_.private_info == PrivateInfoType::kAllPlayers) {
       for (int i = 0; i < chess::NumPlayers(); ++i) {
         chess::Color color = chess::PlayerToColor(player);
         std::string prefix = chess::ColorToString(color);
-        WritePrivateInfoTensor(state, public_info_table, i, prefix, allocator);
+        WritePrivateInfoTensor(state, i, prefix, allocator);
       }
     }
   }
@@ -329,47 +323,32 @@ class RbcObserver : public Observer {
  private:
   void WritePieces(chess::Color color, chess::PieceType piece_type,
                    const chess::ChessBoard& board,
-                   const chess::ObservationTable& observability_table,
+                   int sense_location, int sense_size,
                    const std::string& prefix, Allocator* allocator) const {
-    const std::string type_string =
-        color == chess::Color::kEmpty
-        ? "empty"
-        : chess::PieceTypeToString(
-            piece_type,
-            /*uppercase=*/color == chess::Color::kWhite);
+    const std::string type_string = chess::PieceTypeToString(
+            piece_type, /*uppercase=*/color == chess::Color::kWhite);
     const int board_size = board.BoardSize();
-
+    int inner_size = board_size - sense_size + 1;
+    chess::Square sense_square =
+        chess::IndexToSquare(sense_location, inner_size);
     auto out = allocator->Get(prefix + "_" + type_string + "_pieces",
                               {board_size, board_size});
-    for (int8_t y = 0; y < board_size; ++y) {
-      for (int8_t x = 0; x < board_size; ++x) {
+
+    if (sense_location < 0) return;  // No sense window specified.
+
+    SPIEL_DCHECK_LE(sense_square.x + sense_size, board_size);
+    SPIEL_DCHECK_LE(sense_square.y + sense_size, board_size);
+    for (int8_t x = sense_square.x; x < sense_square.x + sense_size; ++x) {
+      for (int8_t y = sense_square.y; y < sense_square.y + sense_size; ++y) {
         const chess::Square square{x, y};
         const chess::Piece& piece_on_board = board.at(square);
-        const bool write_square =
-            piece_on_board.color == color &&
-                piece_on_board.type == piece_type &&
-                observability_table[chess::SquareToIndex(square, board_size)];
+        const bool write_square = piece_on_board.color == color
+                               && piece_on_board.type == piece_type;
         out.at(x, y) = write_square ? 1.0f : 0.0f;
       }
     }
   }
 
-  void WriteUnknownSquares(const chess::ChessBoard& board,
-                           chess::ObservationTable& observability_table,
-                           const std::string& prefix,
-                           Allocator* allocator) const {
-    const int board_size = board.BoardSize();
-    auto out = allocator->Get(prefix + "_unknown_squares",
-                              {board.BoardSize(), board.BoardSize()});
-    for (int8_t y = 0; y < board_size; ++y) {
-      for (int8_t x = 0; x < board_size; ++x) {
-        const chess::Square square{x, y};
-        const bool write_square =
-            observability_table[chess::SquareToIndex(square, board_size)];
-        out.at(x, y) = write_square ? 0.0f : 1.0f;
-      }
-    }
-  }
 
   void WriteScalar(int val, int min, int max, const std::string& field_name,
                    Allocator* allocator) const {
@@ -387,23 +366,16 @@ class RbcObserver : public Observer {
   }
 
   void WritePrivateInfoTensor(const RbcState& state,
-                              const chess::ObservationTable& public_info_table,
                               int player, const std::string& prefix,
                               Allocator* allocator) const {
     chess::Color color = chess::PlayerToColor(player);
-    chess::ObservationTable private_info_table =
-        ComputePrivateInfoTable(state.Board(), color, public_info_table);
 
     // Piece configuration.
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
-      WritePieces(chess::Color::kWhite, piece_type, state.Board(),
-                  private_info_table, prefix, allocator);
-      WritePieces(chess::Color::kBlack, piece_type, state.Board(),
-                  private_info_table, prefix, allocator);
+      WritePieces(chess::Color{player}, piece_type, state.Board(),
+                  0, state.game()->board_size(),
+                  prefix, allocator);
     }
-    WritePieces(chess::Color::kEmpty, chess::PieceType::kEmpty, state.Board(),
-                private_info_table, prefix, allocator);
-    WriteUnknownSquares(state.Board(), private_info_table, prefix, allocator);
 
     // Castling rights.
     WriteBinary(
@@ -412,39 +384,49 @@ class RbcObserver : public Observer {
     WriteBinary(
         state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
         prefix + "_right_castling", allocator);
+
+    // Last sensing
+    for (const chess::PieceType& piece_type : chess::kPieceTypes) {
+      int sense_location = (state.phase_ == MovePhase::kMoving
+                            && state.CurrentPlayer() == player)
+                         ? state.sense_location_[player]
+                         // Make sure that sense from last round does not
+                         // reveal a new hidden move: allow players to perceive
+                         // only results of the last sensing.
+                         : kNonSpecifiedSenseLocation;
+      WritePieces(chess::Color{1 - player}, piece_type, state.Board(),
+                  sense_location, state.game()->sense_size(),
+                  prefix + "_sense", allocator);
+    }
   }
 
   void WritePublicInfoTensor(const RbcState& state,
-                             const chess::ObservationTable& public_info_table,
                              Allocator* allocator) const {
-    const auto entry = state.repetitions_.find(state.Board().HashValue());
-    SPIEL_CHECK_FALSE(entry == state.repetitions_.end());
-    int repetitions = entry->second;
-
-    // Piece configuration.
-    std::string prefix = "public";
-    for (const chess::PieceType& piece_type : chess::kPieceTypes) {
-      WritePieces(chess::Color::kWhite, piece_type, state.Board(),
-                  public_info_table, prefix, allocator);
-      WritePieces(chess::Color::kBlack, piece_type, state.Board(),
-                  public_info_table, prefix, allocator);
+    // Number of pieces of each player: Let's compute it.
+    const int board_size = state.game()->board_size();
+    std::array<int, 2> num_pieces = {0, 0};
+    for (int x = 0; x < board_size; ++x) {
+      for (int y = 0; y < board_size; ++y) {
+        for (int pl = 0; pl < 2; ++pl) {
+          num_pieces[pl] += state.Board().IsFriendly(chess::Square{x, y},
+                                                     chess::Color{pl});
+        }
+      }
     }
-    WritePieces(chess::Color::kEmpty, chess::PieceType::kEmpty, state.Board(),
-                public_info_table, prefix, allocator);
 
-    // Num repetitions for the current board.
-    WriteScalar(/*val=*/repetitions, /*min=*/1, /*max=*/3, "repetitions",
-                        allocator);
-
-    // Side to play.
-    WriteScalar(/*val=*/ColorToPlayer(state.Board().ToPlay()),
-        /*min=*/0, /*max=*/1, "side_to_play", allocator);
-
-    // Irreversible move counter.
-    auto out = allocator->Get("irreversible_move_counter", {1});
-    out.at(0) = state.Board().IrreversibleMoveCounter() / 100.;
+    {
+      auto out = allocator->Get("num_pieces", {board_size * 2, 2});
+      for (int pl = 0; pl < 2; ++pl) {
+        SPIEL_CHECK_LE(num_pieces[pl], board_size * 2);
+        if (num_pieces[pl]) out.at(num_pieces[pl] - 1, pl) = 1.;
+      }
+    }
+    {
+      auto out = allocator->Get("phase", {2});
+      if (state.phase_ == MovePhase::kSensing) out.at(0) = 1.;
+      else out.at(1) = 1.;
+    }
   }
-
   IIGObservationType iig_obs_type_;
 };
 
@@ -459,7 +441,7 @@ RbcState::RbcState(std::shared_ptr<const Game> game, int board_size,
 
 void RbcState::DoApplyAction(Action action) {
   if (phase_ == MovePhase::kSensing) {
-    sense_location_ = action;
+    sense_location_[CurrentPlayer()] = action;
     phase_ = MovePhase::kMoving;
   } else {
     chess::Move move = ActionToMove(action, Board());
@@ -499,8 +481,10 @@ std::vector<Action> RbcState::LegalActions() const {
 
 std::string RbcState::ActionToString(Player player, Action action) const {
   if (phase_ == MovePhase::kSensing) {
-    // TODO corners in chess notation.
-    return absl::StrCat("Sense ", " to ");
+    int inner_size = game()->board_size() - game()->sense_size() + 1;
+    std::string from =
+        chess::SquareToString(chess::IndexToSquare(action, inner_size));
+    return absl::StrCat("Sense ", from);
   } else {
     chess::Move move = ActionToMove(action, Board());
     return move.ToSAN(Board());

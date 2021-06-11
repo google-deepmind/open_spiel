@@ -90,6 +90,9 @@ enum class MovePhase {
   kSensing,  // First sense.
   kMoving,   // Then make a regular move.
 };
+// Special value if sense location is not specified (beginning of the game,
+// or if we want to hide the sensing results).
+constexpr int kNonSpecifiedSenseLocation = -1;
 
 // State of an in-play game.
 class RbcState : public State {
@@ -167,8 +170,9 @@ class RbcState : public State {
   chess::ChessBoard current_board_;
   // How to interpret current actions.
   MovePhase phase_;
-  // Which place was the last sensing made at?
-  int sense_location_;
+  // Which place was the last sensing made at? (for each player)
+  std::array<int, 2> sense_location_ = {kNonSpecifiedSenseLocation,
+                                        kNonSpecifiedSenseLocation};
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
