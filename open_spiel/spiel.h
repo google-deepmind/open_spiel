@@ -676,7 +676,7 @@ class State {
   // needs to be updated. States are identified by their corresponding string
   // representation.
   virtual std::vector<std::string> DistributionSupport() {
-    SpielFatalError("UpdateDistribution has not been implemented");
+    SpielFatalError("DistributionSupport has not been implemented");
   }
   // Update the state distribution. `distribution[i]` must correspond to
   // `DistributionSupport()[i]`. After this is called, the state will be of
