@@ -65,6 +65,7 @@ class DistributionPolicy(distribution.Distribution):
 
     while not self.is_terminal_from_states(listing_states):
       new_listing_states = []
+      new_distribution_over_states = collections.defaultdict(float)
 
       if self.player_id_from_states(listing_states) == pyspiel.PlayerId.CHANCE:
         for mfg_state in listing_states:
@@ -72,9 +73,12 @@ class DistributionPolicy(distribution.Distribution):
             new_mfg_state = mfg_state.child(action)
             new_mfg_state_str = new_mfg_state.observation_string(
                 pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-            if new_mfg_state_str not in self.distribution_over_states:
+            # as a state can be the child of two different parent states, we do
+            # not add it in the new states if it has already been seen in this
+            # iteration.
+            if new_mfg_state_str not in new_distribution_over_states:
               new_listing_states.append(new_mfg_state)
-            self.distribution_over_states[
+            new_distribution_over_states[
                 new_mfg_state_str] += prob * self.distribution_over_states[
                     mfg_state.observation_string(
                         pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
@@ -90,26 +94,39 @@ class DistributionPolicy(distribution.Distribution):
           new_mfg_state = mfg_state.clone()
           new_mfg_state.update_distribution(dist)
           new_listing_states.append(new_mfg_state)
-          self.distribution_over_states[new_mfg_state.observation_string(
+          new_distribution_over_states[new_mfg_state.observation_string(
               pyspiel.PlayerId.DEFAULT_PLAYER_ID
           )] = self.distribution_over_states[mfg_state.observation_string(
               pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
 
       else:
         assert self.player_id_from_states(
-            listing_states) == 0, "The player id should be 0"
+            listing_states) == pyspiel.PlayerId.DEFAULT_PLAYER_ID, (
+          f"The player id should be {pyspiel.PlayerId.DEFAULT_PLAYER_ID}")
         for mfg_state in listing_states:
           for action, prob in self._policy.action_probabilities(
               mfg_state).items():
             new_mfg_state = mfg_state.child(action)
             new_mfg_state_str = new_mfg_state.observation_string(
                 pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-            if new_mfg_state_str not in self.distribution_over_states:
+            # as a state can be the child of two different parent states, we do
+            # not add it in the new states if it has already been seen in this
+            # iteration.
+            if new_mfg_state_str not in new_distribution_over_states:
               new_listing_states.append(new_mfg_state)
-            self.distribution_over_states[
+            new_distribution_over_states[
                 new_mfg_state_str] += prob * self.distribution_over_states[
                     mfg_state.observation_string(
                         pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+
+      assert all(state_str not in self.distribution_over_states
+                 for state_str in new_distribution_over_states), (
+        "Some new states have the same string representation of old states.")
+      self.distribution_over_states.update(new_distribution_over_states)
+      sum_state_probabilities = sum(map(self.value, new_listing_states))
+      assert abs(sum_state_probabilities - 1) < 1e-4, (
+        "Sum of probabilities off all possible states should be 1, it is "
+        f"{sum_state_probabilities}.")
       listing_states = new_listing_states
 
   def value(self, mfg_state):
