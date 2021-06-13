@@ -85,11 +85,12 @@ class BestResponse(value.ValueFunction):
     assert state.current_player() == pyspiel.PlayerId.DEFAULT_PLAYER_ID, (
       "The player id should be 0")
     state_legal_actions = state.legal_actions()
-    max_q = 0
     if state_legal_actions:
       max_q = max(
           self.eval_state(state.child(action))
           for action in state_legal_actions)
+    else:
+      max_q = self.eval_state(state.child(0))
     self._state_value[state_str] = state.rewards()[0] + max_q
     return self._state_value[state_str]
 

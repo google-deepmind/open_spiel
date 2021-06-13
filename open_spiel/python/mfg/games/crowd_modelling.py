@@ -214,7 +214,6 @@ class MFGCrowdModellingState(pyspiel.State):
       - function should be called when the node is in MEAN_FIELD state.
       - distribution are probabilities that correspond to each game state
       given by distribution_support.
-
     """
     if self._player_id != pyspiel.PlayerId.MEAN_FIELD:
       raise ValueError(
