@@ -44,10 +44,15 @@ inline constexpr int kDefaultHorizon = 10;
 inline constexpr int kDefaultSize = 10;
 inline constexpr int kNumActions = 5;
 inline constexpr int kNumChanceActions = 5;
-inline constexpr bool kOnlyDistributionReward = false;
-inline constexpr const char* kForbiddenStates = "[]";  // "[0|0;0|1]"
-inline constexpr const char* kInitialDistribution = "[]";  // "[0|2;0|3]"
-inline constexpr const char* kInitialDistributionValue = "[]";  // "[0.5;0.5]"
+inline constexpr bool kDefaultOnlyDistributionReward = false;
+
+// Example string format: "[0|0;0|1]"
+inline constexpr const char* kDefaultForbiddenStates = "[]";
+// Example string format: "[0|2;0|3]"
+inline constexpr const char* kDefaultInitialDistribution = "[]";
+// Example string format: "[0.5;0.5]"
+inline constexpr const char* kDefaultInitialDistributionValue = "[]";
+
 // Action that leads to no displacement on the torus of the game.
 inline constexpr int kNeutralAction = 2;
 
@@ -66,20 +71,28 @@ std::vector<absl::string_view> ProcessStringParam(
 // 3. Chance node, where one of {down, left, neutral, right, up} actions is
 // externally selected.
 // The game stops after a non-initial chance node when the horizon is reached.
-class CrowdModellingState : public State {
+class CrowdModelling2dState : public State {
  public:
   // forbidden_states and initial_distribution are formated like
   // '[int|int;...;int|int]'. Example : "[]" or "[0|0;0|1]".
   // initial_distribution_value is formated like '[float;...;float]'. Example :
   // "[]" or "[0.5;0.5]"
-  CrowdModellingState(std::shared_ptr<const Game> game, int size, int horizon,
-                      bool only_distribution_reward,
-                      const std::string& forbidden_states,
-                      const std::string& initial_distribution,
-                      const std::string& initial_distribution_value);
+  CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
+                        bool only_distribution_reward,
+                        const std::string& forbidden_states,
+                        const std::string& initial_distribution,
+                        const std::string& initial_distribution_value);
+  CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
+                        bool only_distribution_reward,
+                        const std::string& forbidden_states,
+                        const std::string& initial_distribution,
+                        const std::string& initial_distribution_value,
+                        Player current_player, bool is_chance_init_, int x,
+                        int y, int t, int last_action, double return_value,
+                        const std::vector<double>& distribution);
 
-  CrowdModellingState(const CrowdModellingState&) = default;
-  CrowdModellingState& operator=(const CrowdModellingState&) = default;
+  CrowdModelling2dState(const CrowdModelling2dState&) = default;
+  CrowdModelling2dState& operator=(const CrowdModelling2dState&) = default;
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
@@ -100,6 +113,8 @@ class CrowdModellingState : public State {
   std::vector<std::string> DistributionSupport() override;
   void UpdateDistribution(const std::vector<double>& distribution) override;
 
+  std::string Serialize() const override;
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -115,14 +130,10 @@ class CrowdModellingState : public State {
   const int size_ = -1;
   const int horizon_ = -1;
   const bool only_distribution_reward_ = false;
-  std::string forbidden_states_;  // Default "", example "[0|0;0|1]"
-  std::string initial_distribution_;  // Default "", example  "[0|2;0|3]"
-  std::string initial_distribution_value_;  // Default "", example "[0.5;0.5]"
   ActionsAndProbs initial_distribution_action_prob_;
   std::vector<std::pair<int, int>> forbidden_states_xy_;
   int last_action_ = kNeutralAction;
   double return_value_ = 0.;
-
 
   // kActionToMoveX[action] and kActionToMoveY[action] is the displacement on
   // the torus of the game for 'action'.
@@ -132,18 +143,14 @@ class CrowdModellingState : public State {
   std::vector<double> distribution_;
 };
 
-class CrowdModellingGame : public Game {
+class CrowdModelling2dGame : public Game {
  public:
-  explicit CrowdModellingGame(const GameParameters& params);
+  explicit CrowdModelling2dGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<CrowdModellingState>(
-        shared_from_this(), ParameterValue<int>("size"),
-        ParameterValue<int>("horizon"),
-        ParameterValue<bool>("only_distribution_reward"),
-        ParameterValue<std::string>("forbidden_states"),
-        ParameterValue<std::string>("initial_distribution"),
-        ParameterValue<std::string>("initial_distribution_value"));
+    return absl::make_unique<CrowdModelling2dState>(
+        shared_from_this(), size_, horizon_, only_distribution_reward_,
+        forbidden_states_, initial_distribution_, initial_distribution_value_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -153,17 +160,25 @@ class CrowdModellingGame : public Game {
   double MaxUtility() const override {
     return std::numeric_limits<double>::infinity();
   }
-  int MaxGameLength() const override {
-    return ParameterValue<int>("horizon", kDefaultHorizon);
-  }
+  int MaxGameLength() const override { return horizon_; }
   int MaxChanceNodesInHistory() const override {
     // + 1 to account for the initial extra chance node.
-    return ParameterValue<int>("horizon", kDefaultHorizon) + 1;
+    return horizon_ + 1;
   }
   std::vector<int> ObservationTensorShape() const override;
   int MaxChanceOutcomes() const override {
-    return std::max(ParameterValue<int>("size"), kNumChanceActions);
+    return std::max(size_, kNumChanceActions);
   }
+  std::unique_ptr<State> DeserializeState(
+      const std::string& str) const override;
+
+ private:
+  const int size_;
+  const int horizon_;
+  const bool only_distribution_reward_;
+  std::string forbidden_states_;            // Default "", example "[0|0;0|1]"
+  std::string initial_distribution_;        // Default "", example  "[0|2;0|3]"
+  std::string initial_distribution_value_;  // Default "", example "[0.5;0.5]"
 };
 
 }  // namespace crowd_modelling_2d

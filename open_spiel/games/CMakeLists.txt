@@ -287,10 +287,9 @@ add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJ
                $<TARGET_OBJECTS:tests>)
 add_test(crowd_modelling_test crowd_modelling_test)
 
-#TODO(perolat): re-enable this when serialization working.
-#add_executable(crowd_modelling_2d_test mfg/crowd_modelling_2d_test.cc ${OPEN_SPIEL_OBJECTS}
-#               $<TARGET_OBJECTS:tests>)
-#add_test(crowd_modelling_2d_test crowd_modelling_2d_test)
+add_executable(crowd_modelling_2d_test mfg/crowd_modelling_2d_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crowd_modelling_2d_test crowd_modelling_2d_test)
 
 add_executable(cursor_go_test cursor_go_test.cc
                ${OPEN_SPIEL_OBJECTS}

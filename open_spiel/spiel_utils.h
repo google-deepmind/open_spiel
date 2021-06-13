@@ -175,6 +175,12 @@ std::string FormatDouble(double value);
 // Converts a bool to either "true" or "false".
 std::string BoolToStr(bool b);
 
+// Converts a vector of pairs to a string.
+template <class A, class B>
+std::string VectorOfPairsToString(const std::vector<std::pair<A, B>>& vec,
+                                  const std::string& delimiter,
+                                  const std::string& pair_delimiter);
+
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
 template <typename T>

@@ -84,12 +84,10 @@ CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
       horizon_(horizon),
       distribution_(size_, 1. / size_) {}
 
-CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
-                                         int size, int horizon,
-                                         Player current_player,
-                                         bool is_chance_init, int x, int t,
-                                         int last_action, double return_value,
-                                         std::vector<double> distribution)
+CrowdModellingState::CrowdModellingState(
+    std::shared_ptr<const Game> game, int size, int horizon,
+    Player current_player, bool is_chance_init, int x, int t, int last_action,
+    double return_value, const std::vector<double>& distribution)
     : State(game),
       size_(size),
       horizon_(horizon),
@@ -99,7 +97,7 @@ CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
       t_(t),
       last_action_(last_action),
       return_value_(return_value),
-      distribution_(std::move(distribution)) {}
+      distribution_(distribution) {}
 
 std::vector<Action> CrowdModellingState::LegalActions() const {
   if (IsTerminal()) return {};
@@ -230,11 +228,13 @@ std::string CrowdModellingState::Serialize() const {
 }
 
 CrowdModellingGame::CrowdModellingGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      size_(ParameterValue<int>("size", kDefaultSize)),
+      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)) {}
 
 std::vector<int> CrowdModellingGame::ObservationTensorShape() const {
   // +1 to allow for t_ == horizon.
-  return {ParameterValue<int>("size") + ParameterValue<int>("horizon") + 1};
+  return {size_ + horizon_ + 1};
 }
 
 std::unique_ptr<State> CrowdModellingGame::DeserializeState(
@@ -271,9 +271,8 @@ std::unique_ptr<State> CrowdModellingGame::DeserializeState(
     distribution.push_back(parsed_weight);
   }
   return absl::make_unique<CrowdModellingState>(
-      shared_from_this(), ParameterValue<int>("size"),
-      ParameterValue<int>("horizon"), current_player, is_chance_init, x, t,
-      last_action, return_value, std::move(distribution));
+      shared_from_this(), size_, horizon_, current_player, is_chance_init, x, t,
+      last_action, return_value, distribution);
 }
 
 }  // namespace crowd_modelling
