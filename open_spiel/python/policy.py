@@ -245,11 +245,11 @@ class TabularPolicy(Policy):
 
   def action_probabilities(self, state, player_id=None):
     """Returns an {action: probability} dict, covering all legal actions."""
-    probability = self.policy_for_key(self._state_key(state, player_id))
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
     if not legal_actions:
       return {0: 1.0}
+    probability = self.policy_for_key(self._state_key(state, player_id))
     return {action: probability[action] for action in legal_actions}
 
   def state_index(self, state):
