@@ -72,8 +72,14 @@ class MFGCrowdModellingGame(pyspiel.Game):
   """
 
   # pylint:disable=dangerous-default-value
-  def __init__(self, params: Mapping[str, Any] = _DEFAULT_PARAMS):
-    super().__init__(_GAME_TYPE, _GAME_INFO, params)
+  def __init__(
+    self, params: Mapping[str, Any] = None, game_info: Mapping[str, Any] = None
+  ):
+    if game_info is None:
+      game_info = _GAME_INFO
+    super().__init__(_GAME_TYPE, game_info, params)
+    if params is None:
+      params = _DEFAULT_PARAMS
     self.size = params["size"]
     self.horizon = params["horizon"]
 
@@ -86,8 +92,7 @@ class MFGCrowdModellingGame(pyspiel.Game):
     if ((iig_obs_type is None) or
         (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
       return Observer(params, self)
-    else:
-      return IIGObserverForPublicInfoGame(iig_obs_type, params)
+    return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
 
 class MFGCrowdModellingState(pyspiel.State):
@@ -219,7 +224,7 @@ class MFGCrowdModellingState(pyspiel.State):
 
   def is_terminal(self):
     """Returns True if the game is over."""
-    return self._t >= self.horizon
+    return self.t >= self.horizon
 
   def current_player(self):
     """Returns id of the next player to move, or TERMINAL if game is over."""
@@ -231,9 +236,9 @@ class MFGCrowdModellingState(pyspiel.State):
   def _rewards(self):
     """Reward for the player for this state."""
     if self._player_id == 0:
-      r_x = 1 - (1.0 * np.abs(self._x - self.size // 2)) / (self.size // 2)
+      r_x = 1 - (1.0 * np.abs(self.x - self.size // 2)) / (self.size // 2)
       r_a = -(1.0 * np.abs(self._ACTION_TO_MOVE[self._last_action])) / self.size
-      r_mu = - np.log(self._distribution[self._x])
+      r_mu = - np.log(self._distribution[self.x])
       return r_x + r_a + r_mu
     else:
       return 0.0
@@ -256,7 +261,7 @@ class MFGCrowdModellingState(pyspiel.State):
 
   def __str__(self):
     """A string that uniquely identify the current state."""
-    return self.state_to_str(self._x, self._t, player_id=self._player_id)
+    return self.state_to_str(self.x, self.t, player_id=self._player_id)
 
 
 class Observer:
