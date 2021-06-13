@@ -51,6 +51,9 @@ inline constexpr const char* kInitialDistributionValue = "[]";  // "[0.5;0.5]"
 // Action that leads to no displacement on the torus of the game.
 inline constexpr int kNeutralAction = 2;
 
+std::vector<absl::string_view> ProcessStringParam(
+    const std::string& string_param_str, int max_size);
+
 // Game state.
 // The high-level state transitions are as follows:
 // - First game state is a chance node where the initial position on the
