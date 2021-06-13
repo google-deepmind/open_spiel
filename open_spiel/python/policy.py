@@ -265,7 +265,13 @@ class TabularPolicy(Policy):
       tabular_policy.policy_for_key(s)[:] = [0.1, 0.5, 0.4]
       ```
     """
-    return self.action_probability_array[self.state_lookup[key]]
+    try:
+      return self.action_probability_array[self.state_lookup[key]]
+    except KeyError:
+      # In case they are no legal actions in a state, then the state
+      # will not be added to action_probability_array in the initialization,
+      # therefore 0 should be played.
+      return {0: 1}
 
   def __copy__(self, copy_action_probability_array=True):
     """Returns a shallow copy of self.

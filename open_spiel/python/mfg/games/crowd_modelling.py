@@ -77,9 +77,9 @@ class MFGCrowdModellingGame(pyspiel.Game):
   ):
     if game_info is None:
       game_info = _GAME_INFO
-    super().__init__(_GAME_TYPE, game_info, params)
     if params is None:
       params = _DEFAULT_PARAMS
+    super().__init__(_GAME_TYPE, game_info, params)
     self.size = params["size"]
     self.horizon = params["horizon"]
 
