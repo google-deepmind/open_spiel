@@ -66,7 +66,7 @@ class BestResponse(value.ValueFunction):
       self._state_value[state_str] = state.rewards()[0]
       return self._state_value[state_str]
     elif state.current_player() == pyspiel.PlayerId.CHANCE:
-      self._state_value[state_str] = state.rewards()[0]
+      self._state_value[state_str] = 0.0
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
         self._state_value[state_str] += prob * self.eval_state(new_state)
