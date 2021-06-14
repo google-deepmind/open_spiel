@@ -39,7 +39,9 @@ void TestLoad() {
 }
 
 void TestLoadWithParams() {
-  auto game = LoadGame("mfg_crowd_modelling_2d(size=100,horizon=1000)");
+  auto game = LoadGame(
+      "mfg_crowd_modelling_2d(size=100,horizon=1000,"
+      "only_distribution_reward=true)");
   auto state = game->NewInitialState();
   SPIEL_CHECK_EQ(game->ObservationTensorShape()[0], 1000 + 2 * 100);
 }

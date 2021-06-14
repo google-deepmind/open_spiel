@@ -419,7 +419,7 @@ CrowdModelling2dGame::CrowdModelling2dGame(const GameParameters& params)
     : Game(kGameType, params),
       size_(ParameterValue<int>("size", kDefaultSize)),
       horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
-      only_distribution_reward_(ParameterValue<int>(
+      only_distribution_reward_(ParameterValue<bool>(
           "only_distribution_reward", kDefaultOnlyDistributionReward)),
       forbidden_states_(ParameterValue<std::string>("forbidden_states",
                                                     kDefaultForbiddenStates)),
