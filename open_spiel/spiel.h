@@ -610,8 +610,8 @@ class State {
     return outcome_list;
   }
 
-  // Returns the type of the state. Either Chance, Terminal, or Decision. See
-  // StateType definition for definitions of the different types.
+  // Returns the type of the state. Either Chance, Terminal, MeanField or
+  // Decision. See StateType definition for definitions of the different types.
   StateType GetType() const;
 
   // Serializes a state into a string.
@@ -667,23 +667,30 @@ class State {
     return {};
   }
 
-  // These functions only apply to mean field games and should only be called
-  // when CurrentPlayer() == kMeanFieldPlayerId.
+  // These functions only apply to mean field games.
   // Mean field game support in open_spiel is experimental, and these functions
   // are subject to change.
 
   // At the current mean field node, the support of the state distribution that
   // needs to be updated. States are identified by their corresponding string
-  // representation.
+  // representation. In multi-population mean field nodes, the support will
+  // typically include states for all the populations.
+  // This should only be called when when CurrentPlayer() == kMeanFieldPlayerId.
   virtual std::vector<std::string> DistributionSupport() {
     SpielFatalError("DistributionSupport has not been implemented");
   }
   // Update the state distribution. `distribution[i]` must correspond to
   // `DistributionSupport()[i]`. After this is called, the state will be of
   // Chance type.
+  // This should only be called when when CurrentPlayer() == kMeanFieldPlayerId.
   virtual void UpdateDistribution(const std::vector<double>& distribution) {
     SpielFatalError("UpdateDistribution has not been implemented");
   }
+
+  // Only makes sense for mean field games. This is the population a state
+  // belongs to. It returns 0 by default, so multi-population mean field games
+  // should override this function.
+  virtual int MeanFieldPopulation() const;
 
  protected:
   // See ApplyAction.
@@ -738,6 +745,14 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
+
+  // Returns newly allocated initial states. In most cases, this will be a
+  // single state.
+  // Games with multi-population mean field dynamics have multiple initial
+  // states, one per population. In that case, N initial states will be
+  // returned, from population 0 to population N-1 (where N is the number of
+  // populations, which is equal to the number of players).
+  virtual std::vector<std::unique_ptr<State>> NewInitialStates() const;
 
   // Maximum number of distinct chance outcomes for chance nodes in the game.
   virtual int MaxChanceOutcomes() const { return 0; }
@@ -921,6 +936,16 @@ class Game : public std::enable_shared_from_this<Game> {
   // or string as defined directly on the state.
   std::shared_ptr<Observer> MakeBuiltInObserver(
       absl::optional<IIGObservationType> iig_obs_type) const;
+
+  // Public member functions below only apply to games with mean field dynamics.
+
+  // Creates a new initial state for the given population (which must be in [0,
+  // NumPlayers())). This must be implemented for multi-population mean field
+  // games.
+  virtual std::unique_ptr<State> NewInitialStateForPopulation(
+      int population) const {
+    SpielFatalError("NewInitialStateForPopulation is not implemented.");
+  }
 
  protected:
   Game(GameType game_type, GameParameters game_parameters)

@@ -38,7 +38,7 @@ class BestResponseTest(absltest.TestCase):
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.6532391712469803)
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), [0.6532391712469803])
 
   def test_average(self):
     """Test the average of policies.
@@ -73,7 +73,7 @@ class BestResponseTest(absltest.TestCase):
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.6532391712469803)
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), [0.6532391712469803])
 
 
 if __name__ == "__main__":

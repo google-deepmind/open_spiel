@@ -33,6 +33,8 @@ class PyGame : public Game {
 
   // Implementation of the Game API.
   std::unique_ptr<State> NewInitialState() const override;
+  std::unique_ptr<State> NewInitialStateForPopulation(
+      int population) const override;
   int NumDistinctActions() const override { return info_.num_distinct_actions; }
   int NumPlayers() const override { return info_.num_players; }
   double MinUtility() const override { return info_.min_utility; }
@@ -85,6 +87,7 @@ class PyState : public State, public py::trampoline_self_life_support {
                          absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
   std::string Serialize() const override;
+  int MeanFieldPopulation() const override;
 
   // Python-specific details.
   void Deserialize(const std::string& str);

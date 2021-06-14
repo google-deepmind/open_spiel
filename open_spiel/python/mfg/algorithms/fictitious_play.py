@@ -39,12 +39,16 @@ class MergedPolicy(policy_std.Policy):
         be in the range 0..game.num_players()-1.
       policies: A `List[policy_std.Policy]` object.
       distributions: A `List[distribution_std.Distribution]` object.
-      weights: A `List[float]` object.
+      weights: A `List[float]` object. They should sum to 1.
     """
     super(MergedPolicy, self).__init__(game, player_ids)
     self._policies = policies
     self._distributions = distributions
     self._weights = weights
+    assert len(policies) == len(distributions), (
+        f'Length mismatch {len(policies)} != {len(distributions)}')
+    assert len(policies) == len(weights), (
+        f'Length mismatch {len(policies)} != {len(weights)}')
 
   def action_probabilities(self, state, player_id=None):
     action_prob = []

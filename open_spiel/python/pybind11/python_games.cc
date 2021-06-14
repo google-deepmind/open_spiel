@@ -40,6 +40,13 @@ std::unique_ptr<State> PyGame::NewInitialState() const {
                               NewInitialState);
 }
 
+std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
+    int population) const {
+  PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game,
+                              "new_initial_state_for_population",
+                              NewInitialStateForPopulation, population);
+}
+
 const Observer& PyGame::default_observer() const {
   if (!default_observer_) default_observer_ = MakeObserver(kDefaultObsType, {});
   return *default_observer_;
@@ -345,6 +352,14 @@ std::string PyState::Serialize() const {
       "\n", kTagMoveNumber, move_number_, "\n",
       // Python attributes
       kTagDict, encode_dict(PyDict(*this)));
+}
+
+int PyState::MeanFieldPopulation() const {
+  // Use a python population() implementation if available.
+  PYBIND11_OVERRIDE_IMPL(int, State, "mean_field_population");
+
+  // Otherwise, default to behavior from the base class.
+  return State::MeanFieldPopulation();
 }
 
 }  // namespace open_spiel
