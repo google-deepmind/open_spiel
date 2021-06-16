@@ -215,9 +215,7 @@ class State {
 
   // Change the state of the game by applying the specified action in turn-based
   // games or in non-simultaneous nodes of simultaneous move games.
-  // This function encodes the logic of the game rules. Returns true
-  // on success. In simultaneous games, returns false (ApplyActions should be
-  // used in that case.)
+  // This function encodes the logic of the game rules.
   //
   // In the case of chance nodes, the behavior of this function depends on
   // GameType::chance_mode. If kExplicit, then the outcome should be
