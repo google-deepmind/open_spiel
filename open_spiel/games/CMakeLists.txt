@@ -487,8 +487,4 @@ add_executable(yorktown_test yorktown_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:algorithms>)
 add_test(yorktown_test yorktown_test)
 
-#add_executable(yorktown_board_test yorktown/yorktown_board_test.cc ${OPEN_SPIEL_OBJECTS}
-#               $<TARGET_OBJECTS:tests>
-#               $<TARGET_OBJECTS:algorithms>)
-#add_test(yorktown_test yorktown_test)
 
