@@ -107,6 +107,7 @@ EXPECTED_GAMES = set([
     "trade_comm",
     "turn_based_simultaneous_game",
     "y",
+    "yorktown",
 ])
 
 
