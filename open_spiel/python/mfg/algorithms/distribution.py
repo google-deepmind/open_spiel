@@ -33,7 +33,6 @@ class DistributionPolicy(distribution.Distribution):
     """
     super(DistributionPolicy, self).__init__(game)
     self._policy = policy
-    self.game = game
     if root_state is None:
       self._root_states = game.new_initial_states()
     else:
@@ -88,13 +87,8 @@ class DistributionPolicy(distribution.Distribution):
             pyspiel.StateType.MEAN_FIELD):
         for mfg_state in listing_states:
           dist_to_register = mfg_state.distribution_support()
-          def get_probability_for_state(str_state):
-            try:
-              return self.value_str(str_state)
-            except ValueError:
-              return 0
           dist = [
-            get_probability_for_state(str_state)
+            self.distribution.get(str_state, 0.)
             for str_state in dist_to_register
           ]
           assert abs(sum(dist) - self.game.num_players()) < 1e-4, (
@@ -142,6 +136,5 @@ class DistributionPolicy(distribution.Distribution):
     try:
       return self.distribution[mfg_state_str]
     except KeyError as e:
-      # Check this because self.distribution is a default dict.
       raise ValueError(
         f'Distribution not computed for state {mfg_state_str}') from e
