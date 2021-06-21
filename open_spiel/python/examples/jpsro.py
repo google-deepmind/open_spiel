@@ -14,8 +14,22 @@
 
 """Joint Policy-Space Response Oracles.
 
-Bibtex:
-TODO(marris): Add ICML citation.
+An implementation of JSPRO, described in https://arxiv.org/abs/2106.09435.
+
+Bibtex / Cite:
+
+```
+@misc{marris2021multiagent,
+    title={Multi-Agent Training beyond Zero-Sum with Correlated Equilibrium
+           Meta-Solvers},
+    author={Luke Marris and Paul Muller and Marc Lanctot and Karl Tuyls and
+            Thore Grapael},
+    year={2021},
+    eprint={2106.09435},
+    archivePrefix={arXiv},
+    primaryClass={cs.MA}
+}
+```
 """
 
 from absl import app
