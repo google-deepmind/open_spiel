@@ -33,6 +33,7 @@ class DistributionPolicy(distribution.Distribution):
     """
     super(DistributionPolicy, self).__init__(game)
     self._policy = policy
+    self.game = game
     if root_state is None:
       self._root_states = game.new_initial_states()
     else:
@@ -61,7 +62,7 @@ class DistributionPolicy(distribution.Distribution):
     # Maps state strings to floats. For each group of states at a
     # given timestep, given player ID and given population, these
     # floats represent a probability distribution.
-    self.distribution = collections.defaultdict(float)
+    self.distribution = {}
     for state in listing_states:
       self.distribution[state.observation_string(
           pyspiel.PlayerId.DEFAULT_PLAYER_ID)] = 1.
@@ -87,10 +88,18 @@ class DistributionPolicy(distribution.Distribution):
             pyspiel.StateType.MEAN_FIELD):
         for mfg_state in listing_states:
           dist_to_register = mfg_state.distribution_support()
-          dist = list(map(self.value_str, dist_to_register))
-          assert (sum(dist) - len(self._root_states)) < 1e-4, (
-            "Sum of probabilities of all possible states should be the number of "
-            f"population, it is {sum(dist)}.")
+          def get_probability_for_state(str_state):
+            try:
+              return self.value_str(str_state)
+            except ValueError:
+              return 0
+          dist = [
+            get_probability_for_state(str_state)
+            for str_state in dist_to_register
+          ]
+          assert (sum(dist) - self.game.num_players()) < 1e-4, (
+            "Sum of probabilities of all possible states should be the number "
+            f"of population, it is {sum(dist)}.")
           new_mfg_state = mfg_state.clone()
           new_mfg_state.update_distribution(dist)
           new_listing_states.append(new_mfg_state)
@@ -113,12 +122,14 @@ class DistributionPolicy(distribution.Distribution):
               new_listing_states.append(new_mfg_state)
             new_distribution[new_mfg_state_str] += prob * self.value(mfg_state)
 
-      assert all(state_str not in self.distribution
-            for state_str in new_distribution), (
-          "Some new states have the same string representation of old states.")
+      for state_str in new_distribution:
+        if state_str in self.distribution:
+          raise ValueError(
+            f'{state_str} has already been seen in distribution.')
       self.distribution.update(new_distribution)
-      sum_state_probabilities = sum(map(self.value, new_listing_states))
-      assert abs(sum_state_probabilities - len(self._root_states)) < 1e-4, (
+      sum_state_probabilities = sum(
+        [self.value(state) for state in new_listing_states])
+      assert abs(sum_state_probabilities - self.game.num_players()) < 1e-4, (
         "Sum of probabilities of all possible states should be the number of "
         f"population, it is {sum_state_probabilities}.")
       listing_states = new_listing_states
@@ -128,8 +139,9 @@ class DistributionPolicy(distribution.Distribution):
         mfg_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
 
   def value_str(self, mfg_state_str):
-    v = self.distribution.get(mfg_state_str)
-    if v is None:
+    try:
+      return self.distribution[mfg_state_str]
+    except KeyError as e:
       # Check this because self.distribution is a default dict.
-      raise ValueError(f'Distribution not computed for state {mfg_state_str}')
-    return v
+      raise ValueError(
+        f'Distribution not computed for state {mfg_state_str}') from e
