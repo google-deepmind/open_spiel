@@ -97,7 +97,7 @@ class DistributionPolicy(distribution.Distribution):
             get_probability_for_state(str_state)
             for str_state in dist_to_register
           ]
-          assert (sum(dist) - self.game.num_players()) < 1e-4, (
+          assert abs(sum(dist) - self.game.num_players()) < 1e-4, (
             "Sum of probabilities of all possible states should be the number "
             f"of population, it is {sum(dist)}.")
           new_mfg_state = mfg_state.clone()
