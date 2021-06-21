@@ -144,7 +144,8 @@ class MFGCrowdModellingState(pyspiel.State):
     """Returns a list of legal actions for player and MFG nodes."""
     if player == pyspiel.PlayerId.MEAN_FIELD:
       return []
-    if player == 0 and player == self.current_player():
+    if (player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
+        and player == self.current_player()):
       return [0, 1, 2]
     raise ValueError(f"Unexpected player {player}. "
                      "Expected a mean field or current player 0.")

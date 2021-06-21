@@ -27,14 +27,6 @@ def type_from_states(states):
   return types[0]
 
 
-def is_terminal_from_states(states):
-  """Get is_terminal of a list of states and assert they are the same."""
-  is_terminal_from_states_ = [state.is_terminal() for state in states]
-  for is_terminal in is_terminal_from_states_:
-    assert is_terminal_from_states_[0] == is_terminal
-  return is_terminal_from_states_[0]
-
-
 class DistributionPolicy(distribution.Distribution):
   """Computes the distribution of a specified strategy."""
 
@@ -68,7 +60,7 @@ class DistributionPolicy(distribution.Distribution):
       self.distribution[state.observation_string(
           pyspiel.PlayerId.DEFAULT_PLAYER_ID)] = 1.
 
-    while not is_terminal_from_states(listing_states):
+    while not type_from_states(listing_states) == pyspiel.StateType.TERMINAL:
       new_listing_states = []
 
       if type_from_states(listing_states) == pyspiel.StateType.CHANCE:
