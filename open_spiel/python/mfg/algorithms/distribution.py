@@ -68,6 +68,7 @@ class DistributionPolicy(distribution.Distribution):
 
     while not self.is_terminal_from_states(listing_states):
       new_listing_states = []
+      new_distribution = collections.defaultdict(float)
 
       if self.type_from_states(listing_states) == pyspiel.StateType.CHANCE:
         for mfg_state in listing_states:
@@ -75,26 +76,26 @@ class DistributionPolicy(distribution.Distribution):
             new_mfg_state = mfg_state.child(action)
             new_mfg_state_str = new_mfg_state.observation_string(
                 pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-            if new_mfg_state_str not in self.distribution:
+            # As a state can be the child of two different parent states, we do
+            # not add it in the new states if it has already been seen in this
+            # iteration.
+            if new_mfg_state_str not in new_distribution:
               new_listing_states.append(new_mfg_state)
-            self.distribution[new_mfg_state_str] += prob * self.distribution[
-                mfg_state.observation_string(
-                    pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+            new_distribution[new_mfg_state_str] += prob * self.value(mfg_state)
 
       elif (self.type_from_states(listing_states) ==
             pyspiel.StateType.MEAN_FIELD):
         for mfg_state in listing_states:
           dist_to_register = mfg_state.distribution_support()
-          dist = [
-              self.distribution[str_state] for str_state in dist_to_register
-          ]
+          dist = list(map(self.value_str, dist_to_register))
+          assert (sum(dist) - len(self._root_states)) < 1e-4, (
+            "Sum of probabilities of all possible states should be the number of "
+            f"population, it is {sum(dist)}.")
           new_mfg_state = mfg_state.clone()
           new_mfg_state.update_distribution(dist)
           new_listing_states.append(new_mfg_state)
-          self.distribution[new_mfg_state.observation_string(
-              pyspiel.PlayerId.DEFAULT_PLAYER_ID)] = self.distribution[
-                  mfg_state.observation_string(
-                      pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+          new_distribution[new_mfg_state.observation_string(
+              pyspiel.PlayerId.DEFAULT_PLAYER_ID)] = self.value(mfg_state)
 
       else:
         assert self.type_from_states(
@@ -105,11 +106,21 @@ class DistributionPolicy(distribution.Distribution):
             new_mfg_state = mfg_state.child(action)
             new_mfg_state_str = new_mfg_state.observation_string(
                 pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-            if new_mfg_state_str not in self.distribution:
+            # As a state can be the child of two different parent states, we do
+            # not add it in the new states if it has already been seen in this
+            # iteration.
+            if new_mfg_state_str not in new_distribution:
               new_listing_states.append(new_mfg_state)
-            self.distribution[new_mfg_state_str] += prob * self.distribution[
-                mfg_state.observation_string(
-                    pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+            new_distribution[new_mfg_state_str] += prob * self.value(mfg_state)
+
+      assert all(state_str not in self.distribution
+            for state_str in new_distribution), (
+          "Some new states have the same string representation of old states.")
+      self.distribution.update(new_distribution)
+      sum_state_probabilities = sum(map(self.value, new_listing_states))
+      assert abs(sum_state_probabilities - len(self._root_states)) < 1e-4, (
+        "Sum of probabilities of all possible states should be the number of "
+        f"population, it is {sum_state_probabilities}.")
       listing_states = new_listing_states
 
   def value(self, mfg_state):
