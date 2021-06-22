@@ -23,7 +23,7 @@ Bibtex / Cite:
     title={Multi-Agent Training beyond Zero-Sum with Correlated Equilibrium
            Meta-Solvers},
     author={Luke Marris and Paul Muller and Marc Lanctot and Karl Tuyls and
-            Thore Grapael},
+            Thore Graepel},
     year={2021},
     eprint={2106.09435},
     archivePrefix={arXiv},
