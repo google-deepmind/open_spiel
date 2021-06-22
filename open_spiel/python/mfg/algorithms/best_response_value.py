@@ -75,13 +75,8 @@ class BestResponse(value.ValueFunction):
       return self._state_value[state_str]
     elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
-      def get_state_probability(str_state):
-        try:
-          return self._distribution.value_str(str_state)
-        except ValueError:
-          return 0
       dist = [
-          get_state_probability(str_state)
+          self._distribution.value_str(str_state, 0.)
           for str_state in dist_to_register
       ]
       assert abs(sum(dist) - self.game.num_players()) < 1e-4, (

@@ -88,7 +88,7 @@ class DistributionPolicy(distribution.Distribution):
         for mfg_state in listing_states:
           dist_to_register = mfg_state.distribution_support()
           dist = [
-            self.distribution.get(str_state, 0.)
+            self.value_str(str_state, 0.)
             for str_state in dist_to_register
           ]
           assert abs(sum(dist) - self.game.num_players()) < 1e-4, (
@@ -132,9 +132,11 @@ class DistributionPolicy(distribution.Distribution):
     return self.value_str(
         mfg_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
 
-  def value_str(self, mfg_state_str):
-    try:
-      return self.distribution[mfg_state_str]
-    except KeyError as e:
-      raise ValueError(
-        f'Distribution not computed for state {mfg_state_str}') from e
+  def value_str(self, mfg_state_str, default_value = None):
+    if default_value is None:
+      try:
+        return self.distribution[mfg_state_str]
+      except KeyError as e:
+        raise ValueError(
+          f'Distribution not computed for state {mfg_state_str}') from e
+    return self.distribution.get(mfg_state_str, 0.)
