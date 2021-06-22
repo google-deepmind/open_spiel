@@ -311,7 +311,9 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line('ToString() = "{}"'.format(str(game)))
 
   players = list(range(game.num_players()))
-  state = game.new_initial_state()
+  # Arbitrarily pick the last possible initial states (for all games
+  # but multi-population MFGs, there will be a single initial state).
+  state = game.new_initial_states()[-1]
   state_idx = 0
   rng = np.random.RandomState(seed)
 

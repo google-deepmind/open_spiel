@@ -1,0 +1,428 @@
+game: python_mfg_predator_prey
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.MEAN_FIELD
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Python Mean Field Predator Prey"
+GameType.max_num_players = 1000000000
+GameType.min_num_players = 1
+GameType.parameter_specification = ["geometry", "horizon", "reward_matrix", "size"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "python_mfg_predator_prey"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 5
+PolicyTensorShape() = [5]
+MaxChanceOutcomes() = 5
+GetParameters() = {geometry=0,horizon=10,reward_matrix=0 -1 1 1 0 -1 -1 1 0,size=5}
+NumPlayers() = 3
+MinUtility() = -inf
+MaxUtility() = inf
+UtilitySum() = 0.0
+ObservationTensorShape() = x: [5], y: [5], t: [11]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 21
+MaxGameLength() = 10
+ToString() = "python_mfg_predator_prey(geometry=0,horizon=10,reward_matrix=0 -1 1 1 0 -1 -1 1 0,size=5)"
+
+# State 0
+# position_init_2
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+InformationStateString(2) = ""
+ObservationString(0) = "position_init_2"
+ObservationString(1) = "position_init_2"
+ObservationString(2) = "position_init_2"
+PublicObservationString() = "position_init_2"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◯◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◯
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◯◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◯
+ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◯◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◯
+ObservationTensor(2).t: ◉◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(20, 1.0)]
+LegalActions() = [20]
+StringLegalActions() = ["init_position=20"]
+
+# Apply action "init_position=20"
+action: 20
+
+# State 1
+# (pop=2, t=0, pos=[0 4])
+IsTerminal() = False
+History() = [20]
+HistoryString() = "20"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "20"
+InformationStateString(1) = "20"
+InformationStateString(2) = "20"
+ObservationString(0) = "(pop=2, t=0, pos=[0 4])"
+ObservationString(1) = "(pop=2, t=0, pos=[0 4])"
+ObservationString(2) = "(pop=2, t=0, pos=[0 4])"
+PublicObservationString() = "(pop=2, t=0, pos=[0 4])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◉
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◉
+ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◉
+ObservationTensor(2).t: ◉◯◯◯◯◯◯◯◯◯◯
+Rewards() = [3.2188508251806955, 3.2188508251806955, 3.2188508251806955]
+Returns() = [3.2188508251806955, 3.2188508251806955, 3.2188508251806955]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
+
+# Apply action "[0 1]"
+action: 2
+
+# State 2
+# (pop=2, t=0_a, pos=[0 4])
+IsTerminal() = False
+History() = [20, 2]
+HistoryString() = "20, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.MEAN_FIELD
+InformationStateString(0) = "20, 2"
+InformationStateString(1) = "20, 2"
+InformationStateString(2) = "20, 2"
+ObservationString(0) = "(pop=2, t=0_a, pos=[0 4])"
+ObservationString(1) = "(pop=2, t=0_a, pos=[0 4])"
+ObservationString(2) = "(pop=2, t=0_a, pos=[0 4])"
+PublicObservationString() = "(pop=2, t=0_a, pos=[0 4])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◉
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◉
+ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◉
+ObservationTensor(2).t: ◉◯◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [3.2188508251806955, 3.2188508251806955, 3.2188508251806955]
+DistributionSupport() = ['(pop=0, t=0, pos=[0 0])', '(pop=1, t=0, pos=[0 0])', '(pop=2, t=0, pos=[0 0])', '(pop=0, t=0, pos=[0 1])', '(pop=1, t=0, pos=[0 1])', '(pop=2, t=0, pos=[0 1])', '(pop=0, t=0, pos=[0 2])', '(pop=1, t=0, pos=[0 2])', '(pop=2, t=0, pos=[0 2])', '(pop=0, t=0, pos=[0 3])', '(pop=1, t=0, pos=[0 3])', '(pop=2, t=0, pos=[0 3])', '(pop=0, t=0, pos=[0 4])', '(pop=1, t=0, pos=[0 4])', '(pop=2, t=0, pos=[0 4])', '(pop=0, t=0, pos=[1 0])', '(pop=1, t=0, pos=[1 0])', '(pop=2, t=0, pos=[1 0])', '(pop=0, t=0, pos=[1 1])', '(pop=1, t=0, pos=[1 1])', '(pop=2, t=0, pos=[1 1])', '(pop=0, t=0, pos=[1 2])', '(pop=1, t=0, pos=[1 2])', '(pop=2, t=0, pos=[1 2])', '(pop=0, t=0, pos=[1 3])', '(pop=1, t=0, pos=[1 3])', '(pop=2, t=0, pos=[1 3])', '(pop=0, t=0, pos=[1 4])', '(pop=1, t=0, pos=[1 4])', '(pop=2, t=0, pos=[1 4])', '(pop=0, t=0, pos=[2 0])', '(pop=1, t=0, pos=[2 0])', '(pop=2, t=0, pos=[2 0])', '(pop=0, t=0, pos=[2 1])', '(pop=1, t=0, pos=[2 1])', '(pop=2, t=0, pos=[2 1])', '(pop=0, t=0, pos=[2 2])', '(pop=1, t=0, pos=[2 2])', '(pop=2, t=0, pos=[2 2])', '(pop=0, t=0, pos=[2 3])', '(pop=1, t=0, pos=[2 3])', '(pop=2, t=0, pos=[2 3])', '(pop=0, t=0, pos=[2 4])', '(pop=1, t=0, pos=[2 4])', '(pop=2, t=0, pos=[2 4])', '(pop=0, t=0, pos=[3 0])', '(pop=1, t=0, pos=[3 0])', '(pop=2, t=0, pos=[3 0])', '(pop=0, t=0, pos=[3 1])', '(pop=1, t=0, pos=[3 1])', '(pop=2, t=0, pos=[3 1])', '(pop=0, t=0, pos=[3 2])', '(pop=1, t=0, pos=[3 2])', '(pop=2, t=0, pos=[3 2])', '(pop=0, t=0, pos=[3 3])', '(pop=1, t=0, pos=[3 3])', '(pop=2, t=0, pos=[3 3])', '(pop=0, t=0, pos=[3 4])', '(pop=1, t=0, pos=[3 4])', '(pop=2, t=0, pos=[3 4])', '(pop=0, t=0, pos=[4 0])', '(pop=1, t=0, pos=[4 0])', '(pop=2, t=0, pos=[4 0])', '(pop=0, t=0, pos=[4 1])', '(pop=1, t=0, pos=[4 1])', '(pop=2, t=0, pos=[4 1])', '(pop=0, t=0, pos=[4 2])', '(pop=1, t=0, pos=[4 2])', '(pop=2, t=0, pos=[4 2])', '(pop=0, t=0, pos=[4 3])', '(pop=1, t=0, pos=[4 3])', '(pop=2, t=0, pos=[4 3])', '(pop=0, t=0, pos=[4 4])', '(pop=1, t=0, pos=[4 4])', '(pop=2, t=0, pos=[4 4])']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 3
+# (pop=2, t=0_a_mu, pos=[0 4])
+IsTerminal() = False
+History() = [20, 2]
+HistoryString() = "20, 2"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = "20, 2"
+InformationStateString(1) = "20, 2"
+InformationStateString(2) = "20, 2"
+ObservationString(0) = "(pop=2, t=0_a_mu, pos=[0 4])"
+ObservationString(1) = "(pop=2, t=0_a_mu, pos=[0 4])"
+ObservationString(2) = "(pop=2, t=0_a_mu, pos=[0 4])"
+PublicObservationString() = "(pop=2, t=0_a_mu, pos=[0 4])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◉
+ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◉
+ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◉
+ObservationTensor(2).t: ◉◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0, 0.2), (1, 0.2), (2, 0.2), (3, 0.2), (4, 0.2)]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
+
+# Apply action "[ 0 -1]"
+action: 3
+
+# State 4
+# (pop=2, t=1, pos=[0 3])
+IsTerminal() = False
+History() = [20, 2, 3]
+HistoryString() = "20, 2, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "20, 2, 3"
+InformationStateString(1) = "20, 2, 3"
+InformationStateString(2) = "20, 2, 3"
+ObservationString(0) = "(pop=2, t=1, pos=[0 3])"
+ObservationString(1) = "(pop=2, t=1, pos=[0 3])"
+ObservationString(2) = "(pop=2, t=1, pos=[0 3])"
+PublicObservationString() = "(pop=2, t=1, pos=[0 3])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◉◯
+ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◉◯
+ObservationTensor(1).t: ◯◉◯◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◉◯
+ObservationTensor(2).t: ◯◉◯◯◯◯◯◯◯◯◯
+Rewards() = [4.3174131163486695, 4.3174131163486695, 4.3174131163486695]
+Returns() = [7.536263941529365, 7.536263941529365, 7.536263941529365]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
+
+# Apply action "[0 0]"
+action: 0
+
+# State 5
+# (pop=2, t=1_a, pos=[0 3])
+IsTerminal() = False
+History() = [20, 2, 3, 0]
+HistoryString() = "20, 2, 3, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.MEAN_FIELD
+InformationStateString(0) = "20, 2, 3, 0"
+InformationStateString(1) = "20, 2, 3, 0"
+InformationStateString(2) = "20, 2, 3, 0"
+ObservationString(0) = "(pop=2, t=1_a, pos=[0 3])"
+ObservationString(1) = "(pop=2, t=1_a, pos=[0 3])"
+ObservationString(2) = "(pop=2, t=1_a, pos=[0 3])"
+PublicObservationString() = "(pop=2, t=1_a, pos=[0 3])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◉◯
+ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◉◯
+ObservationTensor(1).t: ◯◉◯◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◉◯
+ObservationTensor(2).t: ◯◉◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [7.536263941529365, 7.536263941529365, 7.536263941529365]
+DistributionSupport() = ['(pop=0, t=1, pos=[0 0])', '(pop=1, t=1, pos=[0 0])', '(pop=2, t=1, pos=[0 0])', '(pop=0, t=1, pos=[0 1])', '(pop=1, t=1, pos=[0 1])', '(pop=2, t=1, pos=[0 1])', '(pop=0, t=1, pos=[0 2])', '(pop=1, t=1, pos=[0 2])', '(pop=2, t=1, pos=[0 2])', '(pop=0, t=1, pos=[0 3])', '(pop=1, t=1, pos=[0 3])', '(pop=2, t=1, pos=[0 3])', '(pop=0, t=1, pos=[0 4])', '(pop=1, t=1, pos=[0 4])', '(pop=2, t=1, pos=[0 4])', '(pop=0, t=1, pos=[1 0])', '(pop=1, t=1, pos=[1 0])', '(pop=2, t=1, pos=[1 0])', '(pop=0, t=1, pos=[1 1])', '(pop=1, t=1, pos=[1 1])', '(pop=2, t=1, pos=[1 1])', '(pop=0, t=1, pos=[1 2])', '(pop=1, t=1, pos=[1 2])', '(pop=2, t=1, pos=[1 2])', '(pop=0, t=1, pos=[1 3])', '(pop=1, t=1, pos=[1 3])', '(pop=2, t=1, pos=[1 3])', '(pop=0, t=1, pos=[1 4])', '(pop=1, t=1, pos=[1 4])', '(pop=2, t=1, pos=[1 4])', '(pop=0, t=1, pos=[2 0])', '(pop=1, t=1, pos=[2 0])', '(pop=2, t=1, pos=[2 0])', '(pop=0, t=1, pos=[2 1])', '(pop=1, t=1, pos=[2 1])', '(pop=2, t=1, pos=[2 1])', '(pop=0, t=1, pos=[2 2])', '(pop=1, t=1, pos=[2 2])', '(pop=2, t=1, pos=[2 2])', '(pop=0, t=1, pos=[2 3])', '(pop=1, t=1, pos=[2 3])', '(pop=2, t=1, pos=[2 3])', '(pop=0, t=1, pos=[2 4])', '(pop=1, t=1, pos=[2 4])', '(pop=2, t=1, pos=[2 4])', '(pop=0, t=1, pos=[3 0])', '(pop=1, t=1, pos=[3 0])', '(pop=2, t=1, pos=[3 0])', '(pop=0, t=1, pos=[3 1])', '(pop=1, t=1, pos=[3 1])', '(pop=2, t=1, pos=[3 1])', '(pop=0, t=1, pos=[3 2])', '(pop=1, t=1, pos=[3 2])', '(pop=2, t=1, pos=[3 2])', '(pop=0, t=1, pos=[3 3])', '(pop=1, t=1, pos=[3 3])', '(pop=2, t=1, pos=[3 3])', '(pop=0, t=1, pos=[3 4])', '(pop=1, t=1, pos=[3 4])', '(pop=2, t=1, pos=[3 4])', '(pop=0, t=1, pos=[4 0])', '(pop=1, t=1, pos=[4 0])', '(pop=2, t=1, pos=[4 0])', '(pop=0, t=1, pos=[4 1])', '(pop=1, t=1, pos=[4 1])', '(pop=2, t=1, pos=[4 1])', '(pop=0, t=1, pos=[4 2])', '(pop=1, t=1, pos=[4 2])', '(pop=2, t=1, pos=[4 2])', '(pop=0, t=1, pos=[4 3])', '(pop=1, t=1, pos=[4 3])', '(pop=2, t=1, pos=[4 3])', '(pop=0, t=1, pos=[4 4])', '(pop=1, t=1, pos=[4 4])', '(pop=2, t=1, pos=[4 4])']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 6
+# Apply action "[0 1]"
+action: 2
+
+# State 7
+# (pop=2, t=2, pos=[0 4])
+IsTerminal() = False
+History() = [20, 2, 3, 0, 2]
+HistoryString() = "20, 2, 3, 0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "20, 2, 3, 0, 2"
+InformationStateString(1) = "20, 2, 3, 0, 2"
+InformationStateString(2) = "20, 2, 3, 0, 2"
+ObservationString(0) = "(pop=2, t=2, pos=[0 4])"
+ObservationString(1) = "(pop=2, t=2, pos=[0 4])"
+ObservationString(2) = "(pop=2, t=2, pos=[0 4])"
+PublicObservationString() = "(pop=2, t=2, pos=[0 4])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◉
+ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◉
+ObservationTensor(1).t: ◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◉
+ObservationTensor(2).t: ◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [4.3174131163486695, 4.3174131163486695, 4.3174131163486695]
+Returns() = [11.853677057878034, 11.853677057878034, 11.853677057878034]
+LegalActions() = [0, 1, 2, 3, 4]
+StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
+
+# Apply action "[0 1]"
+action: 2
+
+# State 8
+# (pop=2, t=2_a, pos=[0 4])
+IsTerminal() = False
+History() = [20, 2, 3, 0, 2, 2]
+HistoryString() = "20, 2, 3, 0, 2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.MEAN_FIELD
+InformationStateString(0) = "20, 2, 3, 0, 2, 2"
+InformationStateString(1) = "20, 2, 3, 0, 2, 2"
+InformationStateString(2) = "20, 2, 3, 0, 2, 2"
+ObservationString(0) = "(pop=2, t=2_a, pos=[0 4])"
+ObservationString(1) = "(pop=2, t=2_a, pos=[0 4])"
+ObservationString(2) = "(pop=2, t=2_a, pos=[0 4])"
+PublicObservationString() = "(pop=2, t=2_a, pos=[0 4])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◉◯◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◉
+ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1).x: ◉◯◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◉
+ObservationTensor(1).t: ◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2).x: ◉◯◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◉
+ObservationTensor(2).t: ◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [11.853677057878034, 11.853677057878034, 11.853677057878034]
+DistributionSupport() = ['(pop=0, t=2, pos=[0 0])', '(pop=1, t=2, pos=[0 0])', '(pop=2, t=2, pos=[0 0])', '(pop=0, t=2, pos=[0 1])', '(pop=1, t=2, pos=[0 1])', '(pop=2, t=2, pos=[0 1])', '(pop=0, t=2, pos=[0 2])', '(pop=1, t=2, pos=[0 2])', '(pop=2, t=2, pos=[0 2])', '(pop=0, t=2, pos=[0 3])', '(pop=1, t=2, pos=[0 3])', '(pop=2, t=2, pos=[0 3])', '(pop=0, t=2, pos=[0 4])', '(pop=1, t=2, pos=[0 4])', '(pop=2, t=2, pos=[0 4])', '(pop=0, t=2, pos=[1 0])', '(pop=1, t=2, pos=[1 0])', '(pop=2, t=2, pos=[1 0])', '(pop=0, t=2, pos=[1 1])', '(pop=1, t=2, pos=[1 1])', '(pop=2, t=2, pos=[1 1])', '(pop=0, t=2, pos=[1 2])', '(pop=1, t=2, pos=[1 2])', '(pop=2, t=2, pos=[1 2])', '(pop=0, t=2, pos=[1 3])', '(pop=1, t=2, pos=[1 3])', '(pop=2, t=2, pos=[1 3])', '(pop=0, t=2, pos=[1 4])', '(pop=1, t=2, pos=[1 4])', '(pop=2, t=2, pos=[1 4])', '(pop=0, t=2, pos=[2 0])', '(pop=1, t=2, pos=[2 0])', '(pop=2, t=2, pos=[2 0])', '(pop=0, t=2, pos=[2 1])', '(pop=1, t=2, pos=[2 1])', '(pop=2, t=2, pos=[2 1])', '(pop=0, t=2, pos=[2 2])', '(pop=1, t=2, pos=[2 2])', '(pop=2, t=2, pos=[2 2])', '(pop=0, t=2, pos=[2 3])', '(pop=1, t=2, pos=[2 3])', '(pop=2, t=2, pos=[2 3])', '(pop=0, t=2, pos=[2 4])', '(pop=1, t=2, pos=[2 4])', '(pop=2, t=2, pos=[2 4])', '(pop=0, t=2, pos=[3 0])', '(pop=1, t=2, pos=[3 0])', '(pop=2, t=2, pos=[3 0])', '(pop=0, t=2, pos=[3 1])', '(pop=1, t=2, pos=[3 1])', '(pop=2, t=2, pos=[3 1])', '(pop=0, t=2, pos=[3 2])', '(pop=1, t=2, pos=[3 2])', '(pop=2, t=2, pos=[3 2])', '(pop=0, t=2, pos=[3 3])', '(pop=1, t=2, pos=[3 3])', '(pop=2, t=2, pos=[3 3])', '(pop=0, t=2, pos=[3 4])', '(pop=1, t=2, pos=[3 4])', '(pop=2, t=2, pos=[3 4])', '(pop=0, t=2, pos=[4 0])', '(pop=1, t=2, pos=[4 0])', '(pop=2, t=2, pos=[4 0])', '(pop=0, t=2, pos=[4 1])', '(pop=1, t=2, pos=[4 1])', '(pop=2, t=2, pos=[4 1])', '(pop=0, t=2, pos=[4 2])', '(pop=1, t=2, pos=[4 2])', '(pop=2, t=2, pos=[4 2])', '(pop=0, t=2, pos=[4 3])', '(pop=1, t=2, pos=[4 3])', '(pop=2, t=2, pos=[4 3])', '(pop=0, t=2, pos=[4 4])', '(pop=1, t=2, pos=[4 4])', '(pop=2, t=2, pos=[4 4])']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 9
+# Apply action "[-1  0]"
+action: 4
+
+# State 10
+# Apply action "[ 0 -1]"
+action: 3
+
+# State 11
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 12
+# Apply action "[ 0 -1]"
+action: 3
+
+# State 13
+# Apply action "[0 0]"
+action: 0
+
+# State 14
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 15
+# Apply action "[0 1]"
+action: 2
+
+# State 16
+# Apply action "[-1  0]"
+action: 4
+
+# State 17
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 18
+# Apply action "[1 0]"
+action: 1
+
+# State 19
+# Apply action "[-1  0]"
+action: 4
+
+# State 20
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 21
+# Apply action "[0 0]"
+action: 0
+
+# State 22
+# Apply action "[0 1]"
+action: 2
+
+# State 23
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 24
+# Apply action "[1 0]"
+action: 1
+
+# State 25
+# Apply action "[0 0]"
+action: 0
+
+# State 26
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 27
+# Apply action "[0 0]"
+action: 0
+
+# State 28
+# Apply action "[0 1]"
+action: 2
+
+# State 29
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 30
+# Apply action "[0 1]"
+action: 2
+
+# State 31
+# (pop=2, t=10, pos=[1 4])
+IsTerminal() = True
+History() = [20, 2, 3, 0, 2, 2, 4, 3, 3, 0, 2, 4, 1, 4, 0, 2, 1, 0, 0, 2, 2]
+HistoryString() = "20, 2, 3, 0, 2, 2, 4, 3, 3, 0, 2, 4, 1, 4, 0, 2, 1, 0, 0, 2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.TERMINAL
+InformationStateString(0) = "20, 2, 3, 0, 2, 2, 4, 3, 3, 0, 2, 4, 1, 4, 0, 2, 1, 0, 0, 2, 2"
+InformationStateString(1) = "20, 2, 3, 0, 2, 2, 4, 3, 3, 0, 2, 4, 1, 4, 0, 2, 1, 0, 0, 2, 2"
+InformationStateString(2) = "20, 2, 3, 0, 2, 2, 4, 3, 3, 0, 2, 4, 1, 4, 0, 2, 1, 0, 0, 2, 2"
+ObservationString(0) = "(pop=2, t=10, pos=[1 4])"
+ObservationString(1) = "(pop=2, t=10, pos=[1 4])"
+ObservationString(2) = "(pop=2, t=10, pos=[1 4])"
+PublicObservationString() = "(pop=2, t=10, pos=[1 4])"
+PrivateObservationString(0) = ""
+PrivateObservationString(1) = ""
+PrivateObservationString(2) = ""
+ObservationTensor(0).x: ◯◉◯◯◯
+ObservationTensor(0).y: ◯◯◯◯◉
+ObservationTensor(0).t: ◯◯◯◯◯◯◯◯◯◯◉
+ObservationTensor(1).x: ◯◉◯◯◯
+ObservationTensor(1).y: ◯◯◯◯◉
+ObservationTensor(1).t: ◯◯◯◯◯◯◯◯◯◯◉
+ObservationTensor(2).x: ◯◉◯◯◯
+ObservationTensor(2).y: ◯◯◯◯◉
+ObservationTensor(2).t: ◯◯◯◯◯◯◯◯◯◯◉
+Rewards() = [4.3174131163486695, 4.3174131163486695, 4.3174131163486695]
+Returns() = [46.39298198866738, 46.39298198866738, 46.39298198866738]
