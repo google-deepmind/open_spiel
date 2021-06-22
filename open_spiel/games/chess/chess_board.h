@@ -232,9 +232,17 @@ inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 using ObservationTable = std::array<bool, k2dMaxBoardSize>;
 
+// Specifies policy for pseudo legal moves generation.
 enum PseudoLegalMoveSettings {
-  kBreachEnemyPieces,
+  // Standard legal moves (do not allow to move past enemy pieces).
   kAcknowledgeEnemyPieces,
+  // Pseudo-legal moves, where a piece can move anywhere (according to the rules
+  // for that piece), except if it was blocked from doing so by other player's
+  // pieces. This is used in games, where the player may not know the position
+  // of an enemy piece (like Kriegspiel or RBC) and it can try to move past the
+  // enemy (for example a rook can try to move the other side of the board, even
+  // if it is in fact blocked by an unseen opponent's pawn).
+  kBreachEnemyPieces,
 };
 
 class ChessBoard {

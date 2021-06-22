@@ -37,26 +37,26 @@
 //
 // - A player cannot see where her opponent's pieces are.
 // - Prior to making each move a player selects a 3 x 3 square of the chess
-// board. She learns of all pieces and their types within that square. The
-// opponent is not informed about where she sensed.
+//   board. She learns of all pieces and their types within that square. The
+//   opponent is not informed about where she sensed.
 // - If a player captures a piece, she is informed that she made a capture (but
-// she is not informed about what she captured).
+//   she is not informed about what she captured).
 // - If a player's piece is captured, she is informed that her piece on the
-// relevant square was captured (but she is not informed about what captured
-// it).
+//   relevant square was captured (but she is not informed about what captured
+//   it).
 // - There is no notion of check or mate (since neither player may be aware of
-// any check relationship).
+//   any check relationship).
 // - A player wins by capturing the opponent's king or when the opponent runs
-// out of time. In this competition, each player begins with a cumulative
-// 15-minute clock to make all her moves.
+//   out of time. In this competition, each player begins with a cumulative
+//   15-minute clock to make all her moves.
 // - If a player tries to move a sliding piece through an opponent's piece, the
-// opponent's piece is captured and the moved piece is stopped where the capture
-// occurred. The moving player is notified of the square where her piece landed,
-// and both players are notified of the capture as stated above.
+//   opponent's piece is captured and the moved piece is stopped where the capture
+//   occurred. The moving player is notified of the square where her piece landed,
+//   and both players are notified of the capture as stated above.
 // - If a player attempts to make an illegal pawn attack or pawn forward-move or
-// castle, she is notified that her move did not succeed and her move is over.
-// Castling through check is allowed, however, as the notion of check is
-// removed.
+//   castle, she is notified that her move did not succeed and her move is over.
+//   Castling through check is allowed, however, as the notion of check is
+//   removed.
 // - There is a "pass" move, where a player can move nothing.
 //
 // Parameters:
@@ -91,8 +91,8 @@ enum class MovePhase {
   kMoving,   // Then make a regular move.
 };
 // Special value if sense location is not specified (beginning of the game,
-// or if we want to hide the sensing results).
-constexpr int kNonSpecifiedSenseLocation = -1;
+// or if we want to hide the sensing results when opponent is moving).
+constexpr int kSenseLocationNonSpecified = -1;
 
 // State of an in-play game.
 class RbcState : public State {
@@ -158,7 +158,6 @@ class RbcState : public State {
   void MaybeGenerateLegalActions() const;
 
   absl::optional<std::vector<double>> MaybeFinalReturns() const;
-  MovePhase SwitchMovePhase();
 
   // We have to store every move made to check for repetitions and to implement
   // undo. We store the current board position as an optimization.
@@ -170,9 +169,10 @@ class RbcState : public State {
   chess::ChessBoard current_board_;
   // How to interpret current actions.
   MovePhase phase_;
-  // Which place was the last sensing made at? (for each player)
-  std::array<int, 2> sense_location_ = {kNonSpecifiedSenseLocation,
-                                        kNonSpecifiedSenseLocation};
+  // Which place was the last sensing made at? (for each player).
+  // See also RbcGame::inner_size()
+  std::array<int, 2> sense_location_ = {kSenseLocationNonSpecified,
+                                        kSenseLocationNonSpecified};
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
@@ -225,6 +225,11 @@ class RbcGame : public Game {
 
   int board_size() const { return board_size_; }
   int sense_size() const { return sense_size_; }
+  // Sensing can be done only within the board, as it makes no sense for
+  // any player to do non-efficient sensing that goes outside of the board.
+  // The sense location is encoded as coordinates within this smaller
+  // inner square.
+  int inner_size() const { return board_size_ - sense_size_ + 1; }
 
  private:
   const int board_size_;
