@@ -133,10 +133,25 @@ class DistributionPolicy(distribution.Distribution):
         mfg_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
 
   def value_str(self, mfg_state_str, default_value = None):
+    """Return probability of the state encoded by mfg_state_str.
+
+    Args:
+      mfg_state_str: string description of the state. This should be created
+        using observation_string.
+      default_value: in case the state has not been seen by the distribution, to
+        avoid raising a value error the default value is returned if it is not
+        None.
+    Returns:
+      state_probability: probability to be in the state descripbed by
+        mfg_state_str.
+    Raises:
+      ValueError: if the state has not been seen by the distribution and no
+        default value has been passed to the method.
+    """
     if default_value is None:
       try:
         return self.distribution[mfg_state_str]
       except KeyError as e:
         raise ValueError(
           f'Distribution not computed for state {mfg_state_str}') from e
-    return self.distribution.get(mfg_state_str, 0.)
+    return self.distribution.get(mfg_state_str, default_value)
