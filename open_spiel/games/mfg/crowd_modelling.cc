@@ -30,6 +30,7 @@
 namespace open_spiel {
 namespace crowd_modelling {
 namespace {
+inline constexpr float kEpsilon = 1e-25;
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"mfg_crowd_modelling",
@@ -173,7 +174,7 @@ std::vector<double> CrowdModellingState::Rewards() const {
   }
   double r_x = 1 - 1.0 * std::abs(x_ - size_ / 2) / (size_ / 2);
   double r_a = -1.0 * std::abs(kActionToMove.at(last_action_)) / size_;
-  double r_mu = -std::log(distribution_[x_]);
+  double r_mu = -std::log(distribution_[x_]+kEpsilon);
   return {r_x + r_a + r_mu};
 }
 

@@ -367,7 +367,7 @@ class MFGPredatorPreyState(pyspiel.State):
     if int(self._player_id) < 0:
       return [0.] * self.num_players()
     # TODO(author15): Remove this eps once b/191064186 is fixed.
-    eps = 1e-6
+    eps = 1e-25
     densities = np.array([
         self.get_pos_proba(self._pos, population)
         for population in range(self.num_players())

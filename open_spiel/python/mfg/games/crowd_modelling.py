@@ -33,6 +33,7 @@ _SIZE = 10
 _HORIZON = 10
 _NUM_ACTIONS = 3
 _NUM_CHANCE = 3
+_EPSILON = 10**(-25)
 _DEFAULT_PARAMS = {"size": _SIZE, "horizon": _HORIZON}
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_mfg_crowd_modelling",
@@ -232,7 +233,7 @@ class MFGCrowdModellingState(pyspiel.State):
     if self._player_id == 0:
       r_x = 1 - (1.0 * np.abs(self.x - self.size // 2)) / (self.size // 2)
       r_a = -(1.0 * np.abs(self._ACTION_TO_MOVE[self._last_action])) / self.size
-      r_mu = - np.log(self._distribution[self.x])
+      r_mu = - np.log(self._distribution[self.x] + _EPSILON)
       return r_x + r_a + r_mu
     return 0.0
 

@@ -135,8 +135,8 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
           ],
           'expected_rewards':
               np.array([
-                  -math.log(1 + 1e-6) + 0.5,  #
-                  -math.log(0.5 + 1e-6) - 1,
+                  -math.log(1 + 1e-25) + 0.5,  #
+                  -math.log(0.5 + 1e-25) - 1,
               ]),
       },
       {
@@ -169,9 +169,9 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
           ],
           'expected_rewards':
               np.array([
-                  -math.log(0.4 + 1e-6) - 0.6 + 0.5 * 0.8,
-                  -math.log(0.6 + 1e-6) + 0.5 * 0.4 - 0.8,
-                  -math.log(0.8 + 1e-6) - 0.5 * 0.4 + 0.6,
+                  -math.log(0.4 + 1e-25) - 0.6 + 0.5 * 0.8,
+                  -math.log(0.6 + 1e-25) + 0.5 * 0.4 - 0.8,
+                  -math.log(0.8 + 1e-25) - 0.5 * 0.4 + 0.6,
               ]),
       },
   )
