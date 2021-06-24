@@ -49,14 +49,6 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_string=True,
     provides_observation_tensor=True,
     parameter_specification=_DEFAULT_PARAMS)
-_GAME_INFO = pyspiel.GameInfo(
-    num_distinct_actions=_NUM_ACTIONS,
-    max_chance_outcomes=max(_SIZE, _NUM_CHANCE),
-    num_players=_NUM_PLAYERS,
-    min_utility=-np.inf,
-    max_utility=+np.inf,
-    utility_sum=0.0,
-    max_game_length=_HORIZON)
 
 
 class MFGCrowdModellingGame(pyspiel.Game):
@@ -73,7 +65,15 @@ class MFGCrowdModellingGame(pyspiel.Game):
 
   # pylint:disable=dangerous-default-value
   def __init__(self, params: Mapping[str, Any] = _DEFAULT_PARAMS):
-    super().__init__(_GAME_TYPE, _GAME_INFO, params)
+    game_info = pyspiel.GameInfo(
+        num_distinct_actions=_NUM_ACTIONS,
+        max_chance_outcomes=max(params["size"], _NUM_CHANCE),
+        num_players=_NUM_PLAYERS,
+        min_utility=-np.inf,
+        max_utility=+np.inf,
+        utility_sum=0.0,
+        max_game_length=params["horizon"])
+    super().__init__(_GAME_TYPE, game_info, params)
     self.size = params["size"]
     self.horizon = params["horizon"]
 
@@ -86,8 +86,7 @@ class MFGCrowdModellingGame(pyspiel.Game):
     if ((iig_obs_type is None) or
         (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
       return Observer(params, self)
-    else:
-      return IIGObserverForPublicInfoGame(iig_obs_type, params)
+    return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
 
 class MFGCrowdModellingState(pyspiel.State):
@@ -125,16 +124,18 @@ class MFGCrowdModellingState(pyspiel.State):
   def t(self):
     return self._t
 
-  def state_to_str(self, x, t, player_id=0):
+  def state_to_str(self, x, t, player_id=pyspiel.PlayerId.DEFAULT_PLAYER_ID):
     """A string that uniquely identify a triplet x, t, player_id."""
     if self._is_chance_init:
       return "initial"
-    elif player_id == 0:
+    if player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
       return str((x, t))
-    elif player_id == pyspiel.PlayerId.MEAN_FIELD:
+    if player_id == pyspiel.PlayerId.MEAN_FIELD:
       return str((x, t)) + "_a"
-    elif player_id == pyspiel.PlayerId.CHANCE:
+    if player_id == pyspiel.PlayerId.CHANCE:
       return str((x, t)) + "_a_mu"
+    raise ValueError(
+        "player_id is not mean field, chance or default player id.")
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every perfect-information sequential-move game.
@@ -143,18 +144,17 @@ class MFGCrowdModellingState(pyspiel.State):
     """Returns a list of legal actions for player and MFG nodes."""
     if player == pyspiel.PlayerId.MEAN_FIELD:
       return []
-    elif player == 0 and player == self.current_player():
+    if (player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
+        and player == self.current_player()):
       return [0, 1, 2]
-    else:
-      raise ValueError(f"Unexpected player {player}. "
-                       "Expected a mean field or current player 0.")
+    raise ValueError(f"Unexpected player {player}. "
+                     "Expected a mean field or current player 0.")
 
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
     if self._is_chance_init:
       return list(enumerate(self._distribution))
-    else:
-      return [(0, 1. / 3.), (1, 1. / 3.), (2, 1. / 3.)]
+    return [(0, 1. / 3.), (1, 1. / 3.), (2, 1. / 3.)]
 
   def _apply_action(self, action):
     """Applies the specified action to the state."""
@@ -175,7 +175,7 @@ class MFGCrowdModellingState(pyspiel.State):
       if action < 0 or action > 2:
         raise ValueError(
             "The action is between 0 and 2 at any chance node")
-      self._x = (self._x + self._ACTION_TO_MOVE[action]) % self.size
+      self._x = (self.x + self._ACTION_TO_MOVE[action]) % self.size
       self._t += 1
       self._player_id = 0
     elif self._player_id == 0:
@@ -183,7 +183,7 @@ class MFGCrowdModellingState(pyspiel.State):
       if action < 0 or action > 2:
         raise ValueError(
             "The action is between 0 and 2 at any chance node")
-      self._x = (self._x + self._ACTION_TO_MOVE[action]) % self.size
+      self._x = (self.x + self._ACTION_TO_MOVE[action]) % self.size
       self._last_action = action
       self._player_id = pyspiel.PlayerId.MEAN_FIELD
 
@@ -197,7 +197,7 @@ class MFGCrowdModellingState(pyspiel.State):
   def distribution_support(self):
     """return a list of state string."""
     return [
-        self.state_to_str(i, self._t, player_id=0) for i in range(self.size)
+        self.state_to_str(i, self.t, player_id=0) for i in range(self.size)
     ]
 
   def update_distribution(self, distribution):
@@ -219,24 +219,22 @@ class MFGCrowdModellingState(pyspiel.State):
 
   def is_terminal(self):
     """Returns True if the game is over."""
-    return self._t >= self.horizon
+    return self.t >= self.horizon
 
   def current_player(self):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     if self.is_terminal():
       return pyspiel.PlayerId.TERMINAL
-    else:
-      return self._player_id
+    return self._player_id
 
   def _rewards(self):
     """Reward for the player for this state."""
     if self._player_id == 0:
-      r_x = 1 - (1.0 * np.abs(self._x - self.size // 2)) / (self.size // 2)
+      r_x = 1 - (1.0 * np.abs(self.x - self.size // 2)) / (self.size // 2)
       r_a = -(1.0 * np.abs(self._ACTION_TO_MOVE[self._last_action])) / self.size
-      r_mu = - np.log(self._distribution[self._x])
+      r_mu = - np.log(self._distribution[self.x])
       return r_x + r_a + r_mu
-    else:
-      return 0.0
+    return 0.0
 
   def rewards(self) -> List[float]:
     """Rewards for all players."""
@@ -256,7 +254,7 @@ class MFGCrowdModellingState(pyspiel.State):
 
   def __str__(self):
     """A string that uniquely identify the current state."""
-    return self.state_to_str(self._x, self._t, player_id=self._player_id)
+    return self.state_to_str(self.x, self.t, player_id=self._player_id)
 
 
 class Observer:

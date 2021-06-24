@@ -19,6 +19,14 @@ from open_spiel.python.mfg import distribution
 import pyspiel
 
 
+def type_from_states(states):
+  """Get node type of a list of states and assert they are the same."""
+  types = [state.get_type() for state in states]
+  for state_type in types:
+    assert types[0] == state_type, f'types: {types}'
+  return types[0]
+
+
 class DistributionPolicy(distribution.Distribution):
   """Computes the distribution of a specified strategy."""
 
@@ -31,27 +39,13 @@ class DistributionPolicy(distribution.Distribution):
       root_state: The state of the game at which to start analysis. If `None`,
         the game root state is used.
     """
-    super(DistributionPolicy, self).__init__(game)
+    super().__init__(game)
     self._policy = policy
     if root_state is None:
       self._root_states = game.new_initial_states()
     else:
       self._root_states = [root_state]
     self.evaluate()
-
-  def type_from_states(self, states):
-    """Get node type of a list of states and assert they are the same."""
-    types = [state.get_type() for state in states]
-    for t in types:
-      assert types[0] == t, f'types: {types}'
-    return types[0]
-
-  def is_terminal_from_states(self, states):
-    """Get is_terminal of a list of states and assert they are the same."""
-    is_terminal_from_states_ = [state.is_terminal() for state in states]
-    for is_terminal in is_terminal_from_states_:
-      assert is_terminal_from_states_[0] == is_terminal
-    return is_terminal_from_states_[0]
 
   def evaluate(self):
     """Evaluate the distribution over states of self._policy."""
@@ -66,10 +60,10 @@ class DistributionPolicy(distribution.Distribution):
       self.distribution[state.observation_string(
           pyspiel.PlayerId.DEFAULT_PLAYER_ID)] = 1.
 
-    while not self.is_terminal_from_states(listing_states):
+    while type_from_states(listing_states) != pyspiel.StateType.TERMINAL:
       new_listing_states = []
 
-      if self.type_from_states(listing_states) == pyspiel.StateType.CHANCE:
+      if type_from_states(listing_states) == pyspiel.StateType.CHANCE:
         for mfg_state in listing_states:
           for action, prob in mfg_state.chance_outcomes():
             new_mfg_state = mfg_state.child(action)
@@ -81,7 +75,7 @@ class DistributionPolicy(distribution.Distribution):
                 mfg_state.observation_string(
                     pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
 
-      elif (self.type_from_states(listing_states) ==
+      elif (type_from_states(listing_states) ==
             pyspiel.StateType.MEAN_FIELD):
         for mfg_state in listing_states:
           dist_to_register = mfg_state.distribution_support()
@@ -97,7 +91,7 @@ class DistributionPolicy(distribution.Distribution):
                       pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
 
       else:
-        assert self.type_from_states(
+        assert type_from_states(
             listing_states) == pyspiel.StateType.DECISION
         for mfg_state in listing_states:
           for action, prob in self._policy.action_probabilities(
@@ -112,13 +106,13 @@ class DistributionPolicy(distribution.Distribution):
                     pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
       listing_states = new_listing_states
 
-  def value(self, mfg_state):
+  def value(self, state):
     return self.value_str(
-        mfg_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
+        state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
 
-  def value_str(self, mfg_state_str):
-    v = self.distribution.get(mfg_state_str)
-    if v is None:
+  def value_str(self, state_str):
+    state_probability = self.distribution.get(state_str)
+    if state_probability is None:
       # Check this because self.distribution is a default dict.
-      raise ValueError(f'Distribution not computed for state {mfg_state_str}')
-    return v
+      raise ValueError(f'Distribution not computed for state {state_str}')
+    return state_probability

@@ -41,7 +41,7 @@ from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
 
-class Policy(object):
+class Policy:
   """Base class for policies.
 
   A policy is something that returns a distribution over possible actions
@@ -181,7 +181,7 @@ class TabularPolicy(Policy):
   def __init__(self, game, players=None, to_string=lambda s: s.history_str()):
     """Initializes a uniform random policy for all players in the game."""
     players = sorted(players or range(game.num_players()))
-    super(TabularPolicy, self).__init__(game, players)
+    super().__init__(game, players)
     self.game_type = game.get_type()
 
     # Get all states in the game at which players have to make decisions.
@@ -233,15 +233,12 @@ class TabularPolicy(Policy):
     if self.game_type.provides_information_state_string:
       if player is None:
         return state.information_state_string()
-      else:
-        return state.information_state_string(player)
-    elif self.game_type.provides_observation_string:
+      return state.information_state_string(player)
+    if self.game_type.provides_observation_string:
       if player is None:
         return state.observation_string()
-      else:
-        return state.observation_string(player)
-    else:
-      return str(state)
+      return state.observation_string(player)
+    return str(state)
 
   def action_probabilities(self, state, player_id=None):
     """Returns an {action: probability} dict, covering all legal actions."""
@@ -341,7 +338,7 @@ class UniformRandomPolicy(Policy):
   def __init__(self, game):
     """Initializes a uniform random policy for all players in the game."""
     all_players = list(range(game.num_players()))
-    super(UniformRandomPolicy, self).__init__(game, all_players)
+    super().__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
     """Returns a uniform random policy for a player in a state.
@@ -369,7 +366,7 @@ class FirstActionPolicy(Policy):
 
   def __init__(self, game):
     all_players = list(range(game.num_players()))
-    super(FirstActionPolicy, self).__init__(game, all_players)
+    super().__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
     legal_actions = (state.legal_actions() if player_id is None

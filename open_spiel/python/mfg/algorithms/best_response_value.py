@@ -35,7 +35,7 @@ class BestResponse(value.ValueFunction):
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
     """
-    super(BestResponse, self).__init__(game)
+    super().__init__(game)
     if root_state is None:
       self._root_states = game.new_initial_states()
     else:
@@ -63,17 +63,17 @@ class BestResponse(value.ValueFunction):
     state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
     if state_str in self._state_value:
       return self._state_value[state_str]
-    elif state.is_terminal():
+    if state.is_terminal():
       self._state_value[state_str] = state.rewards()[
           state.mean_field_population()]
       return self._state_value[state_str]
-    elif state.current_player() == pyspiel.PlayerId.CHANCE:
+    if state.current_player() == pyspiel.PlayerId.CHANCE:
       self._state_value[state_str] = 0.0
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
         self._state_value[state_str] += prob * self.eval_state(new_state)
       return self._state_value[state_str]
-    elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
+    if state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
       dist = [
           self._distribution.value_str(str_state)
@@ -101,14 +101,13 @@ class BestResponse(value.ValueFunction):
 
   def evaluate(self):
     """Evaluate the best response value on all states."""
-    for s in self._root_states:
-      self.eval_state(s)
+    for state in self._root_states:
+      self.eval_state(state)
 
   def value(self, state, action=None):
     if action is None:
       return self._state_value[state.observation_string(
           pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
-    else:
-      new_state = state.child(action)
-      return state.rewards()[state.mean_field_population()] + self._state_value[
-          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+    new_state = state.child(action)
+    return state.rewards()[state.mean_field_population()] + self._state_value[
+        new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
