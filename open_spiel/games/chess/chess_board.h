@@ -462,9 +462,12 @@ class ChessBoard {
                                  const YieldFn& yield) const;
 
   template <typename YieldFn>
-  void GenerateCastlingDestinations_(Square sq, Color color,
+  void GenerateCastlingDestinations_(Square x_direction, Color color,
                                      PseudoLegalMoveSettings settings,
                                      const YieldFn& yield) const;
+  bool CanCastleBetween(const Square& sq1, const Square& sq2,
+                        const bool& check_safe_from_opponent,
+                        const PseudoLegalMoveSettings& settings) const;
 
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,
