@@ -16,18 +16,28 @@
 
 from absl.testing import absltest
 from open_spiel.python import policy
+from open_spiel.python.mfg import games  # pylint: disable=unused-import
 from open_spiel.python.mfg.algorithms import distribution
-from open_spiel.python.mfg.games import crowd_modelling
+import pyspiel
 
 
 class DistributionTest(absltest.TestCase):
 
   def test_basic(self):
-    game = crowd_modelling.MFGCrowdModellingGame()
+    game = pyspiel.load_game("python_mfg_crowd_modelling")
     uniform_policy = policy.UniformRandomPolicy(game)
     dist = distribution.DistributionPolicy(game, uniform_policy)
     state = game.new_initial_state().child(0)
     self.assertAlmostEqual(dist.value(state), 1 / game.size)
+
+  def test_multi_pop(self):
+    game = pyspiel.load_game("python_mfg_predator_prey")
+    self.assertEqual(game.num_players(), 3)
+    uniform_policy = policy.UniformRandomPolicy(game)
+    dist = distribution.DistributionPolicy(game, uniform_policy)
+    for pop in range(3):
+      self.assertAlmostEqual(
+          dist.value(game.new_initial_state_for_population(pop)), 1.)
 
 
 if __name__ == "__main__":

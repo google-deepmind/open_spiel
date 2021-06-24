@@ -75,7 +75,7 @@ def _format_matrix(mat):
 
 def _format_tensor(tensor, tensor_name, max_cols=120):
   """Formats a tensor in an easy-to-view format as a list of lines."""
-  if ((tensor.shape == (0,)) or (len(tensor.shape) > 3) or
+  if ((not tensor.shape) or (tensor.shape == (0,)) or (len(tensor.shape) > 3) or
       not np.logical_or(tensor == 0, tensor == 1).all()):
     vec = ", ".join(str(round(v, 5)) for v in tensor.ravel())
     return ["{} = [{}]".format(tensor_name, vec)]
@@ -311,7 +311,9 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line('ToString() = "{}"'.format(str(game)))
 
   players = list(range(game.num_players()))
-  state = game.new_initial_state()
+  # Arbitrarily pick the last possible initial states (for all games
+  # but multi-population MFGs, there will be a single initial state).
+  state = game.new_initial_states()[-1]
   state_idx = 0
   rng = np.random.RandomState(seed)
 

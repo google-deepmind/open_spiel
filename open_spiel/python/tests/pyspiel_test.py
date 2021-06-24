@@ -90,6 +90,7 @@ EXPECTED_GAMES = set([
     "pig",
     "python_iterated_prisoners_dilemma",
     "python_mfg_crowd_modelling",
+    "python_mfg_predator_prey",
     "python_kuhn_poker",
     "python_tic_tac_toe",
     "quoridor",

@@ -55,6 +55,7 @@ std::vector<absl::string_view> ProcessStringParam(
 }
 
 namespace {
+inline constexpr float kEpsilon = 1e-25;
 
 // Facts about the game.
 const GameType kGameType{
@@ -353,7 +354,7 @@ std::vector<double> CrowdModelling2dState::Rewards() const {
   if (current_player_ != 0) {
     return {0.};
   }
-  double r_mu = -std::log(distribution_[MergeXY(x_, y_, size_)]);
+  double r_mu = -std::log(distribution_[MergeXY(x_, y_, size_)]+kEpsilon);
   if (only_distribution_reward_) {
     return {r_mu};
   }

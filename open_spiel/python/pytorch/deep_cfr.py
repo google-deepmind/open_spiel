@@ -28,10 +28,13 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import math
 import random
 import numpy as np
+from scipy import stats
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from open_spiel.python import policy
 import pyspiel
@@ -43,37 +46,100 @@ StrategyMemory = collections.namedtuple(
     "StrategyMemory", "info_state iteration strategy_action_probs")
 
 
-def reset_params(m):
-  """Reinitializes the parameters of the given layer.
+class SonnetLinear(nn.Module):
+  """A Sonnet linear module.
 
-  Args:
-    m: (nn.Module) layer object
+  Always includes biases and only supports ReLU activations.
   """
-  if isinstance(m, nn.Linear):
-    m.reset_parameters()
+
+  def __init__(self, in_size, out_size, activate_relu=True):
+    """Creates a Sonnet linear layer.
+
+    Args:
+      in_size: (int) number of inputs
+      out_size: (int) number of outputs
+      activate_relu: (bool) whether to include a ReLU activation layer
+    """
+    super(SonnetLinear, self).__init__()
+    self._activate_relu = activate_relu
+    self._in_size = in_size
+    self._out_size = out_size
+    # stddev = 1.0 / math.sqrt(self._in_size)
+    # mean = 0
+    # lower = (-2 * stddev - mean) / stddev
+    # upper = (2 * stddev - mean) / stddev
+    # # Weight initialization inspired by Sonnet's Linear layer,
+    # # which cites https://arxiv.org/abs/1502.03167v3
+    # # pytorch default: initialized from
+    # # uniform(-sqrt(1/in_features), sqrt(1/in_features))
+    self._weight = None
+    self._bias = None
+    self.reset()
+
+  def forward(self, tensor):
+    y = F.linear(tensor, self._weight, self._bias)
+    return F.relu(y) if self._activate_relu else y
+
+  def reset(self):
+    stddev = 1.0 / math.sqrt(self._in_size)
+    mean = 0
+    lower = (-2 * stddev - mean) / stddev
+    upper = (2 * stddev - mean) / stddev
+    # Weight initialization inspired by Sonnet's Linear layer,
+    # which cites https://arxiv.org/abs/1502.03167v3
+    # pytorch default: initialized from
+    # uniform(-sqrt(1/in_features), sqrt(1/in_features))
+    self._weight = nn.Parameter(
+        torch.Tensor(
+            stats.truncnorm.rvs(
+                lower,
+                upper,
+                loc=mean,
+                scale=stddev,
+                size=[self._out_size, self._in_size])))
+    self._bias = nn.Parameter(torch.zeros([self._out_size]))
 
 
 class MLP(nn.Module):
-  """Basic MLP implementation using PyTorch."""
+  """A simple network built from nn.linear layers."""
 
-  def __init__(self, layers):
-    """Initialize a MLP in PyTorch.
+  def __init__(self,
+               input_size,
+               hidden_sizes,
+               output_size,
+               activate_final=False):
+    """Create the MLP.
 
     Args:
-      layers: (list[int]) Layer sizes.
+      input_size: (int) number of inputs
+      hidden_sizes: (list) sizes (number of units) of each hidden layer
+      output_size: (int) number of outputs
+      activate_final: (bool) should final layer should include a ReLU
     """
-    super(MLP, self).__init__()
-    layers = [
-        nn.Linear(layers[i], layers[i + 1]) for i in range(len(layers[:-1]))
-    ]
-    self._model = nn.Sequential(*layers)
 
-  def forward(self, model_input):
-    return self._model(model_input)
+    super(MLP, self).__init__()
+    self._layers = []
+    # Hidden layers
+    for size in hidden_sizes:
+      self._layers.append(SonnetLinear(in_size=input_size, out_size=size))
+      input_size = size
+    # Output layer
+    self._layers.append(
+        SonnetLinear(
+            in_size=input_size,
+            out_size=output_size,
+            activate_relu=activate_final))
+
+    self.model = nn.ModuleList(self._layers)
+
+  def forward(self, x):
+    for layer in self.model:
+      x = layer(x)
+    return x
 
   def reset(self):
-    """Reinitializes the network."""
-    self._model.apply(reset_params)
+    for layer in self._layers:
+      layer.reset()
 
 
 class ReservoirBuffer(object):
@@ -199,9 +265,9 @@ class DeepCFRSolver(policy.Policy):
 
     # Define strategy network, loss & memory.
     self._strategy_memories = ReservoirBuffer(memory_capacity)
-    self._policy_network = MLP([self._embedding_size] +
-                               list(policy_network_layers) +
-                               [self._num_actions])
+    self._policy_network = MLP(self._embedding_size,
+                               list(advantage_network_layers),
+                               self._num_actions)
     # Illegal actions are handled in the traversal code where expected payoff
     # and sampled regret is computed from the advantage networks.
     self._policy_sm = nn.Softmax(dim=-1)
@@ -214,8 +280,8 @@ class DeepCFRSolver(policy.Policy):
         ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
     ]
     self._advantage_networks = [
-        MLP([self._embedding_size] + list(advantage_network_layers) +
-            [self._num_actions]) for _ in range(self._num_players)
+        MLP(self._embedding_size, list(advantage_network_layers),
+            self._num_actions) for _ in range(self._num_players)
     ]
     self._loss_advantages = nn.MSELoss(reduction="mean")
     self._optimizer_advantages = []
@@ -223,6 +289,7 @@ class DeepCFRSolver(policy.Policy):
       self._optimizer_advantages.append(
           torch.optim.Adam(
               self._advantage_networks[p].parameters(), lr=learning_rate))
+    self._learning_rate = learning_rate
 
   @property
   def advantage_buffers(self):
@@ -238,6 +305,8 @@ class DeepCFRSolver(policy.Policy):
 
   def reinitialize_advantage_network(self, player):
     self._advantage_networks[player].reset()
+    self._optimizer_advantages[player] = torch.optim.Adam(
+        self._advantage_networks[player].parameters(), lr=self._learning_rate)
 
   def reinitialize_advantage_networks(self):
     for p in range(self._num_players):
