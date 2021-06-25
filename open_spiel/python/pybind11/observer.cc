@@ -20,6 +20,7 @@
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/pybind11.h"
+#include "third_party/pybind11_abseil/absl_casters.h"
 
 namespace open_spiel {
 namespace py = ::pybind11;
@@ -35,12 +36,19 @@ void init_pyspiel_observer(py::module& m) {
       .def_readonly("shape", &TensorInfo::shape)
       .def("__str__", &TensorInfo::DebugString);
 
+  py::class_<TensorInfoWithData>(m, "TensorInfoWithData")
+      .def_readonly("name", &TensorInfoWithData::name)
+      .def_readonly("shape", &TensorInfoWithData::shape)
+      .def_readonly("data", &TensorInfoWithData::data)
+      .def("__str__", &TensorInfoWithData::DebugString);
+
   // C++ Observation, intended only for the Python Observation class, not
   // for general Python code.
   py::class_<Observation>(m, "_Observation", py::buffer_protocol())
       .def(py::init<const Game&, std::shared_ptr<Observer>>(), py::arg("game"),
            py::arg("observer"))
       .def("tensor_info", &Observation::tensor_info)
+      .def("tensors", &Observation::tensors)
       .def("string_from", &Observation::StringFrom)
       .def("set_from", &Observation::SetFrom)
       .def("has_string", &Observation::HasString)
