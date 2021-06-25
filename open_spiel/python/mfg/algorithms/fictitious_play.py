@@ -58,7 +58,8 @@ class MergedPolicy(policy_std.Policy):
       for p, d, w in zip(self._policies, self._distributions, self._weights):
         merged_pi += w * d(state) * p(state)[a]
         norm_merged_pi += w * d(state)
-      action_prob.append((a, merged_pi/norm_merged_pi))
+      if norm_merged_pi:
+        action_prob.append((a, merged_pi/norm_merged_pi))
     return dict(action_prob)
 
 
