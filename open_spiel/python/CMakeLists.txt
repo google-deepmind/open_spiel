@@ -169,6 +169,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/fictitious_play_test.py
+  mfg/algorithms/mirror_descent_test.py
   mfg/algorithms/greedy_policy_test.py
   mfg/algorithms/nash_conv_test.py
   mfg/algorithms/policy_value_test.py

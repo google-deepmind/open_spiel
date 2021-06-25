@@ -42,13 +42,12 @@ class NashConv(object):
     """Returns the nash conv.
 
     Returns:
-      A list of size `game.num_players()` representing the nash conv for each
-      population.
+      A float representing the nash conv for the policy.
     """
     distrib = distribution.DistributionPolicy(self._game, self._policy)
     pi_value = policy_value.PolicyValue(self._game, distrib, self._policy)
     br_value = best_response_value.BestResponse(self._game, distrib)
-    return [
+    return sum([
         br_value.eval_state(state) - pi_value.eval_state(state)
         for state in self._game.new_initial_states()
-    ]
+    ])
