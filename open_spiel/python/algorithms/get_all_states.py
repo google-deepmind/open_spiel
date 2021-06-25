@@ -62,7 +62,10 @@ def _get_subgames_states(state, all_states, depth_limit, depth,
                          include_mean_field_states, to_string,
                          stop_if_encountered)
   else:
-    for action in state.legal_actions():
+    state_legal_actions = state.legal_actions()
+    if not state_legal_actions:
+      state_legal_actions = [0]
+    for action in state_legal_actions:
       state_for_search = state.child(action)
       _get_subgames_states(state_for_search, all_states, depth_limit, depth + 1,
                            include_terminals, include_chance_states,
