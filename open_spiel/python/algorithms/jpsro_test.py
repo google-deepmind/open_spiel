@@ -24,8 +24,6 @@ from open_spiel.python.algorithms import jpsro
 import pyspiel
 
 GAMES = (
-    "kuhn_poker_3p",
-    "trade_comm_2p_2i",
     "sheriff_2p_gabriele",
 )
 SWEEP_KWARGS = [
