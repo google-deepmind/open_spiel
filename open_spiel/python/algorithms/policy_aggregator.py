@@ -40,9 +40,8 @@ class PolicyFunction(policy.Policy):
         1).
       game: OpenSpiel game.
     """
-    self.player_ids = pids
+    super().__init__(game, pids)
     self._policies = policies
-    self.game = game
     self._game_type = game.get_type()
 
   def _state_key(self, state, player_id=None):
