@@ -219,8 +219,7 @@ class RbcObserver : public Observer {
     // Piece configuration.
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
       WritePieces(chess::Color{player}, piece_type, state.Board(),
-                  0, state.game()->board_size(),
-                  prefix, allocator);
+                  0, state.game()->board_size(), prefix, allocator);
     }
 
     // Castling rights.
@@ -260,18 +259,11 @@ class RbcObserver : public Observer {
       }
     }
 
-    {
-      auto out = allocator->Get("num_pieces", {board_size * 2, 2});
-      for (int pl = 0; pl < 2; ++pl) {
-        SPIEL_CHECK_LE(num_pieces[pl], board_size * 2);
-        if (num_pieces[pl]) out.at(num_pieces[pl] - 1, pl) = 1.;
-      }
-    }
-    {
-      auto out = allocator->Get("phase", {2});
-      if (state.phase_ == MovePhase::kSensing) out.at(0) = 1.;
-      else out.at(1) = 1.;
-    }
+    WriteScalar(num_pieces[0], 0, board_size * 2, "pieces_black", allocator);
+    WriteScalar(num_pieces[1], 0, board_size * 2, "pieces_white", allocator);
+    WriteBinary(state.phase_ == MovePhase::kSensing, "phase", allocator);
+    WriteBinary(state.illegal_move_attempted_, "illegal_move", allocator);
+    WriteBinary(state.move_captured_, "capture", allocator);
   }
 
   IIGObservationType iig_obs_type_;
@@ -291,10 +283,42 @@ void RbcState::DoApplyAction(Action action) {
   if (phase_ == MovePhase::kSensing) {
     sense_location_[CurrentPlayer()] = action;
     phase_ = MovePhase::kMoving;
+    illegal_move_attempted_ = false;
+    move_captured_ = false;
   } else {
     chess::Move move = ActionToMove(action, Board());
-    moves_history_.push_back(move);
-    Board().ApplyMove(move);
+    bool apply_move = true;
+
+    // Handle special cases for RBC.
+    if (action == chess::kPassAction) {
+      apply_move = false;
+    } else if (Board().IsBreachingMove(move)) {
+      SPIEL_DCHECK_FALSE(Board().IsMoveLegal(move));
+      Board().BreachingMoveToCaptureMove(&move);
+      // Transformed move must be legal.
+      SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
+      // And it must be a capture.
+      SPIEL_DCHECK_NE(Board().at(move.from).color, Board().at(move.to).color);
+    } else if (!Board().IsMoveLegal(move)) {
+      illegal_move_attempted_ = true;
+      apply_move = false;
+    }
+
+    if(apply_move) {
+      // Some player must be indeed moving.
+      SPIEL_DCHECK_NE(Board().at(move.from).color, chess::Color::kEmpty);
+      SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
+
+      illegal_move_attempted_ = false;
+      move_captured_ = Board().at(move.from).color != Board().at(move.to).color;
+      moves_history_.push_back(move);
+      SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
+      Board().ApplyMove(move);
+    } else {
+      Board().SetEpSquare(chess::kInvalidSquare);
+      Board().SetToPlay(chess::OppColor(Board().ToPlay()));
+    }
+
     ++repetitions_[current_board_.HashValue()];
     phase_ = MovePhase::kSensing;
   }
@@ -317,7 +341,7 @@ void RbcState::MaybeGenerateLegalActions() const {
       Board().GeneratePseudoLegalMoves([this](const chess::Move& move) -> bool {
         cached_legal_actions_->push_back(MoveToAction(move, BoardSize()));
         return true;
-      }, Board().ToPlay(), chess::PseudoLegalMoveSettings::kAcknowledgeEnemyPieces);
+      }, Board().ToPlay(), chess::PseudoLegalMoveSettings::kBreachEnemyPieces);
       absl::c_sort(*cached_legal_actions_);
     }
   }
@@ -335,6 +359,7 @@ std::string RbcState::ActionToString(Player player, Action action) const {
         chess::IndexToSquare(action, game()->inner_size()));
     return absl::StrCat("Sense ", from);
   } else {
+    if (action == chess::kPassAction) return "pass";
     chess::Move move = ActionToMove(action, Board());
     return move.ToSAN(Board());
   }

@@ -655,6 +655,61 @@ void ChessBoard::GeneratePseudoLegalPawnCaptures(
 #undef YIELD
 }
 
+bool ChessBoard::IsBreachingMove(Move tested_move) const{
+  const Piece& piece = at(tested_move.from);
+  if (piece.type == PieceType::kEmpty)  return false;
+  if (piece.type == PieceType::kKnight) return false;
+  if (piece.type == PieceType::kPawn)   return false;
+  // King never makes breaching moves: a castling that would be breaching
+  // is considered an illegal move.
+  if (piece.type == PieceType::kKing)   return false;
+
+  SPIEL_DCHECK_TRUE(piece.type == PieceType::kQueen ||
+                    piece.type == PieceType::kRook  ||
+                    piece.type == PieceType::kBishop);
+
+  // The move is not breaching, if it is generated with
+  // PseudoLegalMoveSettings::kAcknowledgeEnemyPieces
+
+  bool is_breaching = true;
+  const auto check_breaching = [&](const Square& to) {
+    if (to == tested_move.to) is_breaching = false;
+  };
+
+  // Queen moves are a combination of rook and bishop moves.
+  if (piece.type == PieceType::kRook || piece.type == PieceType::kQueen) {
+    GenerateRookDestinations_(tested_move.from, piece.color,
+                              kAcknowledgeEnemyPieces, check_breaching);
+  }
+  if (piece.type == PieceType::kBishop || piece.type == PieceType::kQueen) {
+    GenerateBishopDestinations_(tested_move.from, piece.color,
+                                kAcknowledgeEnemyPieces, check_breaching);
+  }
+
+  return is_breaching;
+}
+
+void ChessBoard::BreachingMoveToCaptureMove(Move* move) const {
+  SPIEL_CHECK_TRUE(move);
+  SPIEL_DCHECK_TRUE(IsBreachingMove(*move));
+  int dx = move->to.x - move->from.x;
+  int dy = move->to.y - move->from.y;
+  SPIEL_DCHECK_TRUE(dx == 0 || dy == 0 || std::abs(dx) == std::abs(dy));
+
+  // Cap values to [-1, 1] range to make a proper step size.
+  dx = std::max(-1, dx);
+  dx = std::min(1, dx);
+  dy = std::max(-1, dy);
+  dy = std::min(1, dy);
+  const Offset step{dx, dy};
+
+  Square sq;
+  for (sq = move->from + step; sq != move->to; sq += step) {
+    if (at(sq).type != PieceType::kEmpty) break;
+  }
+  move->to = sq;
+}
+
 bool ChessBoard::HasSufficientMaterial() const {
   // Try to detect these 4 conditions.
   // 1. K vs K

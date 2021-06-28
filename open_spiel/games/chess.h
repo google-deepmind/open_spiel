@@ -86,6 +86,10 @@ enum class PromotionTypeEncoding {
   kKnight = 4
 };
 
+// Some chess variants (RBC) allow a "pass" action, where a player can avoid
+// making a move.
+constexpr int kPassAction = 0;
+
 inline constexpr std::array<PieceType, 3> kUnderPromotionIndexToType = {
     PieceType::kRook, PieceType::kBishop, PieceType::kKnight};
 inline constexpr std::array<Offset, 3> kUnderPromotionDirectionToOffset = {

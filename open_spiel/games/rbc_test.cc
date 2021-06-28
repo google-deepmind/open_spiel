@@ -11,7 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and// limitations under the License.
 
+#include "open_spiel/games/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/games/rbc.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -21,7 +23,32 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
-void BasicDarkChessTests(int board_size) {
+void RbcTestPassMove() {
+  auto game = LoadGame("rbc");
+  std::unique_ptr<State> s = game->NewInitialState();
+
+  const std::string white_fen = chess::kDefaultStandardFEN;
+  /*const*/ std::string black_fen = chess::kDefaultStandardFEN;
+  std::replace(black_fen.begin(), black_fen.end(), 'w', 'b');  // Switch sides.
+
+  SPIEL_CHECK_EQ(s->ToString(), white_fen);
+
+  // First move
+  SPIEL_CHECK_EQ(s->ActionToString(Player{0}, 0), "Sense a1");
+  s->ApplyAction(0);  // Sense phase
+  SPIEL_CHECK_EQ(s->ActionToString(Player{0}, chess::kPassAction), "pass");
+  s->ApplyAction(chess::kPassAction);  // Move phase
+  SPIEL_CHECK_EQ(s->ToString(), black_fen);
+
+  // Second move
+  SPIEL_CHECK_EQ(s->ActionToString(Player{1}, 0), "Sense a1");
+  s->ApplyAction(0);  // Sense phase
+  SPIEL_CHECK_EQ(s->ActionToString(Player{1}, chess::kPassAction), "pass");
+  s->ApplyAction(chess::kPassAction);  // Move phase
+  SPIEL_CHECK_EQ(s->ToString(), white_fen);
+}
+
+void BasicRbcTests(int board_size) {
   GameParameters params;
   params["board_size"] = GameParameter(board_size);
 
@@ -30,37 +57,13 @@ void BasicDarkChessTests(int board_size) {
   testing::RandomSimTest(*LoadGame("rbc", params), 100);
 }
 
-void ChessBoardFlagPropagationTest(bool flag_king_in_check_allowed) {
-  auto tested_move =
-      chess::Move(/*from=*/{3, 0}, /*to=*/{2, 0},
-                           {chess::Color::kWhite, chess::PieceType::kKing});
-
-  auto board = chess::ChessBoard::BoardFromFEN("1kr1/4/4/3K w - - 0 1",
-      /*board_size=*/4,
-                                               flag_king_in_check_allowed);
-  bool move_allowed = false;
-  board->GenerateLegalMoves(
-      [&move_allowed, tested_move](const chess::Move& found_move) {
-        if (found_move == tested_move) {
-          move_allowed = true;
-          return false;
-        }
-        return true;
-      });
-
-  SPIEL_CHECK_EQ(move_allowed, flag_king_in_check_allowed);
-}
 
 }  // namespace
 }  // namespace rbc
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::rbc::BasicDarkChessTests(/*board_size=*/4);
-  open_spiel::rbc::BasicDarkChessTests(/*board_size=*/8);
-
-  open_spiel::rbc::ChessBoardFlagPropagationTest(
-      /*flag_king_in_check_allowed=*/true);
-  open_spiel::rbc::ChessBoardFlagPropagationTest(
-      /*flag_king_in_check_allowed=*/false);
+  open_spiel::rbc::RbcTestPassMove();
+  open_spiel::rbc::BasicRbcTests(/*board_size=*/8);
+  open_spiel::rbc::BasicRbcTests(/*board_size=*/4);
 }

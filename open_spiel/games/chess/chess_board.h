@@ -431,6 +431,8 @@ class ChessBoard {
   std::string ToDarkFEN(const ObservationTable& observability_table,
                         Color color) const;
 
+  bool IsBreachingMove(Move move) const;
+  void BreachingMoveToCaptureMove(Move* move) const;
  private:
   size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }
 
@@ -465,6 +467,8 @@ class ChessBoard {
   void GenerateCastlingDestinations_(Square x_direction, Color color,
                                      PseudoLegalMoveSettings settings,
                                      const YieldFn& yield) const;
+  bool CanCastle(Square king_sq, Color color,
+                 PseudoLegalMoveSettings settings) const;
   bool CanCastleBetween(const Square& sq1, const Square& sq2,
                         const bool& check_safe_from_opponent,
                         const PseudoLegalMoveSettings& settings) const;

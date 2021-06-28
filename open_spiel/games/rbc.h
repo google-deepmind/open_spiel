@@ -46,9 +46,7 @@
 //   it).
 // - There is no notion of check or mate (since neither player may be aware of
 //   any check relationship).
-// - A player wins by capturing the opponent's king or when the opponent runs
-//   out of time. In this competition, each player begins with a cumulative
-//   15-minute clock to make all her moves.
+// - A player wins by capturing the opponent's king.
 // - If a player tries to move a sliding piece through an opponent's piece, the
 //   opponent's piece is captured and the moved piece is stopped where the capture
 //   occurred. The moving player is notified of the square where her piece landed,
@@ -173,6 +171,9 @@ class RbcState : public State {
   // See also RbcGame::inner_size()
   std::array<int, 2> sense_location_ = {kSenseLocationNonSpecified,
                                         kSenseLocationNonSpecified};
+  bool move_captured_ = false;
+  bool illegal_move_attempted_ = false;
+
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).
@@ -197,8 +198,7 @@ class RbcGame : public Game {
     return chess::NumDistinctActions();
   }
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<RbcState>(shared_from_this(), board_size_,
-                                             fen_);
+    return absl::make_unique<RbcState>(shared_from_this(), board_size_, fen_);
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
