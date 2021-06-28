@@ -87,14 +87,9 @@ class BestResponse(value.ValueFunction):
       return self._state_value[state_str]
     else:
       assert int(state.current_player()) >= 0, "The player id should be >= 0"
-      state_legal_actions = state.legal_actions()
-      if state_legal_actions:
-        max_q = max(
-            self.eval_state(state.child(action))
-            for action in state.legal_actions())
-      else:
-        # If no legal action 0 should be played.
-        max_q = self.eval_state(state.child(0))
+      max_q = max(
+          self.eval_state(state.child(action))
+          for action in state.legal_actions())
       self._state_value[state_str] = state.rewards()[
           state.mean_field_population()] + max_q
       return self._state_value[state_str]
