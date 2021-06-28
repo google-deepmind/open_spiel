@@ -196,11 +196,15 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/dqn_jax_test.py
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     jax/nfsp_jax_test.py
 =======
     jax/deep_cfr_jax_test.py
 =======
 >>>>>>> a5a92bb8 (put it as TF test)
+=======
+    jax/deep_cfr_jax_test.py
+>>>>>>> ebf19c0b (dont hide GPUs)
     # This test is flaky. TODO(perolat): fix this.
     # See https://github.com/deepmind/open_spiel/issues/602
     # jax/nfsp_jax_test.py
@@ -240,7 +244,6 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
-      jax/deep_cfr_jax_test.py
   )
   if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
     set(PYTHON_TESTS ${PYTHON_TESTS}
