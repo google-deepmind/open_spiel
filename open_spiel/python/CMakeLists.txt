@@ -218,7 +218,6 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/alpha_zero/model_test.py
       algorithms/deep_cfr_test.py
       algorithms/deep_cfr_tf2_test.py
-      jax/deep_cfr_jax_test.py
       algorithms/discounted_cfr_test.py
       algorithms/dqn_test.py
       algorithms/eva_test.py
@@ -231,6 +230,7 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
+      jax/deep_cfr_jax_test.py
   )
   if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
     set(PYTHON_TESTS ${PYTHON_TESTS}
