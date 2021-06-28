@@ -44,7 +44,6 @@ import numpy as np
 import optax
 import tensorflow as tf
 import tensorflow_datasets as tfds
-tf.config.set_visible_devices([], 'GPU')
 
 
 from open_spiel.python import policy
