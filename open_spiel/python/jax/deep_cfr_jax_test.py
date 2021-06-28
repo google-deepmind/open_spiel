@@ -25,7 +25,6 @@ from open_spiel.python import policy
 from open_spiel.python.jax import deep_cfr
 from open_spiel.python.algorithms import exploitability
 import pyspiel
-import tensorflow as tf
 
 
 class DeepCFRTest(parameterized.TestCase):
@@ -68,4 +67,4 @@ class DeepCFRTest(parameterized.TestCase):
 
 
 if __name__ == '__main__':
-  tf.test.main()
+  absltest.main()
