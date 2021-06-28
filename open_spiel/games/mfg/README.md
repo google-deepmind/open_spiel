@@ -31,13 +31,13 @@ Game states go through the following stages:
 
 Then game states cycle over:
 
-1. Decision node with normal in-game actions (e.g. {left, neutral, right}).
+1.  Decision node with normal in-game actions (e.g. {left, neutral, right}).
 
-2. Mean field node, where we expect that external logic will have update the
-   state distribution and call DistributionSupport() and UpdateDistribution().
+2.  Chance node, where one of the normal in-game action (e.g. {left, neutral,
+    right}) can be randomly selected.
 
-3. Chance node, where one of the normal in-game action (e.g. {left, neutral,
-   right}) can be randomly selected.
+3.  Mean field node, where we expect that external logic will have update the
+    state distribution and call DistributionSupport() and UpdateDistribution().
 
 Multi-population mean field games are modeled as N-player games: the concept of
 a `player` is conflated with the concept of `population`. Game states depend on

@@ -190,6 +190,8 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
     npt.assert_array_equal(state.pos, initial_pos)
     state.apply_action(state._NEUTRAL_ACTION)
     npt.assert_array_equal(state.pos, initial_pos)
+    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
+    state.apply_action(state._NEUTRAL_ACTION)
     self.assertEqual(state.current_player(), pyspiel.PlayerId.MEAN_FIELD)
 
     # Maps states (in string representation) to their proba.
@@ -203,8 +205,6 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
     support = state.distribution_support()
     state.update_distribution([dist[s] for s in support])
 
-    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
-    state.apply_action(state._NEUTRAL_ACTION)
     # Decision node where we get a reward.
     self.assertEqual(state.current_player(), population)
     npt.assert_array_equal(state.rewards(), expected_rewards)

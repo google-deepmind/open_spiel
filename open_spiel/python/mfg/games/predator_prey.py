@@ -279,13 +279,13 @@ class MFGPredatorPreyState(pyspiel.State):
     elif self._player_id == pyspiel.PlayerId.CHANCE:
       self.update_pos(action)
       self._t += 1
-      self._player_id = self._population
+      self._player_id = pyspiel.PlayerId.MEAN_FIELD
     elif int(self._player_id) >= 0:
       assert self._player_id == self._population, (
           f"Invalid decision player id {self._player_id} "
           f"expected {self._population}")
       self.update_pos(action)
-      self._player_id = pyspiel.PlayerId.MEAN_FIELD
+      self._player_id = pyspiel.PlayerId.CHANCE
     else:
       raise ValueError(f"Unexpected state. Player id: {self._player_id}")
 
@@ -344,7 +344,7 @@ class MFGPredatorPreyState(pyspiel.State):
       raise ValueError(
           "update_distribution should only be called at a MEAN_FIELD state.")
     self._distribution = distribution.copy()
-    self._player_id = pyspiel.PlayerId.CHANCE
+    self._player_id = self._population
 
   def is_terminal(self):
     """Returns True if the game is over."""

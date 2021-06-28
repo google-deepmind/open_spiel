@@ -107,8 +107,7 @@ void TestReward() {
   SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 1. + std::log(100));
 
   state->ApplyAction(2);
-  SPIEL_CHECK_EQ(state->CurrentPlayer(), kMeanFieldPlayerId);
-  SPIEL_CHECK_FLOAT_EQ(state->CurrentPlayer(), kMeanFieldPlayerId);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
   SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 0.);
   SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 1. + std::log(100));
 }

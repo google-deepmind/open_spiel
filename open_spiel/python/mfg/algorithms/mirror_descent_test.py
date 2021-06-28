@@ -33,7 +33,7 @@ class MirrorDescentTest(absltest.TestCase):
     md_policy = md.get_policy()
     nash_conv_md = nash_conv.NashConv(game, md_policy)
 
-    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.54733968557111)
+    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.2730324915546056)
 
   def test_fp_cpp_game(self):
     """Checks if mirror descent works."""
@@ -44,7 +44,7 @@ class MirrorDescentTest(absltest.TestCase):
     md_policy = md.get_policy()
     nash_conv_md = nash_conv.NashConv(game, md_policy)
 
-    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.54733968557111)
+    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.2730324915546056)
 
 
 if __name__ == "__main__":

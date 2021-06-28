@@ -148,7 +148,7 @@ int MergeXY(int xx, int yy, int size) {
   SPIEL_CHECK_LE(xx, size - 1);
   SPIEL_CHECK_GE(yy, 0);
   SPIEL_CHECK_LE(yy, size - 1);
-  return xx + yy * size;
+  return yy +  xx * size;
 }
 
 bool ComparisonPair(const std::pair<int, int>& a,
@@ -297,13 +297,13 @@ void CrowdModelling2dState::DoApplyAction(Action action) {
     xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
     yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
     ++t_;
-    current_player_ = 0;
+    current_player_ = kMeanFieldPlayerId;
   } else {
     SPIEL_CHECK_EQ(current_player_, 0);
     xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
     yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
     last_action_ = action;
-    current_player_ = kMeanFieldPlayerId;
+    current_player_ = kChancePlayerId;
   }
   // Check if the new (xx,yy) is forbidden.
   bool is_next_state_forbidden = false;
@@ -345,7 +345,7 @@ void CrowdModelling2dState::UpdateDistribution(
   SPIEL_CHECK_EQ(current_player_, kMeanFieldPlayerId);
   SPIEL_CHECK_EQ(distribution.size(), size_ * size_);
   distribution_ = distribution;
-  current_player_ = kChancePlayerId;
+  current_player_ = kDefaultPlayerId;
 }
 
 bool CrowdModelling2dState::IsTerminal() const { return t_ >= horizon_; }

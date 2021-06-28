@@ -102,7 +102,7 @@ class MFGCrowdModellingGameTest(absltest.TestCase):
     self.assertAlmostEqual(state.rewards()[0], 1. + np.log(game.size))
     self.assertAlmostEqual(state.returns()[0], 1. + np.log(game.size))
     state.apply_action(1)
-    self.assertEqual(state.current_player(), pyspiel.PlayerId.MEAN_FIELD)
+    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
     self.assertAlmostEqual(state.returns()[0], 1. + np.log(game.size))
 
   def test_distribution(self):
@@ -115,18 +115,15 @@ class MFGCrowdModellingGameTest(absltest.TestCase):
     # This expected reward assumes that the game is initialized with
     # uniform state distribution.
     self.assertAlmostEqual(state.rewards()[0], 1. + np.log(game.size))
-
     state.apply_action(crowd_modelling.MFGCrowdModellingState._NEUTRAL_ACTION)
-
-    self.assertEqual(state.current_player(), pyspiel.PlayerId.MEAN_FIELD)
+    # Chance node.
+    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
+    state.apply_action(crowd_modelling.MFGCrowdModellingState._NEUTRAL_ACTION)
     self.assertEqual(
-        state.distribution_support(), [str((x, 0)) for x in range(10)])
+        state.distribution_support(), [str((x, 1)) for x in range(10)])
     new_distrib = [0.01] * 9 + [1. - 0.01 * 9]
     state.update_distribution(new_distrib)
     self.assertAlmostEqual(state._distribution, new_distrib)
-
-    # Chance node.
-    state.apply_action(crowd_modelling.MFGCrowdModellingState._NEUTRAL_ACTION)
 
     # Check that the distribution is taken into account for the reward
     # computation.
