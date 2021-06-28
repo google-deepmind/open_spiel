@@ -408,6 +408,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
           str(action) for action in actions)), force=True)
       state.apply_actions(actions)
     else:
+      assert state.legal_actions(), 'Legal actions should be non empty array.'
       add_line("LegalActions() = [{}]".format(", ".join(
           str(x) for x in state.legal_actions())))
       add_line("StringLegalActions() = [{}]".format(", ".join(
