@@ -43,6 +43,7 @@ import jax.numpy as jnp
 import numpy as np
 import optax
 import chex
+from typing import Optional
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
