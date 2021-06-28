@@ -195,9 +195,12 @@ if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
     jax/dqn_jax_test.py
 <<<<<<< HEAD
+<<<<<<< HEAD
     jax/nfsp_jax_test.py
 =======
     jax/deep_cfr_jax_test.py
+=======
+>>>>>>> a5a92bb8 (put it as TF test)
     # This test is flaky. TODO(perolat): fix this.
     # See https://github.com/deepmind/open_spiel/issues/602
     # jax/nfsp_jax_test.py
@@ -225,6 +228,7 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/alpha_zero/model_test.py
       algorithms/deep_cfr_test.py
       algorithms/deep_cfr_tf2_test.py
+      jax/deep_cfr_jax_test.py
       algorithms/discounted_cfr_test.py
       algorithms/dqn_test.py
       algorithms/eva_test.py
