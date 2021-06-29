@@ -165,11 +165,7 @@ class DeepCFRSolver(policy.Policy):
                memory_capacity: int = int(1e6),
                policy_network_train_steps: int = 5000,
                advantage_network_train_steps: int = 750,
-               reinitialize_advantage_networks: bool = True,
-               save_advantage_networks: str = None,
-               save_strategy_memories: str = None,
-               infer_device='cpu',
-               train_device='cpu'):
+               reinitialize_advantage_networks: bool = True):
     """Initialize the Deep CFR algorithm.
 
     Args:
@@ -188,16 +184,6 @@ class DeepCFRSolver(policy.Policy):
         (per iteration).
       reinitialize_advantage_networks: Whether to re-initialize the advantage
         network before training on each iteration.
-      save_advantage_networks: If provided, all advantage network itearations
-        are saved in the given folder. This can be useful to implement SD-CFR
-        https://arxiv.org/abs/1901.07621
-      save_strategy_memories: saves the collected strategy memories as a
-        tfrecords file in the given location. This is not affected by
-        memory_capacity. All memories are saved to disk and not kept in memory
-      infer_device: device used for TF-operations in the traversal branch.
-        Format is anything accepted by tf.device
-      train_device: device used for TF-operations in the NN training steps.
-        Format is anything accepted by tf.device
     """
     all_players = list(range(game.num_players()))
     super(DeepCFRSolver, self).__init__(game, all_players)
@@ -253,24 +239,28 @@ class DeepCFRSolver(policy.Policy):
     self._params_policy_network = self._hk_policy_network.init(self._next_rng_key(),
                             x, mask)
 
+    # initialize losses and grads
     self._adv_loss = l2_loss
     self._policy_loss = l2_loss
     self._adv_grads = jax.value_and_grad(self._loss_adv)
     self._policy_grads = jax.value_and_grad(self._loss_policy)
 
+    # initialize optimizers
     self._opt_adv_init, self._opt_adv_update = optax.adam(learning_rate)
     self._opt_adv_state = [self._opt_adv_init(params)
                             for params in self._params_adv_network]
     self._opt_policy_init, self._opt_policy_update = optax.adam(learning_rate)
     self._opt_policy_state = self._opt_policy_init(self._params_policy_network)
 
+    # initialize memories
     self._create_memories(memory_capacity)
 
+    # jit param updates and matched regrets calculations
     self._jitted_matched_regrets = self._get_jitted_matched_regrets()
-    self._jitted_adv_update = self.get_jitted_adv_update()
-    self._jitted_policy_update = self.get_jitted_policy_update()
+    self._jitted_adv_update = self._get_jitted_adv_update()
+    self._jitted_policy_update = self._get_jitted_policy_update()
 
-  def get_jitted_adv_update(self):
+  def _get_jitted_adv_update(self):
     """get jitted advantage update function."""
     @jax.jit
     def update(params_adv, opt_state, info_states, samp_regrets, iterations, masks,
@@ -285,7 +275,7 @@ class DeepCFRSolver(policy.Policy):
       
     return update
 
-  def get_jitted_policy_update(self):
+  def _get_jitted_policy_update(self):
     """get jitted policy update function."""
     @jax.jit
     def update(params_policy, opt_state, info_states, action_probs, iterations, masks,
@@ -302,7 +292,7 @@ class DeepCFRSolver(policy.Policy):
 
   def _get_jitted_matched_regrets(self):
     """get jitted regret matching function."""
-    @jax.jit
+    #@jax.jit
     def get_matched_regrets(info_state, legal_actions_mask, params_adv):
       advs = self._hk_adv_network.apply(params_adv,
             info_state, legal_actions_mask)
@@ -352,7 +342,7 @@ class DeepCFRSolver(policy.Policy):
       self._advantage_memories[p].clear()
 
   def _create_memories(self, memory_capacity):
-    """Create memory buffers"""
+    """Create memory buffers and associated feature descriptions."""
     self._strategy_memories = ReservoirBuffer(memory_capacity)
     self._advantage_memories = [
         ReservoirBuffer(memory_capacity) for _ in range(self._num_players)
@@ -491,14 +481,13 @@ class DeepCFRSolver(policy.Policy):
     else:
       other_player = state.current_player()
       _, strategy = self._sample_action_from_advantage(state, other_player)
-      strategy = np.array(strategy)
       # Recompute distribution for numerical errors.
-      probs = strategy
+      probs = np.array(strategy)
       probs /= probs.sum()
       sampled_action = np.random.choice(range(self._num_actions), p=probs)
       self._add_to_strategy_memory(
           state.information_state_tensor(other_player), self._iteration,
-          strategy, state.legal_actions_mask(other_player))
+          probs, state.legal_actions_mask(other_player))
       return self._traverse_game_tree(state.child(sampled_action), player)
 
 
@@ -537,11 +526,10 @@ class DeepCFRSolver(policy.Policy):
     """Returns the collected regrets for the given player as a dataset.
     """    
     self._advantage_memories[player].shuffle_data()
-    self._advantage_memories[player]
     data = tf.data.Dataset.from_tensor_slices(
         self._advantage_memories[player].data)
-    data = data.shuffle(ADVANTAGE_TRAIN_SHUFFLE_SIZE)
     data = data.repeat()
+    data = data.shuffle(ADVANTAGE_TRAIN_SHUFFLE_SIZE)
     data = data.batch(self._batch_size_advantage)
     data = data.map(self._deserialize_advantage_memory)
     data = data.prefetch(tf.data.experimental.AUTOTUNE)
@@ -552,8 +540,8 @@ class DeepCFRSolver(policy.Policy):
     """Returns the collected strategy memories as a dataset."""
     self._strategy_memories.shuffle_data()
     data = tf.data.Dataset.from_tensor_slices(self._strategy_memories.data)
-    data = data.shuffle(STRATEGY_TRAIN_SHUFFLE_SIZE)
     data = data.repeat()
+    data = data.shuffle(STRATEGY_TRAIN_SHUFFLE_SIZE)
     data = data.batch(self._batch_size_strategy)
     data = data.map(self._deserialize_strategy_memory)
     data = data.prefetch(tf.data.experimental.AUTOTUNE)
