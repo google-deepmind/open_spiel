@@ -292,7 +292,7 @@ class DeepCFRSolver(policy.Policy):
 
   def _get_jitted_matched_regrets(self):
     """get jitted regret matching function."""
-    #@jax.jit
+    @jax.jit
     def get_matched_regrets(info_state, legal_actions_mask, params_adv):
       advs = self._hk_adv_network.apply(params_adv,
             info_state, legal_actions_mask)
