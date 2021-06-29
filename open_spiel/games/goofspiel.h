@@ -24,19 +24,20 @@
 #include "open_spiel/spiel.h"
 
 // Goofspiel, or the Game of Pure Strategy, is a bidding card game where players
-// are trying to obtain the most points. In, Goofspiel(K), each player has bid
-// cards numbered 1-K and a point card deck containing cards numbered 1-K is
-// shuffled and set face-down. Each turn, the top point card is revealed, and
-// players simultaneously play a bid card; the point card is given to the
-// highest bidder or discarded if the bids are equal. For more detail, see:
-// https://en.wikipedia.org/wiki/Goofspiel
+// are trying to obtain the most points. In, Goofspiel(N,K), each player has bid
+// cards numbered 1..N and a point card deck containing cards numbered 1..N is
+// shuffled and set face-down. There are K turns. Each turn, the top point card
+// is revealed, and players simultaneously play a bid card; the point card is
+// given to the highest bidder or discarded if the bids are equal. For more
+// detail, see: https://en.wikipedia.org/wiki/Goofspiel
 //
 // This implementation of Goofspiel is slightly more general than the standard
 // game. First, more than 2 players can play it. Second, the deck can take on
 // pre-determined orders rather than randomly determined. Third, there is an
 // option to enable the imperfect information variant described in Sec 3.1.4
 // of http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf, where only
-// the sequences of wins / losses is revealed (not the players' hands).
+// the sequences of wins / losses is revealed (not the players' hands). Fourth,
+// players can play for only K turns (if not specified, K=N by default).
 //
 // The returns_type parameter determines how returns (utilities) are defined:
 //   - win_loss distributed 1 point divided by number of winners (i.e. players
@@ -49,6 +50,8 @@
 // Parameters:
 //   "imp_info"      bool     Enable the imperfect info variant (default: false)
 //   "num_cards"     int      The highest bid card, and point card (default: 13)
+//   "num_turns"    int       The number of turns to play (default: -1, play
+//                            for the same number of rounds as there are cards)
 //   "players"       int      number of players (default: 2)
 //   "points_order"  string   "random" (default), "descending", or "ascending"
 //   "returns_type"  string   "win_loss" (default), "point_difference", or
@@ -57,8 +60,11 @@
 namespace open_spiel {
 namespace goofspiel {
 
+inline constexpr int kNumTurnsSameAsCards = -1;
+
 inline constexpr int kDefaultNumPlayers = 2;
 inline constexpr int kDefaultNumCards = 13;
+inline constexpr int kDefaultNumTurns = kNumTurnsSameAsCards;
 inline constexpr const char* kDefaultPointsOrder = "random";
 inline constexpr const char* kDefaultReturnsType = "win_loss";
 inline constexpr const bool kDefaultImpInfo = false;
@@ -81,8 +87,11 @@ class GoofspielObserver;
 
 class GoofspielState : public SimMoveState {
  public:
-  explicit GoofspielState(std::shared_ptr<const Game> game, int num_cards,
-                          PointsOrder points_order, bool impinfo,
+  explicit GoofspielState(std::shared_ptr<const Game> game,
+                          int num_cards, 
+                          int num_turns,
+                          PointsOrder points_order,
+                          bool impinfo,
                           ReturnsType returns_type);
 
   Player CurrentPlayer() const override;
@@ -114,13 +123,14 @@ class GoofspielState : public SimMoveState {
   int CurrentPointValue() const { return 1 + point_card_; }
 
   int num_cards_;
+  int num_turns_;
   PointsOrder points_order_;
   ReturnsType returns_type_;
   bool impinfo_;
 
   Player current_player_;
   std::set<int> winners_;
-  int turns_;
+  int current_turn_;
   int point_card_;
   std::vector<int> points_;
   std::vector<std::vector<bool>> player_hands_;  // true if card is in hand.
@@ -148,7 +158,8 @@ class GoofspielGame : public Game {
       const GameParameters& params) const override;
 
   int NumCards() const { return num_cards_; }
-  int NumRounds() const { return num_cards_; }
+  int NumRounds() const { return num_turns_; }
+  int NumTurns() const { return num_turns_; }
   PointsOrder GetPointsOrder() const { return points_order_; }
   ReturnsType GetReturnsType() const { return returns_type_; }
   bool IsImpInfo() const { return impinfo_; }
@@ -163,7 +174,8 @@ class GoofspielGame : public Game {
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
  private:
-  int num_cards_;    // The K in Goofspiel(K)
+  int num_cards_;    // The N in Goofspiel(N,K)
+  int num_turns_;    // The K in Goofspiel(N,K)
   int num_players_;  // Number of players
   PointsOrder points_order_;
   ReturnsType returns_type_;
