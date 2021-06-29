@@ -22,6 +22,7 @@ import collections
 
 from absl.testing import absltest
 from scipy import stats
+import numpy as np
 
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import nfsp
@@ -78,6 +79,7 @@ class ReservoirBufferTest(absltest.TestCase):
     self.assertEqual(len(reservoir_buffer), 2)
 
   def test_reservoir_uniform(self):
+    np.random.seed(42)
     size = 10
     max_value = 100
     num_trials = 1000
