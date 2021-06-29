@@ -175,6 +175,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/algorithms/policy_value_test.py
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
+  tests/game_implementation_test/finite_horizon_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py

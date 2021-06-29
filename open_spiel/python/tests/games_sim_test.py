@@ -14,19 +14,24 @@
 
 """Python spiel example."""
 
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import pickle
+
 from absl import app
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
 from open_spiel.python import games  # pylint: disable=unused-import
+from open_spiel.python.algorithms import get_all_states
+from open_spiel.python.mfg.games import crowd_modelling  # pylint:disable=unused-import
 import pyspiel
 from open_spiel.python.utils import file_utils
+# TODO(perolat): add predator_prey in the list of game tested
 
 # Put a bound on length of game so test does not timeout.
 MAX_ACTIONS_PER_GAME = 1000
@@ -297,6 +302,30 @@ class GamesSimTest(parameterized.TestCase):
                             not checker_moves[1].hit)
         action = np.random.choice(legal_actions)
         state.apply_action(action)
+
+# TODO(perolat): find the list of games where it is reasonable to call
+# get_all_states
+  @parameterized.parameters(
+      {"game_name": "python_mfg_crowd_modelling"},
+      {"game_name": "mfg_crowd_modelling"},
+      {"game_name": "mfg_crowd_modelling_2d"},
+      {"game_name": "kuhn_poker"},
+      {"game_name": "leduc_poker"},
+  )
+  def test_has_at_least_an_action(self, game_name):
+    """Check that all population's state have at least one action."""
+    game = pyspiel.load_game(game_name)
+    to_string = lambda s: s.observation_string(pyspiel.PlayerId.
+                                               DEFAULT_PLAYER_ID)
+    states = get_all_states.get_all_states(
+        game,
+        depth_limit=-1,
+        include_terminals=False,
+        include_chance_states=False,
+        include_mean_field_states=False,
+        to_string=to_string)
+    for state in states.values():
+      self.assertNotEmpty(state.legal_actions())
 
 
 def main(_):
