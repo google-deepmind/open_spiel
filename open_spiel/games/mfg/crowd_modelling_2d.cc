@@ -391,16 +391,22 @@ void CrowdModelling2dState::ObservationTensor(Player player,
                                               absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), 2 * size_ + horizon_);
-  SPIEL_CHECK_GE(x_, 0);
+  SPIEL_CHECK_EQ(values.size(), 2 * size_ + horizon_ + 1);
   SPIEL_CHECK_LT(x_, size_);
-  SPIEL_CHECK_GE(y_, 0);
   SPIEL_CHECK_LT(y_, size_);
   SPIEL_CHECK_GE(t_, 0);
-  SPIEL_CHECK_LT(t_, horizon_);
+  // Allow t_ == horizon_.
+  SPIEL_CHECK_LE(t_, horizon_);
   std::fill(values.begin(), values.end(), 0.);
-  values[x_] = 1.;
-  values[y_ + size_] = 1.;
+  if (x_ >= 0 && y_ >= 0) {
+    values[x_] = 1.;
+    values[y_ + size_] = 1.;
+  } else {
+    // x_ and y_ equal -1 for the initial (blank) state, don't set any position
+    // bit in that case.
+    SPIEL_CHECK_EQ(x_, -1);
+    SPIEL_CHECK_EQ(y_, -1);
+  }
   values[size_ + t_] = 1.;
 }
 
@@ -430,7 +436,8 @@ CrowdModelling2dGame::CrowdModelling2dGame(const GameParameters& params)
           "initial_distribution_value", kDefaultInitialDistributionValue)) {}
 
 std::vector<int> CrowdModelling2dGame::ObservationTensorShape() const {
-  return {2 * ParameterValue<int>("size") + ParameterValue<int>("horizon")};
+  // +1 to allow for t_ == horizon.
+  return {2 * ParameterValue<int>("size") + ParameterValue<int>("horizon") + 1};
 }
 
 std::unique_ptr<State> CrowdModelling2dGame::DeserializeState(
