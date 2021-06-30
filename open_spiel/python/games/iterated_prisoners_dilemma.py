@@ -63,20 +63,12 @@ class Chance(enum.IntEnum):
   STOP = 1
 
 
-# Hold a list of created games to stop them being garbage-collected
-# Without this, pyspiel.load_game("turn_based_simultaneous_game(...)")
-# will return an unusable game (the Python class will be deleted).
-# TODO(author11) Fix the underlying issue and remove this
-_games = []
-
-
 class IteratedPrisonersDilemmaGame(pyspiel.Game):
   """The game, from which states and observers can be made."""
 
   # pylint:disable=dangerous-default-value
   def __init__(self, params=_DEFAULT_PARAMS):
     super().__init__(_GAME_TYPE, _GAME_INFO, params)
-    _games.append(self)
     self._termination_probability = params["termination_probability"]
 
   def new_initial_state(self):
