@@ -119,6 +119,7 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
               ]),
           'population':
               0,
+          'players': 2,
           'initial_pos':
               np.array([0, 0]),
           'distributions': [
@@ -148,6 +149,7 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
               ]),
           'population':
               2,
+          'players': 3,
           'initial_pos':
               np.array([1, 1]),
           'distributions': [
@@ -175,12 +177,13 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
               ]),
       },
   )
-  def test_rewards(self, reward_matrix, population, initial_pos, distributions,
-                   expected_rewards):
+  def test_rewards(self, reward_matrix, players, population, initial_pos,
+                   distributions, expected_rewards):
     game = pyspiel.load_game(
         'python_mfg_predator_prey', {
             'size': 2,
-            'reward_matrix': ' '.join(str(v) for v in reward_matrix.flatten())
+            'reward_matrix': ' '.join(str(v) for v in reward_matrix.flatten()),
+            'players': players
         })
     state = game.new_initial_state_for_population(population)
     # Initial chance node.

@@ -43,12 +43,14 @@ _DEFAULT_HORIZON = 10
 _NUM_ACTIONS = 5
 _NUM_CHANCE = 5
 _DEFAULT_REWARD_MATRIX = np.array([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
+_DEFAULT_NUM_PLAYERS = 3
 
 _DEFAULT_GEOMETRY = Geometry.SQUARE
 
 _DEFAULT_PARAMS = {
     "size": _DEFAULT_SIZE,
     "horizon": _DEFAULT_HORIZON,
+    "players": _DEFAULT_NUM_PLAYERS,
     # The reward matrix is represented as a string containing a
     # space-separated list of values.
     # Its size defines the number of populations in the mean field game.
@@ -87,7 +89,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.horizon = get_param("horizon", params)
     flat_reward_matrix = np.fromstring(
         get_param("reward_matrix", params), dtype=np.float, sep=" ")
-    num_players = int(round(np.sqrt(len(flat_reward_matrix))))
+    num_players = get_param("players", params)
     if len(flat_reward_matrix) != num_players**2:
       raise ValueError(
           f"Reward matrix passed in flat representation does not represent a "

@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Python Mean Field Predator Prey"
 GameType.max_num_players = 1000000000
 GameType.min_num_players = 1
-GameType.parameter_specification = ["geometry", "horizon", "reward_matrix", "size"]
+GameType.parameter_specification = ["geometry", "horizon", "players", "reward_matrix", "size"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 5
 PolicyTensorShape() = [5]
 MaxChanceOutcomes() = 5
-GetParameters() = {geometry=0,horizon=10,reward_matrix=0 -1 1 1 0 -1 -1 1 0,size=5}
+GetParameters() = {geometry=0,horizon=10,players=3,reward_matrix=0 -1 1 1 0 -1 -1 1 0,size=5}
 NumPlayers() = 3
 MinUtility() = -inf
 MaxUtility() = inf
@@ -28,7 +28,7 @@ ObservationTensorShape() = x: [5], y: [5], t: [11]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 21
 MaxGameLength() = 10
-ToString() = "python_mfg_predator_prey(geometry=0,horizon=10,reward_matrix=0 -1 1 1 0 -1 -1 1 0,size=5)"
+ToString() = "python_mfg_predator_prey(geometry=0,horizon=10,players=3,reward_matrix=0 -1 1 1 0 -1 -1 1 0,size=5)"
 
 # State 0
 # position_init_2
