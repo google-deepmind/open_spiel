@@ -237,9 +237,8 @@ PYBIND11_MODULE(pyspiel, m) {
   player_action.def_readonly("player", &State::PlayerAction::player)
       .def_readonly("action", &State::PlayerAction::action);
 
-  // TODO(author11) Remove py::dynamic_attr when
-  // https://github.com/pybind/pybind11/pull/2972 is submitted
-  py::classh<State, PyState> state(m, "State", py::dynamic_attr());
+  // https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst
+  py::classh<State, PyState> state(m, "State");
   state.def(py::init<std::shared_ptr<const Game>>())
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
