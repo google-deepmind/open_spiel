@@ -198,7 +198,9 @@ class MFGCrowdModellingState(pyspiel.State):
   def distribution_support(self):
     """return a list of state string."""
     return [
-        self.state_to_str(i, self.t, player_id=0) for i in range(self.size)
+        self.state_to_str(
+            i, self.t, player_id=pyspiel.PlayerId.MEAN_FIELD)
+        for i in range(self.size)
     ]
 
   def update_distribution(self, distribution):

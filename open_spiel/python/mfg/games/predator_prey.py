@@ -304,7 +304,10 @@ class MFGPredatorPreyState(pyspiel.State):
         for population in range(self.num_players()):
           support.append(
               self.state_to_str(
-                  np.array([x, y]), self._t, population, player_id=population))
+                  np.array([x, y]),
+                  self._t,
+                  population,
+                  player_id=pyspiel.PlayerId.MEAN_FIELD))
     return support
 
   def get_pos_proba(self, pos: np.ndarray, population: int) -> float:

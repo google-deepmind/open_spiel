@@ -334,7 +334,7 @@ std::vector<std::string> CrowdModelling2dState::DistributionSupport() {
   support.reserve(size_ * size_);
   for (int x = 0; x < size_; ++x) {
     for (int y = 0; y < size_; ++y) {
-      support.push_back(StateToString(x, y, t_, 0, false));
+      support.push_back(StateToString(x, y, t_, kMeanFieldPlayerId, false));
     }
   }
   return support;
@@ -407,7 +407,7 @@ void CrowdModelling2dState::ObservationTensor(Player player,
     SPIEL_CHECK_EQ(x_, -1);
     SPIEL_CHECK_EQ(y_, -1);
   }
-  values[size_ + t_] = 1.;
+  values[2 * size_ + t_] = 1.;
 }
 
 std::unique_ptr<State> CrowdModelling2dState::Clone() const {

@@ -199,9 +199,12 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
     for x in range(state.size):
       for y in range(state.size):
         for pop in range(len(reward_matrix)):
-          dist[state.state_to_str(
-              np.array([x, y]), state.t, pop,
-              player_id=pop)] = distributions[pop][y][x]
+          state_str = state.state_to_str(
+              np.array([x, y]),
+              state.t,
+              pop,
+              player_id=pyspiel.PlayerId.MEAN_FIELD)
+          dist[state_str] = distributions[pop][y][x]
     support = state.distribution_support()
     state.update_distribution([dist[s] for s in support])
 

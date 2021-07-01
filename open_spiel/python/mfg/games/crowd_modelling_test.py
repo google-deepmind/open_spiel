@@ -20,6 +20,8 @@ import numpy as np
 from open_spiel.python.mfg.games import crowd_modelling
 import pyspiel
 
+MFG_STR_CONST = "_a"
+
 
 class MFGCrowdModellingGameTest(absltest.TestCase):
 
@@ -119,8 +121,10 @@ class MFGCrowdModellingGameTest(absltest.TestCase):
     # Chance node.
     self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
     state.apply_action(crowd_modelling.MFGCrowdModellingState._NEUTRAL_ACTION)
-    self.assertEqual(
-        state.distribution_support(), [str((x, 1)) for x in range(10)])
+    self.assertEqual(state.distribution_support(), [
+        "(0, 1)_a", "(1, 1)_a", "(2, 1)_a", "(3, 1)_a", "(4, 1)_a", "(5, 1)_a",
+        "(6, 1)_a", "(7, 1)_a", "(8, 1)_a", "(9, 1)_a"
+    ])
     new_distrib = [0.01] * 9 + [1. - 0.01 * 9]
     state.update_distribution(new_distrib)
     self.assertAlmostEqual(state._distribution, new_distrib)

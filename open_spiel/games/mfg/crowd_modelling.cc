@@ -153,7 +153,7 @@ std::vector<std::string> CrowdModellingState::DistributionSupport() {
   std::vector<std::string> support;
   support.reserve(size_);
   for (int x = 0; x < size_; ++x) {
-    support.push_back(StateToString(x, t_, 0, false));
+    support.push_back(StateToString(x, t_, kMeanFieldPlayerId, false));
   }
   return support;
 }
