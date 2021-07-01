@@ -20,7 +20,6 @@
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/pybind11.h"
-#include "third_party/pybind11_abseil/absl_casters.h"
 
 namespace open_spiel {
 namespace py = ::pybind11;
@@ -39,7 +38,17 @@ void init_pyspiel_observer(py::module& m) {
   py::class_<TensorInfoWithData>(m, "TensorInfoWithData")
       .def_readonly("name", &TensorInfoWithData::name)
       .def_readonly("shape", &TensorInfoWithData::shape)
-      .def_readonly("data", &TensorInfoWithData::data)
+      // .def_readonly("data", &TensorInfoWithData::data)
+      .def_property_readonly("data",
+                             [](const TensorInfoWithData& tensor) {
+                               // absl::Span requires pybind11_abseil which
+                               // open spiel forbids. Thus copy the data
+                               // and expose a vector through pybind.
+                               std::vector<float> data(
+                                   tensor.data.data(),
+                                   tensor.data.data() + tensor.data.size());
+                               return data;
+                             })
       .def("__str__", &TensorInfoWithData::DebugString);
 
   // C++ Observation, intended only for the Python Observation class, not
