@@ -27,7 +27,7 @@ from open_spiel.python.mfg.games import crowd_modelling
 import pyspiel
 
 
-class BestResponseTest(absltest.TestCase):
+class FictitiousPlayTest(absltest.TestCase):
 
   def test_fp_python_game(self):
     """Checks if fictitious play works."""
@@ -38,7 +38,7 @@ class BestResponseTest(absltest.TestCase):
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), [0.6532391712469803])
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
 
   def test_average(self):
     """Test the average of policies.
@@ -73,7 +73,7 @@ class BestResponseTest(absltest.TestCase):
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), [0.6532391712469803])
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
 
 
 if __name__ == "__main__":

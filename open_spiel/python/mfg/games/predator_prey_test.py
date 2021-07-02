@@ -94,6 +94,7 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
               ]),
           'population':
               0,
+          'players': 2,
           'initial_pos':
               np.array([0, 0]),
           'distributions': [
@@ -123,6 +124,7 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
               ]),
           'population':
               2,
+          'players': 3,
           'initial_pos':
               np.array([1, 1]),
           'distributions': [
@@ -150,12 +152,13 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
               ]),
       },
   )
-  def test_rewards(self, reward_matrix, population, initial_pos, distributions,
-                   expected_rewards):
+  def test_rewards(self, reward_matrix, players, population, initial_pos,
+                   distributions, expected_rewards):
     game = pyspiel.load_game(
         'python_mfg_predator_prey', {
             'size': 2,
-            'reward_matrix': ' '.join(str(v) for v in reward_matrix.flatten())
+            'reward_matrix': ' '.join(str(v) for v in reward_matrix.flatten()),
+            'players': players
         })
     state = game.new_initial_state_for_population(population)
     # Initial chance node.
@@ -165,6 +168,8 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
     npt.assert_array_equal(state.pos, initial_pos)
     state.apply_action(state._NEUTRAL_ACTION)
     npt.assert_array_equal(state.pos, initial_pos)
+    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
+    state.apply_action(state._NEUTRAL_ACTION)
     self.assertEqual(state.current_player(), pyspiel.PlayerId.MEAN_FIELD)
 
     # Maps states (in string representation) to their proba.
@@ -172,14 +177,15 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
     for x in range(state.size):
       for y in range(state.size):
         for pop in range(len(reward_matrix)):
-          dist[state.state_to_str(
-              np.array([x, y]), state.t, pop,
-              player_id=pop)] = distributions[pop][y][x]
+          state_str = state.state_to_str(
+              np.array([x, y]),
+              state.t,
+              pop,
+              player_id=pyspiel.PlayerId.MEAN_FIELD)
+          dist[state_str] = distributions[pop][y][x]
     support = state.distribution_support()
     state.update_distribution([dist[s] for s in support])
 
-    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
-    state.apply_action(state._NEUTRAL_ACTION)
     # Decision node where we get a reward.
     self.assertEqual(state.current_player(), population)
     npt.assert_array_equal(state.rewards(), expected_rewards)

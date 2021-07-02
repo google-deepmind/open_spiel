@@ -169,11 +169,13 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/fictitious_play_test.py
+  mfg/algorithms/mirror_descent_test.py
   mfg/algorithms/greedy_policy_test.py
   mfg/algorithms/nash_conv_test.py
   mfg/algorithms/policy_value_test.py
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
+  tests/mfg_implementation_test/finite_horizon_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
@@ -192,9 +194,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
     jax/dqn_jax_test.py
-    # This test is flaky. TODO(perolat): fix this.
-    # See https://github.com/deepmind/open_spiel/issues/602
-    # jax/nfsp_jax_test.py
+    jax/nfsp_jax_test.py
   )
 endif()
 

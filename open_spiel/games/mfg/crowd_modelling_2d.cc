@@ -148,7 +148,7 @@ int MergeXY(int xx, int yy, int size) {
   SPIEL_CHECK_LE(xx, size - 1);
   SPIEL_CHECK_GE(yy, 0);
   SPIEL_CHECK_LE(yy, size - 1);
-  return xx + yy * size;
+  return yy +  xx * size;
 }
 
 bool ComparisonPair(const std::pair<int, int>& a,
@@ -297,13 +297,13 @@ void CrowdModelling2dState::DoApplyAction(Action action) {
     xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
     yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
     ++t_;
-    current_player_ = 0;
+    current_player_ = kMeanFieldPlayerId;
   } else {
     SPIEL_CHECK_EQ(current_player_, 0);
     xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
     yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
     last_action_ = action;
-    current_player_ = kMeanFieldPlayerId;
+    current_player_ = kChancePlayerId;
   }
   // Check if the new (xx,yy) is forbidden.
   bool is_next_state_forbidden = false;
@@ -334,7 +334,7 @@ std::vector<std::string> CrowdModelling2dState::DistributionSupport() {
   support.reserve(size_ * size_);
   for (int x = 0; x < size_; ++x) {
     for (int y = 0; y < size_; ++y) {
-      support.push_back(StateToString(x, y, t_, 0, false));
+      support.push_back(StateToString(x, y, t_, kMeanFieldPlayerId, false));
     }
   }
   return support;
@@ -345,7 +345,7 @@ void CrowdModelling2dState::UpdateDistribution(
   SPIEL_CHECK_EQ(current_player_, kMeanFieldPlayerId);
   SPIEL_CHECK_EQ(distribution.size(), size_ * size_);
   distribution_ = distribution;
-  current_player_ = kChancePlayerId;
+  current_player_ = kDefaultPlayerId;
 }
 
 bool CrowdModelling2dState::IsTerminal() const { return t_ >= horizon_; }
@@ -391,17 +391,23 @@ void CrowdModelling2dState::ObservationTensor(Player player,
                                               absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), 2 * size_ + horizon_);
-  SPIEL_CHECK_GE(x_, 0);
+  SPIEL_CHECK_EQ(values.size(), 2 * size_ + horizon_ + 1);
   SPIEL_CHECK_LT(x_, size_);
-  SPIEL_CHECK_GE(y_, 0);
   SPIEL_CHECK_LT(y_, size_);
   SPIEL_CHECK_GE(t_, 0);
-  SPIEL_CHECK_LT(t_, horizon_);
+  // Allow t_ == horizon_.
+  SPIEL_CHECK_LE(t_, horizon_);
   std::fill(values.begin(), values.end(), 0.);
-  values[x_] = 1.;
-  values[y_ + size_] = 1.;
-  values[size_ + t_] = 1.;
+  if (x_ >= 0 && y_ >= 0) {
+    values[x_] = 1.;
+    values[y_ + size_] = 1.;
+  } else {
+    // x_ and y_ equal -1 for the initial (blank) state, don't set any position
+    // bit in that case.
+    SPIEL_CHECK_EQ(x_, -1);
+    SPIEL_CHECK_EQ(y_, -1);
+  }
+  values[2 * size_ + t_] = 1.;
 }
 
 std::unique_ptr<State> CrowdModelling2dState::Clone() const {
@@ -430,7 +436,8 @@ CrowdModelling2dGame::CrowdModelling2dGame(const GameParameters& params)
           "initial_distribution_value", kDefaultInitialDistributionValue)) {}
 
 std::vector<int> CrowdModelling2dGame::ObservationTensorShape() const {
-  return {2 * ParameterValue<int>("size") + ParameterValue<int>("horizon")};
+  // +1 to allow for t_ == horizon.
+  return {2 * ParameterValue<int>("size") + ParameterValue<int>("horizon") + 1};
 }
 
 std::unique_ptr<State> CrowdModelling2dGame::DeserializeState(

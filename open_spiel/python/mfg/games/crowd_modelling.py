@@ -60,8 +60,8 @@ class MFGCrowdModellingGame(pyspiel.Game):
     of the MFG.
     Then the game sequentially alternates between:
       - An action selection node (Where the player Id >= 0)
-      - A Mean Field node (the player id is pyspiel.PlayerId.MEAN_FIELD)
       - A chance node (the player id is pyspiel.PlayerId.CHANCE)
+      - A Mean Field node (the player id is pyspiel.PlayerId.MEAN_FIELD)
   """
 
   # pylint:disable=dangerous-default-value
@@ -178,7 +178,7 @@ class MFGCrowdModellingState(pyspiel.State):
             "The action is between 0 and 2 at any chance node")
       self._x = (self.x + self._ACTION_TO_MOVE[action]) % self.size
       self._t += 1
-      self._player_id = 0
+      self._player_id = pyspiel.PlayerId.MEAN_FIELD
     elif self._player_id == 0:
       # Here the action is between 0 and 2
       if action < 0 or action > 2:
@@ -186,7 +186,7 @@ class MFGCrowdModellingState(pyspiel.State):
             "The action is between 0 and 2 at any chance node")
       self._x = (self.x + self._ACTION_TO_MOVE[action]) % self.size
       self._last_action = action
-      self._player_id = pyspiel.PlayerId.MEAN_FIELD
+      self._player_id = pyspiel.PlayerId.CHANCE
 
   def _action_to_string(self, player, action):
     """Action -> string."""
@@ -198,7 +198,9 @@ class MFGCrowdModellingState(pyspiel.State):
   def distribution_support(self):
     """return a list of state string."""
     return [
-        self.state_to_str(i, self.t, player_id=0) for i in range(self.size)
+        self.state_to_str(
+            i, self.t, player_id=pyspiel.PlayerId.MEAN_FIELD)
+        for i in range(self.size)
     ]
 
   def update_distribution(self, distribution):
@@ -216,7 +218,7 @@ class MFGCrowdModellingState(pyspiel.State):
       raise ValueError(
           "update_distribution should only be called at a MEAN_FIELD state.")
     self._distribution = distribution.copy()
-    self._player_id = pyspiel.PlayerId.CHANCE
+    self._player_id = pyspiel.PlayerId.DEFAULT_PLAYER_ID
 
   def is_terminal(self):
     """Returns True if the game is over."""

@@ -32,7 +32,7 @@ class PolicyValueTest(absltest.TestCase):
     dist = distribution.DistributionPolicy(game, uniform_policy)
     py_value = policy_value.PolicyValue(game, dist, uniform_policy)
     py_val = py_value(game.new_initial_state())
-    self.assertAlmostEqual(py_val, 29.92843602293449)
+    self.assertAlmostEqual(py_val, 27.215850929940448)
 
   def test_cpp_game(self):
     """Checks if the value of a policy computation works."""
@@ -41,7 +41,7 @@ class PolicyValueTest(absltest.TestCase):
     dist = distribution.DistributionPolicy(game, uniform_policy)
     py_value = policy_value.PolicyValue(game, dist, uniform_policy)
     py_val = py_value(game.new_initial_state())
-    self.assertAlmostEqual(py_val, 29.92843602293449)
+    self.assertAlmostEqual(py_val, 27.215850929940448)
 
 
 if __name__ == "__main__":
