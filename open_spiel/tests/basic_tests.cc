@@ -328,8 +328,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
     SPIEL_CHECK_EQ(state->History(), state_copy->History());
 
-
-    if (game.GetType().dynamics == GameType::Dynamics::kMeanField){
+    if (game.GetType().dynamics == GameType::Dynamics::kMeanField) {
       SPIEL_CHECK_LT(state->MoveNumber(), game.MaxMoveNumber());
       SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
     }
