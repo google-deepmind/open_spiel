@@ -78,6 +78,8 @@ class PyState : public State, public py::trampoline_self_life_support {
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
   std::unique_ptr<State> Clone() const override;
+  std::vector<std::string> DistributionSupport() override;
+  void UpdateDistribution(const std::vector<double>& distribution) override;
   void DoApplyAction(Action action_id) override;
   void DoApplyActions(const std::vector<Action>& actions) override;
   std::string InformationStateString(Player player) const override;
