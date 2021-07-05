@@ -63,7 +63,8 @@ void CheckStatesEqual(const State& a, const State& b) {
 
 void TestRandomPlay() {
   testing::LoadGameTest("mfg_crowd_modelling(size=10,horizon=20)");
-  testing::RandomSimTest(*LoadGame("mfg_crowd_modelling(size=10,horizon=20)"), 3);
+  testing::RandomSimTest(*LoadGame("mfg_crowd_modelling(size=10,horizon=20)"),
+                         3);
 }
 
 void TestReward() {

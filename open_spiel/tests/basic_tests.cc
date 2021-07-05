@@ -255,11 +255,13 @@ void CheckObservables(const Game& game,
   }
 }
 
-std::vector<double> RandomDistribution(int num_states, std::mt19937& rng) {
+// This is used for mean-field games.
+std::vector<double> RandomDistribution(int num_states, std::mt19937* rng) {
   std::uniform_real_distribution<double> rand(0, 1);
   std::vector<double> distrib;
+  distrib.reserve(num_states);
   for (int i = 0; i < num_states; ++i) {
-    distrib.push_back(rand(rng));
+    distrib.push_back(rand(*rng));
   }
   double sum = std::accumulate(distrib.begin(), distrib.end(), 0.);
   for (int i = 0; i < num_states; ++i) {
@@ -326,8 +328,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
     SPIEL_CHECK_EQ(state->History(), state_copy->History());
 
-
-    if (game.GetType().dynamics == GameType::Dynamics::kMeanField){
+    if (game.GetType().dynamics == GameType::Dynamics::kMeanField) {
       SPIEL_CHECK_LT(state->MoveNumber(), game.MaxMoveNumber());
       SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
     }
@@ -395,7 +396,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       game_length++;
     } else if (state->CurrentPlayer() == open_spiel::kMeanFieldPlayerId) {
       auto support = state->DistributionSupport();
-      state->UpdateDistribution(RandomDistribution(support.size(), *rng));
+      state->UpdateDistribution(RandomDistribution(support.size(), rng));
     } else {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
