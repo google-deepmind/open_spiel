@@ -40,9 +40,8 @@ class PolicyFunction(policy.Policy):
         1).
       game: OpenSpiel game.
     """
-    self._pids = pids
+    super().__init__(game, pids)
     self._policies = policies
-    self._game = game
     self._game_type = game.get_type()
 
   def _state_key(self, state, player_id=None):
@@ -194,12 +193,17 @@ class PolicyAggregator(object):
     elif state.is_simultaneous_node():
       # TODO(author10): this is assuming that if there is a sim.-move state, it is
       #               the only state, i.e., the game is a normal-form game
-      assert self._game_type.dynamics ==\
-        pyspiel.GameType.Dynamics.SIMULTANEOUS, "Game must be simultaneous-move"
-      assert self._game_type.chance_mode ==\
-        pyspiel.GameType.ChanceMode.DETERMINISTIC, "Chance nodes not supported"
-      assert self._game_type.information ==\
-        pyspiel.GameType.Information.ONE_SHOT, "Only one-shot NFGs supported"
+      def assert_type(cond, msg):
+        assert cond, msg
+      assert_type(self._game_type.dynamics ==
+                  pyspiel.GameType.Dynamics.SIMULTANEOUS,
+                  "Game must be simultaneous-move")
+      assert_type(self._game_type.chance_mode ==
+                  pyspiel.GameType.ChanceMode.DETERMINISTIC,
+                  "Chance nodes not supported")
+      assert_type(self._game_type.information ==
+                  pyspiel.GameType.Information.ONE_SHOT,
+                  "Only one-shot NFGs supported")
       policies = self._policy_pool(state, pid)
       state_key = self._state_key(state, pid)
       self._policy[state_key] = {}
