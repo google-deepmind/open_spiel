@@ -123,6 +123,17 @@ void CFRAveragePolicy::GetStatePolicyFromInformationStateValues(
   }
 }
 
+TabularPolicy CFRAveragePolicy::AsTabular() const {
+  TabularPolicy policy;
+  for (const auto& infoset_and_entry : info_states_) {
+    ActionsAndProbs state_policy;
+    GetStatePolicyFromInformationStateValues(infoset_and_entry.second,
+                                             &state_policy);
+    policy.SetStatePolicy(infoset_and_entry.first, state_policy);
+  }
+  return policy;
+}
+
 CFRCurrentPolicy::CFRCurrentPolicy(const CFRInfoStateValuesTable& info_states,
                                    std::shared_ptr<Policy> default_policy)
     : info_states_(info_states), default_policy_(default_policy) {}
