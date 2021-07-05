@@ -83,7 +83,8 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
         'size': size,
     })
     pyspiel.random_sim_test(
-        game, num_sims=10, serialize=False, verbose=True)
+        game, num_sims=10, serialize=False, verbose=True,
+        mean_field_population=population)
 
   @parameterized.parameters(
       {

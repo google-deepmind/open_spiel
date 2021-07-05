@@ -584,6 +584,7 @@ PYBIND11_MODULE(pyspiel, m) {
         py::arg("mask_test") = true,
         py::arg("state_checker_fn") =
             py::cpp_function(&testing::DefaultStateChecker),
+        py::arg("mean_field_population") = -1,
         "Run the C++ tests on a game");
 
   // Set an error handler that will raise exceptions. These exceptions are for
