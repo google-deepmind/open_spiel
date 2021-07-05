@@ -24,7 +24,7 @@ from open_spiel.python.mfg.games import predator_prey
 import pyspiel
 
 
-class MFGCrowdModellingGameTest(parameterized.TestCase):
+class MFGPredatorPreyGameTest(parameterized.TestCase):
 
   def test_load(self):
     game = pyspiel.load_game('python_mfg_predator_prey')
