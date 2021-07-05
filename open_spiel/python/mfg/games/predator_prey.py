@@ -116,6 +116,10 @@ class MFGPredatorPreyGame(pyspiel.Game):
     """
     return MFGPredatorPreyState(self)
 
+  def max_chance_nodes_in_history(self):
+    """Maximun chance nodes in game history."""
+    return self.horizon
+
   def new_initial_state_for_population(self, population):
     """State corresponding to the start of a game for a given population."""
     return MFGPredatorPreyState(self, population)
