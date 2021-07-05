@@ -44,19 +44,6 @@ void TestLoadWithParams() {
   SPIEL_CHECK_EQ(game->ObservationTensorShape()[0], 1000 + 100 + 1);
 }
 
-std::vector<double> RandomDistribution(int num_states, std::mt19937& rng) {
-  std::uniform_real_distribution<double> rand(0, 1);
-  std::vector<double> distrib;
-  for (int i = 0; i < num_states; ++i) {
-    distrib.push_back(rand(rng));
-  }
-  double sum = std::accumulate(distrib.begin(), distrib.end(), 0.);
-  for (int i = 0; i < num_states; ++i) {
-    distrib[i] /= sum;
-  }
-  return distrib;
-}
-
 void CheckStatesEqual(const State& a, const State& b) {
   const CrowdModellingState& left =
       open_spiel::down_cast<const CrowdModellingState&>(a);
@@ -75,41 +62,8 @@ void CheckStatesEqual(const State& a, const State& b) {
 }
 
 void TestRandomPlay() {
-  std::mt19937 rng(7);
-  // TODO(author15): Should we adapt and use testing::RandomSimTest instead?
-  auto game = LoadGame("mfg_crowd_modelling(size=10,horizon=20)");
-  auto state = game->NewInitialState();
-  int t = 0;
-  int num_moves = 0;
-  while (!state->IsTerminal()) {
-    SPIEL_CHECK_LT(state->MoveNumber(), game->MaxMoveNumber());
-    SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
-    CheckStatesEqual(*game->DeserializeState(state->Serialize()), *state);
-    auto cloned = state->Clone();
-    CheckStatesEqual(*state, *cloned);
-    testing::CheckLegalActionsAreSorted(*game, *state);
-    if (state->CurrentPlayer() == kChancePlayerId) {
-      ActionsAndProbs outcomes = state->ChanceOutcomes();
-      Action action = open_spiel::SampleAction(outcomes, rng).first;
-      SPIEL_CHECK_EQ(state->LegalActions().size(), outcomes.size());
-      state->ApplyAction(action);
-      ++num_moves;
-    } else if (state->CurrentPlayer() == kMeanFieldPlayerId) {
-      auto support = state->DistributionSupport();
-      state->UpdateDistribution(RandomDistribution(support.size(), rng));
-    } else {
-      SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
-      std::vector<Action> actions = state->LegalActions();
-      std::uniform_int_distribution<int> dis(0, actions.size() - 1);
-      Action action = actions[dis(rng)];
-      state->ApplyAction(action);
-      ++t;
-      ++num_moves;
-    }
-  }
-  SPIEL_CHECK_EQ(t, 20);
-  SPIEL_CHECK_EQ(state->MoveNumber(), game->MaxMoveNumber());
-  SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
+  testing::LoadGameTest("mfg_crowd_modelling(size=10,horizon=20)");
+  testing::RandomSimTest(*LoadGame("mfg_crowd_modelling(size=10,horizon=20)"), 3);
 }
 
 void TestReward() {
