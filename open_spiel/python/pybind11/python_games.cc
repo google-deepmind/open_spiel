@@ -49,7 +49,7 @@ std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
 
 int PyGame::MaxChanceNodesInHistory() const {
   PYBIND11_OVERLOAD_PURE_NAME(int, Game,
-                              "new_initial_state_for_population",
+                              "max_chance_nodes_in_history",
                               MaxChanceNodesInHistory);
 }
 
