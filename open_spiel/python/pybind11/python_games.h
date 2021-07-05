@@ -35,6 +35,7 @@ class PyGame : public Game {
   std::unique_ptr<State> NewInitialState() const override;
   std::unique_ptr<State> NewInitialStateForPopulation(
       int population) const override;
+  int MaxChanceNodesInHistory() const override;
   int NumDistinctActions() const override { return info_.num_distinct_actions; }
   int NumPlayers() const override { return info_.num_players; }
   double MinUtility() const override { return info_.min_utility; }
@@ -77,6 +78,8 @@ class PyState : public State, public py::trampoline_self_life_support {
   std::vector<double> Returns() const override;
   std::vector<double> Rewards() const override;
   std::unique_ptr<State> Clone() const override;
+  std::vector<std::string> DistributionSupport() override;
+  void UpdateDistribution(const std::vector<double>& distribution) override;
   void DoApplyAction(Action action_id) override;
   void DoApplyActions(const std::vector<Action>& actions) override;
   std::string InformationStateString(Player player) const override;
