@@ -35,6 +35,7 @@ class PyGame : public Game {
   std::unique_ptr<State> NewInitialState() const override;
   std::unique_ptr<State> NewInitialStateForPopulation(
       int population) const override;
+  int MaxChanceNodesInHistory() const override;
   int NumDistinctActions() const override { return info_.num_distinct_actions; }
   int NumPlayers() const override { return info_.num_players; }
   double MinUtility() const override { return info_.min_utility; }

@@ -47,6 +47,12 @@ std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
                               NewInitialStateForPopulation, population);
 }
 
+int PyGame::MaxChanceNodesInHistory() const {
+  PYBIND11_OVERLOAD_PURE_NAME(int, Game,
+                              "max_chance_nodes_in_history",
+                              MaxChanceNodesInHistory);
+}
+
 const Observer& PyGame::default_observer() const {
   if (!default_observer_) default_observer_ = MakeObserver(kDefaultObsType, {});
   return *default_observer_;
