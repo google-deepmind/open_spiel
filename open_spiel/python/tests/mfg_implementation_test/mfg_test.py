@@ -12,25 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests that games are finite horizon.
+"""Tests that Mean Field Games are implemented properly.
 
-These tests are intended to help developers to write games that satisfy most of
-the unspecified constraints assumed by the following algorithms:
+These tests are intended to help developers to write mean field games that
+satisfy most of the unspecified constraints assumed by the following algorithms:
 - python/mfg/algorithms/policy_value.py
 - python/mfg/algorithms/nash_conv.py
 - python/mfg/algorithms/mirror_descent.py
 - python/mfg/algorithms/fictitious_play.py
 - python/mfg/algorithms/distribution.py
 - python/mfg/algorithms/best_response_value.py
-These tests are not exhaustive.
+- python/rl_environment.py
+These tests are not exhaustive and will be updated with time.
 """
-
+import random
 
 from absl.testing import absltest
 from absl.testing import parameterized
 
+from open_spiel.python import policy
+from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.mfg import games as mfg_games  # pylint:disable=unused-import
+from open_spiel.python.mfg.algorithms import distribution
 import pyspiel
 
 
@@ -119,6 +123,32 @@ class FiniteHorizonTest(parameterized.TestCase):
         to_string=to_string)
     for state in states.values():
       self.assertNotEmpty(state.legal_actions())
+
+  @parameterized.parameters(
+      {'game_name': 'python_mfg_crowd_modelling'},
+      {'game_name': 'mfg_crowd_modelling'},
+      {'game_name': 'mfg_crowd_modelling_2d'},
+      {'game_name': 'python_mfg_predator_prey'},
+  )
+  def test_rl_environment(self, game_name):
+    """Check that the RL environment runs for a few trajectories."""
+    game = pyspiel.load_game(game_name)
+    uniform_policy = policy.UniformRandomPolicy(game)
+    mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
+
+    envs = [
+        rl_environment.Environment(
+            game, distribution=mfg_dist, mfg_population=p)
+        for p in range(game.num_players())
+    ]
+    for p, env in enumerate(envs):
+      for _ in range(100):
+        time_step = env.reset()
+        while not time_step.last():
+          print(time_step)
+          a = random.choice(time_step.observations['legal_actions'][p])
+          time_step = env.step([a])
+
 
 if __name__ == '__main__':
   absltest.main()
