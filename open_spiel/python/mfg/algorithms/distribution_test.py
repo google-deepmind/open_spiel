@@ -30,6 +30,14 @@ class DistributionTest(absltest.TestCase):
     state = game.new_initial_state().child(0)
     self.assertAlmostEqual(dist.value(state), 1 / game.size)
 
+  def test_state_support_outside_distrib(self):
+    game = pyspiel.load_game("mfg_crowd_modelling_2d", {
+        "initial_distribution": "[0|0]",
+        "initial_distribution_value": "[1.]",
+    })
+    uniform_policy = policy.UniformRandomPolicy(game)
+    _ = distribution.DistributionPolicy(game, uniform_policy)
+
   def test_multi_pop(self):
     game = pyspiel.load_game("python_mfg_predator_prey")
     self.assertEqual(game.num_players(), 3)
