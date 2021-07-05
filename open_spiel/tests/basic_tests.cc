@@ -274,7 +274,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
                       bool serialize, bool verbose, bool mask_test,
                       std::shared_ptr<Observer> observer,  // Can be nullptr
                       std::function<void(const State&)> state_checker_fn,
-                      int mean_field_population
+                      int mean_field_population = -1
                      ) {
   std::unique_ptr<Observation> observation =
       observer == nullptr ? nullptr
@@ -309,7 +309,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
   if (mean_field_population == -1) {
     state = game.NewInitialState();
   } else {
-    state = game.NewInitialStateForPopulation(mean_field_population)
+    state = game.NewInitialStateForPopulation(mean_field_population);
   }
 
   if (verbose) {
