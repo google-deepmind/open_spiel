@@ -255,6 +255,21 @@ void CheckObservables(const Game& game,
   }
 }
 
+// This is used for mean-field games.
+std::vector<double> RandomDistribution(int num_states, std::mt19937* rng) {
+  std::uniform_real_distribution<double> rand(0, 1);
+  std::vector<double> distrib;
+  distrib.reserve(num_states);
+  for (int i = 0; i < num_states; ++i) {
+    distrib.push_back(rand(*rng));
+  }
+  double sum = std::accumulate(distrib.begin(), distrib.end(), 0.);
+  for (int i = 0; i < num_states; ++i) {
+    distrib[i] /= sum;
+  }
+  return distrib;
+}
+
 void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
                       bool serialize, bool verbose, bool mask_test,
                       std::shared_ptr<Observer> observer,  // Can be nullptr
@@ -296,6 +311,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     std::cout << "State:" << std::endl << state->ToString() << std::endl;
   }
   int game_length = 0;
+  int num_moves = 0;
 
   while (!state->IsTerminal()) {
     state_checker_fn(*state);
@@ -312,6 +328,11 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
     SPIEL_CHECK_EQ(state->History(), state_copy->History());
 
+    if (game.GetType().dynamics == GameType::Dynamics::kMeanField) {
+      SPIEL_CHECK_LT(state->MoveNumber(), game.MaxMoveNumber());
+      SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
+    }
+
     if (serialize && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
       TestSerializeDeserialize(game, state.get());
     }
@@ -326,7 +347,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       if (verbose) {
         std::cout << "sampled outcome: "
                   << state->ActionToString(kChancePlayerId, action)
-                  << "with prob " << prob
+                  << " with prob " << prob
                   << std::endl;
       }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
@@ -335,6 +356,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       if (undo && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
         TestUndo(state->Clone(), history);
       }
+      num_moves++;
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
@@ -372,6 +394,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
       ApplyActionTestClone(game, state.get(), joint_action);
       game_length++;
+    } else if (state->CurrentPlayer() == open_spiel::kMeanFieldPlayerId) {
+      auto support = state->DistributionSupport();
+      state->UpdateDistribution(RandomDistribution(support.size(), rng));
     } else {
       std::vector<double> rewards = state->Rewards();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
@@ -405,6 +430,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       history.emplace_back(state->Clone(), player, action);
       ApplyActionTestClone(game, state.get(), action);
       game_length++;
+      num_moves++;
 
       if (undo && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
         TestUndo(state->Clone(), history);

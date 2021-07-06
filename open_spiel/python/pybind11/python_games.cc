@@ -40,6 +40,19 @@ std::unique_ptr<State> PyGame::NewInitialState() const {
                               NewInitialState);
 }
 
+std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
+    int population) const {
+  PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game,
+                              "new_initial_state_for_population",
+                              NewInitialStateForPopulation, population);
+}
+
+int PyGame::MaxChanceNodesInHistory() const {
+  PYBIND11_OVERLOAD_PURE_NAME(int, Game,
+                              "max_chance_nodes_in_history",
+                              MaxChanceNodesInHistory);
+}
+
 const Observer& PyGame::default_observer() const {
   if (!default_observer_) default_observer_ = MakeObserver(kDefaultObsType, {});
   return *default_observer_;
@@ -131,6 +144,15 @@ std::unique_ptr<State> PyState::Clone() const {
   state->move_number_ = move_number_;
 
   return rv;
+}
+
+std::vector<std::string> PyState::DistributionSupport() {
+  PYBIND11_OVERLOAD_PURE_NAME(std::vector<std::string>, State,
+                              "distribution_support", DistributionSupport);
+}
+void PyState::UpdateDistribution(const std::vector<double>& distribution) {
+  PYBIND11_OVERLOAD_PURE_NAME(void, State, "update_distribution",
+                              UpdateDistribution, distribution);
 }
 
 // Register a Python game.
@@ -345,6 +367,14 @@ std::string PyState::Serialize() const {
       "\n", kTagMoveNumber, move_number_, "\n",
       // Python attributes
       kTagDict, encode_dict(PyDict(*this)));
+}
+
+int PyState::MeanFieldPopulation() const {
+  // Use a python population() implementation if available.
+  PYBIND11_OVERRIDE_IMPL(int, State, "mean_field_population");
+
+  // Otherwise, default to behavior from the base class.
+  return State::MeanFieldPopulation();
 }
 
 }  // namespace open_spiel

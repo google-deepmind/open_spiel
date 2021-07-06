@@ -255,7 +255,8 @@ double CCEDist(const Game& game, const NormalFormCorrelationDevice& mu) {
 }
 
 CorrDistInfo CCEDist(
-    const Game& game, const CorrelationDevice& mu, int player) {
+    const Game& game, const CorrelationDevice& mu, int player,
+    const float prob_cut_threshold) {
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
   CorrDistConfig config;
@@ -273,7 +274,7 @@ CorrDistInfo CCEDist(
   CCETabularPolicy policy;
   std::unique_ptr<State> root = cce_game->NewInitialState();
   TabularBestResponse best_response(
-      *cce_game, player, &policy);
+      *cce_game, player, &policy, prob_cut_threshold);
   // Do not populate on policy values to save unnecessary computation.
   // dist_info.on_policy_values[0] = ExpectedReturns(
   //     *root, policy, -1, false)[player];
@@ -288,7 +289,9 @@ CorrDistInfo CCEDist(
   return dist_info;
 }
 
-CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu) {
+CorrDistInfo CCEDist(
+    const Game& game, const CorrelationDevice& mu,
+    const float prob_cut_threshold) {
   // Check for proper probability distribution.
   CheckCorrelationDeviceProbDist(mu);
   CorrDistConfig config;
@@ -314,7 +317,8 @@ CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu) {
 
   std::unique_ptr<State> root = cce_game->NewInitialState();
   for (auto p = Player{0}; p < cce_game->NumPlayers(); ++p) {
-    TabularBestResponse best_response(*cce_game, p, &policy);
+    TabularBestResponse best_response(
+        *cce_game, p, &policy, prob_cut_threshold);
     dist_info.best_response_values[p] = best_response.Value(*root);
     dist_info.best_response_policies[p] = best_response.GetBestResponsePolicy();
   }

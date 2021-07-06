@@ -30,6 +30,7 @@
 namespace open_spiel {
 namespace crowd_modelling {
 namespace {
+inline constexpr float kEpsilon = 1e-25;
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"mfg_crowd_modelling",
@@ -84,12 +85,10 @@ CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
       horizon_(horizon),
       distribution_(size_, 1. / size_) {}
 
-CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
-                                         int size, int horizon,
-                                         Player current_player,
-                                         bool is_chance_init, int x, int t,
-                                         int last_action, double return_value,
-                                         std::vector<double> distribution)
+CrowdModellingState::CrowdModellingState(
+    std::shared_ptr<const Game> game, int size, int horizon,
+    Player current_player, bool is_chance_init, int x, int t, int last_action,
+    double return_value, const std::vector<double>& distribution)
     : State(game),
       size_(size),
       horizon_(horizon),
@@ -99,7 +98,7 @@ CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,
       t_(t),
       last_action_(last_action),
       return_value_(return_value),
-      distribution_(std::move(distribution)) {}
+      distribution_(distribution) {}
 
 std::vector<Action> CrowdModellingState::LegalActions() const {
   if (IsTerminal()) return {};
@@ -133,12 +132,12 @@ void CrowdModellingState::DoApplyAction(Action action) {
   } else if (current_player_ == kChancePlayerId) {
     x_ = (x_ + kActionToMove.at(action) + size_) % size_;
     ++t_;
-    current_player_ = 0;
+    current_player_ = kMeanFieldPlayerId;
   } else {
     SPIEL_CHECK_EQ(current_player_, 0);
     x_ = (x_ + kActionToMove.at(action) + size_) % size_;
     last_action_ = action;
-    current_player_ = kMeanFieldPlayerId;
+    current_player_ = kChancePlayerId;
   }
 }
 
@@ -154,7 +153,7 @@ std::vector<std::string> CrowdModellingState::DistributionSupport() {
   std::vector<std::string> support;
   support.reserve(size_);
   for (int x = 0; x < size_; ++x) {
-    support.push_back(StateToString(x, t_, 0, false));
+    support.push_back(StateToString(x, t_, kMeanFieldPlayerId, false));
   }
   return support;
 }
@@ -164,7 +163,7 @@ void CrowdModellingState::UpdateDistribution(
   SPIEL_CHECK_EQ(current_player_, kMeanFieldPlayerId);
   SPIEL_CHECK_EQ(distribution.size(), size_);
   distribution_ = distribution;
-  current_player_ = kChancePlayerId;
+  current_player_ = kDefaultPlayerId;
 }
 
 bool CrowdModellingState::IsTerminal() const { return t_ >= horizon_; }
@@ -175,7 +174,7 @@ std::vector<double> CrowdModellingState::Rewards() const {
   }
   double r_x = 1 - 1.0 * std::abs(x_ - size_ / 2) / (size_ / 2);
   double r_a = -1.0 * std::abs(kActionToMove.at(last_action_)) / size_;
-  double r_mu = -std::log(distribution_[x_]);
+  double r_mu = -std::log(distribution_[x_]+kEpsilon);
   return {r_x + r_a + r_mu};
 }
 
@@ -230,11 +229,13 @@ std::string CrowdModellingState::Serialize() const {
 }
 
 CrowdModellingGame::CrowdModellingGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      size_(ParameterValue<int>("size", kDefaultSize)),
+      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)) {}
 
 std::vector<int> CrowdModellingGame::ObservationTensorShape() const {
   // +1 to allow for t_ == horizon.
-  return {ParameterValue<int>("size") + ParameterValue<int>("horizon") + 1};
+  return {size_ + horizon_ + 1};
 }
 
 std::unique_ptr<State> CrowdModellingGame::DeserializeState(
@@ -271,9 +272,8 @@ std::unique_ptr<State> CrowdModellingGame::DeserializeState(
     distribution.push_back(parsed_weight);
   }
   return absl::make_unique<CrowdModellingState>(
-      shared_from_this(), ParameterValue<int>("size"),
-      ParameterValue<int>("horizon"), current_player, is_chance_init, x, t,
-      last_action, return_value, std::move(distribution));
+      shared_from_this(), size_, horizon_, current_player, is_chance_init, x, t,
+      last_action, return_value, distribution);
 }
 
 }  // namespace crowd_modelling

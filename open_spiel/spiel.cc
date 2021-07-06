@@ -348,6 +348,20 @@ std::vector<int> State::LegalActionsMask(Player player) const {
   return mask;
 }
 
+std::vector<std::unique_ptr<State>> Game::NewInitialStates() const {
+  std::vector<std::unique_ptr<State>> states;
+  if (GetType().dynamics == GameType::Dynamics::kMeanField &&
+      NumPlayers() >= 2) {
+    states.reserve(NumPlayers());
+    for (int p = 0; p < NumPlayers(); ++p) {
+      states.push_back(NewInitialStateForPopulation(p));
+    }
+    return states;
+  }
+  states.push_back(NewInitialState());
+  return states;
+}
+
 std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
   // This does not work for games with sampled chance nodes and for mean field
   //  games. See comments in State::Serialize() for the explanation. If you wish
@@ -750,6 +764,15 @@ void State::InformationStateTensor(Player player,
 
 bool State::PlayerAction::operator==(const PlayerAction& other) const {
   return player == other.player && action == other.action;
+}
+
+int State::MeanFieldPopulation() const {
+  if (GetGame()->GetType().dynamics != GameType::Dynamics::kMeanField) {
+    SpielFatalError(
+        "MeanFieldPopulation() does not make sense for games that are not mean "
+        "field games.");
+  }
+  return 0;
 }
 
 std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action) {

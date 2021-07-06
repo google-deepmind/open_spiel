@@ -26,3 +26,4 @@ pyspiel.register_game(_GAME_TYPE, KuhnPokerGame)
 ```
 """
 from open_spiel.python.mfg.games import crowd_modelling
+from open_spiel.python.mfg.games import predator_prey

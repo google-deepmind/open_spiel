@@ -86,6 +86,8 @@ set(GAME_SOURCES
   matrix_games.cc
   mfg/crowd_modelling.cc
   mfg/crowd_modelling.h
+  mfg/crowd_modelling_2d.cc
+  mfg/crowd_modelling_2d.h
   negotiation.cc
   negotiation.h
   nfg_game.cc
@@ -281,6 +283,14 @@ add_executable(coordinated_mp_test coordinated_mp_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:algorithms>)
 add_test(coordinated_mp_test coordinated_mp_test)
 
+add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crowd_modelling_test crowd_modelling_test)
+
+add_executable(crowd_modelling_2d_test mfg/crowd_modelling_2d_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crowd_modelling_2d_test crowd_modelling_2d_test)
+
 add_executable(cursor_go_test cursor_go_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -468,6 +478,3 @@ add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(y_test y_test)
 
-add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(crowd_modelling_test crowd_modelling_test)

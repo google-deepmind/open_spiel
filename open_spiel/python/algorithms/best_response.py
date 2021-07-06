@@ -29,18 +29,18 @@ from open_spiel.python.algorithms import policy_utils
 import pyspiel
 
 
-def _memoize_method(method):
+def _memoize_method(key_fn=lambda x: x):
   """Memoize a single-arg instance method using an on-object cache."""
-  cache_name = "cache_" + method.__name__
-
-  def wrap(self, arg):
-    key = str(arg)
-    cache = vars(self).setdefault(cache_name, {})
-    if key not in cache:
-      cache[key] = method(self, arg)
-    return cache[key]
-
-  return wrap
+  def memoizer(method):
+    cache_name = "cache_" + method.__name__
+    def wrap(self, arg):
+      key = key_fn(arg)
+      cache = vars(self).setdefault(cache_name, {})
+      if key not in cache:
+        cache[key] = method(self, arg)
+      return cache[key]
+    return wrap
+  return memoizer
 
 
 def compute_states_and_info_states_if_none(game,
@@ -56,7 +56,7 @@ def compute_states_and_info_states_if_none(game,
     game: The open_spiel game.
     all_states: The result of calling get_all_states.get_all_states. Cached for
       improved performance.
-    state_to_information_state: A dict mapping str(state) to
+    state_to_information_state: A dict mapping state.history_str() to
       state.information_state for every state in the game. Cached for improved
       performance.
   """
@@ -129,7 +129,7 @@ class BestResponsePolicy(openspiel_policy.Policy):
     else:
       return list(self._policy.action_probabilities(state).items())
 
-  @_memoize_method
+  @_memoize_method(key_fn=lambda state: state.history_str())
   def value(self, state):
     """Returns the value of the specified state to the best-responder."""
     if state.is_terminal():
@@ -146,7 +146,7 @@ class BestResponsePolicy(openspiel_policy.Policy):
     """Returns the value of the (state, action) to the best-responder."""
     return self.value(state.child(action))
 
-  @_memoize_method
+  @_memoize_method()
   def best_response_action(self, infostate):
     """Returns the best response for this information state."""
     infoset = self.infosets[infostate]
@@ -199,7 +199,7 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
         aggr_policy, for instance.
       all_states: The result of calling get_all_states.get_all_states. Cached
         for improved performance.
-      state_to_information_state: A dict mapping str(state) to
+      state_to_information_state: A dict mapping state.history_str to
         state.information_state for every state in the game. Cached for improved
         performance.
       best_response_processor: A TabularBestResponse object, used for processing
@@ -250,7 +250,7 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
     else:
       return list(self._policy.action_probabilities(state).items())
 
-  @_memoize_method
+  @_memoize_method(key_fn=lambda state: state.history_str())
   def value(self, state):
     """Returns the value of the specified state to the best-responder."""
     if state.is_terminal():
@@ -267,7 +267,7 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
     """Returns the value of the (state, action) to the best-responder."""
     return self.value(state.child(action))
 
-  @_memoize_method
+  @_memoize_method()
   def best_response_action(self, infostate):
     """Returns the best response for this information state."""
     action = self.tabular_best_response_map[infostate]

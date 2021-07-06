@@ -112,6 +112,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .value("TERMINAL", open_spiel::StateType::kTerminal)
       .value("CHANCE", open_spiel::StateType::kChance)
       .value("DECISION", open_spiel::StateType::kDecision)
+      .value("MEAN_FIELD", open_spiel::StateType::kMeanField)
       .export_values();
 
   py::class_<GameType> game_type(m, "GameType");
@@ -236,9 +237,8 @@ PYBIND11_MODULE(pyspiel, m) {
   player_action.def_readonly("player", &State::PlayerAction::player)
       .def_readonly("action", &State::PlayerAction::action);
 
-  // TODO(author11) Remove py::dynamic_attr when
-  // https://github.com/pybind/pybind11/pull/2972 is submitted
-  py::classh<State, PyState> state(m, "State", py::dynamic_attr());
+  // https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst
+  py::classh<State, PyState> state(m, "State");
   state.def(py::init<std::shared_ptr<const Game>>())
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
@@ -315,17 +315,21 @@ PYBIND11_MODULE(pyspiel, m) {
             return std::make_pair(std::move(state), pydict);
           }))
       .def("distribution_support", &State::DistributionSupport)
-      .def("update_distribution", &State::UpdateDistribution);
+      .def("update_distribution", &State::UpdateDistribution)
+      .def("mean_field_population", &State::MeanFieldPopulation);
 
   py::classh<Game, PyGame> game(m, "Game");
   game.def(py::init<GameType, GameInfo, GameParameters>())
       .def("num_distinct_actions", &Game::NumDistinctActions)
+      .def("new_initial_states", &Game::NewInitialStates)
       .def("new_initial_state",
            [](const Game* self) { return self->NewInitialState(); })
       .def("new_initial_state",
            [](const Game* self, const std::string& s) {
              return self->NewInitialState(s);
            })
+      .def("new_initial_state_for_population",
+           &Game::NewInitialStateForPopulation)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
       .def("get_parameters", &Game::GetParameters)
       .def("num_players", &Game::NumPlayers)
@@ -348,14 +352,14 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
       .def("make_observer",
-          [](const Game& game, IIGObservationType iig_obs_type,
-             const GameParameters& params) {
+           [](const Game& game, IIGObservationType iig_obs_type,
+              const GameParameters& params) {
              return game.MakeObserver(iig_obs_type, params);
-          })
+           })
       .def("make_observer",
-          [](const Game& game, const GameParameters& params) {
+           [](const Game& game, const GameParameters& params) {
              return game.MakeObserver(absl::nullopt, params);
-          })
+           })
       .def("__str__", &Game::ToString)
       .def("__repr__", &Game::ToString)
       .def("__eq__",

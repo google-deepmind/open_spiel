@@ -35,10 +35,11 @@ class BestResponse(value.ValueFunction):
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
     """
-    super(BestResponse, self).__init__(game)
+    super().__init__(game)
     if root_state is None:
-      root_state = game.new_initial_state()
-    self._root_state = root_state
+      self._root_states = game.new_initial_states()
+    else:
+      self._root_states = [root_state]
     self._distribution = distribution
     # Maps states (in string format) to the value of the optimal policy given
     # 'self._distribution'.
@@ -62,43 +63,49 @@ class BestResponse(value.ValueFunction):
     state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
     if state_str in self._state_value:
       return self._state_value[state_str]
-    elif state.is_terminal():
-      self._state_value[state_str] = state.rewards()[0]
+    if state.is_terminal():
+      self._state_value[state_str] = state.rewards()[
+          state.mean_field_population()]
       return self._state_value[state_str]
-    elif state.current_player() == pyspiel.PlayerId.CHANCE:
-      self._state_value[state_str] = state.rewards()[0]
+    if state.current_player() == pyspiel.PlayerId.CHANCE:
+      self._state_value[state_str] = 0.0
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
         self._state_value[state_str] += prob * self.eval_state(new_state)
       return self._state_value[state_str]
-    elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
-      dist_to_register = state.distribution_support()
+    if state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist = [
-          self._distribution.value_str(str_state)
-          for str_state in dist_to_register
+          # We need to default to 0, because
+          # `state.distribution_support()` might contain states that
+          # we did not reach yet. These states should be given a
+          # probability of 0.
+          self._distribution.value_str(str_state, 0.)
+          for str_state in state.distribution_support()
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
       self._state_value[state_str] = (
-          state.rewards()[0] + self.eval_state(new_state))
+          state.rewards()[state.mean_field_population()] +
+          self.eval_state(new_state))
       return self._state_value[state_str]
     else:
-      assert state.current_player() == 0, "The player id should be 0"
+      assert int(state.current_player()) >= 0, "The player id should be >= 0"
       max_q = max(
           self.eval_state(state.child(action))
           for action in state.legal_actions())
-      self._state_value[state_str] = state.rewards()[0] + max_q
+      self._state_value[state_str] = state.rewards()[
+          state.mean_field_population()] + max_q
       return self._state_value[state_str]
 
   def evaluate(self):
     """Evaluate the best response value on all states."""
-    _ = self.eval_state(self._root_state)
+    for state in self._root_states:
+      self.eval_state(state)
 
   def value(self, state, action=None):
     if action is None:
       return self._state_value[state.observation_string(
           pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
-    else:
-      new_state = state.child(action)
-      return state.rewards()[0] + self._state_value[
-          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+    new_state = state.child(action)
+    return state.rewards()[state.mean_field_population()] + self._state_value[
+        new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)]

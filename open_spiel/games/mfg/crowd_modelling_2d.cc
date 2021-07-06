@@ -33,7 +33,29 @@
 
 namespace open_spiel {
 namespace crowd_modelling_2d {
+
+std::vector<absl::string_view> ProcessStringParam(
+    const std::string& string_param_str, int max_size) {
+  // ProcessStringParam takes a parameter string and split it is a sequence of
+  // substring. Example:
+  // "" -> {}
+  // "[0|0;0|1]" -> {"0|0", "0|1"}
+  // "[0.5;0.5]" -> {"0.5", "0.5"}
+  absl::string_view string_param = absl::StripAsciiWhitespace(string_param_str);
+  SPIEL_CHECK_TRUE(absl::ConsumePrefix(&string_param, "["));
+  SPIEL_CHECK_TRUE(absl::ConsumeSuffix(&string_param, "]"));
+
+  std::vector<absl::string_view> split_string_list;
+  if (!string_param.empty()) {
+    split_string_list = absl::StrSplit(string_param, ';');
+  }
+  SPIEL_CHECK_GE(split_string_list.size(), 0);
+  SPIEL_CHECK_LE(split_string_list.size(), max_size * max_size);
+  return split_string_list;
+}
+
 namespace {
+inline constexpr float kEpsilon = 1e-25;
 
 // Facts about the game.
 const GameType kGameType{
@@ -54,17 +76,18 @@ const GameType kGameType{
     {
         {"size", GameParameter(kDefaultSize)},
         {"horizon", GameParameter(kDefaultHorizon)},
-        {"only_distribution_reward", GameParameter(kOnlyDistributionReward)},
-        {"forbidden_states", GameParameter(kForbiddenStates)},
-        {"initial_distribution", GameParameter(kInitialDistribution)},
+        {"only_distribution_reward",
+         GameParameter(kDefaultOnlyDistributionReward)},
+        {"forbidden_states", GameParameter(kDefaultForbiddenStates)},
+        {"initial_distribution", GameParameter(kDefaultInitialDistribution)},
         {"initial_distribution_value",
-         GameParameter(kInitialDistributionValue)},
+         GameParameter(kDefaultInitialDistributionValue)},
     },
     /*default_loadable*/ true,
     /*provides_factored_observation_string*/ false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new CrowdModellingGame(params));
+  return std::shared_ptr<const Game>(new CrowdModelling2dGame(params));
 }
 
 std::string StateToString(int x, int y, int t, Player player_id,
@@ -84,26 +107,6 @@ std::string StateToString(int x, int y, int t, Player player_id,
   SpielFatalError(
       absl::Substitute("Unexpected state (player_id: $0, is_chance_init: $1)",
                        player_id, is_chance_init));
-}
-
-std::vector<absl::string_view> ProcessStringParam(
-    const std::string& string_param_str, int max_size) {
-  // ProcessStringParam takes a parameter string and split it is a sequence of
-  // substring. Example:
-  // "" -> {}
-  // "[0|0;0|1]" -> {"0|0", "0|1"}
-  // "[0.5;0.5]" -> {"0.5", "0.5"}
-  absl::string_view string_param = absl::StripAsciiWhitespace(string_param_str);
-  SPIEL_CHECK_TRUE(absl::ConsumePrefix(&string_param, "["));
-  SPIEL_CHECK_TRUE(absl::ConsumeSuffix(&string_param, "]"));
-
-  std::vector<absl::string_view> split_string_list;
-  if (!string_param.empty()) {
-    split_string_list = absl::StrSplit(string_param, ';');
-  }
-  SPIEL_CHECK_GE(split_string_list.size(), 0);
-  SPIEL_CHECK_LE(split_string_list.size(), max_size * max_size);
-  return split_string_list;
 }
 
 std::vector<std::pair<int, int>> StringListToPairs(
@@ -145,7 +148,7 @@ int MergeXY(int xx, int yy, int size) {
   SPIEL_CHECK_LE(xx, size - 1);
   SPIEL_CHECK_GE(yy, 0);
   SPIEL_CHECK_LE(yy, size - 1);
-  return xx + yy * size;
+  return yy +  xx * size;
 }
 
 bool ComparisonPair(const std::pair<int, int>& a,
@@ -174,7 +177,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-CrowdModellingState::CrowdModellingState(
+CrowdModelling2dState::CrowdModelling2dState(
     std::shared_ptr<const Game> game, int size, int horizon,
     bool only_distribution_reward, const std::string& forbidden_states,
     const std::string& initial_distribution,
@@ -183,16 +186,13 @@ CrowdModellingState::CrowdModellingState(
       size_(size),
       horizon_(horizon),
       only_distribution_reward_(only_distribution_reward),
-      forbidden_states_(forbidden_states),
-      initial_distribution_(initial_distribution),
-      initial_distribution_value_(initial_distribution_value),
       distribution_(size_ * size_, 1. / (size_ * size_)) {
   std::vector<absl::string_view> forbidden_states_list =
-      ProcessStringParam(forbidden_states_, size_);
+      ProcessStringParam(forbidden_states, size_);
   std::vector<absl::string_view> initial_distribution_list =
-      ProcessStringParam(initial_distribution_, size_);
+      ProcessStringParam(initial_distribution, size_);
   std::vector<absl::string_view> initial_distribution_value_list =
-      ProcessStringParam(initial_distribution_value_, size_);
+      ProcessStringParam(initial_distribution_value, size_);
   SPIEL_CHECK_EQ(initial_distribution_list.size(),
                  initial_distribution_value_list.size());
 
@@ -245,7 +245,26 @@ CrowdModellingState::CrowdModellingState(
   SPIEL_CHECK_EQ(intersection.size(), 0);
 }
 
-std::vector<Action> CrowdModellingState::LegalActions() const {
+CrowdModelling2dState::CrowdModelling2dState(
+    std::shared_ptr<const Game> game, int size, int horizon,
+    bool only_distribution_reward, const std::string& forbidden_states,
+    const std::string& initial_distribution,
+    const std::string& initial_distribution_value, Player current_player,
+    bool is_chance_init, int x, int y, int t, int last_action,
+    double return_value, const std::vector<double>& distribution)
+    : CrowdModelling2dState(game, size, horizon, only_distribution_reward,
+                            forbidden_states, initial_distribution,
+                            initial_distribution_value) {
+  current_player_ = current_player;
+  is_chance_init_ = is_chance_init;
+  x_ = x;
+  y_ = y;
+  t_ = t;
+  last_action_ = last_action;
+  return_value_ = return_value;
+}
+
+std::vector<Action> CrowdModelling2dState::LegalActions() const {
   if (IsTerminal()) return {};
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsMeanFieldNode()) return {};
@@ -253,14 +272,14 @@ std::vector<Action> CrowdModellingState::LegalActions() const {
   return {0, 1, 2, 3, 4};
 }
 
-ActionsAndProbs CrowdModellingState::ChanceOutcomes() const {
+ActionsAndProbs CrowdModelling2dState::ChanceOutcomes() const {
   if (is_chance_init_) {
     return initial_distribution_action_prob_;
   }
   return {{0, 1. / 5}, {1, 1. / 5}, {2, 1. / 5}, {3, 1. / 5}, {4, 1. / 5}};
 }
 
-void CrowdModellingState::DoApplyAction(Action action) {
+void CrowdModelling2dState::DoApplyAction(Action action) {
   SPIEL_CHECK_NE(current_player_, kMeanFieldPlayerId);
   return_value_ += Rewards()[0];
   int xx;
@@ -278,13 +297,13 @@ void CrowdModellingState::DoApplyAction(Action action) {
     xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
     yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
     ++t_;
-    current_player_ = 0;
+    current_player_ = kMeanFieldPlayerId;
   } else {
     SPIEL_CHECK_EQ(current_player_, 0);
     xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
     yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
     last_action_ = action;
-    current_player_ = kMeanFieldPlayerId;
+    current_player_ = kChancePlayerId;
   }
   // Check if the new (xx,yy) is forbidden.
   bool is_next_state_forbidden = false;
@@ -301,8 +320,8 @@ void CrowdModellingState::DoApplyAction(Action action) {
   }
 }
 
-std::string CrowdModellingState::ActionToString(Player player,
-                                                Action action) const {
+std::string CrowdModelling2dState::ActionToString(Player player,
+                                                  Action action) const {
   if (IsChanceNode() && is_chance_init_) {
     return absl::Substitute("init_state=$0", action);
   }
@@ -310,32 +329,32 @@ std::string CrowdModellingState::ActionToString(Player player,
                           kActionToMoveY.at(action));
 }
 
-std::vector<std::string> CrowdModellingState::DistributionSupport() {
+std::vector<std::string> CrowdModelling2dState::DistributionSupport() {
   std::vector<std::string> support;
   support.reserve(size_ * size_);
   for (int x = 0; x < size_; ++x) {
     for (int y = 0; y < size_; ++y) {
-      support.push_back(StateToString(x, y, t_, 0, false));
+      support.push_back(StateToString(x, y, t_, kMeanFieldPlayerId, false));
     }
   }
   return support;
 }
 
-void CrowdModellingState::UpdateDistribution(
+void CrowdModelling2dState::UpdateDistribution(
     const std::vector<double>& distribution) {
   SPIEL_CHECK_EQ(current_player_, kMeanFieldPlayerId);
   SPIEL_CHECK_EQ(distribution.size(), size_ * size_);
   distribution_ = distribution;
-  current_player_ = kChancePlayerId;
+  current_player_ = kDefaultPlayerId;
 }
 
-bool CrowdModellingState::IsTerminal() const { return t_ >= horizon_; }
+bool CrowdModelling2dState::IsTerminal() const { return t_ >= horizon_; }
 
-std::vector<double> CrowdModellingState::Rewards() const {
+std::vector<double> CrowdModelling2dState::Rewards() const {
   if (current_player_ != 0) {
     return {0.};
   }
-  double r_mu = -std::log(distribution_[MergeXY(x_, y_, size_)]);
+  double r_mu = -std::log(distribution_[MergeXY(x_, y_, size_)]+kEpsilon);
   if (only_distribution_reward_) {
     return {r_mu};
   }
@@ -348,52 +367,116 @@ std::vector<double> CrowdModellingState::Rewards() const {
   return {r_x + r_y + r_a + r_mu};
 }
 
-std::vector<double> CrowdModellingState::Returns() const {
+std::vector<double> CrowdModelling2dState::Returns() const {
   return {return_value_ + Rewards()[0]};
 }
 
-std::string CrowdModellingState::ToString() const {
+std::string CrowdModelling2dState::ToString() const {
   return StateToString(x_, y_, t_, current_player_, is_chance_init_);
 }
 
-std::string CrowdModellingState::InformationStateString(Player player) const {
+std::string CrowdModelling2dState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string CrowdModellingState::ObservationString(Player player) const {
+std::string CrowdModelling2dState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void CrowdModellingState::ObservationTensor(Player player,
-                                            absl::Span<float> values) const {
+void CrowdModelling2dState::ObservationTensor(Player player,
+                                              absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), 2 * size_ + horizon_);
-  SPIEL_CHECK_GE(x_, 0);
+  SPIEL_CHECK_EQ(values.size(), 2 * size_ + horizon_ + 1);
   SPIEL_CHECK_LT(x_, size_);
-  SPIEL_CHECK_GE(y_, 0);
   SPIEL_CHECK_LT(y_, size_);
   SPIEL_CHECK_GE(t_, 0);
-  SPIEL_CHECK_LT(t_, horizon_);
+  // Allow t_ == horizon_.
+  SPIEL_CHECK_LE(t_, horizon_);
   std::fill(values.begin(), values.end(), 0.);
-  values[x_] = 1.;
-  values[y_ + size_] = 1.;
-  values[size_ + t_] = 1.;
+  if (x_ >= 0 && y_ >= 0) {
+    values[x_] = 1.;
+    values[y_ + size_] = 1.;
+  } else {
+    // x_ and y_ equal -1 for the initial (blank) state, don't set any position
+    // bit in that case.
+    SPIEL_CHECK_EQ(x_, -1);
+    SPIEL_CHECK_EQ(y_, -1);
+  }
+  values[2 * size_ + t_] = 1.;
 }
 
-std::unique_ptr<State> CrowdModellingState::Clone() const {
-  return std::unique_ptr<State>(new CrowdModellingState(*this));
+std::unique_ptr<State> CrowdModelling2dState::Clone() const {
+  return std::unique_ptr<State>(new CrowdModelling2dState(*this));
 }
 
-CrowdModellingGame::CrowdModellingGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+std::string CrowdModelling2dState::Serialize() const {
+  std::string out =
+      absl::StrCat(current_player_, ",", is_chance_init_, ",", x_, ",", y_, ",",
+                   t_, ",", last_action_, ",", return_value_, "\n");
+  absl::StrAppend(&out, absl::StrJoin(distribution_, ","));
+  return out;
+}
 
-std::vector<int> CrowdModellingGame::ObservationTensorShape() const {
-  return {2 * ParameterValue<int>("size") + ParameterValue<int>("horizon")};
+CrowdModelling2dGame::CrowdModelling2dGame(const GameParameters& params)
+    : Game(kGameType, params),
+      size_(ParameterValue<int>("size", kDefaultSize)),
+      horizon_(ParameterValue<int>("horizon", kDefaultHorizon)),
+      only_distribution_reward_(ParameterValue<bool>(
+          "only_distribution_reward", kDefaultOnlyDistributionReward)),
+      forbidden_states_(ParameterValue<std::string>("forbidden_states",
+                                                    kDefaultForbiddenStates)),
+      initial_distribution_(ParameterValue<std::string>(
+          "initial_distribution", kDefaultInitialDistribution)),
+      initial_distribution_value_(ParameterValue<std::string>(
+          "initial_distribution_value", kDefaultInitialDistributionValue)) {}
+
+std::vector<int> CrowdModelling2dGame::ObservationTensorShape() const {
+  // +1 to allow for t_ == horizon.
+  return {2 * ParameterValue<int>("size") + ParameterValue<int>("horizon") + 1};
+}
+
+std::unique_ptr<State> CrowdModelling2dGame::DeserializeState(
+    const std::string& str) const {
+  std::vector<std::string> lines = absl::StrSplit(str, '\n');
+  if (lines.size() != 2) {
+    SpielFatalError(absl::StrCat("Expected 2 lines in serialized state, got: ",
+                                 lines.size()));
+  }
+  Player current_player;
+  int is_chance_init, x, y, t, last_action;
+  double return_value;
+  std::vector<double> distribution;
+
+  std::vector<std::string> properties = absl::StrSplit(lines[0], ',');
+  if (properties.size() != 7) {
+    SpielFatalError(
+        absl::StrCat("Expected 7 properties for serialized state, got: ",
+                     properties.size()));
+  }
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[0], &current_player));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[1], &is_chance_init));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[2], &x));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[3], &y));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[4], &t));
+  SPIEL_CHECK_TRUE(absl::SimpleAtoi(properties[5], &last_action));
+  SPIEL_CHECK_TRUE(absl::SimpleAtod(properties[6], &return_value));
+  std::vector<std::string> serialized_distrib = absl::StrSplit(lines[1], ',');
+  distribution.reserve(serialized_distrib.size());
+  for (std::string& v : serialized_distrib) {
+    double parsed_weight;
+    SPIEL_CHECK_TRUE(absl::SimpleAtod(v, &parsed_weight));
+    distribution.push_back(parsed_weight);
+  }
+  return absl::make_unique<CrowdModelling2dState>(
+      shared_from_this(), size_, horizon_, only_distribution_reward_,
+      forbidden_states_, initial_distribution_, initial_distribution_value_,
+      current_player, is_chance_init, x, y, t, last_action, return_value,
+      distribution);
 }
 
 }  // namespace crowd_modelling_2d

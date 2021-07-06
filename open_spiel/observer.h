@@ -129,7 +129,19 @@ struct TensorInfo {
 
   std::string DebugString() const {
     return absl::StrCat("TensorInfo(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), ")");
+                        absl::StrJoin(shape, ","), "))");
+  }
+};
+
+struct TensorInfoWithData {
+  std::string name;
+  std::vector<int> shape;
+  absl::Span<const float> data;
+
+  std::string DebugString() const {
+    return absl::StrCat("TensorInfoWithData(name='", name, "', shape=(",
+                        absl::StrJoin(shape, ","), "), data=<", data.size(),
+                        " bytes>)");
   }
 };
 
@@ -289,6 +301,9 @@ class Observation {
 
   // Returns information on the component tensors of the observation.
   const std::vector<TensorInfo>& tensor_info() const { return tensors_; }
+
+  // Returns the component tensors of the observation: both info and data.
+  std::vector<TensorInfoWithData> tensors() const;
 
   // Gets the observation from the State and player and stores it in
   // the internal tensor.

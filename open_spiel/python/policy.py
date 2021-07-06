@@ -41,7 +41,7 @@ from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
 
-class Policy(object):
+class Policy:
   """Base class for policies.
 
   A policy is something that returns a distribution over possible actions
@@ -181,7 +181,7 @@ class TabularPolicy(Policy):
   def __init__(self, game, players=None, to_string=lambda s: s.history_str()):
     """Initializes a uniform random policy for all players in the game."""
     players = sorted(players or range(game.num_players()))
-    super(TabularPolicy, self).__init__(game, players)
+    super().__init__(game, players)
     self.game_type = game.get_type()
 
     # Get all states in the game at which players have to make decisions.
@@ -233,21 +233,20 @@ class TabularPolicy(Policy):
     if self.game_type.provides_information_state_string:
       if player is None:
         return state.information_state_string()
-      else:
-        return state.information_state_string(player)
-    elif self.game_type.provides_observation_string:
+      return state.information_state_string(player)
+    if self.game_type.provides_observation_string:
       if player is None:
         return state.observation_string()
-      else:
-        return state.observation_string(player)
-    else:
-      return str(state)
+      return state.observation_string(player)
+    return str(state)
 
   def action_probabilities(self, state, player_id=None):
     """Returns an {action: probability} dict, covering all legal actions."""
-    probability = self.policy_for_key(self._state_key(state, player_id))
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
+    if not legal_actions:
+      return {0: 1.0}
+    probability = self.policy_for_key(self._state_key(state, player_id))
     return {action: probability[action] for action in legal_actions}
 
   def state_index(self, state):
@@ -339,7 +338,7 @@ class UniformRandomPolicy(Policy):
   def __init__(self, game):
     """Initializes a uniform random policy for all players in the game."""
     all_players = list(range(game.num_players()))
-    super(UniformRandomPolicy, self).__init__(game, all_players)
+    super().__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
     """Returns a uniform random policy for a player in a state.
@@ -356,6 +355,8 @@ class UniformRandomPolicy(Policy):
     """
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
+    if not legal_actions:
+      return {0: 1.0}
     probability = 1 / len(legal_actions)
     return {action: probability for action in legal_actions}
 
@@ -365,11 +366,13 @@ class FirstActionPolicy(Policy):
 
   def __init__(self, game):
     all_players = list(range(game.num_players()))
-    super(FirstActionPolicy, self).__init__(game, all_players)
+    super().__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
     legal_actions = (state.legal_actions() if player_id is None
                      else state.legal_actions(player_id))
+    if not legal_actions:
+      return {0: 1.0}
     min_action = min(legal_actions)
     return {action: 1.0 if action == min_action else 0.0
             for action in legal_actions}
@@ -401,10 +404,26 @@ def tabular_policy_from_callable(game, callable_policy, players=None):
   return tabular_policy
 
 
-def pyspiel_policy_to_python_policy(game, pyspiel_tabular_policy):
-  policy = TabularPolicy(game)
+def pyspiel_policy_to_python_policy(game, pyspiel_tabular_policy, players=None):
+  """Converts a pyspiel.TabularPolicy to a TabularPolicy.
+
+  Args:
+    game: The OpenSpiel game.
+    pyspiel_tabular_policy: Pyspiel tabular policy to copy from.
+    players: List of integer player ids to copy policy from. For example,
+      `players=[0]` will only copy player 0's policy over into the python
+      policy (the other player's policies will be undefined). Default value of
+      `None` will copy all players' policies.
+
+  Returns:
+    python_policy
+  """
+  policy = TabularPolicy(game, players=players)
   for item in pyspiel_tabular_policy.policy_table().items():
     info_state_str, actions_probs = item
+    # If requested, only populate a policy for particular players.
+    if players is not None and info_state_str not in policy.state_lookup:
+      continue
     state_policy = policy.policy_for_key(info_state_str)
     for action, prob in actions_probs:
       state_policy[action] = prob

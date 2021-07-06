@@ -62,9 +62,9 @@ class CrowdModellingState : public State {
  public:
   CrowdModellingState(std::shared_ptr<const Game> game, int size, int horizon);
   CrowdModellingState(std::shared_ptr<const Game> game, int size, int horizon,
-                      Player current_player, bool is_chance_init_, int x, int t,
+                      Player current_player, bool is_chance_init, int x, int t,
                       int last_action, double return_value,
-                      std::vector<double> distribution);
+                      const std::vector<double>& distribution);
 
   CrowdModellingState(const CrowdModellingState&) = default;
   CrowdModellingState& operator=(const CrowdModellingState&) = default;
@@ -119,9 +119,8 @@ class CrowdModellingGame : public Game {
   explicit CrowdModellingGame(const GameParameters& params);
   int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<CrowdModellingState>(
-        shared_from_this(), ParameterValue<int>("size"),
-        ParameterValue<int>("horizon"));
+    return absl::make_unique<CrowdModellingState>(shared_from_this(), size_,
+                                                  horizon_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -131,19 +130,21 @@ class CrowdModellingGame : public Game {
   double MaxUtility() const override {
     return std::numeric_limits<double>::infinity();
   }
-  int MaxGameLength() const override {
-    return ParameterValue<int>("horizon", kDefaultHorizon);
-  }
+  int MaxGameLength() const override { return horizon_; }
   int MaxChanceNodesInHistory() const override {
     // + 1 to account for the initial extra chance node.
-    return ParameterValue<int>("horizon", kDefaultHorizon) + 1;
+    return horizon_ + 1;
   }
   std::vector<int> ObservationTensorShape() const override;
   int MaxChanceOutcomes() const override {
-    return std::max(ParameterValue<int>("size"), kNumChanceActions);
+    return std::max(size_, kNumChanceActions);
   }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;
+
+ private:
+  const int size_;
+  const int horizon_;
 };
 
 }  // namespace crowd_modelling

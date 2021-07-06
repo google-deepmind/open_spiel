@@ -51,14 +51,21 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
                     &CorrDistInfo::conditional_best_response_policies);
 
   m.def("cce_dist",
-        py::overload_cast<const Game&, const CorrelationDevice&, int>(
+        py::overload_cast<const Game&, const CorrelationDevice&, int, float>(
             &open_spiel::algorithms::CCEDist),
-        "Returns a player's distance to a coarse-correlated equilibrium.");
+        "Returns a player's distance to a coarse-correlated equilibrium.",
+        py::arg("game"),
+        py::arg("correlation_device"),
+        py::arg("player"),
+        py::arg("prob_cut_threshold") = -1.0);
 
   m.def("cce_dist",
-        py::overload_cast<const Game&, const CorrelationDevice&>(
+        py::overload_cast<const Game&, const CorrelationDevice&, float>(
             &open_spiel::algorithms::CCEDist),
-        "Returns the distance to a coarse-correlated equilibrium.");
+        "Returns the distance to a coarse-correlated equilibrium.",
+        py::arg("game"),
+        py::arg("correlation_device"),
+        py::arg("prob_cut_threshold") = -1.0);
 
   m.def("ce_dist",
         py::overload_cast<const Game&, const CorrelationDevice&>(

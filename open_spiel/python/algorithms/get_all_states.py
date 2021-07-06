@@ -105,21 +105,21 @@ def get_all_states(game,
     A `dict` with `to_string(state)` keys and `pyspiel.State` values containing
     all states encountered traversing the game tree up to the specified depth.
   """
-  # Get the root state.
-  state = game.new_initial_state()
+  root_states = game.new_initial_states()
   all_states = dict()
 
-  # Then, do a recursive tree walk to fill up the map.
-  _get_subgames_states(
-      state=state,
-      all_states=all_states,
-      depth_limit=depth_limit,
-      depth=0,
-      include_terminals=include_terminals,
-      include_chance_states=include_chance_states,
-      include_mean_field_states=include_mean_field_states,
-      to_string=to_string,
-      stop_if_encountered=stop_if_encountered)
+  for root in root_states:
+    # Then, do a recursive tree walk to fill up the map.
+    _get_subgames_states(
+        state=root,
+        all_states=all_states,
+        depth_limit=depth_limit,
+        depth=0,
+        include_terminals=include_terminals,
+        include_chance_states=include_chance_states,
+        include_mean_field_states=include_mean_field_states,
+        to_string=to_string,
+        stop_if_encountered=stop_if_encountered)
 
   if not all_states:
     raise ValueError("GetSubgameStates returned 0 states!")

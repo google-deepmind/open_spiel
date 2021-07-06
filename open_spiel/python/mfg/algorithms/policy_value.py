@@ -40,8 +40,9 @@ class PolicyValue(value.ValueFunction):
     """
     super(PolicyValue, self).__init__(game)
     if root_state is None:
-      root_state = game.new_initial_state()
-    self._root_state = root_state
+      self._root_states = game.new_initial_states()
+    else:
+      self._root_states = [root_state]
     self._distribution = distribution
     self._policy = policy
 
@@ -55,10 +56,11 @@ class PolicyValue(value.ValueFunction):
     if state_str in self._state_value:
       return self._state_value[state_str]
     elif state.is_terminal():
-      self._state_value[state_str] = state.rewards()[0]
+      self._state_value[state_str] = state.rewards()[
+          state.mean_field_population()]
       return self._state_value[state_str]
     elif state.current_player() == pyspiel.PlayerId.CHANCE:
-      self._state_value[state_str] = state.rewards()[0]
+      self._state_value[state_str] = 0.0
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
         self._state_value[state_str] += prob * self.eval_state(new_state)
@@ -66,26 +68,29 @@ class PolicyValue(value.ValueFunction):
     elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
       dist = [
-          self._distribution.value_str(str_state)
+          self._distribution.value_str(str_state, 0.)
           for str_state in dist_to_register
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
       self._state_value[state_str] = (
-          state.rewards()[0] + self.eval_state(new_state))
+          state.rewards()[state.mean_field_population()] +
+          self.eval_state(new_state))
       return self._state_value[state_str]
     else:
-      assert state.current_player() == 0, "The player id should be 0"
+      assert int(state.current_player()) >= 0, "The player id should be >= 0"
       v = 0.0
       for action, prob in self._policy.action_probabilities(state).items():
         new_state = state.child(action)
         v += prob * self.eval_state(new_state)
-      self._state_value[state_str] = state.rewards()[0] + v
+      self._state_value[state_str] = state.rewards()[
+          state.mean_field_population()] + v
       return self._state_value[state_str]
 
   def evaluate(self):
     """Evaluate the value over states of self._policy."""
-    _ = self.eval_state(self._root_state)
+    for state in self._root_states:
+      self.eval_state(state)
 
   def value(self, state, action=None):
     if action is None:

@@ -424,7 +424,6 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
 
     DataLogger::Record record = {
         {"step", step},
-        // XXX: "total_states" is currently incorrect if resuming.
         {"total_states", replay_buffer.TotalAdded()},
         {"states_per_s", num_states / seconds},
         {"states_per_s_actor", num_states / (config.actors * seconds)},
@@ -542,8 +541,8 @@ bool AlphaZero(AlphaZeroConfig config, StopToken* stop, bool resuming) {
 
   StartInfo start_info = {/*start_time=*/absl::Now(),
                           /*start_step=*/1,
-                          /*model_checkpoint_step*/0,
-                          /*total_trajectories*/0};
+                          /*model_checkpoint_step=*/0,
+                          /*total_trajectories=*/0};
   if (resuming) {
     start_info = StartInfoFromLearnerJson(config.path);
   }
