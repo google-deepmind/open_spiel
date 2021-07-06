@@ -76,39 +76,15 @@ class MFGPredatorPreyGameTest(parameterized.TestCase):
   )
   def test_random_game(self, population):
     """Tests basic API functions."""
-    np.random.seed(7)
     horizon = 10
     size = 20
     game = predator_prey.MFGPredatorPreyGame(params={
         'horizon': horizon,
         'size': size,
     })
-    state = game.new_initial_state_for_population(population)
-    t = 0
-    while not state.is_terminal():
-      if state.current_player() == pyspiel.PlayerId.CHANCE:
-        actions, probs = zip(*state.chance_outcomes())
-        action = np.random.choice(actions, p=probs)
-        self.check_cloning(state)
-        self.assertEqual(
-            len(state.legal_actions()), len(state.chance_outcomes()))
-        state.apply_action(action)
-      elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
-        self.assertEqual(state.legal_actions(), [])
-        self.check_cloning(state)
-        num_states = len(state.distribution_support())
-        state.update_distribution([1 / num_states] * num_states)
-      else:
-        self.assertEqual(state.current_player(), population)
-        self.check_cloning(state)
-        state.observation_string()
-        state.information_state_string()
-        legal_actions = state.legal_actions()
-        action = np.random.choice(legal_actions)
-        state.apply_action(action)
-        t += 1
-
-    self.assertEqual(t, horizon)
+    pyspiel.random_sim_test(
+        game, num_sims=10, serialize=False, verbose=True,
+        mean_field_population=population)
 
   @parameterized.parameters(
       {
