@@ -108,7 +108,7 @@ class MirrorDescent(object):
     elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
       dist = [
-          self._distribution.value_str(str_state)
+          self._distribution.value_str(str_state, 0.0)
           for str_state in dist_to_register
       ]
       new_state = state.clone()
