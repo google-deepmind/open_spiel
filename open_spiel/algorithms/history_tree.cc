@@ -34,6 +34,9 @@ std::unique_ptr<HistoryNode> RecursivelyBuildGameTree(
   (*state_to_node)[node->GetHistory()] = node.get();
   State* state_ptr = node->GetState();
   switch (node->GetType()) {
+    case StateType::kMeanField: {
+      SpielFatalError("kMeanField not supported.");
+    }
     case StateType::kChance: {
       double probability_sum = 0;
       for (const auto& [outcome, prob] : state_ptr->ChanceOutcomes()) {

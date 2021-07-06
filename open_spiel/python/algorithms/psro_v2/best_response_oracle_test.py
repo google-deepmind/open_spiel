@@ -30,8 +30,7 @@ class BestResponseOracleTest(parameterized.TestCase, absltest.TestCase):
                             ("leduc_poker", 2))
   def test_cpp_python_best_response_oracle(self, game_name, num_players):
     # Tests that these best responses interface well with Best Response Oracle
-    game = pyspiel.load_game(game_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_name, {"players": num_players})
     all_states, _ = best_response.compute_states_and_info_states_if_none(
         game, all_states=None, state_to_information_state=None)
 

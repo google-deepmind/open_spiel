@@ -24,7 +24,13 @@ namespace testing = open_spiel::testing;
 void BasicLiarsDiceTests() {
   testing::LoadGameTest("liars_dice");
   testing::ChanceOutcomesTest(*LoadGame("liars_dice"));
-  testing::RandomSimTest(*LoadGame("liars_dice"), 100);
+  testing::RandomSimTest(*LoadGame("liars_dice"), 50);
+}
+
+void ImperfectRecallLiarsDiceTests() {
+  testing::LoadGameTest("liars_dice_ir");
+  testing::ChanceOutcomesTest(*LoadGame("liars_dice_ir"));
+  testing::RandomSimTest(*LoadGame("liars_dice_ir"), 50);
 }
 
 }  // namespace
@@ -33,4 +39,5 @@ void BasicLiarsDiceTests() {
 
 int main(int argc, char** argv) {
   open_spiel::liars_dice::BasicLiarsDiceTests();
+  open_spiel::liars_dice::ImperfectRecallLiarsDiceTests();
 }

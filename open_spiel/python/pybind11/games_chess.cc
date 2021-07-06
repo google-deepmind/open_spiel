@@ -16,15 +16,16 @@
 
 #include "open_spiel/games/chess.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 
 namespace py = ::pybind11;
 using open_spiel::State;
 using open_spiel::chess::ChessState;
 
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessState);
+
 void open_spiel::init_pyspiel_games_chess(py::module& m) {
-  py::class_<ChessState, State>(m, "ChessState")
+  py::classh<ChessState, State>(m, "ChessState")
       .def("debug_string", &ChessState::DebugString)
       .def("parse_move_to_action", &ChessState::ParseMoveToAction)
       // Pickle support

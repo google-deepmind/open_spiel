@@ -151,6 +151,8 @@ class Environment(object):
                chance_event_sampler=None,
                observation_type=None,
                include_full_state=False,
+               distribution=None,
+               mfg_population=None,
                **kwargs):
     """Constructor.
 
@@ -163,16 +165,19 @@ class Environment(object):
         default to INFORMATION_STATE unless the game doesn't provide it.
       include_full_state: whether or not to include the full serialized
         OpenSpiel state in the observations (sometimes useful for debugging).
+      distribution: the distribution over states if the game is a mean field
+        game.
+      mfg_population: The Mean Field Game population to consider.
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
     self._include_full_state = include_full_state
+    self._distribution = distribution
+    self._mfg_population = mfg_population
 
     if isinstance(game, str):
       if kwargs:
-        game_settings = {
-            key: pyspiel.GameParameter(val) for (key, val) in kwargs.items()
-        }
+        game_settings = {key: val for (key, val) in kwargs.items()}
         logging.info("Using game settings: %s", game_settings)
         self._game = pyspiel.load_game(game, game_settings)
       else:
@@ -199,11 +204,16 @@ class Environment(object):
     # Check the requested observation type is supported.
     if observation_type == ObservationType.OBSERVATION:
       if not self._game.get_type().provides_observation_tensor:
-        raise ValueError("observation_tensor not supported by " + game)
+        raise ValueError(f"observation_tensor not supported by {game}")
     elif observation_type == ObservationType.INFORMATION_STATE:
       if not self._game.get_type().provides_information_state_tensor:
-        raise ValueError("information_state_tensor not supported by " + game)
+        raise ValueError(f"information_state_tensor not supported by {game}")
     self._use_observation = (observation_type == ObservationType.OBSERVATION)
+
+    if self._game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
+      assert distribution is not None
+      assert mfg_population is not None
+      assert 0 <= mfg_population < self._num_players
 
   def seed(self, seed=None):
     self._chance_event_sampler.seed(seed)
@@ -308,7 +318,12 @@ class Environment(object):
         step_type: A `StepType` value.
     """
     self._should_reset = False
-    self._state = self._game.new_initial_state()
+    if self._game.get_type(
+    ).dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD and self._num_players > 1:
+      self._state = self._game.new_initial_state_for_population(
+          self._mfg_population)
+    else:
+      self._state = self._game.new_initial_state()
     self._sample_external_events()
 
     observations = {
@@ -336,9 +351,18 @@ class Environment(object):
 
   def _sample_external_events(self):
     """Sample chance events until we get to a decision node."""
-    while self._state.is_chance_node():
-      outcome = self._chance_event_sampler(self._state)
-      self._state.apply_action(outcome)
+    while self._state.is_chance_node() or (self._state.current_player()
+                                           == pyspiel.PlayerId.MEAN_FIELD):
+      if self._state.is_chance_node():
+        outcome = self._chance_event_sampler(self._state)
+        self._state.apply_action(outcome)
+      if self._state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
+        dist_to_register = self._state.distribution_support()
+        dist = [
+            self._distribution.value_str(str_state, default_value=0.0)
+            for str_state in dist_to_register
+        ]
+        self._state.update_distribution(dist)
 
   def observation_spec(self):
     """Defines the observation per player provided by the environment.
@@ -401,8 +425,10 @@ class Environment(object):
   # New RL calls for more advanced use cases (e.g. search + RL).
   @property
   def is_turn_based(self):
-    return self._game.get_type(
-    ).dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL
+    return ((self._game.get_type().dynamics
+             == pyspiel.GameType.Dynamics.SEQUENTIAL) or
+            (self._game.get_type().dynamics
+             == pyspiel.GameType.Dynamics.MEAN_FIELD))
 
   @property
   def max_game_length(self):

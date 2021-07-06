@@ -64,14 +64,17 @@ class _Observation:
   """Contains an observation from a game."""
 
   def __init__(self, game, imperfect_information_observation_type, params):
-    obs = game.make_observer(imperfect_information_observation_type, params)
+    if imperfect_information_observation_type is not None:
+      obs = game.make_observer(imperfect_information_observation_type, params)
+    else:
+      obs = game.make_observer(params)
     self._observation = pyspiel._Observation(game, obs)
     self.dict = {}
     if self._observation.has_tensor():
       self.tensor = np.frombuffer(self._observation, np.float32)
       offset = 0
       for tensor_info in self._observation.tensor_info():
-        size = np.product(tensor_info.shape)
+        size = np.product(tensor_info.shape, dtype=np.int64)
         values = self.tensor[offset:offset + size].reshape(tensor_info.shape)
         self.dict[tensor_info.name] = values
         offset += size

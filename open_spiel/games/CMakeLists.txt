@@ -67,6 +67,8 @@ set(GAME_SOURCES
   hearts.h
   hex.cc
   hex.h
+  kriegspiel.cc
+  kriegspiel.h
   kuhn_poker.cc
   kuhn_poker.h
   laser_tag.cc
@@ -82,6 +84,10 @@ set(GAME_SOURCES
   matching_pennies_3p.cc
   matching_pennies_3p.h
   matrix_games.cc
+  mfg/crowd_modelling.cc
+  mfg/crowd_modelling.h
+  mfg/crowd_modelling_2d.cc
+  mfg/crowd_modelling_2d.h
   negotiation.cc
   negotiation.h
   nfg_game.cc
@@ -277,6 +283,14 @@ add_executable(coordinated_mp_test coordinated_mp_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:algorithms>)
 add_test(coordinated_mp_test coordinated_mp_test)
 
+add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crowd_modelling_test crowd_modelling_test)
+
+add_executable(crowd_modelling_2d_test mfg/crowd_modelling_2d_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crowd_modelling_2d_test crowd_modelling_2d_test)
+
 add_executable(cursor_go_test cursor_go_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -326,6 +340,10 @@ add_test(hearts_test hearts_test)
 add_executable(hex_test hex_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(hex_test hex_test)
+
+add_executable(kriegspiel_test kriegspiel_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>)
+add_test(kriegspiel_test kriegspiel_test)
 
 add_executable(kuhn_poker_test kuhn_poker_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
@@ -452,9 +470,11 @@ if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   add_executable(universal_poker_test universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}
           $<TARGET_OBJECTS:tests>
           $<TARGET_OBJECTS:algorithms>)
-  add_test(universal_poker_test.cc universal_poker_test)
+  add_test(universal_poker_test universal_poker_test
+           --subgames_data_dir=${CMAKE_CURRENT_SOURCE_DIR}/universal_poker/endgames)
 endif()
 
 add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(y_test y_test)
+

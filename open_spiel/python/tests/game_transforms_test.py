@@ -27,16 +27,16 @@ class RepeatedGameTest(absltest.TestCase):
 
   def test_create_repeated_game(self):
     """Test both create_repeated_game function signatures."""
-    repeated_game = pyspiel.create_repeated_game(
-        "matrix_rps", {"num_repetitions": pyspiel.GameParameter(10)})
+    repeated_game = pyspiel.create_repeated_game("matrix_rps",
+                                                 {"num_repetitions": 10})
     state = repeated_game.new_initial_state()
     for _ in range(10):
       state.apply_actions([0, 0])
     assert state.is_terminal()
 
     stage_game = pyspiel.load_game("matrix_mp")
-    repeated_game = pyspiel.create_repeated_game(
-        stage_game, {"num_repetitions": pyspiel.GameParameter(5)})
+    repeated_game = pyspiel.create_repeated_game(stage_game,
+                                                 {"num_repetitions": 5})
     state = repeated_game.new_initial_state()
     for _ in range(5):
       state.apply_actions([0, 0])

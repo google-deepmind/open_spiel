@@ -152,4 +152,18 @@ void Normalize(absl::Span<double> weights) {
 
 std::string BoolToStr(bool b) { return b ? "true" : "false"; }
 
+template <class A, class B>
+std::string VectorOfPairsToString(std::vector<std::pair<A, B>>& vec,
+                                  const std::string& delimiter,
+                                  const std::string& pair_delimiter) {
+  std::string str;
+  for (int i = 0; i < vec.size(); ++i) {
+    absl::StrAppend(&str, vec[i].first, pair_delimiter, vec[i].second);
+    if (i != vec.size() - 1) {
+      absl::StrAppend(&str, delimiter);
+    }
+  }
+  return str;
+}
+
 }  // namespace open_spiel

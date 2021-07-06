@@ -78,7 +78,7 @@ class GameParameter {
   explicit GameParameter(bool value, bool is_mandatory = false)
       : is_mandatory_(is_mandatory), bool_value_(value), type_(Type::kBool) {}
 
-  explicit GameParameter(std::map<std::string, GameParameter> value,
+  explicit GameParameter(GameParameters value,
                          bool is_mandatory = false)
       : is_mandatory_(is_mandatory),
         game_value_(std::move(value)),
@@ -126,7 +126,7 @@ class GameParameter {
     return bool_value_;
   }
 
-  const std::map<std::string, GameParameter>& game_value() const {
+  const GameParameters& game_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kGame);
     return game_value_;
   }
@@ -170,7 +170,7 @@ class GameParameter {
   double double_value_ = 0.0;
   std::string string_value_ = "";
   bool bool_value_ = false;
-  std::map<std::string, GameParameter> game_value_ = {};
+  GameParameters game_value_ = {};
   Type type_;
 };
 

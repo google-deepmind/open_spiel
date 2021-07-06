@@ -38,11 +38,10 @@ using open_spiel::algorithms::GetAllHistories;
 //     applied), e.g. in tic-tac-toe the current state of the board, regardless
 //     of the order in which the moves were played.
 int main(int argc, char** argv) {
-  for (std::string_view game_name :
+  for (const std::string& game_name :
        {std::string("tic_tac_toe"), std::string("kuhn_poker"),
         std::string("leduc_poker"), std::string("liars_dice"),
-        TurnBasedGoofspielGameString(4),
-        TurnBasedGoofspielGameString(5),
+        TurnBasedGoofspielGameString(4), TurnBasedGoofspielGameString(5),
         TurnBasedGoofspielGameString(6)}) {
     std::shared_ptr<const open_spiel::Game> game =
         LoadGame(std::string(game_name));
@@ -71,6 +70,8 @@ int main(int argc, char** argv) {
         case StateType::kChance:
           ++num_chance_nodes;
           break;
+        case StateType::kMeanField:
+          open_spiel::SpielFatalError("kMeanField not handeled.");
       }
     }
     const int num_nonterminal_states = nonterminal_states.size();

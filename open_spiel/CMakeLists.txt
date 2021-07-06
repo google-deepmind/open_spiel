@@ -34,20 +34,20 @@ if(NOT BUILD_TYPE)
 endif()
 message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
 
-if(${BUILD_TYPE} EQUAL "Debug")
+if(${BUILD_TYPE} STREQUAL "Debug")
   # Basic build for debugging (default).
   # -Og enables optimizations that do not interfere with debugging.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
 endif()
 
-if(${BUILD_TYPE} EQUAL "Testing")
+if(${BUILD_TYPE} STREQUAL "Testing")
   # A build used for running tests: keep all runtime checks (assert,
   # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
   # otherwise tests run for too long.
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 endif()
 
-if(${BUILD_TYPE} EQUAL "Release")
+if(${BUILD_TYPE} STREQUAL "Release")
   # Optimized release build: turn off debug runtime checks (assert,
   # SPIEL_DCHECK_*) and turn on highest speed optimizations.
   # The difference in perfomance can be up to 10x higher.
@@ -106,12 +106,12 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HANABI         OFF
   "Build against the Hanabi game.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBNOP         OFF
+  "Build with support for libnop.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC  OFF
   "Build with support for Tensorflow C++ API.")
-openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES  OFF
-  "Build with support for public states in C++.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_PYTHON         ON
   "Build binary for Python.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_XINXIN         OFF
@@ -144,9 +144,6 @@ set (OPEN_SPIEL_CORE_FILES
   action_view.cc
   canonical_game_strings.cc
   canonical_game_strings.h
-  fog/fog_constants.h
-  fog/observation_history.cc
-  fog/observation_history.h
   game_parameters.cc
   game_parameters.h
   matrix_game.cc
@@ -193,6 +190,7 @@ set (OPEN_SPIEL_CORE_OBJECTS $<TARGET_OBJECTS:open_spiel_core>)
 
 set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:open_spiel_core>
+  $<TARGET_OBJECTS:bots>
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
@@ -218,24 +216,15 @@ if (OPEN_SPIEL_BUILD_WITH_EIGEN)
   include_directories(eigen/libeigen)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
 endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  if (NOT OPEN_SPIEL_BUILD_WITH_EIGEN)
-    message(FATAL_ERROR "You want to build with public states API, but Eigen dependency is not enabled. Please enable OPEN_SPIEL_BUILD_WITH_EIGEN=ON")
-  endif()
-  add_compile_definitions(OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set(OPEN_SPIEL_OBJECTS
-    $<TARGET_OBJECTS:public_states_core>
-    $<TARGET_OBJECTS:public_states_games>
-    $<TARGET_OBJECTS:public_states_algorithms>
-    $<TARGET_OBJECTS:public_states_game_transforms>
-    ${OPEN_SPIEL_OBJECTS})
-  add_subdirectory(public_states)
-endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_ROSHAMBO)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:roshambo>)
+endif()
+if (OPEN_SPIEL_BUILD_WITH_LIBNOP)
+  include_directories(libnop/libnop/include)
+  add_subdirectory(libnop)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/libtorch")
@@ -278,7 +267,6 @@ include_directories(..)
 add_subdirectory (algorithms)
 add_subdirectory (bots)
 add_subdirectory (examples)
-add_subdirectory (fog)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 add_subdirectory (contrib)
@@ -308,11 +296,15 @@ if(NOT DEFINED ENV{BUILD_SHARED_LIB})
 endif()
 set (BUILD_SHARED_LIB $ENV{BUILD_SHARED_LIB})
 if (BUILD_SHARED_LIB)
-  add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
-    # Optionally include files that use external dependencies, for example
-    # linear program specification for finding Nash equilibria.
-    $<TARGET_OBJECTS:open_spiel_ortools>
-  )
+  if (OPEN_SPIEL_BUILD_WITH_ORTOOLS)
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS}
+      # Optionally include files that use external dependencies, for example
+      # linear program specification for finding Nash equilibria.
+      $<TARGET_OBJECTS:open_spiel_ortools>
+    )
+  else()
+    add_library(open_spiel SHARED ${OPEN_SPIEL_OBJECTS})
+  endif()
   target_include_directories(open_spiel PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
   target_link_libraries(open_spiel PUBLIC

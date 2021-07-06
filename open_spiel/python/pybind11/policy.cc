@@ -27,14 +27,8 @@
 #include "open_spiel/algorithms/outcome_sampling_mccfr.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/detail/common.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
 namespace {
@@ -114,6 +108,8 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy)
+      .def("tabular_average_policy",
+           &open_spiel::algorithms::CFRSolver::TabularAveragePolicy)
       .def(py::pickle(
           [](const open_spiel::algorithms::CFRSolver& solver) {  // __getstate__
             return solver.Serialize();
@@ -201,9 +197,27 @@ void init_pyspiel_policy(py::module& m) {
 
   m.def("expected_returns",
         py::overload_cast<const State&, const std::vector<const Policy*>&, int,
-                          bool>(&open_spiel::algorithms::ExpectedReturns),
+                          bool, float>(
+                              &open_spiel::algorithms::ExpectedReturns),
         "Computes the undiscounted expected returns from a depth-limited "
-        "search.");
+        "search.",
+        py::arg("state"),
+        py::arg("policies"),
+        py::arg("depth_limit"),
+        py::arg("use_infostate_get_policy"),
+        py::arg("prob_cut_threshold") = 0.0);
+
+  m.def("expected_returns",
+        py::overload_cast<const State&, const Policy&, int,
+                          bool, float>(
+                              &open_spiel::algorithms::ExpectedReturns),
+        "Computes the undiscounted expected returns from a depth-limited "
+        "search.",
+        py::arg("state"),
+        py::arg("joint_policy"),
+        py::arg("depth_limit"),
+        py::arg("use_infostate_get_policy"),
+        py::arg("prob_cut_threshold") = 0.0);
 
   m.def("exploitability",
         py::overload_cast<const Game&, const Policy&>(&Exploitability),

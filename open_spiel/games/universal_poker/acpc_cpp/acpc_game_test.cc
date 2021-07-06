@@ -53,6 +53,8 @@ void BasicACPCTests() {
 
   std::cout << state.ValueOfState(0) << std::endl;
   std::cout << state.ValueOfState(1) << std::endl;
+
+  SPIEL_CHECK_EQ(game.TotalMoney(), 2400);
 }
 
 }  // namespace acpc_cpp

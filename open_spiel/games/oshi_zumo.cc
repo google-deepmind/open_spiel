@@ -105,9 +105,9 @@ void OshiZumoState::DoApplyActions(const std::vector<Action>& actions) {
 
   // Check winner.
   if (wrestler_pos_ == 0) {
-    winner_ = 0;
-  } else if (wrestler_pos_ == (2 * size_ + 2)) {
     winner_ = 1;
+  } else if (wrestler_pos_ == (2 * size_ + 2)) {
+    winner_ = 0;
   }
 
   total_moves_++;

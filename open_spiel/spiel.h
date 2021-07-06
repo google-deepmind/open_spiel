@@ -32,7 +32,6 @@
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -57,8 +56,11 @@ struct GameType {
 
   // Is the game one-player-at-a-time or do players act simultaneously?
   enum class Dynamics {
-    kSimultaneous,  // In some or all nodes every player acts.
-    kSequential,    // Turn-based games.
+    kSimultaneous,           // In some or all nodes every player acts.
+    kSequential,             // Turn-based games.
+    // Mean field game. In particular, this adds mean field nodes. Support for
+    // mean field games is experimental. See details in games/mfg/README.md.
+    kMeanField,              // Is a Mean Field Game
   };
   Dynamics dynamics;
 
@@ -120,7 +122,7 @@ struct GameType {
   bool provides_observation_string;
   bool provides_observation_tensor;
 
-  std::map<std::string, GameParameter> parameter_specification;
+  GameParameters parameter_specification;
   bool ContainsRequiredParameters() const;
 
   // A number of optional values that have defaults, whose values can be
@@ -133,7 +135,6 @@ struct GameType {
   // Can we factorize observations into public and private parts?
   // This is similar to observation fields before, but adds additional
   // distinction between public and private observations.
-  // See fog_constants.h for more details.
   bool provides_factored_observation_string = false;
 };
 
@@ -165,7 +166,9 @@ struct GameInfo {
   double utility_sum;
 
   // The maximum number of player decisions in a game. Does not include chance
-  // events.
+  // events. For a simultaneous action game, this is the maximum number of joint
+  // decisions. In a turn-based game, this is the maximum number of individual
+  // decisions summed over all players.
   int max_game_length;
 };
 
@@ -207,14 +210,12 @@ class State {
 
   // Returns current player. Player numbers start from 0.
   // Negative numbers are for chance (-1) or simultaneous (-2).
-  // kTerminalState should be returned on a TerminalNode().
+  // kTerminalPlayerId should be returned on a TerminalNode().
   virtual Player CurrentPlayer() const = 0;
 
   // Change the state of the game by applying the specified action in turn-based
   // games or in non-simultaneous nodes of simultaneous move games.
-  // This function encodes the logic of the game rules. Returns true
-  // on success. In simultaneous games, returns false (ApplyActions should be
-  // used in that case.)
+  // This function encodes the logic of the game rules.
   //
   // In the case of chance nodes, the behavior of this function depends on
   // GameType::chance_mode. If kExplicit, then the outcome should be
@@ -229,7 +230,8 @@ class State {
   // actions should be returned in ascending order.
   //
   // This default implementation is fine for turn-based games, but should
-  // be overridden by simultaneous-move games.
+  // be overridden by simultaneous-move games. At least one player should have a
+  // legal action or the game should be terminal.
   //
   // Since games mostly override LegalActions(), this method will not be visible
   // in derived classes unless a using directive is added.
@@ -243,9 +245,12 @@ class State {
 
   // `LegalActions()` returns the actions for the current player (including at
   // chance nodes). All games should implement this function.
-  // For any action `a`, it must hold that 0 <= `a` < NumDistinctActions().
+  // At a player node, all returned actions should be in
+  // [0, NumDistinctActions()). For a chance node, they should all be in
+  // [0, MaxChanceOutcomes()).
   // The actions should be returned in ascending order.
-  // If the state is non-terminal, there must be at least one legal action.
+  // If the state is non-terminal (and not a mean field node), there must be at
+  // least one legal action.
   //
   // In simultaneous-move games, the abstract base class implements it in
   // terms of LegalActions(player) and LegalChanceOutcomes(), and so derived
@@ -348,6 +353,13 @@ class State {
   // player with a fixed (randomized) policy.
   virtual bool IsChanceNode() const {
     return CurrentPlayer() == kChancePlayerId;
+  }
+
+  // Is this a mean field node? In that case, no action should be performed, but
+  // instead the global state distribution should be updated with
+  // UpdateDistribution(). See more details in games/mfg/README.md.
+  virtual bool IsMeanFieldNode() const {
+    return CurrentPlayer() == kMeanFieldPlayerId;
   }
 
   // Is this state a player node, with a single player acting?
@@ -552,8 +564,9 @@ class State {
   // Change the state of the game by applying the specified actions, one per
   // player, for simultaneous action games. This function encodes the logic of
   // the game rules. Element i of the vector is the action for player i.
-  // Every player must submit a action; if one of the players has no actions at
-  // this node, then kInvalidAction should be passed instead.
+  //
+  // Every player must submit a action. If some of the players have no legal
+  // actions at this node, then 0 should be passed instead.
   //
   // Simultaneous games should implement DoApplyActions.
   void ApplyActions(const std::vector<Action>& actions);
@@ -595,8 +608,8 @@ class State {
     return outcome_list;
   }
 
-  // Returns the type of the state. Either Chance, Terminal, or Decision. See
-  // StateType definition for definitions of the different types.
+  // Returns the type of the state. Either Chance, Terminal, MeanField or
+  // Decision. See StateType definition for definitions of the different types.
   StateType GetType() const;
 
   // Serializes a state into a string.
@@ -652,6 +665,31 @@ class State {
     return {};
   }
 
+  // These functions only apply to mean field games.
+  // Mean field game support in open_spiel is experimental, and these functions
+  // are subject to change.
+
+  // At the current mean field node, the support of the state distribution that
+  // needs to be updated. States are identified by their corresponding string
+  // representation. In multi-population mean field nodes, the support will
+  // typically include states for all the populations.
+  // This should only be called when when CurrentPlayer() == kMeanFieldPlayerId.
+  virtual std::vector<std::string> DistributionSupport() {
+    SpielFatalError("DistributionSupport has not been implemented");
+  }
+  // Update the state distribution. `distribution[i]` must correspond to
+  // `DistributionSupport()[i]`. After this is called, the state will be of
+  // Chance type.
+  // This should only be called when when CurrentPlayer() == kMeanFieldPlayerId.
+  virtual void UpdateDistribution(const std::vector<double>& distribution) {
+    SpielFatalError("UpdateDistribution has not been implemented");
+  }
+
+  // Only makes sense for mean field games. This is the population a state
+  // belongs to. It returns 0 by default, so multi-population mean field games
+  // should override this function.
+  virtual int MeanFieldPopulation() const;
+
  protected:
   // See ApplyAction.
   virtual void DoApplyAction(Action action_id) {
@@ -662,14 +700,15 @@ class State {
     SpielFatalError("DoApplyActions is not implemented.");
   }
 
-  // Fields common to every game state.
-  int num_distinct_actions_;
-  int num_players_;
-  std::vector<PlayerAction> history_;  // Actions taken so far.
-  int move_number_;
+  // The game that created this state, plus some static information about it,
+  // cached here for efficient access.
+  const std::shared_ptr<const Game> game_;
+  const int num_distinct_actions_;
+  const int num_players_;
 
-  // A pointer to the game that created this state.
-  std::shared_ptr<const Game> game_;
+  // Information that changes over the course of the game.
+  std::vector<PlayerAction> history_;
+  int move_number_;
 };
 
 std::ostream& operator<<(std::ostream& stream, const State& state);
@@ -704,6 +743,14 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
+
+  // Returns newly allocated initial states. In most cases, this will be a
+  // single state.
+  // Games with multi-population mean field dynamics have multiple initial
+  // states, one per population. In that case, N initial states will be
+  // returned, from population 0 to population N-1 (where N is the number of
+  // populations, which is equal to the number of players).
+  virtual std::vector<std::unique_ptr<State>> NewInitialStates() const;
 
   // Maximum number of distinct chance outcomes for chance nodes in the game.
   virtual int MaxChanceOutcomes() const { return 0; }
@@ -887,6 +934,16 @@ class Game : public std::enable_shared_from_this<Game> {
   // or string as defined directly on the state.
   std::shared_ptr<Observer> MakeBuiltInObserver(
       absl::optional<IIGObservationType> iig_obs_type) const;
+
+  // Public member functions below only apply to games with mean field dynamics.
+
+  // Creates a new initial state for the given population (which must be in [0,
+  // NumPlayers())). This must be implemented for multi-population mean field
+  // games.
+  virtual std::unique_ptr<State> NewInitialStateForPopulation(
+      int population) const {
+    SpielFatalError("NewInitialStateForPopulation is not implemented.");
+  }
 
  protected:
   Game(GameType game_type, GameParameters game_parameters)

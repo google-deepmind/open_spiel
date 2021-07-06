@@ -80,12 +80,11 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_tarok.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
-  pybind11/observation_history.cc
-  pybind11/observation_history.h
   pybind11/observer.cc
   pybind11/observer.h
   pybind11/policy.cc
   pybind11/policy.h
+  pybind11/pybind11.h
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h
@@ -96,12 +95,6 @@ if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
       ../games/gamut/gamut_pybind11.h
       ../games/gamut/gamut_pybind11.cc
-      )
-endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set (PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      ../public_states/pybind11/public_states.h
-      ../public_states/pybind11/public_states.cc
       )
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
@@ -129,10 +122,6 @@ if (OPEN_SPIEL_BUILD_WITH_EIGEN)
 
   set(PYTHON_TESTS ${PYTHON_TESTS}
     ../eigen/eigen_binding_test.py)
-endif()
-if (OPEN_SPIEL_BUILD_WITH_PUBLIC_STATES)
-  set(PYTHON_TESTS ${PYTHON_TESTS}
-    ../integration_tests/public_states_api_test.py)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
@@ -165,7 +154,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
-  algorithms/policy_gradient_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
   bots/bluechip_bridge_test.py
@@ -179,10 +167,18 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/cliff_walking_test.py
   games/data_test.py
   games/tic_tac_toe_test.py
+  mfg/algorithms/best_response_value_test.py
+  mfg/algorithms/fictitious_play_test.py
+  mfg/algorithms/mirror_descent_test.py
+  mfg/algorithms/greedy_policy_test.py
+  mfg/algorithms/nash_conv_test.py
+  mfg/algorithms/policy_value_test.py
+  mfg/games/crowd_modelling_test.py
+  mfg/games/predator_prey_test.py
+  tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
-  tests/observation_history_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
@@ -196,6 +192,10 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
+  set (PYTHON_TESTS ${PYTHON_TESTS}
+    jax/dqn_jax_test.py
+    jax/nfsp_jax_test.py
+  )
 endif()
 
 # Add PyTorch tests if is enabled.
@@ -227,6 +227,7 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/masked_softmax_test.py
       algorithms/neurd_test.py
       algorithms/nfsp_test.py
+      algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
       algorithms/rcfr_test.py
   )
@@ -243,6 +244,8 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/double_oracle_test.py
       algorithms/lp_solver_test.py
+      algorithms/jpsro_test.py
+      algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
       algorithms/value_iteration_test.py
       egt/alpharank_test.py
@@ -253,16 +256,15 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   )
 endif()
 
-# Create a python test.
+# Create python tests.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
-  get_filename_component(py_test ${py_test_file} NAME_WE)
-  add_test(NAME python_${py_test} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
+  add_test(NAME ${py_test_file} COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${py_test_file})
 
   # We need two elements in the python path: CURRENT_BINARY_DIR to pick up
   # pyspiel.so, and CURRENT_SOURCE_DIR for the Python source files. We use
   # CURRENT_SOURCE_DIR/../.. so that the Python module imports are of the form:
   #  from open_spiel.python import rl_environment.
-  set_property(TEST python_${py_test}
+  set_property(TEST ${py_test_file}
       PROPERTY ENVIRONMENT
       PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
       TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)

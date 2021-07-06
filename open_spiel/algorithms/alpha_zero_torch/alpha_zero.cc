@@ -14,11 +14,13 @@
 
 #include "open_spiel/algorithms/alpha_zero_torch/alpha_zero.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
@@ -41,6 +43,7 @@
 #include "open_spiel/utils/json.h"
 #include "open_spiel/utils/logger.h"
 #include "open_spiel/utils/lru_cache.h"
+#include "open_spiel/utils/serializable_circular_buffer.h"
 #include "open_spiel/utils/stats.h"
 #include "open_spiel/utils/thread.h"
 #include "open_spiel/utils/threaded_queue.h"
@@ -48,6 +51,41 @@
 namespace open_spiel {
 namespace algorithms {
 namespace torch_az {
+
+struct StartInfo {
+  absl::Time start_time;
+  int start_step;
+  int model_checkpoint_step;
+  int64_t total_trajectories;
+};
+
+StartInfo StartInfoFromLearnerJson(const std::string& path) {
+  StartInfo start_info;
+  file::File learner_file(path + "/learner.jsonl", "r");
+  std::vector<std::string> learner_lines = absl::StrSplit(
+      learner_file.ReadContents(), "\n");
+  std::string last_learner_line;
+
+  // Get the last non-empty line in learner.jsonl.
+  for (int i = learner_lines.size() - 1; i >= 0; i--) {
+    if (!learner_lines[i].empty()) {
+      last_learner_line = learner_lines[i];
+      break;
+    }
+  }
+
+  json::Object last_learner_json = json::FromString(
+      last_learner_line).value().GetObject();
+
+  start_info.start_time = absl::Now() - absl::Seconds(
+      last_learner_json["time_rel"].GetDouble());
+  start_info.start_step = last_learner_json["step"].GetInt() + 1;
+  start_info.model_checkpoint_step = VPNetModel::kMostRecentCheckpointStep;
+  start_info.total_trajectories =
+      last_learner_json["total_trajectories"].GetInt();
+
+  return start_info;
+}
 
 struct Trajectory {
   struct State {
@@ -250,19 +288,24 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
              DeviceManager* device_manager,
              std::shared_ptr<VPNetEvaluator> eval,
              ThreadedQueue<Trajectory>* trajectory_queue,
-             EvalResults* eval_results, StopToken* stop) {
-  FileLogger logger(config.path, "learner");
-  DataLoggerJsonLines data_logger(config.path, "learner", true);
+             EvalResults* eval_results, StopToken* stop,
+             const StartInfo& start_info) {
+  FileLogger logger(config.path, "learner", "a");
+  DataLoggerJsonLines data_logger(
+      config.path, "learner", true, "a", start_info.start_time);
   std::mt19937 rng;
 
   int device_id = 0;  // Do not change, the first device is the learner.
   logger.Print("Running the learner on device %d: %s", device_id,
                device_manager->Get(0, device_id)->Device());
 
-  CircularBuffer<VPNetModel::TrainInputs> replay_buffer(
+  SerializableCircularBuffer<VPNetModel::TrainInputs> replay_buffer(
       config.replay_buffer_size);
+  if (start_info.start_step > 1) {
+    replay_buffer.LoadBuffer(config.path + "/replay_buffer.data");
+  }
   int learn_rate = config.replay_buffer_size / config.replay_buffer_reuse;
-  int64_t total_trajectories = 0;
+  int64_t total_trajectories = start_info.total_trajectories;
 
   const int stage_count = 7;
   std::vector<open_spiel::BasicStats> value_accuracies(stage_count);
@@ -274,8 +317,9 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
   // Actor threads have likely been contributing for a while, so put `last` in
   // the past to avoid a giant spike on the first step.
   absl::Time last = absl::Now() - absl::Seconds(60);
-  for (int step = 1; !stop->StopRequested() &&
-                     (config.max_steps == 0 || step <= config.max_steps);
+  for (int step = start_info.start_step;
+       !stop->StopRequested() &&
+           (config.max_steps == 0 || step <= config.max_steps);
        ++step) {
     outcomes.Reset();
     game_lengths.Reset();
@@ -339,6 +383,8 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
 
     last = now;
 
+    replay_buffer.SaveBuffer(config.path + "/replay_buffer.data");
+
     VPNetModel::LossInfo losses;
     {  // Extra scope to return the device for use for inference asap.
       DeviceManager::DeviceLoan learn_model =
@@ -362,9 +408,11 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
 
     // Always save a checkpoint, either for keeping or for loading the weights
     // to the other sessions. It only allows numbers, so use -1 as "latest".
-    std::string checkpoint_path =
-        device_manager->Get(0, device_id)
-            ->SaveCheckpoint(step % config.checkpoint_freq == 0 ? step : -1);
+    std::string checkpoint_path = device_manager->Get(0, device_id)
+        ->SaveCheckpoint(VPNetModel::kMostRecentCheckpointStep);
+    if (step % config.checkpoint_freq == 0) {
+      device_manager->Get(0, device_id)->SaveCheckpoint(step);
+    }
     if (device_manager->Count() > 0) {
       for (int i = 0; i < device_manager->Count(); ++i) {
         if (i != device_id) {
@@ -434,7 +482,7 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
   }
 }
 
-bool AlphaZero(AlphaZeroConfig config, StopToken* stop) {
+bool AlphaZero(AlphaZeroConfig config, StopToken* stop, bool resuming) {
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(config.game);
 
@@ -491,6 +539,14 @@ bool AlphaZero(AlphaZeroConfig config, StopToken* stop) {
     fd.Write(json::ToString(config.ToJson(), true) + "\n");
   }
 
+  StartInfo start_info = {/*start_time=*/absl::Now(),
+                          /*start_step=*/1,
+                          /*model_checkpoint_step=*/0,
+                          /*total_trajectories=*/0};
+  if (resuming) {
+    start_info = StartInfoFromLearnerJson(config.path);
+  }
+
   DeviceManager device_manager;
   for (const absl::string_view& device : absl::StrSplit(config.devices, ',')) {
     device_manager.AddDevice(
@@ -511,10 +567,15 @@ bool AlphaZero(AlphaZeroConfig config, StopToken* stop) {
     return false;
   }
 
+  std::cerr << "Loading model from step " << start_info.model_checkpoint_step
+            << std::endl;
   {  // Make sure they're all in sync.
-    std::string first_checkpoint = device_manager.Get(0)->SaveCheckpoint(0);
-    for (int i = 1; i < device_manager.Count(); ++i) {
-      device_manager.Get(0, i)->LoadCheckpoint(first_checkpoint);
+    if (!resuming) {
+      device_manager.Get(0)->SaveCheckpoint(start_info.model_checkpoint_step);
+    }
+    for (int i = 0; i < device_manager.Count(); ++i) {
+      device_manager.Get(0, i)->LoadCheckpoint(
+          start_info.model_checkpoint_step);
     }
   }
 
@@ -540,7 +601,7 @@ bool AlphaZero(AlphaZeroConfig config, StopToken* stop) {
         [&, i]() { evaluator(*game, config, i, &eval_results, eval, stop); });
   }
   learner(*game, config, &device_manager, eval, &trajectory_queue,
-          &eval_results, stop);
+          &eval_results, stop, start_info);
 
   if (!stop->StopRequested()) {
     stop->Stop();

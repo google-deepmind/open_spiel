@@ -64,7 +64,7 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{2, 0.250000000000}, {3, 0.250000000000}, {4, 0.250000000000}, {5, 0.250000000000}]
+ChanceOutcomes() = [(2, 0.25), (3, 0.25), (4, 0.25), (5, 0.25)]
 LegalActions() = [2, 3, 4, 5]
 StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", "(spawned at location #2)", "(spawned at location #3)"]
 
@@ -105,7 +105,7 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{2, 0.250000000000}, {3, 0.250000000000}, {4, 0.250000000000}, {5, 0.250000000000}]
+ChanceOutcomes() = [(2, 0.25), (3, 0.25), (4, 0.25), (5, 0.25)]
 LegalActions() = [2, 3, 4, 5]
 StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", "(spawned at location #2)", "(spawned at location #3)"]
 
@@ -156,43 +156,6 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [7, 8]
 
 # State 3
-# ......B
-# .......
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .......
-# ......A
-# Orientations: 1 1
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8]
-HistoryString() = "3, 5, 7, 8"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\nChance Node"
-ObservationString(1) = "......B\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 1\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
@@ -240,43 +203,6 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [3, 4]
 
 # State 5
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .......
-# ......A
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n......A\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
@@ -324,631 +250,62 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [5, 9]
 
 # State 7
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 8
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 3
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["fire", "step right"]
 actions: [9, 5]
 
 # State 9
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 10
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 3
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["move backward", "move forward"]
 actions: [3, 2]
 
 # State 11
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 12
-# .......
-# .....B.
-# ..*.*..
-# .**.**.
-# ..*.*A.
-# .......
-# .......
-# Orientations: 1 3
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\n"
-ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["move forward", "step left"]
 actions: [2, 4]
 
 # State 13
-# .......
-# .....B.
-# ..*.*..
-# .**.**.
-# ..*.*A.
-# .......
-# .......
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 14
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 3
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["move forward", "step left"]
 actions: [2, 4]
 
 # State 15
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 16
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# .......
-# .....A.
-# Orientations: 1 3
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["stand", "move backward"]
 actions: [6, 3]
 
 # State 17
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# .......
-# .....A.
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 18
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# .......
-# .....A.
-# Orientations: 1 3
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["move backward", "right turn"]
 actions: [3, 1]
 
 # State 19
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# .......
-# .....A.
-# Orientations: 1 3
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 1 3\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 20
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 0
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\n"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["step left", "step left"]
 actions: [4, 4]
 
 # State 21
-# .......
-# .......
-# ..*.*.B
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 1 0
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*.B\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 1 0\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◯◉◯◉◯  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
@@ -996,799 +353,78 @@ StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backwa
 actions: [6, 1]
 
 # State 23
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 1 0
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 0\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 24
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 1 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\n"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["right turn", "fire"]
 actions: [1, 9]
 
 # State 25
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 1 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 1 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 26
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 3 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["stand", "stand"]
 actions: [6, 6]
 
 # State 27
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 3 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 28
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 3 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["step forward and right turn", "stand"]
 actions: [8, 6]
 
 # State 29
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# ......A
-# .......
-# Orientations: 3 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n......A\n.......\nOrientations: 3 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 30
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 0 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["stand", "step left"]
 actions: [6, 4]
 
 # State 31
-# .......
-# .......
-# ..*.*B.
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 0 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
-ObservationString(1) = ".......\n.......\n..*.*B.\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(B's action first)"
 action: 1
 
 # State 32
-# .......
-# .....B.
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 0 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
-ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["move backward", "step forward and right turn"]
 actions: [3, 8]
 
 # State 33
-# .......
-# .....B.
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 0 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
-ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 0 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 34
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .......
-# .....A.
-# Orientations: 0 1
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\n"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["step forward and right turn", "left turn"]
 actions: [8, 0]
 
 # State 35
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .......
-# .....A.
-# Orientations: 0 1
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\nChance Node"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.......\n.....A.\nOrientations: 0 1\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 36
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 2 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\n"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["step left", "move backward"]
 actions: [4, 3]
 
 # State 37
-# .......
-# ......B
-# ..*.*..
-# .**.**.
-# ..*.*..
-# .....A.
-# .......
-# Orientations: 2 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\nChance Node"
-ObservationString(1) = ".......\n......B\n..*.*..\n.**.**.\n..*.*..\n.....A.\n.......\nOrientations: 2 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◉  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 38
-# .......
-# .....B.
-# ..*.*..
-# .**.**.
-# ..*.*A.
-# .......
-# .......
-# Orientations: 2 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
-ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["step left", "step left"]
 actions: [4, 4]
 
 # State 39
-# .......
-# .....B.
-# ..*.*..
-# .**.**.
-# ..*.*A.
-# .......
-# .......
-# Orientations: 2 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0, 4, 4]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0, 4, 4"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
-ObservationString(1) = ".......\n.....B.\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 
 # State 40
-# .....B.
-# .......
-# ..*.*..
-# .**.**.
-# ..*.*A.
-# .......
-# .......
-# Orientations: 2 2
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0, 4, 4, 0]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0, 4, 4, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = True
-CurrentPlayer() = -2
-ObservationString(0) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
-ObservationString(1) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\n"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
-LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-StringLegalActions(1) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
-
 # Apply joint action ["left turn", "fire"]
 actions: [0, 9]
 
 # State 41
-# .....B.
-# .......
-# ..*.*..
-# .**.**.
-# ..*.*A.
-# .......
-# .......
-# Orientations: 2 2
-# Chance Node
-IsTerminal() = False
-History() = [3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0, 4, 4, 0, 0, 9]
-HistoryString() = "3, 5, 7, 8, 0, 3, 4, 1, 5, 9, 1, 9, 5, 0, 3, 2, 1, 2, 4, 0, 2, 4, 1, 6, 3, 1, 3, 1, 1, 4, 4, 0, 6, 1, 0, 1, 9, 0, 6, 6, 1, 8, 6, 1, 6, 4, 1, 3, 8, 0, 8, 0, 0, 4, 3, 0, 4, 4, 0, 0, 9"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-ObservationString(0) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
-ObservationString(1) = ".....B.\n.......\n..*.*..\n.**.**.\n..*.*A.\n.......\n.......\nOrientations: 2 2\nChance Node"
-ObservationTensor(0):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ObservationTensor(1):
-◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◉◉◉◉◉◯◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◉◯◯◉  ◯◉◉◯◉◉◯
-◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
-LegalActions() = [0, 1]
-StringLegalActions() = ["(A's action first)", "(B's action first)"]
-
 # Apply action "(A's action first)"
 action: 0
 

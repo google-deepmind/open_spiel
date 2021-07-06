@@ -171,8 +171,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
                                                      alternating_updates):
     num_players = 3
 
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
     cfr_solver = cfr._CFRSolver(
         game,
         regret_matching_plus=regret_matching_plus,
@@ -189,8 +188,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
   def test_simultaneous_two_step_avg_1b_seq_in_kuhn_poker(
       self, regret_matching_plus):
     num_players = 2
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
     cfr_solver = cfr._CFRSolver(
         game,
         regret_matching_plus=regret_matching_plus,

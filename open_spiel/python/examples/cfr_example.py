@@ -34,8 +34,7 @@ flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
 
 
 def main(_):
-  game = pyspiel.load_game(FLAGS.game,
-                           {"players": pyspiel.GameParameter(FLAGS.players)})
+  game = pyspiel.load_game(FLAGS.game, {"players": FLAGS.players})
   cfr_solver = cfr.CFRSolver(game)
 
   for i in range(FLAGS.iterations):

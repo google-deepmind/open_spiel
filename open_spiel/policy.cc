@@ -83,18 +83,34 @@ ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
   return new_policy;
 }
 
-ActionsAndProbs UniformStatePolicy(const State& state) {
+ActionsAndProbs UniformStatePolicy(const std::vector<Action>& actions) {
   ActionsAndProbs actions_and_probs;
-  std::vector<Action> actions = state.LegalActions();
-  actions_and_probs.reserve(actions.size());
   absl::c_for_each(actions, [&actions_and_probs, &actions](Action a) {
     actions_and_probs.push_back({a, 1. / static_cast<double>(actions.size())});
   });
   return actions_and_probs;
 }
 
+ActionsAndProbs UniformStatePolicy(const State& state) {
+  return UniformStatePolicy(state.LegalActions());
+}
+
+ActionsAndProbs UniformStatePolicy(const State& state, Player player) {
+  return UniformStatePolicy(state.LegalActions(player));
+}
+
 ActionsAndProbs FirstActionStatePolicy(const State& state) {
-  return {{state.LegalActions()[0], 1.0}};
+  return FirstActionStatePolicy(state, state.CurrentPlayer());
+}
+
+ActionsAndProbs FirstActionStatePolicy(const State& state, Player player) {
+  ActionsAndProbs actions_and_probs;
+  std::vector<Action> legal_actions = state.LegalActions(player);
+  actions_and_probs.reserve(legal_actions.size());
+  for (int i = 0; i < legal_actions.size(); ++i) {
+    actions_and_probs.push_back({legal_actions[i], i == 0 ? 1.0 : 0.0});
+  }
+  return actions_and_probs;
 }
 
 std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,

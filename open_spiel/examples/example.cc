@@ -116,8 +116,11 @@ int main(int argc, char** argv) {
           PrintLegalActions(*state, player, actions);
         }
 
-        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
-        open_spiel::Action action = actions[dis(rng)];
+        open_spiel::Action action = 0;
+        if (!actions.empty()){
+          absl::uniform_int_distribution<> dis(0, actions.size() - 1);
+          action = actions[dis(rng)];
+        }
         joint_action.push_back(action);
         std::cerr << "player " << player << " chose "
                   << state->ActionToString(player, action) << std::endl;

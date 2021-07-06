@@ -18,8 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import collections
-from scipy import stats
 
 from torch.testing._internal.common_utils import run_tests
 from torch.testing._internal.common_utils import TestCase
@@ -75,25 +73,6 @@ class ReservoirBufferTest(TestCase):
     reservoir_buffer.add("entry3")
 
     self.assertEqual(len(reservoir_buffer), 2)
-
-  def test_reservoir_uniform(self):
-    size = 10
-    max_value = 100
-    num_trials = 1000
-    expected_count = 1. / max_value * size * num_trials
-
-    reservoir_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=size)
-    counter = collections.Counter()
-    for _ in range(num_trials):
-      reservoir_buffer.clear()
-      for idx in range(max_value):
-        reservoir_buffer.add(idx)
-      data = reservoir_buffer.sample(size)
-      counter.update(data)
-    # Tests the null hypothesis (H0) that data has the given frequencies.
-    # We reject the null hypothesis if we get a p-value below our threshold.
-    pvalue = stats.chisquare(list(counter.values()), expected_count).pvalue
-    self.assertGreater(pvalue, 0.05)  # We cannot reject H0.
 
   def test_reservoir_buffer_sample(self):
     replay_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=3)

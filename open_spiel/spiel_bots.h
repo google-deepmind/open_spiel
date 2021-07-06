@@ -166,6 +166,7 @@ std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
                                            int seed);
 
 // A bot that samples from a policy.
+std::unique_ptr<Bot> MakePolicyBot(int seed, std::shared_ptr<Policy> policy);
 std::unique_ptr<Bot> MakePolicyBot(const Game& game, Player player_id, int seed,
                                    std::shared_ptr<Policy> policy);
 

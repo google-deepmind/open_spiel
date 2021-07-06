@@ -24,16 +24,9 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/pytypes.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
 namespace {
@@ -260,8 +253,10 @@ void init_pyspiel_bots(py::module& m) {
       .def("restart", &algorithms::ISMCTSBot::Restart)
       .def("restart_at", &algorithms::ISMCTSBot::RestartAt);
 
-  m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),
-        py::arg("bots"), py::arg("seed"),
+  m.def("evaluate_bots",
+        py::overload_cast<State*, const std::vector<Bot*>&, int>(
+            open_spiel::EvaluateBots),
+        py::arg("state"), py::arg("bots"), py::arg("seed"),
         "Plays a single game with the given bots and returns the final "
         "utilities.");
 
@@ -270,8 +265,9 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
         "A stateful random bot, for test purposes.");
-
-  m.def("make_policy_bot", open_spiel::MakePolicyBot,
+  m.def("make_policy_bot",
+        py::overload_cast<const Game&, Player, int, std::shared_ptr<Policy>>(
+            open_spiel::MakePolicyBot),
         "A bot that samples from a policy.");
 }
 }  // namespace open_spiel

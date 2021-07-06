@@ -93,8 +93,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
 
   def test_external_sampling_kuhn_3p_simple(self):
     np.random.seed(SEED)
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(3)})
+    game = pyspiel.load_game("kuhn_poker", {"players": 3})
     es_solver = external_sampling_mccfr.ExternalSamplingSolver(
         game, external_sampling_mccfr.AverageType.SIMPLE)
     for _ in range(10):
@@ -105,8 +104,7 @@ class ExternalSamplingMCCFRTest(absltest.TestCase):
 
   def test_external_sampling_kuhn_3p_full(self):
     np.random.seed(SEED)
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(3)})
+    game = pyspiel.load_game("kuhn_poker", {"players": 3})
     es_solver = external_sampling_mccfr.ExternalSamplingSolver(
         game, external_sampling_mccfr.AverageType.FULL)
     for _ in range(10):

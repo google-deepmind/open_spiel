@@ -1,0 +1,180 @@
+# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""DQN agents trained on an MFG against a crowd following a uniform policy."""
+
+from absl import app
+from absl import flags
+from absl import logging
+
+from open_spiel.python import policy
+from open_spiel.python import rl_environment
+from open_spiel.python.jax import dqn
+from open_spiel.python.mfg.algorithms import distribution
+from open_spiel.python.mfg.algorithms import nash_conv
+from open_spiel.python.mfg.algorithms import policy_value
+from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
+from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
+import pyspiel
+
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string("game_name", "python_mfg_predator_prey",
+                    "Name of the game.")
+flags.DEFINE_integer("num_train_episodes", int(20e6),
+                     "Number of training episodes.")
+flags.DEFINE_integer("eval_every", 10000,
+                     "Episode frequency at which the agents are evaluated.")
+flags.DEFINE_list("hidden_layers_sizes", [
+    128,
+    128,
+], "Number of hidden units in the avg-net and Q-net.")
+flags.DEFINE_integer("replay_buffer_capacity", int(2e5),
+                     "Size of the replay buffer.")
+flags.DEFINE_integer("min_buffer_size_to_learn", 1000,
+                     "Number of samples in buffer before learning begins.")
+flags.DEFINE_integer("batch_size", 128,
+                     "Number of transitions to sample at each learning step.")
+flags.DEFINE_integer("learn_every", 64,
+                     "Number of steps between learning updates.")
+flags.DEFINE_float("rl_learning_rate", 0.01,
+                   "Learning rate for inner rl agent.")
+flags.DEFINE_string("optimizer_str", "sgd",
+                    "Optimizer, choose from 'adam', 'sgd'.")
+flags.DEFINE_string("loss_str", "mse",
+                    "Loss function, choose from 'mse', 'huber'.")
+flags.DEFINE_integer("update_target_network_every", 19200,
+                     "Number of steps between DQN target network updates.")
+flags.DEFINE_float("discount_factor", 1.0,
+                   "Discount factor for future rewards.")
+flags.DEFINE_integer("epsilon_decay_duration", int(20e6),
+                     "Number of game steps over which epsilon is decayed.")
+flags.DEFINE_float("epsilon_start", 0.1, "Starting exploration parameter.")
+flags.DEFINE_float("epsilon_end", 0.1, "Final exploration parameter.")
+flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
+flags.DEFINE_string("checkpoint_dir", "/tmp/dqn_test",
+                    "Directory to save/load the agent.")
+
+GAME_SETTINGS = {
+    "mfg_crowd_modelling_2d": {
+        "only_distribution_reward": False,
+        "forbidden_states": "[0|0;0|1]",
+        "initial_distribution": "[0|2;0|3]",
+        "initial_distribution_value": "[0.5;0.5]",
+    }
+}
+
+
+class DQNPolicies(policy.Policy):
+  """Joint policy to be evaluated."""
+
+  def __init__(self, envs, policies):
+    game = envs[0].game
+    player_ids = list(range(game.num_players()))
+    super(DQNPolicies, self).__init__(game, player_ids)
+    self._policies = policies
+    self._obs = {
+        "info_state": [None] * game.num_players(),
+        "legal_actions": [None] * game.num_players()
+    }
+
+  def action_probabilities(self, state, player_id=None):
+    cur_player = state.current_player()
+    legal_actions = state.legal_actions(cur_player)
+
+    self._obs["current_player"] = cur_player
+    self._obs["info_state"][cur_player] = (state.observation_tensor(cur_player))
+    self._obs["legal_actions"][cur_player] = legal_actions
+
+    info_state = rl_environment.TimeStep(
+        observations=self._obs, rewards=None, discounts=None, step_type=None)
+
+    p = self._policies[cur_player].step(info_state, is_evaluation=True).probs
+    prob_dict = {action: p[action] for action in legal_actions}
+    return prob_dict
+
+
+def main(unused_argv):
+  logging.info("Loading %s", FLAGS.game_name)
+  game = pyspiel.load_game(FLAGS.game_name,
+                           GAME_SETTINGS.get(FLAGS.game_name, {}))
+  uniform_policy = policy.UniformRandomPolicy(game)
+  mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
+
+  envs = [
+      rl_environment.Environment(game, distribution=mfg_dist, mfg_population=p)
+      for p in range(game.num_players())
+  ]
+  info_state_size = envs[0].observation_spec()["info_state"][0]
+  num_actions = envs[0].action_spec()["num_actions"]
+
+  hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
+  kwargs = {
+      "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
+      "min_buffer_size_to_learn": FLAGS.min_buffer_size_to_learn,
+      "batch_size": FLAGS.batch_size,
+      "learn_every": FLAGS.learn_every,
+      "learning_rate": FLAGS.rl_learning_rate,
+      "optimizer_str": FLAGS.optimizer_str,
+      "loss_str": FLAGS.loss_str,
+      "update_target_network_every": FLAGS.update_target_network_every,
+      "discount_factor": FLAGS.discount_factor,
+      "epsilon_decay_duration": FLAGS.epsilon_decay_duration,
+      "epsilon_start": FLAGS.epsilon_start,
+      "epsilon_end": FLAGS.epsilon_end,
+  }
+
+  # pylint: disable=g-complex-comprehension
+  agents = [
+      dqn.DQN(idx, info_state_size, num_actions, hidden_layers_sizes, **kwargs)
+      for idx in range(game.num_players())
+  ]
+  joint_avg_policy = DQNPolicies(envs, agents)
+  if FLAGS.use_checkpoints:
+    for agent in agents:
+      if agent.has_checkpoint(FLAGS.checkpoint_dir):
+        agent.restore(FLAGS.checkpoint_dir)
+
+  for ep in range(FLAGS.num_train_episodes):
+    if (ep + 1) % FLAGS.eval_every == 0:
+      losses = [agent.loss for agent in agents]
+      logging.info("Losses: %s", losses)
+      nash_conv_obj = nash_conv.NashConv(game, uniform_policy)
+      print(
+          str(ep + 1) + " Exact Best Response to Uniform " +
+          str(nash_conv_obj.br_values()))
+      pi_value = policy_value.PolicyValue(game, mfg_dist, joint_avg_policy)
+      print(
+          str(ep + 1) + " DQN Best Response to Uniform " + str([
+              pi_value.eval_state(state)
+              for state in game.new_initial_states()
+          ]))
+      if FLAGS.use_checkpoints:
+        for agent in agents:
+          agent.save(FLAGS.checkpoint_dir)
+      logging.info("_____________________________________________")
+
+    for p in range(game.num_players()):
+      time_step = envs[p].reset()
+      while not time_step.last():
+        agent_output = agents[p].step(time_step)
+        action_list = [agent_output.action]
+        time_step = envs[p].step(action_list)
+
+      # Episode is over, step all agents with final info state.
+      agents[p].step(time_step)
+
+
+if __name__ == "__main__":
+  app.run(main)

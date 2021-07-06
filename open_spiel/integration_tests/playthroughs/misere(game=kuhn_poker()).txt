@@ -48,7 +48,7 @@ ObservationString(0) = ""
 ObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◯◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
-ChanceOutcomes() = [{0, 0.333333333333}, {1, 0.333333333333}, {2, 0.333333333333}]
+ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2"]
 
@@ -71,7 +71,7 @@ ObservationString(0) = "111"
 ObservationString(1) = ""
 ObservationTensor(0): ◉◯◯◉◯◉◉
 ObservationTensor(1): ◯◉◯◯◯◉◉
-ChanceOutcomes() = [{0, 0.500000000000}, {2, 0.500000000000}]
+ChanceOutcomes() = [(0, 0.5), (2, 0.5)]
 LegalActions() = [0, 2]
 StringLegalActions() = ["Deal:0", "Deal:2"]
 

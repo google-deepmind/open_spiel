@@ -15,6 +15,11 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_TORCH_ALPHA_ZERO_H_
 #define OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_TORCH_ALPHA_ZERO_H_
 
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "open_spiel/utils/file.h"
 #include "open_spiel/utils/json.h"
 #include "open_spiel/utils/thread.h"
 
@@ -91,9 +96,42 @@ struct AlphaZeroConfig {
         {"max_steps", max_steps},
     });
   }
+
+  void FromJson(const json::Object& config_json) {
+    game = config_json.at("game").GetString();
+    path = config_json.at("path").GetString();
+    graph_def = config_json.at("graph_def").GetString();
+    nn_model = config_json.at("nn_model").GetString();
+    nn_width = config_json.at("nn_width").GetInt();
+    nn_depth = config_json.at("nn_depth").GetInt();
+    devices = config_json.at("devices").GetString();
+    explicit_learning = config_json.at("explicit_learning").GetBool();
+    learning_rate = config_json.at("learning_rate").GetDouble();
+    weight_decay = config_json.at("weight_decay").GetDouble();
+    train_batch_size = config_json.at("train_batch_size").GetInt();
+    inference_batch_size = config_json.at("inference_batch_size").GetInt();
+    inference_threads = config_json.at("inference_threads").GetInt();
+    inference_cache = config_json.at("inference_cache").GetInt();
+    replay_buffer_size = config_json.at("replay_buffer_size").GetInt();
+    replay_buffer_reuse = config_json.at("replay_buffer_reuse").GetInt();
+    checkpoint_freq = config_json.at("checkpoint_freq").GetInt();
+    evaluation_window = config_json.at("evaluation_window").GetInt();
+    uct_c = config_json.at("uct_c").GetDouble();
+    max_simulations = config_json.at("max_simulations").GetInt();
+    policy_alpha = config_json.at("policy_alpha").GetDouble();
+    policy_epsilon = config_json.at("policy_epsilon").GetDouble();
+    temperature = config_json.at("temperature").GetDouble();
+    temperature_drop = config_json.at("temperature_drop").GetDouble();
+    cutoff_probability = config_json.at("cutoff_probability").GetDouble();
+    cutoff_value = config_json.at("cutoff_value").GetDouble();
+    actors = config_json.at("actors").GetInt();
+    evaluators = config_json.at("evaluators").GetInt();
+    eval_levels = config_json.at("eval_levels").GetInt();
+    max_steps = config_json.at("max_steps").GetInt();
+  }
 };
 
-bool AlphaZero(AlphaZeroConfig config, StopToken* stop);
+bool AlphaZero(AlphaZeroConfig config, StopToken* stop, bool resuming);
 
 }  // namespace torch_az
 }  // namespace algorithms
