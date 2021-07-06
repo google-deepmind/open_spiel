@@ -98,7 +98,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.geometry = get_param("geometry", params)
     game_info = pyspiel.GameInfo(
         num_distinct_actions=_NUM_ACTIONS,
-        max_chance_outcomes=max(self.size, _NUM_CHANCE),
+        max_chance_outcomes=max(self.size * self.size, _NUM_CHANCE),
         num_players=num_players,
         min_utility=-np.inf,
         max_utility=+np.inf,
