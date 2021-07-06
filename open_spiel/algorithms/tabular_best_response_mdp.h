@@ -24,10 +24,6 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 
-// **WARNING** This is a work-in-progress, and there are currently a known
-// issue for one case of simultaneous move games (in Goofspiel). Please see the
-// tests.
-//
 // A tabular best response algorithm based on building an information set Markov
 // decision process (IS-MDP), and then solving it using value iteration. In
 // computing a best response, there is a maximizing player and a number of fixed
@@ -37,6 +33,19 @@
 // states to other ISMDP states are functions of the reach probabilities given
 // the possible histories in the information states, chance node distributions,
 // and policies of the other players.
+//
+// The keys used to uniquely identify states is in the MDP are
+// State::InformationStateString for one-shot games and imperfect information
+// games, and State::ObservationString for perfect information games. In the
+// case of perfect information games (including simultaneous move games), this
+// implementation requires that ObservationString is a sufficient Markovian
+// description of the state; it does not need to be perfect recall, but it must
+// not merge states that are might have different expected values under the
+// policies using these keys as state descriptions. As an example: in Goofspiel,
+// it is insufficient for the observation to only include the current point card
+// because which point cards remain in the point card deck is important for
+// determining the expected value of the state (but the particular order they
+// were played is is not).
 //
 // This implementation has several advantages over best_response.* and
 // tabular_exploitability.*:

@@ -27,9 +27,9 @@ UtilitySum() = 0.0
 InformationStateTensorShape() = point_totals: [2, 11], player_hand: [4], win_sequence: [4, 2], point_card_sequence: [4, 4], player_action_sequence: [4, 4]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 66
-ObservationTensorShape() = current_point_card: [4], point_totals: [2, 11], player_hand: [4], win_sequence: [4, 2]
+ObservationTensorShape() = current_point_card: [4], remaining_point_cards: [4], point_totals: [2, 11], player_hand: [4], win_sequence: [4, 2]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 38
+ObservationTensorSize() = 42
 MaxGameLength() = 4
 ToString() = "goofspiel(imp_info=True,num_cards=4,points_order=descending)"
 
@@ -78,12 +78,13 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
-ObservationString(0) = "Current point card: 4\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
-ObservationString(1) = "Current point card: 4\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
-PublicObservationString() = "Current point card: 4\nWin sequence: \nPoints: 0 0 \n"
-PrivateObservationString(0) = "Current point card: 4\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
-PrivateObservationString(1) = "Current point card: 4\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationString(0) = "Current point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationString(1) = "Current point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
+PublicObservationString() = "Current point card: 4\nRemaining Point Cards: 123\nWin sequence: \nPoints: 0 0 \n"
+PrivateObservationString(0) = "Current point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
+PrivateObservationString(1) = "Current point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
 ObservationTensor(0).current_point_card: ◯◯◯◉
+ObservationTensor(0).remaining_point_cards: ◉◉◉◯
 ObservationTensor(0).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
                                    ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).player_hand: ◉◉◉◉
@@ -92,6 +93,7 @@ ObservationTensor(0).win_sequence: ◯◯
                                    ◯◯
                                    ◯◯
 ObservationTensor(1).current_point_card: ◯◯◯◉
+ObservationTensor(1).remaining_point_cards: ◉◉◉◯
 ObservationTensor(1).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
                                    ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).player_hand: ◉◉◉◉
@@ -154,12 +156,13 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◉
                                                   ◯◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
-ObservationString(0) = "Current point card: 3\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
-ObservationString(1) = "Current point card: 3\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
-PublicObservationString() = "Current point card: 3\nWin sequence: 1 \nPoints: 0 4 \n"
-PrivateObservationString(0) = "Current point card: 3\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
-PrivateObservationString(1) = "Current point card: 3\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
+ObservationString(0) = "Current point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
+ObservationString(1) = "Current point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
+PublicObservationString() = "Current point card: 3\nRemaining Point Cards: 12\nWin sequence: 1 \nPoints: 0 4 \n"
+PrivateObservationString(0) = "Current point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
+PrivateObservationString(1) = "Current point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
 ObservationTensor(0).current_point_card: ◯◯◉◯
+ObservationTensor(0).remaining_point_cards: ◉◉◯◯
 ObservationTensor(0).point_totals: ◉◯◯◯◯◯◯◯◯◯◯
                                    ◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).player_hand: ◉◉◯◉
@@ -168,6 +171,7 @@ ObservationTensor(0).win_sequence: ◯◉
                                    ◯◯
                                    ◯◯
 ObservationTensor(1).current_point_card: ◯◯◉◯
+ObservationTensor(1).remaining_point_cards: ◉◉◯◯
 ObservationTensor(1).point_totals: ◯◯◯◯◉◯◯◯◯◯◯
                                    ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).player_hand: ◉◉◉◯
@@ -230,12 +234,13 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◉
                                                   ◉◯◯◯
                                                   ◯◯◯◯
                                                   ◯◯◯◯
-ObservationString(0) = "Current point card: 2\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
-ObservationString(1) = "Current point card: 2\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
-PublicObservationString() = "Current point card: 2\nWin sequence: 1 0 \nPoints: 3 4 \n"
-PrivateObservationString(0) = "Current point card: 2\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
-PrivateObservationString(1) = "Current point card: 2\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
+ObservationString(0) = "Current point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
+ObservationString(1) = "Current point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
+PublicObservationString() = "Current point card: 2\nRemaining Point Cards: 1\nWin sequence: 1 0 \nPoints: 3 4 \n"
+PrivateObservationString(0) = "Current point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
+PrivateObservationString(1) = "Current point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
 ObservationTensor(0).current_point_card: ◯◉◯◯
+ObservationTensor(0).remaining_point_cards: ◉◯◯◯
 ObservationTensor(0).point_totals: ◯◯◯◉◯◯◯◯◯◯◯
                                    ◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).player_hand: ◉◯◯◉
@@ -244,6 +249,7 @@ ObservationTensor(0).win_sequence: ◯◉
                                    ◯◯
                                    ◯◯
 ObservationTensor(1).current_point_card: ◯◉◯◯
+ObservationTensor(1).remaining_point_cards: ◉◯◯◯
 ObservationTensor(1).point_totals: ◯◯◯◯◉◯◯◯◯◯◯
                                    ◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(1).player_hand: ◯◉◉◯
@@ -306,12 +312,13 @@ InformationStateTensor(1).player_action_sequence: ◯◯◯◉
                                                   ◉◯◯◯
                                                   ◯◉◯◯
                                                   ◯◯◉◯
-ObservationString(0) = "Current point card: 1\nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
-ObservationString(1) = "Current point card: 1\nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
-PublicObservationString() = "Current point card: 1\nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
-PrivateObservationString(0) = "Current point card: 1\nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
-PrivateObservationString(1) = "Current point card: 1\nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
+ObservationString(0) = "Current point card: 1\nRemaining Point Cards: \nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
+ObservationString(1) = "Current point card: 1\nRemaining Point Cards: \nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
+PublicObservationString() = "Current point card: 1\nRemaining Point Cards: \nWin sequence: 1 0 0 1 \nPoints: 5 5 \n"
+PrivateObservationString(0) = "Current point card: 1\nRemaining Point Cards: \nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
+PrivateObservationString(1) = "Current point card: 1\nRemaining Point Cards: \nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
 ObservationTensor(0).current_point_card: ◉◯◯◯
+ObservationTensor(0).remaining_point_cards: ◯◯◯◯
 ObservationTensor(0).point_totals: ◯◯◯◯◯◉◯◯◯◯◯
                                    ◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).player_hand: ◯◯◯◯
@@ -320,6 +327,7 @@ ObservationTensor(0).win_sequence: ◯◉
                                    ◉◯
                                    ◯◉
 ObservationTensor(1).current_point_card: ◉◯◯◯
+ObservationTensor(1).remaining_point_cards: ◯◯◯◯
 ObservationTensor(1).point_totals: ◯◯◯◯◯◉◯◯◯◯◯
                                    ◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).player_hand: ◯◯◯◯
