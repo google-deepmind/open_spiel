@@ -5,7 +5,10 @@ on:
     branches: [ master ]
   workflow_dispatch:
     inputs:
-      name: "Input Name"
+      name:
+        description: 'Name'
+        required: false
+        default: 'No name specified'
 
 jobs:
   build_wheels:
