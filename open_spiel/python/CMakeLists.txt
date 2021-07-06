@@ -194,26 +194,8 @@ if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
     jax/dqn_jax_test.py
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    jax/nfsp_jax_test.py
-=======
-    jax/deep_cfr_jax_test.py
-=======
->>>>>>> a5a92bb8 (put it as TF test)
-=======
-    jax/deep_cfr_jax_test.py
->>>>>>> ebf19c0b (dont hide GPUs)
-    # This test is flaky. TODO(perolat): fix this.
-    # See https://github.com/deepmind/open_spiel/issues/602
-    # jax/nfsp_jax_test.py
->>>>>>> 921a0a6c (initial deepcfr-jax implementation)
-=======
     jax/nfsp_jax_test.py
     jax/deep_cfr_jax_test.py
->>>>>>> e2f24bbf (CMakeFile include nfsp_jax_test)
   )
 endif()
 
