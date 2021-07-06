@@ -146,6 +146,15 @@ std::unique_ptr<State> PyState::Clone() const {
   return rv;
 }
 
+std::vector<std::string> PyState::DistributionSupport() {
+  PYBIND11_OVERLOAD_PURE_NAME(std::vector<std::string>, State,
+                              "distribution_support", DistributionSupport);
+}
+void PyState::UpdateDistribution(const std::vector<double>& distribution) {
+  PYBIND11_OVERLOAD_PURE_NAME(void, State, "update_distribution",
+                              UpdateDistribution, distribution);
+}
+
 // Register a Python game.
 void RegisterPyGame(const GameType& game_type, py::function creator) {
   GameRegisterer::RegisterGame(

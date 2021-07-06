@@ -89,6 +89,10 @@ class MFGCrowdModellingGame(pyspiel.Game):
       return Observer(params, self)
     return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
+  def max_chance_nodes_in_history(self):
+    """Maximun chance nodes in game history."""
+    return self.horizon + 1
+
 
 class MFGCrowdModellingState(pyspiel.State):
   """A Mean Field Crowd Modelling state."""
