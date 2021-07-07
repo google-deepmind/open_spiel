@@ -42,8 +42,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
-import chex
-from typing import Optional
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
@@ -51,33 +49,10 @@ import tensorflow_datasets as tfds
 from open_spiel.python import policy
 import pyspiel
 
-from datetime import datetime
-
 # The size of the shuffle buffer used to reshuffle part of the data each
 # epoch within one training iteration
 ADVANTAGE_TRAIN_SHUFFLE_SIZE = 100000
 STRATEGY_TRAIN_SHUFFLE_SIZE = 1000000
-
-
-def l2_loss(
-    predictions: chex.Array,
-    targets: Optional[chex.Array] = None,
-) -> chex.Array:
-  """Calculates the L2 loss for a set of predictions.
-  Note: the 0.5 term is standard in "Pattern Recognition and Machine Learning"
-  by Bishop, but not "The Elements of Statistical Learning" by Tibshirani.
-  References:
-    [Chris Bishop, 2006](https://bit.ly/3eeP0ga)
-  Args:
-    predictions: a vector of arbitrary shape.
-    targets: a vector of shape compatible with predictions; if not provides
-      then it is assumed to be zero.
-  Returns:
-    the squared error loss.
-  """
-  chex.assert_type([predictions], float)
-  errors = (predictions - targets) if (targets is not None) else predictions
-  return 0.5 * (errors)**2
 
 
 # TODO(author3) Refactor into data structures lib.
@@ -240,8 +215,8 @@ class DeepCFRSolver(policy.Policy):
                             x, mask)
 
     # initialize losses and grads
-    self._adv_loss = l2_loss
-    self._policy_loss = l2_loss
+    self._adv_loss = optax.l2_loss
+    self._policy_loss = optax.l2_loss
     self._adv_grads = jax.value_and_grad(self._loss_adv)
     self._policy_grads = jax.value_and_grad(self._loss_policy)
 
