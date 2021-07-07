@@ -33,8 +33,6 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-import contextlib
-import os
 import random
 
 import haiku as hk
@@ -42,9 +40,10 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+
+# tensorflow is only used for data processing
 import tensorflow as tf
 import tensorflow_datasets as tfds
-
 
 from open_spiel.python import policy
 import pyspiel
