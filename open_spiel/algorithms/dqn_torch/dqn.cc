@@ -142,12 +142,14 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
         {info_state.size()},
         torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
     torch::Tensor q_value = q_network_->forward(info_state_tensor);
-    torch::Tensor legal_actions_mask = torch::empty({legal_actions.size()});
+    torch::Tensor legal_actions_mask =
+        torch::full({legal_actions.size()},
+                    kIllegalActionLogitsPenalty,
+                    torch::TensorOptions().dtype(torch::kFloat32));
     for (Action a : legal_actions) {
-      legal_actions_mask[a] = 1;
+      legal_actions_mask[a] = 0;
     }
-    action = torch::mul(
-        q_value.detach(), legal_actions_mask).argmax(1).item().toInt();
+    action = (q_value.detach() + legal_actions_mask).argmax(1).item().toInt();
   }
   return action;
 }
