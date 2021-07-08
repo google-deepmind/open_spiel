@@ -66,6 +66,9 @@
 //
 // Currently no performance comparisons have been done to compare the
 // implementations.
+//
+// This implementation is exposed to Python. See
+// test_cfr_plus_solver_best_response_mdp in cfr_test.py for an example use.
 namespace open_spiel {
 namespace algorithms {
 
@@ -137,7 +140,7 @@ struct TabularBestResponseMDPInfo {
 
 class TabularBestResponseMDP {
  public:
-  TabularBestResponseMDP(const Game &game, const Policy &fixed_policy);
+  TabularBestResponseMDP(const Game& game, const Policy& fixed_policy);
 
   // Compute best responses for all players.
   TabularBestResponseMDPInfo ComputeBestResponses();
