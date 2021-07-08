@@ -197,6 +197,7 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:bots>
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
+  $<TARGET_OBJECTS:higc>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   $<TARGET_OBJECTS:algorithms>
   $<TARGET_OBJECTS:utils>
@@ -273,6 +274,7 @@ add_subdirectory (bots)
 add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
+add_subdirectory (higc)
 add_subdirectory (contrib)
 
 if (OPEN_SPIEL_BUILD_WITH_GO)
