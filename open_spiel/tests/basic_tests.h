@@ -43,11 +43,11 @@ void NoChanceOutcomesTest(const Game& game);
 // state_checker_fn is called at every state (including chance nodes and
 // terminals), and is intended to be an easy way to pass context-specific
 // testing functions to the simulation tests.
-void RandomSimTest(
-    const Game& game, int num_sims,
-    bool serialize = true, bool verbose = true, bool mask_test = true,
-    const std::function<void(const State&)>& state_checker_fn
-        = &DefaultStateChecker);
+void RandomSimTest(const Game& game, int num_sims, bool serialize = true,
+                   bool verbose = true, bool mask_test = true,
+                   const std::function<void(const State&)>& state_checker_fn =
+                       &DefaultStateChecker,
+                   int mean_field_population = -1);
 
 // Perform num_sims random simulations of the specified game. Also tests the
 // Undo function. Note: for every step in the simulation, the entire simulation
