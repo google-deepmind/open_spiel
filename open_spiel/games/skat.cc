@@ -598,7 +598,7 @@ std::vector<Action> SkatState::PlayLegalActions() const {
     int suit = CardSuit(first_card);
     if (game_type_ == kNullGame) {
       for (int rank = 0; rank < kNumRanks; ++rank) {
-        int card = rank * kNumSuits + static_cast<int>(suit);
+        int card = static_cast<int>(suit) * kNumRanks + rank;
         if (card_locations_[card] == PlayerToLocation(current_player_)) {
           legal_actions.push_back(card);
         }
