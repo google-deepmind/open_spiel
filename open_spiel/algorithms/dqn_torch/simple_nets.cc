@@ -62,9 +62,9 @@ torch::Tensor SimpleLinearImpl::forward(torch::Tensor x) {
   }
 }
 
-MLPImpl::MLPImpl(const int& input_size,
+MLPImpl::MLPImpl(int input_size,
                  const std::vector<int>& hidden_layers_sizes,
-                 const int& output_size,
+                 int output_size,
                  bool activate_final)
     : input_size_(input_size),
       hidden_layers_sizes_(hidden_layers_sizes),

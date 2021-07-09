@@ -45,9 +45,9 @@ TORCH_MODULE(SimpleLinear);
 // A simple dense network built from linear layers above.
 class MLPImpl : public torch::nn::Module {
  public:
-  MLPImpl(const int& input_size,
+  MLPImpl(int input_size,
           const std::vector<int>& hidden_layers_sizes,
-          const int& output_size,
+          int output_size,
           bool activate_final = false);
   torch::Tensor forward(torch::Tensor x);
 
