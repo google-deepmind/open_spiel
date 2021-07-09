@@ -74,6 +74,18 @@ class DQN {
               bool add_transition_record = true);
 
  private:
+  std::vector<float> GetInfoState(const State& state,
+                                  Player player_id,
+                                  bool use_observation);
+  void AddTransition(const State& prev_state,
+                     Action prev_action,
+                     const State& state);
+  Action EpsilonGreedy(std::vector<float> info_state,
+                       std::vector<Action> legal_actions,
+                       double epsilon);
+  double GetEpsilon(bool is_evaluation, int power = 1.0);
+  void Learn();
+
   bool use_observation_;
   int player_id_;
   int num_actions_;
@@ -97,18 +109,6 @@ class DQN {
   MLP target_q_network_;
   torch::optim::SGD optimizer_;
   std::mt19937 rng_;
-
-  std::vector<float> GetInfoState(const State& state,
-                                  Player player_id,
-                                  bool use_observation);
-  void AddTransition(const State& prev_state,
-                     Action prev_action,
-                     const State& state);
-  Action EpsilonGreedy(std::vector<float> info_state,
-                       std::vector<Action> legal_actions,
-                       double epsilon);
-  double GetEpsilon(bool is_evaluation, int power = 1.0);
-  void Learn();
 };
 
 }  // namespace torch_dqn
