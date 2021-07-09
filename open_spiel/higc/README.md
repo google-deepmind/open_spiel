@@ -3,7 +3,8 @@
 There is an implementation of:
 
 - Random bots in [Python](./bots/random_bot.py) or [C++](./bots/random_bot.cc).
-- [Referee](./referee.h) that communicates with the bots according to the rules of the competition (C++).
+- [Referee](./referee.h) that communicates with the bots (C++)
+- [Tournament](./tournament.cc) organized by the referee according to the rules of the competition (C++).
 
 You can just copy-paste the random bots into your codebase and start developing
 your own bot submission for the competition.
