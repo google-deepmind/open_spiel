@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
       absl::GetFlag(FLAGS_executables),
       absl::GetFlag(FLAGS_seed),
       open_spiel::higc::TournamentSettings{
-          .timeout_ready = 200,
-          .timeout_start = 5000,
+          .timeout_ready = 5000,
+          .timeout_start = 200,
           .timeout_act = 5000,
           .timeout_ponder = 200,
           .timeout_match_over = 1000,
