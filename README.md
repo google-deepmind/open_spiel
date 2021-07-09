@@ -1,3 +1,6 @@
+# Fork of OpenSpiel used for a referee implementation in the [Hidden Information Games Competition](http://higcompetition.info/)
+
+Please go to [HIGC README](open_spiel/higc/README.md) for more information.
 
 # OpenSpiel: A Framework for Reinforcement Learning in Games
 
