@@ -1,17 +1,15 @@
-# Implementations related to [Hidden Information Games Competition](http://higcompetition.info/)
-
-This folder contains code for the [HIG Competition](http://higcompetition.info/).
+# Code related to the [Hidden Information Games Competition](http://higcompetition.info/).
 
 There is an implementation of:
 
-- Random bots (Python/C++)
-- Referee that communicates with the bots according to the rules of the competition (C++).
+- Random bots in [Python](./bots/random_bot.py) or [C++](./bots/random_bot.cc).
+- [Referee](./referee.h) that communicates with the bots according to the rules of the competition (C++).
 
 You can just copy-paste the random bots into your codebase and start developing
 your own bot submission for the competition.
 
-Follow instructions in the next section if you'd like to setup a referee to test
-your bot in a tournament setting.
+Follow instructions in the next section if you'd like to setup the referee to
+test your bot in a tournament setting.
 
 ## Set-up instructions
 
