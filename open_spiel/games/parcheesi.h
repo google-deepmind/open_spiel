@@ -45,8 +45,6 @@ inline constexpr const int kNumDistinctActions = 1352;
 inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize;
-inline constexpr const char* kDefaultScoringType = "winloss_scoring";
-inline constexpr bool kDefaultHyperBackgammon = false;
 
 // Game scoring type, whether to score gammons/backgammons specially.
 enum class ScoringType {
