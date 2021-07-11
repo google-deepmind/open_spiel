@@ -141,6 +141,7 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
         info_state.data(),
         {info_state.size()},
         torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
+    q_network_->eval();
     torch::Tensor q_value = q_network_->forward(info_state_tensor);
     torch::Tensor legal_actions_mask =
         torch::full({legal_actions.size()},
@@ -193,7 +194,7 @@ void DQN::Learn() {
         torch::from_blob(
             t.legal_actions_mask.data(),
             {1, t.legal_actions_mask.size()},
-            torch::TensorOptions().dtype(torch::kFloat32))
+            torch::TensorOptions().dtype(torch::kInt32))
             .to(torch::kInt64).clone());
     actions.push_back(t.action);
     rewards.push_back(t.reward);
@@ -201,7 +202,9 @@ void DQN::Learn() {
   }
   torch::Tensor info_states_tensor = torch::stack(info_states, 0);
   torch::Tensor next_info_states_tensor = torch::stack(next_info_states, 0);
+  q_network_->train();
   torch::Tensor q_values = q_network_->forward(info_states_tensor);
+  target_q_network_->eval();
   torch::Tensor target_q_values = target_q_network_->forward(
       next_info_states_tensor).detach();
 
