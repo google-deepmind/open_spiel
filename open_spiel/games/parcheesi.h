@@ -29,7 +29,9 @@
 namespace open_spiel {
 namespace parcheesi {
 
-inline constexpr const int kNumPlayers = 2;
+inline constexpr const int kNumPos = 2;
+
+inline constexpr const int kNumPlayers = 4;
 inline constexpr const int kNumChanceOutcomes = 21;
 inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
@@ -267,7 +269,7 @@ class ParcheesiGame : public Game {
   // determining starting player.
   int MaxChanceNodesInHistory() const override { return MaxGameLength() + 1; }
 
-  int NumPlayers() const override { return 2; }
+  int NumPlayers() const override { return 4; }
   double MinUtility() const override { return -MaxUtility(); }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override;
@@ -298,6 +300,7 @@ class ParcheesiGame : public Game {
  private:
   ScoringType scoring_type_;  // Which rules apply when scoring the game.
   bool hyper_backgammon_;     // Is hyper-backgammon variant enabled?
+  int num_players_;
 };
 
 }  // namespace parcheesi

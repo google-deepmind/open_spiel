@@ -77,8 +77,8 @@ const GameType kGameType{
     GameType::Information::kPerfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
-    /*min_num_players=*/2,
-    /*max_num_players=*/2,
+    /*min_num_players=*/4,
+    /*max_num_players=*/4,
     /*provides_information_state_string=*/false,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
@@ -164,127 +164,12 @@ int ParcheesiState::AugmentCheckerMove(CheckerMove* cmove, int player,
 
 std::string ParcheesiState::ActionToString(Player player,
                                             Action move_id) const {
-  if (player == kChancePlayerId) {
-    if (turns_ >= 0) {
-      // Normal chance roll.
-      return absl::StrCat("chance outcome ", move_id,
+  if(player == kChancePlayerId){
+    return absl::StrCat("chance outcome ", move_id,
                           " (roll: ", kChanceOutcomeValues[move_id][0],
                           kChanceOutcomeValues[move_id][1], ")");
-    } else {
-      // Initial roll to determine who starts.
-      const char* starter = (move_id < 15 ? "X starts" : "O starts");
-      if (move_id >= 15) {
-        move_id -= 15;
-      }
-      return absl::StrCat("chance outcome ", move_id, " ", starter, ", ",
-                          "(roll: ", kChanceOutcomeValues[move_id][0],
-                          kChanceOutcomeValues[move_id][1], ")");
-    }
-  } else {
-    // Assemble a human-readable string representation of the move using
-    // standard backgammon notation:
-    //
-    // - Always show the numbering going from Bar->24->0->Off, irrespective of
-    //   which player is moving.
-    // - Show the start position followed by end position.
-    // - Show hits with an asterisk, e.g. 9/7*.
-    // - Order the moves by highest number first, e.g. 22/7 10/8 not 10/8 22/7.
-    //   Not an official requirement, but seems to be standard convention.
-    // - Show duplicate moves as 10/8(2).
-    // - Show moves on a single piece as 10/8/5 not 10/8 8/5
-    //
-    // Note that there are tests to ensure the ActionToString follows this
-    // output format. Any changes would need to be reflected in the tests as
-    // well.
-    std::vector<CheckerMove> cmoves = SpielMoveToCheckerMoves(player, move_id);
-
-    int cmove0_start;
-    int cmove1_start;
-    if (player == kOPlayerId) {
-      cmove0_start = (cmoves[0].pos == kBarPos ? kNumBarPosHumanReadable
-                                               : cmoves[0].pos + 1);
-      cmove1_start = (cmoves[1].pos == kBarPos ? kNumBarPosHumanReadable
-                                               : cmoves[1].pos + 1);
-    } else {
-      // swap the board numbering round for Player X so player is moving
-      // from 24->0
-      cmove0_start = (cmoves[0].pos == kBarPos ? kNumBarPosHumanReadable
-                                               : kNumPoints - cmoves[0].pos);
-      cmove1_start = (cmoves[1].pos == kBarPos ? kNumBarPosHumanReadable
-                                               : kNumPoints - cmoves[1].pos);
-    }
-
-    // Add hit information and compute whether the moves go off the board.
-    int cmove0_end = AugmentCheckerMove(&cmoves[0], player, cmove0_start);
-    int cmove1_end = AugmentCheckerMove(&cmoves[1], player, cmove1_start);
-
-    // check for 2 pieces hitting on the same point.
-    bool double_hit =
-        (cmoves[1].hit && cmoves[0].hit && cmove1_end == cmove0_end);
-
-    std::string returnVal = "";
-    if (cmove0_start == cmove1_start &&
-        cmove0_end == cmove1_end) {     // same move, show as (2).
-      if (cmoves[1].num == kPassPos) {  // Player can't move at all!
-        returnVal = "Pass";
-      } else {
-        returnVal = absl::StrCat(move_id, " - ",
-                                 PositionToStringHumanReadable(cmove0_start),
-                                 "/", PositionToStringHumanReadable(cmove0_end),
-                                 cmoves[0].hit ? "*" : "", "(2)");
-      }
-    } else if ((cmove0_start < cmove1_start ||
-                (cmove0_start == cmove1_start && cmove0_end < cmove1_end) ||
-                cmoves[0].num == kPassPos) &&
-               cmoves[1].num != kPassPos) {
-      // tradition to start with higher numbers first,
-      // so swap moves round if this not the case. If
-      // there is a pass move, put it last.
-      if (cmove1_end == cmove0_start) {
-        // Check to see if the same piece is moving for both
-        // moves, as this changes the format of the output.
-        returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
-            PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
-            "/", PositionToStringHumanReadable(cmove0_end),
-            cmoves[0].hit ? "*" : "");
-      } else {
-        returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
-            PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
-            " ",
-            (cmoves[0].num != kPassPos)
-                ? PositionToStringHumanReadable(cmove0_start)
-                : "",
-            (cmoves[0].num != kPassPos) ? "/" : "",
-            PositionToStringHumanReadable(cmove0_end),
-            (cmoves[0].hit && !double_hit) ? "*" : "");
-      }
-    } else {
-      if (cmove0_end == cmove1_start) {
-        // Check to see if the same piece is moving for both
-        // moves, as this changes the format of the output.
-        returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove0_start), "/",
-            PositionToStringHumanReadable(cmove0_end), cmoves[0].hit ? "*" : "",
-            "/", PositionToStringHumanReadable(cmove1_end),
-            cmoves[1].hit ? "*" : "");
-      } else {
-        returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove0_start), "/",
-            PositionToStringHumanReadable(cmove0_end), cmoves[0].hit ? "*" : "",
-            " ",
-            (cmoves[1].num != kPassPos)
-                ? PositionToStringHumanReadable(cmove1_start)
-                : "",
-            (cmoves[1].num != kPassPos) ? "/" : "",
-            PositionToStringHumanReadable(cmove1_end),
-            (cmoves[1].hit && !double_hit) ? "*" : "");
-      }
-    }
-
-    return returnVal;
   }
+  return absl::StrCat("player ", player, " move: ", move_id);
 }
 
 std::string ParcheesiState::ObservationString(Player player) const {
@@ -343,30 +228,15 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game,
       bar_({0, 0}),
       scores_({0, 0}),
       board_(
-          {std::vector<int>(kNumPoints, 0), std::vector<int>(kNumPoints, 0)}),
+          {std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0)}),
       turn_history_info_({}) {
   SetupInitialBoard();
 }
 
 void ParcheesiState::SetupInitialBoard() {
-  if (hyper_backgammon_) {
-    // https://bkgm.com/variants/HyperBackgammon.html
-    // Each player has one checker on each of the furthest points.
-    board_[kXPlayerId][0] = board_[kXPlayerId][1] = board_[kXPlayerId][2] = 1;
-    board_[kOPlayerId][23] = board_[kOPlayerId][22] = board_[kOPlayerId][21] =
-        1;
-  } else {
-    // Setup the board. First, XPlayer.
-    board_[kXPlayerId][0] = 2;
-    board_[kXPlayerId][11] = 5;
-    board_[kXPlayerId][16] = 3;
-    board_[kXPlayerId][18] = 5;
-    // OPlayer.
-    board_[kOPlayerId][23] = 2;
-    board_[kOPlayerId][12] = 5;
-    board_[kOPlayerId][7] = 3;
-    board_[kOPlayerId][5] = 5;
-  }
+  for(int i = 0; i < 4; i++){
+    board_[i][0] = 4;
+  }  
 }
 
 int ParcheesiState::board(int player, int pos) const {
@@ -406,80 +276,23 @@ int ParcheesiState::DiceValue(int i) const {
 }
 
 void ParcheesiState::DoApplyAction(Action move) {
+
   if (IsChanceNode()) {
     turn_history_info_.push_back(TurnHistoryInfo(kChancePlayerId, prev_player_,
                                                  dice_, move, double_turn_,
                                                  false, false));
-
-    if (turns_ == -1) {
-      SPIEL_CHECK_TRUE(dice_.empty());
-      if (move < 15) {
-        // X starts.
-        cur_player_ = prev_player_ = kXPlayerId;
-      } else {
-        // O Starts
-        cur_player_ = prev_player_ = kOPlayerId;
-        move -= 15;
-      }
-      RollDice(move);
-      turns_ = 0;
-      return;
-    } else {
-      // Normal chance node.
-      SPIEL_CHECK_TRUE(dice_.empty());
-      RollDice(move);
-      cur_player_ = Opponent(prev_player_);
-      return;
-    }
+    SPIEL_CHECK_TRUE(dice_.empty());
+    RollDice(move);
+    cur_player_ = NextPlayerRoundRobin(prev_player_, num_players_);
+    return;
   }
 
-  // Normal move action.
-  std::vector<CheckerMove> moves = SpielMoveToCheckerMoves(cur_player_, move);
-  bool first_move_hit = ApplyCheckerMove(cur_player_, moves[0]);
-  bool second_move_hit = ApplyCheckerMove(cur_player_, moves[1]);
-
-  turn_history_info_.push_back(
-      TurnHistoryInfo(cur_player_, prev_player_, dice_, move, double_turn_,
-                      first_move_hit, second_move_hit));
-
-  if (!double_turn_) {
-    turns_++;
-    if (cur_player_ == kXPlayerId) {
-      x_turns_++;
-    } else if (cur_player_ == kOPlayerId) {
-      o_turns_++;
-    }
-  }
+  board_[cur_player_][0] -= move;
+  board_[cur_player_][1] += move;
 
   prev_player_ = cur_player_;
-
-  // Check for doubles.
-  bool extra_turn = false;
-  if (!double_turn_ && dice_[0] == dice_[1]) {
-    // Check the dice, and unuse them if they are used.
-    int dice_used = 0;
-    for (int i = 0; i < 2; i++) {
-      if (dice_[i] > 6) {
-        dice_[i] -= 6;
-        dice_used++;
-      }
-      SPIEL_CHECK_GE(dice_[i], 1);
-      SPIEL_CHECK_LE(dice_[i], 6);
-    }
-
-    if (dice_used == 2) {
-      extra_turn = true;
-    }
-  }
-
-  if (extra_turn) {
-    // Dice have been unused above.
-    double_turn_ = true;
-  } else {
-    cur_player_ = kChancePlayerId;
-    dice_.clear();
-    double_turn_ = false;
-  }
+  cur_player_ = kChancePlayerId;
+  dice_.clear();
 }
 
 void ParcheesiState::UndoAction(int player, Action action) {
@@ -1121,109 +934,42 @@ std::vector<Action> ParcheesiState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
 
-  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId),
-                 NumCheckersPerPlayer(game_.get()));
-  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId),
-                 NumCheckersPerPlayer(game_.get()));
-
-  std::unique_ptr<State> cstate = this->Clone();
-  ParcheesiState* state = dynamic_cast<ParcheesiState*>(cstate.get());
-  std::set<std::vector<CheckerMove>> movelist;
-  int max_moves = state->RecLegalMoves({}, &movelist);
-  SPIEL_CHECK_GE(max_moves, 0);
-  SPIEL_CHECK_LE(max_moves, 2);
-  std::vector<Action> legal_actions = ProcessLegalMoves(max_moves, movelist);
-  std::sort(legal_actions.begin(), legal_actions.end());
-  return legal_actions;
+  if(dice_[0] == 5 && dice_[1] == 5){
+    return {2};
+  }
+  if(dice_[0] == 5 || dice_[1] == 5 || dice_[0] + dice_[1] == 5){
+    return {1};
+  }
+  return{0};
 }
 
 std::vector<std::pair<Action, double>> ParcheesiState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  if (turns_ == -1) {
-    // Doubles not allowed for the initial roll to determine who goes first.
-    // Range 0-14: X goes first, range 15-29: O goes first.
-    std::vector<std::pair<Action, double>> outcomes;
-    outcomes.reserve(30);
-    const double uniform_prob = 1.0 / 30.0;
-    for (Action action = 0; action < 30; ++action) {
-      outcomes.push_back({action, uniform_prob});
-    }
-    return outcomes;
-  } else {
-    return kChanceOutcomes;
-  }
+  return kChanceOutcomes;
 }
 
 std::string ParcheesiState::ToString() const {
-  std::vector<std::string> board_array = {
-      "+------|------+", "|......|......|", "|......|......|",
-      "|......|......|", "|......|......|", "|......|......|",
-      "|      |      |", "|......|......|", "|......|......|",
-      "|......|......|", "|......|......|", "|......|......|",
-      "+------|------+"};
-
-  // Fill the board.
-  for (int pos = 0; pos < 24; pos++) {
-    if (board_[kXPlayerId][pos] > 0 || board_[kOPlayerId][pos] > 0) {
-      int start_row = (pos < 12 ? 11 : 1);
-      int col = (pos < 12 ? (pos >= 6 ? 12 - pos : 13 - pos)
-                          : (pos < 18 ? pos - 11 : pos - 10));
-
-      int row_offset = (pos < 12 ? -1 : 1);
-
-      int owner = board_[kXPlayerId][pos] > 0 ? kXPlayerId : kOPlayerId;
-      char piece = (owner == kXPlayerId ? 'x' : 'o');
-      int my_checkers = board_[owner][pos];
-
-      for (int i = 0; i < 5 && i < my_checkers; i++) {
-        board_array[start_row + i * row_offset][col] = piece;
-      }
-
-      // Check for special display of >= 10 and >5 pieces
-      if (my_checkers >= 10) {
-        char lsd = std::to_string(my_checkers % 10)[0];
-        // Make sure it reads downward.
-        if (pos < 12) {
-          board_array[start_row + row_offset][col] = '1';
-          board_array[start_row][col] = lsd;
-        } else {
-          board_array[start_row][col] = '1';
-          board_array[start_row + row_offset][col] = lsd;
-        }
-      } else if (my_checkers > 5) {
-        board_array[start_row][col] = std::to_string(my_checkers)[0];
-      }
-    }
+  std::string board_str = "";
+  std::vector<std::string> colors = {"r", "g", "b", "y"};
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < board_[i][0]; j++){
+      absl::StrAppend(&board_str, colors[i]);
+    }    
   }
-
-  std::string board_str = absl::StrJoin(board_array, "\n") + "\n";
-
-  // Extra info like whose turn it is etc.
-  absl::StrAppend(&board_str, "Turn: ");
-  absl::StrAppend(&board_str, CurPlayerToString(cur_player_));
-  absl::StrAppend(&board_str, "\n");
-  absl::StrAppend(&board_str, "Dice: ");
-  absl::StrAppend(&board_str, !dice_.empty() ? DiceToString(dice_[0]) : "");
-  absl::StrAppend(&board_str, dice_.size() > 1 ? DiceToString(dice_[1]) : "");
-  absl::StrAppend(&board_str, "\n");
-  absl::StrAppend(&board_str, "Bar:");
-  absl::StrAppend(&board_str,
-                  (bar_[kXPlayerId] > 0 || bar_[kOPlayerId] > 0 ? " " : ""));
-  for (int p = 0; p < 2; p++) {
-    for (int n = 0; n < bar_[p]; n++) {
-      absl::StrAppend(&board_str, (p == kXPlayerId ? "x" : "o"));
-    }
-  }
-  absl::StrAppend(&board_str, "\n");
-  absl::StrAppend(&board_str, "Scores, X: ", scores_[kXPlayerId]);
-  absl::StrAppend(&board_str, ", O: ", scores_[kOPlayerId], "\n");
-
+  absl::StrAppend(&board_str, " - ");
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < board_[i][1]; j++){
+      absl::StrAppend(&board_str, colors[i]);
+    }    
+  }  
   return board_str;
 }
 
 bool ParcheesiState::IsTerminal() const {
-  return (scores_[kXPlayerId] == NumCheckersPerPlayer(game_.get()) ||
-          scores_[kOPlayerId] == NumCheckersPerPlayer(game_.get()));
+  for(int i = 0; i < 4; i++)
+    if(board_[i][1] >= 4)
+      return true;
+  return false;
 }
 
 std::vector<double> ParcheesiState::Returns() const {
