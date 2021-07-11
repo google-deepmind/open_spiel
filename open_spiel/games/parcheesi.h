@@ -110,10 +110,6 @@ class ParcheesiGame : public Game {
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
 
-  // Upper bound: chance node per move, with an initial chance node for
-  // determining starting player.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength() + 1; }
-
   int NumPlayers() const override { return 4; }
   double MinUtility() const override { return -MaxUtility(); }
   double UtilitySum() const override { return 0; }
@@ -143,7 +139,6 @@ class ParcheesiGame : public Game {
   int NumCheckersPerPlayer() const;
 
  private:
-  bool hyper_backgammon_;     // Is hyper-backgammon variant enabled?
   int num_players_;
 };
 
