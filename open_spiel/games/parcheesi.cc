@@ -189,10 +189,6 @@ void ParcheesiState::UndoAction(int player, Action action) {
   --move_number_;
 }
 
-Action ParcheesiState::EncodedBarMove() const { return 24; }
-
-Action ParcheesiState::EncodedPassMove() const { return 25; }
-
 Action ParcheesiState::CheckerMovesToSpielMove(
     const std::vector<CheckerMove>& moves) const {
   SPIEL_CHECK_LE(moves.size(), 2);
