@@ -158,8 +158,6 @@ Player ParcheesiState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
 }
 
-int ParcheesiState::Opponent(int player) const { return 1 - player; }
-
 void ParcheesiState::RollDice(int outcome) {
   dice_.push_back(kChanceOutcomeValues[outcome][0]);
   dice_.push_back(kChanceOutcomeValues[outcome][1]);
