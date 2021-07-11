@@ -109,8 +109,7 @@ class ParcheesiGame;
 class ParcheesiState : public State {
  public:
   ParcheesiState(const ParcheesiState&) = default;
-  ParcheesiState(std::shared_ptr<const Game>, ScoringType scoring_type,
-                  bool hyper_backgammone);
+  ParcheesiState(std::shared_ptr<const Game>);
 
   Player CurrentPlayer() const override;
   void UndoAction(Player player, Action action) override;
@@ -255,7 +254,7 @@ class ParcheesiGame : public Game {
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ParcheesiState(
-        shared_from_this(), scoring_type_, hyper_backgammon_));
+        shared_from_this()));
   }
 
   // On the first turn there are 30 outcomes: 15 for each player (rolls without

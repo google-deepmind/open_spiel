@@ -136,21 +136,12 @@ void ParcheesiState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(value_it, values.end());
 }
 
-ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game,
-                                 ScoringType scoring_type,
-                                 bool hyper_backgammon)
+ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
     : State(game),
-      scoring_type_(scoring_type),
-      hyper_backgammon_(hyper_backgammon),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
       turns_(-1),
-      x_turns_(0),
-      o_turns_(0),
-      double_turn_(false),
       dice_({}),
-      bar_({0, 0}),
-      scores_({0, 0}),
       board_(
           {std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0)}),
       turn_history_info_({}) {
@@ -897,37 +888,10 @@ bool ParcheesiState::IsTerminal() const {
 }
 
 std::vector<double> ParcheesiState::Returns() const {
-  int winner = -1;
-  int loser = -1;
-  if (scores_[kXPlayerId] == 15) {
-    winner = kXPlayerId;
-    loser = kOPlayerId;
-  } else if (scores_[kOPlayerId] == 15) {
-    winner = kOPlayerId;
-    loser = kXPlayerId;
-  } else {
-    return {0.0, 0.0};
-  }
-
-  // Magnify the util based on the scoring rules for this game.
-  int util_mag = 1;
-  switch (scoring_type_) {
-    case ScoringType::kWinLossScoring:
-    default:
-      break;
-
-    case ScoringType::kEnableGammons:
-      util_mag = (IsGammoned(loser) ? 2 : 1);
-      break;
-
-    case ScoringType::kFullScoring:
-      util_mag = (IsBackgammoned(loser) ? 3 : IsGammoned(loser) ? 2 : 1);
-      break;
-  }
-
   std::vector<double> returns(kNumPlayers);
-  returns[winner] = util_mag;
-  returns[loser] = -util_mag;
+  for(int i = 0; i < 4; i++)
+    if(board_[i][1] >= 4)
+      returns[i] = 1.0;
   return returns;
 }
 
