@@ -211,6 +211,7 @@ void DQN::Learn() {
   torch::Tensor legal_action_masks_tensor = torch::stack(legal_actions_mask, 0);
   torch::Tensor illegal_actions = 1.0 - legal_action_masks_tensor;
   torch::Tensor illegal_logits = illegal_actions * kIllegalActionLogitsPenalty;
+
   torch::Tensor max_next_q = std::get<0>(
       torch::max(target_q_values + illegal_logits, 2));
   torch::Tensor are_final_steps_tensor = torch::from_blob(
@@ -232,7 +233,6 @@ void DQN::Learn() {
                      torch::indexing::Slice(),
                      actions_tensor});
 
-  
   optimizer_.zero_grad();
   torch::Tensor value_loss;
   if (loss_str_ == "mse") {
