@@ -141,6 +141,7 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
         info_state.data(),
         {info_state.size()},
         torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
+    q_network_->eval();
     torch::Tensor q_value = q_network_->forward(info_state_tensor);
     torch::Tensor legal_actions_mask =
         torch::full({legal_actions.size()},
@@ -193,7 +194,7 @@ void DQN::Learn() {
         torch::from_blob(
             t.legal_actions_mask.data(),
             {1, t.legal_actions_mask.size()},
-            torch::TensorOptions().dtype(torch::kFloat32))
+            torch::TensorOptions().dtype(torch::kInt32))
             .to(torch::kInt64).clone());
     actions.push_back(t.action);
     rewards.push_back(t.reward);
@@ -201,14 +202,17 @@ void DQN::Learn() {
   }
   torch::Tensor info_states_tensor = torch::stack(info_states, 0);
   torch::Tensor next_info_states_tensor = torch::stack(next_info_states, 0);
+  // std::cout << "q_net" << std::endl;
+  q_network_->train();
   torch::Tensor q_values = q_network_->forward(info_states_tensor);
+  // std::cout << q_values[0] << std::endl;
+  target_q_network_->eval();
   torch::Tensor target_q_values = target_q_network_->forward(
       next_info_states_tensor).detach();
 
   torch::Tensor legal_action_masks_tensor = torch::stack(legal_actions_mask, 0);
   torch::Tensor illegal_actions = 1.0 - legal_action_masks_tensor;
   torch::Tensor illegal_logits = illegal_actions * kIllegalActionLogitsPenalty;
-
   torch::Tensor max_next_q = std::get<0>(
       torch::max(target_q_values + illegal_logits, 2));
   torch::Tensor are_final_steps_tensor = torch::from_blob(
@@ -230,11 +234,14 @@ void DQN::Learn() {
                      torch::indexing::Slice(),
                      actions_tensor});
 
+  
   optimizer_.zero_grad();
   torch::Tensor value_loss;
   if (loss_str_ == "mse") {
     torch::nn::MSELoss mse_loss;
     value_loss = mse_loss(predictions.squeeze(1), target);
+    // std::cout << predictions << " " << target << std::endl;
+    // std::cout << value_loss << std::endl;
   } else if (loss_str_ == "huber") {
     torch::nn::SmoothL1Loss l1_loss;
     value_loss = l1_loss(predictions.squeeze(1), target);

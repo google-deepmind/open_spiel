@@ -33,7 +33,7 @@ class SimpleLinearImpl : public torch::nn::Module {
  public :
   SimpleLinearImpl(int input_size,
                    int output_size,
-                   bool activate_relu);
+                   bool activate_relu = true);
   torch::Tensor forward(torch::Tensor x);
 
  private:
