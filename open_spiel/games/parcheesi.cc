@@ -189,44 +189,6 @@ void ParcheesiState::UndoAction(int player, Action action) {
   --move_number_;
 }
 
-Action ParcheesiState::CheckerMovesToSpielMove(
-    const std::vector<CheckerMove>& moves) const {
-  SPIEL_CHECK_LE(moves.size(), 2);
-  int dig0 = EncodedPassMove();
-  int dig1 = EncodedPassMove();
-  bool high_roll_first = false;
-  int high_roll = DiceValue(0) >= DiceValue(1) ? DiceValue(0) : DiceValue(1);
-
-  if (!moves.empty()) {
-    int pos1 = moves[0].pos;
-    if (pos1 == kBarPos) {
-      pos1 = EncodedBarMove();
-    }
-    if (pos1 != kPassPos) {
-      int num1 = moves[0].num;
-      dig0 = pos1;
-      high_roll_first = num1 == high_roll;
-    }
-  }
-
-  if (moves.size() > 1) {
-    int pos2 = moves[1].pos;
-    if (pos2 == kBarPos) {
-      pos2 = EncodedBarMove();
-    }
-    if (pos2 != kPassPos) {
-      dig1 = pos2;
-    }
-  }
-
-  Action move = dig1 * 26 + dig0;
-  if (!high_roll_first) {
-    move += 676;  // 26**2
-  }
-  SPIEL_CHECK_GE(move, 0);
-  SPIEL_CHECK_LT(move, kNumDistinctActions);
-  return move;
-}
 
 std::vector<CheckerMove> ParcheesiState::SpielMoveToCheckerMoves(
     int player, Action spiel_move) const {
