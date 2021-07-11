@@ -248,22 +248,7 @@ ParcheesiGame::ParcheesiGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
 double ParcheesiGame::MaxUtility() const {
-  if (hyper_backgammon_) {
-    // We do not have the cube implemented, so Hyper-backgammon us currently
-    // restricted to a win-loss game regardless of the scoring type.
-    return 1;
-  }
-
-  switch (scoring_type_) {
-    case ScoringType::kWinLossScoring:
-      return 1;
-    case ScoringType::kEnableGammons:
-      return 2;
-    case ScoringType::kFullScoring:
-      return 3;
-    default:
-      SpielFatalError("Unknown scoring_type");
-  }
+  return 1;
 }
 
 
