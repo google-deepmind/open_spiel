@@ -55,11 +55,6 @@ SimpleLinearImpl::SimpleLinearImpl(int input_size,
 }
 
 torch::Tensor SimpleLinearImpl::forward(torch::Tensor x) {
-  // for (auto& named_parameter : simple_linear_->named_parameters()) {
-  //   if (named_parameter.key().find("weight") != std::string::npos) {
-  //     std::cout << named_parameter.value() << std::endl;
-  //   }
-  // }
   if (activate_relu_) {
     return torch::relu(simple_linear_->forward(x));
   } else {
