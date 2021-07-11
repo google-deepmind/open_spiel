@@ -189,17 +189,6 @@ void ParcheesiState::UndoAction(int player, Action action) {
   --move_number_;
 }
 
-Action ParcheesiState::TranslateAction(int from1, int from2,
-                                        bool use_high_die_first) const {
-  int player = CurrentPlayer();
-  int num1 = use_high_die_first ? dice_.at(1) : dice_.at(0);
-  int num2 = use_high_die_first ? dice_.at(0) : dice_.at(1);
-  bool hit1 = IsHit(player, from1, num1);
-  bool hit2 = IsHit(player, from2, num2);
-  std::vector<CheckerMove> moves = {{from1, num1, hit1}, {from2, num2, hit2}};
-  return CheckerMovesToSpielMove(moves);
-}
-
 Action ParcheesiState::EncodedBarMove() const { return 24; }
 
 Action ParcheesiState::EncodedPassMove() const { return 25; }
