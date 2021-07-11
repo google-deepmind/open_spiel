@@ -73,9 +73,6 @@ class ParcheesiState : public State {
                 const std::vector<int>& bar, const std::vector<int>& scores,
                 const std::vector<std::vector<int>>& board);
 
-  // Returns the opponent of the specified player.
-  int Opponent(int player) const;
-
  protected:
   void DoApplyAction(Action move_id) override;
 

@@ -107,32 +107,8 @@ void ParcheesiState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  int opponent = Opponent(player);
   SPIEL_CHECK_EQ(values.size(), kStateEncodingSize);
   auto value_it = values.begin();
-  // The format of this vector is described in Section 3.4 of "G. Tesauro,
-  // Practical issues in temporal-difference learning, 1994."
-  // https://link.springer.com/article/10.1007/BF00992697
-  for (int count : board_[player]) {
-    *value_it++ = ((count == 1) ? 1 : 0);
-    *value_it++ = ((count == 2) ? 1 : 0);
-    *value_it++ = ((count == 3) ? 1 : 0);
-    *value_it++ = ((count > 3) ? (count - 3) : 0);
-  }
-  for (int count : board_[opponent]) {
-    *value_it++ = ((count == 1) ? 1 : 0);
-    *value_it++ = ((count == 2) ? 1 : 0);
-    *value_it++ = ((count == 3) ? 1 : 0);
-    *value_it++ = ((count > 3) ? (count - 3) : 0);
-  }
-  *value_it++ = (bar_[player]);
-  *value_it++ = (scores_[player]);
-  *value_it++ = ((cur_player_ == player) ? 1 : 0);
-
-  *value_it++ = (bar_[opponent]);
-  *value_it++ = (scores_[opponent]);
-  *value_it++ = ((cur_player_ == opponent) ? 1 : 0);
-
   SPIEL_CHECK_EQ(value_it, values.end());
 }
 
