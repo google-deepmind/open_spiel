@@ -163,21 +163,6 @@ void ParcheesiState::RollDice(int outcome) {
   dice_.push_back(kChanceOutcomeValues[outcome][1]);
 }
 
-int ParcheesiState::DiceValue(int i) const {
-  SPIEL_CHECK_GE(i, 0);
-  SPIEL_CHECK_LT(i, dice_.size());
-
-  if (dice_[i] >= 1 && dice_[i] <= 6) {
-    return dice_[i];
-  } else if (dice_[i] >= 7 && dice_[i] <= 12) {
-    // This die is marked as chosen, so return its proper value.
-    // Note: dice are only marked as chosen during the legal moves enumeration.
-    return dice_[i] - 6;
-  } else {
-    SpielFatalError(absl::StrCat("Bad dice value: ", dice_[i]));
-  }
-}
-
 void ParcheesiState::DoApplyAction(Action move) {
 
   if (IsChanceNode()) {
