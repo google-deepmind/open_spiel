@@ -84,6 +84,7 @@ EXPECTED_GAMES = set([
     "oshi_zumo",
     "othello",
     "oware",
+    "parcheesi",
     "pentago",
     "phantom_ttt",
     "phantom_ttt_ir",
