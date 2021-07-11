@@ -59,9 +59,6 @@ const std::vector<std::vector<int>> kChanceOutcomeValues = {
     {2, 5}, {2, 6}, {3, 4}, {3, 5}, {3, 6}, {4, 5}, {4, 6},
     {5, 6}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}};
 
-int NumCheckersPerPlayer(const Game* game) {
-  return static_cast<const ParcheesiGame*>(game)->NumCheckersPerPlayer();
-}
 
 // Facts about the game
 const GameType kGameType{
@@ -992,10 +989,6 @@ void ParcheesiState::SetState(int cur_player, bool double_turn,
   scores_ = scores;
   board_ = board;
 
-  SPIEL_CHECK_EQ(CountTotalCheckers(kXPlayerId),
-                 NumCheckersPerPlayer(game_.get()));
-  SPIEL_CHECK_EQ(CountTotalCheckers(kOPlayerId),
-                 NumCheckersPerPlayer(game_.get()));
 }
 
 ParcheesiGame::ParcheesiGame(const GameParameters& params)
@@ -1023,13 +1016,6 @@ double ParcheesiGame::MaxUtility() const {
   }
 }
 
-int ParcheesiGame::NumCheckersPerPlayer() const {
-  if (hyper_backgammon_) {
-    return 3;
-  } else {
-    return kNumCheckersPerPlayer;
-  }
-}
 
 }  // namespace parcheesi
 }  // namespace open_spiel
