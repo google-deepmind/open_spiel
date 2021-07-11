@@ -85,17 +85,6 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-ScoringType ParseScoringType(const std::string& st_str) {
-  if (st_str == "winloss_scoring") {
-    return ScoringType::kWinLossScoring;
-  } else if (st_str == "enable_gammons") {
-    return ScoringType::kEnableGammons;
-  } else if (st_str == "full_scoring") {
-    return ScoringType::kFullScoring;
-  } else {
-    SpielFatalError("Unrecognized scoring_type parameter: " + st_str);
-  }
-}
 
 std::string PositionToString(int pos) {
   switch (pos) {
