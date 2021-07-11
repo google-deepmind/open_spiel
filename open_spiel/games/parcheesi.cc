@@ -184,31 +184,6 @@ void ParcheesiState::DoApplyAction(Action move) {
 }
 
 void ParcheesiState::UndoAction(int player, Action action) {
-  {
-    const TurnHistoryInfo& thi = turn_history_info_.back();
-    SPIEL_CHECK_EQ(thi.player, player);
-    SPIEL_CHECK_EQ(action, thi.action);
-    cur_player_ = thi.player;
-    prev_player_ = thi.prev_player;
-    dice_ = thi.dice;
-    double_turn_ = thi.double_turn;
-    if (player != kChancePlayerId) {
-      std::vector<CheckerMove> moves = SpielMoveToCheckerMoves(player, action);
-      SPIEL_CHECK_EQ(moves.size(), 2);
-      moves[0].hit = thi.first_move_hit;
-      moves[1].hit = thi.second_move_hit;
-      UndoCheckerMove(player, moves[1]);
-      UndoCheckerMove(player, moves[0]);
-      turns_--;
-      if (!double_turn_) {
-        if (player == kXPlayerId) {
-          x_turns_--;
-        } else if (player == kOPlayerId) {
-          o_turns_--;
-        }
-      }
-    }
-  }
   turn_history_info_.pop_back();
   history_.pop_back();
   --move_number_;
