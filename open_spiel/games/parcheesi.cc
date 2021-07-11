@@ -109,7 +109,6 @@ void ParcheesiState::ObservationTensor(Player player,
 
   SPIEL_CHECK_EQ(values.size(), kStateEncodingSize);
   auto value_it = values.begin();
-  SPIEL_CHECK_EQ(value_it, values.end());
 }
 
 ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)

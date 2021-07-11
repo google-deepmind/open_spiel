@@ -24,6 +24,9 @@ NumPlayers() = 4
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
+ObservationTensorShape() = [396]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 396
 MaxGameLength() = 1000
 ToString() = "parcheesi()"
 
@@ -35,21 +38,37 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
+ObservationString(0) = "rrrrggggbbbbyyyy - "
+ObservationString(1) = "rrrrggggbbbbyyyy - "
+ObservationString(2) = "rrrrggggbbbbyyyy - "
+ObservationString(3) = "rrrrggggbbbbyyyy - "
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 ChanceOutcomes() = [(0, 0.05555555555555555), (1, 0.05555555555555555), (2, 0.05555555555555555), (3, 0.05555555555555555), (4, 0.05555555555555555), (5, 0.05555555555555555), (6, 0.05555555555555555), (7, 0.05555555555555555), (8, 0.05555555555555555), (9, 0.05555555555555555), (10, 0.05555555555555555), (11, 0.05555555555555555), (12, 0.05555555555555555), (13, 0.05555555555555555), (14, 0.05555555555555555), (15, 0.027777777777777776), (16, 0.027777777777777776), (17, 0.027777777777777776), (18, 0.027777777777777776), (19, 0.027777777777777776), (20, 0.027777777777777776)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 StringLegalActions() = ["chance outcome 0 (roll: 12)", "chance outcome 1 (roll: 13)", "chance outcome 2 (roll: 14)", "chance outcome 3 (roll: 15)", "chance outcome 4 (roll: 16)", "chance outcome 5 (roll: 23)", "chance outcome 6 (roll: 24)", "chance outcome 7 (roll: 25)", "chance outcome 8 (roll: 26)", "chance outcome 9 (roll: 34)", "chance outcome 10 (roll: 35)", "chance outcome 11 (roll: 36)", "chance outcome 12 (roll: 45)", "chance outcome 13 (roll: 46)", "chance outcome 14 (roll: 56)", "chance outcome 15 (roll: 11)", "chance outcome 16 (roll: 22)", "chance outcome 17 (roll: 33)", "chance outcome 18 (roll: 44)", "chance outcome 19 (roll: 55)", "chance outcome 20 (roll: 66)"]
 
-# Apply action "chance outcome 8 (roll: 26)"
-action: 8
+# Apply action "chance outcome 13 (roll: 46)"
+action: 13
 
 # State 1
 # rrrrggggbbbbyyyy -
 IsTerminal() = False
-History() = [8]
-HistoryString() = "8"
+History() = [13]
+HistoryString() = "13"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+ObservationString(0) = "rrrrggggbbbbyyyy - "
+ObservationString(1) = "rrrrggggbbbbyyyy - "
+ObservationString(2) = "rrrrggggbbbbyyyy - "
+ObservationString(3) = "rrrrggggbbbbyyyy - "
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -61,26 +80,42 @@ action: 0
 # State 2
 # rrrrggggbbbbyyyy -
 IsTerminal() = False
-History() = [8, 0]
-HistoryString() = "8, 0"
+History() = [13, 0]
+HistoryString() = "13, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
+ObservationString(0) = "rrrrggggbbbbyyyy - "
+ObservationString(1) = "rrrrggggbbbbyyyy - "
+ObservationString(2) = "rrrrggggbbbbyyyy - "
+ObservationString(3) = "rrrrggggbbbbyyyy - "
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 ChanceOutcomes() = [(0, 0.05555555555555555), (1, 0.05555555555555555), (2, 0.05555555555555555), (3, 0.05555555555555555), (4, 0.05555555555555555), (5, 0.05555555555555555), (6, 0.05555555555555555), (7, 0.05555555555555555), (8, 0.05555555555555555), (9, 0.05555555555555555), (10, 0.05555555555555555), (11, 0.05555555555555555), (12, 0.05555555555555555), (13, 0.05555555555555555), (14, 0.05555555555555555), (15, 0.027777777777777776), (16, 0.027777777777777776), (17, 0.027777777777777776), (18, 0.027777777777777776), (19, 0.027777777777777776), (20, 0.027777777777777776)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 StringLegalActions() = ["chance outcome 0 (roll: 12)", "chance outcome 1 (roll: 13)", "chance outcome 2 (roll: 14)", "chance outcome 3 (roll: 15)", "chance outcome 4 (roll: 16)", "chance outcome 5 (roll: 23)", "chance outcome 6 (roll: 24)", "chance outcome 7 (roll: 25)", "chance outcome 8 (roll: 26)", "chance outcome 9 (roll: 34)", "chance outcome 10 (roll: 35)", "chance outcome 11 (roll: 36)", "chance outcome 12 (roll: 45)", "chance outcome 13 (roll: 46)", "chance outcome 14 (roll: 56)", "chance outcome 15 (roll: 11)", "chance outcome 16 (roll: 22)", "chance outcome 17 (roll: 33)", "chance outcome 18 (roll: 44)", "chance outcome 19 (roll: 55)", "chance outcome 20 (roll: 66)"]
 
-# Apply action "chance outcome 7 (roll: 25)"
-action: 7
+# Apply action "chance outcome 10 (roll: 35)"
+action: 10
 
 # State 3
 # rrrrggggbbbbyyyy -
 IsTerminal() = False
-History() = [8, 0, 7]
-HistoryString() = "8, 0, 7"
+History() = [13, 0, 10]
+HistoryString() = "13, 0, 10"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+ObservationString(0) = "rrrrggggbbbbyyyy - "
+ObservationString(1) = "rrrrggggbbbbyyyy - "
+ObservationString(2) = "rrrrggggbbbbyyyy - "
+ObservationString(3) = "rrrrggggbbbbyyyy - "
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [1]
@@ -90,37 +125,53 @@ StringLegalActions() = ["player 1 move: 1"]
 action: 1
 
 # State 4
-# Apply action "chance outcome 18 (roll: 44)"
-action: 18
+# Apply action "chance outcome 2 (roll: 14)"
+action: 2
 
 # State 5
 # rrrrgggbbbbyyyy - g
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18]
-HistoryString() = "8, 0, 7, 1, 18"
+History() = [13, 0, 10, 1, 2]
+HistoryString() = "13, 0, 10, 1, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
+ObservationString(0) = "rrrrgggbbbbyyyy - g"
+ObservationString(1) = "rrrrgggbbbbyyyy - g"
+ObservationString(2) = "rrrrgggbbbbyyyy - g"
+ObservationString(3) = "rrrrgggbbbbyyyy - g"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0]
-StringLegalActions() = ["player 2 move: 0"]
+LegalActions() = [1]
+StringLegalActions() = ["player 2 move: 1"]
 
-# Apply action "player 2 move: 0"
-action: 0
+# Apply action "player 2 move: 1"
+action: 1
 
 # State 6
-# Apply action "chance outcome 11 (roll: 36)"
-action: 11
+# Apply action "chance outcome 20 (roll: 66)"
+action: 20
 
 # State 7
-# rrrrgggbbbbyyyy - g
+# rrrrgggbbbyyyy - gb
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11"
+History() = [13, 0, 10, 1, 2, 1, 20]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
+ObservationString(0) = "rrrrgggbbbyyyy - gb"
+ObservationString(1) = "rrrrgggbbbyyyy - gb"
+ObservationString(2) = "rrrrgggbbbyyyy - gb"
+ObservationString(3) = "rrrrgggbbbyyyy - gb"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -130,17 +181,25 @@ StringLegalActions() = ["player 3 move: 0"]
 action: 0
 
 # State 8
-# Apply action "chance outcome 15 (roll: 11)"
-action: 15
+# Apply action "chance outcome 13 (roll: 46)"
+action: 13
 
 # State 9
-# rrrrgggbbbbyyyy - g
+# rrrrgggbbbyyyy - gb
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+ObservationString(0) = "rrrrgggbbbyyyy - gb"
+ObservationString(1) = "rrrrgggbbbyyyy - gb"
+ObservationString(2) = "rrrrgggbbbyyyy - gb"
+ObservationString(3) = "rrrrgggbbbyyyy - gb"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -150,37 +209,53 @@ StringLegalActions() = ["player 0 move: 0"]
 action: 0
 
 # State 10
-# Apply action "chance outcome 19 (roll: 55)"
-action: 19
+# Apply action "chance outcome 14 (roll: 56)"
+action: 14
 
 # State 11
-# rrrrgggbbbbyyyy - g
+# rrrrgggbbbyyyy - gb
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+ObservationString(0) = "rrrrgggbbbyyyy - gb"
+ObservationString(1) = "rrrrgggbbbyyyy - gb"
+ObservationString(2) = "rrrrgggbbbyyyy - gb"
+ObservationString(3) = "rrrrgggbbbyyyy - gb"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
-LegalActions() = [2]
-StringLegalActions() = ["player 1 move: 2"]
+LegalActions() = [1]
+StringLegalActions() = ["player 1 move: 1"]
 
-# Apply action "player 1 move: 2"
-action: 2
+# Apply action "player 1 move: 1"
+action: 1
 
 # State 12
-# Apply action "chance outcome 8 (roll: 26)"
-action: 8
+# Apply action "chance outcome 11 (roll: 36)"
+action: 11
 
 # State 13
-# rrrrgbbbbyyyy - ggg
+# rrrrggbbbyyyy - ggb
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
+ObservationString(0) = "rrrrggbbbyyyy - ggb"
+ObservationString(1) = "rrrrggbbbyyyy - ggb"
+ObservationString(2) = "rrrrggbbbyyyy - ggb"
+ObservationString(3) = "rrrrggbbbyyyy - ggb"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -190,37 +265,53 @@ StringLegalActions() = ["player 2 move: 0"]
 action: 0
 
 # State 14
-# Apply action "chance outcome 1 (roll: 13)"
-action: 1
+# Apply action "chance outcome 3 (roll: 15)"
+action: 3
 
 # State 15
-# rrrrgbbbbyyyy - ggg
+# rrrrggbbbyyyy - ggb
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
+ObservationString(0) = "rrrrggbbbyyyy - ggb"
+ObservationString(1) = "rrrrggbbbyyyy - ggb"
+ObservationString(2) = "rrrrggbbbyyyy - ggb"
+ObservationString(3) = "rrrrggbbbyyyy - ggb"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0]
-StringLegalActions() = ["player 3 move: 0"]
+LegalActions() = [1]
+StringLegalActions() = ["player 3 move: 1"]
 
-# Apply action "player 3 move: 0"
-action: 0
+# Apply action "player 3 move: 1"
+action: 1
 
 # State 16
-# Apply action "chance outcome 11 (roll: 36)"
-action: 11
+# Apply action "chance outcome 8 (roll: 26)"
+action: 8
 
 # State 17
-# rrrrgbbbbyyyy - ggg
+# rrrrggbbbyyy - ggby
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+ObservationString(0) = "rrrrggbbbyyy - ggby"
+ObservationString(1) = "rrrrggbbbyyy - ggby"
+ObservationString(2) = "rrrrggbbbyyy - ggby"
+ObservationString(3) = "rrrrggbbbyyy - ggby"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [0]
@@ -230,57 +321,81 @@ StringLegalActions() = ["player 0 move: 0"]
 action: 0
 
 # State 18
-# Apply action "chance outcome 16 (roll: 22)"
-action: 16
+# Apply action "chance outcome 2 (roll: 14)"
+action: 2
 
 # State 19
-# rrrrgbbbbyyyy - ggg
+# rrrrggbbbyyy - ggby
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
-LegalActions() = [0]
-StringLegalActions() = ["player 1 move: 0"]
-
-# Apply action "player 1 move: 0"
-action: 0
-
-# State 20
-# Apply action "chance outcome 5 (roll: 23)"
-action: 5
-
-# State 21
-# rrrrgbbbbyyyy - ggg
-IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16, 0, 5]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16, 0, 5"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
+ObservationString(0) = "rrrrggbbbyyy - ggby"
+ObservationString(1) = "rrrrggbbbyyy - ggby"
+ObservationString(2) = "rrrrggbbbyyy - ggby"
+ObservationString(3) = "rrrrggbbbyyy - ggby"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [1]
-StringLegalActions() = ["player 2 move: 1"]
+StringLegalActions() = ["player 1 move: 1"]
 
-# Apply action "player 2 move: 1"
+# Apply action "player 1 move: 1"
 action: 1
 
+# State 20
+# Apply action "chance outcome 0 (roll: 12)"
+action: 0
+
+# State 21
+# rrrrgbbbyyy - gggby
+IsTerminal() = False
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2, 1, 0]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "rrrrgbbbyyy - gggby"
+ObservationString(1) = "rrrrgbbbyyy - gggby"
+ObservationString(2) = "rrrrgbbbyyy - gggby"
+ObservationString(3) = "rrrrgbbbyyy - gggby"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
+Rewards() = [0.0, 0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0, 0.0]
+LegalActions() = [0]
+StringLegalActions() = ["player 2 move: 0"]
+
+# Apply action "player 2 move: 0"
+action: 0
+
 # State 22
-# Apply action "chance outcome 10 (roll: 35)"
-action: 10
+# Apply action "chance outcome 5 (roll: 23)"
+action: 5
 
 # State 23
-# rrrrgbbbyyyy - gggb
+# rrrrgbbbyyy - gggby
 IsTerminal() = False
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16, 0, 5, 1, 10]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16, 0, 5, 1, 10"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2, 1, 0, 0, 5]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2, 1, 0, 0, 5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
+ObservationString(0) = "rrrrgbbbyyy - gggby"
+ObservationString(1) = "rrrrgbbbyyy - gggby"
+ObservationString(2) = "rrrrgbbbyyy - gggby"
+ObservationString(3) = "rrrrgbbbyyy - gggby"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
 Rewards() = [0.0, 0.0, 0.0, 0.0]
 Returns() = [0.0, 0.0, 0.0, 0.0]
 LegalActions() = [1]
@@ -290,28 +405,28 @@ StringLegalActions() = ["player 3 move: 1"]
 action: 1
 
 # State 24
-# Apply action "chance outcome 13 (roll: 46)"
-action: 13
+# Apply action "chance outcome 4 (roll: 16)"
+action: 4
 
 # State 25
 # Apply action "player 0 move: 0"
 action: 0
 
 # State 26
-# Apply action "chance outcome 20 (roll: 66)"
-action: 20
+# Apply action "chance outcome 11 (roll: 36)"
+action: 11
 
 # State 27
 # Apply action "player 1 move: 0"
 action: 0
 
 # State 28
-# Apply action "chance outcome 17 (roll: 33)"
-action: 17
+# Apply action "chance outcome 19 (roll: 55)"
+action: 19
 
 # State 29
-# Apply action "player 2 move: 0"
-action: 0
+# Apply action "player 2 move: 2"
+action: 2
 
 # State 30
 # Apply action "chance outcome 0 (roll: 12)"
@@ -322,116 +437,44 @@ action: 0
 action: 0
 
 # State 32
-# Apply action "chance outcome 14 (roll: 56)"
-action: 14
+# Apply action "chance outcome 9 (roll: 34)"
+action: 9
 
 # State 33
-# Apply action "player 0 move: 1"
-action: 1
+# Apply action "player 0 move: 0"
+action: 0
 
 # State 34
-# Apply action "chance outcome 8 (roll: 26)"
-action: 8
+# Apply action "chance outcome 17 (roll: 33)"
+action: 17
 
 # State 35
 # Apply action "player 1 move: 0"
 action: 0
 
 # State 36
-# Apply action "chance outcome 8 (roll: 26)"
-action: 8
+# Apply action "chance outcome 12 (roll: 45)"
+action: 12
 
 # State 37
-# Apply action "player 2 move: 0"
-action: 0
-
-# State 38
-# Apply action "chance outcome 20 (roll: 66)"
-action: 20
-
-# State 39
-# Apply action "player 3 move: 0"
-action: 0
-
-# State 40
-# Apply action "chance outcome 5 (roll: 23)"
-action: 5
-
-# State 41
-# Apply action "player 0 move: 1"
-action: 1
-
-# State 42
-# Apply action "chance outcome 13 (roll: 46)"
-action: 13
-
-# State 43
-# Apply action "player 1 move: 0"
-action: 0
-
-# State 44
-# Apply action "chance outcome 6 (roll: 24)"
-action: 6
-
-# State 45
-# Apply action "player 2 move: 0"
-action: 0
-
-# State 46
-# Apply action "chance outcome 10 (roll: 35)"
-action: 10
-
-# State 47
-# Apply action "player 3 move: 1"
-action: 1
-
-# State 48
-# Apply action "chance outcome 7 (roll: 25)"
-action: 7
-
-# State 49
-# Apply action "player 0 move: 1"
-action: 1
-
-# State 50
-# Apply action "chance outcome 18 (roll: 44)"
-action: 18
-
-# State 51
-# Apply action "player 1 move: 0"
-action: 0
-
-# State 52
-# Apply action "chance outcome 3 (roll: 15)"
-action: 3
-
-# State 53
 # Apply action "player 2 move: 1"
 action: 1
 
-# State 54
-# Apply action "chance outcome 18 (roll: 44)"
-action: 18
-
-# State 55
-# Apply action "player 3 move: 0"
-action: 0
-
-# State 56
-# Apply action "chance outcome 10 (roll: 35)"
-action: 10
-
-# State 57
-# Apply action "player 0 move: 1"
-action: 1
-
-# State 58
-# gbbyy - rrrrgggbbyy
+# State 38
+# rrrrgyy - gggbbbbyy
 IsTerminal() = True
-History() = [8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16, 0, 5, 1, 10, 1, 13, 0, 20, 0, 17, 0, 0, 0, 14, 1, 8, 0, 8, 0, 20, 0, 5, 1, 13, 0, 6, 0, 10, 1, 7, 1, 18, 0, 3, 1, 18, 0, 10, 1]
-HistoryString() = "8, 0, 7, 1, 18, 0, 11, 0, 15, 0, 19, 2, 8, 0, 1, 0, 11, 0, 16, 0, 5, 1, 10, 1, 13, 0, 20, 0, 17, 0, 0, 0, 14, 1, 8, 0, 8, 0, 20, 0, 5, 1, 13, 0, 6, 0, 10, 1, 7, 1, 18, 0, 3, 1, 18, 0, 10, 1"
+History() = [13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2, 1, 0, 0, 5, 1, 4, 0, 11, 0, 19, 2, 0, 0, 9, 0, 17, 0, 12, 1]
+HistoryString() = "13, 0, 10, 1, 2, 1, 20, 0, 13, 0, 14, 1, 11, 0, 3, 1, 8, 0, 2, 1, 0, 0, 5, 1, 4, 0, 11, 0, 19, 2, 0, 0, 9, 0, 17, 0, 12, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-Rewards() = [1.0, 0.0, 0.0, 0.0]
-Returns() = [1.0, 0.0, 0.0, 0.0]
+ObservationString(0) = "rrrrgyy - gggbbbbyy"
+ObservationString(1) = "rrrrgyy - gggbbbbyy"
+ObservationString(2) = "rrrrgyy - gggbbbbyy"
+ObservationString(3) = "rrrrgyy - gggbbbbyy"
+ObservationTensor(0): zeros(396)
+ObservationTensor(1): zeros(396)
+ObservationTensor(2): zeros(396)
+ObservationTensor(3): zeros(396)
+Rewards() = [0.0, 0.0, 1.0, 0.0]
+Returns() = [0.0, 0.0, 1.0, 0.0]
