@@ -154,16 +154,6 @@ void ParcheesiState::SetupInitialBoard() {
   }  
 }
 
-int ParcheesiState::board(int player, int pos) const {
-  if (pos == kBarPos) {
-    return bar_[player];
-  } else {
-    SPIEL_CHECK_GE(pos, 0);
-    SPIEL_CHECK_LT(pos, kNumPoints);
-    return board_[player][pos];
-  }
-}
-
 Player ParcheesiState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
 }
