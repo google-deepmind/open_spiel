@@ -143,8 +143,7 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
       turns_(-1),
       dice_({}),
       board_(
-          {std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0)}),
-      turn_history_info_({}) {
+          {std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0), std::vector<int>(kNumPos, 0)}) {
   SetupInitialBoard();
 }
 
@@ -166,9 +165,6 @@ void ParcheesiState::RollDice(int outcome) {
 void ParcheesiState::DoApplyAction(Action move) {
 
   if (IsChanceNode()) {
-    turn_history_info_.push_back(TurnHistoryInfo(kChancePlayerId, prev_player_,
-                                                 dice_, move, double_turn_,
-                                                 false, false));
     SPIEL_CHECK_TRUE(dice_.empty());
     RollDice(move);
     cur_player_ = NextPlayerRoundRobin(prev_player_, num_players_);
@@ -184,7 +180,6 @@ void ParcheesiState::DoApplyAction(Action move) {
 }
 
 void ParcheesiState::UndoAction(int player, Action action) {
-  turn_history_info_.pop_back();
   history_.pop_back();
   --move_number_;
 }

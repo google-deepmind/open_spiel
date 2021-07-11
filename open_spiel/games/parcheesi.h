@@ -46,27 +46,6 @@ inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize;
 
-// This is a small helper to track historical turn info not stored in the moves.
-// It is only needed for proper implementation of Undo.
-struct TurnHistoryInfo {
-  int player;
-  int prev_player;
-  std::vector<int> dice;
-  Action action;
-  bool double_turn;
-  bool first_move_hit;
-  bool second_move_hit;
-  TurnHistoryInfo(int _player, int _prev_player, std::vector<int> _dice,
-                  int _action, bool _double_turn, bool fmh, bool smh)
-      : player(_player),
-        prev_player(_prev_player),
-        dice(_dice),
-        action(_action),
-        double_turn(_double_turn),
-        first_move_hit(fmh),
-        second_move_hit(smh) {}
-};
-
 class ParcheesiGame;
 
 class ParcheesiState : public State {
@@ -180,7 +159,6 @@ class ParcheesiState : public State {
   std::vector<int> bar_;     // Checkers of each player in the bar.
   std::vector<int> scores_;  // Checkers returned home by each player.
   std::vector<std::vector<int>> board_;  // Checkers for each player on points.
-  std::vector<TurnHistoryInfo> turn_history_info_;  // Info needed for Undo.
 };
 
 class ParcheesiGame : public Game {
