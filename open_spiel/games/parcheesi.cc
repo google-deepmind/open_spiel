@@ -86,19 +86,6 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 
-std::string PositionToString(int pos) {
-  switch (pos) {
-    case kBarPos:
-      return "Bar";
-    case kScorePos:
-      return "Score";
-    case -1:
-      return "Pass";
-    default:
-      return absl::StrCat(pos);
-  }
-}
-
 std::string CurPlayerToString(Player cur_player) {
   switch (cur_player) {
     case kXPlayerId:
