@@ -76,9 +76,7 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"hyper_backgammon", GameParameter(kDefaultHyperBackgammon)},
-     {"scoring_type",
-      GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
+    {}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new ParcheesiGame(params));
@@ -992,10 +990,7 @@ void ParcheesiState::SetState(int cur_player, bool double_turn,
 }
 
 ParcheesiGame::ParcheesiGame(const GameParameters& params)
-    : Game(kGameType, params),
-      scoring_type_(
-          ParseScoringType(ParameterValue<std::string>("scoring_type"))),
-      hyper_backgammon_(ParameterValue<bool>("hyper_backgammon")) {}
+    : Game(kGameType, params) {}
 
 double ParcheesiGame::MaxUtility() const {
   if (hyper_backgammon_) {
