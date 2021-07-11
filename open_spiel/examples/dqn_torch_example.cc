@@ -41,7 +41,7 @@ float EvalAgent(
         action = open_spiel::SampleAction(state->ChanceOutcomes(),
                                           absl::Uniform(*rng, 0.0, 1.0)).first;
       } else {
-        agent->Step(*state, true);
+        action = agent->Step(*state, true);
       }
       state->ApplyAction(action);
       episode_return += state->Rewards()[0];

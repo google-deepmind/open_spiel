@@ -29,7 +29,7 @@ constexpr int kSeed = 93879211;
 
 SimpleLinearImpl::SimpleLinearImpl(int input_size,
                                    int output_size,
-                                   bool activate_relu = false)
+                                   bool activate_relu)
     : simple_linear_(torch::nn::LinearOptions(/*in_features*/input_size,
                                               /*out_features*/output_size)),
       activate_relu_(activate_relu) {
