@@ -82,27 +82,7 @@ class ParcheesiState : public State {
  private:
   void SetupInitialBoard();
   void RollDice(int outcome);
-  bool IsPosInHome(int player, int pos) const;
-  bool AllInHome(int player) const;
-  int CheckersInHome(int player) const;
-  bool UsableDiceOutcome(int outcome) const;
-  int PositionFromBar(int player, int spaces) const;
-  int PositionFrom(int player, int pos, int spaces) const;
-  int NumOppCheckers(int player, int pos) const;
-  std::string DiceToString(int outcome) const;
-  int IsGammoned(int player) const;
-  int IsBackgammoned(int player) const;
-  int DiceValue(int i) const;
-  int HighestUsableDiceOutcome() const;
-  Action EncodedPassMove() const;
-  Action EncodedBarMove() const;
-
-  // Returns the position of the furthest checker in the home of this player.
-  // Returns -1 if none found.
-  int FurthestCheckerInHome(int player) const;
-
-  bool hyper_backgammon_;     // Is the Hyper-backgammon variant enabled?
-
+  
   Player cur_player_;
   Player prev_player_;
   int turns_;
