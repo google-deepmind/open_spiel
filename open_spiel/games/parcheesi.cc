@@ -86,22 +86,6 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 
-std::string CurPlayerToString(Player cur_player) {
-  switch (cur_player) {
-    case kXPlayerId:
-      return "x";
-    case kOPlayerId:
-      return "o";
-    case kChancePlayerId:
-      return "*";
-    case kTerminalPlayerId:
-      return "T";
-    default:
-      SpielFatalError(absl::StrCat("Unrecognized player id: ", cur_player));
-  }
-}
-
-
 std::string ParcheesiState::ActionToString(Player player,
                                             Action move_id) const {
   if(player == kChancePlayerId){
