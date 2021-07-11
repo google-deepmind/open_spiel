@@ -189,15 +189,6 @@ void ParcheesiState::UndoAction(int player, Action action) {
   --move_number_;
 }
 
-bool ParcheesiState::IsHit(Player player, int from_pos, int num) const {
-  if (from_pos != kPassPos) {
-    int to = PositionFrom(player, from_pos, num);
-    return to != kScorePos && board(Opponent(player), to) == 1;
-  } else {
-    return false;
-  }
-}
-
 Action ParcheesiState::TranslateAction(int from1, int from2,
                                         bool use_high_die_first) const {
   int player = CurrentPlayer();
