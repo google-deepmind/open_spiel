@@ -32,22 +32,7 @@ namespace parcheesi {
 inline constexpr const int kNumPos = 2;
 
 inline constexpr const int kNumPlayers = 4;
-inline constexpr const int kNumChanceOutcomes = 21;
 inline constexpr const int kNumPoints = 24;
-inline constexpr const int kNumDiceOutcomes = 6;
-inline constexpr const int kXPlayerId = 0;
-inline constexpr const int kOPlayerId = 1;
-inline constexpr const int kPassPos = -1;
-
-// Number of checkers per player in the standard game. For varaints, use
-// ParcheesiGame::NumCheckersPerPlayer.
-inline constexpr const int kNumCheckersPerPlayer = 15;
-
-// TODO: look into whether these can be set to 25 and -2 to avoid having a
-// separate helper function (PositionToStringHumanReadable) to convert moves
-// to strings.
-inline constexpr const int kBarPos = 100;
-inline constexpr const int kScorePos = 101;
 
 // The action encoding stores a number in { 0, 1, ..., 1351 }. If the high
 // roll is to move first, then the number is encoded as a 2-digit number in
@@ -166,9 +151,7 @@ class ParcheesiState : public State {
 
   // Accessor functions for some of the specific data.
   int player_turns() const { return turns_; }
-  int player_turns(int player) const {
-    return (player == kXPlayerId ? x_turns_ : o_turns_);
-  }
+  
   int bar(int player) const { return bar_[player]; }
   int score(int player) const { return scores_[player]; }
   int dice(int i) const { return dice_[i]; }
