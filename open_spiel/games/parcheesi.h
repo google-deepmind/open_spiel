@@ -46,14 +46,6 @@ inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize;
 
-// Game scoring type, whether to score gammons/backgammons specially.
-enum class ScoringType {
-  kWinLossScoring,  // "winloss_scoring": Score only 1 point per player win.
-  kEnableGammons,   // "enable_gammons": Score 2 points for a "gammon".
-  kFullScoring,     // "full_scoring": Score gammons as well as 3 points for a
-                    // "backgammon".
-};
-
 struct CheckerMove {
   // Pass is encoded as (pos, num, hit) = (-1, -1, false).
   int pos;  // 0-24  (0-23 for locations on the board and kBarPos)
@@ -211,7 +203,6 @@ class ParcheesiState : public State {
   std::vector<Action> ProcessLegalMoves(
       int max_moves, const std::set<std::vector<CheckerMove>>& movelist) const;
 
-  ScoringType scoring_type_;  // Which rules apply when scoring the game.
   bool hyper_backgammon_;     // Is the Hyper-backgammon variant enabled?
 
   Player cur_player_;
@@ -278,7 +269,6 @@ class ParcheesiGame : public Game {
   int NumCheckersPerPlayer() const;
 
  private:
-  ScoringType scoring_type_;  // Which rules apply when scoring the game.
   bool hyper_backgammon_;     // Is hyper-backgammon variant enabled?
   int num_players_;
 };
