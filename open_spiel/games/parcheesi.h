@@ -76,52 +76,6 @@ class ParcheesiState : public State {
   // Returns the opponent of the specified player.
   int Opponent(int player) const;
 
-  // Compute a distance between 'from' and 'to'. The from can be kBarPos. The
-  // to can be a number below 0 or above 23, but do not use kScorePos directly.
-  int GetDistance(int player, int from, int to) const;
-
-  // Is this position off the board, i.e. >23 or <0?
-  bool IsOff(int player, int pos) const;
-
-  // Returns whether pos2 is further (closer to scoring) than pos1 for the
-  // specifed player.
-  bool IsFurther(int player, int pos1, int pos2) const;
-
-  // Is this a legal from -> to checker move? Here, the to_pos can be a number
-  // that is outside {0, ..., 23}; if so, it is counted as "off the board" for
-  // the corresponding player (i.e. >23 is a bear-off move for XPlayerId, and
-  // <0 is a bear-off move for OPlayerId).
-  bool IsLegalFromTo(int player, int from_pos, int to_pos, int my_checkers_from,
-                     int opp_checkers_to) const;
-
-  // Get the To position for this play given the from position and number of
-  // pips on the die. This function simply adds the values: the return value
-  // will be a position that might be off the the board (<0 or >23).
-  int GetToPos(int player, int from_pos, int pips) const;
-
-  // Count the total number of checkers for this player (on the board, in the
-  // bar, and have borne off). Should be 15 for the standard game.
-  int CountTotalCheckers(int player) const;
-
-  // Returns if moving from the position for the number of spaces is a hit.
-  bool IsHit(Player player, int from_pos, int num) const;
-
-  // Accessor functions for some of the specific data.
-  int player_turns() const { return turns_; }
-  
-  int bar(int player) const { return bar_[player]; }
-  int score(int player) const { return scores_[player]; }
-  int dice(int i) const { return dice_[i]; }
-  bool double_turn() const { return double_turn_; }
-
-  // Get the number of checkers on the board in the specified position belonging
-  // to the specified player. The position can be kBarPos or any valid position
-  // on the main part of the board, but kScorePos (use score() to get the number
-  // of checkers born off).
-  int board(int player, int pos) const;
-
-  Action TranslateAction(int from1, int from2, bool use_high_die_first) const;
-
  protected:
   void DoApplyAction(Action move_id) override;
 
