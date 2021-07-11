@@ -46,18 +46,6 @@ inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize;
 
-struct CheckerMove {
-  // Pass is encoded as (pos, num, hit) = (-1, -1, false).
-  int pos;  // 0-24  (0-23 for locations on the board and kBarPos)
-  int num;  // 1-6
-  bool hit;
-  CheckerMove(int _pos, int _num, bool _hit)
-      : pos(_pos), num(_num), hit(_hit) {}
-  bool operator<(const CheckerMove& rhs) const {
-    return (pos * 6 + (num - 1)) < (rhs.pos * 6 + rhs.num - 1);
-  }
-};
-
 // This is a small helper to track historical turn info not stored in the moves.
 // It is only needed for proper implementation of Undo.
 struct TurnHistoryInfo {
@@ -153,18 +141,7 @@ class ParcheesiState : public State {
   // of checkers born off).
   int board(int player, int pos) const;
 
-  // Action encoding / decoding functions. Note, the converted checker moves
-  // do not contain the hit information; use the AddHitInfo function to get the
-  // hit information.
-  Action CheckerMovesToSpielMove(const std::vector<CheckerMove>& moves) const;
-  std::vector<CheckerMove> SpielMoveToCheckerMoves(int player,
-                                                   Action spiel_move) const;
   Action TranslateAction(int from1, int from2, bool use_high_die_first) const;
-
-  // Return checker moves with extra hit information.
-  std::vector<CheckerMove>
-  AugmentWithHitInfo(Player player,
-                     const std::vector<CheckerMove> &cmoves) const;
 
  protected:
   void DoApplyAction(Action move_id) override;
@@ -187,21 +164,9 @@ class ParcheesiState : public State {
   Action EncodedPassMove() const;
   Action EncodedBarMove() const;
 
-  // A helper function used by ActionToString to add necessary hit information
-  // and compute whether the move goes off the board.
-  int AugmentCheckerMove(CheckerMove* cmove, int player, int start) const;
-
   // Returns the position of the furthest checker in the home of this player.
   // Returns -1 if none found.
   int FurthestCheckerInHome(int player) const;
-
-  bool ApplyCheckerMove(int player, const CheckerMove& move);
-  void UndoCheckerMove(int player, const CheckerMove& move);
-  std::set<CheckerMove> LegalCheckerMoves(int player) const;
-  int RecLegalMoves(std::vector<CheckerMove> moveseq,
-                    std::set<std::vector<CheckerMove>>* movelist);
-  std::vector<Action> ProcessLegalMoves(
-      int max_moves, const std::set<std::vector<CheckerMove>>& movelist) const;
 
   bool hyper_backgammon_;     // Is the Hyper-backgammon variant enabled?
 
