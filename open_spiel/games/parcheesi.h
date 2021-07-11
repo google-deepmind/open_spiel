@@ -86,9 +86,6 @@ class ParcheesiState : public State {
   Player cur_player_;
   Player prev_player_;
   int turns_;
-  int x_turns_;
-  int o_turns_;
-  bool double_turn_;
   std::vector<int> dice_;    // Current dice.
   std::vector<int> bar_;     // Checkers of each player in the bar.
   std::vector<int> scores_;  // Checkers returned home by each player.
