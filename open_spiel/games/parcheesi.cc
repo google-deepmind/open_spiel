@@ -244,20 +244,6 @@ std::unique_ptr<State> ParcheesiState::Clone() const {
   return std::unique_ptr<State>(new ParcheesiState(*this));
 }
 
-void ParcheesiState::SetState(int cur_player, bool double_turn,
-                               const std::vector<int>& dice,
-                               const std::vector<int>& bar,
-                               const std::vector<int>& scores,
-                               const std::vector<std::vector<int>>& board) {
-  cur_player_ = cur_player;
-  double_turn_ = double_turn;
-  dice_ = dice;
-  bar_ = bar;
-  scores_ = scores;
-  board_ = board;
-
-}
-
 ParcheesiGame::ParcheesiGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
