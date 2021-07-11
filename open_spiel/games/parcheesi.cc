@@ -29,11 +29,6 @@ namespace open_spiel {
 namespace parcheesi {
 namespace {
 
-// A few constants to help with the conversion to human-readable string formats.
-// TODO: remove these once we've changed kBarPos and kScorePos (see TODO in
-// header).
-constexpr int kNumBarPosHumanReadable = 25;
-constexpr int kNumOffPosHumanReadable = -2;
 
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
     std::pair<Action, double>(0, 1.0 / 18),
@@ -135,32 +130,6 @@ std::string CurPlayerToString(Player cur_player) {
   }
 }
 
-std::string PositionToStringHumanReadable(int pos) {
-  if (pos == kNumBarPosHumanReadable) {
-    return "Bar";
-  } else if (pos == kNumOffPosHumanReadable) {
-    return "Off";
-  } else {
-    return PositionToString(pos);
-  }
-}
-
-int ParcheesiState::AugmentCheckerMove(CheckerMove* cmove, int player,
-                                        int start) const {
-  int end = cmove->num;
-  if (end != kPassPos) {
-    // Not a pass, so work out where the piece finished
-    end = start - cmove->num;
-    if (end <= 0) {
-      end = kNumOffPosHumanReadable;  // Off
-    } else if (board_[Opponent(player)]
-                     [player == kOPlayerId ? (end - 1) : (kNumPoints - end)] ==
-               1) {
-      cmove->hit = true;  // Check to see if move is a hit
-    }
-  }
-  return end;
-}
 
 std::string ParcheesiState::ActionToString(Player player,
                                             Action move_id) const {
