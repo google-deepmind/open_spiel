@@ -64,14 +64,30 @@ struct DQNSettings {
   std::string loss_str = "mse";
 };
 
+// TODO(lanctot): make this into a proper general RL env/agent API as we have
+// in the Python API. Then include tabular q-learning and Sarsa as well.
+class Agent {
+ public:
+  virtual Action Step(const State& state, bool is_evaluation = false) = 0;
+};
+
+class RandomAgent : public Agent {
+ public:
+  RandomAgent(Player player, int seed) : player_(player), rng_(seed) {}
+  Action Step(const State& state, bool is_evaluation = false) override;
+
+ private:
+  Player player_;
+  std::mt19937 rng_;
+};
+
 // DQN Agent implementation in LibTorch.
-class DQN {
+class DQN : public Agent {
  public:
   DQN(const DQNSettings& settings);
   virtual ~DQN() = default;
   Action Step(const State& state,
-              bool is_evaluation = false,
-              bool add_transition_record = true);
+              bool is_evaluation = false) override;
 
  private:
   std::vector<float> GetInfoState(const State& state,

@@ -54,7 +54,7 @@ void TestSimpleGame() {
   DQN dqn(settings);
   int total_reward = 0;
   std::unique_ptr<State> state;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 150; i++) {
     state = game->NewInitialState();
     while (!state->IsTerminal()) {
       open_spiel::Action action = dqn.Step(*state);
@@ -64,7 +64,7 @@ void TestSimpleGame() {
     dqn.Step(*state);
   }
 
-  SPIEL_CHECK_GE(total_reward, 75);
+  SPIEL_CHECK_GE(total_reward, 120);
 }
 
 void TestTicTacToe() {

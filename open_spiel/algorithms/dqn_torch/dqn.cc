@@ -22,6 +22,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -32,6 +33,12 @@ namespace algorithms {
 namespace torch_dqn {
 
 constexpr const int kIllegalActionLogitsPenalty = -1e9;
+
+Action RandomAgent::Step(const State& state, bool is_evaluation) {
+  std::vector<Action> legal_actions = state.LegalActions(player_);
+  int aidx = absl::Uniform<int>(rng_, 0, legal_actions.size());
+  return legal_actions[aidx];
+}
 
 DQN::DQN(const DQNSettings& settings)
     : use_observation_(settings.use_observation),
@@ -69,8 +76,7 @@ std::vector<float> DQN::GetInfoState(const State& state,
 }
 
 Action DQN::Step(const State& state,
-                 bool is_evaluation,
-                 bool add_transition_record) {
+                 bool is_evaluation) {
   // Chance nodes should be handled externally to the agent.
   SPIEL_CHECK_TRUE(!state.IsChanceNode());
 
@@ -96,7 +102,7 @@ Action DQN::Step(const State& state,
       torch::save(q_network_, "q_network.pt");
       torch::load(target_q_network_, "q_network.pt");
     }
-    if (exists_prev_ && add_transition_record) {
+    if (exists_prev_ && !is_evaluation) {
       AddTransition(*prev_state_, prev_action_, state);
     }
     if (state.IsTerminal()) {
