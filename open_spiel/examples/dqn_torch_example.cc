@@ -25,6 +25,11 @@
 
 ABSL_FLAG(int, seed, 8263487, "Seed to use for random number generation.");
 
+namespace open_spiel {
+namespace algorithms {
+namespace torch_dqn {
+namespace {
+
 void SolveCatch(int seed, int total_episodes, int report_every,
                 int num_eval_episodes) {
   std::cout << "Solving catch" << std::endl;
@@ -32,7 +37,7 @@ void SolveCatch(int seed, int total_episodes, int report_every,
   std::shared_ptr<const open_spiel::Game> game = open_spiel::LoadGame("catch");
 
   // Values copied from: python/examples/single_agent_catch.py
-  open_spiel::algorithms::torch_dqn::DQNSettings settings = {
+  DQNSettings settings = {
     /*use_observation*/game->GetType().provides_observation_tensor,
     /*player_id*/0,
     /*state_representation_size*/game->ObservationTensorSize(),
@@ -49,8 +54,8 @@ void SolveCatch(int seed, int total_episodes, int report_every,
     /*epsilon_end*/0.1,
     /*epsilon_decay_duration*/2000
   };
-  auto dqn = std::make_unique<open_spiel::algorithms::torch_dqn::DQN>(settings);
-  std::vector<open_spiel::algorithms::torch_dqn::Agent*> agents = {dqn.get()};
+  auto dqn = std::make_unique<DQN>(settings);
+  std::vector<Agent*> agents = {dqn.get()};
 
   for (int num_episodes = 0;
        num_episodes < total_episodes;
@@ -68,9 +73,16 @@ void SolveCatch(int seed, int total_episodes, int report_every,
   }
 }
 
+}  // namespace
+}  // namespace torch_dqn
+}  // namespace algorithms
+}  // namespace open_spiel
+
+namespace torch_dqn = open_spiel::algorithms::torch_dqn;
+
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
-  SolveCatch(absl::GetFlag(FLAGS_seed), /*total_episodes*/2000,
-                           /*report_every*/250, /*num_eval_episodes*/100);
+  torch_dqn::SolveCatch(absl::GetFlag(FLAGS_seed), /*total_episodes*/2000,
+                        /*report_every*/250, /*num_eval_episodes*/100);
   return 0;
 }
