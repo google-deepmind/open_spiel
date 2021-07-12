@@ -254,6 +254,41 @@ void DQN::Learn() {
   optimizer_.step();
 }
 
+std::vector<double> RunEpisodes(
+    std::mt19937* rng,
+    const Game& game,
+    const std::vector<Agent*>& agents,
+    int num_episodes,
+    bool is_evaluation) {
+  SPIEL_CHECK_GE(num_episodes, 1);
+  std::vector<double> total_returns(game.NumPlayers(), 0.0);
+  for (int i = 0; i < num_episodes; i++) {
+    std::unique_ptr<open_spiel::State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      Player player = state->CurrentPlayer();
+      open_spiel::Action action;
+      if (state->IsChanceNode()) {
+        action = open_spiel::SampleAction(state->ChanceOutcomes(),
+                                          absl::Uniform(*rng, 0.0, 1.0)).first;
+      } else {
+        action = agents[player]->Step(*state, is_evaluation);
+      }
+      state->ApplyAction(action);
+    }
+    std::vector<double> episode_returns = state->Returns();
+    for (Player p = 0; p < game.NumPlayers(); ++p) {
+      agents[p]->Step(*state, is_evaluation);
+      total_returns[p] += episode_returns[p];
+    }
+  }
+
+  for (Player p = 0; p < game.NumPlayers(); ++p) {
+    total_returns[p] /= num_episodes;
+  }
+
+  return total_returns;
+}
+
 }  // namespace torch_dqn
 }  // namespace algorithms
 }  // namespace open_spiel

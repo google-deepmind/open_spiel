@@ -23,38 +23,12 @@
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
-ABSL_FLAG(int, max_iterations, 1000, "How many learn steps to run.");
-ABSL_FLAG(int, eval_every, 300, "How often to evaluate the policy.");
+ABSL_FLAG(int, seed, 8263487, "Seed to use for random number generation.");
 
-float EvalAgent(
-    std::mt19937* rng,
-    std::shared_ptr<const open_spiel::Game> game,
-    const std::unique_ptr<open_spiel::algorithms::torch_dqn::DQN>& agent,
-    int num_episodes) {
-  double total_returns = 0.0;
-  for (int i = 0; i < num_episodes; i++) {
-    std::unique_ptr<open_spiel::State> state = game->NewInitialState();
-    double episode_return = 0.0;
-    while (!state->IsTerminal()) {
-      open_spiel::Action action;
-      if (state->IsChanceNode()) {
-        action = open_spiel::SampleAction(state->ChanceOutcomes(),
-                                          absl::Uniform(*rng, 0.0, 1.0)).first;
-      } else {
-        action = agent->Step(*state, true);
-      }
-      state->ApplyAction(action);
-      episode_return += state->Rewards()[0];
-    }
-    agent->Step(*state, true);
-    SPIEL_CHECK_EQ(episode_return, state->Returns()[0]);
-    total_returns += episode_return;
-  }
-  return total_returns / num_episodes;
-}
-
-void SolveCatch() {
-  std::mt19937 rng;
+void SolveCatch(int seed, int total_episodes, int report_every,
+                int num_eval_episodes) {
+  std::cout << "Solving catch" << std::endl;
+  std::mt19937 rng(seed);
   std::shared_ptr<const open_spiel::Game> game = open_spiel::LoadGame("catch");
 
   // Values copied from: python/examples/single_agent_catch.py
@@ -76,31 +50,27 @@ void SolveCatch() {
     /*epsilon_decay_duration*/2000
   };
   auto dqn = std::make_unique<open_spiel::algorithms::torch_dqn::DQN>(settings);
-  int max_iterations = absl::GetFlag(FLAGS_max_iterations);
-  int eval_every = absl::GetFlag(FLAGS_eval_every);
-  int total_reward = 0;
-  for (int iter = 0; iter < max_iterations; ++iter) {
-    std::unique_ptr<open_spiel::State> state = game->NewInitialState();
-    while (!state->IsTerminal()) {
-      open_spiel::Action action;
-      if (state->IsChanceNode()) {
-        action = open_spiel::SampleAction(state->ChanceOutcomes(),
-                                          absl::Uniform(rng, 0.0, 1.0)).first;
-      } else {
-        action = dqn->Step(*state);
-      }
-      state->ApplyAction(action);
-    }
-    dqn->Step(*state);
-    if (iter % eval_every == 0) {
-      float reward = EvalAgent(&rng, game, dqn, 100);
-      std::cout << iter << " " << reward << std::endl;
-    }
+  std::vector<open_spiel::algorithms::torch_dqn::Agent*> agents = {dqn.get()};
+
+  for (int num_episodes = 0;
+       num_episodes < total_episodes;
+       num_episodes += report_every) {
+    // Training
+    RunEpisodes(&rng, *game, agents,
+                /*num_episodes*/report_every, /*is_evaluation*/false);
+
+    std::vector<double> avg_returns = 
+        RunEpisodes(&rng, *game, agents,
+                    /*num_episodes*/num_eval_episodes, /*is_evaluation*/true);
+
+    std::cout << num_episodes + report_every << " "
+              << avg_returns[0] << std::endl;
   }
 }
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
-  SolveCatch();
+  SolveCatch(absl::GetFlag(FLAGS_seed), /*total_episodes*/2000,
+                           /*report_every*/250, /*num_eval_episodes*/100);
   return 0;
 }

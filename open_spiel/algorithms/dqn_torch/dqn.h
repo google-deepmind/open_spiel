@@ -66,10 +66,22 @@ struct DQNSettings {
 
 // TODO(lanctot): make this into a proper general RL env/agent API as we have
 // in the Python API. Then include tabular q-learning and Sarsa as well.
+
+// A general agent class with a Step function.
 class Agent {
  public:
   virtual Action Step(const State& state, bool is_evaluation = false) = 0;
 };
+
+// Run a number of episodes with the given agents and return the average return
+// for each agent over the episodes. Set is_evaluation to true when using this
+// for evaluation.
+std::vector<double> RunEpisodes(
+    std::mt19937* rng,
+    const Game& game,
+    const std::vector<Agent*>& agents,
+    int num_episodes,
+    bool is_evaluation);
 
 class RandomAgent : public Agent {
  public:
