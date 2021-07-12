@@ -100,8 +100,8 @@ class BotChannel {
   std::string buf_;         // Incomplete response buffer.
   bool time_out_ = false;
 
-  bool shutdown_ = false;
-  bool wait_for_message_ = true;
+  std::atomic<bool> shutdown_ = false;
+  std::atomic<bool> wait_for_message_ = true;
   int time_limit_ = 0;
   bool cancel_read_ = false;
   std::mutex mx_read;
@@ -109,7 +109,6 @@ class BotChannel {
   // Reading thread loops.
   friend void ReadLineFromChannelStdout(BotChannel* c);
   friend void ReadLineFromChannelStderr(BotChannel* c);
-
 };
 
 // Referee that communicates with the bots and provides them with observations

@@ -18,7 +18,7 @@ First, follow [OpenSpiel install instructions](../../docs/install.md) for
 installation from source and run all tests. As part of the test suite, there are
 also tests for the competition (`referee_test.cc`) that should pass.
 
-Then run the tournament in terminal:
+Then run the tournament in the console:
 ```
 $ # Set your own path
 $ OPEN_SPIEL_REPO=/home/michal/Code/open_spiel/
@@ -27,7 +27,7 @@ $ cd $OPEN_SPIEL_REPO/build/higc
 $ ./tournament --game="kuhn_poker" --num_matches=1 --executables="$OPEN_SPIEL_REPO/open_spiel/higc/bots/random_bot_py.sh,$OPEN_SPIEL_REPO/open_spiel/higc/bots/random_bot_cpp.sh"
 ```
 
-You should get an output similar to following:
+You should get an output similar to the following:
 
 ```
 Starting players.
