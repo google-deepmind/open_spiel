@@ -9,8 +9,8 @@ GameType.min_num_players = 2
 GameType.parameter_specification = []
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
-GameType.provides_observation_string = False
-GameType.provides_observation_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = False
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "matrix_rpsw"
@@ -27,6 +27,9 @@ UtilitySum() = 0.0
 InformationStateTensorShape() = [1]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 1
+ObservationTensorShape() = [1]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 1
 MaxGameLength() = 1
 ToString() = "matrix_rpsw()"
 
@@ -49,6 +52,10 @@ InformationStateString(0) = "Observing player: 0. Non-terminal"
 InformationStateString(1) = "Observing player: 1. Non-terminal"
 InformationStateTensor(0): ◯
 InformationStateTensor(1): ◯
+ObservationString(0) = "Non-terminal"
+ObservationString(1) = "Non-terminal"
+ObservationTensor(0): ◯
+ObservationTensor(1): ◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions(0) = [0, 1, 2, 3]
@@ -80,5 +87,9 @@ InformationStateString(0) = "Observing player: 0. Terminal. History string: 0, 2
 InformationStateString(1) = "Observing player: 1. Terminal. History string: 0, 2"
 InformationStateTensor(0): ◉
 InformationStateTensor(1): ◉
+ObservationString(0) = "Terminal. History string: 0, 2"
+ObservationString(1) = "Terminal. History string: 0, 2"
+ObservationTensor(0): ◉
+ObservationTensor(1): ◉
 Rewards() = [1.0, -1.0]
 Returns() = [1.0, -1.0]
