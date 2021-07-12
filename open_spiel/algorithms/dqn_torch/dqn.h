@@ -46,6 +46,7 @@ struct Transition {
 };
 
 struct DQNSettings {
+  int seed;
   bool use_observation;
   Player player_id;
   int state_representation_size;
@@ -70,6 +71,7 @@ struct DQNSettings {
 // A general agent class with a Step function.
 class Agent {
  public:
+  virtual ~Agent() = default;
   virtual Action Step(const State& state, bool is_evaluation = false) = 0;
 };
 
@@ -86,6 +88,7 @@ std::vector<double> RunEpisodes(
 class RandomAgent : public Agent {
  public:
   RandomAgent(Player player, int seed) : player_(player), rng_(seed) {}
+  virtual ~RandomAgent() = default;
   Action Step(const State& state, bool is_evaluation = false) override;
 
  private:
@@ -101,6 +104,9 @@ class DQN : public Agent {
   Action Step(const State& state,
               bool is_evaluation = false) override;
 
+  double GetEpsilon(bool is_evaluation, int power = 1.0);
+  int seed() const { return seed_; }
+
  private:
   std::vector<float> GetInfoState(const State& state,
                                   Player player_id,
@@ -111,9 +117,9 @@ class DQN : public Agent {
   Action EpsilonGreedy(std::vector<float> info_state,
                        std::vector<Action> legal_actions,
                        double epsilon);
-  double GetEpsilon(bool is_evaluation, int power = 1.0);
   void Learn();
 
+  int seed_;
   bool use_observation_;
   int player_id_;
   int num_actions_;

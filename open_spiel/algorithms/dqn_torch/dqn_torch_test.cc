@@ -31,11 +31,14 @@ namespace algorithms {
 namespace torch_dqn {
 namespace {
 
+constexpr int kSeed = 93879211;
+
 void TestSimpleGame() {
   std::shared_ptr<const Game> game = efg_game::LoadEFGGame(
       efg_game::GetSimpleForkEFGData());
   SPIEL_CHECK_TRUE(game != nullptr);
   DQNSettings settings = {
+    /*seed*/kSeed,
     /*use_observation*/game->GetType().provides_observation_tensor,
     /*player_id*/0,
     /*state_representation_size*/game->InformationStateTensorSize(),
@@ -74,6 +77,7 @@ void TestTicTacToe() {
   std::vector<int> hidden_layers = {16};
   for (int i = 0; i < 2; i++) {
     DQNSettings settings = {
+      /*seed*/kSeed + i,
       /*use_observation*/game->GetType().provides_observation_tensor,
       /*player_id*/i,
       /*state_representation_size*/game->ObservationTensorSize(),
@@ -108,6 +112,7 @@ void TestHanabi() {
   std::mt19937 rng_;
   for (int i = 0; i < 2; i++) {
     DQNSettings settings = {
+      /*seed*/kSeed + i,
       /*use_observation*/game->GetType().provides_observation_tensor,
       /*player_id*/i,
       /*state_representation_size*/game->InformationStateTensorSize(),
@@ -151,9 +156,12 @@ void TestHanabi() {
 }  // namespace algorithms
 }  // namespace open_spiel
 
+namespace torch_dqn = open_spiel::algorithms::torch_dqn;
+
 int main(int args, char** argv) {
-  open_spiel::algorithms::torch_dqn::TestSimpleGame();
-  open_spiel::algorithms::torch_dqn::TestTicTacToe();
-  open_spiel::algorithms::torch_dqn::TestHanabi();
+  torch::manual_seed(torch_dqn::kSeed);
+  torch_dqn::TestSimpleGame();
+  torch_dqn::TestTicTacToe();
+  torch_dqn::TestHanabi();
   return 0;
 }

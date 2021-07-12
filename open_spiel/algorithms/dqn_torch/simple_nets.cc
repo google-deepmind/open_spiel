@@ -25,7 +25,6 @@ namespace algorithms {
 namespace torch_dqn {
 
 constexpr double kSqrt2 = 1.4142135623730950488;
-constexpr int kSeed = 93879211;
 
 SimpleLinearImpl::SimpleLinearImpl(int input_size,
                                    int output_size,
@@ -33,7 +32,6 @@ SimpleLinearImpl::SimpleLinearImpl(int input_size,
     : simple_linear_(torch::nn::LinearOptions(/*in_features*/input_size,
                                               /*out_features*/output_size)),
       activate_relu_(activate_relu) {
-  torch::manual_seed(kSeed);
   double stddev = 1.0 / std::sqrt(input_size);
   double lower = -2.0 * stddev;
   double upper = 2.0 * stddev;
@@ -77,8 +75,8 @@ MLPImpl::MLPImpl(int input_size,
     layer_size = h_size;
   }
   layers_->push_back(SimpleLinear(/*input_size*/layer_size,
-                                  /*output_size*/output_size,
-                                  /*activate_final*/activate_final));
+                                  /*output_size*/output_size_,
+                                  /*activate_final*/activate_final_));
   register_module("layers_", layers_);
 }
 

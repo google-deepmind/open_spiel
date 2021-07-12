@@ -56,6 +56,19 @@ class NFGState : public SimMoveState {
     }
     return info_state;
   }
+  
+  std::string ObservationString(Player player) const override {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
+    std::string obs_str;
+    if (!IsTerminal()) {
+      absl::StrAppend(&obs_str, "Non-terminal");
+    } else {
+      absl::StrAppend(&obs_str,
+                      "Terminal. History string: ", HistoryString());
+    }
+    return obs_str;
+  }
 
   std::string ToString() const override {
     std::string result = "Normal form game default NFGState::ToString. ";
@@ -79,12 +92,27 @@ class NFGState : public SimMoveState {
       values[0] = 0;
     }
   }
+  
+  void ObservationTensor(Player player,
+                         absl::Span<float> values) const override {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LT(player, num_players_);
+    SPIEL_CHECK_EQ(values.size(), 1);
+    if (IsTerminal()) {
+      values[0] = 1;
+    } else {
+      values[0] = 0;
+    }
+  }
 };
 
 class NormalFormGame : public SimMoveGame {
  public:
   // Game has one state.
   std::vector<int> InformationStateTensorShape() const override {
+    return {1};
+  }
+  std::vector<int> ObservationTensorShape() const override {
     return {1};
   }
 
