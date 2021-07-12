@@ -135,6 +135,7 @@ class CFRAveragePolicy : public Policy {
   ActionsAndProbs GetStatePolicy(const State& state,
                                  Player player) const override;
   ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+  TabularPolicy AsTabular() const;
 
  private:
   const CFRInfoStateValuesTable& info_states_;
@@ -207,7 +208,7 @@ class CFRSolverBase {
   // Note: This can be quite large.
   TabularPolicy TabularAveragePolicy() const {
     CFRAveragePolicy policy(info_states_, nullptr);
-    return TabularPolicy(*game_, policy);
+    return policy.AsTabular();
   }
 
   // Computes the current policy, containing the policy for all players.

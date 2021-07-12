@@ -24,8 +24,6 @@ from open_spiel.python.algorithms import jpsro
 import pyspiel
 
 GAMES = (
-    "kuhn_poker_3p",
-    "trade_comm_2p_2i",
     "sheriff_2p_gabriele",
 )
 SWEEP_KWARGS = [
@@ -59,7 +57,7 @@ SWEEP_KWARGS = [
             ["mwcce"],
             [True, False])
 ]
-TEST_COUNT_LIMIT = 500
+TEST_COUNT_LIMIT = 100
 
 interval = len(SWEEP_KWARGS) // TEST_COUNT_LIMIT
 interval = interval if interval % 2 != 0 else interval + 1  # Odd interval.

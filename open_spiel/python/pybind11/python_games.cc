@@ -47,6 +47,12 @@ std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
                               NewInitialStateForPopulation, population);
 }
 
+int PyGame::MaxChanceNodesInHistory() const {
+  PYBIND11_OVERLOAD_PURE_NAME(int, Game,
+                              "max_chance_nodes_in_history",
+                              MaxChanceNodesInHistory);
+}
+
 const Observer& PyGame::default_observer() const {
   if (!default_observer_) default_observer_ = MakeObserver(kDefaultObsType, {});
   return *default_observer_;
@@ -138,6 +144,15 @@ std::unique_ptr<State> PyState::Clone() const {
   state->move_number_ = move_number_;
 
   return rv;
+}
+
+std::vector<std::string> PyState::DistributionSupport() {
+  PYBIND11_OVERLOAD_PURE_NAME(std::vector<std::string>, State,
+                              "distribution_support", DistributionSupport);
+}
+void PyState::UpdateDistribution(const std::vector<double>& distribution) {
+  PYBIND11_OVERLOAD_PURE_NAME(void, State, "update_distribution",
+                              UpdateDistribution, distribution);
 }
 
 // Register a Python game.

@@ -74,10 +74,13 @@ class BestResponse(value.ValueFunction):
         self._state_value[state_str] += prob * self.eval_state(new_state)
       return self._state_value[state_str]
     if state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
-      dist_to_register = state.distribution_support()
       dist = [
-          self._distribution.value_str(str_state)
-          for str_state in dist_to_register
+          # We need to default to 0, because
+          # `state.distribution_support()` might contain states that
+          # we did not reach yet. These states should be given a
+          # probability of 0.
+          self._distribution.value_str(str_state, 0.)
+          for str_state in state.distribution_support()
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
@@ -87,14 +90,9 @@ class BestResponse(value.ValueFunction):
       return self._state_value[state_str]
     else:
       assert int(state.current_player()) >= 0, "The player id should be >= 0"
-      state_legal_actions = state.legal_actions()
-      if state_legal_actions:
-        max_q = max(
-            self.eval_state(state.child(action))
-            for action in state.legal_actions())
-      else:
-        # If no legal action 0 should be played.
-        max_q = self.eval_state(state.child(0))
+      max_q = max(
+          self.eval_state(state.child(action))
+          for action in state.legal_actions())
       self._state_value[state_str] = state.rewards()[
           state.mean_field_population()] + max_q
       return self._state_value[state_str]

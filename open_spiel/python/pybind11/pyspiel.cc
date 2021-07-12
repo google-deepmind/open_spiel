@@ -237,9 +237,8 @@ PYBIND11_MODULE(pyspiel, m) {
   player_action.def_readonly("player", &State::PlayerAction::player)
       .def_readonly("action", &State::PlayerAction::action);
 
-  // TODO(author11) Remove py::dynamic_attr when
-  // https://github.com/pybind/pybind11/pull/2972 is submitted
-  py::classh<State, PyState> state(m, "State", py::dynamic_attr());
+  // https://github.com/pybind/pybind11/blob/smart_holder/README_smart_holder.rst
+  py::classh<State, PyState> state(m, "State");
   state.def(py::init<std::shared_ptr<const Game>>())
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
@@ -585,7 +584,7 @@ PYBIND11_MODULE(pyspiel, m) {
         py::arg("mask_test") = true,
         py::arg("state_checker_fn") =
             py::cpp_function(&testing::DefaultStateChecker),
-        "Run the C++ tests on a game");
+        py::arg("mean_field_population") = -1, "Run the C++ tests on a game");
 
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise

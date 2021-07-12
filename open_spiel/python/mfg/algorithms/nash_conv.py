@@ -28,27 +28,47 @@ from open_spiel.python.mfg.algorithms import policy_value
 class NashConv(object):
   """Computes the Nash Conv of a policy."""
 
-  def __init__(self, game, policy: policy_std.Policy):
+  def __init__(self, game, policy: policy_std.Policy, root_state=None):
     """Initializes the nash conv.
 
     Args:
       game: The game to analyze.
       policy: A `policy.Policy` object.
+      root_state: The state of the game at which to start. If `None`, the game
+        root state is used.
     """
     self._game = game
     self._policy = policy
+    if root_state is None:
+      self._root_states = game.new_initial_states()
+    else:
+      self._root_states = [root_state]
+    self._distrib = distribution.DistributionPolicy(
+        self._game, self._policy, root_state=root_state)
+    self._pi_value = policy_value.PolicyValue(
+        self._game, self._distrib, self._policy, root_state=root_state)
+    self._br_value = best_response_value.BestResponse(
+        self._game, self._distrib, root_state=root_state)
 
   def nash_conv(self):
     """Returns the nash conv.
 
     Returns:
-      A list of size `game.num_players()` representing the nash conv for each
-      population.
+      A float representing the nash conv for the policy.
     """
-    distrib = distribution.DistributionPolicy(self._game, self._policy)
-    pi_value = policy_value.PolicyValue(self._game, distrib, self._policy)
-    br_value = best_response_value.BestResponse(self._game, distrib)
+    return sum([
+        self._br_value.eval_state(state) - self._pi_value.eval_state(state)
+        for state in self._root_states
+    ])
+
+  def br_values(self):
+    """Returns the best response values to the policy distribution.
+
+    Returns:
+      A List[float] representing the best response values for a policy
+        distribution.
+    """
     return [
-        br_value.eval_state(state) - pi_value.eval_state(state)
-        for state in self._game.new_initial_states()
+        self._br_value.eval_state(state)
+        for state in self._root_states
     ]

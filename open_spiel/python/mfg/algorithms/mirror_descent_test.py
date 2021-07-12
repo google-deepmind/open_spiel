@@ -12,33 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for nash conv."""
+"""Tests for mirror descent."""
 
 from absl.testing import absltest
 
-from open_spiel.python import policy
+from open_spiel.python.mfg.algorithms import mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.games import crowd_modelling
 import pyspiel
 
 
-class BestResponseTest(absltest.TestCase):
+class MirrorDescentTest(absltest.TestCase):
 
-  def test_python_game(self):
-    """Checks if the NashConv is consistent through time."""
+  def test_fp_python_game(self):
+    """Checks if mirror descent works."""
     game = crowd_modelling.MFGCrowdModellingGame()
-    uniform_policy = policy.UniformRandomPolicy(game)
-    nash_conv_fp = nash_conv.NashConv(game, uniform_policy)
+    md = mirror_descent.MirrorDescent(game)
+    for _ in range(10):
+      md.iteration()
+    md_policy = md.get_policy()
+    nash_conv_md = nash_conv.NashConv(game, md_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 2.8135365543870385)
+    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.2730324915546056)
 
-  def test_cpp_game(self):
-    """Checks if the NashConv is consistent through time."""
+  def test_fp_cpp_game(self):
+    """Checks if mirror descent works."""
     game = pyspiel.load_game("mfg_crowd_modelling")
-    uniform_policy = policy.UniformRandomPolicy(game)
-    nash_conv_fp = nash_conv.NashConv(game, uniform_policy)
+    md = mirror_descent.MirrorDescent(game)
+    for _ in range(10):
+      md.iteration()
+    md_policy = md.get_policy()
+    nash_conv_md = nash_conv.NashConv(game, md_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 2.8135365543870385)
+    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.2730324915546056)
 
 
 if __name__ == "__main__":

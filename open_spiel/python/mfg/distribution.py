@@ -50,11 +50,13 @@ class Distribution(object):
     """
     raise NotImplementedError()
 
-  def value_str(self, state_str):
+  def value_str(self, state_str, default_value=None):
     """Returns the probability of the distribution on the state string given.
 
     Args:
       state_str: A string.
+      default_value: If not None, return this value if the state is not in the
+        support of the distribution.
 
     Returns:
       A `float`.
@@ -71,4 +73,3 @@ class Distribution(object):
       Float: probability.
     """
     return self.value(state)
-

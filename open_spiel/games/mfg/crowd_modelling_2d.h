@@ -167,7 +167,7 @@ class CrowdModelling2dGame : public Game {
   }
   std::vector<int> ObservationTensorShape() const override;
   int MaxChanceOutcomes() const override {
-    return std::max(size_, kNumChanceActions);
+    return std::max(size_ * size_, kNumChanceActions);
   }
   std::unique_ptr<State> DeserializeState(
       const std::string& str) const override;

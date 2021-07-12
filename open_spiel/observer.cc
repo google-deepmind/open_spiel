@@ -225,6 +225,23 @@ void Observation::SetFrom(const State& state, int player) {
   observer_->WriteTensor(state, player, &allocator);
 }
 
+std::vector<TensorInfoWithData> Observation::tensors() const {
+  std::vector<TensorInfoWithData> result;
+  result.reserve(tensors_.size());
+  int start = 0;
+  for (const TensorInfo& info : tensors_) {
+    const int size = absl::c_accumulate(info.shape, 1, std::multiplies<int>());
+    TensorInfoWithData tensor_with_data;
+    // Copy the TensorInfo base part.
+    tensor_with_data.name = info.name;
+    tensor_with_data.shape = info.shape;
+    tensor_with_data.data = absl::MakeSpan(buffer_).subspan(start, size);
+    result.emplace_back(std::move(tensor_with_data));
+    start += size;
+  }
+  return result;
+}
+
 // We may in the future support multiple compression schemes.
 // The Compress() method should select the most effective scheme adaptively.
 enum CompressionScheme : char {

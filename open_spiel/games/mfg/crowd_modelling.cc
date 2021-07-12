@@ -132,12 +132,12 @@ void CrowdModellingState::DoApplyAction(Action action) {
   } else if (current_player_ == kChancePlayerId) {
     x_ = (x_ + kActionToMove.at(action) + size_) % size_;
     ++t_;
-    current_player_ = 0;
+    current_player_ = kMeanFieldPlayerId;
   } else {
     SPIEL_CHECK_EQ(current_player_, 0);
     x_ = (x_ + kActionToMove.at(action) + size_) % size_;
     last_action_ = action;
-    current_player_ = kMeanFieldPlayerId;
+    current_player_ = kChancePlayerId;
   }
 }
 
@@ -153,7 +153,7 @@ std::vector<std::string> CrowdModellingState::DistributionSupport() {
   std::vector<std::string> support;
   support.reserve(size_);
   for (int x = 0; x < size_; ++x) {
-    support.push_back(StateToString(x, t_, 0, false));
+    support.push_back(StateToString(x, t_, kMeanFieldPlayerId, false));
   }
   return support;
 }
@@ -163,7 +163,7 @@ void CrowdModellingState::UpdateDistribution(
   SPIEL_CHECK_EQ(current_player_, kMeanFieldPlayerId);
   SPIEL_CHECK_EQ(distribution.size(), size_);
   distribution_ = distribution;
-  current_player_ = kChancePlayerId;
+  current_player_ = kDefaultPlayerId;
 }
 
 bool CrowdModellingState::IsTerminal() const { return t_ >= horizon_; }

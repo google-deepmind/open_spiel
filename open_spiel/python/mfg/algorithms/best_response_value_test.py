@@ -32,7 +32,7 @@ class BestResponseTest(absltest.TestCase):
     dist = distribution.DistributionPolicy(game, uniform_policy)
     br_value = best_response_value.BestResponse(game, dist)
     br_val = br_value(game.new_initial_state())
-    self.assertAlmostEqual(br_val, 33.09846599803991)
+    self.assertAlmostEqual(br_val, 30.029387484327486)
 
   def test_cpp_game(self):
     """Checks if the value of a policy computation works."""
@@ -41,7 +41,7 @@ class BestResponseTest(absltest.TestCase):
     dist = distribution.DistributionPolicy(game, uniform_policy)
     br_value = best_response_value.BestResponse(game, dist)
     br_val = br_value(game.new_initial_state())
-    self.assertAlmostEqual(br_val, 33.09846599803991)
+    self.assertAlmostEqual(br_val, 30.029387484327486)
 
 
 if __name__ == "__main__":

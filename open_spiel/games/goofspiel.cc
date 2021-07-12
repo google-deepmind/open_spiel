@@ -110,7 +110,10 @@ class GoofspielObserver : public Observer {
         iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer;
 
     // Conditionally write each field.
-    if (pub_info && !perf_rec) WriteCurrentPointCard(game, state, allocator);
+    if (pub_info && !perf_rec) {
+      WriteCurrentPointCard(game, state, allocator);
+      WriteRemainingPointCards(game, state, allocator);
+    }
     if (pub_info) WritePointsTotal(game, state, player, allocator);
     if (imp_info && priv_one) WritePlayerHand(game, state, player, allocator);
     if (imp_info && pub_info) WriteWinSequence(game, state, allocator);
@@ -151,6 +154,7 @@ class GoofspielObserver : public Observer {
     }
     if (imp_info && priv_one && !perf_rec) {  // Observation
       StringCurrentPointCard(state, &result);
+      StringRemainingPointCards(state, &result);
       StringPoints(game, state, &result);
       StringPlayerHand(game, state, player, &result);
       StringWinSequence(state, &result);
@@ -159,7 +163,10 @@ class GoofspielObserver : public Observer {
 
     // Remaining public observation requests.
     if (pub_info && perf_rec) StringPointCardSequence(state, &result);
-    if (pub_info && !perf_rec) StringCurrentPointCard(state, &result);
+    if (pub_info && !perf_rec) {
+      StringCurrentPointCard(state, &result);
+      StringRemainingPointCards(state, &result);
+    }
     if (pub_info && !imp_info) StringPlayersHands(game, state, &result);
     if (pub_info) {
       StringWinSequence(state, &result);
@@ -206,6 +213,17 @@ class GoofspielObserver : public Observer {
     for (int i = 0; i < state.win_sequence_.size(); ++i) {
       if (state.win_sequence_[i] != kInvalidPlayer)
         out.at(i, state.win_sequence_[i]) = 1.0;
+    }
+  }
+
+  void WriteRemainingPointCards(const GoofspielGame& game,
+                                const GoofspielState& state,
+                                Allocator* allocator) const {
+    auto out = allocator->Get("remaining_point_cards", {game.NumCards()});
+    std::set<int> played(state.point_card_sequence_.begin(),
+                         state.point_card_sequence_.end());
+    for (int i = 0; i < state.num_cards_; ++i) {
+      if (played.count(i) == 0) out.at(i) = 1.0;
     }
   }
 
@@ -274,6 +292,16 @@ class GoofspielObserver : public Observer {
     absl::StrAppend(result, "Point card sequence: ");
     for (int i = 0; i < state.point_card_sequence_.size(); ++i) {
       absl::StrAppend(result, 1 + state.point_card_sequence_[i], " ");
+    }
+    absl::StrAppend(result, "\n");
+  }
+  void StringRemainingPointCards(const GoofspielState& state,
+                                 std::string* result) const {
+    std::set<int> played(state.point_card_sequence_.begin(),
+                         state.point_card_sequence_.end());
+    absl::StrAppend(result, "Remaining Point Cards: ");
+    for (int i = 0; i < state.num_cards_; ++i) {
+      if (played.count(i) == 0) absl::StrAppend(result, 1 + i);
     }
     absl::StrAppend(result, "\n");
   }
@@ -727,6 +755,8 @@ std::vector<int> GoofspielGame::ObservationTensorShape() const {
   if (impinfo_) {
     return {// 1-hot bit to encode the current point card
             num_cards_ +
+            // many-hot bit sequence to encode the remaining point cards
+            num_cards_ +
             // 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + N = N*(N+1) / 2, but must add one to include 0 points.
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
@@ -737,6 +767,8 @@ std::vector<int> GoofspielGame::ObservationTensorShape() const {
             num_turns_ * num_players_};
   } else {
     return {// 1-hot bit to encode the current point card
+            num_cards_ +
+            // many-hot bit sequence to encode the remaining point cards
             num_cards_ +
             // 1-hot bit vector for point total per player; upper bound is 1 +
             // 2 + ... + N = N*(N+1) / 2, but must add one to include 0 points.

@@ -24,7 +24,7 @@ from open_spiel.python.mfg.games import predator_prey
 import pyspiel
 
 
-class MFGCrowdModellingGameTest(parameterized.TestCase):
+class MFGPredatorPreyGameTest(parameterized.TestCase):
 
   def test_load(self):
     game = pyspiel.load_game('python_mfg_predator_prey')
@@ -61,14 +61,6 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
     self.assertEqual(game.size, 20)
     self.assertEqual(game.horizon, 100)
 
-  def check_cloning(self, state):
-    cloned = state.clone()
-    self.assertEqual(str(cloned), str(state))
-    self.assertEqual(cloned._distribution, state._distribution)
-    self.assertEqual(cloned.current_player(), state.current_player())
-    self.assertEqual(cloned.size, state.size)
-    self.assertEqual(cloned.horizon, state.horizon)
-
   @parameterized.parameters(
       {'population': 0},
       {'population': 1},
@@ -76,39 +68,18 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
   )
   def test_random_game(self, population):
     """Tests basic API functions."""
-    np.random.seed(7)
     horizon = 10
     size = 20
     game = predator_prey.MFGPredatorPreyGame(params={
         'horizon': horizon,
         'size': size,
     })
-    state = game.new_initial_state_for_population(population)
-    t = 0
-    while not state.is_terminal():
-      if state.current_player() == pyspiel.PlayerId.CHANCE:
-        actions, probs = zip(*state.chance_outcomes())
-        action = np.random.choice(actions, p=probs)
-        self.check_cloning(state)
-        self.assertEqual(
-            len(state.legal_actions()), len(state.chance_outcomes()))
-        state.apply_action(action)
-      elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
-        self.assertEqual(state.legal_actions(), [])
-        self.check_cloning(state)
-        num_states = len(state.distribution_support())
-        state.update_distribution([1 / num_states] * num_states)
-      else:
-        self.assertEqual(state.current_player(), population)
-        self.check_cloning(state)
-        state.observation_string()
-        state.information_state_string()
-        legal_actions = state.legal_actions()
-        action = np.random.choice(legal_actions)
-        state.apply_action(action)
-        t += 1
-
-    self.assertEqual(t, horizon)
+    pyspiel.random_sim_test(
+        game,
+        num_sims=10,
+        serialize=False,
+        verbose=True,
+        mean_field_population=population)
 
   @parameterized.parameters(
       {
@@ -119,6 +90,7 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
               ]),
           'population':
               0,
+          'players': 2,
           'initial_pos':
               np.array([0, 0]),
           'distributions': [
@@ -148,6 +120,7 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
               ]),
           'population':
               2,
+          'players': 3,
           'initial_pos':
               np.array([1, 1]),
           'distributions': [
@@ -175,12 +148,13 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
               ]),
       },
   )
-  def test_rewards(self, reward_matrix, population, initial_pos, distributions,
-                   expected_rewards):
+  def test_rewards(self, reward_matrix, players, population, initial_pos,
+                   distributions, expected_rewards):
     game = pyspiel.load_game(
         'python_mfg_predator_prey', {
             'size': 2,
-            'reward_matrix': ' '.join(str(v) for v in reward_matrix.flatten())
+            'reward_matrix': ' '.join(str(v) for v in reward_matrix.flatten()),
+            'players': players
         })
     state = game.new_initial_state_for_population(population)
     # Initial chance node.
@@ -190,6 +164,8 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
     npt.assert_array_equal(state.pos, initial_pos)
     state.apply_action(state._NEUTRAL_ACTION)
     npt.assert_array_equal(state.pos, initial_pos)
+    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
+    state.apply_action(state._NEUTRAL_ACTION)
     self.assertEqual(state.current_player(), pyspiel.PlayerId.MEAN_FIELD)
 
     # Maps states (in string representation) to their proba.
@@ -197,14 +173,15 @@ class MFGCrowdModellingGameTest(parameterized.TestCase):
     for x in range(state.size):
       for y in range(state.size):
         for pop in range(len(reward_matrix)):
-          dist[state.state_to_str(
-              np.array([x, y]), state.t, pop,
-              player_id=pop)] = distributions[pop][y][x]
+          state_str = state.state_to_str(
+              np.array([x, y]),
+              state.t,
+              pop,
+              player_id=pyspiel.PlayerId.MEAN_FIELD)
+          dist[state_str] = distributions[pop][y][x]
     support = state.distribution_support()
     state.update_distribution([dist[s] for s in support])
 
-    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
-    state.apply_action(state._NEUTRAL_ACTION)
     # Decision node where we get a reward.
     self.assertEqual(state.current_player(), population)
     npt.assert_array_equal(state.rewards(), expected_rewards)

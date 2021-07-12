@@ -25,6 +25,7 @@
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/algorithms/outcome_sampling_mccfr.h"
+#include "open_spiel/algorithms/tabular_best_response_mdp.h"
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -36,6 +37,8 @@ namespace {
 using ::open_spiel::algorithms::Exploitability;
 using ::open_spiel::algorithms::NashConv;
 using ::open_spiel::algorithms::TabularBestResponse;
+using ::open_spiel::algorithms::TabularBestResponseMDP;
+using ::open_spiel::algorithms::TabularBestResponseMDPInfo;
 
 namespace py = ::pybind11;
 }  // namespace
@@ -108,6 +111,8 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy)
+      .def("tabular_average_policy",
+           &open_spiel::algorithms::CFRSolver::TabularAveragePolicy)
       .def(py::pickle(
           [](const open_spiel::algorithms::CFRSolver& solver) {  // __getstate__
             return solver.Serialize();
@@ -192,6 +197,24 @@ void init_pyspiel_policy(py::module& m) {
             return open_spiel::algorithms::
                 DeserializeOutcomeSamplingMCCFRSolver(serialized);
           }));
+
+  py::class_<TabularBestResponseMDPInfo>(m, "TabularBestResponseMDPInfo")
+      .def_readonly("br_values", &TabularBestResponseMDPInfo::br_values)
+      .def_readonly("br_policies", &TabularBestResponseMDPInfo::br_policies)
+      .def_readonly("on_policy_values",
+                    &TabularBestResponseMDPInfo::on_policy_values)
+      .def_readonly("deviation_incentives",
+                    &TabularBestResponseMDPInfo::deviation_incentives)
+      .def_readonly("nash_conv", &TabularBestResponseMDPInfo::nash_conv)
+      .def_readonly("exploitability",
+                    &TabularBestResponseMDPInfo::exploitability);
+
+  py::class_<TabularBestResponseMDP>(m, "TabularBestResponseMDP")
+      .def(py::init<const open_spiel::Game&, const open_spiel::Policy&>())
+      .def("compute_best_responses",
+           &TabularBestResponseMDP::ComputeBestResponses)
+      .def("nash_conv", &TabularBestResponseMDP::NashConv)
+      .def("exploitability", &TabularBestResponseMDP::Exploitability);
 
   m.def("expected_returns",
         py::overload_cast<const State&, const std::vector<const Policy*>&, int,

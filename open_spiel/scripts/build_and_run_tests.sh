@@ -42,7 +42,7 @@ ArgsLibAddArg install string "default" 'Whether to install requirements.txt pack
 ArgsLibAddArg system_wide_packages bool false 'Whether to use --system-site-packages on the virtualenv.'
 ArgsLibAddArg build_with_pip bool false 'Whether to use "python3 -m pip install ." or the usual cmake&make and ctest.'
 ArgsLibAddArg build_only bool false 'Builds only the library, without running tests.'
-ArgsLibAddArg test_only string "all" 'Builds and runs the specified test only (use "all" to run all tests)'
+ArgsLibAddArg test_only string "all" 'Build and runs the tests matching this string (use "all" to run all tests)'
 ArgsLibAddArg build_dir string "build" 'Location of the build directory.'
 ArgsLibAddArg num_threads int -1 'Number of threads to use when paralellizing build / tests. (Defaults to 4*<number of CPUs>)'
 ArgsLibParse $@
@@ -187,7 +187,6 @@ if [[ $ARG_build_with_pip == "true" ]]; then
   fi
 else
   cd $BUILD_DIR
-
   echo "Building and testing in $PWD using 'python' (version $PYVERSION)."
 
   pwd=`pwd`
@@ -217,8 +216,8 @@ else
       echo "Building Go API"
       make -j$MAKE_NUM_PROCS gospiel
     else
-      echo "Building $ARG_test_only"
-      make -j$MAKE_NUM_PROCS $ARG_test_only
+      echo "Building everything"
+      make -j$MAKE_NUM_PROCS
     fi
 
     if [[ $ARG_build_only == "true" ]]; then
@@ -228,7 +227,7 @@ else
         execute_export_graph
       fi
 
-      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "^$ARG_test_only\$" ../open_spiel; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "$ARG_test_only" ../open_spiel; then
         print_tests_passed
       else
         print_tests_failed

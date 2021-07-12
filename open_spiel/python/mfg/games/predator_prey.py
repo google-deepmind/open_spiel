@@ -43,12 +43,14 @@ _DEFAULT_HORIZON = 10
 _NUM_ACTIONS = 5
 _NUM_CHANCE = 5
 _DEFAULT_REWARD_MATRIX = np.array([[0, -1, 1], [1, 0, -1], [-1, 1, 0]])
+_DEFAULT_NUM_PLAYERS = 3
 
 _DEFAULT_GEOMETRY = Geometry.SQUARE
 
 _DEFAULT_PARAMS = {
     "size": _DEFAULT_SIZE,
     "horizon": _DEFAULT_HORIZON,
+    "players": _DEFAULT_NUM_PLAYERS,
     # The reward matrix is represented as a string containing a
     # space-separated list of values.
     # Its size defines the number of populations in the mean field game.
@@ -87,7 +89,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.horizon = get_param("horizon", params)
     flat_reward_matrix = np.fromstring(
         get_param("reward_matrix", params), dtype=np.float, sep=" ")
-    num_players = int(round(np.sqrt(len(flat_reward_matrix))))
+    num_players = get_param("players", params)
     if len(flat_reward_matrix) != num_players**2:
       raise ValueError(
           f"Reward matrix passed in flat representation does not represent a "
@@ -96,7 +98,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.geometry = get_param("geometry", params)
     game_info = pyspiel.GameInfo(
         num_distinct_actions=_NUM_ACTIONS,
-        max_chance_outcomes=max(self.size, _NUM_CHANCE),
+        max_chance_outcomes=max(self.size * self.size, _NUM_CHANCE),
         num_players=num_players,
         min_utility=-np.inf,
         max_utility=+np.inf,
@@ -113,6 +115,10 @@ class MFGPredatorPreyGame(pyspiel.Game):
     instantiated with new_initial_state_for_population().
     """
     return MFGPredatorPreyState(self)
+
+  def max_chance_nodes_in_history(self):
+    """Maximun chance nodes in game history."""
+    return self.horizon + 1
 
   def new_initial_state_for_population(self, population):
     """State corresponding to the start of a game for a given population."""
@@ -279,13 +285,13 @@ class MFGPredatorPreyState(pyspiel.State):
     elif self._player_id == pyspiel.PlayerId.CHANCE:
       self.update_pos(action)
       self._t += 1
-      self._player_id = self._population
+      self._player_id = pyspiel.PlayerId.MEAN_FIELD
     elif int(self._player_id) >= 0:
       assert self._player_id == self._population, (
           f"Invalid decision player id {self._player_id} "
           f"expected {self._population}")
       self.update_pos(action)
-      self._player_id = pyspiel.PlayerId.MEAN_FIELD
+      self._player_id = pyspiel.PlayerId.CHANCE
     else:
       raise ValueError(f"Unexpected state. Player id: {self._player_id}")
 
@@ -304,7 +310,10 @@ class MFGPredatorPreyState(pyspiel.State):
         for population in range(self.num_players()):
           support.append(
               self.state_to_str(
-                  np.array([x, y]), self._t, population, player_id=population))
+                  np.array([x, y]),
+                  self._t,
+                  population,
+                  player_id=pyspiel.PlayerId.MEAN_FIELD))
     return support
 
   def get_pos_proba(self, pos: np.ndarray, population: int) -> float:
@@ -344,7 +353,7 @@ class MFGPredatorPreyState(pyspiel.State):
       raise ValueError(
           "update_distribution should only be called at a MEAN_FIELD state.")
     self._distribution = distribution.copy()
-    self._player_id = pyspiel.PlayerId.CHANCE
+    self._player_id = self._population
 
   def is_terminal(self):
     """Returns True if the game is over."""

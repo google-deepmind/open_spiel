@@ -26,6 +26,7 @@ from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import fictitious_play
 from open_spiel.python.mfg.algorithms import greedy_policy
+from open_spiel.python.mfg.algorithms import mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
 import pyspiel
@@ -111,6 +112,14 @@ def main(argv: Sequence[str]) -> None:
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(mfg_game, fp_policy)
     print('Nashconv of the current FP policy', nash_conv_fp.nash_conv())
+  print('md')
+  md = mirror_descent.MirrorDescent(mfg_game)
+  for j in range(10):
+    print('Iteration', j, 'of mirror descent')
+    md.iteration()
+    md_policy = md.get_policy()
+    nash_conv_md = nash_conv.NashConv(mfg_game, md_policy)
+    print('Nashconv of the current MD policy', nash_conv_md.nash_conv())
 
 
 if __name__ == '__main__':

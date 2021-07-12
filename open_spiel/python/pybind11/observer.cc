@@ -35,12 +35,29 @@ void init_pyspiel_observer(py::module& m) {
       .def_readonly("shape", &TensorInfo::shape)
       .def("__str__", &TensorInfo::DebugString);
 
+  py::class_<TensorInfoWithData>(m, "TensorInfoWithData")
+      .def_readonly("name", &TensorInfoWithData::name)
+      .def_readonly("shape", &TensorInfoWithData::shape)
+      // .def_readonly("data", &TensorInfoWithData::data)
+      .def_property_readonly("data",
+                             [](const TensorInfoWithData& tensor) {
+                               // absl::Span requires pybind11_abseil which
+                               // open spiel forbids. Thus copy the data
+                               // and expose a vector through pybind.
+                               std::vector<float> data(
+                                   tensor.data.data(),
+                                   tensor.data.data() + tensor.data.size());
+                               return data;
+                             })
+      .def("__str__", &TensorInfoWithData::DebugString);
+
   // C++ Observation, intended only for the Python Observation class, not
   // for general Python code.
   py::class_<Observation>(m, "_Observation", py::buffer_protocol())
       .def(py::init<const Game&, std::shared_ptr<Observer>>(), py::arg("game"),
            py::arg("observer"))
       .def("tensor_info", &Observation::tensor_info)
+      .def("tensors", &Observation::tensors)
       .def("string_from", &Observation::StringFrom)
       .def("set_from", &Observation::SetFrom)
       .def("has_string", &Observation::HasString)

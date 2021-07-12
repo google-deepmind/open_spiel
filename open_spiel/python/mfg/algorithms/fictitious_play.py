@@ -52,13 +52,18 @@ class MergedPolicy(policy_std.Policy):
 
   def action_probabilities(self, state, player_id=None):
     action_prob = []
-    for a in state.legal_actions():
+    legal = state.legal_actions()
+    num_legal = len(legal)
+    for a in legal:
       merged_pi = 0.0
       norm_merged_pi = 0.0
       for p, d, w in zip(self._policies, self._distributions, self._weights):
         merged_pi += w * d(state) * p(state)[a]
         norm_merged_pi += w * d(state)
-      action_prob.append((a, merged_pi/norm_merged_pi))
+      if norm_merged_pi > 0.0:
+        action_prob.append((a, merged_pi/norm_merged_pi))
+      else:
+        action_prob.append((a, 1.0/num_legal))
     return dict(action_prob)
 
 
