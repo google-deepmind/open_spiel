@@ -221,12 +221,12 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   int seed = absl::GetFlag(FLAGS_seed);
   torch::manual_seed(seed);
-  //torch_dqn::DQNCatch(seed, /*total_episodes*/2000,
-  //                    /*report_every*/250, /*num_eval_episodes*/100);
-  //torch_dqn::SelfPlayTicTacToe(seed,
-  //                             /*total_episodes*/100000,
-  //                             /*report_every*/1000,
-  //                            /*num_eval_episodes*/100);
+  torch_dqn::DQNCatch(seed, /*total_episodes*/2000,
+                      /*report_every*/250, /*num_eval_episodes*/100);
+  torch_dqn::SelfPlayTicTacToe(seed,
+                               /*total_episodes*/100000,
+                               /*report_every*/1000,
+                               /*num_eval_episodes*/100);
   torch_dqn::SelfPlayPrisonersDilemma(
       seed, /*total_episodes*/50000,
       /*report_every*/100, /*num_eval_episodes*/1);
