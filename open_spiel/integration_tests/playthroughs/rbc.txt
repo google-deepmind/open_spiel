@@ -24,9 +24,9 @@ NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-ObservationTensorShape() = pieces_black: [17], pieces_white: [17], phase: [2], illegal_move: [2], capture: [2], private_k_pieces: [8, 8], private_q_pieces: [8, 8], private_r_pieces: [8, 8], private_b_pieces: [8, 8], private_n_pieces: [8, 8], private_p_pieces: [8, 8], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [8, 8], private_sense_Q_pieces: [8, 8], private_sense_R_pieces: [8, 8], private_sense_B_pieces: [8, 8], private_sense_N_pieces: [8, 8], private_sense_P_pieces: [8, 8]
+ObservationTensorShape() = pieces_black: [17], pieces_white: [17], phase: [2], illegal_move: [2], capture: [2], side_to_play: [2], private_k_pieces: [8, 8], private_q_pieces: [8, 8], private_r_pieces: [8, 8], private_b_pieces: [8, 8], private_n_pieces: [8, 8], private_p_pieces: [8, 8], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [8, 8], private_sense_Q_pieces: [8, 8], private_sense_R_pieces: [8, 8], private_sense_B_pieces: [8, 8], private_sense_N_pieces: [8, 8], private_sense_P_pieces: [8, 8]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 812
+ObservationTensorSize() = 814
 MaxGameLength() = 17695
 ToString() = "rbc()"
 
@@ -45,6 +45,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -148,6 +149,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -269,6 +271,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◉◯
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -372,6 +375,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◉◯
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -493,6 +497,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -596,6 +601,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -717,6 +723,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◉◯
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -820,6 +827,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◉◯
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -941,6 +949,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1044,6 +1053,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1167,8 +1177,9 @@ ObservationString(1) = "????????/????????/????????/????????/?P??????/????????/P?
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1270,8 +1281,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1445,6 +1457,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1548,6 +1561,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1673,6 +1687,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1776,6 +1791,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -1965,6 +1981,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2068,6 +2085,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2193,6 +2211,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2296,6 +2315,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2471,20 +2491,21 @@ action: 18
 action: 3155
 
 # State 60
-# 1nb1kb1r/4n1p1/rpppp3/1Q5p/3BPp2/3P2PN/P1PN1P1P/R3KB1R w KQk - 0 14
+# 1nb1kb1r/4n1p1/rpppp3/1Q5p/3BPp2/3P2PN/P1PN1P1P/R3KB1R w KQk - 0 16
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "?nb?kb?r/????n?p?/rpppp???/???????p/?????p??/????????/????????/???????? w k - 0 14"
-ObservationString(1) = "????????/????????/????????/?Q??????/???BP???/???P??PN/P?PN?P?P/R???KB?R w KQ - 0 14"
+ObservationString(0) = "?nb?kb?r/????n?p?/rpppp???/???????p/?????p??/????????/????????/???????? w k - 0 16"
+ObservationString(1) = "????????/????????/????????/?Q??????/???BP???/???P??PN/P?PN?P?P/R???KB?R w KQ - 0 16"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2588,6 +2609,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2699,20 +2721,21 @@ action: 35
 action: 2014
 
 # State 62
-# 1nb1kb1r/4n1p1/rpppp3/1Q5p/4Pp2/2BP2PN/P1PN1P1P/R3KB1R b KQk - 1 14
+# 1nb1kb1r/4n1p1/rpppp3/1Q5p/4Pp2/2BP2PN/P1PN1P1P/R3KB1R b KQk - 1 16
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "?nb?kb?r/????n?p?/rpppp???/???????p/?????p??/????????/????????/???????? b k - 1 14"
-ObservationString(1) = "????????/????????/????????/?Q??????/????P???/??BP??PN/P?PN?P?P/R???KB?R b KQ - 1 14"
+ObservationString(0) = "?nb?kb?r/????n?p?/rpppp???/???????p/?????p??/????????/????????/???????? b k - 1 16"
+ObservationString(1) = "????????/????????/????????/?Q??????/????P???/??BP??PN/P?PN?P?P/R???KB?R b KQ - 1 16"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2816,6 +2839,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -2991,20 +3015,21 @@ action: 5
 action: 4510
 
 # State 80
-# 1n2kb1r/r3n1Q1/1ppp4/8/4Pp1p/2BP2P1/2PN1PbP/R3KB1R w KQk - 1 19
+# 1n2kb1r/r3n1Q1/1ppp4/8/4Pp1p/2BP2P1/2PN1PbP/R3KB1R w KQk - 1 21
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "?n??kb?r/r???n???/?ppp????/????????/?????p?p/????????/??????b?/???????? w k - 1 19"
-ObservationString(1) = "????????/??????Q?/????????/????????/????P???/??BP??P?/??PN?P?P/R???KB?R w KQ - 1 19"
+ObservationString(0) = "?n??kb?r/r???n???/?ppp????/????????/?????p?p/????????/??????b?/???????? w k - 1 21"
+ObservationString(1) = "????????/??????Q?/????????/????????/????P???/??BP??P?/??PN?P?P/R???KB?R w KQ - 1 21"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -3108,6 +3133,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -3219,20 +3245,21 @@ action: 26
 action: 3707
 
 # State 82
-# 1n2kb1r/r3n1Q1/1ppp4/8/4PP1p/2BP4/2PN1PbP/R3KB1R b KQk - 0 19
+# 1n2kb1r/r3n1Q1/1ppp4/8/4PP1p/2BP4/2PN1PbP/R3KB1R b KQk - 0 21
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "?n??kb?r/r???n???/?ppp????/????????/???????p/????????/??????b?/???????? b k - 0 19"
-ObservationString(1) = "????????/??????Q?/????????/????????/????PP??/??BP????/??PN?P?P/R???KB?R b KQ - 0 19"
+ObservationString(0) = "?n??kb?r/r???n???/?ppp????/????????/???????p/????????/??????b?/???????? b k - 0 21"
+ObservationString(1) = "????????/??????Q?/????????/????????/????PP??/??BP????/??PN?P?P/R???KB?R b KQ - 0 21"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -3336,6 +3363,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -3511,20 +3539,21 @@ action: 22
 action: 787
 
 # State 100
-# 1n2kb1Q/4n3/rppp3r/8/4bP1p/2BP3P/2PN1P2/2KR1B2 w - - 3 23
+# 1n2kb1Q/4n3/rppp3r/8/4bP1p/2BP3P/2PN1P2/2KR1B2 w - - 3 26
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "?n??kb??/????n???/rppp???r/????????/????b??p/????????/????????/???????? w - - 3 23"
-ObservationString(1) = "???????Q/????????/????????/????????/?????P??/??BP???P/??PN?P??/??KR?B?? w - - 3 23"
+ObservationString(0) = "?n??kb??/????n???/rppp???r/????????/????b??p/????????/????????/???????? w - - 3 26"
+ObservationString(1) = "???????Q/????????/????????/????????/?????P??/??BP???P/??PN?P??/??KR?B?? w - - 3 26"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -3626,8 +3655,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◉◯◯◯◯◯◯◯
@@ -3739,20 +3769,21 @@ action: 20
 action: 4250
 
 # State 102
-# 1n2kb1Q/4n3/rppp3r/8/4bP1p/2BP3P/2PN1P2/2KR1B2 b - - 3 23
+# 1n2kb1Q/4n3/rppp3r/8/4bP1p/2BP3P/2PN1P2/2KR1B2 b - - 3 26
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "?n??kb??/????n???/rppp???r/????????/????b??p/????????/????????/???????? b - - 3 23"
-ObservationString(1) = "???????Q/????????/????????/????????/?????P??/??BP???P/??PN?P??/??KR?B?? b - - 3 23"
+ObservationString(0) = "?n??kb??/????n???/rppp???r/????????/????b??p/????????/????????/???????? b - - 3 26"
+ObservationString(1) = "???????Q/????????/????????/????????/?????P??/??BP???P/??PN?P??/??KR?B?? b - - 3 26"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -3854,8 +3885,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◉◯◯◯◯◯◯◯
@@ -4031,20 +4063,21 @@ action: 7
 action: 4248
 
 # State 120
-# 1n2kQ1r/r3n3/1ppp1B2/8/4bP1p/2P4P/3N1P2/2KR1B2 w - - 1 28
+# 1n2kQ1r/r3n3/1ppp1B2/8/4bP1p/2P4P/3N1P2/2KR1B2 w - - 1 31
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250, 14, 164, 26, 1359, 5, 2683, 12, 2672, 29, 377, 24, 4622, 0, 2175, 12, 1257, 7, 4248]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250, 14, 164, 26, 1359, 5, 2683, 12, 2672, 29, 377, 24, 4622, 0, 2175, 12, 1257, 7, 4248"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "?n??k??r/r???n???/?ppp????/????????/????b??p/????????/????????/???????? w - - 1 28"
-ObservationString(1) = "?????Q??/????????/?????B??/????????/?????P??/??P????P/???N?P??/??KR?B?? w - - 1 28"
+ObservationString(0) = "?n??k??r/r???n???/?ppp????/????????/????b??p/????????/????????/???????? w - - 1 31"
+ObservationString(1) = "?????Q??/????????/?????B??/????????/?????P??/??P????P/???N?P??/??KR?B?? w - - 1 31"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -4148,6 +4181,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◉◯◯◯◯◯◯◯
@@ -4259,20 +4293,21 @@ action: 1
 action: 3344
 
 # State 122
-# 1n2kQ1r/r3n3/1ppp4/8/4bP1B/2P4P/3N1P2/2KR1B2 b - - 0 28
+# 1n2kQ1r/r3n3/1ppp4/8/4bP1B/2P4P/3N1P2/2KR1B2 b - - 0 31
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250, 14, 164, 26, 1359, 5, 2683, 12, 2672, 29, 377, 24, 4622, 0, 2175, 12, 1257, 7, 4248, 1, 3344]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250, 14, 164, 26, 1359, 5, 2683, 12, 2672, 29, 377, 24, 4622, 0, 2175, 12, 1257, 7, 4248, 1, 3344"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "?n??k??r/r???n???/?ppp????/????????/????b???/????????/????????/???????? b - - 0 28"
-ObservationString(1) = "?????Q??/????????/????????/????????/?????P?B/??P????P/???N?P??/??KR?B?? b - - 0 28"
+ObservationString(0) = "?n??k??r/r???n???/?ppp????/????????/????b???/????????/????????/???????? b - - 0 31"
+ObservationString(1) = "?????Q??/????????/????????/????????/?????P?B/??P????P/???N?P??/??KR?B?? b - - 0 31"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -4376,6 +4411,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◉◯◯◯◯◯◯◯
@@ -4551,20 +4587,21 @@ action: 32
 action: 2684
 
 # State 140
-# 1n2k3/r3n3/1ppp4/r7/5P2/2P4P/2bN1P2/R4BQ1 w - - 0 32
+# 1n2k3/r3n3/1ppp4/r7/5P2/2P4P/2bN1P2/R4BQ1 w - - 0 36
 IsTerminal() = True
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250, 14, 164, 26, 1359, 5, 2683, 12, 2672, 29, 377, 24, 4622, 0, 2175, 12, 1257, 7, 4248, 1, 3344, 16, 4109, 25, 1184, 16, 4395, 1, 3461, 32, 4330, 13, 1779, 21, 1358, 10, 4024, 32, 2684]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010, 29, 1880, 13, 673, 33, 309, 25, 3621, 9, 423, 34, 4364, 26, 2426, 0, 17, 17, 654, 18, 3155, 35, 2014, 9, 4323, 12, 890, 12, 165, 28, 776, 12, 449, 35, 2733, 21, 1216, 28, 4509, 5, 4510, 26, 3707, 9, 3986, 31, 2599, 12, 4105, 26, 4177, 18, 4640, 32, 2364, 7, 89, 27, 3986, 22, 787, 20, 4250, 14, 164, 26, 1359, 5, 2683, 12, 2672, 29, 377, 24, 4622, 0, 2175, 12, 1257, 7, 4248, 1, 3344, 16, 4109, 25, 1184, 16, 4395, 1, 3461, 32, 4330, 13, 1779, 21, 1358, 10, 4024, 32, 2684"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "?n??k???/r???n???/?ppp????/r???????/????????/????????/??b?????/???????? w - - 0 32"
-ObservationString(1) = "????????/????????/????????/????????/?????P??/??P????P/???N?P??/R????BQ? w - - 0 32"
+ObservationString(0) = "?n??k???/r???n???/?ppp????/r???????/????????/????????/??b?????/???????? w - - 0 36"
+ObservationString(1) = "????????/????????/????????/????????/?????P??/??P????P/???N?P??/R????BQ? w - - 0 36"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
@@ -4668,6 +4705,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯
                                        ◯◯◯◯◯◯◯◯

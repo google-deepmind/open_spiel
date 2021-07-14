@@ -265,6 +265,7 @@ class RbcObserver : public Observer {
     WriteBinary(state.phase_ == MovePhase::kSensing, "phase", allocator);
     WriteBinary(state.illegal_move_attempted_, "illegal_move", allocator);
     WriteBinary(state.move_captured_, "capture", allocator);
+    WriteBinary(state.CurrentPlayer(), "side_to_play", allocator);
   }
 
   IIGObservationType iig_obs_type_;
