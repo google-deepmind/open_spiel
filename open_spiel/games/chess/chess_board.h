@@ -245,10 +245,17 @@ enum PseudoLegalMoveSettings {
   kBreachEnemyPieces,
 };
 
+// Some chess variants (RBC) allow a "pass" action/move
+inline constexpr open_spiel::Action kPassAction = 0;
+inline const chess::Move kPassMove = Move(Square{-1, -1}, Square{-1, -1},
+                                          Piece{.color=Color::kEmpty,
+                                                .type=PieceType::kEmpty});
+
 class ChessBoard {
  public:
   ChessBoard(int board_size = kDefaultBoardSize,
-             bool king_in_check_allowed = false);
+             bool king_in_check_allowed = false,
+             bool allow_pass_move = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -517,6 +524,7 @@ class ChessBoard {
 
   int board_size_;
   bool king_in_check_allowed_;
+  bool allow_pass_move_;
 
   std::array<Piece, k2dMaxBoardSize> board_;
   Color to_play_;
