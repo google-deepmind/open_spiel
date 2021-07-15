@@ -43,9 +43,10 @@ from open_spiel.python import policy
 import pyspiel
 
 
-# The number of examples to pull out of the entire data set when training
-ADVANTAGE_TRAIN_DATASET_SIZE = 100000
-STRATEGY_TRAIN_DATASET_SIZE = 1000000
+# The size of the shuffle buffer used to reshuffle part of the data each
+# epoch within one training iteration
+ADVANTAGE_TRAIN_SHUFFLE_SIZE = 100000
+STRATEGY_TRAIN_SHUFFLE_SIZE = 1000000
 
 
 # TODO(author3) Refactor into data structures lib.
@@ -390,8 +391,8 @@ class DeepCFRSolver(policy.Policy):
           self._num_actions)
       self._optimizer_advantages[player] = tf.keras.optimizers.Adam(
           learning_rate=self._learning_rate)
-      self._advantage_train_step[player] = \
-                    self._get_advantage_train_graph(player)
+      self._advantage_train_step[player] = (
+          self._get_advantage_train_graph(player))
 
   @property
   def advantage_buffers(self):
@@ -644,7 +645,7 @@ class DeepCFRSolver(policy.Policy):
     self._advantage_memories[player].shuffle_data()
     data = tf.data.Dataset.from_tensor_slices(
         self._advantage_memories[player].data)
-    data = data.shuffle(ADVANTAGE_TRAIN_DATASET_SIZE)
+    data = data.shuffle(ADVANTAGE_TRAIN_SHUFFLE_SIZE)
     data = data.repeat()
     data = data.batch(self._batch_size_advantage)
     data = data.map(self._deserialize_advantage_memory)
@@ -698,7 +699,7 @@ class DeepCFRSolver(policy.Policy):
     else:
       self._strategy_memories.shuffle_data()
       data = tf.data.Dataset.from_tensor_slices(self._strategy_memories.data)
-    data = data.shuffle(STRATEGY_TRAIN_DATASET_SIZE)
+    data = data.shuffle(STRATEGY_TRAIN_SHUFFLE_SIZE)
     data = data.repeat()
     data = data.batch(self._batch_size_strategy)
     data = data.map(self._deserialize_strategy_memory)

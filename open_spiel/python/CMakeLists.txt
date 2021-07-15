@@ -193,6 +193,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
+    jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
   )
