@@ -49,6 +49,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
+<font color="orange"><b>~</b></font>         | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
 <font color="orange"><b>~</b></font>         | [Sheriff](#sheriff)
 <font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
@@ -497,6 +498,20 @@ Status                                       | Game
 *   Perfect information.
 *   2-4 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
+
+### Reconnaissance Blind Chess
+
+*   Chess with opponent's pieces unknown, with sensing moves.
+*   Chess variant, invented by John Hopkins University Applied Physics Lab. Used
+    in NeurIPS competition and Hidden Information Game Competition.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   [JHU APL Main site](https://rbc.jhuapl.edu/)
+*   [Markowitz et al. '18, On the Complexity of Reconnaissance Blind Chess](https://arxiv.org/abs/1811.03119)
+*   [Newman et al. '16, Reconnaissance blind multi-chess: an experimentation
+    platform for ISR sensor fusion and resource
+    management](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/9842/984209/Reconnaissance-blind-multi-chess--an-experimentation-platform-for-ISR/10.1117/12.2228127.short?SSO=1)
 
 ### Sheriff
 

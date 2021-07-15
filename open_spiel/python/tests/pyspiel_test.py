@@ -95,6 +95,7 @@ EXPECTED_GAMES = set([
     "python_tic_tac_toe",
     "quoridor",
     "repeated_game",
+    "rbc",
     "sheriff",
     "skat",
     "start_at",

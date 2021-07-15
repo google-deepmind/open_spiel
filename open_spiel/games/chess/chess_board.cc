@@ -655,6 +655,62 @@ void ChessBoard::GeneratePseudoLegalPawnCaptures(
 #undef YIELD
 }
 
+bool ChessBoard::IsBreachingMove(Move tested_move) const {
+  const Piece &piece = at(tested_move.from);
+  if (piece.type == PieceType::kEmpty) return false;
+  if (piece.type == PieceType::kKnight) return false;
+  if (piece.type == PieceType::kPawn) return false;
+  // King never makes breaching moves: a castling that would be breaching
+  // is considered an illegal move.
+  if (piece.type == PieceType::kKing) return false;
+
+  SPIEL_DCHECK_TRUE(piece.type == PieceType::kQueen ||
+                    piece.type == PieceType::kRook ||
+                    piece.type == PieceType::kBishop);
+
+  // The move is not breaching, if it is generated with
+  // PseudoLegalMoveSettings::kAcknowledgeEnemyPieces
+
+  bool is_breaching = true;
+  const auto check_breaching = [&](const Square &to) {
+    if (to == tested_move.to) is_breaching = false;
+  };
+
+  // Queen moves are a combination of rook and bishop moves.
+  if (piece.type == PieceType::kRook || piece.type == PieceType::kQueen) {
+    GenerateRookDestinations_(tested_move.from, piece.color,
+                              kAcknowledgeEnemyPieces, check_breaching);
+  }
+  if (piece.type == PieceType::kBishop || piece.type == PieceType::kQueen) {
+    GenerateBishopDestinations_(tested_move.from, piece.color,
+                                kAcknowledgeEnemyPieces, check_breaching);
+  }
+
+  return is_breaching;
+}
+
+void ChessBoard::BreachingMoveToCaptureMove(Move* move) const {
+  SPIEL_CHECK_TRUE(move);
+  SPIEL_DCHECK_TRUE(IsBreachingMove(*move));
+  int dx = move->to.x - move->from.x;
+  int dy = move->to.y - move->from.y;
+  SPIEL_DCHECK_TRUE(dx == 0 || dy == 0 || std::abs(dx) == std::abs(dy));
+
+  // Cap values to [-1, 1] range to make a proper step size.
+  dx = std::max(-1, dx);
+  dx = std::min(1, dx);
+  dy = std::max(-1, dy);
+  dy = std::min(1, dy);
+  const Offset step{static_cast<int8_t>(dx),
+                    static_cast<int8_t>(dy)};
+
+  Square sq;
+  for (sq = move->from + step; sq != move->to; sq += step) {
+    if (at(sq).type != PieceType::kEmpty) break;
+  }
+  move->to = sq;
+}
+
 bool ChessBoard::HasSufficientMaterial() const {
   // Try to detect these 4 conditions.
   // 1. K vs K
@@ -1226,6 +1282,32 @@ void ChessBoard::GenerateKingDestinations_(Square sq, Color color,
   }
 }
 
+// Whether all squares between sq1 and sq2 exclusive are empty, and
+// optionally safe (not under attack).
+bool ChessBoard::CanCastleBetween(
+    Square sq1, Square sq2, bool check_safe_from_opponent,
+    PseudoLegalMoveSettings settings) const {
+  SPIEL_DCHECK_EQ(sq1.y, sq2.y);
+  const int y = sq1.y;
+  const Color &our_color = at(sq1).color;
+
+  const int x_start = std::min(sq1.x, sq2.x);
+  const int x_end = std::max(sq1.x, sq2.x);
+
+  for (int x = x_start; x <= x_end; ++x) {
+    Square test_square{static_cast<int8_t>(x),
+                       static_cast<int8_t>(y)};
+    if (check_safe_from_opponent && UnderAttack(test_square, our_color))
+      return false;
+    if (settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces &&
+        IsEnemy(test_square, our_color))
+      return false;
+    const bool x_in_between = x > x_start && x < x_end;
+    if (x_in_between && IsFriendly(test_square, our_color)) return false;
+  }
+  return true;
+}
+
 template <typename YieldFn>
 void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
                                                PseudoLegalMoveSettings settings,
@@ -1259,48 +1341,15 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
     return;
   }
 
-  // Whether all squares between sq1 and sq2 exclusive are empty, and
-  // optionally safe (not under attack).
-  const auto check_squares_between = [this, &color, &settings](
-                                         const Square &sq1, const Square &sq2,
-                                         bool check_safe) -> bool {
-    SPIEL_CHECK_EQ(sq1.y, sq2.y);
-
-    if (sq1.x <= sq2.x) {
-      for (Square test_square = sq1 + Offset{1, 0}; test_square != sq2;
-           test_square += Offset{1, 0}) {
-        if (IsFriendly(test_square, color) ||
-            (IsEnemy(test_square, color) &&
-             settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
-            (check_safe && UnderAttack(test_square, color))) {
-          return false;
-        }
-      }
-    } else {
-      for (Square test_square = sq1 + Offset{-1, 0}; test_square != sq2;
-           test_square += Offset{-1, 0}) {
-        if (IsFriendly(test_square, color) ||
-            (IsEnemy(test_square, color) &&
-             settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
-            (check_safe && UnderAttack(test_square, color))) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  };
-
   const auto check_castling_conditions =
-      [this, &sq, &color, &settings,
-       &check_squares_between](int8_t direction) -> bool {
+      [this, &sq, &color, &settings](int8_t x_direction) -> bool {
     // First we need to find the rook.
-    Square rook_sq = sq + Offset{direction, 0};
+    Square rook_sq = sq + Offset{x_direction, 0};
     bool rook_found = false;
 
     // Yes, we do actually have to check colour -
     // https://github.com/official-stockfish/Stockfish/issues/356
-    for (; InBoardArea(rook_sq); rook_sq.x += direction) {
+    for (; InBoardArea(rook_sq); rook_sq.x += x_direction) {
       if (at(rook_sq) == Piece{color, PieceType::kRook}) {
         rook_found = true;
         break;
@@ -1313,25 +1362,19 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
       SpielFatalError("Rook not found");
     }
 
-    int8_t rook_final_x = direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
+    int8_t rook_final_x = x_direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
     Square rook_final_sq = Square{rook_final_x, sq.y};
-    int8_t king_final_x = direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
+    int8_t king_final_x = x_direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
     Square king_final_sq = Square{king_final_x, sq.y};
 
     // 4. 5. 6. All squares the king and rook jump over, including the final
     // squares, must be empty. Squares king jumps over must additionally be
     // safe.
-    if (IsFriendly(rook_final_sq, color) ||
-        (IsEnemy(rook_final_sq, color) &&
-         settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
-        IsFriendly(king_final_sq, color) ||
-        (IsEnemy(king_final_sq, color) &&
-         settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces) ||
-        !check_squares_between(rook_sq, rook_final_sq, false) ||
-        !check_squares_between(
-            sq, king_final_sq,
-            !(king_in_check_allowed_ ||
-              settings == PseudoLegalMoveSettings::kBreachEnemyPieces))) {
+    const bool make_king_jump_check =
+        !king_in_check_allowed_ &&
+        settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces;
+    if (!CanCastleBetween(rook_sq, rook_final_sq, false, settings) ||
+        !CanCastleBetween(sq, king_final_sq, make_king_jump_check, settings)) {
       return false;
     }
 
