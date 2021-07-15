@@ -589,8 +589,10 @@ PYBIND11_MODULE(pyspiel, m) {
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise
   // exceptions - the process will be terminated instead.
-  open_spiel::SetErrorHandler(
-      [](const std::string& string) { throw SpielException(string); });
+  open_spiel::SetErrorHandler([](const std::string& string) {
+    std::cerr << "OpenSpiel exception: " << string << std::endl << std::flush;
+    throw SpielException(string);
+  });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
 
   // Register other bits of the API.
