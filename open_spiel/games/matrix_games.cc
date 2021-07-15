@@ -35,8 +35,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/false,
-    /*provides_observation_tensor=*/false,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -64,6 +64,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -94,6 +96,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -126,6 +130,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -153,6 +159,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -179,6 +187,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -205,6 +215,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 
@@ -232,6 +244,8 @@ const GameType kGameType{
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
     /*parameter_specification=*/{}  // no parameters
 };
 

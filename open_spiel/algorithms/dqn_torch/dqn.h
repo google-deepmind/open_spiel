@@ -46,6 +46,7 @@ struct Transition {
 };
 
 struct DQNSettings {
+  int seed;
   bool use_observation;
   Player player_id;
   int state_representation_size;
@@ -64,16 +65,54 @@ struct DQNSettings {
   std::string loss_str = "mse";
 };
 
+// TODO(author5): make this into a proper general RL env/agent API as we have
+// in the Python API. Then include tabular q-learning and Sarsa as well.
+
+// A general agent class with a Step function.
+class Agent {
+ public:
+  virtual ~Agent() = default;
+  virtual Action Step(const State& state, bool is_evaluation = false) = 0;
+};
+
+// Run a number of episodes with the given agents and return the average return
+// for each agent over the episodes. Set is_evaluation to true when using this
+// for evaluation.
+std::vector<double> RunEpisodes(std::mt19937* rng, const Game& game,
+                                const std::vector<Agent*>& agents,
+                                int num_episodes, bool is_evaluation);
+
+class RandomAgent : public Agent {
+ public:
+  RandomAgent(Player player, int seed) : player_(player), rng_(seed) {}
+  virtual ~RandomAgent() = default;
+  Action Step(const State& state, bool is_evaluation = false) override;
+
+ private:
+  Player player_;
+  std::mt19937 rng_;
+};
+
 // DQN Agent implementation in LibTorch.
-class DQN {
+class DQN : public Agent {
  public:
   DQN(const DQNSettings& settings);
   virtual ~DQN() = default;
-  Action Step(const State& state,
-              bool is_evaluation = false,
-              bool add_transition_record = true);
+  Action Step(const State& state, bool is_evaluation = false) override;
+
+  double GetEpsilon(bool is_evaluation, int power = 1.0);
+  int seed() const { return seed_; }
 
  private:
+  std::vector<float> GetInfoState(const State& state, Player player_id,
+                                  bool use_observation);
+  void AddTransition(const State& prev_state, Action prev_action,
+                     const State& state);
+  Action EpsilonGreedy(std::vector<float> info_state,
+                       std::vector<Action> legal_actions, double epsilon);
+  void Learn();
+
+  int seed_;
   bool use_observation_;
   int player_id_;
   int num_actions_;
@@ -97,18 +136,6 @@ class DQN {
   MLP target_q_network_;
   torch::optim::SGD optimizer_;
   std::mt19937 rng_;
-
-  std::vector<float> GetInfoState(const State& state,
-                                  Player player_id,
-                                  bool use_observation);
-  void AddTransition(const State& prev_state,
-                     Action prev_action,
-                     const State& state);
-  Action EpsilonGreedy(std::vector<float> info_state,
-                       std::vector<Action> legal_actions,
-                       double epsilon);
-  double GetEpsilon(bool is_evaluation, int power = 1.0);
-  void Learn();
 };
 
 }  // namespace torch_dqn
