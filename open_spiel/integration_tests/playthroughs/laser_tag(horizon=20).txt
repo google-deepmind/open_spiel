@@ -105,9 +105,9 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-ChanceOutcomes() = [(2, 0.25), (3, 0.25), (4, 0.25), (5, 0.25)]
-LegalActions() = [2, 3, 4, 5]
-StringLegalActions() = ["(spawned at location #0)", "(spawned at location #1)", "(spawned at location #2)", "(spawned at location #3)"]
+ChanceOutcomes() = [(2, 0.3333333333333333), (4, 0.3333333333333333), (5, 0.3333333333333333)]
+LegalActions() = [2, 4, 5]
+StringLegalActions() = ["(spawned at location #0)", "(spawned at location #2)", "(spawned at location #3)"]
 
 # Apply action "(spawned at location #3)"
 action: 5
