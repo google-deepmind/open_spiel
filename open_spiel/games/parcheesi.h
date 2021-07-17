@@ -31,7 +31,9 @@ namespace parcheesi {
 
 inline constexpr const int kNumPos = 2;
 inline constexpr const int kNumBoardTiles = 68;
-inline const std::vector<std::string> kTokens = {"r", "g", "b", "y"};
+//after 64 moves, tokens go into the ladder
+inline constexpr const int kNumBoardPos = 64;
+inline const std::vector<std::string> kTokens = {"r", "g", "y", "b"};
 inline const std::vector<int> kStartPos = {0, 17, 34, 51};
 inline const std::vector<int> kSafePos = {0, 7, 12, 17, 24, 29, 34, 41, 46, 51, 58, 63};
 inline constexpr const int kHomePos = 71;
@@ -62,7 +64,7 @@ struct TokenMove {
       : die_index(_die_index), old_pos(_old_pos), new_pos(_new_pos), token_index(_token_index), breaking_block(_breaking_block) {}
 };
 
-inline constexpr const int kTokenMoveDieIndexMax = 2;
+inline constexpr const int kTokenMoveDieIndexMax = 3; //'2' => both die used
 inline constexpr const int kTokenMovePosMax = 73; //(72 + 1) since there's -1 value also
 inline constexpr const int kTokenMoveTokenIndexMax = 5;//(4 + 1) since we assign -1 for the token moving from base
 inline constexpr const int kTokenMoveBreakingBlockMax = 2;
