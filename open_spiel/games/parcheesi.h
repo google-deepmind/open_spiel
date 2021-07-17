@@ -30,8 +30,14 @@ namespace open_spiel {
 namespace parcheesi {
 
 inline constexpr const int kNumPos = 2;
+inline constexpr const int kNumBoardTiles = 68;
+inline const std::vector<std::string> kTokens = {"r", "g", "b", "y"};
+inline const std::vector<int> kStartPos = {0, 17, 34, 51};
+inline const std::vector<int> kSafePos = {0, 7, 12, 17, 24, 29, 34, 41, 46, 51, 58, 63};
+inline constexpr const int kHomePos = 71;
 
 inline constexpr const int kNumPlayers = 4;
+inline constexpr const int kNumTokens = 4;
 inline constexpr const int kNumPoints = 24;
 
 // The action encoding stores a number in { 0, 1, ..., 1351 }. If the high
@@ -45,6 +51,21 @@ inline constexpr const int kNumDistinctActions = 1352;
 inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
     3 * kNumPlayers + kBoardEncodingSize;
+
+struct TokenMove {
+  int die_index;
+  int old_pos;
+  int new_pos;
+  int token_index;
+  bool breaking_block;
+  TokenMove(int _die_index, int _old_pos, int _new_pos, int _token_index, bool _breaking_block)
+      : die_index(_die_index), old_pos(_old_pos), new_pos(_new_pos), token_index(_token_index), breaking_block(_breaking_block) {}
+};
+
+inline constexpr const int kTokenMoveDieIndexMax = 2;
+inline constexpr const int kTokenMovePosMax = 73; //(72 + 1) since there's -1 value also
+inline constexpr const int kTokenMoveTokenIndexMax = 5;//(4 + 1) since we assign -1 for the token moving from base
+inline constexpr const int kTokenMoveBreakingBlockMax = 2;
 
 class ParcheesiGame;
 
@@ -79,14 +100,32 @@ class ParcheesiState : public State {
  private:
   void SetupInitialBoard();
   void RollDice(int outcome);
+
+  void PrintMove(TokenMove move) const;
+  int GetPlayerFromToken(std::string token) const;
+  TokenMove SpielMoveToTokenMove(Action move) const;
+  std::vector<Action> MultipleTokenMoveToSpielMove(std::vector<TokenMove> tokenMoves) const;
+  Action TokenMoveToSpielMove(TokenMove tokenMoves) const;
+  int GetGridPosForPlayer(int pos, int player) const;
+  std::string GetHumanReadablePosForPlayer(int pos, int player) const;
+  std::vector<TokenMove> GetTokenMoves(int player) const;
+  std::vector<TokenMove> GetGridMoves(std::vector<int> player_token_pos, int player, bool breaking_block) const;
+  bool DestinationOccupiedBySafeToken(int destination,int player) const;
+  bool BlocksInRoute(int start, int end, int player) const;
   
   Player cur_player_;
   Player prev_player_;
   int turns_;
+  bool player_forced_to_move_block_;
   std::vector<int> dice_;    // Current dice.
-  std::vector<int> bar_;     // Checkers of each player in the bar.
-  std::vector<int> scores_;  // Checkers returned home by each player.
-  std::vector<std::vector<int>> board_;  // Checkers for each player on points.
+  std::vector<std::vector<std::string>> board_;  // Board designates the common 68 tiles all players can occuppy. This excludes the ladder and home tiles.
+  std::vector<std::vector<std::string>> home_;
+  std::vector<std::vector<std::string>> base_;
+  //  -1   : base
+  //  0-63 : 64 grid positions
+  // 64-70 : 7 ladder positions
+  //  71   : home
+  std::vector<std::vector<int>> token_pos_;
 };
 
 class ParcheesiGame : public Game {
