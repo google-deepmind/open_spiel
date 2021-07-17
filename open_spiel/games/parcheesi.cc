@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//todo:
+//extra moves for doubles
+//bonus moves
+//banned move
+
 #include "open_spiel/games/parcheesi.h"
 
 #include <algorithm>
@@ -96,7 +101,9 @@ std::string ParcheesiState::ActionToString(Player player,
     return absl::StrCat("Player ", kTokens[player], " does not have any valid moves");
   }else{
     TokenMove tokenMove = SpielMoveToTokenMove(move_id);
-    return absl::StrCat("Player ", kTokens[player], " moved token ", tokenMove.token_index, " from ", tokenMove.old_pos, " to ", tokenMove.new_pos);    
+    return absl::StrCat("Player ", kTokens[player], " moved token ", tokenMove.token_index, " from ", 
+      GetHumanReadablePosForPlayer(tokenMove.old_pos, player), " to ", 
+      GetHumanReadablePosForPlayer(tokenMove.new_pos, player));    
   }
 }
 
@@ -156,15 +163,15 @@ int ParcheesiState::GetPlayerFromToken(std::string token) const {
 }
 
 TokenMove ParcheesiState::SpielMoveToTokenMove(Action move) const {
+  bool breaking_block = move % kTokenMoveBreakingBlockMax;
+  move /= kTokenMoveBreakingBlockMax;
   int token_index = (move % kTokenMoveTokenIndexMax) - 1;
   move /= kTokenMoveTokenIndexMax;
   int new_pos = (move % kTokenMovePosMax) - 1;
   move /= kTokenMovePosMax;
   int old_pos = (move % kTokenMovePosMax) - 1;
   move /= kTokenMovePosMax;
-  int die_index = move % kTokenMoveBreakingBlockMax;
-  move /= kTokenMoveBreakingBlockMax;
-  bool breaking_block = move;
+  int die_index = move;
   TokenMove tokenMove = TokenMove(die_index, old_pos, new_pos, token_index, breaking_block);
   return tokenMove;
 }
@@ -178,15 +185,15 @@ std::vector<Action> ParcheesiState::MultipleTokenMoveToSpielMove(std::vector<Tok
 }
 
 Action ParcheesiState::TokenMoveToSpielMove(TokenMove tokenMove) const {
-  Action move = tokenMove.breaking_block;
-  move *= kTokenMoveBreakingBlockMax;
-  move += tokenMove.die_index;
+  Action move = tokenMove.die_index;
   move *= kTokenMovePosMax;
   move += (tokenMove.old_pos + 1);
   move *= kTokenMovePosMax;
   move += (tokenMove.new_pos + 1);
   move *= kTokenMoveTokenIndexMax;
   move += (tokenMove.token_index + 1);
+  move *= kTokenMoveBreakingBlockMax;
+  move += tokenMove.breaking_block;
   return move;
 }
 
@@ -211,7 +218,7 @@ void ParcheesiState::DoApplyAction(Action move) {
       token = base_[cur_player_].back();
       base_[cur_player_].pop_back();       
     }
-    else if(tokenMove.old_pos < kNumBoardTiles){      
+    else if(tokenMove.old_pos < kNumBoardPos){      
       int grid_pos = GetGridPosForPlayer(tokenMove.old_pos, cur_player_);
       for(int i = 0; i < board_[grid_pos].size(); i++){
         if(board_[grid_pos][i] == token){
@@ -220,7 +227,7 @@ void ParcheesiState::DoApplyAction(Action move) {
         }
       }
     }
-    if(tokenMove.new_pos < kNumBoardTiles){
+    if(tokenMove.new_pos < kNumBoardPos){
       int grid_pos = GetGridPosForPlayer(tokenMove.new_pos, cur_player_);
       if(board_[grid_pos].size() == 1 && board_[grid_pos][0].at(0) != kTokens[cur_player_].at(0)){
         std::string killed_token = board_[grid_pos].back();
@@ -237,21 +244,28 @@ void ParcheesiState::DoApplyAction(Action move) {
       bonus_move = 10;
     }    
     token_pos_[cur_player_][token.at(1) - '0'] = tokenMove.new_pos;
-  }
 
-  prev_player_ = cur_player_;
-  cur_player_ = kChancePlayerId;
-  dice_.clear();
-  turns_++;
+    if(tokenMove.die_index == 2)
+      dice_.clear();
+    else
+      dice_.erase(dice_.begin() + tokenMove.die_index);
+  }  
+
+  if(move == 0 || dice_.size() == 0){
+    prev_player_ = cur_player_;
+    cur_player_ = kChancePlayerId;
+    dice_.clear();
+    turns_++;
+  }  
 }
 
 std::string ParcheesiState::GetHumanReadablePosForPlayer(int pos, int player) const {
   if(pos == -1)
     return "base";
-  else if(pos < kNumBoardTiles)
+  else if(pos < kNumBoardPos)
     return std::to_string(GetGridPosForPlayer(pos, player) + 1);
   else if(pos < kHomePos)
-    return "ladder pos " + std::to_string(pos - kNumBoardTiles + 1);
+    return "ladder pos " + std::to_string(pos - kNumBoardPos + 1);
   else
     return "home";
 }
@@ -284,7 +298,7 @@ std::vector<TokenMove> ParcheesiState::GetTokenMoves(int player) const {
     std::vector<int> block_pos;
     for(int i = 0; i < token_pos_[player].size(); i++){
       int pos = token_pos_[player][i];
-      if(pos >= 0 && pos < kNumBoardTiles && count(token_pos_[player].begin(), token_pos_[player].end(), pos) == 2)
+      if(pos >= 0 && pos < kNumBoardPos && count(token_pos_[player].begin(), token_pos_[player].end(), pos) == 2)
         block_pos.push_back(pos);
     }
     if(block_pos.size() > 0){
@@ -347,10 +361,10 @@ int ParcheesiState::GetGridPosForPlayer(int pos, int player) const {
 }    
 
 bool ParcheesiState::BlocksInRoute(int start, int end, int player) const {
-  if(start >= kNumBoardTiles)
+  if(start >= kNumBoardPos)
       return false;
   bool block_found = false;
-  for(int i = start + 1; i < std::min(end + 1, kNumBoardTiles); i++){
+  for(int i = start + 1; i < std::min(end + 1, kNumBoardPos); i++){
     if(board_[GetGridPosForPlayer(i, player)].size() == 2){
       block_found = true;
       break;
