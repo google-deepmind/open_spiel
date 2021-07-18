@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//todo:
-
+// Todo:
+// Implement UndoAction
 
 #include "open_spiel/games/parcheesi.h"
 
@@ -126,11 +126,11 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
-      turns_(-1),
+      turns_(0),
       dice_({}),
       extra_turn_(0),
       bonus_move_(0),
-      banned_move_((TokenMove(-1, -1, -1, -1, false))),
+      illegal_move_((TokenMove(-1, -1, -1, -1, false))),
       home_(std::vector<std::vector<std::string>>(kNumPlayers, std::vector<std::string>())),
       base_(std::vector<std::vector<std::string>>(kNumPlayers, std::vector<std::string>())),
       token_pos_(std::vector<std::vector<int>>(kNumPlayers, std::vector<int>(4, -1))),
@@ -139,10 +139,18 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
 }
 
 void ParcheesiState::SetupInitialBoard() {
+  
+  // Start with all tokens in base
+  // The 4 players in order are denoted as: r(red), g(green), y(yellow), b(blue)
+  // Tokens for each players are
+  //  r(red)    : r0, r1, r2, r3
+  //  g(green)  : g0, g1, g2, g3
+  //  y(yellow) : y0, y1, y2, y3
+  //  b(blue)   : b0, b1, b2, b3
+
   for(int i = 0; i < kNumPlayers; i++){
     for(int j = 0; j < kNumTokens; j++){
       base_[i].push_back(kTokens[i] + std::to_string(j));
-      token_pos_[i].push_back(-1);
     }
   }
 }
@@ -200,11 +208,8 @@ Action ParcheesiState::TokenMoveToSpielMove(TokenMove tokenMove) const {
   return move;
 }
 
-void ParcheesiState::PrintMove(TokenMove move) const {
-  std::cout << "\nprint move funcion\n";
-  std::cout << move.die_index << " " << move.old_pos << " " << move.new_pos << " " << move.token_index << " " << move.breaking_block;
-}
-
+// If a player rolls 3 consecutive doubles, their turn ends and the farthest token they have that
+// is not inside ladder/home is removed from the board
 void ParcheesiState::PenalisePlayer(Player player){
   std::vector<int> player_pos = token_pos_[player];
   sort(player_pos.begin(), player_pos.end(), std::greater<int>());
@@ -226,11 +231,14 @@ void ParcheesiState::DoApplyAction(Action move) {
   if (IsChanceNode()) {
     SPIEL_CHECK_TRUE(dice_.empty());
     RollDice(move);
+
+    // Move on to the next player unless extra_turn granted due to doubles
     if(extra_turn_ == 0)
       cur_player_ = NextPlayerRoundRobin(prev_player_, num_players_);
-    else{
+    else
       cur_player_ = prev_player_;
-    }
+
+    // Doubles rolled! player gets an extra turn
     if(dice_[0] == dice_[1]){
       extra_turn_++;
       if(extra_turn_ == 3){
@@ -243,21 +251,29 @@ void ParcheesiState::DoApplyAction(Action move) {
     return;
   }
 
+  // Reset bonus move here. Bonus moves are granted if a player hits an opponents token (20 moves)
+  // or gets a token into home (10 moves). When bonus moves are granted, it's mandatory to play
+  // them first before any die moves that the player may have left
   bonus_move_ = 0;
-  if(move > 1){
 
-    banned_move_ = TokenMove(-1, -1, -1, -1, false);
+  // Execute a playable move
+  if(move > kActionNoBonusMoves){
+    // It is illegal to move a block (blocks are formed when two tokens of the same player occupies
+    // the same position on the board) using a double. So if the player used one die value in a double
+    // dice roll to move one token of a block, then he cannot also move the other one unless it's the
+    // only move possible. We track that move with illegal_move
+    illegal_move_ = TokenMove(-1, -1, -1, -1, false);
     TokenMove tokenMove = SpielMoveToTokenMove(move);    
     if(tokenMove.breaking_block)
-      banned_move_ = tokenMove;
+      illegal_move_ = tokenMove;
 
-    std::string token = kTokens[cur_player_] + std::to_string(tokenMove.token_index);
-    //moving from base   
+    std::string token = kTokens[cur_player_] + std::to_string(tokenMove.token_index);       
+    
+    // Remove the token from it's old location. Either in base_ or board_
     if(tokenMove.old_pos == -1){
       token = base_[cur_player_].back();
       base_[cur_player_].pop_back();       
-    }
-    else if(tokenMove.old_pos < kNumBoardPos){      
+    }else if(tokenMove.old_pos < kNumBoardPos){      
       int grid_pos = GetGridPosForPlayer(tokenMove.old_pos, cur_player_);
       for(int i = 0; i < board_[grid_pos].size(); i++){
         if(board_[grid_pos][i] == token){
@@ -267,6 +283,8 @@ void ParcheesiState::DoApplyAction(Action move) {
       }
     }
 
+    // Place the token to it's new location. Remove any opponent tokens that were hit.
+    // Award bonus moves as applicable.
     if(tokenMove.new_pos < kNumBoardPos){
       int grid_pos = GetGridPosForPlayer(tokenMove.new_pos, cur_player_);
       if(board_[grid_pos].size() == 1 && board_[grid_pos][0].at(0) != kTokens[cur_player_].at(0)){
@@ -275,24 +293,31 @@ void ParcheesiState::DoApplyAction(Action move) {
         int snubbed_player = GetPlayerFromToken(killed_token);
         base_[snubbed_player].push_back(killed_token);
         token_pos_[snubbed_player][killed_token.at(1) - '0'] = -1;
-        bonus_move_ = 20;
+        bonus_move_ = kBonusMovesForHittingOpponentToken;
       }      
       board_[grid_pos].push_back(token);
-    }    
-    else if(tokenMove.new_pos == kHomePos){
+    }else if(tokenMove.new_pos == kHomePos){
       home_[cur_player_].push_back(token);
-      bonus_move_ = 10;
-    }    
+      bonus_move_ = kBonusMovesForGettingTokenHome;
+    } 
+
+    // Update token_pos_   
     token_pos_[cur_player_][token.at(1) - '0'] = tokenMove.new_pos;
 
-    if(tokenMove.new_pos - tokenMove.old_pos < 10){
+    // If the move is not a bonus move, removed used die from dice_
+    if(tokenMove.new_pos - tokenMove.old_pos < kBonusMovesForGettingTokenHome){
       if(tokenMove.die_index == 2)
         dice_.clear();
       else
         dice_.erase(dice_.begin() + tokenMove.die_index);
     }    
   }  
-  if(move == 0 || (dice_.size() == 0 && bonus_move_ == 0) || (move == 1 && dice_.size() == 0)){
+
+  // End player's turn when:
+  // 1. No valid moves available for player
+  // 2. No bonus moves available and dice are used up
+  // 3. Bonus moves are not playable and dice are used up
+  if(move == kActionNoValidMoves || (bonus_move_ == 0 && dice_.size() == 0) || (move == kActionNoBonusMoves && dice_.size() == 0)){
     NextTurn();
   }  
 }
@@ -327,14 +352,15 @@ std::vector<Action> ParcheesiState::LegalActions() const {
   if (IsTerminal()) return {};
 
   std::vector<TokenMove> moves;
-  if(bonus_move_ != 0){
+  // If bonus moves are granted, mandatory to use them first.
+  if(bonus_move_ != 0)
     moves = GetTokenMoves(cur_player_, {bonus_move_});
-  }
   else{
     moves = GetTokenMoves(cur_player_, dice_);
-    if(banned_move_.die_index != -1 && moves.size() > 1){
+    // Remove the move that'll allow to move block if other moves are available.
+    if(illegal_move_.die_index != -1 && moves.size() > 1){
       for(int i = 0; i < moves.size(); i++){
-        if(moves[i].old_pos == banned_move_.old_pos && moves[i].new_pos == banned_move_.new_pos){
+        if(moves[i].old_pos == illegal_move_.old_pos && moves[i].new_pos == illegal_move_.new_pos){
           moves.erase(moves.begin() + i);
           break;
         }
@@ -344,11 +370,13 @@ std::vector<Action> ParcheesiState::LegalActions() const {
 
   std::vector<Action> spielmoves = MultipleTokenMoveToSpielMove(moves);
 
+  // kActionNoValidMoves: No valid move is possible now for the player and turn should end now
+  // kActionNoBonusMoves: No moves possible with bonus_moves, althought turn might not be over if unused die is left
   if(spielmoves.size() == 0){
     if(bonus_move_ != 0)
-      spielmoves.push_back(1);
+      spielmoves.push_back(kActionNoBonusMoves);
     else
-      spielmoves.push_back(0);    
+      spielmoves.push_back(kActionNoValidMoves);
   }
 
   return spielmoves;
@@ -357,7 +385,7 @@ std::vector<Action> ParcheesiState::LegalActions() const {
 std::vector<TokenMove> ParcheesiState::GetTokenMoves(int player, std::vector<int> dice) const {
   std::vector<TokenMove> moves;
 
-  //if rolled doubles, blocks should be removed if applicable
+  // If rolled doubles, moving blocks is mandatory
   if(dice.size() == 2 && dice[0] == dice[1]){
     std::vector<int> block_pos;
     for(int i = 0; i < token_pos_[player].size(); i++){
@@ -378,7 +406,9 @@ std::vector<TokenMove> ParcheesiState::GetTokenMoves(int player, std::vector<int
         return moves;                
       }
     }        
-  }      
+  }
+
+  // If player gets a 5, mandatory to move token from base to board if applicable
   if(board_[kStartPos[player]].size() < 2){
     if(base_[player].size() > 0){
       if(dice[0] == 5){

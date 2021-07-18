@@ -23,36 +23,56 @@
 
 #include "open_spiel/spiel.h"
 
-// An implementation of the classic parcheesi
-// todo: add game wiki link
+// An implementation of the classic parcheesi game
+// Wiki: https://en.wikipedia.org/wiki/Parcheesi
+// Android: https://play.google.com/store/apps/details?id=com.superking.parchisi.star
 
 namespace open_spiel {
 namespace parcheesi {
 
-inline constexpr const int kNumPos = 2;
 inline constexpr const int kNumBoardTiles = 68;
-//after 64 moves, tokens go into the ladder
+// After 64 moves, tokens go into the ladder
 inline constexpr const int kNumBoardPos = 64;
 inline const std::vector<std::string> kTokens = {"r", "g", "y", "b"};
+// Position where token enters the board for each player
 inline const std::vector<int> kStartPos = {0, 17, 34, 51};
+// Safe positions on the board where tokens cannot be hit by another player.
+// StartPos is not safe if a token enters the board from base
 inline const std::vector<int> kSafePos = {0, 7, 12, 17, 24, 29, 34, 41, 46, 51, 58, 63};
 inline constexpr const int kHomePos = 71;
 
+inline constexpr const int kBonusMovesForHittingOpponentToken = 20;
+inline constexpr const int kBonusMovesForGettingTokenHome = 10;
+
+inline constexpr const int kActionNoValidMoves = 0;
+inline constexpr const int kActionNoBonusMoves = 1;
+
 inline constexpr const int kNumPlayers = 4;
 inline constexpr const int kNumTokens = 4;
-inline constexpr const int kNumPoints = 24;
 
-// The action encoding stores a number in { 0, 1, ..., 1351 }. If the high
-// roll is to move first, then the number is encoded as a 2-digit number in
-// base 26 ({0, 1, .., 23, kBarPos, Pass}) (=> first 676 numbers). Otherwise,
-// the low die is to move first and, 676 is subtracted and then again the
-// number is encoded as a 2-digit number in base 26.
-inline constexpr const int kNumDistinctActions = 1352;
+// die_index values
+// '0': first die used
+// '1': second die used
+// '2': both die used
+inline constexpr const int kTokenMoveDieIndexMax = 3;
 
-// See ObservationTensorShape for details.
-inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
-inline constexpr const int kStateEncodingSize =
-    3 * kNumPlayers + kBoardEncodingSize;
+// pos values
+//  -1   : base
+//  0-63 : 64 grid positions
+// 64-70 : 7 ladder positions
+//  71   : home
+inline constexpr const int kTokenMovePosMax = 73;
+
+// token_index values
+// (4 + 1) since we assign -1 for the token moving from base
+inline constexpr const int kTokenMoveTokenIndexMax = 5;
+
+// breaking_block values
+// true & false
+inline constexpr const int kTokenMoveBreakingBlockMax = 2;
+
+inline constexpr const int kNumDistinctActions = kTokenMoveDieIndexMax * kTokenMovePosMax * kTokenMovePosMax * kTokenMoveTokenIndexMax * kTokenMoveBreakingBlockMax;
+inline constexpr const int kStateEncodingSize = 1;
 
 struct TokenMove {
   int die_index;
@@ -63,11 +83,6 @@ struct TokenMove {
   TokenMove(int _die_index, int _old_pos, int _new_pos, int _token_index, bool _breaking_block)
       : die_index(_die_index), old_pos(_old_pos), new_pos(_new_pos), token_index(_token_index), breaking_block(_breaking_block) {}
 };
-
-inline constexpr const int kTokenMoveDieIndexMax = 3; //'2' => both die used
-inline constexpr const int kTokenMovePosMax = 73; //(72 + 1) since there's -1 value also
-inline constexpr const int kTokenMoveTokenIndexMax = 5;//(4 + 1) since we assign -1 for the token moving from base
-inline constexpr const int kTokenMoveBreakingBlockMax = 2;
 
 class ParcheesiGame;
 
@@ -122,17 +137,27 @@ class ParcheesiState : public State {
   int turns_;
   int extra_turn_;
   int bonus_move_;
-  TokenMove banned_move_;
+  TokenMove illegal_move_;
   bool player_forced_to_move_block_;
   std::vector<int> dice_;    // Current dice.
-  std::vector<std::vector<std::string>> board_;  // Board designates the common 68 tiles all players can occuppy. This excludes the ladder and home tiles.
-  std::vector<std::vector<std::string>> home_;
+
+  // Starting position for tokens
   std::vector<std::vector<std::string>> base_;
+  
+  // Final position for tokens. If all of the token of a player reaches home_, he wins
+  std::vector<std::vector<std::string>> home_;
+
   //  -1   : base
   //  0-63 : 64 grid positions
   // 64-70 : 7 ladder positions
   //  71   : home
   std::vector<std::vector<int>> token_pos_;
+
+  // board_ designates the common 68 tiles all players can occuppy. This excludes the ladder and home tiles.
+  // Each player starts at different positions on the board and token_pos_ marks these starting positions 
+  // relatively to zero. So board_ makes it easy to check if there's a hit or blocks while moving tokens
+  std::vector<std::vector<std::string>> board_;  
+  
 };
 
 class ParcheesiGame : public Game {
@@ -146,8 +171,6 @@ class ParcheesiGame : public Game {
         shared_from_this()));
   }
 
-  // On the first turn there are 30 outcomes: 15 for each player (rolls without
-  // the doubles).
   int MaxChanceOutcomes() const override { return 30; }
 
   // There is arbitrarily chosen number to ensure the game is finite.
@@ -159,23 +182,6 @@ class ParcheesiGame : public Game {
   double MaxUtility() const override;
 
   std::vector<int> ObservationTensorShape() const override {
-    // Encode each point on the board as four doubles:
-    // - One double for whether there is one checker or not (1 or 0).
-    // - One double for whether there are two checkers or not (1 or 0).
-    // - One double for whether there are three checkers or not (1 or 0).
-    // - One double if there are more than 3 checkers, the number of checkers.
-    //   more than three that are on that point.
-    //
-    // Return a vector encoding:
-    // Every point listed for the current player.
-    // Every point listed for the opponent.
-    // One double for the number of checkers on the bar for the current player.
-    // One double for the number of checkers scored for the current player.
-    // One double for whether it's the current player's turn (1 or 0).
-    // One double for the number of checkers on the bar for the opponent.
-    // One double for the number of checkers scored for the opponent.
-    // One double for whether it's the opponent's turn (1 or 0).
-
     return {kStateEncodingSize};
   }
 
