@@ -110,14 +110,16 @@ class ParcheesiState : public State {
   Action TokenMoveToSpielMove(TokenMove tokenMoves) const;
   int GetGridPosForPlayer(int pos, int player) const;
   std::string GetHumanReadablePosForPlayer(int pos, int player) const;
-  std::vector<TokenMove> GetTokenMoves(int player) const;
-  std::vector<TokenMove> GetGridMoves(std::vector<int> player_token_pos, int player, bool breaking_block) const;
+  std::vector<TokenMove> GetTokenMoves(int player, std::vector<int> dice) const;
+  std::vector<TokenMove> GetGridMoves(std::vector<int> player_token_pos, int player, std::vector<int> dice, bool breaking_block) const;
   bool DestinationOccupiedBySafeToken(int destination,int player) const;
   bool BlocksInRoute(int start, int end, int player) const;
   
   Player cur_player_;
   Player prev_player_;
   int turns_;
+  int extra_turn_;
+  int bonus_move_;
   bool player_forced_to_move_block_;
   std::vector<int> dice_;    // Current dice.
   std::vector<std::vector<std::string>> board_;  // Board designates the common 68 tiles all players can occuppy. This excludes the ladder and home tiles.
