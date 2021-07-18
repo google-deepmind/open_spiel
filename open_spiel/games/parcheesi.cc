@@ -14,7 +14,8 @@
 
 //todo:
 //banned move
-//turn ends when bonus moves not applicable
+//penalise on 3rd double
+
 
 #include "open_spiel/games/parcheesi.h"
 
@@ -98,6 +99,8 @@ std::string ParcheesiState::ActionToString(Player player,
                           kChanceOutcomeValues[move_id][1], ")");
   }else if(move_id == 0){
     return absl::StrCat("Player ", kTokens[player], " does not have any valid moves");
+  }else if(move_id == 1){
+    return absl::StrCat("Player ", kTokens[player], " does not have any valid bonus moves");
   }else{
     TokenMove tokenMove = SpielMoveToTokenMove(move_id);
     return absl::StrCat("Player ", kTokens[player], " moved token ", tokenMove.token_index, " from ", 
@@ -220,8 +223,7 @@ void ParcheesiState::DoApplyAction(Action move) {
   }
 
   bonus_move_ = 0;
-  if(move != 0){
-
+  if(move > 1){
     TokenMove tokenMove = SpielMoveToTokenMove(move);    
     std::string token = kTokens[cur_player_] + std::to_string(tokenMove.token_index);
     //moving from base   
@@ -264,7 +266,7 @@ void ParcheesiState::DoApplyAction(Action move) {
         dice_.erase(dice_.begin() + tokenMove.die_index);
     }    
   }  
-  if(move == 0 || (dice_.size() == 0 && bonus_move_ == 0)){
+  if(move == 0 || (dice_.size() == 0 && bonus_move_ == 0) || (move == 1 && dice_.size() == 0)){
     prev_player_ = cur_player_;
     cur_player_ = kChancePlayerId;
     dice_.clear();
@@ -303,8 +305,12 @@ std::vector<Action> ParcheesiState::LegalActions() const {
 
   std::vector<Action> spielmoves = MultipleTokenMoveToSpielMove(moves);
 
-  if(spielmoves.size() == 0)
-    spielmoves.push_back(0);    
+  if(spielmoves.size() == 0){
+    if(bonus_move_ != 0)
+      spielmoves.push_back(1);
+    else
+      spielmoves.push_back(0);    
+  }
 
   return spielmoves;
 }
