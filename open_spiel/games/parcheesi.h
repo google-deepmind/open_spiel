@@ -122,6 +122,7 @@ class ParcheesiState : public State {
   int turns_;
   int extra_turn_;
   int bonus_move_;
+  TokenMove banned_move_;
   bool player_forced_to_move_block_;
   std::vector<int> dice_;    // Current dice.
   std::vector<std::vector<std::string>> board_;  // Board designates the common 68 tiles all players can occuppy. This excludes the ladder and home tiles.

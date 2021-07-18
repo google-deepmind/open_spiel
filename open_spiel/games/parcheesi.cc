@@ -13,7 +13,6 @@
 // limitations under the License.
 
 //todo:
-//banned move
 
 
 #include "open_spiel/games/parcheesi.h"
@@ -131,6 +130,7 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
       dice_({}),
       extra_turn_(0),
       bonus_move_(0),
+      banned_move_((TokenMove(-1, -1, -1, -1, false))),
       home_(std::vector<std::vector<std::string>>(kNumPlayers, std::vector<std::string>())),
       base_(std::vector<std::vector<std::string>>(kNumPlayers, std::vector<std::string>())),
       token_pos_(std::vector<std::vector<int>>(kNumPlayers, std::vector<int>(4, -1))),
@@ -245,7 +245,12 @@ void ParcheesiState::DoApplyAction(Action move) {
 
   bonus_move_ = 0;
   if(move > 1){
+
+    banned_move_ = TokenMove(-1, -1, -1, -1, false);
     TokenMove tokenMove = SpielMoveToTokenMove(move);    
+    if(tokenMove.breaking_block)
+      banned_move_ = tokenMove;
+
     std::string token = kTokens[cur_player_] + std::to_string(tokenMove.token_index);
     //moving from base   
     if(tokenMove.old_pos == -1){
@@ -325,8 +330,17 @@ std::vector<Action> ParcheesiState::LegalActions() const {
   if(bonus_move_ != 0){
     moves = GetTokenMoves(cur_player_, {bonus_move_});
   }
-  else
+  else{
     moves = GetTokenMoves(cur_player_, dice_);
+    if(banned_move_.die_index != -1 && moves.size() > 1){
+      for(int i = 0; i < moves.size(); i++){
+        if(moves[i].old_pos == banned_move_.old_pos && moves[i].new_pos == banned_move_.new_pos){
+          moves.erase(moves.begin() + i);
+          break;
+        }
+      }
+    }
+  }
 
   std::vector<Action> spielmoves = MultipleTokenMoveToSpielMove(moves);
 
