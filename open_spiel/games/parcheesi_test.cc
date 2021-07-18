@@ -31,10 +31,27 @@ bool ActionsContains(const std::vector<Action>& legal_actions, Action action) {
          legal_actions.end();
 }
 
+void SpielMoveTokenMoveEncodingDecodingTest() {
+  std::shared_ptr<const Game> game = LoadGame("parcheesi");
+  std::unique_ptr<State> state = game->NewInitialState();
+  ParcheesiState* pstate = static_cast<ParcheesiState*>(state.get());
+  
+  TokenMove tokenMove = TokenMove(1, 20, 25, 2, false);
+  Action spielMove = pstate->TokenMoveToSpielMove(tokenMove);
+  TokenMove decodedTokenMove = pstate->SpielMoveToTokenMove(spielMove);
+
+  SPIEL_CHECK_EQ(tokenMove.die_index, decodedTokenMove.die_index);
+  SPIEL_CHECK_EQ(tokenMove.old_pos, decodedTokenMove.old_pos);
+  SPIEL_CHECK_EQ(tokenMove.new_pos, decodedTokenMove.new_pos);
+  SPIEL_CHECK_EQ(tokenMove.token_index, decodedTokenMove.token_index);
+  SPIEL_CHECK_EQ(tokenMove.breaking_block, decodedTokenMove.breaking_block);
+}
+
 }  // namespace
 }  // namespace parcheesi
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::testing::LoadGameTest("parcheesi");
+  open_spiel::parcheesi::SpielMoveTokenMoveEncodingDecodingTest();
 }

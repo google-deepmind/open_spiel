@@ -111,6 +111,11 @@ class ParcheesiState : public State {
                 const std::vector<int>& bar, const std::vector<int>& scores,
                 const std::vector<std::vector<int>>& board);
 
+  TokenMove SpielMoveToTokenMove(Action move) const;
+  std::vector<Action> MultipleTokenMoveToSpielMove(std::vector<TokenMove> tokenMoves) const;
+  Action TokenMoveToSpielMove(TokenMove tokenMoves) const;
+  
+
  protected:
   void DoApplyAction(Action move_id) override;
 
@@ -120,9 +125,6 @@ class ParcheesiState : public State {
 
   void PrintMove(TokenMove move) const;
   int GetPlayerFromToken(std::string token) const;
-  TokenMove SpielMoveToTokenMove(Action move) const;
-  std::vector<Action> MultipleTokenMoveToSpielMove(std::vector<TokenMove> tokenMoves) const;
-  Action TokenMoveToSpielMove(TokenMove tokenMoves) const;
   int GetGridPosForPlayer(int pos, int player) const;
   std::string GetHumanReadablePosForPlayer(int pos, int player) const;
   std::vector<TokenMove> GetTokenMoves(int player, std::vector<int> dice) const;
