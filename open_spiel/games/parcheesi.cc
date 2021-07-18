@@ -14,7 +14,6 @@
 
 //todo:
 //banned move
-//penalise on 3rd double
 
 
 #include "open_spiel/games/parcheesi.h"
@@ -206,6 +205,23 @@ void ParcheesiState::PrintMove(TokenMove move) const {
   std::cout << move.die_index << " " << move.old_pos << " " << move.new_pos << " " << move.token_index << " " << move.breaking_block;
 }
 
+void ParcheesiState::PenalisePlayer(Player player){
+  std::vector<int> player_pos = token_pos_[player];
+  sort(player_pos.begin(), player_pos.end(), std::greater<int>());
+  for(int i = 0; i < player_pos.size(); i++){
+    int pos = player_pos[i];
+    if(pos < kNumBoardPos && pos >= 0){
+      int grid_pos = GetGridPosForPlayer(pos, player);
+      std::string token = board_[grid_pos].back();
+      board_[grid_pos].pop_back();
+      token_pos_[player][token.at(1) - '0'] = -1;      
+      base_[player].push_back(token);      
+      break;
+    }      
+  }
+}
+
+
 void ParcheesiState::DoApplyAction(Action move) {
   if (IsChanceNode()) {
     SPIEL_CHECK_TRUE(dice_.empty());
@@ -216,7 +232,12 @@ void ParcheesiState::DoApplyAction(Action move) {
       cur_player_ = prev_player_;
     }
     if(dice_[0] == dice_[1]){
-      extra_turn_ = (extra_turn_ + 1) % 3;
+      extra_turn_++;
+      if(extra_turn_ == 3){
+        extra_turn_ = 0;
+        PenalisePlayer(cur_player_);
+        NextTurn();
+      }
     }else
       extra_turn_ = 0;
     return;
@@ -267,11 +288,15 @@ void ParcheesiState::DoApplyAction(Action move) {
     }    
   }  
   if(move == 0 || (dice_.size() == 0 && bonus_move_ == 0) || (move == 1 && dice_.size() == 0)){
-    prev_player_ = cur_player_;
-    cur_player_ = kChancePlayerId;
-    dice_.clear();
-    turns_++;
+    NextTurn();
   }  
+}
+
+void ParcheesiState::NextTurn(){
+  prev_player_ = cur_player_;
+  cur_player_ = kChancePlayerId;
+  dice_.clear();
+  turns_++;
 }
 
 std::string ParcheesiState::GetHumanReadablePosForPlayer(int pos, int player) const {

@@ -114,6 +114,8 @@ class ParcheesiState : public State {
   std::vector<TokenMove> GetGridMoves(std::vector<int> player_token_pos, int player, std::vector<int> dice, bool breaking_block) const;
   bool DestinationOccupiedBySafeToken(int destination,int player) const;
   bool BlocksInRoute(int start, int end, int player) const;
+  void PenalisePlayer(Player player);
+  void NextTurn();
   
   Player cur_player_;
   Player prev_player_;
