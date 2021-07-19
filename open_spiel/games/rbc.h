@@ -203,14 +203,14 @@ class RbcGame : public Game {
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
     std::vector<int> shape{
-        (13 +  // public boards:  piece types * colours + empty
-         14)   // private boards: piece types * colours + empty + unknown
-            * board_size_ * board_size_ +
-        3 +    // public: repetitions count, one-hot encoding
-        2 +    // public: side to play
-        1 +    // public: irreversible move counter -- a fraction of $n over 100
-        2 * 2  // private: left/right castling rights, one-hot encoded.
-    };
+        17 * 2     // public: Num of pieces for both sides
+        + 2        // public: Phase
+        + 2        // public: Illegal move
+        + 2        // public: Capture
+        + 2        // public: Side to play
+        + 2 * 2    // private: left/right castling rights, one-hot encoded.
+        + (6 * 2)  // private: board + sensing: 6 piece types
+              * board_size_ * board_size_};
     return shape;
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
@@ -222,7 +222,7 @@ class RbcGame : public Game {
 
   int board_size() const { return board_size_; }
   int sense_size() const { return sense_size_; }
-  // Sensing can be done only within the board, as it makes no sense for
+  // Sensing is done only within the board, as it makes no sense for
   // any player to do non-efficient sensing that goes outside of the board.
   // The sense location is encoded as coordinates within this smaller
   // inner square.

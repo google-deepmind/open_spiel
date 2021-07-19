@@ -330,9 +330,11 @@ std::string Move::ToSAN(const ChessBoard &board) const {
   return move_text;
 }
 
-ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed)
+ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
+                       bool allow_pass_move)
     : board_size_(board_size),
       king_in_check_allowed_(king_in_check_allowed),
+      allow_pass_move_(allow_pass_move),
       to_play_(Color::kWhite),
       ep_square_(kInvalidSquare),
       irreversible_move_counter_(0),
@@ -507,6 +509,8 @@ void ChessBoard::GeneratePseudoLegalMoves(
   if (!yield(move)) {   \
     generating = false; \
   }
+
+  if (allow_pass_move_) YIELD(kPassMove);
 
   for (int8_t y = 0; y < board_size_ && generating; ++y) {
     for (int8_t x = 0; x < board_size_ && generating; ++x) {
@@ -1000,6 +1004,14 @@ absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move) const {
 }
 
 void ChessBoard::ApplyMove(const Move &move) {
+  // Skip applying a move if it's a pass.
+  if (move == kPassMove) {
+    if (to_play_ == Color::kBlack) ++move_number_;
+    SetToPlay(OppColor(to_play_));
+    SetEpSquare(chess::kInvalidSquare);
+    return;
+  }
+
   // Most moves are simple - we remove the moving piece from the original
   // square, and put it on the destination square, overwriting whatever was
   // there before, update the 50 move counter, and update castling rights.

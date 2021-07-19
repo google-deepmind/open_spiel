@@ -28,18 +28,15 @@ namespace testing = open_spiel::testing;
 void RbcTestPassMove() {
   auto game = LoadGame("rbc");
   std::unique_ptr<State> s = game->NewInitialState();
-
-  const std::string white_fen = chess::kDefaultStandardFEN;
-  /*const*/ std::string black_fen = chess::kDefaultStandardFEN;
-  std::replace(black_fen.begin(), black_fen.end(), 'w', 'b');  // Switch sides.
-
-  SPIEL_CHECK_EQ(s->ToString(), white_fen);
+  SPIEL_CHECK_EQ(s->ToString(), chess::kDefaultStandardFEN);
 
   // First move
   SPIEL_CHECK_EQ(s->ActionToString(Player{0}, 0), "Sense a1");
   s->ApplyAction(0);  // Sense phase
   SPIEL_CHECK_EQ(s->ActionToString(Player{0}, chess::kPassAction), "pass");
   s->ApplyAction(chess::kPassAction);  // Move phase
+  std::string black_fen = chess::kDefaultStandardFEN;
+  std::replace(black_fen.begin(), black_fen.end(), 'w', 'b');  // Switch sides.
   SPIEL_CHECK_EQ(s->ToString(), black_fen);
 
   // Second move
@@ -47,6 +44,8 @@ void RbcTestPassMove() {
   s->ApplyAction(0);  // Sense phase
   SPIEL_CHECK_EQ(s->ActionToString(Player{1}, chess::kPassAction), "pass");
   s->ApplyAction(chess::kPassAction);  // Move phase
+  std::string white_fen = chess::kDefaultStandardFEN;
+  std::replace(white_fen.begin(), white_fen.end(), '1', '2');  // Update clock.
   SPIEL_CHECK_EQ(s->ToString(), white_fen);
 }
 
@@ -57,6 +56,7 @@ void BasicRbcTests(int board_size) {
   testing::LoadGameTest("rbc");
   testing::NoChanceOutcomesTest(*LoadGame("rbc", params));
   testing::RandomSimTest(*LoadGame("rbc", params), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("rbc", params), 1);
 }
 
 }  // namespace

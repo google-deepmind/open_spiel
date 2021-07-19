@@ -24,9 +24,9 @@ NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-ObservationTensorShape() = pieces_black: [9], pieces_white: [9], phase: [2], illegal_move: [2], capture: [2], private_k_pieces: [4, 4], private_q_pieces: [4, 4], private_r_pieces: [4, 4], private_b_pieces: [4, 4], private_n_pieces: [4, 4], private_p_pieces: [4, 4], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [4, 4], private_sense_Q_pieces: [4, 4], private_sense_R_pieces: [4, 4], private_sense_B_pieces: [4, 4], private_sense_N_pieces: [4, 4], private_sense_P_pieces: [4, 4]
+ObservationTensorShape() = pieces_black: [9], pieces_white: [9], phase: [2], illegal_move: [2], capture: [2], side_to_play: [2], private_k_pieces: [4, 4], private_q_pieces: [4, 4], private_r_pieces: [4, 4], private_b_pieces: [4, 4], private_n_pieces: [4, 4], private_p_pieces: [4, 4], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [4, 4], private_sense_Q_pieces: [4, 4], private_sense_R_pieces: [4, 4], private_sense_B_pieces: [4, 4], private_sense_N_pieces: [4, 4], private_sense_P_pieces: [4, 4]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 220
+ObservationTensorSize() = 222
 MaxGameLength() = 17695
 ToString() = "rbc(board_size=4)"
 
@@ -45,6 +45,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -100,6 +101,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -173,6 +175,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◉◯
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -228,6 +231,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◉◯
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -301,6 +305,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -356,6 +361,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -429,6 +435,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◉◯
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -484,6 +491,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◉◯
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -557,6 +565,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -612,6 +621,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -689,6 +699,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -744,6 +755,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -869,6 +881,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -924,6 +937,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -1001,6 +1015,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1056,6 +1071,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -1197,6 +1213,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1252,6 +1269,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -1329,6 +1347,7 @@ ObservationTensor(0).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1384,6 +1403,7 @@ ObservationTensor(1).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1525,6 +1545,7 @@ ObservationTensor(0).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◉◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1580,6 +1601,7 @@ ObservationTensor(1).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1657,6 +1679,7 @@ ObservationTensor(0).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◉◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1712,6 +1735,7 @@ ObservationTensor(1).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◉◯◯
@@ -1805,6 +1829,7 @@ ObservationTensor(0).pieces_white: ◯◉◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
 ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◉◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1860,6 +1885,7 @@ ObservationTensor(1).pieces_white: ◯◉◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
 ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◯

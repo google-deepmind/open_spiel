@@ -265,6 +265,7 @@ class RbcObserver : public Observer {
     WriteBinary(state.phase_ == MovePhase::kSensing, "phase", allocator);
     WriteBinary(state.illegal_move_attempted_, "illegal_move", allocator);
     WriteBinary(state.move_captured_, "capture", allocator);
+    WriteBinary(state.CurrentPlayer(), "side_to_play", allocator);
   }
 
   IIGObservationType iig_obs_type_;
@@ -289,11 +290,10 @@ void RbcState::DoApplyAction(Action action) {
     move_captured_ = false;
   } else {
     chess::Move move = ActionToMove(action, Board());
-    bool apply_move = true;
 
     // Handle special cases for RBC.
     if (action == chess::kPassAction) {
-      apply_move = false;
+      move = chess::kPassMove;
     } else if (Board().IsBreachingMove(move)) {
       SPIEL_DCHECK_FALSE(Board().IsMoveLegal(move));
       Board().BreachingMoveToCaptureMove(&move);
@@ -303,23 +303,17 @@ void RbcState::DoApplyAction(Action action) {
       SPIEL_DCHECK_NE(Board().at(move.from).color, Board().at(move.to).color);
     } else if (!Board().IsMoveLegal(move)) {
       illegal_move_attempted_ = true;
-      apply_move = false;
+      move = chess::kPassMove;
     }
 
-    if (apply_move) {
-      // Some player must be indeed moving.
-      SPIEL_DCHECK_NE(Board().at(move.from).color, chess::Color::kEmpty);
-      SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
+    // Some player must be indeed moving.
+    SPIEL_DCHECK_NE(Board().at(move.from).color, chess::Color::kEmpty);
+    SPIEL_DCHECK_TRUE(move == chess::kPassMove || Board().IsMoveLegal(move));
 
-      illegal_move_attempted_ = false;
-      move_captured_ = Board().at(move.from).color != Board().at(move.to).color;
-      moves_history_.push_back(move);
-      SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
-      Board().ApplyMove(move);
-    } else {
-      Board().SetEpSquare(chess::kInvalidSquare);
-      Board().SetToPlay(chess::OppColor(Board().ToPlay()));
-    }
+    illegal_move_attempted_ = false;
+    move_captured_ = Board().at(move.from).color != Board().at(move.to).color;
+    moves_history_.push_back(move);
+    Board().ApplyMove(move);
 
     ++repetitions_[current_board_.HashValue()];
     phase_ = MovePhase::kSensing;
@@ -396,14 +390,21 @@ std::unique_ptr<State> RbcState::Clone() const {
 
 void RbcState::UndoAction(Player player, Action action) {
   // TODO: Make this fast by storing undo info in another stack.
-  SPIEL_CHECK_GE(moves_history_.size(), 1);
-  --repetitions_[current_board_.HashValue()];
-  moves_history_.pop_back();
+  SPIEL_CHECK_FALSE(history_.empty());  // Can't undo initial state.
   history_.pop_back();
   --move_number_;
-  current_board_ = start_board_;
-  for (const chess::Move& move : moves_history_) {
-    current_board_.ApplyMove(move);
+
+  if (phase_ == MovePhase::kMoving) {
+    phase_ = MovePhase::kSensing;
+  } else {
+    SPIEL_CHECK_GE(moves_history_.size(), 1);
+    phase_ = MovePhase::kMoving;
+    --repetitions_[current_board_.HashValue()];
+    moves_history_.pop_back();
+    current_board_ = start_board_;
+    for (const chess::Move& move : moves_history_) {
+      current_board_.ApplyMove(move);
+    }
   }
 }
 
