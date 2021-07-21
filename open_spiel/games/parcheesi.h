@@ -54,33 +54,33 @@ inline constexpr const int kNumTokens = 4;
 // '0': first die used
 // '1': second die used
 // '2': both die used
-inline constexpr const int kTokenMoveDieIndexMax = 3;
+inline constexpr const int kParcheesiMoveDieIndexMax = 3;
 
 // pos values
 //  -1   : base
 //  0-63 : 64 grid positions
 // 64-70 : 7 ladder positions
 //  71   : home
-inline constexpr const int kTokenMovePosMax = 73;
+inline constexpr const int kParcheesiMovePosMax = 73;
 
 // token_index values
 // (4 + 1) since we assign -1 for the token moving from base
-inline constexpr const int kTokenMoveTokenIndexMax = 5;
+inline constexpr const int kParcheesiMoveTokenIndexMax = 5;
 
 // breaking_block values
 // true & false
-inline constexpr const int kTokenMoveBreakingBlockMax = 2;
+inline constexpr const int kParcheesiMoveBreakingBlockMax = 2;
 
-inline constexpr const int kNumDistinctActions = kTokenMoveDieIndexMax * kTokenMovePosMax * kTokenMovePosMax * kTokenMoveTokenIndexMax * kTokenMoveBreakingBlockMax;
+inline constexpr const int kNumDistinctActions = kParcheesiMoveDieIndexMax * kParcheesiMovePosMax * kParcheesiMovePosMax * kParcheesiMoveTokenIndexMax * kParcheesiMoveBreakingBlockMax;
 inline constexpr const int kStateEncodingSize = 1;
 
-struct TokenMove {
+struct ParcheesiMove {
   int die_index;
   int old_pos;
   int new_pos;
   int token_index;
   bool breaking_block;
-  TokenMove(int _die_index, int _old_pos, int _new_pos, int _token_index, bool _breaking_block)
+  ParcheesiMove(int _die_index, int _old_pos, int _new_pos, int _token_index, bool _breaking_block)
       : die_index(_die_index), old_pos(_old_pos), new_pos(_new_pos), token_index(_token_index), breaking_block(_breaking_block) {}
 };
 
@@ -111,9 +111,9 @@ class ParcheesiState : public State {
                 const std::vector<int>& bar, const std::vector<int>& scores,
                 const std::vector<std::vector<int>>& board);
 
-  TokenMove SpielMoveToTokenMove(Action move) const;
-  std::vector<Action> MultipleTokenMoveToSpielMove(std::vector<TokenMove> tokenMoves) const;
-  Action TokenMoveToSpielMove(TokenMove tokenMoves) const;
+  ParcheesiMove SpielMoveToParcheesiMove(Action move) const;
+  std::vector<Action> MultipleParcheesiMoveToSpielMove(std::vector<ParcheesiMove> parcheesiMoves) const;
+  Action ParcheesiMoveToSpielMove(ParcheesiMove parcheesiMoves) const;
   
 
  protected:
@@ -123,12 +123,12 @@ class ParcheesiState : public State {
   void SetupInitialBoard();
   void RollDice(int outcome);
 
-  void PrintMove(TokenMove move) const;
+  void PrintMove(ParcheesiMove move) const;
   int GetPlayerFromToken(std::string token) const;
   int GetGridPosForPlayer(int pos, int player) const;
   std::string GetHumanReadablePosForPlayer(int pos, int player) const;
-  std::vector<TokenMove> GetTokenMoves(int player, std::vector<int> dice) const;
-  std::vector<TokenMove> GetGridMoves(std::vector<int> player_token_pos, int player, std::vector<int> dice, bool breaking_block) const;
+  std::vector<ParcheesiMove> GetParcheesiMoves(int player, std::vector<int> dice) const;
+  std::vector<ParcheesiMove> GetGridMoves(std::vector<int> player_token_pos, int player, std::vector<int> dice, bool breaking_block) const;
   bool DestinationOccupiedBySafeToken(int destination,int player) const;
   bool BlocksInRoute(int start, int end, int player) const;
   void PenalisePlayer(Player player);
@@ -139,7 +139,7 @@ class ParcheesiState : public State {
   int turns_;
   int extra_turn_;
   int bonus_move_;
-  TokenMove illegal_move_;
+  ParcheesiMove illegal_move_;
   bool player_forced_to_move_block_;
   std::vector<int> dice_;    // Current dice.
 

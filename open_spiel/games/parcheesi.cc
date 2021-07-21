@@ -100,10 +100,10 @@ std::string ParcheesiState::ActionToString(Player player,
   }else if(move_id == 1){
     return absl::StrCat("Player ", kTokens[player], " does not have any valid bonus moves");
   }else{
-    TokenMove tokenMove = SpielMoveToTokenMove(move_id);
-    return absl::StrCat("Player ", kTokens[player], " moved token ", tokenMove.token_index, " from ", 
-      GetHumanReadablePosForPlayer(tokenMove.old_pos, player), " to ", 
-      GetHumanReadablePosForPlayer(tokenMove.new_pos, player));    
+    ParcheesiMove parcheesiMove = SpielMoveToParcheesiMove(move_id);
+    return absl::StrCat("Player ", kTokens[player], " moved token ", parcheesiMove.token_index, " from ", 
+      GetHumanReadablePosForPlayer(parcheesiMove.old_pos, player), " to ", 
+      GetHumanReadablePosForPlayer(parcheesiMove.new_pos, player));    
   }
 }
 
@@ -130,7 +130,7 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
       dice_({}),
       extra_turn_(0),
       bonus_move_(0),
-      illegal_move_((TokenMove(-1, -1, -1, -1, false))),
+      illegal_move_((ParcheesiMove(-1, -1, -1, -1, false))),
       home_(std::vector<std::vector<std::string>>(kNumPlayers, std::vector<std::string>())),
       base_(std::vector<std::vector<std::string>>(kNumPlayers, std::vector<std::string>())),
       token_pos_(std::vector<std::vector<int>>(kNumPlayers, std::vector<int>(4, -1))),
@@ -173,38 +173,38 @@ int ParcheesiState::GetPlayerFromToken(std::string token) const {
   return -1;
 }
 
-TokenMove ParcheesiState::SpielMoveToTokenMove(Action move) const {
-  bool breaking_block = move % kTokenMoveBreakingBlockMax;
-  move /= kTokenMoveBreakingBlockMax;
-  int token_index = (move % kTokenMoveTokenIndexMax) - 1;
-  move /= kTokenMoveTokenIndexMax;
-  int new_pos = (move % kTokenMovePosMax) - 1;
-  move /= kTokenMovePosMax;
-  int old_pos = (move % kTokenMovePosMax) - 1;
-  move /= kTokenMovePosMax;
+ParcheesiMove ParcheesiState::SpielMoveToParcheesiMove(Action move) const {
+  bool breaking_block = move % kParcheesiMoveBreakingBlockMax;
+  move /= kParcheesiMoveBreakingBlockMax;
+  int token_index = (move % kParcheesiMoveTokenIndexMax) - 1;
+  move /= kParcheesiMoveTokenIndexMax;
+  int new_pos = (move % kParcheesiMovePosMax) - 1;
+  move /= kParcheesiMovePosMax;
+  int old_pos = (move % kParcheesiMovePosMax) - 1;
+  move /= kParcheesiMovePosMax;
   int die_index = move;
-  TokenMove tokenMove = TokenMove(die_index, old_pos, new_pos, token_index, breaking_block);
-  return tokenMove;
+  ParcheesiMove parcheesiMove = ParcheesiMove(die_index, old_pos, new_pos, token_index, breaking_block);
+  return parcheesiMove;
 }
 
-std::vector<Action> ParcheesiState::MultipleTokenMoveToSpielMove(std::vector<TokenMove> tokenMoves) const {
+std::vector<Action> ParcheesiState::MultipleParcheesiMoveToSpielMove(std::vector<ParcheesiMove> parcheesiMoves) const {
   std::vector<Action> moves = {};
-  for(int i = 0; i < tokenMoves.size(); i++){
-    moves.push_back(TokenMoveToSpielMove(tokenMoves[i]));
+  for(int i = 0; i < parcheesiMoves.size(); i++){
+    moves.push_back(ParcheesiMoveToSpielMove(parcheesiMoves[i]));
   }  
   return moves;
 }
 
-Action ParcheesiState::TokenMoveToSpielMove(TokenMove tokenMove) const {
-  Action move = tokenMove.die_index;
-  move *= kTokenMovePosMax;
-  move += (tokenMove.old_pos + 1);
-  move *= kTokenMovePosMax;
-  move += (tokenMove.new_pos + 1);
-  move *= kTokenMoveTokenIndexMax;
-  move += (tokenMove.token_index + 1);
-  move *= kTokenMoveBreakingBlockMax;
-  move += tokenMove.breaking_block;
+Action ParcheesiState::ParcheesiMoveToSpielMove(ParcheesiMove parcheesiMove) const {
+  Action move = parcheesiMove.die_index;
+  move *= kParcheesiMovePosMax;
+  move += (parcheesiMove.old_pos + 1);
+  move *= kParcheesiMovePosMax;
+  move += (parcheesiMove.new_pos + 1);
+  move *= kParcheesiMoveTokenIndexMax;
+  move += (parcheesiMove.token_index + 1);
+  move *= kParcheesiMoveBreakingBlockMax;
+  move += parcheesiMove.breaking_block;
   return move;
 }
 
@@ -262,19 +262,19 @@ void ParcheesiState::DoApplyAction(Action move) {
     // the same position on the board) using a double. So if the player used one die value in a double
     // dice roll to move one token of a block, then he cannot also move the other one unless it's the
     // only move possible. We track that move with illegal_move
-    illegal_move_ = TokenMove(-1, -1, -1, -1, false);
-    TokenMove tokenMove = SpielMoveToTokenMove(move);    
-    if(tokenMove.breaking_block)
-      illegal_move_ = tokenMove;
+    illegal_move_ = ParcheesiMove(-1, -1, -1, -1, false);
+    ParcheesiMove parcheesiMove = SpielMoveToParcheesiMove(move);    
+    if(parcheesiMove.breaking_block)
+      illegal_move_ = parcheesiMove;
 
-    std::string token = kTokens[cur_player_] + std::to_string(tokenMove.token_index);       
+    std::string token = kTokens[cur_player_] + std::to_string(parcheesiMove.token_index);       
     
     // Remove the token from it's old location. Either in base_ or board_
-    if(tokenMove.old_pos == -1){
+    if(parcheesiMove.old_pos == -1){
       token = base_[cur_player_].back();
       base_[cur_player_].pop_back();       
-    }else if(tokenMove.old_pos < kNumBoardPos){      
-      int grid_pos = GetGridPosForPlayer(tokenMove.old_pos, cur_player_);
+    }else if(parcheesiMove.old_pos < kNumBoardPos){      
+      int grid_pos = GetGridPosForPlayer(parcheesiMove.old_pos, cur_player_);
       for(int i = 0; i < board_[grid_pos].size(); i++){
         if(board_[grid_pos][i] == token){
           board_[grid_pos].erase(board_[grid_pos].begin() + i);
@@ -285,8 +285,8 @@ void ParcheesiState::DoApplyAction(Action move) {
 
     // Place the token to it's new location. Remove any opponent tokens that were hit.
     // Award bonus moves as applicable.
-    if(tokenMove.new_pos < kNumBoardPos){
-      int grid_pos = GetGridPosForPlayer(tokenMove.new_pos, cur_player_);
+    if(parcheesiMove.new_pos < kNumBoardPos){
+      int grid_pos = GetGridPosForPlayer(parcheesiMove.new_pos, cur_player_);
       if(board_[grid_pos].size() == 1 && board_[grid_pos][0].at(0) != kTokens[cur_player_].at(0)){
         std::string killed_token = board_[grid_pos].back();
         board_[grid_pos].pop_back();
@@ -296,20 +296,20 @@ void ParcheesiState::DoApplyAction(Action move) {
         bonus_move_ = kBonusMovesForHittingOpponentToken;
       }      
       board_[grid_pos].push_back(token);
-    }else if(tokenMove.new_pos == kHomePos){
+    }else if(parcheesiMove.new_pos == kHomePos){
       home_[cur_player_].push_back(token);
       bonus_move_ = kBonusMovesForGettingTokenHome;
     } 
 
     // Update token_pos_   
-    token_pos_[cur_player_][token.at(1) - '0'] = tokenMove.new_pos;
+    token_pos_[cur_player_][token.at(1) - '0'] = parcheesiMove.new_pos;
 
     // If the move is not a bonus move, removed used die from dice_
-    if(tokenMove.new_pos - tokenMove.old_pos < kBonusMovesForGettingTokenHome){
-      if(tokenMove.die_index == 2)
+    if(parcheesiMove.new_pos - parcheesiMove.old_pos < kBonusMovesForGettingTokenHome){
+      if(parcheesiMove.die_index == 2)
         dice_.clear();
       else
-        dice_.erase(dice_.begin() + tokenMove.die_index);
+        dice_.erase(dice_.begin() + parcheesiMove.die_index);
     }    
   }  
 
@@ -351,12 +351,12 @@ std::vector<Action> ParcheesiState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
 
-  std::vector<TokenMove> moves;
+  std::vector<ParcheesiMove> moves;
   // If bonus moves are granted, mandatory to use them first.
   if(bonus_move_ != 0)
-    moves = GetTokenMoves(cur_player_, {bonus_move_});
+    moves = GetParcheesiMoves(cur_player_, {bonus_move_});
   else{
-    moves = GetTokenMoves(cur_player_, dice_);
+    moves = GetParcheesiMoves(cur_player_, dice_);
     // Remove the move that'll allow to move block if other moves are available.
     if(illegal_move_.die_index != -1 && moves.size() > 1){
       for(int i = 0; i < moves.size(); i++){
@@ -368,7 +368,7 @@ std::vector<Action> ParcheesiState::LegalActions() const {
     }
   }
 
-  std::vector<Action> spielmoves = MultipleTokenMoveToSpielMove(moves);
+  std::vector<Action> spielmoves = MultipleParcheesiMoveToSpielMove(moves);
 
   // kActionNoValidMoves: No valid move is possible now for the player and turn should end now
   // kActionNoBonusMoves: No moves possible with bonus_moves, althought turn might not be over if unused die is left
@@ -382,8 +382,8 @@ std::vector<Action> ParcheesiState::LegalActions() const {
   return spielmoves;
 }
 
-std::vector<TokenMove> ParcheesiState::GetTokenMoves(int player, std::vector<int> dice) const {
-  std::vector<TokenMove> moves;
+std::vector<ParcheesiMove> ParcheesiState::GetParcheesiMoves(int player, std::vector<int> dice) const {
+  std::vector<ParcheesiMove> moves;
 
   // If rolled doubles, moving blocks is mandatory
   if(dice.size() == 2 && dice[0] == dice[1]){
@@ -412,16 +412,16 @@ std::vector<TokenMove> ParcheesiState::GetTokenMoves(int player, std::vector<int
   if(board_[kStartPos[player]].size() < 2){
     if(base_[player].size() > 0){
       if(dice[0] == 5){
-        moves.push_back(TokenMove(0, -1, 0, -1, false));
+        moves.push_back(ParcheesiMove(0, -1, 0, -1, false));
         return moves;
       }
       if(dice.size() > 1){
         if(dice[1] == 5){
-          moves.push_back(TokenMove(1, -1, 0, -1, false));
+          moves.push_back(ParcheesiMove(1, -1, 0, -1, false));
           return moves;
         }
         if(dice[0] + dice[1] == 5){
-          moves.push_back(TokenMove(2, -1, 0, -1, false));
+          moves.push_back(ParcheesiMove(2, -1, 0, -1, false));
           return moves;
         }
       }
@@ -434,15 +434,15 @@ std::vector<TokenMove> ParcheesiState::GetTokenMoves(int player, std::vector<int
   return {};
 }
 
-std::vector<TokenMove> ParcheesiState::GetGridMoves(std::vector<int> player_token_pos, int player, std::vector<int> dice, bool breaking_block) const {
-  std::vector<TokenMove> moves;
+std::vector<ParcheesiMove> ParcheesiState::GetGridMoves(std::vector<int> player_token_pos, int player, std::vector<int> dice, bool breaking_block) const {
+  std::vector<ParcheesiMove> moves;
   for(int i = 0; i < player_token_pos.size(); i++){
     int old_pos = player_token_pos[i];
     if(old_pos >= 0){
       for(int j = 0; j < dice.size(); j++){
         int new_pos = old_pos + dice[j];
         if(new_pos <= kHomePos && !DestinationOccupiedBySafeToken(new_pos, player) && !BlocksInRoute(old_pos, new_pos, player)){
-          moves.push_back(TokenMove(j, old_pos, new_pos, i, breaking_block));
+          moves.push_back(ParcheesiMove(j, old_pos, new_pos, i, breaking_block));
         }
       }
     }
