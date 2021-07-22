@@ -27,11 +27,11 @@ namespace higc {
 // All times are in miliseconds.
 struct TournamentSettings {
   int timeout_ready = 200;
-  int timeout_start = 10;
-  int timeout_act = 10;
-  int timeout_ponder = 5;
-  int timeout_match_over = 10;
-  int time_tournament_over = 10;
+  int timeout_start = 100;
+  int timeout_act = 100;
+  int timeout_ponder = 50;
+  int timeout_match_over = 100;
+  int time_tournament_over = 100;
   int max_invalid_behaviors = 1;
   double disqualification_rate = 0.1;
 };
