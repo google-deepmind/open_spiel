@@ -11,13 +11,47 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <ext/stdio_filebuf.h>
-#include <cstdio>
-#include <system_error>
-
-#include <unistd.h>
-#include <sys/types.h>
+#include <fstream>
 #include <sys/wait.h>
+
+namespace {
+
+// Provides a layer of compatibility for C/POSIX.
+template <typename _CharT, typename _Traits = std::char_traits<_CharT> >
+class stdio_filebuf : public std::basic_filebuf<_CharT, _Traits> {
+ public:
+  /**
+   *  @param  fd   An open file descriptor.
+   *  @param  mode Same meaning as in a standard filebuf.
+   *  @param  size Optimal or preferred size of internal buffer,
+   *               in chars.
+   *
+   *  This constructor associates a file stream buffer with an open
+   *  POSIX file descriptor. The file descriptor will be automatically
+   *  closed when the stdio_filebuf is closed/destroyed.
+  */
+  stdio_filebuf(int fd, std::ios_base::openmode mode,
+                size_t size = static_cast<size_t>(BUFSIZ)) {
+    this->_M_file.sys_open(fd, mode);
+    if (this->is_open()) {
+      this->_M_mode = mode;
+      this->_M_buf_size = size;
+      this->_M_allocate_internal_buffer();
+      this->_M_reading = false;
+      this->_M_writing = false;
+      this->_M_set_buffer(-1);
+    }
+  }
+  ~stdio_filebuf() = default;
+  stdio_filebuf(stdio_filebuf&&) = default;
+  stdio_filebuf& operator=(stdio_filebuf&&) = default;
+  // The underlying file descriptor.
+  int fd() { return this->_M_file.fd(); }
+  // The underlying FILE*
+  FILE* file() { return this->_M_file.file(); }
+};
+
+} // namespace
 
 namespace subprocess {
 
@@ -49,8 +83,7 @@ class popen {
         in_stream(nullptr),
         out_stream(nullptr),
         err_stream(nullptr) {
-    auto filebuf =
-        dynamic_cast<__gnu_cxx::stdio_filebuf<char>*>(pipe_stdout.rdbuf());
+    auto filebuf = dynamic_cast<stdio_filebuf<char>*>(pipe_stdout.rdbuf());
     out_pipe[READ] = -1;
     out_pipe[WRITE] = filebuf->fd();
 
@@ -113,21 +146,15 @@ class popen {
     ::close(out_pipe[WRITE]);
     ::close(err_pipe[WRITE]);
 
-    in_filebuf = new __gnu_cxx::stdio_filebuf<char>(in_pipe[WRITE],
-                                                    std::ios_base::out,
-                                                    1);
+    in_filebuf = new stdio_filebuf<char>(in_pipe[WRITE], std::ios_base::out, 1);
     in_stream = new std::ostream(in_filebuf);
 
     if (out_pipe[READ] != -1) {
-      out_filebuf = new __gnu_cxx::stdio_filebuf<char>(out_pipe[READ],
-                                                       std::ios_base::in,
-                                                       1);
+      out_filebuf = new stdio_filebuf<char>(out_pipe[READ], std::ios_base::in, 1);
       out_stream = new std::istream(out_filebuf);
     }
 
-    err_filebuf = new __gnu_cxx::stdio_filebuf<char>(err_pipe[READ],
-                                                     std::ios_base::in,
-                                                     1);
+    err_filebuf = new stdio_filebuf<char>(err_pipe[READ], std::ios_base::in, 1);
     err_stream = new std::istream(err_filebuf);
   }
 
@@ -162,9 +189,9 @@ class popen {
   int out_pipe[2];
   int err_pipe[2];
 
-  __gnu_cxx::stdio_filebuf<char>* in_filebuf;
-  __gnu_cxx::stdio_filebuf<char>* out_filebuf;
-  __gnu_cxx::stdio_filebuf<char>* err_filebuf;
+  stdio_filebuf<char>* in_filebuf;
+  stdio_filebuf<char>* out_filebuf;
+  stdio_filebuf<char>* err_filebuf;
 
   std::ostream* in_stream;
   std::istream* out_stream;
