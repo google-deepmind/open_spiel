@@ -36,7 +36,8 @@ void SpielMoveParcheesiMoveEncodingDecodingTest() {
   std::unique_ptr<State> state = game->NewInitialState();
   ParcheesiState* pstate = static_cast<ParcheesiState*>(state.get());
   
-  ParcheesiMove parcheesiMove = ParcheesiMove(1, 20, 25, 2, false);
+  pstate->SetPlayer(0);
+  ParcheesiMove parcheesiMove = ParcheesiMove(0, -1, 0, 3, false);
   Action spielMove = pstate->ParcheesiMoveToSpielMove(parcheesiMove);
   ParcheesiMove decodedParcheesiMove = pstate->SpielMoveToParcheesiMove(spielMove);
 

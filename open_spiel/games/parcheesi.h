@@ -56,22 +56,15 @@ inline constexpr const int kNumTokens = 4;
 // '2': both die used
 inline constexpr const int kParcheesiMoveDieIndexMax = 3;
 
-// pos values
-//  -1   : base
-//  0-63 : 64 grid positions
-// 64-70 : 7 ladder positions
-//  71   : home
-inline constexpr const int kParcheesiMovePosMax = 73;
+inline constexpr const int kParcheesiMoveTokenMoveMax = 8;
 
-// token_index values
-// (4 + 1) since we assign -1 for the token moving from base
-inline constexpr const int kParcheesiMoveTokenIndexMax = 5;
+inline constexpr const int kParcheesiMoveTokenIndexMax = 16;
 
 // breaking_block values
 // true & false
 inline constexpr const int kParcheesiMoveBreakingBlockMax = 2;
 
-inline constexpr const int kNumDistinctActions = kParcheesiMoveDieIndexMax * kParcheesiMovePosMax * kParcheesiMovePosMax * kParcheesiMoveTokenIndexMax * kParcheesiMoveBreakingBlockMax;
+inline constexpr const int kNumDistinctActions = kParcheesiMoveDieIndexMax * kParcheesiMoveTokenMoveMax * kParcheesiMoveTokenIndexMax * kParcheesiMoveBreakingBlockMax;
 inline constexpr const int kStateEncodingSize = 1;
 
 struct ParcheesiMove {
@@ -82,6 +75,15 @@ struct ParcheesiMove {
   bool breaking_block;
   ParcheesiMove(int _die_index, int _old_pos, int _new_pos, int _token_index, bool _breaking_block)
       : die_index(_die_index), old_pos(_old_pos), new_pos(_new_pos), token_index(_token_index), breaking_block(_breaking_block) {}
+};
+
+struct ParcheesiMoveCompact {
+  int die_index;
+  int token_move;
+  int token_index;
+  bool breaking_block;
+  ParcheesiMoveCompact(int _die_index, int _token_move, int _token_index, bool _breaking_block)
+      : die_index(_die_index), token_move(_token_move), token_index(_token_index), breaking_block(_breaking_block) {}
 };
 
 class ParcheesiGame;
@@ -114,7 +116,9 @@ class ParcheesiState : public State {
   ParcheesiMove SpielMoveToParcheesiMove(Action move) const;
   std::vector<Action> MultipleParcheesiMoveToSpielMove(std::vector<ParcheesiMove> parcheesiMoves) const;
   Action ParcheesiMoveToSpielMove(ParcheesiMove parcheesiMoves) const;
-  
+  ParcheesiMoveCompact ParcheesiMoveCompressed(ParcheesiMove parcheesiMove) const;
+  ParcheesiMove ParcheesiMoveExpanded(ParcheesiMoveCompact parcheesiMoveCompact) const;
+  void SetPlayer(int player);
 
  protected:
   void DoApplyAction(Action move_id) override;
