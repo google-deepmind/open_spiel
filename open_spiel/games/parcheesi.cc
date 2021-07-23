@@ -120,6 +120,25 @@ void ParcheesiState::ObservationTensor(Player player,
 
   SPIEL_CHECK_EQ(values.size(), kStateEncodingSize);
   auto value_it = values.begin();
+  auto value_pos = values.begin();
+
+  for(std::vector<std::string> player_base : base_)
+    *value_it++ = (player_base.size() / 4.0);
+  for(int i = 0; i < token_pos_.size(); i++){
+    for(int j = 0; j < token_pos_[i].size(); j++){
+      int pos = token_pos_[i][j];
+      if (pos >= 0 && pos < kNumBoardPos){
+        value_pos = value_it + GetGridPosForPlayer(pos, i) * 4 + i;
+        *value_pos = *value_pos + 0.25;
+      }else if(pos >= kNumBoardPos){
+        value_pos = value_it + (pos - kNumBoardPos + kNumBoardTiles) * 4 + i;
+        *value_pos = *value_pos + 0.25;
+      }
+    }
+  }
+
+  value_it = value_it + 304;
+  SPIEL_CHECK_EQ(value_it, values.end());
 }
 
 ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
@@ -136,6 +155,18 @@ ParcheesiState::ParcheesiState(std::shared_ptr<const Game> game)
       token_pos_(std::vector<std::vector<int>>(kNumPlayers, std::vector<int>(4, -1))),
       board_(std::vector<std::vector<std::string>>(kNumBoardTiles, std::vector<std::string>())){
   SetupInitialBoard();
+  // SetupCustomBoard();
+}
+
+void ParcheesiState::SetupCustomBoard() {
+  base_ = {{},{"g0","g1","g3"},{"y2"},{"b0"}};
+  token_pos_ = {{7, 6, 27, 7}, {-1, -1, 45, -1}, {6, 12, -1, 4}, {-1, 3, 15, 52}};
+  for(int i = 0; i < token_pos_.size(); i++){
+    for(int j = 0; j < token_pos_[i].size(); j++){
+      if(token_pos_[i][j] >= 0 && token_pos_[i][j] < kNumBoardPos)
+        board_[GetGridPosForPlayer(token_pos_[i][j], i)].push_back(kTokens[i] + std::to_string(j));
+    }
+  }  
 }
 
 void ParcheesiState::SetupInitialBoard() {
@@ -282,7 +313,7 @@ void ParcheesiState::DoApplyAction(Action move) {
   bonus_move_ = 0;
 
   // Execute a playable move
-  if(move > kActionNoBonusMoves){
+  if(move != kActionNoBonusMoves && move != kActionNoValidMoves){
     // It is illegal to move a block (blocks are formed when two tokens of the same player occupies
     // the same position on the board) using a double. So if the player used one die value in a double
     // dice roll to move one token of a block, then he cannot also move the other one unless it's the

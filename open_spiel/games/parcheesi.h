@@ -44,9 +44,6 @@ inline constexpr const int kHomePos = 71;
 inline constexpr const int kBonusMovesForHittingOpponentToken = 20;
 inline constexpr const int kBonusMovesForGettingTokenHome = 10;
 
-inline constexpr const int kActionNoValidMoves = 0;
-inline constexpr const int kActionNoBonusMoves = 1;
-
 inline constexpr const int kNumPlayers = 4;
 inline constexpr const int kNumTokens = 4;
 
@@ -64,8 +61,10 @@ inline constexpr const int kParcheesiMoveTokenIndexMax = 16;
 // true & false
 inline constexpr const int kParcheesiMoveBreakingBlockMax = 2;
 
-inline constexpr const int kNumDistinctActions = kParcheesiMoveDieIndexMax * kParcheesiMoveTokenMoveMax * kParcheesiMoveTokenIndexMax * kParcheesiMoveBreakingBlockMax;
-inline constexpr const int kStateEncodingSize = 1;
+inline constexpr const int kNumDistinctActions = kParcheesiMoveDieIndexMax * kParcheesiMoveTokenMoveMax * kParcheesiMoveTokenIndexMax * kParcheesiMoveBreakingBlockMax + 2;
+inline constexpr const int kActionNoValidMoves = kNumDistinctActions - 1;
+inline constexpr const int kActionNoBonusMoves = kNumDistinctActions - 2;
+inline constexpr const int kStateEncodingSize = 308;
 
 struct ParcheesiMove {
   int die_index;
@@ -125,6 +124,7 @@ class ParcheesiState : public State {
 
  private:
   void SetupInitialBoard();
+  void SetupCustomBoard();
   void RollDice(int outcome);
 
   void PrintMove(ParcheesiMove move) const;
