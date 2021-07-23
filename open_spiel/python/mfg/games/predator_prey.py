@@ -169,7 +169,6 @@ class MFGPredatorPreyState(pyspiel.State):
         States with population=None cannot be used to perform game actions.
     """
     super().__init__(game)
-    self._game = game
     # Initial state where the initial position is chosen according to
     # an initial distribution.
     self._is_position_init = True

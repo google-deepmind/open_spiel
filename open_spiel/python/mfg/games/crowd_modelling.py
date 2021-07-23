@@ -105,7 +105,6 @@ class MFGCrowdModellingState(pyspiel.State):
   def __init__(self, game):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
-    self._game = game
     self._is_chance_init = True  # is true for the first state of the game.
     self._player_id = pyspiel.PlayerId.CHANCE
     self._x = None
