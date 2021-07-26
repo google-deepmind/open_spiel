@@ -171,7 +171,9 @@ std::string PhantomTTTState::InformationStateString(Player player) const {
   SPIEL_CHECK_LT(player, num_players_);
   std::string str;
   absl::StrAppend(&str, ViewToString(player), "\n");
-  absl::StrAppend(&str, history_.size(), "\n");
+  if (obs_type_ != ObservationType::kRevealNothing) {
+    absl::StrAppend(&str, history_.size(), "\n");
+  }
   absl::StrAppend(&str, ActionSequenceToString(player));
   return str;
 }
