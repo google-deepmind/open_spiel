@@ -25,13 +25,13 @@
 
 namespace open_spiel {
 
-DimensionedSpan ContiguousAllocator::Get(
-    absl::string_view name, const absl::InlinedVector<int, 4>& shape) {
+SpanTensor ContiguousAllocator::Get(absl::string_view name,
+                                    const absl::InlinedVector<int, 4>& shape) {
   const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
   SPIEL_DCHECK_LE(offset_, data_.size());
-  auto piece = data_.subspan(offset_, size);
+  auto buffer = data_.subspan(offset_, size);
   offset_ += size;
-  return DimensionedSpan(piece, shape);
+  return SpanTensor(SpanTensorInfo(name, shape), buffer);
 }
 
 namespace {
@@ -51,7 +51,7 @@ class InformationStateObserver : public Observer {
   void WriteTensor(const State& state, int player,
                    Allocator* allocator) const override {
     auto tensor = allocator->Get("info_state", shape_);
-    state.InformationStateTensor(player, tensor.data);
+    state.InformationStateTensor(player, tensor.data());
   }
 
   std::string StringFrom(const State& state, int player) const override {
@@ -80,7 +80,7 @@ class DefaultObserver : public Observer {
                    Allocator* allocator) const override {
     SPIEL_CHECK_TRUE(has_tensor_);
     auto tensor = allocator->Get("observation", shape_);
-    state.ObservationTensor(player, tensor.data);
+    state.ObservationTensor(player, tensor.data());
   }
 
   std::string StringFrom(const State& state, int player) const override {
@@ -189,21 +189,25 @@ std::shared_ptr<Observer> Game::MakeObserver(
   }
 }
 
-DimensionedSpan TrackingVectorAllocator::Get(absl::string_view name,
-                    const absl::InlinedVector<int, 4>& shape) {
+SpanTensor TrackingVectorAllocator::Get(
+    absl::string_view name, const absl::InlinedVector<int, 4>& shape) {
   SPIEL_DCHECK_TRUE(IsNameUnique(name));
-  tensors.push_back(
-      TensorInfo{std::string(name), {shape.begin(), shape.end()}});
-  const int begin_size = data.size();
-  const int size = absl::c_accumulate(shape, 1, std::multiplies<int>());
-  data.resize(begin_size + size);
-  return DimensionedSpan(absl::MakeSpan(data).subspan(begin_size, size),
-                         shape);
+
+  SpanTensorInfo info(name, shape);
+  tensors_info_.push_back(info);
+
+  const int offset = data_.size();
+  const int size = info.size();
+  data_.resize(offset + size);
+  return SpanTensor(std::move(info),
+                    absl::MakeSpan(data_).subspan(offset, size));
 }
 
-bool TrackingVectorAllocator::IsNameUnique(absl::string_view name) {
-  for (const TensorInfo& tensor : tensors) {
-    if (tensor.name == name) return false;
+bool TrackingVectorAllocator::IsNameUnique(absl::string_view name) const {
+  for (const SpanTensorInfo& info : tensors_info_) {
+    if (info.name() == name) {
+      return false;
+    }
   }
   return true;
 }
@@ -215,8 +219,8 @@ Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
     auto state = game.NewInitialState();
     TrackingVectorAllocator allocator;
     observer_->WriteTensor(*state, /*player=*/0, &allocator);
-    buffer_ = std::move(allocator.data);
-    tensors_ = std::move(allocator.tensors);
+    buffer_ = allocator.data();
+    tensors_info_ = allocator.tensors_info();
   }
 }
 
@@ -225,19 +229,14 @@ void Observation::SetFrom(const State& state, int player) {
   observer_->WriteTensor(state, player, &allocator);
 }
 
-std::vector<TensorInfoWithData> Observation::tensors() const {
-  std::vector<TensorInfoWithData> result;
-  result.reserve(tensors_.size());
-  int start = 0;
-  for (const TensorInfo& info : tensors_) {
-    const int size = absl::c_accumulate(info.shape, 1, std::multiplies<int>());
-    TensorInfoWithData tensor_with_data;
-    // Copy the TensorInfo base part.
-    tensor_with_data.name = info.name;
-    tensor_with_data.shape = info.shape;
-    tensor_with_data.data = absl::MakeSpan(buffer_).subspan(start, size);
-    result.emplace_back(std::move(tensor_with_data));
-    start += size;
+std::vector<SpanTensor> Observation::tensors() {
+  std::vector<SpanTensor> result;
+  result.reserve(tensors_info_.size());
+  int offset = 0;
+  for (const SpanTensorInfo& info : tensors_info_) {
+    const int size = info.size();
+    result.emplace_back(info, absl::MakeSpan(buffer_).subspan(offset, size));
+    offset += size;
   }
   return result;
 }
@@ -363,17 +362,17 @@ std::vector<float> TensorFromObserver(const State& state,
                                       const Observer& observer) {
   TrackingVectorAllocator allocator;
   observer.WriteTensor(state, /*player=*/state.CurrentPlayer(), &allocator);
-  return std::move(allocator.data);
+  return std::move(allocator.data());
 }
 
 std::vector<int> ObserverTensorShape(const State& state,
                                      const Observer& observer) {
   TrackingVectorAllocator allocator;
   observer.WriteTensor(state, /*player=*/0, &allocator);
-  if (allocator.tensors.size() == 1) {
-    return allocator.tensors.front().shape;
+  if (allocator.tensors_info().size() == 1) {
+    return allocator.tensors_info().front().vector_shape();
   } else {
-    return {static_cast<int>(allocator.data.size())};
+    return {static_cast<int>(allocator.data().size())};
   }
 }
 
