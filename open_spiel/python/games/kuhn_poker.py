@@ -23,8 +23,8 @@ for prototyping or for small games.
 
 It is possible to run C++ algorithms on Python implemented games, This is likely
 to have good performance if the algorithm simply extracts a game tree and then
-works with that (e.g. CFR algorithms). It is likely to be poor if the algorithm
-relies on processing and updating states as it goes, e.g. MCTS.
+works with that. It is likely to be poor if the algorithm relies on processing
+and updating states as it goes, e.g. MCTS.
 """
 
 import enum
