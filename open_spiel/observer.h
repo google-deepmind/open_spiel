@@ -63,7 +63,7 @@ class State;
 using ObservationParams = GameParameters;
 
 // Information about a multi-dimensional tensor span, eg name, shape, etc.
-// TODO(etar): add types information. For now only floats are supported.
+// TODO(etar) add types information. For now only floats are supported.
 class SpanTensorInfo {
  public:
   using Shape = absl::InlinedVector<int, 4>;
@@ -334,7 +334,7 @@ class Observer {
   virtual ~Observer() = default;
 
  protected:
-  // TODO(author11) Remove when all games support both types of observations
+  // TODO(author11) Remove when all games support both types of observations.
   bool has_string_;
   bool has_tensor_;
 };
@@ -368,11 +368,21 @@ class Observation {
   // The first byte of the compressed data is reserved for the specific
   // compression scheme. Note that currently there is only one supported, which
   // requires bitwise observations.
+  //
+  // Note: Use compress and decompress on the same machine, or on systems
+  //       with the same float memory layout (aka Endianness).
+  //       Different computer architectures may use different Endianness
+  //       (https://en.wikipedia.org/wiki/Endianness) when storing floats.
+  //       The compressed data is a raw memory representation of an array
+  //       of floats. Passing it from, say, big-endian architecture
+  //       to little-endian architecture may corrupt the original data.
+  // TODO(etar) address the note above and implement things in a platform
+  //             independent way.
   std::string Compress() const;
   void Decompress(absl::string_view compressed);
 
   // What observations do we support?
-  // TODO(author11) Remove when all games support both types of observations
+  // TODO(author11) Remove when all games support both types of observations.
   bool HasString() const { return observer_->HasString(); }
   bool HasTensor() const { return observer_->HasTensor(); }
 
