@@ -17,229 +17,155 @@
 #include <memory>
 
 // Interface code for using Python Games and States from C++.
-// There are two complications which mean we cannot use the standard pybind
-// approach:
-//
-// 1. We wish to use std::unique_ptr to return new objects in the C++ API,
-//    which implies that the Python implementations of those APIs must also
-//    return std::unique_ptr, which is not supported by pybind11.
-//
-//
-// 2. We wish to create and use Python-backed objects from within C++, which
-//    requires that the C++ code has an owning reference to the Python
-//    object.
-//
-// These two factors require separate considerations. (1) means that we must
-// create an additional object which the C++ code can own, id addition to the
-// trampoline that pybind creates and the underlying Python object. (2) means
-// that our trampoline objects must (temporarily) own their backing Python
-// objects, unlike the default setup where the C++ trampoline is owned by the
-// Python object.
-//
-// The full workaround is as follows. When a State object is initially created,
-// we create a second C++ trampoline, resulting in the following three objects:
-//
-//    a. Python State object; implicitly governs the lifetime of (b)
-//    b. C++ PyState object, created by pybind11; holds a weak reference to (a)
-//    c. C++ PyState object, created by StateForCpp; owns (a)
-//
-// C++ code holds a std::unique_ptr to the object (c).
-// If this object is used entirely in C++, then this structure persists
-// throughout the object's lifetime. Calls to methods on (c) are routed to (a)
-// using the reference it holds to the Python object. The standard pybind11
-// macros cannot be used since pybind is unaware of the (a) <-> (c) linkage.
-//
-// If the object is returned to Python, then we no longer need (c), and so in
-// `ToPython`, we copy (c) to (b), return (b) and delete (c). In doing so, we
-// need to make sure that the Python object (a) sticks around until the
-// Python-side code takes ownership of it. This is managed by temporarily giving
-// (b) ownership of the Python object, and then relinquishing it using a custom
-// deleter when ownership of (b) is taken by the pybind11 code, by which time it
-// will have ownership of (a) also. This then results in the canonical pybind
-// setup:
-//
-//    a. Python State object; implicitly governs the lifetime of (b); owned by
-//       the Python caller
-//    b. C++ PyState object, created by pybind11
-//
-// Additionally, (b) holds a weak reference to (a) - we use this in place of
-// the normal pybind mechanism (same codepath as above).
-//
-// TODO(author11) Adopt a similar scheme for Game objects (currently leaked).
-// TODO(author11) Simplify as and when pybind11 enhancements are submitted.
 
+#include "open_spiel/abseil-cpp/absl/strings/escaping.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
 
 namespace py = ::pybind11;
 
-// Alternate macros to PYBIND11_OVERRIDE_NAME and PYBIND11_OVERRIDE_PURE_NAME.
-// We use our own because the trampoline class on which the method is invoked
-// may be the for-use-in-C++ copy rather than the original that pybind11 knows
-// about, which would mean that pybind11 is unable to find the Python object.
-#define PYSPIEL_OVERRIDE_IMPL(ret_type, cname, name, ...)                  \
-  do {                                                                     \
-    pybind11::gil_scoped_acquire gil;                                      \
-    pybind11::function override = py_handle_.attr(name);                   \
-    if (override) {                                                        \
-      auto o = override(__VA_ARGS__);                                      \
-      if (pybind11::detail::cast_is_temporary_value_reference<             \
-              ret_type>::value) {                                          \
-        static pybind11::detail::override_caster_t<ret_type> caster;       \
-        return pybind11::detail::cast_ref<ret_type>(std::move(o), caster); \
-      } else {                                                             \
-        return pybind11::detail::cast_safe<ret_type>(std::move(o));        \
-      }                                                                    \
-    }                                                                      \
-  } while (false)
-
-#define PYSPIEL_OVERRIDE_PURE(ret_type, cname, name, fn, ...)                  \
-  do {                                                                         \
-    PYSPIEL_OVERRIDE_IMPL(PYBIND11_TYPE(ret_type), PYBIND11_TYPE(cname), name, \
-                          __VA_ARGS__);                                        \
-    pybind11::pybind11_fail(                                                   \
-        "Tried to call pure virtual function \"" PYBIND11_STRINGIFY(           \
-            cname) "::" name "\"");                                            \
-  } while (false)
-
-#define PYSPIEL_OVERRIDE(ret_type, cname, name, fn, ...)                       \
-  do {                                                                         \
-    PYSPIEL_OVERRIDE_IMPL(PYBIND11_TYPE(ret_type), PYBIND11_TYPE(cname), name, \
-                          __VA_ARGS__);                                        \
-    return cname::fn(__VA_ARGS__);                                             \
-  } while (false)
-
-PyGame::PyGame(py::object py_game, GameType game_type, GameInfo game_info,
+PyGame::PyGame(GameType game_type, GameInfo game_info,
                GameParameters game_parameters)
-    : Game(game_type, game_parameters),
-      py_handle_(std::move(py_game)),
-      info_(game_info) {
-  default_observer_ = MakeObserver(kDefaultObsType, {});
-  info_state_observer_ = MakeObserver(kInfoStateObsType, {});
-}
-
-// Creates an additional C++ wrapper class. See discussion at top of file.
-std::unique_ptr<State> StateForCpp(py::object py_state,
-                                   std::shared_ptr<const Game> game) {
-  auto rv = std::make_unique<PyState>(py_state, game);
-  rv->TakeOwnership();
-  return rv;
-}
+    : Game(game_type, game_parameters), info_(game_info) {}
 
 std::unique_ptr<State> PyGame::NewInitialState() const {
-  // Can't use the standard macro because we need to create a second State
-  // object (for use in C++).
-  py::gil_scoped_acquire gil;
-  py::function f = py_handle_.attr("new_initial_state");
-  return StateForCpp(f(), shared_from_this());
+  PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game, "new_initial_state",
+                              NewInitialState);
 }
 
-PyState::PyState(py::handle py_state, std::shared_ptr<const Game> game)
-    : State(game), py_handle_(py_state), own_(false) {}
+std::unique_ptr<State> PyGame::NewInitialStateForPopulation(
+    int population) const {
+  PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game,
+                              "new_initial_state_for_population",
+                              NewInitialStateForPopulation, population);
+}
+
+int PyGame::MaxChanceNodesInHistory() const {
+  PYBIND11_OVERLOAD_PURE_NAME(int, Game,
+                              "max_chance_nodes_in_history",
+                              MaxChanceNodesInHistory);
+}
+
+const Observer& PyGame::default_observer() const {
+  if (!default_observer_) default_observer_ = MakeObserver(kDefaultObsType, {});
+  return *default_observer_;
+}
+
+const Observer& PyGame::info_state_observer() const {
+  if (!info_state_observer_)
+    info_state_observer_ = MakeObserver(kInfoStateObsType, {});
+  return *info_state_observer_;
+}
+
+PyState::PyState(std::shared_ptr<const Game> game) : State(game) {}
 
 Player PyState::CurrentPlayer() const {
-  PYSPIEL_OVERRIDE_PURE(Player, State, "current_player", CurrentPlayer);
+  PYBIND11_OVERLOAD_PURE_NAME(Player, State, "current_player", CurrentPlayer);
 }
 
 std::vector<Action> PyState::LegalActions() const {
-  PYSPIEL_OVERRIDE_PURE(std::vector<Action>, State, "legal_actions",
-                        LegalActions);
+  return LegalActions(CurrentPlayer());
+}
+
+std::vector<Action> PyState::LegalActions(Player player) const {
+  if (IsTerminal()) return {};
+  if (IsChanceNode()) return LegalChanceOutcomes();
+  if ((player == CurrentPlayer()) || (player >= 0 && IsSimultaneousNode())) {
+    PYBIND11_OVERLOAD_PURE_NAME(std::vector<Action>, State, "_legal_actions",
+                                LegalActions, player);
+  } else if (player < 0) {
+    SpielFatalError(
+        absl::StrCat("Called LegalActions for psuedo-player ", player));
+  } else {
+    return {};
+  }
 }
 
 std::string PyState::ActionToString(Player player, Action action_id) const {
-  PYSPIEL_OVERRIDE_PURE(std::string, State, "action_to_string", ActionToString,
-                        player, action_id);
+  PYBIND11_OVERLOAD_PURE_NAME(std::string, State, "_action_to_string",
+                              ActionToString, player, action_id);
 }
 
 std::string PyState::ToString() const {
-  PYSPIEL_OVERRIDE_PURE(std::string, State, "__str__", ToString);
+  PYBIND11_OVERLOAD_PURE_NAME(std::string, State, "__str__", ToString);
 }
 
 bool PyState::IsTerminal() const {
-  PYSPIEL_OVERRIDE_PURE(bool, State, "is_terminal", IsTerminal);
+  PYBIND11_OVERLOAD_PURE_NAME(bool, State, "is_terminal", IsTerminal);
 }
 
 std::vector<double> PyState::Returns() const {
-  PYSPIEL_OVERRIDE_PURE(std::vector<double>, State, "returns", Returns);
+  PYBIND11_OVERRIDE_PURE_NAME(std::vector<double>, State, "returns", Returns);
+}
+
+std::vector<double> PyState::Rewards() const {
+  PYBIND11_OVERRIDE_NAME(std::vector<double>, State, "rewards", Rewards);
 }
 
 void PyState::DoApplyAction(Action action_id) {
-  PYSPIEL_OVERRIDE(void, State, "do_apply_action", DoApplyAction, action_id);
+  PYBIND11_OVERLOAD_PURE_NAME(void, State, "_apply_action", DoApplyAction,
+                              action_id);
 }
 
 void PyState::DoApplyActions(const std::vector<Action>& actions) {
-  PYSPIEL_OVERRIDE(void, State, "do_apply_actions", DoApplyActions, actions);
+  PYBIND11_OVERLOAD_PURE_NAME(void, State, "_apply_actions", DoApplyActions,
+                              actions);
 }
 
 ActionsAndProbs PyState::ChanceOutcomes() const {
-  PYSPIEL_OVERRIDE_PURE(ActionsAndProbs, State, "chance_outcomes",
-                        ChanceOutcomes);
+  PYBIND11_OVERLOAD_PURE_NAME(ActionsAndProbs, State, "chance_outcomes",
+                              ChanceOutcomes);
 }
 
 std::unique_ptr<State> PyState::Clone() const {
-  auto state = game_->NewInitialState();
-  for (auto [p, a] : FullHistory()) {
-    state->ApplyAction(a);
+  // Create a new State of the right type.
+  auto rv = game_->NewInitialState();
+
+  // Copy the Python-side properties of the state.
+  py::function deepcopy = py::module::import("copy").attr("deepcopy");
+  py::object py_state = py::cast(*rv);
+  for (auto [k, v] : PyDict(*this)) {
+    py_state.attr(k) = deepcopy(v);
   }
-  return state;
+
+  // Copy the C++-side properties of the state (all on the parent class).
+  // Since we started with a valid initial state, we only need to copy
+  // properties that change during the life of the state - hence num_players,
+  // num_distinct_actions are omitted.
+  PyState* state = open_spiel::down_cast<PyState*>(rv.get());
+  state->history_ = history_;
+  state->move_number_ = move_number_;
+
+  return rv;
 }
 
-// Handle the ownership of the Python object.
-void PyState::RelinquishOwnership() {
-  if (own_) py_handle_.dec_ref();
-  own_ = false;
+std::vector<std::string> PyState::DistributionSupport() {
+  PYBIND11_OVERLOAD_PURE_NAME(std::vector<std::string>, State,
+                              "distribution_support", DistributionSupport);
 }
-
-void PyState::TakeOwnership() {
-  if (!own_) py_handle_.inc_ref();
-  own_ = true;
-}
-
-// Returning states to Python, with deferred relinquishing of ownership.
-StateRetPtr ToPython(std::unique_ptr<State> state) {
-  if (auto pystate = dynamic_cast<PyState*>(state.get())) {
-    // Python created this in the first place, and we created a copy to pass
-    // around the C++ library. Return the original and let the copy be deleted.
-    // Retain the reference to the Python object held by the original until the
-    // pybind11 code takes ownership.
-    auto original = py::cast<PyState*>(pystate->py_handle());
-    original->TakeOwnership();
-    *original = *pystate;
-    return StateRetPtr(original);
-  } else {
-    // This is a C++ object; Python takes ownership.
-    return StateRetPtr(state.release());
-  }
-}
-
-// Custom deleter which frees the Python-side object instead of the C++ one in
-// the case of Python-defined states.
-void StateDeleter::operator()(State* state) {
-  if (auto pystate = dynamic_cast<PyState*>(state)) {
-    // Once the Python object is deleted, pybind11 will tidy up the C++ side.
-    pystate->RelinquishOwnership();
-  } else {
-    // Should never happen.
-    delete state;
-  }
+void PyState::UpdateDistribution(const std::vector<double>& distribution) {
+  PYBIND11_OVERLOAD_PURE_NAME(void, State, "update_distribution",
+                              UpdateDistribution, distribution);
 }
 
 // Register a Python game.
 void RegisterPyGame(const GameType& game_type, py::function creator) {
   GameRegisterer::RegisterGame(
       game_type, [game_type, creator](const GameParameters& game_parameters) {
-        auto py_game = creator(game_parameters);
-        // TODO(author11) Fix leak
-        // (circular reference between C++ Game and Python Game)
+        py::dict params = py::cast(game_parameters);
+        for (const auto& [k, v] : game_type.parameter_specification) {
+          if (game_parameters.count(k) == 0) {
+            params[pybind11::str(k)] = v;
+          }
+        }
+        auto py_game = creator(params);
         return py::cast<std::shared_ptr<Game>>(py_game);
       });
 }
@@ -248,6 +174,7 @@ void RegisterPyGame(const GameType& game_type, py::function creator) {
 // Python one.
 
 // Wrapper for using a Python observer from C++.
+// This is not a 'trampoline' class, just a wrapper.
 class PyObserver : public Observer {
  public:
   PyObserver(py::object py_observer);
@@ -273,7 +200,7 @@ void PyObserver::WriteTensor(const State& state, int player,
                              Allocator* allocator) const {
   using Array = py::array_t<float, py::array::c_style | py::array::forcecast>;
   const PyState& py_state = open_spiel::down_cast<const PyState&>(state);
-  set_from_(py_state.py_handle(), player);
+  set_from_(py_state, player);
   py::dict dict = py_observer_.attr("dict");
   for (auto [k, v] : dict) {
     auto a = py::cast<Array>(v);
@@ -287,30 +214,38 @@ void PyObserver::WriteTensor(const State& state, int player,
 
 std::string PyObserver::StringFrom(const State& state, int player) const {
   const PyState& py_state = open_spiel::down_cast<const PyState&>(state);
-  return py::cast<std::string>(string_from_(py_state.py_handle(), player));
+  return py::cast<std::string>(string_from_(py_state, player));
 }
 
 std::shared_ptr<Observer> PyGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-  py::function f = py_handle_.attr("make_py_observer");
+  py::object h = py::cast(this);
+  py::function f = h.attr("make_py_observer");
   if (!f) SpielFatalError("make_py_observer not implemented");
-  py::object observer = f(iig_obs_type, params);
+  py::object observer = (iig_obs_type.has_value() ?
+      f(iig_obs_type.value(), params) : f(params));
   return std::make_shared<PyObserver>(observer);
 }
 
 std::string PyState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.info_state_observer().StringFrom(*this, player);
 }
 
 std::string PyState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   return game.default_observer().StringFrom(*this, player);
 }
 
 void PyState::InformationStateTensor(Player player,
                                      absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.info_state_observer().WriteTensor(*this, player, &allocator);
@@ -343,6 +278,8 @@ std::vector<int> PyGame::InformationStateTensorShape() const {
 }
 
 void PyState::ObservationTensor(Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, NumPlayers());
   ContiguousAllocator allocator(values);
   const PyGame& game = open_spiel::down_cast<const PyGame&>(*game_);
   game.default_observer().WriteTensor(*this, player, &allocator);
@@ -353,6 +290,91 @@ std::vector<int> PyGame::ObservationTensorShape() const {
   auto state = NewInitialState();
   default_observer().WriteTensor(*state, kDefaultPlayerId, &allocator);
   return TensorShape(allocator);
+}
+
+py::dict PyDict(const State& state) {
+  py::object obj = py::cast(&state);
+  if (py::hasattr(obj, "__dict__")) {
+    return obj.attr("__dict__");
+  } else {
+    return py::dict();
+  }
+}
+
+std::unique_ptr<State> PyGame::DeserializeState(const std::string& str) const {
+  std::unique_ptr<State> state = NewInitialState();
+  open_spiel::down_cast<PyState*>(state.get())->Deserialize(str);
+  return state;
+}
+
+// Serialization form for the Python-side attributes is a b64-encoded pickled
+// Python dict (the __dict__ member of the Python object).
+
+py::dict decode_dict(const absl::string_view str) {
+  std::string bytes;
+  SPIEL_CHECK_TRUE(absl::Base64Unescape(str, &bytes));
+  py::function pickle_loads = py::module::import("pickle").attr("loads");
+  return pickle_loads(py::bytes(bytes));
+}
+
+std::string encode_dict(py::dict dict) {
+  py::function pickle_dumps = py::module::import("pickle").attr("dumps");
+  py::bytes bytes = pickle_dumps(dict);
+  return absl::Base64Escape(std::string(bytes));
+}
+
+inline constexpr const absl::string_view kTagHistory = "history=";
+inline constexpr const absl::string_view kTagMoveNumber = "move_number=";
+inline constexpr const absl::string_view kTagDict = "__dict__=";
+
+void PyState::Deserialize(const std::string& str) {
+  std::vector<absl::string_view> pieces =
+      absl::StrSplit(str, absl::MaxSplits('\n', 2));
+  SPIEL_CHECK_EQ(pieces.size(), 3);
+
+  SPIEL_CHECK_EQ(pieces[0].substr(0, kTagHistory.size()), kTagHistory);
+  auto history_str = pieces[0].substr(kTagHistory.size());
+  if (!history_str.empty()) {
+    for (auto& h : absl::StrSplit(history_str, ',')) {
+      std::vector<absl::string_view> p = absl::StrSplit(h, ':');
+      SPIEL_CHECK_EQ(p.size(), 2);
+      int player, action;
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(p[0], &player));
+      SPIEL_CHECK_TRUE(absl::SimpleAtoi(p[1], &action));
+      history_.push_back({player, action});
+    }
+  }
+
+  SPIEL_CHECK_EQ(pieces[1].substr(0, kTagMoveNumber.size()), kTagMoveNumber);
+  SPIEL_CHECK_TRUE(
+      absl::SimpleAtoi(pieces[1].substr(kTagMoveNumber.size()), &move_number_));
+
+  SPIEL_CHECK_EQ(pieces[2].substr(0, kTagDict.size()), kTagDict);
+  py::object py_state = py::cast(*this);
+  for (const auto& [k, v] : decode_dict(pieces[2].substr(kTagDict.size()))) {
+    py_state.attr(k) = v;
+  }
+}
+
+std::string PyState::Serialize() const {
+  return absl::StrCat(
+      // C++ Attributes
+      kTagHistory,
+      absl::StrJoin(history_, ",",
+                    [](std::string* out, const PlayerAction& pa) {
+                      absl::StrAppend(out, pa.player, ":", pa.action);
+                    }),
+      "\n", kTagMoveNumber, move_number_, "\n",
+      // Python attributes
+      kTagDict, encode_dict(PyDict(*this)));
+}
+
+int PyState::MeanFieldPopulation() const {
+  // Use a python population() implementation if available.
+  PYBIND11_OVERRIDE_IMPL(int, State, "mean_field_population");
+
+  // Otherwise, default to behavior from the base class.
+  return State::MeanFieldPopulation();
 }
 
 }  // namespace open_spiel

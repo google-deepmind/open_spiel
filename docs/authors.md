@@ -34,7 +34,7 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Timo Ewalds <tewalds@google.com>
 -   Vinicius Zambaldi <vzambaldi@google.com>
 
-## OpenSpiel with Swift for Tensorflow
+## OpenSpiel with Swift for Tensorflow (now removed)
 
 -   James Bradbury <jekbradbury@google.com>
 -   Brennan Saeta <saeta@google.com>

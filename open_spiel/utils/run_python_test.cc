@@ -14,22 +14,39 @@
 
 #include "open_spiel/utils/run_python.h"
 
+#include <string>
+
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/spiel_utils.h"
+
+ABSL_FLAG(std::string, python_command, open_spiel::kDefaultPythonCommand,
+          "The python interpreter command to use.");
 
 namespace open_spiel {
 namespace {
 
-const char test_module[] = "open_spiel.utils.run_python_test_file";
+inline constexpr const char* kTestModuleName =
+    "open_spiel.utils.run_python_test_file";
 
 void TestRunPython() {
-  SPIEL_CHECK_TRUE(RunPython(test_module, {"--return_value", "0"}));
-  SPIEL_CHECK_FALSE(RunPython(test_module, {"--return_value", "1"}));
+  std::string test_module(kTestModuleName);
+  std::string python_command = absl::GetFlag(FLAGS_python_command);
+  SPIEL_CHECK_TRUE(RunPython(python_command, test_module,
+                             {"--return_value", "0"}));
+  SPIEL_CHECK_FALSE(RunPython(python_command, test_module,
+                              {"--return_value", "1"}));
 
-  SPIEL_CHECK_TRUE(RunPython(test_module, {"--print_value", "asdf"}));
-  SPIEL_CHECK_FALSE(RunPython(test_module, {"--bogus_flag"}));
+  SPIEL_CHECK_TRUE(RunPython(python_command, test_module,
+                             {"--print_value", "asdf"}));
+  SPIEL_CHECK_FALSE(RunPython(python_command, test_module,
+                              {"--bogus_flag"}));
 }
 
 }  // namespace
 }  // namespace open_spiel
 
-int main(int argc, char** argv) { open_spiel::TestRunPython(); }
+int main(int argc, char** argv) {
+  absl::ParseCommandLine(argc, argv);
+  open_spiel::TestRunPython();
+}

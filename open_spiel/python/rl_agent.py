@@ -21,13 +21,10 @@ from __future__ import print_function
 import abc
 import collections
 
-import six
-
 StepOutput = collections.namedtuple("step_output", ["action", "probs"])
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AbstractAgent(object):
+class AbstractAgent(metaclass=abc.ABCMeta):
   """Abstract base class for Open Spiel RL agents."""
 
   @abc.abstractmethod

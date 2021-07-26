@@ -19,11 +19,9 @@ from __future__ import division
 from __future__ import print_function
 
 import abc
-import six
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ValueSchedule(object):
+class ValueSchedule(metaclass=abc.ABCMeta):
   """Abstract base class changing (decaying) values."""
 
   @abc.abstractmethod

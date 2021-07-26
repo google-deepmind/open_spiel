@@ -62,6 +62,10 @@ class CardSet {
   std::vector<CardSet> SampleCards(int nbCards);
 };
 
+// Returns the lexicographically next permutation of the supplied bits.
+// See https://graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation
+uint64_t bit_twiddle_permute(uint64_t v);
+
 }  // namespace logic
 }  // namespace universal_poker
 }  // namespace open_spiel

@@ -50,6 +50,26 @@ class BotTest(absltest.TestCase):
   def test_registered_bots(self):
     self.assertCountEqual(pyspiel.registered_bots(), SPIEL_BOTS_LIST)
 
+  def test_cpp_mcts_bot(self):
+    game = pyspiel.load_game("tic_tac_toe")
+    bots = [
+        pyspiel.MCTSBot(game, pyspiel.RandomRolloutEvaluator(1, 0), 2.0,
+                        100, 100, False, 42, False)
+    ] * 2
+    _ = np.array([
+        pyspiel.evaluate_bots(game.new_initial_state(), bots, iteration)
+        for iteration in range(10)
+    ])
+    # Do a search directly, and inspect the values.
+    state = game.new_initial_state()
+    search_node = bots[0].mcts_search(state)
+    for child in search_node.children:
+      print(f"Child action {child.action}, total reward: {child.total_reward}" +
+            f", explore count: {child.explore_count}")
+    # Similar way to achieve the above.
+    print(f"Children string: {search_node.children_str(state)}")
+    print(f"Best child: {search_node.best_child().to_string(state)}")
+
   def test_can_play_game(self):
     game = pyspiel.load_game("kuhn_poker")
     self.assertIn("uniform_random", pyspiel.bots_that_can_play_game(game))
@@ -61,12 +81,12 @@ class BotTest(absltest.TestCase):
             "fixed_action_preference",
             game,
             player=0,
-            params={"actions": pyspiel.GameParameter("0:1:2")}),
+            params={"actions": "0:1:2"}),
         pyspiel.load_bot(
             "fixed_action_preference",
             game,
             player=1,
-            params={"actions": pyspiel.GameParameter("3:4")}),
+            params={"actions": "3:4"}),
     ]
     result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
     self.assertEqual(result, [1, -1])  # Player 0 wins.

@@ -221,6 +221,7 @@ GameParameters GameParametersFromString(const std::string& game_string) {
       equals = -1;
     }
   }
+  if (parens > 0) SpielFatalError("Missing closing bracket ')'.");
   return params;
 }
 
@@ -264,11 +265,11 @@ bool GameParameter::value() const {
   return bool_value();
 }
 template <>
-const std::map<std::string, GameParameter>& GameParameter::value() const {
+const GameParameters& GameParameter::value() const {
   return game_value();
 }
 template <>
-std::map<std::string, GameParameter> GameParameter::value() const {
+GameParameters GameParameter::value() const {
   return game_value();
 }
 

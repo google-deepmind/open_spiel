@@ -33,8 +33,7 @@ import pyspiel
 
 def get_kuhn_poker_data(num_players=3):
   """Returns the kuhn poker data for the number of players specified."""
-  game = pyspiel.load_game('kuhn_poker',
-                           {'players': pyspiel.GameParameter(num_players)})
+  game = pyspiel.load_game('kuhn_poker', {'players': num_players})
   xfp_solver = fictitious_play.XFPSolver(game, save_oracles=True)
   for _ in range(3):
     xfp_solver.iteration()

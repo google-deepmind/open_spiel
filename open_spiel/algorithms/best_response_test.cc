@@ -39,29 +39,6 @@ namespace {
 
 using InfostatesAndActions = std::vector<std::pair<std::string, Action>>;
 
-// The optimal Kuhn policy is taken directly from the Python implementation in
-// open_spiel/python/algorithms/exploitability_test.py. In it, the player bets
-// with probability alpha with the jack.
-TabularPolicy GetOptimalKuhnPolicy(double alpha) {
-  double three_alpha = 3 * alpha;
-  std::unordered_map<std::string, ActionsAndProbs> policy;
-  // Player 0
-  policy["0"] = {{0, 1 - alpha}, {1, alpha}};
-  policy["0pb"] = {{0, 1}, {1, 0}};
-  policy["1"] = {{0, 1}, {1, 0}};
-  policy["1pb"] = {{0, 2. / 3. - alpha}, {1, 1. / 3. + alpha}};
-  policy["2"] = {{0, 1 - three_alpha}, {1, three_alpha}};
-  policy["2pb"] = {{0, 0}, {1, 1}};
-
-  // Player 1
-  policy["0p"] = {{0, 2. / 3.}, {1, 1. / 3.}};
-  policy["0b"] = {{0, 1}, {1, 0}};
-  policy["1p"] = {{0, 1}, {1, 0}};
-  policy["1b"] = {{0, 2. / 3.}, {1, 1. / 3.}};
-  policy["2p"] = {{0, 0}, {1, 1}};
-  policy["2b"] = {{0, 0}, {1, 1}};
-  return TabularPolicy(policy);
-}
 
 // Correct values come from the existing Python implementation in
 // open_spiel/python/algorithms/exploitability.py.
@@ -456,7 +433,7 @@ void KuhnPokerUniformBestResponseAfterSwitchingPolicies() {
 // open_spiel/algorithms/exploitability.py.
 void KuhnPokerOptimalBestResponsePid0() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
-  TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
+  TabularPolicy policy = kuhn_poker::GetOptimalPolicy(/*alpha=*/0.2);
   InfostatesAndActions actual_best_responses = {
       {"0", 0}, {"0pb", 0}, {"1", 0}, {"1pb", 0}, {"2", 0}, {"2pb", 1}};
   CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{0},
@@ -467,7 +444,7 @@ void KuhnPokerOptimalBestResponsePid0() {
 // open_spiel/algorithms/exploitability.py.
 void KuhnPokerOptimalBestResponsePid1() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
-  TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
+  TabularPolicy policy = kuhn_poker::GetOptimalPolicy(/*alpha=*/0.2);
   InfostatesAndActions actual_best_responses = {
       {"0b", 0}, {"0p", 0}, {"1p", 0}, {"1b", 0}, {"2p", 1}, {"2b", 1}};
   CheckBestResponseAgainstGoldenPolicy(*game, /*best_responder=*/Player{1},
@@ -575,7 +552,7 @@ void KuhnPokerEFGUniformValueTestPid1() {
 
 void KuhnPokerOptimalValueTestPid0() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
-  TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
+  TabularPolicy policy = kuhn_poker::GetOptimalPolicy(/*alpha=*/0.2);
   std::vector<std::pair<std::string, double>> histories_and_values =
       GetKuhnOptimalBestResponseValuesPid0();
   CheckBestResponseValuesAgainstGoldenValues(
@@ -584,7 +561,7 @@ void KuhnPokerOptimalValueTestPid0() {
 
 void KuhnPokerOptimalValueTestPid1() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
-  TabularPolicy policy = GetOptimalKuhnPolicy(/*alpha=*/0.2);
+  TabularPolicy policy = kuhn_poker::GetOptimalPolicy(/*alpha=*/0.2);
   std::vector<std::pair<std::string, double>> histories_and_values =
       GetKuhnOptimalBestResponseValuesPid1();
   CheckBestResponseValuesAgainstGoldenValues(

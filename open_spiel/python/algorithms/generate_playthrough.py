@@ -16,14 +16,18 @@
 """Functions to manipulate game playthoughs.
 
 Used by examples/playthrough.py and tests/playthrough_test.py.
+
+Note that not all states are fully represented in the playthrough.
+See the logic in ShouldDisplayStateTracker for details.
 """
 
+import collections
 import os
 import re
 import numpy as np
 
-from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
-from open_spiel.python.games import tic_tac_toe  # pylint: disable=unused-import
+from open_spiel.python import games  # pylint: disable=unused-import
+from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -46,7 +50,23 @@ def _format_value(v):
 
 
 def _format_vec(vec):
-  return "".join(_format_value(v) for v in vec)
+  """Returns a readable format for a vector."""
+  full_fmt = "".join(_format_value(v) for v in vec)
+  short_fmt = None
+  max_len = 250
+  vec2int = lambda vec: int("".join("1" if b else "0" for b in vec), 2)
+  if len(vec) > max_len:
+    if all(v == 0 for v in vec):
+      short_fmt = f"zeros({len(vec)})"
+    elif all(v in (0, 1) for v in vec):
+      sz = (len(vec) + 15) // 16
+      # To reconstruct the original vector:
+      # binvec = lambda n, x: [int(x) for x in f"{x:0>{n}b}"]
+      short_fmt = f"binvec({len(vec)}, 0x{vec2int(vec):0>{sz}x})"
+  if short_fmt and len(short_fmt) < len(full_fmt):
+    return short_fmt
+  else:
+    return full_fmt
 
 
 def _format_matrix(mat):
@@ -55,7 +75,7 @@ def _format_matrix(mat):
 
 def _format_tensor(tensor, tensor_name, max_cols=120):
   """Formats a tensor in an easy-to-view format as a list of lines."""
-  if ((tensor.shape == (0,)) or (len(tensor.shape) > 3) or
+  if ((not tensor.shape) or (tensor.shape == (0,)) or (len(tensor.shape) > 3) or
       not np.logical_or(tensor == 0, tensor == 1).all()):
     vec = ", ".join(str(round(v, 5)) for v in tensor.ravel())
     return ["{} = [{}]".format(tensor_name, vec)]
@@ -88,7 +108,9 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
     return lines
 
 
-def playthrough(game_string, action_sequence, alsologtostdout=False,
+def playthrough(game_string,
+                action_sequence,
+                alsologtostdout=False,
                 observation_params_string=None):
   """Returns a playthrough of the specified game as a single text.
 
@@ -116,6 +138,48 @@ def format_shapes(d):
     return ", ".join(f"{key}: {list(value.shape)}" for key, value in d.items())
 
 
+def _format_params(d, as_game=False):
+  """Format a collection of params."""
+
+  def fmt(val):
+    if isinstance(val, dict):
+      return _format_params(val, as_game=True)
+    else:
+      return _escape(str(val))
+
+  if as_game:
+    return d["name"] + "(" + ",".join(
+        "{}={}".format(key, fmt(value))
+        for key, value in sorted(d.items())
+        if key != "name") + ")"
+  else:
+    return "{" + ",".join(
+        "{}={}".format(key, fmt(value))
+        for key, value in sorted(d.items())) + "}"
+
+
+class ShouldDisplayStateTracker:
+  """Determines whether a state is interesting enough to display."""
+
+  def __init__(self):
+    self.states_by_player = collections.defaultdict(int)
+
+  def __call__(self, state) -> bool:
+    """Returns True if a state is sufficiently interesting to display."""
+    player = state.current_player()
+    count = self.states_by_player[player]
+    self.states_by_player[player] += 1
+    if count == 0:
+      # Always display the first state for a player
+      return True
+    elif player == -1:
+      # For chance moves, display the first two only
+      return count < 2
+    else:
+      # For regular player moves, display the first three and selected others
+      return (count < 3) or (count % 10 == 0)
+
+
 def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
                       observation_params_string=None):
   """Returns a playthrough of the specified game as a list of lines.
@@ -130,15 +194,16 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     observation_params_string: Optional observation parameters for constructing
       an observer.
   """
+  should_display_state_fn = ShouldDisplayStateTracker()
   lines = []
   action_sequence = action_sequence or []
-  if alsologtostdout:
+  should_display = True
 
-    def add_line(v):
-      print(v)
+  def add_line(v, force=False):
+    if force or should_display:
+      if alsologtostdout:
+        print(v)
       lines.append(v)
-  else:
-    add_line = lines.append
 
   game = pyspiel.load_game(game_string)
   add_line("game: {}".format(game_string))
@@ -155,8 +220,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         game,
         imperfect_information_observation_type=None,
         params=observation_params)
-  except (RuntimeError, ValueError):
-    pass
+  except (RuntimeError, ValueError) as e:
+    print("Warning: unable to build an observation: ", e)
 
   infostate_observation = None
   # TODO(author11) reinstate this restriction
@@ -219,9 +284,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line("NumDistinctActions() = {}".format(game.num_distinct_actions()))
   add_line("PolicyTensorShape() = {}".format(game.policy_tensor_shape()))
   add_line("MaxChanceOutcomes() = {}".format(game.max_chance_outcomes()))
-  add_line("GetParameters() = {{{}}}".format(",".join(
-      "{}={}".format(key, _escape(str(value)))
-      for key, value in sorted(game.get_parameters().items()))))
+  add_line("GetParameters() = {}".format(_format_params(game.get_parameters())))
   add_line("NumPlayers() = {}".format(game.num_players()))
   add_line("MinUtility() = {:.5}".format(game.min_utility()))
   add_line("MaxUtility() = {:.5}".format(game.max_utility()))
@@ -248,13 +311,16 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line('ToString() = "{}"'.format(str(game)))
 
   players = list(range(game.num_players()))
-  state = game.new_initial_state()
+  # Arbitrarily pick the last possible initial states (for all games
+  # but multi-population MFGs, there will be a single initial state).
+  state = game.new_initial_states()[-1]
   state_idx = 0
   rng = np.random.RandomState(seed)
 
   while True:
-    add_line("")
-    add_line("# State {}".format(state_idx))
+    should_display = should_display_state_fn(state)
+    add_line("", force=True)
+    add_line("# State {}".format(state_idx), force=True)
     for line in str(state).splitlines():
       add_line("# {}".format(line).rstrip())
     add_line("IsTerminal() = {}".format(state.is_terminal()))
@@ -274,7 +340,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         for name, tensor in infostate_observation.dict.items():
           label = f"InformationStateTensor({player})"
           label += f".{name}" if name != "info_state" else ""
-          lines += _format_tensor(tensor, label)
+          for line in _format_tensor(tensor, label):
+            add_line(line)
     if default_observation:
       for player in players:
         s = default_observation.string_from(state, player)
@@ -294,7 +361,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         for name, tensor in default_observation.dict.items():
           label = f"ObservationTensor({player})"
           label += f".{name}" if name != "observation" else ""
-          lines += _format_tensor(tensor, label)
+          for line in _format_tensor(tensor, label):
+            add_line(line)
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
@@ -303,12 +371,20 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     if state.is_terminal():
       break
     if state.is_chance_node():
-      # In Python 2 and Python 3, the default number of decimal places displayed
-      # is different. Thus, we hardcode a ".12" which is Python 2 behaviour.
-      add_line("ChanceOutcomes() = [{}]".format(", ".join(
-          "{{{}, {:.12f}}}".format(outcome, prob)
-          for outcome, prob in state.chance_outcomes())))
-    if state.is_simultaneous_node():
+      add_line("ChanceOutcomes() = {}".format(state.chance_outcomes()))
+    if state.is_mean_field_node():
+      add_line("DistributionSupport() = {}".format(
+          state.distribution_support()))
+      num_states = len(state.distribution_support())
+      state.update_distribution([1. / num_states] * num_states)
+      if state_idx < len(action_sequence):
+        assert action_sequence[state_idx] == "update_distribution", (
+            f"Unexpected action at MFG node: {action_sequence[state_idx]}, "
+            f"state: {state}, action_sequence: {action_sequence}")
+      add_line("")
+      add_line("# Set mean field distribution to be uniform", force=True)
+      add_line("action: update_distribution", force=True)
+    elif state.is_simultaneous_node():
       for player in players:
         add_line("LegalActions({}) = [{}]".format(
             player, ", ".join(str(x) for x in state.legal_actions(player))))
@@ -319,14 +395,17 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       if state_idx < len(action_sequence):
         actions = action_sequence[state_idx]
       else:
-        actions = [rng.choice(state.legal_actions(pl)) for pl in players]
+        actions = []
+        for pl in players:
+          legal_actions = state.legal_actions(pl)
+          actions.append(0 if not legal_actions else rng.choice(legal_actions))
       add_line("")
       add_line("# Apply joint action [{}]".format(
           format(", ".join(
               '"{}"'.format(state.action_to_string(player, action))
-              for player, action in enumerate(actions)))))
+              for player, action in enumerate(actions)))), force=True)
       add_line("actions: [{}]".format(", ".join(
-          str(action) for action in actions)))
+          str(action) for action in actions)), force=True)
       state.apply_actions(actions)
     else:
       add_line("LegalActions() = [{}]".format(", ".join(
@@ -340,8 +419,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         action = rng.choice(state.legal_actions())
       add_line("")
       add_line('# Apply action "{}"'.format(
-          state.action_to_string(state.current_player(), action)))
-      add_line("action: {}".format(action))
+          state.action_to_string(state.current_player(), action)), force=True)
+      add_line("action: {}".format(action), force=True)
       state.apply_action(action)
     state_idx += 1
   return lines
@@ -378,7 +457,9 @@ def _playthrough_params(lines):
     if match_observation_params:
       params["observation_params_string"] = match_observation_params.group(1)
     if match_action:
-      params["action_sequence"].append(int(match_action.group(1)))
+      matched = match_action.group(1)
+      params["action_sequence"].append(matched if matched ==
+                                       "update_distribution" else int(matched))
     if match_actions:
       params["action_sequence"].append(
           [int(x) for x in match_actions.group(1).split(", ")])
@@ -413,9 +494,11 @@ def update_path(path, shard_index=0, num_shards=1):
           print("[Skipped] Skipping game ", filename, " as ",
                 kwargs["game_string"], " is not available.")
           continue
+        else:
+          raise
       new = playthrough(**kwargs)
       if original == new:
-        print("          {}".format(filename))
+        print("        {}".format(filename))
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)

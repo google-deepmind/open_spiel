@@ -22,6 +22,7 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response
+from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
@@ -81,8 +82,7 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
   @parameterized.parameters(("kuhn_poker", 2))
   def test_cpp_and_python_best_response_are_identical(self, game_name,
                                                       num_players):
-    game = pyspiel.load_game(game_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_name, {"players": num_players})
 
     test_policy = policy.TabularPolicy(game)
     for i_player in range(num_players):
@@ -104,8 +104,7 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(("kuhn_poker", 2), ("kuhn_poker", 3))
   def test_cpp_and_python_value_are_identical(self, game_name, num_players):
-    game = pyspiel.load_game(game_name,
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game(game_name, {"players": num_players})
     test_policy = policy.TabularPolicy(game)
     root_state = game.new_initial_state()
     for i_player in range(num_players):
@@ -118,6 +117,25 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
       value_cpp_backend = best_resp_cpp_backend.value(root_state)
 
       self.assertTrue(np.allclose(value_py_backend, value_cpp_backend))
+
+  def test_best_response_tic_tac_toe_value_is_consistent(self):
+    # This test was failing because of use of str(state) in the best response,
+    # which is imperfect recall. We now use state.history_str() throughout.
+
+    # Chose a policy at random; not the uniform random policy.
+    game = pyspiel.load_game("tic_tac_toe")
+    pi = policy.TabularPolicy(game)
+    rng = np.random.RandomState(1234)
+    pi.action_probability_array[:] = rng.rand(*pi.legal_actions_mask.shape)
+    pi.action_probability_array *= pi.legal_actions_mask
+    pi.action_probability_array /= np.sum(
+        pi.action_probability_array, axis=1, keepdims=True)
+
+    # Compute a best response and verify the best response value is consistent.
+    br = best_response.BestResponsePolicy(game, 1, pi)
+    self.assertAlmostEqual(
+        expected_game_score.policy_value(game.new_initial_state(), [pi, br])[1],
+        br.value(game.new_initial_state()))
 
 
 if __name__ == "__main__":

@@ -50,6 +50,15 @@ void LegalActionsValidAtEveryState() {
   testing::RandomSimTest(*game, /*num_sims=*/10);
 }
 
+void GoofspielWithLimitedTurns() {
+  GameParameters params;
+  params["imp_info"] = GameParameter(true);
+  params["num_cards"] = GameParameter(13);
+  params["num_turns"] = GameParameter(3);
+  params["points_order"] = GameParameter(std::string("descending"));
+  testing::RandomSimTest(*LoadGame("goofspiel", params), 10);
+}
+
 }  // namespace
 }  // namespace goofspiel
 }  // namespace open_spiel
@@ -57,4 +66,5 @@ void LegalActionsValidAtEveryState() {
 int main(int argc, char **argv) {
   open_spiel::goofspiel::BasicGoofspielTests();
   open_spiel::goofspiel::LegalActionsValidAtEveryState();
+  open_spiel::goofspiel::GoofspielWithLimitedTurns();
 }

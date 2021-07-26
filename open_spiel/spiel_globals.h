@@ -31,16 +31,22 @@ enum PlayerId {
   // Invalid player.
   kInvalidPlayer = -3,
   // What is returned as the player id on terminal nodes.
-  kTerminalPlayerId = -4
+  kTerminalPlayerId = -4,
+  // player id of a mean field node
+  kMeanFieldPlayerId = -5
 };
 
 // Constant representing an invalid action.
 inline constexpr Action kInvalidAction = -1;
 
 enum class StateType {
-  kTerminal,  // If the state is terminal.
-  kChance,    // If the player to act equals kChanceId.
-  kDecision,  // If a player other than kChanceId is acting.
+  kTerminal,   // If the state is terminal.
+  kChance,     // If the player to act equals kChanceId.
+  kDecision,   // If a player other than kChanceId (and kMeanField) is acting.
+  // The Mean Field state. We expect that logic external to the game will update
+  // the state distribution in each game state. See details in
+  // games/mfg/README.md.
+  kMeanField,
 };
 
 // Layouts for 3-D tensors. For 2-D tensors, we assume that the layout is a

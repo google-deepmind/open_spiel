@@ -42,8 +42,9 @@ class Logger {
 // A logger to print stuff to a file.
 class FileLogger : public Logger {
  public:
-  FileLogger(const std::string& path, const std::string& name)
-      : fd_(absl::StrFormat("%s/log-%s.txt", path, name), "w"),
+  FileLogger(const std::string& path, const std::string& name,
+             const std::string& mode = "w")
+      : fd_(absl::StrFormat("%s/log-%s.txt", path, name), mode),
         tz_(absl::LocalTimeZone()) {
     Print("%s started", name);
   }

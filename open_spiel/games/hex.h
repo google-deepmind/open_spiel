@@ -28,6 +28,8 @@
 //
 // Parameters:
 //       "board_size"    int     size of the board   (default = 11)
+//       "row_size"      int     number of rows (optional)
+//       "col_size"      int     number of columns (optional)
 
 namespace open_spiel {
 namespace hex {
@@ -63,7 +65,7 @@ enum class CellState {
 // State of an in-play game.
 class HexState : public State {
  public:
-  HexState(std::shared_ptr<const Game> game, int board_size);
+  HexState(std::shared_ptr<const Game> game, int row_size, int col_size);
 
   HexState(const HexState&) = default;
 
@@ -80,7 +82,9 @@ class HexState : public State {
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
+
   CellState BoardAt(int cell) const { return board_[cell]; }
+  void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
 
  protected:
   std::vector<CellState> board_;
@@ -91,29 +95,33 @@ class HexState : public State {
   Player current_player_ = 0;                      // Player zero goes first
   double result_black_perspective_ = 0;            // 1 if Black (player 0) wins
   std::vector<int> AdjacentCells(int cell) const;  // Cells adjacent to cell
-  const int board_size_;
+  // Same function as above when board size is 2.
+  std::vector<int> AdjacentCellsBoardSize2(int cell) const;
+  const int row_size_;  // x
+  const int col_size_;  // y
 };
 
 // Game object.
 class HexGame : public Game {
  public:
   explicit HexGame(const GameParameters& params);
-  int NumDistinctActions() const override { return board_size_ * board_size_; }
+  int NumDistinctActions() const override { return row_size_ * col_size_; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new HexState(shared_from_this(), board_size_));
+        new HexState(shared_from_this(), row_size_, col_size_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, board_size_, board_size_};
+    return {kCellStates, row_size_, col_size_};
   }
-  int MaxGameLength() const override { return board_size_ * board_size_; }
+  int MaxGameLength() const override { return row_size_ * col_size_; }
 
  private:
-  const int board_size_;
+  const int row_size_;
+  const int col_size_;
 };
 
 CellState PlayerToState(Player player);

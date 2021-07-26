@@ -13,8 +13,7 @@ information games, as well as traditional multiagent environments such as
 also includes tools to analyze learning dynamics and other common evaluation
 metrics. Games are represented as procedural extensive-form games, with some
 natural extensions. The core API and games are implemented in C++ and exposed to
-Python. Algorithms and tools are written both in C++ and Python. There is also a
-branch of pure Swift in the `swift` subdirectory.
+Python. Algorithms and tools are written both in C++ and Python.
 
 To try OpenSpiel in Google Colaboratory, please refer to `open_spiel/colabs` subdirectory or start [here](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/install_open_spiel.ipynb).
 
@@ -32,17 +31,26 @@ Please choose among the following options:
 *   [Overview of Implemented Games](docs/games.md)
 *   [Overview of Implemented Algorithms](docs/algorithms.md)
 *   [Developer Guide](docs/developer_guide.md)
+*   [Using OpenSpiel as a C++ Library](docs/library.md)
 *   [Guidelines and Contributing](docs/contributing.md)
-*   [Swift OpenSpiel](docs/swift.md)
 *   [Authors](docs/authors.md)
 
 For a longer introduction to the core concepts, formalisms, and terminology,
 including an overview of the algorithms and some results, please see
 [OpenSpiel: A Framework for Reinforcement Learning in Games](https://arxiv.org/abs/1908.09453).
 
-For an overview of OpenSpiel and example uses of the core API, see the tutorial
-presentation slides:
-[Introduction to OpenSpiel](http://mlanctot.info/open_spiel-tutorial-kuleuven-mar11-2020.pdf).
+For an overview of OpenSpiel and example uses of the core API, please check out
+our tutorials:
+
+*   [Motivation, Core API, Brief Intro to Replictor Dynamics and Imperfect
+    Information Games](https://www.youtube.com/watch?v=YE0E0F39lac) by Marc
+    Lanctot.
+    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
+*   [Motivation, Core API, Implementing CFR and REINFORCE on Kuhn poker, Leduc
+    poker, and Goofspiel](https://www.youtube.com/watch?v=o6JNHoGUXCo) by Edward
+    Lockhart.
+    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-comarl.pdf)
+    [(colab)](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/CFR_and_REINFORCE.ipynb)
 
 If you use OpenSpiel in your research, please cite the paper using the following
 BibTeX:
@@ -70,5 +78,5 @@ BibTeX:
 
 ## Versioning
 
-We use [Semantic Versioning](https://semver.org/)
+We use [Semantic Versioning](https://semver.org/).
 

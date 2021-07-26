@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/fog/fog_constants.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/policy.h"
@@ -138,7 +137,7 @@ class KuhnObserver : public Observer {
         // Imperfect recall public info - two different formats.
         if (iig_obs_type_.private_info == PrivateInfoType::kNone) {
           if (state.history_.empty()) {
-            absl::StrAppend(&result, kStartOfGamePublicObservation);
+            absl::StrAppend(&result, "start game");
           } else if (state.history_.size() > state.num_players_) {
             absl::StrAppend(&result,
                             state.history_.back().action ? "Bet" : "Pass");
@@ -322,6 +321,7 @@ void KuhnState::UndoAction(Player player, Action move) {
     winner_ = kInvalidPlayer;
   }
   history_.pop_back();
+  --move_number_;
 }
 
 std::vector<std::pair<Action, double>> KuhnState::ChanceOutcomes() const {
@@ -440,6 +440,31 @@ TabularPolicy GetAlwaysBetPolicy(const Game& game) {
   SPIEL_CHECK_TRUE(
       dynamic_cast<KuhnGame*>(const_cast<Game*>(&game)) != nullptr);
   return GetPrefActionPolicy(game, {ActionType::kBet});
+}
+
+TabularPolicy GetOptimalPolicy(double alpha) {
+  SPIEL_CHECK_GE(alpha, 0.);
+  SPIEL_CHECK_LE(alpha, 1. / 3);
+  const double three_alpha = 3 * alpha;
+  std::unordered_map<std::string, ActionsAndProbs> policy;
+
+  // All infostates have two actions: Pass (0) and Bet (1).
+  // Player 0
+  policy["0"] = {{0, 1 - alpha}, {1, alpha}};
+  policy["0pb"] = {{0, 1}, {1, 0}};
+  policy["1"] = {{0, 1}, {1, 0}};
+  policy["1pb"] = {{0, 2. / 3. - alpha}, {1, 1. / 3. + alpha}};
+  policy["2"] = {{0, 1 - three_alpha}, {1, three_alpha}};
+  policy["2pb"] = {{0, 0}, {1, 1}};
+
+  // Player 1
+  policy["0p"] = {{0, 2. / 3.}, {1, 1. / 3.}};
+  policy["0b"] = {{0, 1}, {1, 0}};
+  policy["1p"] = {{0, 1}, {1, 0}};
+  policy["1b"] = {{0, 2. / 3.}, {1, 1. / 3.}};
+  policy["2p"] = {{0, 0}, {1, 1}};
+  policy["2b"] = {{0, 0}, {1, 1}};
+  return TabularPolicy(policy);
 }
 
 }  // namespace kuhn_poker

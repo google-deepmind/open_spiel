@@ -13,8 +13,9 @@
 // limitations under the License.
 
 #include "open_spiel/games/tarok.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "open_spiel/python/pybind11/pybind11.h"
+
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::tarok::TarokState);
 
 namespace open_spiel {
 
@@ -23,7 +24,7 @@ using tarok::TarokState;
 
 void init_pyspiel_games_tarok(py::module& m) {
   // state object
-  py::class_<TarokState, State> tarok_state(m, "TarokState");
+  py::classh<TarokState, State> tarok_state(m, "TarokState");
   tarok_state.def("card_action_to_string",
                   &TarokState::CardActionToString);
   tarok_state.def("current_game_phase", &TarokState::CurrentGamePhase);

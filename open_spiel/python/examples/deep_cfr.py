@@ -21,7 +21,6 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 from absl import logging
-import six
 
 import tensorflow.compat.v1 as tf
 
@@ -61,7 +60,7 @@ def main(unused_argv):
         reinitialize_advantage_networks=False)
     sess.run(tf.global_variables_initializer())
     _, advantage_losses, policy_loss = deep_cfr_solver.solve()
-    for player, losses in six.iteritems(advantage_losses):
+    for player, losses in advantage_losses.items():
       logging.info("Advantage for player %d: %s", player,
                    losses[:2] + ["..."] + losses[-2:])
       logging.info("Advantage Buffer Size for player %s: '%s'", player,

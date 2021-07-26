@@ -117,7 +117,7 @@ class NoPrivateObserver : public Observer {
   void WriteTensor(const State& state, int player,
                    Allocator* allocator) const override {}
   std::string StringFrom(const State& state, int player) const override {
-    return kNothingPrivateObservation;
+    return "";
   }
 };
 }  // namespace
@@ -223,6 +223,23 @@ Observation::Observation(const Game& game, std::shared_ptr<Observer> observer)
 void Observation::SetFrom(const State& state, int player) {
   ContiguousAllocator allocator(absl::MakeSpan(buffer_));
   observer_->WriteTensor(state, player, &allocator);
+}
+
+std::vector<TensorInfoWithData> Observation::tensors() const {
+  std::vector<TensorInfoWithData> result;
+  result.reserve(tensors_.size());
+  int start = 0;
+  for (const TensorInfo& info : tensors_) {
+    const int size = absl::c_accumulate(info.shape, 1, std::multiplies<int>());
+    TensorInfoWithData tensor_with_data;
+    // Copy the TensorInfo base part.
+    tensor_with_data.name = info.name;
+    tensor_with_data.shape = info.shape;
+    tensor_with_data.data = absl::MakeSpan(buffer_).subspan(start, size);
+    result.emplace_back(std::move(tensor_with_data));
+    start += size;
+  }
+  return result;
 }
 
 // We may in the future support multiple compression schemes.
@@ -342,5 +359,22 @@ std::shared_ptr<Observer> ObserverRegisterer::CreateByName(
   return it->second(game, iig_obs_type, params);
 }
 
+std::vector<float> TensorFromObserver(const State& state,
+                                      const Observer& observer) {
+  TrackingVectorAllocator allocator;
+  observer.WriteTensor(state, /*player=*/state.CurrentPlayer(), &allocator);
+  return std::move(allocator.data);
+}
+
+std::vector<int> ObserverTensorShape(const State& state,
+                                     const Observer& observer) {
+  TrackingVectorAllocator allocator;
+  observer.WriteTensor(state, /*player=*/0, &allocator);
+  if (allocator.tensors.size() == 1) {
+    return allocator.tensors.front().shape;
+  } else {
+    return {static_cast<int>(allocator.data.size())};
+  }
+}
 
 }  // namespace open_spiel

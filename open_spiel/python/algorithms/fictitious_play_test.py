@@ -64,8 +64,7 @@ class FictitiousPlayTest(absltest.TestCase):
 
   def test_meta_game_kuhn3p(self):
     print("Kuhn 3p")
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(3)})
+    game = pyspiel.load_game("kuhn_poker", {"players": 3})
     xfp_solver = fictitious_play.XFPSolver(game, save_oracles=True)
     for _ in range(3):
       xfp_solver.iteration()
@@ -77,8 +76,7 @@ class FictitiousPlayTest(absltest.TestCase):
 
   def test_meta_game_kuhn4p(self):
     print("Kuhn 4p")
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(4)})
+    game = pyspiel.load_game("kuhn_poker", {"players": 4})
     xfp_solver = fictitious_play.XFPSolver(game, save_oracles=True)
     for _ in range(3):
       xfp_solver.iteration()

@@ -129,7 +129,19 @@ struct TensorInfo {
 
   std::string DebugString() const {
     return absl::StrCat("TensorInfo(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), ")");
+                        absl::StrJoin(shape, ","), "))");
+  }
+};
+
+struct TensorInfoWithData {
+  std::string name;
+  std::vector<int> shape;
+  absl::Span<const float> data;
+
+  std::string DebugString() const {
+    return absl::StrCat("TensorInfoWithData(name='", name, "', shape=(",
+                        absl::StrJoin(shape, ","), "), data=<", data.size(),
+                        " bytes>)");
   }
 };
 
@@ -159,7 +171,7 @@ enum class PrivateInfoType {
 
 // The public / private observations factorize observations into their
 // (mostly) non-overlapping public and private parts. They may overlap only for
-// the start of the game and time. See also fog/ directory for details.
+// the start of the game and time.
 //
 // The public observations correspond to information that all the players know
 // that all the players know, like upward-facing cards on a table.
@@ -189,12 +201,6 @@ enum class PrivateInfoType {
 // automatically, and return observation "draw-5". We do not require this, as
 // it is in general expensive to compute. Returning public observation "draw"
 // is sufficient.
-//
-// In the initial state this function must return
-// kStartOfGamePublicObservation. If there is no public observation available
-// except time, the implementation must return kClockTickObservation. Note
-// that empty strings for public observations are forbidden - they correspond
-// to kInvalidPublicObservation.
 
 // The private observations correspond to the part of the observation that
 // is not public. In Poker, this would be the cards the player holds in his
@@ -211,11 +217,7 @@ enum class PrivateInfoType {
 // everyone to see.
 //
 // If there is no private observation available, the implementation should
-// return kNothingPrivateObservation. Perfect information games have no
-// private observations and should return only this constant.
-// Imperfect-information games should return a different string
-// at least once in at least one possible trajectory of the game (otherwise
-// they would be considered perfect-info games).
+// return an empty string.
 struct IIGObservationType {
   // If true, include public information in the observation.
   bool public_info;
@@ -300,6 +302,9 @@ class Observation {
   // Returns information on the component tensors of the observation.
   const std::vector<TensorInfo>& tensor_info() const { return tensors_; }
 
+  // Returns the component tensors of the observation: both info and data.
+  std::vector<TensorInfoWithData> tensors() const;
+
   // Gets the observation from the State and player and stores it in
   // the internal tensor.
   void SetFrom(const State& state, int player);
@@ -366,6 +371,17 @@ class ObserverRegisterer {
     return impl;
   }
 };
+
+// Pure function that creates a tensor from an observer. Slower than using an
+// Observation, but threadsafe. This is useful when you cannot keep an
+// Observation around to use multiple times.
+std::vector<float> TensorFromObserver(const State& state,
+                                      const Observer& observer);
+
+// Pure function that gets the tensor shape from an observer.
+// Any valid state may be supplied.
+std::vector<int> ObserverTensorShape(const State& state,
+                                     const Observer& observer);
 
 }  // namespace open_spiel
 

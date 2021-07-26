@@ -22,6 +22,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
+<font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
@@ -31,6 +32,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Havannah](#havannah)
 <font color="orange"><b>~</b></font>         | [Hearts](#hearts)
 <font color="orange"><b>~</b></font>         | [Hex](#hex)
+<font color="orange"><b>~</b></font>         | [Kriegspiel](#Kriegspiel)
 ![](_static/green_circ10.png "green circle") | [Kuhn poker](#kuhn-poker)
 <font color="orange"><b>~</b></font>         | [Laser Tag](#laser-tag)
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
@@ -47,6 +49,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
+<font color="orange"><b>~</b></font>         | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
 <font color="orange"><b>~</b></font>         | [Sheriff](#sheriff)
 <font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
@@ -201,6 +204,16 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
 
+### Dark Hex
+
+*   Hex, except the opponent's tokens are hidden. (Imperfect-information
+    version)
+*   Uses tokens on a hex grid.
+*   Research game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+
 ### Deep Sea
 
 *   Agent must explore to find reward (first version) or penalty (second
@@ -300,6 +313,18 @@ Status                                       | Game
 *   [Wikipedia](https://en.wikipedia.org/wiki/Hex_\(board_game\))
 *   [Hex, the full story by Ryan Hayward and Bjarne Toft](https://webdocs.cs.ualberta.ca/~hayward/hexbook/hex.html)
 
+### Kriegspiel
+
+*   Chess with opponent's pieces unknown. Illegal moves have no effect - it
+    remains the same player's turn until they make a legal move.
+*   Traditional chess variant, invented by Henry Michael Temple in 1899.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Kriegspiel_\(chess\))
+*   [Monte Carlo tree search in Kriegspiel](https://www.ics.uci.edu/~dechter/courses/ics-295/fall-2019/papers/2010-mtc-aij.pdf)
+*   [Game-Tree Search with Combinatorially Large Belief States, Parker 2005](https://www.cs.umd.edu/~nau/papers/parker2005game-tree.pdf)
+
 ### Kuhn poker
 
 *   Simplified poker amenable to game-theoretic analysis.
@@ -312,7 +337,7 @@ Status                                       | Game
 
 ### Laser Tag
 
-*   Agents see a local part of the grid, and attempt to tag eachother with
+*   Agents see a local part of the grid, and attempt to tag each other with
     beams.
 *   Agents on a grid.
 *   Research game.
@@ -473,6 +498,20 @@ Status                                       | Game
 *   Perfect information.
 *   2-4 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
+
+### Reconnaissance Blind Chess
+
+*   Chess with opponent's pieces unknown, with sensing moves.
+*   Chess variant, invented by John Hopkins University Applied Physics Lab. Used
+    in NeurIPS competition and Hidden Information Game Competition.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   [JHU APL Main site](https://rbc.jhuapl.edu/)
+*   [Markowitz et al. '18, On the Complexity of Reconnaissance Blind Chess](https://arxiv.org/abs/1811.03119)
+*   [Newman et al. '16, Reconnaissance blind multi-chess: an experimentation
+    platform for ISR sensor fusion and resource
+    management](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/9842/984209/Reconnaissance-blind-multi-chess--an-experimentation-platform-for-ISR/10.1117/12.2228127.short?SSO=1)
 
 ### Sheriff
 

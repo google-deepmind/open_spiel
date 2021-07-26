@@ -21,12 +21,10 @@ extensions.
 
 *   C++17
 *   Python 3
-*   A subset of the features are available in Swift.
 
 The games and utility functions (e.g. exploitability computation) are written in
 C++. These are also available using
-[pybind11](https://pybind11.readthedocs.io/en/stable/) Python (2.7 and 3)
-bindings.
+[pybind11](https://pybind11.readthedocs.io/en/stable/) Python bindings.
 
 The methods names are in `CamelCase` in C++ and `snake_case` in Python (e.g.
 `state.ApplyAction` in C++ will be `state.apply_action` in Python). See the

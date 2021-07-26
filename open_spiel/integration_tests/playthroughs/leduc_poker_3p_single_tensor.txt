@@ -94,7 +94,7 @@ PrivateObservationString(2) = "[Observer: 2][Private: -10000]"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ChanceOutcomes() = [{0, 0.125000000000}, {1, 0.125000000000}, {2, 0.125000000000}, {3, 0.125000000000}, {4, 0.125000000000}, {5, 0.125000000000}, {6, 0.125000000000}, {7, 0.125000000000}]
+ChanceOutcomes() = [(0, 0.125), (1, 0.125), (2, 0.125), (3, 0.125), (4, 0.125), (5, 0.125), (6, 0.125), (7, 0.125)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7]
 StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
 
@@ -161,7 +161,7 @@ PrivateObservationString(2) = "[Observer: 2][Private: -10000]"
 ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ChanceOutcomes() = [{0, 0.142857142857}, {1, 0.142857142857}, {2, 0.142857142857}, {3, 0.142857142857}, {5, 0.142857142857}, {6, 0.142857142857}, {7, 0.142857142857}]
+ChanceOutcomes() = [(0, 0.14285714285714285), (1, 0.14285714285714285), (2, 0.14285714285714285), (3, 0.14285714285714285), (5, 0.14285714285714285), (6, 0.14285714285714285), (7, 0.14285714285714285)]
 LegalActions() = [0, 1, 2, 3, 5, 6, 7]
 StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
 
@@ -169,69 +169,6 @@ StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:
 action: 2
 
 # State 2
-# Round: 1
-# Player: -1
-# Pot: 3
-# Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 2 -10000
-# Round 1 sequence:
-# Round 2 sequence:
-IsTerminal() = False
-History() = [4, 2]
-HistoryString() = "4, 2"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
-InformationStateString(1) = "[Observer: 1][Private: 2][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
-InformationStateString(2) = "[Observer: 2][Private: -10000][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
-InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(0).betting:
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(1).betting:
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(2).betting:
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-ObservationString(0) = "[Observer: 0][Private: 4][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Ante: 1 1 1]"
-ObservationString(1) = "[Observer: 1][Private: 2][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Ante: 1 1 1]"
-ObservationString(2) = "[Observer: 2][Private: -10000][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Ante: 1 1 1]"
-PublicObservationString() = "[Round 1][Player: -1][Pot: 3][Money: 99 99 99][Ante: 1 1 1]"
-PrivateObservationString(0) = "[Observer: 0][Private: 4]"
-PrivateObservationString(1) = "[Observer: 1][Private: 2]"
-PrivateObservationString(2) = "[Observer: 2][Private: -10000]"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ChanceOutcomes() = [{0, 0.166666666667}, {1, 0.166666666667}, {3, 0.166666666667}, {5, 0.166666666667}, {6, 0.166666666667}, {7, 0.166666666667}]
-LegalActions() = [0, 1, 3, 5, 6, 7]
-StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:3", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
-
 # Apply action "Chance outcome:3"
 action: 3
 
@@ -508,69 +445,6 @@ StringLegalActions() = ["Fold", "Call", "Raise"]
 action: 0
 
 # State 7
-# Round: 2
-# Player: -1
-# Pot: 7
-# Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): -10000 4 2 3
-# Round 1 sequence: Call, Raise, Call, Fold
-# Round 2 sequence:
-IsTerminal() = False
-History() = [4, 2, 3, 1, 2, 1, 0]
-HistoryString() = "4, 2, 3, 1, 2, 1, 0"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "[Observer: 0][Private: 4][Round 2][Player: -1][Pot: 7][Money: 99 97 97][Round1: 1 2 1 0][Round2: ]"
-InformationStateString(1) = "[Observer: 1][Private: 2][Round 2][Player: -1][Pot: 7][Money: 99 97 97][Round1: 1 2 1 0][Round2: ]"
-InformationStateString(2) = "[Observer: 2][Private: 3][Round 2][Player: -1][Pot: 7][Money: 99 97 97][Round1: 1 2 1 0][Round2: ]"
-InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(0).betting:
-◉◯  ◯◯
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(1).betting:
-◉◯  ◯◯
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(2).betting:
-◉◯  ◯◯
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-ObservationString(0) = "[Observer: 0][Private: 4][Round 2][Player: -1][Pot: 7][Money: 99 97 97][Ante: 1 3 3]"
-ObservationString(1) = "[Observer: 1][Private: 2][Round 2][Player: -1][Pot: 7][Money: 99 97 97][Ante: 1 3 3]"
-ObservationString(2) = "[Observer: 2][Private: 3][Round 2][Player: -1][Pot: 7][Money: 99 97 97][Ante: 1 3 3]"
-PublicObservationString() = "[Round 2][Player: -1][Pot: 7][Money: 99 97 97][Ante: 1 3 3]"
-PrivateObservationString(0) = "[Observer: 0][Private: 4]"
-PrivateObservationString(1) = "[Observer: 1][Private: 2]"
-PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ChanceOutcomes() = [{0, 0.200000000000}, {1, 0.200000000000}, {5, 0.200000000000}, {6, 0.200000000000}, {7, 0.200000000000}]
-LegalActions() = [0, 1, 5, 6, 7]
-StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
-
 # Apply action "Chance outcome:1"
 action: 1
 

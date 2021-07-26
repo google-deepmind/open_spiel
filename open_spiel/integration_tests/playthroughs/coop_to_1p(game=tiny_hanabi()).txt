@@ -40,7 +40,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\n"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
+ChanceOutcomes() = [(0, 0.5), (1, 0.5)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["d0", "d1"]
 
@@ -58,7 +58,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 possible: d0 d1\n"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [{0, 0.500000000000}, {1, 0.500000000000}]
+ChanceOutcomes() = [(0, 0.5), (1, 0.5)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["d0", "d1"]
 
@@ -135,25 +135,6 @@ StringLegalActions() = ["d0->p1a0", "d0->p1a1", "d0->p1a2"]
 action: 2
 
 # State 5
-# p0:d0 p1:d1 p0:a2
-# Player 0 possible: d0
-# Player 1 p1a0: none
-# Player 1 p1a1: none
-# Player 1 p1a2: d0
-# Player 1 unassigned: d1
-IsTerminal() = False
-History() = [0, 1, 2, 1, 2]
-HistoryString() = "0, 1, 2, 1, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "Player 0\np0a2\nPlayer 0 possible: d0\nPlayer 1 p1a0: none\nPlayer 1 p1a1: none\nPlayer 1 p1a2: d0\nPlayer 1 unassigned: d1\n"
-ObservationTensor(0): ◯◯◉◉◯◉◉◯◯◯◯◉◯◯◉
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["d1->p1a0", "d1->p1a1", "d1->p1a2"]
-
 # Apply action "d1->p1a2"
 action: 2
 

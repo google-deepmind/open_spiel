@@ -80,6 +80,10 @@ class ConnectFourState : public State {
       Action action) const override {
     return {action};
   }
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override {
+    return Clone();
+  }
 
  protected:
   void DoApplyAction(Action move) override;

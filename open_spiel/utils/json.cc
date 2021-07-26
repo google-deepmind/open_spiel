@@ -60,13 +60,14 @@ void ConsumeWhitespace(absl::string_view* str) {
   }
 }
 
-std::nullopt_t ParseError(absl::string_view error, absl::string_view str) {
+absl::nullopt_t ParseError(absl::string_view error, absl::string_view str) {
   // Comment out this check if you want parse errors to return nullopt instead
   // of crash with an error message of where the problem is.
-  SPIEL_CHECK_EQ(error, str.substr(0, std::min(30ul, str.size())));
+  SPIEL_CHECK_EQ(error, str.substr(0,
+                                   std::min(30, static_cast<int>(str.size()))));
 
   // TODO(author7): Maybe return a variant of error string or Value?
-  return std::nullopt;
+  return absl::nullopt;
 }
 
 bool ConsumeToken(absl::string_view* str, absl::string_view token) {
@@ -168,7 +169,7 @@ absl::optional<Array> ParseArray(absl::string_view* str) {
     ConsumeWhitespace(str);
     absl::optional<Value> v = ParseValue(str);
     if (!v) {
-      return std::nullopt;
+      return absl::nullopt;
     }
     out.push_back(*v);
   }
@@ -193,7 +194,7 @@ absl::optional<Object> ParseObject(absl::string_view* str) {
     ConsumeWhitespace(str);
     absl::optional<std::string> key = ParseString(str);
     if (!key) {
-      return std::nullopt;
+      return absl::nullopt;
     }
     ConsumeWhitespace(str);
     if (!ConsumeToken(str, ":")) {
@@ -202,7 +203,7 @@ absl::optional<Object> ParseObject(absl::string_view* str) {
     ConsumeWhitespace(str);
     absl::optional<Value> v = ParseValue(str);
     if (!v) {
-      return std::nullopt;
+      return absl::nullopt;
     }
     out.emplace(*key, *v);
   }

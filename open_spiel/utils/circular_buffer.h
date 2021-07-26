@@ -61,7 +61,7 @@ class CircularBuffer {
   // How many elements have ever been added to the buffer.
   int64_t TotalAdded() const { return total_added_; }
 
- private:
+ protected:
   const int max_size_;
   int64_t total_added_;
   std::vector<T> data_;

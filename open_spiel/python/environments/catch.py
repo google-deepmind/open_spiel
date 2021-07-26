@@ -20,7 +20,6 @@ from __future__ import print_function
 
 import collections
 import numpy as np
-import six
 
 from open_spiel.python import rl_environment
 
@@ -97,7 +96,7 @@ class Environment(object):
 
     if isinstance(actions, list):
       action = actions[0]
-    elif isinstance(actions, six.integer_types):
+    elif isinstance(actions, int):
       action = actions
     else:
       raise ValueError("Action not supported.", actions)

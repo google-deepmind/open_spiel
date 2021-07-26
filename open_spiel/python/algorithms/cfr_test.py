@@ -122,6 +122,17 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     np.testing.assert_allclose(
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
+  def test_cfr_plus_solver_best_response_mdp(self):
+    game = pyspiel.load_game("kuhn_poker")
+    cfr_solver = cfr.CFRPlusSolver(game)
+    for _ in range(200):
+      cfr_solver.evaluate_and_update_policy()
+    average_policy = cfr_solver.average_policy()
+    pyspiel_avg_policy = policy.python_policy_to_pyspiel_policy(average_policy)
+    br_computer = pyspiel.TabularBestResponseMDP(game, pyspiel_avg_policy)
+    br_info = br_computer.exploitability()
+    self.assertLessEqual(br_info.exploitability, 0.001)
+
   def test_cfr_cce_ce_dist_goofspiel(self):
     """Copy of the TestCCEDistCFRGoofSpiel in corr_dist_test.cc."""
     game = pyspiel.load_game(
@@ -171,8 +182,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
                                                      alternating_updates):
     num_players = 3
 
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
     cfr_solver = cfr._CFRSolver(
         game,
         regret_matching_plus=regret_matching_plus,
@@ -189,8 +199,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
   def test_simultaneous_two_step_avg_1b_seq_in_kuhn_poker(
       self, regret_matching_plus):
     num_players = 2
-    game = pyspiel.load_game("kuhn_poker",
-                             {"players": pyspiel.GameParameter(num_players)})
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
     cfr_solver = cfr._CFRSolver(
         game,
         regret_matching_plus=regret_matching_plus,

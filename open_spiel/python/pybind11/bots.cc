@@ -24,21 +24,15 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
-#include "pybind11/include/pybind11/cast.h"
-#include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
-#include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/pytypes.h"
-#include "pybind11/include/pybind11/stl.h"
 
 namespace open_spiel {
 namespace {
 
 using ::open_spiel::algorithms::Evaluator;
+using ::open_spiel::algorithms::SearchNode;
 
 namespace py = ::pybind11;
 
@@ -211,6 +205,18 @@ void init_pyspiel_bots(py::module& m) {
       .value("UCT", algorithms::ChildSelectionPolicy::UCT)
       .value("PUCT", algorithms::ChildSelectionPolicy::PUCT);
 
+  py::class_<SearchNode> search_node(m, "SearchNode");
+  search_node.def_readonly("action", &SearchNode::action)
+      .def_readonly("prior", &SearchNode::prior)
+      .def_readonly("player", &SearchNode::player)
+      .def_readonly("explore_count", &SearchNode::explore_count)
+      .def_readonly("total_reward", &SearchNode::total_reward)
+      .def_readonly("outcome", &SearchNode::outcome)
+      .def_readonly("children", &SearchNode::children)
+      .def("best_child", &SearchNode::BestChild)
+      .def("to_string", &SearchNode::ToString)
+      .def("children_str", &SearchNode::ChildrenStr);
+
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
       .def(py::init<const Game&, std::shared_ptr<Evaluator>, double, int,
                     int64_t, bool, int, bool,
@@ -247,8 +253,10 @@ void init_pyspiel_bots(py::module& m) {
       .def("restart", &algorithms::ISMCTSBot::Restart)
       .def("restart_at", &algorithms::ISMCTSBot::RestartAt);
 
-  m.def("evaluate_bots", open_spiel::EvaluateBots, py::arg("state"),
-        py::arg("bots"), py::arg("seed"),
+  m.def("evaluate_bots",
+        py::overload_cast<State*, const std::vector<Bot*>&, int>(
+            open_spiel::EvaluateBots),
+        py::arg("state"), py::arg("bots"), py::arg("seed"),
         "Plays a single game with the given bots and returns the final "
         "utilities.");
 
@@ -257,8 +265,9 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
         "A stateful random bot, for test purposes.");
-
-  m.def("make_policy_bot", open_spiel::MakePolicyBot,
+  m.def("make_policy_bot",
+        py::overload_cast<const Game&, Player, int, std::shared_ptr<Policy>>(
+            open_spiel::MakePolicyBot),
         "A bot that samples from a policy.");
 }
 }  // namespace open_spiel

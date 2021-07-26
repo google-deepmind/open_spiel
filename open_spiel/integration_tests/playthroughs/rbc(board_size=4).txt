@@ -1,0 +1,1940 @@
+game: rbc(board_size=4)
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Reconnaisance Blind Chess"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["board_size", "fen", "sense_size"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "rbc"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 4672
+PolicyTensorShape() = [4672]
+MaxChanceOutcomes() = 0
+GetParameters() = {board_size=4,fen=r1kr/pppp/PPPP/R1KR w - - 0 1,sense_size=3}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = pieces_black: [9], pieces_white: [9], phase: [2], illegal_move: [2], capture: [2], side_to_play: [2], private_k_pieces: [4, 4], private_q_pieces: [4, 4], private_r_pieces: [4, 4], private_b_pieces: [4, 4], private_n_pieces: [4, 4], private_p_pieces: [4, 4], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [4, 4], private_sense_Q_pieces: [4, 4], private_sense_R_pieces: [4, 4], private_sense_B_pieces: [4, 4], private_sense_N_pieces: [4, 4], private_sense_P_pieces: [4, 4]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 222
+MaxGameLength() = 17695
+ToString() = "rbc(board_size=4)"
+
+# State 0
+# r1kr/pppp/PPPP/R1KR w - - 0 1
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "r?kr/pppp/????/???? w - - 0 1"
+ObservationString(1) = "????/????/PPPP/R?KR w - - 0 1"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense a2"
+action: 2
+
+# State 1
+# r1kr/pppp/PPPP/R1KR w - - 0 1
+IsTerminal() = False
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "r?kr/pppp/????/???? w - - 0 1"
+ObservationString(1) = "r1k?/ppp?/PPPP/R?KR w - - 0 1"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).phase: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).phase: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◉
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◉
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◉◯
+                                             ◯◯◉◯
+                                             ◯◯◉◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["Rab1", "axa3", "axb3", "bxb3", "bxc3", "bxa3", "Kcb1", "cxc3", "cxd3", "cxb3", "dxd3", "dxc3"]
+
+# Apply action "axb3"
+action: 117
+
+# State 2
+# r1kr/pPpp/1PPP/R1KR b - - 0 1
+IsTerminal() = False
+History() = [2, 117]
+HistoryString() = "2, 117"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "r?kr/p?pp/????/???? b - - 0 1"
+ObservationString(1) = "????/?P??/?PPP/R?KR b - - 0 1"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense b1"
+action: 1
+
+# State 3
+# r1kr/pPpp/1PPP/R1KR b - - 0 1
+IsTerminal() = False
+History() = [2, 117, 1]
+HistoryString() = "2, 117, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "r?kr/pPpp/?PPP/?1KR b - - 0 1"
+ObservationString(1) = "????/?P??/?PPP/R?KR b - - 0 1"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).phase: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◉◯
+ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◉◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◉◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◉◉◯
+                                             ◯◉◯◯
+                                             ◯◉◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).phase: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◉◯
+ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["Rab4", "a2", "axb2", "Kcb4", "Kxb3", "cxc2", "cxd2", "cxb2", "dxd2", "dxc2"]
+
+# Apply action "Rab4"
+action: 30
+
+# State 4
+# 1rkr/pPpp/1PPP/R1KR w - - 1 2
+IsTerminal() = False
+History() = [2, 117, 1, 30]
+HistoryString() = "2, 117, 1, 30"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "?rkr/p?pp/????/???? w - - 1 2"
+ObservationString(1) = "????/?P??/?PPP/R?KR w - - 1 2"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense a1"
+action: 0
+
+# State 5
+# Apply action "Rab1"
+action: 30
+
+# State 6
+# 1rkr/pPpp/1PPP/1RKR b - - 2 2
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30]
+HistoryString() = "2, 117, 1, 30, 0, 30"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "?rkr/p?pp/????/???? b - - 2 2"
+ObservationString(1) = "????/?P??/?PPP/?RKR b - - 2 2"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◉◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◉◉◯
+                                       ◯◉◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense a1"
+action: 0
+
+# State 7
+# Apply action "Rxb1"
+action: 602
+
+# State 8
+# Apply action "Sense a1"
+action: 0
+
+# State 9
+# Apply action "Ra1"
+action: 613
+
+# State 10
+# Apply action "Sense a2"
+action: 2
+
+# State 11
+# Apply action "Kcb4"
+action: 1197
+
+# State 12
+# Apply action "Sense b1"
+action: 1
+
+# State 13
+# Apply action "cxd3"
+action: 1285
+
+# State 14
+# Apply action "Sense b1"
+action: 1
+
+# State 15
+# Apply action "Rdc4"
+action: 1781
+
+# State 16
+# Apply action "Sense a2"
+action: 2
+
+# State 17
+# Apply action "d4=Q"
+action: 1914
+
+# State 18
+# Apply action "Sense a1"
+action: 0
+
+# State 19
+# Apply action "Ka4"
+action: 613
+
+# State 20
+# k1rQ/prp1/1P1P/R1KR w - - 1 6
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "k?r?/prp?/????/???? w - - 1 6"
+ObservationString(1) = "???Q/????/?P?P/R?KR w - - 1 6"
+ObservationTensor(0).pieces_black: ◯◯◯◯◯◉◯◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◯◉◯◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◉◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense a2"
+action: 2
+
+# State 21
+# Apply action "bxa3"
+action: 714
+
+# State 22
+# k1rQ/Prp1/3P/R1KR b - - 0 6
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "k?r?/?rp?/????/???? b - - 0 6"
+ObservationString(1) = "???Q/P???/???P/R?KR b - - 0 6"
+ObservationTensor(0).pieces_black: ◯◯◯◯◉◯◯◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◯◉
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◯◉◯◯◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◉◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◉
+ObservationTensor(1).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense b1"
+action: 1
+
+# State 23
+# Apply action "Rbxa3"
+action: 686
+
+# State 24
+# Apply action "Sense b2"
+action: 3
+
+# State 25
+# Apply action "Ra2"
+action: 16
+
+# State 26
+# Apply action "Sense b2"
+action: 3
+
+# State 27
+# Apply action "Rxa2"
+action: 89
+
+# State 28
+# Apply action "Sense b2"
+action: 3
+
+# State 29
+# Apply action "Qxa4"
+action: 1998
+
+# State 30
+# Apply action "Sense b2"
+action: 3
+
+# State 31
+# Apply action "Rb2"
+action: 176
+
+# State 32
+# Apply action "Sense b2"
+action: 3
+
+# State 33
+# Apply action "Qb3"
+action: 1430
+
+# State 34
+# Apply action "Sense b2"
+action: 3
+
+# State 35
+# Apply action "cc2"
+action: 1257
+
+# State 36
+# Apply action "Sense b2"
+action: 3
+
+# State 37
+# Apply action "Qc3"
+action: 760
+
+# State 38
+# Apply action "Sense b2"
+action: 3
+
+# State 39
+# Apply action "cxd1=N"
+action: 1321
+
+# State 40
+# k3/2Q1/1r1P/2Kn w - - 0 11
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "k???/????/?r??/???n w - - 0 11"
+ObservationString(1) = "????/??Q?/???P/??K? w - - 0 11"
+ObservationTensor(0).pieces_black: ◯◯◯◉◯◯◯◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◉◯◯◯◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◉◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◯◉◯◯◯◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◉◯◯◯◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense b2"
+action: 3
+
+# State 41
+# Apply action "Kxd1"
+action: 1198
+
+# State 42
+# k3/2Q1/1r1P/3K b - - 0 11
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "k???/????/?r??/???? b - - 0 11"
+ObservationString(1) = "????/??Q?/???P/???K b - - 0 11"
+ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(0).pieces_white: ◯◯◯◉◯◯◯◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).private_k_pieces: ◯◯◯◉
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◉◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(1).pieces_white: ◯◯◯◉◯◯◯◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◉◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense b2"
+action: 3
+
+# State 43
+# Apply action "Ka3"
+action: 16
+
+# State 44
+# Apply action "Sense a2"
+action: 2
+
+# State 45
+# Apply action "Qcc1"
+action: 1328
+
+# State 46
+# Apply action "Sense a2"
+action: 2
+
+# State 47
+# Apply action "Rbb3"
+action: 745
+
+# State 48
+# Apply action "Sense b2"
+action: 3
+
+# State 49
+# Apply action "dxc3"
+action: 1882
+
+# State 50
+# Apply action "Sense b2"
+action: 3
+
+# State 51
+# Apply action "Rbb4"
+action: 672
+
+# State 52
+# Apply action "Sense b2"
+action: 3
+
+# State 53
+# Apply action "Qb1"
+action: 1197
+
+# State 54
+# Apply action "Sense b2"
+action: 3
+
+# State 55
+# Apply action "Rxb1"
+action: 602
+
+# State 56
+# Apply action "Sense b1"
+action: 1
+
+# State 57
+# Apply action "dxc3"
+action: 1882
+
+# State 58
+# Apply action "Sense a1"
+action: 0
+
+# State 59
+# Apply action "Ra1"
+action: 832
+
+# State 60
+# 4/k3/3P/r2K w - - 1 16
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198, 3, 16, 2, 1328, 2, 745, 3, 1882, 3, 672, 3, 1197, 3, 602, 1, 1882, 0, 832]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198, 3, 16, 2, 1328, 2, 745, 3, 1882, 3, 672, 3, 1197, 3, 602, 1, 1882, 0, 832"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "????/k???/????/r??? w - - 1 16"
+ObservationString(1) = "????/????/???P/???K w - - 1 16"
+ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(0).pieces_white: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(1).pieces_white: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◉◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense b1"
+action: 1
+
+# State 61
+# Apply action "Kc2"
+action: 1809
+
+# State 62
+# 4/k3/2KP/r3 b - - 2 16
+IsTerminal() = False
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198, 3, 16, 2, 1328, 2, 745, 3, 1882, 3, 672, 3, 1197, 3, 602, 1, 1882, 0, 832, 1, 1809]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198, 3, 16, 2, 1328, 2, 745, 3, 1882, 3, 672, 3, 1197, 3, 602, 1, 1882, 0, 832, 1, 1809"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "????/k???/????/r??? b - - 2 16"
+ObservationString(1) = "????/????/??KP/???? b - - 2 16"
+ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(0).pieces_white: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).private_k_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◉◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(1).pieces_white: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
+
+# Apply action "Sense a2"
+action: 2
+
+# State 63
+# Apply action "Rb1"
+action: 249
+
+# State 64
+# Apply action "Sense b1"
+action: 1
+
+# State 65
+# Apply action "Kb2"
+action: 1270
+
+# State 66
+# Apply action "Sense b2"
+action: 3
+
+# State 67
+# Apply action "Rbb3"
+action: 817
+
+# State 68
+# 4/k3/1r1P/4 w - - 0 18
+IsTerminal() = True
+History() = [2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198, 3, 16, 2, 1328, 2, 745, 3, 1882, 3, 672, 3, 1197, 3, 602, 1, 1882, 0, 832, 1, 1809, 2, 249, 1, 1270, 3, 817]
+HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 1781, 2, 1914, 0, 613, 2, 714, 1, 686, 3, 16, 3, 89, 3, 1998, 3, 176, 3, 1430, 3, 1257, 3, 760, 3, 1321, 3, 1198, 3, 16, 2, 1328, 2, 745, 3, 1882, 3, 672, 3, 1197, 3, 602, 1, 1882, 0, 832, 1, 1809, 2, 249, 1, 1270, 3, 817"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "????/k???/?r??/???? w - - 0 18"
+ObservationString(1) = "????/????/???P/???? w - - 0 18"
+ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(0).pieces_white: ◯◉◯◯◯◯◯◯◯
+ObservationTensor(0).phase: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).private_k_pieces: ◯◯◉◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_r_pieces: ◯◯◯◯
+                                       ◯◉◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(0).private_left_castling: ◉◯
+ObservationTensor(0).private_right_castling: ◉◯
+ObservationTensor(0).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
+ObservationTensor(1).pieces_white: ◯◉◯◯◯◯◯◯◯
+ObservationTensor(1).phase: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).private_k_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_q_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_r_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_b_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_n_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+ObservationTensor(1).private_p_pieces: ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◯◯◯
+                                       ◯◉◯◯
+ObservationTensor(1).private_left_castling: ◉◯
+ObservationTensor(1).private_right_castling: ◉◯
+ObservationTensor(1).private_sense_K_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_Q_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_R_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_B_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_N_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+                                             ◯◯◯◯
+Rewards() = [1.0, -1.0]
+Returns() = [1.0, -1.0]

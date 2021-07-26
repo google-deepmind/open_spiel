@@ -342,5 +342,98 @@ class UniformRandomPolicyTest(absltest.TestCase):
         })
 
 
+class MergeTabularPoliciesTest(absltest.TestCase):
+
+  def test_identity(self):
+    num_players = 2
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
+
+    tabular_policies = [  # Policy limited to player.
+        policy.TabularPolicy(game, players=(player,))
+        for player in range(num_players)]
+    for player, tabular_policy in enumerate(tabular_policies):
+      tabular_policy.action_probability_array[:] = 0
+      tabular_policy.action_probability_array[:, player] = 1.0
+
+    merged_tabular_policy = policy.merge_tabular_policies(
+        tabular_policies, game)
+
+    self.assertIdentityPoliciesEqual(
+        tabular_policies, merged_tabular_policy, game)
+
+  def test_identity_redundant(self):
+    num_players = 2
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
+
+    tabular_policies = [  # Policy for all players.
+        policy.TabularPolicy(game, players=None)
+        for player in range(num_players)]
+    for player, tabular_policy in enumerate(tabular_policies):
+      tabular_policy.action_probability_array[:] = 0
+      tabular_policy.action_probability_array[:, player] = 1.0
+
+    merged_tabular_policy = policy.merge_tabular_policies(
+        tabular_policies, game)
+
+    self.assertIdentityPoliciesEqual(
+        tabular_policies, merged_tabular_policy, game)
+
+  def test_identity_missing(self):
+    num_players = 2
+    game = pyspiel.load_game("kuhn_poker", {"players": num_players})
+
+    tabular_policies = [  # Only first player (repeated).
+        policy.TabularPolicy(game, players=(0,))
+        for player in range(num_players)]
+    for player, tabular_policy in enumerate(tabular_policies):
+      tabular_policy.action_probability_array[:] = 0
+      tabular_policy.action_probability_array[:, player] = 1.0
+
+    merged_tabular_policy = policy.merge_tabular_policies(
+        tabular_policies, game)
+
+    for player in range(game.num_players()):
+      if player == 0:
+        self.assertListEqual(
+            tabular_policies[player].states_per_player[player],
+            merged_tabular_policy.states_per_player[player])
+        for p_state in merged_tabular_policy.states_per_player[player]:
+          to_index = merged_tabular_policy.state_lookup[p_state]
+          from_index = tabular_policies[player].state_lookup[p_state]
+          self.assertTrue(np.allclose(
+              merged_tabular_policy.action_probability_array[to_index],
+              tabular_policies[player].action_probability_array[from_index]))
+
+          self.assertTrue(np.allclose(
+              merged_tabular_policy.action_probability_array[to_index, player],
+              1))
+      else:
+        # Missing players have uniform policy.
+        self.assertEmpty(tabular_policies[player].states_per_player[player])
+        for p_state in merged_tabular_policy.states_per_player[player]:
+          to_index = merged_tabular_policy.state_lookup[p_state]
+          self.assertTrue(np.allclose(
+              merged_tabular_policy.action_probability_array[to_index, player],
+              0.5))
+
+  def assertIdentityPoliciesEqual(
+      self, tabular_policies, merged_tabular_policy, game):
+    for player in range(game.num_players()):
+      self.assertListEqual(
+          tabular_policies[player].states_per_player[player],
+          merged_tabular_policy.states_per_player[player])
+
+      for p_state in merged_tabular_policy.states_per_player[player]:
+        to_index = merged_tabular_policy.state_lookup[p_state]
+        from_index = tabular_policies[player].state_lookup[p_state]
+        self.assertTrue(np.allclose(
+            merged_tabular_policy.action_probability_array[to_index],
+            tabular_policies[player].action_probability_array[from_index]))
+
+        self.assertTrue(np.allclose(
+            merged_tabular_policy.action_probability_array[to_index, player],
+            1))
+
+
 if __name__ == "__main__":
   absltest.main()

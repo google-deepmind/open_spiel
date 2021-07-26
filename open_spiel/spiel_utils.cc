@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -103,7 +104,8 @@ std::string FormatDouble(double value) {
   // the .0 if necessary (to clarify that it's a double value).
   std::string double_str = absl::StrFormat("%.15f", value);
   size_t idx = double_str.find('.');
-  if (double_str.find('.') == std::string::npos) {
+
+  if (double_str.find('.') == std::string::npos) {  // NOLINT
     absl::StrAppend(&double_str, ".0");
   } else {
     // Remove the extra trailing zeros, if there are any.
@@ -115,7 +117,9 @@ std::string FormatDouble(double value) {
 }
 
 void SpielDefaultErrorHandler(const std::string& error_msg) {
-  std::cerr << "Spiel Fatal Error: " << error_msg << std::endl << std::endl;
+  std::cerr << "Spiel Fatal Error: " << error_msg << std::endl
+            << std::endl
+            << std::flush;
   std::exit(1);
 }
 
@@ -147,5 +151,19 @@ void Normalize(absl::Span<double> weights) {
 }
 
 std::string BoolToStr(bool b) { return b ? "true" : "false"; }
+
+template <class A, class B>
+std::string VectorOfPairsToString(std::vector<std::pair<A, B>>& vec,
+                                  const std::string& delimiter,
+                                  const std::string& pair_delimiter) {
+  std::string str;
+  for (int i = 0; i < vec.size(); ++i) {
+    absl::StrAppend(&str, vec[i].first, pair_delimiter, vec[i].second);
+    if (i != vec.size() - 1) {
+      absl::StrAppend(&str, delimiter);
+    }
+  }
+  return str;
+}
 
 }  // namespace open_spiel
