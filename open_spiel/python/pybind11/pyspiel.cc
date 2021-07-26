@@ -242,6 +242,9 @@ PYBIND11_MODULE(pyspiel, m) {
   state.def(py::init<std::shared_ptr<const Game>>())
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
+      .def("apply_action_with_legality_check",
+           py::overload_cast<Action>(
+               &State::ApplyActionWithLegalityCheck))
       .def("legal_actions",
            (std::vector<open_spiel::Action>(State::*)(int) const) &
                State::LegalActions)
@@ -298,6 +301,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
       .def("apply_actions", &State::ApplyActions)
+      .def("apply_actions_with_legality_checks",
+           &State::ApplyActionsWithLegalityChecks)
       .def("num_distinct_actions", &State::NumDistinctActions)
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)
