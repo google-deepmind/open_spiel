@@ -148,6 +148,9 @@ Color PlayerToColor(Player p) {
 }
 
 Action MoveToAction(const Move& move, int board_size) {
+  // Special-case for pass move.
+  if (move == kPassMove) return kPassAction;
+
   Color color = move.piece.color;
   // We rotate the move to be from player p's perspective.
   Move player_move(move);
@@ -228,6 +231,10 @@ std::pair<Square, int> ActionToDestination(int action, int board_size,
 Move ActionToMove(const Action& action, const ChessBoard& board) {
   SPIEL_CHECK_GE(action, 0);
   SPIEL_CHECK_LT(action, NumDistinctActions());
+
+  if (board.AllowPassMove() && action == kPassAction) {
+    return kPassMove;
+  }
 
   // The encoded action represents an action encoded from color's perspective.
   Color color = board.ToPlay();

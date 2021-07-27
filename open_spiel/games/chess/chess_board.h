@@ -254,13 +254,15 @@ inline const chess::Move kPassMove =
 class ChessBoard {
  public:
   ChessBoard(int board_size = kDefaultBoardSize,
-             bool king_in_check_allowed = false, bool allow_pass_move = false);
+             bool king_in_check_allowed = false,
+             bool allow_pass_move = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   static absl::optional<ChessBoard> BoardFromFEN(
       const std::string& fen, int board_size = 8,
-      bool king_in_check_allowed = false);
+      bool king_in_check_allowed = false,
+      bool allow_pass_move = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -411,6 +413,8 @@ class ChessBoard {
   int BoardSize() const { return board_size_; }
 
   bool KingInCheckAllowed() const { return king_in_check_allowed_; }
+
+  bool AllowPassMove() const { return allow_pass_move_; }
 
   uint64_t HashValue() const { return zobrist_hash_; }
 
