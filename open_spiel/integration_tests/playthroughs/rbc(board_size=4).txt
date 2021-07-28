@@ -284,8 +284,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◉◯
                                              ◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
-StringLegalActions() = ["Rab1", "axa3", "axb3", "bxb3", "bxc3", "bxa3", "Kcb1", "cxc3", "cxd3", "cxb3", "dxd3", "dxc3"]
+LegalActions() = [0, 30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["pass", "Rab1", "axa3", "axb3", "bxb3", "bxc3", "bxa3", "Kcb1", "cxc3", "cxd3", "cxb3", "dxd3", "dxc3"]
 
 # Apply action "axb3"
 action: 117
@@ -544,8 +544,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
-StringLegalActions() = ["Rab4", "a2", "axb2", "Kcb4", "Kxb3", "cxc2", "cxd2", "cxb2", "dxd2", "dxc2"]
+LegalActions() = [0, 30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
+StringLegalActions() = ["pass", "Rab4", "a2", "axb2", "Kcb4", "Kxb3", "cxc2", "cxd2", "cxb2", "dxd2", "dxc2"]
 
 # Apply action "Rab4"
 action: 30

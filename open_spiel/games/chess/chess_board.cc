@@ -345,7 +345,8 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
 }
 
 /*static*/ absl::optional<ChessBoard> ChessBoard::BoardFromFEN(
-    const std::string &fen, int board_size, bool king_in_check_allowed) {
+    const std::string &fen, int board_size,
+    bool king_in_check_allowed, bool allow_pass_move) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
    *
@@ -357,7 +358,7 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
    *
    * Many FEN strings don't have the last two fields.
    */
-  ChessBoard board(board_size, king_in_check_allowed);
+  ChessBoard board(board_size, king_in_check_allowed, allow_pass_move);
 
   for (auto color : {Color::kBlack, Color::kWhite}) {
     for (auto dir : {CastlingDirection::kLeft, CastlingDirection::kRight}) {
@@ -660,7 +661,9 @@ void ChessBoard::GeneratePseudoLegalPawnCaptures(
 }
 
 bool ChessBoard::IsBreachingMove(Move tested_move) const {
-  const Piece &piece = at(tested_move.from);
+  if (tested_move == kPassMove) return false;
+
+  const Piece& piece = tested_move.piece;
   if (piece.type == PieceType::kEmpty) return false;
   if (piece.type == PieceType::kKnight) return false;
   if (piece.type == PieceType::kPawn) return false;

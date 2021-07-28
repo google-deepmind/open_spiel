@@ -275,7 +275,9 @@ RbcState::RbcState(std::shared_ptr<const Game> game, int board_size,
                    const std::string& fen)
     : State(game),
       start_board_(*chess::ChessBoard::BoardFromFEN(
-          fen, board_size, /*king_in_check_allowed=*/true)),
+          fen, board_size,
+          /*king_in_check_allowed=*/true,
+          /*allow_pass_move=*/true)),
       current_board_(start_board_),
       phase_(MovePhase::kSensing) {
   SPIEL_CHECK_TRUE(&current_board_);
@@ -283,35 +285,38 @@ RbcState::RbcState(std::shared_ptr<const Game> game, int board_size,
 }
 
 void RbcState::DoApplyAction(Action action) {
+  // Reset common flags.
+  illegal_move_attempted_ = false;
+  move_captured_ = false;
+
   if (phase_ == MovePhase::kSensing) {
     sense_location_[CurrentPlayer()] = action;
     phase_ = MovePhase::kMoving;
-    illegal_move_attempted_ = false;
-    move_captured_ = false;
   } else {
     chess::Move move = ActionToMove(action, Board());
 
     // Handle special cases for RBC.
-    if (action == chess::kPassAction) {
-      move = chess::kPassMove;
+    // The RBC's pass move is handled via ChessBoard flag allow_pass_move.
+    if (move == chess::kPassMove) {
+      // Nothing here. Values set above.
     } else if (Board().IsBreachingMove(move)) {
       SPIEL_DCHECK_FALSE(Board().IsMoveLegal(move));
       Board().BreachingMoveToCaptureMove(&move);
       // Transformed move must be legal.
       SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
-      // And it must be a capture.
+      // And it must be a capture, since we breached unseen opponent pieces.
       SPIEL_DCHECK_NE(Board().at(move.from).color, Board().at(move.to).color);
+      move_captured_ = true;
     } else if (!Board().IsMoveLegal(move)) {
       illegal_move_attempted_ = true;
-      move = chess::kPassMove;
+      move = chess::kPassMove;  // Illegal move was chosen, so pass instead.
+    } else {
+      // All other moves
+      SPIEL_DCHECK_NE(Board().at(move.from).color, chess::Color::kEmpty);
+      move_captured_ = Board().at(move.from).color != Board().at(move.to).color;
     }
 
-    // Some player must be indeed moving.
-    SPIEL_DCHECK_NE(Board().at(move.from).color, chess::Color::kEmpty);
-    SPIEL_DCHECK_TRUE(move == chess::kPassMove || Board().IsMoveLegal(move));
-
-    illegal_move_attempted_ = false;
-    move_captured_ = Board().at(move.from).color != Board().at(move.to).color;
+    SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
     moves_history_.push_back(move);
     Board().ApplyMove(move);
 

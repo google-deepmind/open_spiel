@@ -476,8 +476,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [89, 90, 117, 652, 656, 673, 674, 701, 714, 1257, 1258, 1285, 1298, 1841, 1842, 1869, 1882, 2425, 2426, 2453, 2466, 3009, 3010, 3037, 3050, 3572, 3576, 3593, 3594, 3621, 3634, 4177, 4178, 4218]
-StringLegalActions() = ["aa3", "a4", "axb3", "Nba3", "Nbc3", "b3", "b4", "bxc3", "bxa3", "cc3", "c4", "cxd3", "cxb3", "d3", "d4", "dxe3", "dxc3", "e3", "e4", "exf3", "exd3", "ff3", "f4", "fxg3", "fxe3", "Ngf3", "Ngh3", "g3", "g4", "gxh3", "gxf3", "hh3", "h4", "hxg3"]
+LegalActions() = [0, 89, 90, 117, 652, 656, 673, 674, 701, 714, 1257, 1258, 1285, 1298, 1841, 1842, 1869, 1882, 2425, 2426, 2453, 2466, 3009, 3010, 3037, 3050, 3572, 3576, 3593, 3594, 3621, 3634, 4177, 4178, 4218]
+StringLegalActions() = ["pass", "aa3", "a4", "axb3", "Nba3", "Nbc3", "b3", "b4", "bxc3", "bxa3", "cc3", "c4", "cxd3", "cxb3", "d3", "d4", "dxe3", "dxc3", "e3", "e4", "exf3", "exd3", "ff3", "f4", "fxg3", "fxe3", "Ngf3", "Ngh3", "g3", "g4", "gxh3", "gxf3", "hh3", "h4", "hxg3"]
 
 # Apply action "b4"
 action: 674
@@ -928,8 +928,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
-LegalActions() = [89, 90, 117, 652, 656, 673, 674, 701, 714, 1257, 1258, 1285, 1298, 1841, 1842, 1869, 1882, 2425, 2426, 2453, 2466, 3009, 3010, 3037, 3050, 3572, 3576, 3593, 3594, 3621, 3634, 4177, 4178, 4218]
-StringLegalActions() = ["aa6", "a5", "axb6", "Nba6", "Nbc6", "b6", "b5", "bxc6", "bxa6", "cc6", "c5", "cxd6", "cxb6", "d6", "d5", "dxe6", "dxc6", "e6", "e5", "exf6", "exd6", "ff6", "f5", "fxg6", "fxe6", "Ngf6", "Ngh6", "g6", "g5", "gxh6", "gxf6", "hh6", "h5", "hxg6"]
+LegalActions() = [0, 89, 90, 117, 652, 656, 673, 674, 701, 714, 1257, 1258, 1285, 1298, 1841, 1842, 1869, 1882, 2425, 2426, 2453, 2466, 3009, 3010, 3037, 3050, 3572, 3576, 3593, 3594, 3621, 3634, 4177, 4178, 4218]
+StringLegalActions() = ["pass", "aa6", "a5", "axb6", "Nba6", "Nbc6", "b6", "b5", "bxc6", "bxa6", "cc6", "c5", "cxd6", "cxb6", "d6", "d5", "dxe6", "dxc6", "e6", "e5", "exf6", "exd6", "ff6", "f5", "fxg6", "fxe6", "Ngf6", "Ngh6", "g6", "g5", "gxh6", "gxf6", "hh6", "h5", "hxg6"]
 
 # Apply action "cc6"
 action: 1257
@@ -1177,7 +1177,7 @@ ObservationString(1) = "????????/????????/????????/????????/?P??????/????????/P?
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).illegal_move: ◯◉
 ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
@@ -1281,7 +1281,7 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).illegal_move: ◯◉
 ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
@@ -3551,7 +3551,7 @@ ObservationString(1) = "???????Q/????????/????????/????????/?????P??/??BP???P/??
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).illegal_move: ◯◉
 ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◯◉
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
@@ -3655,7 +3655,7 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).illegal_move: ◯◉
 ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◯◉
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
@@ -3781,7 +3781,7 @@ ObservationString(1) = "???????Q/????????/????????/????????/?????P??/??BP???P/??
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
+ObservationTensor(0).illegal_move: ◯◉
 ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯◯◯◯◯
@@ -3885,7 +3885,7 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
+ObservationTensor(1).illegal_move: ◯◉
 ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯◯◯◯◯
