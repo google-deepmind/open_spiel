@@ -46,15 +46,31 @@ void RandomUciBot() {
       state = game->NewInitialState();
       chess_state = down_cast<chess::ChessState*>(state.get());
     } else if (absl::StartsWith(line, "position fen ")) {
+      // This command has following syntax:
+      // position fen <FEN> moves <MOVES>
       std::vector<std::string> tokens = absl::StrSplit(line, ' ');
-      state = game->NewInitialState(tokens[2]);
+      // Build up the <FEN> which can contain spaces.
+      std::stringstream fen;
+      int pos = 2;
+      bool has_moves = false;
+      while (pos < tokens.size()) {
+        if(tokens[pos] == "moves") {
+          has_moves = true;
+          break;
+        }
+        if (pos > 2) fen << ' ';
+        fen << tokens[pos];
+        ++pos;
+      }
+
+      state = game->NewInitialState(fen.str());
       chess_state = down_cast<chess::ChessState*>(state.get());
-      if (tokens.size() > 3) {
-        SPIEL_CHECK_GT(tokens.size(), 4);
-        SPIEL_CHECK_EQ(tokens[3], "moves");
-        for (int i = 4; i < tokens.size(); ++i) {
-          Action action = chess_state->ParseMoveToAction(tokens[i]);
+
+      if (has_moves) {
+        while (pos < tokens.size()) {
+          Action action = chess_state->ParseMoveToAction(tokens[pos]);
           state->ApplyAction(action);
+          ++pos;
         }
       }
     } else if (absl::StartsWith(line, "go movetime ")) {
@@ -62,7 +78,7 @@ void RandomUciBot() {
       int index = absl::Uniform<int>(rng, 0, legal_actions.size());
       Action action = legal_actions[index];
       chess::Move move = ActionToMove(action, chess_state->Board());
-      std::cout << move.ToLAN() << std::endl;
+      std::cout << "bestmove " << move.ToLAN() << std::endl;
     } else if (line == "quit") {
       return;
     } else {
