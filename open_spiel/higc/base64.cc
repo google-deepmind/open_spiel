@@ -23,6 +23,9 @@
 
 #include "open_spiel/higc/base64.h"
 
+#include <filesystem>
+#include <unistd.h>
+
 namespace open_spiel {
 namespace higc {
 
@@ -31,30 +34,32 @@ const char* base64_chars = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                             "abcdefghijklmnopqrstuvwxyz"
                             "0123456789"
                             "+/"};
-constexpr char trailing_char = '=';
+const char trailing_char = '=';
 
-void base64_encode(std::ostream& os, char const* buf, size_t len) {
+void base64_encode(int fd, char const* buf, size_t len) {
+#define W(c) write(fd, &c, 1)
   unsigned int pos = 0;
   while (pos < len) {
-    os << base64_chars[(buf[pos + 0] & 0xfc) >> 2];
+    W(base64_chars[(buf[pos + 0] & 0xfc) >> 2]);
     if (pos + 1 < len) {
-      os << base64_chars[((buf[pos + 0] & 0x03) << 4)
-          + ((buf[pos + 1] & 0xf0) >> 4)];
+      W(base64_chars[((buf[pos + 0] & 0x03) << 4) +
+                     ((buf[pos + 1] & 0xf0) >> 4)]);
       if (pos + 2 < len) {
-        os << base64_chars[((buf[pos + 1] & 0x0f) << 2)
-            + ((buf[pos + 2] & 0xc0) >> 6)];
-        os << base64_chars[buf[pos + 2] & 0x3f];
+        W(base64_chars[((buf[pos + 1] & 0x0f) << 2) +
+                       ((buf[pos + 2] & 0xc0) >> 6)]);
+        W(base64_chars[buf[pos + 2] & 0x3f]);
       } else {
-        os << base64_chars[(buf[pos + 1] & 0x0f) << 2];
-        os << trailing_char;
+        W(base64_chars[(buf[pos + 1] & 0x0f) << 2]);
+        W(trailing_char);
       }
     } else {
-      os << base64_chars[(buf[pos + 0] & 0x03) << 4];
-      os << trailing_char;
-      os << trailing_char;
+      W(base64_chars[(buf[pos + 0] & 0x03) << 4]);
+      W(trailing_char);
+      W(trailing_char);
     }
     pos += 3;
   }
+#undef W
 }
 
 

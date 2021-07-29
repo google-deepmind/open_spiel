@@ -1,55 +1,41 @@
-//
-// subprocess C++ library - https://github.com/tsaarni/cpp-subprocess
-//
-// The MIT License (MIT)
-//
-// Copyright (c) 2015 Tero Saarni
-//
-
-#pragma once
-
 #include <string>
 #include <vector>
-#include <iostream>
-#include <fstream>
 #include <sys/wait.h>
 #include <sys/prctl.h>
-#include "fdstream.hpp"
+#include <fcntl.h>
 
 namespace subprocess {
 
 class popen {
  public:
-
-  popen(const std::string& cmd, std::vector<std::string> argv)
-      : in_stream(nullptr),
-        out_stream(nullptr),
-        err_stream(nullptr) {
+  popen(const std::vector<std::string>& args) {
     if (pipe(in_pipe) == -1 ||
         pipe(out_pipe) == -1 ||
         pipe(err_pipe) == -1) {
       throw std::system_error(errno, std::system_category());
     }
 
-    run(cmd, argv);
+    fcntl(in_pipe[WRITE], F_SETFL, O_NONBLOCK);
+    fcntl(out_pipe[READ], F_SETFL, O_NONBLOCK);
+    fcntl(err_pipe[READ], F_SETFL, O_NONBLOCK);
+
+    // Clone the calling process, creating an exact copy.
+    // Return -1 for errors, 0 to the new process,
+    // and the process ID of the new process to the old process.
+    pid = fork();
+    if (pid == 0) child(args);
+
+    // The code below will be executed only by parent.
+    close(in_pipe[READ]);
+    close(out_pipe[WRITE]);
+    close(err_pipe[WRITE]);
   }
 
-  ~popen() {
-    delete in_stream;
-    if (out_stream != nullptr) delete out_stream;
-    delete err_stream;
-  }
+  ~popen() {}
 
-  std::ostream& stdin() { return *in_stream; };
-
-  std::istream& stdout() {
-    if (out_stream == nullptr) {
-      throw std::system_error(EBADF, std::system_category());
-    }
-    return *out_stream;
-  };
-
-  std::istream& stderr() { return *err_stream; };
+  int stdin() { return in_pipe[WRITE]; };
+  int stdout() { return out_pipe[READ]; }
+  int stderr() { return err_pipe[READ]; };
 
   int wait() {
     int status = 0;
@@ -58,7 +44,6 @@ class popen {
   };
 
  private:
-
   enum ends_of_pipe { READ = 0, WRITE = 1 };
 
   struct raii_char_str {
@@ -66,28 +51,6 @@ class popen {
     operator char*() const { return &buf[0]; };
     mutable std::vector<char> buf;
   };
-
-  void run(const std::string& cmd, std::vector<std::string> argv) {
-    argv.insert(argv.begin(), cmd);
-
-    // Clone the calling process, creating an exact copy.
-    // Return -1 for errors, 0 to the new process,
-    // and the process ID of the new process to the old process.
-    pid = fork();
-    if (pid == 0) child(argv);
-
-    // The code below will be executed only by parent.
-
-    close(in_pipe[READ]);
-    close(out_pipe[WRITE]);
-    close(err_pipe[WRITE]);
-
-    in_stream = new boost::fdostream(in_pipe[WRITE]);
-    if (out_pipe[READ] != -1) {
-      out_stream = new boost::fdistream(out_pipe[READ]);
-    }
-    err_stream = new boost::fdistream(err_pipe[READ]);
-  }
 
   // Code run only by the child process.
   void child(const std::vector<std::string>& argv) {
@@ -123,10 +86,6 @@ class popen {
   int in_pipe[2];
   int out_pipe[2];
   int err_pipe[2];
-
-  std::ostream* in_stream;
-  std::istream* out_stream;
-  std::istream* err_stream;
 };
 
 } // namespace subprocess

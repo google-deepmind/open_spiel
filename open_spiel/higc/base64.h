@@ -22,7 +22,7 @@
 namespace open_spiel {
 namespace higc {
 
-void base64_encode(std::ostream& os, char const* buf, size_t len);
+void base64_encode(int fd, char const* buf, size_t len);
 std::string base64_decode(absl::string_view encoded_string);
 
 }  // namespace higc

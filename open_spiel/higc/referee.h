@@ -81,9 +81,9 @@ class BotChannel {
  public:
   BotChannel(int bot_index, std::unique_ptr<subprocess::popen> popen)
       : bot_index_(bot_index), popen_(std::move(popen)) {}
-  std::ostream& in() { return popen_->stdin(); }
-  std::istream& out() { return popen_->stdout(); }
-  std::istream& err() { return popen_->stderr(); };
+  int in() { return popen_->stdin(); }
+  int out() { return popen_->stdout(); }
+  int err() { return popen_->stderr(); };
 
   void StartRead(int time_limit);
   void CancelReadBlocking();

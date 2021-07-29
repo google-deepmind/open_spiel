@@ -37,8 +37,31 @@ const std::string kTournamentOverMessage = "tournament over";
 std::unique_ptr<BotChannel> MakeBotChannel(int bot_index,
                                            std::string executable) {
   auto popen = std::make_unique<subprocess::popen>(
-      executable, std::vector<std::string>());
+      std::vector<std::string>{executable});
   return std::make_unique<BotChannel>(bot_index, std::move(popen));
+}
+
+bool getline_async(int read_fd, std::string& line_out, std::string& buf) {
+  int chars_read = 0;
+  bool line_read = false;
+  line_out.clear();
+
+  do {
+    // Read a single character (non-blocking).
+    char c;
+    chars_read = read(read_fd, &c, 1);
+    if (chars_read == 1) {
+      if (c == '\n') {
+        line_out = buf;
+        buf = "";
+        line_read = true;
+      } else {
+        buf.append(1, c);
+      }
+    }
+  } while (chars_read != 0 && !line_read);
+
+  return line_read;
 }
 
 // Read a response message from the bot in a separate thread.
@@ -80,8 +103,8 @@ void ReadLineFromChannelStderr(BotChannel* c) {
   int read_bytes;
   std::array<char, 1024> buf;
   while (!c->shutdown_) {
-    read_bytes = c->err().readsome(&buf[0], 1024);
-    if (read_bytes) {
+    read_bytes = read(c->err(), &buf[0], 1024);
+    if (read_bytes > 0) {
       std::lock_guard<std::mutex> lock(mx_cerr);  // Have nice stderr outputs.
       std::cerr << "Bot#" << c->bot_index_ << ": ";
       for (int i = 0; i < read_bytes; ++i) std::cerr << buf[i];
@@ -129,10 +152,14 @@ std::vector<bool> Referee::StartPlayers() {
   }
 
   // Send setup information.
+  const char nl = '\n';
   for (int pl = 0; pl < num_bots(); ++pl) {
     BotChannel* chn = channels_[pl].get();
-    chn->in() << game_name_ << std::endl;
-    chn->in() << pl << std::endl;
+    write(chn->in(), game_name_.c_str(), game_name_.size());
+    write(chn->in(), &nl, 1);
+    const char pl_char = '0'+pl;
+    write(chn->in(), &pl_char, 1);
+    write(chn->in(), &nl, 1);
     chn->StartRead(settings_.timeout_ready);
   }
 
@@ -153,9 +180,13 @@ bool Referee::StartPlayer(int pl) {
   threads_stderr_[pl] = std::make_unique<std::thread>(
       ReadLineFromChannelStderr, channels_.back().get());
 
+  const char nl = '\n';
   BotChannel* chn = channels_[pl].get();
-  chn->in() << game_name_ << std::endl;
-  chn->in() << pl << std::endl;
+  write(chn->in(), game_name_.c_str(), game_name_.size());
+  write(chn->in(), &nl, 1);
+  const char pl_char = '0'+pl;
+  write(chn->in(), &pl_char, 1);
+  write(chn->in(), &nl, 1);
   chn->StartRead(settings_.timeout_ready);
 
   sleep_ms(settings_.timeout_ready);  // Blocking sleep to give time to the bot.
@@ -223,19 +254,25 @@ std::unique_ptr<State> Referee::PlayMatch() {
       std::string private_tensor = private_observation_->Compress();
 
       // Send observations.
+      const char space = ' ';
       base64_encode(chn->in(),
                     reinterpret_cast<char* const>(public_tensor.data()),
                     public_tensor.size());
-      chn->in() << ' ';
+      write(chn->in(), &space, 1);
       base64_encode(chn->in(),
                     reinterpret_cast<char* const>(private_tensor.data()),
                     private_tensor.size());
       // Send actions.
       if (is_acting[pl]) {
         std::vector<Action> legal_actions = state->LegalActions(pl);
-        for (Action a : legal_actions) chn->in() << ' ' << a;
+        for (Action a : legal_actions) {
+          write(chn->in(), &space, 1);
+          std::string action_str = std::to_string(a);
+          write(chn->in(), action_str.c_str(), action_str.size());
+        }
       }
-      chn->in() << std::endl;
+      const char nl = '\n';
+      write(chn->in(), &nl, 1);
     }
 
     std::chrono::time_point start = std::chrono::system_clock::now();
@@ -355,8 +392,14 @@ std::unique_ptr<State> Referee::PlayMatch() {
   log_ << "History: " << absl::StrJoin(state->History(), " ") << std::endl;
 
   for (int pl = 0; pl < num_bots(); ++pl) {
-    channels_[pl]->in() << kMatchOverMessage << ' '
-                        << returns[pl] << std::endl;
+    write(channels_[pl]->in(), kMatchOverMessage.c_str(), kMatchOverMessage.size());
+    const char space = ' ';
+    write(channels_[pl]->in(), &space, 1);
+    int score = returns[pl];
+    std::string score_str = std::to_string(score);
+    write(channels_[pl]->in(), score_str.c_str(), score_str.size());
+    const char nl = '\n';
+    write(channels_[pl]->in(), &nl, 1);
     channels_[pl]->StartRead(settings_.timeout_match_over);
   }
 
@@ -412,7 +455,9 @@ bool Referee::CheckResponse(const std::string& expected_response, int pl) {
 
 void Referee::TournamentOver() {
   for (int pl = 0; pl < num_bots(); ++pl) {
-    channels_[pl]->in() << kTournamentOverMessage << std::endl;
+    write(channels_[pl]->in(), kTournamentOverMessage.c_str(), kTournamentOverMessage.size());
+    const char nl = '\n';
+    write(channels_[pl]->in(), &nl, 1);
   }
   sleep_ms(settings_.time_tournament_over);
   // Do not check the final message.

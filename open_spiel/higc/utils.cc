@@ -27,29 +27,6 @@ int time_elapsed(const std::chrono::time_point<std::chrono::system_clock>& start
       std::chrono::system_clock::now() - start).count();
 }
 
-bool getline_async(std::istream& is, std::string& line_out, std::string& buf) {
-  int chars_read = 0;
-  bool line_read = false;
-  line_out.clear();
-
-  do {
-    // Read a single character (non-blocking).
-    char c;
-    chars_read = is.readsome(&c, 1);
-
-    if (chars_read == 1) {
-      if (c == '\n') {
-        line_out = buf;
-        buf = "";
-        line_read = true;
-      } else {
-        buf.append(1, c);
-      }
-    }
-  } while (chars_read != 0 && !line_read);
-
-  return line_read;
-}
 
 }  // namespace higc
 }  // namespace open_spiel
