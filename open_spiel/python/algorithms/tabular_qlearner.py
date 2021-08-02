@@ -24,6 +24,8 @@ import numpy as np
 from open_spiel.python import rl_agent
 from open_spiel.python import rl_tools
 
+def valuedict():
+  return collections.defaultdict(float)
 
 class QLearner(rl_agent.AbstractAgent):
   """Tabular Q-Learning agent.
@@ -46,8 +48,7 @@ class QLearner(rl_agent.AbstractAgent):
     self._epsilon = epsilon_schedule.value
     self._discount_factor = discount_factor
     self._centralized = centralized
-    self._q_values = collections.defaultdict(
-        lambda: collections.defaultdict(float))
+    self._q_values = collections.defaultdict(valuedict)
     self._prev_info_state = None
     self._last_loss_value = None
 
