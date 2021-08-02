@@ -21,6 +21,8 @@
 #include <iostream>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
+
 namespace open_spiel {
 namespace uci {
 
@@ -52,7 +54,6 @@ UCIBot::~UCIBot() {
 }
 
 Action UCIBot::Step(const State& state) {
-  std::cout << "step" << std::endl;
   std::string move_str;
   auto chess_state = down_cast<const chess::ChessState&>(state);
   if (ponder_ && ponder_move_) {
@@ -118,7 +119,7 @@ void UCIBot::StartProcess(const std::string& bot_binary_path) {
     SpielFatalError("Forking failed");
   }
 
-  if (pid_) {  // parent
+  if (pid_ > 0) {  // parent
     close(output_pipe[0]);
     close(input_pipe[1]);
 
@@ -132,23 +133,29 @@ void UCIBot::StartProcess(const std::string& bot_binary_path) {
     close(output_pipe[1]);
     close(input_pipe[0]);
 
-    std::cerr << "neco" << std::endl;
     execlp(bot_binary_path.c_str(), bot_binary_path.c_str(), (char *)nullptr);
-    std::cerr << "neco" << std::endl;
-    SpielFatalError("Executing uci bot sub-process failed");
+    // See /usr/include/asm-generic/errno-base.h for error codes.
+    switch (errno) {
+      case ENOENT:
+        SpielFatalError(
+            absl::StrCat("Executing uci bot sub-process failed: file '",
+                         bot_binary_path, "' not found."));
+      default:
+        SpielFatalError(absl::StrCat(
+            "Executing uci bot sub-process failed: Error ", errno));
+    }
   }
 }
 
 void UCIBot::Uci() {
   Write("uci");
   while (true) {
-    auto response = Read(false);
-    std::istringstream response_stream(response);
-    std::string line;
-    while (getline(response_stream, line)) {
-      // skip id and option lines
-      if (line.rfind("uciok", 0) == 0) {
+    std::string response = Read(false);
+    if (!response.empty()) {
+      if (absl::StrContains(response, "uciok")) {
         return;
+      } else {
+        std::cerr << "Bot: " << response << std::endl;
       }
     }
   }
@@ -163,15 +170,13 @@ void UCIBot::UciNewGame() { Write("ucinewgame"); }
 
 void UCIBot::IsReady() {
   Write("isready");
-
   while (true) {
-    auto response = Read(false);
-    std::istringstream response_stream(response);
-    std::string line;
-    while (getline(response_stream, line)) {
-      // skip id and option lines
-      if (line.rfind("readyok", 0) == 0) {
+    std::string response = Read(false);
+    if (!response.empty()) {
+      if (absl::StrContains(response, "readyok")) {
         return;
+      } else {
+        std::cerr << "Bot: " << response << std::endl;
       }
     }
   }
@@ -180,9 +185,8 @@ void UCIBot::IsReady() {
 void UCIBot::Position(const std::string& fen,
                       const std::vector<std::string>& moves) {
   std::string msg = "position fen " + fen;
-
-  std::string moves_str = absl::StrJoin(moves, " ");
-  if (!moves_str.empty()) {
+  if (!moves.empty()) {
+    std::string moves_str = absl::StrJoin(moves, " ");
     msg += " moves " + moves_str;
   }
   Write(msg);
@@ -244,32 +248,33 @@ std::string UCIBot::Read(bool wait) const {
   int count = 0;
   std::string response;
 
-  struct timeval timeout = {1, 0};
-
   fd_set fds;
   FD_ZERO(&fds);
   FD_SET(input_fd_, &fds);
+  timeval timeout = {1, 0};  // 1 second timeout.
 
-  int ready_fd =
-      select(input_fd_ + 1, &fds, nullptr, nullptr, wait ? nullptr : &timeout);
-
+  int ready_fd = select(/*nfds=*/input_fd_ + 1,
+                        /*readfds=*/&fds,
+                        /*writefds=*/nullptr,
+                        /*exceptfds*/ nullptr, wait ? nullptr : &timeout);
   if (ready_fd == -1) {
     SpielFatalError("Failed to read from uci sub-process");
   }
   if (ready_fd == 0) {
     SpielFatalError("Response from uci sub-process not received on time");
   }
-
-  if (ioctl(input_fd_, FIONREAD, &count) != -1) {
-    buff = (char *)malloc(count);
-    if (read(input_fd_, buff, count) != count) {
-      SpielFatalError("Read wrong number of bytes");
-    }
-    response = buff;
-    free(buff);
-  } else {
+  if (ioctl(input_fd_, FIONREAD, &count) == -1) {
     SpielFatalError("Failed to read input size.");
   }
+  if (count == 0) {
+    return "";
+  }
+  buff = (char*)malloc(count);
+  if (read(input_fd_, buff, count) != count) {
+    SpielFatalError("Read wrong number of bytes");
+  }
+  response = buff;
+  free(buff);
   return response;
 }
 
@@ -278,5 +283,6 @@ std::unique_ptr<Bot> MakeUCIBot(const std::string& bot_binary_path,
                                 const Options& options) {
   return std::make_unique<UCIBot>(bot_binary_path, move_time, ponder, options);
 }
+
 }  // namespace uci
 }  // namespace open_spiel

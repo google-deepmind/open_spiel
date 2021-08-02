@@ -21,6 +21,7 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/utils/init.h"
 
 ABSL_FLAG(std::string, binary, "random_uci_bot", "Name of the binary to run.");
 
@@ -28,7 +29,7 @@ namespace open_spiel {
 namespace uci {
 namespace {
 
-inline constexpr const int kNumGames = 1;
+inline constexpr const int kNumGames = 3;
 inline constexpr const int kSeed = 12874681;
 
 void RandomUciBotTest() {
@@ -43,6 +44,7 @@ void RandomUciBotTest() {
   for (int i = 0; i < kNumGames; ++i) {
     std::unique_ptr<State> state = game->NewInitialState();
     EvaluateBots(state.get(), bots, kSeed);
+    std::cout << "Game over: " << state->HistoryString() << std::endl;
   }
 }
 
@@ -51,5 +53,7 @@ void RandomUciBotTest() {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
+  open_spiel::Init("", &argc, &argv, false);
+  absl::ParseCommandLine(argc, argv);
   open_spiel::uci::RandomUciBotTest();
 }
