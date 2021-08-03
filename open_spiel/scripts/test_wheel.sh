@@ -35,7 +35,7 @@ PYBIN=${PYBIN:-"python"}
 PYBIN=`which $PYBIN`
          
 $PYBIN -m pip install --upgrade setuptools
-$PYBIN -m pip install --upgrade -r requirements.txt -q
+$PYBIN -m pip install --upgrade -r $1/requirements.txt -q
 source $1/open_spiel/scripts/python_extra_deps.sh
 $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
 
