@@ -36,7 +36,7 @@ flags.DEFINE_integer("give_up_after", 100,
                      "Give up rollout when the history length is exceeded.")
 flags.DEFINE_bool(
   "if_simultaneous_convert_to_turn_based", False,
-  "Load any simultaneous game as turn based for the benchmark.")
+  "If True, load any simultaneous game as turn based for the benchmark.")
 
 
 def _rollout_until_timeout(
@@ -49,8 +49,8 @@ def _rollout_until_timeout(
     game_name:      str
     time_limit:     In number of seconds
     give_up_after:  Cuts off trajectories longer than specified
-    if_simultaneous_convert_to_turn_based: if the game is simultaneous, then it
-      is loaded as a turn based game.
+    if_simultaneous_convert_to_turn_based: if the game is simultaneous and this
+      boolean is true, then the game is loaded as a turn based game.
 
   Returns:
     A dict of collected statistics.
@@ -58,7 +58,7 @@ def _rollout_until_timeout(
   game = pyspiel.load_game(game_name)
   if game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
     raise NotImplementedError(
-      'Benchmark on mean field game is not available yet.')
+      'Benchmark on mean field games is not available yet.')
   if (game.get_type().dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS
       and if_simultaneous_convert_to_turn_based):
     game = pyspiel.convert_to_turn_based(game)
