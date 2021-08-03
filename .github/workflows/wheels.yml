@@ -65,10 +65,10 @@ jobs:
           python -m build -s
           twine check dist/*.tar.gz
           
-      - name: Build and test bdist_wheel
+      - name: Build bdist_wheel and basic test
         run: python -m cibuildwheel --output-dir wheelhouse
 
-      - name: Install and test bdist_wheel
+      - name: Install bdist_wheel and full test
         run: ./open_spiel/scripts/test_wheel.sh full `pwd`
 
       - uses: actions/upload-artifact@v2
