@@ -33,7 +33,7 @@ jobs:
       CIBW_MANYLINUX_I686_IMAGE: manylinux2014
       CIBW_SKIP: cp27-* pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
-      CIBW_TEST_COMMAND: {project}/open_spiel/scripts/test_wheel.sh {project}
+      CIBW_TEST_COMMAND: \{project\}/open_spiel/scripts/test_wheel.sh \{project\}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
