@@ -34,7 +34,7 @@ jobs:
       CIBW_SKIP: cp27-* pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
-      CIBW_TEST_COMMAND: {project}/open_spiel/scripts/test_wheel.sh {project}
+      CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
