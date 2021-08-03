@@ -19,8 +19,10 @@ jobs:
         include:
         - os: ubuntu-20.04
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
+          CIBW_BUILD: cp36-manylinux_x86_64 cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64
         - os: macOS-10.15
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
+          CIBW_BUILD: cp36-macosx_x86_64 cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -30,7 +32,7 @@ jobs:
       # CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
       CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-      CIBW_MANYLINUX_I686_IMAGE: manylinux2014
+      CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: cp27-* pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
