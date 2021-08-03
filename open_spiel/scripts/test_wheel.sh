@@ -34,7 +34,6 @@ uname -a
 PYBIN=${PYBIN:-"python"}
 PYBIN=`which $PYBIN`
          
-$PYBIN -m pip install --upgrade pip
 $PYBIN -m pip install --upgrade setuptools
 $PYBIN -m pip install --upgrade -r requirements.txt -q
 source $1/open_spiel/scripts/python_extra_deps.sh
