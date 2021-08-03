@@ -28,9 +28,6 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
       OS_PYTHON_VERSION: 3.9
-      # While testing, try specific versions
-      # CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
-      CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: cp27-* pp*
@@ -58,11 +55,11 @@ jobs:
           python -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
           python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
-          python -m pip install twine build
-          python -m pip install cibuildwheel==1.12.0
+          python -m pip install twine
+          python -m pip install cibuildwheel==2.0.1
       - name: Build sdist
         run: |
-          python -m build -s
+          pipx run build --sdist
           twine check dist/*.tar.gz
           
       - name: Build bdist_wheel and basic test
