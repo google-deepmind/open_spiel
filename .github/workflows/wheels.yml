@@ -34,6 +34,7 @@ jobs:
       CIBW_SKIP: cp27-* pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
+      CIBW_TEST_COMMAND: {project}/open_spiel/scripts/test_wheel.sh {project}
 
     steps:
       - uses: actions/checkout@v2
@@ -51,9 +52,9 @@ jobs:
           ./install.sh
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
-          python -m pip install --upgrade -r requirements.txt -q
-          source ./open_spiel/scripts/python_extra_deps.sh
-          python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          # python -m pip install --upgrade -r requirements.txt -q
+          # source ./open_spiel/scripts/python_extra_deps.sh
+          #python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine build
           python -m pip install cibuildwheel==1.12.0
       - name: Build sdist
@@ -61,11 +62,11 @@ jobs:
           python -m build -s
           twine check dist/*.tar.gz
           
-      - name: Build bdist_wheel
+      - name: Build and test bdist_wheel
         run: python -m cibuildwheel --output-dir wheelhouse
 
-      - name: Install and test bdist_wheel
-        run: ./open_spiel/scripts/test_wheel.sh
+      #- name: Install and test bdist_wheel
+      #  run: ./open_spiel/scripts/test_wheel.sh
 
       - uses: actions/upload-artifact@v2
         with:
