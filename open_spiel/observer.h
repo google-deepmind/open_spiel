@@ -46,6 +46,8 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/base/attributes.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
@@ -60,37 +62,97 @@ class State;
 
 using ObservationParams = GameParameters;
 
-// Viewing a span as a multi-dimensional tensor.
-struct DimensionedSpan {
-  absl::InlinedVector<int, 4> shape;
-  absl::Span<float> data;
+// Information about a multi-dimensional tensor span, eg name, shape, etc.
+// TODO(etar) add types information. For now only floats are supported.
+class SpanTensorInfo {
+ public:
+  using Shape = absl::InlinedVector<int, 4>;
 
-  DimensionedSpan(absl::Span<float> data, absl::InlinedVector<int, 4> shape)
-      : shape(std::move(shape)), data(data) {
-    int m = std::accumulate(
-        this->shape.begin(), this->shape.end(), 1, std::multiplies<int>());
-    SPIEL_CHECK_EQ(m, data.size());
+  SpanTensorInfo(absl::string_view name, const Shape& shape)
+      : name_(name), shape_(shape) {}
+
+  inline const std::string& name() const { return name_; }
+  inline const Shape& shape() const { return shape_; }
+
+  // Convenience accessor for the shape as a plain vector of ints.
+  template <typename int_type = int32_t>
+  inline std::vector<int_type> vector_shape() const {
+    return {shape_.begin(), shape_.end()};
+  }
+
+  // Number of floats in a tensor.
+  int32_t size() const {
+    return std::accumulate(shape_.begin(), shape_.end(), 1,
+                           std::multiplies<int32_t>());
+  }
+
+  // Akin to numpy.ndarray.nbytes returns the memory footprint.
+  int32_t nbytes() const { return size() * sizeof(float); }
+
+  std::string DebugString() const {
+    return absl::StrCat("SpanTensor(name='", name(), "', shape=(",
+                        absl::StrJoin(shape_, ","), "), nbytes=", nbytes(),
+                        ")");
+  }
+
+ private:
+  std::string name_;
+  Shape shape_;
+};
+
+// A tensor backed up by a data buffer *not* owned by SpanTensor.
+//
+// This is a view class that points to some externally owned data buffer
+// and helps with accessing and modifying the data via its `at` methods.
+//
+// The class has the pointer semantics, akin to `std::unique_ptr` or a raw
+// pointer, where `SpanTensor` just "points" to an array.
+// In particular helper accessor methods like `data` or `at` are marked as const
+// but still give access to mutable data.
+class SpanTensor {
+ public:
+  SpanTensor(SpanTensorInfo info, absl::Span<float> data)
+      : info_(std::move(info)), data_(data) {
+    SPIEL_CHECK_EQ(info_.size(), data_.size());
+  }
+
+  const SpanTensorInfo& info() const { return info_; }
+
+  absl::Span<float> data() const { return data_; }
+
+  std::string DebugString() const { return info_.DebugString(); }
+
+  // Mutators of data.
+  float& at() const {
+    SPIEL_DCHECK_EQ(info_.shape().size(), 0);
+    return data_[0];
   }
 
   float& at(int idx) const {
-    SPIEL_DCHECK_EQ(shape.size(), 1);
-    return data[idx];
+    SPIEL_DCHECK_EQ(info_.shape().size(), 1);
+    return data_[idx];
   }
 
   float& at(int idx1, int idx2) const {
-    SPIEL_DCHECK_EQ(shape.size(), 2);
-    return data[idx1 * shape[1] + idx2];
+    SPIEL_DCHECK_EQ(info_.shape().size(), 2);
+    return data_[idx1 * info_.shape()[1] + idx2];
   }
 
   float& at(int idx1, int idx2, int idx3) const {
-    SPIEL_DCHECK_EQ(shape.size(), 3);
-    return data[(idx1 * shape[1] + idx2) * shape[2] + idx3];
+    SPIEL_DCHECK_EQ(info_.shape().size(), 3);
+    return data_[(idx1 * info_.shape()[1] + idx2) * info_.shape()[2] + idx3];
   }
 
   float& at(int idx1, int idx2, int idx3, int idx4) const {
-    SPIEL_DCHECK_EQ(shape.size(), 4);
-    return data[((idx1 * shape[1] + idx2) * shape[2] + idx3) * shape[3] + idx4];
+    SPIEL_DCHECK_EQ(info_.shape().size(), 4);
+    return data_[((idx1 * info_.shape()[1] + idx2) * info_.shape()[2] + idx3) *
+                     info_.shape()[3] +
+                 idx4];
   }
+
+ private:
+  SpanTensorInfo info_;
+  absl::Span<float> data_;
 };
 
 // An Allocator is responsible for returning memory for an Observer.
@@ -99,8 +161,8 @@ class Allocator {
   // Returns zero-initialized memory into which the data should be written.
   // `name` is the name of this piece of the tensor; the allocator may
   // use it to label the tensor when accessed by the clients.
-  virtual DimensionedSpan Get(absl::string_view name,
-                              const absl::InlinedVector<int, 4>& shape) = 0;
+  virtual SpanTensor Get(absl::string_view name,
+                         const absl::InlinedVector<int, 4>& shape) = 0;
 
   virtual ~Allocator() = default;
 };
@@ -113,36 +175,12 @@ class ContiguousAllocator : public Allocator {
   ContiguousAllocator(absl::Span<float> data) : data_(data), offset_(0) {
     absl::c_fill(data, 0);
   }
-  DimensionedSpan Get(absl::string_view name,
-                      const absl::InlinedVector<int, 4>& shape) override;
+  SpanTensor Get(absl::string_view name,
+                 const absl::InlinedVector<int, 4>& shape) override;
 
  private:
   absl::Span<float> data_;
   int offset_;
-};
-
-
-// Information about a tensor (shape and type).
-struct TensorInfo {
-  std::string name;
-  std::vector<int> shape;
-
-  std::string DebugString() const {
-    return absl::StrCat("TensorInfo(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), "))");
-  }
-};
-
-struct TensorInfoWithData {
-  std::string name;
-  std::vector<int> shape;
-  absl::Span<const float> data;
-
-  std::string DebugString() const {
-    return absl::StrCat("TensorInfoWithData(name='", name, "', shape=(",
-                        absl::StrJoin(shape, ","), "), data=<", data.size(),
-                        " bytes>)");
-  }
 };
 
 // Allocates new memory for each allocation request and keeps track
@@ -151,12 +189,23 @@ struct TensorInfoWithData {
 class TrackingVectorAllocator : public Allocator {
  public:
   TrackingVectorAllocator() {}
-  DimensionedSpan Get(absl::string_view name,
-                      const absl::InlinedVector<int, 4>& shape);
-  bool IsNameUnique(absl::string_view name);
 
-  std::vector<TensorInfo> tensors;
-  std::vector<float> data;
+  SpanTensor Get(absl::string_view name,
+                 const absl::InlinedVector<int, 4>& shape) override;
+
+  // Should only be called *after* all spans were created (via `Get`).
+  // A call to `Get` invalidates the previous result of `spans`.
+  std::vector<SpanTensorInfo> tensors_info() const { return tensors_info_; }
+
+  std::vector<float>& data() { return data_; }
+  const std::vector<float>& data() const { return data_; }
+
+ private:
+  bool IsNameUnique(absl::string_view name) const;
+
+  std::vector<float> data_;
+  std::vector<SpanTensorInfo> tensors_info_;
+  absl::flat_hash_set<std::string> tensor_names_;
 };
 
 // Specification of which players' private information we get to see.
@@ -285,7 +334,7 @@ class Observer {
   virtual ~Observer() = default;
 
  protected:
-  // TODO(author11) Remove when all games support both types of observations
+  // TODO(author11) Remove when all games support both types of observations.
   bool has_string_;
   bool has_tensor_;
 };
@@ -296,18 +345,17 @@ class Observation {
   // Create
   Observation(const Game& game, std::shared_ptr<Observer> observer);
 
-  // Returns the internal buffer into which observations are written.
-  absl::Span<float> Tensor() { return absl::MakeSpan(buffer_); }
-
-  // Returns information on the component tensors of the observation.
-  const std::vector<TensorInfo>& tensor_info() const { return tensors_; }
-
-  // Returns the component tensors of the observation: both info and data.
-  std::vector<TensorInfoWithData> tensors() const;
-
   // Gets the observation from the State and player and stores it in
   // the internal tensor.
   void SetFrom(const State& state, int player);
+
+  // Describes the observation components.
+  const std::vector<SpanTensorInfo>& tensors_info() const {
+    return tensors_info_;
+  }
+
+  // Returns the component tensors of the observation.
+  std::vector<SpanTensor> tensors();
 
   // Returns the string observation for the State and player.
   std::string StringFrom(const State& state, int player) const {
@@ -320,21 +368,38 @@ class Observation {
   // The first byte of the compressed data is reserved for the specific
   // compression scheme. Note that currently there is only one supported, which
   // requires bitwise observations.
+  //
+  // Note: Use compress and decompress on the same machine, or on systems
+  //       with the same float memory layout (aka Endianness).
+  //       Different computer architectures may use different Endianness
+  //       (https://en.wikipedia.org/wiki/Endianness) when storing floats.
+  //       The compressed data is a raw memory representation of an array
+  //       of floats. Passing it from, say, big-endian architecture
+  //       to little-endian architecture may corrupt the original data.
+  // TODO(etar) address the note above and implement things in a platform
+  //             independent way.
   std::string Compress() const;
   void Decompress(absl::string_view compressed);
 
   // What observations do we support?
-  // TODO(author11) Remove when all games support both types of observations
+  // TODO(author11) Remove when all games support both types of observations.
   bool HasString() const { return observer_->HasString(); }
   bool HasTensor() const { return observer_->HasTensor(); }
+
+ public:
+  // Deprecated methods.
+
+  // Returns the internal buffer into which observations are written.
+  ABSL_DEPRECATED("Use `tensors()`. This method is unsafe.")
+  absl::Span<float> Tensor() { return absl::MakeSpan(buffer_); }
 
  private:
   std::shared_ptr<Observer> observer_;
   std::vector<float> buffer_;
-  std::vector<TensorInfo> tensors_;
+  std::vector<SpanTensorInfo> tensors_info_;
 };
 
-// Allows to registers observers to a game. Usage:
+// Allows to register observers to a game. Usage:
 // ObserverRegisterer unused_name(game_name, observer_name, creator);
 //
 // Once an observer is registered, it can be created by
@@ -375,11 +440,13 @@ class ObserverRegisterer {
 // Pure function that creates a tensor from an observer. Slower than using an
 // Observation, but threadsafe. This is useful when you cannot keep an
 // Observation around to use multiple times.
+ABSL_DEPRECATED("Use 'Observation::tensors()`.")
 std::vector<float> TensorFromObserver(const State& state,
                                       const Observer& observer);
 
 // Pure function that gets the tensor shape from an observer.
 // Any valid state may be supplied.
+ABSL_DEPRECATED("Use 'Observation::tensors_info()`.")
 std::vector<int> ObserverTensorShape(const State& state,
                                      const Observer& observer);
 

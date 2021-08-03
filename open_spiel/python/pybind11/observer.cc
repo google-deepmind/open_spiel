@@ -30,34 +30,38 @@ void init_pyspiel_observer(py::module& m) {
   py::class_<Observer, std::shared_ptr<Observer>>(m, "Observer")
       .def("__str__", [](const Observer& self) { return "Observer()"; });
 
-  py::class_<TensorInfo>(m, "TensorInfo")
-      .def_readonly("name", &TensorInfo::name)
-      .def_readonly("shape", &TensorInfo::shape)
-      .def("__str__", &TensorInfo::DebugString);
+  py::class_<SpanTensorInfo>(m, "SpanTensorInfo")
+      .def_property_readonly(
+          "name", [](const SpanTensorInfo& info) { return info.name(); })
+      .def_property_readonly(
+          "shape",
+          [](const SpanTensorInfo& info) { return info.vector_shape(); })
+      .def("__str__", &SpanTensorInfo::DebugString);
 
-  py::class_<TensorInfoWithData>(m, "TensorInfoWithData")
-      .def_readonly("name", &TensorInfoWithData::name)
-      .def_readonly("shape", &TensorInfoWithData::shape)
-      // .def_readonly("data", &TensorInfoWithData::data)
+  py::class_<SpanTensor>(m, "SpanTensor")
+      .def_property_readonly(
+          "name", [](const SpanTensor& tensor) { return tensor.info().name(); })
+      .def_property_readonly(
+          "shape",
+          [](const SpanTensor& tensor) { return tensor.info().vector_shape(); })
       .def_property_readonly("data",
-                             [](const TensorInfoWithData& tensor) {
+                             [](const SpanTensor& tensor) {
                                // absl::Span requires pybind11_abseil which
                                // open spiel forbids. Thus copy the data
                                // and expose a vector through pybind.
-                               std::vector<float> data(
-                                   tensor.data.data(),
-                                   tensor.data.data() + tensor.data.size());
+                               std::vector<float> data(tensor.data().begin(),
+                                                       tensor.data().end());
                                return data;
                              })
-      .def("__str__", &TensorInfoWithData::DebugString);
+      .def("__str__", &SpanTensor::DebugString);
 
   // C++ Observation, intended only for the Python Observation class, not
   // for general Python code.
   py::class_<Observation>(m, "_Observation", py::buffer_protocol())
       .def(py::init<const Game&, std::shared_ptr<Observer>>(), py::arg("game"),
            py::arg("observer"))
-      .def("tensor_info", &Observation::tensor_info)
       .def("tensors", &Observation::tensors)
+      .def("tensors_info", &Observation::tensors_info)
       .def("string_from", &Observation::StringFrom)
       .def("set_from", &Observation::SetFrom)
       .def("has_string", &Observation::HasString)

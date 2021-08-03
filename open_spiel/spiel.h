@@ -225,6 +225,9 @@ class State {
   // Games should implement DoApplyAction.
   virtual void ApplyAction(Action action_id);
 
+  // Helper versions of ApplyAction that first does a legality check.
+  virtual void ApplyActionWithLegalityCheck(Action action_id);
+
   // `LegalActions(Player player)` is valid for all nodes in all games,
   // returning an empty list for players who don't act at this state. The
   // actions should be returned in ascending order.
@@ -570,6 +573,10 @@ class State {
   //
   // Simultaneous games should implement DoApplyActions.
   void ApplyActions(const std::vector<Action>& actions);
+
+  // A helper version of ApplyActions that first does legality checks.
+  void ApplyActionsWithLegalityChecks(const std::vector<Action>& actions);
+
 
   // The size of the action space. See `Game` for a full description.
   int NumDistinctActions() const { return num_distinct_actions_; }

@@ -26,6 +26,51 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Set default build type.
+set (BUILD_TYPE $ENV{BUILD_TYPE})
+if(NOT BUILD_TYPE)
+   set(BUILD_TYPE Testing
+       CACHE STRING "Choose the type of build: Debug Release Testing."
+       FORCE)
+endif()
+message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
+
+if(${BUILD_TYPE} STREQUAL "Debug")
+  # Basic build for debugging (default).
+  # -Og enables optimizations that do not interfere with debugging.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
+endif()
+
+if(${BUILD_TYPE} STREQUAL "Testing")
+  # A build used for running tests: keep all runtime checks (assert,
+  # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
+  # otherwise tests run for too long.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+endif()
+
+if(${BUILD_TYPE} STREQUAL "Release")
+  # Optimized release build: turn off debug runtime checks (assert,
+  # SPIEL_DCHECK_*) and turn on highest speed optimizations.
+  # The difference in perfomance can be up to 10x higher.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3")
+endif()
+
+if(APPLE)
+  # On MacOS:
+  #   -undefined dynamic_lookup is necessary for pybind11 linking
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything -w -undefined dynamic_lookup")
+
+  # On MacOS, we need this so that CMake will use the right Python if the user
+  # has a virtual environment active
+  set (CMAKE_FIND_FRAMEWORK LAST)
+else()
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+endif()
+
+# Position-independent code is needed for Python extension modules.
+set (CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+
 ## Optional dependencies
 # One can optionally build and link against specific external dependencies.
 # We expect these arguments to be always defined, when building using any script
@@ -91,54 +136,6 @@ openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
 openspiel_optional_dependency(OPEN_SPIEL_BUILDING_WHEEL           OFF
   "Building a Python wheel?")
 
-
-# Set default build type.
-if(NOT BUILD_TYPE)
-   set(BUILD_TYPE Testing
-       CACHE STRING "Choose the type of build: Debug Release Testing."
-       FORCE)
-endif()
-message("${BoldYellow}Current build type is: ${BUILD_TYPE}${ColourReset}")
-
-if(${BUILD_TYPE} STREQUAL "Debug")
-  # Basic build for debugging (default).
-  # -Og enables optimizations that do not interfere with debugging.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Og")
-endif()
-
-if(${BUILD_TYPE} STREQUAL "Testing")
-  # A build used for running tests: keep all runtime checks (assert,
-  # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
-  # otherwise tests run for too long.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
-endif()
-
-if(${BUILD_TYPE} STREQUAL "Release")
-  # Optimized release build: turn off debug runtime checks (assert,
-  # SPIEL_DCHECK_*) and turn on highest speed optimizations.
-  # The difference in perfomance can be up to 10x higher.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3")
-endif()
-
-if(APPLE)
-  if(OPEN_SPIEL_BUILDING_WHEEL)
-    # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.15")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  endif()
-
-  # On MacOS:
-  #   -undefined dynamic_lookup is necessary for pybind11 linking
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything -w -undefined dynamic_lookup")
-
-  # On MacOS, we need this so that CMake will use the right Python if the user
-  # has a virtual environment active
-  set (CMAKE_FIND_FRAMEWORK LAST)
-else()
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
-endif()
-
-# Position-independent code is needed for Python extension modules.
-set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)

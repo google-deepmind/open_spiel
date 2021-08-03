@@ -27,6 +27,7 @@ These tests are not exhaustive and will be updated with time.
 """
 import random
 
+from absl import flags
 from absl.testing import absltest
 from absl.testing import parameterized
 
@@ -36,6 +37,14 @@ from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.mfg import games as mfg_games  # pylint:disable=unused-import
 from open_spiel.python.mfg.algorithms import distribution
 import pyspiel
+
+FLAGS = flags.FLAGS
+
+# Use a small depth limit to keep the length of the test reasonable.
+flags.DEFINE_integer('get_all_states_depth_limit', 10,
+                     'Depth limit of getting all the states (-1 for unlimited)')
+flags.DEFINE_integer('rl_env_simulations', 10,
+                     'Number of simulations for the RL environment tests')
 
 
 def _get_next_states(state, next_states, to_string):
@@ -116,7 +125,7 @@ class FiniteHorizonTest(parameterized.TestCase):
                                                DEFAULT_PLAYER_ID)
     states = get_all_states.get_all_states(
         game,
-        depth_limit=-1,
+        depth_limit=FLAGS.get_all_states_depth_limit,
         include_terminals=False,
         include_chance_states=False,
         include_mean_field_states=False,
@@ -142,7 +151,7 @@ class FiniteHorizonTest(parameterized.TestCase):
         for p in range(game.num_players())
     ]
     for p, env in enumerate(envs):
-      for _ in range(100):
+      for _ in range(FLAGS.rl_env_simulations):
         time_step = env.reset()
         while not time_step.last():
           print(time_step)

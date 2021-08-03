@@ -207,8 +207,8 @@ void PyObserver::WriteTensor(const State& state, int player,
     const int dims = a.ndim();
     absl::InlinedVector<int, 4> shape(dims);
     for (int i = 0; i < dims; ++i) shape[i] = a.shape(i);
-    auto out = allocator->Get(k.cast<std::string>(), shape);
-    std::copy(a.data(), a.data() + a.size(), out.data.data());
+    SpanTensor out = allocator->Get(k.cast<std::string>(), shape);
+    std::copy(a.data(), a.data() + a.size(), out.data().begin());
   }
 }
 
@@ -253,16 +253,15 @@ void PyState::InformationStateTensor(Player player,
 
 namespace {
 std::vector<int> TensorShape(const TrackingVectorAllocator& allocator) {
-  switch (allocator.tensors.size()) {
+  switch (allocator.tensors_info().size()) {
     case 0:
       return {};
     case 1:
-      return allocator.tensors.front().shape;
+      return allocator.tensors_info().front().vector_shape();
     default: {
       int size = 0;
-      for (auto tensor : allocator.tensors) {
-        size += std::accumulate(tensor.shape.begin(), tensor.shape.end(), 1,
-                                std::multiplies<int>());
+      for (const auto& info : allocator.tensors_info()) {
+        size += info.size();
       }
       return {size};
     }

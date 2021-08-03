@@ -232,21 +232,37 @@ inline const std::string kDefaultSmallFEN = "r1kr/pppp/PPPP/R1KR w - - 0 1";
 
 using ObservationTable = std::array<bool, k2dMaxBoardSize>;
 
+// Specifies policy for pseudo legal moves generation.
 enum PseudoLegalMoveSettings {
-  kBreachEnemyPieces,
+  // Standard legal moves (do not allow to move past enemy pieces).
   kAcknowledgeEnemyPieces,
+  // Pseudo-legal moves, where a piece can move anywhere (according to the rules
+  // for that piece), except if it was blocked from doing so by other player's
+  // pieces. This is used in games, where the player may not know the position
+  // of an enemy piece (like Kriegspiel or RBC) and it can try to move past the
+  // enemy (for example a rook can try to move the other side of the board, even
+  // if it is in fact blocked by an unseen opponent's pawn).
+  kBreachEnemyPieces,
 };
+
+// Some chess variants (RBC) allow a "pass" action/move
+inline constexpr open_spiel::Action kPassAction = 0;
+inline const chess::Move kPassMove =
+    Move(Square{-1, -1}, Square{-1, -1},
+         Piece{.color = Color::kEmpty, .type = PieceType::kEmpty});
 
 class ChessBoard {
  public:
   ChessBoard(int board_size = kDefaultBoardSize,
-             bool king_in_check_allowed = false);
+             bool king_in_check_allowed = false,
+             bool allow_pass_move = false);
 
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   static absl::optional<ChessBoard> BoardFromFEN(
       const std::string& fen, int board_size = 8,
-      bool king_in_check_allowed = false);
+      bool king_in_check_allowed = false,
+      bool allow_pass_move = false);
 
   const Piece& at(Square sq) const { return board_[SquareToIndex_(sq)]; }
 
@@ -398,6 +414,8 @@ class ChessBoard {
 
   bool KingInCheckAllowed() const { return king_in_check_allowed_; }
 
+  bool AllowPassMove() const { return allow_pass_move_; }
+
   uint64_t HashValue() const { return zobrist_hash_; }
 
   std::string DebugString() const;
@@ -422,6 +440,9 @@ class ChessBoard {
    */
   std::string ToDarkFEN(const ObservationTable& observability_table,
                         Color color) const;
+
+  bool IsBreachingMove(Move move) const;
+  void BreachingMoveToCaptureMove(Move* move) const;
 
  private:
   size_t SquareToIndex_(Square sq) const { return sq.y * board_size_ + sq.x; }
@@ -457,6 +478,11 @@ class ChessBoard {
   void GenerateCastlingDestinations_(Square sq, Color color,
                                      PseudoLegalMoveSettings settings,
                                      const YieldFn& yield) const;
+  bool CanCastle(Square king_sq, Color color,
+                 PseudoLegalMoveSettings settings) const;
+  bool CanCastleBetween(Square sq1, Square sq2,
+                        bool check_safe_from_opponent,
+                        PseudoLegalMoveSettings settings) const;
 
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,
@@ -501,6 +527,7 @@ class ChessBoard {
 
   int board_size_;
   bool king_in_check_allowed_;
+  bool allow_pass_move_;
 
   std::array<Piece, k2dMaxBoardSize> board_;
   Color to_play_;

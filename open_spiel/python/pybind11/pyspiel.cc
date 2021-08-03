@@ -242,6 +242,9 @@ PYBIND11_MODULE(pyspiel, m) {
   state.def(py::init<std::shared_ptr<const Game>>())
       .def("current_player", &State::CurrentPlayer)
       .def("apply_action", &State::ApplyAction)
+      .def("apply_action_with_legality_check",
+           py::overload_cast<Action>(
+               &State::ApplyActionWithLegalityCheck))
       .def("legal_actions",
            (std::vector<open_spiel::Action>(State::*)(int) const) &
                State::LegalActions)
@@ -298,6 +301,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("child", &State::Child)
       .def("undo_action", &State::UndoAction)
       .def("apply_actions", &State::ApplyActions)
+      .def("apply_actions_with_legality_checks",
+           &State::ApplyActionsWithLegalityChecks)
       .def("num_distinct_actions", &State::NumDistinctActions)
       .def("num_players", &State::NumPlayers)
       .def("chance_outcomes", &State::ChanceOutcomes)
@@ -584,13 +589,15 @@ PYBIND11_MODULE(pyspiel, m) {
         py::arg("mask_test") = true,
         py::arg("state_checker_fn") =
             py::cpp_function(&testing::DefaultStateChecker),
-        "Run the C++ tests on a game");
+        py::arg("mean_field_population") = -1, "Run the C++ tests on a game");
 
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise
   // exceptions - the process will be terminated instead.
-  open_spiel::SetErrorHandler(
-      [](const std::string& string) { throw SpielException(string); });
+  open_spiel::SetErrorHandler([](const std::string& string) {
+    std::cerr << "OpenSpiel exception: " << string << std::endl << std::flush;
+    throw SpielException(string);
+  });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
 
   // Register other bits of the API.

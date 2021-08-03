@@ -153,6 +153,7 @@ class Environment(object):
                include_full_state=False,
                distribution=None,
                mfg_population=None,
+               enable_legality_check=False,
                **kwargs):
     """Constructor.
 
@@ -168,12 +169,14 @@ class Environment(object):
       distribution: the distribution over states if the game is a mean field
         game.
       mfg_population: The Mean Field Game population to consider.
+      enable_legality_check: Check the legality of the move before stepping.
       **kwargs: dict, additional settings passed to the Open Spiel game.
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
     self._include_full_state = include_full_state
     self._distribution = distribution
     self._mfg_population = mfg_population
+    self._enable_legality_check = enable_legality_check
 
     if isinstance(game, str):
       if kwargs:
@@ -265,6 +268,18 @@ class Environment(object):
         discounts=discounts,
         step_type=step_type)
 
+  def _check_legality(self, actions):
+    if self.is_turn_based:
+      legal_actions = self._state.legal_actions()
+      if actions[0] not in legal_actions:
+        raise RuntimeError(f"step() called on illegal action {actions[0]}")
+    else:
+      for p in range(len(actions)):
+        legal_actions = self._state.legal_actions(p)
+        if legal_actions and actions[p] not in legal_actions:
+          raise RuntimeError(f"step() by player {p} called on illegal " +
+                             f"action: {actions[p]}")
+
   def step(self, actions):
     """Updates the environment according to `actions` and returns a `TimeStep`.
 
@@ -295,6 +310,9 @@ class Environment(object):
             self.num_actions_per_step))
     if self._should_reset:
       return self.reset()
+
+    if self._enable_legality_check:
+      self._check_legality(actions)
 
     if self.is_turn_based:
       self._state.apply_action(actions[0])

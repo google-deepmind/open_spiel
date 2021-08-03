@@ -16,16 +16,16 @@
 
 #include <torch/torch.h>
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
-#include <algorithm>
 
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
-
 
 namespace open_spiel {
 namespace algorithms {
@@ -33,8 +33,18 @@ namespace torch_dqn {
 
 constexpr const int kIllegalActionLogitsPenalty = -1e9;
 
+Action RandomAgent::Step(const State& state, bool is_evaluation) {
+  if (state.IsTerminal()) {
+    return;
+  }
+  std::vector<Action> legal_actions = state.LegalActions(player_);
+  int aidx = absl::Uniform<int>(rng_, 0, legal_actions.size());
+  return legal_actions[aidx];
+}
+
 DQN::DQN(const DQNSettings& settings)
-    : use_observation_(settings.use_observation),
+    : seed_(settings.seed),
+      use_observation_(settings.use_observation),
       player_id_(settings.player_id),
       input_size_(settings.state_representation_size),
       num_actions_(settings.num_actions),
@@ -55,8 +65,8 @@ DQN::DQN(const DQNSettings& settings)
       loss_str_(settings.loss_str),
       exists_prev_(false),
       prev_state_(nullptr),
-      step_counter_(0) {
-}
+      step_counter_(0),
+      rng_(settings.seed) {}
 
 std::vector<float> DQN::GetInfoState(const State& state,
                                      Player player_id,
@@ -68,14 +78,13 @@ std::vector<float> DQN::GetInfoState(const State& state,
   }
 }
 
-Action DQN::Step(const State& state,
-                 bool is_evaluation,
-                 bool add_transition_record) {
+Action DQN::Step(const State& state, bool is_evaluation) {
   // Chance nodes should be handled externally to the agent.
   SPIEL_CHECK_TRUE(!state.IsChanceNode());
 
   Action action;
-  if (!state.IsTerminal() && state.CurrentPlayer() == player_id_) {
+  if (!state.IsTerminal() &&
+      (state.CurrentPlayer() == player_id_ || state.IsSimultaneousNode())) {
     std::vector<float> info_state = GetInfoState(state,
                                                  player_id_,
                                                  use_observation_);
@@ -96,25 +105,31 @@ Action DQN::Step(const State& state,
       torch::save(q_network_, "q_network.pt");
       torch::load(target_q_network_, "q_network.pt");
     }
-    if (exists_prev_ && add_transition_record) {
+    if (exists_prev_) {
       AddTransition(*prev_state_, prev_action_, state);
     }
-    if (state.IsTerminal()) {
-      exists_prev_ = false;
-      prev_action_ = 0;
-      return kInvalidAction;
-    } else {
-      exists_prev_ = true;
-      prev_state_ = state.Clone();
-      prev_action_ = action;
-    }
   }
+
+  if (state.IsTerminal()) {
+    exists_prev_ = false;
+    prev_action_ = 0;
+    prev_state_ = nullptr;
+    return kInvalidAction;
+  } else {
+    exists_prev_ = true;
+    prev_state_ = state.Clone();
+    prev_action_ = action;
+  }
+
   return action;
 }
 
 void DQN::AddTransition(const State& prev_state,
                         Action prev_action,
                         const State& state) {
+  // std::cout << "Adding transition: prev_action = " << prev_action
+  //           << ", player id = " << player_id_
+  //           << ", reward = " << state.PlayerReward(player_id_) << std::endl;
   Transition transition = {
     /*info_state=*/GetInfoState(prev_state, player_id_, use_observation_),
     /*action=*/prev_action_,
@@ -129,6 +144,13 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
                           std::vector<Action> legal_actions,
                           double epsilon) {
   Action action;
+  if (legal_actions.empty()) {
+    // In some simultaneous games, some players can have no legal actions.
+    return 0;
+  } else if (legal_actions.size() == 1) {
+    return legal_actions[0];
+  }
+
   if (absl::Uniform(rng_, 0.0, 1.0) < epsilon) {
     ActionsAndProbs actions_probs;
     std::vector<double> probs(legal_actions.size(), 1.0/legal_actions.size());
@@ -141,13 +163,15 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
         info_state.data(),
         {info_state.size()},
         torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
+    q_network_->eval();
     torch::Tensor q_value = q_network_->forward(info_state_tensor);
-    torch::Tensor legal_actions_mask = torch::empty({legal_actions.size()});
+    torch::Tensor legal_actions_mask =
+        torch::full({num_actions_}, kIllegalActionLogitsPenalty,
+                    torch::TensorOptions().dtype(torch::kFloat32));
     for (Action a : legal_actions) {
-      legal_actions_mask[a] = 1;
+      legal_actions_mask[a] = 0;
     }
-    action = torch::mul(
-        q_value.detach(), legal_actions_mask).argmax(1).item().toInt();
+    action = (q_value.detach() + legal_actions_mask).argmax(1).item().toInt();
   }
   return action;
 }
@@ -188,18 +212,20 @@ void DQN::Learn() {
             {1, t.next_info_state.size()},
             torch::TensorOptions().dtype(torch::kFloat32)).clone());
     legal_actions_mask.push_back(
-        torch::from_blob(
-            t.legal_actions_mask.data(),
-            {1, t.legal_actions_mask.size()},
-            torch::TensorOptions().dtype(torch::kFloat32))
-            .to(torch::kInt64).clone());
+        torch::from_blob(t.legal_actions_mask.data(),
+                         {1, t.legal_actions_mask.size()},
+                         torch::TensorOptions().dtype(torch::kInt32))
+            .to(torch::kInt64)
+            .clone());
     actions.push_back(t.action);
     rewards.push_back(t.reward);
     are_final_steps.push_back(t.is_final_step);
   }
   torch::Tensor info_states_tensor = torch::stack(info_states, 0);
   torch::Tensor next_info_states_tensor = torch::stack(next_info_states, 0);
+  q_network_->train();
   torch::Tensor q_values = q_network_->forward(info_states_tensor);
+  target_q_network_->eval();
   torch::Tensor target_q_values = target_q_network_->forward(
       next_info_states_tensor).detach();
 
@@ -241,6 +267,47 @@ void DQN::Learn() {
   }
   value_loss.backward();
   optimizer_.step();
+}
+
+std::vector<double> RunEpisodes(std::mt19937* rng, const Game& game,
+                                const std::vector<Agent*>& agents,
+                                int num_episodes, bool is_evaluation) {
+  SPIEL_CHECK_GE(num_episodes, 1);
+  SPIEL_CHECK_EQ(agents.size(), game.NumPlayers());
+  std::vector<double> total_returns(game.NumPlayers(), 0.0);
+  for (int i = 0; i < num_episodes; i++) {
+    std::unique_ptr<open_spiel::State> state = game.NewInitialState();
+    while (!state->IsTerminal()) {
+      Player player = state->CurrentPlayer();
+      open_spiel::Action action;
+      if (state->IsChanceNode()) {
+        action = open_spiel::SampleAction(state->ChanceOutcomes(),
+                                          absl::Uniform(*rng, 0.0, 1.0))
+                     .first;
+        state->ApplyAction(action);
+      } else if (state->IsSimultaneousNode()) {
+        std::vector<Action> joint_action(game.NumPlayers());
+        for (Player p = 0; p < game.NumPlayers(); ++p) {
+          joint_action[p] = agents[p]->Step(*state, is_evaluation);
+        }
+        state->ApplyActions(joint_action);
+      } else {
+        action = agents[player]->Step(*state, is_evaluation);
+        state->ApplyAction(action);
+      }
+    }
+    std::vector<double> episode_returns = state->Returns();
+    for (Player p = 0; p < game.NumPlayers(); ++p) {
+      agents[p]->Step(*state, is_evaluation);
+      total_returns[p] += episode_returns[p];
+    }
+  }
+
+  for (Player p = 0; p < game.NumPlayers(); ++p) {
+    total_returns[p] /= num_episodes;
+  }
+
+  return total_returns;
 }
 
 }  // namespace torch_dqn

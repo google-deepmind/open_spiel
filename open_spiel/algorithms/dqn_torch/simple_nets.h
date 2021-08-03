@@ -31,9 +31,7 @@ namespace torch_dqn {
 // Always includes biases and only supports ReLU activations.
 class SimpleLinearImpl : public torch::nn::Module {
  public :
-  SimpleLinearImpl(int input_size,
-                   int output_size,
-                   bool activate_relu);
+  SimpleLinearImpl(int input_size, int output_size, bool activate_relu = true);
   torch::Tensor forward(torch::Tensor x);
 
  private:
@@ -45,10 +43,8 @@ TORCH_MODULE(SimpleLinear);
 // A simple dense network built from linear layers above.
 class MLPImpl : public torch::nn::Module {
  public:
-  MLPImpl(const int& input_size,
-          const std::vector<int>& hidden_layers_sizes,
-          const int& output_size,
-          bool activate_final = false);
+  MLPImpl(int input_size, const std::vector<int>& hidden_layers_sizes,
+          int output_size, bool activate_final = false);
   torch::Tensor forward(torch::Tensor x);
 
  private:

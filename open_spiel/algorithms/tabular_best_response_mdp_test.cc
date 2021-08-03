@@ -98,40 +98,30 @@ void GoofspielGameTests() {
   UniformPolicy uniform_policy;
   FirstActionPolicy first_action_policy;
 
-  // There The values in Goofspiel are inconsistent across BR implementations.
-  // This gets: 1.333333333333333 1.666666666666667
-  {
-    std::shared_ptr<const Game> game = LoadGame(
-        "turn_based_simultaneous_game(game=goofspiel(num_cards=3))");
-    double value = NashConv(*game, uniform_policy, true);
-    printf("%0.15lf\n", value);
-    double value2 = NashConv(*game, first_action_policy, true);
-    printf("%0.15lf\n", value2);
+  std::vector<std::string> game_strings = {
+    "goofspiel(num_cards=3)",
+    "goofspiel(num_cards=3,points_order=descending)",
+  };
+
+  for (const std::string& game_string : game_strings) {
+    std::string tbs_game_string =
+        absl::StrCat("turn_based_simultaneous_game(game=", game_string, ")");
+    std::shared_ptr<const Game> tbs_game = LoadGame(tbs_game_string);
+    double uniform_nash_conv = NashConv(*tbs_game, uniform_policy, true);
+    double first_action_nash_conv = NashConv(*tbs_game, first_action_policy,
+                                             true);
+
+    std::shared_ptr<const Game> game = LoadGame(game_string);
+    TabularBestResponseMDP tbr1(*game, uniform_policy);
+    TabularBestResponseMDPInfo br_info = tbr1.NashConv();
+    SPIEL_CHECK_FLOAT_NEAR(br_info.nash_conv, uniform_nash_conv,
+                           kFloatTolerance);
+
+    TabularBestResponseMDP tbr2(*game, first_action_policy);
+    TabularBestResponseMDPInfo br_info2 = tbr2.NashConv();
+    SPIEL_CHECK_FLOAT_NEAR(br_info2.nash_conv, first_action_nash_conv,
+                           kFloatTolerance);
   }
-
-  {
-    // This gets: 1.33333 2.0
-    std::shared_ptr<const Game> game = LoadGame(
-        "turn_based_simultaneous_game("
-        "game=goofspiel(num_cards=3,points_order=descending))");
-    double value = NashConv(*game, uniform_policy, true);
-    printf("%0.15lf\n", value);
-    double value2 = NashConv(*game, first_action_policy, true);
-    printf("%0.15lf\n", value2);
-  }
-
-  /* These get much lower values. I suspect some issues with the observation
-   * string.
-  std::shared_ptr<const Game> game = LoadGame("goofspiel(num_cards=3)");
-  std::shared_ptr<const Game> game = LoadGame("goofspiel(num_cards=3,points_order=descending)");
-  TabularBestResponseMDP tbr1(*game, uniform_policy);
-  TabularBestResponseMDPInfo br_info = tbr1.NashConv();
-  SPIEL_CHECK_FLOAT_NEAR(br_info.nash_conv, 0.0, kFloatTolerance);
-
-  TabularBestResponseMDP tbr2(*game, first_action_policy);
-  TabularBestResponseMDPInfo br_info2 = tbr2.NashConv();
-  SPIEL_CHECK_FLOAT_NEAR(br_info2.nash_conv, 2.0, kFloatTolerance);
-  */
 }
 
 void OshiZumoGameTests() {

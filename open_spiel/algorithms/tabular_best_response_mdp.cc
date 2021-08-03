@@ -273,13 +273,13 @@ void TabularBestResponseMDP::BuildMDPs(
 std::string TabularBestResponseMDP::GetNodeKey(const State &state,
                                                Player player) const {
   switch (game_.GetType().information) {
-  case GameType::Information::kImperfectInformation:
-  case GameType::Information::kOneShot:
-    return state.InformationStateString(player);
-  case GameType::Information::kPerfectInformation:
-    return state.ObservationString(player);
-  default:
-    SpielFatalError("Information type not supported.");
+    case GameType::Information::kImperfectInformation:
+    case GameType::Information::kOneShot:
+      return state.InformationStateString(player);
+    case GameType::Information::kPerfectInformation:
+      return state.ObservationString(player);
+    default:
+      SpielFatalError("Information type not supported.");
   }
 }
 
@@ -314,7 +314,7 @@ TabularBestResponseMDPInfo TabularBestResponseMDP::ComputeBestResponses() {
     }
   }
 
-  std::vector<MDPNode *> parent_nodes;
+  std::vector<MDPNode*> parent_nodes;
   parent_nodes.reserve(num_players_);
   for (Player p = 0; p < num_players_; p++) {
     parent_nodes.push_back(mdps_[p]->RootNode());

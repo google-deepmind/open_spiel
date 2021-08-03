@@ -38,8 +38,8 @@ const GameType kGameType{/*short_name=*/"matching_pennies_3p",
                          /*min_num_players=*/3,
                          /*provides_information_state_string=*/true,
                          /*provides_information_state_tensor=*/true,
-                         /*provides_observation_string=*/false,
-                         /*provides_observation_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/{}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

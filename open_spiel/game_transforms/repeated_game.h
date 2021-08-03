@@ -77,6 +77,8 @@ class RepeatedGame : public SimMoveGame {
   }
   std::vector<int> ObservationTensorShape() const override;
 
+  const Game* StageGame() const { return stage_game_.get(); }
+
  private:
   std::shared_ptr<const Game> stage_game_;
   const int num_repetitions_;

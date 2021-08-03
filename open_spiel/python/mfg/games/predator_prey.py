@@ -98,7 +98,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.geometry = get_param("geometry", params)
     game_info = pyspiel.GameInfo(
         num_distinct_actions=_NUM_ACTIONS,
-        max_chance_outcomes=max(self.size, _NUM_CHANCE),
+        max_chance_outcomes=max(self.size * self.size, _NUM_CHANCE),
         num_players=num_players,
         min_utility=-np.inf,
         max_utility=+np.inf,
@@ -115,6 +115,10 @@ class MFGPredatorPreyGame(pyspiel.Game):
     instantiated with new_initial_state_for_population().
     """
     return MFGPredatorPreyState(self)
+
+  def max_chance_nodes_in_history(self):
+    """Maximun chance nodes in game history."""
+    return self.horizon + 1
 
   def new_initial_state_for_population(self, population):
     """State corresponding to the start of a game for a given population."""
@@ -165,7 +169,6 @@ class MFGPredatorPreyState(pyspiel.State):
         States with population=None cannot be used to perform game actions.
     """
     super().__init__(game)
-    self._game = game
     # Initial state where the initial position is chosen according to
     # an initial distribution.
     self._is_position_init = True

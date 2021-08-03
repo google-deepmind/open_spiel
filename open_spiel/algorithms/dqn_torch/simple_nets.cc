@@ -25,15 +25,12 @@ namespace algorithms {
 namespace torch_dqn {
 
 constexpr double kSqrt2 = 1.4142135623730950488;
-constexpr int kSeed = 93879211;
 
-SimpleLinearImpl::SimpleLinearImpl(int input_size,
-                                   int output_size,
-                                   bool activate_relu = false)
-    : simple_linear_(torch::nn::LinearOptions(/*in_features*/input_size,
-                                              /*out_features*/output_size)),
+SimpleLinearImpl::SimpleLinearImpl(int input_size, int output_size,
+                                   bool activate_relu)
+    : simple_linear_(torch::nn::LinearOptions(/*in_features*/ input_size,
+                                              /*out_features*/ output_size)),
       activate_relu_(activate_relu) {
-  torch::manual_seed(kSeed);
   double stddev = 1.0 / std::sqrt(input_size);
   double lower = -2.0 * stddev;
   double upper = 2.0 * stddev;
@@ -62,10 +59,8 @@ torch::Tensor SimpleLinearImpl::forward(torch::Tensor x) {
   }
 }
 
-MLPImpl::MLPImpl(const int& input_size,
-                 const std::vector<int>& hidden_layers_sizes,
-                 const int& output_size,
-                 bool activate_final)
+MLPImpl::MLPImpl(int input_size, const std::vector<int>& hidden_layers_sizes,
+                 int output_size, bool activate_final)
     : input_size_(input_size),
       hidden_layers_sizes_(hidden_layers_sizes),
       output_size_(output_size),
@@ -76,9 +71,9 @@ MLPImpl::MLPImpl(const int& input_size,
                                     /*output_size*/h_size));
     layer_size = h_size;
   }
-  layers_->push_back(SimpleLinear(/*input_size*/layer_size,
-                                  /*output_size*/output_size,
-                                  /*activate_final*/activate_final));
+  layers_->push_back(SimpleLinear(/*input_size*/ layer_size,
+                                  /*output_size*/ output_size_,
+                                  /*activate_final*/ activate_final_));
   register_module("layers_", layers_);
 }
 
