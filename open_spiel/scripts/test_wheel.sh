@@ -16,41 +16,54 @@
 set -e
 set -x
 
-if [ "$1" = "" ];
+if [ "$2" = "" ];
 then
-  echo "Usage: test_wheel <project main dir>"
+  echo "Usage: test_wheel <mode (full|basic)> <project main dir>"
+  echo ""
+  echo "Basic mode tests only the python functionaly (no ML libraries)"
+  echo "Full mode installs the extra ML libraries and the wheel. (requires Python >= 3.7 for JAX)."
+  exit -1
 fi
+
+MODE=$1
+PROJDIR=$2
 
 uname -a
 
-#OS=`uname -a | awk '{print $1}'`
-#if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
-#  echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
-#  sudo apt-get install python3.9 python3.9-dev
-#  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
-#  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
-#fi
+OS=`uname -a | awk '{print $1}'`
+if [[ "$MODE" = "full" && "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
+  echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
+  sudo apt-get install python3.9 python3.9-dev
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+fi
 
 PYBIN=${PYBIN:-"python"}
 PYBIN=`which $PYBIN`
          
 $PYBIN -m pip install --upgrade setuptools
-$PYBIN -m pip install --upgrade -r $1/requirements.txt -q
-source $1/open_spiel/scripts/python_extra_deps.sh
-$PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+$PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
 
-#if [[ "$OS" = "Linux" ]]; then
-#  ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-manylinux2014_x86_64.whl
-#else
-#  ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-macosx_10_9_x86_64.whl
-#fi
+if [[ "$MODE" = "full" ]]; then  
+  echo "Full mode. Installing ML libraries."
+  source $1/open_spiel/scripts/python_extra_deps.sh
+  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+fi
+
+if [[ "$MODE" = "full" ]]; then
+  if [[ "$OS" = "Linux" ]]; then
+    ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-manylinux2014_x86_64.whl
+  else
+    ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-macosx_10_9_x86_64.whl
+  fi
+fi
 
 export OPEN_SPIEL_BUILDING_WHEEL="ON"
 export OPEN_SPIEL_BUILD_WITH_HANABI="ON"
 export OPEN_SPIEL_BUILD_WITH_ACPC="ON"
 
 rm -rf build && mkdir build && cd build
-cmake -DPython3_EXECUTABLE=${PYBIN} $1/open_spiel
+cmake -DPython3_EXECUTABLE=${PYBIN} $PROJDIR/open_spiel
 
 NPROC="nproc"
 if [[ "$OS" == "darwin"* ]]; then

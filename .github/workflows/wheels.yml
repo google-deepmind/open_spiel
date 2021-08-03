@@ -27,14 +27,14 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
       OS_PYTHON_VERSION: 3.9
       # While testing, try specific versions
-      CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
+      # CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
       CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_MANYLINUX_I686_IMAGE: manylinux2014
       CIBW_SKIP: cp27-* pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
-      CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh {project}
+      CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
@@ -53,9 +53,9 @@ jobs:
           ./install.sh
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
-          # python -m pip install --upgrade -r requirements.txt -q
-          # source ./open_spiel/scripts/python_extra_deps.sh
-          #python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          python -m pip install --upgrade -r requirements.txt -q
+          source ./open_spiel/scripts/python_extra_deps.sh
+          python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine build
           python -m pip install cibuildwheel==1.12.0
       - name: Build sdist
@@ -66,8 +66,8 @@ jobs:
       - name: Build and test bdist_wheel
         run: python -m cibuildwheel --output-dir wheelhouse
 
-      #- name: Install and test bdist_wheel
-      #  run: ./open_spiel/scripts/test_wheel.sh
+      - name: Install and test bdist_wheel
+        run: ./open_spiel/scripts/test_wheel.sh full `pwd`
 
       - uses: actions/upload-artifact@v2
         with:
