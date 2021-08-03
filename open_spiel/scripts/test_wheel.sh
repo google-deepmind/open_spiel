@@ -46,7 +46,7 @@ $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
 
 if [[ "$MODE" = "full" ]]; then  
   echo "Full mode. Installing ML libraries."
-  source $1/open_spiel/scripts/python_extra_deps.sh
+  source $PROJDIR/open_spiel/scripts/python_extra_deps.sh
   $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
 fi
 
