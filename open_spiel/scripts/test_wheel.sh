@@ -52,7 +52,7 @@ fi
 
 if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-manylinux2014_x86_64.whl
+    ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
   else
     ${PYBIN} -m pip install wheelhouse/open_spiel-0.3.1-cp39-cp39-macosx_10_9_x86_64.whl
   fi

@@ -66,8 +66,10 @@ jobs:
      
       # Build all the wheels and run the basic tests (within the docker images)
       # Basic tests are run via the CIBW_TEST_COMMAND environment variable.
-      - name: Build bdist_wheel and basic tests
-        run: python -m cibuildwheel --output-dir wheelhouse
+      - name: Build bdist_wheel and run tests
+        run: |
+          python -m cibuildwheel --output-dir wheelhouse
+          ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
       # tests include all the ones that use the machine learning libraries,
