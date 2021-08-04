@@ -166,6 +166,9 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/data_test.py
+  games/dynamic_routing/dynamic_routing_game_test.py
+  games/dynamic_routing/dynamic_routing_game_utils_test.py
+  games/dynamic_routing/mean_field_routing_game_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/fictitious_play_test.py
