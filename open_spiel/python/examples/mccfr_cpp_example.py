@@ -44,6 +44,23 @@ flags.DEFINE_integer("players", 2, "Number of players")
 MODEL_FILE_NAME = "{}_sampling_mccfr_solver.pickle"
 
 
+def run_iterations(game, solver, start_iteration=0):
+  for i in range(int(FLAGS.iterations / 2)):
+    solver.run_iteration()
+    policy = solver.average_policy()
+    exploitability = pyspiel.exploitability(game, policy)
+
+    # We also compute NashConv to highlight an important API feature:
+    # when using Monte Carlo sampling, the policy
+    # may not have a table entry for every info state.
+    # Therefore, when calling nash_conv, ensure the third argument,
+    # "use_state_get_policy" is set to True
+    # See https://github.com/deepmind/open_spiel/issues/500 
+    nash_conv = pyspiel.nash_conv(game, policy, True) 
+
+    print("Iteration {} nashconv: {:.6f} exploitability: {:.6f}".format(
+        start_iteration + i, nash_conv, exploitability))
+
 def main(_):
   game = pyspiel.load_game(
       FLAGS.game,
@@ -58,10 +75,7 @@ def main(_):
   elif FLAGS.sampling == "outcome":
     solver = pyspiel.OutcomeSamplingMCCFRSolver(game)
 
-  for i in range(int(FLAGS.iterations / 2)):
-    solver.run_iteration()
-    print("Iteration {} exploitability: {:.6f}".format(
-        i, pyspiel.exploitability(game, solver.average_policy())))
+  run_iterations(game, solver)
 
   print("Persisting the model...")
   with open(MODEL_FILE_NAME.format(FLAGS.sampling), "wb") as file:
@@ -73,11 +87,7 @@ def main(_):
   print("Exploitability of the loaded model: {:.6f}".format(
       pyspiel.exploitability(game, loaded_solver.average_policy())))
 
-  for i in range(int(FLAGS.iterations / 2)):
-    solver.run_iteration()
-    print("Iteration {} exploitability: {:.6f}".format(
-        int(FLAGS.iterations / 2) + i,
-        pyspiel.exploitability(game, solver.average_policy())))
+  run_iterations(game, solver, start_iteration=int(FLAGS.iterations / 2))
 
 
 if __name__ == "__main__":
