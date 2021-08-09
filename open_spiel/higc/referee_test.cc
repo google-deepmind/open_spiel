@@ -62,28 +62,34 @@ void TestInvalidBots() {
 }
 
 void PlayWithFailingBots() {
-  std::string bot_first_action = absl::StrCat(absl::GetFlag(FLAGS_bots_dir),
-                                              "/test_bot_first_action.sh");
   std::vector<std::string> failing_cases = {
-//      "/non_existing_bot",
-//      "/test_bot_with_non_exec_flag",
-//      "/test_bot_buffer_overflow.sh",
       "/test_bot_break_pipe.sh",
       "/test_bot_sleep.sh",
       "/test_bot_ready.sh",
       "/test_bot_start.sh",
+      "/test_bot_illegal_action.sh",
+      "/test_bot_buffer_overflow.sh",
   };
 
-  for (const std::string& failing_case : failing_cases) {
+  for (int i = 0; i < failing_cases.size(); ++i) {
+    const std::string& failing_case = failing_cases[i];
     std::cout << "\n\nFailing bot: " << failing_case << std::endl;
     std::string failing_bot = absl::StrCat(absl::GetFlag(FLAGS_bots_dir),
                                            failing_case);
-    open_spiel::higc::Referee ref("tic_tac_toe",
-                                  {failing_bot, bot_first_action});
-    std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
-    SPIEL_CHECK_EQ(results->num_matches(), 0);
+    // Use a single-player game.
+    open_spiel::higc::Referee ref("cliff_walking", {failing_bot}, /*seed=*/42,
+                                  /*settings=*/TournamentSettings{
+                                    // Disqualify after the 2nd failing match.
+                                    .disqualification_rate = 0.5
+                                  });
+    std::unique_ptr<TournamentResults> results = ref.PlayTournament(2);
     SPIEL_CHECK_EQ(results->disqualified[0], true);
-    SPIEL_CHECK_EQ(results->disqualified[1], false);
+    if (i < 2) {
+      // No matches are played, if the bot can't even start properly.
+      SPIEL_CHECK_EQ(results->num_matches(), 0);
+    } else {
+      SPIEL_CHECK_EQ(results->num_matches(), 2);
+    }
   }
 }
 
@@ -105,8 +111,8 @@ void PlayManyRandomMatches(int num_matches = 20) {
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
-  open_spiel::higc::PlaySingleMatchIIGS();
   open_spiel::higc::TestInvalidBots();
-//  open_spiel::higc::PlayWithFailingBots();
+  open_spiel::higc::PlayWithFailingBots();
+  open_spiel::higc::PlaySingleMatchIIGS();
   open_spiel::higc::PlayManyRandomMatches();
 }

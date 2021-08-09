@@ -30,7 +30,6 @@ namespace higc {
 void BotChannel::StartRead(int time_limit) {
   SPIEL_CHECK_FALSE(shutdown_);
   SPIEL_CHECK_TRUE(wait_for_message_);
-  SPIEL_CHECK_EQ(comm_error_, 0);
   time_limit_ = time_limit;
   time_out_ = false;
   cancel_read_ = false;
@@ -54,7 +53,7 @@ void BotChannel::Write(const std::string& s) {
 }
 
 void BotChannel::Write(char c) {
-  if (comm_error_ < 0) return;  // Do not write anything anymore after error.
+  if (comm_error_ != 0) return;  // Do not write anything anymore after error.
 
   int written_bytes = write(in(), &c, 1);
   if (written_bytes == -1) {
@@ -62,6 +61,33 @@ void BotChannel::Write(char c) {
   } else if (written_bytes != 1) {
     comm_error_ = errno;
   }
+}
+
+bool BotChannel::ReadLineAsync() {
+  int chars_read = 0;
+  bool line_read = false;
+  response_.clear();
+
+  do {
+    // Read a single character (non-blocking).
+    char c;
+    chars_read = read(out(), &c, 1);
+    if (chars_read == 1) {
+      if (c == '\n') {
+        response_ = buf_;
+        buf_ = "";
+        line_read = true;
+      } else {
+        buf_.append(1, c);
+      }
+    }
+  } while (chars_read > 0 && !line_read && buf_.size() < kMaxLineLength);
+
+  if (buf_.size() >= kMaxLineLength) {
+    comm_error_ = -1;
+  }
+
+  return line_read;
 }
 
 void BotChannel::ShutDown() {
@@ -76,6 +102,56 @@ std::unique_ptr<BotChannel> MakeBotChannel(int bot_index,
   return std::make_unique<BotChannel>(bot_index, std::move(popen));
 }
 
+// Read a response message from the bot in a separate thread.
+void ReadLineFromChannelStdout(BotChannel* c) {
+  SPIEL_CHECK_TRUE(c);
+  // Outer loop for repeated match playing.
+  while (!c->shutdown_) {
+
+    // Wait until referee sends a message to the bot.
+    while (c->wait_for_message_) {
+      sleep_ms(1);
+      if (c->shutdown_) return;
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(c->mx_read);
+
+      std::chrono::time_point time_start = std::chrono::system_clock::now();
+      while (!c->ReadLineAsync()
+             && c->comm_error() == 0
+             && !(c->time_out_ = time_elapsed(time_start) > c->time_limit_)
+             && !c->cancel_read_) {
+        sleep_ms(1);
+        if (c->shutdown_) return;
+      }
+    }
+
+    c->wait_for_message_ = true;
+  }
+}
+
+// Global cerr mutex.
+std::mutex mx_cerr;
+
+// Read a stderr output from the bot in a separate thread.
+// Forward all bot's stderr to the referee's stderr.
+// Makes sure that lines are not tangled together by using a mutex.
+void ReadLineFromChannelStderr(BotChannel* c) {
+  SPIEL_CHECK_TRUE(c);
+  int read_bytes;
+  std::array<char, 1024> buf;
+  while (!c->shutdown_) {
+    read_bytes = read(c->err(), &buf[0], 1024);
+    if (read_bytes > 0) {
+      std::lock_guard<std::mutex> lock(mx_cerr);  // Have nice stderr outputs.
+      std::cerr << "Bot#" << c->bot_index_ << ": ";
+      for (int i = 0; i < read_bytes; ++i) std::cerr << buf[i];
+      std::cerr << std::flush;
+    }
+    sleep_ms(1);
+  }
+}
 
 }  // namespace higc
 }  // namespace open_spiel

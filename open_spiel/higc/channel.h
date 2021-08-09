@@ -24,23 +24,32 @@
 namespace open_spiel {
 namespace higc {
 
+constexpr int kMaxLineLength = 1024;
+
 // Communication channel with the bot.
 class BotChannel {
  public:
   BotChannel(int bot_index, std::unique_ptr<Subprocess> popen)
-  : bot_index_(bot_index), popen_(std::move(popen)) {}
+    : bot_index_(bot_index), popen_(std::move(popen)) {
+    response_.reserve(kMaxLineLength);
+    buf_.reserve(kMaxLineLength);
+  }
   int in() { return popen_->stdin(); }
   int out() { return popen_->stdout(); }
   int err() { return popen_->stderr(); };
 
   void StartRead(int time_limit);
   void CancelReadBlocking();
+  void ShutDown();
+
+  // Was line successfully read into response() yet?
+  bool ReadLineAsync();
   void Write(const std::string& s);
   void Write(char c);
-  void ShutDown();
 
   bool has_read() const { return !response_.empty(); }
   bool is_time_out() const { return time_out_; }
+  int comm_error() const { return comm_error_; }
   std::string response() const { return response_; }
 
  private:
@@ -66,6 +75,9 @@ class BotChannel {
 };
 
 std::unique_ptr<BotChannel> MakeBotChannel(int bot_index, std::string executable);
+
+void ReadLineFromChannelStdout(BotChannel* c);
+void ReadLineFromChannelStderr(BotChannel* c);
 
 }  // namespace higc
 }  // namespace open_spiel

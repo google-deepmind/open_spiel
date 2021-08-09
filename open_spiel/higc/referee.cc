@@ -27,79 +27,6 @@
 namespace open_spiel {
 namespace higc {
 
-bool getline_async(int read_fd, std::string& line_out, std::string& buf) {
-  int chars_read = 0;
-  bool line_read = false;
-  line_out.clear();
-
-  do {
-    // Read a single character (non-blocking).
-    char c;
-    chars_read = read(read_fd, &c, 1);
-    if (chars_read == 1) {
-      if (c == '\n') {
-        line_out = buf;
-        buf = "";
-        line_read = true;
-      } else {
-        buf.append(1, c);
-      }
-    }
-  } while (chars_read != 0 && !line_read);
-
-  return line_read;
-}
-
-// Read a response message from the bot in a separate thread.
-void ReadLineFromChannelStdout(BotChannel* c) {
-  SPIEL_CHECK_TRUE(c);
-  // Outer loop for repeated match playing.
-  while (!c->shutdown_) {
-
-    // Wait until referee sends a message to the bot.
-    while (c->wait_for_message_) {
-      sleep_ms(1);
-      if (c->shutdown_) return;
-    }
-
-    {
-      std::lock_guard<std::mutex> lock(c->mx_read);
-
-      std::chrono::time_point time_start = std::chrono::system_clock::now();
-      while (!getline_async(c->out(), c->response_, c->buf_)
-          && !(c->time_out_ = time_elapsed(time_start) > c->time_limit_)
-          && !c->cancel_read_) {
-        sleep_ms(1);
-        if (c->shutdown_) return;
-      }
-    }
-
-    c->wait_for_message_ = true;
-  }
-}
-
-// Global cerr mutex.
-std::mutex mx_cerr;
-
-// Read a stderr output from the bot in a separate thread.
-// Forward all bot's stderr to the referee's stderr.
-// Makes sure that lines are not tangled together by using a mutex.
-void ReadLineFromChannelStderr(BotChannel* c) {
-  SPIEL_CHECK_TRUE(c);
-  int read_bytes;
-  std::array<char, 1024> buf;
-  while (!c->shutdown_) {
-    read_bytes = read(c->err(), &buf[0], 1024);
-    if (read_bytes > 0) {
-      std::lock_guard<std::mutex> lock(mx_cerr);  // Have nice stderr outputs.
-      std::cerr << "Bot#" << c->bot_index_ << ": ";
-      for (int i = 0; i < read_bytes; ++i) std::cerr << buf[i];
-      std::cerr << std::flush;
-    }
-    sleep_ms(1);
-  }
-}
-
 // Start all players and wait for ready messages from all them simultaneously.
 std::vector<bool> Referee::StartPlayers() {
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
@@ -286,7 +213,11 @@ std::unique_ptr<State> Referee::PlayMatch() {
       BotChannel* chn = channels_[pl].get();
       std::vector<Action> legal_actions = state->LegalActions(pl);
 
-      if (chn->is_time_out()) {
+      if (chn->comm_error() != 0) {
+        log_ << "Bot#" << pl << " act communication error: "
+             << chn->comm_error() << std::endl;
+        errors_[pl].protocol_error++;
+      } else if (chn->is_time_out()) {
         log_ << "Bot#" << pl << " act timed out. " << std::endl;
         errors_[pl].time_over++;
       } else if (!chn->has_read()) {
@@ -318,12 +249,13 @@ std::unique_ptr<State> Referee::PlayMatch() {
       }
 
       if (bot_actions[pl] == kInvalidAction) {  // Pick a random action.
+        log_ << "Picking random action for Bot#" << pl << std::endl;
         std::uniform_int_distribution<int> dist(0, legal_actions.size() - 1);
         int random_idx = dist(rng_);
         bot_actions[pl] = legal_actions[random_idx];
       }
     }
-    log_ << "Bot actions:";
+    log_ << "Submitting actions:";
     for (Action a : bot_actions) log_ << ' ' << a;
     log_ << std::endl;
 
@@ -392,6 +324,10 @@ bool Referee::CheckResponse(const std::string& expected_response, int pl) {
          << expected_response << "'" << std::endl;
     log_ << "Bot#" << pl << " response was: '" << response << "'"
          << std::endl;
+    if (chn->comm_error() < 0) {
+      log_ << "Bot#" << pl << " also had a communication error: "
+           << chn->comm_error() << std::endl;
+    }
     errors_[pl].protocol_error++;
     if (chn->is_time_out()) {
       errors_[pl].time_over++;
@@ -441,6 +377,7 @@ Referee::Referee(const std::string& game_name,
           std::make_unique<Observation>(*game_, private_observer_)),
       executables_(executables), settings_(settings), rng_(seed), log_(log) {
   SPIEL_CHECK_FALSE(executables_.empty());
+  SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
 
   for (const std::string& executable : executables_) {
     std::filesystem::path f(executable);
@@ -495,6 +432,7 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
       results->returns_agg[pl] += delta * delta2;
     }
     // Disqualifications update.
+    bool tournament_over = false;
     for (int pl = 0; pl < num_bots(); ++pl) {
       if (!corrupted_match_due(pl)) continue;
       log_ << "Bot#" << pl << " exceeded illegal behaviors in match "
@@ -504,8 +442,7 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
       if (results->corrupted_matches[pl] > corruption_threshold) {
         log_ << "Bot#" << pl << " is disqualified!" << std::endl;
         results->disqualified[pl] = true;
-        TournamentOver();
-        return results;
+        tournament_over = true;
       } else {
         log_ << "Bot#" << pl << " is going to restart!" << std::endl;
         ++results->restarts[pl];
@@ -517,6 +454,11 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
       .terminal = std::move(state),
       .errors = errors_
     });
+
+    if (tournament_over) {
+      TournamentOver();
+      return results;
+    }
   }
 
   log_ << "\n";

@@ -1,4 +1,10 @@
 #!/usr/bin/bash
 
+BASE=$(dirname "$0")
+source "$BASE/../../venv/bin/activate"
+
+echo "ready"
+echo "start"
+
 # Test for some fun overflows and killing child processes.
-python -c 'for _ in range(10000000000): print("x", end="")'
+python -c 'print("x"*100000)'
