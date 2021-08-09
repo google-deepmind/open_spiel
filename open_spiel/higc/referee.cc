@@ -27,20 +27,6 @@
 namespace open_spiel {
 namespace higc {
 
-// Special messages that the bots should submit at appropriate occasions.
-const std::string kReadyMessage = "ready";
-const std::string kStartMessage = "start";
-const std::string kPonderMessage = "ponder";
-const std::string kMatchOverMessage = "match over";
-const std::string kTournamentOverMessage = "tournament over";
-
-std::unique_ptr<BotChannel> MakeBotChannel(int bot_index,
-                                           std::string executable) {
-  auto popen = std::make_unique<subprocess::popen>(
-      std::vector<std::string>{executable});
-  return std::make_unique<BotChannel>(bot_index, std::move(popen));
-}
-
 bool getline_async(int read_fd, std::string& line_out, std::string& buf) {
   int chars_read = 0;
   bool line_read = false;
@@ -114,25 +100,6 @@ void ReadLineFromChannelStderr(BotChannel* c) {
   }
 }
 
-void BotChannel::StartRead(int time_limit) {
-  SPIEL_CHECK_FALSE(shutdown_);
-  SPIEL_CHECK_TRUE(wait_for_message_);
-  time_limit_ = time_limit;
-  time_out_ = false;
-  cancel_read_ = false;
-  wait_for_message_ = false;
-}
-
-void BotChannel::CancelReadBlocking() {
-  cancel_read_ = true;
-  std::lock_guard<std::mutex> lock(mx_read);  // Wait until reading is cancelled.
-}
-
-void BotChannel::ShutDown() {
-  shutdown_ = true;
-  cancel_read_ = true;
-}
-
 // Start all players and wait for ready messages from all them simultaneously.
 std::vector<bool> Referee::StartPlayers() {
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
@@ -155,11 +122,8 @@ std::vector<bool> Referee::StartPlayers() {
   const char nl = '\n';
   for (int pl = 0; pl < num_bots(); ++pl) {
     BotChannel* chn = channels_[pl].get();
-    write(chn->in(), game_name_.c_str(), game_name_.size());
-    write(chn->in(), &nl, 1);
-    const char pl_char = '0'+pl;
-    write(chn->in(), &pl_char, 1);
-    write(chn->in(), &nl, 1);
+    chn->Write(game_name_ + "\n");
+    chn->Write(std::to_string(pl) + "\n");
     chn->StartRead(settings_.timeout_ready);
   }
 
@@ -182,11 +146,8 @@ bool Referee::StartPlayer(int pl) {
 
   const char nl = '\n';
   BotChannel* chn = channels_[pl].get();
-  write(chn->in(), game_name_.c_str(), game_name_.size());
-  write(chn->in(), &nl, 1);
-  const char pl_char = '0'+pl;
-  write(chn->in(), &pl_char, 1);
-  write(chn->in(), &nl, 1);
+  chn->Write(game_name_ + "\n");
+  chn->Write(std::to_string(pl) + "\n");
   chn->StartRead(settings_.timeout_ready);
 
   sleep_ms(settings_.timeout_ready);  // Blocking sleep to give time to the bot.
@@ -255,24 +216,20 @@ std::unique_ptr<State> Referee::PlayMatch() {
 
       // Send observations.
       const char space = ' ';
-      base64_encode(chn->in(),
-                    reinterpret_cast<char* const>(public_tensor.data()),
+      base64_encode(chn, reinterpret_cast<char* const>(public_tensor.data()),
                     public_tensor.size());
-      write(chn->in(), &space, 1);
-      base64_encode(chn->in(),
-                    reinterpret_cast<char* const>(private_tensor.data()),
+      chn->Write(" ");
+      base64_encode(chn, reinterpret_cast<char* const>(private_tensor.data()),
                     private_tensor.size());
       // Send actions.
       if (is_acting[pl]) {
         std::vector<Action> legal_actions = state->LegalActions(pl);
         for (Action a : legal_actions) {
-          write(chn->in(), &space, 1);
-          std::string action_str = std::to_string(a);
-          write(chn->in(), action_str.c_str(), action_str.size());
+          chn->Write(" ");
+          chn->Write(std::to_string(a));
         }
       }
-      const char nl = '\n';
-      write(chn->in(), &nl, 1);
+      chn->Write("\n");
     }
 
     std::chrono::time_point start = std::chrono::system_clock::now();
@@ -392,14 +349,8 @@ std::unique_ptr<State> Referee::PlayMatch() {
   log_ << "History: " << absl::StrJoin(state->History(), " ") << std::endl;
 
   for (int pl = 0; pl < num_bots(); ++pl) {
-    write(channels_[pl]->in(), kMatchOverMessage.c_str(), kMatchOverMessage.size());
-    const char space = ' ';
-    write(channels_[pl]->in(), &space, 1);
     int score = returns[pl];
-    std::string score_str = std::to_string(score);
-    write(channels_[pl]->in(), score_str.c_str(), score_str.size());
-    const char nl = '\n';
-    write(channels_[pl]->in(), &nl, 1);
+    channels_[pl]->Write(kMatchOverMessage + " " + std::to_string(score) + "\n");
     channels_[pl]->StartRead(settings_.timeout_match_over);
   }
 
@@ -455,9 +406,7 @@ bool Referee::CheckResponse(const std::string& expected_response, int pl) {
 
 void Referee::TournamentOver() {
   for (int pl = 0; pl < num_bots(); ++pl) {
-    write(channels_[pl]->in(), kTournamentOverMessage.c_str(), kTournamentOverMessage.size());
-    const char nl = '\n';
-    write(channels_[pl]->in(), &nl, 1);
+    channels_[pl]->Write(kTournamentOverMessage + "\n");
   }
   sleep_ms(settings_.time_tournament_over);
   // Do not check the final message.
@@ -496,11 +445,11 @@ Referee::Referee(const std::string& game_name,
   for (const std::string& executable : executables_) {
     std::filesystem::path f(executable);
     if (!std::filesystem::exists(f)) {
-      SpielFatalError(absl::StrCat(
+      throw std::runtime_error(absl::StrCat(
           "The bot file '", executable, "' was not found."));
     }
     if (access(executable.c_str(), X_OK) != 0) {
-      SpielFatalError(absl::StrCat(
+      throw std::runtime_error(absl::StrCat(
           "The bot file '", executable, "' cannot be executed. "
                                         "(missing +x flag?)"));
     }
@@ -513,7 +462,7 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
   bool all_ok = true;
   for (int pl = 0; pl < num_bots(); ++pl) {
     all_ok = all_ok && start_ok[pl];
-    if (!start_ok[pl]) results->corrupted_matches[pl] = num_matches;
+    if (!start_ok[pl]) results->disqualified[pl] = true;
   }
   if (!all_ok) {
     log_ << "Could not start all players correctly, "

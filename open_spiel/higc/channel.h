@@ -1,0 +1,73 @@
+// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef OPEN_SPIEL_HIGC_CHANNEL_
+#define OPEN_SPIEL_HIGC_CHANNEL_
+
+#include <thread>
+#include <mutex>
+
+#include "open_spiel/spiel.h"
+#include "open_spiel/higc/subprocess.h"
+
+namespace open_spiel {
+namespace higc {
+
+// Communication channel with the bot.
+class BotChannel {
+ public:
+  BotChannel(int bot_index, std::unique_ptr<Subprocess> popen)
+  : bot_index_(bot_index), popen_(std::move(popen)) {}
+  int in() { return popen_->stdin(); }
+  int out() { return popen_->stdout(); }
+  int err() { return popen_->stderr(); };
+
+  void StartRead(int time_limit);
+  void CancelReadBlocking();
+  void Write(const std::string& s);
+  void Write(char c);
+  void ShutDown();
+
+  bool has_read() const { return !response_.empty(); }
+  bool is_time_out() const { return time_out_; }
+  std::string response() const { return response_; }
+
+ private:
+  // Did some communication error occur? Store an error code returned
+  // by write() or read() functions.
+  int comm_error_ = 0;
+
+  int bot_index_;
+  std::unique_ptr<Subprocess> popen_;
+  std::string response_;    // A complete line response.
+  std::string buf_;         // Incomplete response buffer.
+  bool time_out_ = false;
+
+  std::atomic<bool> shutdown_ = false;
+  std::atomic<bool> wait_for_message_ = true;
+  int time_limit_ = 0;
+  bool cancel_read_ = false;
+  std::mutex mx_read;
+
+  // Reading thread loops.
+  friend void ReadLineFromChannelStdout(BotChannel* c);
+  friend void ReadLineFromChannelStderr(BotChannel* c);
+};
+
+std::unique_ptr<BotChannel> MakeBotChannel(int bot_index, std::string executable);
+
+}  // namespace higc
+}  // namespace open_spiel
+
+#endif  // OPEN_SPIEL_HIGC_CHANNEL_

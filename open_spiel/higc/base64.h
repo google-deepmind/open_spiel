@@ -19,11 +19,14 @@
 #include <string>
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 
+#include "open_spiel/higc/channel.h"
+
 namespace open_spiel {
 namespace higc {
 
 // Write buffer using base64 encoding into a file descriptor.
-void base64_encode(int fd, char const* buf, size_t len);
+void base64_encode(BotChannel* fd, char const* buf, size_t len);
+
 // Decode base64 from a string.
 std::string base64_decode(absl::string_view encoded_string);
 

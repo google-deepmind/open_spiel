@@ -36,30 +36,28 @@ const char* base64_chars = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                             "+/"};
 const char trailing_char = '=';
 
-void base64_encode(int fd, char const* buf, size_t len) {
-#define W(c) write(fd, &c, 1)
+void base64_encode(BotChannel* chn, char const* buf, size_t len) {
   unsigned int pos = 0;
   while (pos < len) {
-    W(base64_chars[(buf[pos + 0] & 0xfc) >> 2]);
+    chn->Write(base64_chars[(buf[pos + 0] & 0xfc) >> 2]);
     if (pos + 1 < len) {
-      W(base64_chars[((buf[pos + 0] & 0x03) << 4) +
+      chn->Write(base64_chars[((buf[pos + 0] & 0x03) << 4) +
                      ((buf[pos + 1] & 0xf0) >> 4)]);
       if (pos + 2 < len) {
-        W(base64_chars[((buf[pos + 1] & 0x0f) << 2) +
+        chn->Write(base64_chars[((buf[pos + 1] & 0x0f) << 2) +
                        ((buf[pos + 2] & 0xc0) >> 6)]);
-        W(base64_chars[buf[pos + 2] & 0x3f]);
+        chn->Write(base64_chars[buf[pos + 2] & 0x3f]);
       } else {
-        W(base64_chars[(buf[pos + 1] & 0x0f) << 2]);
-        W(trailing_char);
+        chn->Write(base64_chars[(buf[pos + 1] & 0x0f) << 2]);
+        chn->Write(trailing_char);
       }
     } else {
-      W(base64_chars[(buf[pos + 0] & 0x03) << 4]);
-      W(trailing_char);
-      W(trailing_char);
+      chn->Write(base64_chars[(buf[pos + 0] & 0x03) << 4]);
+      chn->Write(trailing_char);
+      chn->Write(trailing_char);
     }
     pos += 3;
   }
-#undef W
 }
 
 

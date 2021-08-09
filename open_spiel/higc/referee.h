@@ -20,19 +20,36 @@
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/higc/subprocess.h"
+#include "open_spiel/higc/channel.h"
 
 namespace open_spiel {
 namespace higc {
 
-// All times are in miliseconds.
+// Special messages that the bots should submit at appropriate occasions.
+// See random bot implementation for explanation.
+const std::string kReadyMessage = "ready";
+const std::string kStartMessage = "start";
+const std::string kPonderMessage = "ponder";
+const std::string kMatchOverMessage = "match over";
+const std::string kTournamentOverMessage = "tournament over";
+
 struct TournamentSettings {
+  // All times are in miliseconds.
   int timeout_ready = 200;
   int timeout_start = 100;
   int timeout_act = 100;
   int timeout_ponder = 50;
   int timeout_match_over = 100;
   int time_tournament_over = 100;
+
+  // Number of invalid responses of a bot that are tolerated within a match.
+  // Exceeding this number results in marking the match as corrupted
+  // random actions are selected instead, and the bot is forced to restart.
+  // If this happens in too many matches, the bot will be disqualified.
   int max_invalid_behaviors = 1;
+
+  // If the bot corrupts more than this fraction of tournament matches,
+  // it is disqualified.
   double disqualification_rate = 0.1;
 };
 
@@ -53,7 +70,8 @@ struct MatchResult {
 
 struct TournamentResults {
   const int num_bots;
-  // For each match.
+
+  // Match result for each played match.
   std::vector<MatchResult> matches;
 
   // Incremental computation of match statistics (mean, variance), per bot.
@@ -62,53 +80,31 @@ struct TournamentResults {
                                     // must be normalized first.
   // Average length of a match.
   double history_len_mean = 0.;
+
   // Summary statistics of how many corrupted matches occurred for each player,
-  // i.e. the player did not respond entirely correctly in the match.
+  // i.e. the player did not respond entirely correctly in some played match.
+  //
+  // A match is marked as corrupted if:
+  // 1) There was a protocol error.
+  // 2) The number of other errors (illegal_actions, ponder_error, time_over)
+  //    exceeded the TournamentSettings::max_invalid_behaviors
   std::vector<int> corrupted_matches;
-  // Flag whether a given player was disqualified.
+
+  // Flag whether a given bot was disqualified.
+  // The disqualification criteria are following:
+  //
+  // 1) The bot could not be properly started.
+  // 2) The number of corrupted matches exceeds corruption_threshold,
+  //    i.e. num_matches * TournamentSettings::disqualification_rate
   std::vector<bool> disqualified;
-  // Number of bot restarts.
+
+  // Number of bot restarts. A restart is forced if a match is corrupted.
   std::vector<int> restarts;
 
   TournamentResults(int num_bots);
   int num_matches() const { return matches.size(); }
   void PrintVerbose(std::ostream&);
   void PrintCsv(std::ostream&, bool print_header = false);
-};
-
-// Communication channel with the bot.
-class BotChannel {
- public:
-  BotChannel(int bot_index, std::unique_ptr<subprocess::popen> popen)
-      : bot_index_(bot_index), popen_(std::move(popen)) {}
-  int in() { return popen_->stdin(); }
-  int out() { return popen_->stdout(); }
-  int err() { return popen_->stderr(); };
-
-  void StartRead(int time_limit);
-  void CancelReadBlocking();
-  void ShutDown();
-
-  bool has_read() const { return !response_.empty(); }
-  bool is_time_out() const { return time_out_; }
-  std::string response() const { return response_; }
-
- private:
-  int bot_index_;
-  std::unique_ptr<subprocess::popen> popen_;
-  std::string response_;    // A complete line response.
-  std::string buf_;         // Incomplete response buffer.
-  bool time_out_ = false;
-
-  std::atomic<bool> shutdown_ = false;
-  std::atomic<bool> wait_for_message_ = true;
-  int time_limit_ = 0;
-  bool cancel_read_ = false;
-  std::mutex mx_read;
-
-  // Reading thread loops.
-  friend void ReadLineFromChannelStdout(BotChannel* c);
-  friend void ReadLineFromChannelStderr(BotChannel* c);
 };
 
 // Referee that communicates with the bots and provides them with observations

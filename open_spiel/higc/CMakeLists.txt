@@ -2,6 +2,8 @@
 add_library (higc OBJECT
         base64.cc
         base64.h
+        channel.cc
+        channel.h
         subprocess.h
         utils.cc
         utils.h
