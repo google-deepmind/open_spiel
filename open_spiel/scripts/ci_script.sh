@@ -17,9 +17,6 @@
 set -e
 set -x
 
-PYBIN=${PYBIN:-"python3"}
-PYBIN=`which $PYBIN`
-
 # Python 3.9 not default on Ubuntu yet.
 OS=`uname -a | awk '{print $1}'`
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
@@ -28,6 +25,9 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 fi
+
+PYBIN=${PYBIN:-"python3"}
+PYBIN=`which $PYBIN`
 
 source ./open_spiel/scripts/python_extra_deps.sh
 

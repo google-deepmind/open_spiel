@@ -89,4 +89,4 @@ jobs:
     - name: Build and test
       run: |
         python3 --version
-        ./open_spiel/scripts/travis_script.sh
+        ./open_spiel/scripts/ci_script.sh

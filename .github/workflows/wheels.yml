@@ -1,12 +1,23 @@
+# Builds and tests the OpenSpiel wheels using cibuildwheel.
+#
+# Each wheel is built via the manylinux2014 pypa Docker image on Linux and
+# standard MacOS X on 10.15. Each binary wheel is built only for x86_64. Basic
+# API tests are run within the Docker environment that built the wheel. Full
+# tests (tests that use extra dependencies such as PyTorch, JAX, Tensorflow)
+# are tested in the Github Actions CI environment (Ubuntu 20.04 and Mac OS
+# 10.15).
 name: wheels
 
 on:
+  # Test the wheels for each PR to ensure the PR doesn't break them.
   pull_request:
     branches: [ master ]
+  # Workflow dispatch is a way to manually trigger workflows. This will be
+  # used to build and test the wheels manually for releases.
   workflow_dispatch:
     inputs:
       name:
-        description: 'Name'
+        description: 'Workflow dispatch (triggered manually)'
         required: false
         default: 'No name specified'
 
@@ -53,6 +64,7 @@ jobs:
           ./install.sh
           # These are necessary to install what is necessary for the build and for the full tests below.
           python -m pip install --upgrade pip
+          python -m pip --version
           python -m pip install --upgrade setuptools
           python -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
