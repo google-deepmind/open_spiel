@@ -22,7 +22,9 @@
 namespace open_spiel {
 namespace higc {
 
+// Write buffer using base64 encoding into a file descriptor.
 void base64_encode(int fd, char const* buf, size_t len);
+// Decode base64 from a string.
 std::string base64_decode(absl::string_view encoded_string);
 
 }  // namespace higc

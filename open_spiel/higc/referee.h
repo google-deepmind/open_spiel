@@ -19,7 +19,7 @@
 #include <mutex>
 
 #include "open_spiel/spiel.h"
-#include "open_spiel/higc/subprocess.hpp"
+#include "open_spiel/higc/subprocess.h"
 
 namespace open_spiel {
 namespace higc {
