@@ -133,6 +133,9 @@ openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW        AUTO
 openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
   "Enable miscellaneous Python dependencies.")
 
+openspiel_optional_dependency(OPEN_SPIEL_BUILDING_WHEEL           OFF
+  "Building a Python wheel?")
+
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
