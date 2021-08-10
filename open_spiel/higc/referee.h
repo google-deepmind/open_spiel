@@ -43,7 +43,7 @@ struct TournamentSettings {
   int time_tournament_over = 100;
 
   // Number of invalid responses of a bot that are tolerated within a match.
-  // Exceeding this number results in marking the match as corrupted
+  // Exceeding this number results in marking the match as corrupted,
   // random actions are selected instead, and the bot is forced to restart.
   // If this happens in too many matches, the bot will be disqualified.
   int max_invalid_behaviors = 1;
@@ -53,7 +53,7 @@ struct TournamentSettings {
   double disqualification_rate = 0.1;
 };
 
-// Store how many errors occured and of which type.
+// Store how many errors occurred and of which type, within a match.
 struct BotErrors {
   int protocol_error = 0;
   int illegal_actions = 0;
@@ -65,7 +65,7 @@ struct BotErrors {
 
 struct MatchResult {
   std::unique_ptr<State> terminal;
-  std::vector<BotErrors> errors;
+  std::vector<BotErrors> errors;  // For each bot.
 };
 
 struct TournamentResults {
