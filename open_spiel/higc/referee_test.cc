@@ -29,7 +29,12 @@ void PlaySingleMatchIIGS() {
                                               "/test_bot_first_action.sh");
   open_spiel::higc::Referee
       ref("goofspiel(imp_info=True,points_order=descending)",
-          {bot_first_action, bot_first_action});
+          {bot_first_action, bot_first_action}, /*seed=*/42,
+      // Increase times for Python scripts.
+          TournamentSettings{
+              .timeout_ready = 2000,
+              .timeout_start = 2000,
+          });
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
   SPIEL_CHECK_EQ(results->num_matches(), 1);
   SPIEL_CHECK_TRUE(results->matches[0].terminal->IsTerminal());
@@ -98,7 +103,13 @@ void PlayManyRandomMatches(int num_matches = 20) {
   open_spiel::higc::Referee ref(
       "leduc_poker",
       {absl::StrCat(absl::GetFlag(FLAGS_bots_dir), "/random_bot_py.sh"),
-       absl::StrCat(absl::GetFlag(FLAGS_bots_dir), "/random_bot_cpp.sh")});
+       absl::StrCat(absl::GetFlag(FLAGS_bots_dir), "/random_bot_cpp.sh")},
+      /*seed=*/42,
+      // Increase times for Python scripts.
+      TournamentSettings{
+          .timeout_ready = 2000,
+          .timeout_start = 2000,
+      });
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(num_matches);
   SPIEL_CHECK_EQ(results->num_matches(), num_matches);
   results->PrintCsv(std::cout, /*print_header=*/true);
