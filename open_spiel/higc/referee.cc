@@ -344,6 +344,8 @@ void Referee::TournamentOver() {
   for (int pl = 0; pl < num_bots(); ++pl) {
     channels_[pl]->Write(kTournamentOverMessage + "\n");
   }
+  log_ << "Waiting for tournament shutdown ("
+       << settings_.time_tournament_over << "ms)" <<std::endl;
   sleep_ms(settings_.time_tournament_over);
   // Do not check the final message.
 }
@@ -456,8 +458,7 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
     });
 
     if (tournament_over) {
-      TournamentOver();
-      return results;
+      break;
     }
   }
 

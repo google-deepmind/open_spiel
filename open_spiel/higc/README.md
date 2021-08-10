@@ -9,10 +9,6 @@ There is an implementation of:
 You can just copy-paste the random bots into your codebase and start developing
 your own bot submission for the competition.
 
-**Tip:** (for easy management of code) Since this is a fork of the OpenSpiel
-framework, you can add this repository to your git remotes -- then you can
-just checkout the `higc` branch.
-
 Follow instructions in the next section if you'd like to setup the referee to
 test your bot in a tournament setting.
 
