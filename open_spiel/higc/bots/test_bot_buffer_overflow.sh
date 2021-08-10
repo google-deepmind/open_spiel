@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 BASE=$(dirname "$0")
-source "$BASE/../../venv/bin/activate"
+source "$BASE/../../../venv/bin/activate"
 
 echo "ready"
 echo "start"
