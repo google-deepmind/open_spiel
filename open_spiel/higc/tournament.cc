@@ -20,9 +20,8 @@
 ABSL_FLAG(std::string, game, "kuhn_poker", "What game should be played.");
 ABSL_FLAG(int, num_matches, 1, "Number of matches to play.");
 ABSL_FLAG(std::vector<std::string>, executables, {},
-              "Comma-separated list of paths to bot executable files.");
+          "Comma-separated list of paths to bot executable files.");
 ABSL_FLAG(int, seed, 42, "Seed of the referee.");
-
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);

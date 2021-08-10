@@ -77,7 +77,7 @@ struct TournamentResults {
   // Incremental computation of match statistics (mean, variance), per bot.
   std::vector<double> returns_mean;
   std::vector<double> returns_agg;  // For computation of variance,
-                                    // must be normalized first.
+  // must be normalized first.
   // Average length of a match.
   double history_len_mean = 0.;
 

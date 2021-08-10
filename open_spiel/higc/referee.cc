@@ -202,7 +202,8 @@ std::unique_ptr<State> Referee::PlayMatch() {
           && !has_all_responses())
         sleep_ms(1);
 
-      for (int pl = 0; pl < num_bots(); ++pl) channels_[pl]->CancelReadBlocking();
+      for (int pl = 0; pl < num_bots(); ++pl)
+        channels_[pl]->CancelReadBlocking();
     }
 
     // Parse submitted actions based on the bot responses.
@@ -282,7 +283,8 @@ std::unique_ptr<State> Referee::PlayMatch() {
 
   for (int pl = 0; pl < num_bots(); ++pl) {
     int score = returns[pl];
-    channels_[pl]->Write(kMatchOverMessage + " " + std::to_string(score) + "\n");
+    channels_[pl]->Write(
+        kMatchOverMessage + " " + std::to_string(score) + "\n");
     channels_[pl]->StartRead(settings_.timeout_match_over);
   }
 
@@ -345,7 +347,7 @@ void Referee::TournamentOver() {
     channels_[pl]->Write(kTournamentOverMessage + "\n");
   }
   log_ << "Waiting for tournament shutdown ("
-       << settings_.time_tournament_over << "ms)" <<std::endl;
+       << settings_.time_tournament_over << "ms)" << std::endl;
   sleep_ms(settings_.time_tournament_over);
   // Do not check the final message.
 }
@@ -426,7 +428,8 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
 
     // Update mean,var statistics.
     results->history_len_mean +=
-        (state->FullHistory().size() - results->history_len_mean) / (match + 1.);
+        (state->FullHistory().size() - results->history_len_mean)
+            / (match + 1.);
     for (int pl = 0; pl < num_bots(); ++pl) {
       double delta = returns[pl] - results->returns_mean[pl];
       results->returns_mean[pl] += delta / (match + 1.);
@@ -453,8 +456,8 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
     }
 
     results->matches.push_back(MatchResult{
-      .terminal = std::move(state),
-      .errors = errors_
+        .terminal = std::move(state),
+        .errors = errors_
     });
 
     if (tournament_over) {
@@ -496,7 +499,7 @@ TournamentResults::TournamentResults(int num_bots)
 void TournamentResults::PrintVerbose(std::ostream& os) {
   os << "In total played " << num_matches() << " matches." << std::endl;
   os << "Average length of a match was " << history_len_mean
-       << " actions." << std::endl;
+     << " actions." << std::endl;
   os << "\nCorruption statistics:" << std::endl;
   for (int pl = 0; pl < num_bots; ++pl) {
     os << "Bot#" << pl << ": " << corrupted_matches[pl] << '\n';
@@ -507,8 +510,8 @@ void TournamentResults::PrintVerbose(std::ostream& os) {
     double mean = returns_mean[pl];
     double var = returns_agg[pl] / (num_matches());
     os << "Bot#" << pl
-         << " mean: " << mean
-         << " var: " << var << std::endl;
+       << " mean: " << mean
+       << " var: " << var << std::endl;
   }
 }
 
@@ -517,10 +520,10 @@ void TournamentResults::PrintCsv(std::ostream& os, bool print_header) {
     os << "history,";
     for (int pl = 0; pl < num_bots; ++pl) {
       os << "returns[" << pl << "],"
-            "protocol_error[" << pl << "],"
-            "illegal_actions[" << pl << "],"
-            "ponder_error[" << pl << "],"
-            "time_over[" << pl << "]";
+         << "protocol_error[" << pl << "],"
+         << "illegal_actions[" << pl << "],"
+         << "ponder_error[" << pl << "],"
+         << "time_over[" << pl << "]";
     }
     os << std::endl;
   }

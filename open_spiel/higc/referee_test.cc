@@ -27,8 +27,9 @@ namespace {
 void PlaySingleMatchIIGS() {
   std::string bot_first_action = absl::StrCat(absl::GetFlag(FLAGS_bots_dir),
                                               "/test_bot_first_action.sh");
-  open_spiel::higc::Referee ref("goofspiel(imp_info=True,points_order=descending)",
-                                {bot_first_action, bot_first_action});
+  open_spiel::higc::Referee
+      ref("goofspiel(imp_info=True,points_order=descending)",
+          {bot_first_action, bot_first_action});
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
   SPIEL_CHECK_EQ(results->num_matches(), 1);
   SPIEL_CHECK_TRUE(results->matches[0].terminal->IsTerminal());
@@ -78,10 +79,10 @@ void PlayWithFailingBots() {
                                            failing_case);
     // Use a single-player game.
     open_spiel::higc::Referee ref("cliff_walking", {failing_bot}, /*seed=*/42,
-                                  /*settings=*/TournamentSettings{
-                                    // Disqualify after the 2nd failing match.
-                                    .disqualification_rate = 0.5
-                                  });
+        /*settings=*/TournamentSettings{
+            // Disqualify after the 2nd failing match.
+            .disqualification_rate = 0.5
+        });
     std::unique_ptr<TournamentResults> results = ref.PlayTournament(2);
     SPIEL_CHECK_EQ(results->disqualified[0], true);
     if (i < 2) {
@@ -102,7 +103,6 @@ void PlayManyRandomMatches(int num_matches = 20) {
   SPIEL_CHECK_EQ(results->num_matches(), num_matches);
   results->PrintCsv(std::cout, /*print_header=*/true);
 }
-
 
 }  // namespace
 }  // namespace higc

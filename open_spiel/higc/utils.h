@@ -24,12 +24,6 @@ namespace higc {
 void sleep_ms(int ms);
 int time_elapsed(const std::chrono::time_point<std::chrono::system_clock>& start);
 
-// Non-blocking reading of line from input stream.
-// If a whole line is read, it returns true and the line is saved into out_line.
-// If only a partial result is available (without the end of the line),
-// it is saved into a provided external buffer.
-bool getline_async(std::istream& is, std::string& line_out, std::string& buf);
-
 }  // namespace higc
 }  // namespace open_spiel
 

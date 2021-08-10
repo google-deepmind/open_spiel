@@ -27,6 +27,5 @@ int time_elapsed(const std::chrono::time_point<std::chrono::system_clock>& start
       std::chrono::system_clock::now() - start).count();
 }
 
-
 }  // namespace higc
 }  // namespace open_spiel
