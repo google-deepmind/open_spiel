@@ -99,7 +99,7 @@ void PlayWithFailingBots() {
   }
 }
 
-void PlayManyRandomMatches(int num_matches = 20) {
+void PlayManyRandomMatches(int num_matches = 5) {
   open_spiel::higc::Referee ref(
       "leduc_poker",
       {absl::StrCat(absl::GetFlag(FLAGS_bots_dir), "/random_bot_py.sh"),
