@@ -16,12 +16,10 @@
 #include <thread>
 #include <mutex>
 #include <exception>
-#include <filesystem>
 #include <unistd.h>
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/higc/base64.h"
-#include "open_spiel/higc/referee.h"
 #include "open_spiel/higc/utils.h"
 
 namespace open_spiel {

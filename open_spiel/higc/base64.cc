@@ -23,7 +23,6 @@
 
 #include "open_spiel/higc/base64.h"
 
-#include <filesystem>
 #include <unistd.h>
 
 namespace open_spiel {

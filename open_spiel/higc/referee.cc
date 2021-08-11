@@ -16,13 +16,13 @@
 #include <thread>
 #include <mutex>
 #include <exception>
-#include <filesystem>
 #include <unistd.h>
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/higc/base64.h"
 #include "open_spiel/higc/referee.h"
 #include "open_spiel/higc/utils.h"
+#include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace higc {
@@ -384,8 +384,7 @@ Referee::Referee(const std::string& game_name,
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
 
   for (const std::string& executable : executables_) {
-    std::filesystem::path f(executable);
-    if (!std::filesystem::exists(f)) {
+    if (!file::Exists(executable)) {
       throw std::runtime_error(absl::StrCat(
           "The bot file '", executable, "' was not found."));
     }
