@@ -119,8 +119,19 @@ void PlayManyRandomMatches(int num_matches = 5) {
 }  // namespace higc
 }  // namespace open_spiel
 
+extern char **environ;
 
 int main(int argc, char** argv) {
+  // This test relies on correct passing of PYTHONPATH, because child bot files
+  // use pyspiel that must be located correctly in the build directory.
+  // The PYTHONPATH is set in CMakeLists file for this test.
+
+  // Prints the env variables for debugging this test.
+  char **s = environ;
+  for (; *s; s++) {
+    printf("env: %s\n", *s);
+  }
+
   absl::ParseCommandLine(argc, argv);
   open_spiel::higc::TestInvalidBots();
   open_spiel::higc::PlayWithFailingBots();
