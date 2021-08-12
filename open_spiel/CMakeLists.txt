@@ -274,7 +274,6 @@ add_subdirectory (bots)
 add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
-add_subdirectory (higc)
 add_subdirectory (contrib)
 
 if (OPEN_SPIEL_BUILD_WITH_GO)
@@ -283,6 +282,9 @@ endif()
 
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
   add_subdirectory (python)
+  # HIGC needs pyspiel.so and corresponding PYTHONPATH to be set
+  # in order to run its tests.
+  add_subdirectory (higc)
 endif()
 
 add_subdirectory (utils)
