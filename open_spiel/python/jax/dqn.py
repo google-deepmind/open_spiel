@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""DQN agent implemented in PyTorch."""
+"""DQN agent implemented in JAX."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -92,7 +92,7 @@ class ReplayBuffer(object):
 
 
 class DQN(rl_agent.AbstractAgent):
-  """DQN Agent implementation in PyTorch.
+  """DQN Agent implementation in JAX.
 
   See open_spiel/python/examples/breakthrough_dqn.py for an usage example.
   """
