@@ -22,9 +22,12 @@ from absl.testing import absltest
 class RefereeTest(absltest.TestCase):
     def test_playing_tournament(self):
         base = os.path.dirname(__file__) + "/../../higc/bots"
-        ref = pyspiel.Referee("kuhn_poker",
-                              [f"{base}/random_bot_py.sh",
-                               f"{base}/random_bot_cpp.sh"])
+        ref = pyspiel.Referee(
+            "kuhn_poker",
+            [f"{base}/random_bot_py.sh", f"{base}/random_bot_cpp.sh"],
+            settings=pyspiel.TournamentSettings(timeout_ready=2000,
+                                                timeout_start=2000)
+        )
         results = ref.play_tournament(num_matches=1)
         self.assertEqual(len(results.matches), 1)
 
