@@ -66,6 +66,7 @@ struct BotErrors {
 struct MatchResult {
   std::unique_ptr<State> terminal;
   std::vector<BotErrors> errors;  // For each bot.
+  std::string ToString() const;
 };
 
 struct TournamentResults {
@@ -76,8 +77,8 @@ struct TournamentResults {
 
   // Incremental computation of match statistics (mean, variance), per bot.
   std::vector<double> returns_mean;
-  std::vector<double> returns_agg;  // For computation of variance,
-  // must be normalized first.
+  // For computation of variance, must be normalized first.
+  std::vector<double> returns_agg;
   // Average length of a match.
   double history_len_mean = 0.;
 
@@ -103,8 +104,10 @@ struct TournamentResults {
 
   TournamentResults(int num_bots);
   int num_matches() const { return matches.size(); }
-  void PrintVerbose(std::ostream&);
-  void PrintCsv(std::ostream&, bool print_header = false);
+  double returns_var(int pl) const { return returns_agg[pl] / (num_matches()); }
+  std::string ToString() const;
+  void PrintVerbose(std::ostream&) const;
+  void PrintCsv(std::ostream&, bool print_header = false) const;
 };
 
 // Referee that communicates with the bots and provides them with observations
@@ -133,7 +136,6 @@ class Referee {
           TournamentSettings settings = TournamentSettings(),
           std::ostream& log = std::cout);
   ~Referee() { ShutDownPlayers(); }
-
   std::unique_ptr<TournamentResults> PlayTournament(int num_matches);
 
   int num_bots() const { return executables_.size(); }

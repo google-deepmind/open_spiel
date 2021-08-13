@@ -472,6 +472,7 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
 
   results->PrintVerbose(log_);
   TournamentOver();
+  ShutDownPlayers();
 
   return results;
 }
@@ -495,7 +496,7 @@ TournamentResults::TournamentResults(int num_bots)
       disqualified(num_bots, false),
       restarts(num_bots, 0) {}
 
-void TournamentResults::PrintVerbose(std::ostream& os) {
+void TournamentResults::PrintVerbose(std::ostream& os) const {
   os << "In total played " << num_matches() << " matches." << std::endl;
   os << "Average length of a match was " << history_len_mean
      << " actions." << std::endl;
@@ -507,14 +508,20 @@ void TournamentResults::PrintVerbose(std::ostream& os) {
   os << "\nReturns statistics:" << std::endl;
   for (int pl = 0; pl < num_bots; ++pl) {
     double mean = returns_mean[pl];
-    double var = returns_agg[pl] / (num_matches());
+    double var = returns_var(pl);
     os << "Bot#" << pl
        << " mean: " << mean
        << " var: " << var << std::endl;
   }
 }
 
-void TournamentResults::PrintCsv(std::ostream& os, bool print_header) {
+std::string TournamentResults::ToString() const {
+  std::stringstream ss;
+  PrintVerbose(ss);
+  return ss.str();
+}
+
+void TournamentResults::PrintCsv(std::ostream& os, bool print_header) const {
   if (print_header) {
     os << "history,";
     for (int pl = 0; pl < num_bots; ++pl) {
@@ -538,6 +545,20 @@ void TournamentResults::PrintCsv(std::ostream& os, bool print_header) {
     }
     os << std::endl;
   }
+}
+
+std::string MatchResult::ToString() const {
+  std::string out = "History: " + terminal->HistoryString();
+  out += "\nReturns: ";
+  std::vector<double> r = terminal->Returns();
+  for (int i = 0; i < r.size(); ++i) {
+    out += std::to_string(r[i]) + " ";
+  }
+  out += "\nErrors:  ";
+  for (int i = 0; i < errors.size(); ++i) {
+    out += std::to_string(errors[i].total_errors()) + " ";
+  }
+  return out;
 }
 
 }  // namespace higc

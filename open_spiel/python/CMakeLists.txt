@@ -103,6 +103,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h
+  pybind11/referee.cc
+  pybind11/referee.h
   )
 
 # Optional pyspiel sub-modules, which can specify their python bindings.
@@ -196,6 +198,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_sim_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
+  tests/referee_test.py
   tests/rl_environment_test.py
   tests/sampled_stochastic_games_test.py
   tests/tensor_game_utils_test.py
