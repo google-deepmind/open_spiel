@@ -1,5 +1,6 @@
 #!/bin/bash
 
+>&2 env
+
 BASE=$(dirname "$0")
-source "$BASE/../../../venv/bin/activate"
 python "$BASE/test_bot_first_action.py"
