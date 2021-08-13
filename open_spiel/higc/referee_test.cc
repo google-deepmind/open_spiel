@@ -123,6 +123,7 @@ extern char **environ;
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
+  // .
 //  open_spiel::higc::TestInvalidBots();
 //  open_spiel::higc::PlayWithFailingBots();
   open_spiel::higc::PlaySingleMatchIIGS();
