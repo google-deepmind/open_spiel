@@ -79,9 +79,10 @@ void PlayWithFailingBots() {
 
   for (int i = 0; i < failing_cases.size(); ++i) {
     const std::string& failing_case = failing_cases[i];
-    std::cout << "\n\nFailing bot: " << failing_case << std::endl;
     std::string failing_bot = absl::StrCat(absl::GetFlag(FLAGS_bots_dir),
                                            failing_case);
+    std::cout << "\n\nFailing bot: " << failing_bot << std::endl;
+
     // Use a single-player game.
     open_spiel::higc::Referee ref("cliff_walking", {failing_bot}, /*seed=*/42,
         /*settings=*/TournamentSettings{

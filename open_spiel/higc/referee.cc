@@ -83,7 +83,6 @@ bool Referee::StartPlayer(int pl) {
 
 // Shut down all the players.
 void Referee::ShutDownPlayers() {
-  log_ << "Shutting down players." << std::endl;
   for (std::unique_ptr<BotChannel>& chn : channels_) chn->ShutDown();
   for (std::unique_ptr<std::thread>& th : threads_stdout_) th->join();
   for (std::unique_ptr<std::thread>& th : threads_stderr_) th->join();
@@ -472,6 +471,7 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
 
   results->PrintVerbose(log_);
   TournamentOver();
+  log_ << "Shutting down players." << std::endl;
   ShutDownPlayers();
 
   return results;
