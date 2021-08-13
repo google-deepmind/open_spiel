@@ -227,7 +227,7 @@ else
         execute_export_graph
       fi
 
-      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "$ARG_test_only" ../open_spiel; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "referee" ../open_spiel; then
         print_tests_passed
       else
         print_tests_failed
@@ -248,7 +248,7 @@ else
         execute_export_graph
       fi
 
-      if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+      if ctest -j$TEST_NUM_PROCS --output-on-failure -R "referee" ../open_spiel; then
         print_tests_passed
       else
         print_tests_failed
