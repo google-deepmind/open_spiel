@@ -13,6 +13,8 @@ add_executable(imperfect_recall_mccfr imperfect_recall_mccfr.cc
 add_executable(example example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(example_test example --game=tic_tac_toe --seed=0)
 
+add_executable(fsicfr_liars_dice fsicfr_liars_dice.cc ${OPEN_SPIEL_OBJECTS})
+
 add_executable(gtp gtp.cc ${OPEN_SPIEL_OBJECTS})
 
 add_executable(matrix_example matrix_example.cc ${OPEN_SPIEL_CORE_OBJECTS})
