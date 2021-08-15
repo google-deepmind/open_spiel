@@ -95,9 +95,9 @@ class VehicleTest(absltest.TestCase):
 
   def test_vehicle_1(self):
     """Test instanciation of Vehicle."""
-    vehicle = dynamic_routing_game_utils.Vehicle('O', 'D')
-    self.assertEqual(vehicle.destination, 'D')
-    self.assertEqual(vehicle.origin, 'O')
+    vehicle = dynamic_routing_game_utils.Vehicle('O->A', 'B->D')
+    self.assertEqual(vehicle.destination, 'B->D')
+    self.assertEqual(vehicle.origin, 'O->A')
     self.assertEqual(vehicle.departure_time, 0)
 
   def test_vehicle_2(self):
@@ -114,9 +114,9 @@ class OriginDestinationDemandTest(absltest.TestCase):
   def test_od_demand_1(self):
     """Test instanciation of OD demand."""
     od_demand = dynamic_routing_game_utils.OriginDestinationDemand(
-      'O', 'D', 0, 30)
-    self.assertEqual(od_demand.destination, 'D')
-    self.assertEqual(od_demand.origin, 'O')
+      'O->A', 'B->D', 0, 30)
+    self.assertEqual(od_demand.destination, 'B->D')
+    self.assertEqual(od_demand.origin, 'O->A')
     self.assertEqual(od_demand.departure_time, 0)
     self.assertEqual(od_demand.counts, 30)
 

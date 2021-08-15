@@ -135,7 +135,7 @@ class MeanFieldRoutingGame(pyspiel.Game):
     self.network.check_list_of_od_demand_is_correct(self._od_demand)
     self.perform_sanity_checks = perform_sanity_checks
     game_info = pyspiel.GameInfo(
-      num_distinct_actions=self.network.num_links() + dynamic_routing_game_utils.INDEX_FIRST_ACTION,
+      num_distinct_actions=self.network.num_actions(),
       max_chance_outcomes=max(2, len(self._od_demand)),
       num_players=1,
       min_utility=-max_num_time_step-1,
@@ -269,7 +269,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
       return (f"Arrived at {location}, with travel time "
         f"{self._vehicle_final_travel_time}, t={time}")
     return (f"Location={location}, movement={vehicle_movement},"
-            f" t={time}, destination='{self.destination}'")
+            f" t={time}, destination='{self._vehicle_destination}'")
 
   def distribution_support(self) -> List[str]:
     """Returns the state that should be used for update_distribution.
@@ -484,7 +484,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
 
   def __str__(self) -> str:
     """String for debug purposes. No particular semantics are required."""
-    if hasattr(self, '_vehicle_location'):
+    if self._vehicle_location is not None:
       return self.state_to_str(
         self._vehicle_location, self._current_time_step,
         player_id=self._player_id,

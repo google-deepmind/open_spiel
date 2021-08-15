@@ -55,18 +55,18 @@ StringLegalActions() = ["Vehicle is assigned to population 0."]
 action: 0
 
 # State 1
-# Location=bef_O->O, movement=True, t=0
+# Location=bef_O->O, movement=True, t=0, destination='D->aft_D'
 IsTerminal() = False
 History() = [0]
 HistoryString() = "0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
-InformationStateString(0) = "Location=bef_O->O, movement=True, t=0"
+InformationStateString(0) = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
 InformationStateTensor(0).observation: ◉◯◯
-ObservationString(0) = "Location=bef_O->O, movement=True, t=0"
-PublicObservationString() = "Location=bef_O->O, movement=True, t=0"
-PrivateObservationString(0) = "Location=bef_O->O, movement=True, t=0"
+ObservationString(0) = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
+PublicObservationString() = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
+PrivateObservationString(0) = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
 ObservationTensor(0): ◉◯◯
 Rewards() = [0.0]
 Returns() = [0]
@@ -77,39 +77,39 @@ StringLegalActions() = ["Vehicle 0 would like to move to O->A."]
 action: 2
 
 # State 2
-# Location=O->A, movement=True, t=1_mean_field
+# Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'
 IsTerminal() = False
 History() = [0, 2]
 HistoryString() = "0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
-InformationStateString(0) = "Location=O->A, movement=True, t=1_mean_field"
+InformationStateString(0) = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
 InformationStateTensor(0).observation = [1.0, 2.0, 0.0]
-ObservationString(0) = "Location=O->A, movement=True, t=1_mean_field"
-PublicObservationString() = "Location=O->A, movement=True, t=1_mean_field"
-PrivateObservationString(0) = "Location=O->A, movement=True, t=1_mean_field"
+ObservationString(0) = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
+PublicObservationString() = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
+PrivateObservationString(0) = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
 ObservationTensor(0) = [1.0, 2.0, 0.0]
 Rewards() = [0.0]
 Returns() = [0]
-DistributionSupport() = ['Location=O->A, movement=True, t=1_mean_field', 'Location=O->A, movement=False, t=1_mean_field']
+DistributionSupport() = ["Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'", "Location=O->A, movement=False, t=1_mean_field, destination='D->aft_D'"]
 
 # Set mean field distribution to be uniform
 action: update_distribution
 
 # State 3
-# Location=O->A, movement=True, t=1_chance
+# Location=O->A, movement=True, t=1_chance, destination='D->aft_D'
 IsTerminal() = False
 History() = [0, 2]
 HistoryString() = "0, 2"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.CHANCE
-InformationStateString(0) = "Location=O->A, movement=True, t=1_chance"
+InformationStateString(0) = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
 InformationStateTensor(0).observation = [1.0, 2.0, 0.0]
-ObservationString(0) = "Location=O->A, movement=True, t=1_chance"
-PublicObservationString() = "Location=O->A, movement=True, t=1_chance"
-PrivateObservationString(0) = "Location=O->A, movement=True, t=1_chance"
+ObservationString(0) = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
+PublicObservationString() = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
+PrivateObservationString(0) = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
 ObservationTensor(0) = [1.0, 2.0, 0.0]
 ChanceOutcomes() = [(1, 0.009900990099009901), (0, 0.9900990099009901)]
 LegalActions() = [1, 0]
@@ -119,18 +119,18 @@ StringLegalActions() = ["Change node; the vehicle movement is True.", "Change no
 action: 0
 
 # State 4
-# Location=O->A, movement=False, t=1
+# Location=O->A, movement=False, t=1, destination='D->aft_D'
 IsTerminal() = False
 History() = [0, 2, 0]
 HistoryString() = "0, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
-InformationStateString(0) = "Location=O->A, movement=False, t=1"
+InformationStateString(0) = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
 InformationStateTensor(0).observation = [1.0, 2.0, 0.0]
-ObservationString(0) = "Location=O->A, movement=False, t=1"
-PublicObservationString() = "Location=O->A, movement=False, t=1"
-PrivateObservationString(0) = "Location=O->A, movement=False, t=1"
+ObservationString(0) = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
+PublicObservationString() = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
+PrivateObservationString(0) = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
 ObservationTensor(0) = [1.0, 2.0, 0.0]
 Rewards() = [0.0]
 Returns() = [0]
