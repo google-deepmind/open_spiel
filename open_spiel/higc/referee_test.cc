@@ -75,7 +75,6 @@ void PlayWithFailingBots() {
       "/test_bot_start.sh",
       "/test_bot_illegal_action.sh",
 //      "/test_bot_buffer_overflow.sh",
-      "/test_bot_fail_after_few_actions.sh",
   };
 
   for (int i = 0; i < failing_cases.size(); ++i) {
@@ -99,6 +98,25 @@ void PlayWithFailingBots() {
       SPIEL_CHECK_EQ(results->num_matches(), 2);
     }
   }
+}
+
+void PlayWithSometimesFailingBot() {
+  std::string failing_bot = absl::StrCat(absl::GetFlag(FLAGS_bots_dir),
+                                         "/test_bot_fail_after_few_actions.sh");
+  std::cout << "\n\nFailing bot: " << failing_bot << std::endl;
+
+  // Use a single-player game.
+  open_spiel::higc::Referee ref("cliff_walking", {failing_bot}, /*seed=*/42,
+      /*settings=*/TournamentSettings{
+          // Disqualify after the 2nd failing match.
+          .disqualification_rate = 0.5,
+          // Increase times for Python scripts.
+          .timeout_ready = 2000,
+          .timeout_start = 500,
+      });
+  std::unique_ptr<TournamentResults> results = ref.PlayTournament(2);
+  SPIEL_CHECK_EQ(results->disqualified[0], true);
+  SPIEL_CHECK_EQ(results->num_matches(), 2);
 }
 
 void PonderActTimeout() {
@@ -168,6 +186,7 @@ int main(int argc, char** argv) {
 
   open_spiel::higc::TestInvalidBots();
   open_spiel::higc::PlayWithFailingBots();
+  open_spiel::higc::PlayWithSometimesFailingBot();
   open_spiel::higc::PonderActTimeout();
   open_spiel::higc::PlayWithManyPlayers();
   open_spiel::higc::PlaySingleMatchIIGS();
