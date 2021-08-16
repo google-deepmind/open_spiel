@@ -266,7 +266,7 @@ class DeepCFRSolver(policy.Policy):
     # Define strategy network, loss & memory.
     self._strategy_memories = ReservoirBuffer(memory_capacity)
     self._policy_network = MLP(self._embedding_size,
-                               list(advantage_network_layers),
+                               list(policy_network_layers),
                                self._num_actions)
     # Illegal actions are handled in the traversal code where expected payoff
     # and sampled regret is computed from the advantage networks.
