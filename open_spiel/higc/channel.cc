@@ -94,9 +94,8 @@ void BotChannel::ShutDown() {
 }
 
 std::unique_ptr<BotChannel> MakeBotChannel(int bot_index,
-                                           std::string executable) {
-  auto popen = std::make_unique<Subprocess>(
-      std::vector<std::string>{executable});
+                                           std::vector<std::string> args) {
+  auto popen = std::make_unique<Subprocess>(args);
   return std::make_unique<BotChannel>(bot_index, std::move(popen));
 }
 

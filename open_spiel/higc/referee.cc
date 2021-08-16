@@ -27,6 +27,21 @@
 namespace open_spiel {
 namespace higc {
 
+bool IsPythonFile(const std::string& file) {
+  if (file.size() < 3) return false;
+  const std::string py_ext = ".py";
+  return std::equal(file.begin() + file.size() - py_ext.size(),
+                    file.end(),
+                    py_ext.begin());
+}
+
+std::vector<std::string> PrepareArgs(const std::string& executable) {
+  if (IsPythonFile(executable)) {
+    return {"python", executable};
+  }
+  return {executable};
+}
+
 // Start all players and wait for ready messages from all them simultaneously.
 std::vector<bool> Referee::StartPlayers() {
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
@@ -37,7 +52,7 @@ std::vector<bool> Referee::StartPlayers() {
     const std::string& executable = executables_[pl];
     log_ << "Bot#" << pl << ": " << executable << std::endl;
     errors_.push_back(BotErrors());
-    channels_.push_back(MakeBotChannel(pl, executable));
+    channels_.push_back(MakeBotChannel(pl, PrepareArgs(executable)));
     // Read from bot's stdout/stderr in separate threads.
     threads_stdout_.push_back(std::make_unique<std::thread>(
         ReadLineFromChannelStdout, channels_.back().get()));
@@ -64,7 +79,7 @@ bool Referee::StartPlayer(int pl) {
   log_ << "Starting player " << pl << " only." << std::endl;
   const std::string& executable = executables_[pl];
   log_ << "Bot#" << pl << ": " << executable << std::endl;
-  channels_[pl] = MakeBotChannel(pl, executable);
+  channels_[pl] = MakeBotChannel(pl, PrepareArgs(executable));
   // Read from bot's stdout/stderr in separate threads.
   threads_stdout_[pl] = std::make_unique<std::thread>(
       ReadLineFromChannelStdout, channels_.back().get());
@@ -374,7 +389,7 @@ Referee::Referee(const std::string& game_name,
       throw std::runtime_error(absl::StrCat(
           "The bot file '", executable, "' was not found."));
     }
-    if (access(executable.c_str(), X_OK) != 0) {
+    if (!IsPythonFile(executable) && access(executable.c_str(), X_OK) != 0) {
       throw std::runtime_error(absl::StrCat(
           "The bot file '", executable, "' cannot be executed. "
                                         "(missing +x flag?)"));

@@ -76,7 +76,8 @@ class BotChannel {
   friend void ReadLineFromChannelStderr(BotChannel* c);
 };
 
-std::unique_ptr<BotChannel> MakeBotChannel(int bot_index, std::string executable);
+std::unique_ptr<BotChannel> MakeBotChannel(int bot_index,
+                                           std::vector<std::string> executable);
 
 void ReadLineFromChannelStdout(BotChannel* c);
 void ReadLineFromChannelStderr(BotChannel* c);
