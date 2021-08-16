@@ -47,6 +47,7 @@ class BotChannel {
   void Write(const std::string& s);
   void Write(char c);
 
+  bool is_waiting_for_referee() const { return wait_for_referee_; };
   bool has_read() const { return !response_.empty(); }
   bool is_time_out() const { return time_out_; }
   int comm_error() const { return comm_error_; }
@@ -54,7 +55,8 @@ class BotChannel {
 
  private:
   // Did some communication error occur? Store an error code returned
-  // by write() or read() functions.
+  // by `errno` for write() or read() functions.
+  // See also <asm-generic/errno.h> for a list of error codes.
   int comm_error_ = 0;
 
   int bot_index_;
@@ -64,7 +66,7 @@ class BotChannel {
   bool time_out_ = false;
 
   std::atomic<bool> shutdown_ = false;
-  std::atomic<bool> wait_for_message_ = true;
+  std::atomic<bool> wait_for_referee_ = true;
   int time_limit_ = 0;
   bool cancel_read_ = false;
   std::mutex mx_read;

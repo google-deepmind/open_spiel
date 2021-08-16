@@ -27,11 +27,11 @@ namespace higc {
 
 void BotChannel::StartRead(int time_limit) {
   SPIEL_CHECK_FALSE(shutdown_);
-  SPIEL_CHECK_TRUE(wait_for_message_);
+  SPIEL_CHECK_TRUE(wait_for_referee_);
   time_limit_ = time_limit;
   time_out_ = false;
   cancel_read_ = false;
-  wait_for_message_ = false;
+  wait_for_referee_ = false;
 }
 
 void BotChannel::CancelReadBlocking() {
@@ -82,7 +82,7 @@ bool BotChannel::ReadLineAsync() {
   } while (chars_read > 0 && !line_read && buf_.size() < kMaxLineLength);
 
   if (buf_.size() >= kMaxLineLength) {
-    comm_error_ = -1;
+    comm_error_ = EMSGSIZE;
   }
 
   return line_read;
@@ -107,7 +107,7 @@ void ReadLineFromChannelStdout(BotChannel* c) {
   while (!c->shutdown_) {
 
     // Wait until referee sends a message to the bot.
-    while (c->wait_for_message_) {
+    while (c->wait_for_referee_) {
       sleep_ms(1);
       if (c->shutdown_) return;
     }
@@ -116,16 +116,20 @@ void ReadLineFromChannelStdout(BotChannel* c) {
       std::lock_guard<std::mutex> lock(c->mx_read);
 
       std::chrono::time_point time_start = std::chrono::system_clock::now();
-      while (!c->ReadLineAsync()
-             && c->comm_error() == 0
-             && !(c->time_out_ = time_elapsed(time_start) > c->time_limit_)
-             && !c->cancel_read_) {
+      while (  // Keep reading the current line,
+               !c->ReadLineAsync()
+               // if there is no error,
+               && c->comm_error() == 0
+               // no timeout,
+               && !(c->time_out_ = (time_elapsed(time_start) > c->time_limit_))
+               // and no reading cancellation.
+               && !c->cancel_read_) {
         sleep_ms(1);
         if (c->shutdown_) return;
       }
-    }
 
-    c->wait_for_message_ = true;
+      c->wait_for_referee_ = true;
+    }
   }
 }
 

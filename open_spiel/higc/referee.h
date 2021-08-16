@@ -158,6 +158,9 @@ class Referee {
   void ShutDownPlayer(int pl);
   bool CheckResponse(const std::string& expected_response, int pl);
   std::vector<bool> CheckResponses(const std::string& expected_response);
+  void WaitForPonderingBots(const std::vector<bool>& is_acting);
+  void WaitForActingBots(const std::vector<bool>& is_acting);
+  void WaitForBots(const std::vector<bool>& is_acting, bool mask);
 };
 
 }  // namespace higc

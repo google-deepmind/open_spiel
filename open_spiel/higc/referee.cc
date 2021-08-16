@@ -126,8 +126,9 @@ std::unique_ptr<State> Referee::PlayMatch() {
 
     only_ponder = state->IsChanceNode();
     // Cache whether player is acting.
-    for (int pl = 0; pl < num_bots(); ++pl)
+    for (int pl = 0; pl < num_bots(); ++pl) {
       is_acting[pl] = state->IsPlayerActing(pl);
+    }
     // Make sure no player is preferred when we communicate with it.
     std::shuffle(player_order.begin(), player_order.end(), rng_);
 
@@ -141,7 +142,6 @@ std::unique_ptr<State> Referee::PlayMatch() {
       std::string private_tensor = private_observation_->Compress();
 
       // Send observations.
-      const char space = ' ';
       base64_encode(chn, reinterpret_cast<char* const>(public_tensor.data()),
                     public_tensor.size());
       chn->Write(" ");
@@ -168,7 +168,7 @@ std::unique_ptr<State> Referee::PlayMatch() {
     }
 
     // Wait for ponder messages.
-    sleep_ms(settings_.timeout_ponder);
+    WaitForPonderingBots(is_acting);
     for (int pl = 0; pl < num_bots(); ++pl) {
       if (is_acting[pl]) continue;
       BotChannel* chn = channels_[pl].get();
@@ -178,7 +178,7 @@ std::unique_ptr<State> Referee::PlayMatch() {
              << std::endl;
         errors_[pl].ponder_error++;
         if (chn->is_time_out()) {
-          log_ << "Bot#" << pl << " ponder timed out." << std::endl;
+          log_ << "Bot#" << pl << " ponder also timed out." << std::endl;
           errors_[pl].time_over++;
         }
       } else {
@@ -189,21 +189,7 @@ std::unique_ptr<State> Referee::PlayMatch() {
     // Wait for response(s) from acting player(s).
     // If (all) response(s) arrive before the time limit,
     // we don't have to wait to apply the action(s).
-    if (!only_ponder) {
-      auto has_all_responses = [&]() {
-        for (int pl = 0; pl < num_bots(); ++pl) {
-          if (is_acting[pl] && !channels_[pl]->has_read()) return false;
-        }
-        return true;
-      };
-
-      while (time_elapsed(start) < settings_.timeout_act
-          && !has_all_responses())
-        sleep_ms(1);
-
-      for (int pl = 0; pl < num_bots(); ++pl)
-        channels_[pl]->CancelReadBlocking();
-    }
+    WaitForActingBots(is_acting);
 
     // Parse submitted actions based on the bot responses.
     std::vector<Action> bot_actions(num_bots(), kInvalidAction);
@@ -381,6 +367,7 @@ Referee::Referee(const std::string& game_name,
       executables_(executables), settings_(settings), rng_(seed), log_(log) {
   SPIEL_CHECK_FALSE(executables_.empty());
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
+  SPIEL_CHECK_LT(settings_.timeout_ponder, settings_.timeout_act);
 
   for (const std::string& executable : executables_) {
     if (!file::Exists(executable)) {
@@ -475,6 +462,34 @@ std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
   ShutDownPlayers();
 
   return results;
+}
+
+void Referee::WaitForBots(const std::vector<bool>& is_acting, bool mask) {
+  int num_bots_to_wait_for = 0;
+  for (int pl = 0; pl < is_acting.size(); ++pl) {
+    if (is_acting[pl] == mask) num_bots_to_wait_for++;
+  }
+  if (num_bots_to_wait_for == 0) return;
+
+  while(true) {
+    sleep_ms(1);
+
+    int arrived_bots = 0;
+    for (int pl = 0; pl < is_acting.size(); ++pl) {
+      if (is_acting[pl] == mask && channels_[pl]->is_waiting_for_referee()) {
+        arrived_bots++;
+      }
+    }
+    if (arrived_bots == num_bots_to_wait_for) return;
+  }
+}
+
+void Referee::WaitForPonderingBots(const std::vector<bool>& is_acting) {
+  WaitForBots(is_acting, /*mask=*/false);
+}
+
+void Referee::WaitForActingBots(const std::vector<bool>& is_acting) {
+  WaitForBots(is_acting, /*mask=*/true);
 }
 
 void BotErrors::Reset() {

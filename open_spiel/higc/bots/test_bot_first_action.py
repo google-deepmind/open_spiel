@@ -1,8 +1,4 @@
 # A bot that picks the first action from the list. Used only for tests.
-import sys
-import os
-print(os.environ, file=sys.stderr)
-
 import base64
 import pyspiel
 

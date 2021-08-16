@@ -74,7 +74,7 @@ void PlayWithFailingBots() {
       "/test_bot_ready.sh",
       "/test_bot_start.sh",
       "/test_bot_illegal_action.sh",
-//      "/test_bot_buffer_overflow.sh",
+      "/test_bot_buffer_overflow.sh",
   };
 
   for (int i = 0; i < failing_cases.size(); ++i) {
@@ -100,6 +100,21 @@ void PlayWithFailingBots() {
   }
 }
 
+void PonderActTimeout() {
+  open_spiel::higc::Referee ref(
+      "leduc_poker",
+      {absl::StrCat(absl::GetFlag(FLAGS_bots_dir), "/random_bot_py.sh"),
+       absl::StrCat(absl::GetFlag(FLAGS_bots_dir), "/test_bot_start.sh")},
+       /*seed=*/42,
+       // Increase times for Python scripts.
+       TournamentSettings{
+         .timeout_ready = 2000,
+         .timeout_start = 2000,
+         });
+  std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
+  SPIEL_CHECK_EQ(results->num_matches(), 1);
+}
+
 void PlayManyRandomMatches(int num_matches = 5) {
   open_spiel::higc::Referee ref(
       "leduc_poker",
@@ -116,6 +131,27 @@ void PlayManyRandomMatches(int num_matches = 5) {
   results->PrintCsv(std::cout, /*print_header=*/true);
 }
 
+void PlayWithManyPlayers() {
+  constexpr const int num_bots = 8;
+  std::vector<std::string> bots;
+  for (int i = 0; i < num_bots; ++i) {
+    bots.push_back(absl::StrCat(absl::GetFlag(FLAGS_bots_dir),
+                                "/random_bot_cpp.sh"));
+  }
+  open_spiel::higc::Referee ref(
+      absl::StrCat("goofspiel(players=",num_bots,
+                   ",imp_info=True,points_order=descending)"),
+      bots,
+      /*seed=*/42,
+      // Increase times for Python scripts.
+      TournamentSettings{
+          .timeout_ready = 2000,
+          .timeout_start = 2000,
+      });
+  std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
+  SPIEL_CHECK_EQ(results->num_matches(), 1);
+}
+
 }  // namespace
 }  // namespace higc
 }  // namespace open_spiel
@@ -126,6 +162,8 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   open_spiel::higc::TestInvalidBots();
   open_spiel::higc::PlayWithFailingBots();
+  open_spiel::higc::PonderActTimeout();
+  open_spiel::higc::PlayWithManyPlayers();
   open_spiel::higc::PlaySingleMatchIIGS();
   open_spiel::higc::PlayManyRandomMatches();
 }
