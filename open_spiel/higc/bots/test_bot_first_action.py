@@ -1,4 +1,5 @@
 # A bot that picks the first action from the list. Used only for tests.
+import sys
 import base64
 import pyspiel
 

@@ -33,7 +33,7 @@ void PlaySingleMatchIIGS() {
       // Increase times for Python scripts.
           TournamentSettings{
               .timeout_ready = 2000,
-              .timeout_start = 2000,
+              .timeout_start = 500,
           });
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
   SPIEL_CHECK_EQ(results->num_matches(), 1);
@@ -110,7 +110,7 @@ void PonderActTimeout() {
        // Increase times for Python scripts.
        TournamentSettings{
          .timeout_ready = 2000,
-         .timeout_start = 2000,
+         .timeout_start = 500,
          });
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
   SPIEL_CHECK_EQ(results->num_matches(), 1);
@@ -125,7 +125,7 @@ void PlayManyRandomMatches(int num_matches = 5) {
       // Increase times for Python scripts.
       TournamentSettings{
           .timeout_ready = 2000,
-          .timeout_start = 2000,
+          .timeout_start = 500,
       });
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(num_matches);
   SPIEL_CHECK_EQ(results->num_matches(), num_matches);
@@ -147,7 +147,7 @@ void PlayWithManyPlayers() {
       // Increase times for Python scripts.
       TournamentSettings{
           .timeout_ready = 2000,
-          .timeout_start = 2000,
+          .timeout_start = 500,
       });
   std::unique_ptr<TournamentResults> results = ref.PlayTournament(1);
   SPIEL_CHECK_EQ(results->num_matches(), 1);
