@@ -74,7 +74,7 @@ void PlayWithFailingBots() {
       "/test_bot_ready.sh",
       "/test_bot_start.sh",
       "/test_bot_illegal_action.sh",
-      "/test_bot_buffer_overflow.sh",
+//      "/test_bot_buffer_overflow.sh",
       "/test_bot_fail_after_few_actions.sh",
   };
 
