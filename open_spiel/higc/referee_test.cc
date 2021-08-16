@@ -157,8 +157,15 @@ void PlayWithManyPlayers() {
 }  // namespace higc
 }  // namespace open_spiel
 
+// Reroute the SIGPIPE signall here, so the test pass ok.
+void signal_callback_handler(int signum) {
+  std::cout << "Caught signal SIGPIPE " << signum << std::endl;
+}
+
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
+  signal(SIGPIPE, signal_callback_handler);
+
   open_spiel::higc::TestInvalidBots();
   open_spiel::higc::PlayWithFailingBots();
   open_spiel::higc::PonderActTimeout();
