@@ -77,11 +77,13 @@ class FictitiousPlay(object):
       game: The game to analyze.
     """
     self._game = game
+    self._states = None  # Required to avoid attribute-error.
     self._policy = policy_std.UniformRandomPolicy(self._game)
     self._fp_step = 0
+    self._states = policy_std.get_tabular_policy_states(self._game)
 
   def get_policy(self):
-    return self._policy.to_tabular()
+    return self._policy
 
   def iteration(self):
     """Returns a new `TabularPolicy` equivalent to this policy."""
@@ -91,11 +93,11 @@ class FictitiousPlay(object):
     br_value = best_response_value.BestResponse(self._game, distrib)
 
     greedy_pi = greedy_policy.GreedyPolicy(self._game, None, br_value)
-    greedy_pi = greedy_pi.to_tabular()
+    greedy_pi = greedy_pi.to_tabular(states=self._states)
     distrib_greedy = distribution.DistributionPolicy(self._game, greedy_pi)
 
     self._policy = MergedPolicy(
         self._game, list(range(self._game.num_players())),
         [self._policy, greedy_pi], [distrib, distrib_greedy],
         [1.0*self._fp_step/(self._fp_step+1), 1.0/(self._fp_step+1)]
-        ).to_tabular()
+        ).to_tabular(states=self._states)
