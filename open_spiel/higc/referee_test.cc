@@ -75,6 +75,7 @@ void PlayWithFailingBots() {
       "/test_bot_start.sh",
       "/test_bot_illegal_action.sh",
       "/test_bot_buffer_overflow.sh",
+      "/test_bot_fail_after_few_actions.sh",
   };
 
   for (int i = 0; i < failing_cases.size(); ++i) {
@@ -155,8 +156,6 @@ void PlayWithManyPlayers() {
 }  // namespace
 }  // namespace higc
 }  // namespace open_spiel
-
-extern char **environ;
 
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
