@@ -23,6 +23,7 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Marc Lanctot <lanctot@google.com>
 -   Matthew Lai
 -   Michal Sustr <michal.sustr@aic.fel.cvut.cz>
+-   Raphael Marinier
 -   Paul Muller
 -   Ryan Faulkner
 -   Satyaki Upadhyay
