@@ -81,12 +81,12 @@ class BuildExt(build_ext):
     if os.environ.get("CXX") is not None:
       cxx = os.environ.get("CXX")
     env = os.environ.copy()
-    # Uncomment when releasing to ensure optional dependencies are built when
-    # users download the source and build the pip package. Leave them commented
-    # out for non-releases because we use nox in our CI testing scripts, which
-    # don't use optional dependencies.
-    # env["OPEN_SPIEL_BUILD_WITH_ACPC"] = "ON"
-    # env["OPEN_SPIEL_BUILD_WITH_HANABI"] = "ON"
+    # If not specified, assume ACPC and Hanabi are built in.
+    # Disable this by passing e.g. OPEN_SPIEL_BUILD_WITH_ACPC=OFF when building
+    if env.get("OPEN_SPIEL_BUILD_WITH_ACPC") is None:
+      env["OPEN_SPIEL_BUILD_WITH_ACPC"] = "ON"
+    if env.get("OPEN_SPIEL_BUILD_WITH_HANABI") is None:
+      env["OPEN_SPIEL_BUILD_WITH_HANABI"] = "ON"
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
         f"-DCMAKE_CXX_COMPILER={cxx}",
@@ -136,7 +136,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="0.3.1",
+    version="1.0.0",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",

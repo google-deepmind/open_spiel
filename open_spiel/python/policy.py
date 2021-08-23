@@ -102,23 +102,19 @@ class Policy:
     """
     return self.action_probabilities(state, player_id)
 
-  def to_tabular(self):
-    """Returns a new `TabularPolicy` equivalent to this policy."""
-    if self.game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
-      # TODO(perolat): We use s.observation_string(DEFAULT_MFG_PLAYER) here as
-      # the number of history is exponential on the depth of the MFG. What we
-      # really need is a representation of the state.
-      # For many player Mean Field games, the state will be
-      # (x0, x1, x2, ..., xn) and the observation_string(0) will output the
-      # string of x0. In that case we would need something like
-      # str([observation_string(i) for i in range(num_player)])
-      tabular_policy = TabularPolicy(
-          self.game,
-          self.player_ids,
-          to_string=lambda s: s.observation_string(pyspiel.PlayerId.
-                                                   DEFAULT_PLAYER_ID))
-    else:
-      tabular_policy = TabularPolicy(self.game, self.player_ids)
+  def to_tabular(self, states=None):
+    """Returns a new `TabularPolicy` equivalent to this policy.
+
+    Args:
+      states: States of the game that will be used for the tabular policy.
+        If None, then get_tabular_policy_states() method will be used to
+        generate them.
+
+    Returns:
+      a TabularPolicy.
+    """
+    states = states or get_tabular_policy_states(self.game)
+    tabular_policy = TabularPolicy(self.game, self.player_ids, states=states)
     for index, state in enumerate(tabular_policy.states):
       tabular_policy.action_probability_array[index, :] = 0
       for action, probability in self.action_probabilities(state).items():
@@ -178,14 +174,19 @@ class TabularPolicy(Policy):
       the tabular policy.
   """
 
-  def __init__(self, game, players=None, to_string=lambda s: s.history_str()):
+  def __init__(self,
+               game,
+               players=None,
+               to_string=lambda s: s.history_str(),
+               states=None):
     """Initializes a uniform random policy for all players in the game."""
     players = sorted(players or range(game.num_players()))
     super().__init__(game, players)
     self.game_type = game.get_type()
 
-    # Get all states in the game at which players have to make decisions.
-    states = get_all_states.get_all_states(
+    # Get all states in the game at which players have to make decisions unless
+    # they are explicitly specified.
+    states = states or get_all_states.get_all_states(
         game,
         depth_limit=-1,
         include_terminals=False,
@@ -376,6 +377,28 @@ class FirstActionPolicy(Policy):
     min_action = min(legal_actions)
     return {action: 1.0 if action == min_action else 0.0
             for action in legal_actions}
+
+
+def get_tabular_policy_states(game):
+  """Returns the states of the game for a tabular policy."""
+  if game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
+    # TODO(perolat): We use s.observation_string(DEFAULT_MFG_PLAYER) here as the
+    # number of history is exponential on the depth of the MFG. What we really
+    # need is a representation of the state. For many player Mean Field games,
+    # the state will be (x0, x1, x2, ..., xn) and the observation_string(0) will
+    # output the string of x0. In that case we would need something like
+    # str([observation_string(i) for i in range(num_player)])
+    to_string = lambda s: s.observation_string(pyspiel.PlayerId.
+                                               DEFAULT_PLAYER_ID)
+  else:
+    to_string = lambda s: s.history_str()
+  return get_all_states.get_all_states(
+      game,
+      depth_limit=-1,
+      include_terminals=False,
+      include_chance_states=False,
+      include_mean_field_states=False,
+      to_string=to_string)
 
 
 def tabular_policy_from_callable(game, callable_policy, players=None):

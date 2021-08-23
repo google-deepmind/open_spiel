@@ -49,7 +49,7 @@ MODE = enum.Enum("mode", "best_response average_policy")
 
 
 class NFSP(rl_agent.AbstractAgent):
-  """NFSP Agent implementation in PyTorch.
+  """NFSP Agent implementation in JAX.
 
   See open_spiel/python/examples/kuhn_nfsp.py for an usage example.
   """

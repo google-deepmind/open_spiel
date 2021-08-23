@@ -3,9 +3,23 @@
 ## Python-only installation via pip
 
 If you plan to only use the Python API, then the easiest way to install
-OpenSpiel is to use pip. As only source distribution is currently supported,
-CMake, Clang and Python 3 development files are required to build the Python
-extension. Note that we recommend Clang but g++ >= 9.2 should also work.
+OpenSpiel is to use pip. On MacOS or Linux, simply run:
+
+```
+python3 -m pip install open_spiel
+```
+
+The binary distribution is new as of OpenSpiel 1.0.0, and is only supported on
+x86_64 architectures. If you encounter any problems, you can still install
+OpenSpiel via pip from source (see below), but please open an issue to let us
+know about the problem.
+
+### Python-only installation via pip (from source).
+
+If the binary distribution is not an option, you can also build OpenSpiel via
+pip from source. CMake, Clang and Python 3 development files are required to
+build the Python extension. Note that we recommend Clang but g++ >= 9.2 should
+also work.
 
 E.g. on Ubuntu or Debian:
 
@@ -31,8 +45,8 @@ virtualenv -p python3 venv
 source venv/bin/activate
 
 # Finally, install OpenSpiel and its dependencies:
-pip3 install --upgrade setuptools pip
-pip3 install open_spiel
+python3 -m pip install --upgrade setuptools pip
+python3 -m pip install --no-binary open_spiel
 
 # To exit the virtual env
 deactivate

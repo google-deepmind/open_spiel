@@ -589,7 +589,8 @@ std::string ImperfectRecallLiarsDiceState::InformationStateString(
   const auto* parent_game = down_cast<const ImperfectRecallLiarsDiceGame*>(
       game_.get());
 
-  std::string result = absl::StrJoin(dice_outcomes_[player], "");
+  std::string result =
+      absl::StrCat("P", player, " ", absl::StrJoin(dice_outcomes_[player], ""));
 
   // Imperfect recall. Show only the last recall_length bids.
   int start_index = std::max<int>(bidseq_.size() - parent_game->recall_length(),

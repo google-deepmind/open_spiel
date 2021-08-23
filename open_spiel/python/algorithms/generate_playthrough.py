@@ -24,6 +24,8 @@ See the logic in ShouldDisplayStateTracker for details.
 import collections
 import os
 import re
+from typing import Optional
+
 import numpy as np
 
 from open_spiel.python import games  # pylint: disable=unused-import
@@ -111,7 +113,8 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
 def playthrough(game_string,
                 action_sequence,
                 alsologtostdout=False,
-                observation_params_string=None):
+                observation_params_string=None,
+                seed: Optional[int] = None):
   """Returns a playthrough of the specified game as a single text.
 
   Actions are selected uniformly at random, including chance actions.
@@ -124,9 +127,10 @@ def playthrough(game_string,
       useful when an error occurs, to still be able to get context information.
     observation_params_string: Optional observation parameters for constructing
       an observer.
+    seed: A(n optional) seed to initialize the random number generator from.
   """
   lines = playthrough_lines(game_string, alsologtostdout, action_sequence,
-                            observation_params_string)
+                            observation_params_string, seed)
   return "\n".join(lines) + "\n"
 
 
@@ -181,7 +185,8 @@ class ShouldDisplayStateTracker:
 
 
 def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
-                      observation_params_string=None):
+                      observation_params_string=None,
+                      seed: Optional[int] = None):
   """Returns a playthrough of the specified game as a list of lines.
 
   Actions are selected uniformly at random, including chance actions.
@@ -193,6 +198,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     action_sequence: A (possibly partial) list of action choices to make.
     observation_params_string: Optional observation parameters for constructing
       an observer.
+    seed: A(n optional) seed to initialize the random number generator from.
   """
   should_display_state_fn = ShouldDisplayStateTracker()
   lines = []
@@ -209,7 +215,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line("game: {}".format(game_string))
   if observation_params_string:
     add_line("observation_params: {}".format(observation_params_string))
-  seed = np.random.randint(2**32 - 1)
+  if seed is None:
+    seed = np.random.randint(2**32 - 1)
   game_type = game.get_type()
 
   default_observation = None

@@ -29,6 +29,8 @@ add_library (algorithms OBJECT
   expected_returns.h
   external_sampling_mccfr.cc
   external_sampling_mccfr.h
+  fsicfr.cc
+  fsicfr.h
   get_all_histories.cc
   get_all_histories.h
   get_all_infostates.cc
