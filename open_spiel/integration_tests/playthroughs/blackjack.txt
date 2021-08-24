@@ -38,9 +38,9 @@ CurrentPlayer() = -1
 ObservationString(0) = "Non-Ace Total: 0 0 Num Aces: 0 0, Chance Player\n"
 ChanceOutcomes() = [(0, 0.019230769230769232), (1, 0.019230769230769232), (2, 0.019230769230769232), (3, 0.019230769230769232), (4, 0.019230769230769232), (5, 0.019230769230769232), (6, 0.019230769230769232), (7, 0.019230769230769232), (8, 0.019230769230769232), (9, 0.019230769230769232), (10, 0.019230769230769232), (11, 0.019230769230769232), (12, 0.019230769230769232), (13, 0.019230769230769232), (14, 0.019230769230769232), (15, 0.019230769230769232), (16, 0.019230769230769232), (17, 0.019230769230769232), (18, 0.019230769230769232), (19, 0.019230769230769232), (20, 0.019230769230769232), (21, 0.019230769230769232), (22, 0.019230769230769232), (23, 0.019230769230769232), (24, 0.019230769230769232), (25, 0.019230769230769232), (26, 0.019230769230769232), (27, 0.019230769230769232), (28, 0.019230769230769232), (29, 0.019230769230769232), (30, 0.019230769230769232), (31, 0.019230769230769232), (32, 0.019230769230769232), (33, 0.019230769230769232), (34, 0.019230769230769232), (35, 0.019230769230769232), (36, 0.019230769230769232), (37, 0.019230769230769232), (38, 0.019230769230769232), (39, 0.019230769230769232), (40, 0.019230769230769232), (41, 0.019230769230769232), (42, 0.019230769230769232), (43, 0.019230769230769232), (44, 0.019230769230769232), (45, 0.019230769230769232), (46, 0.019230769230769232), (47, 0.019230769230769232), (48, 0.019230769230769232), (49, 0.019230769230769232), (50, 0.019230769230769232), (51, 0.019230769230769232)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
-StringLegalActions() = ["Deal:0", "Deal:1", "Deal:2", "Deal:3", "Deal:4", "Deal:5", "Deal:6", "Deal:7", "Deal:8", "Deal:9", "Deal:10", "Deal:11", "Deal:12", "Deal:13", "Deal:14", "Deal:15", "Deal:16", "Deal:17", "Deal:18", "Deal:19", "Deal:20", "Deal:21", "Deal:22", "Deal:23", "Deal:24", "Deal:25", "Deal:26", "Deal:27", "Deal:28", "Deal:29", "Deal:30", "Deal:31", "Deal:32", "Deal:33", "Deal:34", "Deal:35", "Deal:36", "Deal:37", "Deal:38", "Deal:39", "Deal:40", "Deal:41", "Deal:42", "Deal:43", "Deal:44", "Deal:45", "Deal:46", "Deal:47", "Deal:48", "Deal:49", "Deal:50", "Deal:51"]
+StringLegalActions() = ["CA", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "DA", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "HA", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "SA", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK"]
 
-# Apply action "Deal:1"
+# Apply action "C2"
 action: 1
 
 # State 1
@@ -54,28 +54,28 @@ CurrentPlayer() = -1
 ObservationString(0) = "Non-Ace Total: 2 0 Num Aces: 0 0, Chance Player\n"
 ChanceOutcomes() = [(0, 0.0196078431372549), (2, 0.0196078431372549), (3, 0.0196078431372549), (4, 0.0196078431372549), (5, 0.0196078431372549), (6, 0.0196078431372549), (7, 0.0196078431372549), (8, 0.0196078431372549), (9, 0.0196078431372549), (10, 0.0196078431372549), (11, 0.0196078431372549), (12, 0.0196078431372549), (13, 0.0196078431372549), (14, 0.0196078431372549), (15, 0.0196078431372549), (16, 0.0196078431372549), (17, 0.0196078431372549), (18, 0.0196078431372549), (19, 0.0196078431372549), (20, 0.0196078431372549), (21, 0.0196078431372549), (22, 0.0196078431372549), (23, 0.0196078431372549), (24, 0.0196078431372549), (25, 0.0196078431372549), (26, 0.0196078431372549), (27, 0.0196078431372549), (28, 0.0196078431372549), (29, 0.0196078431372549), (30, 0.0196078431372549), (31, 0.0196078431372549), (32, 0.0196078431372549), (33, 0.0196078431372549), (34, 0.0196078431372549), (35, 0.0196078431372549), (36, 0.0196078431372549), (37, 0.0196078431372549), (38, 0.0196078431372549), (39, 0.0196078431372549), (40, 0.0196078431372549), (41, 0.0196078431372549), (42, 0.0196078431372549), (43, 0.0196078431372549), (44, 0.0196078431372549), (45, 0.0196078431372549), (46, 0.0196078431372549), (47, 0.0196078431372549), (48, 0.0196078431372549), (49, 0.0196078431372549), (50, 0.0196078431372549), (51, 0.0196078431372549)]
 LegalActions() = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
-StringLegalActions() = ["Deal:0", "Deal:2", "Deal:3", "Deal:4", "Deal:5", "Deal:6", "Deal:7", "Deal:8", "Deal:9", "Deal:10", "Deal:11", "Deal:12", "Deal:13", "Deal:14", "Deal:15", "Deal:16", "Deal:17", "Deal:18", "Deal:19", "Deal:20", "Deal:21", "Deal:22", "Deal:23", "Deal:24", "Deal:25", "Deal:26", "Deal:27", "Deal:28", "Deal:29", "Deal:30", "Deal:31", "Deal:32", "Deal:33", "Deal:34", "Deal:35", "Deal:36", "Deal:37", "Deal:38", "Deal:39", "Deal:40", "Deal:41", "Deal:42", "Deal:43", "Deal:44", "Deal:45", "Deal:46", "Deal:47", "Deal:48", "Deal:49", "Deal:50", "Deal:51"]
+StringLegalActions() = ["CA", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "DA", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "HA", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "SA", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK"]
 
-# Apply action "Deal:15"
-action: 15
-
-# State 2
-# Apply action "Deal:45"
+# Apply action "S7"
 action: 45
 
+# State 2
+# Apply action "D3"
+action: 15
+
 # State 3
-# Apply action "Deal:38"
+# Apply action "HK"
 action: 38
 
 # State 4
-# Non-Ace Total: 5 17 Num Aces: 0 0, Player's Turn
+# Non-Ace Total: 9 13 Num Aces: 0 0, Player's Turn
 IsTerminal() = False
-History() = [1, 15, 45, 38]
-HistoryString() = "1, 15, 45, 38"
+History() = [1, 45, 15, 38]
+HistoryString() = "1, 45, 15, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "Non-Ace Total: 5 17 Num Aces: 0 0, Player's Turn\n"
+ObservationString(0) = "Non-Ace Total: 9 13 Num Aces: 0 0, Player's Turn\n"
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1]
@@ -85,18 +85,18 @@ StringLegalActions() = ["Hit", "Stand"]
 action: 0
 
 # State 5
-# Apply action "Deal:49"
+# Apply action "SJ"
 action: 49
 
 # State 6
-# Non-Ace Total: 15 17 Num Aces: 0 0, Player's Turn
+# Non-Ace Total: 19 13 Num Aces: 0 0, Player's Turn
 IsTerminal() = False
-History() = [1, 15, 45, 38, 0, 49]
-HistoryString() = "1, 15, 45, 38, 0, 49"
+History() = [1, 45, 15, 38, 0, 49]
+HistoryString() = "1, 45, 15, 38, 0, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "Non-Ace Total: 15 17 Num Aces: 0 0, Player's Turn\n"
+ObservationString(0) = "Non-Ace Total: 19 13 Num Aces: 0 0, Player's Turn\n"
 Rewards() = [0.0]
 Returns() = [0.0]
 LegalActions() = [0, 1]
@@ -106,34 +106,17 @@ StringLegalActions() = ["Hit", "Stand"]
 action: 1
 
 # State 7
-# Non-Ace Total: 15 17 Num Aces: 0 0, Player's Turn
-IsTerminal() = False
-History() = [1, 15, 45, 38, 0, 49, 1]
-HistoryString() = "1, 15, 45, 38, 0, 49, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "Non-Ace Total: 15 17 Num Aces: 0 0, Player's Turn\n"
-Rewards() = [0.0]
-Returns() = [0.0]
-LegalActions() = [0, 1]
-StringLegalActions() = ["Hit", "Stand"]
-
-# Apply action "Hit"
-action: 0
+# Apply action "D5"
+action: 17
 
 # State 8
-# Apply action "Deal:5"
-action: 5
-
-# State 9
-# Non-Ace Total: 15 23 Num Aces: 0 0, Player's Turn
+# Non-Ace Total: 19 18 Num Aces: 0 0, Player's Turn
 IsTerminal() = True
-History() = [1, 15, 45, 38, 0, 49, 1, 0, 5]
-HistoryString() = "1, 15, 45, 38, 0, 49, 1, 0, 5"
+History() = [1, 45, 15, 38, 0, 49, 1, 17]
+HistoryString() = "1, 45, 15, 38, 0, 49, 1, 17"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "Non-Ace Total: 15 23 Num Aces: 0 0, Player's Turn\n"
+ObservationString(0) = "Non-Ace Total: 19 18 Num Aces: 0 0, Player's Turn\n"
 Rewards() = [1.0]
 Returns() = [1.0]

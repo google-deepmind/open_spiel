@@ -28,30 +28,27 @@ void NoBustPlayerWinTest() {
   std::shared_ptr<const Game> game = LoadGame("blackjack");
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(0);  // Deal Ace to Player.
+  state->ApplyAction(0);  // Deal CA to Player.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(0);  // Deal Ace to Player.
+  state->ApplyAction(13);  // Deal DA to Player.
 
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(9);  // Deal 10 to Dealer.
+  state->ApplyAction(11);  // Deal CQ to Dealer.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(4);  // Deal 5 to Dealer.
+  state->ApplyAction(4);  // Deal C5 to Dealer.
 
   SPIEL_CHECK_TRUE(!state->IsChanceNode());
   state->ApplyAction(0);  // Player hits.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(8);  // Deal 9 to Player.
+  state->ApplyAction(8);  // Deal C9 to Player.
 
   SPIEL_CHECK_TRUE(!state->IsChanceNode());
   state->ApplyAction(1);  // Player stands.
 
-  SPIEL_CHECK_TRUE(!state->IsChanceNode());
-  state->ApplyAction(0);  // Dealer hits.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(2);  // Deal 3 to Dealer.
+  state->ApplyAction(2);  // Deal C3 to Dealer.
 
-  SPIEL_CHECK_TRUE(!state->IsChanceNode());
-  state->ApplyAction(1);  // Dealer stands.
+  SPIEL_CHECK_TRUE(state->IsTerminal());  // Dealer stands.
 
   // Player wins.
   SPIEL_CHECK_EQ(state->PlayerReturn(0), 1);
@@ -62,24 +59,23 @@ void DealerBustTest() {
   std::shared_ptr<const Game> game = LoadGame("blackjack");
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(8);  // Deal 9 to Player.
+  state->ApplyAction(8);  // Deal C9 to Player.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(4);  // Deal 5 to Player.
+  state->ApplyAction(4);  // Deal C5 to Player.
 
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(9);  // Deal 10 to Dealer.
+  state->ApplyAction(10);  // Deal CJ to Dealer.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(9);  // Deal 10 to Dealer.
+  state->ApplyAction(2);  // Deal C3 to Dealer.
 
   SPIEL_CHECK_TRUE(!state->IsChanceNode());
   state->ApplyAction(1);  // Player stands.
 
-  SPIEL_CHECK_TRUE(!state->IsChanceNode());
-  state->ApplyAction(0);  // Dealer hits.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(8);  // Deal 9 to Dealer.
+  state->ApplyAction(21);  // Deal D9 to Dealer.
 
   // Player wins.
+  SPIEL_CHECK_TRUE(state->IsTerminal());
   SPIEL_CHECK_EQ(state->PlayerReturn(0), 1);
 }
 
@@ -88,22 +84,23 @@ void PlayerBustTest() {
   std::shared_ptr<const Game> game = LoadGame("blackjack");
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(9);  // Deal 10 to Player.
+  state->ApplyAction(9);  // Deal C10 to Player.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(9);  // Deal 10 to Player.
+  state->ApplyAction(22);  // Deal D10 to Player.
 
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(8);  // Deal 9 to Dealer.
+  state->ApplyAction(8);  // Deal C9 to Dealer.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(4);  // Deal 5 to Dealer.
+  state->ApplyAction(4);  // Deal C5 to Dealer.
 
   SPIEL_CHECK_TRUE(!state->IsChanceNode());
   state->ApplyAction(0);  // Player hits.
   SPIEL_CHECK_TRUE(state->IsChanceNode());
-  state->ApplyAction(8);  // Deal 9 to Player.
+  state->ApplyAction(21);  // Deal D9 to Player.
 
   // Player loses.
-  SPIEL_CHECK_EQ(state->PlayerReturn(0), 0);
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), -1);
 }
 
 void BasicBlackjackTests() {

@@ -28,11 +28,9 @@
 namespace open_spiel {
 namespace blackjack {
 
-using Card = std::pair<int, int>;
-
 constexpr int kNumSuits = 4;
-constexpr int kCardsPerSuite = 13;
-constexpr int kDeckSize = kCardsPerSuite * kNumSuits;
+constexpr int kCardsPerSuit = 13;
+constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
 
 class BlackjackGame;
 
@@ -47,7 +45,7 @@ class BlackjackState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
-  std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  ActionsAndProbs ChanceOutcomes() const override;
 
   std::unique_ptr<State> Clone() const override;
 
@@ -65,17 +63,20 @@ class BlackjackState : public State {
   void DoApplyAction(Action move_id) override;
 
  private:
+  void MaybeApplyDealerAction();
+
   // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
 
   int total_moves_ = -1;    // Total num moves taken during the game.
   Player cur_player_ = -1;  // Player to play.
   int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
                             // to remember whose is playing for next turns.
+  int live_players_ = 0;    // Number of players who haven't yet bust.
   std::vector<int>
       non_ace_total_;  // Total value of cards for each player, excluding aces.
   std::vector<int> num_aces_;            // Number of aces owned by each player.
   std::vector<int> turn_over_;           // Whether each player's turn is over.
-  std::vector<Card> rem_cards_in_deck_;  // Remaining cards in the deck.
+  std::vector<int> deck_;                // Remaining cards in the deck.
   std::vector<std::vector<int>> cards_;  // Cards dealt to each player.
 };
 

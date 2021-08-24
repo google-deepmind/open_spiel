@@ -62,12 +62,16 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 std::string BlackjackState::ActionToString(Player player,
                                            Action move_id) const {
-  if (player == kChancePlayerId)
-    return absl::StrCat("Deal:", move_id);
-  else if (move_id == ActionType::kHit)
+  if (player == kChancePlayerId) {
+    const char kSuitNames[kNumSuits + 1] = "CDHS";
+    const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
+    return std::string(1, kSuitNames[move_id / kCardsPerSuit]) +
+           std::string(1, kRanks[move_id % kCardsPerSuit]);
+  } else if (move_id == ActionType::kHit) {
     return "Hit";
-  else
+  } else {
     return "Stand";
+  }
 }
 
 bool BlackjackState::IsTerminal() const { return turn_over_[DealerId()]; }
@@ -109,26 +113,25 @@ bool BlackjackState::InitialCardsDealt(int player) const {
 
 int BlackjackState::CardValue(int card) const {
   // Cards are indexed from 0 to kDeckSize-1;
-  int card_mod = card % kCardsPerSuite;
-  if (card_mod == 0) {
+  const int rank = card % kCardsPerSuit;
+  if (rank == 0) {
     return kAceValue;
-  } else if (card_mod <= 9) {
-    return card_mod + 1;
+  } else if (rank <= 9) {
+    return rank + 1;
   } else {
-    // Non-ace face card.
+    // Ten or a face card.
     return 10;
   }
 }
 
 void BlackjackState::DealCardToPlayer(int player, int card) {
-  int value = CardValue(card);
   // Remove card from deck.
-  rem_cards_in_deck_.erase(
-      std::remove(rem_cards_in_deck_.begin(), rem_cards_in_deck_.end(),
-                  Card(card, value)),
-      rem_cards_in_deck_.end());
+  auto new_end = std::remove(deck_.begin(), deck_.end(), card);
+  if (new_end == deck_.end()) SpielFatalError("Card not present in deck");
+  deck_.erase(new_end, deck_.end());
 
   cards_[player].push_back(card);
+  const int value = CardValue(card);
   if (value == kAceValue) {
     num_aces_[player]++;
   } else {
@@ -140,6 +143,7 @@ BlackjackState::BlackjackState(std::shared_ptr<const Game> game) : State(game) {
   total_moves_ = 0;
   cur_player_ = kChancePlayerId;
   turn_player_ = kPlayerId;
+  live_players_ = 1;
 
   // The values are stored for the dealer as well, whose id is NumPlayers.
   // See DealerId().
@@ -148,11 +152,8 @@ BlackjackState::BlackjackState(std::shared_ptr<const Game> game) : State(game) {
   turn_over_.resize(game_->NumPlayers() + 1, false);
   cards_.resize(game_->NumPlayers() + 1);
 
-  rem_cards_in_deck_.clear();
-  for (int i = 0; i < kDeckSize; i++) {
-    rem_cards_in_deck_.push_back(Card(i, CardValue(i)));
-  }
-  std::sort(rem_cards_in_deck_.begin(), rem_cards_in_deck_.end());
+  deck_.resize(kDeckSize);
+  std::iota(deck_.begin(), deck_.end(), 0);
 }
 
 int BlackjackState::GetBestPlayerTotal(int player) const {
@@ -211,8 +212,10 @@ void BlackjackState::DoApplyAction(Action move) {
     DealCardToPlayer(turn_player_, move);
     cur_player_ = turn_player_;
     if (GetBestPlayerTotal(turn_player_) > kApproachScore) {
+      if (turn_player_ != DealerId()) --live_players_;
       EndPlayerTurn(turn_player_);
     }
+    MaybeApplyDealerAction();
     return;
   }
 
@@ -221,10 +224,28 @@ void BlackjackState::DoApplyAction(Action move) {
     cur_player_ = kChancePlayerId;
   } else if (move == kStand) {
     EndPlayerTurn(turn_player_);
+    MaybeApplyDealerAction();
+  }
+}
+
+void BlackjackState::MaybeApplyDealerAction() {
+  // If there are no players still live, dealer doesn't play.
+  if (live_players_ == 0) {
+    EndPlayerTurn(DealerId());
+  }
+
+  // Otherwise, hits 16 or less, stands on 17 or more.
+  if (cur_player_ == DealerId()) {
+    if (GetBestPlayerTotal(DealerId()) <= 16) {
+      cur_player_ = kChancePlayerId;
+    } else {
+      EndPlayerTurn(cur_player_);
+    }
   }
 }
 
 std::vector<Action> BlackjackState::LegalActions() const {
+  SPIEL_CHECK_NE(cur_player_, DealerId());
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
   } else if (IsTerminal()) {
@@ -234,21 +255,13 @@ std::vector<Action> BlackjackState::LegalActions() const {
   }
 }
 
-std::vector<std::pair<Action, double>> BlackjackState::ChanceOutcomes() const {
+ActionsAndProbs BlackjackState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  std::vector<std::pair<Action, double>> outcomes;
-  if (rem_cards_in_deck_.empty()) {
-    return outcomes;
+  ActionsAndProbs outcomes;
+  outcomes.reserve(deck_.size());
+  for (int card : deck_) {
+    outcomes.emplace_back(card, 1.0 / deck_.size());
   }
-
-  // Chance outcomes are labelled x, where x is the value of the card.
-  // Aces are represented by kAceValue.
-  outcomes.reserve(rem_cards_in_deck_.size());
-  for (auto card : rem_cards_in_deck_) {
-    outcomes.push_back(
-        std::make_pair(card.first, 1.0 / rem_cards_in_deck_.size()));
-  }
-
   return outcomes;
 }
 
