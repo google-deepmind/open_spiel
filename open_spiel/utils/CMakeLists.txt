@@ -24,6 +24,8 @@ add_library (utils OBJECT
   thread.h
   thread.cc
   threaded_queue.h
+  usage_logging.h
+  usage_logging.cc
 )
 target_include_directories (utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

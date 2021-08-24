@@ -34,6 +34,7 @@
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/usage_logging.h"
 
 namespace open_spiel {
 namespace {
@@ -234,6 +235,7 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
   if (result == nullptr) {
     SpielFatalError(absl::StrCat("Unable to create game: ", name));
   }
+  LogUsage();
   return result;
 }
 
