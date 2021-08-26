@@ -118,7 +118,7 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; the
   # The repository is very infrequently updated, thus the last 15 commits should
   # be ok for a long time.
   pushd ${DIR}
-  git checkout  'b31c973'
+  git checkout '54e7959'
   popd
 fi
 
