@@ -233,7 +233,8 @@ bool OpenSpielHanabiState::IsTerminal() const { return state_.IsTerminal(); }
 
 OpenSpielHanabiState::OpenSpielHanabiState(std::shared_ptr<const Game> game)
     : State(game),
-      state_(&(static_cast<const OpenSpielHanabiGame&>(*game).HanabiGame())),
+      state_(const_cast<hanabi_learning_env::HanabiGame*>(
+             &(static_cast<const OpenSpielHanabiGame&>(*game).HanabiGame()))),
       game_(static_cast<const OpenSpielHanabiGame*>(game.get())),
       prev_state_score_(0.) {}
 
