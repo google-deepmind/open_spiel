@@ -57,7 +57,7 @@ class OpenSpielHanabiGame : public Game {
     return encoder_;
   }
 
-  const hanabi_learning_env::HanabiGame& HanabiGame() const { return game_; }
+  hanabi_learning_env::HanabiGame& HanabiGame() const { return game_; }
 
  private:
   std::unordered_map<std::string, std::string> MapParams() const;
