@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/games/hex.h"
 #include "open_spiel/spiel.h"
 
@@ -174,7 +175,7 @@ class ImperfectRecallDarkHexState : public DarkHexState {
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-    return ViewToString(player);
+    return absl::StrCat("P", player, " ", ViewToString(player));
   }
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new ImperfectRecallDarkHexState(*this));
