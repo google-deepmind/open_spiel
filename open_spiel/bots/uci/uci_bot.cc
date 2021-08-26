@@ -251,7 +251,7 @@ std::string UCIBot::Read(bool wait) const {
   fd_set fds;
   FD_ZERO(&fds);
   FD_SET(input_fd_, &fds);
-  timeval timeout = {1, 0};  // 1 second timeout.
+  timeval timeout = {5, 0};  // 5 second timeout.
 
   int ready_fd = select(/*nfds=*/input_fd_ + 1,
                         /*readfds=*/&fds,
@@ -261,7 +261,7 @@ std::string UCIBot::Read(bool wait) const {
     SpielFatalError("Failed to read from uci sub-process");
   }
   if (ready_fd == 0) {
-    SpielFatalError("Response from uci sub-process not received on time");
+    SpielFatalError("Response from uci sub-process not received in time");
   }
   if (ioctl(input_fd_, FIONREAD, &count) == -1) {
     SpielFatalError("Failed to read input size.");
@@ -273,7 +273,7 @@ std::string UCIBot::Read(bool wait) const {
   if (read(input_fd_, buff, count) != count) {
     SpielFatalError("Read wrong number of bytes");
   }
-  response = buff;
+  response.assign(buff, count);
   free(buff);
   return response;
 }
