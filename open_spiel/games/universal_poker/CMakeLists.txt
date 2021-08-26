@@ -24,14 +24,14 @@ add_library(universal_poker_lib OBJECT
   ${HEADER_FILES}
 )
 
-add_executable(universal_poker_acpc_cpp_test acpc_cpp/acpc_game_test.cc ${SOURCE_FILES}
-        $<TARGET_OBJECTS:tests>)
+add_executable(universal_poker_acpc_cpp_test acpc_cpp/acpc_game_test.cc
+               ${SOURCE_FILES} $<TARGET_OBJECTS:utils> $<TARGET_OBJECTS:tests>)
 target_link_libraries(universal_poker_acpc_cpp_test universal_poker_clib)
 
 add_test(universal_poker_acpc_cpp_test universal_poker_acpc_cpp_test)
 
-add_executable(universal_poker_card_set_test logic/card_set_test.cc ${SOURCE_FILES}
-        $<TARGET_OBJECTS:tests>)
+add_executable(universal_poker_card_set_test logic/card_set_test.cc
+               ${SOURCE_FILES} $<TARGET_OBJECTS:utils> $<TARGET_OBJECTS:tests>)
 target_link_libraries(universal_poker_card_set_test universal_poker_clib)
 
 add_test(universal_poker_card_set_test universal_poker_card_set_test)
