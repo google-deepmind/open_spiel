@@ -148,23 +148,26 @@ void TabularBestResponseMDP::BuildMDPs(
   if (state.IsTerminal()) {
     std::vector<double> terminal_values = state.Returns();
     for (Player p = 0; p < game_.NumPlayers(); ++p) {
-      std::string node_key = state.ToString();
-      MDPNode *node = mdps_.at(p)->CreateTerminalNode(node_key);
-      node->set_value(terminal_values[p]);
-      double opponent_reach = OpponentReach(reach_probs, p);
-      SPIEL_CHECK_GE(opponent_reach, 0.0);
-      SPIEL_CHECK_LE(opponent_reach, 1.0);
-      // Following line is not actually necessary because the weight of a leaf
-      // is never in a denominator for a transition probability, btu we include
-      // it to keep the semantics of the values consistent across the ISMDP.
-      node->add_weight(opponent_reach);
-      MDPNode *parent_node = parent_nodes[p];
-      SPIEL_CHECK_TRUE(parent_node != nullptr);
-      parent_node->IncTransitionWeight(parent_actions[p], node, opponent_reach);
+      if (only_for_player == kInvalidPlayer || only_for_player == p) {
+        std::string node_key = state.ToString();
+        MDPNode *node = mdps_.at(p)->CreateTerminalNode(node_key);
+        node->set_value(terminal_values[p]);
+        double opponent_reach = OpponentReach(reach_probs, p);
+        SPIEL_CHECK_GE(opponent_reach, 0.0);
+        SPIEL_CHECK_LE(opponent_reach, 1.0);
+        // Following line is not actually necessary because the weight of a leaf
+        // is never in a denominator for a transition probability, but we
+        // include it to keep the semantics of the values consistent across the
+        // ISMDP.
+        node->add_weight(opponent_reach);
+        MDPNode *parent_node = parent_nodes[p];
+        SPIEL_CHECK_TRUE(parent_node != nullptr);
+        parent_node->IncTransitionWeight(parent_actions[p], node,
+                                         opponent_reach);
+      }
     }
   } else if (state.IsChanceNode()) {
     ActionsAndProbs outcomes_and_probs = state.ChanceOutcomes();
-
     for (const auto &[outcome, prob] : outcomes_and_probs) {
       std::unique_ptr<State> state_copy = state.Clone();
       state_copy->ApplyAction(outcome);
@@ -176,37 +179,37 @@ void TabularBestResponseMDP::BuildMDPs(
     }
   } else if (state.IsSimultaneousNode()) {
     // Several nodes are created: one for each player as the maximizer.
-    std::vector<std::string> node_keys;
-    std::vector<MDPNode*> nodes;
-    std::vector<double> opponent_reaches;
-    std::vector<ActionsAndProbs> fixed_state_policies;
-    node_keys.reserve(num_players_);
-    nodes.reserve(num_players_);
-    opponent_reaches.reserve(num_players_);
-    fixed_state_policies.reserve(num_players_);
+    std::vector<std::string> node_keys(num_players_);
+    std::vector<MDPNode*> nodes(num_players_, nullptr);
+    std::vector<double> opponent_reaches(num_players_, 1.0);
+    std::vector<ActionsAndProbs> fixed_state_policies(num_players_);
 
     for (Player player = 0; player < num_players_; ++player) {
-      node_keys.push_back(GetNodeKey(state, player));
-      nodes.push_back(mdps_.at(player)->LookupOrCreateNode(node_keys[player]));
-      opponent_reaches.push_back(OpponentReach(reach_probs, player));
-      fixed_state_policies.push_back(
-          fixed_policy_.GetStatePolicy(state, player));
+      if (only_for_player == kInvalidPlayer || only_for_player == player) {
+        node_keys[player] = GetNodeKey(state, player);
+        nodes[player] = mdps_.at(player)->LookupOrCreateNode(node_keys[player]);
+        opponent_reaches[player] = OpponentReach(reach_probs, player);
 
-      SPIEL_CHECK_GE(opponent_reaches[player], 0.0);
-      SPIEL_CHECK_LE(opponent_reaches[player], 1.0);
-      nodes[player]->add_weight(opponent_reaches[player]);
+        SPIEL_CHECK_GE(opponent_reaches[player], 0.0);
+        SPIEL_CHECK_LE(opponent_reaches[player], 1.0);
+        nodes[player]->add_weight(opponent_reaches[player]);
 
-      MDPNode* parent_node = parent_nodes[player];
-      SPIEL_CHECK_TRUE(parent_node != nullptr);
-      parent_node->IncTransitionWeight(parent_actions[player], nodes[player],
-                                       opponent_reaches[player]);
+        MDPNode* parent_node = parent_nodes[player];
+        SPIEL_CHECK_TRUE(parent_node != nullptr);
+        parent_node->IncTransitionWeight(parent_actions[player], nodes[player],
+                                         opponent_reaches[player]);
+      }
+
+      if (only_for_player == kInvalidPlayer || only_for_player != player) {
+        fixed_state_policies[player] =
+            fixed_policy_.GetStatePolicy(state, player);
+      }
     }
 
     // Traverse over the list of joint actions. For each one, first deconstruct
     // the actions, and then recurse once for each player as the maximizer with
     // the others as the fixed policies.
     const auto& sim_move_state = down_cast<const SimMoveState&>(state);
-
     for (Action joint_action : state.LegalActions()) {
       std::vector<Action> actions =
           sim_move_state.FlatJointActionToActions(joint_action);
@@ -218,11 +221,17 @@ void TabularBestResponseMDP::BuildMDPs(
       std::vector<MDPNode*> new_parent_nodes = parent_nodes;
       std::vector<Action> new_parent_actions = parent_actions;
       for (Player player = 0; player < num_players_; ++player) {
-        double action_prob = GetProb(fixed_state_policies[player],
-                                     actions[player]);
-        SPIEL_CHECK_PROB(action_prob);
-        new_reach_probs[player] *= action_prob;
-        new_parent_nodes[player] = nodes[player];
+        if (only_for_player == kInvalidPlayer || only_for_player != player) {
+          double action_prob = GetProb(fixed_state_policies[player],
+                                       actions[player]);
+          SPIEL_CHECK_PROB(action_prob);
+          new_reach_probs[player] *= action_prob;
+        }
+
+        if (only_for_player == kInvalidPlayer || only_for_player == player) {
+          new_parent_nodes[player] = nodes[player];
+        }
+
         new_parent_actions[player] = actions[player];
       }
 
@@ -233,33 +242,51 @@ void TabularBestResponseMDP::BuildMDPs(
     // Normal decisions node.
     std::vector<Action> legal_actions = state.LegalActions();
     Player player = state.CurrentPlayer();
-    std::string node_key = GetNodeKey(state, player);
+    ActionsAndProbs state_policy;  // Fixed joint policy we're responding to.
+    MDPNode* node = nullptr;
 
-    MDPNode *node = mdps_.at(player)->LookupOrCreateNode(node_key);
-    double opponent_reach = OpponentReach(reach_probs, player);
+    // Check to see if we need to build this node.
+    if (only_for_player == kInvalidPlayer || only_for_player == player) {
+      std::string node_key = GetNodeKey(state, player);
 
-    SPIEL_CHECK_GE(opponent_reach, 0.0);
-    SPIEL_CHECK_LE(opponent_reach, 1.0);
-    node->add_weight(opponent_reach);
-    MDPNode *parent_node = parent_nodes[player];
-    SPIEL_CHECK_TRUE(parent_node != nullptr);
-    parent_node->IncTransitionWeight(parent_actions[player], node,
-                                     opponent_reach);
+      node = mdps_.at(player)->LookupOrCreateNode(node_key);
+      double opponent_reach = OpponentReach(reach_probs, player);
 
-    ActionsAndProbs state_policy = fixed_policy_.GetStatePolicy(state);
+      SPIEL_CHECK_GE(opponent_reach, 0.0);
+      SPIEL_CHECK_LE(opponent_reach, 1.0);
+      node->add_weight(opponent_reach);
+      MDPNode *parent_node = parent_nodes[player];
+      SPIEL_CHECK_TRUE(parent_node != nullptr);
+      parent_node->IncTransitionWeight(parent_actions[player], node,
+                                       opponent_reach);
+    }
+
+    // Get the fixed policy all the time if building all MDPs, or only at
+    // opponent nodes otherwise
+    if (only_for_player == kInvalidPlayer || only_for_player != player) {
+        state_policy = fixed_policy_.GetStatePolicy(state);
+    }
 
     for (Action action : legal_actions) {
       std::unique_ptr<State> state_copy = state.Clone();
       state_copy->ApplyAction(action);
 
       std::vector<double> new_reach_probs = reach_probs;
-      double action_prob = GetProb(state_policy, action);
+      std::vector<MDPNode*> new_parent_nodes = parent_nodes;
 
-      SPIEL_CHECK_PROB(action_prob);
-      new_reach_probs[player] *= action_prob;
+      // If building all MDPs at once, modify reach probs in all cases.
+      // Otherwise, only at opponent nodes.
+      if (only_for_player == kInvalidPlayer || only_for_player != player) {
+        double action_prob = GetProb(state_policy, action);
+        SPIEL_CHECK_PROB(action_prob);
+        new_reach_probs[player] *= action_prob;
+      }
 
-      std::vector<MDPNode *> new_parent_nodes = parent_nodes;
-      new_parent_nodes[player] = node;
+      // If building all MDPs at once, modify parent nodes for that MDP.
+      // Otherwise, only do it for the player we're building the MDP for.
+      if (only_for_player == kInvalidPlayer || only_for_player == player) {
+        new_parent_nodes[player] = node;
+      }
 
       std::vector<Action> new_parent_actions = parent_actions;
       new_parent_actions[player] = action;
@@ -336,8 +363,24 @@ TabularBestResponseMDPInfo TabularBestResponseMDP::ComputeBestResponses() {
 TabularBestResponseMDPInfo
 TabularBestResponseMDP::ComputeBestResponse(Player max_player) {
   TabularBestResponseMDPInfo br_info(num_players_);
-  // TODO(author5): implement this.
-  SpielFatalError("Unimplemented.");
+
+  if (mdps_.empty()) {
+    mdps_.resize(num_players_);
+    mdps_[max_player] = absl::make_unique<MDP>();
+  }
+
+  std::vector<MDPNode*> parent_nodes(num_players_, nullptr);
+  parent_nodes[max_player] = mdps_[max_player]->RootNode();
+  std::vector<double> reach_probs(num_players_ + 1, 1.0);  // include chance.
+  std::vector<Action> parent_actions(num_players_, 0);
+
+  std::unique_ptr<State> initial_state = game_.NewInitialState();
+  BuildMDPs(*initial_state, reach_probs, parent_nodes, parent_actions,
+            max_player);
+
+  br_info.br_values[max_player] =
+        mdps_[max_player]->Solve(kSolveTolerance,
+                                 &br_info.br_policies[max_player]);
   return br_info;
 }
 

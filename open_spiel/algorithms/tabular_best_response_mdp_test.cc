@@ -29,7 +29,7 @@ namespace {
 constexpr int kNumLiarsDiceCFRIterations = 1;
 constexpr double kFloatTolerance = 1e-12;
 
-double NashConvTest(const std::string &game_string, const Policy &policy,
+double NashConvTest(const std::string& game_string, const Policy& policy,
                     absl::optional<double> expected_nash_conv = absl::nullopt) {
   std::shared_ptr<const Game> game = LoadGame(game_string);
   TabularBestResponseMDP tbr(*game, policy);
@@ -54,6 +54,20 @@ void LeducNashConvTests() {
   FirstActionPolicy first_action_policy;
   NashConvTest("leduc_poker", first_action_policy, 2.0);
 }
+
+void OnlyFirstPlayerTests() {
+  UniformPolicy uniform_policy;
+
+  for (std::string game_string : { "leduc_poker", "kuhn_poker(players=3)",
+                                   "matrix_pd", "goofspiel(num_cards=3)" })
+  {
+    std::shared_ptr<const Game> game = LoadGame(game_string);
+    TabularBestResponseMDP tbr(*game, uniform_policy);
+    TabularBestResponseMDPInfo br_info = tbr.ComputeBestResponse(0);
+    SPIEL_CHECK_GT(br_info.br_values[0], 0);
+  }
+}
+
 
 void KuhnLeduc3pTests() {
   UniformPolicy uniform_policy;
@@ -192,6 +206,7 @@ int main(int argc, char **argv) {
   open_spiel::algorithms::TicTacToeTests();
   open_spiel::algorithms::KuhnNashConvTests();
   open_spiel::algorithms::LeducNashConvTests();
+  open_spiel::algorithms::OnlyFirstPlayerTests();
   open_spiel::algorithms::KuhnLeduc3pTests();
   open_spiel::algorithms::RPSGameTests();
   open_spiel::algorithms::OshiZumoGameTests();

@@ -152,9 +152,7 @@ class TabularBestResponseMDP {
   TabularBestResponseMDPInfo NashConv();
   TabularBestResponseMDPInfo Exploitability();
 
-  // Currently unimplemented: build only one MDP and compute only the response
-  // for the specific player.
-  // TODO(author5): implement this.
+  // Build only one MDP and compute only the response for the specific player.
   TabularBestResponseMDPInfo ComputeBestResponse(Player max_player);
 
   int TotalNumNonterminals() const;

@@ -211,7 +211,9 @@ void init_pyspiel_policy(py::module& m) {
 
   py::class_<TabularBestResponseMDP>(m, "TabularBestResponseMDP")
       .def(py::init<const open_spiel::Game&, const open_spiel::Policy&>())
-      .def("compute_best_responses",
+      .def("compute_best_responses",  // Takes no arguments.
+           &TabularBestResponseMDP::ComputeBestResponses)
+      .def("compute_best_response",   // Takes one argument: Player max_player.
            &TabularBestResponseMDP::ComputeBestResponses)
       .def("nash_conv", &TabularBestResponseMDP::NashConv)
       .def("exploitability", &TabularBestResponseMDP::Exploitability);
