@@ -277,7 +277,9 @@ class DynamicRoutingGameState(pyspiel.State):
     # TODO: enable movement based on departure time.
     if vehicle in self._vehicle_without_legal_actions:
       # If the vehicle is at destination it cannot do anything.
-      return []
+      return [dynamic_routing_game_utils.NO_POSSIBLE_ACTION]
+    if not self._can_vehicles_move[vehicle]:
+      return [dynamic_routing_game_utils.NO_POSSIBLE_ACTION]
     _, end_section_node = dynamic_routing_game_utils._road_section_to_nodes(
       self._vehicle_locations[vehicle])
     successors = self.get_game().network.get_successors(end_section_node)
@@ -303,7 +305,8 @@ class DynamicRoutingGameState(pyspiel.State):
     """
     # This is not called at simultaneous-move states.
     if self.get_game().perform_sanity_checks:
-      assert self._is_chance and not self._is_terminal
+      assert self._is_chance
+      assert not self._is_terminal
       assert (isinstance(action, int)
               and 0 <= action <= self.get_game().max_chance_outcomes())
     self._is_chance = False
@@ -334,7 +337,6 @@ class DynamicRoutingGameState(pyspiel.State):
       assert len(actions) == self.get_game().num_players(), (
         f"Each player does not have an actions. Actions has {len(actions)} "
         f"elements, it should have {self.get_game().num_players()}.")
-    self._current_time_step += 1
     for vehicle_id, action in enumerate(actions):
       # Has the vehicle already reached a sink node?
       if vehicle_id in self._vehicle_without_legal_actions:
@@ -362,9 +364,12 @@ class DynamicRoutingGameState(pyspiel.State):
         self._vehicle_at_destination.add(vehicle_id)
         self._vehicle_without_legal_actions.add(vehicle_id)
       # Will the vehicle have a legal action for next time step?
-      if self.get_game().network.is_location_at_sink_node(
+      elif self.get_game().network.is_location_at_sink_node(
           self._vehicle_locations[vehicle_id]):
         self._vehicle_without_legal_actions.add(vehicle_id)
+        self._vehicle_final_travel_times[vehicle_id] = - self.get_game(
+          ).min_utility()
+    self._current_time_step += 1
     # Is the game finished?
     if (self._current_time_step >= self.get_game().max_game_length() or
             len(self._vehicle_without_legal_actions) == self.get_game(
@@ -420,8 +425,14 @@ class DynamicRoutingGameState(pyspiel.State):
 
   def __str__(self) -> str:
     """String for debug purposes. No particular semantics are required."""
+    if self._is_terminal:
+      time = f"{self._current_time_step}, game finished."
+    elif self._is_chance:
+      time = f"{self._current_time_step}_chance"
+    else:
+      time = f"{self._current_time_step}"
     return (f"Vehicle locations: {self._vehicle_locations}, "
-            f"time: {self._current_time_step}.")
+            f"time: {time}, movements={self._can_vehicles_move}.")
 
 
 class NetworkObserver:

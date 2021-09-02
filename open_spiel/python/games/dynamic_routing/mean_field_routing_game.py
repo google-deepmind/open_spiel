@@ -178,7 +178,8 @@ class MeanFieldRoutingGameState(pyspiel.State):
     _vehicle_at_destination: boolean that encodes if the representative vehicle
       has reached its destination.
     _vehicle_destination: the destination of the representative vehicle
-      corresponding to this state (once the state is no longer in chance_init mode).
+      corresponding to this state (once the state is no longer in chance_init
+      mode).
     _vehicle_final_travel_time: the travel time of the representative vehicle,
       the travel is either 0 if the vehicle is still in the network or its
       travel time if the vehicle has reached its destination.
@@ -434,12 +435,10 @@ class MeanFieldRoutingGameState(pyspiel.State):
             self._vehicle_final_travel_time = self._current_time_step
             self._vehicle_at_destination = True
             self._vehicle_without_legal_action = True
-            self._is_terminal = True
           # Will the vehicle have a legal action for next time step?
           elif self.get_game().network.is_location_at_sink_node(
               self._vehicle_location):
             self._vehicle_without_legal_action = True
-            self._is_terminal = True
             self._vehicle_final_travel_time = - self.get_game().min_utility()
       self._current_time_step += 1
     # Is the game finished?
