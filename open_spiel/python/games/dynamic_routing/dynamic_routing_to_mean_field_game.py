@@ -79,7 +79,6 @@ class DynamicRoutingToMeanFieldGameState(
     # if player_id is None:
     #   player_id = self.current_player_
     assert player_id >= 0, "player_id should be a positive integer."
-    # create a string key for N player game.
     state_key = (str(self), player_id)
     if state_key in self.__state_memoization:
       return self.__state_memoization[state_key].clone()
@@ -88,7 +87,7 @@ class DynamicRoutingToMeanFieldGameState(
     mfg_state._is_chance_init = False
     mfg_state._current_time_step = self._current_time_step
     mfg_state._is_terminal = self._is_terminal
-    mfg_state._player_id = pyspiel.PlayerId.DEFAULT_PLAYER_ID
+    mfg_state._player_id = 0
     mfg_state._can_vehicle_move = self._can_vehicles_move[player_id]
     mfg_state._vehicle_at_destination = (
       player_id in self._vehicle_at_destination)
