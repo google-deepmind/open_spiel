@@ -115,23 +115,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
       if parent_state.current_player() == self._player_id:
         yield (parent_state, 1.0)
       for action, p_action in self.transitions(parent_state):
-        # try:
         for state, p_state in self.decision_nodes(parent_state.child(action)):
           yield (state, p_state * p_action)
-        # except AssertionError as e:
-        #   print('Here *****')
-        #   print(f'Parent state: {parent_state}')
-        #   print(f'Action: {action}')
-        #   print(f'Current player: {parent_state.current_player_}')
-        #   print(parent_state.legal_actions(parent_state.current_player_))
-        #   print(f'Corresponding MF state: {parent_state.convert_state_to_mean_field_state(parent_state.current_player_)}')
-        #   print(self._policy.action_probabilities(parent_state))
-        #   print(f'Applying action to state: {parent_state.child(action)}')
-        #   if parent_state.is_chance_node():
-        #     print('CHANCE NODE')
-        #     print(parent_state.chance_outcomes())
-        #   print(self.transitions(parent_state))
-        #   raise ValueError() from e
 
   def transitions(self, state):
     """Returns a list of (action, cf_prob) pairs from the specified state."""

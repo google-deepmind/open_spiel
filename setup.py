@@ -84,9 +84,9 @@ class BuildExt(build_ext):
     # If not specified, assume ACPC and Hanabi are built in.
     # Disable this by passing e.g. OPEN_SPIEL_BUILD_WITH_ACPC=OFF when building
     if env.get("OPEN_SPIEL_BUILD_WITH_ACPC") is None:
-      env["OPEN_SPIEL_BUILD_WITH_ACPC"] = "OFF"
+      env["OPEN_SPIEL_BUILD_WITH_ACPC"] = "ON"
     if env.get("OPEN_SPIEL_BUILD_WITH_HANABI") is None:
-      env["OPEN_SPIEL_BUILD_WITH_HANABI"] = "OFF"
+      env["OPEN_SPIEL_BUILD_WITH_HANABI"] = "ON"
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
         f"-DCMAKE_CXX_COMPILER={cxx}",
