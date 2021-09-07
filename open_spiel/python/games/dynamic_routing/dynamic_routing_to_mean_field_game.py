@@ -67,21 +67,16 @@ class DynamicRoutingToMeanFieldGameState(
 ):
   """TODO"""
 
-  def __init__(self, game, vehicles):
-    super().__init__(game, vehicles)
-    self.__state_memoization = {}
+  # def __init__(self, game, vehicles):
+  #   super().__init__(game, vehicles)
   #   self.current_player_ = 0
   #   self.actions_ = [0 for _ in range(self.get_game().num_players())]
-  # TODO: generate all states and memoize them here?
 
   def convert_state_to_mean_field_state(self, player_id):
     """Convert a N player state to a mean field state."""
     # if player_id is None:
     #   player_id = self.current_player_
     assert player_id >= 0, "player_id should be a positive integer."
-    state_key = (str(self), player_id)
-    if state_key in self.__state_memoization:
-      return self.__state_memoization[state_key].clone()
     mfg_state = mean_field_routing_game.MeanFieldRoutingGameState(
       self.get_game().mfg_game, self.get_game().od_demand)
     mfg_state._is_chance_init = False
@@ -97,8 +92,7 @@ class DynamicRoutingToMeanFieldGameState(
     mfg_state._vehicle_location = self._vehicle_locations[player_id]
     mfg_state._vehicle_without_legal_action = (
       player_id in self._vehicle_without_legal_actions)
-    self.__state_memoization[state_key] = mfg_state
-    return mfg_state.clone()
+    return mfg_state
 
   # def is_simultaneous_node(self):
   #   return not self._is_chance and not self._is_terminal
