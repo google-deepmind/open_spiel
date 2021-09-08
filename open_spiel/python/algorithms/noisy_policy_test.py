@@ -40,15 +40,21 @@ class NoisyPolicyTest(parameterized.TestCase, absltest.TestCase):
         to_string=lambda s: s.information_state_string())
 
     for current_player in range(game.num_players()):
-      noise = noisy_policy.NoisyPolicy(policy, 0, alpha=0.5, beta=10.)
+      noise = noisy_policy.NoisyPolicy(
+        policy, player_id=current_player, alpha=0.5, beta=10.)
       for state in all_states.values():
-        if state.current_player() != current_player:
+        if state.current_player() < 0:
           continue
 
-        # TODO(b/141737795): Decide what to do about this.
-        self.assertNotEqual(
-            policy.action_probabilities(state),
-            noise.action_probabilities(state))
+        if state.current_player() != current_player:
+          self.assertEqual(
+              policy.action_probabilities(state),
+              noise.action_probabilities(state))
+        else:
+          # TODO(b/141737795): Decide what to do about this.
+          self.assertNotEqual(
+              policy.action_probabilities(state),
+              noise.action_probabilities(state))
 
 if __name__ == "__main__":
   absltest.main()
