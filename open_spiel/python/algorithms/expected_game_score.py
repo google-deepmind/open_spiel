@@ -18,12 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import itertools
+from typing import List, Union
+
 import numpy as np
+
+from open_spiel.python import policy
+
 
 PROBABILITY_THRESHOLD = 0
 
 
-def policy_value(state, policies):
+def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
   """Returns the expected values for the state for players following `policies`.
 
   Computes the expected value of the`state` for each player, assuming player `i`
@@ -31,14 +37,13 @@ def policy_value(state, policies):
 
   Args:
     state: A `pyspiel.State`.
-    policies: A `list` of `policy.Policy` objects, one per player.
+    policies: A `list` of `policy.Policy` objects, one per player for sequential
+      games, one policy for simulatenous games.
 
   Returns:
     A `numpy.array` containing the expected value for each player.
   """
-  assert not state.is_simultaneous_node()
-
-  num_players = len(policies)
+  num_players = state.get_game().num_players()
 
   if state.is_terminal():
     values = np.array(state.returns())
@@ -47,10 +52,22 @@ def policy_value(state, policies):
     for action, action_prob in state.chance_outcomes():
       child = state.child(action)
       values += action_prob * policy_value(child, policies)
-    return values
   elif state.is_simultaneous_node():
-    raise NotImplementedError(
-        "Policy Value is not implemented for simultaneous games")
+    values = np.zeros(shape=num_players)
+    action_prob_dicts = []
+    for player in range(num_players):
+      action_prob_dicts.append(
+        policies.action_probabilities(state, player))
+    actions = itertools.product(*action_prob_dicts)
+    probabilities = itertools.product(
+      *[action_prob.values() for action_prob in action_prob_dicts])
+    for action_tuple, probability_tuple in zip(actions, probabilities):
+      probability = np.prod(probability_tuple)
+      action_list = list(action_tuple)
+      if probability > PROBABILITY_THRESHOLD:
+        child = state.clone()
+        child.apply_actions(action_list)
+        values += probability * policy_value(child, policies)
   else:
     player = state.current_player()
     values = np.zeros(shape=num_players)

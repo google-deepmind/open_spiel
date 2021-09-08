@@ -23,6 +23,7 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.algorithms import expected_game_score
+import open_spiel.python.games
 import pyspiel
 
 
@@ -34,6 +35,16 @@ class PolicyValueTest(absltest.TestCase):
     uniform_policy_values = expected_game_score.policy_value(
         game.new_initial_state(), [uniform_policy] * 2)
     self.assertTrue(np.allclose(uniform_policy_values, [1 / 8, -1 / 8]))
+
+  def test_expected_game_score_uniform_random_iterated_prisoner_dilemma(self):
+    game = pyspiel.load_game(
+      "python_iterated_prisoners_dilemma(max_game_length=6)")
+    uniform_policy = policy.UniformRandomPolicy(game)
+    uniform_policy_values = expected_game_score.policy_value(
+        game.new_initial_state(), uniform_policy)
+    print(uniform_policy_values)
+    self.assertTrue(
+      np.allclose(uniform_policy_values, [19.43373108, 19.43373108]))
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ import numpy as np
 import pyspiel
 
 _NUM_PLAYERS = 2
-_DEFAULT_PARAMS = {"termination_probability": 0.125}
+_DEFAULT_PARAMS = {"termination_probability": 0.125, "max_game_length": 9999}
 _PAYOFF = [[5, 0], [10, 1]]
 
 _GAME_TYPE = pyspiel.GameType(
@@ -43,14 +43,6 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_tensor=False,
     provides_factored_observation_string=False,
     parameter_specification=_DEFAULT_PARAMS)
-_GAME_INFO = pyspiel.GameInfo(
-    num_distinct_actions=2,
-    max_chance_outcomes=2,
-    num_players=2,
-    min_utility=0.,
-    max_utility=np.inf,
-    utility_sum=0.0,
-    max_game_length=9999)
 
 
 class Action(enum.IntEnum):
@@ -68,7 +60,15 @@ class IteratedPrisonersDilemmaGame(pyspiel.Game):
 
   # pylint:disable=dangerous-default-value
   def __init__(self, params=_DEFAULT_PARAMS):
-    super().__init__(_GAME_TYPE, _GAME_INFO, params)
+    game_info = pyspiel.GameInfo(
+        num_distinct_actions=2,
+        max_chance_outcomes=2,
+        num_players=2,
+        min_utility=0.,
+        max_utility=np.inf,
+        utility_sum=0.0,
+        max_game_length=params["max_game_length"])
+    super().__init__(_GAME_TYPE, game_info, params)
     self._termination_probability = params["termination_probability"]
 
   def new_initial_state(self):
@@ -88,6 +88,7 @@ class IteratedPrisonersDilemmaState(pyspiel.State):
   def __init__(self, game, termination_probability):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
+    self._current_iteration = 0
     self._termination_probability = termination_probability
     self._is_chance = False
     self._game_over = False
@@ -121,8 +122,11 @@ class IteratedPrisonersDilemmaState(pyspiel.State):
     """Applies the specified action to the state."""
     # This is not called at simultaneous-move states.
     assert self._is_chance and not self._game_over
+    self._current_iteration += 1
     self._is_chance = False
     self._game_over = (action == Chance.STOP)
+    if self._current_iteration > self.get_game().max_game_length():
+      self._game_over = True
 
   def _apply_actions(self, actions):
     """Applies the specified actions (per player) to the state."""
