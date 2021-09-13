@@ -44,7 +44,7 @@ class PolicyValueTest(absltest.TestCase):
         game.new_initial_state(), uniform_policy)
     print(uniform_policy_values)
     self.assertTrue(
-      np.allclose(uniform_policy_values, [19.43373108, 19.43373108]))
+      np.allclose(uniform_policy_values, [17.6385498, 17.6385498]))
 
 
 if __name__ == "__main__":

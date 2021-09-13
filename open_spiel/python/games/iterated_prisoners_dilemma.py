@@ -88,7 +88,7 @@ class IteratedPrisonersDilemmaState(pyspiel.State):
   def __init__(self, game, termination_probability):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
-    self._current_iteration = 0
+    self._current_iteration = 1
     self._termination_probability = termination_probability
     self._is_chance = False
     self._game_over = False
