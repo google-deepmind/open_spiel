@@ -42,7 +42,6 @@ class PolicyValueTest(absltest.TestCase):
     uniform_policy = policy.UniformRandomPolicy(game)
     uniform_policy_values = expected_game_score.policy_value(
         game.new_initial_state(), uniform_policy)
-    print(uniform_policy_values)
     self.assertTrue(
       np.allclose(uniform_policy_values, [17.6385498, 17.6385498]))
 
