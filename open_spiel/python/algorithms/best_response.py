@@ -115,11 +115,11 @@ class BestResponsePolicy(openspiel_policy.Policy):
   def decision_nodes(self, parent_state):
     """Yields a (state, cf_prob) pair for each descendant decision node."""
     if not parent_state.is_terminal():
-      if parent_state.current_player() == self._player_id:
+      if (parent_state.current_player() == self._player_id
+          or parent_state.is_simultaneous_node()):
         yield (parent_state, 1.0)
       for action, p_action in self.transitions(parent_state):
         if parent_state.is_simultaneous_node():
-          yield (parent_state, 1.0)
           child = parent_state.clone()
           child.apply_actions(action)
         else:
@@ -127,70 +127,81 @@ class BestResponsePolicy(openspiel_policy.Policy):
         for state, p_state in self.decision_nodes(child):
           yield (state, p_state * p_action)
 
+  def get_action_probabilities_list_simultaneous_node(self, state):
+    """Get list of action, probability tuples for simultaneous node.
+
+    Counterfactual reach probabilities exclude the best-responder's actions,
+    the sum of the probabilities is equal to the number of actions of the
+    player _player_id.
+    Args:
+      state: the current state of the game.
+    Returns:
+      list of action, probability tuples. An action is a tuple of individual
+        actions for each player of the game.
+    """
+    assert state.is_simultaneous_node()
+    action_prob_dicts = []
+    for player in range(self._num_players):
+      if player == self._player_id:
+        action_prob_dicts.append(
+          {action: 1.0 for action in state.legal_actions(player)})
+      else:
+        action_prob_dicts.append(
+          self._policy.action_probabilities(state, player))
+    actions = list(itertools.product(*action_prob_dicts))
+    probabilities = list(itertools.product(
+      *[action_prob.values() for action_prob in action_prob_dicts]))
+    return [
+        (list(action_tuple), np.prod(probability_tuple))
+        for action_tuple, probability_tuple
+        in list(zip(actions, probabilities))]
+
   def transitions(self, state):
     """Returns a list of (action, cf_prob) pairs from the specified state."""
     if state.current_player() == self._player_id:
       # Counterfactual reach probabilities exclude the best-responder's actions,
       # hence return probability 1.0 for every action.
       return [(action, 1.0) for action in state.legal_actions()]
-    if state.is_chance_node():
+    elif state.is_chance_node():
       return state.chance_outcomes()
-    if state.is_simultaneous_node():
-      action_prob_dicts = []
-      for player in range(state.get_game().num_players()):
-        if player == self._player_id:
-          action_prob_dicts.append(
-            {action: 1.0 for action in state.legal_actions(player)})
-        else:
-          action_prob_dicts.append(
-            self._policy.action_probabilities(state, player))
-      actions = list(itertools.product(*action_prob_dicts))
-      probabilities = list(itertools.product(
-        *[action_prob.values() for action_prob in action_prob_dicts]))
-      return [
-        (list(action_tuple), np.prod(probability_tuple))
-        for action_tuple, probability_tuple
-        in list(zip(actions, probabilities))]
-    return list(self._policy.action_probabilities(state).items())
+    elif state.is_simultaneous_node():
+      return self.get_action_probabilities_list_simultaneous_node(state)
+    else:
+      return list(self._policy.action_probabilities(state).items())
 
   @_memoize_method(key_fn=lambda state: state.history_str())
   def value(self, state):
     """Returns the value of the specified state to the best-responder."""
     if state.is_terminal():
       return state.player_return(self._player_id)
-    if state.current_player() == self._player_id:
+    elif state.current_player() == self._player_id:
       action = self.best_response_action(
         state.information_state_string(self._player_id))
       return self.q_value(state, action)
-    if state.is_simultaneous_node():
-      def q_value_sim(state, actions):
-        child = state.clone()
-        # change action of _player_id
-        actions[self._player_id] = self.best_response_action(
-          state.information_state_string(self._player_id))
-        child.apply_actions(actions)
-        return self.value(child)
-      actions, probabilities = zip(*self.transitions(state))
-      return sum(p * q_value_sim(state, a)
-                 for a, p in zip(actions, probabilities/sum(probabilities))
+    elif state.is_simultaneous_node():
+      return sum(self.q_value(state, action)
+                 for action in state.legal_actions(self._player_id))
+    else:
+      return sum(p * self.q_value(state, a)
+                 for a, p in self.transitions(state)
                  if p > self._cut_threshold)
-    return sum(p * self.q_value(state, a)
-               for a, p in self.transitions(state)
-               if p > self._cut_threshold)
 
   def q_value(self, state, action):
     """Returns the value of the (state, action) to the best-responder."""
     # Change that also.
     if state.is_simultaneous_node():
-      def q_value_sim(state, actions):
-        child = state.clone()
+      def q_value_sim(sim_state, sim_actions):
+        child = sim_state.clone()
         # change action of _player_id
-        actions[self._player_id] = action
-        child.apply_actions(actions)
+        sim_actions[self._player_id] = action
+        child.apply_actions(sim_actions)
         return self.value(child)
-      return sum(p * q_value_sim(state, a) for a, p in self.transitions(state)
+      actions_list, probabilities = zip(*self.transitions(state))
+      return sum(p * q_value_sim(state, a)
+                 for a, p in zip(actions_list, probabilities/sum(probabilities))
                  if p > self._cut_threshold)
-    return self.value(state.child(action))
+    else:
+      return self.value(state.child(action))
 
   @_memoize_method()
   def best_response_action(self, infostate):
