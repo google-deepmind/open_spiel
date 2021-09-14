@@ -710,6 +710,8 @@ std::unique_ptr<State> TinyBridgeAuctionState::Clone() const {
 
 void TinyBridgeAuctionState::UndoAction(Player player, Action action) {
   actions_.pop_back();
+  history_.pop_back();
+  --move_number_;
   is_terminal_ = false;
 }
 
