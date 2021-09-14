@@ -186,7 +186,6 @@ class BestResponsePolicy(openspiel_policy.Policy):
 
   def q_value(self, state, action):
     """Returns the value of the (state, action) to the best-responder."""
-    # Change that also.
     if state.is_simultaneous_node():
       def q_value_sim(sim_state, sim_actions):
         child = sim_state.clone()
@@ -207,12 +206,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
     infoset = self.infosets[infostate]
     # Get actions from the first (state, cf_prob) pair in the infoset list.
     # Return the best action by counterfactual-reach-weighted state-value.
-    def legal_actions_wrapper(state):
-      if state.is_simultaneous_node():
-        return state.legal_actions(self._player_id)
-      return state.legal_actions()
     return max(
-        legal_actions_wrapper(infoset[0][0]),
+        infoset[0][0].legal_actions(self._player_id),
         key=lambda a: sum(cf_p * self.q_value(s, a) for s, cf_p in infoset))
 
   def action_probabilities(self, state, player_id=None):
