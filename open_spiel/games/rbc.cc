@@ -62,6 +62,7 @@ chess::ObservationTable ComputeObservationTable(const chess::ChessBoard& board,
   const int board_size = board.BoardSize();
   chess::ObservationTable observability_table{false};
 
+  // Player pieces.
   for (int8_t y = 0; y < board_size; ++y) {
     for (int8_t x = 0; x < board_size; ++x) {
       chess::Square sq{x, y};
@@ -72,9 +73,11 @@ chess::ObservationTable ComputeObservationTable(const chess::ChessBoard& board,
       }
     }
   }
+
   // No sense window specified.
   if (sense_location < 0) return observability_table;
 
+  // All pieces under the sense window.
   int inner_size = board_size - sense_size + 1;
   chess::Square sense_sq = chess::IndexToSquare(sense_location, inner_size);
   SPIEL_DCHECK_LE(sense_sq.x + sense_size, board_size);
@@ -148,17 +151,7 @@ class RbcObserver : public Observer {
     }
 
     if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
-      chess::Color color = chess::PlayerToColor(player);
-      int sense_location = (state.phase_ == MovePhase::kMoving &&
-                            state.CurrentPlayer() == player)
-                               ? state.sense_location_[player]
-                               // Make sure that sense from last round does not
-                               // reveal a new hidden move: allow players to
-                               // perceive only results of the last sensing.
-                               : kSenseLocationNonSpecified;
-      auto obs_table = ComputeObservationTable(
-          state.Board(), color, sense_location, game.sense_size());
-      return state.Board().ToDarkFEN(obs_table, color);
+      return StringPrivateInfoObservation(state, game, player);
     } else {
       SpielFatalError(
           "RbcObserver: string with imperfect recall is implemented only"
@@ -167,6 +160,77 @@ class RbcObserver : public Observer {
   }
 
  private:
+
+  // Encode the private observations as a FEN-like string.
+  std::string StringPrivateInfoObservation(const RbcState& state,
+                                           const RbcGame& game, int player) const {
+    chess::Color color = chess::PlayerToColor(player);
+    int sense_location =
+        (state.phase_ == MovePhase::kMoving && state.CurrentPlayer() == player)
+        ? state.sense_location_[player]
+        // Make sure that sense from last round does not
+        // reveal a new hidden move: allow players to
+        // perceive only results of the last sensing.
+        : kSenseLocationNonSpecified;
+    const chess::ChessBoard& board = state.Board();
+    auto observability_table = ComputeObservationTable(
+        board, color, sense_location, game.sense_size());
+    int board_size = game.board_size();
+    std::string str = "";
+
+    // 1. Encode the board based on what can be observed for the player.
+    for (int8_t rank = board_size - 1; rank >= 0; --rank) {
+      int num_unknown = 0;
+      for (int8_t file = 0; file < board_size; ++file) {
+        size_t index =
+            chess::SquareToIndex(chess::Square{file, rank}, board_size);
+        if (!observability_table[index]) {
+          num_unknown++;
+        } else {
+          if(num_unknown > 0) {
+            absl::StrAppend(&str, num_unknown);
+            num_unknown = 0;
+          }
+          const chess::Piece& piece = board.at(chess::Square{file, rank});
+          absl::StrAppend(&str, piece.ToString());
+        }
+      }
+      if (num_unknown > 0) {
+        absl::StrAppend(&str, num_unknown);
+      }
+      if (rank > 0) {
+        str.push_back('/');
+      }
+    }
+
+    // 2. Castling rights of the player.
+    absl::StrAppend(&str, " ");
+    std::string castling_rights;
+    if (board.CastlingRight(color, chess::CastlingDirection::kRight)) {
+      castling_rights.push_back('K');
+    }
+    if (board.CastlingRight(color, chess::CastlingDirection::kLeft)) {
+      castling_rights.push_back('Q');
+    }
+    absl::StrAppend(&str, castling_rights.empty() ? "-" : castling_rights);
+
+    // 3. Phase.
+    absl::StrAppend(&str, " ", state.phase_ == MovePhase::kSensing ? "s" : "m");
+
+    // 4. Capture (but no information about what was captured).
+    absl::StrAppend(&str, " ", state.move_captured_ ? "c" : "-");
+
+    // 5. Side to play.
+    absl::StrAppend(&str, " ",
+                    board.ToPlay() == chess::Color::kWhite ? "w" : "b");
+
+    // 6. Illegal move.
+    const bool can_show = state.CurrentPlayer() == player;
+    absl::StrAppend(&str, " ",
+                    can_show && state.illegal_move_attempted_ ? "i" : "-");
+    return str;
+  }
+
   void WritePieces(chess::Color color, chess::PieceType piece_type,
                    const chess::ChessBoard& board, int sense_location,
                    int sense_size, const std::string& prefix,
@@ -213,6 +277,12 @@ class RbcObserver : public Observer {
                               const std::string& prefix,
                               Allocator* allocator) const {
     chess::Color color = chess::PlayerToColor(player);
+
+    // Illegal move (pawn attack or pawn forward-move or castle through
+    // opponent pieces).
+    const bool can_show = state.CurrentPlayer() == player;
+    WriteBinary(can_show && state.illegal_move_attempted_,
+                "illegal_move", allocator);
 
     // Piece configuration.
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
@@ -263,7 +333,6 @@ class RbcObserver : public Observer {
     WriteScalar(num_pieces[0], 0, board_size * 2, "pieces_black", allocator);
     WriteScalar(num_pieces[1], 0, board_size * 2, "pieces_white", allocator);
     WriteBinary(state.phase_ == MovePhase::kSensing, "phase", allocator);
-    WriteBinary(state.illegal_move_attempted_, "illegal_move", allocator);
     WriteBinary(state.move_captured_, "capture", allocator);
     WriteBinary(state.CurrentPlayer(), "side_to_play", allocator);
   }
@@ -293,11 +362,13 @@ void RbcState::DoApplyAction(Action action) {
     sense_location_[CurrentPlayer()] = action;
     phase_ = MovePhase::kMoving;
   } else {
+    SPIEL_CHECK_TRUE(phase_ == MovePhase::kMoving);
     chess::Move move = ActionToMove(action, Board());
 
     // Handle special cases for RBC.
-    // The RBC's pass move is handled via ChessBoard flag allow_pass_move.
+
     if (move == chess::kPassMove) {
+      // The RBC's pass move is handled via ChessBoard flag allow_pass_move.
       // Nothing here. Values set above.
     } else if (Board().IsBreachingMove(move)) {
       SPIEL_DCHECK_FALSE(Board().IsMoveLegal(move));
@@ -308,12 +379,28 @@ void RbcState::DoApplyAction(Action action) {
       SPIEL_DCHECK_NE(Board().at(move.from).color, Board().at(move.to).color);
       move_captured_ = true;
     } else if (!Board().IsMoveLegal(move)) {
+      // Illegal move was chosen.
       illegal_move_attempted_ = true;
-      move = chess::kPassMove;  // Illegal move was chosen, so pass instead.
+
+      // Check why the move was illegal: if it is pawn two-squares-forward move,
+      // and there is an enemy piece blocking it, the attempt to move only one
+      // square forward (if that would be a legal move).
+      if (move.piece.type == chess::PieceType::kPawn
+          && abs(move.from.y - move.to.y) == 2) {
+        int dy = move.to.y - move.from.y > 0 ? 1 : -1;
+        chess::Move one_forward_move = move;
+        one_forward_move.to.y -= dy;
+        move = Board().IsMoveLegal(one_forward_move)
+             ? one_forward_move : chess::kPassMove;
+      } else {
+        // Treat the illegal move as a pass.
+        move = chess::kPassMove;
+      }
     } else {
       // All other moves
-      SPIEL_DCHECK_NE(Board().at(move.from).color, chess::Color::kEmpty);
-      move_captured_ = Board().at(move.from).color != Board().at(move.to).color;
+      SPIEL_DCHECK_EQ(Board().at(move.from).color, Board().ToPlay());
+      move_captured_ =
+          Board().at(move.to).color == chess::OppColor(Board().ToPlay());
     }
 
     SPIEL_DCHECK_TRUE(Board().IsMoveLegal(move));
@@ -362,7 +449,7 @@ std::string RbcState::ActionToString(Player player, Action action) const {
   } else {
     if (action == chess::kPassAction) return "pass";
     chess::Move move = ActionToMove(action, Board());
-    return move.ToSAN(Board());
+    return move.ToLAN();
   }
 }
 

@@ -344,8 +344,8 @@ class ChessBoard {
   // 4. K+B* vs K+B* (all bishops on same coloured squares)
   bool HasSufficientMaterial() const;
 
-  // Parses a move in standard algebraic notation or long algebraic notation (
-  // see below). Returns absl::nullopt on failure.
+  // Parses a move in standard algebraic notation or long algebraic notation
+  // (see below). Returns absl::nullopt on failure.
   absl::optional<Move> ParseMove(const std::string& move) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.

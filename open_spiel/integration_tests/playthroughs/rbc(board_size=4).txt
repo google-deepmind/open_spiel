@@ -24,7 +24,7 @@ NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-ObservationTensorShape() = pieces_black: [9], pieces_white: [9], phase: [2], illegal_move: [2], capture: [2], side_to_play: [2], private_k_pieces: [4, 4], private_q_pieces: [4, 4], private_r_pieces: [4, 4], private_b_pieces: [4, 4], private_n_pieces: [4, 4], private_p_pieces: [4, 4], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [4, 4], private_sense_Q_pieces: [4, 4], private_sense_R_pieces: [4, 4], private_sense_B_pieces: [4, 4], private_sense_N_pieces: [4, 4], private_sense_P_pieces: [4, 4]
+ObservationTensorShape() = pieces_black: [9], pieces_white: [9], phase: [2], capture: [2], side_to_play: [2], illegal_move: [2], private_k_pieces: [4, 4], private_q_pieces: [4, 4], private_r_pieces: [4, 4], private_b_pieces: [4, 4], private_n_pieces: [4, 4], private_p_pieces: [4, 4], private_left_castling: [2], private_right_castling: [2], private_sense_K_pieces: [4, 4], private_sense_Q_pieces: [4, 4], private_sense_R_pieces: [4, 4], private_sense_B_pieces: [4, 4], private_sense_N_pieces: [4, 4], private_sense_P_pieces: [4, 4]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 222
 MaxGameLength() = 17695
@@ -38,14 +38,14 @@ HistoryString() = ""
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "r?kr/pppp/????/???? w - - 0 1"
-ObservationString(1) = "????/????/PPPP/R?KR w - - 0 1"
+ObservationString(0) = "r1kr/pppp/4/4 - s - w -"
+ObservationString(1) = "4/4/PPPP/R1KR - s - w -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -99,9 +99,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -168,14 +168,14 @@ HistoryString() = "2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "r?kr/pppp/????/???? w - - 0 1"
-ObservationString(1) = "r1k?/ppp?/PPPP/R?KR w - - 0 1"
+ObservationString(0) = "r1kr/pppp/4/4 - m - w -"
+ObservationString(1) = "r k1/ppp1/PPPP/R1KR - m - w -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◉◯
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -229,9 +229,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◉◯
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -285,9 +285,9 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◉◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
-StringLegalActions() = ["pass", "Rab1", "axa3", "axb3", "bxb3", "bxc3", "bxa3", "Kcb1", "cxc3", "cxd3", "cxb3", "dxd3", "dxc3"]
+StringLegalActions() = ["pass", "a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2d3", "d2c3"]
 
-# Apply action "axb3"
+# Apply action "a2b3"
 action: 117
 
 # State 2
@@ -298,14 +298,14 @@ HistoryString() = "2, 117"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "r?kr/p?pp/????/???? b - - 0 1"
-ObservationString(1) = "????/?P??/?PPP/R?KR b - - 0 1"
+ObservationString(0) = "r1kr/p1pp/4/4 - s c b -"
+ObservationString(1) = "4/1P2/1PPP/R1KR - s c b -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
 ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -359,9 +359,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
 ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -428,14 +428,14 @@ HistoryString() = "2, 117, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "r?kr/pPpp/?PPP/?1KR b - - 0 1"
-ObservationString(1) = "????/?P??/?PPP/R?KR b - - 0 1"
+ObservationString(0) = "r1kr/pPpp/1PPP/1 KR - m - b -"
+ObservationString(1) = "4/1P2/1PPP/R1KR - m - b -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◉◯
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -489,9 +489,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◉◯
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -545,9 +545,9 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
-StringLegalActions() = ["pass", "Rab4", "a2", "axb2", "Kcb4", "Kxb3", "cxc2", "cxd2", "cxb2", "dxd2", "dxc2"]
+StringLegalActions() = ["pass", "a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3d2", "c3b2", "d3d2", "d3c2"]
 
-# Apply action "Rab4"
+# Apply action "a4b4"
 action: 30
 
 # State 4
@@ -558,14 +558,14 @@ HistoryString() = "2, 117, 1, 30"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "?rkr/p?pp/????/???? w - - 1 2"
-ObservationString(1) = "????/?P??/?PPP/R?KR w - - 1 2"
+ObservationString(0) = "1rkr/p1pp/4/4 - s - w -"
+ObservationString(1) = "4/1P2/1PPP/R1KR - s - w -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
-ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -619,9 +619,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
-ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -681,7 +681,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 0
 
 # State 5
-# Apply action "Rab1"
+# Apply action "a1b1"
 action: 30
 
 # State 6
@@ -692,14 +692,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "?rkr/p?pp/????/???? b - - 2 2"
-ObservationString(1) = "????/?P??/?PPP/?RKR b - - 2 2"
+ObservationString(0) = "1rkr/p1pp/4/4 - s - b -"
+ObservationString(1) = "4/1P2/1PPP/1RKR - s - b -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
-ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◉
@@ -753,9 +753,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◯◉◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
-ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -815,7 +815,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 0
 
 # State 7
-# Apply action "Rxb1"
+# Apply action "b4b1"
 action: 602
 
 # State 8
@@ -823,7 +823,7 @@ action: 602
 action: 0
 
 # State 9
-# Apply action "Ra1"
+# Apply action "b1a1"
 action: 613
 
 # State 10
@@ -831,7 +831,7 @@ action: 613
 action: 2
 
 # State 11
-# Apply action "Kcb4"
+# Apply action "c4b4"
 action: 1197
 
 # State 12
@@ -839,7 +839,7 @@ action: 1197
 action: 1
 
 # State 13
-# Apply action "cxd3"
+# Apply action "c2d3"
 action: 1285
 
 # State 14
@@ -847,7 +847,7 @@ action: 1285
 action: 1
 
 # State 15
-# Apply action "Rdc4"
+# Apply action "d4c4"
 action: 1781
 
 # State 16
@@ -855,7 +855,7 @@ action: 1781
 action: 2
 
 # State 17
-# Apply action "d4=Q"
+# Apply action "d3d4q"
 action: 1914
 
 # State 18
@@ -863,7 +863,7 @@ action: 1914
 action: 0
 
 # State 19
-# Apply action "Ka4"
+# Apply action "b4a4"
 action: 613
 
 # State 20
@@ -874,14 +874,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "k?r?/prp?/????/???? w - - 1 6"
-ObservationString(1) = "???Q/????/?P?P/R?KR w - - 1 6"
+ObservationString(0) = "k1r1/prp1/4/4 - s - w -"
+ObservationString(1) = "3Q/4/1P1P/R1KR - s - w -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◯◉◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
-ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -935,9 +935,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◯◉◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
-ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -997,7 +997,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 2
 
 # State 21
-# Apply action "bxa3"
+# Apply action "b2a3"
 action: 714
 
 # State 22
@@ -1008,14 +1008,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "k?r?/?rp?/????/???? b - - 0 6"
-ObservationString(1) = "???Q/P???/???P/R?KR b - - 0 6"
+ObservationString(0) = "k1r1/1rp1/4/4 - s c b -"
+ObservationString(1) = "3Q/P3/3P/R1KR - s c b -"
 ObservationTensor(0).pieces_black: ◯◯◯◯◉◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
 ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1069,9 +1069,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◯◉◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◯◯◯◉◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
 ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -1131,7 +1131,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 1
 
 # State 23
-# Apply action "Rbxa3"
+# Apply action "b3a3"
 action: 686
 
 # State 24
@@ -1139,7 +1139,7 @@ action: 686
 action: 3
 
 # State 25
-# Apply action "Ra2"
+# Apply action "a1a2"
 action: 16
 
 # State 26
@@ -1147,7 +1147,7 @@ action: 16
 action: 3
 
 # State 27
-# Apply action "Rxa2"
+# Apply action "a3a2"
 action: 89
 
 # State 28
@@ -1155,7 +1155,7 @@ action: 89
 action: 3
 
 # State 29
-# Apply action "Qxa4"
+# Apply action "d4a4"
 action: 1998
 
 # State 30
@@ -1163,7 +1163,7 @@ action: 1998
 action: 3
 
 # State 31
-# Apply action "Rb2"
+# Apply action "a2b2"
 action: 176
 
 # State 32
@@ -1171,7 +1171,7 @@ action: 176
 action: 3
 
 # State 33
-# Apply action "Qb3"
+# Apply action "c4b3"
 action: 1430
 
 # State 34
@@ -1179,7 +1179,7 @@ action: 1430
 action: 3
 
 # State 35
-# Apply action "cc2"
+# Apply action "c3c2"
 action: 1257
 
 # State 36
@@ -1187,7 +1187,7 @@ action: 1257
 action: 3
 
 # State 37
-# Apply action "Qc3"
+# Apply action "b3c3"
 action: 760
 
 # State 38
@@ -1195,7 +1195,7 @@ action: 760
 action: 3
 
 # State 39
-# Apply action "cxd1=N"
+# Apply action "c2d1n"
 action: 1321
 
 # State 40
@@ -1206,14 +1206,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "k???/????/?r??/???n w - - 0 11"
-ObservationString(1) = "????/??Q?/???P/??K? w - - 0 11"
+ObservationString(0) = "k3/4/1r2/3n - s c w -"
+ObservationString(1) = "4/2Q1/3P/2K1 - s c w -"
 ObservationTensor(0).pieces_black: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1267,9 +1267,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◉◯◯◯
@@ -1329,7 +1329,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 3
 
 # State 41
-# Apply action "Kxd1"
+# Apply action "c1d1"
 action: 1198
 
 # State 42
@@ -1340,14 +1340,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "k???/????/?r??/???? b - - 0 11"
-ObservationString(1) = "????/??Q?/???P/???K b - - 0 11"
+ObservationString(0) = "k3/4/1r2/4 - s c b -"
+ObservationString(1) = "4/2Q1/3P/3K - s c b -"
 ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
 ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◯◉
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1401,9 +1401,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
 ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1463,7 +1463,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 3
 
 # State 43
-# Apply action "Ka3"
+# Apply action "a4a3"
 action: 16
 
 # State 44
@@ -1471,7 +1471,7 @@ action: 16
 action: 2
 
 # State 45
-# Apply action "Qcc1"
+# Apply action "c3c1"
 action: 1328
 
 # State 46
@@ -1479,7 +1479,7 @@ action: 1328
 action: 2
 
 # State 47
-# Apply action "Rbb3"
+# Apply action "b2b3"
 action: 745
 
 # State 48
@@ -1487,7 +1487,7 @@ action: 745
 action: 3
 
 # State 49
-# Apply action "dxc3"
+# Apply action "d2c3"
 action: 1882
 
 # State 50
@@ -1495,7 +1495,7 @@ action: 1882
 action: 3
 
 # State 51
-# Apply action "Rbb4"
+# Apply action "b3b4"
 action: 672
 
 # State 52
@@ -1503,7 +1503,7 @@ action: 672
 action: 3
 
 # State 53
-# Apply action "Qb1"
+# Apply action "c1b1"
 action: 1197
 
 # State 54
@@ -1511,7 +1511,7 @@ action: 1197
 action: 3
 
 # State 55
-# Apply action "Rxb1"
+# Apply action "b4b1"
 action: 602
 
 # State 56
@@ -1519,7 +1519,7 @@ action: 602
 action: 1
 
 # State 57
-# Apply action "dxc3"
+# Apply action "d2c3"
 action: 1882
 
 # State 58
@@ -1527,7 +1527,7 @@ action: 1882
 action: 0
 
 # State 59
-# Apply action "Ra1"
+# Apply action "b1a1"
 action: 832
 
 # State 60
@@ -1538,14 +1538,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "????/k???/????/r??? w - - 1 16"
-ObservationString(1) = "????/????/???P/???K w - - 1 16"
+ObservationString(0) = "4/k3/4/r3 - s - w -"
+ObservationString(1) = "4/4/3P/3K - s - w -"
 ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
-ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◉◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1599,9 +1599,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
-ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1661,7 +1661,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 1
 
 # State 61
-# Apply action "Kc2"
+# Apply action "d1c2"
 action: 1809
 
 # State 62
@@ -1672,14 +1672,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "????/k???/????/r??? b - - 2 16"
-ObservationString(1) = "????/????/??KP/???? b - - 2 16"
+ObservationString(0) = "4/k3/4/r3 - s - b -"
+ObservationString(1) = "4/4/2KP/4 - s - b -"
 ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
-ObservationTensor(0).capture: ◯◉
+ObservationTensor(0).capture: ◉◯
 ObservationTensor(0).side_to_play: ◉◯
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◉◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1733,9 +1733,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
-ObservationTensor(1).capture: ◯◉
+ObservationTensor(1).capture: ◉◯
 ObservationTensor(1).side_to_play: ◉◯
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◉◯◯
@@ -1795,7 +1795,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 action: 2
 
 # State 63
-# Apply action "Rb1"
+# Apply action "a1b1"
 action: 249
 
 # State 64
@@ -1803,7 +1803,7 @@ action: 249
 action: 1
 
 # State 65
-# Apply action "Kb2"
+# Apply action "c2b2"
 action: 1270
 
 # State 66
@@ -1811,7 +1811,7 @@ action: 1270
 action: 3
 
 # State 67
-# Apply action "Rbb3"
+# Apply action "b1b3"
 action: 817
 
 # State 68
@@ -1822,14 +1822,14 @@ HistoryString() = "2, 117, 1, 30, 0, 30, 0, 602, 0, 613, 2, 1197, 1, 1285, 1, 17
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "????/k???/?r??/???? w - - 0 18"
-ObservationString(1) = "????/????/???P/???? w - - 0 18"
+ObservationString(0) = "4/k3/1r2/4 - s c w -"
+ObservationString(1) = "4/4/3P/4 - s c w -"
 ObservationTensor(0).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).pieces_white: ◯◉◯◯◯◯◯◯◯
 ObservationTensor(0).phase: ◯◉
-ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).capture: ◯◉
 ObservationTensor(0).side_to_play: ◯◉
+ObservationTensor(0).illegal_move: ◉◯
 ObservationTensor(0).private_k_pieces: ◯◯◉◯
                                        ◯◯◯◯
                                        ◯◯◯◯
@@ -1883,9 +1883,9 @@ ObservationTensor(0).private_sense_P_pieces: ◯◯◯◯
 ObservationTensor(1).pieces_black: ◯◯◉◯◯◯◯◯◯
 ObservationTensor(1).pieces_white: ◯◉◯◯◯◯◯◯◯
 ObservationTensor(1).phase: ◯◉
-ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).capture: ◯◉
 ObservationTensor(1).side_to_play: ◯◉
+ObservationTensor(1).illegal_move: ◉◯
 ObservationTensor(1).private_k_pieces: ◯◯◯◯
                                        ◯◯◯◯
                                        ◯◯◯◯
