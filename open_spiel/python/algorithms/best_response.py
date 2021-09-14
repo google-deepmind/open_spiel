@@ -177,11 +177,10 @@ class BestResponsePolicy(openspiel_policy.Policy):
     elif (state.current_player() == self._player_id
           or state.is_simultaneous_node()):
       action = self.best_response_action(
-        state.information_state_string(self._player_id))
+          state.information_state_string(self._player_id))
       return self.q_value(state, action)
     else:
-      return sum(p * self.q_value(state, a)
-                 for a, p in self.transitions(state)
+      return sum(p * self.q_value(state, a) for a, p in self.transitions(state)
                  if p > self._cut_threshold)
 
   def q_value(self, state, action):
