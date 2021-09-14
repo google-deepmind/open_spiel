@@ -260,22 +260,6 @@ std::unique_ptr<State> DarkHexState::Clone() const {
   return std::unique_ptr<State>(new DarkHexState(*this));
 }
 
-void DarkHexState::UndoAction(Player player, Action move) {
-  Action last_move = action_sequence_.back().second;
-  SPIEL_CHECK_EQ(last_move, move);
-
-  if (state_.BoardAt(move) == PlayerToState(player)) {
-    state_.UndoAction(player, move);
-  }
-
-  auto& player_view = (player == 0 ? black_view_ : white_view_);
-  player_view[move] = CellState::kEmpty;
-  action_sequence_.pop_back();
-
-  history_.pop_back();
-  --move_number_;
-}
-
 DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
     : Game(game_type, params),
       game_(std::static_pointer_cast<const hex::HexGame>(LoadGame(
