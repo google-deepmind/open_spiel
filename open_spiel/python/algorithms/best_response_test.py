@@ -154,6 +154,7 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(
         expected_policy,
         {key: br.best_response_action(key) for key in expected_policy})
+    self.assertAlmostEqual(br.value(game.new_initial_state()), 0.856471051954)
 
 
 if __name__ == "__main__":
