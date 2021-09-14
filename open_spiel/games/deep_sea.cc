@@ -151,11 +151,22 @@ std::unique_ptr<State> DeepSeaState::Clone() const {
 }
 
 void DeepSeaState::UndoAction(Player player, Action move) {
-  player_col_ -= direction_history_.back() ? 1 : -1;
-  --player_row_;
+  // Can only reliably undo by replaying the actions. This is because moving
+  // left from column 0 is a no-op, so we can't deduce the previous column if
+  // we're now at column 0.
   direction_history_.pop_back();
   history_.pop_back();
   --move_number_;
+  player_row_ = 0;
+  player_col_ = 0;
+  for (auto action_right : direction_history_) {
+    if (action_right) {
+      ++player_col_;
+    } else if (player_col_ > 0) {
+      --player_col_;
+    }
+    ++player_row_;
+  }
 }
 
 void DeepSeaState::DoApplyAction(Action move) {
