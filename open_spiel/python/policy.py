@@ -35,10 +35,37 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import itertools
+
 import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
+
+
+def get_action_probabilities_list_simultaneous_node(state, policy):
+  """Get list of action, probability tuples for simultaneous node.
+
+  Args:
+    state: a game state at a simultaneous decision node.
+    policy: policy that gives the probability distribution over the legal
+      actions for each players.
+  Returns:
+    list of action, probability tuples. An action is a tuple of individual
+      actions for each player of the game.
+  """
+  assert state.is_simultaneous_node()
+  action_prob_dicts = []
+  for player in range(state.get_game().num_players()):
+    action_prob_dicts.append(
+      policy.action_probabilities(state, player))
+  actions = itertools.product(*action_prob_dicts)
+  probabilities = itertools.product(
+    *[action_prob.values() for action_prob in action_prob_dicts])
+  for action_tuple, probability_tuple in zip(actions, probabilities):
+    probability = np.prod(probability_tuple)
+    action_list = list(action_tuple)
+    yield action_list, probability
 
 
 class Policy:

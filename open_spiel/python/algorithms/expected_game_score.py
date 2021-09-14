@@ -54,16 +54,8 @@ def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
       values += action_prob * policy_value(child, policies)
   elif state.is_simultaneous_node():
     values = np.zeros(shape=num_players)
-    action_prob_dicts = []
-    for player in range(num_players):
-      action_prob_dicts.append(
-        policies.action_probabilities(state, player))
-    actions = itertools.product(*action_prob_dicts)
-    probabilities = itertools.product(
-      *[action_prob.values() for action_prob in action_prob_dicts])
-    for action_tuple, probability_tuple in zip(actions, probabilities):
-      probability = np.prod(probability_tuple)
-      action_list = list(action_tuple)
+    for action_list, probability in (policy
+        .get_action_probabilities_list_simultaneous_node(state, policies)):
       if probability > PROBABILITY_THRESHOLD:
         child = state.clone()
         child.apply_actions(action_list)
