@@ -166,16 +166,19 @@ void CatchState::ObservationTensor(Player player,
 }
 
 void CatchState::UndoAction(Player player, Action move) {
-  if (player == kChancePlayerId) {
-    initialized_ = false;
-    return;
-  }
-  int direction = move - 1;
-  paddle_col_ =
-      std::min(std::max(paddle_col_ - direction, 0), num_columns_ - 1);
-  --ball_row_;
   history_.pop_back();
   --move_number_;
+  if (player == kChancePlayerId) {
+    initialized_ = false;
+    ball_row_ = -1;
+    ball_col_ = -1;
+    paddle_col_ = -1;
+  } else {
+    int direction = move - 1;
+    paddle_col_ =
+        std::min(std::max(paddle_col_ - direction, 0), num_columns_ - 1);
+    --ball_row_;
+  }
 }
 
 std::unique_ptr<State> CatchState::Clone() const {
