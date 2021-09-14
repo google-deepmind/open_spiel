@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 #include "open_spiel/spiel.h"
-#include "open_spiel/higc/base64.h"
+#include "open_spiel/higc/channel.h"
 #include "open_spiel/higc/utils.h"
 
 namespace open_spiel {

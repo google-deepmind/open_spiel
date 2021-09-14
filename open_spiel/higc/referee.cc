@@ -18,8 +18,9 @@
 #include <exception>
 #include <unistd.h>
 
+#include "absl/strings/escaping.h"
+
 #include "open_spiel/spiel.h"
-#include "open_spiel/higc/base64.h"
 #include "open_spiel/higc/referee.h"
 #include "open_spiel/higc/utils.h"
 #include "open_spiel/utils/file.h"
@@ -157,11 +158,15 @@ std::unique_ptr<State> Referee::PlayMatch() {
       std::string private_tensor = private_observation_->Compress();
 
       // Send observations.
-      base64_encode(chn, reinterpret_cast<char* const>(public_tensor.data()),
-                    public_tensor.size());
+      absl::string_view public_string(
+          reinterpret_cast<char* const>(public_tensor.data()),
+          public_tensor.size());
+      chn->Write(absl::Base64Escape(public_string));
       chn->Write(" ");
-      base64_encode(chn, reinterpret_cast<char* const>(private_tensor.data()),
-                    private_tensor.size());
+      absl::string_view private_string(
+          reinterpret_cast<char* const>(private_tensor.data()),
+          private_tensor.size());
+      chn->Write(absl::Base64Escape(private_string));
       // Send actions.
       if (is_acting[pl]) {
         std::vector<Action> legal_actions = state->LegalActions(pl);

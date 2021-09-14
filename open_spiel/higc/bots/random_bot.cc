@@ -14,8 +14,9 @@
 
 #include <charconv>
 
+#include "absl/strings/escaping.h"
+
 #include "open_spiel/spiel.h"
-#include "open_spiel/higc/base64.h"
 
 // Example implementation of the random bot for HIG competition.
 // The bot must strictly follow the communication protocol via stdin/stdout,
@@ -96,7 +97,8 @@ void RandomBotMainLoop() {
       for (int i = 0; i < xs.size(); ++i) {
         absl::string_view x = xs[i];
         if (i <= 1) {  // Observations.
-          std::string decoded = base64_decode(x);
+          std::string decoded;
+          absl::Base64Unescape(x, &decoded);
           if (i == 0) public_observation.Decompress(decoded);
           else if (i == 1) private_observation.Decompress(decoded);
         } else {  // Legal actions.
