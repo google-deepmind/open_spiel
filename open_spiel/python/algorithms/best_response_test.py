@@ -137,6 +137,24 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
         expected_game_score.policy_value(game.new_initial_state(), [pi, br])[1],
         br.value(game.new_initial_state()))
 
+  def test_best_response_simultaneous_game(self):
+    """Test best response computation for simultaneous game."""
+    game = pyspiel.load_game("oshi_zumo(horizon=5,coins=5)")
+    test_policy = policy.UniformRandomPolicy(game)
+    br = best_response.BestResponsePolicy(game, policy=test_policy, player_id=0)
+    expected_policy = {
+        "0, 0, 0, 3, 0, 2": 1,
+        "0, 0, 1, 4, 3, 1": 0,
+        "0, 0, 4, 1, 0, 2, 0, 2": 1,
+        "0, 1, 1, 0, 1, 4": 1,
+        "0, 1, 4, 1, 0, 0, 0, 1": 1,
+        "0, 2, 2, 2, 3, 0, 0, 0": 0,
+        "0, 5, 0, 0, 0, 0, 3, 0": 1
+    }
+    self.assertEqual(
+        expected_policy,
+        {key: br.best_response_action(key) for key in expected_policy})
+
 
 if __name__ == "__main__":
   absltest.main()
