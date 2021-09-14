@@ -305,7 +305,7 @@ class DynamicRoutingGameState(pyspiel.State):
     if self.get_game().perform_sanity_checks:
       assert self._is_chance and not self._is_terminal
       assert (isinstance(action, int)
-              and 0 <= action <= self.get_game().max_chance_outcomes())
+              and 0 <= action < self.get_game().max_chance_outcomes())
     self._is_chance = False
     self._can_vehicles_move = [
       bool((action >> vehicle) % 2)
