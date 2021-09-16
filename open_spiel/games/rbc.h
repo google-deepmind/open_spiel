@@ -76,11 +76,16 @@
 // difference of player's pieces observations in the sensing phase.
 //
 // > "Sense phase: the player chooses any square on the chessboard to target
-// > their sensor."
+// >  their sensor. Then, the true state of the game board in a three square by
+// >  three square window centered at the chosen square is revealed to the
+// >  sensing player."
 //
-// Sensing is done as a square within the chessboard and not centered on any
-// square, because smaller windows near the border of the chessboard give
-// less information and such actions will be always dominated by better sensing.
+// Sensing is done as picking a sensing window that fully fits within the
+// chessboard and is not centered on an underlying square. The centering can
+// make the sensing window smaller (as a rectangle near the border of the
+// chessboard) which gives strictly less information than a better placed window
+// (that remains a full square). This modification eliminates strategically
+// useless sensing actions.
 //
 // > "If the move was modified [..] then the modified move is made, and
 // >  the current player is notified of the modified move in the move results."
