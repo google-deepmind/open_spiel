@@ -109,10 +109,11 @@ def one_forward_step(current_states: List[pyspiel.State],
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
-      new_states.append(new_state)
-      if state_to_str(new_state) not in new_distribution:
-        new_distribution[state_to_str(new_state)] = 0.0
-      new_distribution[state_to_str(new_state)] += distribution.get(
+      new_state_str = state_to_str(new_state)
+      if new_state_str not in new_distribution:
+        new_states.append(new_state)
+        new_distribution[new_state_str] = 0.0
+      new_distribution[new_state_str] += distribution.get(
           state_to_str(state), 0)
     return new_states, new_distribution
 
