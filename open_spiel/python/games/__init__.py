@@ -29,4 +29,4 @@ pyspiel.register_game(_GAME_TYPE, KuhnPokerGame)
 from open_spiel.python.games import iterated_prisoners_dilemma
 from open_spiel.python.games import kuhn_poker
 from open_spiel.python.games import tic_tac_toe
-from open_spiel.python.games.dynamic_routing import dynamic_routing_game
+from open_spiel.python.games import routing

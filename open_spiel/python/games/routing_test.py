@@ -22,8 +22,8 @@ from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import external_sampling_mccfr as external_mccfr
 from open_spiel.python.algorithms import outcome_sampling_mccfr as outcome_mccfr
-from open_spiel.python.games.dynamic_routing import dynamic_routing_game
-from open_spiel.python.games.dynamic_routing import dynamic_routing_game_utils
+from open_spiel.python.games import routing
+from open_spiel.python.games.dynamic_routing import utils
 import pyspiel
 
 
@@ -31,12 +31,12 @@ class DynamicRoutingGameTest(absltest.TestCase):
 
   def setUp(self):
     """TODO"""
-    network = dynamic_routing_game_utils.Network(
+    network = utils.Network(
       {'A': ['B'], 'B': ['C', 'D'], 'C': ['D', 'E'], 'D': ['E', 'G'],
        'E': ['F'], 'F': [], 'G': []})
-    vehicles = [dynamic_routing_game_utils.Vehicle('A->B', 'E->F')
+    vehicles = [utils.Vehicle('A->B', 'E->F')
                 for _ in range(3)]
-    self.more_complex_game = dynamic_routing_game.DynamicRoutingGame(
+    self.more_complex_game = routing.DynamicRoutingGame(
       network=network, vehicles=vehicles, max_num_time_step=100)
     self.num_iteration_cfr_test = 1
 
@@ -69,18 +69,18 @@ class DynamicRoutingGameTest(absltest.TestCase):
   def test_game_as_turn_based_via_string(self):
     """Check the game can be created as a turn-based game from a string."""
     game = pyspiel.load_game(
-      "turn_based_simultaneous_game(game=python_dynamic_routing_game())"
+      "turn_based_simultaneous_game(game=python_dynamic_routing())"
     )
     pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=True)
 
   def test_game_from_cc(self):
     """Runs our standard game tests, checking API consistency."""
-    game = pyspiel.load_game("python_dynamic_routing_game")
+    game = pyspiel.load_game("python_dynamic_routing")
     pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=True)
 
   def test_action_consistency_convert_to_turn_based(self):
     """Check if the sequential game is consistent with the game."""
-    game = pyspiel.load_game("python_dynamic_routing_game")
+    game = pyspiel.load_game("python_dynamic_routing")
     seq_game = pyspiel.convert_to_turn_based(game)
     state = game.new_initial_state()
     seq_state = seq_game.new_initial_state()
@@ -91,7 +91,7 @@ class DynamicRoutingGameTest(absltest.TestCase):
 
   def test_cfr_on_turn_based_game_with_exploitability(self):
     """Check if CFR can be applied to the sequential game."""
-    game = pyspiel.load_game("python_dynamic_routing_game")
+    game = pyspiel.load_game("python_dynamic_routing")
     seq_game = pyspiel.convert_to_turn_based(game)
     cfr_solver = cfr.CFRSolver(seq_game)
     for _ in range(self.num_iteration_cfr_test):
@@ -100,7 +100,7 @@ class DynamicRoutingGameTest(absltest.TestCase):
 
   def test_ext_mccfr_on_turn_based_game_with_exploitability(self):
     """Check if external sampling MCCFR can be applied."""
-    game = pyspiel.load_game("python_dynamic_routing_game")
+    game = pyspiel.load_game("python_dynamic_routing")
     seq_game = pyspiel.convert_to_turn_based(game)
     cfr_solver = external_mccfr.ExternalSamplingSolver(
       seq_game, external_mccfr.AverageType.SIMPLE)
@@ -110,7 +110,7 @@ class DynamicRoutingGameTest(absltest.TestCase):
 
   def test_int_mccfr_on_turn_based_game_with_exploitability(self):
     """Check if outcome sampling MCCFR can be applied."""
-    game = pyspiel.load_game("python_dynamic_routing_game")
+    game = pyspiel.load_game("python_dynamic_routing")
     seq_game = pyspiel.convert_to_turn_based(game)
     cfr_solver = outcome_mccfr.OutcomeSamplingSolver(seq_game)
     for _ in range(self.num_iteration_cfr_test):
@@ -119,7 +119,7 @@ class DynamicRoutingGameTest(absltest.TestCase):
 
   def test_creation_of_rl_environment(self):
     """Check if RL environment can be created."""
-    game = pyspiel.load_game("python_dynamic_routing_game")
+    game = pyspiel.load_game("python_dynamic_routing")
     seq_game = pyspiel.convert_to_turn_based(game)
     rl_environment.Environment(seq_game)
 

@@ -1,4 +1,4 @@
-game: python_mean_field_routing_game
+game: python_mfg_routing
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.MEAN_FIELD
@@ -13,7 +13,7 @@ GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = True
 GameType.reward_model = RewardModel.TERMINAL
-GameType.short_name = "python_mean_field_routing_game"
+GameType.short_name = "python_mfg_routing"
 GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 5
@@ -31,7 +31,7 @@ ObservationTensorShape() = [3]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 3
 MaxGameLength() = 2
-ToString() = "python_mean_field_routing_game(players=-1)"
+ToString() = "python_mfg_routing(players=-1)"
 
 # State 0
 # Before initial chance node
@@ -137,14 +137,14 @@ Returns() = [0]
 LegalActions() = [0]
 StringLegalActions() = ["Vehicle 0 reach a sink node or its destination."]
 
-# Apply action "Vehicle 0 would like to move to A->D."
-action: 3
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
 
 # State 5
 # Arrived at O->A, with travel time 3.0, t=2_mean_field
 IsTerminal() = True
-History() = [0, 2, 0, 3]
-HistoryString() = "0, 2, 0, 3"
+History() = [0, 2, 0, 0]
+HistoryString() = "0, 2, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL

@@ -20,7 +20,7 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.mfg.algorithms import distribution
-from open_spiel.python.mfg.games import mean_field_routing_game
+from open_spiel.python.mfg.games import routing
 import pyspiel
 
 
@@ -29,12 +29,12 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
 
   def test_load(self):
     """Test load and game creation."""
-    game = pyspiel.load_game("python_mean_field_routing_game")
+    game = pyspiel.load_game("python_mfg_routing")
     game.new_initial_state()
 
   def test_create(self):
     """Checks we can create the game and clone states."""
-    game = mean_field_routing_game.MeanFieldRoutingGame()
+    game = routing.MeanFieldRoutingGame()
     self.assertEqual(game.get_type().dynamics,
     pyspiel.GameType.Dynamics.MEAN_FIELD)
     state = game.new_initial_state()
@@ -49,12 +49,12 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
 
   def test_trajectory_under_uniform_distribution(self):
     """Test random simulation."""
-    game = mean_field_routing_game.MeanFieldRoutingGame()
+    game = routing.MeanFieldRoutingGame()
     pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=True)
 
   def test_evolving_trajectory_with_uniform_policy(self):
     """Test evolving distribution."""
-    game = mean_field_routing_game.MeanFieldRoutingGame()
+    game = routing.MeanFieldRoutingGame()
     distribution.DistributionPolicy(game, policy.UniformRandomPolicy(game))
 
   # TODO: Add test with bigger network. See dynamic routing game class.

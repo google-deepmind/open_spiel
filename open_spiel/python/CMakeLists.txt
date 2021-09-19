@@ -181,9 +181,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/data_test.py
-  games/dynamic_routing/dynamic_routing_game_test.py
-  games/dynamic_routing/dynamic_routing_game_utils_test.py
-  games/dynamic_routing/mean_field_routing_game_test.py
+  games/routing_test.py
+  games/dynamic_routing/utils_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/fictitious_play_test.py
@@ -193,6 +192,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/algorithms/policy_value_test.py
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
+  mfg/games/routing_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/games_bridge_test.py

@@ -16,7 +16,7 @@
 """Tests for Python dynamic routing game utils."""
 
 from absl.testing import absltest
-from open_spiel.python.games.dynamic_routing import dynamic_routing_game_utils
+from open_spiel.python.games.dynamic_routing import utils
 
 
 class NetworkTest(absltest.TestCase):
@@ -24,7 +24,7 @@ class NetworkTest(absltest.TestCase):
 
   def setUp(self):
     """Create a network O->A->D for testing."""
-    self.network = dynamic_routing_game_utils.Network(
+    self.network = utils.Network(
       {"O": ["A"], "A": ["D"], "D": []})
 
   def test_adjacency_list_init(self):
@@ -95,14 +95,14 @@ class VehicleTest(absltest.TestCase):
 
   def test_vehicle_1(self):
     """Test instanciation of Vehicle."""
-    vehicle = dynamic_routing_game_utils.Vehicle('O->A', 'B->D')
+    vehicle = utils.Vehicle('O->A', 'B->D')
     self.assertEqual(vehicle.destination, 'B->D')
     self.assertEqual(vehicle.origin, 'O->A')
     self.assertEqual(vehicle.departure_time, 0)
 
   def test_vehicle_2(self):
     """Test instanciation of with departure time."""
-    vehicle = dynamic_routing_game_utils.Vehicle('O->A', 'B->D', 10.5)
+    vehicle = utils.Vehicle('O->A', 'B->D', 10.5)
     self.assertEqual(vehicle.origin, 'O->A')
     self.assertEqual(vehicle.destination, 'B->D')
     self.assertEqual(vehicle.departure_time, 10.5)
@@ -113,7 +113,7 @@ class OriginDestinationDemandTest(absltest.TestCase):
 
   def test_od_demand_1(self):
     """Test instanciation of OD demand."""
-    od_demand = dynamic_routing_game_utils.OriginDestinationDemand(
+    od_demand = utils.OriginDestinationDemand(
       'O->A', 'B->D', 0, 30)
     self.assertEqual(od_demand.destination, 'B->D')
     self.assertEqual(od_demand.origin, 'O->A')
@@ -122,7 +122,7 @@ class OriginDestinationDemandTest(absltest.TestCase):
 
   def test_od_demand_2(self):
     """Test instanciation of OD demand."""
-    od_demand = dynamic_routing_game_utils.OriginDestinationDemand(
+    od_demand = utils.OriginDestinationDemand(
       'O->A', 'B->D', 10.5, 43.2)
     self.assertEqual(od_demand.origin, 'O->A')
     self.assertEqual(od_demand.destination, 'B->D')

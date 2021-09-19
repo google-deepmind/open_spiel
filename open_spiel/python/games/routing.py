@@ -32,7 +32,7 @@ the vehicle does not reach its destination by the end of the game, then its cost
 is the number of time steps + 1.
 
 The current game is implementated as a N player game. However this game can also
-be extended to a mean field game, implemented as python_mean_field_routing_game.
+be extended to a mean field game, implemented as python_mfg_routing.
 """
 
 from typing import Any, Iterable, List, Mapping, Set
@@ -40,11 +40,11 @@ from typing import Any, Iterable, List, Mapping, Set
 import numpy as np
 
 import pyspiel
-from open_spiel.python.games.dynamic_routing import dynamic_routing_game_utils
+from open_spiel.python.games.dynamic_routing import utils
 
 
 _GAME_TYPE = pyspiel.GameType(
-    short_name="python_dynamic_routing_game",
+    short_name="python_dynamic_routing",
     long_name="Python Dynamic Routing Game",
     dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS,
     chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
@@ -62,9 +62,9 @@ _GAME_TYPE = pyspiel.GameType(
     parameter_specification={"players": -1})
 
 
-_DEFAULT_NETWORK = dynamic_routing_game_utils.Network({"bef_O": "O", "O": ["A"], "A": ["D"],
+_DEFAULT_NETWORK = utils.Network({"bef_O": "O", "O": ["A"], "A": ["D"],
                             "D": ["aft_D"], "aft_D": []})
-_DEFAULT_VEHICLES = [dynamic_routing_game_utils.Vehicle("bef_O->O", "D->aft_D") for _ in range(2)]
+_DEFAULT_VEHICLES = [utils.Vehicle("bef_O->O", "D->aft_D") for _ in range(2)]
 
 
 class DynamicRoutingGame(pyspiel.Game):
@@ -104,8 +104,8 @@ class DynamicRoutingGame(pyspiel.Game):
   """
   def __init__(
       self, params: Mapping[str, Any] = None,
-      network: dynamic_routing_game_utils.Network = None,
-      vehicles: List[dynamic_routing_game_utils.Vehicle] = None,
+      network: utils.Network = None,
+      vehicles: List[utils.Vehicle] = None,
       max_num_time_step: int = 2,
       perform_sanity_checks: bool = True
   ):
@@ -179,7 +179,7 @@ class DynamicRoutingGameState(pyspiel.State):
   _vehicle_without_legal_actions: Set[int]
 
   def __init__(self, game: DynamicRoutingGame,
-               vehicles: Iterable[dynamic_routing_game_utils.Vehicle]):
+               vehicles: Iterable[utils.Vehicle]):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
     self._can_vehicles_move = [True for _ in vehicles]
@@ -278,7 +278,7 @@ class DynamicRoutingGameState(pyspiel.State):
     if vehicle in self._vehicle_without_legal_actions:
       # If the vehicle is at destination it cannot do anything.
       return []
-    _, end_section_node = dynamic_routing_game_utils._road_section_to_nodes(
+    _, end_section_node = utils._road_section_to_nodes(
       self._vehicle_locations[vehicle])
     successors = self.get_game().network.get_successors(end_section_node)
     if successors:
@@ -339,7 +339,7 @@ class DynamicRoutingGameState(pyspiel.State):
       # Has the vehicle already reached a sink node?
       if vehicle_id in self._vehicle_without_legal_actions:
         if self.get_game().perform_sanity_checks:
-          assert action == dynamic_routing_game_utils.NO_POSSIBLE_ACTION, (
+          assert action == utils.NO_POSSIBLE_ACTION, (
             f"{action} should be 0.")
         continue
       # If the vehicle is stuck in traffic it cannot move.
@@ -382,7 +382,7 @@ class DynamicRoutingGameState(pyspiel.State):
               "readable chance outcome.")
     if self.get_game().perform_sanity_checks:
       self.assert_valid_player(player)
-    if action == dynamic_routing_game_utils.NO_POSSIBLE_ACTION:
+    if action == utils.NO_POSSIBLE_ACTION:
       return f"Vehicle {player} reach a sink node or its destination."
     if self.get_game().perform_sanity_checks:
       self.get_game().network.assert_valid_action(action)
@@ -408,7 +408,7 @@ class DynamicRoutingGameState(pyspiel.State):
 
   def get_location_as_int(self, vehicle: int) -> int:
     """Get the vehicle location."""
-    origin, destination = dynamic_routing_game_utils._road_section_to_nodes(
+    origin, destination = utils._road_section_to_nodes(
       self._vehicle_locations[vehicle])
     return self.get_game().network.get_action_id_from_movement(
       origin, destination)

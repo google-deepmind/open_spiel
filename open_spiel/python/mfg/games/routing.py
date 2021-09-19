@@ -41,12 +41,12 @@ from typing import Any, Iterable, List, Mapping, Tuple
 
 import numpy as np
 
-from open_spiel.python.games.dynamic_routing import dynamic_routing_game_utils
+from open_spiel.python.games.dynamic_routing import utils
 import pyspiel
 
 
 _GAME_TYPE = pyspiel.GameType(
-  short_name="python_mean_field_routing_game",
+  short_name="python_mfg_routing",
   long_name="Python Mean Field Routing Game",
   dynamics=pyspiel.GameType.Dynamics.MEAN_FIELD,
   chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
@@ -64,9 +64,9 @@ _GAME_TYPE = pyspiel.GameType(
   parameter_specification={"players": -1})
 
 
-_DEFAULT_NETWORK = dynamic_routing_game_utils.Network(
+_DEFAULT_NETWORK = utils.Network(
   {"bef_O": "O", "O": ["A"], "A": ["D"], "D": ["aft_D"], "aft_D": []})
-_DEFAULT_DEMAND = [dynamic_routing_game_utils.OriginDestinationDemand(
+_DEFAULT_DEMAND = [utils.OriginDestinationDemand(
   "bef_O->O", "D->aft_D", 0, 100)]
 
 
@@ -108,14 +108,14 @@ class MeanFieldRoutingGame(pyspiel.Game):
     perform_sanity_checks: if true, sanity checks are done during the game,
       should be set to false to speed up the game.
   """
-  network: dynamic_routing_game_utils.Network
-  _od_demand: List[dynamic_routing_game_utils.OriginDestinationDemand]
+  network: utils.Network
+  _od_demand: List[utils.OriginDestinationDemand]
   perform_sanity_checks: bool
 
   def __init__(
     self, params: Mapping[str, Any] = None,
-    network: dynamic_routing_game_utils.Network = None,
-    od_demand: List[dynamic_routing_game_utils.OriginDestinationDemand] = None,
+    network: utils.Network = None,
+    od_demand: List[utils.OriginDestinationDemand] = None,
     max_num_time_step: int = 2,
     perform_sanity_checks: bool = True
   ):
@@ -194,7 +194,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
   _is_chance_init: bool
   _is_terminal: bool
   _normed_density_on_vehicle_link: float
-  _od_demand: List[dynamic_routing_game_utils.OriginDestinationDemand]
+  _od_demand: List[utils.OriginDestinationDemand]
   _total_num_vehicle: float
   _vehicle_at_destination: bool
   _vehicle_destination: str
@@ -204,7 +204,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
 
   def __init__(
     self, game: MeanFieldRoutingGame,
-    od_demand: List[dynamic_routing_game_utils.OriginDestinationDemand]
+    od_demand: List[utils.OriginDestinationDemand]
   ):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
@@ -363,10 +363,10 @@ class MeanFieldRoutingGameState(pyspiel.State):
       assert player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
     if self._vehicle_without_legal_action:
       # If the vehicle is at destination it cannot do anything.
-      return [dynamic_routing_game_utils.NO_POSSIBLE_ACTION]
+      return [utils.NO_POSSIBLE_ACTION]
     if not self._can_vehicle_move:
-      return [dynamic_routing_game_utils.NO_POSSIBLE_ACTION]
-    _, end_section_node = dynamic_routing_game_utils._road_section_to_nodes(
+      return [utils.NO_POSSIBLE_ACTION]
+    _, end_section_node = utils._road_section_to_nodes(
       self._vehicle_location)
     successors = self.get_game().network.get_successors(end_section_node)
     if self.get_game().perform_sanity_checks:
@@ -456,7 +456,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
       return f"Change node; the vehicle movement is {bool(action)}."
     if self.get_game().perform_sanity_checks:
       assert player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
-    if action == dynamic_routing_game_utils.NO_POSSIBLE_ACTION:
+    if action == utils.NO_POSSIBLE_ACTION:
       return f"Vehicle {player} reach a sink node or its destination."
     if self.get_game().perform_sanity_checks:
       self.get_game().network.assert_valid_action(action)
@@ -478,7 +478,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     """Get the vehicle location."""
     if self._vehicle_location is None:
       return -1
-    start_node, end_node = dynamic_routing_game_utils._road_section_to_nodes(self._vehicle_location)
+    start_node, end_node = utils._road_section_to_nodes(self._vehicle_location)
     return self.get_game().network.get_action_id_from_movement(
       start_node, end_node)
 
