@@ -33,8 +33,10 @@
 // players do not see the full board, but they can make explicit "sensing" moves
 // to reveal specific parts of the board.
 //
-// Specifically, based on https://rbc.jhuapl.edu/gameRules:
+// Specifically, based on [1,2] the implementation follow these rules:
 //
+// - The rules of Standard Chess apply, with the exceptions and modifications
+//   that follow.
 // - A player cannot see where her opponent's pieces are.
 // - Prior to making each move a player selects a 3 x 3 square of the chess
 //   board. She learns of all pieces and their types within that square. The
@@ -50,13 +52,49 @@
 // - If a player tries to move a sliding piece through an opponent's piece, the
 //   opponent's piece is captured and the moved piece is stopped where the
 //   capture occurred. The moving player is notified of the square where her
-//   piece landed,
-//   and both players are notified of the capture as stated above.
+//   piece landed, and both players are notified of the capture as stated above.
 // - If a player attempts to make an illegal pawn attack or pawn forward-move or
 //   castle, she is notified that her move did not succeed and her move is over.
 //   Castling through check is allowed, however, as the notion of check is
 //   removed.
 // - There is a "pass" move, where a player can move nothing.
+//
+// There are some differences to the original rules [1,2]:
+//
+// > "All rules associated with stalemates or automatic draw conditions are
+// >  eliminated"
+//
+// Automatic draws are made after the same board repeats itself 3 times
+// in the game (kNumRepetitionsToDraw) or after a large number of moves
+// (kNumReversibleMovesToDraw). This is to make sure that random play
+// in the game would stop after a limited number of steps.
+//
+// > "Turn phase: [..] if the opponent captured a piece on their turn,
+// >  the current player is given the capture square"
+//
+// Turn phase is eliminated: all the capture information can be deduced as the
+// difference of player's pieces observations in the sensing phase.
+//
+// > "Sense phase: the player chooses any square on the chessboard to target
+// >  their sensor. Then, the true state of the game board in a three square by
+// >  three square window centered at the chosen square is revealed to the
+// >  sensing player."
+//
+// Sensing is done as picking a sensing window that fully fits within the
+// chessboard and is not centered on an underlying square. The centering can
+// make the sensing window smaller (as a rectangle near the border of the
+// chessboard) which gives strictly less information than a better placed window
+// (that remains a full square). This modification eliminates strategically
+// useless sensing actions.
+//
+// > "If the move was modified [..] then the modified move is made, and
+// >  the current player is notified of the modified move in the move results."
+//
+// All the modifications can be deduced through the observations provided
+// by the observation tensors or strings and are not given explicitly.
+//
+// [1] https://rbc.jhuapl.edu/gameRules and
+// [2] https://reconchess.readthedocs.io/en/latest/rules.html
 //
 // Parameters:
 //   "board_size"  int     Number of squares in each row and column (default: 8)
@@ -133,19 +171,24 @@ class RbcState : public State {
     return moves_history_;
   }
 
+  // Draw can be claimed under the FIDE 3-fold repetition rule (the current
+  // board position has already appeared twice in the history).
+  bool IsRepetitionDraw() const;
+
   const RbcGame* game() const {
     return open_spiel::down_cast<const RbcGame*>(game_.get());
   }
+
+  MovePhase phase() const { return phase_; }
+  const std::array<int, 2>& sense_location() const { return sense_location_; }
+  bool move_captured() const { return move_captured_; }
+  bool illegal_move_attempted() const { return illegal_move_attempted_; }
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
   friend class RbcObserver;
-
-  // Draw can be claimed under the FIDE 3-fold repetition rule (the current
-  // board position has already appeared twice in the history).
-  bool IsRepetitionDraw() const;
 
   // Calculates legal actions and caches them. This is separate from
   // LegalActions() as there are a number of other methods that need the value
@@ -196,6 +239,10 @@ class RbcGame : public Game {
   }
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<RbcState>(shared_from_this(), board_size_, fen_);
+  }
+  std::unique_ptr<State> NewInitialState(
+      const std::string& fen) const override {
+    return absl::make_unique<RbcState>(shared_from_this(), board_size_, fen);
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
