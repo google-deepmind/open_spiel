@@ -73,7 +73,6 @@ class CatchState : public State {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
-  void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;
   CellState BoardAt(int row, int column) const;

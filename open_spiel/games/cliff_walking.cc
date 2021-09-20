@@ -157,30 +157,6 @@ void CliffWalkingState::InformationStateTensor(Player player,
   }
 }
 
-void CliffWalkingState::UndoAction(Player player, Action move) {
-  switch (move) {
-    case RIGHT:
-      --player_col_;
-      break;
-    case UP:
-      ++player_row_;
-      break;
-    case LEFT:
-      ++player_col_;
-      break;
-    case DOWN:
-      --player_row_;
-      break;
-    default:
-      SpielFatalError("Unexpected action");
-  }
-  player_row_ = std::min(std::max(player_row_, 0), height_ - 1);
-  player_col_ = std::min(std::max(player_col_, 0), width_ - 1);
-  --time_counter_;
-  history_.pop_back();
-  --move_number_;
-}
-
 std::unique_ptr<State> CliffWalkingState::Clone() const {
   return std::unique_ptr<State>(new CliffWalkingState(*this));
 }

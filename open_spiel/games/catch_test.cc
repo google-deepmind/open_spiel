@@ -29,7 +29,6 @@ void BasicCatchTests() {
   testing::LoadGameTest("catch");
   testing::ChanceOutcomesTest(*LoadGame("catch"));
   testing::RandomSimTest(*LoadGame("catch"), 100);
-  testing::RandomSimTestWithUndo(*LoadGame("catch"), 1);
 }
 
 void GetAllStatesTest() {
