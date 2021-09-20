@@ -35,10 +35,36 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import itertools
+
 import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
+
+
+def joint_action_probabilities(state, policy):
+  """Yields action, probability pairs for a joint policy in simultaneous state.
+
+  Args:
+    state: a game state at a simultaneous decision node.
+    policy: policy that gives the probability distribution over the legal
+      actions for each players.
+  Yields:
+    (action, probability) pairs. An action is a tuple of individual
+      actions for each player of the game. The probability is a single joint
+      probability (product of all the individual probabilities).
+  """
+  assert state.is_simultaneous_node()
+  action_probs_per_player = [
+      policy.action_probabilities(state, player)
+      for player in range(state.get_game().num_players())
+  ]
+  actions_per_player = [pi.keys() for pi in action_probs_per_player]
+  probs_per_player = [pi.values() for pi in action_probs_per_player]
+  for actions, probs in zip(itertools.product(*actions_per_player),
+                            itertools.product(*probs_per_player)):
+    yield actions, np.prod(probs)
 
 
 class Policy:

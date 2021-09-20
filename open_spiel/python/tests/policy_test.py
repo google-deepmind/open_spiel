@@ -22,6 +22,7 @@ from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
+from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python import policy
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
@@ -433,6 +434,21 @@ class MergeTabularPoliciesTest(absltest.TestCase):
         self.assertTrue(np.allclose(
             merged_tabular_policy.action_probability_array[to_index, player],
             1))
+
+
+class JointActionProbTest(absltest.TestCase):
+
+  def test_joint_action_probabilities(self):
+    game = pyspiel.load_game("python_iterated_prisoners_dilemma")
+    uniform_policy = policy.UniformRandomPolicy(game)
+    joint_action_probs = policy.joint_action_probabilities(
+        game.new_initial_state(), uniform_policy)
+    self.assertCountEqual(list(joint_action_probs), [
+        ((0, 0), 0.25),
+        ((1, 1), 0.25),
+        ((1, 0), 0.25),
+        ((0, 1), 0.25),
+    ])
 
 
 if __name__ == "__main__":

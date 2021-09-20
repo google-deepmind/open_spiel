@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Python Iterated Prisoner's Dilemma"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["termination_probability"]
+GameType.parameter_specification = ["max_game_length", "termination_probability"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = False
@@ -19,13 +19,13 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 2
 PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 2
-GetParameters() = {termination_probability=0.125}
+GetParameters() = {max_game_length=9999,termination_probability=0.125}
 NumPlayers() = 2
 MinUtility() = 0.0
-MaxUtility() = inf
+MaxUtility() = 9.999e+04
 UtilitySum() = 0.0
 MaxGameLength() = 9999
-ToString() = "python_iterated_prisoners_dilemma(termination_probability=0.125)"
+ToString() = "python_iterated_prisoners_dilemma(max_game_length=9999,termination_probability=0.125)"
 
 # State 0
 # p0: p1:
