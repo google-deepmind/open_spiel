@@ -1,7 +1,11 @@
 # AlphaZero
 
-OpenSpiel includes two implementations of AlphaZero, one in Python, and one in
-C++, with a shared model written in TensorFlow.
+OpenSpiel includes three implementations of AlphaZero, two based on Tensorflow
+(one in Python and one in C++ using Tensorflow C++ API), with a shared model
+written in TensorFlow. The other based on C++ Libtorch-base. This document
+covers mostly the TF-based implementation and common components. For the
+Libtorch-based implementation,
+[see here](https://github.com/deepmind/open_spiel/tree/master/open_spiel/algorithms/alpha_zero_torch).
 
 **Disclaimer**: this is not the code that was used for the Go challenge matches
 or the AlphaZero paper results. It is a re-implementation for illustrative
