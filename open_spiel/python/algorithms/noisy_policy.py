@@ -113,11 +113,11 @@ class NoisyPolicy(openspiel_policy.Policy):
 
     # If self._player_id is None, or if self.player_id == current_player, add
     # noise.
-    if (not self.player_id) or (state.current_player() == self.player_id):
+    if (self.player_id is None) or (state.current_player() == self.player_id):
       noise_probs = self.get_or_create_noise(state)
       probs = self._policy.action_probabilities(state, player_id)
       probs = self.mix_probs(probs, noise_probs)
       return probs
 
     # Send the default probabilities for all other players
-    return self._policy.action_probabilities(state, player_id)
+    return self._policy.action_probabilities(state)
