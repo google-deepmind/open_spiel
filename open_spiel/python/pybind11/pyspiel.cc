@@ -40,6 +40,7 @@
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_games.h"
+#include "open_spiel/python/pybind11/referee.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -605,6 +606,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
+  init_pyspiel_referee(m);                  // Referee.
   init_pyspiel_game_transforms(m);          // Game transformations.
   init_pyspiel_games_backgammon(m);         // Backgammon game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
