@@ -36,6 +36,7 @@ void BasicTinyBridge4pTests() {
   testing::LoadGameTest("tiny_bridge_4p");
   testing::ChanceOutcomesTest(*LoadGame("tiny_bridge_4p"));
   testing::RandomSimTest(*LoadGame("tiny_bridge_4p"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("tiny_bridge_4p"), 1);
 }
 
 void CountStates2p() {

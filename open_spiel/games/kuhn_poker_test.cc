@@ -29,6 +29,7 @@ void BasicKuhnTests() {
   testing::LoadGameTest("kuhn_poker");
   testing::ChanceOutcomesTest(*LoadGame("kuhn_poker"));
   testing::RandomSimTest(*LoadGame("kuhn_poker"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("kuhn_poker"), 1);
   for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
         *LoadGame("kuhn_poker", {{"players", GameParameter(players)}}), 100);

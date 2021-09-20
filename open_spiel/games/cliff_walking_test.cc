@@ -28,6 +28,7 @@ void BasicCliffWalkingTests() {
   testing::LoadGameTest("cliff_walking");
   testing::NoChanceOutcomesTest(*LoadGame("cliff_walking"));
   testing::RandomSimTest(*LoadGame("cliff_walking"), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("cliff_walking"), 1);
 }
 
 }  // namespace
