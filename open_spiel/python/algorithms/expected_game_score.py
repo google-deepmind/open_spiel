@@ -48,7 +48,8 @@ def _transitions(state, policies):
     return policies[player].action_probabilities(state).items()
 
 
-def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
+def policy_value(state, policies: Union[List[policy.Policy], policy.Policy],
+                 probability_threshold: float = PROBABILITY_THRESHOLD):
   """Returns the expected values for the state for players following `policies`.
 
   Computes the expected value of the`state` for each player, assuming player `i`
@@ -67,4 +68,4 @@ def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
   else:
     return sum(prob * policy_value(_child(state, action), policies)
                for action, prob in _transitions(state, policies)
-               if prob > PROBABILITY_THRESHOLD)
+               if prob > probability_threshold)
