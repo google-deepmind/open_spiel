@@ -13,8 +13,6 @@
 # limitations under the License.
 
 """Does a backward pass to output the value of a policy."""
-import collections
-
 from open_spiel.python import policy as policy_std
 from open_spiel.python.mfg import distribution as distribution_std
 from open_spiel.python.mfg import value
@@ -28,6 +26,7 @@ class PolicyValue(value.ValueFunction):
                game,
                distribution: distribution_std.Distribution,
                policy: policy_std.Policy,
+               state_value: value.ValueFunction,
                root_state=None):
     """Initializes the value calculation.
 
@@ -35,6 +34,7 @@ class PolicyValue(value.ValueFunction):
       game: The game to analyze.
       distribution: A `distribution.Distribution` object.
       policy: A `policy.Policy` object.
+      state_value: A state value function.
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
     """
@@ -46,25 +46,27 @@ class PolicyValue(value.ValueFunction):
     self._distribution = distribution
     self._policy = policy
 
-    self._state_value = collections.defaultdict(float)
+    self._state_value = state_value
 
     self.evaluate()
 
   def eval_state(self, state):
     """Evaluate the value of a state."""
     state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-    if state_str in self._state_value:
-      return self._state_value[state_str]
+    if self._state_value.has(state_str):
+      return self._state_value(state_str)
     elif state.is_terminal():
-      self._state_value[state_str] = state.rewards()[
-          state.mean_field_population()]
-      return self._state_value[state_str]
+      self._state_value.set_value(
+          state_str,
+          state.rewards()[state.mean_field_population()])
+      return self._state_value(state_str)
     elif state.current_player() == pyspiel.PlayerId.CHANCE:
-      self._state_value[state_str] = 0.0
+      self._state_value.set_value(state_str, 0.0)
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
-        self._state_value[state_str] += prob * self.eval_state(new_state)
-      return self._state_value[state_str]
+        self._state_value.add_value(state_str,
+                                    prob * self.eval_state(new_state))
+      return self._state_value(state_str)
     elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
       dist = [
@@ -73,19 +75,21 @@ class PolicyValue(value.ValueFunction):
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
-      self._state_value[state_str] = (
+      self._state_value.set_value(
+          state_str,
           state.rewards()[state.mean_field_population()] +
           self.eval_state(new_state))
-      return self._state_value[state_str]
+      return self._state_value(state_str)
     else:
       assert int(state.current_player()) >= 0, "The player id should be >= 0"
       v = 0.0
       for action, prob in self._policy.action_probabilities(state).items():
         new_state = state.child(action)
         v += prob * self.eval_state(new_state)
-      self._state_value[state_str] = state.rewards()[
-          state.mean_field_population()] + v
-      return self._state_value[state_str]
+      self._state_value.set_value(
+          state_str,
+          state.rewards()[state.mean_field_population()] + v)
+      return self._state_value(state_str)
 
   def evaluate(self):
     """Evaluate the value over states of self._policy."""
@@ -94,9 +98,9 @@ class PolicyValue(value.ValueFunction):
 
   def value(self, state, action=None):
     if action is None:
-      return self._state_value[state.observation_string(
-          pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+      return self._state_value(
+          state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
     else:
       new_state = state.child(action)
-      return state.rewards()[0] + self._state_value[
-          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+      return state.rewards()[0] + self._state_value(
+          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))

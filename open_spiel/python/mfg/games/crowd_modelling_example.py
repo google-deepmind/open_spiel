@@ -22,6 +22,7 @@ import numpy as np
 
 from open_spiel.python import policy
 from open_spiel.python.mfg import games
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import fictitious_play
@@ -77,8 +78,10 @@ def main(argv: Sequence[str]) -> None:
 
   print('compute distribution')
   mfg_dist = distribution.DistributionPolicy(mfg_game, uniform_policy)
-  br_value = best_response_value.BestResponse(mfg_game, mfg_dist)
-  py_value = policy_value.PolicyValue(mfg_game, mfg_dist, uniform_policy)
+  br_value = best_response_value.BestResponse(
+      mfg_game, mfg_dist, value.TabularValueFunction(mfg_game))
+  py_value = policy_value.PolicyValue(mfg_game, mfg_dist, uniform_policy,
+                                      value.TabularValueFunction(mfg_game))
   print(
       'Value of a best response policy to a uniform policy '
       '(computed with best_response_value)',
@@ -86,7 +89,8 @@ def main(argv: Sequence[str]) -> None:
   print('Value of the uniform policy:', py_value(mfg_game.new_initial_state()))
   greedy_pi = greedy_policy.GreedyPolicy(mfg_game, None, br_value)
   greedy_pi = greedy_pi.to_tabular()
-  pybr_value = policy_value.PolicyValue(mfg_game, mfg_dist, greedy_pi)
+  pybr_value = policy_value.PolicyValue(mfg_game, mfg_dist, greedy_pi,
+                                        value.TabularValueFunction(mfg_game))
   print(
       'Value of a best response policy to a uniform policy (computed at the '
       'value of the greedy policy of the best response value)',
@@ -98,7 +102,8 @@ def main(argv: Sequence[str]) -> None:
       [mfg_dist, distribution.DistributionPolicy(mfg_game, greedy_pi)],
       [0.5, 0.5])
 
-  merged_pi_value = policy_value.PolicyValue(mfg_game, mfg_dist, merged_pi)
+  merged_pi_value = policy_value.PolicyValue(
+      mfg_game, mfg_dist, merged_pi, value.TabularValueFunction(mfg_game))
   print(br_value(mfg_game.new_initial_state()))
   print(py_value(mfg_game.new_initial_state()))
   print(merged_pi_value(mfg_game.new_initial_state()))
@@ -113,7 +118,8 @@ def main(argv: Sequence[str]) -> None:
     nash_conv_fp = nash_conv.NashConv(mfg_game, fp_policy)
     print('Nashconv of the current FP policy', nash_conv_fp.nash_conv())
   print('md')
-  md = mirror_descent.MirrorDescent(mfg_game)
+  md = mirror_descent.MirrorDescent(mfg_game,
+                                    value.TabularValueFunction(mfg_game))
   for j in range(10):
     print('Iteration', j, 'of mirror descent')
     md.iteration()

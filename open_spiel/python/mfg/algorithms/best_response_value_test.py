@@ -15,34 +15,30 @@
 """Tests for best_response_value."""
 
 from absl.testing import absltest
+from absl.testing import parameterized
 
 from open_spiel.python import policy
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
-from open_spiel.python.mfg.games import crowd_modelling
+from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
 import pyspiel
 
 
-class BestResponseTest(absltest.TestCase):
+class BestResponseTest(parameterized.TestCase):
 
-  def test_python_game(self):
+  @parameterized.named_parameters(('python', 'python_mfg_crowd_modelling'),
+                                  ('cpp', 'mfg_crowd_modelling'))
+  def test_best_response(self, name):
     """Checks if the value of a policy computation works."""
-    game = crowd_modelling.MFGCrowdModellingGame()
+    game = pyspiel.load_game(name)
     uniform_policy = policy.UniformRandomPolicy(game)
     dist = distribution.DistributionPolicy(game, uniform_policy)
-    br_value = best_response_value.BestResponse(game, dist)
-    br_val = br_value(game.new_initial_state())
-    self.assertAlmostEqual(br_val, 30.029387484327486)
-
-  def test_cpp_game(self):
-    """Checks if the value of a policy computation works."""
-    game = pyspiel.load_game("mfg_crowd_modelling")
-    uniform_policy = policy.UniformRandomPolicy(game)
-    dist = distribution.DistributionPolicy(game, uniform_policy)
-    br_value = best_response_value.BestResponse(game, dist)
+    br_value = best_response_value.BestResponse(
+        game, dist, value.TabularValueFunction(game))
     br_val = br_value(game.new_initial_state())
     self.assertAlmostEqual(br_val, 30.029387484327486)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   absltest.main()

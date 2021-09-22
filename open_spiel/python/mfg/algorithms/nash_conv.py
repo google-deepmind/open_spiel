@@ -20,6 +20,7 @@ In the context of mean field games, the Nash Conv is the difference between:
 """
 
 from open_spiel.python import policy as policy_std
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import policy_value
@@ -46,9 +47,16 @@ class NashConv(object):
     self._distrib = distribution.DistributionPolicy(
         self._game, self._policy, root_state=root_state)
     self._pi_value = policy_value.PolicyValue(
-        self._game, self._distrib, self._policy, root_state=root_state)
+        self._game,
+        self._distrib,
+        self._policy,
+        value.TabularValueFunction(self._game),
+        root_state=root_state)
     self._br_value = best_response_value.BestResponse(
-        self._game, self._distrib, root_state=root_state)
+        self._game,
+        self._distrib,
+        value.TabularValueFunction(self._game),
+        root_state=root_state)
 
   def nash_conv(self):
     """Returns the nash conv.
@@ -68,7 +76,4 @@ class NashConv(object):
       A List[float] representing the best response values for a policy
         distribution.
     """
-    return [
-        self._br_value.eval_state(state)
-        for state in self._root_states
-    ]
+    return [self._br_value.eval_state(state) for state in self._root_states]

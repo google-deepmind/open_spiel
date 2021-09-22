@@ -13,10 +13,10 @@
 # limitations under the License.
 
 """Mirror Descent (https://arxiv.org/pdf/2103.00623.pdf)."""
-import collections
 import numpy as np
 
 from open_spiel.python import policy as policy_std
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import distribution
 import pyspiel
 
@@ -31,7 +31,8 @@ def softmax_projection(logits):
 class ProjectedPolicy(policy_std.Policy):
   """Project values on the policy simplex."""
 
-  def __init__(self, game, player_ids, cumulative_state_value):
+  def __init__(self, game, player_ids,
+               cumulative_state_value: value.ValueFunction):
     """Initializes the projected policy.
 
     Args:
@@ -45,12 +46,12 @@ class ProjectedPolicy(policy_std.Policy):
 
   def cumulative_value(self, state, action=None):
     if action is None:
-      return self._cumulative_state_value[state.observation_string(
-          pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+      return self._cumulative_state_value(
+          state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
     else:
       new_state = state.child(action)
-      return state.rewards()[0] + self._cumulative_state_value[
-          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)]
+      return state.rewards()[0] + self._cumulative_state_value(
+          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
 
   def action_probabilities(self, state, player_id=None):
     action_logit = [(a, self.cumulative_value(state, action=a))
@@ -64,11 +65,16 @@ class ProjectedPolicy(policy_std.Policy):
 class MirrorDescent(object):
   """The mirror descent algorithm."""
 
-  def __init__(self, game, lr=0.01, root_state=None):
+  def __init__(self,
+               game,
+               state_value: value.ValueFunction,
+               lr=0.01,
+               root_state=None):
     """Initializes mirror descent.
 
     Args:
       game: The game,
+      state_value: A state value function.
       lr: The learning rate of mirror descent,
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
@@ -83,28 +89,30 @@ class MirrorDescent(object):
     self._md_step = 0
     self._lr = lr
 
-    self._state_value = collections.defaultdict(float)
-    self._cumulative_state_value = collections.defaultdict(float)
+    self._state_value = state_value
+    self._cumulative_state_value = value.TabularValueFunction(game)
 
   def eval_state(self, state):
     """Evaluate the value of a state and update the cumulative sum."""
     state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-    if state_str in self._state_value:
-      return self._state_value[state_str]
+    if self._state_value.has(state_str):
+      return self._state_value(state_str)
     elif state.is_terminal():
-      self._state_value[state_str] = state.rewards()[
-          state.mean_field_population()]
-      self._cumulative_state_value[
-          state_str] += self._lr * self._state_value[state_str]
-      return self._state_value[state_str]
+      self._state_value.set_value(
+          state_str,
+          state.rewards()[state.mean_field_population()])
+      self._cumulative_state_value.add_value(
+          state_str, self._lr * self._state_value(state_str))
+      return self._state_value(state_str)
     elif state.current_player() == pyspiel.PlayerId.CHANCE:
-      self._state_value[state_str] = 0.0
+      self._state_value.set_value(state_str, 0.0)
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
-        self._state_value[state_str] += prob * self.eval_state(new_state)
-      self._cumulative_state_value[
-          state_str] += self._lr * self._state_value[state_str]
-      return self._state_value[state_str]
+        self._state_value.add_value(state_str,
+                                    prob * self.eval_state(new_state))
+      self._cumulative_state_value.add_value(
+          state_str, self._lr * self._state_value(state_str))
+      return self._state_value(state_str)
     elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
       dist = [
@@ -113,28 +121,31 @@ class MirrorDescent(object):
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
-      self._state_value[state_str] = (
+      self._state_value.set_value(
+          state_str,
           state.rewards()[state.mean_field_population()] +
           self.eval_state(new_state))
-      self._cumulative_state_value[
-          state_str] += self._lr * self._state_value[state_str]
-      return self._state_value[state_str]
+      self._cumulative_state_value.add_value(
+          state_str, self._lr * self._state_value(state_str))
+      return self._state_value(state_str)
     else:
       assert int(state.current_player()) >= 0, "The player id should be >= 0"
       v = 0.0
       for action, prob in self._policy.action_probabilities(state).items():
         new_state = state.child(action)
         v += prob * self.eval_state(new_state)
-      self._state_value[state_str] = state.rewards()[
-          state.mean_field_population()] + v
-      self._cumulative_state_value[
-          state_str] += self._lr * self._state_value[state_str]
-      return self._state_value[state_str]
+      self._state_value.set_value(
+          state_str,
+          state.rewards()[state.mean_field_population()] + v)
+      self._cumulative_state_value.add_value(
+          state_str, self._lr * self._state_value(state_str))
+      return self._state_value(state_str)
 
   def iteration(self):
     """an iteration of Mirror Descent."""
     self._md_step += 1
-    self._state_value = collections.defaultdict(float)
+    # TODO(sertan): Fix me.
+    self._state_value = value.TabularValueFunction(self._game)
     for state in self._root_states:
       self.eval_state(state)
     self._policy = ProjectedPolicy(self._game,

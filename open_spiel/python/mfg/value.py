@@ -22,7 +22,18 @@ The main way of using a value is to call `value(state)`
 or `value(state, action)`.
 
 We will prevent calling a value on a state action on a MEAN_FIELD state.
+
+The state can be a pyspiel.State object or its string representation. For a
+particular ValueFunction instance, you should use only one or the other. The
+behavior may be undefined for mixed usage depending on the implementation.
 """
+
+import collections
+from typing import Union
+
+import pyspiel
+
+ValueFunctionState = Union[pyspiel.State, str]
 
 
 class ValueFunction(object):
@@ -43,11 +54,11 @@ class ValueFunction(object):
     """
     self.game = game
 
-  def value(self, state, action=None):
+  def value(self, state: ValueFunctionState, action=None) -> float:
     """Returns a float representing a value.
 
     Args:
-      state: A `pyspiel.State` object.
+      state: A `pyspiel.State` object or its string representation.
       action: may be None or a legal action
 
     Returns:
@@ -55,11 +66,11 @@ class ValueFunction(object):
     """
     raise NotImplementedError()
 
-  def __call__(self, state, action=None):
+  def __call__(self, state: ValueFunctionState, action=None) -> float:
     """Turns the value into a callable.
 
     Args:
-      state: The current state of the game.
+      state: A `pyspiel.State` object or its string representation.
       action: may be None or a legal action
 
     Returns:
@@ -67,3 +78,52 @@ class ValueFunction(object):
     """
     return self.value(state, action=action)
 
+  def set_value(self, state: ValueFunctionState, value: float, action=None):
+    """Sets the value of the state.
+
+    Args:
+      state: A `pyspiel.State` object or its string representation.
+      value: Value of the state.
+      action: may be None or a legal action
+    """
+    raise NotImplementedError()
+
+  def has(self, state: ValueFunctionState, action=None) -> bool:
+    """Returns true if state(-action) has an explicit value.
+
+    Args:
+      state: A `pyspiel.State` object or its string representation.
+      action: may be None or a legal action
+
+    Returns:
+      True if there is an explicitly specified value.
+    """
+    raise NotImplementedError()
+
+  def add_value(self, state, value: float, action=None):
+    """Adds the value to the current value of the state.
+
+    Args:
+      state: A `pyspiel.State` object or its string representation.
+      value: Value to add.
+      action: may be None or a legal action
+    """
+    self.set_value(
+        state, self.value(state, action=action) + value, action=action)
+
+
+class TabularValueFunction(ValueFunction):
+  """Tabular value function backed by a dictionary."""
+
+  def __init__(self, game):
+    super().__init__(game)
+    self._values = collections.defaultdict(float)
+
+  def value(self, state: ValueFunctionState, action=None):
+    return self._values[(state, action)]
+
+  def set_value(self, state: ValueFunctionState, value: float, action=None):
+    self._values[(state, action)] = value
+
+  def has(self, state: ValueFunctionState, action=None):
+    return (state, action) in self._values

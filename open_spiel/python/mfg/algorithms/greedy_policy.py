@@ -16,29 +16,29 @@
 import numpy as np
 
 from open_spiel.python import policy as policy_std
-from open_spiel.python.mfg import value as value_std
+from open_spiel.python.mfg import value
 
 
 class GreedyPolicy(policy_std.Policy):
   """Computes the greedy policy of a value."""
 
-  def __init__(self,
-               game,
-               player_ids,
-               value: value_std.ValueFunction):
+  def __init__(self, game, player_ids, state_action_value: value.ValueFunction):
     """Initializes the greedy policy.
 
     Args:
       game: The game to analyze.
       player_ids: list of player ids for which this policy applies; each should
         be in the range 0..game.num_players()-1.
-      value: A `value_std.Value` object.
+      state_action_value: A state-action value function.
     """
     super(GreedyPolicy, self).__init__(game, player_ids)
-    self._value = value
+    self._state_action_value = state_action_value
 
   def action_probabilities(self, state, player_id=None):
-    q = [self._value(state, action) for action in state.legal_actions()]
+    q = [
+        self._state_action_value(state, action)
+        for action in state.legal_actions()
+    ]
     amax_q = [0.0 for _ in state.legal_actions()]
     amax_q[np.argmax(q)] = 1.0
     return dict(zip(state.legal_actions(), amax_q))

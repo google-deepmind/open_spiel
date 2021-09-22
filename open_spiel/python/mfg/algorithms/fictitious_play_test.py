@@ -17,6 +17,7 @@
 from absl.testing import absltest
 
 from open_spiel.python import policy
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import fictitious_play
@@ -48,16 +49,18 @@ class FictitiousPlayTest(absltest.TestCase):
     game = crowd_modelling.MFGCrowdModellingGame()
     uniform_policy = policy.UniformRandomPolicy(game)
     mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
-    br_value = best_response_value.BestResponse(game, mfg_dist)
-    py_value = policy_value.PolicyValue(game, mfg_dist, uniform_policy)
+    br_value = best_response_value.BestResponse(
+        game, mfg_dist, value.TabularValueFunction(game))
+    py_value = policy_value.PolicyValue(game, mfg_dist, uniform_policy,
+                                        value.TabularValueFunction(game))
     greedy_pi = greedy_policy.GreedyPolicy(game, None, br_value)
     greedy_pi = greedy_pi.to_tabular()
     merged_pi = fictitious_play.MergedPolicy(
-        game, list(range(game.num_players())),
-        [uniform_policy, greedy_pi],
+        game, list(range(game.num_players())), [uniform_policy, greedy_pi],
         [mfg_dist, distribution.DistributionPolicy(game, greedy_pi)],
         [0.5, 0.5])
-    merged_pi_value = policy_value.PolicyValue(game, mfg_dist, merged_pi)
+    merged_pi_value = policy_value.PolicyValue(game, mfg_dist, merged_pi,
+                                               value.TabularValueFunction(game))
 
     self.assertAlmostEqual(
         merged_pi_value(game.new_initial_state()),

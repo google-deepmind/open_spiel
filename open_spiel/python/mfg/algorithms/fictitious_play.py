@@ -20,6 +20,7 @@ from typing import List
 
 from open_spiel.python import policy as policy_std
 from open_spiel.python.mfg import distribution as distribution_std
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import greedy_policy
@@ -61,9 +62,9 @@ class MergedPolicy(policy_std.Policy):
         merged_pi += w * d(state) * p(state)[a]
         norm_merged_pi += w * d(state)
       if norm_merged_pi > 0.0:
-        action_prob.append((a, merged_pi/norm_merged_pi))
+        action_prob.append((a, merged_pi / norm_merged_pi))
       else:
-        action_prob.append((a, 1.0/num_legal))
+        action_prob.append((a, 1.0 / num_legal))
     return dict(action_prob)
 
 
@@ -90,7 +91,8 @@ class FictitiousPlay(object):
     self._fp_step += 1
 
     distrib = distribution.DistributionPolicy(self._game, self._policy)
-    br_value = best_response_value.BestResponse(self._game, distrib)
+    br_value = best_response_value.BestResponse(
+        self._game, distrib, value.TabularValueFunction(self._game))
 
     greedy_pi = greedy_policy.GreedyPolicy(self._game, None, br_value)
     greedy_pi = greedy_pi.to_tabular(states=self._states)
@@ -99,5 +101,5 @@ class FictitiousPlay(object):
     self._policy = MergedPolicy(
         self._game, list(range(self._game.num_players())),
         [self._policy, greedy_pi], [distrib, distrib_greedy],
-        [1.0*self._fp_step/(self._fp_step+1), 1.0/(self._fp_step+1)]
-        ).to_tabular(states=self._states)
+        [1.0 * self._fp_step / (self._fp_step + 1), 1.0 /
+         (self._fp_step + 1)]).to_tabular(states=self._states)

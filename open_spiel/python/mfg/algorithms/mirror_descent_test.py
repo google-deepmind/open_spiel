@@ -15,30 +15,23 @@
 """Tests for mirror descent."""
 
 from absl.testing import absltest
+from absl.testing import parameterized
 
+from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
-from open_spiel.python.mfg.games import crowd_modelling
+from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
 import pyspiel
 
 
-class MirrorDescentTest(absltest.TestCase):
+class MirrorDescentTest(parameterized.TestCase):
 
-  def test_fp_python_game(self):
+  @parameterized.named_parameters(('python', 'python_mfg_crowd_modelling'),
+                                  ('cpp', 'mfg_crowd_modelling'))
+  def test_fp(self, name):
     """Checks if mirror descent works."""
-    game = crowd_modelling.MFGCrowdModellingGame()
-    md = mirror_descent.MirrorDescent(game)
-    for _ in range(10):
-      md.iteration()
-    md_policy = md.get_policy()
-    nash_conv_md = nash_conv.NashConv(game, md_policy)
-
-    self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.2730324915546056)
-
-  def test_fp_cpp_game(self):
-    """Checks if mirror descent works."""
-    game = pyspiel.load_game("mfg_crowd_modelling")
-    md = mirror_descent.MirrorDescent(game)
+    game = pyspiel.load_game(name)
+    md = mirror_descent.MirrorDescent(game, value.TabularValueFunction(game))
     for _ in range(10):
       md.iteration()
     md_policy = md.get_policy()
@@ -47,5 +40,5 @@ class MirrorDescentTest(absltest.TestCase):
     self.assertAlmostEqual(nash_conv_md.nash_conv(), 2.2730324915546056)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   absltest.main()
