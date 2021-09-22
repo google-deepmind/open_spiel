@@ -120,7 +120,7 @@ void VPNetEvaluator::Runner() {
       // Only one thread at a time should be listening to the queue to maximize
       // batch size and minimize latency.
       absl::MutexLock lock(&inference_queue_m_);
-      absl::Time deadline = absl::Now() + absl::InfiniteDuration();
+      absl::Time deadline = absl::InfiniteFuture();
       for (int i = 0; i < batch_size_; ++i) {
         absl::optional<QueueItem> item = queue_.Pop(deadline);
         if (!item) {  // Hit the deadline.
