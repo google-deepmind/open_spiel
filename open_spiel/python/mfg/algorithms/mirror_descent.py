@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Mirror Descent (https://arxiv.org/pdf/2103.00623.pdf)."""
+from typing import Optional
+
 import numpy as np
 
 from open_spiel.python import policy as policy_std
@@ -67,14 +69,14 @@ class MirrorDescent(object):
 
   def __init__(self,
                game,
-               state_value: value.ValueFunction,
+               state_value: Optional[value.ValueFunction] = None,
                lr=0.01,
                root_state=None):
     """Initializes mirror descent.
 
     Args:
       game: The game,
-      state_value: A state value function.
+      state_value: A state value function. Default to TabularValueFunction.
       lr: The learning rate of mirror descent,
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
@@ -89,7 +91,8 @@ class MirrorDescent(object):
     self._md_step = 0
     self._lr = lr
 
-    self._state_value = state_value
+    self._state_value = (state_value if state_value
+                         else value.TabularValueFunction(game))
     self._cumulative_state_value = value.TabularValueFunction(game)
 
   def eval_state(self, state, learning_rate):

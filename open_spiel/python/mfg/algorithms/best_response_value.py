@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Does a backward pass to output a value of a best response policy."""
+from typing import Optional
+
 from open_spiel.python.mfg import distribution as distribution_std
 from open_spiel.python.mfg import value
 import pyspiel
@@ -24,14 +26,14 @@ class BestResponse(value.ValueFunction):
   def __init__(self,
                game,
                distribution: distribution_std.Distribution,
-               state_value: value.ValueFunction,
+               state_value: Optional[value.ValueFunction] = None,
                root_state=None):
     """Initializes the best response calculation.
 
     Args:
       game: The game to analyze.
       distribution: A `distribution_std.Distribution` object.
-      state_value: A state value function.
+      state_value: A state value function. Default to TabularValueFunction.
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
     """
@@ -41,7 +43,8 @@ class BestResponse(value.ValueFunction):
     else:
       self._root_states = [root_state]
     self._distribution = distribution
-    self._state_value = state_value
+    self._state_value = (state_value if state_value
+                         else value.TabularValueFunction(game))
 
     self.evaluate()
 
