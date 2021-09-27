@@ -92,7 +92,7 @@ class MirrorDescent(object):
     self._state_value = state_value
     self._cumulative_state_value = value.TabularValueFunction(game)
 
-  def eval_state(self, state):
+  def eval_state(self, state, learning_rate):
     """Evaluate the value of a state and update the cumulative sum."""
     state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
     if self._state_value.has(state_str):
@@ -102,16 +102,16 @@ class MirrorDescent(object):
           state_str,
           state.rewards()[state.mean_field_population()])
       self._cumulative_state_value.add_value(
-          state_str, self._lr * self._state_value(state_str))
+          state_str, learning_rate * self._state_value(state_str))
       return self._state_value(state_str)
     elif state.current_player() == pyspiel.PlayerId.CHANCE:
       self._state_value.set_value(state_str, 0.0)
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
-        self._state_value.add_value(state_str,
-                                    prob * self.eval_state(new_state))
+        self._state_value.add_value(
+            state_str, prob * self.eval_state(new_state, learning_rate))
       self._cumulative_state_value.add_value(
-          state_str, self._lr * self._state_value(state_str))
+          state_str, learning_rate * self._state_value(state_str))
       return self._state_value(state_str)
     elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
@@ -124,30 +124,30 @@ class MirrorDescent(object):
       self._state_value.set_value(
           state_str,
           state.rewards()[state.mean_field_population()] +
-          self.eval_state(new_state))
+          self.eval_state(new_state, learning_rate))
       self._cumulative_state_value.add_value(
-          state_str, self._lr * self._state_value(state_str))
+          state_str, learning_rate * self._state_value(state_str))
       return self._state_value(state_str)
     else:
       assert int(state.current_player()) >= 0, "The player id should be >= 0"
       v = 0.0
       for action, prob in self._policy.action_probabilities(state).items():
         new_state = state.child(action)
-        v += prob * self.eval_state(new_state)
+        v += prob * self.eval_state(new_state, learning_rate)
       self._state_value.set_value(
           state_str,
           state.rewards()[state.mean_field_population()] + v)
       self._cumulative_state_value.add_value(
-          state_str, self._lr * self._state_value(state_str))
+          state_str, learning_rate * self._state_value(state_str))
       return self._state_value(state_str)
 
-  def iteration(self):
+  def iteration(self, learning_rate=None):
     """an iteration of Mirror Descent."""
     self._md_step += 1
     # TODO(sertan): Fix me.
     self._state_value = value.TabularValueFunction(self._game)
     for state in self._root_states:
-      self.eval_state(state)
+      self.eval_state(state, learning_rate if learning_rate else self._lr)
     self._policy = ProjectedPolicy(self._game,
                                    list(range(self._game.num_players())),
                                    self._cumulative_state_value)
