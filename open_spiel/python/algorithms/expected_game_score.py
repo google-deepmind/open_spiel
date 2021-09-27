@@ -24,8 +24,6 @@ import numpy as np
 
 from open_spiel.python import policy
 
-PROBABILITY_THRESHOLD = 0
-
 
 def _child(state, action):
   """Returns a child state, handling the simultaneous node case."""
@@ -48,7 +46,8 @@ def _transitions(state, policies):
     return policies[player].action_probabilities(state).items()
 
 
-def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
+def policy_value(state, policies: Union[List[policy.Policy], policy.Policy],
+                 probability_threshold: float = 0):
   """Returns the expected values for the state for players following `policies`.
 
   Computes the expected value of the`state` for each player, assuming player `i`
@@ -58,6 +57,8 @@ def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
     state: A `pyspiel.State`.
     policies: A `list` of `policy.Policy` objects, one per player for sequential
       games, one policy for simulatenous games.
+    probability_threshold: only sum over entries with prob greater than this
+      (default: 0).
 
   Returns:
     A `numpy.array` containing the expected value for each player.
@@ -67,4 +68,4 @@ def policy_value(state, policies: Union[List[policy.Policy], policy.Policy]):
   else:
     return sum(prob * policy_value(_child(state, action), policies)
                for action, prob in _transitions(state, policies)
-               if prob > PROBABILITY_THRESHOLD)
+               if prob > probability_threshold)
