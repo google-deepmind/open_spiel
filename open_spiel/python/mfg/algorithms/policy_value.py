@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Does a backward pass to output the value of a policy."""
+from typing import Optional
 from open_spiel.python import policy as policy_std
 from open_spiel.python.mfg import distribution as distribution_std
 from open_spiel.python.mfg import value
@@ -26,7 +27,7 @@ class PolicyValue(value.ValueFunction):
                game,
                distribution: distribution_std.Distribution,
                policy: policy_std.Policy,
-               state_value: value.ValueFunction,
+               state_value: Optional[value.ValueFunction] = None,
                root_state=None):
     """Initializes the value calculation.
 
@@ -34,7 +35,7 @@ class PolicyValue(value.ValueFunction):
       game: The game to analyze.
       distribution: A `distribution.Distribution` object.
       policy: A `policy.Policy` object.
-      state_value: A state value function.
+      state_value: A state value function. Defaults to Tabular.
       root_state: The state of the game at which to start. If `None`, the game
         root state is used.
     """
@@ -46,7 +47,8 @@ class PolicyValue(value.ValueFunction):
     self._distribution = distribution
     self._policy = policy
 
-    self._state_value = state_value
+    self._state_value = (state_value if state_value is not None
+                         else value.TabularValueFunction(game))
 
     self.evaluate()
 
