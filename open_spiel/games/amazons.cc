@@ -296,6 +296,7 @@ namespace open_spiel
       std::vector<Action> horizontals = GetHorizontalMoves(cell);
       std::vector<Action> verticals = GetVerticalMoves(cell);
       std::vector<Action> diagonals = GetDiagonalMoves(cell);
+      
       std::vector<Action> acc = horizontals;
 
       acc.insert(acc.end(), verticals.begin(), verticals.end());
