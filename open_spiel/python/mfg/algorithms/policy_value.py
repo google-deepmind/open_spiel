@@ -102,7 +102,6 @@ class PolicyValue(value.ValueFunction):
     if action is None:
       return self._state_value(
           state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
-    else:
-      new_state = state.child(action)
-      return state.rewards()[0] + self._state_value(
-          new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
+    new_state = state.child(action)
+    return state.rewards()[state.mean_field_population()] + self._state_value(
+        new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
