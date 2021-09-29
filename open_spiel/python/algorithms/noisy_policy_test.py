@@ -18,6 +18,7 @@
 from absl.testing import absltest
 from absl.testing import parameterized
 
+from open_spiel.python import games  # pylint:disable=unused-import
 from open_spiel.python import policy as openspiel_policy
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import noisy_policy
@@ -51,10 +52,37 @@ class NoisyPolicyTest(parameterized.TestCase, absltest.TestCase):
               policy.action_probabilities(state),
               noise.action_probabilities(state))
         else:
-          # TODO(b/141737795): Decide what to do about this.
           self.assertNotEqual(
               policy.action_probabilities(state),
               noise.action_probabilities(state))
+
+  @parameterized.parameters(["python_iterated_prisoners_dilemma"])
+  def test_simultaneous_game_noisy_policy(self, game_name):
+    game = pyspiel.load_game(game_name)
+
+    policy = openspiel_policy.UniformRandomPolicy(game)
+
+    all_states = get_all_states.get_all_states(
+        game,
+        depth_limit=10,
+        include_terminals=False,
+        include_chance_states=False,
+        to_string=lambda s: s.history_str())
+
+    for current_player in range(game.num_players()):
+      noise = noisy_policy.NoisyPolicy(
+          policy, player_id=current_player, alpha=0.5, beta=10.)
+      for state in all_states.values():
+        if state.current_player() == pyspiel.PlayerId.SIMULTANEOUS:
+          for player_id in range(game.num_players()):
+            if player_id != current_player:
+              self.assertEqual(
+                  policy.action_probabilities(state, player_id),
+                  noise.action_probabilities(state, player_id))
+            else:
+              self.assertNotEqual(
+                  policy.action_probabilities(state, player_id),
+                  noise.action_probabilities(state, player_id))
 
 
 if __name__ == "__main__":
