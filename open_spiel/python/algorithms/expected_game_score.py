@@ -18,21 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from typing import Iterable, List, Union
+from typing import List, Union
 
 import numpy as np
 
 from open_spiel.python import policy
-
-
-def _child(state, action):
-  """Returns a child state, handling the simultaneous node case."""
-  if isinstance(action, Iterable):
-    child = state.clone()
-    child.apply_actions(action)
-    return child
-  else:
-    return state.child(action)
 
 
 def _transitions(state, policies):
@@ -46,7 +36,8 @@ def _transitions(state, policies):
     return policies[player].action_probabilities(state).items()
 
 
-def policy_value(state, policies: Union[List[policy.Policy], policy.Policy],
+def policy_value(state,
+                 policies: Union[List[policy.Policy], policy.Policy],
                  probability_threshold: float = 0):
   """Returns the expected values for the state for players following `policies`.
 
@@ -66,6 +57,6 @@ def policy_value(state, policies: Union[List[policy.Policy], policy.Policy],
   if state.is_terminal():
     return np.array(state.returns())
   else:
-    return sum(prob * policy_value(_child(state, action), policies)
+    return sum(prob * policy_value(policy.child(state, action), policies)
                for action, prob in _transitions(state, policies)
                if prob > probability_threshold)

@@ -36,11 +36,45 @@ from __future__ import division
 from __future__ import print_function
 
 import itertools
+from typing import Iterable
 
 import numpy as np
 
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
+
+
+def child(state, action):
+  """Returns a child state, handling the simultaneous node case."""
+  if isinstance(action, Iterable):
+    child_state = state.clone()
+    child_state.apply_actions(action)
+    return child_state
+  else:
+    return state.child(action)
+
+
+def joint_action_probabilities_aux(state, policy):
+  """Auxiliary function for joint_action_probabilities.
+
+  Args:
+    state: a game state at a simultaneous decision node.
+    policy: policy that gives the probability distribution over the legal
+      actions for each players.
+
+  Returns:
+    actions_per_player: list of list of actions for each player
+    probs_per_player: list of list of probabilities do the corresponding action
+     in actions_per_player for each player.
+  """
+  assert state.is_simultaneous_node()
+  action_probs_per_player = [
+      policy.action_probabilities(state, player)
+      for player in range(state.get_game().num_players())
+  ]
+  actions_per_player = [pi.keys() for pi in action_probs_per_player]
+  probs_per_player = [pi.values() for pi in action_probs_per_player]
+  return actions_per_player, probs_per_player
 
 
 def joint_action_probabilities(state, policy):
@@ -50,20 +84,17 @@ def joint_action_probabilities(state, policy):
     state: a game state at a simultaneous decision node.
     policy: policy that gives the probability distribution over the legal
       actions for each players.
+
   Yields:
     (action, probability) pairs. An action is a tuple of individual
       actions for each player of the game. The probability is a single joint
       probability (product of all the individual probabilities).
   """
-  assert state.is_simultaneous_node()
-  action_probs_per_player = [
-      policy.action_probabilities(state, player)
-      for player in range(state.get_game().num_players())
-  ]
-  actions_per_player = [pi.keys() for pi in action_probs_per_player]
-  probs_per_player = [pi.values() for pi in action_probs_per_player]
-  for actions, probs in zip(itertools.product(*actions_per_player),
-                            itertools.product(*probs_per_player)):
+  actions_per_player, probs_per_player = joint_action_probabilities_aux(
+      state, policy)
+  for actions, probs in zip(
+      itertools.product(*actions_per_player),
+      itertools.product(*probs_per_player)):
     yield actions, np.prod(probs)
 
 
@@ -132,9 +163,9 @@ class Policy:
     """Returns a new `TabularPolicy` equivalent to this policy.
 
     Args:
-      states: States of the game that will be used for the tabular policy.
-        If None, then get_tabular_policy_states() method will be used to
-        generate them.
+      states: States of the game that will be used for the tabular policy. If
+        None, then get_tabular_policy_states() method will be used to generate
+        them.
 
     Returns:
       a TabularPolicy.
@@ -269,8 +300,9 @@ class TabularPolicy(Policy):
 
   def action_probabilities(self, state, player_id=None):
     """Returns an {action: probability} dict, covering all legal actions."""
-    legal_actions = (state.legal_actions() if player_id is None
-                     else state.legal_actions(player_id))
+    legal_actions = (
+        state.legal_actions()
+        if player_id is None else state.legal_actions(player_id))
     if not legal_actions:
       return {0: 1.0}
     probability = self.policy_for_key(self._state_key(state, player_id))
@@ -380,8 +412,9 @@ class UniformRandomPolicy(Policy):
       supplied state. This will contain all legal actions, each with the same
       probability, equal to 1 / num_legal_actions.
     """
-    legal_actions = (state.legal_actions() if player_id is None
-                     else state.legal_actions(player_id))
+    legal_actions = (
+        state.legal_actions()
+        if player_id is None else state.legal_actions(player_id))
     if not legal_actions:
       return {0: 1.0}
     probability = 1 / len(legal_actions)
@@ -396,13 +429,15 @@ class FirstActionPolicy(Policy):
     super().__init__(game, all_players)
 
   def action_probabilities(self, state, player_id=None):
-    legal_actions = (state.legal_actions() if player_id is None
-                     else state.legal_actions(player_id))
+    legal_actions = (
+        state.legal_actions()
+        if player_id is None else state.legal_actions(player_id))
     if not legal_actions:
       return {0: 1.0}
     min_action = min(legal_actions)
-    return {action: 1.0 if action == min_action else 0.0
-            for action in legal_actions}
+    return {
+        action: 1.0 if action == min_action else 0.0 for action in legal_actions
+    }
 
 
 def get_tabular_policy_states(game):
@@ -437,8 +472,9 @@ def tabular_policy_from_callable(game, callable_policy, players=None):
   Args:
     game: The game for which we want a TabularPolicy.
     callable_policy: A callable: state -> action probabilities dict or list.
-    players: List of players this policy applies to. If `None`, applies to
-      all players.
+    players: List of players this policy applies to. If `None`, applies to all
+      players.
+
   Returns:
     A TabularPolicy that materializes the callable policy.
   """
@@ -460,9 +496,9 @@ def pyspiel_policy_to_python_policy(game, pyspiel_tabular_policy, players=None):
     game: The OpenSpiel game.
     pyspiel_tabular_policy: Pyspiel tabular policy to copy from.
     players: List of integer player ids to copy policy from. For example,
-      `players=[0]` will only copy player 0's policy over into the python
-      policy (the other player's policies will be undefined). Default value of
-      `None` will copy all players' policies.
+      `players=[0]` will only copy player 0's policy over into the python policy
+      (the other player's policies will be undefined). Default value of `None`
+      will copy all players' policies.
 
   Returns:
     python_policy

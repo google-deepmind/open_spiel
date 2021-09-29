@@ -20,6 +20,7 @@ from absl.testing import parameterized
 
 import numpy as np
 
+from open_spiel.python import games  # pylint:disable=unused-import
 from open_spiel.python import policy
 from open_spiel.python.algorithms import best_response
 from open_spiel.python.algorithms import expected_game_score
@@ -71,7 +72,6 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
         if state.current_player() != current_player:
           continue
 
-        # TODO(b/141737795): Decide what to do about this.
         self.assertEqual(
             python_br.action_probabilities(state), {
                 a: prob
@@ -136,6 +136,42 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
     self.assertAlmostEqual(
         expected_game_score.policy_value(game.new_initial_state(), [pi, br])[1],
         br.value(game.new_initial_state()))
+
+  def test_best_response_oshi_zumo_simultaneous_game(self):
+    """Test best response computation for simultaneous game."""
+    game = pyspiel.load_game("oshi_zumo(horizon=5,coins=5)")
+    test_policy = policy.UniformRandomPolicy(game)
+    br = best_response.BestResponsePolicy(game, policy=test_policy, player_id=0)
+    expected_policy = {
+        "0, 0, 0, 3, 0, 2": 1,
+        "0, 0, 1, 4, 3, 1": 0,
+        "0, 0, 4, 1, 0, 2, 0, 2": 1,
+        "0, 1, 1, 0, 1, 4": 1,
+        "0, 1, 4, 1, 0, 0, 0, 1": 1,
+        "0, 2, 2, 2, 3, 0, 0, 0": 0,
+        "0, 5, 0, 0, 0, 0, 3, 0": 1
+    }
+    self.assertEqual(
+        expected_policy,
+        {key: br.best_response_action(key) for key in expected_policy})
+    self.assertAlmostEqual(br.value(game.new_initial_state()), 0.856471051954)
+
+  def test_best_response_prisoner_dilemma_simultaneous_game(self):
+    """Test best response computation for simultaneous game."""
+    game = pyspiel.load_game(
+        "python_iterated_prisoners_dilemma(max_game_length=5)")
+    test_policy = policy.UniformRandomPolicy(game)
+    br = best_response.BestResponsePolicy(game, policy=test_policy, player_id=0)
+    expected_policy = {  # Always defect.
+        "us:CCCC op:CCCC": 1,
+        "us:DDDD op:CCCC": 1,
+        "us:CDCD op:DCDC": 1,
+        "us:CCCC op:DDDD": 1,
+    }
+    self.assertEqual(
+        expected_policy,
+        {key: br.best_response_action(key) for key in expected_policy})
+    self.assertAlmostEqual(br.value(game.new_initial_state()), 21.4320068359375)
 
 
 if __name__ == "__main__":

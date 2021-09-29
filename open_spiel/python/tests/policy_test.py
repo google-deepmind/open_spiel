@@ -351,7 +351,8 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
     tabular_policies = [  # Policy limited to player.
         policy.TabularPolicy(game, players=(player,))
-        for player in range(num_players)]
+        for player in range(num_players)
+    ]
     for player, tabular_policy in enumerate(tabular_policies):
       tabular_policy.action_probability_array[:] = 0
       tabular_policy.action_probability_array[:, player] = 1.0
@@ -359,8 +360,8 @@ class MergeTabularPoliciesTest(absltest.TestCase):
     merged_tabular_policy = policy.merge_tabular_policies(
         tabular_policies, game)
 
-    self.assertIdentityPoliciesEqual(
-        tabular_policies, merged_tabular_policy, game)
+    self.assertIdentityPoliciesEqual(tabular_policies, merged_tabular_policy,
+                                     game)
 
   def test_identity_redundant(self):
     num_players = 2
@@ -368,7 +369,8 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
     tabular_policies = [  # Policy for all players.
         policy.TabularPolicy(game, players=None)
-        for player in range(num_players)]
+        for player in range(num_players)
+    ]
     for player, tabular_policy in enumerate(tabular_policies):
       tabular_policy.action_probability_array[:] = 0
       tabular_policy.action_probability_array[:, player] = 1.0
@@ -376,8 +378,8 @@ class MergeTabularPoliciesTest(absltest.TestCase):
     merged_tabular_policy = policy.merge_tabular_policies(
         tabular_policies, game)
 
-    self.assertIdentityPoliciesEqual(
-        tabular_policies, merged_tabular_policy, game)
+    self.assertIdentityPoliciesEqual(tabular_policies, merged_tabular_policy,
+                                     game)
 
   def test_identity_missing(self):
     num_players = 2
@@ -385,7 +387,8 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
     tabular_policies = [  # Only first player (repeated).
         policy.TabularPolicy(game, players=(0,))
-        for player in range(num_players)]
+        for player in range(num_players)
+    ]
     for player, tabular_policy in enumerate(tabular_policies):
       tabular_policy.action_probability_array[:] = 0
       tabular_policy.action_probability_array[:, player] = 1.0
@@ -395,60 +398,104 @@ class MergeTabularPoliciesTest(absltest.TestCase):
 
     for player in range(game.num_players()):
       if player == 0:
-        self.assertListEqual(
-            tabular_policies[player].states_per_player[player],
-            merged_tabular_policy.states_per_player[player])
+        self.assertListEqual(tabular_policies[player].states_per_player[player],
+                             merged_tabular_policy.states_per_player[player])
         for p_state in merged_tabular_policy.states_per_player[player]:
           to_index = merged_tabular_policy.state_lookup[p_state]
           from_index = tabular_policies[player].state_lookup[p_state]
-          self.assertTrue(np.allclose(
-              merged_tabular_policy.action_probability_array[to_index],
-              tabular_policies[player].action_probability_array[from_index]))
+          self.assertTrue(
+              np.allclose(
+                  merged_tabular_policy.action_probability_array[to_index],
+                  tabular_policies[player].action_probability_array[from_index])
+          )
 
-          self.assertTrue(np.allclose(
-              merged_tabular_policy.action_probability_array[to_index, player],
-              1))
+          self.assertTrue(
+              np.allclose(
+                  merged_tabular_policy.action_probability_array[to_index,
+                                                                 player], 1))
       else:
         # Missing players have uniform policy.
         self.assertEmpty(tabular_policies[player].states_per_player[player])
         for p_state in merged_tabular_policy.states_per_player[player]:
           to_index = merged_tabular_policy.state_lookup[p_state]
-          self.assertTrue(np.allclose(
-              merged_tabular_policy.action_probability_array[to_index, player],
-              0.5))
+          self.assertTrue(
+              np.allclose(
+                  merged_tabular_policy.action_probability_array[to_index,
+                                                                 player], 0.5))
 
-  def assertIdentityPoliciesEqual(
-      self, tabular_policies, merged_tabular_policy, game):
+  def assertIdentityPoliciesEqual(self, tabular_policies, merged_tabular_policy,
+                                  game):
     for player in range(game.num_players()):
-      self.assertListEqual(
-          tabular_policies[player].states_per_player[player],
-          merged_tabular_policy.states_per_player[player])
+      self.assertListEqual(tabular_policies[player].states_per_player[player],
+                           merged_tabular_policy.states_per_player[player])
 
       for p_state in merged_tabular_policy.states_per_player[player]:
         to_index = merged_tabular_policy.state_lookup[p_state]
         from_index = tabular_policies[player].state_lookup[p_state]
-        self.assertTrue(np.allclose(
-            merged_tabular_policy.action_probability_array[to_index],
-            tabular_policies[player].action_probability_array[from_index]))
+        self.assertTrue(
+            np.allclose(
+                merged_tabular_policy.action_probability_array[to_index],
+                tabular_policies[player].action_probability_array[from_index]))
 
-        self.assertTrue(np.allclose(
-            merged_tabular_policy.action_probability_array[to_index, player],
-            1))
+        self.assertTrue(
+            np.allclose(
+                merged_tabular_policy.action_probability_array[to_index,
+                                                               player], 1))
 
 
 class JointActionProbTest(absltest.TestCase):
 
   def test_joint_action_probabilities(self):
+    """Test expected behavior of joint_action_probabilities."""
     game = pyspiel.load_game("python_iterated_prisoners_dilemma")
     uniform_policy = policy.UniformRandomPolicy(game)
     joint_action_probs = policy.joint_action_probabilities(
         game.new_initial_state(), uniform_policy)
-    self.assertCountEqual(list(joint_action_probs), [
-        ((0, 0), 0.25),
-        ((1, 1), 0.25),
-        ((1, 0), 0.25),
-        ((0, 1), 0.25),
-    ])
+    self.assertCountEqual(
+        list(joint_action_probs), [
+            ((0, 0), 0.25),
+            ((1, 1), 0.25),
+            ((1, 0), 0.25),
+            ((0, 1), 0.25),
+        ])
+
+  def test_joint_action_probabilities_failure_on_seq_game(self):
+    """Test failure of child on sequential games."""
+    game = pyspiel.load_game("kuhn_poker")
+    with self.assertRaises(AssertionError):
+      list(policy.joint_action_probabilities(
+          game.new_initial_state(), policy.UniformRandomPolicy(game)))
+
+
+class ChildTest(absltest.TestCase):
+
+  def test_child_function_expected_behavior_for_seq_game(self):
+    """Test expected behavior of child on sequential games."""
+    game = pyspiel.load_game("tic_tac_toe")
+    initial_state = game.new_initial_state()
+    action = 3
+    new_state = policy.child(initial_state, action)
+    self.assertNotEqual(new_state.history(), initial_state.history())
+    expected_new_state = initial_state.child(action)
+    self.assertNotEqual(new_state, expected_new_state)
+    self.assertEqual(new_state.history(), expected_new_state.history())
+
+  def test_child_function_expected_behavior_for_sim_game(self):
+    """Test expected behavior of child on simultaneous games."""
+    game = pyspiel.load_game("python_dynamic_routing")
+    parameter_state = game.new_initial_state()
+    actions = [2, 2]
+    new_state = policy.child(parameter_state, actions)
+    self.assertEqual(
+        str(new_state), ("Vehicle locations: ['O->A', 'O->A'], "
+                         "time: 1."))
+
+  def test_child_function_failure_behavior_for_sim_game(self):
+    """Test failure behavior of child on simultaneous games."""
+    game = pyspiel.load_game("python_dynamic_routing")
+    parameter_state = game.new_initial_state()
+    with self.assertRaises(AssertionError):
+      policy.child(parameter_state, 2)
 
 
 if __name__ == "__main__":

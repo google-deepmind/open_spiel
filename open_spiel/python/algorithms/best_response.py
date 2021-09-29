@@ -21,6 +21,9 @@ TODO(author2): Also include computation using the more efficient C++
 """
 
 import collections
+import itertools
+
+import numpy as np
 
 from open_spiel.python import games  # pylint:disable=unused-import
 from open_spiel.python import policy as openspiel_policy
@@ -121,11 +124,35 @@ class BestResponsePolicy(openspiel_policy.Policy):
   def decision_nodes(self, parent_state):
     """Yields a (state, cf_prob) pair for each descendant decision node."""
     if not parent_state.is_terminal():
-      if parent_state.current_player() == self._player_id:
+      if (parent_state.current_player() == self._player_id or
+          parent_state.is_simultaneous_node()):
         yield (parent_state, 1.0)
       for action, p_action in self.transitions(parent_state):
-        for state, p_state in self.decision_nodes(parent_state.child(action)):
+        for state, p_state in self.decision_nodes(
+            openspiel_policy.child(parent_state, action)):
           yield (state, p_state * p_action)
+
+  def joint_action_probabilities_counterfactual(self, state):
+    """Get list of action, probability tuples for simultaneous node.
+
+    Counterfactual reach probabilities exclude the best-responder's actions,
+    the sum of the probabilities is equal to the number of actions of the
+    player _player_id.
+    Args:
+      state: the current state of the game.
+
+    Returns:
+      list of action, probability tuples. An action is a tuple of individual
+        actions for each player of the game.
+    """
+    actions_per_player, probs_per_player = (
+        openspiel_policy.joint_action_probabilities_aux(state, self._policy))
+    probs_per_player[self._player_id] = [
+        1.0 for _ in probs_per_player[self._player_id]
+    ]
+    return [(list(actions), np.prod(probs)) for actions, probs in zip(
+        itertools.product(
+            *actions_per_player), itertools.product(*probs_per_player))]
 
   def transitions(self, state):
     """Returns a list of (action, cf_prob) pairs from the specified state."""
@@ -135,6 +162,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
       return [(action, 1.0) for action in state.legal_actions()]
     elif state.is_chance_node():
       return state.chance_outcomes()
+    elif state.is_simultaneous_node():
+      return self.joint_action_probabilities_counterfactual(state)
     else:
       return list(self._policy.action_probabilities(state).items())
 
@@ -143,7 +172,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
     """Returns the value of the specified state to the best-responder."""
     if state.is_terminal():
       return state.player_return(self._player_id)
-    elif state.current_player() == self._player_id:
+    elif (state.current_player() == self._player_id or
+          state.is_simultaneous_node()):
       action = self.best_response_action(
           state.information_state_string(self._player_id))
       return self.q_value(state, action)
@@ -154,7 +184,21 @@ class BestResponsePolicy(openspiel_policy.Policy):
 
   def q_value(self, state, action):
     """Returns the value of the (state, action) to the best-responder."""
-    return self.value(state.child(action))
+    if state.is_simultaneous_node():
+
+      def q_value_sim(sim_state, sim_actions):
+        child = sim_state.clone()
+        # change action of _player_id
+        sim_actions[self._player_id] = action
+        child.apply_actions(sim_actions)
+        return self.value(child)
+
+      actions, probabilities = zip(*self.transitions(state))
+      return sum(p * q_value_sim(state, a)
+                 for a, p in zip(actions, probabilities / sum(probabilities))
+                 if p > self._cut_threshold)
+    else:
+      return self.value(state.child(action))
 
   @_memoize_method()
   def best_response_action(self, infostate):
@@ -163,7 +207,7 @@ class BestResponsePolicy(openspiel_policy.Policy):
     # Get actions from the first (state, cf_prob) pair in the infoset list.
     # Return the best action by counterfactual-reach-weighted state-value.
     return max(
-        infoset[0][0].legal_actions(),
+        infoset[0][0].legal_actions(self._player_id),
         key=lambda a: sum(cf_p * self.q_value(s, a) for s, cf_p in infoset))
 
   def action_probabilities(self, state, player_id=None):
@@ -179,7 +223,10 @@ class BestResponsePolicy(openspiel_policy.Policy):
       supplied state.
     """
     if player_id is None:
-      player_id = state.current_player()
+      if state.is_simultaneous_node():
+        player_id = self._player_id
+      else:
+        player_id = state.current_player()
     return {
         self.best_response_action(state.information_state_string(player_id)): 1
     }
