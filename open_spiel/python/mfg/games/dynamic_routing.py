@@ -42,12 +42,12 @@ from typing import Any, Iterable, List, Mapping, Optional, Tuple
 import numpy as np
 
 from open_spiel.python.games import dynamic_routing_utils as utils
+from open_spiel.python.observation import IIGObserverForPublicInfoGame
 import pyspiel
 
 # pylint: disable=g-bad-todo
 # pylint: disable=g-complex-comprehension
 # pylint: disable=protected-access
-
 
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_mfg_dynamic_routing",
@@ -157,7 +157,10 @@ class MeanFieldRoutingGame(pyspiel.Game):
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns a NetworkObserver object used for observing game state."""
-    return NetworkObserver(self.max_game_length())
+    if ((iig_obs_type is None) or
+        (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
+      return NetworkObserver(self.max_game_length())
+    return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
   def max_chance_nodes_in_history(self):
     """Maximun chance nodes in game history."""
@@ -523,13 +526,13 @@ class NetworkObserver:
       state: the state,
       player: the player.
     """
-    assert player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
+    del player
     self.dict["observation"][
         state.current_time_step()] = state.get_location_as_int()
 
   def string_from(self, state, player):
     """Return the state history string."""
-    assert player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
+    del player
     return str(state)
 
 

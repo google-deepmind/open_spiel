@@ -25,8 +25,10 @@ from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 
+from open_spiel.python import games  # pylint:disable=unused-import
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import sample_some_states
+from open_spiel.python.mfg import games as mfg_games  # pylint:disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -50,14 +52,14 @@ _GAMES_FULL_TREE_TRAVERSAL_TESTS = [
     ("cliff_walking", "cliff_walking(horizon=7)"),
     ("kuhn_poker", "kuhn_poker"),
     ("leduc_poker", "leduc_poker"),
-    ("iigoofspiel4", "turn_based_simultaneous_game(game=goofspiel("
-     "imp_info=True,num_cards=4,points_order=descending))"),
+    ("iigoofspiel4", ("turn_based_simultaneous_game(game=goofspiel("
+                      "imp_info=True,num_cards=4,points_order=descending))")),
     ("kuhn_poker3p", "kuhn_poker(players=3)"),
     ("first_sealed_auction", "first_sealed_auction(max_value=2)"),
     ("tiny_hanabi", "tiny_hanabi"),
-    ("nf_auction", "turn_based_simultaneous_game(game="
-     "normal_form_extensive_game(game="
-     "first_sealed_auction(max_value=3)))"),
+    ("nf_auction", ("turn_based_simultaneous_game(game="
+                    "normal_form_extensive_game(game="
+                    "first_sealed_auction(max_value=3)))")),
     # Disabled by default - big games, slow tests.
     # Uncomment to check the games if you modify them.
     # ("liars_dice", "liars_dice"),
@@ -423,7 +425,7 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
       return
 
     for state in self.some_states:
-      self.assertTrue(public_observation.string_from(state, 0))
+      self.assertIsNotNone(public_observation.string_from(state, 0))
 
 
 def _assert_properties_recursive(state, assert_functions):

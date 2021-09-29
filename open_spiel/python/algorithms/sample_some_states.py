@@ -15,6 +15,7 @@
 """Example algorithm to sample some states from a game."""
 
 import random
+import pyspiel
 
 
 def sample_some_states(
@@ -27,7 +28,8 @@ def sample_some_states(
   for tests that need to check a predicate only on a subset of the game, since
   generating the whole game is infeasible.
 
-  Currently only works for sequential games.
+  Currently only works for sequential games. For simultaneous games and mean
+  field games it returns only the initial state.
 
   The algorithm maintains a list of states and repeatedly picks a random state
   from the list to expand until enough states have been sampled.
@@ -35,13 +37,18 @@ def sample_some_states(
   Arguments:
     game: The game to analyze, as returned by `load_game`.
     max_states: The maximum number of states to return. Negative means no limit.
-    make_distribution_fn: Function that takes a list of states and
-      returns a corresponding distribution (as a list of floats). Only
-      used for mean field games.
+    make_distribution_fn: Function that takes a list of states and returns a
+      corresponding distribution (as a list of floats). Only used for mean field
+      games.
 
   Returns:
     A `list` of `pyspiel.State`.
   """
+  if game.get_type().dynamics in [
+      pyspiel.GameType.Dynamics.SIMULTANEOUS,
+      pyspiel.GameType.Dynamics.MEAN_FIELD
+  ]:
+    return [game.new_initial_state()]
   states = []
   unexplored_actions = []
   indexes_with_unexplored_actions = set()

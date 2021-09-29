@@ -2,7 +2,7 @@ game: python_iterated_prisoners_dilemma
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
-GameType.information = Information.PERFECT_INFORMATION
+GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Python Iterated Prisoner's Dilemma"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
