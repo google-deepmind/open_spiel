@@ -22,6 +22,7 @@ TODO(author2): Also include computation using the more efficient C++
 
 import collections
 
+from open_spiel.python import games  # pylint:disable=unused-import
 from open_spiel.python import policy as openspiel_policy
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import noisy_policy
@@ -31,15 +32,19 @@ import pyspiel
 
 def _memoize_method(key_fn=lambda x: x):
   """Memoize a single-arg instance method using an on-object cache."""
+
   def memoizer(method):
     cache_name = "cache_" + method.__name__
+
     def wrap(self, arg):
       key = key_fn(arg)
       cache = vars(self).setdefault(cache_name, {})
       if key not in cache:
         cache[key] = method(self, arg)
       return cache[key]
+
     return wrap
+
   return memoizer
 
 
@@ -79,7 +84,11 @@ def compute_states_and_info_states_if_none(game,
 class BestResponsePolicy(openspiel_policy.Policy):
   """Computes the best response to a specified strategy."""
 
-  def __init__(self, game, player_id, policy, root_state=None,
+  def __init__(self,
+               game,
+               player_id,
+               policy,
+               root_state=None,
                cut_threshold=0.0):
     """Initializes the best-response calculation.
 
@@ -139,7 +148,8 @@ class BestResponsePolicy(openspiel_policy.Policy):
           state.information_state_string(self._player_id))
       return self.q_value(state, action)
     else:
-      return sum(p * self.q_value(state, a) for a, p in self.transitions(state)
+      return sum(p * self.q_value(state, a)
+                 for a, p in self.transitions(state)
                  if p > self._cut_threshold)
 
   def q_value(self, state, action):
@@ -208,8 +218,8 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
         Increasing this value will trade off accuracy for speed.
     """
     (self.all_states, self.state_to_information_state) = (
-        compute_states_and_info_states_if_none(
-            game, all_states, state_to_information_state))
+        compute_states_and_info_states_if_none(game, all_states,
+                                               state_to_information_state))
 
     policy_to_dict = policy_utils.policy_to_dict(
         policy, game, self.all_states, self.state_to_information_state)
@@ -260,7 +270,8 @@ class CPPBestResponsePolicy(openspiel_policy.Policy):
           state.information_state_string(self.best_responder_id))
       return self.q_value(state, action)
     else:
-      return sum(p * self.q_value(state, a) for a, p in self.transitions(state)
+      return sum(p * self.q_value(state, a)
+                 for a, p in self.transitions(state)
                  if p > self._cut_threshold)
 
   def q_value(self, state, action):
