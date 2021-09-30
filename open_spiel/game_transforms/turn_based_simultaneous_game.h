@@ -103,6 +103,14 @@ class TurnBasedSimultaneousGame : public Game {
   int MaxChanceNodesInHistory() const override {
     return game_->MaxChanceNodesInHistory();
   }
+  std::vector<int> InformationStateTensorShape() const override {
+    return {NumDistinctActions() + NumPlayers()
+            + game_->InformationStateTensorSize()};
+  }
+  std::vector<int> ObservationTensorShape() const override {
+    return {NumDistinctActions() + NumPlayers()
+            + game_->ObservationTensorSize()};
+  }
   std::shared_ptr<Observer> MakeObserver(
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const override;

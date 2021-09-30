@@ -76,7 +76,7 @@ class TurnBasedSimultaneousObserver : public Observer {
       // in the transformation.
       int num_actions = state.GetGame()->NumDistinctActions();
       auto out = allocator->Get("turn_based_sim_played_action",
-                                {num_actions + 1});
+                                {num_actions});
       if (turn_state.action_vector_[player] != kInvalidAction) {
         const int played_action = turn_state.action_vector_[player];
         out.at(played_action) = 1;
