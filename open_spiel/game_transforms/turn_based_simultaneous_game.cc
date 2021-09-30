@@ -55,6 +55,82 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
+
+class TurnBasedSimultaneousObserver : public Observer {
+  std::shared_ptr<Observer> observer_;
+  IIGObservationType iig_obs_type_;
+ public:
+  TurnBasedSimultaneousObserver(const std::shared_ptr<Observer>& observer,
+                                IIGObservationType iig_obs_type)
+      : Observer(observer->HasString(), observer->HasTensor()),
+        observer_(observer), iig_obs_type_(iig_obs_type) {}
+
+  void WriteTensor(const State& state,
+                   Player player,
+                   Allocator* allocator) const override {
+    const TurnBasedSimultaneousState& turn_state =
+        open_spiel::down_cast<const TurnBasedSimultaneousState&>(state);
+
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      // Tell the observing player what actions it has already picked
+      // in the transformation.
+      int num_actions = state.GetGame()->NumDistinctActions();
+      auto out = allocator->Get("turn_based_sim_played_action",
+                                {num_actions + 1});
+      if (turn_state.action_vector_[player] != kInvalidAction) {
+        const int played_action = turn_state.action_vector_[player];
+        out.at(played_action) = 1;
+      }
+    }
+
+    if (iig_obs_type_.public_info) {
+      // Tell the players publicly which player already acted
+      // in the transformation.
+      auto out = allocator->Get("turn_based_sim_progress",
+                                {turn_state.NumPlayers()});
+      if (turn_state.rollout_mode_) {
+        out.at(turn_state.CurrentPlayer()) = 1;
+      }
+    }
+
+    // Write the additional observations.
+    return observer_->WriteTensor(*turn_state.state_, player, allocator);
+  }
+
+  std::string StringFrom(const State& state, Player player) const override {
+    const TurnBasedSimultaneousState& turn_state =
+        open_spiel::down_cast<const TurnBasedSimultaneousState&>(state);
+
+    std::string extra_info = "";
+
+    if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+      // Include the player's action if they have take one already.
+      if (turn_state.action_vector_[player] != kInvalidAction) {
+        absl::StrAppend(&extra_info, "Player ", player, " picked ");
+        absl::StrAppend(&extra_info, turn_state.action_vector_[player]);
+        extra_info.push_back('\n');
+      }
+    }
+
+    if (iig_obs_type_.public_info) {
+      extra_info = "Current player: ";
+      absl::StrAppend(&extra_info, turn_state.current_player_);
+      extra_info.push_back('\n');
+    }
+
+    // Append the additional strings.
+    return extra_info + observer_->StringFrom(*turn_state.state_, player);
+  }
+};
+
+std::shared_ptr<Observer> TurnBasedSimultaneousGame::MakeObserver(
+    absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) const {
+  return std::make_shared<TurnBasedSimultaneousObserver>(
+      game_->MakeObserver(iig_obs_type, params),
+      iig_obs_type.value_or(kDefaultObsType));
+}
+
 TurnBasedSimultaneousState::TurnBasedSimultaneousState(
     std::shared_ptr<const Game> game, std::unique_ptr<State> state)
     : State(game), state_(std::move(state)), action_vector_(game->NumPlayers()),
@@ -90,7 +166,7 @@ void TurnBasedSimultaneousState::RolloutModeIncrementCurrentPlayer() {
   while (current_player_ < num_players_ &&
          state_->LegalActions(current_player_).empty()) {
     // Unnecessary to set an action here, but leads to a nicer ToString.
-    action_vector_[current_player_] = 0;
+    action_vector_[current_player_] = kInvalidAction;
     current_player_++;
   }
 }
@@ -154,86 +230,29 @@ std::vector<double> TurnBasedSimultaneousState::Returns() const {
   return state_->Returns();
 }
 
-std::string TurnBasedSimultaneousState::InformationStateString(
-    Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
 
-  std::string extra_info = "";
-  extra_info = "Current player: ";
-  absl::StrAppend(&extra_info, current_player_);
-  extra_info.push_back('\n');
-  if (rollout_mode_) {
-    // Include the player's action if they have take one already.
-    if (player < current_player_) {
-      absl::StrAppend(&extra_info, "Observer's action this turn: ");
-      absl::StrAppend(&extra_info, action_vector_[player]);
-      extra_info.push_back('\n');
-    }
-  }
-  return extra_info + state_->InformationStateString(player);
-}
-
-void TurnBasedSimultaneousState::InformationStateTensor(
-    Player player, absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
-  auto value_it = values.begin();
-
-  // First, get the 2 * num_players bits to encode whose turn it is and who
-  // the observer is.
-  for (auto p = Player{0}; p < num_players_; ++p) {
-    *value_it++ = (p == current_player_ ? 1 : 0);
-  }
-  for (auto p = Player{0}; p < num_players_; ++p) {
-    *value_it++ = (p == player ? 1 : 0);
-  }
-
-  // Then get the underlying observation
-  state_->InformationStateTensor(player,
-                                 absl::MakeSpan(value_it, values.end()));
+std::string TurnBasedSimultaneousState::InformationStateString(Player player) const {
+  const auto& game = down_cast<const TurnBasedSimultaneousGame&>(*game_);
+  return game.info_state_observer_->StringFrom(*this, player);
 }
 
 std::string TurnBasedSimultaneousState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  std::string extra_info = "";
-  extra_info = "Current player: ";
-  absl::StrAppend(&extra_info, current_player_);
-  extra_info.push_back('\n');
-  if (rollout_mode_) {
-    // Include the player's action if they have take one already.
-    if (player < current_player_) {
-      absl::StrAppend(&extra_info, "Observer's action this turn: ");
-      absl::StrAppend(&extra_info, action_vector_[player]);
-      extra_info.push_back('\n');
-    }
-  }
-  return extra_info + state_->ObservationString(player);
+  const auto& game = down_cast<const TurnBasedSimultaneousGame&>(*game_);
+  return game.default_observer_->StringFrom(*this, player);
 }
 
-void TurnBasedSimultaneousState::ObservationTensor(
-    Player player, absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
+void TurnBasedSimultaneousState::InformationStateTensor(Player player,
+                                                        absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const auto& game = down_cast<const TurnBasedSimultaneousGame&>(*game_);
+  game.info_state_observer_->WriteTensor(*this, player, &allocator);
+}
 
-  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
-  auto value_it = values.begin();
-
-  // First, get the 2 * num_players bits to encode whose turn it is and who
-  // the observer is.
-  for (auto p = Player{0}; p < num_players_; ++p) {
-    *value_it++ = (p == current_player_ ? 1 : 0);
-  }
-  for (auto p = Player{0}; p < num_players_; ++p) {
-    *value_it++ = (p == player ? 1 : 0);
-  }
-
-  // Then get the underlying observation
-  state_->ObservationTensor(player, absl::MakeSpan(value_it, values.end()));
+void TurnBasedSimultaneousState::ObservationTensor(Player player,
+                                                   absl::Span<float> values) const {
+  ContiguousAllocator allocator(values);
+  const auto& game = down_cast<const TurnBasedSimultaneousGame&>(*game_);
+  game.default_observer_->WriteTensor(*this, player, &allocator);
 }
 
 TurnBasedSimultaneousState::TurnBasedSimultaneousState(
@@ -255,8 +274,6 @@ GameType ConvertType(GameType type) {
   type.short_name = kGameType.short_name;
   type.long_name = "Turn-based " + type.long_name;
   type.parameter_specification = kGameType.parameter_specification;
-  type.provides_observation_string = false;
-  type.provides_observation_tensor = false;
   return type;
 }
 
@@ -271,7 +288,17 @@ TurnBasedSimultaneousGame::TurnBasedSimultaneousGame(
     std::shared_ptr<const Game> game)
     : Game(ConvertType(game->GetType()),
            ConvertParams(game->GetType(), game->GetParameters())),
-      game_(game) {}
+      game_(game),
+    // TODO: remove compatibility layer with old observations API once
+    //       the API is not supported.
+      default_observer_(game->GetType().provides_observation()
+                        ? std::make_shared<TurnBasedSimultaneousObserver>(
+              game->MakeObserver(kDefaultObsType, {}), kDefaultObsType)
+                        : nullptr),
+      info_state_observer_(game->GetType().provides_information_state()
+                           ? std::make_shared<TurnBasedSimultaneousObserver>(
+              game->MakeObserver(kInfoStateObsType, {}), kInfoStateObsType)
+                           : nullptr) {}
 
 std::shared_ptr<const Game> ConvertToTurnBased(const Game& game) {
   SPIEL_CHECK_EQ(game.GetType().dynamics, GameType::Dynamics::kSimultaneous);

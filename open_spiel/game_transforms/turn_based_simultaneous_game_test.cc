@@ -44,20 +44,20 @@ namespace testing = open_spiel::testing;
 // having any legal actions at simultaneous nodes, which are then skipped over
 // when converted to turn-based games.
 const GameType kGameType{/*short_name=*/"mprmp",
-                         /*long_name=*/"Missing Player Repeated MP",
-                         GameType::Dynamics::kSimultaneous,
-                         GameType::ChanceMode::kDeterministic,
-                         GameType::Information::kPerfectInformation,
-                         GameType::Utility::kZeroSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/2,
-                         /*min_num_players=*/2,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/false,
-                         /*provides_observation_string=*/false,
-                         /*provides_observation_tensor=*/false,
-                         /*parameter_specification=*/
-                         {{"num_players", GameParameter(4)}}};
+    /*long_name=*/"Missing Player Repeated MP",
+                                        GameType::Dynamics::kSimultaneous,
+                                        GameType::ChanceMode::kDeterministic,
+                                        GameType::Information::kPerfectInformation,
+                                        GameType::Utility::kZeroSum,
+                                        GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/false,
+    /*provides_observation_string=*/false,
+    /*provides_observation_tensor=*/false,
+    /*parameter_specification=*/
+                                        {{"num_players", GameParameter(4)}}};
 
 class MissingPlayerRepeatedMatchingPenniesState : public SimMoveState {
  public:
@@ -178,24 +178,30 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 
       // Sample an action for each player
       for (auto p = Player{0}; p < game.NumPlayers(); p++) {
-        if (game.GetType().provides_information_state_string) {
-          // Check the information states to each player are consistent.
-          SPIEL_CHECK_EQ(sim_state->InformationStateString(p),
-                         wrapped_sim_state->InformationStateString(p));
+        if (turn_based_state->IsPlayerActing(p)) {
+          std::vector<Action> actions;
+          actions = sim_state->LegalActions(p);
+          absl::uniform_int_distribution<> dis(0, actions.size() - 1);
+          Action action = actions[dis(*rng)];
+          joint_action.push_back(action);
+          std::cout << "player " << p << " chose "
+                    << sim_state->ActionToString(p, action) << std::endl;
+          SPIEL_CHECK_EQ(p, turn_based_state->CurrentPlayer());
+          turn_based_state->ApplyAction(action);
+        } else {
+          joint_action.push_back(kInvalidAction);
         }
-
-        std::vector<Action> actions;
-        actions = sim_state->LegalActions(p);
-        absl::uniform_int_distribution<> dis(0, actions.size() - 1);
-        Action action = actions[dis(*rng)];
-        joint_action.push_back(action);
-        std::cout << "player " << p << " chose "
-                  << sim_state->ActionToString(p, action) << std::endl;
-        SPIEL_CHECK_EQ(p, turn_based_state->CurrentPlayer());
-        turn_based_state->ApplyAction(action);
       }
 
       sim_state->ApplyActions(joint_action);
+
+      // Check the information states to each player are consistent.
+      if (game.GetType().provides_information_state_string) {
+        for (auto p = Player{0}; p < game.NumPlayers(); p++) {
+          SPIEL_CHECK_EQ(sim_state->InformationStateString(p),
+                         wrapped_sim_state->InformationStateString(p));
+        }
+      }
     } else {
       SPIEL_CHECK_EQ(sim_state->CurrentPlayer(),
                      wrapped_sim_state->CurrentPlayer());
@@ -212,6 +218,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 
       std::vector<Action> actions;
       actions = sim_state->LegalActions(p);
+      SPIEL_CHECK_GT(actions.size(), 0);
       absl::uniform_int_distribution<> dis(0, actions.size() - 1);
       Action action = actions[dis(*rng)];
 
@@ -243,6 +250,7 @@ void SimulateGames(std::mt19937* rng, const Game& game, State* sim_state,
 }
 
 void BasicTurnBasedSimultaneousTests() {
+  constexpr int kNumSimulations = 100;
   std::mt19937 rng;
 
   for (const GameType& type : RegisteredGameTypes()) {
@@ -250,10 +258,10 @@ void BasicTurnBasedSimultaneousTests() {
       std::string name = type.short_name;
       if (type.dynamics == GameType::Dynamics::kSimultaneous) {
         std::cout << "TurnBasedSimultaneous: Testing " << name << std::endl;
-        for (int i = 0; i < 100; ++i) {
-          std::shared_ptr<const Game> sim_game = LoadGame(name);
-          std::shared_ptr<const Game> turn_based_game =
-              ConvertToTurnBased(*LoadGame(name));
+        std::shared_ptr<const Game> sim_game = LoadGame(name);
+        std::shared_ptr<const Game> turn_based_game =
+            ConvertToTurnBased(*LoadGame(name));
+        for (int i = 0; i < kNumSimulations; ++i) {
           auto sim_state = sim_game->NewInitialState();
           auto turn_based_state = turn_based_game->NewInitialState();
           SimulateGames(&rng, *sim_game, sim_state.get(),
@@ -298,6 +306,6 @@ void SomePlayersHaveNoLegalActionsTests() {
 
 int main(int argc, char** argv) {
   open_spiel::Init("", &argc, &argv, true);
-  // open_spiel::BasicTurnBasedSimultaneousTests();
+  open_spiel::BasicTurnBasedSimultaneousTests();
   open_spiel::SomePlayersHaveNoLegalActionsTests();
 }
