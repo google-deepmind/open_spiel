@@ -49,9 +49,6 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . . . . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . . . . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . . . . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◯
@@ -95,9 +92,6 @@ InformationStateString(0) = "23"
 InformationStateString(1) = "23"
 ObservationString(0) = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . .[O]. . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . .[O]. . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 . . . . e\n    2 . . . . . f\n   3 . . . . . . g\n  4 . .[O]. . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◯◯
@@ -141,9 +135,6 @@ InformationStateString(0) = "23, 10"
 InformationStateString(1) = "23, 10"
 ObservationString(0) = "        a b c d\n     1 . . . . e\n    2 . . .[@]. f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 . . . . e\n    2 . . .[@]. f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 . . . . e\n    2 . . .[@]. f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 . . . . . .\n    6 . . . . .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◉◉◉◯◉◯◯
@@ -187,9 +178,6 @@ InformationStateString(0) = "23, 10, 30"
 InformationStateString(1) = "23, 10, 30"
 ObservationString(0) = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 .[O]. . . .\n    6 . . . . .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 .[O]. . . .\n    6 . . . . .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . . O . . . .\n   5 .[O]. . . .\n    6 . . . . .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◉◉◉◯◉◯◯
@@ -233,9 +221,6 @@ InformationStateString(0) = "23, 10, 30, 22"
 InformationStateString(1) = "23, 10, 30, 22"
 ObservationString(0) = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 .[@]O . . . .\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 .[@]O . . . .\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 .[@]O . . . .\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◉◉◉◯◉◯◯
@@ -279,9 +264,6 @@ InformationStateString(0) = "23, 10, 30, 22, 26"
 InformationStateString(1) = "23, 10, 30, 22, 26"
 ObservationString(0) = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . @ O . .[O].\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . @ O . .[O].\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 . . . . e\n    2 . . . @ . f\n   3 . . . . . . g\n  4 . @ O . .[O].\n   5 . O . . . .\n    6 . . . . .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯  ◉◉◉◯◉◯◯
@@ -381,9 +363,6 @@ InformationStateString(0) = "23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 
 InformationStateString(1) = "23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0"
 ObservationString(0) = "        a b c d\n     1[@]. . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . . . @ .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1[@]. . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . . . @ .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1[@]. . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 . . . @ .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◯◯◯
 ◯◉◯◯◉◯◯  ◯◯◯◉◯◯◯  ◉◯◉◯◯◯◯
@@ -427,9 +406,6 @@ InformationStateString(0) = "23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 
 InformationStateString(1) = "23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38"
 ObservationString(0) = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 .[O]. @ .\n     7 . . . .\n"
 ObservationString(1) = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 .[O]. @ .\n     7 . . . .\n"
-PublicObservationString() = "        a b c d\n     1 @ . . O e\n    2 . O . @ O f\n   3 @ @ . . . @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 .[O]. @ .\n     7 . . . .\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◉◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◯◯◯◯
 ◯◉◯◯◉◯◯  ◯◯◯◉◯◯◯  ◉◯◉◯◯◯◯
@@ -517,9 +493,6 @@ InformationStateString(0) = "23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 
 InformationStateString(1) = "23, 10, 30, 22, 26, 15, 11, 33, 27, 32, 8, 34, 21, 14, 24, 19, 3, 40, 31, 0, 38, 45, 39, 18, 47, 41, 2, 9, 37, 17, 1, 48, 7"
 ObservationString(0) = "        a b c d\n     1 @ O O O e\n    2[O]O @ @ O f\n   3 @ @ . @ @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O @\n"
 ObservationString(1) = "        a b c d\n     1 @ O O O e\n    2[O]O @ @ O f\n   3 @ @ . @ @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O @\n"
-PublicObservationString() = "        a b c d\n     1 @ O O O e\n    2[O]O @ @ O f\n   3 @ @ . @ @ @ g\n  4 O @ O O . O O\n   5 . O O @ @ @\n    6 O O O @ @\n     7 @ . O @\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◯◯◯  ◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯
 ◉◉◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◯◯◯◯◯◯

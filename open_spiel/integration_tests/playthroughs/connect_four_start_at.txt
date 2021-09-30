@@ -47,9 +47,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0"
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0"
 ObservationString(0) = ".......\n....x..\n....o..\n....x..\no..xo..\nx.oox..\n"
 ObservationString(1) = ".......\n....x..\n....o..\n....x..\no..xo..\nx.oox..\n"
-PublicObservationString() = ".......\n....x..\n....o..\n....x..\no..xo..\nx.oox..\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◯◉◯◯◯  ◯◉◉◯◯◉◉
@@ -89,9 +86,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2"
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2"
 ObservationString(0) = ".......\n....x..\n....o..\n....x..\no.xxo..\nx.oox..\n"
 ObservationString(1) = ".......\n....x..\n....o..\n....x..\no.xxo..\nx.oox..\n"
-PublicObservationString() = ".......\n....x..\n....o..\n....x..\no.xxo..\nx.oox..\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -131,9 +125,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0"
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0"
 ObservationString(0) = ".......\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
 ObservationString(1) = ".......\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
-PublicObservationString() = ".......\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -173,9 +164,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4"
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4"
 ObservationString(0) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
 ObservationString(1) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
-PublicObservationString() = "....x..\n....x..\n....o..\no...x..\no.xxo..\nx.oox..\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◉◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -215,9 +203,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1"
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1"
 ObservationString(0) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nxooox..\n"
 ObservationString(1) = "....x..\n....x..\n....o..\no...x..\no.xxo..\nxooox..\n"
-PublicObservationString() = "....x..\n....x..\n....o..\no...x..\no.xxo..\nxooox..\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◯◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -257,9 +242,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1, 2"
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1, 2"
 ObservationString(0) = "....x..\n....x..\n....o..\no.x.x..\no.xxo..\nxooox..\n"
 ObservationString(1) = "....x..\n....x..\n....o..\no.x.x..\no.xxo..\nxooox..\n"
-PublicObservationString() = "....x..\n....x..\n....o..\no.x.x..\no.xxo..\nxooox..\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◯◯◯  ◉◯◯◯◉◯◯  ◯◯◯◯◯◉◉
 ◉◯◯◯◉◯◯  ◯◯◉◉◯◯◯  ◯◉◯◯◯◉◉
@@ -327,9 +309,6 @@ InformationStateString(0) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1, 2, 6, 3, 
 InformationStateString(1) = "4, 3, 3, 2, 0, 4, 4, 4, 4, 0, 2, 0, 4, 1, 2, 6, 3, 6, 2, 3, 6, 1, 2"
 ObservationString(0) = "....x..\n..x.x..\n..xoo..\no.xxx.x\nooxxo.o\nxooox.o\n"
 ObservationString(1) = "....x..\n..x.x..\n..xoo..\no.xxx.x\nooxxo.o\nxooox.o\n"
-PublicObservationString() = "....x..\n..x.x..\n..xoo..\no.xxx.x\nooxxo.o\nxooox.o\n"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◯◯◉  ◉◯◯◯◉◯◯  ◯◯◯◯◯◉◯
 ◉◉◯◯◉◯◉  ◯◯◉◉◯◯◯  ◯◯◯◯◯◉◯

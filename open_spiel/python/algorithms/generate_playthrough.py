@@ -241,26 +241,31 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     pass
 
   public_observation = None
-  try:
-    public_observation = make_observation(
-        game,
-        pyspiel.IIGObservationType(
-            public_info=True,
-            perfect_recall=False,
-            private_info=pyspiel.PrivateInfoType.NONE))
-  except (RuntimeError, ValueError):
-    pass
-
   private_observation = None
-  try:
-    private_observation = make_observation(
-        game,
-        pyspiel.IIGObservationType(
-            public_info=False,
-            perfect_recall=False,
-            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
-  except (RuntimeError, ValueError):
-    pass
+
+  # Instantiate factored observations only for imperfect information games,
+  # as it would yield unncessarily redundant information for perfect info games.
+  # The default observation is the same as the public observation, while private
+  # observations are always empty.
+  if game_type.information == pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+    try:
+      public_observation = make_observation(
+          game,
+          pyspiel.IIGObservationType(
+              public_info=True,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.NONE))
+    except (RuntimeError, ValueError):
+      pass
+    try:
+      private_observation = make_observation(
+          game,
+          pyspiel.IIGObservationType(
+              public_info=False,
+              perfect_recall=False,
+              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
+    except (RuntimeError, ValueError):
+      pass
 
   add_line("")
   add_line("GameType.chance_mode = {}".format(game_type.chance_mode))

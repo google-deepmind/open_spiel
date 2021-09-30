@@ -40,8 +40,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.CHANCE
 InformationStateString(0) = ""
 ObservationString(0) = "initial"
-PublicObservationString() = "initial"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
@@ -61,8 +59,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "5"
 ObservationString(0) = "(5, 0)"
-PublicObservationString() = "(5, 0)"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
 Rewards() = [3.3025850929940455]
@@ -83,8 +79,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.CHANCE
 InformationStateString(0) = "5, 1"
 ObservationString(0) = "(5, 0)_a_mu"
-PublicObservationString() = "(5, 0)_a_mu"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
@@ -104,8 +98,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "5, 1, 1"
 ObservationString(0) = "(5, 1)_a"
-PublicObservationString() = "(5, 1)_a"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
 Rewards() = [0.0]
@@ -125,8 +117,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "5, 1, 1"
 ObservationString(0) = "(5, 1)"
-PublicObservationString() = "(5, 1)"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
 Rewards() = [3.3025850929940455]
@@ -151,8 +141,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "5, 1, 1, 0, 0"
 ObservationString(0) = "(3, 2)_a"
-PublicObservationString() = "(3, 2)_a"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0.0]
@@ -172,8 +160,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "5, 1, 1, 0, 0"
 ObservationString(0) = "(3, 2)"
-PublicObservationString() = "(3, 2)"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [2.8025850929940455]
@@ -198,8 +184,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "5, 1, 1, 0, 0, 2, 1"
 ObservationString(0) = "(4, 3)_a"
-PublicObservationString() = "(4, 3)_a"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(0).t: ◯◯◯◉◯◯◯◯◯◯◯
 Rewards() = [0.0]
@@ -299,8 +283,6 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
 InformationStateString(0) = "5, 1, 1, 0, 0, 2, 1, 1, 0, 0, 0, 2, 2, 1, 0, 1, 1, 0, 0, 0, 1"
 ObservationString(0) = "(9, 10)_a"
-PublicObservationString() = "(9, 10)_a"
-PrivateObservationString(0) = ""
 ObservationTensor(0).x: ◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).t: ◯◯◯◯◯◯◯◯◯◯◉
 Rewards() = [0.0]

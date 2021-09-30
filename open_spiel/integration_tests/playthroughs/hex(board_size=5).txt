@@ -46,9 +46,6 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = ". . . . . \n . . . . . \n  . . . . . \n   . . . . . \n    . . . . . "
 ObservationString(1) = ". . . . . \n . . . . . \n  . . . . . \n   . . . . . \n    . . . . . "
-PublicObservationString() = ". . . . . \n . . . . . \n  . . . . . \n   . . . . . \n    . . . . . "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
@@ -85,9 +82,6 @@ InformationStateString(0) = "12"
 InformationStateString(1) = "12"
 ObservationString(0) = ". . . . . \n . . . . . \n  . . x . . \n   . . . . . \n    . . . . . "
 ObservationString(1) = ". . . . . \n . . . . . \n  . . x . . \n   . . . . . \n    . . . . . "
-PublicObservationString() = ". . . . . \n . . . . . \n  . . x . . \n   . . . . . \n    . . . . . "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
@@ -124,9 +118,6 @@ InformationStateString(0) = "12, 11"
 InformationStateString(1) = "12, 11"
 ObservationString(0) = ". . . . . \n . . . . . \n  . o x . . \n   . . . . . \n    . . . . . "
 ObservationString(1) = ". . . . . \n . . . . . \n  . o x . . \n   . . . . . \n    . . . . . "
-PublicObservationString() = ". . . . . \n . . . . . \n  . o x . . \n   . . . . . \n    . . . . . "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
@@ -163,9 +154,6 @@ InformationStateString(0) = "12, 11, 10"
 InformationStateString(1) = "12, 11, 10"
 ObservationString(0) = ". . . . . \n . . . . . \n  x o x . . \n   . . . . . \n    . . . . . "
 ObservationString(1) = ". . . . . \n . . . . . \n  x o x . . \n   . . . . . \n    . . . . . "
-PublicObservationString() = ". . . . . \n . . . . . \n  x o x . . \n   . . . . . \n    . . . . . "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
@@ -202,9 +190,6 @@ InformationStateString(0) = "12, 11, 10, 14"
 InformationStateString(1) = "12, 11, 10, 14"
 ObservationString(0) = ". . . . . \n . . . . . \n  x o x . q \n   . . . . . \n    . . . . . "
 ObservationString(1) = ". . . . . \n . . . . . \n  x o x . q \n   . . . . . \n    . . . . . "
-PublicObservationString() = ". . . . . \n . . . . . \n  x o x . q \n   . . . . . \n    . . . . . "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
@@ -241,9 +226,6 @@ InformationStateString(0) = "12, 11, 10, 14, 4"
 InformationStateString(1) = "12, 11, 10, 14, 4"
 ObservationString(0) = ". . . . y \n . . . . . \n  x o x . q \n   . . . . . \n    . . . . . "
 ObservationString(1) = ". . . . y \n . . . . . \n  x o x . q \n   . . . . . \n    . . . . . "
-PublicObservationString() = ". . . . y \n . . . . . \n  x o x . q \n   . . . . . \n    . . . . . "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◉  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯
@@ -336,9 +318,6 @@ InformationStateString(0) = "12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9
 InformationStateString(1) = "12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23, 13"
 ObservationString(0) = ". q q q y \n . q z q y \n  x q z q q \n   . q z z z \n    . . z z q "
 ObservationString(1) = ". q q q y \n . q z q y \n  x q z q q \n   . q z z z \n    . . z z q "
-PublicObservationString() = ". q q q y \n . q z q y \n  x q z q q \n   . q z z z \n    . . z z q "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◉◉◉◯  ◯◯◯◯◯  ◉◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◉  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◉◯◉◯  ◯◯◯◯◯  ◉◯◯◯◯  ◯◯◯◯◯  ◯◯◉◯◯  ◯◯◯◯◉  ◯◯◯◯◯
@@ -375,9 +354,6 @@ InformationStateString(0) = "12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9
 InformationStateString(1) = "12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23, 13, 5"
 ObservationString(0) = ". q q q y \n x q z q y \n  x q z q q \n   . q z z z \n    . . z z q "
 ObservationString(1) = ". q q q y \n x q z q y \n  x q z q q \n   . q z z z \n    . . z z q "
-PublicObservationString() = ". q q q y \n x q z q y \n  x q z q q \n   . q z z z \n    . . z z q "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◉◉◉◯  ◯◯◯◯◯  ◉◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◉  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◉◯◉◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◯◯◯◯  ◯◯◉◯◯  ◯◯◯◯◉  ◯◯◯◯◯
@@ -414,9 +390,6 @@ InformationStateString(0) = "12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9
 InformationStateString(1) = "12, 11, 10, 14, 4, 8, 22, 3, 7, 1, 18, 6, 17, 24, 9, 2, 19, 16, 23, 13, 5, 15"
 ObservationString(0) = ". q q q y \n x q z q y \n  x q z q q \n   O q z z z \n    . . z z q "
 ObservationString(1) = ". q q q y \n x q z q y \n  x q z q q \n   O q z z z \n    . . z z q "
-PublicObservationString() = ". q q q y \n x q z q y \n  x q z q q \n   O q z z z \n    . . z z q "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◉◉◉◯  ◯◯◯◯◯  ◉◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◉  ◯◯◯◯◯
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◉◯◉◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◯◯◯◯  ◯◯◉◯◯  ◯◯◯◯◉  ◯◯◯◯◯

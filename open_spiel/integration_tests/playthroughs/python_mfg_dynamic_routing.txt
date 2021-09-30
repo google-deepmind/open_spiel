@@ -44,8 +44,6 @@ CurrentPlayer() = PlayerId.CHANCE
 InformationStateString(0) = "Before initial chance node"
 InformationStateTensor(0).observation = [-1.0, 0.0, 0.0]
 ObservationString(0) = "Before initial chance node"
-PublicObservationString() = "Before initial chance node"
-PrivateObservationString(0) = "Before initial chance node"
 ObservationTensor(0) = [-1.0, 0.0, 0.0]
 ChanceOutcomes() = [(0, 1.0)]
 LegalActions() = [0]
@@ -65,8 +63,6 @@ CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
 InformationStateTensor(0).observation: ◉◯◯
 ObservationString(0) = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
-PublicObservationString() = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
-PrivateObservationString(0) = "Location=bef_O->O, movement=True, t=0, destination='D->aft_D'"
 ObservationTensor(0): ◉◯◯
 Rewards() = [0.0]
 Returns() = [0]
@@ -87,8 +83,6 @@ CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
 InformationStateTensor(0).observation = [1.0, 2.0, 0.0]
 ObservationString(0) = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
-PublicObservationString() = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
-PrivateObservationString(0) = "Location=O->A, movement=True, t=1_mean_field, destination='D->aft_D'"
 ObservationTensor(0) = [1.0, 2.0, 0.0]
 Rewards() = [0.0]
 Returns() = [0]
@@ -108,8 +102,6 @@ CurrentPlayer() = PlayerId.CHANCE
 InformationStateString(0) = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
 InformationStateTensor(0).observation = [1.0, 2.0, 0.0]
 ObservationString(0) = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
-PublicObservationString() = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
-PrivateObservationString(0) = "Location=O->A, movement=True, t=1_chance, destination='D->aft_D'"
 ObservationTensor(0) = [1.0, 2.0, 0.0]
 ChanceOutcomes() = [(1, 0.009900990099009901), (0, 0.9900990099009901)]
 LegalActions() = [1, 0]
@@ -129,8 +121,6 @@ CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
 InformationStateTensor(0).observation = [1.0, 2.0, 0.0]
 ObservationString(0) = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
-PublicObservationString() = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
-PrivateObservationString(0) = "Location=O->A, movement=False, t=1, destination='D->aft_D'"
 ObservationTensor(0) = [1.0, 2.0, 0.0]
 Rewards() = [0.0]
 Returns() = [0]
@@ -151,8 +141,6 @@ CurrentPlayer() = PlayerId.TERMINAL
 InformationStateString(0) = "Arrived at O->A, with travel time 3.0, t=2_mean_field"
 InformationStateTensor(0).observation = [1.0, 2.0, 2.0]
 ObservationString(0) = "Arrived at O->A, with travel time 3.0, t=2_mean_field"
-PublicObservationString() = "Arrived at O->A, with travel time 3.0, t=2_mean_field"
-PrivateObservationString(0) = "Arrived at O->A, with travel time 3.0, t=2_mean_field"
 ObservationTensor(0) = [1.0, 2.0, 2.0]
 Rewards() = [-3.0]
 Returns() = [-3.0]
