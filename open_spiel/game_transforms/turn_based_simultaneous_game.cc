@@ -133,7 +133,8 @@ std::shared_ptr<Observer> TurnBasedSimultaneousGame::MakeObserver(
 
 TurnBasedSimultaneousState::TurnBasedSimultaneousState(
     std::shared_ptr<const Game> game, std::unique_ptr<State> state)
-    : State(game), state_(std::move(state)), action_vector_(game->NumPlayers()),
+    : State(game), state_(std::move(state)),
+      action_vector_(game->NumPlayers()),
       rollout_mode_(false) {
   DetermineWhoseTurn();
 }
@@ -166,7 +167,8 @@ void TurnBasedSimultaneousState::RolloutModeIncrementCurrentPlayer() {
   while (current_player_ < num_players_ &&
          state_->LegalActions(current_player_).empty()) {
     // Unnecessary to set an action here, but leads to a nicer ToString.
-    action_vector_[current_player_] = kInvalidAction;
+    // FIXME(sustr): use something like kNonActingAction = -2
+    action_vector_[current_player_] = 0;
     current_player_++;
   }
 }
