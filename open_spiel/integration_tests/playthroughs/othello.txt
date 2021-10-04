@@ -52,9 +52,6 @@ InformationStateString(0) = ""
 InformationStateString(1) = ""
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - x o - - - 5\n6 - - - - - - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - x o - - - 5\n6 - - - - - - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - x o - - - 5\n6 - - - - - - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -103,9 +100,6 @@ InformationStateString(0) = "44"
 InformationStateString(1) = "44"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - x x - - - 5\n6 - - - - x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - x x - - - 5\n6 - - - - x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - x x - - - 5\n6 - - - - x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -154,9 +148,6 @@ InformationStateString(0) = "44, 43"
 InformationStateString(1) = "44, 43"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - o x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - o x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - - o x - - - 4\n5 - - - o x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -205,9 +196,6 @@ InformationStateString(0) = "44, 43, 26"
 InformationStateString(1) = "44, 43, 26"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x - - - 4\n5 - - - x x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x - - - 4\n5 - - - x x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x - - - 4\n5 - - - x x - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -256,9 +244,6 @@ InformationStateString(0) = "44, 43, 26, 29"
 InformationStateString(1) = "44, 43, 26, 29"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x o - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x o - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x o - - - 5\n6 - - - o x - - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -307,9 +292,6 @@ InformationStateString(0) = "44, 43, 26, 29, 45"
 InformationStateString(1) = "44, 43, 26, 29, 45"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 - - - - - - - - 1\n2 - - - - - - - - 2\n3 - - - - - - - - 3\n4 - - x x x o - - 4\n5 - - - x x - - - 5\n6 - - - o x x - - 6\n7 - - - - - - - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
@@ -414,9 +396,6 @@ InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41,
 InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - o o o o o - - 6\n7 o - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - o o o o o - - 6\n7 o - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - o o o o - - 5\n6 - o o o o o - - 6\n7 o - o - o o - - 7\n8 - - - - - - - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◉◉◉  ◉◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◯◉◉◉◉◯◉◉  ◉◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
@@ -465,9 +444,6 @@ InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41,
 InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - x o - - 7\n8 - - - - - x - - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - x o - - 7\n8 - - - - - x - - 8\n  a b c d e f g h  "
-PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x - - - - - - - 1\n2 x - - - - o - - 2\n3 x o - - - o - - 3\n4 - x o o o o - - 4\n5 - - x o o o - - 5\n6 - o o x o o - - 6\n7 o - o - x o - - 7\n8 - - - - - x - - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◉◉◉◉◉◉◉  ◉◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◯◉◉◉◉◯◉◉  ◉◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
@@ -588,9 +564,6 @@ InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41,
 InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3"
 ObservationString(0) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
-PublicObservationString() = "Black (x) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o - - 2\n3 x o o - - o x - 3\n4 - o x o o x - - 4\n5 o o o o x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◉◉◉◉  ◉◯◯◯◯◯◯◯  ◯◉◉◉◯◯◯◯
 ◯◯◉◉◉◯◉◉  ◉◯◯◯◯◯◯◯  ◯◉◯◯◯◉◯◯
@@ -639,9 +612,6 @@ InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41,
 InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14"
 ObservationString(0) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o - - x x - 3\n4 - o x o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
 ObservationString(1) = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o - - x x - 3\n4 - o x o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
-PublicObservationString() = "White (o) to play:\n  a b c d e f g h  \n1 x o o o - - - - 1\n2 x o - - - o x - 2\n3 x o o - - x x - 3\n4 - o x o x x - - 4\n5 o o o x x x x - 5\n6 x o x x x x - - 6\n7 x o o o x o o - 7\n8 x o x x x x x - 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◉◉◉◉  ◉◯◯◯◯◯◯◯  ◯◉◉◉◯◯◯◯
 ◯◯◉◉◉◯◯◉  ◉◯◯◯◯◯◉◯  ◯◉◯◯◯◉◯◯
@@ -762,9 +732,6 @@ InformationStateString(0) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41,
 InformationStateString(1) = "44, 43, 26, 29, 45, 25, 17, 52, 21, 13, 37, 42, 41, 53, 34, 8, 16, 50, 0, 48, 61, 60, 59, 33, 18, 51, 58, 9, 2, 49, 62, 1, 40, 54, 56, 32, 22, 57, 38, 3, 14, 19, 12, 63, 20, 31, 39, 24, 23, 11, 46, 30, 10, 15, 47, 5, 6, 4, 7, 55"
 ObservationString(0) = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
 ObservationString(1) = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
-PublicObservationString() = "Terminal State:\n  a b c d e f g h  \n1 x o o o o o x x 1\n2 x x x o o o x x 2\n3 x o o o x o o x 3\n4 o o x o o x o x 4\n5 o o x o x o x x 5\n6 x x o o o x o x 6\n7 x o o o o o o o 7\n8 x o o o o o o o 8\n  a b c d e f g h  "
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
 ObservationTensor(0):
 ◯◯◯◯◯◯◯◯  ◉◯◯◯◯◯◉◉  ◯◉◉◉◉◉◯◯
 ◯◯◯◯◯◯◯◯  ◉◉◉◯◯◯◉◉  ◯◯◯◉◉◉◯◯

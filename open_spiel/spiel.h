@@ -136,6 +136,15 @@ struct GameType {
   // This is similar to observation fields before, but adds additional
   // distinction between public and private observations.
   bool provides_factored_observation_string = false;
+
+  bool provides_information_state() const {
+    return provides_information_state_tensor
+        || provides_information_state_string;
+  }
+  bool provides_observation() const {
+    return provides_observation_tensor
+        || provides_observation_string;
+  }
 };
 
 // Information about a concrete Game instantiation.

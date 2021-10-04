@@ -140,12 +140,6 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
 
   const bool perfect_info_game =
       game_type_.information == GameType::Information::kPerfectInformation;
-  const bool provides_information_state =
-      game_type_.provides_information_state_tensor ||
-      game_type_.provides_information_state_string;
-  const bool provides_observation =
-      game_type_.provides_information_state_tensor ||
-      game_type_.provides_information_state_string;
 
   // Perfect information games can provide public information regardless
   // of requested PrivateInfoType (as they have no private information).
@@ -154,9 +148,9 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
     // The game will just have empty private observations.
     if (!iig_obs_type->public_info)
       return absl::make_unique<NoPrivateObserver>(*this);
-    if (provides_information_state && iig_obs_type->perfect_recall)
+    if (game_type_.provides_information_state() && iig_obs_type->perfect_recall)
       return absl::make_unique<InformationStateObserver>(*this);
-    if (provides_observation && !iig_obs_type->perfect_recall)
+    if (game_type_.provides_observation() && !iig_obs_type->perfect_recall)
       return absl::make_unique<DefaultObserver>(*this);
   }
 
@@ -164,10 +158,11 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
   // SPIEL_CHECK_EQ(GetType().information,
   //                GameType::Information::kImperfectInformation);
   if (iig_obs_type.value() == kDefaultObsType) {
-    if (provides_observation) return absl::make_unique<DefaultObserver>(*this);
+    if (game_type_.provides_observation())
+      return absl::make_unique<DefaultObserver>(*this);
   }
   if (iig_obs_type.value() == kInfoStateObsType) {
-    if (provides_information_state)
+    if (game_type_.provides_information_state())
       return absl::make_unique<InformationStateObserver>(*this);
   }
   SpielFatalError(absl::StrCat("Requested Observer type not available: ",
@@ -334,8 +329,8 @@ ObserverRegisterer::ObserverRegisterer(const std::string& game_name,
 }
 
 void ObserverRegisterer::RegisterObserver(const std::string& game_name,
-                                     const std::string& observer_name,
-                                     CreateFunc creator) {
+                                          const std::string& observer_name,
+                                          CreateFunc creator) {
   auto key = std::pair(game_name, observer_name);
   if (observers().find(key) != observers().end()) {
     SpielFatalError(absl::StrCat("Duplicate observer '", key.second, "'",

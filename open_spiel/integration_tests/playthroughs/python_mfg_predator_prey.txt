@@ -44,10 +44,6 @@ InformationStateString(2) = ""
 ObservationString(0) = "position_init_2"
 ObservationString(1) = "position_init_2"
 ObservationString(2) = "position_init_2"
-PublicObservationString() = "position_init_2"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◯◯◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◯
 ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
@@ -78,10 +74,6 @@ InformationStateString(2) = "20"
 ObservationString(0) = "(pop=2, t=0, pos=[0 4])"
 ObservationString(1) = "(pop=2, t=0, pos=[0 4])"
 ObservationString(2) = "(pop=2, t=0, pos=[0 4])"
-PublicObservationString() = "(pop=2, t=0, pos=[0 4])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◉◯◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◉
 ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
@@ -113,10 +105,6 @@ InformationStateString(2) = "20, 0"
 ObservationString(0) = "(pop=2, t=0_a_mu, pos=[0 4])"
 ObservationString(1) = "(pop=2, t=0_a_mu, pos=[0 4])"
 ObservationString(2) = "(pop=2, t=0_a_mu, pos=[0 4])"
-PublicObservationString() = "(pop=2, t=0_a_mu, pos=[0 4])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◉◯◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◉
 ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
@@ -147,10 +135,6 @@ InformationStateString(2) = "20, 0, 3"
 ObservationString(0) = "(pop=2, t=1_a, pos=[0 3])"
 ObservationString(1) = "(pop=2, t=1_a, pos=[0 3])"
 ObservationString(2) = "(pop=2, t=1_a, pos=[0 3])"
-PublicObservationString() = "(pop=2, t=1_a, pos=[0 3])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◉◯◯◯◯
 ObservationTensor(0).y: ◯◯◯◉◯
 ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
@@ -181,10 +165,6 @@ InformationStateString(2) = "20, 0, 3"
 ObservationString(0) = "(pop=2, t=1, pos=[0 3])"
 ObservationString(1) = "(pop=2, t=1, pos=[0 3])"
 ObservationString(2) = "(pop=2, t=1, pos=[0 3])"
-PublicObservationString() = "(pop=2, t=1, pos=[0 3])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◉◯◯◯◯
 ObservationTensor(0).y: ◯◯◯◉◯
 ObservationTensor(0).t: ◯◉◯◯◯◯◯◯◯◯◯
@@ -220,10 +200,6 @@ InformationStateString(2) = "20, 0, 3, 1, 2"
 ObservationString(0) = "(pop=2, t=2_a, pos=[1 4])"
 ObservationString(1) = "(pop=2, t=2_a, pos=[1 4])"
 ObservationString(2) = "(pop=2, t=2_a, pos=[1 4])"
-PublicObservationString() = "(pop=2, t=2_a, pos=[1 4])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◯◉◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◉
 ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
@@ -254,10 +230,6 @@ InformationStateString(2) = "20, 0, 3, 1, 2"
 ObservationString(0) = "(pop=2, t=2, pos=[1 4])"
 ObservationString(1) = "(pop=2, t=2, pos=[1 4])"
 ObservationString(2) = "(pop=2, t=2, pos=[1 4])"
-PublicObservationString() = "(pop=2, t=2, pos=[1 4])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◯◉◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◉
 ObservationTensor(0).t: ◯◯◉◯◯◯◯◯◯◯◯
@@ -293,10 +265,6 @@ InformationStateString(2) = "20, 0, 3, 1, 2, 4, 4"
 ObservationString(0) = "(pop=2, t=3_a, pos=[0 4])"
 ObservationString(1) = "(pop=2, t=3_a, pos=[0 4])"
 ObservationString(2) = "(pop=2, t=3_a, pos=[0 4])"
-PublicObservationString() = "(pop=2, t=3_a, pos=[0 4])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◉◯◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◉
 ObservationTensor(0).t: ◯◯◯◉◯◯◯◯◯◯◯
@@ -407,10 +375,6 @@ InformationStateString(2) = "20, 0, 3, 1, 2, 4, 4, 2, 4, 3, 0, 2, 0, 0, 0, 1, 2,
 ObservationString(0) = "(pop=2, t=10_a, pos=[1 4])"
 ObservationString(1) = "(pop=2, t=10_a, pos=[1 4])"
 ObservationString(2) = "(pop=2, t=10_a, pos=[1 4])"
-PublicObservationString() = "(pop=2, t=10_a, pos=[1 4])"
-PrivateObservationString(0) = ""
-PrivateObservationString(1) = ""
-PrivateObservationString(2) = ""
 ObservationTensor(0).x: ◯◉◯◯◯
 ObservationTensor(0).y: ◯◯◯◯◉
 ObservationTensor(0).t: ◯◯◯◯◯◯◯◯◯◯◉
