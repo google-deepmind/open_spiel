@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Example algorithm to get all states from a game."""
+"""Example algorithm to get all states from a game.
+
+The algorithm does not support mean field games where the game evolution depends
+on the mean field distribution.
+"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -64,7 +68,7 @@ def _get_subgames_states(state, all_states, depth_limit, depth,
                          include_terminals, include_chance_states,
                          include_mean_field_states, to_string,
                          stop_if_encountered)
-  if state.is_simultaneous_node():
+  elif state.is_simultaneous_node():
     joint_legal_actions = [
         state.legal_actions(player)
         for player in range(state.get_game().num_players())
