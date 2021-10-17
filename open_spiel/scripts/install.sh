@@ -266,7 +266,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     pyenv install ${OS_PYTHON_MINOR_VERSION}
     pyenv global ${OS_PYTHON_MINOR_VERSION}
   fi
-  which python3
+  which python && ls -l `which python`
+  which python3 && ls -l `which python3`
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
   python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
