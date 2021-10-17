@@ -40,7 +40,7 @@ if [[ "$MODE" = "full" && "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; th
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 fi
 
-PYBIN=${PYBIN:-"python"}
+PYBIN=${PYBIN:-"python3"}
 PYBIN=`which $PYBIN`
          
 $PYBIN -m pip install --upgrade setuptools
