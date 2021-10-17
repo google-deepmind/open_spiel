@@ -263,8 +263,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     # brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
     # brew switch python ${OS_PYTHON_VERSION}
     brew install pyenv
-    pyenv install ${OS_PYTHON_VERSION}
-    pyenv global ${OS_PYTHON_VERSION}
+    pyenv install ${OS_PYTHON_MINOR_VERSION}
+    pyenv global ${OS_PYTHON_MINOR_VERSION}
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
   python3 --version
