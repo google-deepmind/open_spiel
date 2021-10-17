@@ -50,6 +50,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.OS_PYTHON_VERSION }}
 
       - name: Install
         run: |
