@@ -255,7 +255,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
-  # On Github Actions, macOS 10.15 comes with Python 3.10, which we don't support yet.
+  # On Github Actions, macOS 10.15 comes with Python 3.10 (which we don't support yet).
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
