@@ -14,6 +14,7 @@ jobs:
         # Standard platforms with Python 3.9.
         - os: ubuntu-20.04
           OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_MINOR_VERSION: 3.9.7
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -21,6 +22,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: macos-10.15
           OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_MINOR_VERSION: 3.9.7
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -29,6 +31,7 @@ jobs:
         # Standard platforms with Python 3.8.
         - os: ubuntu-20.04
           OS_PYTHON_VERSION: 3.8
+          OS_PYTHON_MINOR_VERSION: 3.8.2
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -36,6 +39,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: macos-10.15
           OS_PYTHON_VERSION: 3.8
+          OS_PYTHON_MINOR_VERSION: 3.8.2
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -45,6 +49,7 @@ jobs:
         # shared library with linkable third party dependencies in place.
         - os: ubuntu-20.04
           OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_MINOR_VERSION: 3.9.7
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           TRAVIS_USE_NOX: 0
           BUILD_SHARED_LIB: "ON"
@@ -53,6 +58,7 @@ jobs:
         # Ubuntu 18.04.2 LTS released on 26 April 2018.
         - os: ubuntu-18.04
           OS_PYTHON_VERSION: 3.6
+          OS_PYTHON_MINOR_VERSION: 3.6.8
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -66,6 +72,7 @@ jobs:
       OPEN_SPIEL_ENABLE_TENSORFLOW: ON
       OPEN_SPIEL_ENABLE_PYTHON_MISC: ON
       OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
+      OS_PYTHON_MINOR_VERSION: ${{ matrix.OS_PYTHON_MINOR_VERSION }}
       TRAVIS_USE_NOX:  ${{ matrix.TRAVIS_USE_NOX }}
       DEFAULT_OPTIONAL_DEPENDENCY: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY }}
       OPEN_SPIEL_BUILD_WITH_JULIA: ${{ matrix.OPEN_SPIEL_BUILD_WITH_JULIA }}
