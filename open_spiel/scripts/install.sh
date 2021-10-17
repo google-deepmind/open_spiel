@@ -258,6 +258,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # On Github Actions, macOS 10.15 comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
+    brew remove -f python@2.7
     brew install "python@${OS_PYTHON_VERSION}"
     brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
@@ -270,7 +271,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     [[ -x `which go` ]] || brew install golang || echo "** Warning: failed 'brew install golang' -- continuing"
   fi
 
-  python3 -m ensurepip
   python3 -m pip install --upgrade pip
   python3 -m pip install virtualenv
 else
