@@ -262,6 +262,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     # brew unlink python@3.10
     # brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
     # brew switch python ${OS_PYTHON_VERSION}
+    rm -f /Users/runner/hostedtoolcache/Python/3.10.0/x64/bin/python
+    rm -f /Users/runner/hostedtoolcache/Python/3.10.0/x64/bin/python3
     brew install pyenv
     pyenv install ${OS_PYTHON_MINOR_VERSION}
     pyenv global ${OS_PYTHON_MINOR_VERSION}
