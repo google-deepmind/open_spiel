@@ -274,7 +274,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
 
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
   python3 get-pip.py
-  pip3 install virtualenv
+  python3 -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."

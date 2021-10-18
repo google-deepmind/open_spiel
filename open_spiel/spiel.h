@@ -690,6 +690,8 @@ class State {
   // representation. In multi-population mean field nodes, the support will
   // typically include states for all the populations.
   // This should only be called when when CurrentPlayer() == kMeanFieldPlayerId.
+  // This can return an empty list in case the distribution is not needed at
+  // this time.
   virtual std::vector<std::string> DistributionSupport() {
     SpielFatalError("DistributionSupport has not been implemented");
   }

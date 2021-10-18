@@ -21,10 +21,7 @@ This module has three main classes:
 - OriginDestinationDemand
 """
 
-# pylint: disable=g-bad-todo
-# pylint: disable=eval-used
-
-from typing import Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 # In case one vehicle has reached a end node, then it cannot do anything. In
 # this case its action is 0. Action 0 is reserved to encode no possible action
@@ -43,6 +40,20 @@ def _road_section_to_nodes(movement: str) -> Tuple[str, str]:
   return origin, destination
 
 
+def assign_dictionary_input_to_object(dict_object: Dict[str, Any],
+                                      road_sections: Iterable[str],
+                                      default_value: Any) -> Dict[str, Any]:
+  """Check dictionary has road sections has key or return default_value dict."""
+  if dict_object:
+    assert set(dict_object) == set(road_sections), (
+        "Objects are not defined for each road sections.")
+    return dict_object
+  dict_object_returned = {}
+  for road_section in road_sections:
+    dict_object_returned[road_section] = default_value
+  return dict_object_returned
+
+
 class Network:
   """Network implementation.
 
@@ -51,8 +62,11 @@ class Network:
   edge as a string f"{node1}->{node2}" (for example "A->B"). The network is
   created from a adjacency list. Each road section is mapped to an action index
   (positive integer) in _road_section_to_action, and vice versa in
-  _action_to_road_section. The volume delay function on each link is given by
-  _probability_to_exit_functions.
+  _action_to_road_section. The volume delay function on each road section rs is
+  given by _free_flow_travel_time[rs]*(1+ _a[rs]*(v/_capacity[rs])**_b[rs])
+  where v is the volume on the road section rs, according to the U.S. Bureau of
+  Public Road (BPR). Such functions are called fundamental diagram of traffic
+  flow.
 
   If one would like to plot the network then node position should be passed
   in the constructor. Then return_list_for_matplotlib_quiver can be used with
@@ -66,31 +80,30 @@ class Network:
 
   See the Network tests for an example.
   Attributes:
+    _a, _b, _capacity, _free_flow_travel_time: dictionary that maps road section
+      string representation to its a, b, relative capacity and free flow travel
+      time coefficient in its BPR function.
     _action_to_road_section: dictionary that maps action id to road section.
     _adjacency_list: adjacency list of the line graph of the road network.
     _node_position: dictionary that maps node to couple of float encoding x and
       y position of the node. None by default.
-    _probability_to_exit_functions: dictionary of functions as string assigned
-      to road sections. A function is a string that will be evaluated with x as
-      parameter (for example '1/(1+x)'). Each function takes as input x; the
-      volume of cars on the road section, and output the probability that a
-      given car exits the road section in the next time step. If average over
-      all the cars on the road section, this function gives the volume of cars
-      exiting the road section during a given time step as a function of the
-      volume of cars on the road section. Such functions are called fundamental
-      diagram of traffic flow.
     _road_section_to_action: dictionary that maps road section to action id.
   """
-  _action_to_road_section: Dict[int, str]
+  _a: Dict[str, float]
+  _b: Dict[str, float]
   _adjacency_list: Dict[str, Iterable[str]]
+  _capacity: Dict[str, float]
+  _free_flow_travel_time: Dict[str, float]
   _node_position: Dict[str, Tuple[float, float]]
-  _probability_to_exit_functions: Dict[str, str]
   _road_section_to_action: Dict[str, int]
 
   def __init__(self,
                adjacency_list: Dict[str, Iterable[str]],
-               node_position: Dict[str, Tuple[float, float]] = None,
-               probability_to_exit_functions: Dict[str, str] = None):
+               node_position: Optional[Dict[str, Tuple[float, float]]] = None,
+               bpr_a_coefficient: Optional[Dict[str, float]] = None,
+               bpr_b_coefficient: Optional[Dict[str, float]] = None,
+               capacity: Optional[Dict[str, float]] = None,
+               free_flow_travel_time: Optional[Dict[str, float]] = None):
     self._adjacency_list = adjacency_list
     self._road_section_to_action, self._action_to_road_section = (
         self._create_movement_to_action_and_action_to_road_section())
@@ -101,24 +114,26 @@ class Network:
                for destination_nodes in self._adjacency_list.values()
                for destination_node in destination_nodes), (
                    "Adjacency list is not correct.")
+    # pylint: enable=g-complex-comprehension
     if node_position:
       assert set(node_position) == nodes
       self._node_position = node_position
     else:
       self._node_position = None
-
-    if probability_to_exit_functions:
-      assert set(probability_to_exit_functions) == set(
-          self._road_section_to_action), (
-              "Exit functions are not defined for each road sections.")
-      self._probability_to_exit_functions = probability_to_exit_functions
-    else:
-      self._probability_to_exit_functions = {}
-      for road_section in self._road_section_to_action:
-        self._probability_to_exit_functions[road_section] = "1 / (1+x)"
+    self._a = assign_dictionary_input_to_object(bpr_a_coefficient,
+                                                self._road_section_to_action, 0)
+    self._b = assign_dictionary_input_to_object(bpr_b_coefficient,
+                                                self._road_section_to_action, 1)
+    self._capacity = assign_dictionary_input_to_object(
+        capacity, self._road_section_to_action, 1)
+    self._free_flow_travel_time = assign_dictionary_input_to_object(
+        free_flow_travel_time, self._road_section_to_action, 1)
     assert hasattr(self, "_adjacency_list")
     assert hasattr(self, "_node_position")
-    assert hasattr(self, "_probability_to_exit_functions")
+    assert hasattr(self, "_a")
+    assert hasattr(self, "_b")
+    assert hasattr(self, "_capacity")
+    assert hasattr(self, "_free_flow_travel_time")
 
   def _create_movement_to_action_and_action_to_road_section(
       self) -> Tuple[Dict[str, int], Dict[int, str]]:
@@ -143,7 +158,6 @@ class Network:
       for destination in successors:
         road_section = _nodes_to_road_section(origin, destination)
         if road_section in road_section_to_action:
-          # TODO: enable parallel links.
           raise ValueError((
               f"{road_section} exists twice in the adjacency list. The current "
               "network implementation does not enable parallel links."))
@@ -206,17 +220,18 @@ class Network:
   def __str__(self) -> str:
     return str(self._adjacency_list)
 
-  def get_probability_to_exit(self, road_section: str, volume: float) -> float:
-    """Returns probability to exit road_section with volume cars."""
+  def get_travel_time(self, road_section: str, volume: float) -> int:
+    """Returns travel time on the road section given the volume on it.
 
-    # TODO: find another way to pass the function.
-    # pylint: disable=unused-argument
-    def probability_to_exit(x):
-      return eval(self._probability_to_exit_functions[road_section])
-
-    prob = probability_to_exit(volume)
-    assert 0 <= prob <= 1
-    return prob
+    Volume unit should be the same as the capacity unit.
+    Travel time unit is the free flow travel time unit.
+    Args:
+      road_section: the road section.
+      volume: the volume on the road section.
+    """
+    return self._free_flow_travel_time[road_section] * (
+        1.0 + self._a[road_section] *
+        (volume / self._capacity[road_section])**self._b[road_section])
 
   def assert_valid_action(self, action: int, road_section: str = None):
     """Assert that an action as a int is valid.
@@ -230,7 +245,7 @@ class Network:
       road_section: the road section.
     """
     assert isinstance(action, int), f"{action} is not a int."
-    assert 1 <= action < self.num_actions()
+    assert 1 <= action < self.num_actions(), str(action)
     if road_section is not None:
       new_road_section = self.get_road_section_from_action_id(action)
       origin_new_section, end_new_section = _road_section_to_nodes(

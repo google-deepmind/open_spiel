@@ -110,7 +110,9 @@ class GamesSimTest(parameterized.TestCase):
       game,
       check_pyspiel_serialization=True,
       check_pickle_serialization=True,
-      make_distribution_fn=lambda states: [1 / len(states)] * len(states)):
+      make_distribution_fn=(
+          lambda states: ([1 / len(states)] * len(states) if states else []))
+  ):
     min_utility = game.min_utility()
     max_utility = game.max_utility()
     self.assertLess(min_utility, max_utility)
