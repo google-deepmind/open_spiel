@@ -11,5 +11,7 @@ add_library (higc OBJECT
 add_executable(tournament tournament.cc ${OPEN_SPIEL_OBJECTS})
 add_executable(random_bot bots/random_bot.cc ${OPEN_SPIEL_OBJECTS})
 add_executable(referee_test referee_test.cc ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
-add_test(referee_test referee_test
-        --bots_dir=${CMAKE_CURRENT_SOURCE_DIR}/bots)
+
+# This is causing sporadic failures. Disabling until we fix it (see #715)
+# add_test(referee_test referee_test
+#        --bots_dir=${CMAKE_CURRENT_SOURCE_DIR}/bots)
