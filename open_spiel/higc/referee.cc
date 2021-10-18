@@ -32,20 +32,6 @@
 namespace open_spiel {
 namespace higc {
 
-bool IsPythonFile(const std::string& file) {
-  if (file.size() < 3) return false;
-  const std::string py_ext = ".py";
-  return std::equal(file.begin() + file.size() - py_ext.size(), file.end(),
-                    py_ext.begin());
-}
-
-std::vector<std::string> PrepareArgs(const std::string& executable) {
-  if (IsPythonFile(executable)) {
-    return {"python", executable};
-  }
-  return {executable};
-}
-
 // Start all players and wait for ready messages from all them simultaneously.
 std::vector<bool> Referee::StartPlayers() {
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
@@ -53,10 +39,10 @@ std::vector<bool> Referee::StartPlayers() {
   // Launch players and create communication channels.
   log_ << "Starting players." << std::endl;
   for (int pl = 0; pl < num_bots(); ++pl) {
-    const std::string& executable = executables_[pl];
-    log_ << "Bot#" << pl << ": " << executable << std::endl;
+    const std::string& bot_command = bot_commands_[pl];
+    log_ << "Bot#" << pl << ": " << bot_command << std::endl;
     errors_.push_back(BotErrors());
-    channels_.push_back(MakeBotChannel(pl, PrepareArgs(executable)));
+    channels_.push_back(MakeBotChannel(pl, bot_command));
     // Read from bot's stdout/stderr in separate threads.
     threads_stdout_.push_back(std::make_unique<std::thread>(
         ReadLineFromChannelStdout, channels_.back().get()));
@@ -81,9 +67,9 @@ std::vector<bool> Referee::StartPlayers() {
 bool Referee::StartPlayer(int pl) {
   // Launch players and create communication channels.
   log_ << "Starting player " << pl << " only." << std::endl;
-  const std::string& executable = executables_[pl];
-  log_ << "Bot#" << pl << ": " << executable << std::endl;
-  channels_[pl] = MakeBotChannel(pl, PrepareArgs(executable));
+  const std::string& bot_command = bot_commands_[pl];
+  log_ << "Bot#" << pl << ": " << bot_command << std::endl;
+  channels_[pl] = MakeBotChannel(pl, bot_command);
   // Read from bot's stdout/stderr in separate threads.
   threads_stdout_[pl] = std::make_unique<std::thread>(ReadLineFromChannelStdout,
                                                       channels_.back().get());
@@ -374,12 +360,11 @@ void Referee::RestartPlayer(int pl) {
 }
 
 Referee::Referee(const std::string& game_name,
-                 const std::vector<std::string>& executables, int seed,
+                 const std::vector<std::string>& bot_commands, int seed,
                  TournamentSettings settings, std::ostream& log)
     : game_name_(game_name),
       game_(LoadGame(game_name)),
-      started_successfully_(false),
-      executables_(executables),
+      bot_commands_(bot_commands),
       rng_(seed),
       log_(log),
       settings_(settings),
@@ -389,24 +374,9 @@ Referee::Referee(const std::string& game_name,
           std::make_unique<Observation>(*game_, public_observer_)),
       private_observation_(
           std::make_unique<Observation>(*game_, private_observer_)) {
-  SPIEL_CHECK_FALSE(executables_.empty());
+  SPIEL_CHECK_FALSE(bot_commands_.empty());
   SPIEL_CHECK_EQ(game_->NumPlayers(), num_bots());
   SPIEL_CHECK_LT(settings_.timeout_ponder, settings_.timeout_act);
-
-  started_successfully_ = true;
-
-  for (const std::string& executable : executables_) {
-    if (!file::Exists(executable)) {
-      std::cerr << "The bot file '" << executable << "' was not found."
-                << std::endl;
-      started_successfully_ = false;
-    }
-    if (!IsPythonFile(executable) && access(executable.c_str(), X_OK) != 0) {
-      std::cerr << "The bot file '" << executable << "' cannot be executed. "
-                << "(missing +x flag?)" << std::endl;
-      started_successfully_ = false;
-    }
-  }
 }
 
 std::unique_ptr<TournamentResults> Referee::PlayTournament(int num_matches) {
@@ -517,6 +487,13 @@ void Referee::WaitForPonderingBots(const std::vector<bool>& is_acting) {
 void Referee::WaitForActingBots(const std::vector<bool>& is_acting) {
   WaitForBots(is_acting, /*mask=*/true);
 }
+
+//bool Referee::StartedSuccessfully() const {
+//  for (int pl = 0; pl < num_bots(); ++pl) {
+//    if (channels_[pl]->exit_status() != -1) return false;
+//  }
+//  return true;
+//}
 
 void BotErrors::Reset() {
   protocol_error = 0;
