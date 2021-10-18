@@ -42,8 +42,8 @@ void SayHelloViaChannel() {
   // Bot channels are asynchronous -- we read from a different thread.
   std::unique_ptr<BotChannel> channel = MakeBotChannel(0, "echo Hello");
   std::thread read(ReadLineFromChannelStdout, channel.get());
-  channel->StartRead(/*time_limit=*/10);
-  sleep_ms(20);
+  channel->StartRead(/*time_limit=*/500);
+  sleep_ms(1000);
   channel->ShutDown();
   read.join();
   SPIEL_CHECK_EQ(channel->response(), "Hello");
