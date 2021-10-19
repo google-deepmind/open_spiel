@@ -75,19 +75,45 @@ class NetworkTest(absltest.TestCase):
     with self.assertRaises(KeyError):
       self.network.get_road_section_from_action_id(0)
 
-  def test_get_probability_to_exit_expected(self):
-    """Test get_probability_to_exit with default functions."""
-    self.assertEqual(self.network.get_probability_to_exit("O->A", 0), 1)
-    self.assertEqual(self.network.get_probability_to_exit("O->A", 1), .5)
-    self.assertEqual(self.network.get_probability_to_exit("O->A", 3), .25)
-    self.assertEqual(self.network.get_probability_to_exit("A->D", 0), 1)
-    self.assertEqual(self.network.get_probability_to_exit("A->D", 1), .5)
-    self.assertEqual(self.network.get_probability_to_exit("A->D", 3), .25)
+  def test_num_links_method(self):
+    # TODO(cabannes): write.
+    pass
 
-  def test_get_probability_to_exit_wrong_road_section(self):
-    """Test get_probability_to_exit with user defined functions."""
-    with self.assertRaises(KeyError):
-      self.network.get_probability_to_exit("Z->D", 0)
+  def test_num_actions_method(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_links(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_check_list_of_vehicles_is_correct_method(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_check_list_of_od_demand_is_correct_method(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_str_method(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_get_travel_time_methods(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_assert_valid_action_methods(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_default_travel_time_methods(self):
+    # TODO(cabannes): write.
+    pass
+
+  def test_customable_travel_time_methods(self):
+    # TODO(cabannes): write.
+    pass
 
 
 class VehicleTest(absltest.TestCase):

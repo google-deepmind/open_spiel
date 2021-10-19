@@ -49,38 +49,35 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
 
       - name: Install
         run: |
           pwd
           uname -a
-          which python
           which g++
           g++ --version
-          python --version
           chmod +x install.sh
           # This is needed to grab OpenSpiel dependencies.
           ./install.sh
           # These are necessary to install what is necessary for the build and for the full tests below.
-          python -m pip install --upgrade pip
-          python -m pip --version
-          python -m pip install --upgrade setuptools
-          python -m pip install --upgrade -r requirements.txt -q
+          python3 -m pip install --upgrade pip
+          python3 -m pip --version
+          python3 -m pip install --upgrade setuptools
+          python3 -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
-          python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
-          python -m pip install twine
-          python -m pip install cibuildwheel==2.0.1
+          python3 -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          python3 -m pip install twine
+          python3 -m pip install cibuildwheel==2.0.1
       - name: Build sdist
         run: |
           pipx run build --sdist
           twine check dist/*.tar.gz
-     
+
       # Build all the wheels and run the basic tests (within the docker images)
       # Basic tests are run via the CIBW_TEST_COMMAND environment variable.
       - name: Build bdist_wheel and run tests
         run: |
-          python -m cibuildwheel --output-dir wheelhouse
+          python3 -m cibuildwheel --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full

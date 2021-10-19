@@ -388,7 +388,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
       add_line("DistributionSupport() = {}".format(
           state.distribution_support()))
       num_states = len(state.distribution_support())
-      state.update_distribution([1. / num_states] * num_states)
+      state.update_distribution(
+          [1. / num_states] * num_states if num_states else [])
       if state_idx < len(action_sequence):
         assert action_sequence[state_idx] == "update_distribution", (
             f"Unexpected action at MFG node: {action_sequence[state_idx]}, "

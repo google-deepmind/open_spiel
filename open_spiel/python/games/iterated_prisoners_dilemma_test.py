@@ -28,13 +28,13 @@ class IteratedPrisonersDilemmaTest(absltest.TestCase):
     self.assertEqual(game._termination_probability, 0.125)
 
   def test_non_default_param_from_string(self):
-    """Check the game can be converted to a turn-based game."""
+    """Check params can be given through the string loading."""
     game = pyspiel.load_game(
         "python_iterated_prisoners_dilemma(termination_probability=0.5)")
     self.assertEqual(game._termination_probability, 0.5)
 
   def test_non_default_param_from_dict(self):
-    """Check the game can be converted to a turn-based game."""
+    """Check params can be given through a dictionary."""
     game = pyspiel.load_game("python_iterated_prisoners_dilemma",
                              {"termination_probability": 0.75})
     self.assertEqual(game._termination_probability, 0.75)

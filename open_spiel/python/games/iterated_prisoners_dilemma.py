@@ -32,7 +32,7 @@ _GAME_TYPE = pyspiel.GameType(
     long_name="Python Iterated Prisoner's Dilemma",
     dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS,
     chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
-    information=pyspiel.GameType.Information.IMPERFECT_INFORMATION,
+    information=pyspiel.GameType.Information.PERFECT_INFORMATION,
     utility=pyspiel.GameType.Utility.GENERAL_SUM,
     reward_model=pyspiel.GameType.RewardModel.REWARDS,
     max_num_players=_NUM_PLAYERS,
@@ -184,8 +184,11 @@ class IteratedPrisonersDilemmaObserver:
 
   def string_from(self, state, player):
     """Observation of `state` from the PoV of `player`, as a string."""
-    return (f"us:{state.action_history_string(player)} "
-            f"op:{state.action_history_string(1 - player)}")
+    if self.iig_obs_type.public_info:
+      return (f"us:{state.action_history_string(player)} "
+              f"op:{state.action_history_string(1 - player)}")
+    else:
+      return None
 
 
 # Register the game with the OpenSpiel library

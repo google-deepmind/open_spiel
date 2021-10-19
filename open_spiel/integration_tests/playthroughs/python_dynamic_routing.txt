@@ -1,40 +1,37 @@
 game: python_dynamic_routing
 
-GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.chance_mode = ChanceMode.DETERMINISTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
 GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Python Dynamic Routing Game"
 GameType.max_num_players = 100
 GameType.min_num_players = 0
-GameType.parameter_specification = ["players"]
+GameType.parameter_specification = ["max_num_time_step", "players", "time_step_length"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = True
-GameType.reward_model = RewardModel.TERMINAL
+GameType.reward_model = RewardModel.REWARDS
 GameType.short_name = "python_dynamic_routing"
 GameType.utility = Utility.GENERAL_SUM
 
-NumDistinctActions() = 5
-PolicyTensorShape() = [5]
-MaxChanceOutcomes() = 4
-GetParameters() = {players=-1}
-NumPlayers() = 2
-MinUtility() = -3.0
+NumDistinctActions() = 8
+PolicyTensorShape() = [8]
+MaxChanceOutcomes() = 0
+GetParameters() = {max_num_time_step=10,players=-1,time_step_length=0.5}
+NumPlayers() = 5
+MinUtility() = -11.0
 MaxUtility() = 0.0
 UtilitySum() = 0.0
-InformationStateTensorShape() = [3, 3]
-InformationStateTensorLayout() = TensorLayout.CHW
-InformationStateTensorSize() = 9
-ObservationTensorShape() = [3, 3]
+ObservationTensorShape() = [11, 6]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 9
-MaxGameLength() = 2
-ToString() = "python_dynamic_routing(players=-1)"
+ObservationTensorSize() = 66
+MaxGameLength() = 10
+ToString() = "python_dynamic_routing(max_num_time_step=10,players=-1,time_step_length=0.5)"
 
 # State 0
-# Vehicle locations: ['bef_O->O', 'bef_O->O'], time: 0.
+# Vehicle locations: ['O->A', 'O->A', 'O->A', 'O->A', 'O->A'], time: 0, waiting_time=[0, 0, 0, 0, 0].
 IsTerminal() = False
 History() = []
 HistoryString() = ""
@@ -43,94 +40,209 @@ IsSimultaneousNode() = True
 CurrentPlayer() = PlayerId.SIMULTANEOUS
 InformationStateString(0) = ""
 InformationStateString(1) = ""
-InformationStateTensor(0).observation: ◉◉◉
-                                       ◯◯◯
-                                       ◯◯◯
-InformationStateTensor(1).observation: ◉◉◉
-                                       ◯◯◯
-                                       ◯◯◯
-ObservationString(0) = ""
-ObservationString(1) = ""
-ObservationTensor(0): ◉◉◉
-                      ◯◯◯
-                      ◯◯◯
-ObservationTensor(1): ◉◉◉
-                      ◯◯◯
-                      ◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0, 0]
-LegalActions(0) = [2]
-LegalActions(1) = [2]
-StringLegalActions(0) = ["Vehicle 0 would like to move to O->A."]
-StringLegalActions(1) = ["Vehicle 1 would like to move to O->A."]
+InformationStateString(2) = ""
+InformationStateString(3) = ""
+InformationStateString(4) = ""
+ObservationString(0) = "0: "
+ObservationString(1) = "1: "
+ObservationString(2) = "2: "
+ObservationString(3) = "3: "
+ObservationString(4) = "4: "
+ObservationTensor(0): ◉◉◉◉◉◉
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+ObservationTensor(1): ◉◉◉◉◉◉
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+ObservationTensor(2): ◉◉◉◉◉◉
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+ObservationTensor(3): ◉◉◉◉◉◉
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+ObservationTensor(4): ◉◉◉◉◉◉
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+                      ◯◯◯◯◯◯
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [-0.0, -0.0, -0.0, -0.0, -0.0]
+LegalActions(0) = [2, 3]
+LegalActions(1) = [2, 3]
+LegalActions(2) = [2, 3]
+LegalActions(3) = [2, 3]
+LegalActions(4) = [2, 3]
+StringLegalActions(0) = ["Vehicle 0 would like to move to A->B.", "Vehicle 0 would like to move to A->C."]
+StringLegalActions(1) = ["Vehicle 1 would like to move to A->B.", "Vehicle 1 would like to move to A->C."]
+StringLegalActions(2) = ["Vehicle 2 would like to move to A->B.", "Vehicle 2 would like to move to A->C."]
+StringLegalActions(3) = ["Vehicle 3 would like to move to A->B.", "Vehicle 3 would like to move to A->C."]
+StringLegalActions(4) = ["Vehicle 4 would like to move to A->B.", "Vehicle 4 would like to move to A->C."]
 
-# Apply joint action ["Vehicle 0 would like to move to O->A.", "Vehicle 1 would like to move to O->A."]
-actions: [2, 2]
+# Apply joint action ["Vehicle 0 would like to move to A->C.", "Vehicle 1 would like to move to A->B.", "Vehicle 2 would like to move to A->C.", "Vehicle 3 would like to move to A->C.", "Vehicle 4 would like to move to A->B."]
+actions: [3, 2, 3, 3, 2]
 
 # State 1
-# Vehicle locations: ['O->A', 'O->A'], time: 1.
+# Vehicle locations: ['A->C', 'A->B', 'A->C', 'A->C', 'A->B'], time: 1, waiting_time=[3, 1, 3, 3, 1].
 IsTerminal() = False
-History() = [2, 2]
-HistoryString() = "2, 2"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = PlayerId.CHANCE
-InformationStateString(0) = "2, 2"
-InformationStateString(1) = "2, 2"
-InformationStateTensor(0).observation = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1).observation = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-ObservationString(0) = "2, 2"
-ObservationString(1) = "2, 2"
-ObservationTensor(0) = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-ChanceOutcomes() = [(0, 0.44444444444444453), (1, 0.22222222222222224), (2, 0.22222222222222224), (3, 0.1111111111111111)]
-LegalActions() = [0, 1, 2, 3]
-StringLegalActions() = ["Change node 0. I will convert it later to human readable chance outcome.", "Change node 1. I will convert it later to human readable chance outcome.", "Change node 2. I will convert it later to human readable chance outcome.", "Change node 3. I will convert it later to human readable chance outcome."]
-
-# Apply action "Change node 1. I will convert it later to human readable chance outcome."
-action: 1
-
-# State 2
-# Vehicle locations: ['O->A', 'O->A'], time: 1.
-IsTerminal() = False
-History() = [2, 2, 1]
-HistoryString() = "2, 2, 1"
+History() = [3, 2, 3, 3, 2]
+HistoryString() = "3, 2, 3, 3, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = True
 CurrentPlayer() = PlayerId.SIMULTANEOUS
-InformationStateString(0) = "2, 2, 1"
-InformationStateString(1) = "2, 2, 1"
-InformationStateTensor(0).observation = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-InformationStateTensor(1).observation = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-ObservationString(0) = "2, 2, 1"
-ObservationString(1) = "2, 2, 1"
-ObservationTensor(0) = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-ObservationTensor(1) = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 0.0, 0.0, 0.0]
-Rewards() = [0.0, 0.0]
-Returns() = [0, 0]
-LegalActions(0) = [3]
-LegalActions(1) = [3]
-StringLegalActions(0) = ["Vehicle 0 would like to move to A->D."]
-StringLegalActions(1) = ["Vehicle 1 would like to move to A->D."]
+InformationStateString(0) = "3, 2, 3, 3, 2"
+InformationStateString(1) = "3, 2, 3, 3, 2"
+InformationStateString(2) = "3, 2, 3, 3, 2"
+InformationStateString(3) = "3, 2, 3, 3, 2"
+InformationStateString(4) = "3, 2, 3, 3, 2"
+ObservationString(0) = "0: 3, 2, 3, 3, 2"
+ObservationString(1) = "1: 3, 2, 3, 3, 2"
+ObservationString(2) = "2: 3, 2, 3, 3, 2"
+ObservationString(3) = "3: 3, 2, 3, 3, 2"
+ObservationString(4) = "4: 3, 2, 3, 3, 2"
+ObservationTensor(0) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(4) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [-0.5, -0.5, -0.5, -0.5, -0.5]
+Returns() = [-0.5, -0.5, -0.5, -0.5, -0.5]
+LegalActions(0) = [0]
+LegalActions(1) = [0]
+LegalActions(2) = [0]
+LegalActions(3) = [0]
+LegalActions(4) = [0]
+StringLegalActions(0) = ["Vehicle 0 reach a sink node or its destination."]
+StringLegalActions(1) = ["Vehicle 1 reach a sink node or its destination."]
+StringLegalActions(2) = ["Vehicle 2 reach a sink node or its destination."]
+StringLegalActions(3) = ["Vehicle 3 reach a sink node or its destination."]
+StringLegalActions(4) = ["Vehicle 4 reach a sink node or its destination."]
 
-# Apply joint action ["Vehicle 0 would like to move to A->D.", "Vehicle 1 would like to move to A->D."]
-actions: [3, 3]
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 reach a sink node or its destination.", "Vehicle 3 reach a sink node or its destination.", "Vehicle 4 reach a sink node or its destination."]
+actions: [0, 0, 0, 0, 0]
+
+# State 2
+# Vehicle locations: ['A->C', 'A->B', 'A->C', 'A->C', 'A->B'], time: 2, waiting_time=[2, 0, 2, 2, 0].
+IsTerminal() = False
+History() = [3, 2, 3, 3, 2, 0, 0, 0, 0, 0]
+HistoryString() = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+InformationStateString(1) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+InformationStateString(2) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+InformationStateString(3) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+InformationStateString(4) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+ObservationString(0) = "0: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+ObservationString(1) = "1: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+ObservationString(2) = "2: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+ObservationString(3) = "3: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+ObservationString(4) = "4: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0"
+ObservationTensor(0) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(4) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [-0.5, -0.5, -0.5, -0.5, -0.5]
+Returns() = [-1.0, -1.0, -1.0, -1.0, -1.0]
+LegalActions(0) = [0]
+LegalActions(1) = [4, 5]
+LegalActions(2) = [0]
+LegalActions(3) = [0]
+LegalActions(4) = [4, 5]
+StringLegalActions(0) = ["Vehicle 0 reach a sink node or its destination."]
+StringLegalActions(1) = ["Vehicle 1 would like to move to B->C.", "Vehicle 1 would like to move to B->D."]
+StringLegalActions(2) = ["Vehicle 2 reach a sink node or its destination."]
+StringLegalActions(3) = ["Vehicle 3 reach a sink node or its destination."]
+StringLegalActions(4) = ["Vehicle 4 would like to move to B->C.", "Vehicle 4 would like to move to B->D."]
+
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 would like to move to B->C.", "Vehicle 2 reach a sink node or its destination.", "Vehicle 3 reach a sink node or its destination.", "Vehicle 4 would like to move to B->C."]
+actions: [0, 4, 0, 0, 4]
 
 # State 3
-# Vehicle locations: ['A->D', 'O->A'], time: 2.
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 would like to move to C->D.", "Vehicle 2 reach a sink node or its destination.", "Vehicle 3 reach a sink node or its destination.", "Vehicle 4 would like to move to C->D."]
+actions: [0, 6, 0, 0, 6]
+
+# State 4
+# Apply joint action ["Vehicle 0 would like to move to C->D.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 would like to move to C->D.", "Vehicle 3 would like to move to C->D.", "Vehicle 4 reach a sink node or its destination."]
+actions: [6, 0, 6, 6, 0]
+
+# State 5
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 would like to move to D->E.", "Vehicle 2 reach a sink node or its destination.", "Vehicle 3 reach a sink node or its destination.", "Vehicle 4 would like to move to D->E."]
+actions: [0, 7, 0, 0, 7]
+
+# State 6
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 reach a sink node or its destination.", "Vehicle 3 reach a sink node or its destination.", "Vehicle 4 reach a sink node or its destination."]
+actions: [0, 0, 0, 0, 0]
+
+# State 7
+# Apply joint action ["Vehicle 0 reach a sink node or its destination.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 reach a sink node or its destination.", "Vehicle 3 reach a sink node or its destination.", "Vehicle 4 reach a sink node or its destination."]
+actions: [0, 0, 0, 0, 0]
+
+# State 8
+# Apply joint action ["Vehicle 0 would like to move to D->E.", "Vehicle 1 reach a sink node or its destination.", "Vehicle 2 would like to move to D->E.", "Vehicle 3 would like to move to D->E.", "Vehicle 4 reach a sink node or its destination."]
+actions: [7, 0, 7, 7, 0]
+
+# State 9
+# Vehicle locations: ['D->E', 'D->E', 'D->E', 'D->E', 'D->E'], time: 9, game finished., waiting_time=[0, 0, 0, 0, 0].
 IsTerminal() = True
-History() = [2, 2, 1, 3, 3]
-HistoryString() = "2, 2, 1, 3, 3"
+History() = [3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0]
+HistoryString() = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
-InformationStateString(0) = "2, 2, 1, 3, 3"
-InformationStateString(1) = "2, 2, 1, 3, 3"
-InformationStateTensor(0).observation = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 2.0]
-InformationStateTensor(1).observation = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 3.0, 2.0]
-ObservationString(0) = "2, 2, 1, 3, 3"
-ObservationString(1) = "2, 2, 1, 3, 3"
-ObservationTensor(0) = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 2.0]
-ObservationTensor(1) = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 3.0, 2.0]
-Rewards() = [-3.0, -3.0]
-Returns() = [-3.0, -3.0]
+InformationStateString(0) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+InformationStateString(1) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+InformationStateString(2) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+InformationStateString(3) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+InformationStateString(4) = "3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+ObservationString(0) = "0: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+ObservationString(1) = "1: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+ObservationString(2) = "2: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+ObservationString(3) = "3: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+ObservationString(4) = "4: 3, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4, 0, 6, 0, 0, 6, 6, 0, 6, 6, 0, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 7, 7, 0"
+ObservationTensor(0) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 3.0, 3.0, 4.0, 6.0, 3.0, 6.0, 3.0, 3.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(1) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 3.0, 3.0, 4.0, 6.0, 3.0, 6.0, 3.0, 3.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(2) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 3.0, 3.0, 4.0, 6.0, 3.0, 6.0, 3.0, 3.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(3) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 3.0, 3.0, 4.0, 6.0, 3.0, 6.0, 3.0, 3.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(4) = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 2.0, 3.0, 2.0, 3.0, 3.0, 2.0, 4.0, 3.0, 4.0, 3.0, 3.0, 4.0, 6.0, 3.0, 6.0, 3.0, 3.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 6.0, 7.0, 6.0, 6.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [-4.0, -2.5, -4.0, -4.0, -2.5]

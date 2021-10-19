@@ -482,20 +482,18 @@ class ChildTest(absltest.TestCase):
 
   def test_child_function_expected_behavior_for_sim_game(self):
     """Test expected behavior of child on simultaneous games."""
-    game = pyspiel.load_game("python_dynamic_routing")
+    game = pyspiel.load_game("python_iterated_prisoners_dilemma")
     parameter_state = game.new_initial_state()
-    actions = [2, 2]
+    actions = [1, 1]
     new_state = policy.child(parameter_state, actions)
-    self.assertEqual(
-        str(new_state), ("Vehicle locations: ['O->A', 'O->A'], "
-                         "time: 1."))
+    self.assertEqual(str(new_state), ("p0:D p1:D"))
 
   def test_child_function_failure_behavior_for_sim_game(self):
     """Test failure behavior of child on simultaneous games."""
-    game = pyspiel.load_game("python_dynamic_routing")
+    game = pyspiel.load_game("python_iterated_prisoners_dilemma")
     parameter_state = game.new_initial_state()
     with self.assertRaises(AssertionError):
-      policy.child(parameter_state, 2)
+      policy.child(parameter_state, 0)
 
 
 if __name__ == "__main__":
