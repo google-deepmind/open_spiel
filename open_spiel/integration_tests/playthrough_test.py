@@ -35,7 +35,7 @@ _AVAILABLE_GAMES = set(pyspiel.registered_names())
 # Games for which we do not have playthroughs. Please don't add new games
 # here if you can avoid it. Adding a playthrough is easy and very useful!
 # Run `generate_new_playthrough.sh $GAME` to add a playthrough.
-_MISSING_GAMES = set(["nfg_game", "efg_game"])
+_MISSING_GAMES = set(["nfg_game", "efg_game", "restricted_nash_response"])
 
 # Regex to find the game name in a playthrough. This will return the name of the
 # transform for wrapped games, e.g. goofspiel --> turn_based_simultaneous_game

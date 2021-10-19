@@ -22,6 +22,7 @@
 #include <open_spiel/policy.h>
 
 #include "open_spiel/spiel.h"
+#include "game_wrapper.h"
 
 namespace open_spiel {
 
@@ -97,7 +98,7 @@ class RestrictedNashResponseState : public State {
   const bool use_fixed_policy_;
 };
 
-class RestrictedNashResponseGame : public Game {
+class RestrictedNashResponseGame : public WrappedGame {
  public:
   explicit RestrictedNashResponseGame(
       const std::shared_ptr<const Game> &game, Player fixed_player,
@@ -157,8 +158,7 @@ class RestrictedNashResponseGame : public Game {
   std::shared_ptr<RestrictedNashResponseObserver> default_observer_;
   std::shared_ptr<RestrictedNashResponseObserver> info_state_observer_;
  private:
-  //
-  const std::shared_ptr<const Game> game_;
+  // Fixed player and p constants to be passed to the initial state
   const Player fixed_player_;
   const double p_;
   // Constants for the fixed strategy and if we use explicit fixed strategy

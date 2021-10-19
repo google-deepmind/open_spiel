@@ -289,8 +289,8 @@ GameType ConvertType(GameType type) {
 RestrictedNashResponseGame::RestrictedNashResponseGame(
     const std::shared_ptr<const Game> &game, Player fixed_player,
     double p, std::shared_ptr<Policy> fixed_policy)
-    : Game(ConvertType(game->GetType()), game->GetParameters()),
-      game_(game), fixed_player_(fixed_player), p_(p), fixed_policy_(std::move(fixed_policy)) {
+    : WrappedGame(game,ConvertType(game->GetType()), game->GetParameters()),
+      fixed_player_(fixed_player), p_(p), fixed_policy_(std::move(fixed_policy)) {
   default_observer_ = std::make_shared<RestrictedNashResponseObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<RestrictedNashResponseObserver>(kInfoStateObsType);
 }
