@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 
@@ -48,8 +49,8 @@ const GameType kGameType{
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return ConvertToRNR(
       *LoadGame(params.at("game").game_value()),
-      params.at("fixed_player").value_with_default(kDefaultFixedPlayer),
-      params.at("p").value_with_default(kDefaultP),
+      ParameterValue<int>(params, "fixed_player", kDefaultFixedPlayer),
+      ParameterValue<double>(params, "p", kDefaultP),
       std::make_shared<UniformPolicy>());
 }
 
