@@ -39,6 +39,5 @@ int main(int argc, char** argv) {
                                     .max_invalid_behaviors = 3,
                                     .disqualification_rate = 0.1,
                                 });
-  SPIEL_CHECK_TRUE(ref.StartedSuccessfully());
   ref.PlayTournament(absl::GetFlag(FLAGS_num_matches));
 }

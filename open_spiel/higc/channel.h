@@ -77,7 +77,7 @@ class BotChannel {
 };
 
 std::unique_ptr<BotChannel> MakeBotChannel(int bot_index,
-                                           std::vector<std::string> args);
+                                           const std::string& shell_command);
 
 void ReadLineFromChannelStdout(BotChannel* c);
 void ReadLineFromChannelStderr(BotChannel* c);

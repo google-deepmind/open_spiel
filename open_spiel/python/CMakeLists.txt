@@ -199,9 +199,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/bot_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
-  # higc tests are causing sporadic failures on Github Actions.
-  # Disabling until we fix them. See #715.
-  # tests/higc_referee_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py
@@ -282,12 +279,10 @@ endif()
 
 # Tests that are excluded when running via the installed wheel.
 # Some bundle data not shipped with the wheel (e.g. playthroughs)
-# Temporarily disable higc_referee_test until #715 is fixed.
 set(WHEEL_EXCLUDED_PYTHON_TESTS
   algorithms/response_graph_ucb_test.py
   games/tic_tac_toe_test.py
-  ../integration_tests/playthrough_test.py
-  tests/higc_referee_test.py)
+  ../integration_tests/playthrough_test.py)
 
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)

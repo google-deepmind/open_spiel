@@ -115,8 +115,7 @@ struct TournamentResults {
 class Referee {
   std::string game_name_;
   std::shared_ptr<const Game> game_;
-  bool started_successfully_;
-  std::vector<std::string> executables_;
+  std::vector<std::string> bot_commands_;
   std::mt19937 rng_;
   std::ostream& log_;
   TournamentSettings settings_;
@@ -132,14 +131,14 @@ class Referee {
 
  public:
   Referee(const std::string& game_name,
-          const std::vector<std::string>& executables, int seed = 42,
+          const std::vector<std::string>& bot_commands, int seed = 42,
           TournamentSettings settings = TournamentSettings(),
           std::ostream& log = std::cout);
   ~Referee() { ShutDownPlayers(); }
   std::unique_ptr<TournamentResults> PlayTournament(int num_matches);
-  bool StartedSuccessfully() const { return started_successfully_; }
+  //  bool StartedSuccessfully() const;
 
-  int num_bots() const { return executables_.size(); }
+  int num_bots() const { return bot_commands_.size(); }
   const TournamentSettings& settings() const { return settings_; }
 
  private:

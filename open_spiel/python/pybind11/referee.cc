@@ -84,8 +84,7 @@ void init_pyspiel_referee(py::module& m) {
            py::arg("game_name"), py::arg("executables"), py::arg("seed") = 42,
            py::arg("settings") = higc::TournamentSettings())
       .def("play_tournament", &higc::Referee::PlayTournament,
-           py::arg("num_matches"))
-      .def("started_successfully", &higc::Referee::StartedSuccessfully);
+           py::arg("num_matches"));
 }
 
 }  // namespace open_spiel
