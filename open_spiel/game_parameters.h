@@ -138,6 +138,9 @@ class GameParameter {
   template <typename T>
   T value() const;
 
+  template <typename T>
+  T value_with_default(T default_value) const;
+
   bool operator==(const GameParameter& rhs) const {
     switch (type_) {
       case Type::kInt:

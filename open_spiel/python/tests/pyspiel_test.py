@@ -98,6 +98,7 @@ EXPECTED_GAMES = set([
     "quoridor",
     "repeated_game",
     "rbc",
+    "restricted_nash_response",
     "sheriff",
     "skat",
     "start_at",
@@ -145,6 +146,7 @@ class PyspielTest(absltest.TestCase):
         "turn_based_simultaneous_game",
         "normal_form_extensive_game",
         "repeated_game",
+        "restricted_nash_response",
         "start_at",
     ]
     self.assertCountEqual(non_default_loadable, expected)

@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
+import unittest
 
 from absl import app
 from absl.testing import absltest
@@ -311,6 +312,24 @@ class GamesSimTest(parameterized.TestCase):
                             not checker_moves[1].hit)
         action = np.random.choice(legal_actions)
         state.apply_action(action)
+
+  # TODO(milecdav): Re-enable when C++ tests are fixed.
+  @unittest.skip("This currently crashes.")
+  @parameterized.parameters(
+      {"game_name": "blotto"},
+      {"game_name": "goofspiel"},
+      {"game_name": "kuhn_poker"},
+      {"game_name": "tiny_hanabi"},
+      {"game_name": "phantom_ttt"},
+      {"game_name": "matrix_rps"},
+      {"game_name": "kuhn_poker"},
+  )
+  def test_restricted_nash_response_test(self, game_name):
+    rnr_game = pyspiel.load_game(
+        f"restricted_nash_response(game={game_name}())")
+    for _ in range(10):
+      self.sim_game(rnr_game, check_pyspiel_serialization=False,
+                    check_pickle_serialization=False)
 
 # TODO(perolat): find the list of games where it is reasonable to call
 # get_all_states

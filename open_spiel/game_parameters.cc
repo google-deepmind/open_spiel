@@ -273,4 +273,46 @@ GameParameters GameParameter::value() const {
   return game_value();
 }
 
+template <>
+int GameParameter::value_with_default(int default_value) const {
+  if (has_int_value()) {
+    return int_value();
+  } else {
+    return default_value;
+  }
+}
+template <>
+double GameParameter::value_with_default(double default_value) const {
+  if (has_double_value()) {
+    return double_value();
+  } else {
+    return default_value;
+  }
+}
+template <>
+const std::string& GameParameter::value_with_default(
+    const std::string& default_value) const {
+  if (has_string_value()) {
+    return string_value();
+  } else {
+    return default_value;
+  }
+}
+template <>
+std::string GameParameter::value_with_default(std::string default_value) const {
+  if (has_string_value()) {
+    return string_value();
+  } else {
+    return default_value;
+  }
+}
+template <>
+bool GameParameter::value_with_default(bool default_value) const {
+  if (has_bool_value()) {
+    return bool_value();
+  } else {
+    return default_value;
+  }
+}
+
 }  // namespace open_spiel
