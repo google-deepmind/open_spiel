@@ -24,6 +24,11 @@ ABSL_FLAG(std::string, bots_dir, "open_spiel/higc/bots",
           "Directory containing the sources for bots.");
 ABSL_FLAG(std::string, build_dir, "open_spiel/higc/bots",
           "Directory containing the binaries for bots.");
+// Communication with bots runs asynchronously. Some tests can be flaky and fail
+// in testing environments with preemption, see
+// https://github.com/deepmind/open_spiel/pull/723
+ABSL_FLAG(bool, run_only_blocking, false,
+          "Do not run async tests that rely on proper timeout handling. ");
 
 namespace open_spiel {
 namespace higc {
@@ -210,7 +215,7 @@ void PlayWithManyPlayers() {
 }  // namespace higc
 }  // namespace open_spiel
 
-// Reroute the SIGPIPE signall here, so the test pass ok.
+// Reroute the SIGPIPE signal here, so the test pass ok.
 void signal_callback_handler(int signum) {
   std::cout << "Caught signal SIGPIPE " << signum << std::endl;
 }
@@ -220,12 +225,15 @@ int main(int argc, char** argv) {
   signal(SIGPIPE, signal_callback_handler);
 
   // General subprocess communication tests.
-  open_spiel::higc::SayHelloViaSubprocess();
-  open_spiel::higc::SayHelloViaChannel();
-  open_spiel::higc::FailViaSubprocess();
-
   // Make sure that we got the right interpreter from virtualenv.
+  open_spiel::higc::SayHelloViaSubprocess();
+  open_spiel::higc::FailViaSubprocess();
   open_spiel::higc::ImportPythonDependenciesTest();
+
+  // Skip over all the other referee tests.
+  if (absl::GetFlag(FLAGS_run_only_blocking)) return;
+
+  open_spiel::higc::SayHelloViaChannel();
 
   // Actual bot tests.
   open_spiel::higc::PlayWithFailingBots();

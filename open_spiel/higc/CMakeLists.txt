@@ -14,7 +14,8 @@ add_executable(referee_test referee_test.cc ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJEC
 
 add_test(referee_test referee_test
          --bots_dir=${CMAKE_CURRENT_SOURCE_DIR}/bots
-         --build_dir=${CMAKE_CURRENT_BINARY_DIR})
+         --build_dir=${CMAKE_CURRENT_BINARY_DIR}
+         --run_only_blocking)
 # Make sure that we can import pyspiel and other python source files.
 set_property(TEST referee_test
         PROPERTY ENVIRONMENT
