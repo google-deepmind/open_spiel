@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
-import unittest
 
 from absl import app
 from absl.testing import absltest
@@ -313,8 +312,6 @@ class GamesSimTest(parameterized.TestCase):
         action = np.random.choice(legal_actions)
         state.apply_action(action)
 
-  # TODO(milecdav): Re-enable when C++ tests are fixed.
-  @unittest.skip("This currently crashes.")
   @parameterized.parameters(
       {"game_name": "blotto"},
       {"game_name": "goofspiel"},

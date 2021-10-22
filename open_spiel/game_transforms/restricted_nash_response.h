@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_GAME_TRANSFORMS_RESTRICTED_NASH_RESPONSE_H_
 #define OPEN_SPIEL_GAME_TRANSFORMS_RESTRICTED_NASH_RESPONSE_H_
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
@@ -128,9 +129,18 @@ class RestrictedNashResponseGame : public WrappedGame {
 
   int MaxChanceOutcomes() const override {
     if (fixed_policy_) {
-      SpielFatalError("Not implemented");
+      // If a fixed policy is set, then we have a real RNR game, which means
+      // there is at least one chance node with 2 outcomes. But also, the
+      // fixed player actions are also treated as chance nodes, so the number
+      // of distinct actions can also determine the maximum number of chance
+      // outcomes.
+      std::vector<int> candidates = {
+        game_->MaxChanceOutcomes(), 2, game_->NumDistinctActions()
+      };
+      return *std::max_element(candidates.begin(), candidates.end());
     } else {
-      return std::max(game_->MaxChanceOutcomes(), 2);
+      // Otherwise, it's the normal game.
+      return game_->MaxChanceOutcomes();
     }
   }
 
@@ -157,9 +167,12 @@ class RestrictedNashResponseGame : public WrappedGame {
 
   int MaxChanceNodesInHistory() const override {
     if (fixed_policy_) {
-      return MaxGameLength();
-    } else {
+      // If a fixed policy is set, then we have a real RNR game, which has an
+      // extra chance node.
       return game_->MaxChanceNodesInHistory() + 1;
+    } else {
+      // Otherwise, it's just the normal game.
+      return game_->MaxChanceNodesInHistory();
     }
   }
   // old observation API

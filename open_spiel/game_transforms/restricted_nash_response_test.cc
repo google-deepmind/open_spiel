@@ -108,8 +108,7 @@ void SimulateGame(std::mt19937 *rng, const Game &game,
   }
 }
 
-void BasicRNRTests() {  // NOLINT
-  // This test crashes, so it is currently disabled.
+void BasicRNRTests() {
   for (const std::string& name :
      {"blotto", "goofspiel", "kuhn_poker", "tiny_hanabi", "phantom_ttt",
       "matrix_rps", "leduc_poker"}) {
@@ -117,7 +116,8 @@ void BasicRNRTests() {  // NOLINT
     std::string full_game_str =
         absl::StrCat("restricted_nash_response(game=",
                                                name, "())");
-    testing::RandomSimTest(*LoadGame(full_game_str), 10);
+    testing::RandomSimTest(*LoadGame(full_game_str), 10, /*serialize*/false,
+                           /*verbose*/false, /*mask_test*/true);
   }
 }
 
@@ -242,7 +242,7 @@ void TestFixedPolicyGame() {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  // open_spiel::BasicRNRTests();
+  open_spiel::BasicRNRTests();
   open_spiel::TestBasicCreation();
   open_spiel::TestMatchingPenniesCreation();
   open_spiel::TestFixedPolicyGame();

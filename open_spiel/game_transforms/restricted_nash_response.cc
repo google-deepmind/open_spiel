@@ -22,6 +22,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 
 namespace open_spiel {
 
@@ -230,7 +231,15 @@ std::string RestrictedNashResponseState::ActionToString(
     SPIEL_CHECK_EQ(player, kChancePlayerId);
     return (action_id == kFixedAction ? "Fixed" : "Free");
   } else {
-    return state_->ActionToString(player, action_id);
+    Player action_player = player;
+    if (action_player == kChancePlayerId && use_fixed_policy_ && fixed_ &&
+        state_->CurrentPlayer() == fixed_player_) {
+      // This is a chance node in the RNR game, but a regular player node
+      // in the underlying game, so we need to use the player's true identity
+      // at this node.
+      action_player = state_->CurrentPlayer();
+    }
+    return state_->ActionToString(action_player, action_id);
   }
 }
 
