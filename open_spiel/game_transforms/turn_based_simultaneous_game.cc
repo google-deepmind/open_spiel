@@ -255,8 +255,6 @@ GameType ConvertType(GameType type) {
   type.short_name = kGameType.short_name;
   type.long_name = "Turn-based " + type.long_name;
   type.parameter_specification = kGameType.parameter_specification;
-  type.provides_observation_string = false;
-  type.provides_observation_tensor = false;
   return type;
 }
 

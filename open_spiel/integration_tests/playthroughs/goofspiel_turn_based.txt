@@ -9,8 +9,8 @@ GameType.min_num_players = 2
 GameType.parameter_specification = ["game"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
-GameType.provides_observation_string = False
-GameType.provides_observation_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = True
 GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "turn_based_simultaneous_game"
@@ -27,6 +27,9 @@ UtilitySum() = 0.0
 InformationStateTensorShape() = [70]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 70
+ObservationTensorShape() = [46]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 46
 MaxGameLength() = 8
 ToString() = "turn_based_simultaneous_game(game=goofspiel(imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss))"
 
@@ -48,6 +51,10 @@ InformationStateString(0) = "Current player: 0\nP0 hand: 1 2 3 4 \nP0 action seq
 InformationStateString(1) = "Current player: 0\nP1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card sequence: 4 \nWin sequence: \nPoints: 0 0 \nTerminal?: 0\n"
 InformationStateTensor(0): ◉◯◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current player: 0\nCurrent point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationString(1) = "Current player: 0\nCurrent point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationTensor(0): ◉◯◉◯◯◯◯◉◉◉◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◉◯◯◯◉◉◉◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2, 3]
@@ -74,6 +81,10 @@ InformationStateString(0) = "Current player: 1\nObserver's action this turn: 2\n
 InformationStateString(1) = "Current player: 1\nP1 hand: 1 2 3 4 \nP1 action sequence: \nPoint card sequence: 4 \nWin sequence: \nPoints: 0 0 \nTerminal?: 0\n"
 InformationStateTensor(0): ◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current player: 1\nObserver's action this turn: 2\nCurrent point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP0 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationString(1) = "Current player: 1\nCurrent point card: 4\nRemaining Point Cards: 123\nPoints: 0 0 \nP1 hand: 1 2 3 4 \nWin sequence: \n"
+ObservationTensor(0): ◯◉◉◯◯◯◯◉◉◉◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◯◉◉◉◉◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◯◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2, 3]
@@ -100,6 +111,10 @@ InformationStateString(0) = "Current player: 0\nP0 hand: 1 2 4 \nP0 action seque
 InformationStateString(1) = "Current player: 0\nP1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card sequence: 4 3 \nWin sequence: 1 \nPoints: 0 4 \nTerminal?: 0\n"
 InformationStateTensor(0): ◉◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current player: 0\nCurrent point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
+ObservationString(1) = "Current player: 0\nCurrent point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
+ObservationTensor(0): ◉◯◉◯◯◯◉◯◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◉◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 3]
@@ -126,6 +141,10 @@ InformationStateString(0) = "Current player: 1\nObserver's action this turn: 1\n
 InformationStateString(1) = "Current player: 1\nP1 hand: 1 2 3 \nP1 action sequence: 3 \nPoint card sequence: 4 3 \nWin sequence: 1 \nPoints: 0 4 \nTerminal?: 0\n"
 InformationStateTensor(0): ◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current player: 1\nObserver's action this turn: 1\nCurrent point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP0 hand: 1 2 4 \nWin sequence: 1 \n"
+ObservationString(1) = "Current player: 1\nCurrent point card: 3\nRemaining Point Cards: 12\nPoints: 0 4 \nP1 hand: 1 2 3 \nWin sequence: 1 \n"
+ObservationTensor(0): ◯◉◉◯◯◯◉◯◉◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◉◯◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◉◯◯◉◯◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 1, 2]
@@ -152,6 +171,10 @@ InformationStateString(0) = "Current player: 0\nP0 hand: 1 4 \nP0 action sequenc
 InformationStateString(1) = "Current player: 0\nP1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card sequence: 4 3 2 \nWin sequence: 1 0 \nPoints: 3 4 \nTerminal?: 0\n"
 InformationStateTensor(0): ◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current player: 0\nCurrent point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
+ObservationString(1) = "Current player: 0\nCurrent point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
+ObservationTensor(0): ◉◯◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◉◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◉◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [0, 3]
@@ -178,6 +201,10 @@ InformationStateString(0) = "Current player: 1\nObserver's action this turn: 3\n
 InformationStateString(1) = "Current player: 1\nP1 hand: 2 3 \nP1 action sequence: 3 0 \nPoint card sequence: 4 3 2 \nWin sequence: 1 0 \nPoints: 3 4 \nTerminal?: 0\n"
 InformationStateTensor(0): ◯◉◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◉◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = "Current player: 1\nObserver's action this turn: 3\nCurrent point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP0 hand: 1 4 \nWin sequence: 1 0 \n"
+ObservationString(1) = "Current player: 1\nCurrent point card: 2\nRemaining Point Cards: 1\nPoints: 3 4 \nP1 hand: 2 3 \nWin sequence: 1 0 \n"
+ObservationTensor(0): ◯◉◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◉◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◉◉◯◯◯◯◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [1, 2]
@@ -203,5 +230,9 @@ InformationStateString(0) = "Current player: -4\nP0 hand: \nP0 action sequence: 
 InformationStateString(1) = "Current player: -4\nP1 hand: \nP1 action sequence: 3 0 1 2 \nPoint card sequence: 4 3 2 1 \nWin sequence: 1 0 0 1 \nPoints: 5 5 \nTerminal?: 1\n"
 InformationStateTensor(0): ◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉◯◯◯◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◉◯◯◯
 InformationStateTensor(1): ◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉◯◯◯◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◉◯◯◯◯◉◯
+ObservationString(0) = "Current player: -4\nCurrent point card: 1\nRemaining Point Cards: \nPoints: 5 5 \nP0 hand: \nWin sequence: 1 0 0 1 \n"
+ObservationString(1) = "Current player: -4\nCurrent point card: 1\nRemaining Point Cards: \nPoints: 5 5 \nP1 hand: \nWin sequence: 1 0 0 1 \n"
+ObservationTensor(0): ◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉
+ObservationTensor(1): ◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◯◉
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
