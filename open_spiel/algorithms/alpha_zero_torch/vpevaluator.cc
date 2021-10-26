@@ -71,9 +71,17 @@ LRUCacheInfo VPNetEvaluator::CacheInfo() {
 }
 
 std::vector<double> VPNetEvaluator::Evaluate(const State& state) {
+  // Make sure that the state's observationTensor is returned from the
+  // perspective of the current player in the implementation of each game!
+  // Otherwise, the network might still learn to infer the current player
+  // from the observation and assign the correct value, but there is
+  // no guarantee on its performance.
   // TODO(author5): currently assumes zero-sum.
-  double p0value = Inference(state).value;
-  return {p0value, -p0value};
+  double cur_player_value = Inference(state).value;
+  if (state.CurrentPlayer() == 1) {
+    return {-cur_player_value, cur_player_value};
+  }
+  return {cur_player_value, -cur_player_value};
 }
 
 open_spiel::ActionsAndProbs VPNetEvaluator::Prior(const State& state) {
