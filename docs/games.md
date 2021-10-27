@@ -40,7 +40,11 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
-![](_static/green_circ10.png "green circle") | [Mean-field routing game](#mean-field-routing-game)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean-field-game-garnet)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean-field-game-crowd-modelling)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean-field-game-crowd-modelling-2d)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean-field-game-predator-prey)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game-routing)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
@@ -403,7 +407,7 @@ Status                                       | Game
 *   3 players.
 *   "Three problems in learning mixed-strategy Nash equilibria"
 
-### Mean-field routing game
+### Mean Field Game : routing
 
 *   Representative player chooses at each nodes where they go. They has an
     origin, a destination and a departure time and choose their route to
