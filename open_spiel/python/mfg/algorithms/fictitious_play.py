@@ -40,9 +40,9 @@ class MergedPolicy(policy_std.Policy):
         be in the range 0..game.num_players()-1.
       policies: A `List[policy_std.Policy]` object.
       distributions: A `List[distribution_std.Distribution]` object.
-      weights: A `List[float]` object. They should sum to 1.
+      weights: A `List[float]` object. The elements of this list should sum to 1.
     """
-    super(MergedPolicy, self).__init__(game, player_ids)
+    super().__init__(game, player_ids)
     self._policies = policies
     self._distributions = distributions
     self._weights = weights
@@ -50,6 +50,8 @@ class MergedPolicy(policy_std.Policy):
         f'Length mismatch {len(policies)} != {len(distributions)}')
     assert len(policies) == len(weights), (
         f'Length mismatch {len(policies)} != {len(weights)}')
+    assert sum(weights) == 1, (
+        f'Weights should sum to 1, but instead sum to {sum(weights)}')
 
   def action_probabilities(self, state, player_id=None):
     action_prob = []
@@ -86,7 +88,7 @@ class FictitiousPlay(object):
   def get_policy(self):
     return self._policy
 
-  def iteration(self):
+  def iteration(self, learning_rate=None):
     """Returns a new `TabularPolicy` equivalent to this policy."""
     self._fp_step += 1
 
@@ -98,8 +100,12 @@ class FictitiousPlay(object):
     greedy_pi = greedy_pi.to_tabular(states=self._states)
     distrib_greedy = distribution.DistributionPolicy(self._game, greedy_pi)
 
+    if learning_rate:
+      weights = [1.0 - learning_rate, learning_rate]
+    else:
+      weights = [1.0 * self._fp_step / (self._fp_step + 1), 1.0 / (self._fp_step + 1)]
+
     self._policy = MergedPolicy(
         self._game, list(range(self._game.num_players())),
         [self._policy, greedy_pi], [distrib, distrib_greedy],
-        [1.0 * self._fp_step / (self._fp_step + 1), 1.0 /
-         (self._fp_step + 1)]).to_tabular(states=self._states)
+        weights).to_tabular(states=self._states)
