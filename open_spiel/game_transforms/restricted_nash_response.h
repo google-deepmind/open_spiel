@@ -25,10 +25,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/policy.h"
 
-// An implementation of Restricted Nash Response by Johanson et al. '08.
-//
-// **Note**: There are known issues with the implementation currently under
-// investigation; we will remove this once they are fixed.
+// An implementation of Restricted Nash Response by Johanson et al. '08:
+// http://www.johanson.ca/publications/poker/2007-nips-rnash/2007-nips-rnash.html
 
 namespace open_spiel {
 

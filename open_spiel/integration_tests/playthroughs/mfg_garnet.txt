@@ -1,0 +1,280 @@
+game: mfg_garnet
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.MEAN_FIELD
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Mean Field Garnet"
+GameType.max_num_players = 1
+GameType.min_num_players = 1
+GameType.parameter_specification = ["eta", "horizon", "num_action", "num_chance_action", "seed", "size", "sparsity_factor"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "mfg_garnet"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 3
+PolicyTensorShape() = [3]
+MaxChanceOutcomes() = 10
+GetParameters() = {eta=1.0,horizon=10,num_action=3,num_chance_action=3,seed=0,size=10,sparsity_factor=1.0}
+NumPlayers() = 1
+MinUtility() = -inf
+MaxUtility() = inf
+UtilitySum() = 0.0
+ObservationTensorShape() = [21]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 21
+MaxGameLength() = 10
+ToString() = "mfg_garnet()"
+
+# State 0
+# initial
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "initial"
+ObservationString(0) = "initial"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+StringLegalActions() = ["init_state=0", "init_state=1", "init_state=2", "init_state=3", "init_state=4", "init_state=5", "init_state=6", "init_state=7", "init_state=8", "init_state=9"]
+
+# Apply action "init_state=1"
+action: 1
+
+# State 1
+# (1, 0)
+IsTerminal() = False
+History() = [1]
+HistoryString() = "1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(1, 0)"
+ObservationString(0) = "(1, 0)"
+ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+Rewards() = [2.600119698457028]
+Returns() = [2.600119698457028]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["0", "1", "2"]
+
+# Apply action "2"
+action: 2
+
+# State 2
+# (1, 0, 2)_a_mu
+IsTerminal() = False
+History() = [1, 2]
+HistoryString() = "1, 2"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "(1, 0, 2)_a_mu"
+ObservationString(0) = "(1, 0, 2)_a_mu"
+ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0, 0.3132183323338943), (1, 0.6521978864471419), (2, 0.03458378121896377)]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["0", "1", "2"]
+
+# Apply action "0"
+action: 0
+
+# State 3
+# (5, 1)_a
+IsTerminal() = False
+History() = [1, 2, 0]
+HistoryString() = "1, 2, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -5
+InformationStateString(0) = "(5, 1)_a"
+ObservationString(0) = "(5, 1)_a"
+ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0]
+Returns() = [2.600119698457028]
+DistributionSupport() = ['(0, 1)_a', '(1, 1)_a', '(2, 1)_a', '(3, 1)_a', '(4, 1)_a', '(5, 1)_a', '(6, 1)_a', '(7, 1)_a', '(8, 1)_a', '(9, 1)_a']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 4
+# (5, 1)
+IsTerminal() = False
+History() = [1, 2, 0]
+HistoryString() = "1, 2, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(5, 1)"
+ObservationString(0) = "(5, 1)"
+ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯
+Rewards() = [2.623582336841608]
+Returns() = [5.223702035298636]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["0", "1", "2"]
+
+# Apply action "1"
+action: 1
+
+# State 5
+# Apply action "2"
+action: 2
+
+# State 6
+# (9, 2)_a
+IsTerminal() = False
+History() = [1, 2, 0, 1, 2]
+HistoryString() = "1, 2, 0, 1, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -5
+InformationStateString(0) = "(9, 2)_a"
+ObservationString(0) = "(9, 2)_a"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0.0]
+Returns() = [5.223702035298636]
+DistributionSupport() = ['(0, 2)_a', '(1, 2)_a', '(2, 2)_a', '(3, 2)_a', '(4, 2)_a', '(5, 2)_a', '(6, 2)_a', '(7, 2)_a', '(8, 2)_a', '(9, 2)_a']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 7
+# (9, 2)
+IsTerminal() = False
+History() = [1, 2, 0, 1, 2]
+HistoryString() = "1, 2, 0, 1, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "(9, 2)"
+ObservationString(0) = "(9, 2)"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [2.698683371361947]
+Returns() = [7.922385406660583]
+LegalActions() = [0, 1, 2]
+StringLegalActions() = ["0", "1", "2"]
+
+# Apply action "2"
+action: 2
+
+# State 8
+# Apply action "0"
+action: 0
+
+# State 9
+# (3, 3)_a
+IsTerminal() = False
+History() = [1, 2, 0, 1, 2, 2, 0]
+HistoryString() = "1, 2, 0, 1, 2, 2, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -5
+InformationStateString(0) = "(3, 3)_a"
+ObservationString(0) = "(3, 3)_a"
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+Rewards() = [0.0]
+Returns() = [7.922385406660583]
+DistributionSupport() = ['(0, 3)_a', '(1, 3)_a', '(2, 3)_a', '(3, 3)_a', '(4, 3)_a', '(5, 3)_a', '(6, 3)_a', '(7, 3)_a', '(8, 3)_a', '(9, 3)_a']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 10
+# Apply action "0"
+action: 0
+
+# State 11
+# Apply action "1"
+action: 1
+
+# State 12
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 13
+# Apply action "1"
+action: 1
+
+# State 14
+# Apply action "0"
+action: 0
+
+# State 15
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 16
+# Apply action "1"
+action: 1
+
+# State 17
+# Apply action "0"
+action: 0
+
+# State 18
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 19
+# Apply action "1"
+action: 1
+
+# State 20
+# Apply action "1"
+action: 1
+
+# State 21
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 22
+# Apply action "1"
+action: 1
+
+# State 23
+# Apply action "1"
+action: 1
+
+# State 24
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 25
+# Apply action "1"
+action: 1
+
+# State 26
+# Apply action "0"
+action: 0
+
+# State 27
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 28
+# Apply action "0"
+action: 0
+
+# State 29
+# Apply action "2"
+action: 2
+
+# State 30
+# (3, 10)_a
+IsTerminal() = True
+History() = [1, 2, 0, 1, 2, 2, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 2]
+HistoryString() = "1, 2, 0, 1, 2, 2, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "(3, 10)_a"
+ObservationString(0) = "(3, 10)_a"
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
+Rewards() = [0.0]
+Returns() = [27.747369277896926]

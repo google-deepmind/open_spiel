@@ -97,6 +97,7 @@ class FiniteHorizonTest(parameterized.TestCase):
   @parameterized.parameters(
       {'game_name': 'python_mfg_crowd_modelling'},
       {'game_name': 'mfg_crowd_modelling'},
+      {'game_name': 'mfg_garnet'},
       {'game_name': 'mfg_crowd_modelling_2d'},
       {'game_name': 'python_mfg_predator_prey'},
   )
@@ -115,6 +116,7 @@ class FiniteHorizonTest(parameterized.TestCase):
   @parameterized.parameters(
       {'game_name': 'python_mfg_crowd_modelling'},
       {'game_name': 'mfg_crowd_modelling'},
+      {'game_name': 'mfg_garnet'},
       {'game_name': 'mfg_crowd_modelling_2d'},
       {'game_name': 'python_mfg_predator_prey'},
   )
@@ -136,6 +138,7 @@ class FiniteHorizonTest(parameterized.TestCase):
   @parameterized.parameters(
       {'game_name': 'python_mfg_crowd_modelling'},
       {'game_name': 'mfg_crowd_modelling'},
+      {'game_name': 'mfg_garnet'},
       {'game_name': 'mfg_crowd_modelling_2d'},
       {'game_name': 'python_mfg_predator_prey'},
   )
