@@ -14,7 +14,6 @@
 
 """DQN agents trained on an MFG against a crowd following a uniform policy."""
 
-from absl import app
 from absl import flags
 from absl import logging
 import jax
@@ -28,6 +27,7 @@ from open_spiel.python.mfg.algorithms import policy_value
 from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
 from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
 import pyspiel
+from open_spiel.python.utils import app
 
 # pylint: disable=g-import-not-at-top
 try:
