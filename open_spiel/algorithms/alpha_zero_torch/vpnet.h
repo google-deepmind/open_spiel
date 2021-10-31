@@ -68,17 +68,19 @@ class VPNetModel {
 
   // A struct to handle the inputs for inference.
   struct InferenceInputs {
+    Player current_player;
     std::vector<Action> legal_actions;
     std::vector<float> observations;
 
     bool operator==(const InferenceInputs& other) const {
-      return legal_actions == other.legal_actions &&
+      return current_player == other.current_player &&
+             legal_actions == other.legal_actions &&
              observations == other.observations;
     }
 
     template <typename H>
     friend H AbslHashValue(H h, const InferenceInputs& in) {
-      return H::combine(std::move(h), in.legal_actions, in.observations);
+      return H::combine(std::move(h), in.current_player, in.legal_actions, in.observations);
     }
   };
 
@@ -90,12 +92,13 @@ class VPNetModel {
 
   // A struct to hold the inputs for training.
   struct TrainInputs {
+    Player current_player;
     std::vector<Action> legal_actions;
     std::vector<float> observations;
     ActionsAndProbs policy;
     double value;
 
-    NOP_STRUCTURE(TrainInputs, legal_actions, observations, policy, value);
+    NOP_STRUCTURE(TrainInputs, current_player, legal_actions, observations, policy, value);
   };
 
   enum CheckpointStep {
@@ -135,6 +138,7 @@ class VPNetModel {
   std::string model_meta_graph_contents_;
 
   int flat_input_size_;
+  int num_players_;
   int num_actions_;
 
   // NOTE:

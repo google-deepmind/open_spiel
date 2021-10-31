@@ -98,6 +98,7 @@ bool CreateGraphDef(const Game& game, double learning_rate, double weight_decay,
                     bool verbose) {
   ModelConfig net_config = {
       /*observation_tensor_shape=*/game.ObservationTensorShape(),
+      /*num_players=*/game.NumPlayers(),
       /*number_of_actions=*/game.NumDistinctActions(),
       /*nn_depth=*/nn_depth,
       /*nn_width=*/nn_width,
@@ -111,6 +112,7 @@ VPNetModel::VPNetModel(const Game &game, const std::string &path,
                        const std::string &file_name, const std::string &device)
     : device_(device), path_(path),
       flat_input_size_(game.ObservationTensorSize()),
+      num_players_(game.NumPlayers()),
       num_actions_(game.NumDistinctActions()),
       model_config_(LoadModelConfig(path, file_name)),
       torch_device_(TorchDeviceName(device)),
@@ -158,13 +160,15 @@ std::vector<VPNetModel::InferenceOutputs> VPNetModel::Inference(
   torch::Tensor torch_inf_inputs =
       torch::empty({inference_batch_size, flat_input_size_}, torch_device_);
   torch::Tensor torch_inf_legal_mask = torch::full(
-      {inference_batch_size, num_actions_}, false,
+      {inference_batch_size, num_players_ * num_actions_}, false,
       torch::TensorOptions().dtype(torch::kByte).device(torch_device_));
 
   for (int batch = 0; batch < inference_batch_size; ++batch) {
+    int policy_offset = inputs[batch].current_player * num_actions_;
+
     // Copy legal mask(s) to a Torch tensor.
     for (Action action : inputs[batch].legal_actions) {
-      torch_inf_legal_mask[batch][action] = true;
+      torch_inf_legal_mask[batch][policy_offset + action] = true;
     }
 
     // Copy the observation(s) to a Torch tensor.
@@ -177,6 +181,8 @@ std::vector<VPNetModel::InferenceOutputs> VPNetModel::Inference(
   model_->eval();
   std::vector<torch::Tensor> torch_outputs =
       model_(torch_inf_inputs, torch_inf_legal_mask);
+  // TODO: reshape the policy output to have one dimension corresponding
+  // to the players.
 
   torch::Tensor value_batch = torch_outputs[0];
   torch::Tensor policy_batch = torch_outputs[1];
@@ -185,13 +191,16 @@ std::vector<VPNetModel::InferenceOutputs> VPNetModel::Inference(
   std::vector<InferenceOutputs> output;
   output.reserve(inference_batch_size);
   for (int batch = 0; batch < inference_batch_size; ++batch) {
-    double value = value_batch[batch].item<double>();
+    Player current_player = inputs[batch].current_player;
+    int policy_offset = current_player * num_actions_;
+
+    double value = value_batch[batch][current_player].item<double>();
 
     ActionsAndProbs state_policy;
     state_policy.reserve(inputs[batch].legal_actions.size());
     for (Action action : inputs[batch].legal_actions) {
       state_policy.push_back(
-          {action, policy_batch[batch][action].item<float>()});
+          {action, policy_batch[batch][policy_offset + action].item<float>()});
     }
 
     output.push_back({value, state_policy});
@@ -210,17 +219,23 @@ VPNetModel::LossInfo VPNetModel::Learn(const std::vector<TrainInputs>& inputs) {
   torch::Tensor torch_train_inputs =
       torch::empty({training_batch_size, flat_input_size_}, torch_device_);
   torch::Tensor torch_train_legal_mask = torch::full(
-      {training_batch_size, num_actions_}, false,
+      {training_batch_size, num_players_ * num_actions_}, false,
       torch::TensorOptions().dtype(torch::kByte).device(torch_device_));
   torch::Tensor torch_policy_targets =
-      torch::zeros({training_batch_size, num_actions_}, torch_device_);
+      torch::zeros({training_batch_size, num_players_ * num_actions_}, torch_device_);
   torch::Tensor torch_value_targets =
       torch::empty({training_batch_size, 1}, torch_device_);
+  torch::Tensor torch_train_player_mask = torch::full(
+      {training_batch_size, num_players_}, false,
+      torch::TensorOptions().dtype(torch::kBool).device(torch_device_));
 
   for (int batch = 0; batch < training_batch_size; ++batch) {
+    Player current_player = inputs[batch].current_player;
+    int policy_offset = current_player * num_actions_;
+
     // Copy the legal mask(s) to a Torch tensor.
     for (Action action : inputs[batch].legal_actions) {
-      torch_train_legal_mask[batch][action] = true;
+      torch_train_legal_mask[batch][policy_offset + action] = true;
     }
 
     // Copy the observation(s) to a Torch tensor.
@@ -230,11 +245,14 @@ VPNetModel::LossInfo VPNetModel::Learn(const std::vector<TrainInputs>& inputs) {
 
     // Copy the policy target(s) to a Torch tensor.
     for (const auto& [action, probability] : inputs[batch].policy) {
-      torch_policy_targets[batch][action] = probability;
+      torch_policy_targets[batch][policy_offset + action] = probability;
     }
 
     // Copy the value target(s) to a Torch tensor.
     torch_value_targets[batch][0] = inputs[batch].value;
+
+    // Copy the current player to a Torch tensor.
+    torch_train_player_mask[batch][current_player] = true;
   }
 
   // Run a training step and get the losses.
@@ -243,7 +261,8 @@ VPNetModel::LossInfo VPNetModel::Learn(const std::vector<TrainInputs>& inputs) {
 
   std::vector<torch::Tensor> torch_outputs =
       model_->losses(torch_train_inputs, torch_train_legal_mask,
-                     torch_policy_targets, torch_value_targets);
+                     torch_policy_targets, torch_value_targets,
+                     torch_train_player_mask);
 
   torch::Tensor total_loss =
       torch_outputs[0] + torch_outputs[1] + torch_outputs[2];

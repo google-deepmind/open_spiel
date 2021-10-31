@@ -60,7 +60,7 @@ double SolveState(const State& state,
 
   cache[state_str] = train_inputs.size();
   train_inputs.push_back(
-      VPNetModel::TrainInputs{legal_actions, obs, policy, best_value});
+      VPNetModel::TrainInputs{max_player, legal_actions, obs, policy, best_value});
   return best_value;
 }
 
@@ -106,16 +106,17 @@ void TestModelCreation(const std::string& nn_model) {
   VPNetModel model = BuildModel(*game, nn_model, true);
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
+  Player cur_player = state->CurrentPlayer();
   std::vector<Action> legal_actions = state->LegalActions();
   std::vector<float> obs = state->ObservationTensor();
-  VPNetModel::InferenceInputs inputs = {legal_actions, obs};
+  VPNetModel::InferenceInputs inputs = {cur_player, legal_actions, obs};
 
   // Check that inference runs at all.
   model.Inference(std::vector{inputs});
 
   std::vector<VPNetModel::TrainInputs> train_inputs;
   train_inputs.emplace_back(VPNetModel::TrainInputs{
-      legal_actions, obs, ActionsAndProbs({{legal_actions[0], 1}}), 0});
+      cur_player, legal_actions, obs, ActionsAndProbs({{legal_actions[0], 1}}), 0});
 
   // Check that learning runs at all.
   model.Learn(train_inputs);
@@ -132,14 +133,15 @@ void TestModelLearnsSimple(const std::string& nn_model) {
 
   while (!state->IsTerminal()) {
     std::vector<float> obs = state->ObservationTensor();
+    Player cur_player = state->CurrentPlayer();
     std::vector<Action> legal_actions = state->LegalActions();
     Action action = legal_actions[0];
     ActionsAndProbs policy({{action, 1}});
 
     train_inputs.emplace_back(
-        VPNetModel::TrainInputs{legal_actions, obs, policy, 1});
+        VPNetModel::TrainInputs{cur_player, legal_actions, obs, policy, 1});
 
-    VPNetModel::InferenceInputs inputs = {legal_actions, obs};
+    VPNetModel::InferenceInputs inputs = {cur_player, legal_actions, obs};
     std::vector<VPNetModel::InferenceOutputs> out =
         model.Inference(std::vector{inputs});
     SPIEL_CHECK_EQ(out.size(), 1);

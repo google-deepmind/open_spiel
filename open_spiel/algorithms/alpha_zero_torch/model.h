@@ -54,13 +54,15 @@ struct ResOutputBlockConfig {
   int policy_linear_out_features;
   int value_observation_size;
   int policy_observation_size;
+  int num_players;
 };
 
 // Information for the model. This should be enough for any type of model
-// (residual, convultional, or MLP). It needs to be saved/loaded to/from
+// (residual, convolutional, or MLP). It needs to be saved/loaded to/from
 // a file so the input and output stream operators are overload.
 struct ModelConfig {
   std::vector<int> observation_tensor_shape;
+  int num_players;
   int number_of_actions;
   int nn_depth;
   int nn_width;
@@ -162,7 +164,8 @@ class ResModelImpl : public torch::nn::Module {
   std::vector<torch::Tensor> forward(torch::Tensor x, torch::Tensor mask);
   std::vector<torch::Tensor> losses(torch::Tensor inputs, torch::Tensor masks,
                                     torch::Tensor policy_targets,
-                                    torch::Tensor value_targets);
+                                    torch::Tensor value_targets,
+                                    torch::Tensor player_mask);
 
  private:
   std::vector<torch::Tensor> forward_(torch::Tensor x, torch::Tensor mask);

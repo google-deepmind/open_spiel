@@ -29,7 +29,7 @@ std::istream& operator>>(std::istream& stream, ModelConfig& config) {
   int height;
   int width;
 
-  stream >> channels >> height >> width >> config.number_of_actions >>
+  stream >> channels >> height >> width >> config.num_players >> config.number_of_actions >>
       config.nn_depth >> config.nn_width >> config.learning_rate >>
       config.weight_decay;
 
@@ -42,8 +42,11 @@ std::ostream& operator<<(std::ostream& stream, const ModelConfig& config) {
   stream << config.observation_tensor_shape[0] << " "
          << config.observation_tensor_shape[1] << " "
          << config.observation_tensor_shape[2] << " "
-         << config.number_of_actions << " " << config.nn_depth << " "
-         << config.nn_width << " " << config.learning_rate << " "
+         << config.num_players << " "
+         << config.number_of_actions << " "
+         << config.nn_depth << " "
+         << config.nn_width << " "
+         << config.learning_rate << " "
          << config.weight_decay;
   return stream;
 }
@@ -157,7 +160,7 @@ ResOutputBlockImpl::ResOutputBlockImpl(const ResOutputBlockConfig& config)
                          .bias(true)),
       value_linear2_(torch::nn::LinearOptions(
                          /*in_features=*/config.value_linear_out_features,
-                         /*out_features=*/1)
+                         /*out_features=*/config.num_players)
                          .bias(true)),
       value_observation_size_(config.value_observation_size),
       policy_conv_(torch::nn::Conv2dOptions(
@@ -237,9 +240,10 @@ ResModelImpl::ResModelImpl(const ModelConfig& config, const std::string& device)
       /*value_linear_in_features=*/1 * width * height,
       /*value_linear_out_features=*/config.nn_width,
       /*policy_linear_in_features=*/2 * width * height,
-      /*policy_linear_out_features=*/config.number_of_actions,
+      /*policy_linear_out_features=*/config.num_players * config.number_of_actions,
       /*value_observation_size=*/1 * width * height,
-      /*policy_observation_size=*/2 * width * height};
+      /*policy_observation_size=*/2 * width * height,
+      /*num_players=*/config.num_players};
 
   layers_->push_back(ResInputBlock(input_config));
   for (int i = 0; i < num_torso_blocks_; i++) {
@@ -259,10 +263,11 @@ std::vector<torch::Tensor> ResModelImpl::forward(torch::Tensor x,
 std::vector<torch::Tensor> ResModelImpl::losses(torch::Tensor inputs,
                                                 torch::Tensor masks,
                                                 torch::Tensor policy_targets,
-                                                torch::Tensor value_targets) {
+                                                torch::Tensor value_targets,
+                                                torch::Tensor player_mask) {
   std::vector<torch::Tensor> output = this->forward_(inputs, masks);
 
-  torch::Tensor value_predictions = output[0];
+  torch::Tensor value_predictions = output[0].index({player_mask}).view({-1, 1});
   torch::Tensor policy_predictions = output[1];
 
   // Policy loss (cross-entropy).

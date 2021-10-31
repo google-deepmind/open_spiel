@@ -36,6 +36,7 @@ void TestModelCreation() {
 
   ModelConfig net_config = {
       /*observation_tensor_shape=*/game->ObservationTensorShape(),
+      /*num_players=*/game->NumPlayers(),
       /*number_of_actions=*/game->NumDistinctActions(),
       /*nn_depth=*/8,
       /*nn_width=*/128,
@@ -61,6 +62,7 @@ void TestModelInference() {
 
   ModelConfig net_config = {
       /*observation_tensor_shape=*/game->ObservationTensorShape(),
+      /*num_players=*/game->NumPlayers(),
       /*number_of_actions=*/game->NumDistinctActions(),
       /*nn_depth=*/rows + 1,
       /*nn_width=*/128,
@@ -71,11 +73,12 @@ void TestModelInference() {
   std::vector<float> observation_vector = state->ObservationTensor();
   torch::Tensor observation_tensor = torch::from_blob(
       observation_vector.data(), {1, channels * rows * columns});
-  torch::Tensor mask = torch::full({1, game->NumDistinctActions()}, false,
-                                   torch::TensorOptions().dtype(torch::kByte));
+  torch::Tensor mask = torch::full({1, game->NumDistinctActions() * game->NumPlayers()},
+                                   false, torch::TensorOptions().dtype(torch::kByte));
 
   for (Action action : state->LegalActions()) {
-    mask[0][action] = true;
+    int policy_offset = state->CurrentPlayer() * game->NumDistinctActions();
+    mask[0][policy_offset + action] = true;
   }
 
   std::cout << "Input:\n"
@@ -88,11 +91,11 @@ void TestModelInference() {
 
   // Check value and policy.
   SPIEL_CHECK_EQ((int)output.size(), 2);
-  SPIEL_CHECK_EQ(output[0].numel(), 1);
-  SPIEL_CHECK_EQ(output[1].numel(), game->NumDistinctActions());
+  SPIEL_CHECK_EQ(output[0].numel(), game->NumPlayers());
+  SPIEL_CHECK_EQ(output[1].numel(), game->NumPlayers() * game->NumDistinctActions());
 
   // Check mask's influence on the policy.
-  for (int i = 0; i < game->NumDistinctActions(); i++) {
+  for (int i = 0; i < game->NumPlayers() * game->NumDistinctActions(); i++) {
     if (mask[0][i].item<bool>()) {
       SPIEL_CHECK_GT(output[1][0][i].item<float>(), 0.0);
     } else {
