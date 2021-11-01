@@ -44,19 +44,24 @@ void GetSubgameStates(State* state,
     return;
   }
 
+  bool explore = true;
   if (!state->IsChanceNode() || include_chance_states) {
     // Decision node; add only if not already present
     std::string key = state->ToString();
     if (all_states->find(key) == all_states->end()) {
       (*all_states)[key] = state->Clone();
+    } else {
+      explore = false;
     }
   }
 
-  for (auto action : state->LegalActions()) {
-    auto next_state = state->Clone();
-    next_state->ApplyAction(action);
-    GetSubgameStates(next_state.get(), all_states, depth_limit, depth + 1,
-                     include_terminals, include_chance_states);
+  if (explore) {
+    for (auto action : state->LegalActions()) {
+      auto next_state = state->Clone();
+      next_state->ApplyAction(action);
+      GetSubgameStates(next_state.get(), all_states, depth_limit, depth + 1,
+                      include_terminals, include_chance_states);
+    }
   }
 }
 
