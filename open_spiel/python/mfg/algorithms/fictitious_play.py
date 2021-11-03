@@ -35,6 +35,8 @@ from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import greedy_policy
 
+from open_spiel.python import rl_environment
+
 
 class MergedPolicy(policy_std.Policy):
   """Merge several policies."""
@@ -96,13 +98,13 @@ class FictitiousPlay(object):
   def get_policy(self):
     return self._policy
 
-  def iteration(self, br_value_fn=None):
+  def iteration(self, br_value_fn=None, **kwargs):
     """Returns a new `TabularPolicy` equivalent to this policy.
 
     Args:
       br_value_fn: The RL approximation method to use to compute the best
        response value for each iteration. If none provided, the exact value 
-       is computed.
+       is computed. **kwargs for any arguments to pass into br_value_fn.
     """
     self._fp_step += 1
 
@@ -116,9 +118,8 @@ class FictitiousPlay(object):
       
       info_state_size = envs[0].observation_spec()["info_state"][0]
       num_actions = envs[0].action_spec()["num_actions"]
-      hidden_layers_sizes = [int(l) for l in self._hidden_layers_sizes]
 
-      joint_avg_policy = br_value_fn(envs, info_state_size, num_actions, hidden_layers_sizes)
+      joint_avg_policy = br_value_fn(envs, info_state_size, num_actions, **kwargs)
       br_value = policy_value.PolicyValue(self._game, distrib, joint_avg_policy)
     else:
       br_value = best_response_value.BestResponse(
