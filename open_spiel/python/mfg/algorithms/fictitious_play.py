@@ -20,7 +20,7 @@ against the distribution induced by the average of the past best responses.
 The provided formulation of Deep Fictitious Play mirrors this procedure,
 but substitutes out the exact best reponse computation with an approximation
 of best response values through a Reinforcement Learning approach (where 
-the RL method in question is a user-determined parameter for every iteration).
+the RL method in question is a user-determined parameter).
 
 Each iteration consists of computing the best response against a policy, 
 followed by the computation of an average policy with that best response.
@@ -86,11 +86,15 @@ class FictitiousPlay(object):
 
     Args:
       game: The game to analyze.
+      br_value_fn: The RL approximation method to use to compute the best
+       response value for each iteration. If none provided, the exact value 
+       is computed.
     """
     self._game = game
     self._states = None  # Required to avoid attribute-error.
     self._policy = policy_std.UniformRandomPolicy(self._game)
     self._fp_step = 0
+    self._br_value_fn = None
     self._states = policy_std.get_tabular_policy_states(self._game)
 
   def get_policy(self):
@@ -101,9 +105,23 @@ class FictitiousPlay(object):
     self._fp_step += 1
 
     distrib = distribution.DistributionPolicy(self._game, self._policy)
-    br_value = best_response_value.BestResponse(
-        self._game, distrib, value.TabularValueFunction(self._game))
+    
+    if self._br_value_fn:
+      envs = [
+          rl_environment.Environment(self._game, distribution=distrib, mfg_population=p)
+          for p in range(self._game.num_players())
+      ]
+      
+      info_state_size = envs[0].observation_spec()["info_state"][0]
+      num_actions = envs[0].action_spec()["num_actions"]
+      hidden_layers_sizes = [int(l) for l in self._hidden_layers_sizes]
 
+      joint_avg_policy = self._br_value_fn(envs, info_state_size, num_actions, hidden_layers_sizes)
+      br_value = policy_value.PolicyValue(self._game, distrib, joint_avg_policy)
+    else:
+      br_value = best_response_value.BestResponse(
+          self._game, distrib, value.TabularValueFunction(self._game))
+              
     greedy_pi = greedy_policy.GreedyPolicy(self._game, None, br_value)
     greedy_pi = greedy_pi.to_tabular(states=self._states)
     distrib_greedy = distribution.DistributionPolicy(self._game, greedy_pi)
@@ -112,4 +130,4 @@ class FictitiousPlay(object):
         self._game, list(range(self._game.num_players())),
         [self._policy, greedy_pi], [distrib, distrib_greedy],
         [1.0 * self._fp_step / (self._fp_step + 1), 1.0 /
-         (self._fp_step + 1)]).to_tabular(states=self._states)
+        (self._fp_step + 1)]).to_tabular(states=self._states)
