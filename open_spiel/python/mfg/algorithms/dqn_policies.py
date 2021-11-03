@@ -17,17 +17,18 @@ import numpy as np
 
 from open_spiel.python import policy as policy_std
 from open_spiel.python import rl_environment
+from open_spiel.python.jax import dqn
 
 class DQNPolicies(policy_std.Policy):
   """Joint policy to be evaluated."""
 
-  def __init__(self, envs, info_state_size, num_actions, hidden_layers_sizes, **kwargs):
+  def __init__(self, envs, info_state_size, num_actions, **kwargs):
     game = envs[0].game
     player_ids = list(range(game.num_players()))
     super(DQNPolicies, self).__init__(game, player_ids)
     self._policies = [
-        dqn.DQN(idx, info_state_size, num_actions, hidden_layers_sizes, **kwargs)
-        for idx in range(self._game.num_players())
+        dqn.DQN(idx, info_state_size, num_actions, **kwargs)
+        for idx in range(game.num_players())
     ]
     self._obs = {
         "info_state": [None] * game.num_players(),

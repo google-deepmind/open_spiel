@@ -47,11 +47,11 @@ class FictitiousPlayTest(absltest.TestCase):
     game = crowd_modelling.MFGCrowdModellingGame()
     dfp = fictitious_play.FictitiousPlay(game)
     for _ in range(10):
-      dfp.iteration(dqn_policies.DQNPolicies)
+      dfp.iteration(dqn_policies.DQNPolicies, hidden_layers_sizes=[256, 128, 64])
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 1.0558451955622807)
+    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.0558451955622807)
 
   def test_average(self):
     """Test the average of policies.
@@ -95,11 +95,11 @@ class FictitiousPlayTest(absltest.TestCase):
     game = pyspiel.load_game("mfg_crowd_modelling")
     dfp = fictitious_play.FictitiousPlay(game)
     for _ in range(10):
-      dfp.iteration(dqn_policies.DQNPolicies)
+      dfp.iteration(dqn_policies.DQNPolicies, hidden_layers_sizes=[256, 128, 64])
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 1.0558451955622807)
+    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.0558451955622807)
 
 
 if __name__ == "__main__":
