@@ -15,8 +15,22 @@
 """Implementation of Fictitious Play from Perrin & al.
 
 Refference : https://arxiv.org/abs/2007.03458.
+
+Policy is initialized to uniform policy.
+Each iteration:
+ 1. Compute best response against policy
+ 2. Update policy as weighted average of best response and current policy
+    (default learning rate is 1 / num_iterations + 1).
+
+To use fictitious play one should initialize it and run multiple iterations:
+fp = FictitiousPlay(game)
+for _ in range(num_iterations):
+  fp.iteration()
+policy = fp.get_policy()
 """
+
 from typing import List
+from math import isclose
 
 from open_spiel.python import policy as policy_std
 from open_spiel.python.mfg import distribution as distribution_std
@@ -50,7 +64,7 @@ class MergedPolicy(policy_std.Policy):
         f'Length mismatch {len(policies)} != {len(distributions)}')
     assert len(policies) == len(weights), (
         f'Length mismatch {len(policies)} != {len(weights)}')
-    assert sum(weights) == 1, (
+    assert isclose(sum(weights) , 1.0), (
         f'Weights should sum to 1, but instead sum to {sum(weights)}')
 
   def action_probabilities(self, state, player_id=None):
