@@ -12,10 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implementation of Fictitious Play from Perrin & al.
+"""Implementation of Fictitious Play from Perrin & al. 
+Reference: https://arxiv.org/abs/2007.03458.
+As presented, the Fictitious Play algorithm provides a robust approximation
+scheme for Nash equilibrium by iteratively computing the best response 
+against the distribution induced by the average of the past best responses.
+The provided formulation of Deep Fictitious Play mirrors this procedure,
+but substitutes out the exact best reponse computation with an approximation
+of best response values through a Reinforcement Learning approach (where 
+the RL method in question is a user-determined parameter for every iteration).
 
-Refference : https://arxiv.org/abs/2007.03458.
+Each iteration consists of computing the best response against a policy, 
+followed by the computation of an average policy with that best response.
 """
+
 from typing import List
 
 from open_spiel.python import policy as policy_std
