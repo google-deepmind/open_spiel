@@ -403,7 +403,7 @@ def create_sioux_falls_network():
   capacity = {}
   free_flow_travel_time = {}
 
-  content = open("./data/SiouxFalls_node.csv", "r").read()
+  content = open("./SiouxFalls_node.csv", "r").read()
   for line in content.split("\n")[1:]:
     row = line.split(",")
     sioux_falls_node_position[row[0]] = [int(row[1]) / 1e5, int(row[2]) / 1e5]
@@ -427,7 +427,7 @@ def create_sioux_falls_network():
     capacity[f"bef_{row[0]}->{row[0]}"] = 0.0
     free_flow_travel_time[f"bef_{row[0]}->{row[0]}"] = 0.0
 
-  content = open("./data/SiouxFalls_net.csv", "r").read()
+  content = open("./SiouxFalls_net.csv", "r").read()
   for l in content.split("\n")[1:-1]:
     _, origin, destination, a0, a1, a2, a3, a4 = l.split(",")
     assert all(int(x) == 0 for x in [a1, a2, a3])
@@ -439,7 +439,7 @@ def create_sioux_falls_network():
     free_flow_travel_time[road_section] = float(a0)
 
   sioux_falls_od_demand = []
-  content = open("./data/SiouxFalls_od.csv", "r").read()
+  content = open("./SiouxFalls_od.csv", "r").read()
   for line in content.split("\n")[1:-1]:
     row = line.split(",")
     sioux_falls_od_demand.append(
