@@ -59,7 +59,7 @@ void GetSubgameStates(State* state,
     auto next_state = state->Clone();
     next_state->ApplyAction(action);
     GetSubgameStates(next_state.get(), all_states, depth_limit, depth + 1,
-                    include_terminals, include_chance_states);
+                     include_terminals, include_chance_states);
   }
 }
 
