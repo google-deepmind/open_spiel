@@ -14,9 +14,9 @@
 
 """DQN agents trained on an MFG against a crowd following a uniform policy."""
 
-from absl import app
 from absl import flags
 from absl import logging
+import jax
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -28,6 +28,16 @@ from open_spiel.python.mfg.algorithms import dqn_policies
 from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
 from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
 import pyspiel
+from open_spiel.python.utils import app
+
+# pylint: disable=g-import-not-at-top
+try:
+  from clu import metric_writers
+except ImportError as e:
+  raise ImportError(
+      str(e) +
+      "\nCLU not found. Please install CLU: python3 -m pip install clu")
+# pylint: enable=g-import-not-at-top
 
 FLAGS = flags.FLAGS
 
@@ -66,6 +76,10 @@ flags.DEFINE_float("epsilon_end", 0.1, "Final exploration parameter.")
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
 flags.DEFINE_string("checkpoint_dir", "/tmp/dqn_test",
                     "Directory to save/load the agent.")
+flags.DEFINE_string(
+    "logdir", None,
+    "Logging dir to use for TF summary files. If None, the metrics will only "
+    "be logged to stderr.")
 
 GAME_SETTINGS = {
     "mfg_crowd_modelling_2d": {
@@ -113,24 +127,40 @@ def main(unused_argv):
       if agent.has_checkpoint(FLAGS.checkpoint_dir):
         agent.restore(FLAGS.checkpoint_dir)
 
-  for ep in range(FLAGS.num_train_episodes):
-    if (ep + 1) % FLAGS.eval_every == 0:
-      losses = [agent.loss for agent in agents]
-      logging.info("Losses: %s", losses)
+  # Metrics writer will also log the metrics to stderr.
+  just_logging = FLAGS.logdir is None or jax.host_id() > 0
+  writer = metric_writers.create_default_writer(
+      FLAGS.logdir, just_logging=just_logging)
+
+  # Save the parameters.
+  writer.write_hparams(kwargs)
+
+  for ep in range(1, FLAGS.num_train_episodes + 1):
+    if ep % FLAGS.eval_every == 0:
+      writer.write_scalars(ep, {
+          f"agent{i}/loss": float(agent.loss) for i, agent in enumerate(agents)
+      })
+
+      initial_states = game.new_initial_states()
+
+      # Exact best response to uniform.
       nash_conv_obj = nash_conv.NashConv(game, uniform_policy)
-      print(
-          str(ep + 1) + " Exact Best Response to Uniform " +
-          str(nash_conv_obj.br_values()))
+      writer.write_scalars(
+          ep, {
+              f"exact_br/{state}": value
+              for state, value in zip(initial_states, nash_conv_obj.br_values())
+          })
+
+      # DQN best response to uniform.
       pi_value = policy_value.PolicyValue(game, mfg_dist, joint_avg_policy)
-      print(
-          str(ep + 1) + " DQN Best Response to Uniform " + str([
-              pi_value.eval_state(state)
-              for state in game.new_initial_states()
-          ]))
+      writer.write_scalars(ep, {
+          f"dqn_br/{state}": pi_value.eval_state(state)
+          for state in initial_states
+      })
+
       if FLAGS.use_checkpoints:
         for agent in agents:
           agent.save(FLAGS.checkpoint_dir)
-      logging.info("_____________________________________________")
 
     for p in range(game.num_players()):
       time_step = envs[p].reset()
@@ -141,6 +171,9 @@ def main(unused_argv):
 
       # Episode is over, step all agents with final info state.
       agents[p].step(time_step)
+
+  # Make sure all values were written.
+  writer.flush()
 
 
 if __name__ == "__main__":

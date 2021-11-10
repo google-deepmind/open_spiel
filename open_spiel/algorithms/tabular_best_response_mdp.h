@@ -40,12 +40,12 @@
 // case of perfect information games (including simultaneous move games), this
 // implementation requires that ObservationString is a sufficient Markovian
 // description of the state; it does not need to be perfect recall, but it must
-// not merge states that are might have different expected values under the
+// not merge states that might have different expected values under the
 // policies using these keys as state descriptions. As an example: in Goofspiel,
 // it is insufficient for the observation to only include the current point card
 // because which point cards remain in the point card deck is important for
 // determining the expected value of the state (but the particular order they
-// were played is is not).
+// were played is not).
 //
 // This implementation has several advantages over best_response.* and
 // tabular_exploitability.*:

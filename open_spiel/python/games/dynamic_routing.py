@@ -19,7 +19,7 @@ This dynamic routing game models the evolution of N vehicles in a road network.
 The vehicles are described by their current link location, the time they have to
 spend on the link before exiting it, and their destination. The action of a
 vehicle is the successor link they want to reach when exiting a given link.
-Actions are encoded as integer from 0 to K. Action 0 encodes not begin able to
+Actions are encoded as integer from 0 to K. Action 0 encodes not being able to
 move on a successor link because the waiting time of the player is still
 positive. Actions 1 to K correspond to the indices of the network links. Legal
 actions for a player on link l, with a negative waiting time are the indices of
