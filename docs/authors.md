@@ -28,6 +28,7 @@ Names are ordered lexicographically. Typo or similar contributors are omitted.
 -   Ryan Faulkner
 -   Satyaki Upadhyay
 -   Sebastian Borgeaud
+-   Sertan Girgin
 -   Shayegan Omidshafiei
 -   Srinivasan Sriram
 -   Thomas Anthony
