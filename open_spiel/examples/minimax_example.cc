@@ -17,23 +17,30 @@
 #include <memory>
 
 #include "open_spiel/games/breakthrough.h"
+#include "open_spiel/games/pig.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-using open_spiel::breakthrough::BreakthroughState;
-
 inline constexpr int kSearchDepth = 2;
+inline constexpr int kSearchDepthPig = 10;
+inline constexpr int kWinscorePig = 30;
+inline constexpr int kDiceoutcomesPig = 2;
+
+uint_fast32_t Seed() {
+  uint_fast32_t seed = 0;
+  return seed != 0 ? seed : absl::ToUnixMicros(absl::Now());
+}
 
 namespace open_spiel {
 namespace {
 
 int BlackPieceAdvantage(const State& state) {
-  const auto& bstate = down_cast<const BreakthroughState&>(state);
+  const auto& bstate = down_cast<const breakthrough::BreakthroughState&>(state);
   return bstate.pieces(breakthrough::kBlackPlayerId) -
          bstate.pieces(breakthrough::kWhitePlayerId);
 }
 
-void PlayGame() {
+void PlayBreakthrough() {
   std::shared_ptr<const Game> game =
       LoadGame("breakthrough", {{"rows", GameParameter(6)},
                                 {"columns", GameParameter(6)}});
@@ -62,9 +69,55 @@ void PlayGame() {
   std::cout << state->ToString() << std::endl;
 }
 
+
+int FirstPlayerAdvantage(const State& state) {
+  const auto& pstate = down_cast<const pig::PigState&>(state);
+  return pstate.score(0) - pstate.score(1);
+}
+
+void PlayPig(std::mt19937& rng) {
+  std::shared_ptr<const Game> game =
+      LoadGame("pig", {{"winscore", GameParameter(kWinscorePig)},
+                      {"diceoutcomes", GameParameter(kDiceoutcomesPig)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  while (!state->IsTerminal()) {
+    std::cout << std::endl << state->ToString() << std::endl;
+
+    Player player = state->CurrentPlayer();
+    if (state->IsChanceNode()) {
+      // Chance node; sample one according to underlying distribution.
+      ActionsAndProbs outcomes = state->ChanceOutcomes();
+      Action action = open_spiel::SampleAction(outcomes, rng).first;
+      std::cerr << "Sampled action: " << state->ActionToString(player, action)
+                << std::endl;
+      state->ApplyAction(action);
+    } else {
+      std::pair<double, Action> value_action = algorithms::ExpectiminimaxSearch(
+          *game, state.get(), [player](const State& state) {
+              return (player == Player{0} ?
+                      FirstPlayerAdvantage(state) :
+                      -FirstPlayerAdvantage(state));
+              },
+          kSearchDepthPig, player);
+
+      std::cout << std::endl << "Player " << player << " choosing action "
+                << state->ActionToString(player, value_action.second)
+                << " with heuristic value " << value_action.first
+                << std::endl;
+
+      state->ApplyAction(value_action.second);
+    }
+  }
+
+  std::cout << "Terminal state: " << std::endl;
+  std::cout << state->ToString() << std::endl;
+}
+
 }  // namespace
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  open_spiel::PlayGame();
+  std::mt19937 rng(Seed());  // Random number generator.
+  open_spiel::PlayBreakthrough();
+  open_spiel::PlayPig(rng);
 }
