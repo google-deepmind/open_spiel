@@ -19,6 +19,7 @@ from absl import logging
 import jax
 
 from open_spiel.python import policy
+from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import dqn
 from open_spiel.python.mfg.algorithms import distribution
@@ -90,35 +91,6 @@ GAME_SETTINGS = {
 }
 
 
-class DQNPolicies(policy.Policy):
-  """Joint policy to be evaluated."""
-
-  def __init__(self, envs, policies):
-    game = envs[0].game
-    player_ids = list(range(game.num_players()))
-    super(DQNPolicies, self).__init__(game, player_ids)
-    self._policies = policies
-    self._obs = {
-        "info_state": [None] * game.num_players(),
-        "legal_actions": [None] * game.num_players()
-    }
-
-  def action_probabilities(self, state, player_id=None):
-    cur_player = state.current_player()
-    legal_actions = state.legal_actions(cur_player)
-
-    self._obs["current_player"] = cur_player
-    self._obs["info_state"][cur_player] = (state.observation_tensor(cur_player))
-    self._obs["legal_actions"][cur_player] = legal_actions
-
-    info_state = rl_environment.TimeStep(
-        observations=self._obs, rewards=None, discounts=None, step_type=None)
-
-    p = self._policies[cur_player].step(info_state, is_evaluation=True).probs
-    prob_dict = {action: p[action] for action in legal_actions}
-    return prob_dict
-
-
 def main(unused_argv):
   logging.info("Loading %s", FLAGS.game_name)
   game = pyspiel.load_game(FLAGS.game_name,
@@ -154,7 +126,9 @@ def main(unused_argv):
       dqn.DQN(idx, info_state_size, num_actions, hidden_layers_sizes, **kwargs)
       for idx in range(game.num_players())
   ]
-  joint_avg_policy = DQNPolicies(envs, agents)
+  joint_avg_policy = rl_agent_policy.JointRLAgentPolicy(
+      game, {idx: agent for idx, agent in enumerate(agents)},
+      envs[0].use_observation)
   if FLAGS.use_checkpoints:
     for agent in agents:
       if agent.has_checkpoint(FLAGS.checkpoint_dir):
