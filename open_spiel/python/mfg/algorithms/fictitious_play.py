@@ -20,7 +20,11 @@ against the distribution induced by the average of the past best responses.
 The provided formulation of Deep Fictitious Play mirrors this procedure,
 but substitutes out the exact best reponse computation with an approximation
 of best response values through a Reinforcement Learning approach (where 
+<<<<<<< HEAD
 the RL method in question is a user-determined parameter for each iteration).
+=======
+the RL method in question is a user-determined parameter for every iteration).
+>>>>>>> parent of d818a9e8... adding a br_value_fn parameter to FP
 
 Each iteration consists of computing the best response against a policy, 
 followed by the computation of an average policy with that best response.
@@ -134,4 +138,4 @@ class FictitiousPlay(object):
         self._game, list(range(self._game.num_players())),
         [self._policy, greedy_pi], [distrib, distrib_greedy],
         [1.0 * self._fp_step / (self._fp_step + 1), 1.0 /
-        (self._fp_step + 1)]).to_tabular(states=self._states)
+         (self._fp_step + 1)]).to_tabular(states=self._states)
