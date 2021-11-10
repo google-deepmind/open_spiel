@@ -40,6 +40,11 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean-field-game--garnet)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean-field-game--crowd-modelling)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean-field-game--crowd-modelling-2d)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean-field-game--predator-prey)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
@@ -50,6 +55,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
 <font color="orange"><b>~</b></font>         | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
+![](_static/green_circ10.png "green circle") | [Routing game](#routing-game)
 <font color="orange"><b>~</b></font>         | [Sheriff](#sheriff)
 <font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
@@ -401,6 +407,20 @@ Status                                       | Game
 *   3 players.
 *   "Three problems in learning mixed-strategy Nash equilibria"
 
+### Mean Field Game : routing
+
+*   Representative player chooses at each nodes where they go. They has an
+    origin, a destination and a departure time and choose their route to
+    minimize their travel time. Time spent on each link is a function of the
+    distribution of players on the link when the player reaches the link.
+*   Network with choice of route.
+*   Research game.
+*   Mean-field (with a unique player).
+*   Explicit stochastic game (only for initial node).
+*   Perfect information.
+*   [Cabannes et. al. '21, Solving N-player dynamic routing games with
+    congestion: a mean field approach](https://arxiv.org/pdf/2110.11943.pdf).
+
 ### Negotiation
 
 *   Agents with different utilities must negotiate an allocation of resources.
@@ -512,6 +532,21 @@ Status                                       | Game
 *   [Newman et al. '16, Reconnaissance blind multi-chess: an experimentation
     platform for ISR sensor fusion and resource
     management](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/9842/984209/Reconnaissance-blind-multi-chess--an-experimentation-platform-for-ISR/10.1117/12.2228127.short?SSO=1)
+
+### Routing game
+
+*   Players choose at each nodes where they go. They have an origin, a
+    destination and a departure time and choose their route to minimize their
+    travel time. Time spent on each link is a function of the number of players
+    on the link when the player reaches the link.
+*   Network with choice of route.
+*   Research game.
+*   Simultaneous.
+*   Deterministic.
+*   Perfect information.
+*   Any number of players.
+*   [Cabannes et. al. '21, Solving N-player dynamic routing games with
+    congestion: a mean field approach](https://arxiv.org/pdf/2110.11943.pdf).
 
 ### Sheriff
 
