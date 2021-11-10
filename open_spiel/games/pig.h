@@ -54,6 +54,7 @@ class PigState : public State {
 
   std::unique_ptr<State> Clone() const override;
 
+  int score(int player_id) const { return scores_[player_id]; }
   int dice_outcomes() const { return dice_outcomes_; }
   std::vector<Action> LegalActions() const override;
 
