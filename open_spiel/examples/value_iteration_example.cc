@@ -39,12 +39,13 @@ int main(int argc, char** argv) {
               << kv.first << std::endl
               << "Value: " << kv.second << std::endl;
   }
-/* tic tac toe example usage
-  std::string initial_state = "...\n...\n...";
-  std::string cross_win_state = "...\n...\n.ox";
-  std::string naught_win_state = "x..\noo.\nxx.";
-  SPIEL_CHECK_EQ(solution[initial_state], 0);
-  SPIEL_CHECK_EQ(solution[cross_win_state], 1);
-  SPIEL_CHECK_EQ(solution[naught_win_state], -1);
-*/
+
+  if (absl::GetFlag(FLAGS_game) == "tic_tac_toe") {
+    std::string initial_state = "...\n...\n...";
+    std::string cross_win_state = "...\n...\n.ox";
+    std::string naught_win_state = "x..\noo.\nxx.";
+    SPIEL_CHECK_EQ(solution[initial_state], 0);
+    SPIEL_CHECK_EQ(solution[cross_win_state], 1);
+    SPIEL_CHECK_EQ(solution[naught_win_state], -1);
+  }
 }
