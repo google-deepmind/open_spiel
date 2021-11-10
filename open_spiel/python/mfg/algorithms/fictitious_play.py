@@ -12,24 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implementation of Fictitious Play from Perrin & al. 
-Reference: https://arxiv.org/abs/2007.03458.
-As presented, the Fictitious Play algorithm provides a robust approximation
-scheme for Nash equilibrium by iteratively computing the best response 
-against the distribution induced by the average of the past best responses.
-The provided formulation of Deep Fictitious Play mirrors this procedure,
-but substitutes out the exact best reponse computation with an approximation
-of best response values through a Reinforcement Learning approach (where 
-<<<<<<< HEAD
-the RL method in question is a user-determined parameter for each iteration).
-=======
-the RL method in question is a user-determined parameter for every iteration).
->>>>>>> parent of d818a9e8... adding a br_value_fn parameter to FP
+"""Implementation of Fictitious Play from Perrin & al.
 
-Each iteration consists of computing the best response against a policy, 
-followed by the computation of an average policy with that best response.
+Refference : https://arxiv.org/abs/2007.03458.
 """
-
 from typing import List
 
 from open_spiel.python import policy as policy_std
@@ -38,9 +24,6 @@ from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import greedy_policy
-from open_spiel.python.mfg.algorithms import policy_value
-
-from open_spiel.python import rl_environment
 
 
 class MergedPolicy(policy_std.Policy):
@@ -103,33 +86,14 @@ class FictitiousPlay(object):
   def get_policy(self):
     return self._policy
 
-  def iteration(self, br_value_fn=None, **kwargs):
-    """Returns a new `TabularPolicy` equivalent to this policy.
-
-    Args:
-      br_value_fn: The RL approximation method to use to compute the best
-       response value for each iteration. If none provided, the exact value 
-       is computed. **kwargs for any arguments to pass into br_value_fn.
-    """
+  def iteration(self):
+    """Returns a new `TabularPolicy` equivalent to this policy."""
     self._fp_step += 1
 
     distrib = distribution.DistributionPolicy(self._game, self._policy)
-    
-    if br_value_fn:
-      envs = [
-          rl_environment.Environment(self._game, distribution=distrib, mfg_population=p)
-          for p in range(self._game.num_players())
-      ]
-      
-      info_state_size = envs[0].observation_spec()["info_state"][0]
-      num_actions = envs[0].action_spec()["num_actions"]
+    br_value = best_response_value.BestResponse(
+        self._game, distrib, value.TabularValueFunction(self._game))
 
-      joint_avg_policy = br_value_fn(envs, info_state_size, num_actions, **kwargs)
-      br_value = policy_value.PolicyValue(self._game, distrib, joint_avg_policy)
-    else:
-      br_value = best_response_value.BestResponse(
-          self._game, distrib, value.TabularValueFunction(self._game))
-              
     greedy_pi = greedy_policy.GreedyPolicy(self._game, None, br_value)
     greedy_pi = greedy_pi.to_tabular(states=self._states)
     distrib_greedy = distribution.DistributionPolicy(self._game, greedy_pi)

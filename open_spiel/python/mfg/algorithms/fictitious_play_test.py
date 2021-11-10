@@ -24,7 +24,6 @@ from open_spiel.python.mfg.algorithms import fictitious_play
 from open_spiel.python.mfg.algorithms import greedy_policy
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
-from open_spiel.python.mfg.algorithms import dqn_policies
 from open_spiel.python.mfg.games import crowd_modelling
 import pyspiel
 
@@ -41,17 +40,6 @@ class FictitiousPlayTest(absltest.TestCase):
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
     self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
-
-  def test_dqn_fp_python_game(self):
-    """Checks if fictitious play works."""
-    game = crowd_modelling.MFGCrowdModellingGame()
-    dfp = fictitious_play.FictitiousPlay(game)
-    for _ in range(10):
-      dfp.iteration(dqn_policies.DQNPolicies, hidden_layers_sizes=[256, 128, 64])
-    dfp_policy = dfp.get_policy()
-    nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
-
-    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.0558451955622807)
 
   def test_average(self):
     """Test the average of policies.
@@ -89,17 +77,6 @@ class FictitiousPlayTest(absltest.TestCase):
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
     self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
-
-  def test_dqn_fp_cpp_game(self):
-    """Checks if fictitious play works."""
-    game = pyspiel.load_game("mfg_crowd_modelling")
-    dfp = fictitious_play.FictitiousPlay(game)
-    for _ in range(10):
-      dfp.iteration(dqn_policies.DQNPolicies, hidden_layers_sizes=[256, 128, 64])
-    dfp_policy = dfp.get_policy()
-    nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
-
-    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.0558451955622807)
 
 
 if __name__ == "__main__":
