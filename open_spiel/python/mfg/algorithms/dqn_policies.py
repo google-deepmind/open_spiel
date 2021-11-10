@@ -13,14 +13,12 @@
 # limitations under the License.
 
 """Computes a set of DQN policies for a list of agents and environments."""
-import numpy as np
-
-from open_spiel.python import policy as policy_std
+from open_spiel.python import policy
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import dqn
 
-class DQNPolicies(policy_std.Policy):
-  """Joint policy to be evaluated."""
+class DQNPolicies(policy.Policy):
+  """Joint policy of DQN policies to be evaluated."""
 
   def __init__(self, envs, info_state_size, num_actions, **kwargs):
     game = envs[0].game

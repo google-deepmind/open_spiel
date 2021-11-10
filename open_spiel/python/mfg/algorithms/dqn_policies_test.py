@@ -19,7 +19,7 @@ from absl.testing import parameterized
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
-from open_spiel.python.jax import dqn
+
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import dqn_policies
 from open_spiel.python.mfg.algorithms import policy_value
@@ -54,7 +54,7 @@ class DQNPoliciesTest(parameterized.TestCase):
     dbr_value = policy_value.PolicyValue(game, dist, joint_avg_policy)
 
     dbr_val = dbr_value(game.new_initial_state())
-    self.assertEqual(dbr_val, 26.135153373673624)
+    self.assertAlmostEqual(dbr_val, 26.135153373673624)
 
 
 if __name__ == '__main__':
