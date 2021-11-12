@@ -29,11 +29,13 @@ followed by the computation of an average policy with that best response.
 from typing import List
 
 from open_spiel.python import policy as policy_std
+from open_spiel.python import rl_agent_policy
 from open_spiel.python.mfg import distribution as distribution_std
 from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import greedy_policy
+from open_spiel.python.mfg.algorithms import policy_value
 
 from open_spiel.python import rl_environment
 
@@ -98,28 +100,20 @@ class FictitiousPlay(object):
   def get_policy(self):
     return self._policy
 
-  def iteration(self, br_value_fn=None, **kwargs):
+  def iteration(self, rl_br_agent=None):
     """Returns a new `TabularPolicy` equivalent to this policy.
 
     Args:
-      br_value_fn: The RL approximation method to use to compute the best
-       response value for each iteration. If none provided, the exact value 
-       is computed. **kwargs for any arguments to pass into br_value_fn.
+      rl_br_agent: An instance of the RL approximation method to use to 
+       compute the best response value for each iteration. If none 
+       provided, the exact value is computed.
     """
     self._fp_step += 1
 
     distrib = distribution.DistributionPolicy(self._game, self._policy)
     
-    if br_value_fn:
-      envs = [
-          rl_environment.Environment(self._game, distribution=distrib, mfg_population=p)
-          for p in range(self._game.num_players())
-      ]
-      
-      info_state_size = envs[0].observation_spec()["info_state"][0]
-      num_actions = envs[0].action_spec()["num_actions"]
-
-      joint_avg_policy = br_value_fn(envs, info_state_size, num_actions, **kwargs)
+    if rl_br_agent:
+      joint_avg_policy = rl_agent_policy.RLAgentPolicy(self._game, rl_br_agent, rl_br_agent.player_id, use_observation=True)
       br_value = policy_value.PolicyValue(self._game, distrib, joint_avg_policy)
     else:
       br_value = best_response_value.BestResponse(
