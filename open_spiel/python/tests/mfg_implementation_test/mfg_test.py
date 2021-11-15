@@ -41,8 +41,9 @@ import pyspiel
 FLAGS = flags.FLAGS
 
 # Use a small depth limit to keep the length of the test reasonable.
-flags.DEFINE_integer('get_all_states_depth_limit', 10,
-                     'Depth limit of getting all the states (-1 for unlimited)')
+flags.DEFINE_integer(
+    'get_all_states_depth_limit', 10,
+    'Depth limit of getting all the states (-1 for unlimited)')
 flags.DEFINE_integer('rl_env_simulations', 10,
                      'Number of simulations for the RL environment tests')
 
@@ -150,16 +151,23 @@ class FiniteHorizonTest(parameterized.TestCase):
 
     envs = [
         rl_environment.Environment(
-            game, distribution=mfg_dist, mfg_population=p)
+            game, mfg_distribution=mfg_dist, mfg_population=p)
         for p in range(game.num_players())
     ]
     for p, env in enumerate(envs):
       for _ in range(FLAGS.rl_env_simulations):
         time_step = env.reset()
         while not time_step.last():
-          print(time_step)
           a = random.choice(time_step.observations['legal_actions'][p])
           time_step = env.step([a])
+
+    env = envs[0]
+    self.assertEqual(env.mfg_distribution, mfg_dist)
+
+    # Update the distribution.
+    new_mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
+    env.update_mfg_distribution(new_mfg_dist)
+    self.assertEqual(env.mfg_distribution, new_mfg_dist)
 
 
 if __name__ == '__main__':
