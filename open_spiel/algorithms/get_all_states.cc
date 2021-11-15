@@ -28,7 +28,8 @@ namespace {
 void GetSubgameStates(State* state,
                       std::map<std::string, std::unique_ptr<State>>* all_states,
                       int depth_limit, int depth, bool include_terminals,
-                      bool include_chance_states) {
+                      bool include_chance_states,
+                      bool stop_at_duplicates) {
   if (state->IsTerminal()) {
     if (include_terminals) {
       // Include if not already present and then terminate recursion.
@@ -49,6 +50,12 @@ void GetSubgameStates(State* state,
     std::string key = state->ToString();
     if (all_states->find(key) == all_states->end()) {
       (*all_states)[key] = state->Clone();
+    } else {
+      // Duplicate node.
+      if (stop_at_duplicates) {
+        // Terminate, do not explore the same node twice
+        return;
+      }
     }
   }
 
@@ -56,7 +63,8 @@ void GetSubgameStates(State* state,
     auto next_state = state->Clone();
     next_state->ApplyAction(action);
     GetSubgameStates(next_state.get(), all_states, depth_limit, depth + 1,
-                     include_terminals, include_chance_states);
+                     include_terminals, include_chance_states,
+                     stop_at_duplicates);
   }
 }
 
@@ -64,14 +72,14 @@ void GetSubgameStates(State* state,
 
 std::map<std::string, std::unique_ptr<State>> GetAllStates(
     const Game& game, int depth_limit, bool include_terminals,
-    bool include_chance_states) {
+    bool include_chance_states, bool stop_at_duplicates) {
   // Get the root state.
   std::unique_ptr<State> state = game.NewInitialState();
   std::map<std::string, std::unique_ptr<State>> all_states;
 
   // Then, do a recursive tree walk to fill up the map.
   GetSubgameStates(state.get(), &all_states, depth_limit, 0, include_terminals,
-                   include_chance_states);
+                   include_chance_states, stop_at_duplicates);
 
   if (all_states.empty()) {
     SpielFatalError("GetSubgameStates returned 0 states!");

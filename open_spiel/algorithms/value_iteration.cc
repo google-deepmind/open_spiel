@@ -88,7 +88,8 @@ std::map<std::string, double> ValueIteration(const Game& game, int depth_limit,
                  GameType::Information::kPerfectInformation);
 
   auto states = GetAllStates(game, depth_limit, /*include_terminals=*/true,
-                             /*include_chance_states=*/false);
+                             /*include_chance_states=*/false,
+                             /*stop_at_duplicates*/true);
   std::map<std::string, double> values;
   std::map<state_action, std::vector<state_prob>> transitions;
 

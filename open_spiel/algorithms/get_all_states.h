@@ -31,13 +31,18 @@ namespace algorithms {
 // walk of the game and could easily fill up memory for larger games or games
 // with long horizons.
 //
+// If stop_at_duplicates is set, then the recursion does not continue if
+// a node with the same string representation is reached via a different path
+// (in some games this should not be used because the history matters and the
+// information may not be stored in the string representation).
+//
 // Currently only works for sequential games.
 //
 // Note: negative depth limit means no limit, 0 means only root, etc..
 
 std::map<std::string, std::unique_ptr<State>> GetAllStates(
     const Game& game, int depth_limit, bool include_terminals,
-    bool include_chance_states);
+    bool include_chance_states, bool stop_at_duplicates = false);
 
 }  // namespace algorithms
 }  // namespace open_spiel
