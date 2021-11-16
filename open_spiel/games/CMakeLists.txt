@@ -88,8 +88,6 @@ set(GAME_SOURCES
   mfg/crowd_modelling.h
   mfg/crowd_modelling_2d.cc
   mfg/crowd_modelling_2d.h
-  mfg/garnet.cc
-  mfg/garnet.h
   negotiation.cc
   negotiation.h
   nfg_game.cc
@@ -106,6 +104,10 @@ set(GAME_SOURCES
   oware/oware_board.h
   pentago.cc
   pentago.h
+  phantom_go.h
+  phantom_go.cc
+  phantom_go/phantom_go_board.h
+  phantom_go/phantom_go_board.cc
   phantom_ttt.cc
   phantom_ttt.h
   pig.cc
@@ -321,10 +323,6 @@ add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                $<TARGET_OBJECTS:tests>)
 add_test(first_sealed_auction_test first_sealed_auction_test)
 
-add_executable(garnet_test mfg/garnet_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(garnet_test garnet_test)
-
 add_executable(gin_rummy_test gin_rummy_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(gin_rummy_test gin_rummy_test)
@@ -332,6 +330,11 @@ add_test(gin_rummy_test gin_rummy_test)
 add_executable(go_test go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(go_test go_test)
+
+#new
+add_executable(phantom_go_test phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(phantom_go_test phantom_go_test)
 
 add_executable(goofspiel_test goofspiel_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
