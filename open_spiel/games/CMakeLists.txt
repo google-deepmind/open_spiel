@@ -88,6 +88,8 @@ set(GAME_SOURCES
   mfg/crowd_modelling.h
   mfg/crowd_modelling_2d.cc
   mfg/crowd_modelling_2d.h
+  mfg/garnet.cc
+  mfg/garnet.h
   negotiation.cc
   negotiation.h
   nfg_game.cc
@@ -322,6 +324,10 @@ add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(first_sealed_auction_test first_sealed_auction_test)
+
+add_executable(garnet_test mfg/garnet_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(garnet_test garnet_test)
 
 add_executable(gin_rummy_test gin_rummy_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
