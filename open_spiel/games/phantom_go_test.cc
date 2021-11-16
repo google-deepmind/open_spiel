@@ -12,47 +12,81 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/go.h"
+#include "open_spiel/games/phantom_go.h"
 
-#include "open_spiel/games/go/go_board.h"
+#include "open_spiel/games/phantom_go/phantom_go_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
-namespace go {
+namespace phantom_go {
 namespace {
 
 namespace testing = open_spiel::testing;
 
-constexpr int kBoardSize = 19;
+constexpr int kBoardSize = 9;
 constexpr float kKomi = 7.5;
 
 void BasicGoTests() {
   GameParameters params;
-  params["board_size"] = GameParameter(13);
+  params["board_size"] = GameParameter(9);
 
-  testing::LoadGameTest("go");
-  testing::NoChanceOutcomesTest(*LoadGame("go"));
-  testing::RandomSimTest(*LoadGame("go", params), 3);
-  testing::RandomSimTestWithUndo(*LoadGame("go", params), 3);
+  testing::LoadGameTest("phantom_go");
+  testing::NoChanceOutcomesTest(*LoadGame("phantom_go"));
+  testing::RandomSimTest(*LoadGame("phantom_go", params), 1);
+  testing::RandomSimTestWithUndo(*LoadGame("phantom_go", params), 1);
+}
+
+void CloneTest()
+{
+    std::cout << "Starting clone test\n"; 
+    GameParameters params;
+    params["board_size"] = GameParameter(9);
+    std::shared_ptr<const Game> game =
+        LoadGame("phantom_go", params);
+    GoState state(game, kBoardSize, kKomi, 0);
+
+    state.ApplyAction(5);
+
+    //std::cout << state.ToString();
+
+
+    std::unique_ptr<State> stateClone = state.Clone();
+
+    SPIEL_CHECK_EQ(state.ToString(), stateClone->ToString());
+    SPIEL_CHECK_EQ(state.History(), stateClone->History());
+
+    //std::cout << stateClone->ToString();
+
+    state.ApplyAction(8);
+    //std::cout << state.ToString();
+    //std::cout << stateClone->ToString();
+
+    SPIEL_CHECK_FALSE(state.ToString() == stateClone->ToString());
+    SPIEL_CHECK_FALSE(state.History() == stateClone->History());
+
+    std::cout << "Clone test sucessfull\n"; 
 }
 
 void HandicapTest() {
   std::shared_ptr<const Game> game =
-      LoadGame("go", {{"board_size", open_spiel::GameParameter(kBoardSize)},
+      LoadGame("phantom_go", {{"board_size", open_spiel::GameParameter(kBoardSize)},
                       {"komi", open_spiel::GameParameter(kKomi)},
                       {"handicap", open_spiel::GameParameter(2)}});
   GoState state(game, kBoardSize, kKomi, 2);
   SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("d4")), GoColor::kBlack);
-  SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("q16")), GoColor::kBlack);
+
+  //SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("q16")), GoColor::kBlack);
+  //excluded because of size of the board
+  
 }
 
 void ConcreteActionsAreUsedInTheAPI() {
-  int board_size = 13;
+  int board_size = 9;
   std::shared_ptr<const Game> game =
-      LoadGame("go", {{"board_size", open_spiel::GameParameter(board_size)}});
+      LoadGame("phantom_go", {{"board_size", open_spiel::GameParameter(board_size)}});
   std::unique_ptr<State> state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->NumDistinctActions(), board_size * board_size + 1);
@@ -64,11 +98,12 @@ void ConcreteActionsAreUsedInTheAPI() {
 }
 
 }  // namespace
-}  // namespace go
+}  // namespace phantom_go
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::go::BasicGoTests();
-  open_spiel::go::HandicapTest();
-  open_spiel::go::ConcreteActionsAreUsedInTheAPI();
+  open_spiel::phantom_go::CloneTest();
+  open_spiel::phantom_go::BasicGoTests();
+  open_spiel::phantom_go::HandicapTest();
+  open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
 }

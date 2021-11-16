@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/go.h"
+#include "open_spiel/games/phantom_go.h"
 
 #include <sstream>
 
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/games/go/go_board.h"
+#include "open_spiel/games/phantom_go/phantom_go_board.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
-namespace go {
+namespace phantom_go {
 namespace {
 
 // Facts about the game
 const GameType kGameType{
-    /*short_name=*/"go",
-    /*long_name=*/"Go",
+    /*short_name=*/"phantom_go",
+    /*long_name=*/"Phantom Go",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
+    GameType::Information::kImperfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
@@ -83,6 +83,7 @@ std::vector<VirtualPoint> HandicapStones(int num_handicap) {
 
 GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
                  int handicap)
+    //help 
     : State(std::move(game)),
       board_(board_size),
       komi_(komi),
@@ -90,6 +91,7 @@ GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
       max_game_length_(game_->MaxGameLength()),
       to_play_(GoColor::kBlack) {
   ResetBoard();
+  
 }
 
 std::string GoState::InformationStateString(int player) const {
@@ -138,17 +140,65 @@ std::vector<Action> GoState::LegalActions() const {
   return actions;
 }
 
+
 std::string GoState::ActionToString(Player player, Action action) const {
   return absl::StrCat(
       GoColorToString(static_cast<GoColor>(player)), " ",
       VirtualPointToString(board_.ActionToVirtualAction(action)));
 }
 
+char GoColorToChar(GoColor c) {
+    switch (c) {
+    case GoColor::kBlack:
+        return 'X';
+    case GoColor::kWhite:
+        return 'O';
+    case GoColor::kEmpty:
+        return '+';
+    case GoColor::kGuard:
+        return '#';
+    default:
+        SpielFatalError(absl::StrCat("Unknown color ", c, " in GoColorToChar."));
+        return '!';
+    }
+}
+
 std::string GoState::ToString() const {
   std::stringstream ss;
   ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
-     << ", history.size()=" << history_.size() << ")\n";
+     << ", history.size()=" << history_.size() << ", " <<
+      "stones_count: w" << board_.stoneCount.first << " b" << board_.stoneCount.second << ")\n";
+  
   ss << board_;
+
+
+  //update 4
+
+  ss << "\nObservation white:\n";
+
+  for (int x = board_.board_size() - 1; x >= 0; x--)
+  {
+      ss << " " << x + 1 << " ";
+      for (int y = 0; y < board_.board_size(); y++)
+      {
+          ss << GoColorToChar(board_.observationWhite[x * board_.board_size() + y]);
+      }
+      ss << "\n";
+  }
+  ss << "   ABCDEFGHJ\n";
+   
+  ss << "\nObservation black:\n";
+  for (int x = board_.board_size() - 1; x >= 0; x--)
+  {
+      ss << " " << x + 1 << " ";
+      for (int y = 0; y < board_.board_size(); y++)
+      {
+          ss << GoColorToChar(board_.observationBlack[x * board_.board_size() + y]);
+      }
+      ss << "\n";
+  }
+  ss << "   ABCDEFGHJ\n";
+
   return ss.str();
 }
 
@@ -173,7 +223,7 @@ std::vector<double> GoState::Returns() const {
   // Score with Tromp-Taylor.
   float black_score = TrompTaylorScore(board_, komi_, handicap_);
 
-  std::vector<double> returns(go::NumPlayers());
+  std::vector<double> returns(phantom_go::NumPlayers());
   if (black_score > 0) {
     returns[ColorToPlayer(GoColor::kBlack)] = WinUtility();
     returns[ColorToPlayer(GoColor::kWhite)] = LossUtility();
@@ -202,16 +252,24 @@ void GoState::UndoAction(Player player, Action action) {
   }
 }
 
+//need to remake
+//update 3
 void GoState::DoApplyAction(Action action) {
-  SPIEL_CHECK_TRUE(
+  /*SPIEL_CHECK_TRUE(
       board_.PlayMove(board_.ActionToVirtualAction(action), to_play_));
-  to_play_ = OppColor(to_play_);
+  to_play_ = OppColor(to_play_);*/
 
-  bool was_inserted = repetitions_.insert(board_.HashValue()).second;
-  if (!was_inserted && action != board_.pass_action()) {
-    // We have encountered this position before.
-    superko_ = true;
-  }
+    if (board_.PlayMove(board_.ActionToVirtualAction(action), to_play_))
+    {
+        to_play_ = OppColor(to_play_);
+
+        bool was_inserted = repetitions_.insert(board_.HashValue()).second;
+        if (!was_inserted && action != board_.pass_action()) {
+            // We have encountered this position before.
+            superko_ = true;
+        }
+    }
+
 }
 
 void GoState::ResetBoard() {
@@ -238,5 +296,7 @@ GoGame::GoGame(const GameParameters& params)
       max_game_length_(ParameterValue<int>(
           "max_game_length", DefaultMaxGameLength(board_size_))) {}
 
-}  // namespace go
+
+
+}  // namespace phantom_go
 }  // namespace open_spiel

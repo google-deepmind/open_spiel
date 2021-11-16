@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
-#define OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
+#ifndef OPEN_SPIEL_GAMES_GO_PHANTOM_GO_BOARD_H_
+#define OPEN_SPIEL_GAMES_GO_PHANTOM_GO_BOARD_H_
 
 #include <array>
 #include <cstdint>
@@ -23,7 +23,7 @@
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
-namespace go {
+namespace phantom_go {
 
 enum class GoColor : uint8_t { kBlack = 0, kWhite = 1, kEmpty = 2, kGuard = 3 };
 
@@ -43,11 +43,14 @@ GoColor OppColor(GoColor c);
 // However, in the OpenSpiel API (in go.{h, cc}), the actions are still exposed
 // as actions within 0, board_size*boardsize) (with pass = board_size **2.
 //
-// We support boards up to size 19.
-inline constexpr int kMaxBoardSize = 19;
+// update 1
+// Normal go is standardly played on board of size 19, for Phantom Go, standard is size 9
+inline constexpr int kMaxBoardSize = 9;
 inline constexpr int kVirtualBoardSize = kMaxBoardSize + 2;
 inline constexpr int kVirtualBoardPoints =
     kVirtualBoardSize * kVirtualBoardSize;
+
+//using ObservationTable = std::array<bool, kMaxBoardSize * kMaxBoardSize>;
 
 using VirtualPoint = uint16_t;
 
@@ -97,6 +100,8 @@ class Neighbours4 {
   const VirtualPoint operator*() const;
   explicit operator bool() const;
 
+  
+
  private:
   VirtualPoint dir_;
   const VirtualPoint p_;
@@ -112,14 +117,24 @@ class GoBoard {
 
   void Clear();
 
+  std::vector<GoColor> observationWhite;
+  std::vector<GoColor> observationBlack;
+
+  std::pair<int, int> stoneCount;
+
+  std::pair<int, int> getStoneCount() { return stoneCount; };
+
+
+  //absl::Span<float> observationRef;
+
   inline int board_size() const { return board_size_; }
   // Returns the concrete pass action.
   inline int pass_action() const { return pass_action_; }
   inline Action VirtualActionToAction(int virtual_action) const {
-    return go::VirtualActionToAction(virtual_action, board_size_);
+    return phantom_go::VirtualActionToAction(virtual_action, board_size_);
   }
   inline int ActionToVirtualAction(Action action) const {
-    return go::ActionToVirtualAction(action, board_size_);
+    return phantom_go::ActionToVirtualAction(action, board_size_);
   }
 
   inline GoColor PointColor(VirtualPoint p) const { return board_[p].color; }
@@ -131,6 +146,8 @@ class GoBoard {
   bool IsInBoardArea(VirtualPoint p) const;
 
   bool IsLegalMove(VirtualPoint p, GoColor c) const;
+
+  bool IsLegalMoveObserver(VirtualPoint p, GoColor c) const;
 
   bool PlayMove(VirtualPoint p, GoColor c);
 
@@ -218,7 +235,7 @@ class GoBoard {
   void JoinChainsAround(VirtualPoint p, GoColor c);
   void SetStone(VirtualPoint p, GoColor c);
   void RemoveLibertyFromNeighbouringChains(VirtualPoint p);
-  int CaptureDeadChains(VirtualPoint p, GoColor c);
+  int  CaptureDeadChains(VirtualPoint p, GoColor c);
   void RemoveChain(VirtualPoint p);
   void InitNewChain(VirtualPoint p);
 
@@ -251,6 +268,8 @@ class GoBoard {
 
   Chain &chain(VirtualPoint p) { return chains_[ChainHead(p)]; }
   const Chain &chain(VirtualPoint p) const { return chains_[ChainHead(p)]; }
+
+
 
   std::array<Vertex, kVirtualBoardPoints> board_;
   std::array<Chain, kVirtualBoardPoints> chains_;
@@ -285,7 +304,7 @@ float TrompTaylorScore(const GoBoard &board, float komi, int handicap = 0);
 // GoBoard in which A1 is at the bottom left.
 GoBoard CreateBoard(const std::string &initial_stones);
 
-}  // namespace go
+}  // namespace phantom_go
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_GO_GO_BOARD_H_
+#endif  // OPEN_SPIEL_GAMES_GO_PHANTOM_GO_BOARD_H_

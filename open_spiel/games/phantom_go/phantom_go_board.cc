@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+﻿// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/go/go_board.h"
+#include "open_spiel/games/phantom_go/phantom_go_board.h"
 
 #include <iomanip>
 
@@ -22,7 +22,7 @@
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
-namespace go {
+namespace phantom_go {
 
 namespace {
 
@@ -116,6 +116,22 @@ const VirtualPoint Neighbours4::operator*() const { return p_ + Dir8[dir_]; }
 
 Neighbours4::operator bool() const { return dir_ < 4; }
 
+
+// update 6
+int VirtualPointToBoardPoint(VirtualPoint p, int boardSize)
+{
+    std::pair<int, int> pair = VirtualPointTo2DPoint(p);
+    return pair.first * boardSize + pair.second;
+}
+
+VirtualPoint VirtualPointFromBoardPoint(int boardPoint, int boardSize)
+{
+    std::pair<int, int> pair;
+    pair.second = boardPoint % boardSize;
+    pair.first = boardPoint / boardSize;
+    return VirtualPointFrom2DPoint(pair);
+}
+
 std::pair<int, int> VirtualPointTo2DPoint(VirtualPoint p) {
   if (p == kInvalidPoint || p == kVirtualPass) return std::make_pair(-1, -1);
 
@@ -203,15 +219,18 @@ std::string GoColorToString(GoColor c) {
     case GoColor::kWhite:
       return "W";
     case GoColor::kEmpty:
-      return "EMPTY";
+        return "E";
+      //return "EMPTY";
     case GoColor::kGuard:
-      return "GUARD";
+        return "G";
+      //return "GUARD";
     default:
       SpielFatalError(
           absl::StrCat("Unknown color ", c, " in GoColorToString."));
       return "This will never return.";
   }
 }
+
 
 std::ostream& operator<<(std::ostream& os, VirtualPoint p) {
   return os << VirtualPointToString(p);
@@ -261,6 +280,13 @@ GoBoard::GoBoard(int board_size)
 void GoBoard::Clear() {
   zobrist_hash_ = 0;
 
+
+  //update 1
+  GoBoard::observationBlack = std::vector<GoColor>(board_size_ * board_size_, GoColor::kEmpty);
+  GoBoard::observationWhite = std::vector<GoColor>(board_size_ * board_size_, GoColor::kEmpty);
+
+  GoBoard::stoneCount = std::pair<int, int>(0, 0);
+
   for (int i = 0; i < board_.size(); ++i) {
     Vertex& v = board_[i];
     v.color = GoColor::kGuard;
@@ -293,13 +319,49 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
     return true;
   }
 
-  if (board_[p].color != GoColor::kEmpty) {
+  /*int boardPoint = VirtualPointToBoardPoint(p, board_size_);
+
+  printf("playing boardPoint %i, check %i\n", boardPoint, VirtualPointFromBoardPoint(boardPoint, board_size_));*/
+
+  //std::vector<GoColor> currObservation;
+  
+  //update 1
+  //add observation to current player's observation
+
+  if (c == GoColor::kBlack)
+  {
+      observationBlack[VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
+  }
+  else
+  {
+      observationWhite[VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
+  }
+
+  //currObservation[p] = board_[p].color;
+
+  /*if (board_[p].color != GoColor::kEmpty) {
     SpielFatalError(absl::StrCat("Trying to play the move ", GoColorToString(c),
                                  ": ", VirtualPointToString(p), " (", p,
                                  ") but the cell is already filled with ",
                                  GoColorToString(board_[p].color)));
   }
-  SPIEL_CHECK_EQ(GoColor::kEmpty, board_[p].color);
+  SPIEL_CHECK_EQ(GoColor::kEmpty, board_[p].color);*/
+
+  //update 1
+  //playing illegal moves will occur standardly during phantom go, it is even desired  
+  if (IsLegalMoveObserver(p, c) == false)
+  {
+      return false;
+  }
+
+  if (c == GoColor::kBlack)
+  {
+      stoneCount.second++;
+  }
+  else
+  {
+      stoneCount.first++;
+  }
 
   // Preparation for ko checking.
   bool played_in_enemy_eye = true;
@@ -315,13 +377,78 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
   RemoveLibertyFromNeighbouringChains(p);
   int stones_captured = CaptureDeadChains(p, c);
 
+  if (stones_captured)
+  {
+      if (c == GoColor::kBlack)
+      {
+          stoneCount.first -= stones_captured;
+      }
+      else
+      {
+          stoneCount.second-= stones_captured;
+      }
+  }
+
+  //update 5
+  //add own stone to own observation
+
+  if (c == GoColor::kBlack)
+  {
+      observationBlack[VirtualPointToBoardPoint(p, board_size_)] = GoColor::kBlack;
+  }
+  else
+  {
+      observationWhite[VirtualPointToBoardPoint(p, board_size_)] = GoColor::kWhite;
+  }
+
+  
+
   if (played_in_enemy_eye && stones_captured == 1) {
     last_ko_point_ = last_captures_[0];
   } else {
     last_ko_point_ = kInvalidPoint;
   }
 
+  //update 2
+  //if player captured stones, update his observation
+
+  if (stones_captured != 0)
+  {
+      printf("removing points\n");
+      for (int point = 0; point < board_size_ * board_size_; point++)
+      {
+          
+          VirtualPoint vpoint = VirtualPointFromBoardPoint(point, board_size_);
+
+          // example: if current color is white, compare observation of black, where all black stones are in state before removal, to observer board
+          //          if there is a black stone in balck observation and not on observer board, it was removed, thus remove it from both observations
+          if (c == GoColor::kWhite) 
+          {
+              if (observationBlack[point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
+              {
+                  observationBlack[point] = GoColor::kEmpty;
+                  observationWhite[point] = GoColor::kEmpty;
+                  std::cout << "removed " << VirtualPointToString(vpoint) << "\n";
+                  
+              }
+          }
+          else
+          {
+              if (observationWhite[point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
+              {
+                  observationWhite[point] = GoColor::kEmpty;
+                  observationBlack[point] = GoColor::kEmpty;
+                  std::cout << "removed " << VirtualPointToString(vpoint) << "\n";
+              }
+          }
+          
+      }
+      printf("finished removing\n");
+  }
+
   SPIEL_CHECK_GT(chain(p).num_pseudo_liberties, 0);
+
+  
 
   return true;
 }
@@ -469,7 +596,7 @@ bool GoBoard::IsInBoardArea(VirtualPoint p) const {
          rc.second < board_size();
 }
 
-bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
+bool GoBoard::IsLegalMoveObserver(VirtualPoint p, GoColor c) const {
   if (p == kVirtualPass) return true;
   if (!IsInBoardArea(p)) return false;
   if (!IsEmpty(p) || p == LastKoPoint()) return false;
@@ -494,6 +621,35 @@ bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
   if (kills_group) return true;
 
   return false;
+}
+
+//update 1
+//finish or rework
+// returns true if is legal according to the vision of the player
+bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
+    
+    /*if(IsLegalMoveObserver(p, c))
+    {
+        return true;
+    }*/
+
+    if (c == GoColor::kBlack)
+    {
+        if (observationBlack[VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
+        {
+            return true;
+        }
+        return false;
+    }
+    else
+    {
+        if (observationWhite[VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
+        {
+            return true;
+        }
+        return false;
+    }
+
 }
 
 void GoBoard::Chain::reset_border() {
@@ -674,7 +830,8 @@ float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
 }
 
 GoBoard CreateBoard(const std::string& initial_stones) {
-  GoBoard board(19);
+    //if fails
+  GoBoard board(9);
 
   int row = 0;
   for (const auto& line : absl::StrSplit(initial_stones, '\n')) {
@@ -703,8 +860,9 @@ GoBoard CreateBoard(const std::string& initial_stones) {
     row++;
   }
 
+
   return board;
 }
 
-}  // namespace go
+}  // namespace phantom_go
 }  // namespace open_spiel

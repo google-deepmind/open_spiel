@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_GO_H_
-#define OPEN_SPIEL_GAMES_GO_H_
+#ifndef OPEN_SPIEL_GAMES_PHANTOM_GO_H_
+#define OPEN_SPIEL_GAMES_PHANTOM_GO_H_
 
 #include <array>
 #include <cstring>
@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "open_spiel/games/go/go_board.h"
+#include "open_spiel/games/phantom_go/phantom_go_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -36,7 +36,7 @@
 //  "handicap"    int    number of handicap stones for black     (default = 0)
 
 namespace open_spiel {
-namespace go {
+namespace phantom_go {
 
 // Constants.
 inline constexpr int NumPlayers() { return 2; }
@@ -77,6 +77,9 @@ class GoState : public State {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(to_play_);
   }
   std::vector<Action> LegalActions() const override;
+
+  //update 2
+  std::vector<Action> LegalActionsObserver() const;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
@@ -129,7 +132,7 @@ class GoGame : public Game {
   explicit GoGame(const GameParameters& params);
 
   int NumDistinctActions() const override {
-    return go::NumDistinctActions(board_size_);
+    return phantom_go::NumDistinctActions(board_size_);
   }
 
   std::unique_ptr<State> NewInitialState() const override {
@@ -147,7 +150,7 @@ class GoGame : public Game {
     return TensorLayout::kCHW;
   }
 
-  int NumPlayers() const override { return go::NumPlayers(); }
+  int NumPlayers() const override { return phantom_go::NumPlayers(); }
 
   double MinUtility() const override { return LossUtility(); }
   double UtilitySum() const override { return LossUtility() + WinUtility(); }
@@ -162,7 +165,7 @@ class GoGame : public Game {
   const int max_game_length_;
 };
 
-}  // namespace go
+}  // namespace phantom_go
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_GO_H_
+#endif  // OPEN_SPIEL_GAMES_PHANTOM_GO_H_
