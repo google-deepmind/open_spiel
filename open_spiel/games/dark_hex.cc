@@ -162,11 +162,21 @@ void DarkHexState::DoApplyAction(Action move) {
 
   // Either occupied or not
   if (game_version_ == GameVersion::kClassicalDarkHex) {
+    /* Pie Rule
+    if(MoveNumber() < 2){
+      state_.ApplyAction(move);
+    }
+    */
     if (state_.BoardAt(move) == CellState::kEmpty) {
       state_.ApplyAction(move);
     }
   } else {
     SPIEL_CHECK_EQ(game_version_, GameVersion::kAbruptDarkHex);
+    /* Pie Rule
+    if(MoveNumber() < 2){
+      state_.ApplyAction(move);
+    }
+    */
     if (state_.BoardAt(move) == CellState::kEmpty) {
       state_.ApplyAction(move);
     } else {
