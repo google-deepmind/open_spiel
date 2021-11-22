@@ -187,7 +187,9 @@ CellState StringToState(char cell) {
 }
 
 void HexState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
+  if(MoveNumber() >= 2){
+    SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
+  }
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
   board_[move] = move_cell_state;
   if (move_cell_state == CellState::kBlackWin) {
@@ -226,11 +228,18 @@ std::vector<Action> HexState::LegalActions() const {
   // Can move in any empty cell.
   std::vector<Action> moves;
   if (IsTerminal()) return moves;
-  for (int cell = 0; cell < board_.size(); ++cell) {
+  if(MoveNumber() < 2){
+    for (int cell = 0; cell < board_.size(); ++cell) {
+      moves.push_back(cell);
+    }
+  }else{
+    for (int cell = 0; cell < board_.size(); ++cell) {
     if (board_[cell] == CellState::kEmpty) {
       moves.push_back(cell);
     }
   }
+  }
+  
   return moves;
 }
 

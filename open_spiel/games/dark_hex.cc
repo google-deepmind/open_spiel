@@ -195,11 +195,18 @@ std::vector<Action> DarkHexState::LegalActions() const {
   const Player player = CurrentPlayer();
   const auto& cur_view = (player == 0 ? black_view_ : white_view_);
 
+if(MoveNumber() < 2){
+  for (Action move = 0; move < num_cells_; ++move) {
+     moves.push_back(move);
+  }
+}else{
   for (Action move = 0; move < num_cells_; ++move) {
     if (cur_view[move] == CellState::kEmpty) {
       moves.push_back(move);
     }
   }
+}
+  
 
   return moves;
 }
