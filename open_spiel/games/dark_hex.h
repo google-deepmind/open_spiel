@@ -87,13 +87,15 @@ class DarkHexState : public State {
  public:
   DarkHexState(std::shared_ptr<const Game> game, int row_size, int col_size,
                GameVersion game_version, ObservationType obs_type);
+  DarkHexState(std::shared_ptr<const Game> game, int row_size, int col_size,
+               GameVersion game_version, ObservationType obs_type, std::string board);
 
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
 
   std::string ActionToString(Player player, Action action_id) const override {
     return state_.ActionToString(player, action_id);
   }
-  std::string ToString() const override { return state_.ToString(); }
+  std::string ToString() const override;
   bool IsTerminal() const override { return state_.IsTerminal(); }
   std::vector<double> Returns() const override { return state_.Returns(); }
   std::string ObservationString(Player player) const override;
@@ -108,6 +110,9 @@ class DarkHexState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
+
+  std::vector<hex::CellState> view_black();
+  std::vector<hex::CellState> view_white();
 
  protected:
   void DoApplyAction(Action move) override;
@@ -127,6 +132,7 @@ class DarkHexState : public State {
 
   // Change this to _history on base class
   std::vector<std::pair<int, Action>> action_sequence_;
+public:
   std::vector<hex::CellState> black_view_;
   std::vector<hex::CellState> white_view_;
 };
@@ -138,6 +144,11 @@ class DarkHexGame : public Game {
     return std::unique_ptr<State>(new DarkHexState(
         shared_from_this(), row_size_, col_size_, game_version_, obs_type_));
   }
+  std::unique_ptr<State> NewInitialState(const std::string& fen) const override {
+    return std::unique_ptr<State>(new DarkHexState(
+        shared_from_this(), row_size_, col_size_, game_version_, obs_type_, fen));
+  }
+
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
   }
@@ -153,6 +164,7 @@ class DarkHexGame : public Game {
   GameVersion game_version() const { return game_version_; }
   int row_size() const { return row_size_; }
   int col_size() const { return col_size_; }
+ 
 
  private:
   std::shared_ptr<const hex::HexGame> game_;

@@ -111,6 +111,51 @@ DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int row_size,
   white_view_.resize(row_size * col_size, CellState::kEmpty);
 }
 
+DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int row_size,
+                           int col_size, GameVersion game_version,
+                           ObservationType obs_type, std::string board)
+    : State(game),
+      state_(game, row_size, col_size, board),
+      obs_type_(obs_type),
+      game_version_(game_version),
+      row_size_(row_size),
+      col_size_(col_size),
+      num_cells_(row_size * col_size),
+      bits_per_action_(num_cells_ + 1),
+      longest_sequence_(num_cells_ * 2 - 1) {
+  black_view_.resize(row_size * col_size, CellState::kEmpty);
+  white_view_.resize(row_size * col_size, CellState::kEmpty);
+
+  int it = 0;
+  for (char const &c: board) {
+        if(c=='o' || c=='O'|| c=='p' || c=='q' || c=='.'){
+          black_view_[it] = hex::StringToState('.');
+          white_view_[it] = hex::StringToState(c);
+          ++it;
+        }
+        if(c == 'x' || c=='X' || c=='y' || c=='z'){
+          black_view_[it] = hex::StringToState(c);
+          white_view_[it] = hex::StringToState('.');
+          ++it;
+        }
+    }
+  if(it != black_view_.size()){
+    std::cout << it << ":" << board << std::endl;
+    SpielFatalError("Unknown fen.");
+  }
+}
+
+std::string DarkHexState::ToString() const{
+  std::string res = "";
+  res.append("Black View \n");
+  res.append(ViewToString(0)+ "\n");
+  res.append("White View \n");
+  res.append(ViewToString(1)+ "\n");
+  res.append("Observer View \n");
+  res.append(state_.ToString());
+  return res;
+}
+
 void DarkHexState::DoApplyAction(Action move) {
   Player cur_player = CurrentPlayer();  // current player
   auto& cur_view = (cur_player == 0 ? black_view_ : white_view_);
@@ -130,9 +175,18 @@ void DarkHexState::DoApplyAction(Action move) {
     }
   }
 
-  SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
+  auto tmp = cur_view[move];
   cur_view[move] = state_.BoardAt(move);
+  SPIEL_CHECK_EQ(tmp, CellState::kEmpty);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
+}
+
+std::vector<hex::CellState> DarkHexState::view_black() {
+  return black_view_;
+}
+
+std::vector<hex::CellState> DarkHexState::view_white() {
+  return white_view_;
 }
 
 std::vector<Action> DarkHexState::LegalActions() const {
@@ -238,6 +292,7 @@ std::string DarkHexState::ObservationString(Player player) const {
   return observation;
 }
 
+/*
 void DarkHexState::ObservationTensor(Player player,
                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -246,6 +301,7 @@ void DarkHexState::ObservationTensor(Player player,
   std::fill(values.begin(), values.end(), 0.);
 
   const auto& player_view = (player == 0 ? black_view_ : white_view_);
+  
   for (int cell = 0; cell < num_cells_; ++cell) {
     values[cell * kCellStates +
            (static_cast<int>(player_view[cell]) - kMinValueCellState)] = 1.0;
@@ -255,6 +311,57 @@ void DarkHexState::ObservationTensor(Player player,
     values[num_cells_ * kCellStates + action_sequence_.size()] = 1.0;
   }
 }
+*/
+
+void DarkHexState::ObservationTensor(Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.);
+
+  const auto& player_view = (player == 0 ? black_view_ : white_view_);
+  
+  int counterWhite = 0;
+  int counterBlack = 0;
+  for (int cell = 0; cell < num_cells_; ++cell) {
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) < 4) {
+      ++counterWhite;
+    }else if((static_cast<int>(player_view[cell]) - kMinValueCellState) > 4){
+      ++counterBlack;
+    }
+  }
+  double prob = 0;
+  if (player == 0) {
+    prob = counterWhite/counterBlack;
+  }else{
+    prob = counterBlack/counterWhite;
+  }
+  
+  for (int cell = 0; cell < num_cells_; ++cell) {
+    
+    //probability plane
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) == 4)
+    values[0 * num_cells_ + cell] = prob;
+    
+    // black cells
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) > 4)
+    values[1 * num_cells_ + cell] = 1.0;
+
+    // white cells
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) < 4)
+    values[2 * num_cells_ + cell] = 1.0;
+    
+    // empty cells
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) == 4)
+    values[3 * num_cells_ + cell] = 1.0;
+  }
+
+  if (obs_type_ == ObservationType::kRevealNumTurns) {
+    values[num_cells_ * 4 + action_sequence_.size()] = 1.0;
+  }
+
+}
+
 
 std::unique_ptr<State> DarkHexState::Clone() const {
   return std::unique_ptr<State>(new DarkHexState(*this));
@@ -318,11 +425,11 @@ std::vector<int> DarkHexGame::InformationStateTensorShape() const {
 
 std::vector<int> DarkHexGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
-    return {num_cells_ * kCellStates};
+    return {num_cells_ * 5};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {num_cells_ * kCellStates + longest_sequence_};
+    return {num_cells_ * 5 + longest_sequence_};
   } else {
-    SpielFatalError("Uknown observation type");
+    SpielFatalError("Unknown observation type");
   }
 }
 

@@ -66,6 +66,7 @@ enum class CellState {
 class HexState : public State {
  public:
   HexState(std::shared_ptr<const Game> game, int row_size, int col_size);
+  HexState(std::shared_ptr<const Game> game, int row_size, int col_size, std::string board);
 
   HexState(const HexState&) = default;
 
@@ -110,6 +111,11 @@ class HexGame : public Game {
     return std::unique_ptr<State>(
         new HexState(shared_from_this(), row_size_, col_size_));
   }
+  std::unique_ptr<State> NewInitialState(
+      const std::string& fen) const override {
+    return std::unique_ptr<State>(
+        new HexState(shared_from_this(), row_size_, col_size_, fen));
+  }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
@@ -126,6 +132,7 @@ class HexGame : public Game {
 
 CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
+CellState StringToState(char cell);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
   return stream << StateToString(state);

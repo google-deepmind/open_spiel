@@ -160,6 +160,32 @@ std::string StateToString(CellState state) {
   }
 }
 
+CellState StringToState(char cell) {
+  switch (cell) {
+    case '.':
+      return CellState::kEmpty;
+    case 'o':
+      return CellState::kWhite;
+    case 'O':
+      return CellState::kWhiteWin;
+    case 'p':
+      return CellState::kWhiteWest;
+    case 'q':
+      return CellState::kWhiteEast;
+    case 'x':
+      return CellState::kBlack;
+    case 'X':
+      return CellState::kBlackWin;
+    case 'y':
+      return CellState::kBlackNorth;
+    case 'z':
+      return CellState::kBlackSouth;
+    default:
+      SpielFatalError("Unknown state.");
+      
+  }
+}
+
 void HexState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
@@ -255,6 +281,26 @@ HexState::HexState(std::shared_ptr<const Game> game, int row_size, int col_size)
       col_size_(row_size < col_size ? row_size : col_size) {
   // for all row_sizes & col_sizes -> row_sizes_ >= col_sizes_
   board_.resize(row_size * col_size, CellState::kEmpty);
+}
+
+HexState::HexState(std::shared_ptr<const Game> game, int row_size, int col_size, std::string board)
+    : State(game),
+      row_size_(row_size > col_size ? row_size : col_size),
+      col_size_(row_size < col_size ? row_size : col_size) {
+  // for all row_sizes & col_sizes -> row_sizes_ >= col_sizes_
+  board_.resize(row_size * col_size, CellState::kEmpty);
+  //board = ". . . . . . . . . . .  . . . . . . . . . . .   . . . . . . . . . . .    . . . . . . . . . . .     . . . . . . . . . . .      . . . . . . . . . . .       . . . . . . . . . . .        . . . . . . . . . . .         . . . . . . . . . . .          . . . . . . . . . . .           . . . . . . . . . . .";
+  int it = 0;
+  for (char const &c: board) {
+        if(c == 'x' || c=='X' || c=='o' || c=='O'|| c=='p' || c=='q' || c=='y' || c=='z' || c=='.'){
+          board_[it] = StringToState(c);
+          ++it;
+        }
+    }
+  if(it != board_.size()){
+    std::cout << it << ":" << board << std::endl;
+    SpielFatalError("Unknown fen.");
+  }
 }
 
 std::string HexState::ToString() const {
