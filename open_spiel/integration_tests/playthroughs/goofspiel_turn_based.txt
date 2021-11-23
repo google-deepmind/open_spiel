@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 4
 PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
-GetParameters() = {game=goofspiel(imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss)}
+GetParameters() = {game=goofspiel(egocentric=False,imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss)}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -31,7 +31,7 @@ ObservationTensorShape() = [46]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 46
 MaxGameLength() = 8
-ToString() = "turn_based_simultaneous_game(game=goofspiel(imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss))"
+ToString() = "turn_based_simultaneous_game(game=goofspiel(egocentric=False,imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss))"
 
 # State 0
 # Partial joint action:

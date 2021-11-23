@@ -1,4 +1,4 @@
-game: goofspiel(imp_info=True,num_cards=4,points_order=descending)
+game: goofspiel(imp_info=True,egocentric=True,num_cards=4,points_order=descending)
 
 GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SIMULTANEOUS
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 4
 PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
-GetParameters() = {egocentric=False,imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss}
+GetParameters() = {egocentric=True,imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -31,7 +31,7 @@ ObservationTensorShape() = current_point_card: [4], remaining_point_cards: [4], 
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 42
 MaxGameLength() = 4
-ToString() = "goofspiel(imp_info=True,num_cards=4,points_order=descending)"
+ToString() = "goofspiel(egocentric=True,imp_info=True,num_cards=4,points_order=descending)"
 
 # State 0
 # P0 hand: 1 2 3 4
@@ -144,7 +144,7 @@ InformationStateTensor(0).player_action_sequence: ◯◯◉◯
 InformationStateTensor(1).point_totals: ◯◯◯◯◉◯◯◯◯◯◯
                                         ◉◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).player_hand: ◉◉◉◯
-InformationStateTensor(1).win_sequence: ◯◉
+InformationStateTensor(1).win_sequence: ◉◯
                                         ◯◯
                                         ◯◯
                                         ◯◯
@@ -175,7 +175,7 @@ ObservationTensor(1).remaining_point_cards: ◉◉◯◯
 ObservationTensor(1).point_totals: ◯◯◯◯◉◯◯◯◯◯◯
                                    ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).player_hand: ◉◉◉◯
-ObservationTensor(1).win_sequence: ◯◉
+ObservationTensor(1).win_sequence: ◉◯
                                    ◯◯
                                    ◯◯
                                    ◯◯
@@ -222,8 +222,8 @@ InformationStateTensor(0).player_action_sequence: ◯◯◉◯
 InformationStateTensor(1).point_totals: ◯◯◯◯◉◯◯◯◯◯◯
                                         ◯◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1).player_hand: ◯◉◉◯
-InformationStateTensor(1).win_sequence: ◯◉
-                                        ◉◯
+InformationStateTensor(1).win_sequence: ◉◯
+                                        ◯◉
                                         ◯◯
                                         ◯◯
 InformationStateTensor(1).point_card_sequence: ◯◯◯◉
@@ -253,8 +253,8 @@ ObservationTensor(1).remaining_point_cards: ◉◯◯◯
 ObservationTensor(1).point_totals: ◯◯◯◯◉◯◯◯◯◯◯
                                    ◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(1).player_hand: ◯◉◉◯
-ObservationTensor(1).win_sequence: ◯◉
-                                   ◉◯
+ObservationTensor(1).win_sequence: ◉◯
+                                   ◯◉
                                    ◯◯
                                    ◯◯
 Rewards() = [0.0, 0.0]
@@ -300,10 +300,10 @@ InformationStateTensor(0).player_action_sequence: ◯◯◉◯
 InformationStateTensor(1).point_totals: ◯◯◯◯◯◉◯◯◯◯◯
                                         ◯◯◯◯◯◉◯◯◯◯◯
 InformationStateTensor(1).player_hand: ◯◯◯◯
-InformationStateTensor(1).win_sequence: ◯◉
-                                        ◉◯
-                                        ◉◯
+InformationStateTensor(1).win_sequence: ◉◯
                                         ◯◉
+                                        ◯◉
+                                        ◉◯
 InformationStateTensor(1).point_card_sequence: ◯◯◯◉
                                                ◯◯◉◯
                                                ◯◉◯◯
@@ -331,9 +331,9 @@ ObservationTensor(1).remaining_point_cards: ◯◯◯◯
 ObservationTensor(1).point_totals: ◯◯◯◯◯◉◯◯◯◯◯
                                    ◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1).player_hand: ◯◯◯◯
-ObservationTensor(1).win_sequence: ◯◉
-                                   ◉◯
-                                   ◉◯
+ObservationTensor(1).win_sequence: ◉◯
                                    ◯◉
+                                   ◯◉
+                                   ◉◯
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]

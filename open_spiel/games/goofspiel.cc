@@ -16,11 +16,13 @@
 
 #include <algorithm>
 #include <memory>
+#include <ostream>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -42,14 +44,17 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"imp_info", GameParameter(kDefaultImpInfo)},
-     {"num_cards", GameParameter(kDefaultNumCards)},
-     {"num_turns", GameParameter(kDefaultNumTurns)},
-     {"players", GameParameter(kDefaultNumPlayers)},
-     {"points_order",
-      GameParameter(static_cast<std::string>(kDefaultPointsOrder))},
-     {"returns_type",
-      GameParameter(static_cast<std::string>(kDefaultReturnsType))}},
+    {
+        {"imp_info", GameParameter(kDefaultImpInfo)},
+        {"egocentric", GameParameter(kDefaultEgocentric)},
+        {"num_cards", GameParameter(kDefaultNumCards)},
+        {"num_turns", GameParameter(kDefaultNumTurns)},
+        {"players", GameParameter(kDefaultNumPlayers)},
+        {"points_order",
+         GameParameter(static_cast<std::string>(kDefaultPointsOrder))},
+        {"returns_type",
+         GameParameter(static_cast<std::string>(kDefaultReturnsType))},
+    },
     /*default_loadable=*/true,
     /*provides_factored_observation_string=*/true};
 
@@ -89,9 +94,10 @@ ReturnsType ParseReturnsType(const std::string& returns_type_str) {
 
 class GoofspielObserver : public Observer {
  public:
-  explicit GoofspielObserver(IIGObservationType iig_obs_type)
+  explicit GoofspielObserver(IIGObservationType iig_obs_type, bool egocentric)
       : Observer(/*has_string=*/true, /*has_tensor=*/true),
-        iig_obs_type_(iig_obs_type) {}
+        iig_obs_type_(iig_obs_type),
+        egocentric_(egocentric) {}
 
   void WriteTensor(const State& observed_state, int player,
                    Allocator* allocator) const override {
@@ -116,7 +122,7 @@ class GoofspielObserver : public Observer {
     }
     if (pub_info) WritePointsTotal(game, state, player, allocator);
     if (imp_info && priv_one) WritePlayerHand(game, state, player, allocator);
-    if (imp_info && pub_info) WriteWinSequence(game, state, allocator);
+    if (imp_info && pub_info) WriteWinSequence(game, state, player, allocator);
     if (pub_info && perf_rec) WritePointCardSequence(game, state, allocator);
     if (imp_info && perf_rec && priv_one)
       WritePlayerActionSequence(game, state, player, allocator);
@@ -207,12 +213,19 @@ class GoofspielObserver : public Observer {
 
   // Sequence of who won each trick.
   void WriteWinSequence(const GoofspielGame& game, const GoofspielState& state,
-                        Allocator* allocator) const {
+                        int player, Allocator* allocator) const {
     auto out =
         allocator->Get("win_sequence", {game.NumRounds(), game.NumPlayers()});
     for (int i = 0; i < state.win_sequence_.size(); ++i) {
-      if (state.win_sequence_[i] != kInvalidPlayer)
-        out.at(i, state.win_sequence_[i]) = 1.0;
+      if (state.win_sequence_[i] != kInvalidPlayer) {
+        int one_hot = state.win_sequence_[i];
+        if (egocentric_) {
+          // Positive, relative distance to the winner.
+          one_hot = ((game.NumPlayers() + state.win_sequence_[i] - player) %
+                     game.NumPlayers());
+        }
+        out.at(i, one_hot) = 1.0;
+      }
     }
   }
 
@@ -344,17 +357,20 @@ class GoofspielObserver : public Observer {
   }
 
   IIGObservationType iig_obs_type_;
+  const bool egocentric_;
 };
 
 GoofspielState::GoofspielState(std::shared_ptr<const Game> game, int num_cards,
                                int num_turns, PointsOrder points_order,
-                               bool impinfo, ReturnsType returns_type)
+                               bool impinfo, bool egocentric,
+                               ReturnsType returns_type)
     : SimMoveState(game),
       num_cards_(num_cards),
       num_turns_(num_turns),
       points_order_(points_order),
       returns_type_(returns_type),
       impinfo_(impinfo),
+      egocentric_(egocentric),
       current_player_(kInvalidPlayer),
       winners_({}),
       current_turn_(0),
@@ -673,7 +689,8 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
           ParsePointsOrder(ParameterValue<std::string>("points_order"))),
       returns_type_(
           ParseReturnsType(ParameterValue<std::string>("returns_type"))),
-      impinfo_(ParameterValue<bool>("imp_info")) {
+      impinfo_(ParameterValue<bool>("imp_info")),
+      egocentric_(ParameterValue<bool>("egocentric")) {
   // Override the zero-sum utility in the game type if general-sum returns.
   if (returns_type_ == ReturnsType::kTotalPoints) {
     game_type_.utility = GameType::Utility::kGeneralSum;
@@ -685,22 +702,26 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
   // Deduce number of turns automatically if requested.
   if (num_turns_ == kNumTurnsSameAsCards) num_turns_ = num_cards_;
 
-  default_observer_ = std::make_shared<GoofspielObserver>(kDefaultObsType);
-  info_state_observer_ = std::make_shared<GoofspielObserver>(kInfoStateObsType);
-  private_observer_ = std::make_shared<GoofspielObserver>(
+  const GameParameters obs_params = {
+      {"egocentric", GameParameter(egocentric_)}};
+  default_observer_ = MakeObserver(kDefaultObsType, obs_params);
+  info_state_observer_ = MakeObserver(kInfoStateObsType, obs_params);
+  private_observer_ = MakeObserver(
       IIGObservationType{.public_info = false,
                          .perfect_recall = false,
-                         .private_info = PrivateInfoType::kSinglePlayer});
-  public_observer_ = std::make_shared<GoofspielObserver>(
-      IIGObservationType{.public_info = true,
-                         .perfect_recall = false,
-                         .private_info = PrivateInfoType::kNone});
+                         .private_info = PrivateInfoType::kSinglePlayer},
+      obs_params);
+  public_observer_ =
+      MakeObserver(IIGObservationType{.public_info = true,
+                                      .perfect_recall = false,
+                                      .private_info = PrivateInfoType::kNone},
+                   obs_params);
 }
 
 std::unique_ptr<State> GoofspielGame::NewInitialState() const {
   return std::make_unique<GoofspielState>(shared_from_this(), num_cards_,
                                           num_turns_, points_order_, impinfo_,
-                                          returns_type_);
+                                          egocentric_, returns_type_);
 }
 
 int GoofspielGame::MaxChanceOutcomes() const {
@@ -718,8 +739,10 @@ std::vector<int> GoofspielGame::InformationStateTensorShape() const {
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // Bit vector for my remaining cards:
             num_cards_ +
-            // A sequence of 1-hot bit vectors encoding the player who won that
-            // turn.
+            // If `egocentric = true`, returns a sequence of one-hot relative
+            // distances to the winner of a turn.
+            // If `egocentric = false`, returns a sequence of one-hot player id
+            // of the winner of a turn.
             num_turns_ * num_players_ +
             // A sequence of 1-hot bit vectors encoding the point card sequence.
             num_turns_ * num_cards_ +
@@ -756,8 +779,10 @@ std::vector<int> GoofspielGame::ObservationTensorShape() const {
             num_players_ * ((num_cards_ * (num_cards_ + 1)) / 2 + 1) +
             // Bit vector for my remaining cards:
             num_cards_ +
-            // A sequence of 1-hot bit vectors encoding the player who won that
-            // turn.
+            // If `egocentric = true`, returns a sequence of one-hot relative
+            // distances to the winner of a turn.
+            // If `egocentric = false`, returns a sequence of one-hot player id
+            // of the winner of a turn.
             num_turns_ * num_players_};
   } else {
     return {// 1-hot bit to encode the current point card
@@ -803,9 +828,14 @@ double GoofspielGame::MaxUtility() const {
 std::shared_ptr<Observer> GoofspielGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-  if (!params.empty()) SpielFatalError("Observation params not supported");
+  // Allows for `egocentric` overrides if observer variant is needed.
+  bool egocentric = egocentric_;
+  const auto& it = params.find("egocentric");
+  if (it != params.end()) {
+    egocentric = it->second.value<bool>();
+  }
   return std::make_shared<GoofspielObserver>(
-      iig_obs_type.value_or(kDefaultObsType));
+      iig_obs_type.value_or(kDefaultObsType), egocentric);
 }
 
 }  // namespace goofspiel

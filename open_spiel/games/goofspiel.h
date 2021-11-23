@@ -49,8 +49,9 @@
 //
 // Parameters:
 //   "imp_info"      bool     Enable the imperfect info variant (default: false)
+//   "egocentric"   bool     Enable the egocentric info variant (default: false)
 //   "num_cards"     int      The highest bid card, and point card (default: 13)
-//   "num_turns"    int       The number of turns to play (default: -1, play
+//   "num_turns"     int       The number of turns to play (default: -1, play
 //                            for the same number of rounds as there are cards)
 //   "players"       int      number of players (default: 2)
 //   "points_order"  string   "random" (default), "descending", or "ascending"
@@ -68,6 +69,7 @@ inline constexpr int kDefaultNumTurns = kNumTurnsSameAsCards;
 inline constexpr const char* kDefaultPointsOrder = "random";
 inline constexpr const char* kDefaultReturnsType = "win_loss";
 inline constexpr const bool kDefaultImpInfo = false;
+inline constexpr const bool kDefaultEgocentric = false;
 
 enum class PointsOrder {
   kRandom,
@@ -89,7 +91,7 @@ class GoofspielState : public SimMoveState {
  public:
   explicit GoofspielState(std::shared_ptr<const Game> game, int num_cards,
                           int num_turns, PointsOrder points_order, bool impinfo,
-                          ReturnsType returns_type);
+                          bool egocentric, ReturnsType returns_type);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action_id) const override;
@@ -124,6 +126,7 @@ class GoofspielState : public SimMoveState {
   PointsOrder points_order_;
   ReturnsType returns_type_;
   bool impinfo_;
+  bool egocentric_;
 
   Player current_player_;
   std::set<int> winners_;
@@ -163,10 +166,10 @@ class GoofspielGame : public Game {
   int MaxPointSlots() const { return (NumCards() * (NumCards() + 1)) / 2 + 1; }
 
   // Used to implement the old observation API.
-  std::shared_ptr<GoofspielObserver> default_observer_;
-  std::shared_ptr<GoofspielObserver> info_state_observer_;
-  std::shared_ptr<GoofspielObserver> public_observer_;
-  std::shared_ptr<GoofspielObserver> private_observer_;
+  std::shared_ptr<Observer> default_observer_;
+  std::shared_ptr<Observer> info_state_observer_;
+  std::shared_ptr<Observer> public_observer_;
+  std::shared_ptr<Observer> private_observer_;
   // TODO: verify whether this bound is tight and/or tighten it.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
@@ -177,6 +180,7 @@ class GoofspielGame : public Game {
   PointsOrder points_order_;
   ReturnsType returns_type_;
   bool impinfo_;
+  bool egocentric_;
 };
 
 }  // namespace goofspiel
