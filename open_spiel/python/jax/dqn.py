@@ -19,7 +19,6 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
-import random
 
 import haiku as hk
 import jax
@@ -29,66 +28,13 @@ import optax
 import rlax
 
 from open_spiel.python import rl_agent
+from open_spiel.python.utils.replay_buffer import ReplayBuffer
 
 Transition = collections.namedtuple(
     "Transition",
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
-
-
-# TODO(perolat): refactor the replay with the NFSP Pytorch implementation
-class ReplayBuffer(object):
-  """ReplayBuffer of fixed size with a FIFO replacement policy.
-
-  Stored transitions can be sampled uniformly.
-
-  The underlying datastructure is a ring buffer, allowing 0(1) adding and
-  sampling.
-  """
-
-  def __init__(self, replay_buffer_capacity):
-    self._replay_buffer_capacity = replay_buffer_capacity
-    self._data = []
-    self._next_entry_index = 0
-
-  def add(self, element):
-    """Adds `element` to the buffer.
-
-    If the buffer is full, the oldest element will be replaced.
-
-    Args:
-      element: data to be added to the buffer.
-    """
-    if len(self._data) < self._replay_buffer_capacity:
-      self._data.append(element)
-    else:
-      self._data[self._next_entry_index] = element
-      self._next_entry_index += 1
-      self._next_entry_index %= self._replay_buffer_capacity
-
-  def sample(self, num_samples):
-    """Returns `num_samples` uniformly sampled from the buffer.
-
-    Args:
-      num_samples: `int`, number of samples to draw.
-
-    Returns:
-      An iterable over `num_samples` random elements of the buffer.
-
-    Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
-    """
-    if len(self._data) < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
-
-  def __len__(self):
-    return len(self._data)
-
-  def __iter__(self):
-    return iter(self._data)
 
 
 class DQN(rl_agent.AbstractAgent):

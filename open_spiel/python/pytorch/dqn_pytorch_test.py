@@ -123,41 +123,5 @@ class DQNTest(TestCase):
       agent.step(time_step)
 
 
-class ReplayBufferTest(TestCase):
-
-  def test_replay_buffer_add(self):
-    replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=10)
-    self.assertEqual(len(replay_buffer), 0)
-    replay_buffer.add("entry1")
-    self.assertEqual(len(replay_buffer), 1)
-    replay_buffer.add("entry2")
-    self.assertEqual(len(replay_buffer), 2)
-
-    self.assertIn("entry1", replay_buffer)
-    self.assertIn("entry2", replay_buffer)
-
-  def test_replay_buffer_max_capacity(self):
-    replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=2)
-    replay_buffer.add("entry1")
-    replay_buffer.add("entry2")
-    replay_buffer.add("entry3")
-    self.assertEqual(len(replay_buffer), 2)
-
-    self.assertIn("entry2", replay_buffer)
-    self.assertIn("entry3", replay_buffer)
-
-  def test_replay_buffer_sample(self):
-    replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=3)
-    replay_buffer.add("entry1")
-    replay_buffer.add("entry2")
-    replay_buffer.add("entry3")
-
-    samples = replay_buffer.sample(3)
-
-    self.assertIn("entry1", samples)
-    self.assertIn("entry2", samples)
-    self.assertIn("entry3", samples)
-
-
 if __name__ == "__main__":
   run_tests()
