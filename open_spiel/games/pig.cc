@@ -37,6 +37,7 @@ constexpr int kDefaultDiceOutcomes = 6;
 constexpr int kDefaultHorizon = 1000;
 constexpr int kDefaultPlayers = 2;
 constexpr int kDefaultWinScore = 100;
+constexpr bool kDefaultPiglet = false;
 
 // Facts about the game
 const GameType kGameType{
@@ -59,6 +60,7 @@ const GameType kGameType{
         {"horizon", GameParameter(kDefaultHorizon)},
         {"winscore", GameParameter(kDefaultWinScore)},
         {"diceoutcomes", GameParameter(kDefaultDiceOutcomes)},
+        {"piglet", GameParameter(kDefaultPiglet)},
     }};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -168,11 +170,12 @@ void PigState::ObservationTensor(Player player,
 }
 
 PigState::PigState(std::shared_ptr<const Game> game, int dice_outcomes,
-                   int horizon, int win_score)
+                   int horizon, int win_score, bool piglet)
     : State(game),
       dice_outcomes_(dice_outcomes),
       horizon_(horizon),
-      win_score_(win_score) {
+      win_score_(win_score),
+      piglet_(piglet) {
   total_moves_ = 0;
   cur_player_ = 0;
   turn_player_ = 0;
@@ -186,7 +189,7 @@ int PigState::CurrentPlayer() const {
 
 void PigState::DoApplyAction(Action move) {
   // For decision node: 0 means roll, 1 means stop.
-  // For chance node: outcome of the dice (x-1).
+  // For chance node: outcome of the dice (x-1, piglet: [x != 1]).
   if (cur_player_ >= 0 && move == kRoll) {
     // Player roll -> chance node.
     cur_player_ = kChancePlayerId;
@@ -208,7 +211,7 @@ void PigState::DoApplyAction(Action move) {
       cur_player_ = turn_player_;
     } else {
       // Add to the turn total.
-      turn_total_ += (move + 1);
+      turn_total_ += (piglet_ ? 1 : move + 1);
       cur_player_ = turn_player_;
     }
   } else {
@@ -234,10 +237,18 @@ std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes;
 
-  // Chance outcomes are labelled 0+, corresponding to rolling 1+x.
-  outcomes.reserve(dice_outcomes_);
-  for (int i = 0; i < dice_outcomes_; i++) {
-    outcomes.push_back(std::make_pair(i, 1.0 / dice_outcomes_));
+  if (piglet_) {
+    // Chance outcomes are labelled 0 or 1, corresponding to rolling 1 or not 1 respectively
+    outcomes.reserve(2);
+    outcomes.push_back(std::make_pair(0, 1.0 / dice_outcomes_));
+    outcomes.push_back(std::make_pair(1, 1.0 - (1.0 / dice_outcomes_)));
+  }
+  else {
+    // Chance outcomes are labelled 0+, corresponding to rolling 1+x.
+    outcomes.reserve(dice_outcomes_);
+    for (int i = 0; i < dice_outcomes_; i++) {
+      outcomes.push_back(std::make_pair(i, 1.0 / dice_outcomes_));
+    }
   }
 
   return outcomes;
@@ -259,7 +270,8 @@ PigGame::PigGame(const GameParameters& params)
       dice_outcomes_(ParameterValue<int>("diceoutcomes")),
       horizon_(ParameterValue<int>("horizon")),
       num_players_(ParameterValue<int>("players")),
-      win_score_(ParameterValue<int>("winscore")) {}
+      win_score_(ParameterValue<int>("winscore")),
+      piglet_(ParameterValue<bool>("piglet")) {}
 
 }  // namespace pig
 }  // namespace open_spiel

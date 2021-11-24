@@ -29,6 +29,8 @@ void BasicPigTests() {
     testing::RandomSimTest(
         *LoadGame("pig", {{"players", GameParameter(players)}}), 100);
   }
+  testing::RandomSimTest(*LoadGame("pig",
+      {{"winscore", GameParameter(25)}, {"piglet", GameParameter(true)}}), 100);
 }
 
 }  // namespace
