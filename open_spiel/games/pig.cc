@@ -20,6 +20,7 @@
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace pig {
@@ -133,9 +134,8 @@ void PigState::ObservationTensor(Player player,
   int num_bins = (win_score_ / kBinSize) + 1;
 
   // One-hot encoding: turn total (#bin) followed by p1, p2, ...
-  SPIEL_CHECK_EQ(values.size(), num_bins + num_players_ * num_bins);
-  std::fill(values.begin(), values.end(), 0.);
-  int pos = 0;
+  // Treat `values` as a 2-d tensor.
+  TensorView<2> view(values, {1 + num_players_, num_bins}, true);
 
   // One-hot encoding:
   //  - turn total (#bins)
@@ -145,27 +145,12 @@ void PigState::ObservationTensor(Player player,
   //      .
   //      .
 
-  int bin = turn_total_ / kBinSize;
-  if (bin >= num_bins) {
-    // When the value is too large, use last bin.
-    values[pos + (num_bins - 1)] = 1;
-  } else {
-    values[pos + bin] = 1;
-  }
+  // turn total
+  view[{0, std::min(turn_total_ / kBinSize, num_bins - 1)}] = 1;
 
-  pos += num_bins;
-
-  // Find the right bin for each player.
   for (auto p = Player{0}; p < num_players_; p++) {
-    bin = scores_[p] / kBinSize;
-    if (bin >= num_bins) {
-      // When the value is too large, use last bin.
-      values[pos + (num_bins - 1)] = 1;
-    } else {
-      values[pos + bin] = 1;
-    }
-
-    pos += num_bins;
+    // score of each player
+    view[{1 + p, std::min(scores_[p] / kBinSize, num_bins - 1)}] = 1;
   }
 }
 
