@@ -64,7 +64,7 @@ class PigState : public State {
 
   std::unique_ptr<State> Clone() const override;
 
-  int score(int player_id) const { return scores_[player_id]; }
+  int score(const int player_id) const { return scores_[player_id]; }
   int dice_outcomes() const { return dice_outcomes_; }
   std::vector<Action> LegalActions() const override;
 
@@ -92,7 +92,7 @@ class PigGame : public Game {
  public:
   explicit PigGame(const GameParameters& params);
 
-  int NumDistinctActions() const override { return 6; }
+  int NumDistinctActions() const override { return 2; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new PigState(shared_from_this(), dice_outcomes_, horizon_, win_score_, piglet_));
@@ -101,8 +101,12 @@ class PigGame : public Game {
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return horizon_; }
-  // TODO: verify whether this bound is tight and/or tighten it.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+
+  // Every chance node is preceded by a decision node (roll)
+  // -> No more than half of all nodes can be chance nodes.
+  // Since the first node in each game is a decision node,
+  // it is okay that the value might be rounded down by integer division.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength() / 2; }
 
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }

@@ -16,8 +16,8 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "misere"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 6
-PolicyTensorShape() = [6]
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 6
 GetParameters() = {game=pig(horizon=20,players=3,winscore=5)}
 NumPlayers() = 3

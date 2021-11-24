@@ -16,8 +16,8 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "pig"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 6
-PolicyTensorShape() = [6]
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 6
 GetParameters() = {diceoutcomes=6,horizon=10,piglet=False,players=4,winscore=8}
 NumPlayers() = 4
