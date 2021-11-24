@@ -39,61 +39,78 @@ void BasicGoTests() {
 }
 
 void CloneTest()
-{
-    std::cout << "Starting clone test\n"; 
+{ 
     GameParameters params;
-    params["board_size"] = GameParameter(9);
+    params["board_size"] = GameParameter(kBoardSize);
     std::shared_ptr<const Game> game =
         LoadGame("phantom_go", params);
-    GoState state(game, kBoardSize, kKomi, 0);
-
+    PhantomGoState state(game, kBoardSize, kKomi, 0);
     state.ApplyAction(5);
-
-    //std::cout << state.ToString();
-
 
     std::unique_ptr<State> stateClone = state.Clone();
 
     SPIEL_CHECK_EQ(state.ToString(), stateClone->ToString());
     SPIEL_CHECK_EQ(state.History(), stateClone->History());
 
-    //std::cout << stateClone->ToString();
-
     state.ApplyAction(8);
-    //std::cout << state.ToString();
-    //std::cout << stateClone->ToString();
 
     SPIEL_CHECK_FALSE(state.ToString() == stateClone->ToString());
     SPIEL_CHECK_FALSE(state.History() == stateClone->History());
-
-    std::cout << "Clone test sucessfull\n"; 
 }
 
 void HandicapTest() {
   std::shared_ptr<const Game> game =
       LoadGame("phantom_go", {{"board_size", open_spiel::GameParameter(kBoardSize)},
                       {"komi", open_spiel::GameParameter(kKomi)},
-                      {"handicap", open_spiel::GameParameter(2)}});
-  GoState state(game, kBoardSize, kKomi, 2);
+                      {"handicap", open_spiel::GameParameter(1)}});
+  PhantomGoState state(game, kBoardSize, kKomi, 2);
   SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("d4")), GoColor::kBlack);
-
-  //SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("q16")), GoColor::kBlack);
-  //excluded because of size of the board
   
 }
 
+void IllegalMoveTest()
+{
+    GameParameters params;
+    params["board_size"] = GameParameter(kBoardSize);
+    std::shared_ptr<const Game> game =
+        LoadGame("phantom_go", params);
+    PhantomGoState state(game, kBoardSize, kKomi, 0);
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kBlack));
+    state.ApplyAction(5);
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
+    state.ApplyAction(5);
+    SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
+}
+
+void StoneCountTest()
+{
+    GameParameters params;
+    params["board_size"] = GameParameter(kBoardSize);
+    std::shared_ptr<const Game> game =
+        LoadGame("phantom_go", params);
+    PhantomGoState state(game, kBoardSize, kKomi, 0);
+    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kBlack], 0);
+    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kWhite], 0);
+    state.ApplyAction(5);
+    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kBlack], 1);
+    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kWhite], 0);
+    state.ApplyAction(6);
+    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kBlack], 1);
+    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kWhite], 1);
+
+}
+
 void ConcreteActionsAreUsedInTheAPI() {
-  int board_size = 9;
   std::shared_ptr<const Game> game =
-      LoadGame("phantom_go", {{"board_size", open_spiel::GameParameter(board_size)}});
+      LoadGame("phantom_go", {{"board_size", open_spiel::GameParameter(kBoardSize)}});
   std::unique_ptr<State> state = game->NewInitialState();
 
-  SPIEL_CHECK_EQ(state->NumDistinctActions(), board_size * board_size + 1);
+  SPIEL_CHECK_EQ(state->NumDistinctActions(), kBoardSize * kBoardSize + 1);
   SPIEL_CHECK_EQ(state->LegalActions().size(), state->NumDistinctActions());
   for (Action action : state->LegalActions()) {
     SPIEL_CHECK_GE(action, 0);
-    SPIEL_CHECK_LE(action, board_size * board_size);
+    SPIEL_CHECK_LE(action, kBoardSize * kBoardSize);
   }
 }
 
@@ -106,4 +123,6 @@ int main(int argc, char** argv) {
   open_spiel::phantom_go::BasicGoTests();
   open_spiel::phantom_go::HandicapTest();
   open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
+  open_spiel::phantom_go::IllegalMoveTest();
+  open_spiel::phantom_go::StoneCountTest();
 }

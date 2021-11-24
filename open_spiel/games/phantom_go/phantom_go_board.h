@@ -33,6 +33,8 @@ std::ostream &operator<<(std::ostream &os, GoColor c);
 
 GoColor OppColor(GoColor c);
 
+
+
 // For simplicity and speed, we store the board in terms of a "virtual board",
 // with a border of guard stones around all sides of the board.
 // This allows us to skip bounds checking.
@@ -43,16 +45,16 @@ GoColor OppColor(GoColor c);
 // However, in the OpenSpiel API (in go.{h, cc}), the actions are still exposed
 // as actions within 0, board_size*boardsize) (with pass = board_size **2.
 //
-// update 1
 // Normal go is standardly played on board of size 19, for Phantom Go, standard is size 9
-inline constexpr int kMaxBoardSize = 9;
+inline constexpr int kMaxBoardSize = 19;
 inline constexpr int kVirtualBoardSize = kMaxBoardSize + 2;
 inline constexpr int kVirtualBoardPoints =
     kVirtualBoardSize * kVirtualBoardSize;
 
-//using ObservationTable = std::array<bool, kMaxBoardSize * kMaxBoardSize>;
-
 using VirtualPoint = uint16_t;
+
+VirtualPoint VirtualPointFromBoardPoint(int boardPoint, int boardSize);
+int VirtualPointToBoardPoint(VirtualPoint p, int boardSize);
 
 inline constexpr VirtualPoint kInvalidPoint = 0;
 inline constexpr VirtualPoint kVirtualPass = kVirtualBoardPoints + 1;
@@ -111,18 +113,20 @@ class Neighbours4 {
 // It only implements the minimum of functionality necessary to support the
 // search and is optimized for speed and size. Importantly, it fits on the
 // stack. For detailed numbers, run the benchmarks in go_board_test.
-class GoBoard {
+class PhantomGoBoard {
  public:
-  explicit GoBoard(int board_size);
+  explicit PhantomGoBoard(int board_size);
 
   void Clear();
 
-  std::vector<GoColor> observationWhite;
-  std::vector<GoColor> observationBlack;
+  
 
-  std::pair<int, int> stoneCount;
+  std::array<int, 2> getStoneCount() const { return stoneCount; };
+  std::string observationToString() const;
+  std::array<GoColor, kMaxBoardSize* kMaxBoardSize> getObservationByID(int player_id) const;
 
-  std::pair<int, int> getStoneCount() { return stoneCount; };
+  // Adds an enemy stone into observation of certain player on certain point
+  //void addEnemyStoneIntoObservation(int boardPoint, int player_id) const;
 
 
   //absl::Span<float> observationRef;
@@ -194,7 +198,7 @@ class GoBoard {
 
   class GroupIter {
    public:
-    GroupIter(const GoBoard *board, VirtualPoint p, GoColor group_color)
+    GroupIter(const PhantomGoBoard *board, VirtualPoint p, GoColor group_color)
         : board_(board), lib_i_(0), group_color_(group_color) {
       marked_.fill(false);
       chain_head_ = board->ChainHead(p);
@@ -214,7 +218,7 @@ class GoBoard {
    private:
     void step();
 
-    const GoBoard *board_;
+    const PhantomGoBoard *board_;
 
     std::array<bool, kVirtualBoardPoints> marked_;
     std::array<VirtualPoint, 4> cur_libs_;
@@ -238,6 +242,15 @@ class GoBoard {
   int  CaptureDeadChains(VirtualPoint p, GoColor c);
   void RemoveChain(VirtualPoint p);
   void InitNewChain(VirtualPoint p);
+
+
+  // In this context, GoColor::kEmpty suggests, that a player does not know, what piece is on that exact spot
+  std::array<std::array<GoColor, kMaxBoardSize* kMaxBoardSize>, 2> observations;
+
+  // On index 0 is stored count of black stones, on index 1 is stored count of white stones
+  // so it equals the enum of GoColor, where kBlack is 0
+  std::array<int, 2> stoneCount;
+
 
   struct Vertex {
     VirtualPoint chain_head;
@@ -285,10 +298,10 @@ class GoBoard {
   VirtualPoint last_ko_point_;
 };
 
-std::ostream &operator<<(std::ostream &os, const GoBoard &board);
+std::ostream &operator<<(std::ostream &os, const PhantomGoBoard &board);
 
 // Score according to https://senseis.xmp.net/?TrompTaylorRules.
-float TrompTaylorScore(const GoBoard &board, float komi, int handicap = 0);
+float TrompTaylorScore(const PhantomGoBoard &board, float komi, int handicap = 0);
 
 // Generates a go board from the given string, setting X to black stones and O
 // to white stones. The first character of the first line is mapped to A1, the
@@ -302,7 +315,7 @@ float TrompTaylorScore(const GoBoard &board, float komi, int handicap = 0);
 // This exists mostly for test purposes.
 // WARNING: This coordinate system is different from the representation in
 // GoBoard in which A1 is at the bottom left.
-GoBoard CreateBoard(const std::string &initial_stones);
+PhantomGoBoard CreateBoard(const std::string &initial_stones);
 
 }  // namespace phantom_go
 }  // namespace open_spiel

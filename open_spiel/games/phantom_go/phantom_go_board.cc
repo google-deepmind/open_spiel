@@ -266,7 +266,7 @@ VirtualPoint MakePoint(std::string s) {
   return VirtualPointFrom2DPoint({row - 1, col});
 }
 
-GoBoard::GoBoard(int board_size)
+PhantomGoBoard::PhantomGoBoard(int board_size)
     : board_size_(board_size), pass_action_(board_size * board_size) {
   if (board_size_ > 19) {
     SpielFatalError(
@@ -277,15 +277,16 @@ GoBoard::GoBoard(int board_size)
   Clear();
 }
 
-void GoBoard::Clear() {
+void PhantomGoBoard::Clear() {
   zobrist_hash_ = 0;
 
+  for (int i = 0; i < board_size_ * board_size_; i++)
+  {
+      observations[(uint8_t)GoColor::kBlack][i] = GoColor::kEmpty;
+      observations[(uint8_t)GoColor::kWhite][i] = GoColor::kEmpty;
+  }
 
-  //update 1
-  GoBoard::observationBlack = std::vector<GoColor>(board_size_ * board_size_, GoColor::kEmpty);
-  GoBoard::observationWhite = std::vector<GoColor>(board_size_ * board_size_, GoColor::kEmpty);
-
-  GoBoard::stoneCount = std::pair<int, int>(0, 0);
+  stoneCount = { 0, 0 };
 
   for (int i = 0; i < board_.size(); ++i) {
     Vertex& v = board_[i];
@@ -313,31 +314,17 @@ void GoBoard::Clear() {
   last_ko_point_ = kInvalidPoint;
 }
 
-bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
+/*void PhantomGoBoard::addEnemyStoneIntoObservation(int boardPoint, int player_id) const {
+    observations[player_id][boardPoint] = OppColor((GoColor)player_id);
+}*/
+
+bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
   if (p == kVirtualPass) {
     last_ko_point_ = kInvalidPoint;
     return true;
   }
 
-  /*int boardPoint = VirtualPointToBoardPoint(p, board_size_);
-
-  printf("playing boardPoint %i, check %i\n", boardPoint, VirtualPointFromBoardPoint(boardPoint, board_size_));*/
-
-  //std::vector<GoColor> currObservation;
-  
-  //update 1
-  //add observation to current player's observation
-
-  if (c == GoColor::kBlack)
-  {
-      observationBlack[VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
-  }
-  else
-  {
-      observationWhite[VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
-  }
-
-  //currObservation[p] = board_[p].color;
+  observations[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
 
   /*if (board_[p].color != GoColor::kEmpty) {
     SpielFatalError(absl::StrCat("Trying to play the move ", GoColorToString(c),
@@ -347,21 +334,13 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
   }
   SPIEL_CHECK_EQ(GoColor::kEmpty, board_[p].color);*/
 
-  //update 1
   //playing illegal moves will occur standardly during phantom go, it is even desired  
   if (IsLegalMoveObserver(p, c) == false)
   {
       return false;
   }
 
-  if (c == GoColor::kBlack)
-  {
-      stoneCount.second++;
-  }
-  else
-  {
-      stoneCount.first++;
-  }
+  stoneCount[(uint8_t)c]++;
 
   // Preparation for ko checking.
   bool played_in_enemy_eye = true;
@@ -377,31 +356,13 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
   RemoveLibertyFromNeighbouringChains(p);
   int stones_captured = CaptureDeadChains(p, c);
 
-  if (stones_captured)
-  {
-      if (c == GoColor::kBlack)
-      {
-          stoneCount.first -= stones_captured;
-      }
-      else
-      {
-          stoneCount.second-= stones_captured;
-      }
-  }
+  
+  stoneCount[(uint8_t)OppColor(c)] -= stones_captured;
 
   //update 5
   //add own stone to own observation
 
-  if (c == GoColor::kBlack)
-  {
-      observationBlack[VirtualPointToBoardPoint(p, board_size_)] = GoColor::kBlack;
-  }
-  else
-  {
-      observationWhite[VirtualPointToBoardPoint(p, board_size_)] = GoColor::kWhite;
-  }
-
-  
+  observations[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] = c;
 
   if (played_in_enemy_eye && stones_captured == 1) {
     last_ko_point_ = last_captures_[0];
@@ -409,41 +370,18 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
     last_ko_point_ = kInvalidPoint;
   }
 
-  //update 2
-  //if player captured stones, update his observation
-
   if (stones_captured != 0)
   {
-      printf("removing points\n");
       for (int point = 0; point < board_size_ * board_size_; point++)
       {
-          
           VirtualPoint vpoint = VirtualPointFromBoardPoint(point, board_size_);
 
-          // example: if current color is white, compare observation of black, where all black stones are in state before removal, to observer board
-          //          if there is a black stone in balck observation and not on observer board, it was removed, thus remove it from both observations
-          if (c == GoColor::kWhite) 
+          if (observations[(uint8_t)OppColor(c)][point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
           {
-              if (observationBlack[point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
-              {
-                  observationBlack[point] = GoColor::kEmpty;
-                  observationWhite[point] = GoColor::kEmpty;
-                  std::cout << "removed " << VirtualPointToString(vpoint) << "\n";
-                  
-              }
+              observations[(uint8_t)GoColor::kBlack][point] = GoColor::kEmpty;
+              observations[(uint8_t)GoColor::kWhite][point] = GoColor::kEmpty;
           }
-          else
-          {
-              if (observationWhite[point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
-              {
-                  observationWhite[point] = GoColor::kEmpty;
-                  observationBlack[point] = GoColor::kEmpty;
-                  std::cout << "removed " << VirtualPointToString(vpoint) << "\n";
-              }
-          }
-          
       }
-      printf("finished removing\n");
   }
 
   SPIEL_CHECK_GT(chain(p).num_pseudo_liberties, 0);
@@ -453,7 +391,7 @@ bool GoBoard::PlayMove(VirtualPoint p, GoColor c) {
   return true;
 }
 
-VirtualPoint GoBoard::SingleLiberty(VirtualPoint p) const {
+VirtualPoint PhantomGoBoard::SingleLiberty(VirtualPoint p) const {
   VirtualPoint head = ChainHead(p);
   VirtualPoint liberty = chain(p).single_liberty();
 
@@ -470,7 +408,7 @@ VirtualPoint GoBoard::SingleLiberty(VirtualPoint p) const {
       absl::StrCat("liberty", liberty, " does not actually border group ", p));
 }
 
-void GoBoard::SetStone(VirtualPoint p, GoColor c) {
+void PhantomGoBoard::SetStone(VirtualPoint p, GoColor c) {
   static const chess_common::ZobristTable<uint64_t, kVirtualBoardPoints, 2>
       zobrist_values(
           /*seed=*/2765481);
@@ -481,9 +419,45 @@ void GoBoard::SetStone(VirtualPoint p, GoColor c) {
   board_[p].color = c;
 }
 
+std::array<GoColor, kMaxBoardSize* kMaxBoardSize> PhantomGoBoard::getObservationByID(int player_id) const
+{
+    return observations[player_id];
+}
+
+std::string PhantomGoBoard::observationToString() const
+{
+    std::stringstream ss;
+    ss << "\nObservation white:\n";
+
+    for (int x = board_size_ - 1; x >= 0; x--)
+    {
+        ss << " " << x + 1 << " ";
+        for (int y = 0; y < board_size_; y++)
+        {
+            ss << GoColorToChar(observations[(uint8_t)GoColor::kWhite][x * board_size_ + y]);
+        }
+        ss << "\n";
+    }
+    ss << "   ABCDEFGHJ\n";
+
+    ss << "\nObservation black:\n";
+    for (int x = board_size_ - 1; x >= 0; x--)
+    {
+        ss << " " << x + 1 << " ";
+        for (int y = 0; y < board_size_; y++)
+        {
+            ss << GoColorToChar(observations[(uint8_t)GoColor::kBlack][x * board_size_ + y]);
+        }
+        ss << "\n";
+    }
+    ss << "   ABCDEFGHJ\n";
+
+    return ss.str();
+}
+
 // Combines the groups around the newly placed stone at vertex. If no groups
 // are available for joining, the new stone is placed as a new group.
-void GoBoard::JoinChainsAround(VirtualPoint p, GoColor c) {
+void PhantomGoBoard::JoinChainsAround(VirtualPoint p, GoColor c) {
   VirtualPoint largest_chain_head = kInvalidPoint;
   int largest_chain_size = 0;
   Neighbours(
@@ -534,11 +508,11 @@ void GoBoard::JoinChainsAround(VirtualPoint p, GoColor c) {
   });
 }
 
-void GoBoard::RemoveLibertyFromNeighbouringChains(VirtualPoint p) {
+void PhantomGoBoard::RemoveLibertyFromNeighbouringChains(VirtualPoint p) {
   Neighbours(p, [this, p](VirtualPoint n) { chain(n).remove_liberty(p); });
 }
 
-int GoBoard::CaptureDeadChains(VirtualPoint p, GoColor c) {
+int PhantomGoBoard::CaptureDeadChains(VirtualPoint p, GoColor c) {
   int stones_captured = 0;
   int capture_index = 0;
   Neighbours(p, [this, c, &capture_index, &stones_captured](VirtualPoint n) {
@@ -556,7 +530,7 @@ int GoBoard::CaptureDeadChains(VirtualPoint p, GoColor c) {
   return stones_captured;
 }
 
-void GoBoard::RemoveChain(VirtualPoint p) {
+void PhantomGoBoard::RemoveChain(VirtualPoint p) {
   VirtualPoint this_chain_head = ChainHead(p);
   VirtualPoint cur = p;
   do {
@@ -575,7 +549,7 @@ void GoBoard::RemoveChain(VirtualPoint p) {
   } while (cur != p);
 }
 
-void GoBoard::InitNewChain(VirtualPoint p) {
+void PhantomGoBoard::InitNewChain(VirtualPoint p) {
   board_[p].chain_head = p;
   board_[p].chain_next = p;
 
@@ -590,13 +564,13 @@ void GoBoard::InitNewChain(VirtualPoint p) {
   });
 }
 
-bool GoBoard::IsInBoardArea(VirtualPoint p) const {
+bool PhantomGoBoard::IsInBoardArea(VirtualPoint p) const {
   auto rc = VirtualPointTo2DPoint(p);
   return rc.first >= 0 && rc.first < board_size() && rc.second >= 0 &&
          rc.second < board_size();
 }
 
-bool GoBoard::IsLegalMoveObserver(VirtualPoint p, GoColor c) const {
+bool PhantomGoBoard::IsLegalMoveObserver(VirtualPoint p, GoColor c) const {
   if (p == kVirtualPass) return true;
   if (!IsInBoardArea(p)) return false;
   if (!IsEmpty(p) || p == LastKoPoint()) return false;
@@ -623,36 +597,17 @@ bool GoBoard::IsLegalMoveObserver(VirtualPoint p, GoColor c) const {
   return false;
 }
 
-//update 1
-//finish or rework
 // returns true if is legal according to the vision of the player
-bool GoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
-    
-    /*if(IsLegalMoveObserver(p, c))
+bool PhantomGoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
+
+    if(observations[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
     {
         return true;
-    }*/
-
-    if (c == GoColor::kBlack)
-    {
-        if (observationBlack[VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
-        {
-            return true;
-        }
-        return false;
     }
-    else
-    {
-        if (observationWhite[VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
-        {
-            return true;
-        }
-        return false;
-    }
-
+    return false;
 }
 
-void GoBoard::Chain::reset_border() {
+void PhantomGoBoard::Chain::reset_border() {
   num_stones = 0;
   // Need to have values big enough that they can never go below 0 even if
   // all liberties are removed.
@@ -661,35 +616,35 @@ void GoBoard::Chain::reset_border() {
   liberty_vertex_sum_squared = 2147483648;
 }
 
-void GoBoard::Chain::reset() {
+void PhantomGoBoard::Chain::reset() {
   num_stones = 0;
   num_pseudo_liberties = 0;
   liberty_vertex_sum = 0;
   liberty_vertex_sum_squared = 0;
 }
 
-void GoBoard::Chain::merge(const Chain& other) {
+void PhantomGoBoard::Chain::merge(const Chain& other) {
   num_stones += other.num_stones;
   num_pseudo_liberties += other.num_pseudo_liberties;
   liberty_vertex_sum += other.liberty_vertex_sum;
   liberty_vertex_sum_squared += other.liberty_vertex_sum_squared;
 }
 
-void GoBoard::Chain::add_liberty(VirtualPoint p) {
+void PhantomGoBoard::Chain::add_liberty(VirtualPoint p) {
   num_pseudo_liberties += 1;
   liberty_vertex_sum += p;
   liberty_vertex_sum_squared +=
       static_cast<uint32_t>(p) * static_cast<uint32_t>(p);
 }
 
-void GoBoard::Chain::remove_liberty(VirtualPoint p) {
+void PhantomGoBoard::Chain::remove_liberty(VirtualPoint p) {
   num_pseudo_liberties -= 1;
   liberty_vertex_sum -= p;
   liberty_vertex_sum_squared -=
       static_cast<uint32_t>(p) * static_cast<uint32_t>(p);
 }
 
-VirtualPoint GoBoard::Chain::single_liberty() const {
+VirtualPoint PhantomGoBoard::Chain::single_liberty() const {
   SPIEL_CHECK_TRUE(in_atari());
   // A point is in Atari if it has only a single liberty, i.e. all pseudo
   // liberties are for the same point.
@@ -704,13 +659,13 @@ VirtualPoint GoBoard::Chain::single_liberty() const {
   return static_cast<VirtualPoint>(liberty_vertex_sum / num_pseudo_liberties);
 }
 
-std::string GoBoard::ToString() {
+std::string PhantomGoBoard::ToString() {
   std::ostringstream stream;
   stream << *this;
   return stream.str();
 }
 
-std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
+std::ostream& operator<<(std::ostream& os, const PhantomGoBoard& board) {
   os << "\n";
   for (int row = board.board_size() - 1; row >= 0; --row) {
     os << std::setw(2) << std::setfill(' ') << (row + 1) << " ";
@@ -739,7 +694,7 @@ std::ostream& operator<<(std::ostream& os, const GoBoard& board) {
   return os;
 }
 
-void GoBoard::GroupIter::step() {
+void PhantomGoBoard::GroupIter::step() {
   --lib_i_;
   while (lib_i_ < 0 && !marked_[chain_cur_]) {
     Neighbours(chain_cur_, [this](VirtualPoint n) {
@@ -756,7 +711,7 @@ void GoBoard::GroupIter::step() {
 
 // Returns the number of points surrounded entirely by one color.
 // Aborts early and returns 0 if the area borders both black and white stones.
-int NumSurroundedPoints(const GoBoard& board, const VirtualPoint p,
+int NumSurroundedPoints(const PhantomGoBoard& board, const VirtualPoint p,
                         std::array<bool, kVirtualBoardPoints>* marked,
                         bool* reached_black, bool* reached_white) {
   if ((*marked)[p]) return 0;
@@ -785,7 +740,7 @@ int NumSurroundedPoints(const GoBoard& board, const VirtualPoint p,
   return num_points;
 }
 
-float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
+float TrompTaylorScore(const PhantomGoBoard& board, float komi, int handicap) {
   // The delta of how many points on the board black and white have occupied,
   // from black's point of view, i.e. Black points - White points.
   int occupied_delta = 0;
@@ -829,9 +784,9 @@ float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
   return score;
 }
 
-GoBoard CreateBoard(const std::string& initial_stones) {
+PhantomGoBoard CreateBoard(const std::string& initial_stones) {
     //if fails
-  GoBoard board(9);
+    PhantomGoBoard board(9);
 
   int row = 0;
   for (const auto& line : absl::StrSplit(initial_stones, '\n')) {

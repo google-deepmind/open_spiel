@@ -27,13 +27,14 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-// Game of Go:
-// https://en.wikipedia.org/wiki/Go_(game)
+// Game of Phantom Go:
+// https://www.chessprogramming.org/Phantom_Go
 //
 // Parameters:
-//  "komi"        float  compensation for white                  (default = 7.5)
-//  "board_size"  int    rows of the board, usually 9, 13 or 19  (default = 19)
-//  "handicap"    int    number of handicap stones for black     (default = 0)
+//  "komi"              float  compensation for white                  (default = 7.5)
+//  "board_size"        int    rows of the board, usually 9, 13 or 19  (default = 19)
+//  "handicap"          int    number of handicap stones for black     (default = 0)
+//  "max_game_length"   int    maximal lenght of a game                (default = board_size * board_size * 2)
 
 namespace open_spiel {
 namespace phantom_go {
@@ -67,10 +68,10 @@ inline GoColor PlayerToColor(Player p) { return static_cast<GoColor>(p); }
 // Actions are contiguous from 0 to board_size * board_size - 1, row-major, i.e.
 // the (row, col) action is encoded as row * board_size + col.
 // The pass action is board_size * board_size.
-class GoState : public State {
+class PhantomGoState : public State {
  public:
   // Constructs a Go state for the empty board.
-  GoState(std::shared_ptr<const Game> game, int board_size, float komi,
+  PhantomGoState(std::shared_ptr<const Game> game, int board_size, float komi,
           int handicap);
 
   Player CurrentPlayer() const override {
@@ -78,12 +79,13 @@ class GoState : public State {
   }
   std::vector<Action> LegalActions() const override;
 
-  //update 2
-  std::vector<Action> LegalActionsObserver() const;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
   bool IsTerminal() const override;
+
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
 
   std::string InformationStateString(int player) const override;
   std::string ObservationString(int player) const override;
@@ -97,7 +99,7 @@ class GoState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
-  const GoBoard& board() const { return board_; }
+  const PhantomGoBoard& board() const { return board_; }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -105,7 +107,7 @@ class GoState : public State {
  private:
   void ResetBoard();
 
-  GoBoard board_;
+  PhantomGoBoard board_;
 
   // RepetitionTable records which positions we have already encountered.
   // We are already indexing by board hash, so there is no need to hash that
@@ -127,9 +129,9 @@ class GoState : public State {
 };
 
 // Game object.
-class GoGame : public Game {
+class PhantomGoGame : public Game {
  public:
-  explicit GoGame(const GameParameters& params);
+  explicit PhantomGoGame(const GameParameters& params);
 
   int NumDistinctActions() const override {
     return phantom_go::NumDistinctActions(board_size_);
@@ -137,7 +139,7 @@ class GoGame : public Game {
 
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new GoState(shared_from_this(), board_size_, komi_, handicap_));
+        new PhantomGoState(shared_from_this(), board_size_, komi_, handicap_));
   }
 
   std::vector<int> ObservationTensorShape() const override {

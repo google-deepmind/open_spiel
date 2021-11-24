@@ -52,7 +52,7 @@ const GameType kGameType{
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new GoGame(params));
+  return std::shared_ptr<const Game>(new PhantomGoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
@@ -81,7 +81,7 @@ std::vector<VirtualPoint> HandicapStones(int num_handicap) {
 
 }  // namespace
 
-GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
+PhantomGoState::PhantomGoState(std::shared_ptr<const Game> game, int board_size, float komi,
                  int handicap)
     //help 
     : State(std::move(game)),
@@ -94,19 +94,50 @@ GoState::GoState(std::shared_ptr<const Game> game, int board_size, float komi,
   
 }
 
-std::string GoState::InformationStateString(int player) const {
+std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+    int boardSize = board_.board_size();
+
+    std::shared_ptr<const Game> newGame = LoadGame("phantom_go");
+    std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(PhantomGoState(newGame, boardSize, komi_, handicap_));
+
+    std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.getObservationByID(player_id);
+    std::array<int, 2> stoneCount = board_.getStoneCount();
+    int historyLength = history_.size();
+    int enemyStonesPlaced = 0;
+
+    // Replicate all visible stones
+    for (int i = 0; i < boardSize * boardSize; i++)
+    {
+        if (infoState[i] != GoColor::kEmpty)
+        {
+            newState->board_.PlayMove(VirtualPointFromBoardPoint(i, boardSize), infoState[i]);
+            if ((uint8_t)OppColor(infoState[i]) == player_id)
+            {
+                enemyStonesPlaced++;
+                //newState->board_.addEnemyStoneIntoObservation(i, player_id);
+            }
+        }
+    }
+
+
+
+    return newState;
+}
+
+std::string PhantomGoState::InformationStateString(int player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string GoState::ObservationString(int player) const {
+std::string PhantomGoState::ObservationString(int player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void GoState::ObservationTensor(int player, absl::Span<float> values) const {
+void PhantomGoState::ObservationTensor(int player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -128,7 +159,7 @@ void GoState::ObservationTensor(int player, absl::Span<float> values) const {
             (to_play_ == GoColor::kWhite ? 1.0 : 0.0));
 }
 
-std::vector<Action> GoState::LegalActions() const {
+std::vector<Action> PhantomGoState::LegalActions() const {
   std::vector<Action> actions{};
   if (IsTerminal()) return actions;
   for (VirtualPoint p : BoardPoints(board_.board_size())) {
@@ -141,7 +172,7 @@ std::vector<Action> GoState::LegalActions() const {
 }
 
 
-std::string GoState::ActionToString(Player player, Action action) const {
+std::string PhantomGoState::ActionToString(Player player, Action action) const {
   return absl::StrCat(
       GoColorToString(static_cast<GoColor>(player)), " ",
       VirtualPointToString(board_.ActionToVirtualAction(action)));
@@ -163,53 +194,28 @@ char GoColorToChar(GoColor c) {
     }
 }
 
-std::string GoState::ToString() const {
+std::string PhantomGoState::ToString() const {
   std::stringstream ss;
+  std::array<int, 2> stoneCount = board_.getStoneCount();
   ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
-     << ", history.size()=" << history_.size() << ", " <<
-      "stones_count: w" << board_.stoneCount.first << " b" << board_.stoneCount.second << ")\n";
+     << ", history.size()=" << history_.size() << ", " 
+     << "stones_count: w" << stoneCount[1] << " b" << stoneCount[0] << ")\n";
   
   ss << board_;
 
-
-  //update 4
-
-  ss << "\nObservation white:\n";
-
-  for (int x = board_.board_size() - 1; x >= 0; x--)
-  {
-      ss << " " << x + 1 << " ";
-      for (int y = 0; y < board_.board_size(); y++)
-      {
-          ss << GoColorToChar(board_.observationWhite[x * board_.board_size() + y]);
-      }
-      ss << "\n";
-  }
-  ss << "   ABCDEFGHJ\n";
-   
-  ss << "\nObservation black:\n";
-  for (int x = board_.board_size() - 1; x >= 0; x--)
-  {
-      ss << " " << x + 1 << " ";
-      for (int y = 0; y < board_.board_size(); y++)
-      {
-          ss << GoColorToChar(board_.observationBlack[x * board_.board_size() + y]);
-      }
-      ss << "\n";
-  }
-  ss << "   ABCDEFGHJ\n";
+  ss << board_.observationToString();
 
   return ss.str();
 }
 
-bool GoState::IsTerminal() const {
+bool PhantomGoState::IsTerminal() const {
   if (history_.size() < 2) return false;
   return (history_.size() >= max_game_length_) || superko_ ||
          (history_[history_.size() - 1].action == board_.pass_action() &&
           history_[history_.size() - 2].action == board_.pass_action());
 }
 
-std::vector<double> GoState::Returns() const {
+std::vector<double> PhantomGoState::Returns() const {
   if (!IsTerminal()) return {0.0, 0.0};
 
   if (superko_) {
@@ -237,11 +243,11 @@ std::vector<double> GoState::Returns() const {
   return returns;
 }
 
-std::unique_ptr<State> GoState::Clone() const {
-  return std::unique_ptr<State>(new GoState(*this));
+std::unique_ptr<State> PhantomGoState::Clone() const {
+  return std::unique_ptr<State>(new PhantomGoState(*this));
 }
 
-void GoState::UndoAction(Player player, Action action) {
+void PhantomGoState::UndoAction(Player player, Action action) {
   // We don't have direct undo functionality, but copying the board and
   // replaying all actions is still pretty fast (> 1 million undos/second).
   history_.pop_back();
@@ -252,17 +258,10 @@ void GoState::UndoAction(Player player, Action action) {
   }
 }
 
-//need to remake
-//update 3
-void GoState::DoApplyAction(Action action) {
-  /*SPIEL_CHECK_TRUE(
-      board_.PlayMove(board_.ActionToVirtualAction(action), to_play_));
-  to_play_ = OppColor(to_play_);*/
-
+void PhantomGoState::DoApplyAction(Action action) {
     if (board_.PlayMove(board_.ActionToVirtualAction(action), to_play_))
     {
         to_play_ = OppColor(to_play_);
-
         bool was_inserted = repetitions_.insert(board_.HashValue()).second;
         if (!was_inserted && action != board_.pass_action()) {
             // We have encountered this position before.
@@ -272,7 +271,7 @@ void GoState::DoApplyAction(Action action) {
 
 }
 
-void GoState::ResetBoard() {
+void PhantomGoState::ResetBoard() {
   board_.Clear();
   if (handicap_ < 2) {
     to_play_ = GoColor::kBlack;
@@ -288,7 +287,7 @@ void GoState::ResetBoard() {
   superko_ = false;
 }
 
-GoGame::GoGame(const GameParameters& params)
+PhantomGoGame::PhantomGoGame(const GameParameters& params)
     : Game(kGameType, params),
       komi_(ParameterValue<double>("komi")),
       board_size_(ParameterValue<int>("board_size")),
