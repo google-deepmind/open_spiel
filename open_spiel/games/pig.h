@@ -103,10 +103,10 @@ class PigGame : public Game {
   int MaxGameLength() const override { return horizon_; }
 
   // Every chance node is preceded by a decision node (roll)
-  // -> No more than half of all nodes can be chance nodes.
-  // Since the first node in each game is a decision node,
-  // it is okay that the value might be rounded down by integer division.
-  int MaxChanceNodesInHistory() const override { return MaxGameLength() / 2; }
+  // -> At most as many chance nodes as decision nodes.
+  // -> Up to as many chance nodes as decision nodes, if
+  //    every action is "roll" and player never 'falls'.
+  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }
