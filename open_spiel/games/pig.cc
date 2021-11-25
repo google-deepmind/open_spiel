@@ -73,7 +73,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 std::string PigState::ActionToString(Player player, Action move_id) const {
   if (player == kChancePlayerId) {
-    return absl::StrCat("Roll ", 1 + move_id);
+    return absl::StrCat("Roll ", piglet_ ? move_id : 1 + move_id);
   } else if (move_id == kRoll) {
     return "roll";
   } else {
