@@ -151,7 +151,7 @@ class Environment(object):
                chance_event_sampler=None,
                observation_type=None,
                include_full_state=False,
-               distribution=None,
+               mfg_distribution=None,
                mfg_population=None,
                enable_legality_check=False,
                **kwargs):
@@ -166,7 +166,7 @@ class Environment(object):
         default to INFORMATION_STATE unless the game doesn't provide it.
       include_full_state: whether or not to include the full serialized
         OpenSpiel state in the observations (sometimes useful for debugging).
-      distribution: the distribution over states if the game is a mean field
+      mfg_distribution: the distribution over states if the game is a mean field
         game.
       mfg_population: The Mean Field Game population to consider.
       enable_legality_check: Check the legality of the move before stepping.
@@ -174,7 +174,7 @@ class Environment(object):
     """
     self._chance_event_sampler = chance_event_sampler or ChanceEventSampler()
     self._include_full_state = include_full_state
-    self._distribution = distribution
+    self._mfg_distribution = mfg_distribution
     self._mfg_population = mfg_population
     self._enable_legality_check = enable_legality_check
 
@@ -214,7 +214,7 @@ class Environment(object):
     self._use_observation = (observation_type == ObservationType.OBSERVATION)
 
     if self._game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
-      assert distribution is not None
+      assert mfg_distribution is not None
       assert mfg_population is not None
       assert 0 <= mfg_population < self._num_players
 
@@ -377,7 +377,7 @@ class Environment(object):
       if self._state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
         dist_to_register = self._state.distribution_support()
         dist = [
-            self._distribution.value_str(str_state, default_value=0.0)
+            self._mfg_distribution.value_str(str_state, default_value=0.0)
             for str_state in dist_to_register
         ]
         self._state.update_distribution(dist)
@@ -469,3 +469,13 @@ class Environment(object):
   @property
   def get_state(self):
     return self._state
+
+  @property
+  def mfg_distribution(self):
+    return self._mfg_distribution
+
+  def update_mfg_distribution(self, mfg_distribution):
+    """Updates the distribution over the states of the mean field game."""
+    assert (
+        self._game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD)
+    self._mfg_distribution = mfg_distribution

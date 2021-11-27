@@ -823,4 +823,12 @@ std::string ActionsToString(const State& state,
       "[", absl::StrJoin(ActionsToStrings(state, actions), ", "), "]");
 }
 
+void SpielFatalErrorWithStateInfo(const std::string& error_msg,
+                                  const Game& game,
+                                  const State& state) {
+  // A fatal error wrapper designed to return useful debugging information.
+  const std::string& info = SerializeGameAndState(game, state);
+  SpielFatalError(absl::StrCat(error_msg, "Serialized state:\n", info));
+}
+
 }  // namespace open_spiel

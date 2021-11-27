@@ -99,7 +99,8 @@ def main(unused_argv):
   mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
 
   envs = [
-      rl_environment.Environment(game, distribution=mfg_dist, mfg_population=p)
+      rl_environment.Environment(
+          game, mfg_distribution=mfg_dist, mfg_population=p)
       for p in range(game.num_players())
   ]
   info_state_size = envs[0].observation_spec()["info_state"][0]

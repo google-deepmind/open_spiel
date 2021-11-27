@@ -1153,6 +1153,12 @@ std::vector<std::string> ActionsToStrings(const State& state,
 std::string ActionsToString(const State& state,
                             const std::vector<Action>& actions);
 
+// A utility to broadcast an error message with game and state info.
+// It is a wrapper around SpielFatalError and meant to facilitate debugging.
+void SpielFatalErrorWithStateInfo(const std::string& error_msg,
+                                  const Game& game,
+                                  const State& state);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_SPIEL_H_

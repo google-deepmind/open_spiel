@@ -22,9 +22,20 @@ but substitutes out the exact best reponse computation with an approximation
 of best response values through a Reinforcement Learning approach (where 
 the RL method in question is a user-determined parameter for each iteration).
 
-Each iteration consists of computing the best response against a policy, 
-followed by the computation of an average policy with that best response.
+Policy is initialized to uniform policy.
+Each iteration:
+ 1. Compute best response against policy
+ 2. Update policy as weighted average of best response and current policy
+    (default learning rate is 1 / num_iterations + 1).
+
+To use fictitious play one should initialize it and run multiple iterations:
+fp = FictitiousPlay(game)
+for _ in range(num_iterations):
+  fp.iteration()
+policy = fp.get_policy()
 """
+
+import math
 
 from typing import List
 
@@ -54,9 +65,9 @@ class MergedPolicy(policy_std.Policy):
         be in the range 0..game.num_players()-1.
       policies: A `List[policy_std.Policy]` object.
       distributions: A `List[distribution_std.Distribution]` object.
-      weights: A `List[float]` object. They should sum to 1.
+      weights: A `List[float]` object. The elements should sum to 1.
     """
-    super(MergedPolicy, self).__init__(game, player_ids)
+    super().__init__(game, player_ids)
     self._policies = policies
     self._distributions = distributions
     self._weights = weights
@@ -64,6 +75,9 @@ class MergedPolicy(policy_std.Policy):
         f'Length mismatch {len(policies)} != {len(distributions)}')
     assert len(policies) == len(weights), (
         f'Length mismatch {len(policies)} != {len(weights)}')
+    assert math.isclose(
+        sum(weights),
+        1.0), (f'Weights should sum to 1, but instead sum to {sum(weights)}')
 
   def action_probabilities(self, state, player_id=None):
     action_prob = []
@@ -100,13 +114,14 @@ class FictitiousPlay(object):
   def get_policy(self):
     return self._policy
 
-  def iteration(self, rl_br_agent=None):
+  def iteration(self, rl_br_agent=None, learning_rate=None):
     """Returns a new `TabularPolicy` equivalent to this policy.
 
     Args:
       rl_br_agent: An instance of the RL approximation method to use to 
        compute the best response value for each iteration. If none 
        provided, the exact value is computed.
+      learning_rate: The learning rate.
     """
     self._fp_step += 1
 
@@ -123,8 +138,9 @@ class FictitiousPlay(object):
     greedy_pi = greedy_pi.to_tabular(states=self._states)
     distrib_greedy = distribution.DistributionPolicy(self._game, greedy_pi)
 
+    weight = learning_rate if learning_rate else 1.0 / (self._fp_step + 1)
+
     self._policy = MergedPolicy(
         self._game, list(range(self._game.num_players())),
         [self._policy, greedy_pi], [distrib, distrib_greedy],
-        [1.0 * self._fp_step / (self._fp_step + 1), 1.0 /
-        (self._fp_step + 1)]).to_tabular(states=self._states)
+        [1.0 - weight, weight]).to_tabular(states=self._states)
