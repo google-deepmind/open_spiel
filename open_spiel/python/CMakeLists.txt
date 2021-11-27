@@ -161,6 +161,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/evaluate_bots_test.py
   algorithms/expected_game_score_test.py
   algorithms/external_sampling_mccfr_test.py
+  algorithms/fictitious_play_test.py
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
@@ -186,7 +187,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_utils_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
-  mfg/algorithms/fictitious_play_test.py
   mfg/algorithms/mirror_descent_test.py
   mfg/algorithms/greedy_policy_test.py
   mfg/algorithms/nash_conv_test.py
@@ -212,10 +212,10 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 if (OPEN_SPIEL_ENABLE_JAX)
   # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
-    algorithms/fictitious_play_test.py
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    mfg/algorithms/fictitious_play_test.py
   )
 endif()
 
