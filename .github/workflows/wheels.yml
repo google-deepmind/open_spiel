@@ -41,7 +41,7 @@ jobs:
       OS_PYTHON_VERSION: 3.9
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
-      CIBW_SKIP: cp27-* pp*
+      CIBW_SKIP: pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
