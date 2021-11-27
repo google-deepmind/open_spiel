@@ -50,7 +50,7 @@ class FictitiousPlayTest(absltest.TestCase):
 
     uniform_policy = policy.UniformRandomPolicy(game)
     dist = distribution.DistributionPolicy(game, uniform_policy)
-    envs = [rl_environment.Environment(game, distribution=dist, mfg_population=p)
+    envs = [rl_environment.Environment(game, mfg_distribution=dist, mfg_population=p)
               for p in range(game.num_players())]
     dqn_agent = dqn.DQN(0,
                   state_representation_size=
@@ -63,7 +63,7 @@ class FictitiousPlayTest(absltest.TestCase):
                   epsilon_end=0.01)
 
     for _ in range(10):
-      dfp.iteration(dqn_agent)
+      dfp.iteration(rl_br_agent=dqn_agent)
 
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
@@ -114,7 +114,7 @@ class FictitiousPlayTest(absltest.TestCase):
 
     uniform_policy = policy.UniformRandomPolicy(game)
     dist = distribution.DistributionPolicy(game, uniform_policy)
-    envs = [rl_environment.Environment(game, distribution=dist, mfg_population=p)
+    envs = [rl_environment.Environment(game, mfg_distribution=dist, mfg_population=p)
               for p in range(game.num_players())]
     dqn_agent = dqn.DQN(0,
                   state_representation_size=
@@ -127,7 +127,7 @@ class FictitiousPlayTest(absltest.TestCase):
                   epsilon_end=0.01)
 
     for _ in range(10):
-      dfp.iteration(dqn_agent)
+      dfp.iteration(rl_br_agent=dqn_agent)
 
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)

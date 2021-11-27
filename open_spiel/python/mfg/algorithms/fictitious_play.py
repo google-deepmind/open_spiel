@@ -128,7 +128,7 @@ class FictitiousPlay(object):
     distrib = distribution.DistributionPolicy(self._game, self._policy)
     
     if rl_br_agent:
-      joint_avg_policy = rl_agent_policy.RLAgentPolicy(self._game, rl_br_agent, rl_br_agent.player_id, use_observation=False)
+      joint_avg_policy = rl_agent_policy.RLAgentPolicy(self._game, rl_br_agent, rl_br_agent.player_id, use_observation=True)
       br_value = policy_value.PolicyValue(self._game, distrib, joint_avg_policy)
     else:
       br_value = best_response_value.BestResponse(
