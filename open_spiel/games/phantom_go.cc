@@ -101,7 +101,11 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     std::shared_ptr<const Game> newGame = LoadGame("phantom_go");
     std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(PhantomGoState(newGame, boardSize, komi_, handicap_));
 
-    std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.getObservationByID(player_id);
+    //ask
+    /*std::shared_ptr<const Game> newGame = GetGame();
+    std::unique_ptr<PhantomGoState> newState = newGame->NewInitialState();*/
+
+    std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
     std::array<int, 2> stoneCount = board_.getStoneCount();
     int historyLength = history_.size();
     int enemyStonesPlaced = 0;
@@ -198,9 +202,9 @@ std::string PhantomGoState::ToString() const {
   std::stringstream ss;
   std::array<int, 2> stoneCount = board_.getStoneCount();
   ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
-     << ", history.size()=" << history_.size() << ", " 
+     << ", history.size()=" << history_.size() << ", "
      << "stones_count: w" << stoneCount[1] << " b" << stoneCount[0] << ")\n";
-  
+
   ss << board_;
 
   ss << board_.observationToString();

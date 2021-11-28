@@ -128,7 +128,6 @@ class PhantomGoState : public State {
   bool superko_;
 };
 
-// Game object.
 class PhantomGoGame : public Game {
  public:
   explicit PhantomGoGame(const GameParameters& params);

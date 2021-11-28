@@ -282,11 +282,11 @@ void PhantomGoBoard::Clear() {
 
   for (int i = 0; i < board_size_ * board_size_; i++)
   {
-      observations[(uint8_t)GoColor::kBlack][i] = GoColor::kEmpty;
-      observations[(uint8_t)GoColor::kWhite][i] = GoColor::kEmpty;
+    observations_[(uint8_t)GoColor::kBlack][i] = GoColor::kEmpty;
+    observations_[(uint8_t)GoColor::kWhite][i] = GoColor::kEmpty;
   }
 
-  stoneCount = { 0, 0 };
+  stone_count_ = {0, 0 };
 
   for (int i = 0; i < board_.size(); ++i) {
     Vertex& v = board_[i];
@@ -314,17 +314,13 @@ void PhantomGoBoard::Clear() {
   last_ko_point_ = kInvalidPoint;
 }
 
-/*void PhantomGoBoard::addEnemyStoneIntoObservation(int boardPoint, int player_id) const {
-    observations[player_id][boardPoint] = OppColor((GoColor)player_id);
-}*/
-
 bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
   if (p == kVirtualPass) {
     last_ko_point_ = kInvalidPoint;
     return true;
   }
 
-  observations[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
+  observations_[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
 
   /*if (board_[p].color != GoColor::kEmpty) {
     SpielFatalError(absl::StrCat("Trying to play the move ", GoColorToString(c),
@@ -340,7 +336,7 @@ bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
       return false;
   }
 
-  stoneCount[(uint8_t)c]++;
+  stone_count_[(uint8_t)c]++;
 
   // Preparation for ko checking.
   bool played_in_enemy_eye = true;
@@ -356,13 +352,13 @@ bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
   RemoveLibertyFromNeighbouringChains(p);
   int stones_captured = CaptureDeadChains(p, c);
 
-  
-  stoneCount[(uint8_t)OppColor(c)] -= stones_captured;
+
+  stone_count_[(uint8_t)OppColor(c)] -= stones_captured;
 
   //update 5
   //add own stone to own observation
 
-  observations[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] = c;
+  observations_[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] = c;
 
   if (played_in_enemy_eye && stones_captured == 1) {
     last_ko_point_ = last_captures_[0];
@@ -376,17 +372,17 @@ bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
       {
           VirtualPoint vpoint = VirtualPointFromBoardPoint(point, board_size_);
 
-          if (observations[(uint8_t)OppColor(c)][point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
+          if (observations_[(uint8_t)OppColor(c)][point] == OppColor(c) && board_[vpoint].color == GoColor::kEmpty)
           {
-              observations[(uint8_t)GoColor::kBlack][point] = GoColor::kEmpty;
-              observations[(uint8_t)GoColor::kWhite][point] = GoColor::kEmpty;
+            observations_[(uint8_t)GoColor::kBlack][point] = GoColor::kEmpty;
+            observations_[(uint8_t)GoColor::kWhite][point] = GoColor::kEmpty;
           }
       }
   }
 
   SPIEL_CHECK_GT(chain(p).num_pseudo_liberties, 0);
 
-  
+
 
   return true;
 }
@@ -419,9 +415,9 @@ void PhantomGoBoard::SetStone(VirtualPoint p, GoColor c) {
   board_[p].color = c;
 }
 
-std::array<GoColor, kMaxBoardSize* kMaxBoardSize> PhantomGoBoard::getObservationByID(int player_id) const
+std::array<GoColor, kMaxBoardSize* kMaxBoardSize> PhantomGoBoard::GetObservationByID(int player_id) const
 {
-    return observations[player_id];
+    return observations_[player_id];
 }
 
 std::string PhantomGoBoard::observationToString() const
@@ -434,7 +430,7 @@ std::string PhantomGoBoard::observationToString() const
         ss << " " << x + 1 << " ";
         for (int y = 0; y < board_size_; y++)
         {
-            ss << GoColorToChar(observations[(uint8_t)GoColor::kWhite][x * board_size_ + y]);
+            ss << GoColorToChar(observations_[(uint8_t)GoColor::kWhite][x * board_size_ + y]);
         }
         ss << "\n";
     }
@@ -446,7 +442,7 @@ std::string PhantomGoBoard::observationToString() const
         ss << " " << x + 1 << " ";
         for (int y = 0; y < board_size_; y++)
         {
-            ss << GoColorToChar(observations[(uint8_t)GoColor::kBlack][x * board_size_ + y]);
+            ss << GoColorToChar(observations_[(uint8_t)GoColor::kBlack][x * board_size_ + y]);
         }
         ss << "\n";
     }
@@ -600,7 +596,7 @@ bool PhantomGoBoard::IsLegalMoveObserver(VirtualPoint p, GoColor c) const {
 // returns true if is legal according to the vision of the player
 bool PhantomGoBoard::IsLegalMove(VirtualPoint p, GoColor c) const {
 
-    if(observations[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
+    if(observations_[(uint8_t)c][VirtualPointToBoardPoint(p, board_size_)] == GoColor::kEmpty)
     {
         return true;
     }

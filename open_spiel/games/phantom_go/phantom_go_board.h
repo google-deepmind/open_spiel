@@ -121,9 +121,9 @@ class PhantomGoBoard {
 
   
 
-  std::array<int, 2> getStoneCount() const { return stoneCount; };
+  std::array<int, 2> getStoneCount() const { return stone_count_; };
   std::string observationToString() const;
-  std::array<GoColor, kMaxBoardSize* kMaxBoardSize> getObservationByID(int player_id) const;
+  std::array<GoColor, kMaxBoardSize* kMaxBoardSize> GetObservationByID(int player_id) const;
 
   // Adds an enemy stone into observation of certain player on certain point
   //void addEnemyStoneIntoObservation(int boardPoint, int player_id) const;
@@ -245,11 +245,11 @@ class PhantomGoBoard {
 
 
   // In this context, GoColor::kEmpty suggests, that a player does not know, what piece is on that exact spot
-  std::array<std::array<GoColor, kMaxBoardSize* kMaxBoardSize>, 2> observations;
+  std::array<std::array<GoColor, kMaxBoardSize* kMaxBoardSize>, 2> observations_;
 
   // On index 0 is stored count of black stones, on index 1 is stored count of white stones
   // so it equals the enum of GoColor, where kBlack is 0
-  std::array<int, 2> stoneCount;
+  std::array<int, 2> stone_count_;
 
 
   struct Vertex {
