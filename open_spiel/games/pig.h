@@ -25,14 +25,18 @@
 // See http://cs.gettysburg.edu/projects/pig/index.html for details.
 // Also https://en.wikipedia.org/wiki/Pig_(dice_game)
 //
-// For the Piglet variant, see http://cs.gettysburg.edu/~tneller/papers/pig.zip.
-// The original Piglet variant described there is played with a fair coin and a
-// winscore of 10. This behaviour can be achieved by setting diceoutcomes = 2,
-// winscore = 10, piglet = true.
-// Divide winscore by the average dice outcome != 1 (i.e. diceoutcomes/2 + 1)
-// when enabling Piglet to have a game that's roughly equivalent to the
+// Piglet variant: Instead of increasing the running total by the roll results,
+// it is always increased by a fixed step size of 1 upon rolling anything higher
+// than a 1. [Note: Internally, this behaviour is modelled with only two chance
+// outcomes, rolling a 1 or rolling anything higher than that.]
+// Divide winscore by the average dice outcome != 1 (i.e. by diceoutcomes/2 + 1)
+// when enabling Piglet to play a game that's roughly equivalent to the
 // corresponding Pig game. The main advantage of this variant is thus a greatly
 // reduced state space, making the game accessible to tabular methods.
+// See also http://cs.gettysburg.edu/~tneller/papers/pig.zip. The original Piglet
+// variant described there is played with a fair coin and a winscore of 10. This
+// behaviour can be achieved by setting diceoutcomes = 2, winscore = 10,
+// piglet = true.
 //
 // Parameters:
 //     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
