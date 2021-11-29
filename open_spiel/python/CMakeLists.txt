@@ -187,7 +187,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_utils_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
-  mfg/algorithms/fictitious_play_test.py
   mfg/algorithms/mirror_descent_test.py
   mfg/algorithms/greedy_policy_test.py
   mfg/algorithms/nash_conv_test.py
@@ -216,6 +215,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    mfg/algorithms/fictitious_play_test.py
   )
 endif()
 
