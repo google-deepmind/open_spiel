@@ -108,6 +108,7 @@ class DarkHexState : public State {
                               absl::Span<float> values) const override;
 
   std::unique_ptr<State> Clone() const override;
+  std::unique_ptr<State> CloneAndRandomizeToState() const ;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
 

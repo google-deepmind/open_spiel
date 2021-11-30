@@ -87,7 +87,6 @@ class HexState : public State {
   CellState BoardAt(int cell) const { return board_[cell]; }
   void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
 
- protected:
   std::vector<CellState> board_;
   void DoApplyAction(Action move) override;
 

@@ -379,9 +379,53 @@ void DarkHexState::ObservationTensor(Player player, absl::Span<float> values) co
 
 }
 
-
 std::unique_ptr<State> DarkHexState::Clone() const {
-  return std::unique_ptr<State>(new DarkHexState(*this));
+return CloneAndRandomizeToState();
+// return std::unique_ptr<State>(new DarkHexState(*this));
+}
+
+std::unique_ptr<State> DarkHexState::CloneAndRandomizeToState() const {
+auto state = new DarkHexState(*this);
+
+const auto& player_view = (state->CurrentPlayer() == 0 ? black_view_ : white_view_);
+int sum = 0;
+std::vector<int> empty_fields;
+
+int counterWhite = 0;
+int counterBlack = 0;
+for (int cell = 0; cell < num_cells_; ++cell) {
+  if((static_cast<int>(player_view[cell]) - kMinValueCellState) == 4) {
+    empty_fields.push_back(cell);
+  }else if((static_cast<int>(player_view[cell]) - kMinValueCellState) < 4) {
+    ++counterWhite;
+  }else if((static_cast<int>(player_view[cell]) - kMinValueCellState) > 4){
+    ++counterBlack;
+  }
+}
+
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+auto rng = std::default_random_engine {seed};
+std::shuffle(empty_fields.begin(), empty_fields.end(), rng);
+
+state->state_.board_ = player_view;
+
+auto res = ViewToString(0);
+if (state->CurrentPlayer() == 0) {
+  sum = counterBlack-counterWhite;
+  for(int i = 0; i < sum; i++){
+     state->state_.board_[empty_fields.at(i)] = CellState::kWhite;
+  }
+  res = "0: " + ViewToString(0);
+}else{
+  sum = counterWhite-counterBlack;
+  for(int i = 0; i < sum; i++){
+    state->state_.board_[empty_fields.at(i)] = CellState::kBlack;
+  }
+  res = "1: " + ViewToString(1);
+}
+
+std::cout << res << std::endl;
+return std::unique_ptr<State>(state);
 }
 
 void DarkHexState::UndoAction(Player player, Action move) {
