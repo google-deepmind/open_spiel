@@ -409,22 +409,19 @@ std::shuffle(empty_fields.begin(), empty_fields.end(), rng);
 
 state->state_.board_ = player_view;
 
-auto res = ViewToString(0);
 if (state->CurrentPlayer() == 0) {
   sum = counterBlack-counterWhite;
   for(int i = 0; i < sum; i++){
      state->state_.board_[empty_fields.at(i)] = CellState::kWhite;
   }
-  res = "0: " + ViewToString(0);
 }else{
   sum = counterWhite-counterBlack;
   for(int i = 0; i < sum; i++){
     state->state_.board_[empty_fields.at(i)] = CellState::kBlack;
   }
-  res = "1: " + ViewToString(1);
 }
 
-std::cout << res << std::endl;
+
 return std::unique_ptr<State>(state);
 }
 
