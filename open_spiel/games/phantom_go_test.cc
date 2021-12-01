@@ -114,15 +114,43 @@ void ConcreteActionsAreUsedInTheAPI() {
   }
 }
 
+void ResampleFromInfostateVisualTest()
+{
+    std::cout << "Starting ResampleFromInfostate visual Test\n";
+    GameParameters params;
+    params["board_size"] = GameParameter(kBoardSize);
+    std::shared_ptr<const Game> game =
+        LoadGame("phantom_go", params);
+    PhantomGoState state(game, kBoardSize, kKomi, 0);
+
+
+    state.ApplyAction(5); //B
+    state.ApplyAction(6); //W
+    state.ApplyAction(7); //B
+    state.ApplyAction(8); //W
+    state.ApplyAction(6); //B
+    state.ApplyAction(9); //B
+    state.ApplyAction(10); //W
+
+    std::cout << "Original state\n" << state.ToString();
+
+    std::unique_ptr<State> resapleState = state.ResampleFromInfostate(0, nullptr);
+
+
+    std::cout << "Resampled state\n " << resapleState->ToString();
+}
+
 }  // namespace
 }  // namespace phantom_go
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::phantom_go::CloneTest();
-  open_spiel::phantom_go::BasicGoTests();
+  //open_spiel::phantom_go::BasicGoTests();
   open_spiel::phantom_go::HandicapTest();
   open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
   open_spiel::phantom_go::IllegalMoveTest();
   open_spiel::phantom_go::StoneCountTest();
+  open_spiel::phantom_go::ResampleFromInfostateVisualTest();
+  
 }

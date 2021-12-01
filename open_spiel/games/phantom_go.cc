@@ -94,36 +94,57 @@ PhantomGoState::PhantomGoState(std::shared_ptr<const Game> game, int board_size,
   
 }
 
+// this method is in progress of making, the implementation is not correct
 std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
     int boardSize = board_.board_size();
 
-    std::shared_ptr<const Game> newGame = LoadGame("phantom_go");
-    std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(PhantomGoState(newGame, boardSize, komi_, handicap_));
-
-    //ask
-    /*std::shared_ptr<const Game> newGame = GetGame();
-    std::unique_ptr<PhantomGoState> newState = newGame->NewInitialState();*/
+    std::shared_ptr<const Game> newGame = GetGame();
+    std::unique_ptr<State> newState = newGame->NewInitialState();
 
     std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
     std::array<int, 2> stoneCount = board_.getStoneCount();
     int historyLength = history_.size();
     int enemyStonesPlaced = 0;
 
-    // Replicate all visible stones
+    std::array<std::vector<int>, 2> stones;
+
+    //Find and store all stones
     for (int i = 0; i < boardSize * boardSize; i++)
     {
         if (infoState[i] != GoColor::kEmpty)
         {
-            newState->board_.PlayMove(VirtualPointFromBoardPoint(i, boardSize), infoState[i]);
-            if ((uint8_t)OppColor(infoState[i]) == player_id)
-            {
-                enemyStonesPlaced++;
-                //newState->board_.addEnemyStoneIntoObservation(i, player_id);
-            }
+            stones[(uint8_t)infoState[i]].push_back(i);
         }
     }
 
+
+    int i = 0;
+    int max;
+    (stones[(uint8_t)GoColor::kBlack].size() < stones[(uint8_t)GoColor::kWhite].size()) ?
+        max = stones[(uint8_t)GoColor::kWhite].size() :
+        max = stones[(uint8_t)GoColor::kBlack].size();
+
+    printf("max %i\n", max);
+    while (i < max)
+    {
+        for (int c = 0; c <= 1; c++)
+        {
+            printf("color %i in depth %i played: ", c, i);
+            if (i >= stones[c].size())
+            {
+                newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+                printf("pass\n");
+            }
+            else
+            {
+                newState->ApplyAction(stones[c][i]);
+                printf("%i\n", stones[c][i]);
+            }
+            printf("Current player is %i\n", newState->CurrentPlayer());
+        }
+        i++;
+    }
 
 
     return newState;
