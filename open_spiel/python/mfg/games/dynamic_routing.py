@@ -15,13 +15,7 @@
 # Lint as python3
 """Implementation of a mean field routing game.
 
-The mean field routing game is a variant of the ones described by:
-- A mean field route choice game by R. Salhab, J. Le Ny and R. P. Malhamé, 2018
-  IEEE CDC.
-- Existence and uniqueness result for mean field games with congestion effect on
-  graphs, O. Gueant, Applied Mathematics & Optimization, 2015
-- Dynamic driving and routing games for autonomous vehicles on networks: A mean
-  field game approach, K. Huang, X. Chen, X. Di and Q. Du, TRB part C, 2021
+The game is derived from https://arxiv.org/abs/2110.11943.
 It is the extension of the dynamic routing game python_dynamic_routing.
 The list of vehicles decribing the N player of the dynamic routing game is
 replaced by a list of OriginDestinationDemand. One OriginDestinationDemand
