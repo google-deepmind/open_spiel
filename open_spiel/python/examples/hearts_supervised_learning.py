@@ -120,7 +120,7 @@ def main(argv):
     FLAGS.hidden_layer_sizes = DEFAULT_LAYER_SIZES
 
   # Make the network.
-  net = hk.without_apply_rng(hk.transform(net_fn, apply_rng=True))
+  net = hk.without_apply_rng(hk.transform(net_fn))
 
   # Make the optimiser.
   opt = optax.adam(FLAGS.step_size)
