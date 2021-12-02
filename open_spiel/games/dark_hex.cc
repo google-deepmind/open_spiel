@@ -349,9 +349,9 @@ void DarkHexState::ObservationTensor(Player player, absl::Span<float> values) co
   }
   double prob = 0;
   if (player == 0) {
-    prob = counterWhite/counterBlack;
+    prob = counterBlack-counterWhite/counterBlack;
   }else{
-    prob = counterBlack/counterWhite;
+    prob = counterWhite-counterBlack/counterWhite;
   }
   
   for (int cell = 0; cell < num_cells_; ++cell) {
