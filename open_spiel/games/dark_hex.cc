@@ -380,8 +380,8 @@ void DarkHexState::ObservationTensor(Player player, absl::Span<float> values) co
 }
 
 std::unique_ptr<State> DarkHexState::Clone() const {
-return CloneAndRandomizeToState();
-// return std::unique_ptr<State>(new DarkHexState(*this));
+// return CloneAndRandomizeToState();
+  return std::unique_ptr<State>(new DarkHexState(*this));
 }
 
 std::unique_ptr<State> DarkHexState::CloneAndRandomizeToState() const {
