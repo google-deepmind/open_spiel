@@ -309,7 +309,7 @@ std::string DarkHexState::ObservationString(Player player) const {
   return observation;
 }
 
-/*
+
 void DarkHexState::ObservationTensor(Player player,
                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -319,17 +319,40 @@ void DarkHexState::ObservationTensor(Player player,
 
   const auto& player_view = (player == 0 ? black_view_ : white_view_);
   
+  int counterWhite = 0;
+  int counterBlack = 0;
+  for (int cell = 0; cell < num_cells_; ++cell) {
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) < 4) {
+      ++counterWhite;
+    }else if((static_cast<int>(player_view[cell]) - kMinValueCellState) > 4){
+      ++counterBlack;
+    }
+  }
+  double prob = 0;
+  if (player == 0) {
+    prob = counterBlack-counterWhite/counterBlack;
+  }else{
+    prob = counterWhite-counterBlack/counterWhite;
+  }
+
+
   for (int cell = 0; cell < num_cells_; ++cell) {
     values[cell * kCellStates +
            (static_cast<int>(player_view[cell]) - kMinValueCellState)] = 1.0;
+    if((static_cast<int>(player_view[cell]) - kMinValueCellState) == 4)
+    values[kCellStates * num_cells_ + cell] = prob;
   }
 
+  
+  
+  /*
   if (obs_type_ == ObservationType::kRevealNumTurns) {
     values[num_cells_ * kCellStates + action_sequence_.size()] = 1.0;
   }
+  */
 }
-*/
 
+/*
 void DarkHexState::ObservationTensor(Player player, absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -378,6 +401,7 @@ void DarkHexState::ObservationTensor(Player player, absl::Span<float> values) co
   }
 
 }
+*/
 
 std::unique_ptr<State> DarkHexState::Clone() const {
 // return CloneAndRandomizeToState();
@@ -483,9 +507,9 @@ std::vector<int> DarkHexGame::InformationStateTensorShape() const {
 
 std::vector<int> DarkHexGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
-    return {num_cells_ * 5};
+    return {num_cells_ * kCellStates};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {num_cells_ * 5 + longest_sequence_};
+    return {num_cells_ * kCellStates + longest_sequence_};
   } else {
     SpielFatalError("Unknown observation type");
   }
