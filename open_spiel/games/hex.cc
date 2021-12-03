@@ -351,7 +351,7 @@ std::string HexState::ObservationString(Player player) const {
 void HexState::ObservationTensor(Player player,
                                  absl::Span<float> values) const {
   // TODO(author8): Make an option to not expose connection info
-  SPIEL_CHECK_GE(player, 0);
+  // SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
   TensorView<2> view(values, {kCellStates, static_cast<int>(board_.size())},
