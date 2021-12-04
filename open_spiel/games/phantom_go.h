@@ -79,6 +79,8 @@ class PhantomGoState : public State {
   }
   std::vector<Action> LegalActions() const override;
 
+  std::array<int, 2> getStoneCount() const;
+
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
@@ -99,7 +101,6 @@ class PhantomGoState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
-  const PhantomGoBoard& board() const { return board_; }
 
  protected:
   void DoApplyAction(Action action) override;

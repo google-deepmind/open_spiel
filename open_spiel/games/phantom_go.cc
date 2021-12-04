@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/phantom_go.h"
 
+#include <random>
 #include <sstream>
 
 #include "open_spiel/game_parameters.h"
@@ -94,13 +95,17 @@ PhantomGoState::PhantomGoState(std::shared_ptr<const Game> game, int board_size,
   
 }
 
+
 // this method is in progress of making, the implementation is not correct
 std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
     int boardSize = board_.board_size();
 
-    std::shared_ptr<const Game> newGame = GetGame();
-    std::unique_ptr<State> newState = newGame->NewInitialState();
+    /*std::shared_ptr<const Game> newGame = GetGame();
+    std::unique_ptr<State> newState = newGame->NewInitialState();*/
+
+    std::shared_ptr<const Game> newGame = LoadGame("phantom_go");
+    std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(PhantomGoState(newGame, boardSize, komi_, handicap_));
 
     std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
     std::array<int, 2> stoneCount = board_.getStoneCount();
@@ -108,6 +113,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     int enemyStonesPlaced = 0;
 
     std::array<std::vector<int>, 2> stones;
+
 
     //Find and store all stones
     for (int i = 0; i < boardSize * boardSize; i++)
@@ -121,31 +127,63 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
 
     int i = 0;
     int max;
-    (stones[(uint8_t)GoColor::kBlack].size() < stones[(uint8_t)GoColor::kWhite].size()) ?
-        max = stones[(uint8_t)GoColor::kWhite].size() :
-        max = stones[(uint8_t)GoColor::kBlack].size();
+    if(stoneCount[(uint8_t)GoColor::kBlack] > stoneCount[(uint8_t)GoColor::kWhite])
+    {
+        max = stoneCount[(uint8_t)GoColor::kBlack];
+    }
+    else
+    {
+        max = stoneCount[(uint8_t)GoColor::kWhite];
+    }
 
-    printf("max %i\n", max);
     while (i < max)
     {
         for (int c = 0; c <= 1; c++)
         {
-            printf("color %i in depth %i played: ", c, i);
             if (i >= stones[c].size())
             {
-                newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
-                printf("pass\n");
+                if(i < stoneCount[c])
+                {
+                    std::vector<Action> actions = newState->LegalActions();
+                    std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+                    std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
+                    currStoneCount[c]++;
+
+                    for(long action : actions)
+                    {
+                        newState->ApplyAction(action);
+                        if(newState->board_.getStoneCount()[0] == currStoneCount[0] &&
+                            newState->board_.getStoneCount()[1] == currStoneCount[1])
+                        { //random move was applied correctly, no captures were made
+                            if(player_id != c) {
+                                newState->ApplyAction(action);
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            newState->UndoAction(-1, -1);
+                        }
+                    }
+
+                }
+                else {
+                    newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+                    //printf("pass\n");
+                }
             }
-            else
-            {
+
+            else{
                 newState->ApplyAction(stones[c][i]);
-                printf("%i\n", stones[c][i]);
+                if(player_id != c) {
+                    newState->ApplyAction(stones[c][i]);
+                }
+                //printf("%i\n", stones[c][i]);
             }
-            printf("Current player is %i\n", newState->CurrentPlayer());
+
         }
         i++;
     }
-
 
     return newState;
 }
