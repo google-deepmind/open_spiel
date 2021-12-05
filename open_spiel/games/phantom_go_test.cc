@@ -123,21 +123,18 @@ void ResampleFromInfostateVisualTest()
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);
 
-
-    state.ApplyAction(5); //B
-    state.ApplyAction(6); //W
-    state.ApplyAction(7); //B
-    state.ApplyAction(8); //W
-    state.ApplyAction(6); //B
-    state.ApplyAction(9); //B
-    state.ApplyAction(10); //W
+    for(int i = 0; i < 80; i++)
+    {
+        std::vector<Action> actions = state.LegalActions();
+        std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+        state.ApplyAction(actions[0]);
+    }
 
     std::cout << "Original state\n" << state.ToString();
 
-    std::unique_ptr<State> resapleState = state.ResampleFromInfostate(0, nullptr);
+    std::unique_ptr<State> resampleState = state.ResampleFromInfostate(0, nullptr);
 
-
-    std::cout << "Resampled state\n " << resapleState->ToString();
+    std::cout << "Resampled state\n " << resampleState->ToString();
 }
 
 }  // namespace

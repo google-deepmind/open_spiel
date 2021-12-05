@@ -133,6 +133,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     {
         max = stoneCount[(uint8_t)GoColor::kWhite];
     }
+    //printf("Max %i\n", max);
 
     while (i < max)
     {
@@ -146,23 +147,29 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
                     std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
                     std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
                     currStoneCount[c]++;
+                    std::vector<int> vec = stones[(uint8_t)OppColor((GoColor)c)];
 
                     for(long action : actions)
                     {
-                        if(action == VirtualActionToAction(kVirtualPass, boardSize))
+                        // pass can't be chosen, also an action that will be played by opposing player can't be chosen
+                        if(action == VirtualActionToAction(kVirtualPass, boardSize) ||
+                            std::find(vec.begin(), vec.end(), action) != vec.end() )
                             continue;
 
                         newState->ApplyAction(action);
                         if(newState->board_.getStoneCount()[0] == currStoneCount[0] &&
                             newState->board_.getStoneCount()[1] == currStoneCount[1])
                         { //random move was applied correctly, no captures were made
+                            //std::cout << "Randomly chosen action " << ActionToString(c, action) << "\n";
                             if(player_id != c) {
                                 newState->ApplyAction(action);
+                                //std::cout << "Added to observation " << ActionToString(c, action) << "\n";
                             }
                             break;
                         }
                         else
                         {
+                            //std::cout << "random action" << ActionToString(c, action) << " was unacceptable\n";
                             newState->UndoAction(-1, -1);
                         }
                     }
@@ -170,20 +177,21 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
                 }
                 else {
                     newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
-                    //printf("pass\n");
+                    //printf("player %i passed\n", c);
                 }
             }
-
             else{
                 newState->ApplyAction(stones[c][i]);
+                //std::cout << "Chosen action " << ActionToString(c, stones[c][i]) << "\n";
                 if(player_id != c) {
                     newState->ApplyAction(stones[c][i]);
+                    //std::cout << "Added to observation " << ActionToString(c, stones[c][i]) << "\n";
                 }
-                //printf("%i\n", stones[c][i]);
             }
 
         }
         i++;
+        //printf("i %i\n", i);
     }
 
     //"fix" the history of newState, if white should be on move
