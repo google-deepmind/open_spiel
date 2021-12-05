@@ -109,8 +109,6 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
 
     std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
     std::array<int, 2> stoneCount = board_.getStoneCount();
-    int historyLength = history_.size();
-    int enemyStonesPlaced = 0;
 
     std::array<std::vector<int>, 2> stones;
 
@@ -151,6 +149,9 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
 
                     for(long action : actions)
                     {
+                        if(action == VirtualActionToAction(kVirtualPass, boardSize))
+                            continue;
+
                         newState->ApplyAction(action);
                         if(newState->board_.getStoneCount()[0] == currStoneCount[0] &&
                             newState->board_.getStoneCount()[1] == currStoneCount[1])
