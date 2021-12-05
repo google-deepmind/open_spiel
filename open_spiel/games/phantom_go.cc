@@ -186,6 +186,19 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
         i++;
     }
 
+    //"fix" the history of newState, if white should be on move
+    if(player_id == (uint8_t)GoColor::kWhite)
+    {
+        if(newState->history_.back().action == VirtualActionToAction(kVirtualPass, boardSize))
+        {
+            newState->UndoAction(-1, -1);
+        }
+        else
+        {
+            newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        }
+    }
+
     return newState;
 }
 
