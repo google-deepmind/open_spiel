@@ -101,6 +101,9 @@ class PhantomGoState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
+  const PhantomGoBoard& board() const { return board_; }
+
+
 
  protected:
   void DoApplyAction(Action action) override;
