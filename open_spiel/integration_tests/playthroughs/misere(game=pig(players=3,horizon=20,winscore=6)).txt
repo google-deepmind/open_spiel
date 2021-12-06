@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Misere Pig"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["diceoutcomes", "horizon", "players", "winscore"]
+GameType.parameter_specification = ["diceoutcomes", "horizon", "piglet", "players", "winscore"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -16,8 +16,8 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "misere"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 6
-PolicyTensorShape() = [6]
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 6
 GetParameters() = {game=pig(horizon=20,players=3,winscore=5)}
 NumPlayers() = 3
