@@ -60,6 +60,14 @@ class ReplayBufferTest(absltest.TestCase):
     self.assertIn("entry2", samples)
     self.assertIn("entry3", samples)
 
+  def test_replay_buffer_reset(self):
+    replay_buffer = ReplayBuffer(replay_buffer_capacity=3)
+    replay_buffer.add("entry1")
+    replay_buffer.add("entry2")
+
+    replay_buffer.reset()
+    self.assertEmpty(replay_buffer)
+
 
 if __name__ == "__main__":
   absltest.main()

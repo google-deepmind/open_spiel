@@ -63,6 +63,11 @@ class ReplayBuffer(object):
           num_samples, len(self._data)))
     return random.sample(self._data, num_samples)
 
+  def reset(self):
+    """Resets the contents of the replay buffer."""
+    self._data = []
+    self._next_entry_index = 0
+
   def __len__(self):
     return len(self._data)
 
