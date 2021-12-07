@@ -25,11 +25,25 @@
 // See http://cs.gettysburg.edu/projects/pig/index.html for details.
 // Also https://en.wikipedia.org/wiki/Pig_(dice_game)
 //
+// Piglet variant: Instead of increasing the running total by the roll results,
+// it is always increased by a fixed step size of 1 upon rolling anything higher
+// than a 1. [Note: Internally, this behaviour is modelled with only two chance
+// outcomes, rolling a 1 or rolling anything higher than that.]
+// Divide winscore by the average dice outcome != 1 (i.e. by diceoutcomes/2 + 1)
+// when enabling Piglet to play a game that's roughly equivalent to the
+// corresponding Pig game. The main advantage of this variant is thus a greatly
+// reduced state space, making the game accessible to tabular methods.
+// See also http://cs.gettysburg.edu/~tneller/papers/pig.zip. The original
+// Piglet variant described there is played with a fair coin and a winscore
+// of 10. This behaviour can be achieved by setting diceoutcomes = 2, winscore =
+// 10, piglet = true.
+//
 // Parameters:
 //     "diceoutcomes"  int    number of outcomes of the dice  (default = 6)
 //     "horizon"       int    max number of moves before draw (default = 1000)
 //     "players"       int    number of players               (default = 2)
-//     "winscore"      int    number of points needed to win   (default = 100)
+//     "winscore"      int    number of points needed to win  (default = 100)
+//     "piglet"        bool   is piglet variant enabled?      (default = false)
 
 namespace open_spiel {
 namespace pig {
@@ -40,7 +54,7 @@ class PigState : public State {
  public:
   PigState(const PigState&) = default;
   PigState(std::shared_ptr<const Game> game, int dice_outcomes, int horizon,
-           int win_score);
+           int win_score, bool piglet);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move_id) const override;
@@ -54,7 +68,7 @@ class PigState : public State {
 
   std::unique_ptr<State> Clone() const override;
 
-  int score(int player_id) const { return scores_[player_id]; }
+  int score(const int player_id) const { return scores_[player_id]; }
   int dice_outcomes() const { return dice_outcomes_; }
   std::vector<Action> LegalActions() const override;
 
@@ -67,6 +81,7 @@ class PigState : public State {
   int horizon_ = -1;
   int nplayers_ = -1;
   int win_score_ = 0;
+  bool piglet_ = false;
 
   int total_moves_ = -1;    // Total num moves taken during the game.
   Player cur_player_ = -1;  // Player to play.
@@ -81,16 +96,20 @@ class PigGame : public Game {
  public:
   explicit PigGame(const GameParameters& params);
 
-  int NumDistinctActions() const override { return 6; }
+  int NumDistinctActions() const override { return 2; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new PigState(shared_from_this(), dice_outcomes_, horizon_, win_score_));
+    return std::unique_ptr<State>(new PigState(
+        shared_from_this(), dice_outcomes_, horizon_, win_score_, piglet_));
   }
   int MaxChanceOutcomes() const override { return dice_outcomes_; }
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return horizon_; }
-  // TODO: verify whether this bound is tight and/or tighten it.
+
+  // Every chance node is preceded by a decision node (roll)
+  // -> At most as many chance nodes as decision nodes.
+  // -> Up to as many chance nodes as decision nodes, if
+  //    every action is "roll" and player never 'falls'.
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
 
   int NumPlayers() const override { return num_players_; }
@@ -111,6 +130,9 @@ class PigGame : public Game {
 
   // The amount needed to win.
   int win_score_;
+
+  // Whether Piglet variant is enabled (always move only 1 step forward)
+  bool piglet_;
 };
 
 }  // namespace pig

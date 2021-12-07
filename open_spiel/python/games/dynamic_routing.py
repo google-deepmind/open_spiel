@@ -15,6 +15,7 @@
 # Lint as python3
 """Implementation of dynamic routing game.
 
+The game is derived from https://arxiv.org/abs/2110.11943.
 This dynamic routing game models the evolution of N vehicles in a road network.
 The vehicles are described by their current link location, the time they have to
 spend on the link before exiting it, and their destination. The action of a
