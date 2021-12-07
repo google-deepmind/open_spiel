@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Computes a greedy policy from a value."""
+"""Computes a softmax policy from a value."""
 import numpy as np
 
 from open_spiel.python import policy as policy_std
