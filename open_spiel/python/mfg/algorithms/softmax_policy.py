@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Computes a softmax policy from a value."""
+"""Computes a softmax policy from a value function."""
+from typing import Optional
+
 import numpy as np
 
-from open_spiel.python import policy as policy_std
+from open_spiel.python import policy
 from open_spiel.python.mfg import value
 
 
-class SoftmaxPolicy(policy_std.Policy):
-  """Computes the softmax policy of a value."""
+class SoftmaxPolicy(policy.Policy):
+  """Computes the softmax policy of a value function."""
 
-  def __init__(self, game, player_ids, temperature,
+  def __init__(self, game, player_ids, temperature: float,
                state_action_value: value.ValueFunction,
-               prior_policy: policy_std.Policy = None):
+               prior_policy: Optional[policy.Policy] = None):
       """Initializes the softmax policy.
       Args:
         game: The game to analyze.
@@ -40,14 +42,16 @@ class SoftmaxPolicy(policy_std.Policy):
       self._temperature = temperature
 
   def action_probabilities(self, state, player_id=None):
+      legal_actions = state.legal_actions()
       max_q = np.max([self._state_action_value(state, action)
-          for action in state.legal_actions()])
+          for action in legal_actions])
       if self._prior_policy is not None:
-        exp_q = [p * np.exp((self._state_action_value(state, action) - max_q) / self._temperature) for action, p
-                in self._prior_policy.action_probabilities(state).items()]
+        prior_probs = self._prior_policy.action_probabilities(state)
+        exp_q = [prior_probs.get(action, 0) * np.exp((self._state_action_value(state, action) - max_q)
+                                                     / self._temperature) for action in legal_actions]
       else:
         exp_q = [np.exp((self._state_action_value(state, action) - max_q) / self._temperature) for action
-                 in state.legal_actions()]
+                 in legal_actions]
       norm_exp = sum(exp_q)
       smax_q = exp_q / norm_exp
-      return dict(zip(state.legal_actions(), smax_q))
+      return dict(zip(legal_actions, smax_q))
