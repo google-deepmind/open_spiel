@@ -127,7 +127,14 @@ void ResampleFromInfostateVisualTest()
     {
         std::vector<Action> actions = state.LegalActions();
         std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-        state.ApplyAction(actions[0]);
+        for(long action : actions)
+        {
+            if(action != VirtualActionToAction(kVirtualPass, kBoardSize))
+            {
+                state.ApplyAction(action);
+                break;
+            }
+        }
     }
 
     std::cout << "Original state\n" << state.ToString();
@@ -135,6 +142,44 @@ void ResampleFromInfostateVisualTest()
     std::unique_ptr<State> resampleState = state.ResampleFromInfostate(0, nullptr);
 
     std::cout << "Resampled state\n " << resampleState->ToString();
+}
+
+void ResampleFromInfostateForceTest()
+{
+    std::cout << "Starting ResampleFromInfostate visual Test\n";
+    GameParameters params;
+    params["board_size"] = GameParameter(kBoardSize);
+    /*std::shared_ptr<const Game> game =
+        LoadGame("phantom_go", params);
+    PhantomGoState state(game, kBoardSize, kKomi, 0);*/
+
+    for(int n = 1; n < 21; n++)
+    {
+        std::cout << "Starting test for n " << n << "\n";
+        for(int x = 0; x < 1000; x++)
+        {
+            std::shared_ptr<const Game> game =
+                LoadGame("phantom_go", params);
+            PhantomGoState state(game, kBoardSize, kKomi, 0);
+
+            for(int i = 0; i < n * 10; i++)
+            {
+                std::vector<Action> actions = state.LegalActions();
+                std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+                for(long action : actions)
+                {
+                    if(action != VirtualActionToAction(kVirtualPass, kBoardSize))
+                    {
+                        state.ApplyAction(action);
+                        break;
+                    }
+                }
+
+
+            }
+            std::unique_ptr<State> resampleState = state.ResampleFromInfostate(0, nullptr);
+        }
+    }
 }
 
 }  // namespace
@@ -148,6 +193,7 @@ int main(int argc, char** argv) {
   open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
   open_spiel::phantom_go::IllegalMoveTest();
   open_spiel::phantom_go::StoneCountTest();
-  open_spiel::phantom_go::ResampleFromInfostateVisualTest();
-  
+  //open_spiel::phantom_go::ResampleFromInfostateVisualTest();
+  open_spiel::phantom_go::ResampleFromInfostateForceTest();
+
 }

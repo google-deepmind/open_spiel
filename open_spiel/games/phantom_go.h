@@ -34,7 +34,7 @@
 //  "komi"              float  compensation for white                  (default = 7.5)
 //  "board_size"        int    rows of the board, usually 9, 13 or 19  (default = 19)
 //  "handicap"          int    number of handicap stones for black     (default = 0)
-//  "max_game_length"   int    maximal lenght of a game                (default = board_size * board_size * 2)
+//  "max_game_length"   int    maximal lenght of a game                (default = board_size * board_size * 8)
 
 namespace open_spiel {
 namespace phantom_go {
@@ -54,11 +54,10 @@ inline int NumDistinctActions(int board_size) {
   return board_size * board_size + 1;
 }
 
-// In theory Go games have no length limit, but we limit them to twice the
-// number of points on the board for practicality - only random games last
-// this long. This value can also be overriden when creating the game.
+// Such high number has been set, mainly because moves on enemy stones are also counted into length
+// And for "clear" resampling, lot of passes and "observation moves" are needed
 inline int DefaultMaxGameLength(int board_size) {
-  return board_size * board_size * 2;
+  return board_size * board_size * 8;
 }
 
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }

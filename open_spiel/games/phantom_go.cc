@@ -122,89 +122,66 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
         }
     }
 
-
-    int i = 0;
-    int max;
-    if(stoneCount[(uint8_t)GoColor::kBlack] > stoneCount[(uint8_t)GoColor::kWhite])
-    {
-        max = stoneCount[(uint8_t)GoColor::kBlack];
-    }
-    else
-    {
-        max = stoneCount[(uint8_t)GoColor::kWhite];
-    }
-    //printf("Max %i\n", max);
-
-    while (i < max)
-    {
-        for (int c = 0; c <= 1; c++)
-        {
-            if (i >= stones[c].size())
-            {
-                if(i < stoneCount[c])
-                {
-                    std::vector<Action> actions = newState->LegalActions();
-                    std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-                    std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
-                    currStoneCount[c]++;
-                    std::vector<int> vec = stones[(uint8_t)OppColor((GoColor)c)];
-
-                    for(long action : actions)
-                    {
-                        // pass can't be chosen, also an action that will be played by opposing player can't be chosen
-                        if(action == VirtualActionToAction(kVirtualPass, boardSize) ||
-                            std::find(vec.begin(), vec.end(), action) != vec.end() )
-                            continue;
-
-                        newState->ApplyAction(action);
-                        if(newState->board_.getStoneCount()[0] == currStoneCount[0] &&
-                            newState->board_.getStoneCount()[1] == currStoneCount[1])
-                        { //random move was applied correctly, no captures were made
-                            //std::cout << "Randomly chosen action " << ActionToString(c, action) << "\n";
-                            if(player_id != c) {
-                                newState->ApplyAction(action);
-                                //std::cout << "Added to observation " << ActionToString(c, action) << "\n";
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            //std::cout << "random action" << ActionToString(c, action) << " was unacceptable\n";
-                            newState->UndoAction(-1, -1);
-                        }
-                    }
-
-                }
-                else {
-                    newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
-                    //printf("player %i passed\n", c);
-                }
-            }
-            else{
-                newState->ApplyAction(stones[c][i]);
-                //std::cout << "Chosen action " << ActionToString(c, stones[c][i]) << "\n";
-                if(player_id != c) {
-                    newState->ApplyAction(stones[c][i]);
-                    //std::cout << "Added to observation " << ActionToString(c, stones[c][i]) << "\n";
-                }
-            }
-
-        }
-        i++;
-        //printf("i %i\n", i);
-    }
-
-    //"fix" the history of newState, if white should be on move
     if(player_id == (uint8_t)GoColor::kWhite)
     {
-        if(newState->history_.back().action == VirtualActionToAction(kVirtualPass, boardSize))
-        {
-            newState->UndoAction(-1, -1);
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    for(long action : stones[player_id]) // Fill the board with stones of player we want to resample for
+    {
+        newState->ApplyAction(action);
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    if(!newState->history_.empty())
+    {
+        newState->UndoAction(-1, -1);
+    }
+
+
+    auto opp_player_id = (uint8_t)OppColor((GoColor)player_id);
+    for(long action : stones[opp_player_id])
+    {
+        newState->ApplyAction(action);
+        newState->ApplyAction(action);
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    for(int i = 0; i < stoneCount[opp_player_id] - stones[opp_player_id].size(); i++) {
+        std::vector<Action> actions = newState->LegalActions();
+        std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+        std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
+        currStoneCount[opp_player_id]++;
+        std::vector<int> vec = stones[opp_player_id];
+
+        for (long action: actions) {
+            // pass can't be chosen, also an action that will be played by opposing player can't be chosen
+            if (action == VirtualActionToAction(kVirtualPass, boardSize) ||
+                std::find(vec.begin(), vec.end(), action) != vec.end())
+                continue;
+
+            newState->ApplyAction(action);
+            if (newState->board_.getStoneCount()[0] == currStoneCount[0] &&
+                newState->board_.getStoneCount()[1] == currStoneCount[1])
+            { //random move was applied correctly, no captures were made
+                newState->ApplyAction(action);
+                newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+                //std::cout << "Added to observation " << ActionToString(c, action) << "\n";
+                break;
+            } else {
+                //std::cout << "random action" << ActionToString(c, action) << " was unacceptable\n";
+                newState->UndoAction(-1, -1);
+            }
         }
-        else
-        {
-            newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
-        }
+    }
+    newState->UndoAction(-1, -1);
+
+    if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
+        newState->board_.getStoneCount()[1] == stoneCount[1]))
+    {
+        ToString();
+        newState->ToString();
+        //SpielFatalError("after resampling, the count of stones doesn't match\n");
     }
 
     return newState;
