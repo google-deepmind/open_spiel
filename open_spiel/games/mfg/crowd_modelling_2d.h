@@ -117,6 +117,12 @@ class CrowdModelling2dState : public State {
 
  protected:
   void DoApplyAction(Action action) override;
+  // Returns true if the specified action leads to a forbidden position.
+  bool IsForbidden(Action action) const;
+  // Returns true if the specified position is forbidden.
+  bool IsForbiddenPosition(int x, int y) const;
+  // Returns the list if legal actions for the player.
+  std::vector<Action> LegalPlayerActions() const;
 
  private:
   Player current_player_ = kChancePlayerId;

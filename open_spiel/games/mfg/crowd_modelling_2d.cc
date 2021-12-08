@@ -148,7 +148,7 @@ int MergeXY(int xx, int yy, int size) {
   SPIEL_CHECK_LE(xx, size - 1);
   SPIEL_CHECK_GE(yy, 0);
   SPIEL_CHECK_LE(yy, size - 1);
-  return yy +  xx * size;
+  return yy + xx * size;
 }
 
 bool ComparisonPair(const std::pair<int, int>& a,
@@ -264,19 +264,55 @@ CrowdModelling2dState::CrowdModelling2dState(
   return_value_ = return_value;
 }
 
+std::vector<Action> CrowdModelling2dState::LegalPlayerActions() const {
+  std::vector<Action> legal_actions;
+  legal_actions.reserve(kNumActions);
+  for (Action action = 0; action < kNumActions; ++action) {
+    if (!IsForbidden(action)) {
+      legal_actions.push_back(action);
+    }
+  }
+  return legal_actions;
+}
+
 std::vector<Action> CrowdModelling2dState::LegalActions() const {
   if (IsTerminal()) return {};
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsMeanFieldNode()) return {};
   SPIEL_CHECK_TRUE(IsPlayerNode());
-  return {0, 1, 2, 3, 4};
+  return LegalPlayerActions();
 }
 
 ActionsAndProbs CrowdModelling2dState::ChanceOutcomes() const {
   if (is_chance_init_) {
     return initial_distribution_action_prob_;
   }
-  return {{0, 1. / 5}, {1, 1. / 5}, {2, 1. / 5}, {3, 1. / 5}, {4, 1. / 5}};
+  const std::vector<Action> legal_actions = LegalPlayerActions();
+  ActionsAndProbs outcomes;
+  if (legal_actions.empty()) {
+    return outcomes;
+  }
+  const double prob = 1. / legal_actions.size();
+  outcomes.reserve(legal_actions.size());
+  for (const Action action : legal_actions) {
+    outcomes.emplace_back(action, prob);
+  }
+  return outcomes;
+}
+
+bool CrowdModelling2dState::IsForbidden(Action action) const {
+  int xx = (x_ + kActionToMoveX.at(action) + size_) % size_;
+  int yy = (y_ + kActionToMoveY.at(action) + size_) % size_;
+  return IsForbiddenPosition(xx, yy);
+}
+
+bool CrowdModelling2dState::IsForbiddenPosition(int x, int y) const {
+  for (const auto& forbidden_xy : forbidden_states_xy_) {
+    if (x == forbidden_xy.first && y == forbidden_xy.second) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void CrowdModelling2dState::DoApplyAction(Action action) {
@@ -305,16 +341,8 @@ void CrowdModelling2dState::DoApplyAction(Action action) {
     last_action_ = action;
     current_player_ = kChancePlayerId;
   }
-  // Check if the new (xx,yy) is forbidden.
-  bool is_next_state_forbidden = false;
-  for (const auto& forbidden_xy : forbidden_states_xy_) {
-    if (xx == forbidden_xy.first && yy == forbidden_xy.second) {
-      is_next_state_forbidden = true;
-      break;
-    }
-  }
   // Assign the new (x,y) position if it isn't forbidden.
-  if (!is_next_state_forbidden || is_chance_init_) {
+  if (!IsForbiddenPosition(xx, yy) || is_chance_init_) {
     x_ = xx;
     y_ = yy;
   }
@@ -354,7 +382,7 @@ std::vector<double> CrowdModelling2dState::Rewards() const {
   if (current_player_ != 0) {
     return {0.};
   }
-  double r_mu = -std::log(distribution_[MergeXY(x_, y_, size_)]+kEpsilon);
+  double r_mu = -std::log(distribution_[MergeXY(x_, y_, size_)] + kEpsilon);
   if (only_distribution_reward_) {
     return {r_mu};
   }

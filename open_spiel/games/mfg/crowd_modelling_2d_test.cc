@@ -89,11 +89,41 @@ void TestProcess() {
   SPIEL_CHECK_EQ(split_string_list3.size(), 2);
 }
 
+void TestLegalActions() {
+  auto game = LoadGame(
+      "mfg_crowd_modelling_2d(size=5,horizon=10,forbidden_states=[0|0;0|1;1|0]"
+      ",initial_distribution=[1|1],initial_distribution_value=[1.0])");
+  auto state = game->NewInitialState();
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  // Legal action will be the state in the initial distribution.
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({6}));
+  state->ApplyAction(6);
+  // Legal actions are moving right, down or no movement.
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({2, 3, 4}));
+  // Go right.
+  state->ApplyAction(3);
+  // Chance node. No forbidden states around and all actions are legal.
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({0, 1, 2, 3, 4}));
+  // Go left.
+  state->ApplyAction(1);
+  // Mean field node; legal actions will be empty.
+  SPIEL_CHECK_TRUE(state->LegalActions().empty());
+  std::vector<double> dist(25);
+  state->UpdateDistribution(dist);
+  // Back to starting point.
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({2, 3, 4}));
+  // Stay in the same position.
+  state->ApplyAction(2);
+  // Chance node. The legal actions should be the same.
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({2, 3, 4}));
+}
+
 }  // namespace
 }  // namespace crowd_modelling_2d
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::crowd_modelling_2d::TestLegalActions();
   open_spiel::crowd_modelling_2d::TestLoad();
   open_spiel::crowd_modelling_2d::TestLoadWithParams();
   open_spiel::crowd_modelling_2d::TestLoadWithParams2();
