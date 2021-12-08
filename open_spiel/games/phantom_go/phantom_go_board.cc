@@ -434,7 +434,18 @@ std::string PhantomGoBoard::observationToString() const
         }
         ss << "\n";
     }
-    ss << "   ABCDEFGHJ\n";
+    ss << "   ";
+
+    for(int i = 0; i < board_size_; i++)
+    {
+        char letter = 'A' + i;
+        if(letter >= 'I')
+        {
+            letter++;
+        }
+        ss << letter;
+    }
+    ss << "\n";
 
     ss << "\nObservation black:\n";
     for (int x = board_size_ - 1; x >= 0; x--)
@@ -446,7 +457,18 @@ std::string PhantomGoBoard::observationToString() const
         }
         ss << "\n";
     }
-    ss << "   ABCDEFGHJ\n";
+    ss << "   ";
+
+    for(int i = 0; i < board_size_; i++)
+    {
+        char letter = 'A' + i;
+        if(letter >= 'I')
+        {
+            letter++;
+        }
+        ss << letter;
+    }
+    ss << "\n";
 
     return ss.str();
 }
