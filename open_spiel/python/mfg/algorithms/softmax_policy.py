@@ -34,8 +34,7 @@ class SoftmaxPolicy(policy.Policy):
           be in the range 0..game.num_players()-1.
         temperature: float to scale the values (multiplied by 1/temperature).
         state_action_value: A state-action value function.
-        prior_policy: Optional argument. Prior policy to scale the softmax policy. The prior must have
-          strictly positive coefficients, ohterwise it won't be used in the method action_probabilities.
+        prior_policy: Optional argument. Prior policy to scale the softmax policy.
       """
       super(SoftmaxPolicy, self).__init__(game, player_ids)
       self._state_action_value = state_action_value
@@ -46,12 +45,11 @@ class SoftmaxPolicy(policy.Policy):
       legal_actions = state.legal_actions()
       max_q = np.max([self._state_action_value(state, action)
           for action in legal_actions])
-      if self._prior_policy is not None and 0 not in self._prior_policy.action_probabilities(state):
+      exp_q = [np.exp((self._state_action_value(state, action) - max_q) / self._temperature) for action
+               in legal_actions]
+      if self._prior_policy is not None:
         prior_probs = self._prior_policy.action_probabilities(state)
-        exp_q = [prior_probs.get(action, 0) * np.exp((self._state_action_value(state, action) - max_q)
-                                                     / self._temperature) for action in legal_actions]
-      else:
-        exp_q = [np.exp((self._state_action_value(state, action) - max_q) / self._temperature) for action
-                 in legal_actions]
-      smax_q = exp_q / sum(exp_q)
+        exp_q = [prior_probs.get(action, 0) * exp_q[i] for i, action in enumerate(legal_actions)]
+      denom = sum(exp_q)
+      smax_q = exp_q if denom == 0 else exp_q / denom
       return dict(zip(legal_actions, smax_q))
