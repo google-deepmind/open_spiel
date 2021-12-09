@@ -21,7 +21,6 @@ from open_spiel.python import policy
 from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
-from open_spiel.python.mfg.algorithms import greedy_policy
 from open_spiel.python.mfg.algorithms import softmax_policy
 from open_spiel.python.mfg.algorithms import policy_value
 from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
