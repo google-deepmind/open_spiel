@@ -44,60 +44,45 @@ class SoftmaxPolicyTest(parameterized.TestCase):
       name: Name of the game.
     """
 
-    # Checks that a greedy policy with respect to an optimal value is an optimal policy.
     game = pyspiel.load_game(name)
     uniform_policy = policy.UniformRandomPolicy(game)
     dist = distribution.DistributionPolicy(game, uniform_policy)
     br_value = best_response_value.BestResponse(
         game, dist, value.TabularValueFunction(game))
-    br_val = br_value(game.new_initial_state())
-
-    greedy_pi = greedy_policy.GreedyPolicy(game, None, br_value)
-    greedy_pi = greedy_pi.to_tabular()
-    pybr_value = policy_value.PolicyValue(game, dist, greedy_pi,
-                                          value.TabularValueFunction(game))
-    pybr_val = pybr_value(game.new_initial_state())
-    self.assertAlmostEqual(br_val, pybr_val)
+    br_init_val = br_value(game.new_initial_state())
 
     # uniform prior policy gives the same results than no prior.
     softmax_pi_uniform_prior = softmax_policy.SoftmaxPolicy(game, None, 1.0, br_value, uniform_policy).to_tabular()
     softmax_pi_uniform_prior_value = policy_value.PolicyValue(game, dist, softmax_pi_uniform_prior,
                                           value.TabularValueFunction(game))
-    softmax_pi_uniform_prior_val = softmax_pi_uniform_prior_value(game.new_initial_state())
+    softmax_pi_uniform_prior_init_val = softmax_pi_uniform_prior_value(game.new_initial_state())
     softmax_pi_no_prior = softmax_policy.SoftmaxPolicy(game, None, 1.0, br_value, None)
     softmax_pi_no_prior_value = policy_value.PolicyValue(game, dist, softmax_pi_no_prior,
                                                             value.TabularValueFunction(game))
-    softmax_pi_no_prior_val = softmax_pi_no_prior_value(game.new_initial_state())
+    softmax_pi_no_prior_init_val = softmax_pi_no_prior_value(game.new_initial_state())
 
-    self.assertAlmostEqual(softmax_pi_uniform_prior_val, softmax_pi_no_prior_val)
+    self.assertAlmostEqual(softmax_pi_uniform_prior_init_val, softmax_pi_no_prior_init_val)
 
     # very high temperature gives almost a uniform policy.
     uniform_policy = uniform_policy.to_tabular()
     uniform_value = policy_value.PolicyValue(game, dist, uniform_policy,
                                           value.TabularValueFunction(game))
-    uniform_val = uniform_value(game.new_initial_state())
+    uniform_init_val = uniform_value(game.new_initial_state())
 
     softmax_pi_no_prior = softmax_policy.SoftmaxPolicy(game, None, 100000000, br_value, None)
     softmax_pi_no_prior_value = policy_value.PolicyValue(game, dist, softmax_pi_no_prior,
                                                          value.TabularValueFunction(game))
-    softmax_pi_no_prior_val = softmax_pi_no_prior_value(game.new_initial_state())
+    softmax_pi_no_prior_init_val = softmax_pi_no_prior_value(game.new_initial_state())
 
-    self.assertAlmostEqual(uniform_val, softmax_pi_no_prior_val)
+    self.assertAlmostEqual(uniform_init_val, softmax_pi_no_prior_init_val)
 
     # very low temperature gives almost a best response policy.
     softmax_pi_no_prior = softmax_policy.SoftmaxPolicy(game, None, 0.0001, br_value, None)
     softmax_pi_no_prior_value = policy_value.PolicyValue(game, dist, softmax_pi_no_prior,
                                                          value.TabularValueFunction(game))
-    softmax_pi_no_prior_val = softmax_pi_no_prior_value(game.new_initial_state())
+    softmax_pi_no_prior_init_val = softmax_pi_no_prior_value(game.new_initial_state())
 
-    self.assertAlmostEqual(br_val, softmax_pi_no_prior_val)
-
-
-
-
-
-
-
+    self.assertAlmostEqual(br_init_val, softmax_pi_no_prior_init_val)
 
 if __name__ == '__main__':
   absltest.main()
