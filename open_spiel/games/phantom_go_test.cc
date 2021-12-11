@@ -123,25 +123,22 @@ void ResampleFromInfostateVisualTest()
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);
 
-    for(int i = 0; i < 80; i++)
+    for(int i = 0; i < 120; i++)
     {
         std::vector<Action> actions = state.LegalActions();
         std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-        for(long action : actions)
+        state.ApplyAction(actions[0]);
+        if(state.IsTerminal())
         {
-            if(action != VirtualActionToAction(kVirtualPass, kBoardSize))
-            {
-                state.ApplyAction(action);
-                break;
-            }
+            break;
         }
     }
 
-    std::cout << "Original state\n" << state.ToString();
+    //std::cout << "Original state\n" << state.ToString();
 
     std::unique_ptr<State> resampleState = state.ResampleFromInfostate(0, nullptr);
 
-    std::cout << "Resampled state\n " << resampleState->ToString();
+    //std::cout << "Resampled state\n " << resampleState->ToString();
 }
 
 void ResampleFromInfostateForceTest()
@@ -153,7 +150,7 @@ void ResampleFromInfostateForceTest()
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);*/
 
-    for(int n = 1; n < 21; n++)
+    for(int n = 1; n < 31; n++)
     {
         std::cout << "Starting test for n " << n << "\n";
         for(int x = 0; x < 1000; x++)
@@ -182,6 +179,27 @@ void ResampleFromInfostateForceTest()
     }
 }
 
+void CloneVisualTest() {
+    std::cout << "Starting Clone visual Test\n";
+    GameParameters params;
+    params["board_size"] = GameParameter(kBoardSize);
+    std::shared_ptr<const Game> game =
+        LoadGame("phantom_go", params);
+    PhantomGoState state(game, kBoardSize, kKomi, 0);
+
+    for (int i = 0; i < 120; i++) {
+        std::vector<Action> actions = state.LegalActions();
+        std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+        state.ApplyAction(actions[0]);
+        if (state.IsTerminal()) {
+            break;
+        }
+    }
+
+    std::unique_ptr<State> cloneState = state.Clone();
+    std::cout << state.ToString() << "\n" << cloneState->ToString();
+}
+
 }  // namespace
 }  // namespace phantom_go
 }  // namespace open_spiel
@@ -193,7 +211,8 @@ int main(int argc, char** argv) {
   open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
   open_spiel::phantom_go::IllegalMoveTest();
   open_spiel::phantom_go::StoneCountTest();
-  //open_spiel::phantom_go::ResampleFromInfostateVisualTest();
-  open_spiel::phantom_go::ResampleFromInfostateForceTest();
+  open_spiel::phantom_go::ResampleFromInfostateVisualTest();
+  //open_spiel::phantom_go::ResampleFromInfostateForceTest();
+  //open_spiel::phantom_go::CloneVisualTest();
 
 }
