@@ -676,6 +676,6 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::CanConvertActionsCorrectly();
   open_spiel::universal_poker::TestFCHPA();
   open_spiel::universal_poker::TestHoleIndexCalculation();
-  // open_spiel::universal_poker::TestSubgameCreation();
+  open_spiel::universal_poker::TestSubgameCreation();
   open_spiel::universal_poker::TestRandomSubgameCreation();
 }
