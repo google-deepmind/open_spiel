@@ -123,7 +123,7 @@ void ResampleFromInfostateVisualTest()
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);
 
-    for(int i = 0; i < 120; i++)
+    for(int i = 0; i < 150; i++)
     {
         std::vector<Action> actions = state.LegalActions();
         std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
@@ -134,11 +134,17 @@ void ResampleFromInfostateVisualTest()
         }
     }
 
-    //std::cout << "Original state\n" << state.ToString();
-
     std::unique_ptr<State> resampleState = state.ResampleFromInfostate(0, nullptr);
 
-    //std::cout << "Resampled state\n " << resampleState->ToString();
+    std::cout << "Original state\n" << state.ToString();
+
+    std::cout << "Resampled state\n " << resampleState->ToString();
+
+    /*for(int i = 0; i < state.FullHistory().size(); i++)
+    {
+        std::cout << state.ActionToString(state.FullHistory()[i].player, state.FullHistory()[i].action) << " " <<
+            state.ActionToString(resampleState->FullHistory()[i].player, resampleState->FullHistory()[i].action) << "\n";
+    }*/
 }
 
 void ResampleFromInfostateForceTest()
@@ -150,7 +156,7 @@ void ResampleFromInfostateForceTest()
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);*/
 
-    for(int n = 1; n < 31; n++)
+    for(int n = 10; n < 15; n++)
     {
         std::cout << "Starting test for n " << n << "\n";
         for(int x = 0; x < 1000; x++)
@@ -161,10 +167,16 @@ void ResampleFromInfostateForceTest()
 
             for(int i = 0; i < n * 10; i++)
             {
+                if(state.IsTerminal())
+                {
+                    state.UndoAction(-1, -1);
+                    break;
+                }
                 std::vector<Action> actions = state.LegalActions();
                 std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
                 for(long action : actions)
                 {
+
                     if(action != VirtualActionToAction(kVirtualPass, kBoardSize))
                     {
                         state.ApplyAction(action);
@@ -174,7 +186,8 @@ void ResampleFromInfostateForceTest()
 
 
             }
-            std::unique_ptr<State> resampleState = state.ResampleFromInfostate(0, nullptr);
+            std::unique_ptr<State> resampleState = state.ResampleFromInfostate(state.CurrentPlayer(), nullptr);
+
         }
     }
 }
@@ -211,8 +224,8 @@ int main(int argc, char** argv) {
   open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
   open_spiel::phantom_go::IllegalMoveTest();
   open_spiel::phantom_go::StoneCountTest();
-  open_spiel::phantom_go::ResampleFromInfostateVisualTest();
-  //open_spiel::phantom_go::ResampleFromInfostateForceTest();
+  //open_spiel::phantom_go::ResampleFromInfostateVisualTest();
+  open_spiel::phantom_go::ResampleFromInfostateForceTest();
   //open_spiel::phantom_go::CloneVisualTest();
 
 }

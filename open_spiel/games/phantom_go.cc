@@ -29,11 +29,11 @@ namespace {
 const GameType kGameType{
     /*short_name=*/"phantom_go",
     /*long_name=*/"Phantom Go",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
+                   GameType::Dynamics::kSequential,
+                   GameType::ChanceMode::kDeterministic,
+                   GameType::Information::kImperfectInformation,
+                   GameType::Utility::kZeroSum,
+                   GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
@@ -41,71 +41,165 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"komi", GameParameter(7.5)},
-     {"board_size", GameParameter(19)},
-     {"handicap", GameParameter(0)},
-     // After the maximum game length, the game will end arbitrarily and the
-     // score is computed as usual (i.e. number of stones + komi).
-     // It's advised to only use shorter games to compute win-rates.
-     // When not provided, it defaults to DefaultMaxGameLength(board_size)
-     {"max_game_length",
-      GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
+                   {{"komi", GameParameter(7.5)},
+                    {"board_size", GameParameter(9)},
+                    {"handicap", GameParameter(0)},
+                       // After the maximum game length, the game will end arbitrarily and the
+                       // score is computed as usual (i.e. number of stones + komi).
+                       // It's advised to only use shorter games to compute win-rates.
+                       // When not provided, it defaults to DefaultMaxGameLength(board_size)
+                    {"max_game_length",
+                     GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
 };
 
-std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new PhantomGoGame(params));
+std::shared_ptr<const Game> Factory(const GameParameters &params) {
+    return std::shared_ptr<const Game>(new PhantomGoGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 std::vector<VirtualPoint> HandicapStones(int num_handicap) {
-  if (num_handicap < 2 || num_handicap > 9) return {};
+    if (num_handicap < 2 || num_handicap > 9) return {};
 
-  static std::array<VirtualPoint, 9> placement = {
-      {MakePoint("d4"), MakePoint("q16"), MakePoint("d16"), MakePoint("q4"),
-       MakePoint("d10"), MakePoint("q10"), MakePoint("k4"), MakePoint("k16"),
-       MakePoint("k10")}};
-  static VirtualPoint center = MakePoint("k10");
+    static std::array<VirtualPoint, 9> placement = {
+        {MakePoint("d4"), MakePoint("q16"), MakePoint("d16"), MakePoint("q4"),
+         MakePoint("d10"), MakePoint("q10"), MakePoint("k4"), MakePoint("k16"),
+         MakePoint("k10")}};
+    static VirtualPoint center = MakePoint("k10");
 
-  std::vector<VirtualPoint> points;
-  points.reserve(num_handicap);
-  for (int i = 0; i < num_handicap; ++i) {
-    points.push_back(placement[i]);
-  }
+    std::vector<VirtualPoint> points;
+    points.reserve(num_handicap);
+    for (int i = 0; i < num_handicap; ++i) {
+        points.push_back(placement[i]);
+    }
 
-  if (num_handicap >= 5 && num_handicap % 2 == 1) {
-    points[num_handicap - 1] = center;
-  }
+    if (num_handicap >= 5 && num_handicap % 2 == 1) {
+        points[num_handicap - 1] = center;
+    }
 
-  return points;
+    return points;
 }
 
 }  // namespace
 
 PhantomGoState::PhantomGoState(std::shared_ptr<const Game> game, int board_size, float komi,
-                 int handicap)
-    //help 
+                               int handicap)
     : State(std::move(game)),
       board_(board_size),
       komi_(komi),
       handicap_(handicap),
       max_game_length_(game_->MaxGameLength()),
       to_play_(GoColor::kBlack) {
-  ResetBoard();
-  
+    ResetBoard();
+
+}
+
+std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix moves into eyes that keep messing up the histories
+    int player_id, std::function<double()> rng) const {
+
+    int boardSize = board_.board_size();
+
+    std::shared_ptr<const Game> newGame = GetGame();
+    std::unique_ptr<PhantomGoState>
+        newState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+
+    std::array<GoColor, kMaxBoardSize * kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
+    std::array<int, 2> stoneCount = board_.getStoneCount();
+
+    std::array<std::vector<int>, 2> stones;
+    std::vector<Action> enemyActions;
+    std::vector<bool> enemyActionVisibility;
+    std::vector<int> enemyActionNumber;
+
+    auto opp_payer_id = (uint8_t) OppColor((GoColor) player_id);
+
+    //Find and store all stones which are in the last move on board
+    for (int i = 0; i < boardSize * boardSize; i++) {
+        if (infoState[i] != GoColor::kEmpty) {
+            stones[(uint8_t) infoState[i]].push_back(i);
+        }
+    }
+
+    if(player_id == (uint8_t)GoColor::kWhite)
+    {
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    for(long action : stones[player_id]) // Fill the board with stones of player we want to resample for
+    {
+        newState->ApplyAction(action);
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    if(!newState->history_.empty())
+    {
+        newState->UndoAction(-1, -1);
+    }
+
+
+    auto opp_player_id = (uint8_t)OppColor((GoColor)player_id);
+    for(long action : stones[opp_player_id])
+    {
+        newState->ApplyAction(action);
+        newState->ApplyAction(action);
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    for(int i = 0; i < stoneCount[opp_player_id] - stones[opp_player_id].size(); i++) {
+        std::vector<Action> actions = newState->LegalActions();
+        std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+        std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
+        currStoneCount[opp_player_id]++;
+        std::vector<int> vec = stones[opp_player_id];
+
+        for (long action: actions) {
+            // pass can't be chosen, also an action that will be played by opposing player can't be chosen
+            if (action == VirtualActionToAction(kVirtualPass, boardSize) ||
+                std::find(vec.begin(), vec.end(), action) != vec.end())
+                continue;
+
+            newState->ApplyAction(action);
+            if (newState->board_.getStoneCount()[0] == currStoneCount[0] &&
+                newState->board_.getStoneCount()[1] == currStoneCount[1])
+            { //random move was applied correctly, no captures were made
+                newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+                //std::cout << "Added to observation " << ActionToString(c, action) << "\n";
+                break;
+            } else {
+                //std::cout << "random action" << ActionToString(c, action) << " was unacceptable\n";
+                newState->UndoAction(-1, -1);
+            }
+        }
+    }
+    if(!newState->history_.empty())
+    {
+        newState->UndoAction(-1, -1);
+    }
+
+    if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
+        newState->board_.getStoneCount()[1] == stoneCount[1]))
+    {
+        ToString();
+        newState->ToString();
+        SpielFatalError("after resampling, the count of stones doesn't match\n");
+    }
+
+    if(CurrentPlayer() != newState->CurrentPlayer())
+    {
+        SpielFatalError("after resampling, wrong current player\n");
+    }
+
+    return newState;
 }
 
 
-// this method is in progress of making, the implementation is not correct
-std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
+std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix moves into eyes that keep messing up the histories
     int player_id, std::function<double()> rng) const {
+
     int boardSize = board_.board_size();
 
     std::shared_ptr<const Game> newGame = GetGame();
     std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
-
-    /*std::shared_ptr<const Game> newGame = LoadGame("phantom_go");
-    std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(PhantomGoState(newGame, boardSize, komi_, handicap_));*/
 
     std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
     std::array<int, 2> stoneCount = board_.getStoneCount();
@@ -115,10 +209,9 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     std::vector<bool> enemyActionVisibility;
     std::vector<int> enemyActionNumber;
 
-
     auto opp_payer_id = (uint8_t)OppColor((GoColor)player_id);
 
-    //Find and store all stones
+    //Find and store all stones which are in the last move on board
     for (int i = 0; i < boardSize * boardSize; i++)
     {
         if (infoState[i] != GoColor::kEmpty)
@@ -127,43 +220,44 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
         }
     }
 
-
     std::vector<int> captureMoves;
     std::vector<std::vector<Action>> capturedActions;
     capturedActions.emplace_back();
 
     { //deciding which actions are important because of captures
-        std::shared_ptr<const Game> historyGame = LoadGame("phantom_go");
-        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(PhantomGoState(historyGame, boardSize, komi_, handicap_));
+        std::shared_ptr<const Game> historyGame = GetGame();
+        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
         //this state will be used as a state to replicate the whole history to be able to observe board in each step
 
 
         for (int i = 0; i < history_.size(); i++){
-
             //continiously filling in a vector of enemy moves, for which their importance will be decided
-            if (history_[i].player == opp_payer_id && history_[i].action != VirtualActionToAction(kVirtualPass, boardSize)) {
+            if (history_[i].player == opp_payer_id) {
                 enemyActions.push_back(history_[i].action);
                 enemyActionVisibility.push_back(false);
                 enemyActionNumber.push_back(i);
+                //pass must be played, the count of the stones wont match up
+                if(history_[i].action == VirtualActionToAction(kVirtualPass, boardSize))
+                {
+                    enemyActionVisibility[enemyActionVisibility.size() - 1] = true;
+                }
             }
 
             std::array<int, 2> prevStoneCount = historyState->board_.getStoneCount();
             historyState->ApplyAction(history_[i].action);
             std::array<int, 2> currStoneCount = historyState->board_.getStoneCount();
+
             if(currStoneCount[0] < prevStoneCount[0] || currStoneCount[1] < prevStoneCount[1]) //if one of the counts of stones is lower than in the previous move
             {
                 captureMoves.push_back(i); //in this move, a capture took place
-                /*std::cout << i << " " << prevStoneCount[0] << " " << prevStoneCount[1] << ", "
-                    << currStoneCount[0] << " " << currStoneCount[1] << "\n"
-                    << ActionToString(history_[i].player, history_[i].action) << "\n";*/
 
                 historyState->UndoAction(-1, -1);
                 bool playerCaptured;
-                if(historyState->to_play_ == (GoColor)player_id) //add to vector representing forbidden moves in phases
+                if(historyState->CurrentPlayer() == player_id)
                 {
                     playerCaptured = true;
                 }
-                else //update enemyActionsVisibility
+                else
                 {
                     playerCaptured = false;
                 }
@@ -185,15 +279,59 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
                         { //if the capture was made by player we are resampling for, change the importance of the move that placed captured stone
                             for(int y = enemyActions.size() - 1; y >= 0; y--)
                             {
-                                if(enemyActions[i] == x)
+                                if(enemyActions[y] == x && enemyActionNumber[y] <= i)
                                 {
-                                    enemyActionVisibility[i] = true;
+                                    enemyActionVisibility[y] = true;
                                     break;
                                 }
                             }
                         }
                     }
                 }
+
+                if(!playerCaptured) //we must add every adjacent stone to every captured stone to the "important" stones
+                {
+                    std::vector<Action> importantActions;
+                    for(int x = 0; x < capturedActions[capturedActions.size()-1].size(); x++)
+                    {
+                        if(historyState->board_.PointColor(ActionToVirtualAction(capturedActions[capturedActions.size()-1][x]-1, boardSize)) ==
+                            (GoColor)opp_payer_id)
+                        {
+                            importantActions.push_back(capturedActions[capturedActions.size()-1][x]-1);
+                        }
+                        if(historyState->board_.PointColor(ActionToVirtualAction(capturedActions[capturedActions.size()-1][x]+1, boardSize)) ==
+                            (GoColor)opp_payer_id)
+                        {
+                            importantActions.push_back(capturedActions[capturedActions.size()-1][x]+1);
+                        }
+
+                        if(historyState->board_.PointColor(ActionToVirtualAction(capturedActions[capturedActions.size()-1][x]+boardSize, boardSize)) ==
+                            (GoColor)opp_payer_id)
+                        {
+                            importantActions.push_back(capturedActions[capturedActions.size()-1][x]+boardSize);
+                        }
+                        if(historyState->board_.PointColor(ActionToVirtualAction(capturedActions[capturedActions.size()-1][x]-boardSize, boardSize)) ==
+                            (GoColor)opp_payer_id)
+                        {
+                            importantActions.push_back(capturedActions[capturedActions.size()-1][x]-boardSize);
+                        }
+                    }
+
+                    std::cout << "important actions: ";
+                    for(int x = 0; x < importantActions.size(); x++)
+                    {
+                        std::cout << ActionToString((uint8_t)OppColor(capturedStonesColor), importantActions[x]) + " ";
+                        for(int y = enemyActions.size() - 1; y >= 0; y--)
+                        {
+                            if(enemyActions[y] == importantActions[x] && enemyActionNumber[y] <= i)
+                            {
+                                enemyActionVisibility[y] = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 std::cout << "\n";
                 capturedActions.emplace_back();
 
@@ -202,18 +340,32 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     }
 
     { //deciding if enemy moves are important, because they will be observed
-        std::shared_ptr<const Game> historyGame = LoadGame("phantom_go");
-        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(PhantomGoState(historyGame, boardSize, komi_, handicap_));
+        std::shared_ptr<const Game> historyGame = GetGame();
+        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
         //this state will be used as a state to replicate the whole history to be able to observe board in each step
 
         for (int i = 0; i < history_.size(); i++) {
+
+            // if the move on i-1 was observational
+            if(history_[i].player == opp_payer_id && historyState->board_.PointColor(ActionToVirtualAction(history_[i].action, boardSize)) == (GoColor)player_id)
+            {
+                for(int x = enemyActions.size() - 1; x >= 0; x--)
+                { //second part of this if is important to mark a correct action, which happened before the observation move
+                    if(enemyActions[x] == history_[i].action && enemyActionNumber[x] <= i)
+                    {
+                        enemyActionVisibility[x] = true;
+                        break;
+                    }
+                }
+            }
+
 
             if(history_[i].player == player_id &&
                 historyState->board_.PointColor(ActionToVirtualAction(history_[i].action, boardSize)) == (GoColor)opp_payer_id)
             {
                 for(int x = enemyActions.size() - 1; x >= 0; x--)
                 { //second part of this if is important to mark a correct action, which happened before the observation move
-                    if(enemyActions[x] == history_[i].action && enemyActionNumber[x] < i)
+                    if(enemyActions[x] == history_[i].action && enemyActionNumber[x] <= i)
                     {
                         enemyActionVisibility[x] = true;
                         break;
@@ -235,6 +387,82 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     {
         std::cout << ActionToString(opp_payer_id, enemyActions[i]) << " " << enemyActionVisibility[i]
                   << " " << enemyActionNumber[i] << "\n";
+    }
+
+    int captureSection = 0;
+    int enemyMove = 0;
+    captureMoves.push_back(history_.size() + 1);
+    capturedActions.emplace_back(); //last section has no actions that are "illegal"
+    for(int i = 0; i < history_.size(); i++)
+    {
+        // moving of separator of board "phases", separated by captures
+        if(captureMoves[captureSection] == i)
+        {
+            captureSection++;
+        }
+
+
+        if(history_[i].player == player_id)
+        {
+            newState->ApplyAction(history_[i].action);
+        }
+        else
+        {
+            if(enemyActionVisibility[enemyMove])
+            {
+                SPIEL_CHECK_EQ(enemyActions[enemyMove], history_[i].action);
+                newState->ApplyAction(history_[i].action);
+            }
+            else
+            {
+                std::vector<Action> actions = newState->LegalActions();
+                std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
+                for(long & action : actions)
+                {
+                    if(action == VirtualActionToAction(kVirtualPass, boardSize))
+                    {
+                        continue;
+                    }
+                    // if is an action that will be made by any player in the future
+                    if(std::find(stones[0].begin(), stones[0].end(), action) != stones[0].end()
+                        || std::find(stones[1].begin(), stones[1].end(), action) != stones[1].end())
+                    {
+                        continue;
+                    }
+                    //if the move would be observational
+                    if(newState->board_.PointColor(ActionToVirtualAction(action, boardSize)) == (GoColor)player_id)
+                    {
+                        continue;
+                    }
+
+
+                    bool legal = true;
+                    for(int p = captureSection; p < captureMoves.size(); p++)
+                    { //if the action is part of any group of actions that will be played and then captured
+                        if(std::find(capturedActions[p].begin(), capturedActions[p].end(), action) !=
+                            capturedActions[p].end())
+                        {
+                            legal = false;
+                            break;
+                        }
+                    }
+                    if(legal)
+                    {
+                        std::array<int, 2> prevStoneCount = newState->board_.getStoneCount();
+                        newState->ApplyAction(action);
+                        std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
+                        if(currStoneCount[0] < prevStoneCount[0] || currStoneCount[1] < prevStoneCount[1]) //if one of the counts of stones is lower than in the previous move
+                        {
+                            newState->UndoAction(-1, -1);
+                            legal = false;
+                            continue;
+                        }
+                        break;
+                    }
+                }
+            }
+            enemyMove++;
+        }
     }
 
     return newState;

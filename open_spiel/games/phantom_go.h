@@ -34,7 +34,7 @@
 //  "komi"              float  compensation for white                  (default = 7.5)
 //  "board_size"        int    rows of the board, usually 9, 13 or 19  (default = 19)
 //  "handicap"          int    number of handicap stones for black     (default = 0)
-//  "max_game_length"   int    maximal lenght of a game                (default = board_size * board_size * 8)
+//  "max_game_length"   int    maximal lenght of a game                (default = board_size * board_size * 4)
 
 namespace open_spiel {
 namespace phantom_go {
@@ -57,7 +57,7 @@ inline int NumDistinctActions(int board_size) {
 // Such high number has been set, mainly because moves on enemy stones are also counted into length
 // And for "clear" resampling, lot of passes and "observation moves" are needed
 inline int DefaultMaxGameLength(int board_size) {
-  return board_size * board_size * 8;
+  return board_size * board_size * 4;
 }
 
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
@@ -86,6 +86,9 @@ class PhantomGoState : public State {
   bool IsTerminal() const override;
 
   std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
+
+  std::unique_ptr<State> ResampleFromInfostateFull(
       int player_id, std::function<double()> rng) const;
 
   std::string InformationStateString(int player) const override;
