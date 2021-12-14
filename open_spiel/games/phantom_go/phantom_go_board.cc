@@ -420,40 +420,34 @@ std::array<GoColor, kMaxBoardSize* kMaxBoardSize> PhantomGoBoard::GetObservation
     return observations_[player_id];
 }
 
-std::string PhantomGoBoard::observationToString() const
+std::string PhantomGoBoard::observationsToString() const
 {
     std::stringstream ss;
     ss << "\nObservation white:\n";
 
-    for (int x = board_size_ - 1; x >= 0; x--)
-    {
-        ss << " " << x + 1 << " ";
-        for (int y = 0; y < board_size_; y++)
-        {
-            ss << GoColorToChar(observations_[(uint8_t)GoColor::kWhite][x * board_size_ + y]);
-        }
-        ss << "\n";
-    }
-    ss << "   ";
-
-    for(int i = 0; i < board_size_; i++)
-    {
-        char letter = 'A' + i;
-        if(letter >= 'I')
-        {
-            letter++;
-        }
-        ss << letter;
-    }
-    ss << "\n";
+    ss << observationToString((uint8_t)GoColor::kWhite);
 
     ss << "\nObservation black:\n";
+
+    ss << observationToString((uint8_t)GoColor::kBlack);
+
+    return ss.str();
+}
+
+
+std::string PhantomGoBoard::observationToString(int player) const
+{
+    std::stringstream ss;
     for (int x = board_size_ - 1; x >= 0; x--)
     {
+        if(board_size_ - 1 >= 10 && x < 10)
+        {
+            ss << " ";
+        }
         ss << " " << x + 1 << " ";
         for (int y = 0; y < board_size_; y++)
         {
-            ss << GoColorToChar(observations_[(uint8_t)GoColor::kBlack][x * board_size_ + y]);
+            ss << GoColorToChar(observations_[player][x * board_size_ + y]);
         }
         ss << "\n";
     }
@@ -469,7 +463,6 @@ std::string PhantomGoBoard::observationToString() const
         ss << letter;
     }
     ss << "\n";
-
     return ss.str();
 }
 

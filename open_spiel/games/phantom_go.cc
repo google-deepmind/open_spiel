@@ -477,7 +477,7 @@ std::string PhantomGoState::InformationStateString(int player) const {
 std::string PhantomGoState::ObservationString(int player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return ToString();
+  return board_.observationToString(player);
 }
 
 void PhantomGoState::ObservationTensor(int player, absl::Span<float> values) const {
@@ -546,7 +546,7 @@ std::string PhantomGoState::ToString() const {
 
   ss << board_;
 
-  ss << board_.observationToString();
+  ss << board_.observationsToString();
 
   return ss.str();
 }
