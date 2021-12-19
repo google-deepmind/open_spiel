@@ -157,7 +157,7 @@ class MorpionGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override {
     return MaxGameLength();
-  }  // see MaxGameLength()
+  }
 };
 
 }  // namespace morpion_solitaire

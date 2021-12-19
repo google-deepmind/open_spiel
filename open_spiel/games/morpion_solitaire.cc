@@ -322,7 +322,6 @@ std::string MorpionState::ObservationString(Player player) const {
 }
 
 void MorpionState::UndoAction(Player player, Action move) {
-  // board_[move] = CellState::kEmpty;
   std::pair<Line, Point> last_move = move_history_.back();
   board_[last_move.second.x * kNumRows + last_move.second.y] = 0;
   move_history_.pop_back();
