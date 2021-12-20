@@ -16,8 +16,6 @@
 // when it is built as a shared library. To use OpenSpiel as a library,
 // see: https://github.com/deepmind/open_spiel/blob/master/docs/library.md
 
-#include <unistd.h>
-
 #include <memory>
 #include <random>
 
