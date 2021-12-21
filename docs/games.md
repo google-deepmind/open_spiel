@@ -45,7 +45,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean-field-game--crowd-modelling-2d)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean-field-game--predator-prey)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
-<font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire)
+<font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
