@@ -67,7 +67,7 @@ namespace open_spiel {
 namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing";
-inline constexpr const char* kDefaultGameVersion = "cdh";
+inline constexpr const char* kDefaultGameVersion = "adh";
 
 // black - white - empty
 inline constexpr int kPosStates = hex::kNumPlayers + 1;

@@ -187,9 +187,7 @@ CellState StringToState(char cell) {
 }
 
 void HexState::DoApplyAction(Action move) {
-  if(MoveNumber() >= 2){
-    SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
-  }
+  //SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
   board_[move] = move_cell_state;
   if (move_cell_state == CellState::kBlackWin) {
