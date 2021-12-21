@@ -45,6 +45,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean-field-game--crowd-modelling-2d)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean-field-game--predator-prey)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
+<font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
@@ -409,17 +410,28 @@ Status                                       | Game
 
 ### Mean Field Game : routing
 
-*   Representative player chooses at each nodes where they go. They has an
+* Representative player chooses at each nodes where they go. They has an
     origin, a destination and a departure time and choose their route to
     minimize their travel time. Time spent on each link is a function of the
     distribution of players on the link when the player reaches the link.
-*   Network with choice of route.
-*   Research game.
-*   Mean-field (with a unique player).
-*   Explicit stochastic game (only for initial node).
-*   Perfect information.
-*   [Cabannes et. al. '21, Solving N-player dynamic routing games with
+* Network with choice of route.
+* Research game.
+* Mean-field (with a unique player).
+* Explicit stochastic game (only for initial node).
+* Perfect information.
+* [Cabannes et. al. '21, Solving N-player dynamic routing games with
     congestion: a mean field approach](https://arxiv.org/pdf/2110.11943.pdf).
+
+### Morpion Solitaire (4D)
+
+* A single player game where player aims to maximize lines drawn on
+a grid, under certain limitations. 
+* Uses tokens on a grid.
+* Traditional game.
+* Deterministic
+* Perfect information.
+* 1 player.
+* [Wikipedia](https://en.wikipedia.org/wiki/Join_Five)
 
 ### Negotiation
 
