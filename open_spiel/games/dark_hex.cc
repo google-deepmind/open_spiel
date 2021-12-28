@@ -308,17 +308,20 @@ void DarkHexState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   std::fill(values.begin(), values.end(), 0.);
 
-  auto& player_view = (player == 0 ? black_view_ : white_view_);
   
   //flip white player to a black_view
   if(player == 1){
+    auto p = white_view_;
     for(int i = 0; i < row_size_; ++i){
       for(int j = 0; j < col_size_; ++j){
-        player_view[i*row_size_+j] = white_view_[j*row_size_+i];
-        player_view[i*row_size_+j] = CellState(static_cast<int>(player_view[j*row_size_+i]) * -1);
+        p[i*row_size_+j] = white_view_[j*row_size_+i];
+        p[i*row_size_+j] = CellState(static_cast<int>(p[j*row_size_+i]) * -1);
       }
     }
   }
+
+  const auto& player_view = (player == 0 ? black_view_ : p);
+  
 
   TensorView<2> view(values, {kCellStates, static_cast<int>(121)},
                      true);
