@@ -1,18 +1,4 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# Copyright 2021 DeepMind Technologies Limited
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -120,12 +106,12 @@ def _get_singlepop_2player_fitness(payoff_table, payoffs_are_hpt_format, m,
   if use_local_selection_model:
     fitness = payoff_table[tuple([my_strat, opponent_strat])]
   else:
-    fitness = (my_popsize-1)/(m-1)*\
-                _get_payoff(payoff_table, payoffs_are_hpt_format,
-                            strat_profile=[my_strat, my_strat], k=0) +\
-              (m-my_popsize)/(m-1)*\
-                _get_payoff(payoff_table, payoffs_are_hpt_format,
-                            strat_profile=[my_strat, opponent_strat], k=0)
+    fitness = ((my_popsize-1)/(m-1)*
+               _get_payoff(payoff_table, payoffs_are_hpt_format,
+                           strat_profile=[my_strat, my_strat], k=0) +
+               (m-my_popsize)/(m-1)*
+               _get_payoff(payoff_table, payoffs_are_hpt_format,
+                           strat_profile=[my_strat, opponent_strat], k=0))
   return fitness
 
 
@@ -296,8 +282,8 @@ def _get_singlepop_transition_matrix(payoff_table,
     Markov transition matrix.
   """
 
-  num_strats_per_population =\
-    utils.get_num_strats_per_population([payoff_table], payoffs_are_hpt_format)
+  num_strats_per_population = utils.get_num_strats_per_population(
+      [payoff_table], payoffs_are_hpt_format)
   num_strats = num_strats_per_population[0]
 
   c = np.zeros((num_strats, num_strats))
@@ -345,8 +331,8 @@ def _get_multipop_transition_matrix(payoff_tables,
                                     inf_alpha_eps=0.1):
   """Gets Markov transition matrix for multipopulation games."""
 
-  num_strats_per_population =\
-    utils.get_num_strats_per_population(payoff_tables, payoffs_are_hpt_format)
+  num_strats_per_population = utils.get_num_strats_per_population(
+      payoff_tables, payoffs_are_hpt_format)
   num_profiles = utils.get_num_profiles(num_strats_per_population)
 
   eta = 1. / (np.sum(num_strats_per_population - 1))
@@ -489,16 +475,16 @@ def sweep_pi_vs_epsilon(payoff_tables,
   """
   payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
   num_populations = len(payoff_tables)
-  num_strats_per_population =\
-    utils.get_num_strats_per_population(payoff_tables, payoffs_are_hpt_format)
+  num_strats_per_population = utils.get_num_strats_per_population(
+      payoff_tables, payoffs_are_hpt_format)
 
   if num_populations == 1:
     num_profiles = num_strats_per_population[0]
   else:
     num_profiles = utils.get_num_profiles(num_strats_per_population)
 
-  assert strat_labels is None or isinstance(strat_labels, dict)\
-      or (len(strat_labels) == num_profiles)
+  assert (strat_labels is None or isinstance(strat_labels, dict)
+          or (len(strat_labels) == num_profiles))
 
   pi_list = np.empty((num_profiles, 0))
   pi, alpha, m = None, None, None  # Unused in infinite-alpha regime
@@ -614,16 +600,16 @@ def sweep_pi_vs_alpha(payoff_tables,
 
   payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
   num_populations = len(payoff_tables)
-  num_strats_per_population =\
-    utils.get_num_strats_per_population(payoff_tables, payoffs_are_hpt_format)
+  num_strats_per_population = utils.get_num_strats_per_population(
+      payoff_tables, payoffs_are_hpt_format)
 
   if num_populations == 1:
     num_profiles = num_strats_per_population[0]
   else:
     num_profiles = utils.get_num_profiles(num_strats_per_population)
 
-  assert strat_labels is None or isinstance(strat_labels, dict)\
-      or (len(strat_labels) == num_profiles)
+  assert (strat_labels is None or isinstance(strat_labels, dict)
+          or (len(strat_labels) == num_profiles))
 
   pi_list = np.empty((num_profiles, 0))
   alpha_list = []
@@ -753,8 +739,8 @@ def compute(payoff_tables,
 
   num_populations = len(payoff_tables)
 
-  num_strats_per_population =\
-    utils.get_num_strats_per_population(payoff_tables, payoffs_are_hpt_format)
+  num_strats_per_population = utils.get_num_strats_per_population(
+      payoff_tables, payoffs_are_hpt_format)
 
   # Handles the trivial case of Markov chain with one state
   if np.array_equal(num_strats_per_population,
@@ -838,8 +824,8 @@ def suggest_alpha(payoff_tables, tol=.1):
   """
   payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
 
-  num_strats_per_population =\
-    utils.get_num_strats_per_population(payoff_tables, payoffs_are_hpt_format)
+  num_strats_per_population = utils.get_num_strats_per_population(
+      payoff_tables, payoffs_are_hpt_format)
   num_profiles = utils.get_num_profiles(num_strats_per_population)
 
   gap = np.inf
