@@ -308,14 +308,14 @@ void DarkHexState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   std::fill(values.begin(), values.end(), 0.);
 
-  const auto& player_view = (player == 0 ? black_view_ : white_view_);
+  auto& player_view = (player == 0 ? black_view_ : white_view_);
   
   //flip white player to a black_view
   if(player == 1){
     for(int i = 0; i < row_size_; ++i){
       for(int j = 0; j < col_size_; ++j){
         player_view[i*row_size_+j] = white_view_[j*row_size_+i];
-        player_view[i*row_size_+j] = player_view[i*row_size_+j] * -1;
+        player_view[i*row_size_+j] = CellState(static_cast<int>(player_view[j*row_size_+i]) * -1);
       }
     }
   }
