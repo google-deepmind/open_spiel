@@ -310,28 +310,30 @@ void DarkHexState::ObservationTensor(Player player,
 
   const auto& player_view = (player == 0 ? black_view_ : white_view_);
   
-  int counterWhite = 0;
-  int counterBlack = 0;
-  for (int cell = 0; cell < num_cells_; ++cell) {
-    if((static_cast<int>(player_view[cell]) - kMinValueCellState) < 4) {
-      ++counterWhite;
-    }else if((static_cast<int>(player_view[cell]) - kMinValueCellState) > 4){
-      ++counterBlack;
+  //flip white player to a black_view
+  if(cur_player == 1){
+    for(int i = 0; i < row_size_; ++i){
+      for(int j = 0; j < col_size_; ++j){
+        player_view[i*row_size_+j] = white_view_[j*row_size_+i];
+        player_view[i*row_size_+j] = player_view[i*row_size_+j] * -1;
+      }
     }
-  }
-  double prob = 0;
-  if (player == 0) {
-    prob = counterBlack-counterWhite/counterBlack;
-  }else{
-    prob = counterWhite-counterBlack/counterWhite;
   }
 
   TensorView<2> view(values, {kCellStates, static_cast<int>(121)},
                      true);
 
   for (int cell = 0; cell < num_cells_; ++cell) {                          
-    view[{static_cast<int>(player_view[cell]) - kMinValueCellState, cell}] = 1.0;
-    view[{8,cell}] = player;  
+    if(static_cast<int>(player_view[cell]) > 0){
+      view[{0, cell}] = 1.0;
+    }
+    if(static_cast<int>(player_view[cell]) < 0){
+      view[{1, cell}] = 1.0;
+    }
+    if(static_cast<int>(player_view[cell]) == 0){
+      view[{2, cell}] = 1.0;
+    }    
+    view[{3,cell}] = player;  
   }
 
   /*
