@@ -311,7 +311,7 @@ void DarkHexState::ObservationTensor(Player player,
   const auto& player_view = (player == 0 ? black_view_ : white_view_);
   
   //flip white player to a black_view
-  if(cur_player == 1){
+  if(player == 1){
     for(int i = 0; i < row_size_; ++i){
       for(int j = 0; j < col_size_; ++j){
         player_view[i*row_size_+j] = white_view_[j*row_size_+i];
