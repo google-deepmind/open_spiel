@@ -199,7 +199,7 @@ Action MoveToAction(const Move& move, int board_size) {
       auto itr = absl::c_find_if(
           kUnderPromotionDirectionToOffset,
           [offset](Offset o) { return o.x_offset == offset.x_offset; });
-      SPIEL_CHECK_NE(itr, kUnderPromotionDirectionToOffset.end());
+      SPIEL_CHECK_TRUE(itr != kUnderPromotionDirectionToOffset.end());
       direction_index =
           std::distance(kUnderPromotionDirectionToOffset.begin(), itr);
     }
