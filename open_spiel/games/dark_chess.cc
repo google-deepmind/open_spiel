@@ -1,4 +1,4 @@
-// Copyright 2021 DeepMind Technologies Limited
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -230,7 +230,10 @@ chess::ObservationTable ComputePublicInfoTable(const chess::ChessBoard& board) {
               offset_y = 1;
             else if (diff_y < 0)
               offset_y = -1;
-            chess::Offset offset_step = {int8_t(offset_x), int8_t(offset_y)};
+            chess::Offset offset_step = {
+              static_cast<int8_t>(offset_x),
+              static_cast<int8_t>(offset_y)
+            };
 
             for (chess::Square dest = move.from + offset_step; dest != move.to;
                  dest += offset_step) {
