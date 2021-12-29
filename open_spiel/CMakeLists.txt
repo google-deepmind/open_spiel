@@ -63,6 +63,9 @@ if(APPLE)
   # On MacOS, we need this so that CMake will use the right Python if the user
   # has a virtual environment active
   set (CMAKE_FIND_FRAMEWORK LAST)
+elseif(WIN32)
+  # Setup for MSVC 2022.
+  # No changes needed. In particular: do not use -Wno-everything.
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
 endif()
@@ -105,6 +108,8 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GO             OFF
   "Build with support for Golang API.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HANABI         OFF
   "Build against the Hanabi game.")
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HIGC           OFF
+  "Build with Hidden Information Game Competition tournament support.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBNOP         OFF
@@ -124,18 +129,30 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GAMUT          OFF
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
 
-openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX               AUTO
-  "Enable JAX.")
-openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH           AUTO
-  "Enable PyTorch.")
-openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW        AUTO
-  "Enable Tensorflow.")
+if (WIN32)
+  if (OPEN_SPIEL_BUILD_WITH_HIGC)
+    message(FATAL_ERROR "HIGC not supported in Windows, please disable it.")
+  endif()
+  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX              OFF
+    "Enable JAX.")
+  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH          OFF
+    "Enable PyTorch.")
+  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW       OFF
+    "Enable Tensorflow.")
+else()
+  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX             AUTO
+    "Enable JAX.")
+  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH         AUTO
+    "Enable PyTorch.")
+  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW      AUTO
+    "Enable Tensorflow.")
+endif()
+
 openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
   "Enable miscellaneous Python dependencies.")
 
 openspiel_optional_dependency(OPEN_SPIEL_BUILDING_WHEEL           OFF
   "Building a Python wheel?")
-
 
 # Needed to disable Abseil tests.
 set (BUILD_TESTING OFF)
@@ -197,12 +214,15 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:bots>
   $<TARGET_OBJECTS:games>
   $<TARGET_OBJECTS:game_transforms>
-  $<TARGET_OBJECTS:higc>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   $<TARGET_OBJECTS:algorithms>
   $<TARGET_OBJECTS:utils>
   $<TARGET_OBJECTS:tests>
 )
+if (OPEN_SPIEL_BUILD_WITH_HIGC)
+  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
+     $<TARGET_OBJECTS:higc>)
+endif()
 if (OPEN_SPIEL_BUILD_WITH_HANABI)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
       $<TARGET_OBJECTS:hanabi_learning_environment>)

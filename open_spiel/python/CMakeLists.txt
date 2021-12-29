@@ -16,6 +16,7 @@ endif()
 
 message(NOTICE "Python executable: ${Python3_EXECUTABLE}")
 message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
+message(NOTICE "Python library dirs: ${Python3_LIBRARY_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
 if(Python3_VERSION VERSION_LESS "3.6.0")
@@ -103,9 +104,14 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h
-  pybind11/referee.cc
-  pybind11/referee.h
   )
+
+if (OPEN_SPIEL_BUILD_WITH_HIGC)
+  set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      pybind11/referee.cc
+      pybind11/referee.h
+  )
+endif()
 
 # Optional pyspiel sub-modules, which can specify their python bindings.
 if (OPEN_SPIEL_BUILD_WITH_GAMUT)
@@ -122,6 +128,7 @@ if (OPEN_SPIEL_BUILD_WITH_XINXIN)
 endif()
 
 add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
+target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")
