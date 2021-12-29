@@ -107,11 +107,7 @@ fi
 
 DIR="open_spiel/abseil-cpp"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b '20200923.3' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
-  # TODO(author5): finally update absl to a newer version and remove this
-  # workaround. Required to fix: https://github.com/deepmind/open_spiel/issues/716.
-  # See https://github.com/deepmind/open_spiel/pull/722 for discussion.
-  patch -u ${MYDIR}/open_spiel/abseil-cpp/absl/debugging/failure_signal_handler.cc ${MYDIR}/open_spiel/scripts/patches/absl_failure_signal_handler.cc.patch
+  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
 fi
 
 # Optional dependencies.

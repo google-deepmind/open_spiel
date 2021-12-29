@@ -188,6 +188,7 @@ set (OPEN_SPIEL_CORE_FILES
 )
 
 # We add the subdirectory here so open_spiel_core can #include absl.
+set(ABSL_PROPAGATE_CXX_STD ON)
 add_subdirectory (abseil-cpp)
 
 # Just the core without any of the games
@@ -195,7 +196,7 @@ add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (
   open_spiel_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
 link_libraries(open_spiel_core
-  absl::container
+  absl::algorithm
   absl::flags
   absl::flags_parse
   absl::flat_hash_map
@@ -268,7 +269,7 @@ if (OPEN_SPIEL_BUILD_WITH_ORTOOLS)
   # and assumed to be in $HOME/or-tools.
   # The flags were taken from the compilation of linear_programming.cc after
   # running make test_cc.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOP -DUSE_GLOP -DUSE_CBC -DUSE_CLP -DUSE_SCIP")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOP -DUSE_GLOP -DUSE_CBC -DUSE_CLP -DUSE_SCIP -pthread")
   set(ORTOOLS_HOME "${CMAKE_CURRENT_SOURCE_DIR}/ortools")
   set(ORTOOLS_INC_DIRS ${ORTOOLS_HOME} ${ORTOOLS_HOME}/include)
   set(ORTOOLS_LIB_DIRS ${ORTOOLS_HOME}/lib ${ORTOOLS_HOME}/lib64)
@@ -336,7 +337,7 @@ if (BUILD_SHARED_LIB)
   target_include_directories(open_spiel PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR} abseil-cpp)
   target_link_libraries(open_spiel PUBLIC
-    absl::container
+    absl::algorithm
     absl::flat_hash_map
     absl::optional
     absl::random_random
