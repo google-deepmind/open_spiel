@@ -16,14 +16,17 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #ifdef _WIN32
 // https://stackoverflow.com/a/42906151
 #include <windows.h>
+#include <direct.h>
+#include <stdio.h>
 #define mkdir(dir, mode) _mkdir(dir)
 #define unlink(file) _unlink(file)
 #define rmdir(dir) _rmdir(dir)
+#else
+#include <unistd.h>
 #endif
 
 #include <cstdio>
