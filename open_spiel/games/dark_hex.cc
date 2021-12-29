@@ -309,7 +309,7 @@ void DarkHexState::ObservationTensor(Player player,
   std::fill(values.begin(), values.end(), 0.);
 
   std::vector<hex::CellState> p;
-  p.resize(row_size * col_size, CellState::kEmpty);
+  p.resize(row_size_ * col_size_, CellState::kEmpty);
 
   //flip white player to a black_view
   if(player == 1){
