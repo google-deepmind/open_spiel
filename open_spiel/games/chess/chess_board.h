@@ -249,7 +249,7 @@ enum PseudoLegalMoveSettings {
 inline constexpr open_spiel::Action kPassAction = 0;
 inline const chess::Move kPassMove =
     Move(Square{-1, -1}, Square{-1, -1},
-         Piece{.color = Color::kEmpty, .type = PieceType::kEmpty});
+         Piece{Color::kEmpty, PieceType::kEmpty});
 
 class ChessBoard {
  public:

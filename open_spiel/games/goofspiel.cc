@@ -707,14 +707,14 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
   default_observer_ = MakeObserver(kDefaultObsType, obs_params);
   info_state_observer_ = MakeObserver(kInfoStateObsType, obs_params);
   private_observer_ = MakeObserver(
-      IIGObservationType{.public_info = false,
-                         .perfect_recall = false,
-                         .private_info = PrivateInfoType::kSinglePlayer},
+      IIGObservationType{/*public_info*/false,
+                         /*perfect_recall*/false,
+                         /*private_info*/PrivateInfoType::kSinglePlayer},
       obs_params);
   public_observer_ =
-      MakeObserver(IIGObservationType{.public_info = true,
-                                      .perfect_recall = false,
-                                      .private_info = PrivateInfoType::kNone},
+      MakeObserver(IIGObservationType{/*public_info*/true,
+                                      /*perfect_recall*/false,
+                                      /*private_info*/PrivateInfoType::kNone},
                    obs_params);
 }
 
