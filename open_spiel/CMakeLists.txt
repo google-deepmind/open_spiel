@@ -123,6 +123,8 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GAMUT          OFF
   "Build with GAMUT generator integration.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_RUST           OFF
+  "Build with support for Rust API.")
 
 openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX               AUTO
   "Enable JAX.")
@@ -278,6 +280,10 @@ add_subdirectory (contrib)
 
 if (OPEN_SPIEL_BUILD_WITH_GO)
   add_subdirectory(go)
+endif()
+
+if (OPEN_SPIEL_BUILD_WITH_RUST)
+  add_subdirectory(rust)
 endif()
 
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
