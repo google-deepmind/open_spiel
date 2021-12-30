@@ -315,7 +315,7 @@ void DarkHexState::ObservationTensor(Player player,
   if(player == 1){
     for(int i = 0; i < row_size_; ++i){
       for(int j = 0; j < col_size_; ++j){
-        p[i*row_size_+j] = white_view_[j*row_size_+i];
+        //p[i*row_size_+j] = white_view_[j*row_size_+i];
         p[i*row_size_+j] = CellState(static_cast<int>(p[i*row_size_+j]) * -1);
       }
     }
