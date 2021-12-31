@@ -20,10 +20,10 @@ foreach(rust_api_file IN LISTS RUST_API_FILES)
   file(COPY ${rust_api_file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${file_dir})
 endforeach(rust_api_file)
 
-add_custom_target(rust_bindgen $ENV{HOME}/.cargo/bin/bindgen ${CMAKE_CURRENT_SOURCE_DIR}/src/rust_open_spiel.h -o ${CMAKE_CURRENT_BINARY_DIR}/src/open_spiel_bindings.rs
+add_custom_target(rust_bindgen ALL $ENV{HOME}/.cargo/bin/bindgen ${CMAKE_CURRENT_SOURCE_DIR}/src/rust_open_spiel.h -o ${CMAKE_CURRENT_BINARY_DIR}/src/open_spiel_bindings.rs
                   DEPENDS rust_spiel)
 
-add_custom_target(rust_open_spiel cargo build
+add_custom_target(rust_open_spiel ALL cargo build
                   DEPENDS rust_spiel rust_bindgen
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
