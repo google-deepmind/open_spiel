@@ -91,6 +91,9 @@ class PhantomGoState : public State {
   std::unique_ptr<State> ResampleFromInfostateFull(
       int player_id, std::function<double()> rng) const;
 
+  std::unique_ptr<State> ResampleFromInfostateHard(
+      int player_id, std::function<double()> rng) const;
+
   std::string InformationStateString(int player) const override;
   std::string ObservationString(int player) const override;
 

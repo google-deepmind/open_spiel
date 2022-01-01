@@ -94,6 +94,84 @@ PhantomGoState::PhantomGoState(std::shared_ptr<const Game> game, int board_size,
 
 }
 
+
+//if metaposition resampling fails, resamples the actual board
+//this situation can happen if the random moves lead to no "legal" moves
+std::unique_ptr<State> PhantomGoState::ResampleFromInfostateHard(
+    int player_id, std::function<double()> rng) const {
+
+    int boardSize = board_.board_size();
+    auto opp_player_id = (uint8_t) OppColor((GoColor) player_id);
+
+    std::shared_ptr<const Game> newGame = GetGame();
+    std::unique_ptr<PhantomGoState>
+        newState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+
+    std::array<std::vector<int>, 2> stones;
+    std::array<int, 2> stoneCount = board_.getStoneCount();
+    std::vector<int> enemyVisibleStones;
+    std::array<GoColor, kMaxBoardSize * kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
+
+    //Find and store all enemy visible stones
+    for (int i = 0; i < boardSize * boardSize; i++) {
+        if (infoState[i] == (GoColor)opp_player_id) {
+            enemyVisibleStones.push_back(i);
+        }
+    }
+
+    for (int i = 0; i < boardSize * boardSize; i++) {
+        if (board_.PointColor(ActionToVirtualAction(i, boardSize)) != GoColor::kEmpty) {
+            stones[(uint8_t) board_.PointColor(ActionToVirtualAction(i, boardSize))].push_back(i);
+        }
+    }
+
+
+    if(player_id == (uint8_t)GoColor::kWhite)
+    {
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    for(long action : stones[player_id]) // Fill the board with stones of player we want to resample for
+    {
+        newState->ApplyAction(action);
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    if(!newState->history_.empty())
+    {
+        newState->UndoAction(-1, -1);
+    }
+
+    if(newState->history_.empty() && (GoColor)player_id == GoColor::kBlack)
+    {
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    for(long action : stones[opp_player_id]) // Fill the board with stones of player we want to resample for
+    {
+        newState->ApplyAction(action);
+        if(std::find(enemyVisibleStones.begin(), enemyVisibleStones.end(), action) != enemyVisibleStones.end())
+        {
+            newState->ApplyAction(action);
+        }
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
+
+    if(!newState->history_.empty() && !stones[opp_player_id].empty())
+    {
+        newState->UndoAction(-1, -1);
+    }
+
+    if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
+        newState->board_.getStoneCount()[1] == stoneCount[1]))
+    {
+        std::cout << "hard resample\nstone count" << ToString() << newState->ToString();
+        SpielFatalError("after resampling, the count of stones doesn't match\n");
+    }
+
+    return newState;
+}
+
 std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix moves into eyes that keep messing up the histories
     int player_id, std::function<double()> rng) const {
 
@@ -111,7 +189,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
     std::vector<bool> enemyActionVisibility;
     std::vector<int> enemyActionNumber;
 
-    auto opp_payer_id = (uint8_t) OppColor((GoColor) player_id);
+    auto opp_player_id = (uint8_t) OppColor((GoColor) player_id);
 
     //Find and store all stones which are in the last move on board
     for (int i = 0; i < boardSize * boardSize; i++) {
@@ -136,8 +214,11 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
         newState->UndoAction(-1, -1);
     }
 
+    if(newState->history_.empty() && (GoColor)player_id == GoColor::kBlack)
+    {
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+    }
 
-    auto opp_player_id = (uint8_t)OppColor((GoColor)player_id);
     for(long action : stones[opp_player_id])
     {
         newState->ApplyAction(action);
@@ -151,7 +232,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
         std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
         currStoneCount[opp_player_id]++;
         std::vector<int> vec = stones[opp_player_id];
-
+        bool actionChosen = false;
         for (long action: actions) {
             // pass can't be chosen, also an action that will be played by opposing player can't be chosen
             if (action == VirtualActionToAction(kVirtualPass, boardSize) ||
@@ -163,6 +244,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
                 newState->board_.getStoneCount()[1] == currStoneCount[1])
             { //random move was applied correctly, no captures were made
                 newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+                actionChosen = true;
                 //std::cout << "Added to observation " << ActionToString(c, action) << "\n";
                 break;
             } else {
@@ -170,23 +252,36 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
                 newState->UndoAction(-1, -1);
             }
         }
+        /*if(!actionChosen)
+        {
+            std::cout << "no action chosen\n";
+        }*/
     }
-    if(!newState->history_.empty())
+
+    if(!newState->history_.empty() && stoneCount[opp_player_id] != 0)
     {
+
         newState->UndoAction(-1, -1);
     }
 
     if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
         newState->board_.getStoneCount()[1] == stoneCount[1]))
     {
-        ToString();
-        newState->ToString();
-        SpielFatalError("after resampling, the count of stones doesn't match\n");
+        //std::cout << "resampling for " << player_id << "\nstone count" << ToString() << newState->ToString();
+        return PhantomGoState::ResampleFromInfostateHard(player_id, rng);
+        //SpielFatalError("after resampling, the count of stones doesn't match\n");
     }
 
     if(CurrentPlayer() != newState->CurrentPlayer())
     {
+        std::cout << "resampling for " << player_id << "\nwrong player" << ToString() << newState->ToString();
+
+        for(int i = 0; i < newState->history_.size(); i++)
+        {
+            std::cout << newState->history_[i] << "\n";
+        }
         SpielFatalError("after resampling, wrong current player\n");
+        //SpielFatalError("after resampling, the current player is wrong\n");
     }
 
     return newState;

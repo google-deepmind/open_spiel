@@ -156,10 +156,10 @@ void ResampleFromInfostateForceTest()
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);*/
 
-    for(int n = 10; n < 15; n++)
+    for(int n = 10; n < 20; n++)
     {
         std::cout << "Starting test for n " << n << "\n";
-        for(int x = 0; x < 1000; x++)
+        for(int x = 0; x < 2000; x++)
         {
             std::shared_ptr<const Game> game =
                 LoadGame("phantom_go", params);
