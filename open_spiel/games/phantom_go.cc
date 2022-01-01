@@ -214,7 +214,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
         newState->UndoAction(-1, -1);
     }
 
-    if(newState->history_.empty() && (GoColor)player_id == GoColor::kBlack)
+    if(newState->history_.empty() && !history_.empty() && (GoColor)player_id == GoColor::kBlack)
     {
         newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
     }
