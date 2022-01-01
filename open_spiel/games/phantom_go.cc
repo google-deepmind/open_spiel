@@ -260,8 +260,12 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
 
     if(!newState->history_.empty() && stoneCount[opp_player_id] != 0)
     {
-
         newState->UndoAction(-1, -1);
+    }
+
+    if(!history_.empty() && stoneCount[opp_player_id] == 0)
+    {
+        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
     }
 
     if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
