@@ -3,7 +3,8 @@ extern crate libc;
 use std::os::raw::c_void;
 use libc::c_char;
 use libc::c_double;
-// use libc::c_int;
+use libc::c_float;
+use libc::c_int;
 use libc::c_long;
 use libc::free;
 use std::ffi::CStr;
@@ -92,6 +93,24 @@ impl State {
     }
     return legal_actions_vec;
   }
+  
+  pub fn chance_outcomes(&self) -> Vec<(i64, f64)> {
+    let legal_actions: Vec<i64> = self.legal_actions();
+    let mut size = 0;
+    let c_buf: *mut c_double = unsafe {
+        StateChanceOutcomeProbs(self.state, &mut size)
+    };
+    let length: usize = size as usize;
+    let mut vec = vec![(0 as i64, 0.0 as f64); length];
+    unsafe {
+      let slice = slice::from_raw_parts(c_buf, length);
+      for i in 0..length {
+        vec[i] = (legal_actions[i], slice[i]);
+      }
+      free(c_buf as *mut c_void);
+    }
+    return vec;
+  }
 
   pub fn apply_action(&self, action: i64) {
     unsafe { StateApplyAction(self.state, action) }
@@ -115,6 +134,62 @@ impl State {
     let str_buf: String = str_slice.to_owned();
     unsafe { free(c_buf as *mut c_void) };
     return str_buf;
+  }
+  
+  pub fn observation_string(&self) -> String {
+    let c_buf: *mut c_char = unsafe { 
+      StateObservationString(self.state)
+    };
+    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+    let str_slice: &str = c_str.to_str().unwrap();
+    let str_buf: String = str_slice.to_owned();
+    unsafe { free(c_buf as *mut c_void) };
+    return str_buf;
+  }
+  
+  pub fn information_state_string(&self) -> String {
+    let c_buf: *mut c_char = unsafe { 
+      StateInformationStateString(self.state)
+    };
+    let c_str: &CStr = unsafe { CStr::from_ptr(c_buf) };
+    let str_slice: &str = c_str.to_str().unwrap();
+    let str_buf: String = str_slice.to_owned();
+    unsafe { free(c_buf as *mut c_void) };
+    return str_buf;
+  }
+  
+  pub fn observation_tensor(&self) -> Vec<f32> {
+    let mut size = 0;
+    let c_buf: *mut c_float = unsafe {
+      StateObservationTensor(self.state, &mut size)
+    };
+    let length: usize = size as usize;
+    let mut vec = vec![0.0 as f32; length];
+    unsafe {
+      let slice = slice::from_raw_parts(c_buf, length);
+      for i in 0..length {
+        vec[i] = slice[i];
+      }
+      free(c_buf as *mut c_void);
+    }
+    return vec;
+  }
+  
+  pub fn information_state_tensor(&self) -> Vec<f32> {
+    let mut size = 0;
+    let c_buf: *mut c_float = unsafe {
+        StateInformationStateTensor(self.state, &mut size)
+    };
+    let length: usize = size as usize;
+    let mut vec = vec![0.0 as f32; length];
+    unsafe {
+      let slice = slice::from_raw_parts(c_buf, length);
+      for i in 0..length {
+        vec[i] = slice[i];
+      }
+      free(c_buf as *mut c_void);
+    }
+    return vec;
   }
 }
 
@@ -163,6 +238,40 @@ impl Game {
   
   pub fn num_distinct_actions(&self) -> i32 {
     return (unsafe { GameNumDistinctActions(self.game) }) as i32;
+  }
+  
+  pub fn observation_shape(&self) -> Vec<i32> {
+    let mut size = 0;
+    let c_buf: *mut c_int = unsafe {
+        GameObservationTensorShape(self.game, &mut size)
+    };
+    let length: usize = size as usize;
+    let mut vec = vec![0; length];
+    unsafe {
+      let slice = slice::from_raw_parts(c_buf, length);
+      for i in 0..length {
+        vec[i] = slice[i];
+      }
+      free(c_buf as *mut c_void);
+    }
+    return vec;
+  }
+  
+  pub fn information_state_tensor_shape(&self) -> Vec<i32> {
+    let mut size = 0;
+    let c_buf: *mut c_int = unsafe {
+        GameInformationStateTensorShape(self.game, &mut size)
+    };
+    let length: usize = size as usize;
+    let mut vec = vec![0; length];
+    unsafe {
+      let slice = slice::from_raw_parts(c_buf, length);
+      for i in 0..length {
+        vec[i] = slice[i];
+      }
+      free(c_buf as *mut c_void);
+    }
+    return vec;
   }
 }
 

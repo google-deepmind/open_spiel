@@ -18,8 +18,8 @@ void* GameNewInitialState(const void* game_ptr);
 int GameNumPlayers(const void* game_ptr);
 int GameMaxGameLength(const void* game_ptr);
 int GameNumDistinctActions(const void* game_ptr);
-/*int* GameObservationTensorShape(const void* game_ptr);*/
-/*int* GameInformationStateTensorShape(const void* game_ptr);*/
+int* GameObservationTensorShape(const void* game_ptr, int* size);
+int* GameInformationStateTensorShape(const void* game_ptri, int* size);
 
 /* State functions. */
 void DeleteState(void* state_ptr);
@@ -34,11 +34,11 @@ int StateNumPlayers(const void* state_ptr);
 void StateApplyAction(void* state_ptr, long action);
 double* StateReturns(const void* state_ptr);
 double StatePlayerReturn(const void* state_ptr, int player);
-/*double* StateChanceOutcomeProbs(const void* state_ptr, int* num);*/
-/*char* StateObservationString(const void* state_ptr);*/
-/*char* StateInformationStateString(const void* state_ptr);*/
-/*float* StateObservationTensor(const void* state_ptr, int *size);*/
-/*float* StateInformationStateTensor(const void* state_ptr, int *size);*/
+double* StateChanceOutcomeProbs(const void* state_ptr, int* size);
+char* StateObservationString(const void* state_ptr);
+char* StateInformationStateString(const void* state_ptr);
+float* StateObservationTensor(const void* state_ptr, int *size);
+float* StateInformationStateTensor(const void* state_ptr, int *size);
 
 #ifdef __cplusplus
 }  /* extern "C" */

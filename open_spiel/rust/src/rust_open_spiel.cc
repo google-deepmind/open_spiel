@@ -12,6 +12,7 @@
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::Action;
+using open_spiel::ActionsAndProbs;
 
 /* We need this because games are shared pointers and we need to return
  raw pointers to objects that contain them.*/
@@ -19,6 +20,16 @@ namespace {
 struct GamePointerHolder {
   std::shared_ptr<const Game> ptr;
 };
+
+template <class T>
+T* AllocBuf(const std::vector<T>& vec, int* size) {
+  *size = vec.size();
+  size_t num_bytes = *size  * sizeof(T);
+  T* buf = static_cast<T*>(malloc(num_bytes));
+  memcpy(buf, vec.data(), num_bytes);
+  return buf;
+}
+
 }  // namespace
 
 extern "C" {
@@ -78,6 +89,20 @@ int GameNumDistinctActions(const void* game_ptr) {
   return game->NumDistinctActions();
 }
 
+int* GameObservationTensorShape(const void* game_ptr, int* size) {
+  std::shared_ptr<const Game> game =
+      reinterpret_cast<const GamePointerHolder*>(game_ptr)->ptr;
+  std::vector<int> shape = game->ObservationTensorShape();
+  return AllocBuf(shape, size);
+}
+
+int* GameInformationStateTensorShape(const void* game_ptr, int* size) {
+  std::shared_ptr<const Game> game =
+      reinterpret_cast<const GamePointerHolder*>(game_ptr)->ptr;
+  std::vector<int> shape = game->InformationStateTensorShape();
+  return AllocBuf(shape, size);
+}
+
 void DeleteState(void* state_ptr) {
   State* state = reinterpret_cast<State*>(state_ptr);
   delete state;
@@ -99,11 +124,7 @@ long* StateLegalActions(const void* state_ptr, int* num_legal_actions) {
   assert(sizeof(long) == sizeof(Action));
   const State* state = reinterpret_cast<const State*>(state_ptr);
   std::vector<Action> legal_actions = state->LegalActions();
-  *num_legal_actions = legal_actions.size();
-  size_t size = *num_legal_actions * sizeof(long);
-  long* buf = static_cast<long*>(malloc(size));
-  memcpy(buf, legal_actions.data(), size);
-  return buf;
+  return AllocBuf(legal_actions, num_legal_actions);
 }
 
 int StateCurrentPlayer(const void* state_ptr) {
@@ -145,10 +166,44 @@ int StateNumPlayers(const void* state_ptr) {
 double* StateReturns(const void* state_ptr) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
   std::vector<double> returns = state->Returns();
-  size_t size = returns.size() * sizeof(double);
-  double* buf = static_cast<double*>(malloc(size));
-  memcpy(buf, returns.data(), size);
+  int size = 0;
+  return AllocBuf(returns, &size);
+}
+
+double* StateChanceOutcomeProbs(const void* state_ptr, int* size) {
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  ActionsAndProbs chance_outcomes = state->ChanceOutcomes(); 
+  *size = chance_outcomes.size();
+  size_t num_bytes = *size  * sizeof(double);
+  double* buf = static_cast<double*>(malloc(num_bytes));
+  for (int i = 0; i < chance_outcomes.size(); ++i) {
+    buf[i] = chance_outcomes[i].second;
+  }
   return buf;
+}
+
+char* StateObservationString(const void* state_ptr) {
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  std::string state_str = state->ObservationString();
+  return strdup(state_str.c_str());
+}
+
+char* StateInformationStateString(const void* state_ptr) {
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  std::string state_str = state->InformationStateString();
+  return strdup(state_str.c_str());
+}
+
+float* StateObservationTensor(const void* state_ptr, int *size) {
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  std::vector<float> tensor = state->ObservationTensor();
+  return AllocBuf(tensor, size);
+}
+
+float* StateInformationStateTensor(const void* state_ptr, int *size) {
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  std::vector<float> tensor = state->InformationStateTensor();
+  return AllocBuf(tensor, size);
 }
 
 }  /* extern "C" */
