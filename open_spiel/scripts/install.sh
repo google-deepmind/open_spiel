@@ -174,8 +174,6 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_ORTOOLS:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; th
   [[ -f "${DOWNLOAD_FILE}" ]] || wget --show-progress -O "${DOWNLOAD_FILE}" "${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL}"
   mkdir "$DIR"
   tar -xzf "${DOWNLOAD_FILE}" --strip 1 -C "$DIR"
-  # Two asbl's causing problems, let's try just one
-  mv $DIR/include/absl $DIR/include/absl_do_not_use
 fi
 
 # 2. Install other required system-wide dependencies
