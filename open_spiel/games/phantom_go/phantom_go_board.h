@@ -121,8 +121,8 @@ class PhantomGoBoard {
 
   
 
-  std::array<int, 2> getStoneCount() const { return stone_count_; };
-  std::string observationsToString() const;
+  std::array<int, 2> GetStoneCount() const { return stone_count_; };
+  std::string ObservationsToString() const;
   std::string observationToString(int player) const;
   std::array<GoColor, kMaxBoardSize* kMaxBoardSize> GetObservationByID(int player_id) const;
 

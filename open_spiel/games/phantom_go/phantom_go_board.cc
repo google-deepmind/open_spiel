@@ -331,7 +331,7 @@ bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
   SPIEL_CHECK_EQ(GoColor::kEmpty, board_[p].color);*/
 
   //playing illegal moves will occur standardly during phantom go, it is even desired  
-  if (IsLegalMoveObserver(p, c) == false)
+  if (!IsLegalMoveObserver(p, c))
   {
       return false;
   }
@@ -420,7 +420,7 @@ std::array<GoColor, kMaxBoardSize* kMaxBoardSize> PhantomGoBoard::GetObservation
     return observations_[player_id];
 }
 
-std::string PhantomGoBoard::observationsToString() const
+std::string PhantomGoBoard::ObservationsToString() const
 {
     std::stringstream ss;
     ss << "\nObservation white:\n";

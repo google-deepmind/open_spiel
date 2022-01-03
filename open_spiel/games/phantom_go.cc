@@ -29,11 +29,11 @@ namespace {
 const GameType kGameType{
     /*short_name=*/"phantom_go",
     /*long_name=*/"Phantom Go",
-                   GameType::Dynamics::kSequential,
-                   GameType::ChanceMode::kDeterministic,
-                   GameType::Information::kImperfectInformation,
-                   GameType::Utility::kZeroSum,
-                   GameType::RewardModel::kTerminal,
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
     /*max_num_players=*/2,
     /*min_num_players=*/2,
     /*provides_information_state_string=*/true,
@@ -41,15 +41,15 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-                   {{"komi", GameParameter(7.5)},
-                    {"board_size", GameParameter(9)},
-                    {"handicap", GameParameter(0)},
-                       // After the maximum game length, the game will end arbitrarily and the
-                       // score is computed as usual (i.e. number of stones + komi).
-                       // It's advised to only use shorter games to compute win-rates.
-                       // When not provided, it defaults to DefaultMaxGameLength(board_size)
-                    {"max_game_length",
-                     GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
+    {{"komi", GameParameter(7.5)},
+     {"board_size", GameParameter(9)},
+     {"handicap", GameParameter(0)},
+     // After the maximum game length, the game will end arbitrarily and the
+     // score is computed as usual (i.e. number of stones + komi).
+     // It's advised to only use shorter games to compute win-rates.
+     // When not provided, it defaults to DefaultMaxGameLength(board_size)
+     {"max_game_length",
+      GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -101,14 +101,15 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateHard(
     int player_id, std::function<double()> rng) const {
 
     int boardSize = board_.board_size();
+    Action pass_action = VirtualActionToAction(kVirtualPass, boardSize);
     auto opp_player_id = (uint8_t) OppColor((GoColor) player_id);
 
-    std::shared_ptr<const Game> newGame = GetGame();
+    std::shared_ptr<const Game> game = GetGame();
     std::unique_ptr<PhantomGoState>
-        newState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+        state = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
 
     std::array<std::vector<int>, 2> stones;
-    std::array<int, 2> stoneCount = board_.getStoneCount();
+    std::array<int, 2> stoneCount = board_.GetStoneCount();
     std::vector<int> enemyVisibleStones;
     std::array<GoColor, kMaxBoardSize * kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
 
@@ -128,61 +129,63 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateHard(
 
     if(player_id == (uint8_t)GoColor::kWhite)
     {
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(pass_action);
     }
 
     for(long action : stones[player_id]) // Fill the board with stones of player we want to resample for
     {
-        newState->ApplyAction(action);
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(action);
+        state->ApplyAction(pass_action);
     }
 
-    if(!newState->history_.empty())
+    if(!state->history_.empty())
     {
-        newState->UndoAction(-1, -1);
+        state->UndoAction(opp_player_id, pass_action);
     }
 
-    if(newState->history_.empty() && (GoColor)player_id == GoColor::kBlack)
+    if(state->history_.empty() && (GoColor)player_id == GoColor::kBlack)
     {
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(pass_action);
     }
 
     for(long action : stones[opp_player_id]) // Fill the board with stones of player we want to resample for
     {
-        newState->ApplyAction(action);
+        state->ApplyAction(action);
         if(std::find(enemyVisibleStones.begin(), enemyVisibleStones.end(), action) != enemyVisibleStones.end())
         {
-            newState->ApplyAction(action);
+            state->ApplyAction(action);
         }
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(pass_action);
     }
 
-    if(!newState->history_.empty() && !stones[opp_player_id].empty())
+    if(!state->history_.empty() && !stones[opp_player_id].empty())
     {
-        newState->UndoAction(-1, -1);
+        state->UndoAction(player_id, pass_action);
     }
 
-    if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
-        newState->board_.getStoneCount()[1] == stoneCount[1]))
+    if (!(state->board_.GetStoneCount()[0] == stoneCount[0] &&
+        state->board_.GetStoneCount()[1] == stoneCount[1]))
     {
-        std::cout << "hard resample\nstone count" << ToString() << newState->ToString();
+        std::cout << "hard resample\nstone count" << ToString() << state->ToString();
         SpielFatalError("after resampling, the count of stones doesn't match\n");
     }
 
-    return newState;
+    return state;
 }
 
-std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix moves into eyes that keep messing up the histories
+std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
 
-    int boardSize = board_.board_size();
 
-    std::shared_ptr<const Game> newGame = GetGame();
+    int boardSize = board_.board_size();
+    Action pass_action = VirtualActionToAction(kVirtualPass, boardSize);
+
+    std::shared_ptr<const Game> game = GetGame();
     std::unique_ptr<PhantomGoState>
-        newState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+        state = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
 
     std::array<GoColor, kMaxBoardSize * kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
-    std::array<int, 2> stoneCount = board_.getStoneCount();
+    std::array<int, 2> stoneCount = board_.GetStoneCount();
 
     std::array<std::vector<int>, 2> stones;
     std::vector<Action> enemyActions;
@@ -200,56 +203,56 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
 
     if(player_id == (uint8_t)GoColor::kWhite)
     {
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(pass_action);
     }
 
     for(long action : stones[player_id]) // Fill the board with stones of player we want to resample for
     {
-        newState->ApplyAction(action);
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(action);
+        state->ApplyAction(pass_action);
     }
 
-    if(!newState->history_.empty())
+    if(!state->history_.empty())
     {
-        newState->UndoAction(-1, -1);
+        state->UndoAction(opp_player_id, pass_action);
     }
 
-    if(newState->history_.empty() && !history_.empty() && (GoColor)player_id == GoColor::kBlack)
+    if(state->history_.empty() && !history_.empty() && (GoColor)player_id == GoColor::kBlack)
     {
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(pass_action);
     }
 
     for(long action : stones[opp_player_id])
     {
-        newState->ApplyAction(action);
-        newState->ApplyAction(action);
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(action);
+        state->ApplyAction(action);
+        state->ApplyAction(pass_action);
     }
 
     for(int i = 0; i < stoneCount[opp_player_id] - stones[opp_player_id].size(); i++) {
-        std::vector<Action> actions = newState->LegalActions();
+        std::vector<Action> actions = state->LegalActions();
         std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-        std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
+        std::array<int, 2> currStoneCount = state->board_.GetStoneCount();
         currStoneCount[opp_player_id]++;
         std::vector<int> vec = stones[opp_player_id];
         bool actionChosen = false;
         for (long action: actions) {
             // pass can't be chosen, also an action that will be played by opposing player can't be chosen
-            if (action == VirtualActionToAction(kVirtualPass, boardSize) ||
+            if (action == pass_action ||
                 std::find(vec.begin(), vec.end(), action) != vec.end())
                 continue;
 
-            newState->ApplyAction(action);
-            if (newState->board_.getStoneCount()[0] == currStoneCount[0] &&
-                newState->board_.getStoneCount()[1] == currStoneCount[1])
+            state->ApplyAction(action);
+            if (state->board_.GetStoneCount()[0] == currStoneCount[0] &&
+                state->board_.GetStoneCount()[1] == currStoneCount[1])
             { //random move was applied correctly, no captures were made
-                newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+                state->ApplyAction(pass_action);
                 actionChosen = true;
                 //std::cout << "Added to observation " << ActionToString(c, action) << "\n";
                 break;
             } else {
                 //std::cout << "random action" << ActionToString(c, action) << " was unacceptable\n";
-                newState->UndoAction(-1, -1);
+                state->UndoAction(opp_player_id, action);
             }
         }
         /*if(!actionChosen)
@@ -258,50 +261,50 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate( //still to fix mov
         }*/
     }
 
-    if(!newState->history_.empty() && stoneCount[opp_player_id] != 0)
+    if(!state->history_.empty() && stoneCount[opp_player_id] != 0)
     {
-        newState->UndoAction(-1, -1);
+        state->UndoAction(player_id, pass_action);
     }
 
     if(!history_.empty() && stoneCount[opp_player_id] == 0)
     {
-        newState->ApplyAction(VirtualActionToAction(kVirtualPass, boardSize));
+        state->ApplyAction(pass_action);
     }
 
-    if (!(newState->board_.getStoneCount()[0] == stoneCount[0] &&
-        newState->board_.getStoneCount()[1] == stoneCount[1]))
+    if (!(state->board_.GetStoneCount()[0] == stoneCount[0] &&
+        state->board_.GetStoneCount()[1] == stoneCount[1]))
     {
         //std::cout << "resampling for " << player_id << "\nstone count" << ToString() << newState->ToString();
         return PhantomGoState::ResampleFromInfostateHard(player_id, rng);
         //SpielFatalError("after resampling, the count of stones doesn't match\n");
     }
 
-    if(CurrentPlayer() != newState->CurrentPlayer())
+    if(CurrentPlayer() != state->CurrentPlayer())
     {
-        std::cout << "resampling for " << player_id << "\nwrong player" << ToString() << newState->ToString();
+        std::cout << "resampling for " << player_id << "\nwrong player" << ToString() << state->ToString();
 
-        for(int i = 0; i < newState->history_.size(); i++)
+        for(int i = 0; i < state->history_.size(); i++)
         {
-            std::cout << newState->history_[i] << "\n";
+            std::cout << state->history_[i] << "\n";
         }
         SpielFatalError("after resampling, wrong current player\n");
         //SpielFatalError("after resampling, the current player is wrong\n");
     }
 
-    return newState;
+    return state;
 }
 
-
+// This method is unfinished
 std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix moves into eyes that keep messing up the histories
     int player_id, std::function<double()> rng) const {
 
     int boardSize = board_.board_size();
 
-    std::shared_ptr<const Game> newGame = GetGame();
-    std::unique_ptr<PhantomGoState> newState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+    std::shared_ptr<const Game> game = GetGame();
+    std::unique_ptr<PhantomGoState> state = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
 
     std::array<GoColor, kMaxBoardSize* kMaxBoardSize> infoState = board_.GetObservationByID(player_id);
-    std::array<int, 2> stoneCount = board_.getStoneCount();
+    std::array<int, 2> stoneCount = board_.GetStoneCount();
 
     std::array<std::vector<int>, 2> stones;
     std::vector<Action> enemyActions;
@@ -325,7 +328,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
 
     { //deciding which actions are important because of captures
         std::shared_ptr<const Game> historyGame = GetGame();
-        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
         //this state will be used as a state to replicate the whole history to be able to observe board in each step
 
 
@@ -342,9 +345,9 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
                 }
             }
 
-            std::array<int, 2> prevStoneCount = historyState->board_.getStoneCount();
+            std::array<int, 2> prevStoneCount = historyState->board_.GetStoneCount();
             historyState->ApplyAction(history_[i].action);
-            std::array<int, 2> currStoneCount = historyState->board_.getStoneCount();
+            std::array<int, 2> currStoneCount = historyState->board_.GetStoneCount();
 
             if(currStoneCount[0] < prevStoneCount[0] || currStoneCount[1] < prevStoneCount[1]) //if one of the counts of stones is lower than in the previous move
             {
@@ -440,7 +443,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
 
     { //deciding if enemy moves are important, because they will be observed
         std::shared_ptr<const Game> historyGame = GetGame();
-        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*newGame->NewInitialState()));
+        std::unique_ptr<PhantomGoState> historyState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
         //this state will be used as a state to replicate the whole history to be able to observe board in each step
 
         for (int i = 0; i < history_.size(); i++) {
@@ -503,18 +506,18 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
 
         if(history_[i].player == player_id)
         {
-            newState->ApplyAction(history_[i].action);
+            state->ApplyAction(history_[i].action);
         }
         else
         {
             if(enemyActionVisibility[enemyMove])
             {
                 SPIEL_CHECK_EQ(enemyActions[enemyMove], history_[i].action);
-                newState->ApplyAction(history_[i].action);
+                state->ApplyAction(history_[i].action);
             }
             else
             {
-                std::vector<Action> actions = newState->LegalActions();
+                std::vector<Action> actions = state->LegalActions();
                 std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
                 for(long & action : actions)
                 {
@@ -529,7 +532,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
                         continue;
                     }
                     //if the move would be observational
-                    if(newState->board_.PointColor(ActionToVirtualAction(action, boardSize)) == (GoColor)player_id)
+                    if(state->board_.PointColor(ActionToVirtualAction(action, boardSize)) == (GoColor)player_id)
                     {
                         continue;
                     }
@@ -547,12 +550,12 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
                     }
                     if(legal)
                     {
-                        std::array<int, 2> prevStoneCount = newState->board_.getStoneCount();
-                        newState->ApplyAction(action);
-                        std::array<int, 2> currStoneCount = newState->board_.getStoneCount();
+                        std::array<int, 2> prevStoneCount = state->board_.GetStoneCount();
+                        state->ApplyAction(action);
+                        std::array<int, 2> currStoneCount = state->board_.GetStoneCount();
                         if(currStoneCount[0] < prevStoneCount[0] || currStoneCount[1] < prevStoneCount[1]) //if one of the counts of stones is lower than in the previous move
                         {
-                            newState->UndoAction(-1, -1);
+                            state->UndoAction(-1, -1);
                             legal = false;
                             continue;
                         }
@@ -564,7 +567,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostateFull( //still to fix
         }
     }
 
-    return newState;
+    return state;
 }
 
 std::string PhantomGoState::InformationStateString(int player) const {
@@ -638,14 +641,14 @@ char GoColorToChar(GoColor c) {
 
 std::string PhantomGoState::ToString() const {
   std::stringstream ss;
-  std::array<int, 2> stoneCount = board_.getStoneCount();
+  std::array<int, 2> stoneCount = board_.GetStoneCount();
   ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
      << ", history.size()=" << history_.size() << ", "
      << "stones_count: w" << stoneCount[1] << " b" << stoneCount[0] << ")\n";
 
   ss << board_;
 
-  ss << board_.observationsToString();
+  ss << board_.ObservationsToString();
 
   return ss.str();
 }

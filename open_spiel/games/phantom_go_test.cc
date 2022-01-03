@@ -90,14 +90,14 @@ void StoneCountTest()
     std::shared_ptr<const Game> game =
         LoadGame("phantom_go", params);
     PhantomGoState state(game, kBoardSize, kKomi, 0);
-    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kBlack], 0);
-    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kWhite], 0);
+    SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kBlack], 0);
+    SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kWhite], 0);
     state.ApplyAction(5);
-    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kBlack], 1);
-    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kWhite], 0);
+    SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kBlack], 1);
+    SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kWhite], 0);
     state.ApplyAction(6);
-    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kBlack], 1);
-    SPIEL_CHECK_EQ(state.board().getStoneCount()[(uint8_t)GoColor::kWhite], 1);
+    SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kBlack], 1);
+    SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kWhite], 1);
 
 }
 
@@ -192,27 +192,6 @@ void ResampleFromInfostateForceTest()
     }
 }
 
-void CloneVisualTest() {
-    std::cout << "Starting Clone visual Test\n";
-    GameParameters params;
-    params["board_size"] = GameParameter(kBoardSize);
-    std::shared_ptr<const Game> game =
-        LoadGame("phantom_go", params);
-    PhantomGoState state(game, kBoardSize, kKomi, 0);
-
-    for (int i = 0; i < 120; i++) {
-        std::vector<Action> actions = state.LegalActions();
-        std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-        state.ApplyAction(actions[0]);
-        if (state.IsTerminal()) {
-            break;
-        }
-    }
-
-    std::unique_ptr<State> cloneState = state.Clone();
-    std::cout << state.ToString() << "\n" << cloneState->ToString();
-}
-
 }  // namespace
 }  // namespace phantom_go
 }  // namespace open_spiel
@@ -225,7 +204,6 @@ int main(int argc, char** argv) {
   open_spiel::phantom_go::IllegalMoveTest();
   open_spiel::phantom_go::StoneCountTest();
   //open_spiel::phantom_go::ResampleFromInfostateVisualTest();
-  open_spiel::phantom_go::ResampleFromInfostateForceTest();
-  //open_spiel::phantom_go::CloneVisualTest();
+  //open_spiel::phantom_go::ResampleFromInfostateForceTest();
 
 }
