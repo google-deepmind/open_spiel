@@ -776,6 +776,11 @@ int LeducState::NumObservableCards() const {
 
 int LeducState::MaxBetsPerRound() const { return 3 * num_players_ - 2; }
 
+void LeducState::SetPrivateCards(const std::vector<int>& new_private_cards) {
+  SPIEL_CHECK_EQ(new_private_cards.size(), NumPlayers());
+  private_cards_ = new_private_cards;
+}
+
 LeducGame::LeducGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
