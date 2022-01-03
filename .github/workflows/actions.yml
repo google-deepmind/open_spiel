@@ -43,7 +43,6 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         # Build and run tests with all optional dependencies, including building a
         # shared library with linkable third party dependencies in place.
-        # FIXME(lanctot):
         # Test temporarily disabled while we figure out why the build breaks
         # with the new OR-Tools.
         #- os: ubuntu-20.04
