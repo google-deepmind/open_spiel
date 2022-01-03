@@ -305,7 +305,9 @@ if (OPEN_SPIEL_BUILD_WITH_PYTHON)
   add_subdirectory (python)
   # HIGC needs pyspiel.so and corresponding PYTHONPATH to be set
   # in order to run its tests.
-  add_subdirectory (higc)
+  if (OPEN_SPIEL_BUILD_WITH_HIGC)
+    add_subdirectory (higc)
+  endif()
 endif()
 
 add_subdirectory (utils)
