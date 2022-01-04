@@ -101,8 +101,7 @@ export OPEN_SPIEL_BUILD_WITH_ORTOOLS="${OPEN_SPIEL_BUILD_WITH_ORTOOLS:-"OFF"}"
 # Use version 9.2 at minimum, due to compatibility between absl library versions
 # used in OpenSpiel and in OrTools.
 # Other links to archives found here: https://developers.google.com/optimization/install/cpp/linux
-export OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v9.2/or-tools_amd64_ubuntu-20.04_v9.2.9972.tar.gz"}"
-
+export OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v9.2/or-tools_amd64_ubuntu-21.10_v9.2.9972.tar.gz"}"
 # Used to determine whether to include the Python ML frameworks in the tests.
 # A value of AUTO runs the appropriate find_X script in open_spiel/scripts to check what is installed.
 # To override automatic detection, set to either ON or OFF.
