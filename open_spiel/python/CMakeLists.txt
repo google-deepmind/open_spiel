@@ -134,6 +134,10 @@ target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")
+if (WIN32)
+  # Python does not seem able to import the module without this change.
+  set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
+endif()
 
 # Optional pyspiel-related modules, which can specify their own python tests.
 if (OPEN_SPIEL_BUILD_WITH_EIGEN)
