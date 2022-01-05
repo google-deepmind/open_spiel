@@ -22,11 +22,11 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void BasicHexTests() {
-  testing::LoadGameTest("hex(row_size=5,col_size=5)");
-  testing::NoChanceOutcomesTest(*LoadGame("hex(row_size=5,col_size=5)"));
-  testing::RandomSimTest(*LoadGame("hex(row_size=5,col_size=5)"), 100);
+  testing::LoadGameTest("hex(num_cols=5,num_rows=5)");
+  testing::NoChanceOutcomesTest(*LoadGame("hex(num_cols=5,num_rows=5)"));
+  testing::RandomSimTest(*LoadGame("hex(num_cols=5,num_rows=5)"), 100);
   testing::RandomSimTest(*LoadGame("hex"), 5);
-  testing::RandomSimTest(*LoadGame("hex(row_size=2,col_size=3)"), 10);
+  testing::RandomSimTest(*LoadGame("hex(num_cols=2,num_rows=3)"), 10);
 }
 
 }  // namespace
