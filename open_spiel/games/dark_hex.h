@@ -60,15 +60,17 @@
 //    (default "reveal-nothing")  ['reveal-nothing', 'reveal-numturns']
 //
 //    "num_cols"    int           Size of the rows on the hex board
-//    (default 11)
+//    (default 3)
 //    "num_rows"    int           Size of the columns on the hex board
-//    (default 11)
+//    (default 3)
 
 namespace open_spiel {
 namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing";
 inline constexpr const char* kDefaultGameVersion = "cdh";
+inline constexpr int kDefaultNumRows = 3;
+inline constexpr int kDefaultNumCols = 3;
 
 // black - white - empty
 inline constexpr int kPosStates = hex::kNumPlayers + 1;

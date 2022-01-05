@@ -53,8 +53,8 @@ const GameType kGameType{/*short_name=*/"dark_hex",
                          {{"obstype", GameParameter(kDefaultObsType)},
                           {"gameversion", GameParameter(kDefaultGameVersion)},
                           {"board_size", GameParameter(hex::kDefaultBoardSize)},
-                          {"num_cols", GameParameter(kDefaultBoardSize)},
-                          {"num_rows", GameParameter(kDefaultBoardSize)}}};
+                          {"num_cols", GameParameter(kDefaultNumCols)},
+                          {"num_rows", GameParameter(kDefaultNumRows)}}};
 
 const GameType kImperfectRecallGameType{
     /*short_name=*/"dark_hex_ir",
@@ -74,8 +74,8 @@ const GameType kImperfectRecallGameType{
     {{"obstype", GameParameter(kDefaultObsType)},
      {"gameversion", GameParameter(kDefaultGameVersion)},
      {"board_size", GameParameter(hex::kDefaultBoardSize)},
-     {"num_cols", GameParameter(kDefaultBoardSize)},
-     {"num_rows", GameParameter(kDefaultBoardSize)}}};
+     {"num_cols", GameParameter(kDefaultNumCols)},
+     {"num_rows", GameParameter(kDefaultNumRows)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new DarkHexGame(params, kGameType));
