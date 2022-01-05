@@ -131,6 +131,18 @@ void DarkHexState::DoApplyAction(Action move) {
   }
 
   SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
+  // Update the view - only using CellState::kBlack and CellState::kWhite
+  if (state_.BoardAt(move) == CellState::kBlack ||
+      state_.BoardAt(move) == CellState::kBlackNorth ||
+      state_.BoardAt(move) == CellState::kBlackSouth ||
+      state_.BoardAt(move) == CellState::kBlackWin) {
+    cur_view[move] = CellState::kBlack;
+  } else if (state_.BoardAt(move) == CellState::kWhite ||
+             state_.BoardAt(move) == CellState::kWhiteEast ||
+             state_.BoardAt(move) == CellState::kWhiteWest ||
+             state_.BoardAt(move) == CellState::kWhiteWin) {
+    cur_view[move] = CellState::kWhite;
+  }
   cur_view[move] = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 }
