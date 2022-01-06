@@ -143,7 +143,6 @@ void DarkHexState::DoApplyAction(Action move) {
              state_.BoardAt(move) == CellState::kWhiteWin) {
     cur_view[move] = CellState::kWhite;
   }
-  cur_view[move] = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 }
 
