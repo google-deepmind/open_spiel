@@ -122,8 +122,8 @@ class DarkHexState : public State {
   hex::HexState state_;
   ObservationType obs_type_;
   GameVersion game_version_;
-  const int num_cols_;  // y
-  const int num_rows_;  // x
+  const int num_cols_;  // x
+  const int num_rows_;  // y
   const int num_cells_;
   const int bits_per_action_;
   const int longest_sequence_;
