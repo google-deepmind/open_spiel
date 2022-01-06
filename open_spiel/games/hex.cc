@@ -83,7 +83,7 @@ CellState HexState::PlayerAndActionToState(Player player, Action move) const {
       bool south_connected = false;
       if (move < num_cols_) {  // First row
         north_connected = true;
-      } else if (move >= num_cols_ * (num_rows_ - 1)) {  // Last row
+      } else if (move >= (board_.size() - num_cols_)) {  // Last row
         south_connected = true;
       }
       for (int neighbour : AdjacentCells(move)) {
@@ -212,37 +212,22 @@ std::string HexState::ActionToString(Player player, Action action_id) const {
   // This does not comply with the Hex Text Protocol
   // TODO(author8): Make compliant with HTP
   return absl::StrCat(StateToString(PlayerAndActionToState(player, action_id)),
-                      "(", action_id % num_rows_, ",", action_id / num_cols_,
+                      "(", action_id % num_cols_, ",", action_id / num_cols_, 
                       ")");
 }
 
-std::vector<int> HexState::AdjacentCellsBoardSize2(int cell) const {
-  if (cell == 0 || cell == 3) {
-    return {1, 2};
-  } else if (cell == 1) {
-    return {0, 2, 3};
-  } else if (cell == 2) {
-    return {0, 1, 3};
-  } else {
-    SpielFatalError(absl::StrCat("Unexpected cell value: ", cell));
-  }
-}
-
 std::vector<int> HexState::AdjacentCells(int cell) const {
-  if (num_cols_ == 2) {
-    // Special case for board size 2 where connections can form between the two
-    // edges of the board.
-    return AdjacentCellsBoardSize2(cell);
-  }
   std::vector<int> neighbours = {};
   neighbours = {cell - num_cols_, cell - num_cols_ + 1, cell - 1,
                 cell + 1,         cell + num_cols_ - 1, cell + num_cols_};
   for (int i = kMaxNeighbours - 1; i >= 0; i--) {
     // Check for invalid neighbours and remove
     // Iterate in reverse to avoid changing the index of a candidate neighbour
-    if (neighbours[i] < 0 || (neighbours[i] >= num_cols_ * num_rows_) ||
-        (neighbours[i] % num_cols_ == 0 && cell % num_cols_ == num_cols_ - 1) ||
-        (neighbours[i] % num_cols_ == num_cols_ - 1 && cell % num_cols_ == 0)) {
+    if (neighbours[i] < 0 || (neighbours[i] >= num_cols_ * num_rows_)) {
+      neighbours.erase(neighbours.begin() + i);
+    } else if (((neighbours[i] % num_cols_ == 0 && cell % num_cols_ == num_cols_ - 1) ||
+      (neighbours[i] % num_cols_ == num_cols_ - 1 && cell % num_cols_ == 0)) &&
+       num_cols_ != 2) {
       neighbours.erase(neighbours.begin() + i);
     }
   }
@@ -251,8 +236,8 @@ std::vector<int> HexState::AdjacentCells(int cell) const {
 
 HexState::HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows)
     : State(game),
-      num_cols_(num_cols > num_rows ? num_cols : num_rows),
-      num_rows_(num_cols < num_rows ? num_cols : num_rows) {
+      num_cols_(num_cols),
+      num_rows_(num_rows) {
   // for all num_colss & num_rowss -> num_colss_ >= num_rowss_
   board_.resize(num_cols * num_rows, CellState::kEmpty);
 }
@@ -261,10 +246,11 @@ std::string HexState::ToString() const {
   std::string str;
   // Each cell has the cell plus a space
   // nth line has n spaces, and 1 "\n", except last line has no "\n"
-  str.reserve(2 * num_cols_ * num_rows_ + num_rows_ * (num_cols_ + 1) / 2 - 1);
+  str.reserve(num_cols_ * num_rows_ * 2 + num_rows_ * (num_rows_ + 1) / 2 - 1);
   int line_num = 0;
   for (int cell = 0; cell < board_.size(); ++cell) {
-    if (cell && !(cell % num_rows_)) {
+    // if its the last cell in the row
+    if (cell && cell % num_cols_ == 0) {
       absl::StrAppend(&str, "\n");
       line_num++;
       absl::StrAppend(&str, std::string(line_num, ' '));
