@@ -170,10 +170,10 @@ class DarkHexGame : public Game {
 
 class ImperfectRecallDarkHexState : public DarkHexState {
  public:
-  ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int num_cols_,
-                              int num_rows_, GameVersion game_version,
+  ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int num_rows_,
+                              int num_cols_, GameVersion game_version,
                               ObservationType obs_type)
-      : DarkHexState(game, num_cols_, num_rows_, game_version, obs_type) {}
+      : DarkHexState(game, num_rows_, num_cols_, game_version, obs_type) {}
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);

@@ -145,7 +145,6 @@ void DarkHexState::DoApplyAction(Action move) {
   } else {
     SPIEL_CHECK_TRUE(false);
   }
-  cur_view[move] = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 }
 
