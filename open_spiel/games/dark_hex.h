@@ -71,6 +71,7 @@ inline constexpr const char* kDefaultObsType = "reveal-nothing";
 inline constexpr const char* kDefaultGameVersion = "cdh";
 inline constexpr int kDefaultNumRows = 3;
 inline constexpr int kDefaultNumCols = 3;
+inline constexpr int kDefaultBoardSize = 3;
 
 // black - white - empty
 inline constexpr int kPosStates = hex::kNumPlayers + 1;
@@ -121,8 +122,8 @@ class DarkHexState : public State {
   hex::HexState state_;
   ObservationType obs_type_;
   GameVersion game_version_;
-  const int num_cols_;  // x
-  const int num_rows_;  // y
+  const int num_cols_;  // y
+  const int num_rows_;  // x
   const int num_cells_;
   const int bits_per_action_;
   const int longest_sequence_;

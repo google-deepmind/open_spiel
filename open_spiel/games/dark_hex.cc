@@ -27,7 +27,6 @@ namespace dark_hex {
 namespace {
 
 using hex::kCellStates;
-using hex::kDefaultBoardSize;
 
 using hex::CellState;
 using hex::kMinValueCellState;
@@ -52,7 +51,7 @@ const GameType kGameType{/*short_name=*/"dark_hex",
                          /*parameter_specification=*/
                          {{"obstype", GameParameter(kDefaultObsType)},
                           {"gameversion", GameParameter(kDefaultGameVersion)},
-                          {"board_size", GameParameter(hex::kDefaultBoardSize)},
+                          {"board_size", GameParameter(kDefaultBoardSize)},
                           {"num_cols", GameParameter(kDefaultNumCols)},
                           {"num_rows", GameParameter(kDefaultNumRows)}}};
 
@@ -73,7 +72,7 @@ const GameType kImperfectRecallGameType{
     /*parameter_specification=*/
     {{"obstype", GameParameter(kDefaultObsType)},
      {"gameversion", GameParameter(kDefaultGameVersion)},
-     {"board_size", GameParameter(hex::kDefaultBoardSize)},
+     {"board_size", GameParameter(kDefaultBoardSize)},
      {"num_cols", GameParameter(kDefaultNumCols)},
      {"num_rows", GameParameter(kDefaultNumRows)}}};
 
@@ -134,15 +133,19 @@ void DarkHexState::DoApplyAction(Action move) {
   // Update the view - only using CellState::kBlack and CellState::kWhite
   if (state_.BoardAt(move) == CellState::kBlack ||
       state_.BoardAt(move) == CellState::kBlackNorth ||
-      state_.BoardAt(move) == CellState::kBlackSouth ||
-      state_.BoardAt(move) == CellState::kBlackWin) {
+      state_.BoardAt(move) == CellState::kBlackSouth) {
     cur_view[move] = CellState::kBlack;
   } else if (state_.BoardAt(move) == CellState::kWhite ||
              state_.BoardAt(move) == CellState::kWhiteEast ||
-             state_.BoardAt(move) == CellState::kWhiteWest ||
-             state_.BoardAt(move) == CellState::kWhiteWin) {
+             state_.BoardAt(move) == CellState::kWhiteWest) {
     cur_view[move] = CellState::kWhite;
+  } else if (state_.BoardAt(move) == CellState::kBlackWin ||
+             state_.BoardAt(move) == CellState::kWhiteWin) {
+    cur_view[move] = state_.BoardAt(move);
+  } else {
+    SPIEL_CHECK_TRUE(false);
   }
+  cur_view[move] = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 }
 
