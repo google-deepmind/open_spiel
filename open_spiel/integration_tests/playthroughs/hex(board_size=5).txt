@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Hex"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["board_size", "col_size", "row_size"]
+GameType.parameter_specification = ["board_size", "num_cols", "num_rows"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 25
 PolicyTensorShape() = [25]
 MaxChanceOutcomes() = 0
-GetParameters() = {board_size=5,col_size=5,row_size=5}
+GetParameters() = {board_size=5,num_cols=5,num_rows=5}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0

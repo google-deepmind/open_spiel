@@ -1,0 +1,231 @@
+game: dark_hex_ir(board_size=3)
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Dark Hex with Imperfect Recall"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["board_size", "gameversion", "num_cols", "num_rows", "obstype"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "dark_hex_ir"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 9
+PolicyTensorShape() = [9]
+MaxChanceOutcomes() = 0
+GetParameters() = {board_size=3,gameversion=cdh,num_cols=3,num_rows=3,obstype=reveal-nothing}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = [268]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 268
+ObservationTensorShape() = [81]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 81
+MaxGameLength() = 17
+ToString() = "dark_hex_ir(board_size=3)"
+
+# State 0
+# . . .
+#  . . .
+#   . . .
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "P0 ...\n...\n..."
+InformationStateString(1) = "P1 ...\n...\n..."
+InformationStateTensor(0): binvec(268, 0x804020100804020100800000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(268, 0x804020100804020100800000000000000000000000000000000000000000000000)
+ObservationString(0) = "...\n...\n..."
+ObservationString(1) = "...\n...\n..."
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, -0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "x(0,1)", "x(1,1)", "x(2,1)", "z(0,2)", "z(1,2)", "z(2,2)"]
+
+# Apply action "y(2,0)"
+action: 2
+
+# State 1
+# . . y
+#  . . .
+#   . . .
+IsTerminal() = False
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "P0 ..y\n...\n..."
+InformationStateString(1) = "P1 ...\n...\n..."
+InformationStateTensor(0): binvec(268, 0x804004100804020100808000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(268, 0x804020100804020100800000000000000000000000000000000000000000000000)
+ObservationString(0) = "..y\n...\n..."
+ObservationString(1) = "...\n...\n..."
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, -0.0]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+StringLegalActions() = ["p(0,0)", "o(1,0)", "q(2,0)", "p(0,1)", "o(1,1)", "q(2,1)", "p(0,2)", "o(1,2)", "q(2,2)"]
+
+# Apply action "q(2,0)"
+action: 2
+
+# State 2
+# . . y
+#  . . .
+#   . . .
+IsTerminal() = False
+History() = [2, 2]
+HistoryString() = "2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "P0 ..y\n...\n..."
+InformationStateString(1) = "P1 ..y\n...\n..."
+InformationStateTensor(0): binvec(268, 0x804004100804020100808000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(268, 0x804004100804020100800090000000000000000000000000000000000000000000)
+ObservationString(0) = "..y\n...\n..."
+ObservationString(1) = "..y\n...\n..."
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, -0.0]
+LegalActions() = [0, 1, 3, 4, 5, 6, 7, 8]
+StringLegalActions() = ["p(0,0)", "o(1,0)", "p(0,1)", "o(1,1)", "q(2,1)", "p(0,2)", "o(1,2)", "q(2,2)"]
+
+# Apply action "q(2,2)"
+action: 8
+
+# State 3
+# . . y
+#  . . .
+#   . . q
+IsTerminal() = False
+History() = [2, 2, 8]
+HistoryString() = "2, 2, 8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "P0 ..y\n...\n..."
+InformationStateString(1) = "P1 ..y\n...\n..q"
+InformationStateTensor(0): binvec(268, 0x804004100804020100808000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(268, 0x804004100804020102000090100800000000000000000000000000000000000000)
+ObservationString(0) = "..y\n...\n..."
+ObservationString(1) = "..y\n...\n..q"
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, -0.0]
+LegalActions() = [0, 1, 3, 4, 5, 6, 7, 8]
+StringLegalActions() = ["y(0,0)", "y(1,0)", "x(0,1)", "y(1,1)", "y(2,1)", "z(0,2)", "z(1,2)", "z(2,2)"]
+
+# Apply action "y(2,1)"
+action: 5
+
+# State 4
+# . . y
+#  . . y
+#   . . q
+IsTerminal() = False
+History() = [2, 2, 8, 5]
+HistoryString() = "2, 2, 8, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "P0 ..y\n..y\n..."
+InformationStateString(1) = "P1 ..y\n...\n..q"
+InformationStateTensor(0): binvec(268, 0x804004100800820100808000000008000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(268, 0x804004100804020102000090100800000000000000000000000000000000000000)
+ObservationString(0) = "..y\n..y\n..."
+ObservationString(1) = "..y\n...\n..q"
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, -0.0]
+LegalActions() = [0, 1, 3, 4, 5, 6, 7]
+StringLegalActions() = ["p(0,0)", "o(1,0)", "p(0,1)", "o(1,1)", "q(2,1)", "p(0,2)", "q(1,2)"]
+
+# Apply action "q(2,1)"
+action: 5
+
+# State 5
+# Apply action "o(1,0)"
+action: 1
+
+# State 6
+# . o y
+#  . . y
+#   . . q
+IsTerminal() = False
+History() = [2, 2, 8, 5, 5, 1]
+HistoryString() = "2, 2, 8, 5, 5, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "P0 ..y\n..y\n..."
+InformationStateString(1) = "P1 .oy\n..y\n..q"
+InformationStateTensor(0): binvec(268, 0x804004100800820100808000000008000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(268, 0x808004100800820102000090100800410a00000000000000000000000000000000)
+ObservationString(0) = "..y\n..y\n..."
+ObservationString(1) = ".oy\n..y\n..q"
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, -0.0]
+LegalActions() = [0, 1, 3, 4, 6, 7, 8]
+StringLegalActions() = ["y(0,0)", "y(1,0)", "x(0,1)", "y(1,1)", "z(0,2)", "X(1,2)", "X(2,2)"]
+
+# Apply action "y(1,0)"
+action: 1
+
+# State 7
+# Apply action "y(0,0)"
+action: 0
+
+# State 8
+# Apply action "p(0,2)"
+action: 6
+
+# State 9
+# Apply action "y(1,1)"
+action: 4
+
+# State 10
+# Apply action "O(1,2)"
+action: 7
+
+# State 11
+# y o y
+#  . y y
+#   p O q
+IsTerminal() = True
+History() = [2, 2, 8, 5, 5, 1, 1, 0, 6, 4, 7]
+HistoryString() = "2, 2, 8, 5, 5, 1, 1, 0, 6, 4, 7"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "P0 yoy\n.yy\n..."
+InformationStateString(1) = "P1 .oy\n..y\npOq"
+InformationStateTensor(0): binvec(268, 0x108004100100820100808000000008000000401000000400000000000000000000)
+InformationStateTensor(1): binvec(268, 0x808004100800901002000090100800410a00000004080010100000000000000000)
+ObservationString(0) = "yoy\n.yy\n..."
+ObservationString(1) = ".oy\n..y\npOq"
+ObservationTensor(0): ◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
+Rewards() = [-1.0, 1.0]
+Returns() = [-1.0, 1.0]
