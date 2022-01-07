@@ -97,6 +97,14 @@ class LeducState : public State {
   int private_card(Player player) const { return private_cards_[player]; }
   std::vector<Action> LegalActions() const override;
 
+  // Gets the private cards.
+  std::vector<int> GetPrivateCards() const { return private_cards_; }
+
+  // Sets the private cards to specific ones. Note that this function does not
+  // change the history, so any functions relying on the history will not longer
+  // work properly.
+  void SetPrivateCards(const std::vector<int>& new_private_cards);
+
   // Returns a vector of MaxGameLength containing all of the betting actions
   // taken so far. If the round has ended, the actions are kInvalidAction.
   std::vector<int> padded_betting_sequence() const;

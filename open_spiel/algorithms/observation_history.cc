@@ -1,4 +1,4 @@
-// Copyright 2021 DeepMind Technologies Limited
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -199,9 +199,9 @@ std::string ActionObservationHistory::ToString() const {
 
 PublicObservationHistory::PublicObservationHistory(const State& target)
     : observer_(target.GetGame()->MakeObserver(
-          IIGObservationType{.public_info = true,
-                             .perfect_recall = false,
-                             .private_info = PrivateInfoType::kNone},
+          IIGObservationType{/*public_info*/true,
+                             /*perfect_recall*/false,
+                             /*private_info*/PrivateInfoType::kNone},
           {})) {
   history_.reserve(target.FullHistory().size());
 

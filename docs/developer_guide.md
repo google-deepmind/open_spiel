@@ -108,13 +108,14 @@ When you add a new conditional dependency, you need to touch:
 -   the root CMakeLists.txt to add the option, with an OFF default
 -   add the option to `scripts/global_variables.sh`
 -   change `install.sh` to make sure the dependency is installed
--   use constructs like `if (${OPEN_SPIEL_OPEN_SPIEL_BUILD_WITH_HANABI})` in
-    CMake to optionally add the targets to build.
+-   use constructs like `if (${OPEN_SPIEL_BUILD_WITH_HANABI})` in CMake to
+    optionally add the targets to build.
 
 ## Debugging tools
 
 For complex games it may be tricky to get all the details right. Reading through
-the playthrough You can visualize small game trees using
-[open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py) or for large
-games there is an interactive viewer for OpenSpiel games called
+the playthrough (or visually inspecting random games via the example) is the
+first step in verifying the game mechanics. You can visualize small game trees
+using [open_spiel/python/examples/treeviz_example.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/examples/treeviz_example.py) or for
+large games there is an interactive viewer for OpenSpiel games called
 [SpielViz](https://github.com/michalsustr/spielviz).

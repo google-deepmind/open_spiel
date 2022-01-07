@@ -1,4 +1,4 @@
-// Copyright 2021 DeepMind Technologies Limited
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,15 +46,15 @@ std::string Escape(const std::string& input) {
 }
 
 void ConsumeWhitespace(absl::string_view* str) {
-  for (const char* c = str->begin(); c < str->end(); ++c) {
-    switch (*c) {
+  for (auto p = str->begin(); p < str->end(); ++p) {
+    switch (*p) {
       case ' ':
       case '\n':
       case '\r':
       case '\t':
         break;
       default:
-        str->remove_prefix(c - str->begin());
+        str->remove_prefix(p - str->begin());
         return;
     }
   }
@@ -112,8 +112,8 @@ absl::optional<std::string> ParseString(absl::string_view* str) {
   }
   std::string out;
   bool escape = false;
-  for (const char* c = str->begin(); c < str->end(); ++c) {
-    switch (*c) {
+  for (auto p = str->begin(); p < str->end(); ++p) {
+    switch (*p) {
       case '\\':
         if (escape) {
           out.push_back('\\');
@@ -126,22 +126,22 @@ absl::optional<std::string> ParseString(absl::string_view* str) {
           escape = false;
           break;
         } else {
-          str->remove_prefix(c - str->begin() + 1);
+          str->remove_prefix(p - str->begin() + 1);
           return out;
         }
       default:
         if (escape) {
-          switch (*c) {
+          switch (*p) {
             case 'b': out.append("\b"); break;
             case 'f': out.append("\f"); break;
             case 'n': out.append("\n"); break;
             case 'r': out.append("\r"); break;
             case 't': out.append("\t"); break;
-            default: out.push_back(*c); break;
+            default: out.push_back(*p); break;
           }
           escape = false;
         } else {
-          out.push_back(*c);
+          out.push_back(*p);
         }
         break;
     }

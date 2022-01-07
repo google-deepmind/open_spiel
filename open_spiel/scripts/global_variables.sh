@@ -39,6 +39,7 @@ export OPEN_SPIEL_BUILD_WITH_JULIA=${OPEN_SPIEL_BUILD_WITH_JULIA:-$DEFAULT_OPTIO
 export OPEN_SPIEL_BUILD_WITH_XINXIN=${OPEN_SPIEL_BUILD_WITH_XINXIN:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export OPEN_SPIEL_BUILD_WITH_ROSHAMBO=${OPEN_SPIEL_BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export OPEN_SPIEL_BUILD_WITH_GO=${OPEN_SPIEL_BUILD_WITH_GO:-$DEFAULT_OPTIONAL_DEPENDENCY}
+export OPEN_SPIEL_BUILD_WITH_HIGC="${OPEN_SPIEL_BUILD_WITH_HIGC:-$DEFAULT_OPTIONAL_DEPENDENCY}"
 export OPEN_SPIEL_BUILD_WITH_RUST=${OPEN_SPIEL_BUILD_WITH_RUST:-$DEFAULT_OPTIONAL_DEPENDENCY}
 
 # Eigen repos is currently down. Setting to OFF by default temporarily.
@@ -98,14 +99,10 @@ export OPEN_SPIEL_BUILD_WITH_GAMUT="${OPEN_SPIEL_BUILD_WITH_GAMUT:-"OFF"}"
 # See algorithms/ortools/CMakeLists.txt for specific instructions.
 export OPEN_SPIEL_BUILD_WITH_ORTOOLS="${OPEN_SPIEL_BUILD_WITH_ORTOOLS:-"OFF"}"
 # You may want to replace this URL according to your system.
-# Use version 8 at minimum, due to compatibility between absl library versions
+# Use version 9.2 at minimum, due to compatibility between absl library versions
 # used in OpenSpiel and in OrTools.
-# Other v8 URLs are:
-# https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-20.04_v8.0.8283.tar.gz
-# https://github.com/google/or-tools/releases/download/v8.0/or-tools_debian-10_v8.0.8283.tar.gz
-# https://github.com/google/or-tools/releases/download/v8.0/or-tools_MacOsX-10.15.7_v8.0.8283.tar.gz
-export OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-18.04_v8.0.8283.tar.gz"}"
-
+# Other links to archives found here: https://developers.google.com/optimization/install/cpp/linux
+export OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v9.2/or-tools_amd64_ubuntu-21.10_v9.2.9972.tar.gz"}"
 # Used to determine whether to include the Python ML frameworks in the tests.
 # A value of AUTO runs the appropriate find_X script in open_spiel/scripts to check what is installed.
 # To override automatic detection, set to either ON or OFF.

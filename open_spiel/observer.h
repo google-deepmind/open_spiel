@@ -1,4 +1,4 @@
-// Copyright 2021 DeepMind Technologies Limited
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -285,34 +285,34 @@ struct IIGObservationType {
 // Default observation type for imperfect information games.
 // Corresponds to the ObservationTensor / ObservationString methods.
 inline constexpr IIGObservationType kDefaultObsType{
-    .public_info = true,
-    .perfect_recall = false,
-    .private_info = PrivateInfoType::kSinglePlayer};
+    /*public_info*/true,
+    /*perfect_recall*/false,
+    /*private_info*/PrivateInfoType::kSinglePlayer};
 
 // Default observation type for imperfect information games.
 // Corresponds to the InformationStateTensor / InformationStateString methods.
 inline constexpr IIGObservationType kInfoStateObsType{
-    .public_info = true,
-    .perfect_recall = true,
-    .private_info = PrivateInfoType::kSinglePlayer};
+    /*public_info*/true,
+    /*perfect_recall*/true,
+    /*private_info*/PrivateInfoType::kSinglePlayer};
 
 // Incremental public observation, mainly used for imperfect information games.
 inline constexpr IIGObservationType kPublicObsType{
-    .public_info = true,
-    .perfect_recall = false,
-    .private_info = PrivateInfoType::kNone};
+    /*public_info*/true,
+    /*perfect_recall*/false,
+    /*private_info*/PrivateInfoType::kNone};
 
 // Complete public observation, mainly used for imperfect information games.
 inline constexpr IIGObservationType kPublicStateObsType{
-    .public_info = true,
-    .perfect_recall = true,
-    .private_info = PrivateInfoType::kNone};
+    /*public_info*/true,
+    /*perfect_recall*/true,
+    /*private_info*/PrivateInfoType::kNone};
 
 // Incremental private observation, mainly used for imperfect information games.
 inline constexpr IIGObservationType kPrivateObsType{
-    .public_info = false,
-    .perfect_recall = false,
-    .private_info = PrivateInfoType::kSinglePlayer};
+    /*public_info*/false,
+    /*perfect_recall*/false,
+    /*private_info*/PrivateInfoType::kSinglePlayer};
 
 // An Observer is something which can produce an observation of a State,
 // e.g. a Tensor or collection of Tensors or a string.

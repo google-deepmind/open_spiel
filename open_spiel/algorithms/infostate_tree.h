@@ -220,7 +220,7 @@ template <typename T>
 class LeafVector;
 template <typename T>
 class DecisionVector;
-using SfStrategy = class TreeplexVector<double>;
+using SfStrategy = TreeplexVector<double>;
 
 // A convenience iterator over a contiguous range of node ids.
 template <class Id>
