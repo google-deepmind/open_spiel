@@ -118,8 +118,11 @@ In `C:\Users\MyUser\open_spiel\open_spiel\python\examples` there are different P
 Use pip for that
 
 pip install absl-py
+
 pip install numpy
+
 pip install tensorflow
+
 pip install cvxopt
 
 
