@@ -113,9 +113,9 @@ Add the directories `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug\`
 
 Now you can execute the abvove file from any directory
 
-In `C:\Users\MyUser\open_spiel\open_spiel\python\examples` there are different Python-scripts but to run these you might have to install the Pytho-library (And might have to update PYTHONPATH)
+In `C:\Users\MyUser\open_spiel\open_spiel\python\examples` there are different Python-scripts but to run these you might have to install the Python-library (And might have to update PYTHONPATH)
 
-Use pip for that
+Use pip for that, and I have seen the following being used
 
 pip install absl-py
 
