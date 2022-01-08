@@ -35,7 +35,7 @@ You will need to have the following dependencies installed:
 The rest of the instructions will assume that OpenSpiel is cloned in
 `C:\Users\MyUser\open_spiel`.
 
-Open a Windows Terminal, clone OpenSpiel and its dependencies (commands adapted
+Open a Windows Terminal (Windows Powershell), clone OpenSpiel and its dependencies (commands adapted
 from open_spiel/scripts/install.sh)
 
 ```
@@ -43,14 +43,85 @@ cd C:\Users\MyUser
 git clone https://github.com/deepmind/open_spiel.git
 cd open_spiel
 git clone -b smart_holder --single-branch --depth 1 https://github.com/pybind/pybind11.git pybind11
-git clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel\abseil-cpp
-git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel\games\bridge\double_dummy_solver
+git clone -b 20211102.0 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel\abseil-cpp
+git clone -b develop --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel\games\bridge\double_dummy_solver
 ```
 
 Open Visual Studio and continue without code. Then, click on File | Open ->
-CMake, and choose `C:\Users\MyUser\open_spiel\CMakeLists.txt`. CMake will then
+CMake, and choose `C:\Users\MyUser\open_spiel\open_spiel\CMakeLists.txt`. CMake will then
 run; once you see `CMake generation finished`, choose Build -> Build All. The
-files will be available in `open_spiel\out\build\x64-Debug`.
+files will be available in `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug`, when the build completes with "Build All succeeded."
+
+To check that python is working, you can switch to `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug\` and create a python-file containing (or cope test.py from examples)
+
+```
+import pyspiel
+game = pyspiel.load_game('bridge(use_double_dummy_result=false)')
+
+line = '30 32 10 35 50 45 21 7 1 42 39 43 0 16 40 20 36 15 22 44 26 6 4 51 47 46 25 14 29 5 34 11 49 31 37 9 41 13 24 8 28 17 48 23 33 18 3 19 38 2 27 12 56 57 52 63 52 52 52 0 32 48 8 3 51 47 15 44 28 16 4 14 50 2 10 49 5 37 9 36 31 24 20 46 22 12 26 13 25 19 1 43 41 17 27 7 33 45 39 40 23 29 6 11 30 18 21 35 38 42 34'
+actions = (int(x) for x in line.split(' '))
+state = game.new_initial_state()
+for a in actions: state.apply_action(a)
+print(state)
+```
+
+and save and execute that file expecting this output
+
+```
+Vul: None
+        S K
+        H AJ98
+        D AQT92
+        C J92
+S AQT7643        S 95
+H 5             H KQ632
+D 4             D K653
+C K754          C T6
+        S J82
+        H T74
+        D J87
+        C AQ83
+
+West  North East  South
+      1D    1H    Pass
+2S    Pass  Pass  Pass
+
+N  E  S  W  N  E  S
+C2 CT CA C4
+      S2 SA SK S5
+         CK C9 C6 C3
+         H5 HA H2 H4
+DA D3 DJ D4
+CJ S9 C8 C7
+   HK H7 C5 H8
+   D5 D8 S6 D2
+         SQ DQ D6 S8
+         S3 DT DK SJ
+      CQ S7 D9 H3
+         S4 H9 H6 D7
+         ST HJ HQ HT
+
+Declarer tricks: 9
+Score: N/S -140 E/W 140
+```
+
+We don't want source code places in output from build, so to be able to import the Python code (both the C++ binding `pyspiel` and the rest) from any location, you will need to add to your PYTHONPATH the root directory and the `open_spiel` directory.
+
+Open windows environment variables and add 
+PYTHONPATH
+Add the directories `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug\` and `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug\` to PYTHONPATH.
+
+Now you can execute the abvove file from any directory
+
+In `C:\Users\MyUser\open_spiel\open_spiel\python\examples` there are different Python-scripts but to run these you might have to install the Pytho-library (And might have to update PYTHONPATH)
+
+Use pip for that
+
+pip install absl-py
+pip install numpy
+pip install tensorflow
+pip install cvxopt
+
 
 ## Option 2: Windows Installation using Windows Subsystem for Linux (WSL)
 
