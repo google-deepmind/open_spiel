@@ -21,12 +21,19 @@ The bot_cmd FLAG should contain a command-line to launch an external bot, e.g.
 """
 # pylint: enable=line-too-long
 
+import os
 import re
+import pickle
 import socket
 import subprocess
+import time
 
 from absl import app
 from absl import flags
+import numpy as np
+
+import haiku as hk
+import jax
 import numpy as np
 
 from open_spiel.python.bots import bluechip_bridge
@@ -35,14 +42,48 @@ import pyspiel
 FLAGS = flags.FLAGS
 flags.DEFINE_float("timeout_secs", 60, "Seconds to wait for bot to respond")
 flags.DEFINE_integer("rng_seed", 1234, "Seed to use to generate hands")
-flags.DEFINE_integer("num_deals", 1, "How many deals to play")
+flags.DEFINE_integer("num_deals", 10, "How many deals to play")
+flags.DEFINE_integer("sleep", 0, "How many seconds to wait before next action")
+flags.DEFINE_string("params_path", '.', "directory path for trained model params-snapshot.pkl")
 flags.DEFINE_string(
     "bot_cmd", None,
     "Command to launch the external bot; must include {port} which will be "
     "replaced by the port number to attach to.")
 
+# Make the network.
+NUM_ACTIONS = 38
+MIN_ACTION = 52
 
-def _run_once(state, bots):
+def net_fn(x):
+  """Haiku module for our network."""
+  net = hk.Sequential([
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(1024),
+      jax.nn.relu,
+      hk.Linear(NUM_ACTIONS),
+      jax.nn.log_softmax,
+  ])
+  return net(x)
+
+def load_model():
+  net = hk.without_apply_rng(hk.transform(net_fn))
+  params = pickle.load(open(os.path.join(FLAGS.params_path, 'params-snapshot.pkl'), 'rb'))
+  return net, params
+
+def ai_action(state, net, params):
+  observation = np.array(state.observation_tensor(), np.float32)
+  policy = np.exp(net.apply(params, observation))
+  probs_actions = [(p, a + MIN_ACTION) for a, p in enumerate(policy)]
+  pred = max(probs_actions)[1]
+  return pred
+
+
+def _run_once(state, bots, net, params):
   """Plays bots with each other, returns terminal utility for each player."""
   for bot in bots:
     bot.restart()
@@ -51,27 +92,33 @@ def _run_once(state, bots):
       outcomes, probs = zip(*state.chance_outcomes())
       state.apply_action(np.random.choice(outcomes, p=probs))
     else:
-      if state.current_player() > 1:
+      if FLAGS.sleep:
+        time.sleep(FLAGS.sleep) # wait for the human to see how it goes
+      if state.current_player() % 2 == 1:
         # Have simplest play for now
-        state.apply_action(state.legal_actions()[0])
+        action = state.legal_actions()[0]
+        if action > 51:
+          # TODO extend beyond just bidding
+          action = ai_action(state, net, params)
+        state.apply_action(action)
       else:
-        result = bots[state.current_player()].step(state)
+        result = bots[state.current_player()//2].step(state)
         state.apply_action(result)
   return state
 
-bots = []
+
 def main(argv):
   if len(argv) > 1:
     raise app.UsageError("Too many command-line arguments.")
   game = pyspiel.load_game("bridge(use_double_dummy_result=false)")
-
+  net, params = load_model()
   bots = [bluechip_bridge.BlueChipBridgeBot(game, 0, controller_factory),
-    bluechip_bridge.BlueChipBridgeBot(game, 1, controller_factory)]
+    bluechip_bridge.BlueChipBridgeBot(game, 2, controller_factory)]
 
   results = []
 
   for i_deal in range(FLAGS.num_deals):
-    state = _run_once(game.new_initial_state(), bots)
+    state = _run_once(game.new_initial_state(), bots, net, params)
     print("Deal #{}; final state:\n{}".format(i_deal, state))
     results.append(state.returns())
 
@@ -84,7 +131,9 @@ def main(argv):
 
 def controller_factory():
   """to satisfy the interface of the bluechip_bridge.BlueChipBridgeBot"""
-  return _WBridge5Client(FLAGS.bot_cmd)
+  client = _WBridge5Client(FLAGS.bot_cmd)
+  client.start()
+  return client
 
 
 class _WBridge5Client(object):
@@ -97,7 +146,6 @@ class _WBridge5Client(object):
     self.sock.listen(1)
     self.process = None
     self.command = command.format(port=self.port)
-    self.start()
 
   def start(self):
     if self.process is not None:
@@ -120,8 +168,8 @@ class _WBridge5Client(object):
     self.conn.send((line + "\r\n").encode("ascii"))
 
   def terminate(self):
-    # TODO debug round 0,2 always skipped, round 3 aborted one open_spiel player
-    pass
+    self.process.kill()
+    self.process = None
 
 
 if __name__ == "__main__":
