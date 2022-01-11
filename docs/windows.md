@@ -35,22 +35,46 @@ You will need to have the following dependencies installed:
 The rest of the instructions will assume that OpenSpiel is cloned in
 `C:\Users\MyUser\open_spiel`.
 
-Open a Windows Terminal, clone OpenSpiel and its dependencies (commands adapted
-from open_spiel/scripts/install.sh)
+Open a Windows Terminal (Windows Powershell), clone OpenSpiel and its
+dependencies (commands adapted from open_spiel/scripts/install.sh)
 
 ```
 cd C:\Users\MyUser
 git clone https://github.com/deepmind/open_spiel.git
 cd open_spiel
 git clone -b smart_holder --single-branch --depth 1 https://github.com/pybind/pybind11.git pybind11
-git clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel\abseil-cpp
-git clone -b 'develop' --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel\games\bridge\double_dummy_solver
+git clone -b 20211102.0 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel\abseil-cpp
+git clone -b develop --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel\games\bridge\double_dummy_solver
 ```
 
 Open Visual Studio and continue without code. Then, click on File | Open ->
-CMake, and choose `C:\Users\MyUser\open_spiel\CMakeLists.txt`. CMake will then
-run; once you see `CMake generation finished`, choose Build -> Build All. The
-files will be available in `open_spiel\out\build\x64-Debug`.
+CMake, and choose `C:\Users\MyUser\open_spiel\open_spiel\CMakeLists.txt`. CMake
+will then run; once you see `CMake generation finished`, choose Build -> Build
+All. The files will be available in
+`C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug`, when the build
+completes with "Build All succeeded."
+
+To be able to import the Python code (both the C++ binding `pyspiel` and the
+rest) from any location, you will need to add to your PYTHONPATH the root
+directory and the `open_spiel` directory. Open
+[Windows environment variables and add to the PYTHONPATH](https://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-so-it-finds-my-modules-packages).
+Add the directories `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug`
+and `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug` to PYTHONPATH.
+To check that python is working, you can run the example in
+`open_spiel\python\examples`.
+
+OpenSpiel has various Python dependencies which may require installing. At a
+minimum, you will need the ones in
+[requirements.txt](https://github.com/deepmind/open_spiel/blob/master/requirements.txt).
+
+```
+pip install absl-py
+pip install attrs
+pip install numpy
+```
+
+For a complete list, depending on what you will use, see
+[python_extra_deps.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/python_extra_deps.sh).
 
 ## Option 2: Windows Installation using Windows Subsystem for Linux (WSL)
 
