@@ -4,7 +4,6 @@ use std::os::raw::c_void;
 use libc::{c_char, free};
 use std::slice;
 
-mod open_spiel_bindings;
 use open_spiel_bindings::*;
 
 fn convert_and_free_cstring(c_buf: *mut c_char, len: u64) -> String {
