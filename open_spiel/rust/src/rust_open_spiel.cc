@@ -22,10 +22,12 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/spiel.h"
 
-using open_spiel::Action;
-using open_spiel::ActionsAndProbs;
-using open_spiel::Game;
-using open_spiel::State;
+using ::open_spiel::Action;
+using ::open_spiel::ActionsAndProbs;
+using ::open_spiel::Game;
+using ::open_spiel::GameParameter;
+using ::open_spiel::GameParameters;
+using ::open_spiel::State;
 
 // A number of functions in this file returns pointers to dynamically-allocated
 // memory. These are temporary memory buffers used to store data that must be
@@ -34,6 +36,7 @@ using open_spiel::State;
 /* We need this because games are shared pointers and we need to return
  raw pointers to objects that contain them.*/
 namespace {
+
 struct GamePointerHolder {
   std::shared_ptr<const Game> ptr;
 };
@@ -57,10 +60,43 @@ char* AllocAndCopyString(const std::string& str) {
 
 extern "C" {
 
+/* GameParameters functions. */
+void* NewGameParameters() {
+  return reinterpret_cast<void*>(new GameParameters());
+}
+
+void DeleteGameParameters(void* params_ptr) {
+  GameParameters* params = reinterpret_cast<GameParameters*>(params_ptr);
+  delete params;
+}
+
+void GameParametersSetInt(void* params_ptr, const char* key, int value) {
+  GameParameters* params = reinterpret_cast<GameParameters*>(params_ptr);
+  params->insert_or_assign(std::string(key), GameParameter(value));
+}
+
+void GameParametersSetDouble(void* params_ptr, const char* key, double value) {
+  GameParameters* params = reinterpret_cast<GameParameters*>(params_ptr);
+  params->insert_or_assign(std::string(key), GameParameter(value));
+}
+
+void GameParametersSetString(void* params_ptr, const char* key,
+                             const char* value) {
+  GameParameters* params = reinterpret_cast<GameParameters*>(params_ptr);
+  params->insert_or_assign(std::string(key), GameParameter(std::string(value)));
+}
+
 /* Game functions. */
 void* LoadGame(const char* name) {
   return reinterpret_cast<void*>(
       new GamePointerHolder{open_spiel::LoadGame(name)});
+}
+
+void* LoadGameFromParameters(const void* params_ptr) {
+  const GameParameters* params =
+      reinterpret_cast<const GameParameters*>(params_ptr);
+  return reinterpret_cast<void*>(
+      new GamePointerHolder{open_spiel::LoadGame(*params)});
 }
 
 void DeleteGame(void* game_ptr) {
@@ -124,6 +160,7 @@ int* GameInformationStateTensorShape(const void* game_ptr, int* size) {
   return AllocBuf(shape, size);
 }
 
+/* State functions. */
 void DeleteState(void* state_ptr) {
   State* state = reinterpret_cast<State*>(state_ptr);
   delete state;
@@ -144,7 +181,7 @@ char* StateToString(const void* state_ptr, unsigned long* length) {  // NOLINT
 
 long* StateLegalActions(const void* state_ptr,  // NOLINT
                         int* num_legal_actions) {
-  assert(sizeof(long) == sizeof(Action));          // NOLINT
+  assert(sizeof(long) == sizeof(Action));  // NOLINT
   const State* state = reinterpret_cast<const State*>(state_ptr);
   std::vector<Action> legal_actions = state->LegalActions();
   return AllocBuf(legal_actions, num_legal_actions);
@@ -155,8 +192,8 @@ int StateCurrentPlayer(const void* state_ptr) {
   return state->CurrentPlayer();
 }
 
-char* StateActionToString(const void* state_ptr, int player,
-                          int action, unsigned long* length) {  // NOLINT
+char* StateActionToString(const void* state_ptr, int player, int action,
+                          unsigned long* length) {  // NOLINT
   const State* state = reinterpret_cast<const State*>(state_ptr);
   std::string action_str = state->ActionToString(player, action);
   *length = action_str.length();
@@ -234,8 +271,7 @@ int StateObservationTensorSize(const void* state_ptr) {
   return parent_game->ObservationTensorSize();
 }
 
-void StateObservationTensor(const void* state_ptr, float* obs_buf,
-                              int length) {
+void StateObservationTensor(const void* state_ptr, float* obs_buf, int length) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
   open_spiel::Player cur_player = state->CurrentPlayer();
   // Currently turn-based games are assumed. See README.md for how to remove
@@ -244,9 +280,8 @@ void StateObservationTensor(const void* state_ptr, float* obs_buf,
   state->ObservationTensor(cur_player, absl::MakeSpan(obs_buf, length));
 }
 
-void StateInformationStateTensor(const void* state_ptr,
-                                   float* infostate_buf,
-                                   int length) {
+void StateInformationStateTensor(const void* state_ptr, float* infostate_buf,
+                                 int length) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
   open_spiel::Player cur_player = state->CurrentPlayer();
   // Currently turn-based games are assumed. See README.md for how to remove

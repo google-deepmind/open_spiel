@@ -3,6 +3,7 @@ extern crate libc;
 use std::os::raw::c_void;
 use libc::{c_char, free};
 use std::slice;
+use std::ffi::CString;
 
 use open_spiel_bindings::*;
 
@@ -14,6 +15,10 @@ fn convert_and_free_cstring(c_buf: *mut c_char, len: u64) -> String {
   str_buf
 }
 
+pub struct GameParameters {
+  params: *mut c_void,
+}
+
 pub struct State {
   state: *mut c_void,
 }
@@ -21,6 +26,45 @@ pub struct State {
 pub struct Game {
   game: *mut c_void,
 }
+
+impl Default for GameParameters {
+  fn default() -> Self {
+    Self { params: unsafe { NewGameParameters() } }
+  }
+}
+
+impl GameParameters {
+  pub fn set_int(&mut self, key: &str, value: i32) {
+    let key = CString::new(key).unwrap();
+    unsafe {
+      GameParametersSetInt(self.params, key.as_ptr(), value);
+    }
+  }
+
+  pub fn set_f64(&mut self, key: &str, value: f64) {
+    let key = CString::new(key).unwrap();
+    unsafe {
+      GameParametersSetDouble(self.params, key.as_ptr(), value);
+    }
+  }
+
+  pub fn set_str(&mut self, key: &str, value: &str) {
+    let key = CString::new(key).unwrap();
+    let value = CString::new(value).unwrap();
+    unsafe {
+      GameParametersSetString(self.params, key.as_ptr(), value.as_ptr());
+    }
+  }
+}
+
+impl Drop for GameParameters {
+  fn drop(&mut self) {
+     unsafe { DeleteGameParameters(self.params) }
+  }
+}
+
+unsafe impl Send for GameParameters {}
+unsafe impl Sync for GameParameters {}
 
 impl State {
   pub fn new(sptr: *mut c_void) -> State {
@@ -30,7 +74,7 @@ impl State {
   }
 
   pub fn current_player(&self) -> i32 {
-    unsafe { StateCurrentPlayer(self.state) as i32 }
+    unsafe { StateCurrentPlayer(self.state) }
   }
 
   pub fn clone(&self) -> State {
@@ -79,8 +123,8 @@ impl State {
     let legal_actions: Vec<i64> = self.legal_actions();
     let mut size = 0;
     let c_buf = unsafe { StateChanceOutcomeProbs(self.state, &mut size) };
-    let length: usize = size as usize;
-    let mut vec = vec![(0 as i64, 0.0 as f64); length];
+    let length = size as usize;
+    let mut vec = vec![(0, 0.0); length];
     unsafe {
       let probs_slice = slice::from_raw_parts(c_buf, length);
       for i in 0..length {
@@ -152,10 +196,20 @@ impl Drop for State {
   }
 }
 
+unsafe impl Send for State {}
+unsafe impl Sync for State {}
+
 impl Game {
-  pub fn new(game_name: String) -> Self {
-    Game {
-      game: unsafe { LoadGame(game_name.as_ptr() as *const i8) }
+  pub fn new(game_name: &str) -> Self {
+    let game_name = CString::new(game_name).unwrap();
+    Self {
+      game: unsafe { LoadGame(game_name.as_ptr()) }
+    }
+  }
+
+  pub fn new_with_parameters(parameters: &GameParameters) -> Self {
+    Self {
+      game: unsafe { LoadGameFromParameters(parameters.params) }
     }
   }
 
@@ -176,15 +230,15 @@ impl Game {
   }
 
   pub fn num_players(&self) -> i32 {
-    unsafe { GameNumPlayers(self.game) as i32 }
+    unsafe { GameNumPlayers(self.game) }
   }
 
   pub fn max_game_length(&self) -> i32 {
-    unsafe { GameMaxGameLength(self.game) as i32 }
+    unsafe { GameMaxGameLength(self.game) }
   }
 
   pub fn num_distinct_actions(&self) -> i32 {
-    unsafe { GameNumDistinctActions(self.game) as i32}
+    unsafe { GameNumDistinctActions(self.game) }
   }
 
   pub fn observation_shape(&self) -> Vec<i32> {
@@ -213,4 +267,7 @@ impl Drop for Game {
      unsafe { DeleteGame(self.game) }
   }
 }
+
+unsafe impl Send for Game {}
+unsafe impl Sync for Game {}
 

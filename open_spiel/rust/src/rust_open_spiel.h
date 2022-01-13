@@ -21,8 +21,17 @@
 extern "C" {
 #endif
 
+/* GameParameters functions */
+void* NewGameParameters();
+void DeleteGameParameters(void* params_ptr);
+void GameParametersSetInt(void* params_ptr, const char* key, int value);
+void GameParametersSetDouble(void* params_ptr, const char* key, double value);
+void GameParametersSetString(void* params_ptr, const char* key,
+                             const char* value);
+
 /* Game functions. */
 void* LoadGame(const char* name);
+void* LoadGameFromParameters(const void* params_ptr);
 void DeleteGame(void* game_ptr);
 char* GameShortName(const void* game_ptr, unsigned long* length);  /* NOLINT */
 char* GameLongName(const void* game_ptr, unsigned long* length);  /* NOLINT */
