@@ -197,7 +197,8 @@ class ADIDAS(object):
   def approximate_nash(self, game, solver, sym,
                        num_iterations=10000, num_samples=1,
                        num_eval_samples=int(10e4), approx_eval=False,
-                       exact_eval=False, avg_trajectory=False):
+                       exact_eval=False, avg_trajectory=False,
+                       return_trajectory=False):
     """Runs solver on game.
 
     Args:
@@ -216,6 +217,8 @@ class ADIDAS(object):
         descent with exact expectation (req. full payoff tensor)
       avg_trajectory: bool, whether to evaluate w.r.t. the average distribution
         up to time t instead of the distribution at time t
+      return_trajectory: bool, whether to record all parameters (e.g., dist)
+        during learning and return them -- see solver code for details
     Returns:
       dictionary of results (key=name of metric,
                              value=[m_0, ..., m_{last_iter}])
@@ -252,11 +255,16 @@ class ADIDAS(object):
     exps_solver_approx = []
     grad_norms = []
 
+    if return_trajectory:
+      params_traj = []
+
     start = time.time()
 
     # search for nash (sgd)
-    for t in range(num_iterations):
+    for t in range(num_iterations + 1):
       dist = params[0]
+      if return_trajectory:
+        params_traj.append(params)
 
       if num_samples < np.inf:
         payoff_matrices = form_payoffs_appx(game, dist, num_samples,
@@ -300,36 +308,29 @@ class ADIDAS(object):
         exps_exact.append(exp.unreg_exploitability(dist_eval, pt))
         exps_solver_exact.append(solver.exploitability(dist_eval, pt))
 
-      params = solver.update(params, grads, t)
-      # TODO(imgemp): if isnan(params[0]) exit, return dist_-1, prorate runtime
+      # skip the last update so to avoid computing the matching exploitability
+      # and gradient norm information outside the loop
+      if t < num_iterations:
+        params = solver.update(params, grads, t)
+        # TODO(imgemp): if isnan(dist) exit, return dist_-1, prorate runtime
 
     end = time.time()
     solve_runtime = end - start
     start = end
 
     # evaluating exploitability (monte-carlo)
-    dist = params[0]
-    if sym:
-      dist_avg += (dist - dist_avg) / float(num_iterations + 1)
-    else:
-      for i, dist_i in enumerate(dist):
-        dist_avg[i] += (dist_i - dist_avg[i]) / float(num_iterations + 1)
-
-    if avg_trajectory:
-      dist_eval = dist_avg
-    else:
-      dist_eval = dist
-    exps_estimated = estimate_exploitability(dist_eval, num_eval_samples,
-                                             num_ckpts, num_players,
-                                             game, policies)
+    exp_estimated = estimate_exploitability(dist_eval, num_eval_samples,
+                                            num_ckpts, num_players,
+                                            game, policies)
 
     eval_runtime = time.time() - start
 
+    # TODO(imgemp): add option to save trajectory of temps/ps
     results = {'exps_approx': exps_approx,
                'exps_solver_approx': exps_solver_approx,
                'exps_exact': exps_exact,
                'exps_solver_exact': exps_solver_exact,
-               'exps_estimated': exps_estimated,
+               'exp_estimated': exp_estimated,
                'grad_norms': grad_norms,
                'dist': dist,
                'dist_avg': dist_avg,
@@ -338,5 +339,8 @@ class ADIDAS(object):
 
     if solver.has_aux:
       results.update({'aux_errors': solver.aux_errors})
+
+    if return_trajectory:
+      results.update({'params_trajectory': params_traj})
 
     self.results = results
