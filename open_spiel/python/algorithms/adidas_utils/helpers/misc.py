@@ -72,3 +72,23 @@ def pt_reduce(payoff_tensor, strats, remove_players):
                        [other_player_idx], new_result_dims)
     result_dims = new_result_dims
   return result
+
+
+def isnan(x):
+  """Checks for NaN's in nested objects."""
+  if isinstance(x, float):
+    return np.isnan(x)
+  elif isinstance(x, int):
+    return np.isnan(x)
+  elif isinstance(x, np.ndarray):
+    return np.any(np.isnan(x))
+  elif isinstance(x, list):
+    return np.any([isnan(xi) for xi in x])
+  elif isinstance(x, tuple):
+    return np.any([isnan(xi) for xi in x])
+  elif isinstance(x, dict):
+    return np.any([isnan(xi) for xi in x.values()])
+  else:
+    typ = repr(type(x))
+    err_string = 'type(x)={:s} not recognized when checking for NaN'.format(typ)
+    raise NotImplementedError(err_string)

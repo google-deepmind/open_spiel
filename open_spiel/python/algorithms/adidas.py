@@ -267,6 +267,8 @@ class ADIDAS(object):
       else:
         temp_attr = 'p'
 
+    early_exit = False
+
     start = time.time()
 
     # search for nash (sgd)
@@ -327,7 +329,10 @@ class ADIDAS(object):
       # and gradient norm information outside the loop
       if t < num_iterations:
         params = solver.update(params, grads, t)
-        # TODO(imgemp): if isnan(dist) exit, return dist_-1, prorate runtime
+        if misc.isnan(params):
+          print('Warning: NaN detected in params post-update. Exiting loop.')
+          early_exit = True
+          break
 
     end = time.time()
     solve_runtime = end - start
@@ -350,7 +355,8 @@ class ADIDAS(object):
                'dist': dist,
                'dist_avg': dist_avg,
                'solve_runtime': solve_runtime,
-               'eval_runtime': eval_runtime}
+               'eval_runtime': eval_runtime,
+               'early_exit': early_exit}
 
     if solver.has_aux:
       results.update({'aux_errors': solver.aux_errors})
