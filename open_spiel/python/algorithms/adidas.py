@@ -258,6 +258,15 @@ class ADIDAS(object):
     if return_trajectory:
       params_traj = []
 
+    has_temp = False
+    if hasattr(solver, 'temperature') or hasattr(solver, 'p'):
+      has_temp = True
+      temperatures = []
+      if hasattr(solver, 'temperature'):
+        temp_attr = 'temperature'
+      else:
+        temp_attr = 'p'
+
     start = time.time()
 
     # search for nash (sgd)
@@ -265,6 +274,12 @@ class ADIDAS(object):
       dist = params[0]
       if return_trajectory:
         params_traj.append(params)
+
+      if return_trajectory:
+        params_traj.append(params)
+
+      if has_temp:
+        temperatures.append(getattr(solver, temp_attr))
 
       if num_samples < np.inf:
         payoff_matrices = form_payoffs_appx(game, dist, num_samples,
@@ -342,5 +357,8 @@ class ADIDAS(object):
 
     if return_trajectory:
       results.update({'params_trajectory': params_traj})
+
+    if has_temp:
+      results.update({'temperatures': temperatures})
 
     self.results = results
