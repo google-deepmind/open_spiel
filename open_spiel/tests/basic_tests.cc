@@ -37,7 +37,7 @@ namespace {
 
 constexpr int kInvalidHistoryPlayer = -300;
 constexpr int kInvalidHistoryAction = -301;
-constexpr double kUtilitySumTolerance = 1e-9;
+constexpr double kRewardEpsilon = 1e-9;
 
 // Information about the simulation history. Used to track past states and
 // actions for rolling back simulations via UndoAction, and check History.
@@ -192,17 +192,16 @@ void CheckReturnsSum(const Game& game, const State& state) {
 
   switch (game.GetType().utility) {
     case GameType::Utility::kZeroSum: {
-      SPIEL_CHECK_TRUE(Near(rsum, 0.0, kUtilitySumTolerance));
+      SPIEL_CHECK_TRUE(Near(rsum, 0.0, kRewardEpsilon));
       break;
     }
     case GameType::Utility::kConstantSum: {
-      SPIEL_CHECK_TRUE(Near(rsum, game.UtilitySum(), kUtilitySumTolerance));
+      SPIEL_CHECK_TRUE(Near(rsum, game.UtilitySum(), kRewardEpsilon));
       break;
     }
     case GameType::Utility::kIdentical: {
       for (int i = 1; i < returns.size(); ++i) {
-        SPIEL_CHECK_TRUE(
-            Near(returns[i], returns[i - 1], kUtilitySumTolerance));
+        SPIEL_CHECK_TRUE(Near(returns[i], returns[i - 1], kRewardEpsilon));
       }
       break;
     }
@@ -364,12 +363,20 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       num_moves++;
     } else if (state->CurrentPlayer() == open_spiel::kSimultaneousPlayerId) {
       std::vector<double> rewards = state->Rewards();
+      std::vector<double> returns = state->Returns();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
-      if (verbose) {
-        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
-      }
+      SPIEL_CHECK_EQ(returns.size(), game.NumPlayers());
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
+      }
+      if (verbose) {
+        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+        std::cout << "Returns: " << absl::StrJoin(returns, " ") << std::endl;
+        std::cout << "Sum Rewards: " << absl::StrJoin(episode_returns, " ")
+                  << std::endl;
+      }
+      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+        SPIEL_CHECK_TRUE(Near(episode_returns[p], returns[p], kRewardEpsilon));
       }
 
       // Players choose simultaneously.
@@ -404,12 +411,20 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       state->UpdateDistribution(RandomDistribution(support.size(), rng));
     } else {
       std::vector<double> rewards = state->Rewards();
+      std::vector<double> returns = state->Returns();
       SPIEL_CHECK_EQ(rewards.size(), game.NumPlayers());
-      if (verbose) {
-        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
-      }
+      SPIEL_CHECK_EQ(returns.size(), game.NumPlayers());
       for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
         episode_returns[p] += rewards[p];
+      }
+      if (verbose) {
+        std::cout << "Rewards: " << absl::StrJoin(rewards, " ") << std::endl;
+        std::cout << "Returns: " << absl::StrJoin(returns, " ") << std::endl;
+        std::cout << "Sum Rewards: " << absl::StrJoin(episode_returns, " ")
+                  << std::endl;
+      }
+      for (auto p = Player{0}; p < game.NumPlayers(); ++p) {
+        SPIEL_CHECK_TRUE(Near(episode_returns[p], returns[p], kRewardEpsilon));
       }
 
       // Decision node.

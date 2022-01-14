@@ -74,7 +74,9 @@ class MissingPlayerRepeatedMatchingPenniesState : public SimMoveState {
 
   std::string ToString() const override { return HistoryString(); }
   bool IsTerminal() const override { return turns_ == num_players_; };
-  std::vector<double> Returns() const override { return returns_; }
+  std::vector<double> Returns() const override {
+    return IsTerminal() ? returns_ : std::vector<double>(num_players_, 0.);
+  }
   std::string InformationStateString(Player player) const override {
     return absl::StrCat(HistoryString(), " P:", player);
   }

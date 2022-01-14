@@ -139,6 +139,10 @@ struct SearchNode {
   // The state is needed to convert the action to a string.
   std::string ToString(const State& state) const;
   std::string ChildrenStr(const State& state) const;
+
+  Action SampleFromPrior(const State& state,
+                         Evaluator* evaluator,
+                         std::mt19937* rng) const;
 };
 
 // A SpielBot that uses the MCTS algorithm as its policy.
