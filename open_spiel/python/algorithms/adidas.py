@@ -345,7 +345,6 @@ class ADIDAS(object):
 
     eval_runtime = time.time() - start
 
-    # TODO(imgemp): add option to save trajectory of temps/ps
     results = {'exps_approx': exps_approx,
                'exps_solver_approx': exps_solver_approx,
                'exps_exact': exps_exact,
