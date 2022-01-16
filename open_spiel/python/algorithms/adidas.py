@@ -37,7 +37,15 @@ from open_spiel.python.algorithms.adidas_utils.helpers.symmetric import game_run
 
 
 class ADIDAS(object):
-  """Average Deviation Incentive Descent with Adaptive Sampling."""
+  """Average Deviation Incentive Descent with Adaptive Sampling.
+
+  Approximate the limiting logit equilibrium of a normal-form game.
+
+  Attributes:
+    experiment_seed: int, seed for random number generator
+    random: numpy.random.RandomState object
+    results: dictionary of results populated upon completion of solver
+  """
 
   def __init__(self, seed=0):
     self.experiment_seed = seed
@@ -138,7 +146,18 @@ class ADIDAS(object):
 
   def construct_payoff_matrices_from_samples_sym(
       self, game, dist, num_samples, policies, num_players, num_ckpts):
-    """Construct payoff matrices (approx. sym. polymatrix game) from samples."""
+    """Construct payoff matrices (approx. sym. polymatrix game) from samples.
+
+    Args:
+      game: game with minimal functionality (see games/small.py)
+      dist: 1-d np.array, estimate of nash distribution
+      num_samples: int, `minibatch' size for stochastic gradient
+      policies: list mapping checkpoints to policies
+      num_players: int, number of players
+      num_ckpts: int, number of checkpoints (actions, policies, ...)
+    Returns:
+      payoff_matrices (2 x num_ckpts x num_ckpts array) to compute adidas grad
+    """
     payoff_matrices = np.zeros((2, num_ckpts, num_ckpts))
     for _ in range(num_samples):
       base_profile = tuple([
@@ -154,7 +173,15 @@ class ADIDAS(object):
 
   def construct_payoff_matrices_exactly_sym(
       self, game, dist, num_players):
-    """Construct payoff matrices exactly (expected sym. polymatrix game)."""
+    """Construct payoff matrices exactly (expected sym. polymatrix game).
+
+    Args:
+      game: game with minimal functionality (see games/small.py)
+      dist: 1-d np.array, estimate of nash distribution
+      num_players: int, number of players
+    Returns:
+      payoff_matrices (2 x A x A array) to compute adidas gradient
+    """
     sym_nash = [dist for _ in range(num_players)]
     pt = game.payoff_tensor()
     payoff_matrix_exp_0 = misc.pt_reduce(pt[0], sym_nash, [0, 1])
@@ -164,7 +191,20 @@ class ADIDAS(object):
 
   def construct_payoff_matrices_from_samples_nonsym(
       self, game, dist, num_samples, policies, num_players, num_ckpts):
-    """Construct payoff matrices (approx. nonsym. polymatrix) from samples."""
+    """Construct payoff matrices (approx. nonsym. polymatrix) from samples.
+
+    Args:
+      game: game with minimal functionality (see games/small.py)
+      dist: list of 1-d np.arrays, estimate of nash distribution
+      num_samples: int, `minibatch' size for stochastic gradient
+      policies: list mapping checkpoints to policies
+      num_players: int, number of players
+      num_ckpts: int, number of checkpoints (actions, policies, ...)
+    Returns:
+      payoff_matrices: dictionary with keys as tuples of agents (i, j) and
+          values of (2 x A x A) np.arrays, payoffs for each joint action. keys
+          are sorted and arrays should be indexed in the same order
+    """
     payoff_matrices = None
     for s in range(num_samples):
       base_profile = tuple([
@@ -184,7 +224,17 @@ class ADIDAS(object):
 
   def construct_payoff_matrices_exactly_nonsym(
       self, game, dist, num_players):
-    """Construct payoff matrices exactly (expected nonsym. polymatrix game)."""
+    """Construct payoff matrices exactly (expected nonsym. polymatrix game).
+
+    Args:
+      game: game with minimal functionality (see games/small.py)
+      dist: list of 1-d np.arrays, estimate of nash distribution
+      num_players: int, number of players
+    Returns:
+      payoff_matrices: dictionary with keys as tuples of agents (i, j) and
+          values of (2 x A x A) np.arrays, payoffs for each joint action. keys
+          are sorted and arrays should be indexed in the same order
+    """
     pt = game.payoff_tensor()
     payoff_matrices = {}
     for pi, pj in itertools.combinations(range(num_players), 2):
@@ -220,8 +270,8 @@ class ADIDAS(object):
       return_trajectory: bool, whether to record all parameters (e.g., dist)
         during learning and return them -- see solver code for details
     Returns:
-      dictionary of results (key=name of metric,
-                             value=[m_0, ..., m_{last_iter}])
+      None -- dict of results stored in `results` attribute upon completion
+        (key=name of metric, value=[m_0, ..., m_{last_iter}])
     """
     num_players = game.num_players()
     num_strats = game.num_strategies()
