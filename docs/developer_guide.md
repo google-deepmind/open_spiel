@@ -123,10 +123,9 @@ large games there is an interactive viewer for OpenSpiel games called
 ## Adding Game-Specific Functionality
 
 OpenSpiel focuses on maintaining a general API to an underlying suite of games,
-but sometimes it is convenient to work on specific games, or be able to pull out
-specific information about the state that may depend on the game. In this
-section, we describe how to get (or set) game-specific information from/to the
-generic state objects, and how to expose these functions to python.
+but sometimes it is convenient to work on specific games. In this section, we
+describe how to get (or set) game-specific information from/to the generic state
+objects, and how to expose these functions to python.
 
 Suppose, for example, we want to look at (or set) the private cards in a game of
 Leduc poker. We will use an example based on this
