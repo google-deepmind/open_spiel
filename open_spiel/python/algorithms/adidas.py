@@ -17,13 +17,13 @@
 This is a python implementation of the Nash solver for normal-form games,
 Average Deviation Incentive Descent with Adaptive Sampling (ADIDAS), from
 "Sample-based Approximation of Nash in Large Many-player Games via Gradient
-Descent" [Gemp et al, AAMAS '22].
+Descent" [Gemp et al, AAMAS 2022].
 
 Link to paper: https://arxiv.org/abs/2106.01285.
 
 The limiting logit equilibrium (LLE) was originally defined in "Quantal Response
 Equilibria for Normal Form Games" [McKelvey & Palfrey, Games and Economic
-Behavior '95]. The LLE is a Nash equilibrium that is uniquely defined for
+Behavior 1995]. The LLE is a Nash equilibrium that is uniquely defined for
 *almost* all games.
 """
 
