@@ -20,6 +20,11 @@ Average Deviation Incentive Descent with Adaptive Sampling (ADIDAS), from
 Descent" [Gemp et al, AAMAS '22].
 
 Link to paper: https://arxiv.org/abs/2106.01285.
+
+The limiting logit equilibrium (LLE) was originally defined in "Quantal Response
+Equilibria for Normal Form Games" [McKelvey & Palfrey, Games and Economic
+Behavior '95]. The LLE is a Nash equilibrium that is uniquely defined for
+*almost* all games.
 """
 
 import itertools
