@@ -166,4 +166,22 @@ std::string VectorOfPairsToString(std::vector<std::pair<A, B>>& vec,
   return str;
 }
 
+int SamplerFromRng::operator()(absl::Span<const double> probs) {
+  const float cutoff = rng_();
+  float sum = 0.0f;
+  for (int i = 0; i < probs.size(); ++i) {
+    sum += probs[i];
+    if (cutoff < sum) {
+      return i;
+    }
+  }
+
+  // To be on the safe side, cover case cutoff == 1.0 and sum < 1
+  for (int i = probs.size() - 1; i >= 0; --i) {
+    if (probs[i] > 0.0) return i;
+  }
+
+  SpielFatalError("SamplerFromRng: not a probability distribution.");
+}
+
 }  // namespace open_spiel

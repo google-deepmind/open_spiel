@@ -906,6 +906,14 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   return acpc_state_.ValueOfState(player);
 }
 
+std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<HistoryDistribution> potential_histories =
+      GetHistoriesConsistentWithInfostate(player_id);
+  const int index = SamplerFromRng(rng)(potential_histories->second);
+  return std::move(potential_histories->first[index]);
+}
+
 std::unique_ptr<HistoryDistribution>
 UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   // This is only implemented for 2 players.

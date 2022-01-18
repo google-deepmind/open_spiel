@@ -94,6 +94,8 @@ class UniversalPokerState : public State {
       Action action) const override {
     return {action};
   }
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
 
   const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
   const BettingAbstraction &betting() const { return betting_abstraction_; }
