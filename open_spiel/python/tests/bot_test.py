@@ -27,7 +27,9 @@ import pyspiel
 
 # Specify bot names in alphabetical order, to make it easier to read.
 SPIEL_BOTS_LIST = [
+    # Chooses actions in a fixed order.
     "fixed_action_preference",
+
     "uniform_random",
 ]
 
