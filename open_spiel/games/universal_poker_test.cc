@@ -660,7 +660,8 @@ void TestHalfCallHalfRaise() {
   std::string bot_string =
       "uniform_restricted_actions(policy_name=HalfCallHalfRaise)";
   for (const std::string& game_string :
-       std::vector<std::string>({HulhGameString("fullgame"), "leduc_poker"})) {
+           std::vector<std::string>({ HulhGameString("fullgame"),
+                                      "leduc_poker" })) {
     std::shared_ptr<const Game> game = LoadGame(game_string);
     std::vector<std::unique_ptr<Bot>> owned_bots;
     owned_bots.push_back(LoadBot(bot_string, game, /*player_id=*/0));
@@ -671,13 +672,13 @@ void TestHalfCallHalfRaise() {
 }
 
 void TestFixedPreferenceBots() {
-  for (const std::string& bot_string : {
+  for (std::string bot_string : {
            "uniform_restricted_actions(policy_name=AlwaysCall)",
            "uniform_restricted_actions(policy_name=AlwaysRaise)",
            "uniform_restricted_actions(policy_name=AlwaysFold)",
        }) {
-    for (const std::string& game_string :
-         {HunlGameString("fcpa"), HulhGameString("fullgame")}) {
+    for (std::string game_string : {HunlGameString("fcpa"),
+                                    HulhGameString("fullgame")}) {
       std::shared_ptr<const Game> game = LoadGame(game_string);
       std::vector<std::unique_ptr<Bot>> owned_bots;
       owned_bots.push_back(LoadBot(bot_string, game, /*player_id=*/0));

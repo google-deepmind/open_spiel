@@ -1419,10 +1419,15 @@ class UniformRestrictedActionsFactory : public BotFactory {
     } else if (policy_name == "HalfCallHalfRaise") {
       std::vector<ActionType> actions = {ActionType::kCall};
 
-      // First, we check if it's UP:
-      const auto *up_game = down_cast<const UniversalPokerGame *>(game.get());
-      if ((up_game != nullptr && up_game->GetACPCGame()->IsLimitGame()) ||
-          game->GetType().short_name == "leduc_poker") {
+      // First, we check if it's universal poker. Add the bet action if it's a
+      // limit ACPC game or Leduc poker.
+      if (game->GetType().short_name == "universal_poker") {
+        const auto *up_game = down_cast<const UniversalPokerGame*>(game.get());
+        if (up_game->GetACPCGame()->IsLimitGame()) {
+          actions.push_back(ActionType::kBet);
+        }
+      } else if (game->GetType().short_name == "leduc_poker") {
+        // Add the betting
         actions.push_back(ActionType::kBet);
       } else {
         SpielFatalError(
