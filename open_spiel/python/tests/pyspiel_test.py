@@ -123,12 +123,14 @@ class PyspielTest(absltest.TestCase):
   def test_registered_names(self):
     game_names = pyspiel.registered_names()
 
-    expected = EXPECTED_GAMES
-    if os.environ.get("OPEN_SPIEL_BUILD_WITH_HANABI", "OFF") == "ON":
-      expected.add("hanabi")
-    if os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON":
-      expected.add("universal_poker")
-    expected = sorted(list(expected))
+    expected = list(EXPECTED_GAMES)
+    if (os.environ.get("OPEN_SPIEL_BUILD_WITH_HANABI", "OFF") == "ON" and
+        "hanabi" not in expected):
+      expected.append("hanabi")
+    if (os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON" and
+        "universal_poker" not in expected):
+      expected.append("universal_poker")
+    expected = sorted(expected)
     self.assertCountEqual(game_names, expected)
 
   def teste_default_loadable(self):
