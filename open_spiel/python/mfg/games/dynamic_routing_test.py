@@ -16,6 +16,8 @@
 """Tests for Python mean field routing game."""
 
 from absl.testing import absltest
+import numpy as np
+import numpy.testing as npt
 
 from open_spiel.python import games  # pylint:disable=unused-import
 from open_spiel.python import policy
@@ -26,6 +28,7 @@ from open_spiel.python.mfg.algorithms import mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
 from open_spiel.python.mfg.games import dynamic_routing
+from open_spiel.python.observation import make_observation
 import pyspiel
 
 _NUMBER_OF_ITERATIONS_TESTS = 1
@@ -200,8 +203,32 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     # TODO(cabannes): test legal_actions().
 
   def test_observer_correct(self):
-    """Check that the observer is correclty updated."""
-    # TODO(cabannes): add test about observer and tensor being updated.
+    """Checks that the observer is correctly updated."""
+    game = pyspiel.load_game("python_mfg_dynamic_routing")
+    num_locations, steps = 8, 10
+    self.assertEqual(game.num_distinct_actions(), num_locations)
+    self.assertEqual(game.max_game_length(), steps)
+    py_obs = make_observation(game)
+
+    state = game.new_initial_state()
+    self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
+
+    state.apply_action(0)
+    self.assertEqual(state.current_player(), 0)
+
+    location, destination = 1, 7
+    self.assertEqual(state.get_location_as_int(), location)
+    self.assertEqual(state.get_destination_as_int(), destination)
+
+    py_obs.set_from(state, state.current_player())
+    obs_size = num_locations * 2 + steps + 2
+    expected_tensor = np.zeros(obs_size)
+    # location = 1
+    # destination + num_locations = 15
+    # time + 2 * num_locations = 16
+    # waiting bit at last index.
+    expected_tensor[[1, 15, 16]] = 1
+    npt.assert_array_equal(py_obs.tensor, expected_tensor)
 
   def test_apply_actions_error_no_movement_with_negative_waiting_time(self):
     """Check that a vehicle cannot choose to not move if it has to move."""
