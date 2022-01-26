@@ -140,6 +140,8 @@ set(GAME_SOURCES
   tiny_hanabi.h
   trade_comm.cc
   trade_comm.h
+  ultimate_tic_tac_toe.h
+  ultimate_tic_tac_toe.cc
   y.cc
   y.h
 )
@@ -489,6 +491,10 @@ add_test(tiny_hanabi_test tiny_hanabi_test)
 add_executable(trade_comm_test trade_comm_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(trade_comm_test trade_comm_test)
+
+add_executable(ultimate_tic_tac_toe_test ultimate_tic_tac_toe_test.cc
+               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
+add_test(ultimate_tic_tac_toe_test ultimate_tic_tac_toe_test)
 
 if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   add_executable(universal_poker_test universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}

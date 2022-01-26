@@ -93,15 +93,16 @@ In a nutshell:
 ./open_spiel/scripts/build_and_run_tests.sh # Run this every-time you need to rebuild.
 ```
 
-1.  Install system packages (e.g. cmake) and download some dependencies. Only
-    needs to be run once or if you enable some new conditional dependencies (see
-    specific section below).
+1.  (Optional) Configure
+    [Conditional Dependencies](#configuring-conditional-dependencies).
+2.  Install system packages (e.g. cmake) and download some dependencies. Only
+    needs to be run once or if you enable some new conditional dependencies.
 
     ```bash
     ./install.sh
     ```
 
-2.  Install your Python dependencies, e.g. in Python 3 using
+3.  Install your Python dependencies, e.g. in Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):
 
     ```bash
@@ -121,7 +122,7 @@ In a nutshell:
     pip3 install --upgrade setuptools testresources
     ```
 
-3.  This sections differs depending on the installation procedure:
+4.  This sections differs depending on the installation procedure:
 
     **Building and testing from source**
 
@@ -144,7 +145,7 @@ In a nutshell:
     source files. If you edit any C++ files, you will have to rerun the install
     command.
 
-4.  Only when building from source:
+5.  Only when building from source:
 
     ```bash
     # For the python modules in open_spiel.
@@ -229,10 +230,20 @@ python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --
 
 ## Detailed steps
 
-### Configuration conditional dependencies
+### Configuring conditional dependencies
 
-See [open_spiel/scripts/global_variables.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/global_variables.sh) to configure the
-conditional dependencies. See also the [Developer Guide](developer_guide.md).
+Conditional dependencies are configured using environment variables, e.g.
+
+```bash
+export OPEN_SPIEL_BUILD_WITH_HANABI=ON
+```
+
+`install.sh` may need to be rerun after enabling new conditional dependencies.
+
+See [open_spiel/scripts/global_variables.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/global_variables.sh) for the full list
+of conditional dependencies.
+
+See also the [Developer Guide](developer_guide.md#conditional-dependencies).
 
 ### Installing system-wide dependencies
 
