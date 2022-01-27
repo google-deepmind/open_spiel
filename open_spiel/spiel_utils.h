@@ -406,6 +406,19 @@ inline To down_cast(From& f) {
   return *static_cast<ToAsPointer>(&f);
 }
 
+// Creates a sampler from a std::function<double()> conforming to the
+// probabilities received. absl::discrete_distribution requires a URBG as a
+// source of randomness (as opposed to a std::function<double()>) so cannot
+// be used directly.
+class SamplerFromRng {
+ public:
+  explicit SamplerFromRng(std::function<double()> rng) : rng_(std::move(rng)) {}
+
+  int operator()(absl::Span<const double> probs);
+
+ private:
+  std::function<double()> rng_;
+};
 
 }  // namespace open_spiel
 

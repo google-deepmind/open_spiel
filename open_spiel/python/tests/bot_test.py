@@ -18,8 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 from absl.testing import absltest
-
 import numpy as np
 
 from open_spiel.python.bots import uniform_random
@@ -27,7 +27,9 @@ import pyspiel
 
 # Specify bot names in alphabetical order, to make it easier to read.
 SPIEL_BOTS_LIST = [
+    # Chooses actions in a fixed order.
     "fixed_action_preference",
+
     "uniform_random",
 ]
 
@@ -48,7 +50,10 @@ class BotTest(absltest.TestCase):
     np.testing.assert_allclose(average_results, [0.125, -0.125], atol=0.1)
 
   def test_registered_bots(self):
-    self.assertCountEqual(pyspiel.registered_bots(), SPIEL_BOTS_LIST)
+    expected = SPIEL_BOTS_LIST[:]
+    if os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON":
+      expected.append("uniform_restricted_actions")
+    self.assertCountEqual(pyspiel.registered_bots(), expected)
 
   def test_cpp_mcts_bot(self):
     game = pyspiel.load_game("tic_tac_toe")

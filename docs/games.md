@@ -65,6 +65,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Tiny Bridge](#tiny-bridge)
 ![](_static/green_circ10.png "green circle") | [Tiny Hanabi](#tiny-hanabi)
 ![](_static/green_circ10.png "green circle") | [Trade Comm](#trade-comm)
+<font color="orange"><b>~</b></font>         | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Y](#y)
 
 ## Details
@@ -644,6 +645,15 @@ Status                                       | Game
 *   Imperfect information.
 *   2 players.
 *   A simple emergent communication game based on trading.
+
+### Ultimate Tic-Tac-Toe
+
+*   Players try and form a pattern in local boards and a meta-board.
+*   Uses tokens on a grid.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
 
 ### Y
 
