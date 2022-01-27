@@ -96,6 +96,33 @@ class BotTest(absltest.TestCase):
     result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
     self.assertEqual(result, [1, -1])  # Player 0 wins.
 
+  def test_roshambo_bot(self):
+    if hasattr(pyspiel, "make_roshambo_bot"):
+      game = pyspiel.load_game("repeated_game(stage_game=matrix_rps()," +
+                               "num_repetitions=" +
+                               f"{pyspiel.ROSHAMBO_NUM_THROWS})")
+      num_players = 2
+      bots = [
+          pyspiel.make_roshambo_bot(0, "rotatebot"),
+          pyspiel.make_roshambo_bot(1, "copybot")
+      ]
+      state = game.new_initial_state()
+      for i in range(pyspiel.ROSHAMBO_NUM_THROWS):
+        joint_action = [-1] * num_players
+        for p in range(num_players):
+          joint_action[p] = bots[p].step(state)
+        for p in range(num_players):
+          bots[p].inform_actions(state, joint_action)
+        state.apply_actions(joint_action)
+        if i == 0:
+          # copybot wins the first round
+          self.assertListEqual(state.returns(), [-1, 1])
+        else:
+          # the rest are a draw
+          self.assertListEqual(state.rewards(), [0, 0])
+      self.assertTrue(state.is_terminal())
+      self.assertListEqual(state.returns(), [-1, 1])
+
 
 if __name__ == "__main__":
   absltest.main()
