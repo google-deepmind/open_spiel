@@ -161,6 +161,4 @@ int main(int argc, char** argv) {
   open_spiel::amazons::PlayerTwoSimpleWinTest();
   open_spiel::amazons::PlayerOneTrappedByAmazonsTest();
   open_spiel::amazons::PlayerOneTrappedByBlocksTest();
-
-
 }

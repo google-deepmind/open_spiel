@@ -27,7 +27,7 @@ from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 import pyspiel
 
 # Specify game names in alphabetical order, to make the test easier to read.
-EXPECTED_GAMES = set([
+EXPECTED_GAMES = frozenset([
     "amazons",
     "backgammon",
     "battleship",
