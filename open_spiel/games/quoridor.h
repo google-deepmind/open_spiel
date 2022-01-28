@@ -33,6 +33,8 @@ namespace open_spiel {
 namespace quoridor {
 
 inline constexpr int kNumPlayers = 2;
+inline constexpr int kMinNumPlayers = 2;
+inline constexpr int kMaxNumPlayers = 4;
 inline constexpr int kDefaultBoardSize = 9;
 inline constexpr int kMinBoardSize = 3;
 inline constexpr int kMaxBoardSize = 25;
@@ -42,6 +44,8 @@ inline constexpr int kCellStates = 1 + kNumPlayers;
 enum QuoridorPlayer : uint8_t {
   kPlayer1,
   kPlayer2,
+  kPlayer3,
+  kPlayer4,
   kPlayerWall,
   kPlayerNone,
   kPlayerDraw,
@@ -138,9 +142,10 @@ class QuoridorState : public State {
   void SearchShortestPath(QuoridorPlayer p, SearchState* search_state) const;
 
   std::vector<QuoridorPlayer> board_;
-  int wall_count_[kNumPlayers];
-  int end_zone_[kNumPlayers];
-  Move player_loc_[kNumPlayers];
+  std::vector<int> players_;
+  std::vector<int> wall_count_;
+  std::vector<int> end_zone_;
+  std::vector<Move> player_loc_;
   QuoridorPlayer current_player_ = kPlayer1;
   QuoridorPlayer outcome_ = kPlayerNone;
   int moves_made_ = 0;
@@ -159,7 +164,7 @@ class QuoridorGame : public Game {
     return std::unique_ptr<State>(new QuoridorState(
         shared_from_this(), board_size_, wall_count_, ansi_color_output_));
   }
-  int NumPlayers() const override { return kNumPlayers; }
+  int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
@@ -178,6 +183,7 @@ class QuoridorGame : public Game {
   const int board_size_;
   const int wall_count_;
   const bool ansi_color_output_ = false;
+  const int num_players_;
 };
 
 }  // namespace quoridor

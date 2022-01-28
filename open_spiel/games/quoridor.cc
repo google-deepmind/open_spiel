@@ -37,8 +37,8 @@ const GameType kGameType{
     GameType::Information::kPerfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
+    /*max_num_players=*/kMaxNumPlayers,
+    /*min_num_players=*/kMinNumPlayers,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
@@ -50,6 +50,7 @@ const GameType kGameType{
         {"wall_count",
          GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
         {"ansi_color_output", GameParameter(false)},
+        {"players", GameParameter(kMinNumPlayers)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -144,8 +145,13 @@ QuoridorState::QuoridorState(std::shared_ptr<const Game> game, int board_size,
       board_diameter_(board_size * 2 - 1),
       ansi_color_output_(ansi_color_output) {
   board_.resize(board_diameter_ * board_diameter_, kPlayerNone);
-  wall_count_[kPlayer1] = wall_count;
-  wall_count_[kPlayer2] = wall_count;
+  players_.resize(num_players_);
+  players_[0] = kPlayer1;
+  wall_count_.resize(num_players_);
+  for (int kPlayeri = 0; kPlayeri < num_players_; ++kPlayeri) {
+    wall_count_[kPlayeri] = wall_count;
+  }
+  player_loc_.resize(num_players_);
   int start_x = board_size - (board_size % 2);
   player_loc_[kPlayer1] = GetMove(start_x, board_diameter_ - 1);
   player_loc_[kPlayer2] = GetMove(start_x, 0);
@@ -153,6 +159,16 @@ QuoridorState::QuoridorState(std::shared_ptr<const Game> game, int board_size,
   SetPlayer(player_loc_[kPlayer2], kPlayer2, kPlayerNone);
   end_zone_[kPlayer1] = player_loc_[kPlayer2].y;
   end_zone_[kPlayer2] = player_loc_[kPlayer1].y;
+  if (num_players_ > 2) {
+    player_loc_[kPlayer3] = GetMove(0, start_x);
+    SetPlayer(player_loc_[kPlayer3], kPlayer3, kPlayerNone);
+    end_zone_[kPlayer3] = board_diameter_ - 1;
+  }
+  if (num_players_ > 3) {
+    player_loc_[kPlayer4] = GetMove(0, board_diameter_ - 1);
+    SetPlayer(player_loc_[kPlayer4], kPlayer4, kPlayerNone);
+    end_zone_[kPlayer4] = 0;
+  }
 }
 
 Move QuoridorState::ActionToMove(Action action_id) const {
@@ -178,8 +194,9 @@ std::vector<Action> QuoridorState::LegalActions() const {
   // Wall placements.
   if (wall_count_[current_player_] > 0) {
     SearchState search_state(board_diameter_);
-    SearchShortestPath(kPlayer1, &search_state);
-    SearchShortestPath(kPlayer2, &search_state);
+    for (int kPlayeri = 0; kPlayeri < num_players_; ++kPlayeri) {
+      SearchShortestPath(kPlayeri, &search_state);
+    }
     for (int y = 0; y < board_diameter_ - 2; y += 2) {
       for (int x = 0; x < board_diameter_ - 2; x += 2) {
         Move h = GetMove(x, y + 1);
@@ -267,14 +284,18 @@ bool QuoridorState::IsValidWall(Move m, SearchState* search_state) const {
   if (count <= 1) return true;
 
   // Do a full search to verify both players can get to their respective goals.
-  return (SearchEndZone(kPlayer1, m, m + offset * 2, search_state) &&
-          SearchEndZone(kPlayer2, m, m + offset * 2, search_state));
+  pathExists = true
+  for (int kPlayeri = 0; kPlayeri < num_players_; ++kPlayeri) {
+    valid = valid && SearchEndZone(kPlayeri, m, m + offset *2, search_state);
+  }
+  return pathExists;
 }
 
 bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
                                   SearchState* search_state) const {
   search_state->ResetSearchQueue();
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
+  /* TODO: The end_zone_ definition does not apply to 4 players  <28-01-22, maxspahn> */
   int goal = end_zone_[p];
   int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
   search_state->Push(0, player_loc_[p]);
@@ -301,6 +322,7 @@ void QuoridorState::SearchShortestPath(QuoridorPlayer p,
   search_state->ResetSearchQueue();
   search_state->ResetDists();
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
+  /* TODO: The end_zone_ definition does not apply to 4 players  <28-01-22, maxspahn> */
   int goal = end_zone_[p];
   int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
   search_state->Push(0, player_loc_[p]);
@@ -371,6 +393,8 @@ std::string QuoridorState::ToString() const {
 
   std::string white = " O ";
   std::string black = " @ ";
+  std::string green = " # ";
+  std::string blue = " % ";
   std::string coord = "";
   std::string reset = "";
   if (ansi_color_output_) {
@@ -493,6 +517,7 @@ QuoridorGame::QuoridorGame(const GameParameters& params)
       board_size_(ParameterValue<int>("board_size")),
       wall_count_(
           ParameterValue<int>("wall_count", board_size_ * board_size_ / 8)),
+      num_players_(ParameterValue<int>("num_players")),
       ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace quoridor
