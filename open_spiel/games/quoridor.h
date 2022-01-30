@@ -94,6 +94,7 @@ class QuoridorState : public State {
                 int wall_count, bool ansi_color_output = false);
 
   QuoridorState(const QuoridorState&) = default;
+  void InitializePlayer(QuoridorPlayer);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : static_cast<int>(current_player_);
@@ -142,11 +143,12 @@ class QuoridorState : public State {
   void SearchShortestPath(QuoridorPlayer p, SearchState* search_state) const;
 
   std::vector<QuoridorPlayer> board_;
-  std::vector<int> players_;
+  std::array<QuoridorPlayer, 4> players_ = {kPlayer1, kPlayer2, kPlayer3, kPlayer4};
   std::vector<int> wall_count_;
   std::vector<int> end_zone_;
   std::vector<Move> player_loc_;
   QuoridorPlayer current_player_ = kPlayer1;
+  int current_player_index_ = 0;
   QuoridorPlayer outcome_ = kPlayerNone;
   int moves_made_ = 0;
   const int board_size_;

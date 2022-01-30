@@ -21,8 +21,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
-ABSL_FLAG(int, players, 0, "How many players in this game, 0 for default.");
+ABSL_FLAG(std::string, game, "quoridor", "The name of the game to play.");
+ABSL_FLAG(int, players, 3, "How many players in this game, 0 for default.");
 ABSL_FLAG(bool, show_infostate, false, "Show the information state.");
 ABSL_FLAG(int, seed, 0, "Seed for the random number generator. 0 for auto.");
 ABSL_FLAG(bool, show_legals, false, "Show the legal moves.");
@@ -61,8 +61,11 @@ int main(int argc, char** argv) {
   // Add any specified parameters to override the defaults.
   open_spiel::GameParameters params;
   if (players > 0) {
-    params["players"] = open_spiel::GameParameter(players);
+    params["num_players"] = open_spiel::GameParameter(players);
   }
+  params["num_players"] = open_spiel::GameParameter(4);
+  params["wall_count"] = open_spiel::GameParameter(1);
+  params["board_size"] = open_spiel::GameParameter(5);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name, params);
 
