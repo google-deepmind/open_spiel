@@ -144,7 +144,7 @@ class VPNetModel {
   // members' (model_config_, model_, model_optimizer_) declaration in
   // the order shown below so the member initialization list works.
   ModelConfig model_config_;
-  ResModel model_;
+  Model model_;
   torch::optim::Adam model_optimizer_;
   torch::Device torch_device_;
 };

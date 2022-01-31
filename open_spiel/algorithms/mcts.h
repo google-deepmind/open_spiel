@@ -165,7 +165,8 @@ class MCTSBot : public Bot {
       bool solve,             // Whether to back up solved states.
       int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
-      double dirichlet_alpha = 0, double dirichlet_epsilon = 0);
+      double dirichlet_alpha = 0, double dirichlet_epsilon = 0,
+      bool dont_return_chance_node=false);
   ~MCTSBot() = default;
 
   void Restart() override {}
@@ -211,6 +212,7 @@ class MCTSBot : public Bot {
   double max_utility_;
   double dirichlet_alpha_;
   double dirichlet_epsilon_;
+  bool dont_return_chance_node_;
   std::mt19937 rng_;
   const ChildSelectionPolicy child_selection_policy_;
   std::shared_ptr<Evaluator> evaluator_;
