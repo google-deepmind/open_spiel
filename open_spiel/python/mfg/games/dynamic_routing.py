@@ -147,12 +147,20 @@ class MeanFieldRoutingGame(pyspiel.Game):
     """Returns a NetworkObserver object used for observing game state."""
     if ((iig_obs_type is None) or
         (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
-      return NetworkObserver(self.max_game_length())
+      return NetworkObserver(self.network.num_actions(), self.max_game_length())
     return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
   def max_chance_nodes_in_history(self):
     """Maximun chance nodes in game history."""
     return self.max_game_length() + 1
+
+  def get_road_section_as_int(self, section: Optional[str]) -> int:
+    """Returns the integer representation of the road section."""
+    if section is None:
+      return 0
+    start_node, end_node = (
+        dynamic_routing_utils._road_section_to_nodes(section))  # pylint:disable=protected-access
+    return self.network.get_action_id_from_movement(start_node, end_node)
 
 
 class MeanFieldRoutingGameState(pyspiel.State):
@@ -185,8 +193,9 @@ class MeanFieldRoutingGameState(pyspiel.State):
     _vehicle_at_destination: boolean that encodes if the representative vehicle
       has reached its destination.
     _vehicle_destination: the destination of the representative vehicle
-      corresponding to this state (once the state is no longer in chance_init
-      mode).
+      corresponding to this state. It is associated to the representative
+      vehicle after the initial chance node according to the _od_demand
+      distribution.
     _vehicle_final_travel_time: the travel time of the representative vehicle,
       the travel is either 0 if the vehicle is still in the network or its
       travel time if the vehicle has reached its destination.
@@ -210,7 +219,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
   _time_step_length: float
   _total_num_vehicle: float
   _vehicle_at_destination: bool
-  _vehicle_destination: str
+  _vehicle_destination: Optional[str]
   _vehicle_final_travel_time: float
   _vehicle_location: Optional[str]
   _vehicle_without_legal_action: bool
@@ -241,9 +250,11 @@ class MeanFieldRoutingGameState(pyspiel.State):
         for od_demand_item in od_demand
     ]
     self._vehicle_location = None
+    self._vehicle_destination = None
     self._max_travel_time = self.get_game().max_game_length()
     # TODO(cabannes): cap maximum link waiting time to faster simulations.
     self._max_waiting_time = self._max_travel_time
+    self._waiting_time = WAITING_TIME_NOT_ASSIGNED
 
   @property
   def current_time_step(self) -> int:
@@ -492,6 +503,10 @@ class MeanFieldRoutingGameState(pyspiel.State):
     """Returns True if the game is over."""
     return self._is_terminal
 
+  def is_waiting(self) -> bool:
+    """Returns True if the wait time is non-zero."""
+    return self._waiting_time > 0
+
   def returns(self) -> List[float]:
     """Total reward for each player over the course of the game so far."""
     if not self._is_terminal:
@@ -499,13 +514,21 @@ class MeanFieldRoutingGameState(pyspiel.State):
     return [-self._vehicle_final_travel_time * self._time_step_length]
 
   def get_location_as_int(self) -> int:
-    """Get the vehicle location."""
-    if self._vehicle_location is None:
-      return -1
-    start_node, end_node = dynamic_routing_utils._road_section_to_nodes(  # pylint:disable=protected-access
-        self._vehicle_location)
-    return self.get_game().network.get_action_id_from_movement(
-        start_node, end_node)
+    """Returns the vehicle location.
+
+    This will be 1-based action index of the location, or 0 when the location is
+    None before the initial chance node.
+    """
+    return self.get_game().get_road_section_as_int(self._vehicle_location)
+
+  def get_destination_as_int(self) -> int:
+    """Returns the vehicle destination.
+
+
+    This will be 1-based action index of the destination, or 0 when the
+    destination is None before the initial chance node.
+    """
+    return self.get_game().get_road_section_as_int(self._vehicle_destination)
 
   def __str__(self) -> str:
     """String for debug purposes. No particular semantics are required."""
@@ -523,31 +546,46 @@ class NetworkObserver:
   """Network observer used by the learning algorithm.
 
   The state string is the state history string. The state tensor is an array
-  of size max_game_length, num_players where each element is the location of
-  the vehicle at this time.
+  of size number of locations * 2 + maximum number of time steps + 2, which is
+  the concatenation of one-hot encodings of the location, destination (1-based;
+  if location or destination is None, then the 0th element will be set to 1) and
+  the current time (0-based). The last element of the array will be set to 1 if
+  waiting time is positive, or 0 otherwise.
+
   Attributes:
-    dict: dictionary {"observation": tensor}.
-    tensor: list of location for each time step.
+    dict: Dictionary of tensors for the components of the observation
+      corresponding to the location, destination and time.
+    tensor: The concatenated form of the observation.
   """
 
-  def __init__(self, num_time: int):
+  def __init__(self, num_locations: int, max_num_time_step: int):
     """Initializes an empty observation tensor."""
-    self.tensor = np.zeros(num_time + 1, np.float32)
-    self.dict = {"observation": self.tensor}
+    self.tensor = np.zeros(num_locations * 2 + max_num_time_step + 1 + 1,
+                           np.float32)
+    self.dict = {
+        "location": self.tensor[:num_locations],
+        "destination": self.tensor[num_locations:num_locations * 2],
+        "time": self.tensor[num_locations * 2:-1],
+        "waiting": self.tensor[-1:]
+    }
 
   def set_from(self, state, player):
-    """Update the state tensor.
+    """Sets the state tensor based on the specified state.
 
-    Put the locations of each players in the tensor row corresponding to
-    the current time step. Insert the current player location at the
-    beginning of the row.
+    Note that the function may be called with arbitrary states of the game, e.g.
+    from different runs, and therefore the tensor should be cleared and updated
+    instead of preserving any earlier values.
+
     Args:
       state: state of the game.
       player: player id that should play.
     """
     assert player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
-    self.dict["observation"][
-        state.current_time_step] = state.get_location_as_int()
+    self.tensor.fill(0)
+    self.dict["location"][state.get_location_as_int()] = 1
+    self.dict["destination"][state.get_destination_as_int()] = 1
+    self.dict["time"][state.current_time_step] = 1
+    self.dict["waiting"][0] = state.is_waiting()
 
   def string_from(self, state, player):
     """Return the state history string."""

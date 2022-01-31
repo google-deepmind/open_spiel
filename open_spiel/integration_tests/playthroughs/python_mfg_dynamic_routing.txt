@@ -24,9 +24,9 @@ NumPlayers() = 1
 MinUtility() = -11.0
 MaxUtility() = 0.0
 UtilitySum() = 0.0
-ObservationTensorShape() = [11]
+ObservationTensorShape() = location: [8], destination: [8], time: [11], waiting: [1]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 11
+ObservationTensorSize() = 28
 MaxGameLength() = 10
 ToString() = "python_mfg_dynamic_routing(max_num_time_step=10,players=-1,time_step_length=0.5)"
 
@@ -40,7 +40,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.CHANCE
 InformationStateString(0) = ""
 ObservationString(0) = "Before initial chance node"
-ObservationTensor(0) = [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0).location: ◉◯◯◯◯◯◯◯
+ObservationTensor(0).destination: ◉◯◯◯◯◯◯◯
+ObservationTensor(0).time: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◯
 ChanceOutcomes() = [(0, 1.0)]
 LegalActions() = [0]
 StringLegalActions() = ["Vehicle is assigned to population 0."]
@@ -58,7 +61,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "0"
 ObservationString(0) = "Location=O->A, waiting_time=0, t=0, destination='D->E'"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).location: ◯◉◯◯◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◉◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◯
 Rewards() = [0.0]
 Returns() = [0]
 LegalActions() = [2, 3]
@@ -77,7 +83,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "0, 3"
 ObservationString(0) = "Location=A->C, waiting_time=-1, t=1_mean_field, destination='D->E'"
-ObservationTensor(0) = [1.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◯◉◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◯
 Rewards() = [0.0]
 Returns() = [0]
 DistributionSupport() = ["Location=A->C, waiting_time=-1, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=0, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=1, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=2, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=3, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=4, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=5, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=6, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=7, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=8, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=9, t=1_mean_field, destination='D->E'"]
@@ -95,7 +104,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "0, 3"
 ObservationString(0) = "Location=A->C, waiting_time=3, t=1, destination='D->E'"
-ObservationTensor(0) = [1.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◯◉◯◯◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◉
 Rewards() = [0.0]
 Returns() = [0]
 LegalActions() = [0]
@@ -114,7 +126,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "0, 3, 0"
 ObservationString(0) = "Location=A->C, waiting_time=2, t=2_mean_field, destination='D->E'"
-ObservationTensor(0) = [1.0, 3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◉
 Rewards() = [0.0]
 Returns() = [0]
 DistributionSupport() = ["Location=A->C, waiting_time=-1, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=0, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=1, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=2, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=3, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=4, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=5, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=6, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=7, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=8, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=9, t=2_mean_field, destination='D->E'"]
@@ -132,7 +147,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "0, 3, 0"
 ObservationString(0) = "Location=A->C, waiting_time=2, t=2, destination='D->E'"
-ObservationTensor(0) = [1.0, 3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◉
 Rewards() = [0.0]
 Returns() = [0]
 LegalActions() = [0]
@@ -151,7 +169,10 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
 InformationStateString(0) = "0, 3, 0, 0"
 ObservationString(0) = "Location=A->C, waiting_time=1, t=3_mean_field, destination='D->E'"
-ObservationTensor(0) = [1.0, 3.0, 3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(0).waiting: ◉
 Rewards() = [0.0]
 Returns() = [0]
 DistributionSupport() = ["Location=A->C, waiting_time=-1, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=0, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=1, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=2, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=3, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=4, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=5, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=6, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=7, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=8, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=9, t=3_mean_field, destination='D->E'"]
@@ -221,6 +242,9 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
 InformationStateString(0) = "0, 3, 0, 0, 0, 6, 0, 0, 0, 7, 0"
 ObservationString(0) = "Arrived at D->E, with travel time 8, t=10_mean_field"
-ObservationTensor(0) = [1.0, 3.0, 3.0, 3.0, 3.0, 6.0, 6.0, 6.0, 6.0, 7.0, 7.0]
+ObservationTensor(0).location: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).time: ◯◯◯◯◯◯◯◯◯◯◉
+ObservationTensor(0).waiting: ◯
 Rewards() = [-4.0]
 Returns() = [-4.0]

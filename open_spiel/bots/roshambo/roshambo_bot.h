@@ -63,6 +63,7 @@ class RoshamboBot : public Bot {
 };
 
 std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name);
+std::vector<std::string> RoshamboBotNames();
 
 }  // namespace roshambo
 }  // namespace open_spiel

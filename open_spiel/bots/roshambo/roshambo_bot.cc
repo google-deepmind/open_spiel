@@ -65,5 +65,14 @@ std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name) {
   return std::make_unique<RoshamboBot>(player_id, bot_name);
 }
 
+std::vector<std::string> RoshamboBotNames() {
+  std::vector<std::string> names;
+  names.reserve(bot_map.size());
+  for (const auto& iter : bot_map) {
+    names.push_back(iter.first);
+  }
+  return names;
+}
+
 }  // namespace roshambo
 }  // namespace open_spiel

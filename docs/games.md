@@ -9,6 +9,7 @@ we verified against known values and/or reproduced results from papers.
 
 Status                                       | Game
 -------------------------------------------- | ----
+<font color="orange"><b>~</b></font>         | [Amazons](#amazons)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
@@ -69,6 +70,16 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Y](#y)
 
 ## Details
+
+### Amazons
+
+*   Move pieces on a board trying to block opponents from moving.
+*   Pieces on a grid.
+*   Modern game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Game_of_the_Amazons)
 
 ### Backgammon
 
@@ -529,7 +540,7 @@ Status                                       | Game
 *   Modern game.
 *   Deterministic.
 *   Perfect information.
-*   2-4 players.
+*   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
 
 ### Reconnaissance Blind Chess
