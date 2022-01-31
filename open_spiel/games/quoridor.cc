@@ -251,6 +251,7 @@ void QuoridorState::AddActions(Move cur, Offset offset,
   }
   // We are jumping over the other player against a wall, which side jumps are
   // valid?
+  /* TODO: Introduce blocked jump if player is behind player <31-01-22, maxspahn> */
 
   Offset left = offset.rotate_left();
   if (!IsWall(forward + left)) {
@@ -307,7 +308,6 @@ bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
                                   SearchState* search_state) const {
   search_state->ResetSearchQueue();
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
-  /* TODO: The end_zone_ definition does not apply to 4 players  <28-01-22, maxspahn> */
   int goal = end_zone_[p];
   int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
   search_state->Push(0, player_loc_[p]);
@@ -317,6 +317,7 @@ bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
       Move wall = c + dir;
       if (!IsWall(wall) && wall != wall1 && wall != wall2) {
         Move move = c + dir * 2;
+        /* TODO: Must be adapted according to player <31-01-22, maxspahn> */
         if (move.y == goal) {
           return true;
         }
@@ -334,7 +335,6 @@ void QuoridorState::SearchShortestPath(QuoridorPlayer p,
   search_state->ResetSearchQueue();
   search_state->ResetDists();
   Offset dir(1, 0);  // Direction is arbitrary. Queue will make it fast.
-  /* TODO: The end_zone_ definition does not apply to 4 players  <28-01-22, maxspahn> */
   int goal = end_zone_[p];
   int goal_dir = (goal == 0 ? -1 : 1);  // Sort for shortest dist in a min-heap.
   search_state->Push(0, player_loc_[p]);
@@ -349,6 +349,7 @@ void QuoridorState::SearchShortestPath(QuoridorPlayer p,
       Move wall = c + dir;
       if (!IsWall(wall)) {
         Move move = c + dir * 2;
+        /* TODO: Must be adapted according to player <31-01-22, maxspahn> */
         if (move.y == goal) {
           search_state->SetDist(move, dist + 1);
           search_state->ClearSearchQueue();  // Break out of the search.
