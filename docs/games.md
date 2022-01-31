@@ -540,7 +540,7 @@ Status                                       | Game
 *   Modern game.
 *   Deterministic.
 *   Perfect information.
-*   2-4 players.
+*   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
 
 ### Reconnaissance Blind Chess
