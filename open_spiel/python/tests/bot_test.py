@@ -111,8 +111,6 @@ class BotTest(absltest.TestCase):
         joint_action = [-1] * num_players
         for p in range(num_players):
           joint_action[p] = bots[p].step(state)
-        for p in range(num_players):
-          bots[p].inform_actions(state, joint_action)
         state.apply_actions(joint_action)
         if i == 0:
           # copybot wins the first round
