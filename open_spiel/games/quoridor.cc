@@ -243,23 +243,29 @@ void QuoridorState::AddActions(Move cur, Offset offset,
     return;
   }
   // Other player, so which jumps are valid?
-  /* TODO: Introduce blocked jump if player is behind player <31-01-22, maxspahn> */
 
   if (!IsWall(cur + offset * 3)) {
     // A normal jump is allowed. We know that spot is empty.
-    moves->push_back((cur + offset * 4).xy);
-    return;
+    if (GetPlayer(cur + offset * 4) == kPlayerNone) {
+      moves->push_back((cur + offset * 4).xy);
+      return;
+    }
   }
   // We are jumping over the other player against a wall, which side jumps are
   // valid?
+  /* TODO: prevent treating second player as wall  <01-02-22, maxspahn> */
 
   Offset left = offset.rotate_left();
   if (!IsWall(forward + left)) {
-    moves->push_back((forward + left * 2).xy);
+    if (GetPlayer(forward + left * 2) == kPlayerNone) {
+      moves->push_back((forward + left * 2).xy);
+    }
   }
   Offset right = offset.rotate_right();
   if (!IsWall(forward + right)) {
-    moves->push_back((forward + right * 2).xy);
+    if (GetPlayer(forward + right * 2) == kPlayerNone) {
+      moves->push_back((forward + right * 2).xy);
+    }
   }
 }
 
@@ -563,6 +569,7 @@ void QuoridorState::DoApplyAction(Action action) {
     outcome_ = kPlayerDraw;
   }
 
+  /* TODO: Adapt so that current player moves in circle <01-02-22, maxspahn> */
   current_player_index_ += 1;
   if (current_player_index_ == num_players_) current_player_index_ = 0;
   current_player_ = players_[current_player_index_];

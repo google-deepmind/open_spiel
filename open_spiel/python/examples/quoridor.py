@@ -1,15 +1,33 @@
 import pyspiel
 import numpy as np
+import sys
 
-game = pyspiel.load_game('quoridor(wall_count=0,board_size=5,num_players=4)')
+def getActionMap(state):
+    legal_actions = state.legal_actions()
+    return {state.action_to_string(action): action for action in legal_actions}
+
+def command_line_action(state):
+	legal_actions = state.legal_actions()
+	action_map = {state.action_to_string(action): action for action in legal_actions}
+	action = -1
+	while action not in legal_actions:
+		print("Choose an action from {}:".format(action_map))
+		sys.stdout.flush()
+		action_str = input()
+		try:
+			action = action_map[str(action_str)]
+		except KeyError:
+			print("Invalid action")
+			continue
+	return action
+
+game = pyspiel.load_game('quoridor(wall_count=0,board_size=5,num_players=3,ansi_color_output=true)')
 print(f"Loading game {game}")
 state = game.new_initial_state()
 print(state)
 while not state.is_terminal():
-    legal_actions = state.legal_actions()
-    action = np.random.choice(state.legal_actions())
+    action = command_line_action(state)
     print(f"Player {state.current_player()} make move : {state.action_to_string(action)}")
     state.apply_action(action)
     print(state)
-    __import__('pdb').set_trace()
     print(state.is_terminal())
