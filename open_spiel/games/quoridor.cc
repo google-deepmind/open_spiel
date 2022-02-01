@@ -243,6 +243,7 @@ void QuoridorState::AddActions(Move cur, Offset offset,
     return;
   }
   // Other player, so which jumps are valid?
+  /* TODO: Introduce blocked jump if player is behind player <31-01-22, maxspahn> */
 
   if (!IsWall(cur + offset * 3)) {
     // A normal jump is allowed. We know that spot is empty.
@@ -251,7 +252,6 @@ void QuoridorState::AddActions(Move cur, Offset offset,
   }
   // We are jumping over the other player against a wall, which side jumps are
   // valid?
-  /* TODO: Introduce blocked jump if player is behind player <31-01-22, maxspahn> */
 
   Offset left = offset.rotate_left();
   if (!IsWall(forward + left)) {
@@ -317,8 +317,14 @@ bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
       Move wall = c + dir;
       if (!IsWall(wall) && wall != wall1 && wall != wall2) {
         Move move = c + dir * 2;
-        /* TODO: Must be adapted according to player <31-01-22, maxspahn> */
-        if (move.y == goal) {
+        int moveCoord;
+        if (p == kPlayer1 or p == kPlayer2) {
+          moveCoord = move.y;
+        }
+        else if(p == kPlayer3 or p == kPlayer4) {
+          moveCoord = move.x;
+        }
+        if (moveCoord == goal){
           return true;
         }
         search_state->Push(goal_dir * (goal - move.y), move);
@@ -349,14 +355,20 @@ void QuoridorState::SearchShortestPath(QuoridorPlayer p,
       Move wall = c + dir;
       if (!IsWall(wall)) {
         Move move = c + dir * 2;
-        /* TODO: Must be adapted according to player <31-01-22, maxspahn> */
-        if (move.y == goal) {
+        int moveCoord;
+        if (p == kPlayer1 or p == kPlayer2) {
+          moveCoord = move.y;
+        }
+        else if(p == kPlayer3 or p == kPlayer4) {
+          moveCoord = move.x;
+        }
+        if (moveCoord == goal){
           search_state->SetDist(move, dist + 1);
           search_state->ClearSearchQueue();  // Break out of the search.
           goal_found = move;
           break;
         }
-        if (search_state->Push(dist + 1 + goal_dir * (goal - move.y), move)) {
+        if (search_state->Push(dist + 1 + goal_dir * (goal - moveCoord), move)) {
           search_state->SetDist(move, dist + 1);
         }
       }
