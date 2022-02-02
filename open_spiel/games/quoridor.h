@@ -143,7 +143,7 @@ class QuoridorState : public State {
   void SearchShortestPath(QuoridorPlayer p, SearchState* search_state) const;
 
   std::vector<QuoridorPlayer> board_;
-  std::array<QuoridorPlayer, 4> players_ = {kPlayer1, kPlayer2, kPlayer3, kPlayer4};
+  std::vector<QuoridorPlayer> players_;
   std::vector<int> wall_count_;
   std::vector<int> end_zone_;
   std::vector<Move> player_loc_;

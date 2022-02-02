@@ -145,6 +145,23 @@ QuoridorState::QuoridorState(std::shared_ptr<const Game> game, int board_size,
       board_diameter_(board_size * 2 - 1),
       ansi_color_output_(ansi_color_output) {
   board_.resize(board_diameter_ * board_diameter_, kPlayerNone);
+  players_.resize(num_players_);
+  // Account for order of turns
+  if (num_players_ == 2) {
+    players_[0] = kPlayer1;
+    players_[1] = kPlayer2;
+  }
+  else if (num_players_ == 3) {
+    players_[0] = kPlayer1;
+    players_[1] = kPlayer3;
+    players_[2] = kPlayer2;
+  }
+  else if (num_players_ == 4) {
+    players_[0] = kPlayer1;
+    players_[1] = kPlayer3;
+    players_[2] = kPlayer2;
+    players_[3] = kPlayer4;
+  }
   wall_count_.resize(num_players_);
   player_loc_.resize(num_players_);
   end_zone_.resize(num_players_);
@@ -242,6 +259,7 @@ void QuoridorState::AddActions(Move cur, Offset offset,
     moves->push_back(forward.xy);
     return;
   }
+
   // Other player, so which jumps are valid?
 
   if (!IsWall(cur + offset * 3)) {
@@ -250,10 +268,10 @@ void QuoridorState::AddActions(Move cur, Offset offset,
       moves->push_back((cur + offset * 4).xy);
       return;
     }
+    else return;
   }
   // We are jumping over the other player against a wall, which side jumps are
   // valid?
-  /* TODO: prevent treating second player as wall  <01-02-22, maxspahn> */
 
   Offset left = offset.rotate_left();
   if (!IsWall(forward + left)) {
@@ -426,18 +444,32 @@ std::string QuoridorState::ToString() const {
   // std::string black = " @ ";
   // std::string green = " # ";
   // std::string blue = " % ";
-  std::string coord = "";
-  std::string reset = "";
-  std::array<std::string, 4> colors = {" 0 ", " @ ", " # ", " % "};
-  /*
+  std::string reset;
+  std::array<std::string, 4> colors, coords;
   if (ansi_color_output_) {
     std::string esc = "\033";
     reset = esc + "[0m";
-    coord = esc + "[1;37m";                  // bright white
-    white = esc + "[1;33m" + " @ " + reset;  // bright yellow
-    black = esc + "[1;34m" + " @ " + reset;  // bright blue
+    coords[0] = esc + "[1;33m";
+    coords[1] = esc + "[1;34m";
+    coords[2] = esc + "[1;35m";
+    coords[3] = esc + "[1;36m";
+    colors[0] = esc + "[1;33m" + " 0 " + reset;
+    colors[1] = esc + "[1;34m" + " & " + reset;
+    colors[2] = esc + "[1;35m" + " # " + reset;
+    colors[3] = esc + "[1;36m" + " % " + reset;
+    std::cout << "colors : " << colors << std::endl;
   }
-  */
+  else {
+    std::string reset = "";
+    coords[0] = "";
+    coords[1] = "";
+    coords[2] = "";
+    coords[3] = "";
+    colors[0] = " 0 ";
+    colors[1] = " & ";
+    colors[2] = " # ";
+    colors[3] = " % ";
+  }
 
   std::ostringstream out;
   out << "Board size: " << board_size_  << ", walls: ";
@@ -448,14 +480,14 @@ std::string QuoridorState::ToString() const {
 
   // Top x coords.
   for (int x = 0; x < board_size_; ++x) {
-    out << "   " << coord << static_cast<char>('a' + x);
+    out << "   " << coords[1] << static_cast<char>('a' + x);
   }
   out << reset << '\n';
 
   for (int y = 0; y < board_diameter_; ++y) {
     if (y % 2 == 0) {
       if (y / 2 + 1 < 10) out << " ";
-      out << coord << (y / 2 + 1) << reset;  // Leading y coord.
+      out << coords[2] << (y / 2 + 1) << reset;  // Leading y coord.
     } else {
       out << "  ";  // Wall lines.
     }
@@ -466,7 +498,7 @@ std::string QuoridorState::ToString() const {
         bool playerFound = false;
         for (int i = 0; i < num_players_; ++i) {
           if (p == players_[i]) {
-            out << colors[i];
+            out << colors[players_[i]];
             playerFound = true;
           }
         }
@@ -482,8 +514,19 @@ std::string QuoridorState::ToString() const {
         out << (p == kPlayerWall ? "---" : "   ");
       }
     }
+    if (y % 2 == 0) {
+      if (y / 2 + 1 < 10) out << " ";
+      out << coords[3] << (y / 2 + 1) << reset;  // Leading y coord.
+    } else {
+      out << "  ";  // Wall lines.
+    }
     out << '\n';
   }
+  // Bottom x coords.
+  for (int x = 0; x < board_size_; ++x) {
+    out << "   " << coords[0] << static_cast<char>('a' + x);
+  }
+  out << reset << '\n';
   return out.str();
 }
 
