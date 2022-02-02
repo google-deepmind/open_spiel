@@ -430,20 +430,17 @@ std::string QuoridorState::ToString() const {
   // Generates something like:
   // Board size: 5, walls: 0, 0
   //    a   b   c   d   e
-  //  1 . | .   .   .   .
+  //  1 . | .   .   .   . 1
   //      +        ---+---
-  //  2 . | . | .   .   .
+  //  2 . | . | .   .   . 2
   //          +
-  //  3 .   . | O   @   .
+  //  3 .   . | O   @   . 3
   //   ---+---
-  //  4 . | .   .   .   .
+  //  4 . | .   .   .   . 4
   //      +    ---+---
-  //  5 . | .   .   .   .
+  //  5 . | .   .   .   . 5
+  //    a   b   c   d   e
 
-  // std::string white = " O ";
-  // std::string black = " @ ";
-  // std::string green = " # ";
-  // std::string blue = " % ";
   std::string reset;
   std::array<std::string, 4> colors, coords;
   if (ansi_color_output_) {
@@ -613,7 +610,6 @@ void QuoridorState::DoApplyAction(Action action) {
     outcome_ = kPlayerDraw;
   }
 
-  /* TODO: Adapt so that current player moves in circle <01-02-22, maxspahn> */
   current_player_index_ += 1;
   if (current_player_index_ == num_players_) current_player_index_ = 0;
   current_player_ = players_[current_player_index_];
