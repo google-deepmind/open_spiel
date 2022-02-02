@@ -434,6 +434,21 @@ Status                                       | Game
 *   [Cabannes et. al. '21, Solving N-player dynamic routing games with
     congestion: a mean field approach](https://arxiv.org/pdf/2110.11943.pdf).
 
+### Mean Field Game : Linear-Quadratic
+
+*   Players are uniformly distributed and are then incentivized to gather at the
+    same point (The lower the distanbce wrt. the distribution mean position, the
+    higher the reward). A mean-reverting term pushes the players towards the
+    distribution, a gaussian noise term perturbs them. The players' actions
+    alter their states linearly (alpha * a * dt) and the cost thereof is
+    quadratic (K * a^2 * dt), hence the name. There exists an exact, closed form
+    solution for the fully continuous version of this game.
+*   Research game.
+*   Mean-field (with a unique player).
+*   Explicit stochastic game (only for initial node).
+*   Perfect information.
+*   [Perrin & al. 2019 (https://arxiv.org/abs/2007.03458)]
+
 ### Morpion Solitaire (4D)
 
 *   A single player game where player aims to maximize lines drawn on a grid,

@@ -75,6 +75,7 @@ EXPECTED_GAMES = frozenset([
     "matrix_rpsw",
     "matrix_sh",
     "matrix_shapleys_game",
+    "mean_field_lin_quad",
     "mfg_crowd_modelling",
     "mfg_crowd_modelling_2d",
     "mfg_garnet",
