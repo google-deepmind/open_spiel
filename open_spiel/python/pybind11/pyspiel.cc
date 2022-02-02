@@ -90,6 +90,9 @@ PYBIND11_MODULE(pyspiel, m) {
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
 
+  m.def("game_parameters_to_string", GameParametersToString,
+        "Converts a GameParameter dictionary to string.");
+
   py::enum_<PrivateInfoType>(m, "PrivateInfoType")
       .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers)
       .value("NONE", PrivateInfoType::kNone)
