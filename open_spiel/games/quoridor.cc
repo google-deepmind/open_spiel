@@ -50,7 +50,7 @@ const GameType kGameType{
         {"wall_count",
          GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
         {"ansi_color_output", GameParameter(false)},
-        {"num_players", GameParameter(kMinNumPlayers, false)},
+        {"players", GameParameter(kMinNumPlayers, false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -454,7 +454,7 @@ std::string QuoridorState::ToString() const {
     coords[2] = esc + "[1;35m";
     coords[3] = esc + "[1;36m";
     colors[0] = esc + "[1;33m" + " 0 " + reset;
-    colors[1] = esc + "[1;34m" + " & " + reset;
+    colors[1] = esc + "[1;34m" + " @ " + reset;
     colors[2] = esc + "[1;35m" + " # " + reset;
     colors[3] = esc + "[1;36m" + " % " + reset;
     std::cout << "colors : " << colors << std::endl;
@@ -466,7 +466,7 @@ std::string QuoridorState::ToString() const {
     coords[2] = "";
     coords[3] = "";
     colors[0] = " 0 ";
-    colors[1] = " & ";
+    colors[1] = " @ ";
     colors[2] = " # ";
     colors[3] = " % ";
   }
@@ -474,7 +474,8 @@ std::string QuoridorState::ToString() const {
   std::ostringstream out;
   out << "Board size: " << board_size_  << ", walls: ";
   for (int i = 0; i < num_players_; ++i) {
-    out << wall_count_[players_[i]] << ", ";
+    out << wall_count_[players_[i]];
+    if (i < num_players_ - 1) out << ", ";
   }
   out << "\n";
 
@@ -627,7 +628,7 @@ QuoridorGame::QuoridorGame(const GameParameters& params)
       board_size_(ParameterValue<int>("board_size")),
       wall_count_(
           ParameterValue<int>("wall_count", board_size_ * board_size_ / 8)),
-      num_players_(ParameterValue<int>("num_players")),
+      num_players_(ParameterValue<int>("players")),
       ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
 
 }  // namespace quoridor

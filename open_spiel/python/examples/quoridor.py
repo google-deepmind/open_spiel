@@ -16,7 +16,7 @@ def command_line_action(state):
 			continue
 	return action
 
-game = pyspiel.load_game('quoridor(wall_count=2,board_size=5,num_players=4,ansi_color_output=True)')
+game = pyspiel.load_game('quoridor(wall_count=2,board_size=5,players=4,ansi_color_output=True)')
 print(f"Loading game {game}")
 state = game.new_initial_state()
 print(state)

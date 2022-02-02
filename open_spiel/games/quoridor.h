@@ -28,6 +28,7 @@
 //   "board_size"        int     Size of the board (default = 9)
 //   "wall_count"        int     How many walls per side (default = size^2/8)
 //   "ansi_color_output" bool    Whether to color the output for a terminal.
+//   "players"           int     Number of players (default = 2)
 
 namespace open_spiel {
 namespace quoridor {

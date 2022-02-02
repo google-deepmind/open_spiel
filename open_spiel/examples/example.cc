@@ -21,14 +21,11 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-ABSL_FLAG(std::string, game, "quoridor", "The name of the game to play.");
-ABSL_FLAG(int, players, 3, "How many players in this game, 0 for default.");
+ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
+ABSL_FLAG(int, players, 0, "How many players in this game, 0 for default.");
 ABSL_FLAG(bool, show_infostate, false, "Show the information state.");
 ABSL_FLAG(int, seed, 0, "Seed for the random number generator. 0 for auto.");
 ABSL_FLAG(bool, show_legals, false, "Show the legal moves.");
-ABSL_FLAG(int, wall_count, 10, "Wall count for quoridor. 0 for auto.");
-ABSL_FLAG(int, board_size, 9, "Board size for quoridor. 0 for auto.");
-ABSL_FLAG(bool, colors, true, "Chose whether to use colors. 0 for auto.");
 
 void PrintLegalActions(const open_spiel::State& state,
                        open_spiel::Player player,
@@ -47,9 +44,6 @@ int main(int argc, char** argv) {
   bool show_infostate = absl::GetFlag(FLAGS_show_infostate);
   int seed = absl::GetFlag(FLAGS_seed);
   bool show_legals = absl::GetFlag(FLAGS_show_legals);
-  auto wall_count = absl::GetFlag(FLAGS_wall_count);
-  auto board_size = absl::GetFlag(FLAGS_board_size);
-  auto ansi_color_output = absl::GetFlag(FLAGS_colors);
 
   // Print out registered games.
   std::cerr << "Registered games:" << std::endl;
@@ -66,12 +60,9 @@ int main(int argc, char** argv) {
 
   // Add any specified parameters to override the defaults.
   open_spiel::GameParameters params;
-  if (game_name.compare("quoridor") == 0) {
-    params["num_players"] = open_spiel::GameParameter(players);
-    params["wall_count"] = open_spiel::GameParameter(wall_count);
-    params["board_size"] = open_spiel::GameParameter(board_size);
+  if (players > 0) {
+    params["players"] = open_spiel::GameParameter(players);
   }
-  params["ansi_color_output"] = open_spiel::GameParameter(ansi_color_output);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame(game_name, params);
 
