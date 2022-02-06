@@ -200,11 +200,12 @@ std::vector<double> dirichlet_noise(int count, double alpha,
   return noise;
 }
 
-MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
+MCTSBot::MCTSBot(const Game &game, std::shared_ptr<Evaluator> evaluator,
                  double uct_c, int max_simulations, int64_t max_memory_mb,
                  bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
-                 double dirichlet_alpha, double dirichlet_epsilon,bool dont_return_chance_node)
+                 double dirichlet_alpha, double dirichlet_epsilon,
+                 bool dont_return_chance_node)
     : uct_c_{uct_c},
       max_simulations_{max_simulations},
       max_nodes_((max_memory_mb << 20) / sizeof(SearchNode) + 1),
@@ -272,7 +273,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
   visit_path->push_back(root);
   std::unique_ptr<State> working_state = state.Clone();
   SearchNode* current_node = root;
-    while ((!working_state->IsTerminal() && current_node->explore_count > 0) || (working_state->IsChanceNode()) and dont_return_chance_node_) {
+  while ((!working_state->IsTerminal() && current_node->explore_count > 0) ||
+  (working_state->IsChanceNode()) and dont_return_chance_node_) {
     if (current_node->children.empty()) {
       // For a new node, initialize its state, then choose a child as normal.
       ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);

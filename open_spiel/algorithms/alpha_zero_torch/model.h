@@ -156,15 +156,15 @@ class ResOutputBlockImpl : public torch::nn::Module {
 TORCH_MODULE(ResOutputBlock);
 
 class MLPOutputBlockImpl : public torch::nn::Module {
-public:
-    MLPOutputBlockImpl(const int nn_width, const int policy_linear_out_features);
-    std::vector<torch::Tensor> forward(torch::Tensor x, torch::Tensor mask);
+ public:
+  MLPOutputBlockImpl(const int nn_width, const int policy_linear_out_features);
+  std::vector<torch::Tensor> forward(torch::Tensor x, torch::Tensor mask);
 
-private:
-    torch::nn::Linear value_linear1_;
-    torch::nn::Linear value_linear2_;
-    torch::nn::Linear policy_linear1_;
-    torch::nn::Linear policy_linear2_;
+ private:
+  torch::nn::Linear value_linear1_;
+  torch::nn::Linear value_linear2_;
+  torch::nn::Linear policy_linear1_;
+  torch::nn::Linear policy_linear2_;
 };
 TORCH_MODULE(MLPOutputBlock);
 
@@ -172,20 +172,20 @@ TORCH_MODULE(MLPOutputBlock);
 // The model class that interacts with the VPNet. The ResInputBlock,
 // ResTorsoBlock, and ResOutputBlock are not to be used by the VPNet directly.
 class ModelImpl : public torch::nn::Module {
-public:
-    ModelImpl(const ModelConfig& config, const std::string& device);
-    std::vector<torch::Tensor> forward(torch::Tensor x, torch::Tensor mask);
-    std::vector<torch::Tensor> losses(torch::Tensor inputs, torch::Tensor masks,
-                                      torch::Tensor policy_targets,
-                                      torch::Tensor value_targets);
+ public:
+  ModelImpl(const ModelConfig &config, const std::string &device);
+  std::vector<torch::Tensor> forward(torch::Tensor x, torch::Tensor mask);
+  std::vector<torch::Tensor> losses(torch::Tensor inputs, torch::Tensor masks,
+                                    torch::Tensor policy_targets,
+                                    torch::Tensor value_targets);
 
-private:
-    std::vector<torch::Tensor> forward_(torch::Tensor x, torch::Tensor mask);
-    torch::nn::ModuleList layers_;
-    torch::Device device_;
-    int num_torso_blocks_;
-    double weight_decay_;
-    std::string nn_model_;
+ private:
+  std::vector<torch::Tensor> forward_(torch::Tensor x, torch::Tensor mask);
+  torch::nn::ModuleList layers_;
+  torch::Device device_;
+  int num_torso_blocks_;
+  double weight_decay_;
+  std::string nn_model_;
 };
 TORCH_MODULE(Model);
 
