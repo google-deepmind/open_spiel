@@ -220,6 +220,11 @@ std::vector<Action> QuoridorState::LegalActions() const {
   AddActions(cur, Offset(-1, 0), &moves);
   AddActions(cur, Offset(0, -1), &moves);
 
+  // If no action is possible add 'pass' action to list of moves
+  if (moves.empty()) {
+    moves.push_back(cur.xy);
+  }
+
   // Wall placements.
   if (wall_count_[current_player_] > 0) {
     SearchState search_state(board_diameter_);
