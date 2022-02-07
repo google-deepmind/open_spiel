@@ -220,10 +220,6 @@ std::vector<Action> QuoridorState::LegalActions() const {
   AddActions(cur, Offset(-1, 0), &moves);
   AddActions(cur, Offset(0, -1), &moves);
 
-  // If no action is possible add 'pass' action to list of moves
-  if (moves.empty()) {
-    moves.push_back(cur.xy);
-  }
 
   // Wall placements.
   if (wall_count_[current_player_] > 0) {
@@ -243,6 +239,11 @@ std::vector<Action> QuoridorState::LegalActions() const {
         }
       }
     }
+  }
+
+  // If no action is possible add 'pass' action to list of moves
+  if (moves.empty()) {
+    moves.push_back(cur.xy);
   }
 
   std::sort(moves.begin(), moves.end());
@@ -578,7 +579,11 @@ void QuoridorState::ObservationTensor(Player player,
 }
 
 void QuoridorState::DoApplyAction(Action action) {
-  SPIEL_CHECK_EQ(board_[action], kPlayerNone);
+  // If players is forced to pass it is valid to stay in place, on a field where there is
+  // already a player
+  if (board_[action] != current_player_) {
+    SPIEL_CHECK_EQ(board_[action], kPlayerNone);
+  }
   SPIEL_CHECK_EQ(outcome_, kPlayerNone);
 
   Move move = ActionToMove(action);
