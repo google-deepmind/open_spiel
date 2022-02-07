@@ -33,14 +33,14 @@ void BasicStonesNGemsTests() {
 
 void BasicStonesNGemsTestsWithParams() {
   constexpr const char kTestDefaultGrid[] =
-      "6,7,20,2\n"
-      "19,19,19,19,19,19\n"
-      "19,01,01,01,01,19\n"
-      "19,02,02,01,01,19\n"
-      "19,01,01,01,01,19\n"
-      "19,00,03,01,02,19\n"
-      "19,05,02,05,01,07\n"
-      "19,19,19,19,19,19";
+      "6|7|20|2\n"
+      "19|19|19|19|19|19\n"
+      "19|01|01|01|01|19\n"
+      "19|02|02|01|01|19\n"
+      "19|01|01|01|01|19\n"
+      "19|00|03|01|02|19\n"
+      "19|05|02|05|01|07\n"
+      "19|19|19|19|19|19";
 
   testing::ChanceOutcomesTest(
       *LoadGame("stones_and_gems",
@@ -53,14 +53,14 @@ void BasicStonesNGemsTestsWithParams() {
 
 void ExtendedStonesNGemsTest() {
   constexpr const char kTestDefaultGrid[] =
-      "6,7,20,2\n"
-      "19,19,19,19,19,19\n"
-      "19,01,01,01,03,19\n"
-      "19,02,02,01,01,19\n"
-      "19,01,01,01,02,19\n"
-      "19,00,03,01,02,19\n"
-      "19,05,02,05,01,07\n"
-      "19,19,19,19,19,19";
+      "6|7|20|2\n"
+      "19|19|19|19|19|19\n"
+      "19|01|01|01|03|19\n"
+      "19|02|02|01|01|19\n"
+      "19|01|01|01|02|19\n"
+      "19|00|03|01|02|19\n"
+      "19|05|02|05|01|07\n"
+      "19|19|19|19|19|19";
 
   constexpr const char kStateToString[] =
       "SSSSSS\n"

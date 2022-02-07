@@ -1312,7 +1312,7 @@ Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
     SpielFatalError("Empty map string passed.");
   }
   // Parse first line which contains level properties
-  std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
+  std::vector<std::string> property_line = absl::StrSplit(lines[0], '|');
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[0], &grid.num_cols));
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[1], &grid.num_rows));
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[2], &max_steps_));
@@ -1321,7 +1321,7 @@ Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
   // Parse grid contents
   for (std::size_t i = 1; i < lines.size(); ++i) {
     // Check for proper number of columns
-    std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
+    std::vector<std::string> grid_line = absl::StrSplit(lines[i], '|');
     if (grid_line.size() != grid.num_cols) {
       SpielFatalError(absl::StrCat(
           "Grid line ", i - 1, " doesn't have correct number of elements.",
