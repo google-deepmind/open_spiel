@@ -350,7 +350,7 @@ class StonesNGemsGame : public Game {
     return std::unique_ptr<State>(new StonesNGemsState(
         shared_from_this(), max_steps_, magic_wall_steps_, false,
         blob_max_size_, 0, blob_chance_, kNullElement, true, gems_required_, 0,
-        0, 0, grid_, obs_show_ids_, 0, 0));
+        0, 0, grid_, obs_show_ids_, (int)grid_.ids.size(), 0));
   }
   int MaxGameLength() const override;
   int NumPlayers() const override;
