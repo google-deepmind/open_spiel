@@ -184,6 +184,10 @@ class UniformRandomBotFactory : public BotFactory {
     if (IsParameterSpecified(bot_params, "seed")) {
       const GameParameter& seed_param = bot_params.at("seed");
       seed = seed_param.int_value();
+    } else {
+      absl::BitGen gen;
+      seed = absl::Uniform<int>(gen, std::numeric_limits<int>::min(),
+                                std::numeric_limits<int>::max());
     }
     return MakeUniformRandomBot(player_id, seed);
   }
