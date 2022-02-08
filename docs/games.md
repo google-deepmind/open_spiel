@@ -41,11 +41,12 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean-field-game--garnet)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean-field-game--crowd-modelling)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean-field-game--crowd-modelling-2d)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean-field-game--predator-prey)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean_field_game_garnet)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean_field_game_crowd_modelling)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean_field_game_crowd_modelling_2d)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : linear quadratic](#mean_field_game_linear_quadratic)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean_field_game_predator_prey)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean_field_game_routing)
 <font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
@@ -433,6 +434,21 @@ Status                                       | Game
 *   Perfect information.
 *   [Cabannes et. al. '21, Solving N-player dynamic routing games with
     congestion: a mean field approach](https://arxiv.org/pdf/2110.11943.pdf).
+
+### Mean Field Game : Linear-Quadratic
+
+*   Players are uniformly distributed and are then incentivized to gather at the
+    same point (The lower the distanbce wrt. the distribution mean position, the
+    higher the reward). A mean-reverting term pushes the players towards the
+    distribution, a gaussian noise term perturbs them. The players' actions
+    alter their states linearly (alpha * a * dt) and the cost thereof is
+    quadratic (K * a^2 * dt), hence the name. There exists an exact, closed form
+    solution for the fully continuous version of this game.
+*   Research game.
+*   Mean-field (with a unique player).
+*   Explicit stochastic game (only for initial node).
+*   Perfect information.
+*   [Perrin & al. 2019 (https://arxiv.org/abs/2007.03458)]
 
 ### Morpion Solitaire (4D)
 

@@ -1069,7 +1069,7 @@ def add_new_policies(
       for policy_id, policy_ in enumerate(per_player_policies[player]):
         if np.all(  # New policy is not novel.
             new_policy.action_probability_array ==
-            policy_.action_probability_array):
+            policy_.action_probability_array):  # pytype: disable=attribute-error  # py39-upgrade
           logging.debug("Player %d's new policy is not novel.", player)
           repeat_policies.append(new_policy)
           repeat_gaps.append(new_gap)

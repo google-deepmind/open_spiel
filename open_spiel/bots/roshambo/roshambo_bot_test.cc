@@ -55,8 +55,6 @@ void RoshamboBotHistoryTest() {
   for (int i = 0; i < roshambo::kNumThrows; ++i) {
     for (Player p = 0; p < num_players; ++p)
       joint_actions[p] = bots[p]->Step(*state);
-    for (Player p = 0; p < num_players; ++p)
-      bots[p]->InformActions(*state, joint_actions);
     state->ApplyActions(joint_actions);
     if (i == 0) {
       // Copybot wins the first round.
@@ -96,8 +94,6 @@ void RoshamboBotBasicPlayGame() {
     while (!state->IsTerminal()) {
       for (Player p = 0; p < num_players; ++p)
         joint_actions[p] = bots[p]->Step(*state);
-      for (Player p = 0; p < num_players; ++p)
-        bots[p]->InformActions(*state, joint_actions);
       state->ApplyActions(joint_actions);
     }
   }

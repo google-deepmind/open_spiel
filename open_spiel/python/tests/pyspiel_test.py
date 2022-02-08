@@ -75,6 +75,7 @@ EXPECTED_GAMES = frozenset([
     "matrix_rpsw",
     "matrix_sh",
     "matrix_shapleys_game",
+    "mean_field_lin_quad",
     "mfg_crowd_modelling",
     "mfg_crowd_modelling_2d",
     "mfg_garnet",
@@ -234,6 +235,33 @@ class PyspielTest(absltest.TestCase):
                     "z": False
                 }
             })
+
+  def test_game_parameters_to_string_empty(self):
+    self.assertEqual(pyspiel.game_parameters_to_string({}), "")
+
+  def test_game_parameters_to_string_simple(self):
+    self.assertEqual(pyspiel.game_parameters_to_string({"name": "foo"}),
+                     "foo()")
+
+  def test_game_parameters_to_string_with_options(self):
+    self.assertEqual(
+        pyspiel.game_parameters_to_string({
+            "name": "foo",
+            "x": 2,
+            "y": True
+        }), "foo(x=2,y=True)")
+
+  def test_game_parameters_to_string_with_subgame(self):
+    self.assertEqual(
+        pyspiel.game_parameters_to_string({
+            "name": "foo",
+            "x": 2,
+            "y": True,
+            "subgame": {
+                "name": "bar",
+                "z": False
+            }
+        }), "foo(subgame=bar(z=False),x=2,y=True)")
 
   def test_game_type(self):
     game_type = pyspiel.GameType(
