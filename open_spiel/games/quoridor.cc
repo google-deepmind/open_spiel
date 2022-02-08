@@ -460,7 +460,6 @@ std::string QuoridorState::ToString() const {
     colors[1] = esc + "[1;34m" + " @ " + reset;
     colors[2] = esc + "[1;35m" + " # " + reset;
     colors[3] = esc + "[1;36m" + " % " + reset;
-    std::cout << "colors : " << colors << std::endl;
   }
   else {
     std::string reset = "";
@@ -540,7 +539,7 @@ std::vector<double> QuoridorState::Returns() const {
   for (int i = 0; i < num_players_; ++i) {
     if (outcome_ == players_[i]) {
       for (int j = 0; j < num_players_; ++j) {
-        res[j] = -1.0;
+        res[j] = -1.0/(num_players_ - 1);
       }
       res[i] = 1.0;
     }
@@ -566,7 +565,7 @@ void QuoridorState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   TensorView<2> view(
-      values, {kCellStates + kNumPlayers, static_cast<int>(board_.size())},
+      values, {kCellStates + num_players_, static_cast<int>(board_.size())},
       true);
 
   for (int i = 0; i < board_.size(); ++i) {

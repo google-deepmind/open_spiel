@@ -33,14 +33,14 @@
 namespace open_spiel {
 namespace quoridor {
 
-inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultNumPlayers = 2;
 inline constexpr int kMinNumPlayers = 2;
 inline constexpr int kMaxNumPlayers = 4;
 inline constexpr int kDefaultBoardSize = 9;
 inline constexpr int kMinBoardSize = 3;
 inline constexpr int kMaxBoardSize = 25;
 inline constexpr int kMaxGameLengthFactor = 4;
-inline constexpr int kCellStates = 1 + kNumPlayers;
+inline constexpr int kCellStates = 1 + kDefaultNumPlayers;
 
 enum QuoridorPlayer : uint8_t {
   kPlayer1,
@@ -172,7 +172,7 @@ class QuoridorGame : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates + kNumPlayers, Diameter(), Diameter()};
+    return {kCellStates + num_players_, Diameter(), Diameter()};
   }
   int MaxGameLength() const override {
     // There's no anti-repetition rule, so this could be infinite, but no sane
