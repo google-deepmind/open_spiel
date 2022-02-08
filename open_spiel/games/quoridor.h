@@ -40,7 +40,6 @@ inline constexpr int kDefaultBoardSize = 9;
 inline constexpr int kMinBoardSize = 3;
 inline constexpr int kMaxBoardSize = 25;
 inline constexpr int kMaxGameLengthFactor = 4;
-inline constexpr int kCellStates = 1 + kDefaultNumPlayers;
 
 enum QuoridorPlayer : uint8_t {
   kPlayer1,
@@ -110,6 +109,7 @@ class QuoridorState : public State {
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
+  int NumCellStates() const { return num_players_ + 1; }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -168,11 +168,12 @@ class QuoridorGame : public Game {
         shared_from_this(), board_size_, wall_count_, ansi_color_output_));
   }
   int NumPlayers() const override { return num_players_; }
+  int NumCellStates() const { return num_players_ + 1; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates + num_players_, Diameter(), Diameter()};
+    return {NumCellStates() + num_players_, Diameter(), Diameter()};
   }
   int MaxGameLength() const override {
     // There's no anti-repetition rule, so this could be infinite, but no sane

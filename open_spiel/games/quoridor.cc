@@ -565,15 +565,16 @@ void QuoridorState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   TensorView<2> view(
-      values, {kCellStates + num_players_, static_cast<int>(board_.size())},
+      values, {NumCellStates() + num_players_, static_cast<int>(board_.size())},
       true);
 
   for (int i = 0; i < board_.size(); ++i) {
-    if (board_[i] < kCellStates) {
+    if (board_[i] < NumCellStates() ) {
       view[{static_cast<int>(board_[i]), i}] = 1.0;
     }
-    view[{kCellStates + kPlayer1, i}] = wall_count_[kPlayer1];
-    view[{kCellStates + kPlayer2, i}] = wall_count_[kPlayer2];
+    for (int j = 0; j < num_players_; ++j) {
+      view[{NumCellStates() + players_[j], i}] = wall_count_[players_[j]];
+    }
   }
 }
 
