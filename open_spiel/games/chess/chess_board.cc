@@ -229,6 +229,9 @@ std::string Move::ToSAN(const ChessBoard &board) const {
     bool disambiguation_required = false;
 
     board.GenerateLegalMoves([&](const Move &move) -> bool {
+      if (move.piece.type != piece.type) {
+        return true;  // Continue generating moves.
+      }
       if (move.to != to) {
         return true;
       }

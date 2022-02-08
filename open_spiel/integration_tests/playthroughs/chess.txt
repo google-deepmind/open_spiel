@@ -81,9 +81,9 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [89, 90, 652, 656, 673, 674, 1257, 1258, 1841, 1842, 2425, 2426, 3009, 3010, 3572, 3576, 3593, 3594, 4177, 4178]
-StringLegalActions() = ["aa3", "a4", "Nba3", "Nbc3", "b3", "b4", "cc3", "c4", "d3", "d4", "e3", "e4", "ff3", "f4", "Ngf3", "Ngh3", "g3", "g4", "hh3", "h4"]
+StringLegalActions() = ["a3", "a4", "Na3", "Nc3", "b3", "b4", "c3", "c4", "d3", "d4", "e3", "e4", "f3", "f4", "Nf3", "Nh3", "g3", "g4", "h3", "h4"]
 
-# Apply action "Ngh3"
+# Apply action "Nh3"
 action: 3576
 
 # State 1
@@ -103,9 +103,9 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [89, 90, 652, 656, 673, 674, 1257, 1258, 1841, 1842, 2425, 2426, 3009, 3010, 3572, 3576, 3593, 3594, 4177, 4178]
-StringLegalActions() = ["aa6", "a5", "Nba6", "Nbc6", "b6", "b5", "cc6", "c5", "d6", "d5", "e6", "e5", "ff6", "f5", "Ngf6", "Ngh6", "g6", "g5", "hh6", "h5"]
+StringLegalActions() = ["a6", "a5", "Na6", "Nc6", "b6", "b5", "c6", "c5", "d6", "d5", "e6", "e5", "f6", "f5", "Nf6", "Nh6", "g6", "g5", "h6", "h5"]
 
-# Apply action "ff6"
+# Apply action "f6"
 action: 3009
 
 # State 2
@@ -159,9 +159,9 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [89, 90, 652, 656, 673, 674, 1257, 1258, 1841, 1842, 2425, 2426, 3009, 3010, 3593, 3594, 4117, 4300, 4301, 4302]
-StringLegalActions() = ["aa3", "a4", "Nba3", "Nbc3", "b3", "b4", "cc3", "c4", "d3", "d4", "e3", "e4", "f3", "ff4", "g3", "g4", "R1g1", "Nhf4", "N3g1", "Ng5"]
+StringLegalActions() = ["a3", "a4", "Na3", "Nc3", "b3", "b4", "c3", "c4", "d3", "d4", "e3", "e4", "f3", "f4", "g3", "g4", "Rg1", "Nf4", "Ng1", "Ng5"]
 
-# Apply action "ff4"
+# Apply action "f4"
 action: 3010
 
 # State 3
@@ -215,7 +215,7 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [89, 90, 652, 656, 673, 674, 1257, 1258, 1841, 1842, 2380, 2425, 2426, 3082, 3576, 3593, 3594, 4177, 4178]
-StringLegalActions() = ["aa6", "a5", "Nba6", "Nbc6", "b6", "b5", "cc6", "c5", "d6", "d5", "Kf7", "e6", "e5", "f5", "Ngh6", "g6", "g5", "hh6", "h5"]
+StringLegalActions() = ["a6", "a5", "Na6", "Nc6", "b6", "b5", "c6", "c5", "d6", "d5", "Kf7", "e6", "e5", "f5", "Nh6", "g6", "g5", "h6", "h5"]
 
 # Apply action "Kf7"
 action: 2380
@@ -237,7 +237,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [89, 90, 652, 656, 673, 674, 1257, 1258, 1841, 1842, 2380, 2425, 2426, 3155, 3593, 3594, 4117, 4299, 4301, 4302]
-StringLegalActions() = ["aa3", "a4", "Nba3", "Nbc3", "b3", "b4", "cc3", "c4", "d3", "d4", "Kef2", "e3", "e4", "f5", "g3", "g4", "R1g1", "Nhf2", "N3g1", "Ng5+"]
+StringLegalActions() = ["a3", "a4", "Na3", "Nc3", "b3", "b4", "c3", "c4", "d3", "d4", "Kf2", "e3", "e4", "f5", "g3", "g4", "Rg1", "Nf2", "Ng1", "Ng5+"]
 
 # Apply action "b3"
 action: 673
@@ -293,9 +293,9 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [89, 90, 652, 656, 673, 674, 1257, 1258, 1782, 1841, 1842, 2425, 2426, 3036, 3037, 3050, 3082, 3576, 3593, 3594, 4177, 4178]
-StringLegalActions() = ["aa6", "a5", "Nba6", "Nbc6", "b6", "b5", "cc6", "c5", "Qde8", "d6", "d5", "ee6", "e5", "Kfe8", "Kfg6", "Kfe6", "f5", "Ngh6", "gg6", "g5", "hh6", "h5"]
+StringLegalActions() = ["a6", "a5", "Na6", "Nc6", "b6", "b5", "c6", "c5", "Qe8", "d6", "d5", "e6", "e5", "Ke8", "Kg6", "Ke6", "f5", "Nh6", "g6", "g5", "h6", "h5"]
 
-# Apply action "Kfe6"
+# Apply action "Ke6"
 action: 3050
 
 # State 6
@@ -303,7 +303,7 @@ action: 3050
 action: 1225
 
 # State 7
-# Apply action "dd5"
+# Apply action "d5"
 action: 1842
 
 # State 8
@@ -319,7 +319,7 @@ action: 1987
 action: 90
 
 # State 11
-# Apply action "Ngh6"
+# Apply action "Nh6"
 action: 3576
 
 # State 12
@@ -327,7 +327,7 @@ action: 3576
 action: 2964
 
 # State 13
-# Apply action "aa6"
+# Apply action "a6"
 action: 89
 
 # State 14
@@ -335,15 +335,15 @@ action: 89
 action: 2425
 
 # State 15
-# Apply action "R8g8"
+# Apply action "Rg8"
 action: 4117
 
 # State 16
-# Apply action "Kee2"
+# Apply action "Ke2"
 action: 2352
 
 # State 17
-# Apply action "Bcd7"
+# Apply action "Bd7"
 action: 1212
 
 # State 18
@@ -405,9 +405,9 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [16, 17, 235, 652, 656, 701, 702, 714, 715, 746, 1257, 1258, 1781, 1782, 1783, 1784, 1841, 2424, 2439, 2453, 2466, 2467, 2498, 2539, 3155, 3183, 3620, 3621, 3630, 3631, 3632, 3633, 3634, 3666, 4115, 4116, 4117, 4177, 4178]
-StringLegalActions() = ["Ra2", "Raa3", "a5", "Nb1a3", "N1c3", "Bb2c3", "Bbxd4", "B2a3", "Bbc1", "b4", "cc3", "c4", "Qdc1", "Qde1", "Qdf1", "Qdg1", "dd3", "Kee1", "Kf2", "Kef3", "Ked3", "Kef1", "ee4", "exd4", "f5+", "fxg5", "Bgf1", "Bgh3+", "Bxb7", "Bc6", "Bd5+", "Bge4", "Bgf3", "g4", "Rhe1", "Rhf1", "Rhg1", "hh3", "h4"]
+StringLegalActions() = ["Ra2", "Ra3", "a5", "Na3", "Nc3", "Bc3", "Bxd4", "Ba3", "Bc1", "b4", "c3", "c4", "Qc1", "Qe1", "Qf1", "Qg1", "d3", "Ke1", "Kf2", "Kf3", "Kd3", "Kf1", "e4", "exd4", "f5+", "fxg5", "Bf1", "Bh3+", "Bxb7", "Bc6", "Bd5+", "Be4", "Bf3", "g4", "Re1", "Rf1", "Rg1", "h3", "h4"]
 
-# Apply action "dd3"
+# Apply action "d3"
 action: 1841
 
 # State 21
@@ -461,17 +461,17 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [16, 162, 656, 673, 674, 1257, 1258, 1781, 1782, 1868, 1880, 1881, 1882, 1883, 2088, 2511, 2512, 2526, 2540, 3534, 3593, 3739, 3780, 4299, 4300, 4302]
-StringLegalActions() = ["Ra7", "a5", "Nbc6", "b6", "bb5", "cc6", "c5", "Q8c8", "Q8e8", "B7c8", "Bxa4", "Bdb5", "Bdc6", "B7e8", "dxe3", "Kd6", "Kf6", "Kef5", "Kef7", "Rh8", "g6", "gg4", "gxf4", "Nhf7", "Nhf5", "Nhg4"]
+StringLegalActions() = ["Ra7", "a5", "Nc6", "b6", "b5", "c6", "c5", "Qc8", "Qe8", "Bc8", "Bxa4", "Bb5", "Bc6", "Be8", "dxe3", "Kd6", "Kf6", "Kf5", "Kf7", "Rh8", "g6", "g4", "gxf4", "Nf7", "Nf5", "Ng4"]
 
-# Apply action "cc6"
+# Apply action "c6"
 action: 1257
 
 # State 22
-# Apply action "B2a3"
+# Apply action "Ba3"
 action: 714
 
 # State 23
-# Apply action "bb6"
+# Apply action "b6"
 action: 673
 
 # State 24
@@ -483,23 +483,23 @@ action: 193
 action: 3593
 
 # State 26
-# Apply action "Rhf1"
+# Apply action "Rf1"
 action: 4116
 
 # State 27
-# Apply action "Bfg7"
+# Apply action "Bg7"
 action: 2964
 
 # State 28
-# Apply action "Bexg5"
+# Apply action "Bxg5"
 action: 2833
 
 # State 29
-# Apply action "Nhf5"
+# Apply action "Nf5"
 action: 4300
 
 # State 30
-# Apply action "cc3"
+# Apply action "c3"
 action: 1257
 
 # State 31
@@ -507,11 +507,11 @@ action: 1257
 action: 3209
 
 # State 32
-# Apply action "Nbd2"
+# Apply action "Nd2"
 action: 654
 
 # State 33
-# Apply action "B7h8"
+# Apply action "Bh8"
 action: 3635
 
 # State 34
@@ -523,7 +523,7 @@ action: 3851
 action: 3533
 
 # State 36
-# Apply action "Ndf3"
+# Apply action "Nf3"
 action: 1895
 
 # State 37
@@ -531,11 +531,11 @@ action: 1895
 action: 162
 
 # State 38
-# Apply action "Bgh3+"
+# Apply action "Bh3+"
 action: 3621
 
 # State 39
-# Apply action "Nhf5"
+# Apply action "Nf5"
 action: 4445
 
 # State 40
@@ -555,7 +555,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [16, 17, 30, 31, 746, 1330, 1358, 1768, 1780, 1781, 1782, 1809, 2305, 2306, 2321, 2322, 2323, 2324, 2424, 2438, 2439, 2498, 2539, 2936, 2949, 2950, 2951, 3131, 3132, 3133, 3134, 3136, 3137, 3138, 3666, 4277, 4290, 4291]
-StringLegalActions() = ["Ra2", "Ra3", "Rab1", "Rac1", "b4", "c4", "cxd4", "Qdd2", "Qdb1", "Qdc1", "Qde1", "Qc2", "Bxb6", "Bc7", "Be7", "Bf6", "Bdg5", "Bdh4", "Kee1", "Ked2", "Kef2", "e4", "exd4", "Rff2", "Rf1e1", "R1g1", "Rh1", "Nfd2", "Nfxd4+", "N3e1", "Ne5", "Nfh4", "N3g1", "Nfg5+", "gg4", "Bg2", "Bxf5+", "Bhg4"]
+StringLegalActions() = ["Ra2", "Ra3", "Rb1", "Rc1", "b4", "c4", "cxd4", "Qd2", "Qb1", "Qc1", "Qe1", "Qc2", "Bxb6", "Bc7", "Be7", "Bf6", "Bg5", "Bh4", "Ke1", "Kd2", "Kf2", "e4", "exd4", "Rf2", "Re1", "Rg1", "Rh1", "Nd2", "Nxd4+", "Ne1", "Ne5", "Nh4", "Ng1", "Ng5+", "g4", "Bg2", "Bxf5+", "Bg4"]
 
 # Apply action "Bf6"
 action: 2322
@@ -577,25 +577,25 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [16, 17, 652, 746, 1330, 1868, 1883, 2088, 2101, 2511, 2512, 2539, 2540, 2936, 2937, 2947, 2948, 2949, 2950, 3666, 4144, 4145, 4177, 4178]
-StringLegalActions() = ["Ra7", "Raa6", "Nba6", "b5", "c5", "Bdc8", "Bde8", "dxe3", "dxc3", "Kd6", "Kexf6", "Kd5", "Kef7", "Rff7", "Rfxf6", "Rfc8", "Rd8", "Rfe8", "Rg8", "g5", "Bhxf6", "Bg7", "h6", "h5"]
+StringLegalActions() = ["Ra7", "Ra6", "Na6", "b5", "c5", "Bc8", "Be8", "dxe3", "dxc3", "Kd6", "Kxf6", "Kd5", "Kf7", "Rf7", "Rxf6", "Rc8", "Rd8", "Re8", "Rg8", "g5", "Bxf6", "Bg7", "h6", "h5"]
 
 # Apply action "Kd5"
 action: 2539
 
 # State 42
-# Apply action "N3g1"
+# Apply action "Ng1"
 action: 3137
 
 # State 43
-# Apply action "Nfh6"
+# Apply action "Nh6"
 action: 3208
 
 # State 44
-# Apply action "Kef2"
+# Apply action "Kf2"
 action: 2439
 
 # State 45
-# Apply action "Kdc5"
+# Apply action "Kc5"
 action: 2000
 
 # State 46
@@ -603,7 +603,7 @@ action: 2000
 action: 17
 
 # State 47
-# Apply action "Bde8"
+# Apply action "Be8"
 action: 1883
 
 # State 48
@@ -615,7 +615,7 @@ action: 1799
 action: 3694
 
 # State 50
-# Apply action "Nge2"
+# Apply action "Ne2"
 action: 3570
 
 # State 51
@@ -623,11 +623,11 @@ action: 3570
 action: 1445
 
 # State 52
-# Apply action "ff5"
+# Apply action "f5"
 action: 3155
 
 # State 53
-# Apply action "Bhxf6"
+# Apply action "Bxf6"
 action: 4144
 
 # State 54
@@ -635,7 +635,7 @@ action: 4144
 action: 2951
 
 # State 55
-# Apply action "Bed7"
+# Apply action "Bd7"
 action: 2393
 
 # State 56
@@ -647,11 +647,11 @@ action: 2481
 action: 3124
 
 # State 58
-# Apply action "Rhg1"
+# Apply action "Rg1"
 action: 4117
 
 # State 59
-# Apply action "Nhg8"
+# Apply action "Ng8"
 action: 4301
 
 # State 60
@@ -671,7 +671,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [160, 161, 746, 1330, 1358, 2498, 2539, 3008, 3009, 3022, 3023, 3036, 3205, 3206, 3207, 3209, 3210, 3211, 3228, 3520, 3528, 3529, 3530, 3531, 3532, 3533, 3534, 3666, 4276, 4277, 4291]
-StringLegalActions() = ["Raa1", "Ra2", "b4", "c4", "cxd4", "e4", "exd4", "Kff1", "Kf3", "K2e2", "K2g2", "Kfe1", "Nd5", "N4e2", "Ne6", "Nxh5", "N4g2", "Ng6", "f6", "Rgg2", "Rga1", "Rb1", "Rc1", "Rd1", "Rge1", "Rgf1", "Rh1", "gg4", "Bhf1", "Bhg2", "Bhg4"]
+StringLegalActions() = ["Raa1", "Ra2", "b4", "c4", "cxd4", "e4", "exd4", "Kf1", "Kf3", "Ke2", "Kg2", "Ke1", "Nd5", "Ne2", "Ne6", "Nxh5", "Ng2", "Ng6", "f6", "Rg2", "Rga1", "Rb1", "Rc1", "Rd1", "Re1", "Rf1", "Rh1", "g4", "Bf1", "Bg2", "Bg4"]
 
 # Apply action "Rd1"
 action: 3531
@@ -693,13 +693,13 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [16, 17, 652, 746, 1330, 1868, 1869, 1870, 1883, 1941, 1942, 1955, 1956, 2088, 2101, 2936, 2937, 2938, 2947, 2948, 2949, 3570, 3572, 3576, 3621, 3633, 3634, 3635, 4177, 4323]
-StringLegalActions() = ["Ra7", "Raa6", "Nba6", "b5", "cc5", "Bdc8", "Be6", "Bdxf5", "Bde8", "Kc7", "Kde5", "Kdc5", "Kde7", "dxe3+", "dxc3", "Rf7", "Rff6", "Rfxf5", "Rfc8", "Rd8", "Rfe8", "Nge7", "Ng8f6", "N8h6", "Bg7h6", "Bge5", "B7f6", "Bh8", "hh6", "h4"]
+StringLegalActions() = ["Ra7", "Ra6", "Na6", "b5", "c5", "Bc8", "Be6", "Bxf5", "Be8", "Kc7", "Ke5", "Kc5", "Ke7", "dxe3+", "dxc3", "Rf7", "Rf6", "Rxf5", "Rc8", "Rd8", "Re8", "Ne7", "Nf6", "Nh6", "Bh6", "Be5", "Bf6", "Bh8", "h6", "h4"]
 
 # Apply action "Be6"
 action: 1869
 
 # State 62
-# Apply action "Bhf1"
+# Apply action "Bf1"
 action: 4276
 
 # State 63
@@ -711,7 +711,7 @@ action: 4323
 action: 746
 
 # State 65
-# Apply action "Bec8"
+# Apply action "Bc8"
 action: 2524
 
 # State 66
@@ -723,7 +723,7 @@ action: 161
 action: 2936
 
 # State 68
-# Apply action "Rde1"
+# Apply action "Re1"
 action: 1782
 
 # State 69
@@ -731,15 +731,15 @@ action: 1782
 action: 16
 
 # State 70
-# Apply action "Bf1e2"
+# Apply action "Be2"
 action: 2977
 
 # State 71
-# Apply action "Rff8"
+# Apply action "Rf8"
 action: 3008
 
 # State 72
-# Apply action "Kff3"
+# Apply action "Kf3"
 action: 3009
 
 # State 73
@@ -747,7 +747,7 @@ action: 3009
 action: 4178
 
 # State 74
-# Apply action "B2f1"
+# Apply action "Bf1"
 action: 2467
 
 # State 75
@@ -755,11 +755,11 @@ action: 2467
 action: 2101
 
 # State 76
-# Apply action "N4e2"
+# Apply action "Ne2"
 action: 3206
 
 # State 77
-# Apply action "Nge7"
+# Apply action "Ne7"
 action: 3570
 
 # State 78
@@ -767,7 +767,7 @@ action: 3570
 action: 2365
 
 # State 79
-# Apply action "Nbd7"
+# Apply action "Nd7"
 action: 654
 
 # State 80
@@ -787,7 +787,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [88, 89, 103, 104, 105, 819, 860, 1768, 1779, 1780, 1781, 1782, 1914, 2474, 2475, 2477, 2478, 2481, 2498, 2964, 2965, 3081, 3082, 3123, 3124, 3228, 3666, 3694, 4177]
-StringLegalActions() = ["Raa1", "Ra3", "Rb2", "Rc2", "Rad2", "b5", "bxa5", "Rdd2", "Rda1", "Rb1", "Rdc1", "Re1", "dd4", "Nec1", "Nxc3", "Ned4", "Ng1", "Nef4", "ee4", "B1g2", "Bfh3", "Kf2", "Kff4", "Kfe4", "K3g2", "f6", "g4", "gxh4", "hh3"]
+StringLegalActions() = ["Raa1", "Ra3", "Rb2", "Rc2", "Rad2", "b5", "bxa5", "Rdd2", "Rda1", "Rb1", "Rc1", "Re1", "d4", "Nc1", "Nxc3", "Nd4", "Ng1", "Nf4", "e4", "Bg2", "Bh3", "Kf2", "Kf4", "Ke4", "Kg2", "f6", "g4", "gxh4", "h3"]
 
 # Apply action "Re1"
 action: 1782
@@ -809,9 +809,9 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [88, 89, 103, 104, 263, 746, 1224, 1225, 1330, 1549, 1890, 1893, 1895, 1897, 1914, 1941, 1942, 2477, 2478, 2479, 2481, 2936, 2937, 2938, 2948, 2949, 2950, 2951, 3621, 3632, 3633, 3634, 3635, 4396, 4437]
-StringLegalActions() = ["Ra8", "Raa6", "Rab7", "Rac7", "axb4", "b5", "Bca6", "Bcb7", "cc5", "c2", "Nb8", "Ndc5", "Ndf6", "Nd7e5+", "Kdd5", "Kdc7", "K6e5", "Ned5", "Neg8", "Ng6", "Nexf5", "Rf7", "Rff6", "Rfxf5+", "Rd8", "Re8", "Rfg8", "Rfh8", "Bh6", "Bd4", "Bge5", "Bgf6", "Bgh8", "h3", "hxg3"]
+StringLegalActions() = ["Ra8", "Ra6", "Rb7", "Rc7", "axb4", "b5", "Ba6", "Bb7", "c5", "c2", "Nb8", "Nc5", "Nf6", "Ne5+", "Kd5", "Kc7", "Ke5", "Nd5", "Ng8", "Ng6", "Nxf5", "Rf7", "Rf6", "Rxf5+", "Rd8", "Re8", "Rg8", "Rh8", "Bh6", "Bd4", "Be5", "Bf6", "Bh8", "h3", "hxg3"]
 
-# Apply action "Rab7"
+# Apply action "Rb7"
 action: 103
 
 # State 82
@@ -831,7 +831,7 @@ action: 2363
 action: 1549
 
 # State 86
-# Apply action "Ned4"
+# Apply action "Nd4"
 action: 2477
 
 # State 87
@@ -839,11 +839,11 @@ action: 2477
 action: 263
 
 # State 88
-# Apply action "K2e2"
+# Apply action "Ke2"
 action: 3022
 
 # State 89
-# Apply action "Nexf5"
+# Apply action "Nxf5"
 action: 2481
 
 # State 90
@@ -859,7 +859,7 @@ action: 3211
 action: 2040
 
 # State 93
-# Apply action "Bgh8"
+# Apply action "Bh8"
 action: 3635
 
 # State 94
@@ -875,7 +875,7 @@ action: 1928
 action: 2965
 
 # State 97
-# Apply action "Ngf5"
+# Apply action "Nf5"
 action: 3936
 
 # State 98
@@ -883,7 +883,7 @@ action: 3936
 action: 3134
 
 # State 99
-# Apply action "Ndb8"
+# Apply action "Nb8"
 action: 1890
 
 # State 100
@@ -903,7 +903,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [88, 89, 235, 672, 673, 674, 687, 1914, 2498, 2693, 2694, 2696, 2697, 2698, 2699, 2700, 3008, 3009, 3022, 3023, 3036, 3051, 4276, 4277, 4290, 4291]
-StringLegalActions() = ["Ra1", "Ra3", "a5", "Rb1", "Rb3", "Rxb4", "Rxc2", "d4", "e4", "Nc4", "Nxc6", "Nd7", "Neg4", "Ng6", "Nef3", "Nf7", "Kff1", "Kff3", "Ke2", "Kfg2", "Ke1", "Kg1", "Bhf1", "Bhg2", "Bxf5+", "Bhg4"]
+StringLegalActions() = ["Ra1", "Ra3", "a5", "Rb1", "Rb3", "Rxb4", "Rxc2", "d4", "e4", "Nc4", "Nxc6", "Nd7", "Ng4", "Ng6", "Nf3", "Nf7", "Kf1", "Kf3", "Ke2", "Kg2", "Ke1", "Kg1", "Bf1", "Bg2", "Bxf5+", "Bg4"]
 
 # Apply action "e4"
 action: 2498
@@ -959,13 +959,13 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [652, 654, 686, 687, 688, 689, 690, 691, 692, 746, 892, 1212, 1330, 1606, 1609, 1612, 1622, 2497, 2498, 2511, 2512, 2936, 2937, 2948, 2949, 2950, 4143, 4144, 4145, 4323]
-StringLegalActions() = ["Na6", "Nb8d7", "Ra7", "Rc7", "R7d7", "Rbe7", "Rbf7", "Rbg7", "Rh7", "b5", "b3", "Bcd7", "c5", "c1=R", "c1=B", "c1=N", "c1=Q", "Kee7", "Kexe5", "Kd6", "Kef6", "Rff7", "Rff6", "Rd8", "Re8", "Rg8", "Bhxe5", "Bhf6", "Bhg7", "h4"]
+StringLegalActions() = ["Na6", "Nd7", "Ra7", "Rc7", "Rd7", "Re7", "Rbf7", "Rg7", "Rh7", "b5", "b3", "Bd7", "c5", "c1=R", "c1=B", "c1=N", "c1=Q", "Ke7", "Kxe5", "Kd6", "Kf6", "Rff7", "Rf6", "Rd8", "Re8", "Rg8", "Bxe5", "Bf6", "Bg7", "h4"]
 
-# Apply action "Bhf6"
+# Apply action "Bf6"
 action: 4144
 
 # State 102
-# Apply action "Kff3"
+# Apply action "Kf3"
 action: 3009
 
 # State 103
@@ -973,19 +973,19 @@ action: 3009
 action: 3110
 
 # State 104
-# Apply action "Neg4"
+# Apply action "Ng4"
 action: 2697
 
 # State 105
-# Apply action "Ked6"
+# Apply action "Kd6"
 action: 2511
 
 # State 106
-# Apply action "Kff2"
+# Apply action "Kf2"
 action: 3081
 
 # State 107
-# Apply action "Rbe7"
+# Apply action "Re7"
 action: 689
 
 # State 108
@@ -993,7 +993,7 @@ action: 689
 action: 3022
 
 # State 109
-# Apply action "Bgh4"
+# Apply action "Bh4"
 action: 3767
 
 # State 110
@@ -1001,15 +1001,15 @@ action: 3767
 action: 687
 
 # State 111
-# Apply action "Bhg3"
+# Apply action "Bg3"
 action: 4437
 
 # State 112
-# Apply action "Rcd2"
+# Apply action "Rd2"
 action: 1271
 
 # State 113
-# Apply action "Red7"
+# Apply action "Rd7"
 action: 2438
 
 # State 114
@@ -1017,7 +1017,7 @@ action: 2438
 action: 235
 
 # State 115
-# Apply action "cc5"
+# Apply action "c5"
 action: 1330
 
 # State 116
@@ -1025,7 +1025,7 @@ action: 1330
 action: 90
 
 # State 117
-# Apply action "Rdb7"
+# Apply action "Rb7"
 action: 1853
 
 # State 118
@@ -1033,7 +1033,7 @@ action: 1853
 action: 234
 
 # State 119
-# Apply action "Nb8d7"
+# Apply action "Nd7"
 action: 654
 
 # State 120
@@ -1053,7 +1053,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [160, 161, 162, 176, 177, 308, 336, 1840, 1852, 1853, 1854, 1914, 2452, 2453, 2467, 2571, 2599, 3788, 3789, 3790, 3791, 3795, 4218, 4276, 4277]
-StringLegalActions() = ["Ra1", "Raa2", "Ra4", "Rb3", "Rc3", "a6", "axb6", "Rdd1", "Rda2", "Rb2", "Rc2", "d4", "Ked1", "Kf3", "Kef1", "ee5+", "exf5", "Ne3", "Nge5", "Nf2", "Nf6", "Nh6", "hxg3", "Bhf1", "Bg2"]
+StringLegalActions() = ["Ra1", "Raa2", "Ra4", "Rb3", "Rc3", "a6", "axb6", "Rd1", "Rda2", "Rb2", "Rc2", "d4", "Kd1", "Kf3", "Kf1", "e5+", "exf5", "Ne3", "Ne5", "Nf2", "Nf6", "Nh6", "hxg3", "Bf1", "Bg2"]
 
 # Apply action "Rb2"
 action: 1853
@@ -1075,9 +1075,9 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [672, 686, 687, 746, 787, 892, 933, 1403, 1890, 1895, 1897, 1927, 1928, 1941, 1956, 2936, 2937, 2948, 2949, 2950, 2951, 3205, 3206, 3207, 3208, 3209, 3210, 3911, 3912, 3913, 3925, 3926, 3927, 4323, 4364]
-StringLegalActions() = ["Rbb8", "Ra7", "Rbc7", "b5", "bxa5", "b3", "bxa3", "c4", "Ndb8", "Ndf6", "Nde5", "Kc6", "Ke6", "Kdc7", "Kde7", "Rf7", "Rff6", "Rd8", "Re8", "Rg8", "Rh8", "Nd4+", "Nfe7", "Ne3", "Nh6", "Nfh4", "Ng7", "Bge5", "Bf4", "Bxh2", "Be1", "Bf2", "Bgh4", "hh4", "hxg4"]
+StringLegalActions() = ["Rb8", "Ra7", "Rc7", "b5", "bxa5", "b3", "bxa3", "c4", "Nb8", "Nf6", "Ne5", "Kc6", "Ke6", "Kc7", "Ke7", "Rf7", "Rf6", "Rd8", "Re8", "Rg8", "Rh8", "Nd4+", "Ne7", "Ne3", "Nh6", "Nh4", "Ng7", "Be5", "Bf4", "Bxh2", "Be1", "Bf2", "Bh4", "h4", "hxg4"]
 
-# Apply action "Nfh4"
+# Apply action "Nh4"
 action: 3209
 
 # State 122
@@ -1085,23 +1085,23 @@ action: 3209
 action: 176
 
 # State 123
-# Apply action "Rff6"
+# Apply action "Rf6"
 action: 2937
 
 # State 124
-# Apply action "Nge3"
+# Apply action "Ne3"
 action: 3788
 
 # State 125
-# Apply action "Nhf3"
+# Apply action "Nf3"
 action: 4446
 
 # State 126
-# Apply action "K2d1"
+# Apply action "Kd1"
 action: 2452
 
 # State 127
-# Apply action "Nfh4"
+# Apply action "Nh4"
 action: 3354
 
 # State 128
@@ -1121,7 +1121,7 @@ action: 2233
 action: 672
 
 # State 132
-# Apply action "Rbg2"
+# Apply action "Rg2"
 action: 691
 
 # State 133
@@ -1129,7 +1129,7 @@ action: 691
 action: 3080
 
 # State 134
-# Apply action "Kdc2"
+# Apply action "Kc2"
 action: 1809
 
 # State 135
@@ -1169,9 +1169,9 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [308, 336, 816, 817, 818, 819, 832, 833, 834, 1257, 1270, 1271, 1298, 1576, 1577, 1578, 1589, 1590, 1591, 1914, 2548, 2549, 2550, 2551, 2552, 2553, 2554, 2571, 3520, 3521, 3533, 3534, 4177, 4218]
-StringLegalActions() = ["a6", "axb6+", "Rb1", "Rbb2", "Rbb3", "Rbxb5", "Ra4", "Rbc4", "Rbd4", "Kc3", "Kcb2", "Kd2", "Kcb3", "Bcxb5", "Bd7", "Be8", "Ba8", "Bb7", "Bcd5", "dd4", "Nec4", "Nd1", "Ned5+", "Neg2", "Ng4", "Nexf1", "Nf5", "e5", "Rgg2", "Rgxg3", "Rgxf1", "Rh1", "h3", "hxg3"]
+StringLegalActions() = ["a6", "axb6+", "Rb1", "Rb2", "Rb3", "Rxb5", "Ra4", "Rc4", "Rd4", "Kc3", "Kb2", "Kd2", "Kb3", "Bxb5", "Bd7", "Be8", "Ba8", "Bb7", "Bd5", "d4", "Nc4", "Nd1", "Nd5+", "Ng2", "Ng4", "Nxf1", "Nf5", "e5", "Rg2", "Rxg3", "Rxf1", "Rh1", "h3", "hxg3"]
 
-# Apply action "Rbxb5"
+# Apply action "Rxb5"
 action: 819
 
 # State 141
@@ -1225,13 +1225,13 @@ ObservationTensor(1):
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [744, 745, 746, 759, 760, 1212, 1213, 1214, 1215, 1216, 1224, 1225, 1257, 1284, 1285, 1299, 1403, 3440, 3441, 3442, 3443, 3444, 3445, 3446, 3456, 3457, 3458, 3459, 3460, 3461, 3910, 3911, 3912, 3913, 3925, 3926, 4445, 4446, 4447, 4448]
-StringLegalActions() = ["Rbb8", "Rbb7", "Rxb5", "Rba6", "Rbxc6", "Bd7", "Be6", "Bcf5", "Bg4", "Bh3", "Bca6", "Bcb7", "Kcxc6", "Kcb8", "Kcd6", "Kd8", "c4", "Rf8", "Rf7", "Rf6", "Rff5", "Rff4", "Rff3", "Rff2+", "Ra1", "Rb1", "Rc1+", "Rd1", "Rfe1", "Rxg1", "Bgd6", "Be5", "Bgf4", "Bxh2", "Bge1", "Bgf2", "Nhf5", "Nhf3", "Ng6", "Ng2"]
+StringLegalActions() = ["Rb8", "Rb7", "Rxb5", "Ra6", "Rxc6", "Bd7", "Be6", "Bf5", "Bg4", "Bh3", "Ba6", "Bb7", "Kxc6", "Kb8", "Kd6", "Kd8", "c4", "Rf8", "Rf7", "Rf6", "Rf5", "Rf4", "Rf3", "Rf2+", "Ra1", "Rb1", "Rc1+", "Rd1", "Re1", "Rxg1", "Bd6", "Be5", "Bf4", "Bxh2", "Be1", "Bf2", "Nf5", "Nf3", "Ng6", "Ng2"]
 
 # Apply action "Rf6"
 action: 3442
 
 # State 142
-# Apply action "Kcb1"
+# Apply action "Kb1"
 action: 1284
 
 # State 143
@@ -1239,7 +1239,7 @@ action: 1284
 action: 1299
 
 # State 144
-# Apply action "Rgxg3"
+# Apply action "Rxg3"
 action: 3521
 
 # State 145
@@ -1247,7 +1247,7 @@ action: 3521
 action: 3080
 
 # State 146
-# Apply action "Bcd5"
+# Apply action "Bd5"
 action: 1591
 
 # State 147
@@ -1267,11 +1267,11 @@ action: 2936
 action: 614
 
 # State 151
-# Apply action "Rbe6"
+# Apply action "Re6"
 action: 762
 
 # State 152
-# Apply action "Nfh4"
+# Apply action "Nh4"
 action: 3281
 
 # State 153
@@ -1291,7 +1291,7 @@ action: 2514
 action: 892
 
 # State 157
-# Apply action "Bcd7"
+# Apply action "Bd7"
 action: 1212
 
 # State 158
@@ -1299,7 +1299,7 @@ action: 1212
 action: 2089
 
 # State 159
-# Apply action "K8c8"
+# Apply action "Kc8"
 action: 1781
 
 # State 160
@@ -1319,9 +1319,9 @@ ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [308, 960, 961, 962, 963, 964, 965, 966, 978, 979, 980, 981, 982, 983, 984, 1184, 1197, 1198, 1212, 1225, 1914, 2496, 2497, 2512, 2513, 2514, 2571, 3397, 3398, 3399, 3400, 3401, 3402, 3415, 3416, 3417, 4177, 4372, 4373, 4374, 4375]
-StringLegalActions() = ["aa6", "Rbb1", "Rbb2", "Rbb3", "Rb4", "Rb5", "Rb7", "Rb8+", "Rba6", "Rc6+", "Rd6", "Rbe6", "Rf6", "Rbg6", "Rxh6", "Kc2", "Kcb1", "Kd1", "Kd2", "Kcb2", "d4", "Re1", "Re2", "Ref3", "Rg3", "Reh3", "e5", "Ba2", "Bfb3", "Bc4", "Bd5", "Bfe6", "Bg8", "Be8", "Bfg6", "Bxh5", "hh3", "Nhf3", "Nf5", "Nxg2", "Nhg6"]
+StringLegalActions() = ["a6", "Rb1", "Rb2", "Rb3", "Rb4", "Rb5", "Rb7", "Rb8+", "Ra6", "Rc6+", "Rd6", "Re6", "Rf6", "Rg6", "Rxh6", "Kc2", "Kb1", "Kd1", "Kd2", "Kb2", "d4", "Re1", "Re2", "Rf3", "Rg3", "Rh3", "e5", "Ba2", "Bb3", "Bc4", "Bd5", "Be6", "Bg8", "Be8", "Bg6", "Bxh5", "h3", "Nf3", "Nf5", "Nxg2", "Ng6"]
 
-# Apply action "Bfg6"
+# Apply action "Bg6"
 action: 3416
 
 # State 161
@@ -1363,7 +1363,7 @@ action: 2497
 action: 1403
 
 # State 166
-# Apply action "Reb2+"
+# Apply action "Rb2+"
 action: 2436
 
 # State 167
@@ -1383,11 +1383,11 @@ action: 1504
 action: 308
 
 # State 171
-# Apply action "Nfxh5"
+# Apply action "Nxh5"
 action: 3281
 
 # State 172
-# Apply action "Kcd2"
+# Apply action "Kd2"
 action: 1212
 
 # State 173
@@ -1399,7 +1399,7 @@ action: 3605
 action: 675
 
 # State 175
-# Apply action "Bde6"
+# Apply action "Be6"
 action: 1869
 
 # State 176
@@ -1435,9 +1435,9 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [1472, 1473, 1474, 1475, 1476, 1477, 1478, 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1841, 1868, 1869, 1882, 1883, 2571, 4177, 4372, 4373, 4374, 4375]
-StringLegalActions() = ["Rcc1", "Rc2", "Rcc3", "Rc4", "Rc6", "Rc7+", "Rc8", "Ra5", "Rb5", "Rd5", "Rce5", "Rcf5", "Rg5", "Rxh5", "Kxd3", "Kdc1", "Ke3", "Kdc3", "Ke1", "ee5", "h3", "Nf3", "Nhf5", "Ng2", "Ng6"]
+StringLegalActions() = ["Rc1", "Rc2", "Rc3", "Rc4", "Rc6", "Rc7+", "Rc8", "Ra5", "Rb5", "Rd5", "Re5", "Rf5", "Rg5", "Rxh5", "Kxd3", "Kc1", "Ke3", "Kc3", "Ke1", "e5", "h3", "Nf3", "Nf5", "Ng2", "Ng6"]
 
-# Apply action "Kdc1"
+# Apply action "Kc1"
 action: 1868
 
 # State 181
@@ -1457,13 +1457,13 @@ ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [88, 89, 117, 131, 992, 993, 994, 1006, 1007, 1008, 1009, 1010, 1011, 2133, 2424, 2425, 2426, 2427, 2436, 2437, 2438, 2439, 2440, 2441, 4104, 4105, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4372, 4373, 4374, 4375]
-StringLegalActions() = ["Kaa8", "Kxa6", "Kb6", "Kab8", "Ba4", "Bc2", "Bd1", "Ba2", "Bc4", "Bd5", "Bbe6", "Bbf7", "Bbg8", "d2+", "Ree8", "Ree6", "Re5", "Rxe4", "Rb7", "Rc7", "Rd7", "Ref7", "Reg7", "Reh7", "Rhh7", "Rh6", "Rha8", "Rhb8", "Rc8", "Rd8", "Rhe8", "Rf8", "Rhg8", "Nf6", "Nf4", "Nhg7", "Ng3"]
+StringLegalActions() = ["Ka8", "Kxa6", "Kb6", "Kb8", "Ba4", "Bc2", "Bd1", "Ba2", "Bc4", "Bd5", "Be6", "Bf7", "Bg8", "d2+", "Ree8", "Re6", "Re5", "Rxe4", "Rb7", "Rc7", "Rd7", "Rf7", "Rg7", "Reh7", "Rhh7", "Rh6", "Ra8", "Rb8", "Rc8", "Rd8", "Rhe8", "Rf8", "Rg8", "Nf6", "Nf4", "Ng7", "Ng3"]
 
-# Apply action "Nhg7"
+# Apply action "Ng7"
 action: 4374
 
 # State 182
-# Apply action "Rcf5"
+# Apply action "Rf5"
 action: 1492
 
 # State 183
@@ -1475,15 +1475,15 @@ action: 1007
 action: 3229
 
 # State 185
-# Apply action "Kaxa6"
+# Apply action "Kxa6"
 action: 89
 
 # State 186
-# Apply action "Nhf3"
+# Apply action "Nf3"
 action: 4372
 
 # State 187
-# Apply action "Rexf7"
+# Apply action "Rxf7"
 action: 2439
 
 # State 188
@@ -1523,7 +1523,7 @@ action: 4116
 action: 787
 
 # State 197
-# Apply action "Rff3"
+# Apply action "Rf3"
 action: 3012
 
 # State 198
@@ -1573,7 +1573,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [161, 176, 204, 1768, 1769, 1770, 1771, 1772, 1773, 1774, 1779, 1780, 1781, 1782, 1783, 1784, 1785, 2912, 2914, 2916, 3296, 3297, 3298, 3299, 3300, 3301, 3302, 3310, 3311, 3312, 3313, 3314, 3315, 3316, 3642, 3643, 3645, 3649]
-StringLegalActions() = ["Ka7", "Kb6", "Kb7", "Rd7", "Rd6", "Rd5", "Rd4+", "Rdd3", "Rd2", "Rd1", "Ra8", "Rb8+", "Rc8", "Rde8", "Rdf8", "Rg8", "Rh8", "Nc2+", "Ned3+", "Ng2", "Rff8", "Rf7", "Rf6", "Rff5", "Rf4", "Rf2", "Rf1", "Ra3", "Rb3+", "Rc3", "Rfd3", "Re3", "Rg3", "Rh3", "Nge8", "Ne6", "Ngf5", "Nh5"]
+StringLegalActions() = ["Ka7", "Kb6", "Kb7", "Rd7", "Rd6", "Rd5", "Rd4+", "Rdd3", "Rd2", "Rd1", "Ra8", "Rb8+", "Rc8", "Re8", "Rdf8", "Rg8", "Rh8", "Nc2+", "Nd3+", "Ng2", "Rff8", "Rf7", "Rf6", "Rf5", "Rf4", "Rf2", "Rf1", "Ra3", "Rb3+", "Rc3", "Rfd3", "Re3", "Rg3", "Rh3", "Ne8", "Ne6", "Nf5", "Nh5"]
 
 # Apply action "Ra3"
 action: 3310
@@ -1623,7 +1623,7 @@ action: 2916
 action: 2644
 
 # State 213
-# Apply action "Rbf4"
+# Apply action "Rf4"
 action: 909
 
 # State 214
@@ -1689,7 +1689,7 @@ ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [161, 162, 176, 190, 204, 2402, 2404, 2406, 2408, 2936, 2937, 2938, 2939, 2940, 2941, 2942, 2950, 2951, 4007, 4008, 4009, 4013]
-StringLegalActions() = ["Ka7", "Ka5", "Kb6", "Kb5", "Kb7", "Nc7", "Nd6", "Ng7", "Nef6", "Rf7", "Rff6", "Rf5", "Rff4", "Rf3", "Rf2", "Rf1+", "Rg8", "Rh8", "Ne3", "Ne1", "Ngf4", "Nxh4"]
+StringLegalActions() = ["Ka7", "Ka5", "Kb6", "Kb5", "Kb7", "Nc7", "Nd6", "Ng7", "Nf6", "Rf7", "Rf6", "Rf5", "Rf4", "Rf3", "Rf2", "Rf1+", "Rg8", "Rh8", "Ne3", "Ne1", "Nf4", "Nxh4"]
 
 # Apply action "Rg8"
 action: 2950
@@ -1707,7 +1707,7 @@ action: 204
 action: 1299
 
 # State 225
-# Apply action "Neg7"
+# Apply action "Ng7"
 action: 2406
 
 # State 226
@@ -1751,7 +1751,7 @@ action: 2777
 action: 3282
 
 # State 236
-# Apply action "hh5"
+# Apply action "h5"
 action: 4323
 
 # State 237
@@ -1805,7 +1805,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [1986, 1987, 2000, 2001, 2015, 2029, 3528, 3529, 3530, 3531, 3532, 3533, 3534, 3642, 3643, 3645, 3649, 3788, 3789, 3790, 3791, 3794, 3795]
-StringLegalActions() = ["Kd6", "Kd4", "Kc5", "Ke5", "Kde4", "Kde6", "Ra8", "Rb8", "Rc8+", "Rd8", "R8e8", "Rf8", "Rh8", "N7e8", "N7e6", "Nf5", "Nxh5", "Ng5e6", "Nge4", "Nf7", "Nf3", "Nh7", "Nh3"]
+StringLegalActions() = ["Kd6", "Kd4", "Kc5", "Ke5", "Ke4", "Ke6", "Ra8", "Rb8", "Rc8+", "Rd8", "Re8", "Rf8", "Rh8", "Ne8", "N7e6", "Nf5", "Nxh5", "N5e6", "Ne4", "Nf7", "Nf3", "Nh7", "Nh3"]
 
 # Apply action "Kd4"
 action: 1987
@@ -1823,7 +1823,7 @@ action: 3530
 action: 1271
 
 # State 245
-# Apply action "Rce8"
+# Apply action "Re8"
 action: 1199
 
 # State 246
@@ -1843,7 +1843,7 @@ action: 1184
 action: 3788
 
 # State 250
-# Apply action "B4b3"
+# Apply action "Bb3"
 action: 1430
 
 # State 251
@@ -1871,7 +1871,7 @@ action: 2554
 action: 119
 
 # State 257
-# Apply action "Ree6"
+# Apply action "Re6"
 action: 2786
 
 # State 258
@@ -1879,7 +1879,7 @@ action: 2786
 action: 2088
 
 # State 259
-# Apply action "Nfd3"
+# Apply action "Nd3"
 action: 3278
 
 # State 260
@@ -1921,9 +1921,9 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [2059, 2087, 2088, 2101, 2102, 2182, 2183, 2184, 2185, 2186, 2187, 2188, 2189, 4372, 4373, 4374, 4375]
-StringLegalActions() = ["Kxd5", "K4c5", "Ke3", "Kc3", "K4e5", "Nb4", "Nb2+", "N3c5", "Nc1", "Ndf4", "Nf2+", "N3e5", "Ne1", "Nf6", "Nhf4", "Ng7", "Ng3"]
+StringLegalActions() = ["Kxd5", "Kc5", "Ke3", "Kc3", "Ke5", "Nb4", "Nb2+", "Nc5", "Nc1", "Ndf4", "Nf2+", "Ne5", "Ne1", "Nf6", "Nhf4", "Ng7", "Ng3"]
 
-# Apply action "N3e5"
+# Apply action "Ne5"
 action: 2188
 
 # State 262
@@ -2037,7 +2037,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [2059, 2074, 2087, 2088, 2101, 2102, 2986, 2988, 2990, 2992, 3934, 3935, 3936, 3937, 3940, 3941]
-StringLegalActions() = ["Kd5", "Kde4", "Kc5", "Ke3", "Kc3", "Ke5", "Nd7", "Ne6", "Nh7", "Ng6", "Nge4", "Ne2", "Nf5", "Nf1", "Nh5", "Nh1"]
+StringLegalActions() = ["Kd5", "Ke4", "Kc5", "Ke3", "Kc3", "Ke5", "Nd7", "Ne6", "Nh7", "Ng6", "Ne4", "Ne2", "Nf5", "Nf1", "Nh5", "Nh1"]
 
 # Apply action "Nf1"
 action: 3937
@@ -2071,7 +2071,7 @@ action: 2745
 action: 1430
 
 # State 289
-# Apply action "Kfe2"
+# Apply action "Ke2"
 action: 3387
 
 # State 290
@@ -2079,7 +2079,7 @@ action: 3387
 action: 1225
 
 # State 291
-# Apply action "Ngf1"
+# Apply action "Nf1"
 action: 3937
 
 # State 292
@@ -2087,7 +2087,7 @@ action: 3937
 action: 715
 
 # State 293
-# Apply action "Nfe3"
+# Apply action "Ne3"
 action: 3498
 
 # State 294
@@ -2103,7 +2103,7 @@ action: 2766
 action: 1197
 
 # State 297
-# Apply action "Ncd2+"
+# Apply action "Nd2+"
 action: 1532
 
 # State 298
@@ -2111,7 +2111,7 @@ action: 1532
 action: 614
 
 # State 299
-# Apply action "Ndf3"
+# Apply action "Nf3"
 action: 2259
 
 # State 300
@@ -2131,9 +2131,9 @@ ObservationTensor(1) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [263, 264, 265, 266, 277, 278, 279, 1184, 1197, 1225]
-StringLegalActions() = ["Bb5+", "Bc6", "Bd7", "Be8", "Bb3", "Bac2", "Bd1+", "Kcc2", "Kb1", "Kb2"]
+StringLegalActions() = ["Bb5+", "Bc6", "Bd7", "Be8", "Bb3", "Bc2", "Bd1+", "Kc2", "Kb1", "Kb2"]
 
-# Apply action "Kcc2"
+# Apply action "Kc2"
 action: 1184
 
 # State 301
@@ -2153,7 +2153,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [2789, 2790, 2804, 2818, 2986, 2988, 2990, 2992, 3350, 3351, 3352, 3353, 3354, 3355, 3356, 3357]
-StringLegalActions() = ["Ke3", "Kee1", "Kf2", "Kf1", "Nd7", "Ne6", "Nh7", "Ng6", "Nd4+", "Nd2", "Ne5", "Nfe1+", "Nh4", "Nh2", "Ng5", "Ng1"]
+StringLegalActions() = ["Ke3", "Ke1", "Kf2", "Kf1", "Nd7", "Ne6", "Nh7", "Ng6", "Nd4+", "Nd2", "Ne5", "Ne1+", "Nh4", "Nh2", "Ng5", "Ng1"]
 
 # Apply action "Ng6"
 action: 2992
@@ -2163,7 +2163,7 @@ action: 2992
 action: 1257
 
 # State 303
-# Apply action "Kee1"
+# Apply action "Ke1"
 action: 2790
 
 # State 304
@@ -2187,7 +2187,7 @@ action: 2890
 action: 860
 
 # State 309
-# Apply action "Nge2"
+# Apply action "Ne2"
 action: 4080
 
 # State 310
@@ -2203,7 +2203,7 @@ action: 3722
 action: 1809
 
 # State 313
-# Apply action "Kdc1"
+# Apply action "Kc1"
 action: 2247
 
 # State 314
@@ -2247,7 +2247,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [307, 308, 322, 336, 350, 1575, 1576, 1577, 1578, 1589, 1590, 1591, 1592, 1593, 1594, 1595]
-StringLegalActions() = ["Kaa4", "Ka6", "Kab5", "Kb6", "Kb4", "Bca4+", "Bcb5", "Bd7", "Be8", "Ba8", "Bb7", "Bd5", "Be4", "Bf3", "Bg2", "Bh1"]
+StringLegalActions() = ["Ka4", "Ka6", "Kb5", "Kb6", "Kb4", "Ba4+", "Bb5", "Bd7", "Be8", "Ba8", "Bb7", "Bd5", "Be4", "Bf3", "Bg2", "Bh1"]
 
 # Apply action "Be8"
 action: 1578
@@ -2269,7 +2269,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [2278, 2292, 2293, 2306, 2766, 2767, 2768, 2770, 2771, 2772, 2773, 2839, 2840, 2841, 2843, 2844, 2845]
-StringLegalActions() = ["Kd2", "Kdc1", "Ke1", "Kdc2", "Nc4+", "Nec2", "Nd5", "Ng4", "Ng2", "Nf5", "Nf1", "Nc3", "Nec1", "Nd4", "Ng3", "Ng1", "Nf4"]
+StringLegalActions() = ["Kd2", "Kc1", "Ke1", "Kc2", "Nc4+", "Nc2", "Nd5", "Ng4", "Ng2", "Nf5", "Nf1", "Nc3", "Nc1", "Nd4", "Ng3", "Ng1", "Nf4"]
 
 # Apply action "Ke1"
 action: 2293
@@ -2299,7 +2299,7 @@ action: 2758
 action: 3209
 
 # State 328
-# Apply action "Bdb5"
+# Apply action "Bb5"
 action: 2232
 
 # State 329
@@ -2307,7 +2307,7 @@ action: 2232
 action: 4447
 
 # State 330
-# Apply action "Kaa6"
+# Apply action "Ka6"
 action: 308
 
 # State 331
@@ -2319,7 +2319,7 @@ action: 3718
 action: 934
 
 # State 333
-# Apply action "K1g2"
+# Apply action "Kg2"
 action: 3489
 
 # State 334
@@ -2327,7 +2327,7 @@ action: 3489
 action: 1432
 
 # State 335
-# Apply action "Neg1"
+# Apply action "Ng1"
 action: 2844
 
 # State 336
@@ -2385,7 +2385,7 @@ ObservationTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0
 Rewards() = [0.0, 0.0]
 Returns() = [0.0, 0.0]
 LegalActions() = [2839, 2840, 2841, 2843, 2844, 3277, 3278, 3279, 3281, 3282, 3283, 3284, 3373, 3374, 3388, 3401, 3402, 3415, 3416]
-StringLegalActions() = ["Nc3", "Nc1", "Nd4", "Neg3", "Neg1", "Nd5", "Nd3", "Nxe6", "Nh5", "Nh3", "Ng6", "N4g2", "Kf3", "Kf1", "K2g2", "Ke3", "Kfg1", "Ke1", "Kfg3"]
+StringLegalActions() = ["Nc3", "Nc1", "Nd4", "Ng3", "Ng1", "Nd5", "Nd3", "Nxe6", "Nh5", "Nh3", "Ng6", "Ng2", "Kf3", "Kf1", "Kg2", "Ke3", "Kg1", "Ke1", "Kg3"]
 
 # Apply action "Ke1"
 action: 3415
@@ -2431,7 +2431,7 @@ action: 891
 action: 4082
 
 # State 352
-# Apply action "Bgc4+"
+# Apply action "Bc4+"
 action: 4055
 
 # State 353
@@ -2443,7 +2443,7 @@ action: 3489
 action: 861
 
 # State 355
-# Apply action "Kgg1"
+# Apply action "Kg1"
 action: 3958
 
 # State 356
