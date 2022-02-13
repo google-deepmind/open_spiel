@@ -196,7 +196,8 @@ def _init_bot(config, game, evaluator_, evaluation):
       solve=False,
       dirichlet_noise=noise,
       child_selection_fn=mcts.SearchNode.puct_value,
-      verbose=False)
+      verbose=False,
+      dont_return_chance_node=True)
 
 
 def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
@@ -204,28 +205,37 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
   trajectory = Trajectory()
   actions = []
   state = game.new_initial_state()
+  random_state = np.random.RandomState()
   logger.opt_print(" Starting game {} ".format(game_num).center(60, "-"))
   logger.opt_print("Initial state:\n{}".format(state))
   while not state.is_terminal():
-    root = bots[state.current_player()].mcts_search(state)
-    policy = np.zeros(game.num_distinct_actions())
-    for c in root.children:
-      policy[c.action] = c.explore_count
-    policy = policy ** (1 / temperature)
-    policy /= policy.sum()
-    if len(actions) >= temperature_drop:
-      action = root.best_child().action
+    if state.is_chance_node():
+      # For chance nodes, rollout according to chance node's probability
+      # distribution
+      outcomes = state.chance_outcomes()
+      action_list, prob_list = zip(*outcomes)
+      action = random_state.choice(action_list, p=prob_list)
+      state.apply_action(action)
     else:
-      action = np.random.choice(len(policy), p=policy)
-    trajectory.states.append(TrajectoryState(
-        state.observation_tensor(), state.current_player(),
-        state.legal_actions_mask(), action, policy,
-        root.total_reward / root.explore_count))
-    action_str = state.action_to_string(state.current_player(), action)
-    actions.append(action_str)
-    logger.opt_print("Player {} sampled action: {}".format(
-        state.current_player(), action_str))
-    state.apply_action(action)
+      root = bots[state.current_player()].mcts_search(state)
+      policy = np.zeros(game.num_distinct_actions())
+      for c in root.children:
+        policy[c.action] = c.explore_count
+      policy = policy**(1 / temperature)
+      policy /= policy.sum()
+      if len(actions) >= temperature_drop:
+        action = root.best_child().action
+      else:
+        action = np.random.choice(len(policy), p=policy)
+      trajectory.states.append(
+          TrajectoryState(state.observation_tensor(), state.current_player(),
+                          state.legal_actions_mask(), action, policy,
+                          root.total_reward / root.explore_count))
+      action_str = state.action_to_string(state.current_player(), action)
+      actions.append(action_str)
+      logger.opt_print("Player {} sampled action: {}".format(
+          state.current_player(), action_str))
+      state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
 
   trajectory.returns = state.returns()
@@ -295,7 +305,8 @@ def evaluator(*, game, config, logger, queue):
             max_simulations,
             random_evaluator,
             solve=True,
-            verbose=False)
+            verbose=False,
+            dont_return_chance_node=True)
     ]
     if az_player == 1:
       bots = list(reversed(bots))

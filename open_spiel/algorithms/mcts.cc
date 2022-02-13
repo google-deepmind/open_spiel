@@ -204,7 +204,8 @@ MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
                  double uct_c, int max_simulations, int64_t max_memory_mb,
                  bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
-                 double dirichlet_alpha, double dirichlet_epsilon)
+                 double dirichlet_alpha, double dirichlet_epsilon,
+                 bool dont_return_chance_node)
     : uct_c_{uct_c},
       max_simulations_{max_simulations},
       max_nodes_((max_memory_mb << 20) / sizeof(SearchNode) + 1),
@@ -215,6 +216,7 @@ MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
       max_utility_(game.MaxUtility()),
       dirichlet_alpha_(dirichlet_alpha),
       dirichlet_epsilon_(dirichlet_epsilon),
+      dont_return_chance_node_(dont_return_chance_node),
       rng_(seed),
       child_selection_policy_(child_selection_policy),
       evaluator_(evaluator) {
@@ -271,7 +273,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
   visit_path->push_back(root);
   std::unique_ptr<State> working_state = state.Clone();
   SearchNode* current_node = root;
-  while (!working_state->IsTerminal() && current_node->explore_count > 0) {
+  while ((!working_state->IsTerminal() && current_node->explore_count > 0) ||
+         (working_state->IsChanceNode() && dont_return_chance_node_)) {
     if (current_node->children.empty()) {
       // For a new node, initialize its state, then choose a child as normal.
       ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);

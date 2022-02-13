@@ -159,13 +159,14 @@ class MCTSBot : public Bot {
   // std::shared_ptr<Evaluator> in the constructor leads to the Julia API test
   // failing. We don't know why right now, but intend to fix this.
   MCTSBot(
-      const Game& game, std::shared_ptr<Evaluator> evaluator,
-      double uct_c, int max_simulations,
+      const Game& game, std::shared_ptr<Evaluator> evaluator, double uct_c,
+      int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
       int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
-      double dirichlet_alpha = 0, double dirichlet_epsilon = 0);
+      double dirichlet_alpha = 0, double dirichlet_epsilon = 0,
+      bool dont_return_chance_node = false);
   ~MCTSBot() = default;
 
   void Restart() override {}
@@ -211,6 +212,7 @@ class MCTSBot : public Bot {
   double max_utility_;
   double dirichlet_alpha_;
   double dirichlet_epsilon_;
+  bool dont_return_chance_node_;
   std::mt19937 rng_;
   const ChildSelectionPolicy child_selection_policy_;
   std::shared_ptr<Evaluator> evaluator_;

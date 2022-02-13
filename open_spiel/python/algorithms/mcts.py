@@ -208,7 +208,8 @@ class MCTSBot(pyspiel.Bot):
                random_state=None,
                child_selection_fn=SearchNode.uct_value,
                dirichlet_noise=None,
-               verbose=False):
+               verbose=False,
+               dont_return_chance_node=False):
     """Initializes a MCTS Search algorithm in the form of a bot.
 
     In multiplayer games, or non-zero-sum games, the players will play the
@@ -232,6 +233,8 @@ class MCTSBot(pyspiel.Bot):
       verbose: Whether to print information about the search tree before
         returning the action. Useful for confirming the search is working
         sensibly.
+      dont_return_chance_node: If true, do not stop expanding at chance nodes.
+        Enabled for AlphaZero.
 
     Raises:
       ValueError: if the game type isn't supported.
@@ -254,6 +257,7 @@ class MCTSBot(pyspiel.Bot):
     self._dirichlet_noise = dirichlet_noise
     self._random_state = random_state or np.random.RandomState()
     self._child_selection_fn = child_selection_fn
+    self.dont_return_chance_node = dont_return_chance_node
 
   def restart_at(self, state):
     pass
@@ -307,7 +311,9 @@ class MCTSBot(pyspiel.Bot):
     visit_path = [root]
     working_state = state.clone()
     current_node = root
-    while not working_state.is_terminal() and current_node.explore_count > 0:
+    while (not working_state.is_terminal() and
+           current_node.explore_count > 0) or (
+               working_state.is_chance_node() and self.dont_return_chance_node):
       if not current_node.children:
         # For a new node, initialize its state, then choose a child as normal.
         legal_actions = self.evaluator.prior(working_state)

@@ -41,7 +41,7 @@ void TestModelCreation() {
       /*nn_width=*/128,
       /*learning_rate=*/0.001,
       /*weight_decay=*/0.001};
-  ResModel net(net_config, "cpu:0");
+  Model net(net_config, "cpu:0");
 
   std::cout << "Good! The network looks like:\n" << net << std::endl;
 }
@@ -66,7 +66,7 @@ void TestModelInference() {
       /*nn_width=*/128,
       /*learning_rate=*/0.001,
       /*weight_decay=*/0.001};
-  ResModel net(net_config, "cpu:0");
+  Model net(net_config, "cpu:0");
 
   std::vector<float> observation_vector = state->ObservationTensor();
   torch::Tensor observation_tensor = torch::from_blob(
