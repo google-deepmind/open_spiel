@@ -44,9 +44,9 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean_field_game_garnet)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean_field_game_crowd_modelling)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean_field_game_crowd_modelling_2d)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : linear quadratic](#mean_field_game_linear_quadratic)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : linear quadratic](#mean-field-game--linear-quadratic)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean_field_game_predator_prey)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean_field_game_routing)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
 <font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
@@ -423,8 +423,8 @@ Status                                       | Game
 
 ### Mean Field Game : routing
 
-*   Representative player chooses at each nodes where they go. They has an
-    origin, a destination and a departure time and choose their route to
+*   Representative player chooses at each node where they go. They has an
+    origin, a destination and a departure time and chooses their route to
     minimize their travel time. Time spent on each link is a function of the
     distribution of players on the link when the player reaches the link.
 *   Network with choice of route.
@@ -575,7 +575,7 @@ Status                                       | Game
 
 ### Routing game
 
-*   Players choose at each nodes where they go. They have an origin, a
+*   Players choose at each node where they go. They have an origin, a
     destination and a departure time and choose their route to minimize their
     travel time. Time spent on each link is a function of the number of players
     on the link when the player reaches the link.
