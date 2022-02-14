@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Run deep online mirror descent algorithm with Munchausen DQN agents."""
 
 import os
@@ -32,6 +31,7 @@ from open_spiel.python.mfg.algorithms import munchausen_deep_mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
 from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
+from open_spiel.python.mfg.games import crowd_modelling_2d
 from open_spiel.python.mfg.games import dynamic_routing
 from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
 import pyspiel
@@ -108,19 +108,9 @@ flags.DEFINE_bool("log_distribution", False,
                   "Enables logging of the distribution.")
 
 GAME_SETTINGS = {
-    # 4 rooms exploration example for crowd modeling 2D
     "mfg_crowd_modelling_2d_four_rooms": {
-        "size": 13,
-        "horizon": 40,
+        **crowd_modelling_2d.FOUR_ROOMS,
         "only_distribution_reward": True,
-        "forbidden_states":
-            "[1|6;2|6;4|6;5|6;6|1;6|2;6|4;6|5;6|6;6|7;6|8;6|10;6|11;7|6;8|6;10"
-            "|6;11|6;0|0;0|1;0|2;0|3;0|4;0|5;0|6;0|7;0|8;0|9;0|10;0|11;0|12;12"
-            "|0;12|1;12|2;12|3;12|4;12|5;12|6;12|7;12|8;12|9;12|10;12|11;12"
-            "|12;0|0;1|0;2|0;3|0;4|0;5|0;6|0;7|0;8|0;9|0;10|0;11|0;12|0;0|12;1"
-            "|12;2|12;3|12;4|12;5|12;6|12;7|12;8|12;9|12;10|12;11|12;12|12]",
-        "initial_distribution": "[1|1]",
-        "initial_distribution_value": "[1.0]",
     },
     "dynamic_routing_braess": {
         "max_num_time_step": 100,
