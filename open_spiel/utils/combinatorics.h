@@ -123,6 +123,43 @@ std::vector<std::vector<T>> VariationsWithoutRepetition(const std::vector<T>& v,
   return vs;
 }
 
+int Factorial(int n);
+
+// Returns the k^th permutation of the elements in v. This algorithm skips over
+// ranges of digits by computing the number of permutations for each digit from
+// factorials over the suffixes in reading order.
+//
+// E.g. for v = {0, 1, 2, 3}   and  k =  19
+// - Skip over 6 (= 3!) permutations starting with 0.
+// - Skip over 6 (= 3!) permutations starting with 1.
+// - Skip over 6 (= 3!) permutations starting with 2.
+// - Skip over two permutations starting with (3, 0) ((3, 0, 1, 2) and
+//   (3, 0, 2, 1)) to arrive at (3, 1, 0, 2).
+template <typename T>
+std::vector<T> UnrankPermutation(const std::vector<T>& v, int k) {
+  int n = v.size();
+  std::vector<bool> used(v.size(), false);
+  std::vector<T> perm(v.size());
+  for (int i = 1; i <= n; ++i) {
+    int divisor = Factorial(n - i);
+    int digit_idx = k / divisor;
+    int j = 0, l = 0;
+    for (; j < n; ++j) {
+      if (used[j]) {
+        continue;
+      }
+      if (l == digit_idx) {
+        break;
+      }
+      ++l;
+    }
+    perm[i - 1] = v[j];
+    used[j] = true;
+    k -= digit_idx * divisor;
+  }
+  return perm;
+}
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_UTILS_COMBINATORICS_H_
