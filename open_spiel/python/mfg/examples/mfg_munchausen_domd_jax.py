@@ -36,15 +36,7 @@ from open_spiel.python.mfg.games import dynamic_routing
 from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
 import pyspiel
 from open_spiel.python.utils import app
-
-# pylint: disable=g-import-not-at-top
-try:
-  from clu import metric_writers
-except ImportError as e:
-  raise ImportError(
-      str(e) +
-      "\nCLU not found. Please install CLU: python3 -m pip install clu") from e
-# pylint: enable=g-import-not-at-top
+from open_spiel.python.utils import metrics
 
 FLAGS = flags.FLAGS
 
@@ -202,8 +194,8 @@ def main(argv: Sequence[str]) -> None:
 
   # Metrics writer will also log the metrics to stderr.
   just_logging = FLAGS.logdir is None or jax.host_id() > 0
-  writer = metric_writers.create_default_writer(
-      FLAGS.logdir, just_logging=just_logging)
+  writer = metrics.create_default_writer(
+      logdir=FLAGS.logdir, just_logging=just_logging)
 
   # # Save the parameters.
   writer.write_hparams(kwargs)
@@ -224,18 +216,18 @@ def main(argv: Sequence[str]) -> None:
     """Logs the training metrics for each iteration."""
     initial_states = game.new_initial_states()
     pi_value = policy_value.PolicyValue(game, md.distribution, md.policy)
-    metrics = {
+    m = {
         f"best_response/{state}": pi_value.eval_state(state)
         for state in initial_states
     }
     nash_conv_md = nash_conv.NashConv(game, md.policy).nash_conv()
-    metrics["nash_conv_md"] = nash_conv_md
+    m["nash_conv_md"] = nash_conv_md
     if FLAGS.log_distribution and FLAGS.logdir:
       # We log distribution directly to a Pickle file as it may be large for
       # logging as a metric.
       filename = os.path.join(FLAGS.logdir, f"distribution_{it}.pkl")
       save_distribution(filename, md.distribution)
-    logging_fn(it, 0, metrics)
+    logging_fn(it, 0, m)
 
   log_metrics(0)
   for it in range(1, FLAGS.num_iterations + 1):

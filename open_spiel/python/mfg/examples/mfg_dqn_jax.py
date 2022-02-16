@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """DQN agents trained on an MFG against a crowd following a uniform policy."""
 
 from absl import flags
@@ -29,15 +28,7 @@ from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unuse
 from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
 import pyspiel
 from open_spiel.python.utils import app
-
-# pylint: disable=g-import-not-at-top
-try:
-  from clu import metric_writers
-except ImportError as e:
-  raise ImportError(
-      str(e) +
-      "\nCLU not found. Please install CLU: python3 -m pip install clu")
-# pylint: enable=g-import-not-at-top
+from open_spiel.python.utils import metrics
 
 FLAGS = flags.FLAGS
 
@@ -137,8 +128,8 @@ def main(unused_argv):
 
   # Metrics writer will also log the metrics to stderr.
   just_logging = FLAGS.logdir is None or jax.host_id() > 0
-  writer = metric_writers.create_default_writer(
-      FLAGS.logdir, just_logging=just_logging)
+  writer = metrics.create_default_writer(
+      logdir=FLAGS.logdir, just_logging=just_logging)
 
   # Save the parameters.
   writer.write_hparams(kwargs)
