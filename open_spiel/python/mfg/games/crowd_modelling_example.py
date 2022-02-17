@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Generate a dummy trajectory and compute the distribution of a policy."""
 # pylint: disable=unused-import
 from typing import Sequence
@@ -21,7 +20,6 @@ from absl import flags
 import numpy as np
 
 from open_spiel.python import policy
-from open_spiel.python.mfg import games
 from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
@@ -30,29 +28,19 @@ from open_spiel.python.mfg.algorithms import greedy_policy
 from open_spiel.python.mfg.algorithms import mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
+from open_spiel.python.mfg.games import factory
 import pyspiel
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('game', 'mfg_crowd_modelling_2d', 'Game to use.')
 
-# Maps game names to the settings to use.
-# Empty settings will be used for games that are not in this mapping.
-GAME_SETTINGS = {
-    'mfg_crowd_modelling_2d': {
-        'only_distribution_reward': True,
-        'forbidden_states': '[0|0;0|1]',
-        'initial_distribution': '[0|2;0|3]',
-        'initial_distribution_value': '[0.5;0.5]',
-    }
-}
-
 
 def main(argv: Sequence[str]) -> None:
   # TODO(perolat): move to an example directory.
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
-  mfg_game = pyspiel.load_game(FLAGS.game, GAME_SETTINGS.get(FLAGS.game, {}))
+  mfg_game = factory.create_game_with_setting(FLAGS.game)
   mfg_state = mfg_game.new_initial_state()
   print('Playing a single arbitrary trajectory')
   while not mfg_state.is_terminal():

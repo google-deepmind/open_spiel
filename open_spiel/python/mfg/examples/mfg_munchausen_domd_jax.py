@@ -18,23 +18,17 @@ import pickle
 from typing import Sequence
 
 from absl import flags
-from absl import logging
 import jax
 from jax.config import config
 
 from open_spiel.python.utils import gfile
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
-from open_spiel.python.games import dynamic_routing_data
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import munchausen_deep_mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
-from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
-from open_spiel.python.mfg.games import crowd_modelling_2d
-from open_spiel.python.mfg.games import dynamic_routing
-from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
-import pyspiel
+from open_spiel.python.mfg.games import factory
 from open_spiel.python.utils import app
 from open_spiel.python.utils import metrics
 
@@ -42,7 +36,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game_name", "mfg_crowd_modelling_2d", "Name of the game.")
 flags.DEFINE_string(
-    "env_setting", "mfg_crowd_modelling_2d_four_rooms",
+    "env_setting", "crowd_modelling_2d_four_rooms",
     "Name of the game settings. If None, the game name will be used.")
 
 # Training options.
@@ -99,25 +93,6 @@ flags.DEFINE_string(
 flags.DEFINE_bool("log_distribution", False,
                   "Enables logging of the distribution.")
 
-GAME_SETTINGS = {
-    "mfg_crowd_modelling_2d_four_rooms": {
-        **crowd_modelling_2d.FOUR_ROOMS,
-        "only_distribution_reward": True,
-    },
-    "dynamic_routing_braess": {
-        "max_num_time_step": 100,
-        "network": "braess",
-        "time_step_length": 0.05,
-    },
-}
-
-DYNAMIC_ROUTING_NETWORK = {
-    "line": (dynamic_routing_data.LINE_NETWORK,
-             dynamic_routing_data.LINE_NETWORK_OD_DEMAND),
-    "braess": (dynamic_routing_data.BRAESS_NETWORK,
-               dynamic_routing_data.BRAESS_NETWORK_OD_DEMAND),
-}
-
 
 def save_distribution(filename: str, dist: distribution.DistributionPolicy):
   """Saves the distribution to a file."""
@@ -131,17 +106,7 @@ def main(argv: Sequence[str]) -> None:
   if len(argv) > 1:
     raise app.UsageError("Too many command-line arguments.")
 
-  game_name = FLAGS.game_name
-  logging.info("Loading %s", game_name)
-  settings = GAME_SETTINGS.get(FLAGS.env_setting or game_name, {})
-  logging.info("Using settings %r", settings)
-  if game_name == "python_mfg_dynamic_routing":
-    network = settings.pop("network")
-    network, od_demand = DYNAMIC_ROUTING_NETWORK[network]
-    game = dynamic_routing.MeanFieldRoutingGame(
-        settings, network=network, od_demand=od_demand)
-  else:
-    game = pyspiel.load_game(FLAGS.game_name, settings)
+  game = factory.create_game_with_setting(FLAGS.game_name, FLAGS.env_setting)
 
   num_players = game.num_players()
 

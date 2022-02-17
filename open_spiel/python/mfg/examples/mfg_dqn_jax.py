@@ -14,7 +14,6 @@
 """DQN agents trained on an MFG against a crowd following a uniform policy."""
 
 from absl import flags
-from absl import logging
 import jax
 
 from open_spiel.python import policy
@@ -24,9 +23,7 @@ from open_spiel.python.jax import dqn
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
-from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
-from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
-import pyspiel
+from open_spiel.python.mfg.games import factory
 from open_spiel.python.utils import app
 from open_spiel.python.utils import metrics
 
@@ -34,6 +31,9 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game_name", "python_mfg_predator_prey",
                     "Name of the game.")
+flags.DEFINE_string(
+    "env_setting", None,
+    "Name of the game settings. If None, the game name will be used.")
 flags.DEFINE_integer("num_train_episodes", int(20e6),
                      "Number of training episodes.")
 flags.DEFINE_integer("eval_every", 10000,
@@ -72,20 +72,9 @@ flags.DEFINE_string(
     "Logging dir to use for TF summary files. If None, the metrics will only "
     "be logged to stderr.")
 
-GAME_SETTINGS = {
-    "mfg_crowd_modelling_2d": {
-        "only_distribution_reward": False,
-        "forbidden_states": "[0|0;0|1]",
-        "initial_distribution": "[0|2;0|3]",
-        "initial_distribution_value": "[0.5;0.5]",
-    }
-}
-
 
 def main(unused_argv):
-  logging.info("Loading %s", FLAGS.game_name)
-  game = pyspiel.load_game(FLAGS.game_name,
-                           GAME_SETTINGS.get(FLAGS.game_name, {}))
+  game = factory.create_game_with_setting(FLAGS.game_name, FLAGS.env_setting)
   uniform_policy = policy.UniformRandomPolicy(game)
   mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
 
