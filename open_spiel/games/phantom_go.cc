@@ -579,7 +579,7 @@ std::string PhantomGoState::InformationStateString(int player) const {
 std::string PhantomGoState::ObservationString(int player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  return board_.observationToString(player);
+  return board_.ObservationToString(player);
 }
 
 void PhantomGoState::ObservationTensor(int player, absl::Span<float> values) const {
@@ -741,6 +741,88 @@ PhantomGoGame::PhantomGoGame(const GameParameters& params)
           "max_game_length", DefaultMaxGameLength(board_size_))) {}
 
 
+
+class PhantomGoObserver : public Observer {
+ public:
+  PhantomGoObserver(IIGObservationType iig_obs_type)
+      : Observer(/*has_string=*/true, /*has_tensor=*/true),
+        iig_obs_type_(iig_obs_type) {}
+
+  void WriteTensor(const State& observed_state, int player,
+                   Allocator* allocator) const override {
+      const PhantomGoState& state =
+          open_spiel::down_cast<const PhantomGoState&>(observed_state);
+
+      const int totalBoardPoints = state.board().board_size() * state.board().board_size();
+
+      {
+          auto out = allocator->Get("stone-counts", {2});
+          auto stoneCount = state.getStoneCount();
+          out.at(0) = stoneCount[0];
+          out.at(1) = stoneCount[1];
+      }
+
+      if (iig_obs_type_.private_info == PrivateInfoType::kSinglePlayer) {
+          {
+              auto out = allocator->Get("player_observation", {totalBoardPoints});
+              auto observation = state.board().GetObservationByID(player);
+              for(int i = 0; i < totalBoardPoints; i++)
+              {
+                  out.at(i) = (uint8_t )observation[i];
+              }
+          }
+      }
+
+      if (iig_obs_type_.public_info) {
+
+          {
+              auto out = allocator->Get("history-turns", {state.History().size()});
+              auto history = state.FullHistory();
+              for(int i = 0; i < history.size(); i++)
+              {
+                  out.at(i) = history[i].player;
+              }
+          }
+
+          {
+              std::shared_ptr<const Game> game = state.GetGame();
+              std::unique_ptr<PhantomGoState> currState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
+              auto out = allocator->Get("history-turns", {state.History().size()});
+              auto history = state.History();
+              std::array<int, 2> prevStoneCount = currState->getStoneCount();
+              for(int i = 0; i < history.size(); i++)
+              {
+                  currState->ApplyAction(history[i]);
+                  std::array<int, 2> currStoneCount = currState->getStoneCount();
+                  if(prevStoneCount[0] - currStoneCount[0] > 0)
+                  {
+                      out.at(i) = prevStoneCount[0] - currStoneCount[0];
+                  }
+                  else if(prevStoneCount[1] - currStoneCount[1] > 0)
+                  {
+                      out.at(i) = prevStoneCount[1] - currStoneCount[1];
+                  }
+                  else
+                  {
+                      out.at(i) = 0;
+                  }
+              }
+          }
+      }
+
+  }
+
+  std::string StringFrom(const State& observed_state,
+                         int player) const override {
+      const PhantomGoState& state =
+          open_spiel::down_cast<const PhantomGoState&>(observed_state);
+
+      return state.ObservationString(player);
+  }
+
+ private:
+  IIGObservationType iig_obs_type_;
+};
 
 }  // namespace phantom_go
 }  // namespace open_spiel

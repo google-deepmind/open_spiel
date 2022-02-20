@@ -123,7 +123,7 @@ class PhantomGoBoard {
 
   std::array<int, 2> GetStoneCount() const { return stone_count_; };
   std::string ObservationsToString() const;
-  std::string observationToString(int player) const;
+  std::string ObservationToString(int player) const;
   std::array<GoColor, kMaxBoardSize* kMaxBoardSize> GetObservationByID(int player_id) const;
 
   // Adds an enemy stone into observation of certain player on certain point

@@ -425,17 +425,17 @@ std::string PhantomGoBoard::ObservationsToString() const
     std::stringstream ss;
     ss << "\nObservation white:\n";
 
-    ss << observationToString((uint8_t)GoColor::kWhite);
+    ss << ObservationToString((uint8_t) GoColor::kWhite);
 
     ss << "\nObservation black:\n";
 
-    ss << observationToString((uint8_t)GoColor::kBlack);
+    ss << ObservationToString((uint8_t) GoColor::kBlack);
 
     return ss.str();
 }
 
 
-std::string PhantomGoBoard::observationToString(int player) const
+std::string PhantomGoBoard::ObservationToString(int player) const
 {
     std::stringstream ss;
     for (int x = board_size_ - 1; x >= 0; x--)
