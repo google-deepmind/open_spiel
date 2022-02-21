@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """DQN agents trained on an MFG against a crowd following a uniform policy."""
 
 from absl import flags
-from absl import logging
 import jax
 
 from open_spiel.python import policy
@@ -25,24 +23,17 @@ from open_spiel.python.jax import dqn
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
-from open_spiel.python.mfg.games import crowd_modelling  # pylint: disable=unused-import
-from open_spiel.python.mfg.games import predator_prey  # pylint: disable=unused-import
-import pyspiel
+from open_spiel.python.mfg.games import factory
 from open_spiel.python.utils import app
-
-# pylint: disable=g-import-not-at-top
-try:
-  from clu import metric_writers
-except ImportError as e:
-  raise ImportError(
-      str(e) +
-      "\nCLU not found. Please install CLU: python3 -m pip install clu")
-# pylint: enable=g-import-not-at-top
+from open_spiel.python.utils import metrics
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game_name", "python_mfg_predator_prey",
                     "Name of the game.")
+flags.DEFINE_string(
+    "env_setting", None,
+    "Name of the game settings. If None, the game name will be used.")
 flags.DEFINE_integer("num_train_episodes", int(20e6),
                      "Number of training episodes.")
 flags.DEFINE_integer("eval_every", 10000,
@@ -81,20 +72,9 @@ flags.DEFINE_string(
     "Logging dir to use for TF summary files. If None, the metrics will only "
     "be logged to stderr.")
 
-GAME_SETTINGS = {
-    "mfg_crowd_modelling_2d": {
-        "only_distribution_reward": False,
-        "forbidden_states": "[0|0;0|1]",
-        "initial_distribution": "[0|2;0|3]",
-        "initial_distribution_value": "[0.5;0.5]",
-    }
-}
-
 
 def main(unused_argv):
-  logging.info("Loading %s", FLAGS.game_name)
-  game = pyspiel.load_game(FLAGS.game_name,
-                           GAME_SETTINGS.get(FLAGS.game_name, {}))
+  game = factory.create_game_with_setting(FLAGS.game_name, FLAGS.env_setting)
   uniform_policy = policy.UniformRandomPolicy(game)
   mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
 
@@ -137,8 +117,8 @@ def main(unused_argv):
 
   # Metrics writer will also log the metrics to stderr.
   just_logging = FLAGS.logdir is None or jax.host_id() > 0
-  writer = metric_writers.create_default_writer(
-      FLAGS.logdir, just_logging=just_logging)
+  writer = metrics.create_default_writer(
+      logdir=FLAGS.logdir, just_logging=just_logging)
 
   # Save the parameters.
   writer.write_hparams(kwargs)

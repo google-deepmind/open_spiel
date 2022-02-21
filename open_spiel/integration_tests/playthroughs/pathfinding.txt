@@ -1,0 +1,2490 @@
+game: pathfinding
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Pathfinding"
+GameType.max_num_players = 10
+GameType.min_num_players = 1
+GameType.parameter_specification = ["grid", "group_reward", "horizon", "players", "solve_reward", "step_reward"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "pathfinding"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 5
+PolicyTensorShape() = [5]
+MaxChanceOutcomes() = 1
+GetParameters() = {grid=A.*..**\n..*....\n....*a.\n,group_reward=100.0,horizon=1000,players=1,solve_reward=100.0,step_reward=-0.01}
+NumPlayers() = 1
+MinUtility() = -10.0
+MaxUtility() = 200.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [5, 3, 7]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 105
+MaxGameLength() = 1000
+ToString() = "pathfinding()"
+
+# State 0
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [0.0]
+Returns() = [0.0]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 1
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-0.01]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 2
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0, 4]
+HistoryString() = "0, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-0.02]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 3
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 4
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 5
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 6
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 7
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 8
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 9
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 10
+# ..*..**
+# ..*..0.
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*..0.\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◯◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.09999999999999999]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 11
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 12
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 13
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 14
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 15
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 16
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 17
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 18
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 19
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 20
+# ..*..**
+# ..*....
+# .0..*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n.0..*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◉◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◯◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.20000000000000004]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 21
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 22
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 23
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 24
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 25
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 26
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 27
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 28
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 29
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 30
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.3000000000000001]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 31
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 32
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 33
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 34
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 35
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 36
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 37
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 38
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 39
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 40
+# ..*0.**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*0.**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◯◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.4000000000000002]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 41
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 42
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 43
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 44
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 45
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 46
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 47
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 48
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 49
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 50
+# ..*.0**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*.0**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.5000000000000002]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 51
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 52
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 53
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 54
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 55
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 56
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 57
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 58
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 59
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 60
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.6000000000000003]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 61
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 62
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 63
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 64
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 65
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 66
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 67
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 68
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 69
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 70
+# ..*0.**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*0.**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◯◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.7000000000000004]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 71
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 72
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 73
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 74
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 75
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 76
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 77
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 78
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 79
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 80
+# ..*..**
+# ..*0...
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*0...\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-0.8000000000000005]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 81
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 82
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 83
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 84
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 85
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 86
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 87
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 88
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 89
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 90
+# ..*..**
+# ..*....
+# ....*.0
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*.0\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◯
+Rewards() = [-0.01]
+Returns() = [-0.9000000000000006]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 91
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 92
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 93
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 94
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 95
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 96
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 97
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 98
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 99
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 100
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.0000000000000007]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 101
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 102
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 103
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 104
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 105
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 106
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 107
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 108
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 109
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 110
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.1000000000000008]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 111
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 112
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 113
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 114
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 115
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 116
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 117
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 118
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 119
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 120
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.2000000000000008]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 121
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 122
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 123
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 124
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 125
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 126
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 127
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 128
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 129
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 130
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.300000000000001]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 131
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 132
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 133
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 134
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 135
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 136
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 137
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 138
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 139
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 140
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.400000000000001]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 141
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 142
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 143
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 144
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 145
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 146
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 147
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 148
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 149
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 150
+# ..*..**
+# ..*....
+# ....*.0
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*.0\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◯
+Rewards() = [-0.01]
+Returns() = [-1.500000000000001]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 151
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 152
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 153
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 154
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 155
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 156
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 157
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 158
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 159
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 160
+# ..*.0**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*.0**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.6000000000000012]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 161
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 162
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 163
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 164
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 165
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 166
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 167
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 168
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 169
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 170
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-1.7000000000000013]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 171
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 172
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 173
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 174
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 175
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 176
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 177
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 178
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 179
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 180
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-1.8000000000000014]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 181
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 182
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 183
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 184
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 185
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 186
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 187
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 188
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 189
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 190
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-1.9000000000000015]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 191
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 192
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 193
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 194
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 195
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 196
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 197
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 198
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 199
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 200
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.0000000000000013]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 201
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 202
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 203
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 204
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 205
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 206
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 207
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 208
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 209
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 210
+# ..*..**
+# ..*....
+# ....*.0
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*.0\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◯
+Rewards() = [-0.01]
+Returns() = [-2.099999999999999]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 211
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 212
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 213
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 214
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 215
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 216
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 217
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 218
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 219
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 220
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.199999999999997]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 221
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 222
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 223
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 224
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 225
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 226
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 227
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 228
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 229
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 230
+# ..*0.**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*0.**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◯◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.299999999999995]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 231
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 232
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 233
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 234
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 235
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 236
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 237
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 238
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 239
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 240
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.399999999999993]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 241
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 242
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 243
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 244
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 245
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 246
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 247
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 248
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 249
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 250
+# ..*0.**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*0.**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◯◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.4999999999999907]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 251
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 252
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 253
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 254
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 255
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 256
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 257
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 258
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 259
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 260
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-2.5999999999999885]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 261
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 262
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 263
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 264
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 265
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 266
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 267
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 268
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 269
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 270
+# ..*..**
+# ..*....
+# ....*.0
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*.0\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◉  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◯
+Rewards() = [-0.01]
+Returns() = [-2.6999999999999864]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 271
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 272
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 273
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 274
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 275
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 276
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 277
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 278
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 279
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 280
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-2.7999999999999843]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 281
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 282
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 283
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 284
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 285
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 286
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 287
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 288
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 289
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 290
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.899999999999982]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 291
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 292
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 293
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 294
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 295
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 296
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 297
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 298
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 299
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 300
+# ..*..**
+# ..*.0..
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*.0..\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◯◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-2.99999999999998]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 301
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 302
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 303
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 304
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 305
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 306
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 307
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 308
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 309
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 310
+# ..*..**
+# ..*0...
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*0...\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◯◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.099999999999978]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 311
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 312
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 313
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 314
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 315
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 316
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 317
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 318
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 319
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 320
+# ..*..**
+# ..*....
+# ....*0.
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n....*0.\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◉◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◯◉
+Rewards() = [-0.01]
+Returns() = [-3.1999999999999758]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 321
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 322
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 323
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 324
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 325
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 326
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 327
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 328
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 329
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 330
+# ..*..**
+# ..*...0
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*...0\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.2999999999999736]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 331
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 332
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 333
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 334
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 335
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 336
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 337
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 338
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 339
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 340
+# ..*0.**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*0.**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◯◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.3999999999999715]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 341
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 342
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 343
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 344
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 345
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 346
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 347
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 348
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 349
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 350
+# ..*.0**
+# ..*....
+# ....*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*.0**\n..*....\n....*..\n"
+ObservationTensor(0):
+◯◯◯◯◉◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◯◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.4999999999999694]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 351
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 352
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 353
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 354
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 355
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 356
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 357
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 358
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 359
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 360
+# ..*..**
+# ..*....
+# ..0.*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n..0.*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◉◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◯◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.5999999999999672]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 361
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 362
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 363
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 364
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 365
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 366
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 367
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 368
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 369
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 370
+# ..*..**
+# ..*....
+# ..0.*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n..0.*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◉◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◯◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.699999999999965]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 371
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 372
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 373
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 374
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 375
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 376
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 377
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 378
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 379
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 380
+# ..*..**
+# ..*....
+# .0..*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n.0..*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◉◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◯◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.799999999999963]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 381
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 382
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 383
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 384
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 385
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 386
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 387
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 388
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 389
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 390
+# ..*..**
+# ..*....
+# ..0.*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3, 0, 3, 4, 3, 4, 0, 1, 2, 1, 3]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3, 0, 3, 4, 3, 4, 0, 1, 2, 1, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n..0.*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◉◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◯◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.899999999999961]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 391
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 392
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 393
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 394
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 395
+# Apply joint action ["Down"]
+actions: [4]
+
+# State 396
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 397
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 398
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 399
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 400
+# ..*..**
+# ..*....
+# 0...*..
+IsTerminal() = False
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3, 0, 3, 4, 3, 4, 0, 1, 2, 1, 3, 4, 0, 3, 0, 2, 4, 1, 1, 1, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3, 0, 3, 4, 3, 4, 0, 1, 2, 1, 3, 4, 0, 3, 0, 2, 4, 1, 1, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = -2
+ObservationString(0) = "..*..**\n..*....\n0...*..\n"
+ObservationTensor(0):
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◉◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◉◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◯◉◉◉◯◉◉
+Rewards() = [-0.01]
+Returns() = [-3.9999999999999587]
+LegalActions(0) = [0, 1, 2, 3, 4]
+StringLegalActions(0) = ["Stay", "Left", "Up", "Right", "Down"]
+
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 401
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 402
+# Apply joint action ["Right"]
+actions: [3]
+
+# State 403
+# Apply joint action ["Stay"]
+actions: [0]
+
+# State 404
+# Apply joint action ["Up"]
+actions: [2]
+
+# State 405
+# Apply joint action ["Left"]
+actions: [1]
+
+# State 406
+# 0.*..**
+# ..*....
+# ....*..
+IsTerminal() = True
+History() = [0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3, 0, 3, 4, 3, 4, 0, 1, 2, 1, 3, 4, 0, 3, 0, 2, 4, 1, 1, 1, 1, 2, 0, 3, 0, 2, 1]
+HistoryString() = "0, 4, 0, 3, 4, 1, 2, 0, 2, 2, 0, 0, 1, 1, 0, 4, 0, 4, 1, 1, 4, 3, 4, 0, 0, 2, 3, 2, 0, 3, 1, 0, 0, 3, 4, 1, 0, 2, 0, 0, 3, 0, 2, 0, 4, 4, 0, 4, 4, 2, 3, 1, 2, 1, 0, 0, 3, 2, 3, 4, 2, 1, 1, 4, 4, 0, 2, 0, 1, 2, 0, 3, 4, 0, 1, 3, 0, 1, 4, 2, 0, 1, 0, 3, 0, 3, 4, 4, 0, 3, 0, 1, 1, 4, 2, 4, 0, 3, 4, 2, 4, 0, 0, 3, 3, 4, 4, 2, 3, 2, 1, 0, 3, 2, 3, 0, 1, 3, 0, 0, 4, 0, 2, 3, 1, 4, 4, 2, 2, 1, 2, 4, 4, 2, 0, 3, 1, 2, 4, 3, 1, 1, 3, 3, 1, 3, 3, 3, 2, 4, 2, 1, 1, 2, 3, 1, 4, 2, 2, 3, 1, 4, 1, 3, 0, 3, 2, 2, 0, 4, 0, 1, 1, 0, 4, 0, 1, 2, 2, 3, 0, 4, 1, 1, 0, 3, 3, 3, 1, 1, 4, 0, 1, 4, 2, 2, 4, 2, 3, 2, 1, 0, 0, 2, 0, 3, 0, 0, 4, 0, 0, 4, 0, 1, 1, 2, 0, 2, 1, 0, 2, 0, 3, 2, 2, 3, 3, 0, 2, 1, 3, 4, 1, 3, 4, 3, 1, 4, 4, 0, 0, 0, 2, 3, 3, 4, 2, 2, 2, 1, 2, 4, 3, 3, 4, 1, 0, 2, 4, 1, 1, 0, 4, 2, 0, 3, 4, 4, 3, 3, 3, 2, 2, 3, 2, 4, 2, 1, 4, 1, 4, 0, 4, 1, 3, 4, 3, 3, 0, 2, 4, 0, 0, 4, 2, 0, 1, 3, 1, 1, 2, 1, 2, 2, 2, 1, 0, 4, 0, 0, 0, 1, 3, 0, 0, 0, 0, 3, 2, 4, 1, 0, 4, 3, 0, 4, 1, 3, 3, 2, 1, 4, 2, 1, 1, 1, 0, 1, 1, 2, 2, 0, 4, 3, 3, 1, 1, 2, 3, 2, 1, 1, 3, 4, 1, 4, 4, 0, 1, 4, 1, 0, 0, 3, 3, 0, 1, 0, 0, 0, 2, 2, 2, 1, 0, 4, 1, 1, 0, 3, 0, 3, 4, 3, 4, 0, 1, 2, 1, 3, 4, 0, 3, 0, 2, 4, 1, 1, 1, 1, 2, 0, 3, 0, 2, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "0.*..**\n..*....\n....*..\n"
+ObservationTensor(0):
+◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◯◉◯◯◉◉  ◯◉◯◉◉◯◯
+◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◯◉◯◯◯◯  ◉◉◯◉◉◉◉
+◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯  ◉◉◉◉◯◉◉
+Rewards() = [200.0]
+Returns() = [195.95000000000005]

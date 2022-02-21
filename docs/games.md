@@ -52,6 +52,7 @@ Status                                       | Game
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
+<font color="orange"><b>~</b></font>         | [Pathfinding](#pathfinding)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
 <font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
@@ -502,6 +503,20 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Oware)
+
+### Pathfinding
+
+*   Agents must move to their desitnation.
+*   Agents on a grid. Single-agent game is the classic examples from Sutton &
+    Barto.
+*   Research game.
+*   Non-deterministic (in multiagent, collisions resolved by chance nodes).
+*   Perfect information.
+*   1-10 players.
+*   Similar games appeared in
+    [Austerweil et al. '15](http://miaoliu.scripts.mit.edu/SSS-16/wp-content/uploads/2016/01/paper.pdf),
+    [Greenwald & Hall '03](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf),
+    and [Littman '01](https://jmvidal.cse.sc.edu/library/littman01a.pdf).
 
 ### Pentago
 

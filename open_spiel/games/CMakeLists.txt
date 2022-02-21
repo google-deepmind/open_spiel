@@ -108,6 +108,8 @@ set(GAME_SOURCES
   oware.h
   oware/oware_board.cc
   oware/oware_board.h
+  pathfinding.cc
+  pathfinding.h
   pentago.cc
   pentago.h
   phantom_ttt.cc
@@ -428,6 +430,10 @@ add_executable(oware_test oware_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(oware_test oware_test)
+
+add_executable(pathfinding_test pathfinding_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(pathfinding_test pathfinding_test)
 
 add_executable(pentago_test pentago_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
