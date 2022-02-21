@@ -37,7 +37,7 @@ class Linear(tf.Module):
       in_size: (int) number of inputs
       out_size: (int) number of outputs
       activate_relu: (bool) whether to include a ReLU activation layer
-      name: (string): the name to give to this layer
+      name: (string) the name to give to this layer
     """
 
     super(Linear, self).__init__(name=name)
@@ -95,7 +95,7 @@ class MLP(tf.Module):
       hidden_sizes: (list) sizes (number of units) of each hidden layer
       output_size: (int) number of outputs
       activate_final: (bool) should final layer should include a ReLU
-      name: (string): the name to give to this network
+      name: (string) the name to give to this network
     """
 
     super(MLP, self).__init__(name=name)
@@ -132,6 +132,59 @@ class MLPTorso(tf.Module):
       for size in hidden_sizes:
         self._layers.append(Linear(in_size=input_size, out_size=size))
         input_size = size
+
+  @tf.Module.with_name_scope
+  def __call__(self, x):
+    for layer in self._layers:
+      x = layer(x)
+    return x
+
+
+class ConvNet(tf.Module):
+  """A simple convolutional network."""
+  
+  def __init__(self,
+               input_shape,
+               conv_layer_sizes,
+               dense_layer_sizes,
+               output_size,
+               activate_final=False,
+               name=None):
+    """Create the convolutional network.
+
+    Args:
+      input_shape: (list) shape of the input tensor
+      conv_layer_sizes: (list) sizes (number of filters) of each convolutional layer
+      dense_layer_sizes: (list) sizes (number of units) of each dense layer after
+        the convolutional layers
+      output_size: (int) number of outputs
+      activate_final: (bool) should final layer should include a ReLU
+      name: (string) the name to give to this network
+    """
+
+    super(ConvNet, self).__init__(name=name)
+    self._layers = []
+    with self.name_scope:
+      # Convolutional layers
+      for size in conv_layer_sizes:
+        self._layers.append(
+            tf.keras.layers.Conv2D(
+                filters=size,
+                kernel_size=(3, 3),
+                strides=(1, 1),
+                padding="same",
+                activation=tf.nn.relu))
+      # Flatten
+      self._layers.append(tf.keras.layers.Flatten())
+      # Dense layers
+      for size in dense_layer_sizes:
+        self._layers.append(
+            tf.keras.layers.Dense(
+              units=size, activation=tf.nn.relu))
+      # Output layer
+      self._layers.append(
+          tf.keras.layers.Dense(
+              units=output_size, activation=tf.nn.relu))
 
   @tf.Module.with_name_scope
   def __call__(self, x):
