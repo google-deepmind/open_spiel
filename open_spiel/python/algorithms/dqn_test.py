@@ -132,6 +132,39 @@ class DQNTest(tf.test.TestCase):
       for agent in agents:
         agent.step(time_step)
 
+  def test_run_dark_hex_conv2d(self):
+    num_rows = 3
+    num_cols = 3
+    env = rl_environment.Environment("dark_hex_ir",
+              num_rows=num_rows, num_cols=num_cols)
+
+    state_size = (num_rows, num_cols)
+    num_actions = env.action_spec()["num_actions"]
+  
+    with self.session() as sess:
+      agents = [
+          dqn.DQN(  # pylint: disable=g-complex-comprehension
+              sess,
+              player_id,
+              state_representation_size=state_size,
+              num_actions=num_actions,
+              hidden_layers_sizes=[16],
+              replay_buffer_capacity=10,
+              batch_size=5,
+              model_type="conv2d",
+              conv_layer_sizes=[32, 64]) for player_id in [0, 1]
+      ]
+      sess.run(tf.global_variables_initializer())
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        current_agent = agents[current_player]
+        agent_output = current_agent.step(time_step)
+        time_step = env.step([agent_output.action])
+
+      for agent in agents:
+        agent.step(time_step)
+
 
 if __name__ == "__main__":
   tf.test.main()
