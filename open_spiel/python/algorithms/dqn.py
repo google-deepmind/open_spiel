@@ -50,6 +50,7 @@ class DQN(rl_agent.AbstractAgent):
                state_representation_size,
                num_actions,
                hidden_layers_sizes=128,
+               conv_layer_sizes=None,
                replay_buffer_capacity=10000,
                batch_size=128,
                replay_buffer_class=ReplayBuffer,
@@ -61,6 +62,7 @@ class DQN(rl_agent.AbstractAgent):
                epsilon_start=1.0,
                epsilon_end=0.1,
                epsilon_decay_duration=int(1e6),
+               model_type="mlp",
                optimizer_str="sgd",
                loss_str="mse"):
     """Initialize the DQN agent."""
@@ -92,15 +94,33 @@ class DQN(rl_agent.AbstractAgent):
     self._prev_timestep = None
     self._prev_action = None
 
+    if isinstance(conv_layer_sizes, int):
+      conv_layer_sizes = [conv_layer_sizes]
+    self._conv_layer_sizes = conv_layer_sizes
+
     # Step counter to keep track of learning, eps decay and target network.
     self._step_counter = 0
 
     # Keep track of the last training loss achieved in an update step.
     self._last_loss_value = None
 
+    # Resize input shape if needed. (4D tensor if CNN, 1D tensor if MLP)
+    if model_type == "mlp":
+      self._input_shape = [None, state_representation_size]
+    elif model_type == "conv2d":
+      if isinstance(state_representation_size, int):
+        raise ValueError(
+          "state_representation_size must be a list of ints to" + \
+          "specify the shape of the input to the conv2d model.")
+      if len(state_representation_size) == 2:
+        # Adding the channel dimension.
+        state_representation_size = [*state_representation_size] + [1]
+      # Adding the batch dimension.
+      self._input_shape = [None, *state_representation_size]
+
     # Create required TensorFlow placeholders to perform the Q-network updates.
     self._info_state_ph = tf.placeholder(
-        shape=[None, state_representation_size],
+        shape=self._input_shape,
         dtype=tf.float32,
         name="info_state_ph")
     self._action_ph = tf.placeholder(
@@ -110,7 +130,7 @@ class DQN(rl_agent.AbstractAgent):
     self._is_final_step_ph = tf.placeholder(
         shape=[None], dtype=tf.float32, name="is_final_step_ph")
     self._next_info_state_ph = tf.placeholder(
-        shape=[None, state_representation_size],
+        shape=self._input_shape,
         dtype=tf.float32,
         name="next_info_state_ph")
     self._legal_actions_mask_ph = tf.placeholder(
@@ -118,12 +138,26 @@ class DQN(rl_agent.AbstractAgent):
         dtype=tf.float32,
         name="legal_actions_mask_ph")
 
-    self._q_network = simple_nets.MLP(state_representation_size,
-                                      self._layer_sizes, num_actions)
+    if model_type == "mlp":
+      self._q_network = simple_nets.MLP(
+          self._input_shape[-1], self._layer_sizes, num_actions)
+      self._target_q_network = simple_nets.MLP(
+          self._input_shape[-1], self._layer_sizes, num_actions)
+    elif model_type == "conv2d":
+      self._q_network = simple_nets.ConvNet(
+          state_representation_size, 
+          self._conv_layer_sizes, 
+          self._layer_sizes, 
+          num_actions)
+      self._target_q_network = simple_nets.ConvNet(
+          state_representation_size, 
+          self._conv_layer_sizes,
+          self._layer_sizes, 
+          num_actions)
+    else:
+      raise ValueError(f"Unknown model type: {model_type}\n",
+                       "Supported model types are: 'mlp', 'conv2d'.")
     self._q_values = self._q_network(self._info_state_ph)
-
-    self._target_q_network = simple_nets.MLP(state_representation_size,
-                                             self._layer_sizes, num_actions)
     self._target_q_values = self._target_q_network(self._next_info_state_ph)
 
     # Stop gradient to prevent updates to the target network while learning
