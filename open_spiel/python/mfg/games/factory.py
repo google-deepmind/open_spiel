@@ -18,7 +18,7 @@ from typing import Optional
 from absl import logging
 
 from open_spiel.python.games import dynamic_routing_data
-import google3.third_party.open_spiel.python.mfg.games  # pylint: disable=unused-import
+import open_spiel.python.mfg.games as games  # pylint: disable=unused-import
 from open_spiel.python.mfg.games import crowd_modelling_2d
 from open_spiel.python.mfg.games import dynamic_routing
 import pyspiel
