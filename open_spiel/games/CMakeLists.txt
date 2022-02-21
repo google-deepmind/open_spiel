@@ -431,7 +431,7 @@ add_executable(oware_test oware_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:algorithms>)
 add_test(oware_test oware_test)
 
-add_executable(pathfinding_test pathfining_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(pathfinding_test pathfinding_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(pathfinding_test pathfinding_test)
 
