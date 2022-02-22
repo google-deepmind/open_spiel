@@ -325,7 +325,8 @@ class DeepCFRSolver(policy.Policy):
       3. (float) Policy loss.
     """
     advantage_losses = collections.defaultdict(list)
-    for _ in range(self._num_iterations):
+    for i in range(self._num_iterations):
+      print(f"iter:{i}/{self._num_iterations}")
       for p in range(self._num_players):
         for _ in range(self._num_traversals):
           self._traverse_game_tree(self._root_node, p)

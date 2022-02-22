@@ -34,15 +34,8 @@ flags.DEFINE_integer("print_freq", 1, "How often to print the exploitability")
 
 
 def main(_):
-  # game_name = "python_iterated_prisoners_dilemma"
-  # game = pyspiel.load_game(game_name, {"max_game_length": 5})
-  # game = pyspiel.convert_to_turn_based(game)
-
   game = pyspiel.load_game("python_optimal_stopping")
   game = pyspiel.convert_to_turn_based(game)
-
-  # game_name = "kuhn_poker"
-  # game = pyspiel.load_game(game_name, {"players": 2})
 
   print("load")
   cfr_solver = cfr.CFRSolver(game)

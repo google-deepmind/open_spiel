@@ -240,14 +240,13 @@ class TabularPolicy(Policy):
     players = sorted(players or range(game.num_players()))
     super().__init__(game, players)
     self.game_type = game.get_type()
-
     # Get all states in the game at which players have to make decisions unless
     # they are explicitly specified.
     states = states or get_all_states.get_all_states(
         game,
         depth_limit=-1,
         include_terminals=False,
-        include_chance_states=False,
+        include_chance_states=True,
         include_mean_field_states=False,
         to_string=to_string)
 

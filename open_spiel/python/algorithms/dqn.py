@@ -289,6 +289,7 @@ class DQN(rl_agent.AbstractAgent):
       probs[legal_actions] = 1.0 / len(legal_actions)
     else:
       info_state = np.reshape(info_state, [1, -1])
+      print(f"info:{info_state}")
       q_values = self._session.run(
           self._q_values, feed_dict={self._info_state_ph: info_state})[0]
       legal_q_values = q_values[legal_actions]

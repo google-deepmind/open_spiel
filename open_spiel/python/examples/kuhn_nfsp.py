@@ -82,6 +82,7 @@ def main(unused_argv):
   env = rl_environment.Environment(game, **env_configs)
   info_state_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
+  print(f"num_actions:{num_actions}")
 
   hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
   kwargs = {

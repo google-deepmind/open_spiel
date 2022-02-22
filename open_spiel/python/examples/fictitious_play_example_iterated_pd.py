@@ -12,47 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Example use of the CFR algorithm on Kuhn Poker."""
+"""Python XFP example."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import sys
 from absl import app
 from absl import flags
 
-from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import exploitability
+from open_spiel.python.algorithms import fictitious_play
 import pyspiel
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("iterations", 100, "Number of iterations")
-flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
+flags.DEFINE_string("game", "leduc_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
-flags.DEFINE_integer("print_freq", 1, "How often to print the exploitability")
+flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
 
 
 def main(_):
-  # game_name = "python_iterated_prisoners_dilemma"
-  # game = pyspiel.load_game(game_name, {"max_game_length": 5})
-  # game = pyspiel.convert_to_turn_based(game)
-
-  game = pyspiel.load_game("python_optimal_stopping")
-  game = pyspiel.convert_to_turn_based(game)
-
-  # game_name = "kuhn_poker"
-  # game = pyspiel.load_game(game_name, {"players": 2})
-
-  print("load")
-  cfr_solver = cfr.CFRSolver(game)
-  print("load_complete")
-
+  game_name = "python_iterated_prisoners_dilemma"
+  players = 2
+  #, {"players": players}
+  game = pyspiel.load_game(game_name, {"max_game_length":5, "termination_probability" : 0.0})
+  xfp_solver = fictitious_play.XFPSolver(game)
   for i in range(FLAGS.iterations):
-    cfr_solver.evaluate_and_update_policy()
+    xfp_solver.iteration()
+    conv = exploitability.exploitability(game, xfp_solver.average_policy())
     if i % FLAGS.print_freq == 0:
-      conv = exploitability.exploitability(game, cfr_solver.average_policy())
-      print("Iteration {} exploitability {}".format(i, conv))
+      print("Iteration: {} Conv: {}".format(i, conv))
+      sys.stdout.flush()
 
 
 if __name__ == "__main__":
