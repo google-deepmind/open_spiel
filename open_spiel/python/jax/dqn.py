@@ -33,6 +33,8 @@ Transition = collections.namedtuple(
     "Transition",
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
+# Penalty for illegal actions in action selection. In epsilon-greedy, this will
+# prevent them from being selected.
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
 
 
@@ -267,8 +269,12 @@ class DQN(rl_agent.AbstractAgent):
 
     q_values = self.hk_network.apply(param, info_states)
     target_q_values = self.hk_network.apply(param_target, next_info_states)
-
-    max_next_q = jnp.max(target_q_values + jnp.log(legal_actions_mask), axis=-1)
+    # Sum a large negative constant to illegal action logits before taking the
+    # max. This prevents illegal action values from being considered as target.
+    max_next_q = jnp.max(
+        target_q_values +
+        (1 - legal_actions_mask) * ILLEGAL_ACTION_LOGITS_PENALTY,
+        axis=-1)
     max_next_q = jax.numpy.where(
         1 - are_final_steps, x=max_next_q, y=jnp.zeros_like(max_next_q))
     target = (
