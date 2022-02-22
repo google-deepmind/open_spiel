@@ -148,7 +148,16 @@ class OptimalStoppingGame(pyspiel.Game):
         self.R_INT = params["R_INT"]
 
     def observation_tensor_size(self):
-        return 1
+        return 2
+
+    def observation_tensor_shape(self):
+        return(2,)
+
+    def information_state_tensor_size(self):
+        return 2
+
+    def information_state_tensor_shape(self):
+        return(2,)
 
     def new_initial_state(self):
         """Returns a state corresponding to the start of a game."""
@@ -158,7 +167,7 @@ class OptimalStoppingGame(pyspiel.Game):
     def make_py_observer(self, iig_obs_type=None, params=None):
         """Returns an object used for observing game state."""
         return OptimalStoppingGameObserver(
-            iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False),
+            iig_obs_type or pyspiel.IIGObservationType(perfect_recall=True),
             params)
 
 
@@ -184,7 +193,10 @@ class OptimalStoppingState(pyspiel.State):
         self.latest_obs = Chance.OBS_0
 
     def observation_tensor(self, player):
-        return [self.latest_obs]
+        return [1,1]
+
+    def information_state_tensor(self, player):
+        return [1,1]
 
     # OpenSpiel (PySpiel) API functions are below. This is the standard set that
     # should be implemented by every simultaneous-move game with chance.
@@ -307,7 +319,7 @@ class OptimalStoppingGameObserver:
         assert not bool(params)
         self.iig_obs_type = iig_obs_type
         self.tensor = None
-        self.dict = {}
+        self.dict = {"observation": np.array([1,44])}
 
     def set_from(self, state, player):
         pass
