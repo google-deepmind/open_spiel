@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """NFSP agents trained on Dark Hex."""
 
 from absl import app
@@ -29,12 +28,12 @@ import numpy as np
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string("game_name", "dark_hex_ir",
-                    "Name of the game.")
+flags.DEFINE_string("game_name", "dark_hex_ir", "Name of the game.")
 flags.DEFINE_integer("num_rows", 4, "Number of rows.")
 flags.DEFINE_integer("num_cols", 3, "Number of cols.")
 flags.DEFINE_integer("num_players", 2, "Number of players.")
-flags.DEFINE_integer("num_train_episodes", int(2e7), "Number of training episodes.")
+flags.DEFINE_integer("num_train_episodes", int(2e7),
+                     "Number of training episodes.")
 flags.DEFINE_integer("eval_every", int(2e5),
                      "Episode frequency at which the agents are evaluated.")
 flags.DEFINE_integer("num_eval_games", int(2e4),
@@ -160,10 +159,16 @@ def main(unused_argv):
   with tf.Session() as sess:
     # pylint: disable=g-complex-comprehension
     agents = [
-        nfsp.NFSP(sess, idx, info_state_size, num_actions, hidden_layers_sizes,
-                  conv_layer_info=conv_layer_info, model_type="conv2d", 
-                  input_shape=(3, FLAGS.num_rows, FLAGS.num_cols),
-                  **kwargs) for idx in range(num_players)
+        nfsp.NFSP(
+            sess,
+            idx,
+            info_state_size,
+            num_actions,
+            hidden_layers_sizes,
+            conv_layer_info=conv_layer_info,
+            model_type="conv2d",
+            input_shape=(3, FLAGS.num_rows, FLAGS.num_cols),
+            **kwargs) for idx in range(num_players)
     ]
     joint_avg_policy = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
@@ -191,8 +196,9 @@ def main(unused_argv):
                                        FLAGS.num_eval_games)
           logging.info("[%s] Random Games AVG %s", ep + 1, rand_eval)
         else:
-          raise ValueError(" ".join(("Invalid evaluation metric, choose from",
-                                     "'exploitability', 'nash_conv', 'random_games'.")))
+          raise ValueError(" ".join(
+              ("Invalid evaluation metric, choose from",
+               "'exploitability', 'nash_conv', 'random_games'.")))
         if FLAGS.use_checkpoints:
           for agent in agents:
             agent.save(FLAGS.checkpoint_dir)
@@ -209,11 +215,11 @@ def main(unused_argv):
       for agent in agents:
         agent.step(time_step)
 
+
 def run_random_games(game, policy, num_games, player=None):
   """Runs random games and returns average score."""
   scores_as_p = [0., 0.]
   games_per_p = num_games if player else num_games // 2
-  
   if player:
     for _ in range(games_per_p):
       scores_as_p[player] += run_random_game(game, policy, player)

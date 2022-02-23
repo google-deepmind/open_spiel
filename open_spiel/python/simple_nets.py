@@ -179,54 +179,49 @@ class ConvNet(tf.Module):
       # Input Layer
       input_layer = conv_layer_info[0]
       self._layers.append(
-        tf.keras.layers.Conv2D(
-          filters=input_layer["filters"],
-          kernel_size=input_layer.get("kernel_size", 3),
-          strides=input_layer.get("strides", 1),
-          padding=input_layer.get("padding", "SAME"),
-          activation=input_layer.get("activation", "relu"),
-          input_shape=input_shape,
-          name="input_layer"))
+          tf.keras.layers.Conv2D(
+              filters=input_layer["filters"],
+              kernel_size=input_layer.get("kernel_size", 3),
+              strides=input_layer.get("strides", 1),
+              padding=input_layer.get("padding", "SAME"),
+              activation=input_layer.get("activation", "relu"),
+              input_shape=input_shape,
+              name="input_layer"))
       if input_layer.get("max_pool", 0) > 0:
         self._layers.append(
             tf.keras.layers.MaxPool2D(
-                pool_size=input_layer["max_pool"],
-                name="max_pool_input"))
-      
+                pool_size=input_layer["max_pool"], name="max_pool_input"))
+
       # Convolutional layers
       for idx, info in enumerate(conv_layer_info[1:]):
         self._layers.append(
-          tf.keras.layers.Conv2D(
-            filters=info["filters"],
-            kernel_size=info.get("kernel_size", 3),
-            strides=info.get("strides", 1),
-            padding=info.get("padding", "SAME"),
-            activation=info.get("activation", "relu"),
-            name=f"conv_layer_{idx}"))
+            tf.keras.layers.Conv2D(
+                filters=info["filters"],
+                kernel_size=info.get("kernel_size", 3),
+                strides=info.get("strides", 1),
+                padding=info.get("padding", "SAME"),
+                activation=info.get("activation", "relu"),
+                name=f"conv_layer_{idx}"))
         if info.get("max_pool", 0) > 0:
           self._layers.append(
               tf.keras.layers.MaxPool2D(
-                  pool_size=info["max_pool"],
-                  name=f"max_pool_{idx}"))
-            
+                  pool_size=info["max_pool"], name=f"max_pool_{idx}"))
+
       # Flatten
-      self._layers.append(
-        tf.keras.layers.Flatten(name="flatten"))
+      self._layers.append(tf.keras.layers.Flatten(name="flatten"))
 
       # Dense layers
       for idx, size in enumerate(dense_layer_sizes):
         self._layers.append(
-          tf.keras.layers.Dense(
-            units=size,
-            activation=tf.nn.relu,
-            name=f"dense_layer_{idx}"))
+            tf.keras.layers.Dense(
+                units=size, activation=tf.nn.relu, name=f"dense_layer_{idx}"))
 
       # Output layer
       self._layers.append(
-        tf.keras.layers.Dense(
-          units=output_size,
-          activation=None if activate_final else tf.nn.relu,
-          name="output_layer"))
+          tf.keras.layers.Dense(
+              units=output_size,
+              activation=None if activate_final else tf.nn.relu,
+              name="output_layer"))
 
   @tf.Module.with_name_scope
   def __call__(self, x):

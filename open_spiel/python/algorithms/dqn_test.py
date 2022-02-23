@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for open_spiel.python.algorithms.dqn."""
 
 from __future__ import absolute_import
@@ -43,15 +42,16 @@ class DQNTest(tf.test.TestCase):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
     env = rl_environment.Environment(game=game)
     with self.session() as sess:
-      agent = dqn.DQN(sess, 0,
-                      state_representation_size=
-                      game.information_state_tensor_shape()[0],
-                      num_actions=game.num_distinct_actions(),
-                      hidden_layers_sizes=[16],
-                      replay_buffer_capacity=100,
-                      batch_size=5,
-                      epsilon_start=0.02,
-                      epsilon_end=0.01)
+      agent = dqn.DQN(
+          sess,
+          0,
+          state_representation_size=game.information_state_tensor_shape()[0],
+          num_actions=game.num_distinct_actions(),
+          hidden_layers_sizes=[16],
+          replay_buffer_capacity=100,
+          batch_size=5,
+          epsilon_start=0.02,
+          epsilon_end=0.01)
       total_reward = 0
       sess.run(tf.global_variables_initializer())
 
@@ -135,12 +135,12 @@ class DQNTest(tf.test.TestCase):
   def test_run_dark_hex_conv2d(self):
     num_rows = 3
     num_cols = 3
-    env = rl_environment.Environment("dark_hex_ir",
-              num_rows=num_rows, num_cols=num_cols)
+    env = rl_environment.Environment(
+        "dark_hex_ir", num_rows=num_rows, num_cols=num_cols)
 
     state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
-  
+
     with self.session() as sess:
       agents = [
           dqn.DQN(  # pylint: disable=g-complex-comprehension
@@ -153,7 +153,9 @@ class DQNTest(tf.test.TestCase):
               batch_size=5,
               model_type="conv2d",
               input_shape=(3, num_rows, num_cols),
-              conv_layer_info=[{'filters': 512}]) for player_id in [0, 1]
+              conv_layer_info=[{
+                  'filters': 512
+              }]) for player_id in [0, 1]
       ]
       sess.run(tf.global_variables_initializer())
       time_step = env.reset()

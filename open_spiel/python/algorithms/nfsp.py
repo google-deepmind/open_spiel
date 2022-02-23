@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Neural Fictitious Self-Play (NFSP) agent implemented in TensorFlow.
 
 See the paper https://arxiv.org/abs/1603.01121 for more details.
@@ -101,9 +100,15 @@ class NFSP(rl_agent.AbstractAgent):
       self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
                                num_actions, hidden_layers_sizes, **kwargs)
     elif model_type == "conv2d":
-      self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
-                               num_actions, conv_layer_info=conv_layer_info,
-                               input_shape=input_shape, model_type="conv2d", **kwargs)
+      self._rl_agent = dqn.DQN(
+          session,
+          player_id,
+          state_representation_size,
+          num_actions,
+          conv_layer_info=conv_layer_info,
+          input_shape=input_shape,
+          model_type="conv2d",
+          **kwargs)
     else:
       raise ValueError(f"Unknown model type: {model_type}",
                        f"Supported model types: {supported_model_types}")
@@ -116,9 +121,7 @@ class NFSP(rl_agent.AbstractAgent):
 
     # Placeholders.
     self._info_state_ph = tf.placeholder(
-        shape=self._input_shape,
-        dtype=tf.float32,
-        name="info_state_ph")
+        shape=self._input_shape, dtype=tf.float32, name="info_state_ph")
 
     self._action_probs_ph = tf.placeholder(
         shape=[None, num_actions], dtype=tf.float32, name="action_probs_ph")
@@ -134,10 +137,10 @@ class NFSP(rl_agent.AbstractAgent):
                                           self._layer_sizes, num_actions)
     elif model_type == "conv2d":
       self._avg_network = simple_nets.ConvNet(
-          input_size=state_representation_size, 
+          input_size=state_representation_size,
           input_shape=input_shape,
-          conv_layer_info=self._conv_layer_info, 
-          dense_layer_sizes=self._layer_sizes, 
+          conv_layer_info=self._conv_layer_info,
+          dense_layer_sizes=self._layer_sizes,
           output_size=num_actions)
     self._avg_policy = self._avg_network(self._info_state_ph)
     self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
