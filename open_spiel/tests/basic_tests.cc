@@ -325,24 +325,17 @@ namespace open_spiel {
                     std::cout << "player " << state->CurrentPlayer() << std::endl;
                 }
                 LegalActionsIsEmptyForOtherPlayers(game, *state);
-                std::cout << "[DEBUG] 1" << std::endl;
                 CheckLegalActionsAreSorted(game, *state);
-                std::cout << "[DEBUG] 2" << std::endl;
 
                 // Test cloning the state.
                 std::unique_ptr <open_spiel::State> state_copy = state->Clone();
-                std::cout << "[DEBUG] 3" << std::endl;
                 SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
-                std::cout << "[DEBUG] 4" << std::endl;
                 SPIEL_CHECK_EQ(state->History(), state_copy->History());
-                std::cout << "[DEBUG] 5" << std::endl;
 
                 if (game.GetType().dynamics == GameType::Dynamics::kMeanField) {
                     SPIEL_CHECK_LT(state->MoveNumber(), game.MaxMoveNumber());
-                    std::cout << "[DEBUG] 6" << std::endl;
                     SPIEL_CHECK_EQ(state->MoveNumber(), num_moves);
                 }
-
                 if (serialize && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
                     TestSerializeDeserialize(game, state.get());
                 }

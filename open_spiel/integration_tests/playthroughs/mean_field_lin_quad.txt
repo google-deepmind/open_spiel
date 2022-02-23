@@ -72,7 +72,7 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6"]
 action: 3
 
 # State 2
-# (0, 0)_a_mu
+# (0.0, 0)_a_mu
 IsTerminal() = False
 History() = [0, 3]
 HistoryString() = "0, 3"
@@ -80,7 +80,7 @@ IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "0, 3"
-ObservationString(0) = "(0, 0)_a_mu"
+ObservationString(0) = "(0.0, 0)_a_mu"
 ObservationTensor(0).x: ◯
 ObservationTensor(0).t: ◯
 ObservationTensor(0): ◯◯
@@ -92,7 +92,7 @@ StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6"]
 action: 5
 
 # State 3
-# (2, 1)_a
+# (2.0, 1)_a
 IsTerminal() = False
 History() = [0, 3, 5]
 HistoryString() = "0, 3, 5"
@@ -100,8 +100,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -5
 InformationStateString(0) = "0, 3, 5"
-ObservationString(0) = "(2, 1)_a"
-ObservationTensor(0).x = [2]
+ObservationString(0) = "(2.0, 1)_a"
+ObservationTensor(0).x = [2.0]
 ObservationTensor(0).t: ◉
 ObservationTensor(0) = [2.0, 1.0]
 Rewards() = [0.0]
@@ -112,7 +112,7 @@ DistributionSupport() = ['(0, 1)_a', '(1, 1)_a', '(2, 1)_a', '(3, 1)_a', '(4, 1)
 action: update_distribution
 
 # State 4
-# (2, 1)
+# (2.0, 1)
 IsTerminal() = False
 History() = [0, 3, 5]
 HistoryString() = "0, 3, 5"
@@ -120,8 +120,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "0, 3, 5"
-ObservationString(0) = "(2, 1)"
-ObservationTensor(0).x = [2]
+ObservationString(0) = "(2.0, 1)"
+ObservationTensor(0).x = [2.0]
 ObservationTensor(0).t: ◉
 ObservationTensor(0) = [2.0, 1.0]
 Rewards() = [-1.562500000000001]
@@ -137,7 +137,7 @@ action: 0
 action: 1
 
 # State 6
-# (7, 2)_a
+# (7.0, 2)_a
 IsTerminal() = False
 History() = [0, 3, 5, 0, 1]
 HistoryString() = "0, 3, 5, 0, 1"
@@ -145,8 +145,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -5
 InformationStateString(0) = "0, 3, 5, 0, 1"
-ObservationString(0) = "(7, 2)_a"
-ObservationTensor(0).x = [7]
+ObservationString(0) = "(7.0, 2)_a"
+ObservationTensor(0).x = [7.0]
 ObservationTensor(0).t = [2.0]
 ObservationTensor(0) = [7.0, 2.0]
 Rewards() = [0.0]
@@ -157,7 +157,7 @@ DistributionSupport() = ['(0, 2)_a', '(1, 2)_a', '(2, 2)_a', '(3, 2)_a', '(4, 2)
 action: update_distribution
 
 # State 7
-# (7, 2)
+# (7.0, 2)
 IsTerminal() = False
 History() = [0, 3, 5, 0, 1]
 HistoryString() = "0, 3, 5, 0, 1"
@@ -165,8 +165,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "0, 3, 5, 0, 1"
-ObservationString(0) = "(7, 2)"
-ObservationTensor(0).x = [7]
+ObservationString(0) = "(7.0, 2)"
+ObservationTensor(0).x = [7.0]
 ObservationTensor(0).t = [2.0]
 ObservationTensor(0) = [7.0, 2.0]
 Rewards() = [-5.987499999999999]
@@ -182,7 +182,7 @@ action: 6
 action: 5
 
 # State 9
-# (2, 3)_a
+# (2.0, 3)_a
 IsTerminal() = False
 History() = [0, 3, 5, 0, 1, 6, 5]
 HistoryString() = "0, 3, 5, 0, 1, 6, 5"
@@ -190,8 +190,8 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -5
 InformationStateString(0) = "0, 3, 5, 0, 1, 6, 5"
-ObservationString(0) = "(2, 3)_a"
-ObservationTensor(0).x = [2]
+ObservationString(0) = "(2.0, 3)_a"
+ObservationTensor(0).x = [2.0]
 ObservationTensor(0).t = [3.0]
 ObservationTensor(0) = [2.0, 3.0]
 Rewards() = [0.0]
@@ -282,7 +282,7 @@ action: 6
 action: 2
 
 # State 30
-# (1, 10)_a
+# (1.0, 10)_a
 IsTerminal() = True
 History() = [0, 3, 5, 0, 1, 6, 5, 3, 3, 3, 3, 5, 3, 4, 1, 3, 0, 4, 1, 6, 2]
 HistoryString() = "0, 3, 5, 0, 1, 6, 5, 3, 3, 3, 3, 5, 3, 4, 1, 3, 0, 4, 1, 6, 2"
@@ -290,7 +290,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "0, 3, 5, 0, 1, 6, 5, 3, 3, 3, 3, 5, 3, 4, 1, 3, 0, 4, 1, 6, 2"
-ObservationString(0) = "(1, 10)_a"
+ObservationString(0) = "(1.0, 10)_a"
 ObservationTensor(0).x: ◉
 ObservationTensor(0).t = [10.0]
 ObservationTensor(0) = [1.0, 10.0]

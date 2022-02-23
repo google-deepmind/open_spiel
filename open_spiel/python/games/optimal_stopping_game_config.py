@@ -1,4 +1,3 @@
-from typing import List
 import numpy as np
 import pyspiel
 from open_spiel.python.games.optimal_stopping_game_action import OptimalStoppingGameAction
@@ -7,8 +6,8 @@ from open_spiel.python.games.optimal_stopping_game_action import OptimalStopping
 class OptimalStoppingGameConfig:
 
     def __init__(self, p: float = 0.001, T_max: int = 5, L: int = 3, R_ST: int = 100, R_SLA: int = 10,
-                 R_COST: int = -50, R_INT: int = -100, obs: List = None,
-                 obs_dist: List = None, obs_dist_intrusion: List = None):
+                 R_COST: int = -50, R_INT: int = -100, obs: str = "",
+                 obs_dist: str = "", obs_dist_intrusion: str = ""):
         """
         DTO class representing the configuration of the optimal stopping game
 
@@ -22,6 +21,12 @@ class OptimalStoppingGameConfig:
         :param obs: the list of observations
         :param obs_dist_intrusion: the observation distribution
         """
+        self.obs_str = obs
+        self.obs_dist_str = obs_dist
+        self.obs_dist_intrusion_str = obs_dist_intrusion
+        obs = list(map(lambda x: int(x), obs.split(" ")))
+        obs_dist = list(map(lambda x: float(x), obs_dist.split(" ")))
+        obs_dist_intrusion = list(map(lambda x: float(x), obs_dist_intrusion.split(" ")))
         assert obs is not None
         assert obs_dist is not None
         assert obs_dist_intrusion is not None
@@ -36,18 +41,18 @@ class OptimalStoppingGameConfig:
         self.R_SLA = R_SLA
         self.R_COST = R_COST
         self.R_INT = R_INT
-        self.obs = np.array(obs)
-        self.obs_dist = np.array(obs_dist)
-        self.obs_dist_intrusion = np.array(obs_dist_intrusion)
+        self.obs = obs
+        self.obs_dist = obs_dist
+        self.obs_dist_intrusion = obs_dist_intrusion
         self.num_players = 2
         self.observation_tensor_size = 1
-        self.observation_tensor_shape = self.obs[0].shape
+        self.observation_tensor_shape = (len(self.obs))
         self.information_state_tensor_size = 2
         self.information_state_tensor_shape = (2,)
-        self.actions = [OptimalStoppingGameAction.STOP, OptimalStoppingGameAction.CONTINUE]
         self.params = self.params_dict()
-        self.game_type = self.create_game_type()
-        self.game_info = self.create_game_info()
+
+    def get_actions(self):
+        return [OptimalStoppingGameAction.STOP, OptimalStoppingGameAction.CONTINUE]
 
     def create_game_type(self) -> pyspiel.GameType:
         """
@@ -75,11 +80,11 @@ class OptimalStoppingGameConfig:
         :return: GameInfo object
         """
         return pyspiel.GameInfo(
-            num_distinct_actions=len(self.actions),
-            max_chance_outcomes=len(self.obs),
+            num_distinct_actions=len(self.get_actions()),
+            max_chance_outcomes=len(self.obs) + 1,
             num_players=self.num_players,
-            min_utility=self.R_INT,
-            max_utility=self.R_ST,
+            min_utility=self.R_INT*10,
+            max_utility=self.R_ST*10,
             utility_sum=0.0,
             max_game_length=self.T_max)
 
@@ -95,9 +100,9 @@ class OptimalStoppingGameConfig:
         d["R_SLA"] = self.R_SLA
         d["R_COST"] = self.R_COST
         d["R_INT"] = self.R_INT
-        d["obs"] = ",".join(list(map(lambda x: str(x), self.obs.tolist())))
-        d["obs_dist"] = ",".join(list(map(lambda x: str(x), self.obs_dist.tolist())))
-        d["obs_dist_intrusion"] = ",".join(list(map(lambda x: str(x), self.obs_dist_intrusion.tolist())))
+        d["obs"] = self.obs_str
+        d["obs_dist"] = self.obs_dist_str
+        d["obs_dist_intrusion"] = self.obs_dist_intrusion_str
         return d
 
     def __str__(self) -> str:
@@ -107,7 +112,7 @@ class OptimalStoppingGameConfig:
         return f"p:{self.p}, T_max:{self.T_max}, L: {self.L}, R_ST:{self.R_ST}, R_SLA:{self.R_SLA}, " \
                f"R_COST:{self.R_COST}, R_INT:{self.R_INT}, observations:{self.obs}, " \
                f"obs_dist:{self.obs_dist}, obs_dist_intrusion:{self.obs_dist_intrusion}, " \
-               f"actions:{self.actions}"
+               f"actions:{self.get_actions()}"
 
     @staticmethod
     def from_params_dict(params_dict: dict) -> "OptimalStoppingGameConfig":
@@ -120,9 +125,9 @@ class OptimalStoppingGameConfig:
         return OptimalStoppingGameConfig(
             p=params_dict["p"], T_max=params_dict["T_max"], L=params_dict["L"], R_ST=params_dict["R_ST"],
             R_SLA=params_dict["R_SLA"], R_COST=params_dict["R_COST"], R_INT=params_dict["R_INT"],
-            obs=list(map(lambda x: int(x), params_dict["obs"].split(","))),
-            obs_dist_intrusion=list(map(lambda x: float(x), params_dict["obs_dist_intrusion"].split(","))),
-            obs_dist=list(map(lambda x: float(x), params_dict["obs_dist"].split(",")))
+            obs=params_dict["obs"],
+            obs_dist_intrusion=params_dict["obs_dist_intrusion"],
+            obs_dist=params_dict["obs_dist"]
         )
 
     @staticmethod
@@ -138,38 +143,7 @@ class OptimalStoppingGameConfig:
         d["R_SLA"] = 10
         d["R_COST"] = -50
         d["R_INT"] = -100
-        d["obs"] = ",".join(list(map(lambda x: str(x),[0,1,2,3,4,5,6,7,8,9])))
-        d["obs_dist"] = ",".join(list(map(lambda x: str(x),[4/20,4/20,4/20,2/20,1/20,1/20,1/20,1/20,1/20,1/20])))
-        d["obs_dist_intrusion"] = ",".join(list(map(lambda x: str(x),[1/20,1/20,1/20,1/20,1/20,1/20,2/20,4/20,4/20,4/20])))
+        d["obs"] = " ".join(list(map(lambda x: str(x),[0,1,2,3,4,5,6,7,8,9])))
+        d["obs_dist"] = " ".join(list(map(lambda x: str(x),[4/20,4/20,4/20,2/20,1/20,1/20,1/20,1/20,1/20,1/20])))
+        d["obs_dist_intrusion"] = " ".join(list(map(lambda x: str(x),[1/20,1/20,1/20,1/20,1/20,1/20,2/20,4/20,4/20,4/20])))
         return d
-
-
-    def __getstate__(self) -> dict:
-        """
-        Serialize the object
-
-        :return: dict state
-        """
-
-        # start with a copy so we don't accidentally modify the object state
-        # or cause other conflicts
-        state = self.__dict__.copy()
-
-        # remove unpicklable entries
-        del state["game_type"]
-        del state["game_info"]
-        return state
-
-    def __setstate__(self, state) -> None:
-        """
-        Deserialize the object
-
-        :param state: the state
-        :return: None
-        """
-        # restore the state which was picklable
-        self.__dict__.update(state)
-
-        # restore unpicklable entries
-        self.game_type = self.create_game_type()
-        self.game_info = self.create_game_info()

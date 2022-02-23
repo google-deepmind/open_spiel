@@ -17,8 +17,9 @@ class OptimalStoppingGame(pyspiel.Game):
         :param params: user-supplied parameters of the game
         """
         config = OptimalStoppingGameConfig.from_params_dict(params_dict=params)
-        super().__init__(config.game_type,config.game_info, params)
+        super().__init__(config.create_game_type(),config.create_game_info(), params)
         self.config = config
+        self.params = params
 
     def observation_tensor_size(self):
         """
@@ -73,5 +74,5 @@ class OptimalStoppingGame(pyspiel.Game):
 
 # Register the game with the OpenSpiel library
 pyspiel.register_game(
-    OptimalStoppingGameConfig.from_params_dict(params_dict=OptimalStoppingGameConfig.default_params()).game_type,
+    OptimalStoppingGameConfig.from_params_dict(params_dict=OptimalStoppingGameConfig.default_params()).create_game_type(),
     OptimalStoppingGame)

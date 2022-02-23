@@ -94,23 +94,21 @@ class OptimalStoppingGameUtil:
         :return: a vector with tuples: (obs, prob)
         """
         if state == 0:
-            return [(-1, config.p)] + [(x, (1-config.p)*config.obs_dist[i]) for i,x in enumerate(config.obs)]
+            return  [(x, (1-config.p)*config.obs_dist[i]) for i,x in enumerate(config.obs)] + [(max(config.obs) + 1, config.p)]
         elif state == 1:
-            return [(-1, config.p)] + [(x, (1-config.p)*config.obs_dist_intrusion[i]) for i,x in enumerate(config.obs)]
+            return [(x, (1-config.p)*config.obs_dist_intrusion[i]) for i,x in enumerate(config.obs)] + [(max(config.obs) + 1, config.p)]
         else:
             raise ValueError(f"Cannot sample chance distribution if game is in the terminal state:{state}")
 
-
-
     @staticmethod
-    def get_observation_type(obs: int) -> OptimalStoppingGameObservationType:
+    def get_observation_type(obs: int, config: OptimalStoppingGameConfig) -> OptimalStoppingGameObservationType:
         """
         Returns the type of the observation
 
         :param obs: the observation to get the type of
         :return: observation type
         """
-        if obs == -1:
+        if obs == max(config.obs) + 1:
             return OptimalStoppingGameObservationType.TERMINAL
         else:
             return OptimalStoppingGameObservationType.NON_TERMINAL

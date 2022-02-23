@@ -21,25 +21,12 @@ class OptimalStoppingGameState(pyspiel.State):
         self.current_iteration = 1
         self.is_chance = False
         self.game_over = False
-        self.rewards = np.zeros(config.num_players)
-        self.returns = np.zeros(config.num_players)
+        self._rewards = np.zeros(config.num_players)
+        self._returns = np.zeros(config.num_players)
         self.intrusion = 0
         self.l = config.L
         self.latest_obs = 0
 
-    # def observation_tensor(self, player: int) -> List:
-    #     """
-    #     Method to conform to PySpiel's API
-    #
-    #     :param player: the player
-    #     :return: an observation tensor for the given player
-    #     """
-    #     assert player >= 0
-    #     return [1]
-    #
-    # def information_state_tensor(self, player):
-    #     assert player >= 0
-    #     return [1]
 
     def current_player(self):
         """
@@ -85,7 +72,7 @@ class OptimalStoppingGameState(pyspiel.State):
         assert self.is_chance and not self.game_over
         self.current_iteration += 1
         self.is_chance = False
-        self.game_over = (OptimalStoppingGameUtil.get_observation_type(obs=obs)
+        self.game_over = (OptimalStoppingGameUtil.get_observation_type(obs=obs, config=self.config)
                            == OptimalStoppingGameObservationType.TERMINAL)
         if self.current_iteration > self.get_game().max_game_length():
             self.game_over = True
@@ -102,9 +89,9 @@ class OptimalStoppingGameState(pyspiel.State):
         # Compute reward
         r = OptimalStoppingGameUtil.reward_function(state=self.intrusion, defender_action=actions[0],
                                                     attacker_action=actions[1], l=self.l, config=self.config)
-        self.rewards[0] = r
-        self.rewards[1] = -r
-        self.returns += self.rewards
+        self._rewards[0] = r
+        self._rewards[1] = -r
+        self._returns += self._rewards
 
         # Compute next state
         s_prime = OptimalStoppingGameUtil.next_state(state=self.intrusion, defender_action=actions[0],
@@ -135,7 +122,7 @@ class OptimalStoppingGameState(pyspiel.State):
         :return: a string representation of an action
         """
         if player == pyspiel.PlayerId.CHANCE:
-            return OptimalStoppingGameUtil.get_observation_type(obs=action).name
+            return OptimalStoppingGameUtil.get_observation_type(obs=action, config=self.config).name
         else:
             return OptimalStoppingGameAction(action).name
 
@@ -153,7 +140,7 @@ class OptimalStoppingGameState(pyspiel.State):
 
         :return: rewards at the previous step
         """
-        return self.rewards
+        return self._rewards
 
     def returns(self) -> np.ndarray:
         """
@@ -161,7 +148,7 @@ class OptimalStoppingGameState(pyspiel.State):
 
         :return: Total reward for each player over the course of the game so far.
         """
-        return self.returns
+        return self._returns
 
     def __str__(self):
         """
