@@ -111,10 +111,14 @@ class DarkHexState : public State {
 
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
+  int num_cells() const { return num_cells_; }
 
  protected:
   void DoApplyAction(Action move) override;
   std::string ViewToString(Player player) const;
+
+  std::vector<hex::CellState> black_view_;
+  std::vector<hex::CellState> white_view_;
 
  private:
   std::string ActionSequenceToString(Player player) const;
@@ -130,8 +134,6 @@ class DarkHexState : public State {
 
   // Change this to _history on base class
   std::vector<std::pair<int, Action>> action_sequence_;
-  std::vector<hex::CellState> black_view_;
-  std::vector<hex::CellState> white_view_;
 };
 
 class DarkHexGame : public Game {
@@ -156,6 +158,7 @@ class DarkHexGame : public Game {
   GameVersion game_version() const { return game_version_; }
   int num_cols() const { return num_cols_; }
   int num_rows() const { return num_rows_; }
+  int num_cells() const { return num_cells_; }
 
  private:
   std::shared_ptr<const hex::HexGame> game_;
@@ -177,8 +180,12 @@ class ImperfectRecallDarkHexState : public DarkHexState {
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-    return absl::StrCat("P", player, " ", ViewToString(player));
+    return absl::StrCat("P", player, "\n", ViewToString(player));
   }
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
+  void ObservationTensor(Player player,
+                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new ImperfectRecallDarkHexState(*this));
   }
@@ -192,6 +199,8 @@ class ImperfectRecallDarkHexGame : public DarkHexGame {
         shared_from_this(), num_cols(), num_rows(), game_version(),
         obs_type()));
   }
+  std::vector<int> InformationStateTensorShape() const override;
+  std::vector<int> ObservationTensorShape() const override;
 };
 
 inline std::ostream& operator<<(std::ostream& stream,

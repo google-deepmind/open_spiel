@@ -322,6 +322,42 @@ std::vector<int> DarkHexGame::ObservationTensorShape() const {
     SpielFatalError("Uknown observation type");
   }
 }
+  void ImperfectRecallDarkHexState::InformationStateTensor(Player player,
+                                          absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  const auto& player_view = (player == 0 ? black_view_ : white_view_);
+
+  SPIEL_CHECK_EQ(values.size(), num_cells() + 1);
+  std::fill(values.begin(), values.end(), 0.);
+  for (int cell = 0; cell < num_cells(); ++cell) {
+    values[cell] = static_cast<int>(player_view[cell]) - kMinValueCellState;
+  }
+
+  values[num_cells()] = player;
+}
+
+std::vector<int> ImperfectRecallDarkHexGame::InformationStateTensorShape() const {
+  return {num_cells() + 1};
+}
+
+void ImperfectRecallDarkHexState::ObservationTensor(Player player,
+                                     absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 0.);
+
+  const auto& player_view = (player == 0 ? black_view_ : white_view_);
+  for (int cell = 0; cell < num_cells(); ++cell) {
+    values[cell] = static_cast<int>(player_view[cell]) - kMinValueCellState;
+  }
+}
+
+std::vector<int> ImperfectRecallDarkHexGame::ObservationTensorShape() const {
+  return {num_cells()};
+}
 
 }  // namespace dark_hex
 }  // namespace open_spiel

@@ -167,6 +167,25 @@ void AbruptDarkHexTests() {
   AbruptDHCustomTest();
 }
 
+void ImperfectRecallDarkHex() {
+  std::shared_ptr<const Game> game =
+      LoadGame("dark_hex_ir", {{"num_cols", GameParameter(2)},
+                              {"num_rows", GameParameter(2)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::cout << state->InformationStateTensor(0) << std::endl;
+  std::cout << state->InformationStateTensor(1) << std::endl;
+  state->ApplyAction(0);
+  state->ApplyAction(1);
+  state->ApplyAction(2);
+  // Black wins
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), 1.0);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), -1.0);
+
+  testing::RandomSimTest(
+      *LoadGame("dark_hex_ir(num_rows=3,num_cols=2)"), 3);
+}
+
 }  // namespace
 }  // namespace dark_hex
 }  // namespace open_spiel
@@ -174,4 +193,5 @@ void AbruptDarkHexTests() {
 int main(int argc, char** argv) {
   open_spiel::dark_hex::ClassicalDarkHexTests();
   open_spiel::dark_hex::AbruptDarkHexTests();
+  open_spiel::dark_hex::ImperfectRecallDarkHex();
 }
