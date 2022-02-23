@@ -375,22 +375,8 @@ void ImperfectRecallDarkHexState::InformationStateTensor(Player player,
 
 void ImperfectRecallDarkHexState::ObservationTensor(Player player,
                                      absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), 3 * num_rows() * num_cols());
-
-  std::fill(values.begin(), values.end(), 0.);
-
-  // Treat `values` as a 3-d tensor.
-  TensorView<3> view(values, {3, num_rows(), num_cols()}, true);
-
-  for (int r = 0; r < num_rows(); r++) {
-    for (int c = 0; c < num_cols(); c++) {
-      int plane = observation_plane(player, r, c);
-      SPIEL_CHECK_TRUE(plane >= 0 && plane < 3);
-      view[{plane, r, c}] = 1.0;
-    }
-  }
+  // Same as the InformationStateTensor.
+  InformationStateTensor(player, values);
 }
 
 std::vector<int> ImperfectRecallDarkHexGame::ObservationTensorShape() const {
