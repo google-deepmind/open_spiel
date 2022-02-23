@@ -1,9 +1,9 @@
 from typing import List,Tuple
 import numpy as np
-from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
-from open_spiel.python.games.optimal_stopping_game_action import OptimalStoppingGameAction
-from open_spiel.python.games.optimal_stopping_game_util import OptimalStoppingGameUtil
-from open_spiel.python.games.optimal_stopping_game_observation_type import OptimalStoppingGameObservationType
+from open_spiel.python.games.optimal_stopping_game_impl.optimal_stopping_game_config import OptimalStoppingGameConfig
+from open_spiel.python.games.optimal_stopping_game_impl.optimal_stopping_game_action import OptimalStoppingGameAction
+from open_spiel.python.games.optimal_stopping_game_impl.optimal_stopping_game_util import OptimalStoppingGameUtil
+from open_spiel.python.games.optimal_stopping_game_impl.optimal_stopping_game_observation_type import OptimalStoppingGameObservationType
 import pyspiel
 
 
@@ -21,13 +21,20 @@ class OptimalStoppingGameState(pyspiel.State):
         self.current_iteration = 1
         self.is_chance = False
         self.game_over = False
-        self._rewards = np.zeros(config.num_players)
-        self._returns = np.zeros(config.num_players)
+        self.rewards = np.zeros(config.num_players)
+        self.returns = np.zeros(config.num_players)
         self.intrusion = 0
         self.l = config.L
         self.latest_obs = 0
-        self.latest_actions = []
-        self.b1 = config.initial_belief
+
+    def observation_tensor(self, player):
+        return [1,1]
+
+    def information_state_tensor(self, player):
+        return [1,1]
+
+    # OpenSpiel (PySpiel) API functions are below. This is the standard set that
+    # should be implemented by every simultaneous-move game with chance.
 
     def current_player(self):
         """
@@ -59,11 +66,7 @@ class OptimalStoppingGameState(pyspiel.State):
         :return: the possible chance outcomes and their probabilities
         """
         assert self.is_chance
-        if self.game_over:
-            s = 2
-        else:
-            s = self.intrusion
-        return OptimalStoppingGameUtil.get_observation_chance_dist(config=self.config, state=s)
+        return OptimalStoppingGameUtil.get_observation_chance_dist(config=self.config, state=self.intrusion)
 
     def _apply_action(self, obs: int) -> None:
         """
@@ -72,27 +75,15 @@ class OptimalStoppingGameState(pyspiel.State):
         :param obs: the observation
         :return: None
         """
+        """Applies the specified action to the state."""
+        # This is not called at simultaneous-move states.
         assert self.is_chance and not self.game_over
         self.current_iteration += 1
         self.is_chance = False
-        self.game_over = (OptimalStoppingGameUtil.get_observation_type(obs=obs, config=self.config)
+        self.game_over = (OptimalStoppingGameUtil.get_observation_type(obs=obs)
                            == OptimalStoppingGameObservationType.TERMINAL)
         if self.current_iteration > self.get_game().max_game_length():
             self.game_over = True
-        self.latest_obs = obs
-        if self.config.use_beliefs and not self.game_over:
-            # TODO Fix this
-            pi_2 = [
-                [0.5,0.5],
-                [0.5,0.5],
-                [0.5,0.5]
-            ]
-            self.b1 = OptimalStoppingGameUtil.next_belief(o=obs, a1=self.latest_actions[0], pi_2=pi_2, b=self.b1,
-                                                          config=self.config, l=self.l)
-
-        # Decrement stops left. This has to be done after belief update.
-        if self.latest_actions[0] == 1:
-            self.l -= 1
 
     def _apply_actions(self, actions : List[int]) -> None:
         """
@@ -102,14 +93,13 @@ class OptimalStoppingGameState(pyspiel.State):
         :return: None
         """
         assert not self.is_chance and not self.game_over
-        self.latest_actions = actions
 
         # Compute reward
         r = OptimalStoppingGameUtil.reward_function(state=self.intrusion, defender_action=actions[0],
                                                     attacker_action=actions[1], l=self.l, config=self.config)
-        self._rewards[0] = r
-        self._rewards[1] = -r
-        self._returns += self._rewards
+        self.rewards[0] = r
+        self.rewards[1] = -r
+        self.returns += self.rewards
 
         # Compute next state
         s_prime = OptimalStoppingGameUtil.next_state(state=self.intrusion, defender_action=actions[0],
@@ -119,6 +109,10 @@ class OptimalStoppingGameState(pyspiel.State):
         else:
             self.intrusion = s_prime
 
+        # Decrement stops left
+        if actions[0] == 1:
+            self.l -= 1
+
         self.current_iteration += 1
         # Check if game has ended
         if self.current_iteration > self.get_game().max_game_length():
@@ -126,7 +120,6 @@ class OptimalStoppingGameState(pyspiel.State):
 
         # If game did not end, next node will be a chance node
         self.is_chance = True
-
 
     def _action_to_string(self, player: pyspiel.PlayerId, action: int) -> str:
         """
@@ -137,7 +130,7 @@ class OptimalStoppingGameState(pyspiel.State):
         :return: a string representation of an action
         """
         if player == pyspiel.PlayerId.CHANCE:
-            return OptimalStoppingGameUtil.get_observation_type(obs=action, config=self.config).name
+            return OptimalStoppingGameUtil.get_observation_type(obs=action).name
         else:
             return OptimalStoppingGameAction(action).name
 
@@ -155,7 +148,7 @@ class OptimalStoppingGameState(pyspiel.State):
 
         :return: rewards at the previous step
         """
-        return self._rewards
+        return self.rewards
 
     def returns(self) -> np.ndarray:
         """
@@ -163,7 +156,7 @@ class OptimalStoppingGameState(pyspiel.State):
 
         :return: Total reward for each player over the course of the game so far.
         """
-        return self._returns
+        return self.returns
 
     def __str__(self):
         """

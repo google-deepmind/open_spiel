@@ -1,0 +1,147 @@
+game: python_optimal_stopping_game
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SIMULTANEOUS
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Python Optimal Stopping Game"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["L", "R_COST", "R_INT", "R_SLA", "R_ST", "T_max", "obs", "obs_dist", "obs_dist_intrusion", "p"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = True
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "python_optimal_stopping_game"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
+MaxChanceOutcomes() = 11
+GetParameters() = {L=3,R_COST=-50,R_INT=-100,R_SLA=10,R_ST=100,T_max=5,obs=0 1 2 3 4 5 6 7 8 9,obs_dist=0.2 0.2 0.2 0.1 0.05 0.05 0.05 0.05 0.05 0.05,obs_dist_intrusion=0.05 0.05 0.05 0.05 0.05 0.05 0.1 0.2 0.2 0.2,p=0.001}
+NumPlayers() = 2
+MinUtility() = -1000.0
+MaxUtility() = 1000.0
+UtilitySum() = 0.0
+MaxGameLength() = 5
+ToString() = "python_optimal_stopping_game(L=3,R_COST=-50,R_INT=-100,R_SLA=10,R_ST=100,T_max=5,obs=0 1 2 3 4 5 6 7 8 9,obs_dist=0.2 0.2 0.2 0.1 0.05 0.05 0.05 0.05 0.05 0.05,obs_dist_intrusion=0.05 0.05 0.05 0.05 0.05 0.05 0.1 0.2 0.2 0.2,p=0.001)"
+
+# State 0
+# p0: p1:
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = "us: op:"
+InformationStateString(1) = "us: op:"
+ObservationString(0) = "us: op:"
+ObservationString(1) = "us: op:"
+Rewards() = [0. 0.]
+Returns() = [0. 0.]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+StringLegalActions(0) = ["CONTINUE", "STOP"]
+StringLegalActions(1) = ["CONTINUE", "STOP"]
+
+# Apply joint action ["STOP", "CONTINUE"]
+actions: [1, 0]
+
+# State 1
+# p0:S p1:C
+IsTerminal() = False
+History() = [1, 0]
+HistoryString() = "1, 0"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = "us:S op:C"
+InformationStateString(1) = "us:C op:S"
+ObservationString(0) = "us:S op:C"
+ObservationString(1) = "us:C op:S"
+ChanceOutcomes() = [(0, 0.1998), (1, 0.1998), (2, 0.1998), (3, 0.0999), (4, 0.04995), (5, 0.04995), (6, 0.04995), (7, 0.04995), (8, 0.04995), (9, 0.04995), (10, 0.001)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+StringLegalActions() = ["NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "TERMINAL"]
+
+# Apply action "NON_TERMINAL"
+action: 7
+
+# State 2
+# p0:S p1:C
+IsTerminal() = False
+History() = [1, 0, 7]
+HistoryString() = "1, 0, 7"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = "us:S op:C"
+InformationStateString(1) = "us:C op:S"
+ObservationString(0) = "us:S op:C"
+ObservationString(1) = "us:C op:S"
+Rewards() = [-16.66666667  16.66666667]
+Returns() = [-16.66666667  16.66666667]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+StringLegalActions(0) = ["CONTINUE", "STOP"]
+StringLegalActions(1) = ["CONTINUE", "STOP"]
+
+# Apply joint action ["CONTINUE", "STOP"]
+actions: [0, 1]
+
+# State 3
+# p0:SC p1:CS
+IsTerminal() = False
+History() = [1, 0, 7, 0, 1]
+HistoryString() = "1, 0, 7, 0, 1"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = "us:SC op:CS"
+InformationStateString(1) = "us:CS op:SC"
+ObservationString(0) = "us:SC op:CS"
+ObservationString(1) = "us:CS op:SC"
+ChanceOutcomes() = [(0, 0.04995), (1, 0.04995), (2, 0.04995), (3, 0.04995), (4, 0.04995), (5, 0.04995), (6, 0.0999), (7, 0.1998), (8, 0.1998), (9, 0.1998), (10, 0.001)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+StringLegalActions() = ["NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "NON_TERMINAL", "TERMINAL"]
+
+# Apply action "NON_TERMINAL"
+action: 2
+
+# State 4
+# p0:SC p1:CS
+IsTerminal() = False
+History() = [1, 0, 7, 0, 1, 2]
+HistoryString() = "1, 0, 7, 0, 1, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = True
+CurrentPlayer() = PlayerId.SIMULTANEOUS
+InformationStateString(0) = "us:SC op:CS"
+InformationStateString(1) = "us:CS op:SC"
+ObservationString(0) = "us:SC op:CS"
+ObservationString(1) = "us:CS op:SC"
+Rewards() = [ 60. -60.]
+Returns() = [ 43.33333333 -43.33333333]
+LegalActions(0) = [0, 1]
+LegalActions(1) = [0, 1]
+StringLegalActions(0) = ["CONTINUE", "STOP"]
+StringLegalActions(1) = ["CONTINUE", "STOP"]
+
+# Apply joint action ["STOP", "CONTINUE"]
+actions: [1, 0]
+
+# State 5
+# p0:SCS p1:CSC
+IsTerminal() = True
+History() = [1, 0, 7, 0, 1, 2, 1, 0]
+HistoryString() = "1, 0, 7, 0, 1, 2, 1, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.TERMINAL
+InformationStateString(0) = "us:SCS op:CSC"
+InformationStateString(1) = "us:CSC op:SCS"
+ObservationString(0) = "us:SCS op:CSC"
+ObservationString(1) = "us:CSC op:SCS"
+Rewards() = [ 33.33333333 -33.33333333]
+Returns() = [ 76.66666667 -76.66666667]
