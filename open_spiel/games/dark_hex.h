@@ -111,7 +111,8 @@ class DarkHexState : public State {
 
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
-  int num_cells() const { return num_cells_; }
+  int num_rows() const { return num_rows_; }
+  int num_cols() const { return num_cols_; }
 
  protected:
   void DoApplyAction(Action move) override;
@@ -189,6 +190,8 @@ class ImperfectRecallDarkHexState : public DarkHexState {
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new ImperfectRecallDarkHexState(*this));
   }
+  hex::CellState board(Player player, int row, int col) const;
+  int observation_plane(Player player, int r, int c) const;
 };
 
 class ImperfectRecallDarkHexGame : public DarkHexGame {

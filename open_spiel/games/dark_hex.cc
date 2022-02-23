@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/games/hex.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace dark_hex {
@@ -200,6 +201,7 @@ std::string DarkHexState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   std::string str;
+  absl::StrAppend(&str, "P", player, "\n");
   absl::StrAppend(&str, ViewToString(player), "\n");
   absl::StrAppend(&str, history_.size(), "\n");
   absl::StrAppend(&str, ActionSequenceToString(player));
@@ -322,41 +324,77 @@ std::vector<int> DarkHexGame::ObservationTensorShape() const {
     SpielFatalError("Uknown observation type");
   }
 }
-  void ImperfectRecallDarkHexState::InformationStateTensor(Player player,
+
+CellState ImperfectRecallDarkHexState::board(Player player, int row, int col) const {
+  // Returns the value of the cell in the given players board and the 2d coordinates.
+  const auto& player_view = (player == 0 ? black_view_ : white_view_);
+  return player_view[row * num_cols() + col];
+}
+
+int ImperfectRecallDarkHexState::observation_plane(Player player, int r, int c) const {
+  int plane = -1;
+  int cell = static_cast<int>(board(player, r, c));
+  if (cell > 0 && cell <= -kMinValueCellState) {
+    plane = 0;
+  } else if (cell < 0 && cell >= kMinValueCellState) {
+    plane = 1;
+  } else if (cell == 0) {
+    plane = 2;
+  } else {
+    std::cerr << "Invalid character on board: " << cell
+                << std::endl;
+    SpielFatalError("Invalid cell state");
+  }
+
+  return plane;
+}
+
+std::vector<int> ImperfectRecallDarkHexGame::InformationStateTensorShape() const {
+  return {3, num_rows(), num_cols()}; // 3 planes: black, white, empty
+}
+
+void ImperfectRecallDarkHexState::InformationStateTensor(Player player,
                                           absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  const auto& player_view = (player == 0 ? black_view_ : white_view_);
-
-  SPIEL_CHECK_EQ(values.size(), num_cells() + 1);
+  SPIEL_CHECK_EQ(values.size(), 3 * num_rows() * num_cols());
   std::fill(values.begin(), values.end(), 0.);
-  for (int cell = 0; cell < num_cells(); ++cell) {
-    values[cell] = static_cast<int>(player_view[cell]) - kMinValueCellState;
+
+  // Treat `values` as a 3-d tensor.
+  TensorView<3> view(values, {3, num_rows(), num_cols()}, true);
+
+  for (int r = 0; r < num_rows(); r++) {
+    for (int c = 0; c < num_cols(); c++) {
+      int plane = observation_plane(player, r, c);
+      SPIEL_CHECK_TRUE(plane >= 0 && plane < 3);
+      view[{plane, r, c}] = 1.0;
+    }
   }
-
-  values[num_cells()] = player;
-}
-
-std::vector<int> ImperfectRecallDarkHexGame::InformationStateTensorShape() const {
-  return {num_cells() + 1};
 }
 
 void ImperfectRecallDarkHexState::ObservationTensor(Player player,
                                      absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  SPIEL_CHECK_EQ(values.size(), 3 * num_rows() * num_cols());
+
   std::fill(values.begin(), values.end(), 0.);
 
-  const auto& player_view = (player == 0 ? black_view_ : white_view_);
-  for (int cell = 0; cell < num_cells(); ++cell) {
-    values[cell] = static_cast<int>(player_view[cell]) - kMinValueCellState;
+  // Treat `values` as a 3-d tensor.
+  TensorView<3> view(values, {3, num_rows(), num_cols()}, true);
+
+  for (int r = 0; r < num_rows(); r++) {
+    for (int c = 0; c < num_cols(); c++) {
+      int plane = observation_plane(player, r, c);
+      SPIEL_CHECK_TRUE(plane >= 0 && plane < 3);
+      view[{plane, r, c}] = 1.0;
+    }
   }
 }
 
 std::vector<int> ImperfectRecallDarkHexGame::ObservationTensorShape() const {
-  return {num_cells()};
+  return {3, num_rows(), num_cols()}; // 3 planes: black, white, empty
 }
 
 }  // namespace dark_hex
