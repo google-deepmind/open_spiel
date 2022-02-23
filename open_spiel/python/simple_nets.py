@@ -141,10 +141,11 @@ class MLPTorso(tf.Module):
 
 
 class ConvNet(tf.Module):
-  """A simple convolutional network."""
+  """A simple 2D convolutional network. The input is linear and converted to
+  channels. The output is then converted back to linear."""
   
   def __init__(self,
-               input_shape,
+               input_size,
                conv_layer_sizes,
                dense_layer_sizes,
                output_size,
@@ -153,7 +154,7 @@ class ConvNet(tf.Module):
     """Create the convolutional network.
 
     Args:
-      input_shape: (list) shape of the input tensor
+      input_size: (int) number of inputs
       conv_layer_sizes: (list) sizes (number of filters) of each convolutional layer
       dense_layer_sizes: (list) sizes (number of units) of each dense layer after
         the convolutional layers
@@ -165,26 +166,38 @@ class ConvNet(tf.Module):
     super(ConvNet, self).__init__(name=name)
     self._layers = []
     with self.name_scope:
+      # ! Input shape is wrong, games have tensor representations taht include
+      # ! other information besides the board.
+      # Reshape input to (x, y, 1) where x * y = input_size
+      temp_size = int(math.sqrt(input_size))
+      
+
       # Convolutional layers
-      for size in conv_layer_sizes:
+      for idx, size in enumerate(conv_layer_sizes):
         self._layers.append(
             tf.keras.layers.Conv2D(
-                filters=size,
-                kernel_size=(3, 3),
-                strides=(1, 1),
-                padding="same",
-                activation=tf.nn.relu))
+                filters=size, 
+                kernel_size=(3, 3), 
+                padding='same',
+                activation='relu',
+                input_shape=None))
+        self._layers.append(tf.keras.layers.MaxPool2D(pool_size=(2, 2)))  
+
       # Flatten
       self._layers.append(tf.keras.layers.Flatten())
+      
       # Dense layers
       for size in dense_layer_sizes:
         self._layers.append(
             tf.keras.layers.Dense(
-              units=size, activation=tf.nn.relu))
+                units=size,
+                activation='relu'))
+      
       # Output layer
       self._layers.append(
           tf.keras.layers.Dense(
-              units=output_size, activation=tf.nn.relu))
+              units=output_size,
+              activation='relu' if activate_final else None))
 
   @tf.Module.with_name_scope
   def __call__(self, x):

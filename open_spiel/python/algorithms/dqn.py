@@ -104,23 +104,9 @@ class DQN(rl_agent.AbstractAgent):
     # Keep track of the last training loss achieved in an update step.
     self._last_loss_value = None
 
-    # Resize input shape if needed. (4D tensor if CNN, 1D tensor if MLP)
-    if model_type == "mlp":
-      self._input_shape = [None, state_representation_size]
-    elif model_type == "conv2d":
-      if isinstance(state_representation_size, int):
-        raise ValueError(
-          "state_representation_size must be a list of ints to" + \
-          "specify the shape of the input to the conv2d model.")
-      if len(state_representation_size) == 2:
-        # Adding the channel dimension.
-        state_representation_size = [*state_representation_size] + [1]
-      # Adding the batch dimension.
-      self._input_shape = [None, *state_representation_size]
-
     # Create required TensorFlow placeholders to perform the Q-network updates.
     self._info_state_ph = tf.placeholder(
-        shape=self._input_shape,
+        shape=[None, state_representation_size],
         dtype=tf.float32,
         name="info_state_ph")
     self._action_ph = tf.placeholder(
@@ -130,7 +116,7 @@ class DQN(rl_agent.AbstractAgent):
     self._is_final_step_ph = tf.placeholder(
         shape=[None], dtype=tf.float32, name="is_final_step_ph")
     self._next_info_state_ph = tf.placeholder(
-        shape=self._input_shape,
+        shape=[None, state_representation_size],
         dtype=tf.float32,
         name="next_info_state_ph")
     self._legal_actions_mask_ph = tf.placeholder(
@@ -140,9 +126,9 @@ class DQN(rl_agent.AbstractAgent):
 
     if model_type == "mlp":
       self._q_network = simple_nets.MLP(
-          self._input_shape[-1], self._layer_sizes, num_actions)
+          state_representation_size, self._layer_sizes, num_actions)
       self._target_q_network = simple_nets.MLP(
-          self._input_shape[-1], self._layer_sizes, num_actions)
+          state_representation_size, self._layer_sizes, num_actions)
     elif model_type == "conv2d":
       self._q_network = simple_nets.ConvNet(
           state_representation_size, 
