@@ -35,7 +35,7 @@ Transition = collections.namedtuple(
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
-supported_model_types = ["mlp", "conv2d"]
+supported_model_types = ["mlp", "conv2d", "resnet"]
 
 
 class DQN(rl_agent.AbstractAgent):
@@ -52,6 +52,8 @@ class DQN(rl_agent.AbstractAgent):
                input_shape=None,
                hidden_layers_sizes=128,
                conv_layer_info=None,
+               dropout_rate=0.0,
+               use_batch_norm=False,
                replay_buffer_capacity=10000,
                batch_size=128,
                replay_buffer_class=ReplayBuffer,
@@ -130,17 +132,34 @@ class DQN(rl_agent.AbstractAgent):
                                                self._layer_sizes, num_actions)
     elif model_type == "conv2d":
       self._q_network = simple_nets.ConvNet(
-          input_size=state_representation_size,
           input_shape=input_shape,
           conv_layer_info=self._conv_layer_info,
           dense_layer_sizes=self._layer_sizes,
-          output_size=num_actions)
+          output_size=num_actions,
+          dropout_rate=dropout_rate,
+          use_batch_norm=use_batch_norm)
       self._target_q_network = simple_nets.ConvNet(
-          input_size=state_representation_size,
           input_shape=input_shape,
           conv_layer_info=self._conv_layer_info,
           dense_layer_sizes=self._layer_sizes,
-          output_size=num_actions)
+          output_size=num_actions,
+          dropout_rate=dropout_rate,
+          use_batch_norm=use_batch_norm)
+    elif model_type == "resnet":
+      self._q_network = simple_nets.ResNet(
+          input_shape=input_shape,
+          conv_layer_info=self._conv_layer_info,
+          dense_layer_sizes=self._layer_sizes,
+          output_size=num_actions,
+          dropout_rate=dropout_rate,
+          use_batch_norm=use_batch_norm)
+      self._target_q_network = simple_nets.ResNet(
+          input_shape=input_shape,
+          conv_layer_info=self._conv_layer_info,
+          dense_layer_sizes=self._layer_sizes,
+          output_size=num_actions,
+          dropout_rate=dropout_rate,
+          use_batch_norm=use_batch_norm)
     else:
       raise ValueError(
           f"Unknown model type: {model_type}\n",

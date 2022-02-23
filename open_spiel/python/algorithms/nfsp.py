@@ -42,7 +42,7 @@ Transition = collections.namedtuple(
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
 
 MODE = enum.Enum("mode", "best_response average_policy")
-supported_model_types = ["mlp", "conv2d"]
+supported_model_types = ["mlp", "conv2d", "resnet"]
 
 
 class NFSP(rl_agent.AbstractAgent):
@@ -96,22 +96,15 @@ class NFSP(rl_agent.AbstractAgent):
         "optimizer_str": optimizer_str,
     })
 
-    if model_type == "mlp":
-      self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
-                               num_actions, hidden_layers_sizes, **kwargs)
-    elif model_type == "conv2d":
-      self._rl_agent = dqn.DQN(
-          session,
-          player_id,
-          state_representation_size,
-          num_actions,
-          conv_layer_info=conv_layer_info,
-          input_shape=input_shape,
-          model_type="conv2d",
-          **kwargs)
-    else:
-      raise ValueError(f"Unknown model type: {model_type}",
-                       f"Supported model types: {supported_model_types}")
+    self._rl_agent = dqn.DQN(
+        session,
+        player_id,
+        state_representation_size,
+        num_actions,
+        conv_layer_info=conv_layer_info,
+        input_shape=input_shape,
+        model_type=model_type,
+        **kwargs)
 
     self._input_shape = [None, state_representation_size]
 
@@ -137,11 +130,22 @@ class NFSP(rl_agent.AbstractAgent):
                                           self._layer_sizes, num_actions)
     elif model_type == "conv2d":
       self._avg_network = simple_nets.ConvNet(
-          input_size=state_representation_size,
           input_shape=input_shape,
           conv_layer_info=self._conv_layer_info,
           dense_layer_sizes=self._layer_sizes,
-          output_size=num_actions)
+          output_size=num_actions,
+          dropout_rate=kwargs["dropout_rate"],
+          use_batch_norm=kwargs["use_batch_norm"])
+    elif model_type == "resnet":
+      self._avg_network = simple_nets.ResNet(
+          input_shape=input_shape,
+          conv_layer_info=self._conv_layer_info,
+          dense_layer_sizes=self._layer_sizes,
+          output_size=num_actions,
+          dropout_rate=kwargs["dropout_rate"],
+          use_batch_norm=kwargs["use_batch_norm"])
+    else:
+      raise ValueError("Unsupported model type: {}".format(model_type))
     self._avg_policy = self._avg_network(self._info_state_ph)
     self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
 

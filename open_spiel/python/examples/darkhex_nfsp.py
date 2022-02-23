@@ -69,6 +69,10 @@ flags.DEFINE_string("optimizer_str", "sgd",
                     "Optimizer, choose from 'adam', 'sgd'.")
 flags.DEFINE_string("loss_str", "mse",
                     "Loss function, choose from 'mse', 'huber'.")
+flags.DEFINE_string("model_type", "resnet", 
+                   "Model type, choose from 'resnet' and 'conv2d'.") 
+flags.DEFINE_float("dropout_rate", 0.2, "Dropout rate.")
+flags.DEFINE_string("use_batch_norm", "True", "Whether to use batch norm.")
 flags.DEFINE_integer("update_target_network_every", 19200,
                      "Number of steps between DQN target network updates.")
 flags.DEFINE_float("discount_factor", 1.0,
@@ -149,6 +153,8 @@ def main(unused_argv):
       "epsilon_decay_duration": FLAGS.epsilon_decay_duration,
       "epsilon_start": FLAGS.epsilon_start,
       "epsilon_end": FLAGS.epsilon_end,
+      "use_batch_norm": FLAGS.use_batch_norm,
+      "dropout_rate": FLAGS.dropout_rate,
   }
 
   if FLAGS.use_checkpoints:
@@ -166,7 +172,7 @@ def main(unused_argv):
             num_actions,
             hidden_layers_sizes,
             conv_layer_info=conv_layer_info,
-            model_type="conv2d",
+            model_type=FLAGS.model_type,
             input_shape=(3, FLAGS.num_rows, FLAGS.num_cols),
             **kwargs) for idx in range(num_players)
     ]
