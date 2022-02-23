@@ -5,6 +5,8 @@ from open_spiel.python.games.optimal_stopping_game_config import OptimalStopping
 
 
 params = OptimalStoppingGameConfig.default_params()
+params["use_beliefs"] = True
+params["T_max"] = 50
 game = pyspiel.load_game("python_optimal_stopping_game", params)
 game = pyspiel.convert_to_turn_based(game)
 state = game.new_initial_state()
@@ -22,5 +24,5 @@ while not state.is_terminal():
         action = random.choice(legal_actions)
         # action = legal_actions[0]
 
-    # print(f"state:{state}, action:{action}")
     state.apply_action(action)
+    print(f"state:{state}")

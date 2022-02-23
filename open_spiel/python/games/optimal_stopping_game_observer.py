@@ -10,14 +10,23 @@ class OptimalStoppingGameObserver:
         assert not bool(params)
         self.iig_obs_type = iig_obs_type
         self.tensor = None
-        self.dict = {"observation": np.array([0])}
+        self.dict = {"observation": np.array([0,0,0])}
 
     def set_from(self, state, player):
         if state.config.use_beliefs:
-            rounded_belief = round(state.b1[1],2)
-            self.dict = {"observation": np.array([rounded_belief])}
+            rounded_belief_1 = round(state.b1[1],2)
         else:
-            self.dict = {"observation": np.array([state.latest_obs])}
+            rounded_belief_1 = state.latest_obs
+
+        if player == 1:
+            intrusion_state = state.intrusion
+        else:
+            intrusion_state = 0
+            if state.config.use_beliefs:
+                intrusion_state = rounded_belief_1
+
+        l = state.l
+        self.dict = {"observation": np.array([l, rounded_belief_1, intrusion_state])}
 
     def string_from(self, state, player):
         """Observation of `state` from the PoV of `player`, as a string."""

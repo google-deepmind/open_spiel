@@ -1,5 +1,6 @@
 from typing import List,Tuple
 import numpy as np
+import random
 from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
 from open_spiel.python.games.optimal_stopping_game_action import OptimalStoppingGameAction
 from open_spiel.python.games.optimal_stopping_game_util import OptimalStoppingGameUtil
@@ -63,7 +64,7 @@ class OptimalStoppingGameState(pyspiel.State):
             s = 2
         else:
             s = self.intrusion
-        return OptimalStoppingGameUtil.get_observation_chance_dist(config=self.config, state=s)
+        return self.config.obs_prob_chance_dists[s]
 
     def _apply_action(self, obs: int) -> None:
         """
@@ -124,8 +125,13 @@ class OptimalStoppingGameState(pyspiel.State):
         if self.current_iteration > self.get_game().max_game_length():
             self.game_over = True
 
+        # Sample random detection
+        if random.random() <= self.config.p:
+            self.game_over = True
+
         # If game did not end, next node will be a chance node
-        self.is_chance = True
+        if not self.game_over:
+            self.is_chance = True
 
 
     def _action_to_string(self, player: pyspiel.PlayerId, action: int) -> str:
@@ -171,8 +177,8 @@ class OptimalStoppingGameState(pyspiel.State):
 
         :return: String for debug purposes. No particular semantics are required.
         """
-        return (f"p0:{self.action_history_string(0)} "
-                f"p1:{self.action_history_string(1)}")
+        return (f"p0_history:{self.action_history_string(0)}, "
+                f"p1_history:{self.action_history_string(1)}, l:{self.l}, belief:{self.b1}, intrusion: {self.intrusion}")
 
     def action_history_string(self, player):
         """
@@ -185,3 +191,4 @@ class OptimalStoppingGameState(pyspiel.State):
             self._action_to_string(pa.player, pa.action)[0]
             for pa in self.full_history()
             if pa.player == player)
+

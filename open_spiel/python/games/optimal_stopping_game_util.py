@@ -87,26 +87,6 @@ class OptimalStoppingGameUtil:
 
 
     @staticmethod
-    def get_observation_chance_dist(config: OptimalStoppingGameConfig, state: int):
-        """
-        Computes a vector with observation probabilities for a chance node
-
-        :param config: the game configuration
-        :param state: the state of the game
-        :return: a vector with tuples: (obs, prob)
-        """
-        if state == 0:
-            return  [(x, (1-config.p)*config.obs_dist[i]) for i,x in enumerate(config.obs)] \
-                    + [(max(config.obs) + 1, config.p)]
-        elif state == 1:
-            return [(x, (1-config.p)*config.obs_dist_intrusion[i]) for i,x in enumerate(config.obs)] \
-                   + [(max(config.obs) + 1, config.p)]
-        elif state == 2:
-            return config.obs_dist_terminal
-        else:
-            raise ValueError(f"Invalid state:{state}")
-
-    @staticmethod
     def get_observation_type(obs: int, config: OptimalStoppingGameConfig) -> OptimalStoppingGameObservationType:
         """
         Returns the type of the observation
@@ -152,6 +132,8 @@ class OptimalStoppingGameUtil:
 
         b_prime_s_prime = temp/norm
         assert b_prime_s_prime <=1
+        if s_prime == 2:
+            assert b_prime_s_prime <= 0.01
         return b_prime_s_prime
 
     @staticmethod

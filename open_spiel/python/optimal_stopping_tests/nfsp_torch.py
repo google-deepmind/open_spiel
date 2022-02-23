@@ -81,6 +81,7 @@ def round_vec(vecs):
 def main(unused_argv):
     params = OptimalStoppingGameConfig.default_params()
     params["use_beliefs"] = True
+    params["T_max"] = 50
     game = pyspiel.load_game("python_optimal_stopping_game", params)
     num_players = game.config.num_players
     game = pyspiel.convert_to_turn_based(game)
@@ -118,8 +119,8 @@ def main(unused_argv):
             player_id = time_step.observations["current_player"]
             time_step.observations["info_state"] = round_vec(time_step.observations["info_state"])
             print(f"time_step.observations:{time_step.observations}")
-            player_id = time_step.obs["current_player"]
             action_output = agents[player_id].step(time_step)
+            s = env.get_state
             action_list = [action_output.action]
             time_step = env.step(action_list)
 

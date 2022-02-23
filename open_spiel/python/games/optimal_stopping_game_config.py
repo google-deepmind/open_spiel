@@ -57,10 +57,10 @@ class OptimalStoppingGameConfig:
         self.obs_dist_terminal[-1] = 1
         self.initial_belief = initial_belief
         self.num_players = 2
-        self.observation_tensor_size = 1
-        self.observation_tensor_shape = (len(self.obs))
-        self.information_state_tensor_size = 2
-        self.information_state_tensor_shape = (2,)
+        self.observation_tensor_size = 3
+        self.observation_tensor_shape = (3,)
+        self.information_state_tensor_size = 3
+        self.information_state_tensor_shape = (3,)
         self.params = self.params_dict()
         self.A1 = list(map(lambda x: x.value, self.get_actions()))
         self.A2 = list(map(lambda x: x.value, self.get_actions()))
@@ -74,6 +74,29 @@ class OptimalStoppingGameConfig:
             self.R.append(self.reward_tensor(l=l+1).tolist())
         self.T = np.array(self.T)
         self.R = np.array(self.R)
+        obs_prob_chance_dists = []
+        for s in self.S:
+            obs_prob_chance_dists.append(self.get_observation_chance_dist(state=s))
+        self.obs_prob_chance_dists = obs_prob_chance_dists
+
+
+    def get_observation_chance_dist(self, state: int):
+        """
+        Computes a vector with observation probabilities for a chance node
+
+        :param config: the game configuration
+        :param state: the state of the game
+        :return: a vector with tuples: (obs, prob)
+        """
+        if state == 0:
+            return  [(x, self.obs_dist[i]) for i,x in enumerate(self.obs)]
+        elif state == 1:
+            return [(x, self.obs_dist_intrusion[i]) for i,x in enumerate(self.obs)]
+        elif state == 2:
+            return [(x, self.obs_dist_terminal[i]) for i,x in enumerate(self.obs)]
+        else:
+            raise ValueError(f"Invalid state:{state}")
+
 
     def get_actions(self) -> List[int]:
         """
@@ -184,9 +207,9 @@ class OptimalStoppingGameConfig:
         d["R_SLA"] = 10
         d["R_COST"] = -50
         d["R_INT"] = -100
-        d["obs"] = " ".join(list(map(lambda x: str(x),[0,1,2,3,4,5,6,7,8,9])))
-        d["obs_dist"] = " ".join(list(map(lambda x: str(x),[4/20,4/20,4/20,2/20,1/20,1/20,1/20,1/20,1/20,1/20])))
-        d["obs_dist_intrusion"] = " ".join(list(map(lambda x: str(x),[1/20,1/20,1/20,1/20,1/20,1/20,2/20,4/20,4/20,4/20])))
+        d["obs"] = " ".join(list(map(lambda x: str(x),[0,1,2,3,4,5,6,7,8,9,10])))
+        d["obs_dist"] = " ".join(list(map(lambda x: str(x),[4/20,4/20,4/20,2/20,1/20,1/20,1/20,1/20,1/20,1/20,0])))
+        d["obs_dist_intrusion"] = " ".join(list(map(lambda x: str(x),[1/20,1/20,1/20,1/20,1/20,1/20,2/20,4/20,4/20,4/20,0])))
         d["initial_belief"] = " ".join(list(map(lambda x: str(x),[1,0,0])))
         d["use_beliefs"] = False
         return d
