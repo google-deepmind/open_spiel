@@ -139,13 +139,13 @@ class MLPTorso(tf.Module):
     return x
 
 
-# ! INCOMPLETE
 class ConvNet(tf.Module):
   """A simple 2D convolutional network. The input is linear and converted to
   channels. The output is then converted back to linear."""
 
   def __init__(self,
                input_size,
+               input_shape,
                conv_layer_sizes,
                dense_layer_sizes,
                output_size,
@@ -155,6 +155,7 @@ class ConvNet(tf.Module):
 
     Args:
       input_size: (int) number of inputs
+      input_shape: (tuple) shape of the input
       conv_layer_sizes: (list) sizes (number of filters) of each convolutional layer
       dense_layer_sizes: (list) sizes (number of units) of each dense layer after
         the convolutional layers
@@ -164,19 +165,29 @@ class ConvNet(tf.Module):
     """
 
     super(ConvNet, self).__init__(name=name)
+    self._shape = input_shape
     self._layers = []
     with self.name_scope:
-      # ! Input shape is wrong, games have tensor representations that include
-      # ! other information besides the board.
+      # Input Layer
+      self._layers.append(
+          tf.keras.layers.Conv2D(
+              conv_layer_sizes[0],
+              kernel_size=3,
+              strides=1,
+              padding="SAME",
+              activation=tf.nn.relu,
+              input_shape=self._shape))
+
       # Convolutional layers
-      for idx, size in enumerate(conv_layer_sizes):
+      for size in conv_layer_sizes[1:]:
         self._layers.append(
             tf.keras.layers.Conv2D(
-                filters=size,
+                size,
                 kernel_size=(3, 3),
-                padding='same',
-                activation='relu',
-                input_shape=None))
+                strides=(1, 1),
+                padding="same",
+                activation=tf.nn.relu,
+                data_format="channels_first"))
         self._layers.append(tf.keras.layers.MaxPool2D(pool_size=(2, 2)))
 
       # Flatten
@@ -194,6 +205,7 @@ class ConvNet(tf.Module):
 
   @tf.Module.with_name_scope
   def __call__(self, x):
+    x = tf.reshape(x, [-1, *self._shape])
     for layer in self._layers:
       x = layer(x)
     return x

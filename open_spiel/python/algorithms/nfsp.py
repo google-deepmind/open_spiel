@@ -43,6 +43,7 @@ Transition = collections.namedtuple(
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
 
 MODE = enum.Enum("mode", "best_response average_policy")
+supported_model_types = ["mlp", "conv2d"]
 
 
 class NFSP(rl_agent.AbstractAgent):
@@ -59,6 +60,7 @@ class NFSP(rl_agent.AbstractAgent):
                hidden_layers_sizes,
                reservoir_buffer_capacity,
                anticipatory_param,
+               input_shape=None,
                conv_layer_sizes=None,
                batch_size=128,
                rl_learning_rate=0.01,
@@ -101,28 +103,16 @@ class NFSP(rl_agent.AbstractAgent):
     elif model_type == "conv2d":
       self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
                                num_actions, conv_layer_sizes=conv_layer_sizes,
-                               model_type="conv2d", **kwargs)
+                               input_shape=input_shape, model_type="conv2d", **kwargs)
     else:
       raise ValueError(f"Unknown model type: {model_type}",
-                       f"Supported model types: {['mlp', 'conv2d']}")
+                       f"Supported model types: {supported_model_types}")
+
+    self._input_shape = [None, state_representation_size]
 
     # Keep track of the last training loss achieved in an update step.
     self._last_rl_loss_value = lambda: self._rl_agent.loss
     self._last_sl_loss_value = None
-
-    # Resize input shape if needed. (4D tensor if CNN, 1D tensor if MLP)
-    if model_type == "mlp":
-      self._input_shape = [None, state_representation_size]
-    elif model_type == "conv2d":
-      if isinstance(state_representation_size, int):
-        raise ValueError(
-          "state_representation_size must be a list of ints to" + \
-          "specify the shape of the input to the conv2d model.")
-      if len(state_representation_size) == 2:
-        # Adding the channel dimension.
-        state_representation_size = [*state_representation_size] + [1]
-      # Adding the batch dimension.
-      self._input_shape = [None, *state_representation_size]
 
     # Placeholders.
     self._info_state_ph = tf.placeholder(
@@ -144,10 +134,11 @@ class NFSP(rl_agent.AbstractAgent):
                                           self._layer_sizes, num_actions)
     elif model_type == "conv2d":
       self._avg_network = simple_nets.ConvNet(
-          state_representation_size, 
-          self._conv_layer_sizes, 
-          self._layer_sizes, 
-          num_actions)
+          input_size=state_representation_size, 
+          input_shape=input_shape,
+          conv_layer_sizes=self._conv_layer_sizes, 
+          dense_layer_sizes=self._layer_sizes, 
+          output_size=num_actions)
     self._avg_policy = self._avg_network(self._info_state_ph)
     self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
 

@@ -36,7 +36,7 @@ Transition = collections.namedtuple(
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
-
+supported_model_types = ["mlp", "conv2d"]
 
 class DQN(rl_agent.AbstractAgent):
   """DQN Agent implementation in TensorFlow.
@@ -49,6 +49,7 @@ class DQN(rl_agent.AbstractAgent):
                player_id,
                state_representation_size,
                num_actions,
+               input_shape=None,
                hidden_layers_sizes=128,
                conv_layer_sizes=None,
                replay_buffer_capacity=10000,
@@ -104,9 +105,10 @@ class DQN(rl_agent.AbstractAgent):
     # Keep track of the last training loss achieved in an update step.
     self._last_loss_value = None
 
+    self._input_shape = [None, state_representation_size]
     # Create required TensorFlow placeholders to perform the Q-network updates.
     self._info_state_ph = tf.placeholder(
-        shape=[None, state_representation_size],
+        shape=self._input_shape,
         dtype=tf.float32,
         name="info_state_ph")
     self._action_ph = tf.placeholder(
@@ -116,7 +118,7 @@ class DQN(rl_agent.AbstractAgent):
     self._is_final_step_ph = tf.placeholder(
         shape=[None], dtype=tf.float32, name="is_final_step_ph")
     self._next_info_state_ph = tf.placeholder(
-        shape=[None, state_representation_size],
+        shape=self._input_shape,
         dtype=tf.float32,
         name="next_info_state_ph")
     self._legal_actions_mask_ph = tf.placeholder(
@@ -131,18 +133,20 @@ class DQN(rl_agent.AbstractAgent):
           state_representation_size, self._layer_sizes, num_actions)
     elif model_type == "conv2d":
       self._q_network = simple_nets.ConvNet(
-          state_representation_size, 
-          self._conv_layer_sizes, 
-          self._layer_sizes, 
-          num_actions)
+          input_size=state_representation_size, 
+          input_shape=input_shape,
+          conv_layer_sizes=self._conv_layer_sizes, 
+          dense_layer_sizes=self._layer_sizes, 
+          output_size=num_actions)
       self._target_q_network = simple_nets.ConvNet(
-          state_representation_size, 
-          self._conv_layer_sizes,
-          self._layer_sizes, 
-          num_actions)
+          input_size=state_representation_size, 
+          input_shape=input_shape,
+          conv_layer_sizes=self._conv_layer_sizes, 
+          dense_layer_sizes=self._layer_sizes, 
+          output_size=num_actions)
     else:
       raise ValueError(f"Unknown model type: {model_type}\n",
-                       "Supported model types are: 'mlp', 'conv2d'.")
+                       f"Supported model types are: [{supported_model_types}].")
     self._q_values = self._q_network(self._info_state_ph)
     self._target_q_values = self._target_q_network(self._next_info_state_ph)
 

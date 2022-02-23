@@ -42,7 +42,7 @@ flags.DEFINE_list("hidden_layers_sizes", [
     128, 256, 128
 ], "Number of hidden units to use in each layer of the avg-net and Q-net.")
 flags.DEFINE_list("conv_layer_sizes", [
-    1024, 512, 256
+    1024
 ], "Number of output filters to use in each hidden convolutional layer in" +
    "the avg-net and Q-net.")
 flags.DEFINE_integer("replay_buffer_capacity", int(2e5),
@@ -148,8 +148,9 @@ def main(unused_argv):
     # pylint: disable=g-complex-comprehension
     agents = [
         nfsp.NFSP(sess, idx, info_state_size, num_actions, hidden_layers_sizes,
-                  conv_layer_sizes=conv_layer_sizes, model_type="conv2d", **kwargs
-                 ) for idx in range(num_players)
+                  conv_layer_sizes=conv_layer_sizes, model_type="conv2d", 
+                  input_shape=(3, FLAGS.num_rows, FLAGS.num_cols),
+                  **kwargs) for idx in range(num_players)
     ]
     joint_avg_policy = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
