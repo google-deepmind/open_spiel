@@ -23,18 +23,18 @@ from absl import flags
 
 from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import exploitability
+from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
 import pyspiel
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("iterations", 100, "Number of iterations")
-flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
-flags.DEFINE_integer("players", 2, "Number of players")
 flags.DEFINE_integer("print_freq", 1, "How often to print the exploitability")
 
 
 def main(_):
-  game = pyspiel.load_game("python_optimal_stopping")
+  params = OptimalStoppingGameConfig.default_params()
+  game = pyspiel.load_game("python_optimal_stopping_game", params)
   game = pyspiel.convert_to_turn_based(game)
 
   print("load")

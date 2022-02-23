@@ -1,10 +1,11 @@
 import random
 import pyspiel
-import open_spiel.python.games.optimal_stopping
 import numpy as np
+from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
 
-# game = pyspiel.load_game("python_iterated_prisoners_dilemma")
-game = pyspiel.load_game("python_optimal_stopping")
+
+params = OptimalStoppingGameConfig.default_params()
+game = pyspiel.load_game("python_optimal_stopping_game", params)
 game = pyspiel.convert_to_turn_based(game)
 state = game.new_initial_state()
 while not state.is_terminal():

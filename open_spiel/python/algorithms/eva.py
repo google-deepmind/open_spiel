@@ -223,13 +223,13 @@ class EVAAgent(object):
     prev_timestep = self._last_time_step
     assert prev_timestep is not None
     legal_actions = (
-        prev_timestep.observations["legal_actions"][self.player_id])
+        prev_timestep.obs["legal_actions"][self.player_id])
     legal_actions_mask = np.zeros(self._num_actions)
     legal_actions_mask[legal_actions] = 1.0
     reward = time_step.rewards[self.player_id] if time_step.rewards else 0.0
     transition = ReplayBufferElement(
         embedding=infostate_embedding,
-        info_state=(prev_timestep.observations["info_state"][self.player_id]),
+        info_state=(prev_timestep.obs["info_state"][self.player_id]),
         action=self._last_action,
         reward=reward,
         next_info_state=time_step.observations["info_state"][self.player_id],
@@ -285,7 +285,7 @@ class EVAAgent(object):
       # TODO(author6) Recompute embeddings for buffers on learning steps.
       if self._embedding_as_parametric_input:
         last_time_step_copy = copy.deepcopy(self._last_time_step)
-        last_time_step_copy.observations["info_state"][
+        last_time_step_copy.obs["info_state"][
             self.player_id] = infostate_embedding
         self._agent.step(last_time_step_copy, add_transition_record=False)
       else:

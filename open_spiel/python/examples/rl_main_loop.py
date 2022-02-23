@@ -34,7 +34,7 @@ flags.DEFINE_integer("num_episodes", 2, "Number of episodes.")
 
 def print_iteration(time_step, player_id, action=None):
   """Print TimeStep information."""
-  obs = time_step.observations
+  obs = time_step.obs
   logging.info("Player: %s", player_id)
   if time_step.first():
     logging.info("Info state: %s, - - %s", obs["info_state"][player_id],
