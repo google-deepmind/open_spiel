@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""NFSP agents trained on Kuhn Poker."""
+"""NFSP agents trained on the optimal stopping game."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -27,6 +27,7 @@ from open_spiel.python import policy
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.pytorch import nfsp
+from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
 
 FLAGS = flags.FLAGS
 
@@ -75,15 +76,12 @@ class NFSPPolicies(policy.Policy):
 
 
 def main(unused_argv):
-    # game = "kuhn_poker"
-    game = "python_optimal_stopping"
-    game = pyspiel.load_game(game)
-    turn_based_game = pyspiel.convert_to_turn_based(game)
-    num_players = 2
+    params = OptimalStoppingGameConfig.default_params()
+    game = pyspiel.load_game("python_optimal_stopping_game", params)
+    num_players = game.config.num_players
+    game = pyspiel.convert_to_turn_based(game)
 
-    # env_configs = {"players": num_players}
-    # env = rl_environment.Environment(game)
-    env = rl_environment.Environment(turn_based_game)
+    env = rl_environment.Environment(game)
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 

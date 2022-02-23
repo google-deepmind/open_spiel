@@ -24,12 +24,13 @@ from absl import logging
 
 # import tensorflow.compat.v1 as tf
 
+import pyspiel
+import collections
 from open_spiel.python import policy
 from open_spiel.python.pytorch import deep_cfr
 from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
-import pyspiel
-import collections
+from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
 
 # Temporarily disable TF2 behavior until we update the code.
 #tf.disable_v2_behavior()
@@ -43,7 +44,9 @@ flags.DEFINE_string("game_name", "python_optimal_stopping", "Name of the game")
 
 def main(unused_argv):
     logging.info("Loading %s", FLAGS.game_name)
-    game = pyspiel.load_game(FLAGS.game_name)
+
+    params = OptimalStoppingGameConfig.default_params()
+    game = pyspiel.load_game("python_optimal_stopping_game", params)
     game = pyspiel.convert_to_turn_based(game)
 
     deep_cfr_solver = deep_cfr.DeepCFRSolver(
