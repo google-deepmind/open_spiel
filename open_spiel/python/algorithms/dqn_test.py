@@ -138,7 +138,7 @@ class DQNTest(tf.test.TestCase):
     env = rl_environment.Environment("dark_hex_ir",
               num_rows=num_rows, num_cols=num_cols)
 
-    state_size = (num_rows, num_cols)
+    state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
   
     with self.session() as sess:
@@ -152,7 +152,8 @@ class DQNTest(tf.test.TestCase):
               replay_buffer_capacity=10,
               batch_size=5,
               model_type="conv2d",
-              conv_layer_sizes=[32, 64]) for player_id in [0, 1]
+              input_shape=(3, num_rows, num_cols),
+              conv_layer_info=[{'filters': 512}]) for player_id in [0, 1]
       ]
       sess.run(tf.global_variables_initializer())
       time_step = env.reset()
