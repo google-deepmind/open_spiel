@@ -25,23 +25,22 @@ from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import nfsp
 
 import json
+import numpy as np
 
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game_name", "dark_hex_ir",
                     "Name of the game.")
-flags.DEFINE_integer("num_rows", 4,
-                     "Number of rows.")
-flags.DEFINE_integer("num_cols", 3,
-                      "Number of cols.")
-flags.DEFINE_integer("num_players", 2,
-                     "Number of players.") # keeping for other games.
-flags.DEFINE_integer("num_train_episodes", int(20e6),
-                     "Number of training episodes.")
-flags.DEFINE_integer("eval_every", 20000,
+flags.DEFINE_integer("num_rows", 4, "Number of rows.")
+flags.DEFINE_integer("num_cols", 3, "Number of cols.")
+flags.DEFINE_integer("num_players", 2, "Number of players.")
+flags.DEFINE_integer("num_train_episodes", int(2e7), "Number of training episodes.")
+flags.DEFINE_integer("eval_every", int(2e5),
                      "Episode frequency at which the agents are evaluated.")
+flags.DEFINE_integer("num_eval_games", int(2e4),
+                     "Number of evaluation games when running random_games evaluator.")
 flags.DEFINE_list("hidden_layers_sizes", [
-    128, 256, 128
+    512, 256, 126
 ], "Number of hidden units to use in each layer of the avg-net and Q-net.")
 flags.DEFINE_list("conv_layer_info", [
     '{"filters": 1024, "kernel_size": 3, "strides": 1, "padding": "same", "max_pool": 2}',
@@ -81,10 +80,10 @@ flags.DEFINE_float("epsilon_start", 0.06,
                    "Starting exploration parameter.")
 flags.DEFINE_float("epsilon_end", 0.001,
                    "Final exploration parameter.")
-flags.DEFINE_string("evaluation_metric", "nash_conv",
-                    "Choose from 'exploitability', 'nash_conv'.")
+flags.DEFINE_string("evaluation_metric", "random_games",
+                    "Choose from 'exploitability', 'nash_conv', 'random_games'.")
 flags.DEFINE_bool("use_checkpoints", True, "Save/load neural network weights.")
-flags.DEFINE_string("checkpoint_dir", "/tmp/nfsp_test",
+flags.DEFINE_string("checkpoint_dir", "tmp/nfsp_test_dh",
                     "Directory to save/load the agent.")
 
 
@@ -153,6 +152,11 @@ def main(unused_argv):
       "epsilon_end": FLAGS.epsilon_end,
   }
 
+  if FLAGS.use_checkpoints:
+    # Create the folder if it doesn't exist.
+    if not tf.gfile.Exists(FLAGS.checkpoint_dir):
+      tf.gfile.MakeDirs(FLAGS.checkpoint_dir)
+
   with tf.Session() as sess:
     # pylint: disable=g-complex-comprehension
     agents = [
@@ -182,9 +186,13 @@ def main(unused_argv):
         elif FLAGS.evaluation_metric == "nash_conv":
           nash_conv = exploitability.nash_conv(env.game, joint_avg_policy)
           logging.info("[%s] NashConv %s", ep + 1, nash_conv)
+        elif FLAGS.evaluation_metric == "random_games":
+          rand_eval = run_random_games(env.game, joint_avg_policy,
+                                       FLAGS.num_eval_games)
+          logging.info("[%s] Random Games AVG %s", ep + 1, rand_eval)
         else:
           raise ValueError(" ".join(("Invalid evaluation metric, choose from",
-                                     "'exploitability', 'nash_conv'.")))
+                                     "'exploitability', 'nash_conv', 'random_games'.")))
         if FLAGS.use_checkpoints:
           for agent in agents:
             agent.save(FLAGS.checkpoint_dir)
@@ -200,6 +208,35 @@ def main(unused_argv):
       # Episode is over, step all agents with final info state.
       for agent in agents:
         agent.step(time_step)
+
+def run_random_games(game, policy, num_games, player=None):
+  """Runs random games and returns average score."""
+  scores_as_p = [0., 0.]
+  games_per_p = num_games if player else num_games // 2
+  
+  if player:
+    for _ in range(games_per_p):
+      scores_as_p[player] += run_random_game(game, policy, player)
+  else:
+    for _ in range(games_per_p):
+      scores_as_p[0] += run_random_game(game, policy, 0)
+      scores_as_p[1] += run_random_game(game, policy, 1)
+  return [score / games_per_p for score in scores_as_p]
+
+
+def run_random_game(game, policy, player):
+  """Runs a single random game and returns score as player."""
+  state = game.new_initial_state()
+  while not state.is_terminal():
+    legal_actions = state.legal_actions()
+    if state.current_player() == player:
+      action_probs = policy.action_probabilities(state)
+      action_probs = [action_probs[a] for a in legal_actions]
+    else:
+      action_probs = [1. / len(legal_actions)] * len(legal_actions)
+    action = np.random.choice(legal_actions, p=action_probs)
+    state.apply_action(action)
+  return state.returns()[player]
 
 
 if __name__ == "__main__":
