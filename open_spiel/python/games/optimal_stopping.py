@@ -18,9 +18,7 @@ This is primarily here to demonstrate simultaneous-move games in Python.
 """
 
 import enum
-
 import numpy as np
-
 import pyspiel
 
 _NUM_PLAYERS = 2
@@ -45,65 +43,6 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_tensor=True,
     provides_factored_observation_string=True,
     parameter_specification=_DEFAULT_PARAMS)
-
-
-def next_state(s, a1, a2, l):
-    # Terminal state already
-    if s == 2:
-        return 2
-
-    # Attacker aborts
-    if s == 1 and a2 == 1:
-        return 2
-
-    # Defender final stop
-    if a1 == 1 and l == 1:
-        return 2
-
-    # Intrusion starts
-    if s == 0 and a2 == 1:
-        return 1
-
-    # Stay in the current state
-    return s
-
-
-def reward_function(s, a1, a2, R_SLA, R_ST, R_COST, L, R_INT, l):
-    # Terminal state
-    if s == 2:
-        return 0
-
-    # No intrusion state
-    if s == 0:
-        # Continue and Wait
-        if a1 == 0 and a2 == 0:
-            return R_SLA
-        # Continue and Attack
-        if a1 == 0 and a2 == 1:
-            return R_SLA + R_ST / l
-        # Stop and Wait
-        if a1 == 1 and a2 == 0:
-            return R_COST / L
-        # Stop and Attack
-        if a1 == 1 and a2 == 1:
-            return R_COST / L + R_ST / L
-
-    # Intrusion state
-    if s == 1:
-        # Continue and Continue
-        if a1 == 0 and a2 == 0:
-            return R_SLA + R_INT
-        # Continue and Stop
-        if a1 == 0 and a2 == 1:
-            return R_SLA
-        # Stop and Continue
-        if a1 == 1 and a2 == 0:
-            return R_COST / L + R_ST / l
-        # Stop and Stop
-        if a1 == 1 and a2 == 1:
-            return R_COST / L
-
-    raise ValueError("Invalid input, s:{}, a1:{}, a2:{}".format(s, a1, a2))
 
 
 class Action(enum.IntEnum):

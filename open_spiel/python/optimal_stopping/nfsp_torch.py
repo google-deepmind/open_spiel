@@ -112,7 +112,7 @@ def main(unused_argv):
 
         time_step = env.reset()
         while not time_step.last():
-            player_id = time_step.observations["current_player"]
+            player_id = time_step.obs["current_player"]
             action_output = agents[player_id].step(time_step)
             print(f"player:{player_id}, input:{time_step}")
             action_list = [action_output.action]

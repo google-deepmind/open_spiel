@@ -21,13 +21,12 @@ from __future__ import print_function
 from absl import app
 from absl import flags
 from absl import logging
-import tensorflow.compat.v1 as tf
 import pyspiel
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.algorithms import nfsp
+from open_spiel.python.pytorch import nfsp
 
 FLAGS = flags.FLAGS
 
@@ -96,35 +95,32 @@ def main(unused_argv):
         "epsilon_end": 0.001,
     }
 
-    with tf.Session() as sess:
-        # pylint: disable=g-complex-comprehension
-        agents = [
-            nfsp.NFSP(sess, idx, info_state_size, num_actions, hidden_layers_sizes,
-                      FLAGS.reservoir_buffer_capacity, FLAGS.anticipatory_param,
-                      **kwargs) for idx in range(num_players)
-        ]
-        expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
+    agents = [
+        nfsp.NFSP(idx, info_state_size, num_actions, hidden_layers_sizes,
+                  FLAGS.reservoir_buffer_capacity, FLAGS.anticipatory_param,
+                  **kwargs) for idx in range(num_players)
+    ]
+    expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
-        sess.run(tf.global_variables_initializer())
-        for ep in range(FLAGS.num_train_episodes):
-            if (ep + 1) % FLAGS.eval_every == 0:
-                losses = [agent.loss for agent in agents]
-                logging.info("Losses: %s", losses)
-                expl = exploitability.exploitability(env.game, expl_policies_avg)
-                logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
-                logging.info("_____________________________________________")
+    for ep in range(FLAGS.num_train_episodes):
+        if (ep + 1) % FLAGS.eval_every == 0:
+            losses = [agent.loss for agent in agents]
+            logging.info("Losses: %s", losses)
+            expl = exploitability.exploitability(env.game, expl_policies_avg)
+            logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
+            logging.info("_____________________________________________")
 
-            time_step = env.reset()
-            while not time_step.last():
-                player_id = time_step.obs["current_player"]
-                action_output = agents[player_id].step(time_step)
-                print(f"player:{player_id}, input:{time_step}")
-                action_list = [action_output.action]
-                time_step = env.step(action_list)
+        time_step = env.reset()
+        while not time_step.last():
+            player_id = time_step.observations["current_player"]
+            action_output = agents[player_id].step(time_step)
+            print(f"player:{player_id}, input:{time_step}")
+            action_list = [action_output.action]
+            time_step = env.step(action_list)
 
-            # Episode is over, step all agents with final info state.
-            for agent in agents:
-                agent.step(time_step)
+        # Episode is over, step all agents with final info state.
+        for agent in agents:
+            agent.step(time_step)
 
 
 if __name__ == "__main__":

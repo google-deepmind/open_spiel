@@ -39,7 +39,7 @@ def select_actions(observations, cur_player):
 
 def print_iteration(time_step, actions, player_id):
   """Print TimeStep information."""
-  obs = time_step.observations
+  obs = time_step.obs
   logging.info("Player: %s", player_id)
   if time_step.step_type.first():
     logging.info("Info state: %s, - - %s", obs["info_state"][player_id],
@@ -68,7 +68,7 @@ def turn_based_example(unused_arg):
 
   while not time_step.step_type.last():
     pid = time_step.observations["current_player"]
-    actions = select_actions(time_step.observations, pid)
+    actions = select_actions(time_step.obs, pid)
     print_iteration(time_step, actions, pid)
     time_step = env.step(actions)
 
