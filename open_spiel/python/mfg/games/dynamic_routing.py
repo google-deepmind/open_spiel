@@ -32,6 +32,7 @@ encoded in the cost function.
 
 More context can be found on the docstring of the python_dynamic_routing class.
 """
+import functools
 from typing import Any, Iterable, List, Mapping, Optional, Tuple
 
 import numpy as np
@@ -67,6 +68,54 @@ _GAME_TYPE = pyspiel.GameType(
 WAITING_TIME_NOT_ASSIGNED = -1
 
 
+@functools.lru_cache(maxsize=None)
+def _state_to_str(
+    is_chance_init: bool,
+    location: str,
+    time_step: int,
+    player_id: int,
+    waiting_time: int,
+    destination: str,
+    final_travel_time: float,
+) -> str:
+  """Convert the state to a string representation.
+
+  As the string representation will be used in dictionaries for various
+  algorithms that computes the state value, expected return, best response or
+  find the mean field Nash equilibrium.
+  The state is uniquely define by the current time, the type of node
+  (decision, mean field or chance), the vehicle location, its destination and
+  its waiting time.
+  Args:
+    is_chance_init: True if at chance initialization.
+    location: the location of the representative player.
+    time_step: the current time step.
+    player_id: the current node type as a player id.
+    waiting_time: the representative player waiting time.
+    destination: the destination of the representative player.
+    final_travel_time: time of arrival.
+
+  Returns:
+    state_string: string representing uniquely the mean field game.
+  """
+  if is_chance_init:
+    return "initial chance node"
+  if player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
+    time = str(time_step)
+  elif player_id == pyspiel.PlayerId.MEAN_FIELD:
+    time = f"{time_step}_mean_field"
+  elif player_id == pyspiel.PlayerId.CHANCE:
+    time = f"{time_step}_chance"
+  else:
+    raise ValueError(
+        "Player id should be DEFAULT_PLAYER_ID, MEAN_FIELD or CHANCE")
+  if final_travel_time:
+    return (f"Arrived at {location}, with travel time "
+            f"{final_travel_time}, t={time}")
+  return (f"Location={location}, waiting_time={waiting_time},"
+          f" t={time}, destination='{destination}'")
+
+
 class MeanFieldRoutingGame(pyspiel.Game):
   """Implementation of mean field routing game.
 
@@ -92,15 +141,18 @@ class MeanFieldRoutingGame(pyspiel.Game):
       game is a one population game.
   Attributes:
     network: the network of the game.
-    _od_demand: a list of the vehicle. Their origin and their destination should
+    od_demand: a list of the vehicle. Their origin and their destination should
       be road sections of the game.
     time_step_length: size of the time step, used to convert travel times into
       number of game time steps.
     perform_sanity_checks: if true, sanity checks are done during the game,
       should be set to false to speed up the game.
+    total_num_vehicle: total number of vehicles as the sum of the od_demand.
+    chance_outcomes: chance outcomes based on the initial probability
+      distribution and their probabilities.
   """
   network: dynamic_routing_utils.Network
-  _od_demand: List[dynamic_routing_utils.OriginDestinationDemand]
+  od_demand: List[dynamic_routing_utils.OriginDestinationDemand]
   perform_sanity_checks: bool
   time_step_length: float
 
@@ -123,15 +175,19 @@ class MeanFieldRoutingGame(pyspiel.Game):
     max_num_time_step = params["max_num_time_step"]
     time_step_length = params["time_step_length"]
     self.network = network if network else dynamic_routing_data.BRAESS_NETWORK
-    self._od_demand = (
+    self.od_demand = (
         od_demand
         if od_demand else dynamic_routing_data.BRAESS_NETWORK_OD_DEMAND)
-    self.network.check_list_of_od_demand_is_correct(self._od_demand)
+    self.network.check_list_of_od_demand_is_correct(self.od_demand)
     self.perform_sanity_checks = perform_sanity_checks
     self.time_step_length = time_step_length
+    self.total_num_vehicle = sum(
+        [od_demand_item.counts for od_demand_item in self.od_demand])
+    self.chance_outcomes = [(i, od_demand_item.counts / self.total_num_vehicle)
+                            for i, od_demand_item in enumerate(self.od_demand)]
     game_info = pyspiel.GameInfo(
         num_distinct_actions=self.network.num_actions(),
-        max_chance_outcomes=len(self._od_demand),
+        max_chance_outcomes=len(self.od_demand),
         num_players=1,
         min_utility=-max_num_time_step - 1,
         max_utility=0,
@@ -140,8 +196,7 @@ class MeanFieldRoutingGame(pyspiel.Game):
 
   def new_initial_state(self) -> "MeanFieldRoutingGameState":
     """Returns the state corresponding to the start of a game."""
-    return MeanFieldRoutingGameState(self, self._od_demand,
-                                     self.time_step_length)
+    return MeanFieldRoutingGameState(self, self.time_step_length)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns a NetworkObserver object used for observing game state."""
@@ -170,9 +225,6 @@ class MeanFieldRoutingGameState(pyspiel.State):
   See docstring of the game class and of the file for more information.
   Attributes:
     _current_time_step: current time step of the game.
-    _init_distribution: probability at time 0 for the representative player to
-      have the origin, the destination and the departure time given by
-      _od_demand.
     _is_chance_init: boolean that encodes weither the current node is the
       initial chance node.
     _is_terminal: boolean that encodes weither the game is over.
@@ -185,16 +237,13 @@ class MeanFieldRoutingGameState(pyspiel.State):
     _normed_density_on_vehicle_link: density of vehicles on the link that is
       used by the representative vehicle. This is given by the mean field
       distribution.
-    _od_demand: list of tuple origin, destination, departure time and count that
-      defines the demand.
     _time_step_length: size of the time step, used to convert travel times into
       number of game time steps.
-    _total_num_vehicle: total number of vehicles as the sum of the _od_demand.
     _vehicle_at_destination: boolean that encodes if the representative vehicle
       has reached its destination.
     _vehicle_destination: the destination of the representative vehicle
       corresponding to this state. It is associated to the representative
-      vehicle after the initial chance node according to the _od_demand
+      vehicle after the initial chance node according to the od_demand
       distribution.
     _vehicle_final_travel_time: the travel time of the representative vehicle,
       the travel is either 0 if the vehicle is still in the network or its
@@ -209,15 +258,12 @@ class MeanFieldRoutingGameState(pyspiel.State):
       link).
   """
   _current_time_step: int
-  _init_distribution: List[float]
   _is_chance_init: bool
   _is_terminal: bool
   _max_travel_time: int
   _max_waiting_time: int
   _normed_density_on_vehicle_link: float
-  _od_demand: List[dynamic_routing_utils.OriginDestinationDemand]
   _time_step_length: float
-  _total_num_vehicle: float
   _vehicle_at_destination: bool
   _vehicle_destination: Optional[str]
   _vehicle_final_travel_time: float
@@ -225,9 +271,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
   _vehicle_without_legal_action: bool
   _waiting_time: int
 
-  def __init__(self, game: MeanFieldRoutingGame,
-               od_demand: List[dynamic_routing_utils.OriginDestinationDemand],
-               time_step_length: float):
+  def __init__(self, game: MeanFieldRoutingGame, time_step_length: float):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
     self._current_time_step = 0
@@ -241,14 +285,6 @@ class MeanFieldRoutingGameState(pyspiel.State):
     self._vehicle_at_destination = False
     self._vehicle_final_travel_time = 0.0
     self._vehicle_without_legal_action = False
-    # create distribution and total weight in the network.
-    self._od_demand = od_demand
-    self._total_num_vehicle = sum(
-        [od_demand_item.counts for od_demand_item in od_demand])
-    self._init_distribution = [
-        od_demand_item.counts / self._total_num_vehicle
-        for od_demand_item in od_demand
-    ]
     self._vehicle_location = None
     self._vehicle_destination = None
     self._max_travel_time = self.get_game().max_game_length()
@@ -273,42 +309,16 @@ class MeanFieldRoutingGameState(pyspiel.State):
                    player_id: int = pyspiel.PlayerId.DEFAULT_PLAYER_ID,
                    waiting_time: int = 0,
                    destination: str = ""):
-    """Convert the state to a string representation.
-
-    As the string representation will be used in dictionaries for various
-    algorithms that computes the state value, expected return, best response or
-    find the mean field Nash equilibrium.
-    The state is uniquely define by the current time, the type of node
-    (decision, mean field or chance), the vehicle location, its destination and
-    its waiting time.
-    Args:
-      location: the location of the representative player.
-      time_step: the current time step.
-      player_id: the current node type as a player id.
-      waiting_time: the representative player waiting time.
-      destination: the representative player waiting time.
-
-    Returns:
-      state_string: string representing uniquely the mean field game.
-    """
-    if not destination:
-      destination = self._vehicle_destination
-    if self._is_chance_init:
-      return "initial chance node"
-    if player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
-      time = str(time_step)
-    elif player_id == pyspiel.PlayerId.MEAN_FIELD:
-      time = f"{time_step}_mean_field"
-    elif player_id == pyspiel.PlayerId.CHANCE:
-      time = f"{time_step}_chance"
-    else:
-      raise ValueError(
-          "Player id should be DEFAULT_PLAYER_ID, MEAN_FIELD or CHANCE")
-    if self._vehicle_final_travel_time:
-      return (f"Arrived at {location}, with travel time "
-              f"{self._vehicle_final_travel_time}, t={time}")
-    return (f"Location={location}, waiting_time={waiting_time},"
-            f" t={time}, destination='{destination}'")
+    """Convert the state to a string representation."""
+    return _state_to_str(
+        self._is_chance_init,
+        location,
+        time_step,
+        player_id,
+        waiting_time,
+        destination or self._vehicle_destination,
+        self._vehicle_final_travel_time,
+    )
 
   def distribution_support(self) -> List[str]:
     """Returns the state that should be used for update_distribution.
@@ -324,6 +334,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     """
     if self._vehicle_without_legal_action:
       return []
+    od_demand = self.get_game().od_demand
     dist = [
         self.state_to_str(  # pylint:disable=g-complex-comprehension
             self._vehicle_location,
@@ -333,7 +344,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
             destination=destination)
         for waiting_time in range(WAITING_TIME_NOT_ASSIGNED,
                                   self._max_travel_time)
-        for destination in {od._destination for od in self._od_demand}  # pylint:disable=protected-access
+        for destination in {od._destination for od in od_demand}  # pylint:disable=protected-access
     ]
     assert len(set(dist)) == len(dist), (
         f"Distribution should not have duplicated states: {dist}.")
@@ -348,21 +359,22 @@ class MeanFieldRoutingGameState(pyspiel.State):
       distribution: the probability for a vehicle to be in the states in
         distribution_support. The distribution is a list of probabilities.
     """
-    if self.get_game().perform_sanity_checks:
+    game = self.get_game()
+    if game.perform_sanity_checks:
       if self._player_id != pyspiel.PlayerId.MEAN_FIELD:
         raise ValueError(("update_distribution should only be called at"
                           " a MEAN_FIELD state."))
     self._player_id = pyspiel.PlayerId.DEFAULT_PLAYER_ID
     if not self._vehicle_without_legal_action:
       self._normed_density_on_vehicle_link = sum(distribution)
-      if self.get_game().perform_sanity_checks:
+      if game.perform_sanity_checks:
         assert 0 <= self._normed_density_on_vehicle_link <= 1 + 1e-4, (
             f"{self._normed_density_on_vehicle_link} is not in [0, 1].")
       if self._waiting_time == WAITING_TIME_NOT_ASSIGNED:
-        volume = (
-            self._total_num_vehicle * self._normed_density_on_vehicle_link)
-        self._waiting_time = int(self.get_game().network.get_travel_time(
-            self._vehicle_location, volume) / self._time_step_length) - 1
+        volume = (game.total_num_vehicle * self._normed_density_on_vehicle_link)
+        self._waiting_time = int(
+            game.network.get_travel_time(self._vehicle_location, volume) /
+            self._time_step_length) - 1
         self._waiting_time = max(0, self._waiting_time)
 
   def chance_outcomes(self) -> List[Tuple[int, float]]:
@@ -374,10 +386,11 @@ class MeanFieldRoutingGameState(pyspiel.State):
     Returns:
       list_tuple_outcome_probabilities: chance outcomes and their probability.
     """
-    if self.get_game().perform_sanity_checks:
+    game = self.get_game()
+    if game.perform_sanity_checks:
       assert self._player_id == pyspiel.PlayerId.CHANCE
       assert self._is_chance_init
-    return list(enumerate(self._init_distribution))
+    return game.chance_outcomes
 
   def _legal_actions(self, player: pyspiel.PlayerId) -> List[int]:
     """Return the legal actions of the vehicle.
@@ -437,9 +450,10 @@ class MeanFieldRoutingGameState(pyspiel.State):
       # Apply action is called on initial chance node to initialized
       # the vehicle position based on the initial location
       # distribution.
-      self._vehicle_destination = self._od_demand[action].destination
-      self._vehicle_location = self._od_demand[action].origin
-      self._waiting_time = int(self._od_demand[action].departure_time /
+      od_demand = self.get_game().od_demand
+      self._vehicle_destination = od_demand[action].destination
+      self._vehicle_location = od_demand[action].origin
+      self._waiting_time = int(od_demand[action].departure_time /
                                self._time_step_length)
       self._is_chance_init = False
       self._normed_density_on_vehicle_link = 0
