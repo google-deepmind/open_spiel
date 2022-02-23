@@ -61,7 +61,7 @@ class NFSP(rl_agent.AbstractAgent):
                reservoir_buffer_capacity,
                anticipatory_param,
                input_shape=None,
-               conv_layer_sizes=None,
+               conv_layer_info=None,
                batch_size=128,
                rl_learning_rate=0.01,
                sl_learning_rate=0.01,
@@ -75,7 +75,7 @@ class NFSP(rl_agent.AbstractAgent):
     self._session = session
     self._num_actions = num_actions
     self._layer_sizes = hidden_layers_sizes
-    self._conv_layer_sizes = conv_layer_sizes
+    self._conv_layer_info = conv_layer_info
     self._batch_size = batch_size
     self._learn_every = learn_every
     self._anticipatory_param = anticipatory_param
@@ -102,7 +102,7 @@ class NFSP(rl_agent.AbstractAgent):
                                num_actions, hidden_layers_sizes, **kwargs)
     elif model_type == "conv2d":
       self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
-                               num_actions, conv_layer_sizes=conv_layer_sizes,
+                               num_actions, conv_layer_info=conv_layer_info,
                                input_shape=input_shape, model_type="conv2d", **kwargs)
     else:
       raise ValueError(f"Unknown model type: {model_type}",
@@ -136,7 +136,7 @@ class NFSP(rl_agent.AbstractAgent):
       self._avg_network = simple_nets.ConvNet(
           input_size=state_representation_size, 
           input_shape=input_shape,
-          conv_layer_sizes=self._conv_layer_sizes, 
+          conv_layer_info=self._conv_layer_info, 
           dense_layer_sizes=self._layer_sizes, 
           output_size=num_actions)
     self._avg_policy = self._avg_network(self._info_state_ph)

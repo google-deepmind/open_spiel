@@ -24,13 +24,15 @@ from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms import nfsp
 
+import json
+
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game_name", "dark_hex_ir",
                     "Name of the game.")
-flags.DEFINE_integer("num_rows", 2,
+flags.DEFINE_integer("num_rows", 4,
                      "Number of rows.")
-flags.DEFINE_integer("num_cols", 2,
+flags.DEFINE_integer("num_cols", 3,
                       "Number of cols.")
 flags.DEFINE_integer("num_players", 2,
                      "Number of players.") # keeping for other games.
@@ -41,10 +43,14 @@ flags.DEFINE_integer("eval_every", 20000,
 flags.DEFINE_list("hidden_layers_sizes", [
     128, 256, 128
 ], "Number of hidden units to use in each layer of the avg-net and Q-net.")
-flags.DEFINE_list("conv_layer_sizes", [
-    1024
-], "Number of output filters to use in each hidden convolutional layer in" +
-   "the avg-net and Q-net.")
+flags.DEFINE_list("conv_layer_info", [
+    '{"filters": 1024, "kernel_size": 3, "strides": 1, "padding": "same", "max_pool": 2}',
+    '{"filters": 512, "kernel_size": 2, "strides": 1, "padding": "same", "max_pool": 1}',
+    '{"filters": 256, "kernel_size": 2, "strides": 1, "padding": "same", "max_pool": 0}',
+], "Convolutional layers information. Each layer is a dictionary with the following keys: " +
+   "filters (int), kernel_size (int), strides (int), padding (str), max_pool (int). " +
+   "If max_pool is 0, no max pooling is used. If max_pool is a positive integer, max " +
+   "pooling is used with the given pool size.")
 flags.DEFINE_integer("replay_buffer_capacity", int(2e5),
                      "Size of the replay buffer.")
 flags.DEFINE_integer("reservoir_buffer_capacity", int(2e6),
@@ -125,7 +131,10 @@ def main(unused_argv):
   num_actions = env.action_spec()["num_actions"]
 
   hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
-  conv_layer_sizes = [int(l) for l in FLAGS.conv_layer_sizes]
+  # Parsing conv_layer_info
+  conv_layer_info = []
+  for layer_info in FLAGS.conv_layer_info:
+    conv_layer_info.append(json.loads(layer_info))
   kwargs = {
       "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
       "reservoir_buffer_capacity": FLAGS.reservoir_buffer_capacity,
@@ -148,7 +157,7 @@ def main(unused_argv):
     # pylint: disable=g-complex-comprehension
     agents = [
         nfsp.NFSP(sess, idx, info_state_size, num_actions, hidden_layers_sizes,
-                  conv_layer_sizes=conv_layer_sizes, model_type="conv2d", 
+                  conv_layer_info=conv_layer_info, model_type="conv2d", 
                   input_shape=(3, FLAGS.num_rows, FLAGS.num_cols),
                   **kwargs) for idx in range(num_players)
     ]

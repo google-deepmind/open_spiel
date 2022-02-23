@@ -51,7 +51,7 @@ class DQN(rl_agent.AbstractAgent):
                num_actions,
                input_shape=None,
                hidden_layers_sizes=128,
-               conv_layer_sizes=None,
+               conv_layer_info=None,
                replay_buffer_capacity=10000,
                batch_size=128,
                replay_buffer_class=ReplayBuffer,
@@ -94,10 +94,7 @@ class DQN(rl_agent.AbstractAgent):
     self._replay_buffer = replay_buffer_class(replay_buffer_capacity)
     self._prev_timestep = None
     self._prev_action = None
-
-    if isinstance(conv_layer_sizes, int):
-      conv_layer_sizes = [conv_layer_sizes]
-    self._conv_layer_sizes = conv_layer_sizes
+    self._conv_layer_info = conv_layer_info
 
     # Step counter to keep track of learning, eps decay and target network.
     self._step_counter = 0
@@ -135,13 +132,13 @@ class DQN(rl_agent.AbstractAgent):
       self._q_network = simple_nets.ConvNet(
           input_size=state_representation_size, 
           input_shape=input_shape,
-          conv_layer_sizes=self._conv_layer_sizes, 
+          conv_layer_info=self._conv_layer_info, 
           dense_layer_sizes=self._layer_sizes, 
           output_size=num_actions)
       self._target_q_network = simple_nets.ConvNet(
           input_size=state_representation_size, 
           input_shape=input_shape,
-          conv_layer_sizes=self._conv_layer_sizes, 
+          conv_layer_info=self._conv_layer_info, 
           dense_layer_sizes=self._layer_sizes, 
           output_size=num_actions)
     else:

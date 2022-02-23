@@ -146,7 +146,7 @@ class ConvNet(tf.Module):
   def __init__(self,
                input_size,
                input_shape,
-               conv_layer_sizes,
+               conv_layer_info,
                dense_layer_sizes,
                output_size,
                activate_final=False,
@@ -156,7 +156,15 @@ class ConvNet(tf.Module):
     Args:
       input_size: (int) number of inputs
       input_shape: (tuple) shape of the input
-      conv_layer_sizes: (list) sizes (number of filters) of each convolutional layer
+      conv_layer_info: (list) list of dictionaries with information about each
+        convolutional layer. Dictionaries can have the following keys:
+          - "filters": (int) number of filters (cannot be None)
+          - "kernel_size": (int) size of the kernel (defaults to 3)
+          - "strides": (int) stride of the convolution (defaults to 1)
+          - "padding": (string) padding type (defaults to "SAME")
+          - "activation": (string) activation type (defaults to "relu")
+          - "max_pool": (int) size of the max pooling layer (defaults to 0, no
+            max pooling)
       dense_layer_sizes: (list) sizes (number of units) of each dense layer after
         the convolutional layers
       output_size: (int) number of outputs
@@ -169,39 +177,56 @@ class ConvNet(tf.Module):
     self._layers = []
     with self.name_scope:
       # Input Layer
+      input_layer = conv_layer_info[0]
       self._layers.append(
-          tf.keras.layers.Conv2D(
-              conv_layer_sizes[0],
-              kernel_size=3,
-              strides=1,
-              padding="SAME",
-              activation=tf.nn.relu,
-              input_shape=self._shape))
-
-      # Convolutional layers
-      for size in conv_layer_sizes[1:]:
+        tf.keras.layers.Conv2D(
+          filters=input_layer["filters"],
+          kernel_size=input_layer.get("kernel_size", 3),
+          strides=input_layer.get("strides", 1),
+          padding=input_layer.get("padding", "SAME"),
+          activation=input_layer.get("activation", "relu"),
+          input_shape=input_shape,
+          name="input_layer"))
+      if input_layer.get("max_pool", 0) > 0:
         self._layers.append(
-            tf.keras.layers.Conv2D(
-                size,
-                kernel_size=(3, 3),
-                strides=(1, 1),
-                padding="same",
-                activation=tf.nn.relu,
-                data_format="channels_first"))
-        self._layers.append(tf.keras.layers.MaxPool2D(pool_size=(2, 2)))
-
+            tf.keras.layers.MaxPool2D(
+                pool_size=input_layer["max_pool"],
+                name="max_pool_input"))
+      
+      # Convolutional layers
+      for idx, info in enumerate(conv_layer_info[1:]):
+        self._layers.append(
+          tf.keras.layers.Conv2D(
+            filters=info["filters"],
+            kernel_size=info.get("kernel_size", 3),
+            strides=info.get("strides", 1),
+            padding=info.get("padding", "SAME"),
+            activation=info.get("activation", "relu"),
+            name=f"conv_layer_{idx}"))
+        if info.get("max_pool", 0) > 0:
+          self._layers.append(
+              tf.keras.layers.MaxPool2D(
+                  pool_size=info["max_pool"],
+                  name=f"max_pool_{idx}"))
+            
       # Flatten
-      self._layers.append(tf.keras.layers.Flatten())
+      self._layers.append(
+        tf.keras.layers.Flatten(name="flatten"))
 
       # Dense layers
-      for size in dense_layer_sizes:
+      for idx, size in enumerate(dense_layer_sizes):
         self._layers.append(
-            tf.keras.layers.Dense(units=size, activation='relu'))
+          tf.keras.layers.Dense(
+            units=size,
+            activation=tf.nn.relu,
+            name=f"dense_layer_{idx}"))
 
       # Output layer
       self._layers.append(
-          tf.keras.layers.Dense(
-              units=output_size, activation='relu' if activate_final else None))
+        tf.keras.layers.Dense(
+          units=output_size,
+          activation=None if activate_final else tf.nn.relu,
+          name="output_layer"))
 
   @tf.Module.with_name_scope
   def __call__(self, x):
