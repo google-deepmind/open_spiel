@@ -45,6 +45,10 @@ namespace pathfinding {
 //                          (default: 100.0).
 //   "step_reward"  double  The reward given to every agent on each per step
 //                          (default: -0.01).
+//
+// Note: currently, the observations are current non-Markovian because the time
+// step is not included and the horizon is finite. This can be easily added as
+// an option if desired.
 
 inline constexpr char kDefaultSingleAgentGrid[] =
     "A.*..**\n"
@@ -131,11 +135,7 @@ class PathfindingState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
-  std::string ObservationString(int player) const override {
-    SPIEL_CHECK_GE(player, 0);
-    SPIEL_CHECK_LT(player, num_players_);
-    return ToString();
-  }
+  std::string ObservationString(int player) const override;
   void ObservationTensor(int player, absl::Span<float> values) const override;
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
@@ -164,6 +164,7 @@ class PathfindingState : public SimMoveState {
   Player PlayerAt(const std::pair<int, int>& coord) const;
   int TryResolveContested();
   bool AllPlayersOnDestinations() const;
+  int PlayerPlaneIndex(int observing_player, int actual_player) const;
 
   const PathfindingGame& parent_game_;
   const GridSpec& grid_spec_;

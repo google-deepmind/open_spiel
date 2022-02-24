@@ -433,6 +433,23 @@ std::string PathfindingState::ToString() const {
   return str;
 }
 
+int PathfindingState::PlayerPlaneIndex(int observing_player,
+                                       int actual_player) const {
+  // Need to add a num_players_ inside the brackets here because of how C++
+  // handles mod of negative values.
+  return (actual_player - observing_player + num_players_) % num_players_;
+}
+
+// Note: currently, the observations are current non-Markovian because the time
+// step is not included and the horizon is finite.
+std::string PathfindingState::ObservationString(int player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  return ToString();
+}
+
+// Note: currently, the observations are current non-Markovian because the time
+// step is not included and the horizon is finite.
 void PathfindingState::ObservationTensor(int player,
                                          absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -450,11 +467,18 @@ void PathfindingState::ObservationTensor(int player,
   //   - Third n planes refer to player's destination position
   //   - 1 plane for wall
   //   - 1 plane for empty
+  //
+  // The first three sets of n planes corresponding to the players are each
+  // ordered ego-centrically:
+  //   - the first plane is the observing player's plane, followed by the next
+  //     player, followed by the next etc. so in a 4-player game, if player 2
+  //     is the observing player, the planes would be ordered by player 2, 3, 0,
+  //     1.
   for (int r = 0; r < grid_spec_.num_rows; ++r) {
     for (int c = 0; c < grid_spec_.num_cols; ++c) {
       // Player on the position.
       if (grid_[r][c] >= 0 && grid_[r][c] < num_players_) {
-        view[{grid_[r][c], r, c}] = 1.0;
+        view[{PlayerPlaneIndex(player, grid_[r][c]), r, c}] = 1.0;
       }
 
       // Wall
@@ -472,8 +496,9 @@ void PathfindingState::ObservationTensor(int player,
   for (Player p = 0; p < num_players_; ++p) {
     const std::pair<int, int>& start_pos = grid_spec_.starting_positions[p];
     const std::pair<int, int>& dest_pos = grid_spec_.destinations[p];
-    view[{num_players_ + p, start_pos.first, start_pos.second}] = 1.0;
-    view[{2 * num_players_ + p, dest_pos.first, dest_pos.second}] = 1.0;
+    int pidx = PlayerPlaneIndex(player, p);
+    view[{num_players_ + pidx, start_pos.first, start_pos.second}] = 1.0;
+    view[{2 * num_players_ + pidx, dest_pos.first, dest_pos.second}] = 1.0;
   }
 }
 
