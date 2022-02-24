@@ -26,9 +26,10 @@ import contextlib
 import enum
 import os
 import random
-from absl import logging
+
 import numpy as np
 import tensorflow.compat.v1 as tf
+from absl import logging
 
 from open_spiel.python import rl_agent
 from open_spiel.python import simple_nets
@@ -38,7 +39,7 @@ from open_spiel.python.algorithms import dqn
 tf.disable_v2_behavior()
 
 Transition = collections.namedtuple(
-    "Transition", "info_state action_probs legal_actions_mask")
+  "Transition", "info_state action_probs legal_actions_mask")
 
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
 
@@ -85,60 +86,65 @@ class NFSP(rl_agent.AbstractAgent):
 
     # Inner RL agent
     kwargs.update({
-        "batch_size": batch_size,
-        "learning_rate": rl_learning_rate,
-        "learn_every": learn_every,
-        "min_buffer_size_to_learn": min_buffer_size_to_learn,
-        "optimizer_str": optimizer_str,
+      "batch_size": batch_size,
+      "learning_rate": rl_learning_rate,
+      "learn_every": learn_every,
+      "min_buffer_size_to_learn": min_buffer_size_to_learn,
+      "optimizer_str": optimizer_str,
     })
-    self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
-                             num_actions, hidden_layers_sizes, **kwargs)
+    with tf.name_scope("NFSP") as scope:
+      self._rl_agent = dqn.DQN(session, player_id, state_representation_size,
+                               num_actions, hidden_layers_sizes, **kwargs)
 
-    # Keep track of the last training loss achieved in an update step.
-    self._last_rl_loss_value = lambda: self._rl_agent.loss
-    self._last_sl_loss_value = None
+      # Keep track of the last training loss achieved in an update step.
+      self._last_rl_loss_value = lambda: self._rl_agent.loss
+      self._last_sl_loss_value = None
 
-    # Placeholders.
-    self._info_state_ph = tf.placeholder(
+      # Placeholders.
+      self._info_state_ph = tf.placeholder(
         shape=[None, state_representation_size],
         dtype=tf.float32,
         name="info_state_ph")
 
-    self._action_probs_ph = tf.placeholder(
+      self._action_probs_ph = tf.placeholder(
         shape=[None, num_actions], dtype=tf.float32, name="action_probs_ph")
 
-    self._legal_actions_mask_ph = tf.placeholder(
+      self._legal_actions_mask_ph = tf.placeholder(
         shape=[None, num_actions],
         dtype=tf.float32,
         name="legal_actions_mask_ph")
 
-    # Average policy network.
-    self._avg_network = simple_nets.MLP(state_representation_size,
-                                        self._layer_sizes, num_actions)
-    self._avg_policy = self._avg_network(self._info_state_ph)
-    self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
+      # Average policy network.
+      self._avg_network = simple_nets.MLP(state_representation_size,
+                                          self._layer_sizes, num_actions)
+      self._avg_policy = self._avg_network(self._info_state_ph)
+      self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
+
+      # Loss
+      self._loss = tf.reduce_mean(
+        tf.nn.softmax_cross_entropy_with_logits_v2(
+          labels=tf.stop_gradient(self._action_probs_ph),
+          logits=self._avg_policy))
+
+      if optimizer_str == "adam":
+        optimizer = tf.train.AdamOptimizer(learning_rate=sl_learning_rate)
+      elif optimizer_str == "sgd":
+        optimizer = tf.train.GradientDescentOptimizer(
+          learning_rate=sl_learning_rate)
+      else:
+        raise ValueError("Not implemented. Choose from ['adam', 'sgd'].")
+
+      self._learn_step = optimizer.minimize(self._loss)
+      self._sample_episode_policy()
+      self._scope = scope
+
+    def strip_scope(vars):
+      return {v.name[len(self._scope):]: v for v in vars}
 
     self._savers = [
-        ("q_network", tf.train.Saver(self._rl_agent._q_network.variables)),
-        ("avg_network", tf.train.Saver(self._avg_network.variables))
+      ("q_network", tf.train.Saver(strip_scope(self._rl_agent._q_network.variables), max_to_keep=10000)),
+      ("avg_network", tf.train.Saver(strip_scope(self._avg_network.variables), max_to_keep=10000))
     ]
-
-    # Loss
-    self._loss = tf.reduce_mean(
-        tf.nn.softmax_cross_entropy_with_logits_v2(
-            labels=tf.stop_gradient(self._action_probs_ph),
-            logits=self._avg_policy))
-
-    if optimizer_str == "adam":
-      optimizer = tf.train.AdamOptimizer(learning_rate=sl_learning_rate)
-    elif optimizer_str == "sgd":
-      optimizer = tf.train.GradientDescentOptimizer(
-          learning_rate=sl_learning_rate)
-    else:
-      raise ValueError("Not implemented. Choose from ['adam', 'sgd'].")
-
-    self._learn_step = optimizer.minimize(self._loss)
-    self._sample_episode_policy()
 
   @contextlib.contextmanager
   def temp_mode_as(self, mode):
@@ -160,8 +166,8 @@ class NFSP(rl_agent.AbstractAgent):
   def _act(self, info_state, legal_actions):
     info_state = np.reshape(info_state, [1, -1])
     action_values, action_probs = self._session.run(
-        [self._avg_policy, self._avg_policy_probs],
-        feed_dict={self._info_state_ph: info_state})
+      [self._avg_policy, self._avg_policy_probs],
+      feed_dict={self._info_state_ph: info_state})
 
     self._last_action_values = action_values[0]
     # Remove illegal actions, normalize probs
@@ -242,9 +248,9 @@ class NFSP(rl_agent.AbstractAgent):
     legal_actions_mask = np.zeros(self._num_actions)
     legal_actions_mask[legal_actions] = 1.0
     transition = Transition(
-        info_state=(time_step.observations["info_state"][self.player_id][:]),
-        action_probs=agent_output.probs,
-        legal_actions_mask=legal_actions_mask)
+      info_state=(time_step.observations["info_state"][self.player_id][:]),
+      action_probs=agent_output.probs,
+      legal_actions_mask=legal_actions_mask)
     self._reservoir_buffer.add(transition)
 
   def _learn(self):
@@ -266,12 +272,12 @@ class NFSP(rl_agent.AbstractAgent):
     legal_actions_mask = [t.legal_actions_mask for t in transitions]
 
     loss, _ = self._session.run(
-        [self._loss, self._learn_step],
-        feed_dict={
-            self._info_state_ph: info_states,
-            self._action_probs_ph: action_probs,
-            self._legal_actions_mask_ph: legal_actions_mask,
-        })
+      [self._loss, self._learn_step],
+      feed_dict={
+        self._info_state_ph: info_states,
+        self._action_probs_ph: action_probs,
+        self._legal_actions_mask_ph: legal_actions_mask,
+      })
     return loss
 
   def _full_checkpoint_name(self, checkpoint_dir, name):
@@ -293,9 +299,9 @@ class NFSP(rl_agent.AbstractAgent):
     """
     for name, saver in self._savers:
       path = saver.save(
-          self._session,
-          self._full_checkpoint_name(checkpoint_dir, name),
-          latest_filename=self._latest_checkpoint_filename(name))
+        self._session,
+        self._full_checkpoint_name(checkpoint_dir, name),
+        latest_filename=self._latest_checkpoint_filename(name))
       logging.info("Saved to path: %s", path)
 
   def has_checkpoint(self, checkpoint_dir):
@@ -364,7 +370,7 @@ class ReservoirBuffer(object):
     """
     if len(self._data) < num_samples:
       raise ValueError("{} elements could not be sampled from size {}".format(
-          num_samples, len(self._data)))
+        num_samples, len(self._data)))
     return random.sample(self._data, num_samples)
 
   def clear(self):
