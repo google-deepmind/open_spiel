@@ -161,3 +161,15 @@ Leduc poker. We will use an example based on this
     [pybind11 documentation](https://pybind11.readthedocs.io/en/stable/).
 6.  Add a simple test to `python/games_sim_test.py` to check that it worked. For
     inspiration, see e.g. `test_leduc_get_and_set_private_cards`.
+
+## Language APIs
+
+There are currently four other language APIs that expose functionality from the
+C++ core.
+
+-   [Python](https://github.com/deepmind/open_spiel/tree/master/open_spiel/python).
+-   [Julia](https://github.com/deepmind/open_spiel/tree/master/open_spiel/julia)
+-   [Go](https://github.com/deepmind/open_spiel/tree/master/open_spiel/go)
+    (experimental)
+-   [Rust](https://github.com/deepmind/open_spiel/tree/master/open_spiel/rust)
+    (experimental)
