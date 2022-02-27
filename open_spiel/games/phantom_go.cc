@@ -270,7 +270,7 @@ std::unique_ptr<State> PhantomGoState::ResampleFromMetaposition(
 //This method is unfinished, will be later replaced by or-tools CSP solver implementation
 std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
-
+    /*
     int boardSize = board_.board_size();
 
     std::shared_ptr<const Game> game = GetGame();
@@ -508,9 +508,9 @@ std::unique_ptr<State> PhantomGoState::ResampleFromInfostate(
             }
             enemyMove++;
         }
-    }
+    }*/
     SpielFatalError("Method ResampleFromInfostate is unfinished and shouldn't be used\n");
-    return state;
+    //return state;
 }
 
 std::string PhantomGoState::InformationStateString(int player) const {
