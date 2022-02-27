@@ -11,13 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #include "open_spiel/algorithms/is_mcts.h"
 
 #include <random>
 
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/algorithms/mcts.h"
-@@ -27,61 +28,186 @@ namespace {
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
+
+namespace open_spiel {
+namespace {
 
 constexpr const int kSeed = 93879211;
 
@@ -58,9 +64,12 @@ void ISMCTSTest_PlayGame(const std::string& game_name) {
         auto bot1 = std::make_unique<algorithms::ISMCTSBot>(
             kSeed, evaluator, 5.0, 1000, algorithms::kUnlimitedNumWorldSamples,
             type, false, false);
+
         std::mt19937 rng(kSeed);
+
         std::cout << "Testing " << game_name << ", bot 1" << std::endl;
         PlayGame(*game, bot1.get(), &rng);
+
         auto bot2 = std::make_unique<algorithms::ISMCTSBot>(
             kSeed, evaluator, 5.0, 1000, 10, type, false, false);
         std::cout << "Testing " << game_name << ", bot 2" << std::endl;
@@ -76,11 +85,24 @@ void ISMCTS_BasicPlayGameTest_Kuhn() {
 void ISMCTS_BasicPlayGameTest_Leduc() {
     ISMCTSTest_PlayGame("leduc_poker");
     ISMCTSTest_PlayGame("leduc_poker(players=3)");
-    @@ -102,7 +228,8 @@ void ISMCTS_LeducObservationTest() {
-    }  // namespace open_spiel
+}
 
-    int main(int argc, char** argv) {
-        open_spiel::ISMCTS_BasicPlayGameTest_Kuhn();
-        open_spiel::ISMCTS_BasicPlayGameTest_Leduc();
-        open_spiel::ISMCTS_LeducObservationTest();
-    }
+void ISMCTS_LeducObservationTest() {
+    std::mt19937 rng(kSeed);
+    std::shared_ptr<const Game> game = LoadGame("leduc_poker");
+    auto evaluator =
+        std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);
+    auto bot = std::make_unique<algorithms::ISMCTSBot>(
+        kSeed, evaluator, 10.0, 1000, algorithms::kUnlimitedNumWorldSamples,
+        algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount, true, true);
+    PlayGame(*game, bot.get(), &rng);
+}
+
+}  // namespace
+}  // namespace open_spiel
+
+int main(int argc, char** argv) {
+    open_spiel::ISMCTS_BasicPlayGameTest_Kuhn();
+    open_spiel::ISMCTS_BasicPlayGameTest_Leduc();
+    open_spiel::ISMCTS_LeducObservationTest();
+}
