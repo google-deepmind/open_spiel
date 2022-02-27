@@ -51,13 +51,13 @@ inline constexpr double DrawUtility() { return 0; }
 
 // All actions must be in [0; NumDistinctActions).
 inline int NumDistinctActions(int board_size) {
-  return board_size * board_size + 1;
+    return board_size * board_size + 1;
 }
 
 // Such high number has been set, mainly because moves on enemy stones are also counted into length
 // And for "clear" resampling, lot of passes and "observation moves" are needed
 inline int DefaultMaxGameLength(int board_size) {
-  return board_size * board_size * 4;
+    return board_size * board_size * 4;
 }
 
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
@@ -71,10 +71,10 @@ class PhantomGoState : public State {
  public:
   // Constructs a Go state for the empty board.
   PhantomGoState(std::shared_ptr<const Game> game, int board_size, float komi,
-          int handicap);
+                 int handicap);
 
   Player CurrentPlayer() const override {
-    return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(to_play_);
+      return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(to_play_);
   }
   std::vector<Action> LegalActions() const override;
 
@@ -85,13 +85,13 @@ class PhantomGoState : public State {
 
   bool IsTerminal() const override;
 
+  std::unique_ptr<State> ResampleFromMetaposition(
+      int player_id, std::function<double()> rng) const;
+
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const;
 
-  std::unique_ptr<State> ResampleFromInfostateFull(
-      int player_id, std::function<double()> rng) const;
-
-  std::unique_ptr<State> ResampleFromInfostateHard(
+  std::unique_ptr<State> ResampleFromMetapositionHard(
       int player_id, std::function<double()> rng) const;
 
   std::string InformationStateString(int player) const override;
@@ -106,9 +106,7 @@ class PhantomGoState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action action) override;
 
-  const PhantomGoBoard& board() const { return board_; }
-
-
+  const PhantomGoBoard &board() const { return board_; }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -124,7 +122,7 @@ class PhantomGoState : public State {
   class PassthroughHash {
    public:
     std::size_t operator()(uint64_t x) const {
-      return static_cast<std::size_t>(x);
+        return static_cast<std::size_t>(x);
     }
   };
   using RepetitionTable = std::unordered_set<uint64_t, PassthroughHash>;
@@ -139,25 +137,25 @@ class PhantomGoState : public State {
 
 class PhantomGoGame : public Game {
  public:
-  explicit PhantomGoGame(const GameParameters& params);
+  explicit PhantomGoGame(const GameParameters &params);
 
   int NumDistinctActions() const override {
-    return phantom_go::NumDistinctActions(board_size_);
+      return phantom_go::NumDistinctActions(board_size_);
   }
 
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new PhantomGoState(shared_from_this(), board_size_, komi_, handicap_));
+      return std::unique_ptr<State>(
+          new PhantomGoState(shared_from_this(), board_size_, komi_, handicap_));
   }
 
   std::vector<int> ObservationTensorShape() const override {
-    // Planes: black, white, empty, and a bias plane indicating komi (whether
-    // white is to play).
-    return {CellStates() + 1, board_size_, board_size_};
+      // Planes: black, white, empty, and a bias plane indicating komi (whether
+      // white is to play).
+      return {CellStates() + 1, board_size_, board_size_};
   }
 
   TensorLayout ObservationTensorLayout() const override {
-    return TensorLayout::kCHW;
+      return TensorLayout::kCHW;
   }
 
   int NumPlayers() const override { return phantom_go::NumPlayers(); }

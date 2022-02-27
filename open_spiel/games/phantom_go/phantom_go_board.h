@@ -33,8 +33,6 @@ std::ostream &operator<<(std::ostream &os, GoColor c);
 
 GoColor OppColor(GoColor c);
 
-
-
 // For simplicity and speed, we store the board in terms of a "virtual board",
 // with a border of guard stones around all sides of the board.
 // This allows us to skip bounds checking.
@@ -102,50 +100,37 @@ class Neighbours4 {
   const VirtualPoint operator*() const;
   explicit operator bool() const;
 
-  
-
  private:
   VirtualPoint dir_;
   const VirtualPoint p_;
 };
 
-// Simple Go board that is optimized for speed.
-// It only implements the minimum of functionality necessary to support the
-// search and is optimized for speed and size. Importantly, it fits on the
-// stack. For detailed numbers, run the benchmarks in go_board_test.
 class PhantomGoBoard {
  public:
   explicit PhantomGoBoard(int board_size);
 
   void Clear();
 
-  
-
   std::array<int, 2> GetStoneCount() const { return stone_count_; };
   std::string ObservationsToString() const;
   std::string ObservationToString(int player) const;
-  std::array<GoColor, kMaxBoardSize* kMaxBoardSize> GetObservationByID(int player_id) const;
-
-  // Adds an enemy stone into observation of certain player on certain point
-  //void addEnemyStoneIntoObservation(int boardPoint, int player_id) const;
-
-
-  //absl::Span<float> observationRef;
+  std::array<GoColor, kMaxBoardSize * kMaxBoardSize> GetObservationByID(int player_id) const;
 
   inline int board_size() const { return board_size_; }
+
   // Returns the concrete pass action.
   inline int pass_action() const { return pass_action_; }
   inline Action VirtualActionToAction(int virtual_action) const {
-    return phantom_go::VirtualActionToAction(virtual_action, board_size_);
+      return phantom_go::VirtualActionToAction(virtual_action, board_size_);
   }
   inline int ActionToVirtualAction(Action action) const {
-    return phantom_go::ActionToVirtualAction(action, board_size_);
+      return phantom_go::ActionToVirtualAction(action, board_size_);
   }
 
   inline GoColor PointColor(VirtualPoint p) const { return board_[p].color; }
 
   inline bool IsEmpty(VirtualPoint p) const {
-    return PointColor(p) == GoColor::kEmpty;
+      return PointColor(p) == GoColor::kEmpty;
   }
 
   bool IsInBoardArea(VirtualPoint p) const;
@@ -163,9 +148,9 @@ class PhantomGoBoard {
   // times, once for each stone of the group that borders it.
   // This is much faster than realLiberty(), so prefer it if possible.
   inline int PseudoLiberty(VirtualPoint p) const {
-    return chain(p).num_pseudo_liberties == 0
-               ? 0
-               : (chain(p).in_atari() ? 1 : chain(p).num_pseudo_liberties);
+      return chain(p).num_pseudo_liberties == 0
+             ? 0
+             : (chain(p).in_atari() ? 1 : chain(p).num_pseudo_liberties);
   }
 
   inline bool InAtari(VirtualPoint p) const { return chain(p).in_atari(); }
@@ -177,11 +162,11 @@ class PhantomGoBoard {
   // This is computed on the fly by actually walking the group and checking the
   // neighbouring stones.
   inline int RealLiberty(VirtualPoint p) const {
-    int num_lib = 0;
-    for (auto it = LibIter(p); it; ++it) {
-      ++num_lib;
-    }
-    return num_lib;
+      int num_lib = 0;
+      for (auto it = LibIter(p); it; ++it) {
+          ++num_lib;
+      }
+      return num_lib;
   }
 
   inline uint64_t HashValue() const { return zobrist_hash_; }
@@ -189,7 +174,7 @@ class PhantomGoBoard {
   // Head of a chain; each chain has exactly one head that can be used to
   // uniquely identify it. Chain heads may change over successive PlayMove()s.
   inline VirtualPoint ChainHead(VirtualPoint p) const {
-    return board_[p].chain_head;
+      return board_[p].chain_head;
   }
 
   // Number of stones in a chain.
@@ -201,10 +186,10 @@ class PhantomGoBoard {
    public:
     GroupIter(const PhantomGoBoard *board, VirtualPoint p, GoColor group_color)
         : board_(board), lib_i_(0), group_color_(group_color) {
-      marked_.fill(false);
-      chain_head_ = board->ChainHead(p);
-      chain_cur_ = chain_head_;
-      step();
+        marked_.fill(false);
+        chain_head_ = board->ChainHead(p);
+        chain_cur_ = chain_head_;
+        step();
     }
 
     inline explicit operator bool() const { return lib_i_ >= 0; }
@@ -212,8 +197,8 @@ class PhantomGoBoard {
     inline VirtualPoint operator*() const { return cur_libs_[lib_i_]; }
 
     GroupIter &operator++() {
-      step();
-      return *this;
+        step();
+        return *this;
     }
 
    private:
@@ -230,28 +215,26 @@ class PhantomGoBoard {
   };
 
   GroupIter LibIter(VirtualPoint p) const {
-    return GroupIter(this, p, GoColor::kEmpty);
+      return GroupIter(this, p, GoColor::kEmpty);
   }
   GroupIter OppIter(VirtualPoint p) const {
-    return GroupIter(this, p, OppColor(PointColor(p)));
+      return GroupIter(this, p, OppColor(PointColor(p)));
   }
 
  private:
   void JoinChainsAround(VirtualPoint p, GoColor c);
   void SetStone(VirtualPoint p, GoColor c);
   void RemoveLibertyFromNeighbouringChains(VirtualPoint p);
-  int  CaptureDeadChains(VirtualPoint p, GoColor c);
+  int CaptureDeadChains(VirtualPoint p, GoColor c);
   void RemoveChain(VirtualPoint p);
   void InitNewChain(VirtualPoint p);
 
-
   // In this context, GoColor::kEmpty suggests, that a player does not know, what piece is on that exact spot
-  std::array<std::array<GoColor, kMaxBoardSize* kMaxBoardSize>, 2> observations_;
+  std::array<std::array<GoColor, kMaxBoardSize * kMaxBoardSize>, 2> observations_;
 
   // On index 0 is stored count of black stones, on index 1 is stored count of white stones
   // so it equals the enum of GoColor, where kBlack is 0
   std::array<int, 2> stone_count_;
-
 
   struct Vertex {
     VirtualPoint chain_head;
@@ -270,10 +253,10 @@ class PhantomGoBoard {
     void merge(const Chain &other);
 
     inline bool in_atari() const {
-      return static_cast<uint32_t>(num_pseudo_liberties) *
-                 liberty_vertex_sum_squared ==
-             static_cast<uint32_t>(liberty_vertex_sum) *
-                 static_cast<uint32_t>(liberty_vertex_sum);
+        return static_cast<uint32_t>(num_pseudo_liberties) *
+            liberty_vertex_sum_squared ==
+            static_cast<uint32_t>(liberty_vertex_sum) *
+                static_cast<uint32_t>(liberty_vertex_sum);
     }
     void add_liberty(VirtualPoint p);
     void remove_liberty(VirtualPoint p);
@@ -282,8 +265,6 @@ class PhantomGoBoard {
 
   Chain &chain(VirtualPoint p) { return chains_[ChainHead(p)]; }
   const Chain &chain(VirtualPoint p) const { return chains_[ChainHead(p)]; }
-
-
 
   std::array<Vertex, kVirtualBoardPoints> board_;
   std::array<Chain, kVirtualBoardPoints> chains_;
