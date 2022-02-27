@@ -59,8 +59,9 @@ rest) from any location, you will need to add to your PYTHONPATH the root
 directory and the `open_spiel` directory. Open
 [Windows environment variables and add to the PYTHONPATH](https://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-so-it-finds-my-modules-packages).
 Add the directories `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug`
-and `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug` to PYTHONPATH.
-To check that python is working, you can run the example in
+and `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug\python` to
+PYTHONPATH. If your PYTHONPATH does not exist, then create a new environment
+variable for it. To check that python is working, you can run the example in
 `open_spiel\python\examples`.
 
 OpenSpiel has various Python dependencies which may require installing. At a

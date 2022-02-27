@@ -62,36 +62,31 @@ Line::Line(Action action) {
   int base;
   Point point1;
   Point point2;
-  switch (action) {
+  if (action >= 0 && action <= 129) {
     // [0, 1]
-    case 0 ... 129:
-      row = action / 10;
-      point1 = Point(row, action - row * 10);
-      point2 = Point(row, (action - row * 10) + 3);
-      break;
+    row = action / 10;
+    point1 = Point(row, action - row * 10);
+    point2 = Point(row, (action - row * 10) + 3);
+  } else if (action >= 130 && action <= 259) {
     // [1, 0]
-    case 130 ... 259:
-      base = action - 130;
-      row = (base) / 13;
-      point1 = Point(row, base - row * 13);
-      point2 = Point(row + 3, (base - row * 13));
-      break;
+    base = action - 130;
+    row = (base) / 13;
+    point1 = Point(row, base - row * 13);
+    point2 = Point(row + 3, (base - row * 13));
+  } else if (action >= 260 && action <= 359) {
     // [1, -1]
-    case 260 ... 359:
-      base = action - 260;
-      row = (base) / 10;
-      point1 = Point(row, base - row * 10);
-      point2 = Point(row + 3, (base - row * 10) + 3);
-      break;
+    base = action - 260;
+    row = (base) / 10;
+    point1 = Point(row, base - row * 10);
+    point2 = Point(row + 3, (base - row * 10) + 3);
+  } else if (action >= 360 && action <= 459) {
     // [1, 1]
-    case 360 ... 459:
-      base = action - 360;
-      row = (base) / 10;
-      point1 = Point(row + 3, base - row * 10);
-      point2 = Point(row, (base - row * 10) + 3);
-      break;
-    default:
-      SpielFatalError("action provided does not correspond with a move");
+    base = action - 360;
+    row = (base) / 10;
+    point1 = Point(row + 3, base - row * 10);
+    point2 = Point(row, (base - row * 10) + 3);
+  } else {
+    SpielFatalError("action provided does not correspond with a move");
   }
   Init(point1, point2);
 }
