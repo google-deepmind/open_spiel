@@ -86,6 +86,7 @@ EXPECTED_GAMES = set([
     "othello",
     "oware",
     "pentago",
+    "pathfinding",
     "phantom_go",
     "phantom_ttt",
     "phantom_ttt_ir",
