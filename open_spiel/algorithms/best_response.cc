@@ -41,7 +41,6 @@ namespace open_spiel {
                                            &tree_)),
                   root_(game.NewInitialState()),
                   dummy_policy_(new TabularPolicy(GetUniformPolicy(game))) {
-            std::cout << "Initialize TabularBestResponse?" << std::endl;
             if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
                 SpielFatalError("The game must be turn-based.");
             }

@@ -96,6 +96,8 @@ class OptimalStoppingGameUtil:
         """
         if obs == max(config.obs):
             return OptimalStoppingGameObservationType.TERMINAL
+        if obs == max(config.obs):
+            return OptimalStoppingGameObservationType.TERMINAL
         else:
             return OptimalStoppingGameObservationType.NON_TERMINAL
 

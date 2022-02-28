@@ -111,7 +111,7 @@ def main(unused_argv):
 
         sess.run(tf.global_variables_initializer())
         for ep in range(FLAGS.num_train_episodes):
-            print(f"Episode {ep}/{FLAGS.num_train_episodes}")
+            # print(f"Episode {ep}/{FLAGS.num_train_episodes}")
             if (ep + 1) % FLAGS.eval_every == 0:
                 losses = [agent.loss for agent in agents]
                 logging.info("Losses: %s", losses)

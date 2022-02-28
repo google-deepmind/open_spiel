@@ -81,7 +81,7 @@ def round_vec(vecs):
 def main(unused_argv):
     params = OptimalStoppingGameConfig.default_params()
     params["use_beliefs"] = True
-    params["T_max"] = 50
+    params["T_max"] = 5
     # params["R_SLA"] = 10
     game = pyspiel.load_game("python_optimal_stopping_game", params)
     num_players = game.config.num_players
@@ -107,11 +107,10 @@ def main(unused_argv):
     expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
     for ep in range(FLAGS.num_train_episodes):
-        print(f"Episode {ep}/{FLAGS.num_train_episodes}")
         if (ep + 1) % FLAGS.eval_every == 0:
             losses = [agent.loss for agent in agents]
             logging.info("Losses: %s", losses)
-            print("Calculating exploitability..")
+            print("Calculating exploitability.. (Don't do this for large games!)")
             expl = exploitability.exploitability(env.game, expl_policies_avg)
             logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
             logging.info("_____________________________________________")
