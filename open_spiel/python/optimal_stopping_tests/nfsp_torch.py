@@ -34,7 +34,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_train_episodes", int(3e6),
                      "Number of training episodes.")
-flags.DEFINE_integer("eval_every", 10000,
+flags.DEFINE_integer("eval_every", 1000,
                      "Episode frequency at which the agents are evaluated.")
 flags.DEFINE_list("hidden_layers_sizes", [
     128,
@@ -82,6 +82,7 @@ def main(unused_argv):
     params = OptimalStoppingGameConfig.default_params()
     params["use_beliefs"] = True
     params["T_max"] = 50
+    # params["R_SLA"] = 10
     game = pyspiel.load_game("python_optimal_stopping_game", params)
     num_players = game.config.num_players
     game = pyspiel.convert_to_turn_based(game)
@@ -106,9 +107,11 @@ def main(unused_argv):
     expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
     for ep in range(FLAGS.num_train_episodes):
+        print(f"Episode {ep}/{FLAGS.num_train_episodes}")
         if (ep + 1) % FLAGS.eval_every == 0:
             losses = [agent.loss for agent in agents]
             logging.info("Losses: %s", losses)
+            print("Calculating exploitability..")
             expl = exploitability.exploitability(env.game, expl_policies_avg)
             logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
             logging.info("_____________________________________________")
@@ -118,7 +121,7 @@ def main(unused_argv):
 
             player_id = time_step.observations["current_player"]
             time_step.observations["info_state"] = round_vec(time_step.observations["info_state"])
-            print(f"time_step.observations:{time_step.observations}")
+            # print(f"time_step.observations:{time_step.observations}")
             action_output = agents[player_id].step(time_step)
             s = env.get_state
             action_list = [action_output.action]

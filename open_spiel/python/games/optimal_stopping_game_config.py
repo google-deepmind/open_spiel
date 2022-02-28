@@ -89,11 +89,11 @@ class OptimalStoppingGameConfig:
         :return: a vector with tuples: (obs, prob)
         """
         if state == 0:
-            return  [(x, self.obs_dist[i]) for i,x in enumerate(self.obs)]
+            return  [(x, self.obs_dist[i]) for i,x in enumerate(list(range(len(self.obs)-1)))]
         elif state == 1:
-            return [(x, self.obs_dist_intrusion[i]) for i,x in enumerate(self.obs)]
+            return [(x, self.obs_dist_intrusion[i]) for i,x in enumerate(list(range(len(self.obs)-1)))]
         elif state == 2:
-            return [(x, self.obs_dist_terminal[i]) for i,x in enumerate(self.obs)]
+            return [(self.obs[-1], self.obs_dist_terminal[-1])]
         else:
             raise ValueError(f"Invalid state:{state}")
 

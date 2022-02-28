@@ -76,8 +76,8 @@ class OptimalStoppingGameState(pyspiel.State):
         assert self.is_chance and not self.game_over
         self.current_iteration += 1
         self.is_chance = False
-        self.game_over = (OptimalStoppingGameUtil.get_observation_type(obs=obs, config=self.config)
-                           == OptimalStoppingGameObservationType.TERMINAL)
+        self.game_over = (self.game_over or (OptimalStoppingGameUtil.get_observation_type(obs=obs, config=self.config)
+                           == OptimalStoppingGameObservationType.TERMINAL))
         if self.current_iteration > self.get_game().max_game_length():
             self.game_over = True
         self.latest_obs = obs
@@ -132,7 +132,6 @@ class OptimalStoppingGameState(pyspiel.State):
         # If game did not end, next node will be a chance node
         if not self.game_over:
             self.is_chance = True
-
 
     def _action_to_string(self, player: pyspiel.PlayerId, action: int) -> str:
         """

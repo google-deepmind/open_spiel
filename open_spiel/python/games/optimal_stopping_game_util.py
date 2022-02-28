@@ -22,7 +22,7 @@ class OptimalStoppingGameUtil:
             return 2
 
         # Attacker aborts
-        if state == 1 and attacker_action == 1:
+        if state ==1  and attacker_action == 1:
             return 2
 
         # Defender final stop
@@ -94,7 +94,7 @@ class OptimalStoppingGameUtil:
         :param obs: the observation to get the type of
         :return: observation type
         """
-        if obs == max(config.obs) + 1:
+        if obs == max(config.obs):
             return OptimalStoppingGameObservationType.TERMINAL
         else:
             return OptimalStoppingGameObservationType.NON_TERMINAL
@@ -123,7 +123,12 @@ class OptimalStoppingGameUtil:
                 for s_prime_1 in config.S:
                     prob_1 = config.Z[a1][a2][s_prime_1][o]
                     norm += b[s]*prob_1*config.T[l][a1][a2][s][s_prime_1]*pi_2[s][a2]
-        assert norm > 0
+
+        if b[2] == 1:
+            print(f"s_prime:{s_prime}, o:{o}, a1:{a1}, norm:{norm}")
+
+        if norm == 0:
+            return 0
         temp = 0
 
         for s in config.S:
@@ -132,7 +137,7 @@ class OptimalStoppingGameUtil:
 
         b_prime_s_prime = temp/norm
         assert b_prime_s_prime <=1
-        if s_prime == 2:
+        if s_prime == 2 and o != config.O[-1]:
             assert b_prime_s_prime <= 0.01
         return b_prime_s_prime
 
@@ -172,5 +177,7 @@ class OptimalStoppingGameUtil:
         for s_prime in config.S:
             b_prime[s_prime] = OptimalStoppingGameUtil.bayes_filter(s_prime=s_prime, o=o, a1=a1, b=b,
                                                                     pi_2=pi_2, config=config, l=l)
-        assert round(sum(b_prime), 5) == 1
+        if round(sum(b_prime), 2) != 1:
+            print(f"error, b_prime:{b_prime}, o:{o}, a1:{a1}, b:{b}")
+        assert round(sum(b_prime), 2) == 1
         return b_prime

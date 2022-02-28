@@ -34,7 +34,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_train_episodes", int(3e6),
                      "Number of training episodes.")
-flags.DEFINE_integer("eval_every", 10000,
+flags.DEFINE_integer("eval_every", 1000,
                      "Episode frequency at which the agents are evaluated.")
 flags.DEFINE_list("hidden_layers_sizes", [
     32,
@@ -111,9 +111,11 @@ def main(unused_argv):
 
         sess.run(tf.global_variables_initializer())
         for ep in range(FLAGS.num_train_episodes):
+            print(f"Episode {ep}/{FLAGS.num_train_episodes}")
             if (ep + 1) % FLAGS.eval_every == 0:
                 losses = [agent.loss for agent in agents]
                 logging.info("Losses: %s", losses)
+                print("Calculating exploitability...")
                 expl = exploitability.exploitability(env.game, expl_policies_avg)
                 logging.info("[%s] Exploitability AVG %s", ep + 1, expl)
                 logging.info("_____________________________________________")
@@ -122,7 +124,7 @@ def main(unused_argv):
             while not time_step.last():
                 player_id = time_step.observations["current_player"]
                 action_output = agents[player_id].step(time_step)
-                print(f"player:{player_id}, input:{time_step}")
+                # print(f"player:{player_id}, input:{time_step}")
                 action_list = [action_output.action]
                 time_step = env.step(action_list)
 
