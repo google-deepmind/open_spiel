@@ -691,7 +691,7 @@ class PhantomGoObserver : public Observer {
 
       {
           auto out = allocator->Get("stone-counts", {2});
-          auto stoneCount = state.getStoneCount();
+          auto stoneCount = state.GetStoneCount();
           out.at(0) = stoneCount[0];
           out.at(1) = stoneCount[1];
       }
@@ -722,10 +722,10 @@ class PhantomGoObserver : public Observer {
                   currState = std::make_unique<PhantomGoState>(down_cast<PhantomGoState>(*game->NewInitialState()));
               auto out = allocator->Get("history-turns", {state.History().size()});
               auto history = state.History();
-              std::array<int, 2> prevStoneCount = currState->getStoneCount();
+              std::array<int, 2> prevStoneCount = currState->GetStoneCount();
               for (int i = 0; i < history.size(); i++) {
                   currState->ApplyAction(history[i]);
-                  std::array<int, 2> currStoneCount = currState->getStoneCount();
+                  std::array<int, 2> currStoneCount = currState->GetStoneCount();
                   if (prevStoneCount[0] - currStoneCount[0] > 0) {
                       out.at(i) = prevStoneCount[0] - currStoneCount[0];
                   } else if (prevStoneCount[1] - currStoneCount[1] > 0) {

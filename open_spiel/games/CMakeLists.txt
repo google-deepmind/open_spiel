@@ -337,7 +337,6 @@ add_executable(go_test go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(go_test go_test)
 
-#new
 add_executable(phantom_go_test phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(phantom_go_test phantom_go_test)

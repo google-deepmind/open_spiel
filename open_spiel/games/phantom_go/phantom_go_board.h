@@ -77,10 +77,6 @@ VirtualPoint VirtualPointFrom2DPoint(std::pair<int, int> row_col);
 Action VirtualActionToAction(int virtual_action, int board_size);
 int ActionToVirtualAction(Action action, int board_size);
 
-/*std::string ActionToString(Action action, int board_size) {
-  return VirtualPointToString(ActionToVirtualAction(action, board_size));
-}*/
-
 // Returns a reference to a vector that contains all points that are on a board
 // of the specified size.
 const std::vector<VirtualPoint> &BoardPoints(int board_size);

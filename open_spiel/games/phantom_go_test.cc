@@ -111,8 +111,9 @@ void ConcreteActionsAreUsedInTheAPI() {
     }
 }
 
-//This is a test, that was used to visually analyze resampling
-void ResampleFromInfostateVisualTest() {
+//This test is implemented to visually analyte correctness of resampling
+
+void ResampleVisualTest() {
     std::cout << "Starting ResampleFromMetaposition visual Test\n";
     GameParameters params;
     params["board_size"] = GameParameter(kBoardSize);
@@ -134,17 +135,11 @@ void ResampleFromInfostateVisualTest() {
     std::cout << "Original state\n" << state.ToString();
 
     std::cout << "Resampled state\n " << resampleState->ToString();
-
-    /*for(int i = 0; i < state.FullHistory().size(); i++)
-    {
-        std::cout << state.ActionToString(state.FullHistory()[i].player, state.FullHistory()[i].action) << " " <<
-            state.ActionToString(resampleState->FullHistory()[i].player, resampleState->FullHistory()[i].action) << "\n";
-    }*/
 }
 
-//This test was used to test metaposition resampling on large ammounts of states
+//This tests metaposition resampling on large ammounts of states
 //  with different lengths
-void ResampleFromInfostateForceTest() {
+void ResampleFromMetapositionForceTest() {
     std::cout << "Starting ResampleFromMetaposition visual Test\n";
     GameParameters params;
     params["board_size"] = GameParameter(kBoardSize);
@@ -192,7 +187,6 @@ int main(int argc, char **argv) {
     open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
     open_spiel::phantom_go::IllegalMoveTest();
     open_spiel::phantom_go::StoneCountTest();
-    //open_spiel::phantom_go::ResampleFromInfostateVisualTest();
-    //open_spiel::phantom_go::ResampleFromInfostateForceTest();
+    //open_spiel::phantom_go::ResampleFromMetapositionForceTest();
 
 }

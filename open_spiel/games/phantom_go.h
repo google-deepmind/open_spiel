@@ -78,13 +78,14 @@ class PhantomGoState : public State {
   }
   std::vector<Action> LegalActions() const override;
 
-  std::array<int, 2> getStoneCount() const;
+  std::array<int, 2> GetStoneCount() const;
 
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 
   bool IsTerminal() const override;
 
+  //Two states are in a same metaposition, if the board is identical from players perspective / observation
   std::unique_ptr<State> ResampleFromMetaposition(
       int player_id, std::function<double()> rng) const;
 
