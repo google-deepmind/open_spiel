@@ -29,6 +29,9 @@ class FactoryTest(parameterized.TestCase):
       ("python_mfg_dynamic_routing", None),
       ("python_mfg_dynamic_routing", "dynamic_routing_line"),
       ("python_mfg_dynamic_routing", "dynamic_routing_braess"),
+      ("python_mfg_dynamic_routing",
+       "dynamic_routing_sioux_falls_dummy_demand"),
+      ("python_mfg_dynamic_routing", "dynamic_routing_sioux_falls"),
       ("python_mfg_predator_prey", None),
       ("python_mfg_predator_prey", "predator_prey_5x5x3"))
   def test_smoke(self, game_name, setting):

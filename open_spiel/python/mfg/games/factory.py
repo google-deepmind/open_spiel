@@ -50,6 +50,17 @@ GAME_SETTINGS = {
         "network": "line",
         "time_step_length": 1.0,
     },
+    "dynamic_routing_sioux_falls_dummy_demand": {
+        "max_num_time_step": 81,
+        "network": "sioux_falls_dummy_demand",
+        "time_step_length": 0.5,
+    },
+    "dynamic_routing_sioux_falls": {
+        # TODO(cabannes): change these values based on experiment output.
+        "max_num_time_step": 81,
+        "network": "sioux_falls",
+        "time_step_length": 0.5,
+    },
     # Predator and prey game.
     "predator_prey_5x5x3": {},
 }
@@ -66,6 +77,11 @@ _DYNAMIC_ROUTING_NETWORK = {
              dynamic_routing_data.LINE_NETWORK_OD_DEMAND),
     "braess": (dynamic_routing_data.BRAESS_NETWORK,
                dynamic_routing_data.BRAESS_NETWORK_OD_DEMAND),
+    "sioux_falls_dummy_demand":
+        (dynamic_routing_data.SIOUX_FALLS_NETWORK,
+         dynamic_routing_data.SIOUX_FALLS_DUMMY_OD_DEMAND),
+    "sioux_falls": (dynamic_routing_data.SIOUX_FALLS_NETWORK,
+                    dynamic_routing_data.SIOUX_FALLS_OD_DEMAND)
 }
 
 

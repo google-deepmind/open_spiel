@@ -28,6 +28,7 @@ from open_spiel.python.mfg.algorithms import mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
 from open_spiel.python.mfg.games import dynamic_routing
+from open_spiel.python.mfg.games import factory
 from open_spiel.python.observation import make_observation
 import pyspiel
 
@@ -241,6 +242,16 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
   def test_apply_actions_error_movement_with_positive_waiting_time(self):
     """Check that a vehicle cannot choose to move if it cannot move yet."""
     # TODO(cabannes): test apply_actions().
+
+  def test_online_mirror_descent_sioux_falls_dummy(self):
+    """Test that online mirror descent can be used on the Sioux Falls game."""
+    mfg_game = factory.create_game_with_setting(
+        "python_mfg_dynamic_routing",
+        "dynamic_routing_sioux_falls_dummy_demand")
+    omd = mirror_descent.MirrorDescent(mfg_game)
+    for _ in range(_NUMBER_OF_ITERATIONS_TESTS):
+      omd.iteration()
+    nash_conv.NashConv(mfg_game, omd.get_policy())
 
 
 if __name__ == "__main__":
