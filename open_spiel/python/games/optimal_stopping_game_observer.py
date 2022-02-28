@@ -31,7 +31,7 @@ class OptimalStoppingGameObserver:
     def string_from(self, state, player):
         """Observation of `state` from the PoV of `player`, as a string."""
         if self.iig_obs_type.public_info:
-            return (f"us:{state.action_history_string(player)} "
-                    f"op:{state.action_history_string(1 - player)}")
+            h = state.history()
+            return ",".join(list(map(lambda x: str(x), h)))
         else:
             return None

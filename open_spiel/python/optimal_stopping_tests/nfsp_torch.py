@@ -20,7 +20,6 @@ from __future__ import print_function
 
 import numpy as np
 from absl import app
-from absl import flags
 from absl import logging
 import pyspiel
 
@@ -29,22 +28,6 @@ from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
 from open_spiel.python.pytorch import nfsp
 from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
-
-FLAGS = flags.FLAGS
-
-flags.DEFINE_integer("num_train_episodes", int(3e6),
-                     "Number of training episodes.")
-flags.DEFINE_integer("eval_every", 1000,
-                     "Episode frequency at which the agents are evaluated.")
-flags.DEFINE_list("hidden_layers_sizes", [
-    128,
-], "Number of hidden units in the avg-net and Q-net.")
-flags.DEFINE_integer("replay_buffer_capacity", int(2e5),
-                     "Size of the replay buffer.")
-flags.DEFINE_integer("reservoir_buffer_capacity", int(2e6),
-                     "Size of the reservoir buffer.")
-flags.DEFINE_float("anticipatory_param", 0.1,
-                   "Prob of using the rl best response as episode policy.")
 
 
 class NFSPPolicies(policy.Policy):
@@ -91,23 +74,34 @@ def main(unused_argv):
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
-    hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
+    eval_every = 10000
+    hidden_layers_sizes = [64, 64, 64]
+    num_train_episodes = int(3e6)
     kwargs = {
-        "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
-        "epsilon_decay_duration": FLAGS.num_train_episodes,
+        "replay_buffer_capacity": int(2e5),
+        "epsilon_decay_duration": num_train_episodes,
         "epsilon_start": 0.06,
         "epsilon_end": 0.001,
     }
 
     agents = [
-        nfsp.NFSP(idx, info_state_size, num_actions, hidden_layers_sizes,
-                  FLAGS.reservoir_buffer_capacity, FLAGS.anticipatory_param,
+        nfsp.NFSP(player_id=idx,
+                  state_representation_size = info_state_size,
+                  num_actions = num_actions,
+                  hidden_layers_sizes = hidden_layers_sizes,
+                  reservoir_buffer_capacity = int(2e5),
+                  anticipatory_param = 0.1,
+                  batch_size = 256,
+                  rl_learning_rate = 0.001,
+                  sl_learning_rate = 0.001,
+                  min_buffer_size_to_learn = 2000,
+                  learn_every = 128,
                   **kwargs) for idx in range(num_players)
     ]
     expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)
 
-    for ep in range(FLAGS.num_train_episodes):
-        if (ep + 1) % FLAGS.eval_every == 0:
+    for ep in range(num_train_episodes):
+        if (ep + 1) % eval_every == 0:
             losses = [agent.loss for agent in agents]
             logging.info("Losses: %s", losses)
             print("Calculating exploitability.. (Don't do this for large games!)")
