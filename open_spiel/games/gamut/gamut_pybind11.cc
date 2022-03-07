@@ -26,7 +26,9 @@ void init_pyspiel_gamut(::pybind11::module& m) {
       .def("generate_game", py::overload_cast<const std::string&>(
                                 &gamut::GamutGenerator::GenerateGame))
       .def("generate_game", py::overload_cast<const std::vector<std::string>&>(
-                                &gamut::GamutGenerator::GenerateGame));
+                                &gamut::GamutGenerator::GenerateGame))
+      .def("generate_matrix_game", &gamut::GamutGenerator::GenerateMatrixGame)
+      .def("generate_tensor_game", &gamut::GamutGenerator::GenerateTensorGame);
 }
 
 }  // namespace open_spiel
