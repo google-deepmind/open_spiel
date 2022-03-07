@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Implementation of Fictitious Play from Perrin & al.
 
 Reference: https://arxiv.org/abs/2007.03458.
@@ -41,7 +40,6 @@ import math
 from typing import List
 
 from open_spiel.python import policy as policy_std
-from open_spiel.python import rl_agent_policy
 from open_spiel.python.mfg import distribution as distribution_std
 from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import best_response_value
@@ -113,23 +111,20 @@ class FictitiousPlay(object):
   def get_policy(self):
     return self._policy
 
-  def iteration(self, rl_br_agent=None, learning_rate=None):
+  def iteration(self, br_policy=None, learning_rate=None):
     """Returns a new `TabularPolicy` equivalent to this policy.
 
     Args:
-      rl_br_agent: An instance of the RL approximation method to use to compute
-        the best response value for each iteration. If none provided, the exact
-        value is computed.
+      br_policy: Policy to compute the best response value for each iteration.
+        If none provided, the exact value is computed.
       learning_rate: The learning rate.
     """
     self._fp_step += 1
 
     distrib = distribution.DistributionPolicy(self._game, self._policy)
 
-    if rl_br_agent:
-      joint_avg_policy = rl_agent_policy.RLAgentPolicy(
-          self._game, rl_br_agent, rl_br_agent.player_id, use_observation=True)
-      br_value = policy_value.PolicyValue(self._game, distrib, joint_avg_policy)
+    if br_policy:
+      br_value = policy_value.PolicyValue(self._game, distrib, br_policy)
     else:
       br_value = best_response_value.BestResponse(
           self._game, distrib, value.TabularValueFunction(self._game))
