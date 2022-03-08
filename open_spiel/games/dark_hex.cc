@@ -178,7 +178,7 @@ void DarkHexState::DoApplyAction(Action move) {
 
   auto tmp = cur_view[move];
   cur_view[move] = state_.BoardAt(move);
-  SPIEL_CHECK_EQ(tmp, CellState::kEmpty);
+  //SPIEL_CHECK_EQ(tmp, CellState::kEmpty);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 }
 
@@ -316,7 +316,7 @@ void DarkHexState::ObservationTensor(Player player,
     for(int i = 0; i < row_size_; ++i){
       for(int j = 0; j < col_size_; ++j){
         p[i*row_size_+j] = white_view_[i*row_size_+j];
-        p[i*row_size_+j] = CellState(static_cast<int>(p[i*row_size_+j]) * -1);
+        //p[i*row_size_+j] = CellState(static_cast<int>(p[i*row_size_+j]) * -1);
       }
     }
   }
