@@ -178,6 +178,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
+  algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
   algorithms/noisy_policy_test.py
