@@ -29,6 +29,10 @@ namespace {
 // Default parameters.
 constexpr int kDefaultHorizon = 1000;
 constexpr bool kDefaultZeroSum = false;
+constexpr bool kDefaultFullyObs = true;
+constexpr int kDefaultObsFront = 17;
+constexpr int kDefaultObsBack = 2;
+constexpr int kDefaultObsSide = 10;
 
 // Register with general sum, since the game is not guaranteed to be zero sum.
 // If we create a zero sum instance, the type on the created game will show it.
@@ -49,7 +53,11 @@ const GameType kGameTypeGeneralSum{
     /*parameter_specification=*/
     {{"horizon", GameParameter(kDefaultHorizon)},
      {"zero_sum", GameParameter(kDefaultZeroSum)},
-     {"grid", GameParameter(std::string(kDefaultGrid))}}};
+     {"grid", GameParameter(std::string(kDefaultGrid))},
+     {"fully_obs", GameParameter(kDefaultFullyObs)},
+     {"obs_front", GameParameter(kDefaultObsFront)},
+     {"obs_back", GameParameter(kDefaultObsBack)},
+     {"obs_side", GameParameter(kDefaultObsSide)}}};
 
 GameType GameTypeForParams(const GameParameters& params) {
   auto game_type = kGameTypeGeneralSum;
@@ -57,6 +65,13 @@ GameType GameTypeForParams(const GameParameters& params) {
   auto it = params.find("zero_sum");
   if (it != params.end()) is_zero_sum = it->second.bool_value();
   if (is_zero_sum) game_type.utility = GameType::Utility::kZeroSum;
+
+  bool is_perfect_info = kDefaultFullyObs;
+  it = params.find("fully_obs");
+  if (it != params.end()) is_perfect_info = it->second.bool_value();
+  if (!is_perfect_info) {
+    game_type.information = GameType::Information::kImperfectInformation;
+  }
   return game_type;
 }
 
@@ -115,8 +130,18 @@ constexpr std::array<std::array<int, 10>, 4> col_offsets = {
      {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
 }  // namespace
 
-LaserTagState::LaserTagState(std::shared_ptr<const Game> game, const Grid& grid)
-    : SimMoveState(game), grid_(grid) {}
+LaserTagState::LaserTagState(std::shared_ptr<const Game> game, const Grid &grid)
+    : SimMoveState(game), grid_(grid) {
+  GameParameters params = game_->GetParameters();
+  auto it = params.find("fully_obs");
+  if (it != params.end()) fully_obs_ = it->second.bool_value();
+  it = params.find("obs_front");
+  if (it != params.end()) obs_front_ = it->second.int_value();
+  it = params.find("obs_back");
+  if (it != params.end()) obs_back_ = it->second.int_value();
+  it = params.find("obs_side");
+  if (it != params.end()) obs_side_ = it->second.int_value();
+}
 
 std::string LaserTagState::ActionToString(int player, Action action_id) const {
   if (player == kSimultaneousPlayerId)
@@ -481,12 +506,78 @@ void LaserTagState::ObservationTensor(int player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
+  if (fully_obs_) {
+    FullObservationTensor(values);
+  } else {
+    PartialObservationTensor(player, values);
+  }
+}
+
+void LaserTagState::FullObservationTensor(absl::Span<float> values) const{
+
   TensorView<3> view(values, {kCellStates, grid_.num_rows, grid_.num_cols},
-                     true);
+		     true);
 
   for (int r = 0; r < grid_.num_rows; r++) {
     for (int c = 0; c < grid_.num_cols; c++) {
       int plane = observation_plane(r, c);
+      SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
+      view[{plane, r, c}] = 1.0;
+    }
+  }
+}
+
+void LaserTagState::PartialObservationTensor(int player,
+					     absl::Span<float> values) const{
+  /* Get observation tensor for player with partial observability.
+
+     Properties of the observation grid
+     1. Player is always located in center row obs_back_ rows from the bottom
+        row.
+     2. If any cell of the players field of vision is outside the grid, then
+        these cells are treated as obstacles.
+   */
+
+  int num_obs_rows = obs_front_ + obs_back_ + 1;
+  int num_obs_cols = obs_side_ * 2 + 1;
+  TensorView<3> view(values, {kCellStates, num_obs_rows, num_obs_cols}, true);
+
+  int player_row = player_row_[player];
+  int player_col = player_col_[player];
+
+  int grid_row = -1;
+  int grid_col = -1;
+  int plane = -1;
+  for (int r = 0; r < num_obs_rows; r++) {
+    for (int c = 0; c < num_obs_cols; c++) {
+
+      // map from player observation grid to game grid
+      switch (player_facing_[player]) {
+	case kNorth:
+	  grid_row = player_row + r - obs_front_;
+	  grid_col = player_col + c - obs_side_;
+	  break;
+	case kSouth:
+	  grid_row = player_row + obs_front_ - r;
+          grid_col = player_col + obs_side_ - c;
+          break;
+	case kEast:
+	  grid_row = player_row + c - obs_side_;
+          grid_col = player_col + obs_front_ - r;
+          break;
+	case kWest:
+	  grid_row = player_row + obs_side_ - c;
+	  grid_col = player_col + r - obs_front_;
+	  break;
+      }
+
+      if (0 <= grid_row && grid_row < grid_.num_rows
+	  && 0 <= grid_col && grid_col < grid_.num_cols) {
+	plane = observation_plane(grid_row, grid_col);
+      } else {
+	// observed cell out-of-bounds of game grid
+	plane = 3;    // '*'
+      }
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
       view[{plane, r, c}] = 1.0;
     }
@@ -529,7 +620,8 @@ double LaserTagGame::MaxUtility() const {
 }
 
 std::vector<int> LaserTagGame::ObservationTensorShape() const {
-  return {kCellStates, grid_.num_rows, grid_.num_cols};
+  if (fully_obs_) return {kCellStates, grid_.num_rows, grid_.num_cols};
+  return {kCellStates, obs_front_ + obs_back_ + 1, obs_side_ * 2 + 1};
 }
 
 namespace {
@@ -567,11 +659,15 @@ Grid ParseGrid(const std::string& grid_string) {
 }
 }  // namespace
 
-LaserTagGame::LaserTagGame(const GameParameters& params)
+LaserTagGame::LaserTagGame(const GameParameters &params)
     : SimMoveGame(GameTypeForParams(params), params),
       grid_(ParseGrid(ParameterValue<std::string>("grid"))),
       horizon_(ParameterValue<int>("horizon")),
-      zero_sum_(ParameterValue<bool>("zero_sum")) {}
+      zero_sum_(ParameterValue<bool>("zero_sum")),
+      fully_obs_(ParameterValue<bool>("fully_obs")),
+      obs_front_(ParameterValue<int>("obs_front")),
+      obs_back_(ParameterValue<int>("obs_back")),
+      obs_side_(ParameterValue<int>("obs_side")) {}
 
 }  // namespace laser_tag
 }  // namespace open_spiel

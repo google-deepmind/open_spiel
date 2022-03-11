@@ -132,6 +132,14 @@ void BasicLaserTagTestsBigGrid() {
       10);
 }
 
+void BasicPartiallyObservableLaserTagTests() {
+  testing::ChanceOutcomesTest(
+      *LoadGame("laser_tag", {{"fully_obs", GameParameter(false)}}));
+
+  testing::RandomSimTest(
+      *LoadGame("laser_tag", {{"fully_obs", GameParameter(false)}}), 100);
+}
+
 }  // namespace
 }  // namespace laser_tag
 }  // namespace open_spiel
@@ -145,4 +153,5 @@ int main(int argc, char **argv) {
   laser_tag::SimpleTagTests(1000, false, laser_tag::kDefaultGrid);
   laser_tag::BasicLaserTagTests();
   laser_tag::BasicLaserTagTestsBigGrid();
+  laser_tag::BasicPartiallyObservableLaserTagTests();
 }
