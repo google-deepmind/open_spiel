@@ -60,7 +60,8 @@ class DQN(rl_agent.AbstractAgent):
                optimizer_str="sgd",
                loss_str="mse",
                huber_loss_parameter=1.0,
-               seed=42):
+               seed=42,
+               gradient_clipping=None):
     """Initialize the DQN agent."""
 
     # This call to locals() is used to store every argument used to initialize
@@ -116,14 +117,21 @@ class DQN(rl_agent.AbstractAgent):
           rlax.huber_loss(x, self.huber_loss_parameter))
     else:
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
+
     if optimizer_str == "adam":
-      opt_init, opt_update = optax.chain(
-          optax.scale_by_adam(b1=0.9, b2=0.999, eps=1e-8),
-          optax.scale(learning_rate))
+      optimizer = optax.adam(learning_rate)
     elif optimizer_str == "sgd":
-      opt_init, opt_update = optax.sgd(learning_rate)
+      optimizer = optax.sgd(learning_rate)
     else:
       raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
+
+    # Clipping the gradients prevent divergence and allow more stable training.
+    if gradient_clipping:
+      optimizer = optax.chain(optimizer,
+                              optax.clip_by_global_norm(gradient_clipping))
+
+    opt_init, opt_update = optimizer.init, optimizer.update
+
     self._opt_update_fn = self._get_update_func(opt_update)
     self._opt_state = opt_init(self.params_q_network)
     self._loss_and_grad = jax.value_and_grad(self._loss, has_aux=False)
