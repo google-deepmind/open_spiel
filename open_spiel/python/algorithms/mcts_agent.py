@@ -41,7 +41,7 @@ class MCTSAgent(rl_agent.AbstractAgent):
     _, state = pyspiel.deserialize_game_and_state(
         time_step.observations["serialized_state"])
 
-    # Pick a random legal action.
+    # Call the MCTS bot's step to get the action.
     probs = np.zeros(self._num_actions)
     action = self._mcts_bot.step(state)
     probs[action] = 1.0
