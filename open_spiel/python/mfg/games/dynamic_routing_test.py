@@ -251,7 +251,9 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     omd = mirror_descent.MirrorDescent(mfg_game)
     for _ in range(_NUMBER_OF_ITERATIONS_TESTS):
       omd.iteration()
-    nash_conv.NashConv(mfg_game, omd.get_policy())
+    # Nash conv computation is disabled for this test as it takes a long time to
+    # run.
+    # nash_conv.NashConv(mfg_game, omd.get_policy())
 
 
 if __name__ == "__main__":
