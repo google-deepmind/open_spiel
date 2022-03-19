@@ -118,7 +118,8 @@ EXPECTED_GAMES = frozenset([
     "turn_based_simultaneous_game",
     "ultimate_tic_tac_toe",
     "y",
-    "python_optimal_stopping_game"
+    "python_optimal_stopping_game",
+    "python_optimal_stopping_game_sequential"
 ])
 
 
