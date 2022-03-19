@@ -57,10 +57,10 @@ class OptimalStoppingGameConfig:
         self.obs_dist_terminal[-1] = 1
         self.initial_belief = initial_belief
         self.num_players = 2
-        self.observation_tensor_size = 3
-        self.observation_tensor_shape = (3,)
-        self.information_state_tensor_size = 3
-        self.information_state_tensor_shape = (3,)
+        self.observation_tensor_size = 4
+        self.observation_tensor_shape = (4,)
+        self.information_state_tensor_size = 4
+        self.information_state_tensor_shape = (4,)
         self.params = self.params_dict()
         self.A1 = list(map(lambda x: x.value, self.get_actions()))
         self.A2 = list(map(lambda x: x.value, self.get_actions()))

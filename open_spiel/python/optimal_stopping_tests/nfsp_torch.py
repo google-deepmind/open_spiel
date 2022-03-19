@@ -96,6 +96,7 @@ def main(unused_argv):
                   sl_learning_rate = 0.001,
                   min_buffer_size_to_learn = 2000,
                   learn_every = 128,
+                  optimizer="adam"
                   **kwargs) for idx in range(num_players)
     ]
     expl_policies_avg = NFSPPolicies(env, agents, nfsp.MODE.average_policy)

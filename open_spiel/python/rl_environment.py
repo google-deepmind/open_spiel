@@ -98,6 +98,10 @@ class TimeStep(
   def current_player(self):
     return self.observations["current_player"]
 
+  def copy(self):
+    return TimeStep(observations=self.observations, rewards=self.rewards, discounts=self.discounts,
+                    step_type=self.step_type)
+
 
 class StepType(enum.Enum):
   """Defines the status of a `TimeStep` within a sequence."""

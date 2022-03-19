@@ -173,9 +173,13 @@ def main(unused_argv):
       time_step = env.reset()
       while not time_step.last():
         player_id = time_step.observations["current_player"]
+        #
         agent_output = agents[player_id].step(time_step)
         action_list = [agent_output.action]
         time_step = env.step(action_list)
+
+        if time_step.rewards is not None and sum(time_step.rewards) != 0:
+            print(f"rewards:{time_step.rewards}, player:{player_id}")
 
       # Episode is over, step all agents with final info state.
       for agent in agents:

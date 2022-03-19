@@ -126,9 +126,6 @@ class OptimalStoppingGameUtil:
                     prob_1 = config.Z[a1][a2][s_prime_1][o]
                     norm += b[s]*prob_1*config.T[l][a1][a2][s][s_prime_1]*pi_2[s][a2]
 
-        if b[2] == 1:
-            print(f"s_prime:{s_prime}, o:{o}, a1:{a1}, norm:{norm}")
-
         if norm == 0:
             return 0
         temp = 0
@@ -163,7 +160,8 @@ class OptimalStoppingGameUtil:
         return prob
 
     @staticmethod
-    def next_belief(o: int, a1: int, b: List, pi_2: List, config: OptimalStoppingGameConfig, l: int) -> List:
+    def next_belief(o: int, a1: int, b: List, pi_2: List, config: OptimalStoppingGameConfig, l: int,
+                    a2 : int = 0, s : int = 0) -> List:
         """
         Computes the next belief using a Bayesian filter
 
@@ -173,6 +171,8 @@ class OptimalStoppingGameUtil:
         :param pi_2: the policy of player 2
         :param config: the game config
         :param l: stops remaining
+        :param a2: the attacker action (for debugging, should be consistent with pi_2)
+        :param s: the true state (for debugging)
         :return: the new belief
         """
         b_prime = np.zeros(len(config.S))
@@ -180,37 +180,10 @@ class OptimalStoppingGameUtil:
             b_prime[s_prime] = OptimalStoppingGameUtil.bayes_filter(s_prime=s_prime, o=o, a1=a1, b=b,
                                                                     pi_2=pi_2, config=config, l=l)
         if round(sum(b_prime), 2) != 1:
-            print(f"error, b_prime:{b_prime}, o:{o}, a1:{a1}, b:{b}")
+            print(f"error, b_prime:{b_prime}, o:{o}, a1:{a1}, b:{b}, pi_2:{pi_2}, "
+                  f"a2: {a2}, s:{s}")
         assert round(sum(b_prime), 2) == 1
         return b_prime
-
-
-
-    # @staticmethod
-    # def update_pi_2(attacker_agent, current_belief, current_l, temp_mode = None, is_temp_mode = False):
-    #     p = [
-    #         [0.5,0.5],
-    #         [0.5,0.5],
-    #         [0.5,0.5]
-    #     ]
-    #     for state in [0,1]:
-    #         temp_observations = {
-    #             'info_state': [[current_l, current_belief, current_belief],
-    #                            [current_l, current_belief, state]],
-    #             'legal_actions': [[],[0, 1]],
-    #             'current_player': 1,
-    #             "serialized_state": []
-    #         }
-    #
-    #         temp_timestep= rl_environment.TimeStep(
-    #             observations= temp_observations, rewards=None, discounts=None, step_type=None)
-    #         if is_temp_mode:
-    #             with attacker_agent.temp_mode_as(temp_mode):
-    #                 p[state] = attacker_agent.step(temp_timestep, is_evaluation=True).probs.tolist()
-    #         else:
-    #             p[state] = attacker_agent.step(temp_timestep, is_evaluation=True).probs.tolist()
-    #     return p
-    #     #raise NotImplementedError
 
     # @staticmethod
     # def approx_exploitability(agents, env):

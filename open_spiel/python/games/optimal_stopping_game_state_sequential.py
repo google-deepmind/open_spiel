@@ -24,6 +24,7 @@ class OptimalStoppingGameStateSequential(pyspiel.State):
         self._rewards = np.zeros(config.num_players)
         self._returns = np.zeros(config.num_players)
         self.intrusion = 0
+        self.previous_intrusion= 0
         self.l = config.L
         self.latest_actions = []
         self.latest_attacker_action = 0
@@ -105,6 +106,7 @@ class OptimalStoppingGameStateSequential(pyspiel.State):
             if s_prime == 2:
                 self.game_over = True
             else:
+                self.previous_intrusion = self.intrusion
                 self.intrusion = s_prime
 
             self.current_iteration += 1
@@ -125,28 +127,34 @@ class OptimalStoppingGameStateSequential(pyspiel.State):
         #Chance player turn
         if self.playing_player == OptimalStoppingGamePlayerType.CHANCE:
             assert not self.game_over
+
+            obs = action
             self.current_iteration += 1
-            # self.game_over = (self.game_over or (OptimalStoppingGameUtil.get_observation_type(obs=obs, config=self.config)
-            #                    == OptimalStoppingGameObservationType.TERMINAL))
             if self.current_iteration >= self.get_game().max_game_length():
                 self.game_over = True
 
             if self.config.use_beliefs:
-                # TODO Fix this
-                #self.update_pi_2()
-
+                # assumes pi_2 is updated!
                 pi_2 = self.pi_2
-                self.b1 = OptimalStoppingGameUtil.next_belief(o=action, a1=self.latest_defender_action, pi_2=pi_2, b=self.b1,
-                                                              config=self.config, l=self.l)
+                self.b1 = OptimalStoppingGameUtil.next_belief(
+                    o=obs, a1=self.latest_defender_action, pi_2=pi_2, b=self.b1,
+                    config=self.config, l=self.l, a2=self.latest_attacker_action, s=self.previous_intrusion)
 
             # Decrement stops left. This has to be done after belief update.
             if self.latest_defender_action == 1:
                 self.l -= 1
 
-            self.latest_obs = action
+            self.latest_obs = obs
 
             # Next turn is defender
             self.playing_player = OptimalStoppingGamePlayerType.DEFENDER
+
+
+    def update_pi_2(self, new_pi_2: np.ndarray):
+        """
+        Update attacker stage-strategy
+        """
+        self.pi_2 = new_pi_2
 
 
     def _action_to_string(self, player: pyspiel.PlayerId, action: int) -> str:
