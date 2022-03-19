@@ -5,7 +5,8 @@ from open_spiel.python.games.optimal_stopping_game_action import OptimalStopping
 from open_spiel.python.games.optimal_stopping_game_state_type import OptimalStoppingGameStateType
 
 
-class OptimalStoppingGameConfig:
+class OptimalStoppingGameConfigSequential:
+
 
     def __init__(self, p: float = 0.001, T_max: int = 5, L: int = 3, R_ST: int = 100, R_SLA: int = 10,
                  R_COST: int = -50, R_INT: int = -100, obs: str = "",
@@ -69,6 +70,7 @@ class OptimalStoppingGameConfig:
         self.Z = self.observation_tensor()
         self.T = []
         self.R = []
+
         for l in range(0, self.L):
             self.T.append(self.transition_tensor(l=l+1).tolist())
             self.R.append(self.reward_tensor(l=l+1).tolist())
@@ -78,7 +80,6 @@ class OptimalStoppingGameConfig:
         for s in self.S:
             obs_prob_chance_dists.append(self.get_observation_chance_dist(state=s))
         self.obs_prob_chance_dists = obs_prob_chance_dists
-
 
     def get_observation_chance_dist(self, state: int):
         """
@@ -120,9 +121,9 @@ class OptimalStoppingGameConfig:
         :return: GameType object
         """
         return pyspiel.GameType(
-            short_name="python_optimal_stopping_game",
-            long_name="Python Optimal Stopping Game",
-            dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS,
+            short_name="python_optimal_stopping_game_sequential",
+            long_name="Python Optimal Stopping Game Sequential",
+            dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
             chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
             information=pyspiel.GameType.Information.IMPERFECT_INFORMATION,
             utility=pyspiel.GameType.Utility.ZERO_SUM,
@@ -177,15 +178,16 @@ class OptimalStoppingGameConfig:
                f"obs_dist:{self.obs_dist}, obs_dist_intrusion:{self.obs_dist_intrusion}, " \
                f"actions:{self.get_actions()}, initial_belief:{self.initial_belief}, use_beliefs:{self.use_beliefs}"
 
+
     @staticmethod
-    def from_params_dict(params_dict: dict) -> "OptimalStoppingGameConfig":
+    def from_params_dict(params_dict: dict) -> "OptimalStoppingGameConfigSequential":
         """
         Creates a config object from a user-supplied dict with parameters
 
         :param params_dict: the dict with parameters
         :return: a config object corresponding to the parameters in the dict
         """
-        return OptimalStoppingGameConfig(
+        return OptimalStoppingGameConfigSequential(
             p=params_dict["p"], T_max=params_dict["T_max"], L=params_dict["L"], R_ST=params_dict["R_ST"],
             R_SLA=params_dict["R_SLA"], R_COST=params_dict["R_COST"], R_INT=params_dict["R_INT"],
             obs=params_dict["obs"],

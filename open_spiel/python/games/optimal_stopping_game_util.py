@@ -183,3 +183,115 @@ class OptimalStoppingGameUtil:
             print(f"error, b_prime:{b_prime}, o:{o}, a1:{a1}, b:{b}")
         assert round(sum(b_prime), 2) == 1
         return b_prime
+
+
+
+    # @staticmethod
+    # def update_pi_2(attacker_agent, current_belief, current_l, temp_mode = None, is_temp_mode = False):
+    #     p = [
+    #         [0.5,0.5],
+    #         [0.5,0.5],
+    #         [0.5,0.5]
+    #     ]
+    #     for state in [0,1]:
+    #         temp_observations = {
+    #             'info_state': [[current_l, current_belief, current_belief],
+    #                            [current_l, current_belief, state]],
+    #             'legal_actions': [[],[0, 1]],
+    #             'current_player': 1,
+    #             "serialized_state": []
+    #         }
+    #
+    #         temp_timestep= rl_environment.TimeStep(
+    #             observations= temp_observations, rewards=None, discounts=None, step_type=None)
+    #         if is_temp_mode:
+    #             with attacker_agent.temp_mode_as(temp_mode):
+    #                 p[state] = attacker_agent.step(temp_timestep, is_evaluation=True).probs.tolist()
+    #         else:
+    #             p[state] = attacker_agent.step(temp_timestep, is_evaluation=True).probs.tolist()
+    #     return p
+    #     #raise NotImplementedError
+
+    # @staticmethod
+    # def approx_exploitability(agents, env):
+    #
+    #     mc_episodes = 1000
+    #     #Calculation v_1 which is the expected value of defender BR vs attacker average
+    #     v_1 = [0,0]
+    #     v1_vec = []
+    #     for ep in range(mc_episodes):
+    #         time_step = env.reset()
+    #         while not time_step.last():
+    #             player_id = time_step.observations["current_player"]
+    #             time_step.observations["info_state"] = OptimalStoppingGameUtil.round_vec(time_step.observations["info_state"])
+    #
+    #             #best_response for defender
+    #             if player_id == 0:
+    #                 with agents[player_id].temp_mode_as(nfsp.MODE.best_response):
+    #                     action_output = agents[player_id].step(time_step, is_evaluation=True)
+    #             #average policy for attacker
+    #             if player_id == 1:
+    #                 with agents[player_id].temp_mode_as(nfsp.MODE.average_policy):
+    #                     action_output = agents[player_id].step(time_step, is_evaluation=True)
+    #
+    #             s = env.get_state
+    #             action = [action_output.action]
+    #             time_step = env.step(action)
+    #             #print(time_step)
+    #             #Update pi2
+    #             time_step.observations["info_state"] = OptimalStoppingGameUtil.round_vec(time_step.observations["info_state"])
+    #             current_l = time_step.observations["info_state"][0][0]
+    #             current_belief = time_step.observations["info_state"][0][1]
+    #             new_pi_2 = OptimalStoppingGameUtil.update_pi_2(agents[1],current_belief,current_l, temp_mode=nfsp.MODE.average_policy, is_temp_mode=True)
+    #             s.update_pi_2(new_pi_2)
+    #
+    #
+    #         #Episode over
+    #         agents[0].prep_next_episode_MC(time_step)
+    #
+    #         agents[1].prep_next_episode_MC(time_step)
+    #
+    #         v_1 = v_1 + s.returns()
+    #         v1_vec.append(v_1[0] / (ep+1))
+    #
+    #     v_1 = v_1 / mc_episodes
+    #     #Calculation v_2 which is the expected value of defender average vs attacker BR
+    #     v_2 = [0,0]
+    #     v2_vec = []
+    #     for ep in range(mc_episodes):
+    #         time_step = env.reset()
+    #         while not time_step.last():
+    #             player_id = time_step.observations["current_player"]
+    #             time_step.observations["info_state"] = OptimalStoppingGameUtil.round_vec(time_step.observations["info_state"])
+    #
+    #             #average policy for defender
+    #             if player_id == 0:
+    #                 with agents[player_id].temp_mode_as(nfsp.MODE.average_policy):
+    #                     action_output = agents[player_id].step(time_step, is_evaluation=True)
+    #             #BR policy for attacker
+    #             if player_id == 1:
+    #                 with agents[player_id].temp_mode_as(nfsp.MODE.best_response):
+    #                     action_output = agents[player_id].step(time_step, is_evaluation=True)
+    #
+    #             s = env.get_state
+    #             action = [action_output.action]
+    #             time_step = env.step(action)
+    #             time_step.observations["info_state"] = OptimalStoppingGameUtil.round_vec(time_step.observations["info_state"])
+    #             current_l = time_step.observations["info_state"][0][0]
+    #             current_belief = time_step.observations["info_state"][0][1]
+    #             new_pi_2 = OptimalStoppingGameUtil.update_pi_2(agents[1],current_belief,current_l, temp_mode=nfsp.MODE.best_response, is_temp_mode=True)
+    #             s.update_pi_2(new_pi_2)
+    #
+    #
+    #         #Episode over
+    #         agents[0].prep_next_episode_MC(time_step)
+    #         agents[1].prep_next_episode_MC(time_step)
+    #
+    #         v_2 = v_2 + s.returns()
+    #         v2_vec.append(v_2[0] / (ep+1))
+    #     v_2 = v_2 / mc_episodes
+    #     return np.subtract(v1_vec,v2_vec)
+    #
+    # @staticmethod
+    # def round_vec(vecs):
+    #     return list(map(lambda vec: list(map(lambda x: round(x, 2), vec)), vecs))

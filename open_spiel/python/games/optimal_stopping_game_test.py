@@ -3,7 +3,6 @@ Tests for optimal_stopping_game.py.
 """
 
 from absl.testing import absltest
-
 from open_spiel.python.games import optimal_stopping_game
 from open_spiel.python.games.optimal_stopping_game_config import OptimalStoppingGameConfig
 import pyspiel
