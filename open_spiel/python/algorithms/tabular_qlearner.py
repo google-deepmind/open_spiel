@@ -133,37 +133,65 @@ class QLearner(rl_agent.AbstractAgent):
 
 
 class BoltzmannQLearner(rl_agent.AbstractAgent):
-    """Tabular Q-Learning agent.
+    """Tabular Boltzmann Q-Learning agent.
 
-  See open_spiel/python/examples/tic_tac_toe_qlearner.py for an usage example.
-  """
+    See open_spiel/python/examples/tic_tac_toe_qlearner.py for an usage example.
+
+    The tic_tac_toe example uses the standard Qlearner. Using the BoltzmannQlearner is
+    identical and only differs in the initialization of the agents.
+    """
 
     def __init__(self,
                  player_id,
                  num_actions,
-                 step_size=0.001,
+                 step_size=0.1,
                  discount_factor=1.0,
-                 temperature=0.2,
+                 temperature_schedule=rl_tools.ConstantSchedule(1.),
                  centralized=False):
         """Initialize the Q-Learning agent."""
         self._player_id = player_id
         self._num_actions = num_actions
         self._step_size = step_size
         self._discount_factor = discount_factor
-        self._temperature = temperature
+        self._temperature_schedule = temperature_schedule
+        self._temperature = temperature_schedule.value
         self._centralized = centralized
         self._q_values = collections.defaultdict(valuedict)
         self._prev_info_state = None
         self._last_loss_value = None
 
-    def _boltzmann_selection(self, info_state):
+    def _boltzmann_selection(self, info_state, legal_actions, temperature):
         """Action selection based on boltzmann probability interpretation of Q-values.
-  """
+
+        For more details, see equation (2) page 2 in
+        https://arxiv.org/pdf/1109.1528.pdf
+
+        Args:
+            info_state: hashable representation of the information state.
+            legal_actions: list of actions at `info_state`.
+            temperature: float, the higher the value, the higher the chance of taking an exploratory action.
+
+        Returns:
+            A valid Boltzmann selected action and valid action probabilities.
+        """
         probs = np.zeros(self._num_actions)
 
-        probs += [np.exp((1 / self._temperature) * self._q_values[info_state][i]) for i in range(self._num_actions)]
-        probs /= np.sum(
-            [np.exp((1 / self._temperature) * self._q_values[info_state][i]) for i in range(self._num_actions)])
+        if temperature != 0.0:
+            probs += [
+                np.exp((1 / temperature) * self._q_values[info_state][i])
+                for i in range(self._num_actions)
+            ]
+            probs /= np.sum(
+                [np.exp((1 / temperature) * self._q_values[info_state][i]) for i in range(self._num_actions)]
+            )
+        else:
+            # Temperature = 0 causes normal greedy action selection
+            greedy_q = max([self._q_values[info_state][a] for a in legal_actions])
+            greedy_actions = [
+                a for a in legal_actions if self._q_values[info_state][a] == greedy_q
+            ]
+
+            probs[greedy_actions] += 1 / len(greedy_actions)
 
         action = np.random.choice(range(self._num_actions), p=probs)
         return action, probs
@@ -189,8 +217,9 @@ class BoltzmannQLearner(rl_agent.AbstractAgent):
 
         # Act step: don't act at terminal states.
         if not time_step.last():
+            temperature = 0.0 if is_evaluation else self._temperature
             action, probs = self._boltzmann_selection(
-                info_state)
+                info_state, legal_actions, temperature=temperature)
 
         # Learn step: don't learn during evaluation or at first agent steps.
         if self._prev_info_state and not is_evaluation:
@@ -203,6 +232,9 @@ class BoltzmannQLearner(rl_agent.AbstractAgent):
             self._last_loss_value = target - prev_q_value
             self._q_values[self._prev_info_state][self._prev_action] += (
                     self._step_size * self._last_loss_value)
+
+            # Decay temperature, if necessary.
+            self._temperature = self._temperature_schedule.step()
 
             if time_step.last():  # prepare for the next episode.
                 self._prev_info_state = None
