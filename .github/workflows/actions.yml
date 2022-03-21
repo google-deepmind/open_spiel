@@ -13,14 +13,14 @@ jobs:
         include:
         # Standard platforms with Python 3.9 and 3.10.
         - os: ubuntu-22.04
-          OS_PYTHON_VERSION: 3.10
+          OS_PYTHON_VERSION: "3.10"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: macos-10.15
-          OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_VERSION: "3.9"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -28,14 +28,14 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         # Standard platforms with Python 3.9 and 3.8.
         - os: ubuntu-22.04
-          OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_VERSION: "3.9"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: macos-10.15
-          OS_PYTHON_VERSION: 3.8
+          OS_PYTHON_VERSION: "3.8"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -45,7 +45,7 @@ jobs:
         # shared library with linkable third party dependencies in place.
         # TODO(lanctot): update this to Ubuntu 22.04 and Python 3.10 once OR-Tools for 22.04 is released.
         - os: ubuntu-20.04
-          OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_VERSION: "3.9"
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           TRAVIS_USE_NOX: 0
           BUILD_SHARED_LIB: "ON"
@@ -53,7 +53,7 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.2/or-tools_amd64_ubuntu-20.04_v9.2.9972.tar.gz"
         # One older test the oldest Ubuntu version supported.
         - os: ubuntu-20.04
-          OS_PYTHON_VERSION: 3.8
+          OS_PYTHON_VERSION: "3.8"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
