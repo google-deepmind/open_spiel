@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.pytorch.deep_cfr."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 from absl import logging
 from absl.testing import absltest
@@ -25,7 +21,10 @@ from absl.testing import parameterized
 
 from open_spiel.python import policy
 import pyspiel
+import torch
 from open_spiel.python.pytorch import deep_cfr
+
+SEED = 24984617
 
 
 class DeepCFRPyTorchTest(parameterized.TestCase):
@@ -67,6 +66,7 @@ class DeepCFRPyTorchTest(parameterized.TestCase):
 
 
 def main(_):
+  torch.manual_seed(SEED)
   absltest.main()
 
 

@@ -145,7 +145,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/deepmind/open_spiel",
     install_requires=_get_requirements(req_file),
-    python_requires=">=3",
+    python_requires=">=3.7",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
     zip_safe=False,

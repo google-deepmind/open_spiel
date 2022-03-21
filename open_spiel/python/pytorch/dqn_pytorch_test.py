@@ -14,15 +14,12 @@
 
 """Tests for open_spiel.python.algorithms.dqn."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+from absl.testing import absltest
 
 from open_spiel.python import rl_environment
+import numpy as np
 import pyspiel
+import torch
 from open_spiel.python.pytorch import dqn
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
@@ -33,9 +30,10 @@ SIMPLE_EFG_DATA = """
     t "L" 1 "Outcome L" { -1.0 }
     t "R" 2 "Outcome R" { 1.0 }
 """
+SEED = 24261711
 
 
-class DQNTest(TestCase):
+class DQNTest(absltest.TestCase):
 
   def test_simple_game(self):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
@@ -124,4 +122,6 @@ class DQNTest(TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  torch.manual_seed(SEED)
+  np.random.seed(SEED)
+  absltest.main()

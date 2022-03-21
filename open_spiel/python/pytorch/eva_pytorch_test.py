@@ -14,17 +14,15 @@
 
 """Tests for open_spiel.python.algorithms.eva."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
+from absl.testing import absltest
 from absl.testing import parameterized
-
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
 
 from open_spiel.python import rl_environment
 from open_spiel.python.pytorch import eva
+
+import torch
+
+SEED = 24984617
 
 
 class EVATest(parameterized.TestCase):
@@ -64,7 +62,7 @@ class EVATest(parameterized.TestCase):
       agent.step(time_step)
 
 
-class QueryableFixedSizeRingBufferTest(TestCase):
+class QueryableFixedSizeRingBufferTest(absltest.TestCase):
 
   def test_replay_buffer_add(self):
     replay_buffer = eva.QueryableFixedSizeRingBuffer(replay_buffer_capacity=10)
@@ -103,4 +101,5 @@ class QueryableFixedSizeRingBufferTest(TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  torch.manual_seed(SEED)
+  absltest.main()

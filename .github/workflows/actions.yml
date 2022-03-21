@@ -11,9 +11,9 @@ jobs:
     strategy:
       matrix:
         include:
-        # Standard platforms with Python 3.9.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: 3.9
+        # Standard platforms with Python 3.9 and 3.10.
+        - os: ubuntu-22.04
+          OS_PYTHON_VERSION: 3.10
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -26,9 +26,9 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Standard platforms with Python 3.8.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: 3.8
+        # Standard platforms with Python 3.10.
+        - os: ubuntu-22.04
+          OS_PYTHON_VERSION: 3.10
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -43,16 +43,16 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         # Build and run tests with all optional dependencies, including building a
         # shared library with linkable third party dependencies in place.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: 3.9
+        - os: ubuntu-22.04
+          OS_PYTHON_VERSION: 3.10
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           TRAVIS_USE_NOX: 0
           BUILD_SHARED_LIB: "ON"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "ON"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.2/or-tools_amd64_ubuntu-20.04_v9.2.9972.tar.gz"
-        # Ubuntu 18.04.2 LTS released on 26 April 2018.
-        - os: ubuntu-18.04
-          OS_PYTHON_VERSION: 3.6
+        # One older test the oldest Ubuntu version supported.
+        - os: ubuntu-20.04
+          OS_PYTHON_VERSION: 3.8
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"

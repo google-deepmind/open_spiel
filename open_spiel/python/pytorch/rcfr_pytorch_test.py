@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import itertools
 
 from absl.testing import absltest
@@ -24,7 +20,6 @@ from absl.testing import parameterized
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.testing._internal.common_utils import TestCase
 # Note: this import needs to come before Tensorflow to fix a malloc error.
 import pyspiel  # pylint: disable=g-bad-import-order
 
@@ -34,6 +29,7 @@ _GAME = pyspiel.load_game('kuhn_poker')
 _BOOLEANS = [False, True]
 
 _BATCH_SIZE = 12
+SEED = 24984617
 
 
 def _new_model():
@@ -45,7 +41,7 @@ def _new_model():
       use_skip_connections=True)
 
 
-class RcfrTest(parameterized.TestCase, TestCase):
+class RcfrTest(parameterized.TestCase, absltest.TestCase):
 
   def setUp(self):
     # pylint: disable=useless-super-delegation
@@ -62,19 +58,15 @@ class RcfrTest(parameterized.TestCase, TestCase):
         information_state_features,
         legal_actions=[0, 1],
         num_distinct_actions=3)
-    self.assertEqual([
-        [1., 2., 3., 1., 0., 0.],
-        [1., 2., 3., 0., 1., 0.],
-    ], features)
+    np.testing.assert_array_equal([1., 2., 3., 1., 0., 0.], features[0])
+    np.testing.assert_array_equal([1., 2., 3., 0., 1., 0.], features[1])
 
     features = rcfr.with_one_hot_action_features(
         information_state_features,
         legal_actions=[1, 2],
         num_distinct_actions=3)
-    self.assertEqual([
-        [1., 2., 3., 0., 1., 0.],
-        [1., 2., 3., 0., 0., 1.],
-    ], features)
+    np.testing.assert_array_equal([1., 2., 3., 0., 1., 0.], features[0])
+    np.testing.assert_array_equal([1., 2., 3., 0., 0., 1.], features[1])
 
   def test_sequence_features(self):
     state = _GAME.new_initial_state()
@@ -84,7 +76,8 @@ class RcfrTest(parameterized.TestCase, TestCase):
     features = rcfr.sequence_features(state, 3)
 
     x = state.information_state_tensor()
-    self.assertEqual([x + [1, 0, 0], x + [0, 1, 0]], features)
+    np.testing.assert_array_equal(x + [1., 0., 0.], features[0])
+    np.testing.assert_array_equal(x + [0., 1., 0.], features[1])
 
   def test_num_features(self):
     assert rcfr.num_features(_GAME) == 13
@@ -163,12 +156,10 @@ class RcfrTest(parameterized.TestCase, TestCase):
         p2_info_state_features[5] + action_features[0],
         p2_info_state_features[5] + action_features[1],
     ]
-    expected_sequence_features = [
-        expected_p1_sequence_features, expected_p2_sequence_features
-    ]
-
-    self.assertEqual(expected_sequence_features,
-                     root_state_wrapper.sequence_features)
+    np.testing.assert_array_equal(expected_p1_sequence_features,
+                                  root_state_wrapper.sequence_features[0])
+    np.testing.assert_array_equal(expected_p2_sequence_features,
+                                  root_state_wrapper.sequence_features[1])
 
   def test_root_state_wrapper_sequence_terminal_values(self):
     root_state_wrapper = rcfr.RootStateWrapper(_GAME.new_initial_state())
@@ -518,7 +509,7 @@ class RcfrTest(parameterized.TestCase, TestCase):
       patient.insert(i)
       x_buffer.append(i)
       assert patient.num_elements == len(x_buffer)
-      self.assertEqual(x_buffer, patient.buffer)
+      np.testing.assert_array_equal(x_buffer, patient.buffer)
 
     assert patient.num_available_spaces() == 0
 
@@ -533,7 +524,7 @@ class RcfrTest(parameterized.TestCase, TestCase):
     x_buffer = list(range(buffer_size))
     patient.insert_all(x_buffer)
     assert patient.num_elements == buffer_size
-    self.assertEqual(x_buffer, patient.buffer)
+    np.testing.assert_array_equal(x_buffer, patient.buffer)
 
     assert patient.num_available_spaces() == 0
 
@@ -574,4 +565,5 @@ class RcfrTest(parameterized.TestCase, TestCase):
 
 
 if __name__ == '__main__':
+  torch.manual_seed(SEED)
   absltest.main()

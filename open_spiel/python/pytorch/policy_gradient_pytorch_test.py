@@ -14,23 +14,21 @@
 
 """Tests for open_spiel.python.algorithms.rpg."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import itertools
 
+from absl.testing import absltest
 from absl.testing import parameterized
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
 
 from open_spiel.python import rl_environment
 import pyspiel
+import torch
 from open_spiel.python.pytorch import policy_gradient
 from open_spiel.python.pytorch.losses import rl_losses
 
+SEED = 24984617
 
-class PolicyGradientTest(parameterized.TestCase, TestCase):
+
+class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
       itertools.product(("rpg", "qpg", "rm", "a2c"),
@@ -133,4 +131,5 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  torch.manual_seed(SEED)
+  absltest.main()

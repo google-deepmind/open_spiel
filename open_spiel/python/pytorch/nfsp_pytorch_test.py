@@ -14,19 +14,17 @@
 
 """Tests for open_spiel.python.algorithms.nfsp."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+from absl.testing import absltest
 
 from open_spiel.python import rl_environment
 from open_spiel.python.pytorch import nfsp
 
+import torch
 
-class NFSPTest(TestCase):
+SEED = 24984617
+
+
+class NFSPTest(absltest.TestCase):
 
   def test_run_kuhn(self):
     env = rl_environment.Environment("kuhn_poker")
@@ -53,7 +51,7 @@ class NFSPTest(TestCase):
         agent.step(time_step)
 
 
-class ReservoirBufferTest(TestCase):
+class ReservoirBufferTest(absltest.TestCase):
 
   def test_reservoir_buffer_add(self):
     reservoir_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=10)
@@ -88,4 +86,5 @@ class ReservoirBufferTest(TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  torch.manual_seed(SEED)
+  absltest.main()
