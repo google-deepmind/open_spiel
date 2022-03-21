@@ -667,6 +667,44 @@ void PhantomGoState::ResetBoard() {
     repetitions_.insert(board_.HashValue());
     superko_ = false;
 }
+std::array<int, 2> PhantomGoState::GetStoneCount() const {
+    return board_.GetStoneCount();
+}
+bool PhantomGoState::equalMetaposition(const PhantomGoState &state1, const PhantomGoState &state2, int playerID) {
+
+    if(state1.board_.board_size() != state2.board_.board_size())
+    {
+        return false;
+    }
+
+    std::array<int, 2> stoneCount1 = state1.board_.GetStoneCount();
+    std::array<int, 2> stoneCount2 = state2.board_.GetStoneCount();
+
+    if(stoneCount1[0] != stoneCount2[0] || stoneCount1[1] != stoneCount2[1])
+    {
+        return false;
+    }
+
+    int boardSize = state1.board_.board_size();
+
+    auto observation1 = state1.board_.GetObservationByID(playerID);
+    auto observation2 = state2.board_.GetObservationByID(playerID);
+
+    for(int i = 0; i < boardSize * boardSize; i++)
+    {
+        if(observation1[i] != observation2[i])
+        {
+            return false;
+        }
+    }
+
+    if(state1.to_play_ != state2.to_play_)
+    {
+        return false;
+    }
+
+    return true;
+}
 
 PhantomGoGame::PhantomGoGame(const GameParameters &params)
     : Game(kGameType, params),

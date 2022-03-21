@@ -113,8 +113,7 @@ void ConcreteActionsAreUsedInTheAPI() {
 
 //This test is implemented to visually analyte correctness of resampling
 
-void ResampleVisualTest() {
-    std::cout << "Starting ResampleFromMetaposition visual Test\n";
+void ResampleMetapositionTest() {
     GameParameters params;
     params["board_size"] = GameParameter(kBoardSize);
     std::shared_ptr<const Game> game =
@@ -132,9 +131,17 @@ void ResampleVisualTest() {
 
     std::unique_ptr<State> resampleState = state.ResampleFromMetaposition(0, nullptr);
 
-    std::cout << "Original state\n" << state.ToString();
+    PhantomGoState resampleState2 = down_cast<PhantomGoState>(*resampleState);
 
-    std::cout << "Resampled state\n " << resampleState->ToString();
+    if(!PhantomGoState::equalMetaposition(state, resampleState2, 0))
+    {
+
+        std::cout << "Metapositions not equal\n";
+        std::cout << "Original state\n" << state.ToString();
+
+        std::cout << "Resampled state\n " << resampleState->ToString();
+
+    }
 }
 
 //This tests metaposition resampling on large ammounts of states
@@ -188,5 +195,6 @@ int main(int argc, char **argv) {
     open_spiel::phantom_go::IllegalMoveTest();
     open_spiel::phantom_go::StoneCountTest();
     //open_spiel::phantom_go::ResampleFromMetapositionForceTest();
+    //open_spiel::phantom_go::ResampleVisualTest();
 
 }

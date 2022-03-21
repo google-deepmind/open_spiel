@@ -80,6 +80,8 @@ class PhantomGoState : public State {
 
   std::array<int, 2> GetStoneCount() const;
 
+  static bool equalMetaposition(const PhantomGoState& state1, const PhantomGoState& state2, int playerID);
+
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
 

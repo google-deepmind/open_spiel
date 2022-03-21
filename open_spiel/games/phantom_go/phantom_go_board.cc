@@ -178,7 +178,7 @@ const std::vector<VirtualPoint> &BoardPoints(int board_size) {
         CASE_GET_POINTS(17);
         CASE_GET_POINTS(18);
         CASE_GET_POINTS(19);
-        default:SpielFatalError("unsupported board size");
+        default:SpielFatalError("unsupported size" + board_size);
     }
 
 #undef CASE_GET_POINTS
