@@ -33,7 +33,7 @@ struct Cell {
     return row == other.row && col == other.col;
   }
   bool operator<(const Cell& other) const {
-    return (row < other.row) || (row == other.row && col <= other.col);
+    return (row < other.row) || (row == other.row && col < other.col);
   }
 };
 

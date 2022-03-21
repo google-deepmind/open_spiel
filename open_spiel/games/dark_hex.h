@@ -59,16 +59,19 @@
 //                                number of moves attempted
 //    (default "reveal-nothing")  ['reveal-nothing', 'reveal-numturns']
 //
-//    "row_size"    int           Size of the rows on the hex board
-//    (default 11)
-//    "col_size"    int           Size of the columns on the hex board
-//    (default 11)
+//    "num_cols"    int           Number of columns on the hex board
+//                                (default 3)
+//    "num_rows"    int           Number of the rows on the hex board
+//                                (default 3)
 
 namespace open_spiel {
 namespace dark_hex {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing";
 inline constexpr const char* kDefaultGameVersion = "cdh";
+inline constexpr int kDefaultNumRows = 3;
+inline constexpr int kDefaultNumCols = 3;
+inline constexpr int kDefaultBoardSize = 3;
 
 // black - white - empty
 inline constexpr int kPosStates = hex::kNumPlayers + 1;
@@ -86,7 +89,7 @@ enum class GameVersion {
 
 class DarkHexState : public State {
  public:
-  DarkHexState(std::shared_ptr<const Game> game, int row_size, int col_size,
+  DarkHexState(std::shared_ptr<const Game> game, int num_cols, int num_rows,
                GameVersion game_version, ObservationType obs_type);
 
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
@@ -119,8 +122,8 @@ class DarkHexState : public State {
   hex::HexState state_;
   ObservationType obs_type_;
   GameVersion game_version_;
-  const int row_size_;  // x
-  const int col_size_;  // y
+  const int num_cols_;  // x
+  const int num_rows_;  // y
   const int num_cells_;
   const int bits_per_action_;
   const int longest_sequence_;
@@ -136,7 +139,7 @@ class DarkHexGame : public Game {
   DarkHexGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new DarkHexState(
-        shared_from_this(), row_size_, col_size_, game_version_, obs_type_));
+        shared_from_this(), num_cols_, num_rows_, game_version_, obs_type_));
   }
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
@@ -148,18 +151,18 @@ class DarkHexGame : public Game {
 
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
-  int MaxGameLength() const override { return row_size_ * col_size_ * 2 - 1; }
+  int MaxGameLength() const override { return num_cols_ * num_rows_ * 2 - 1; }
   ObservationType obs_type() const { return obs_type_; }
   GameVersion game_version() const { return game_version_; }
-  int row_size() const { return row_size_; }
-  int col_size() const { return col_size_; }
+  int num_cols() const { return num_cols_; }
+  int num_rows() const { return num_rows_; }
 
  private:
   std::shared_ptr<const hex::HexGame> game_;
   ObservationType obs_type_;
   GameVersion game_version_;
-  const int row_size_;
-  const int col_size_;
+  const int num_cols_;
+  const int num_rows_;
   const int num_cells_;
   const int bits_per_action_;
   const int longest_sequence_;
@@ -167,10 +170,10 @@ class DarkHexGame : public Game {
 
 class ImperfectRecallDarkHexState : public DarkHexState {
  public:
-  ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int row_size_,
-                              int col_size_, GameVersion game_version,
+  ImperfectRecallDarkHexState(std::shared_ptr<const Game> game, int num_rows_,
+                              int num_cols_, GameVersion game_version,
                               ObservationType obs_type)
-      : DarkHexState(game, row_size_, col_size_, game_version, obs_type) {}
+      : DarkHexState(game, num_rows_, num_cols_, game_version, obs_type) {}
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
@@ -186,7 +189,7 @@ class ImperfectRecallDarkHexGame : public DarkHexGame {
   explicit ImperfectRecallDarkHexGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new ImperfectRecallDarkHexState(
-        shared_from_this(), row_size(), col_size(), game_version(),
+        shared_from_this(), num_cols(), num_rows(), game_version(),
         obs_type()));
   }
 };

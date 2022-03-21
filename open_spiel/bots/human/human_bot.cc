@@ -86,7 +86,7 @@ Action HumanBot::Step(const State &state) {
 
       std::sort(sorted_action_map.begin(), sorted_action_map.end(),
                 [](const auto &left, const auto &right) {
-                  return left.first.compare(right.first);
+                  return left.first < right.first;
                 });
 
       int longest_action_length = 0;

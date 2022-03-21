@@ -66,10 +66,12 @@ class TradeCommState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
-  std::string ObservationString(Player player) const override;
-  void ObservationTensor(Player player,
-                         absl::Span<float> values) const override;
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
   std::string InformationStateString(Player player) const override;
+  void ObservationTensor(Player player,
+                              absl::Span<float> values) const override;
+  std::string ObservationString(Player player) const override;
 
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
@@ -105,6 +107,7 @@ class TradeCommGame : public Game {
   double MaxUtility() const override { return kWinUtility; }
   double MinUtility() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override;
+  std::vector<int> InformationStateTensorShape() const override;
 
  private:
   const int num_items_;

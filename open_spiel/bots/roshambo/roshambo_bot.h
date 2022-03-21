@@ -51,18 +51,15 @@ class RoshamboBot : public Bot {
  public:
   explicit RoshamboBot(int player_id, std::string bot_name);
   Action Step(const State& state) override;
-  void InformActions(const State& state,
-                     const std::vector<Action>& actions) override;
-  void Restart() override;
 
  private:
   Player player_id_;
+  Player opponent_id_;
   std::string bot_name_;
-  std::vector<int> my_history_;
-  std::vector<int> opp_history_;
 };
 
 std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name);
+std::vector<std::string> RoshamboBotNames();
 
 }  // namespace roshambo
 }  // namespace open_spiel

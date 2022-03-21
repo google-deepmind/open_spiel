@@ -18,7 +18,7 @@ add_library (bots OBJECT ${BOT_SOURCES})
 add_subdirectory(gin_rummy)
 add_subdirectory(human)
 
-if (WIN32)
+if (NOT WIN32)
   # UCI bot not supported on Windows.
   add_subdirectory(uci)
 endif()

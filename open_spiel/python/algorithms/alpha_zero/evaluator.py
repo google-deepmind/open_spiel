@@ -33,8 +33,6 @@ class AlphaZeroEvaluator(mcts.Evaluator):
       raise ValueError("Game must have terminal rewards.")
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
-    if game_type.chance_mode != pyspiel.GameType.ChanceMode.DETERMINISTIC:
-      raise ValueError("Game must be deterministic.")
 
     self._model = model
     self._cache = lru_cache.LRUCache(cache_size)
@@ -64,6 +62,9 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     return np.array([value, -value])
 
   def prior(self, state):
-    """Returns the probabilities for all actions."""
-    _, policy = self._inference(state)
-    return [(action, policy[action]) for action in state.legal_actions()]
+    if state.is_chance_node():
+      return state.chance_outcomes()
+    else:
+      # Returns the probabilities for all actions.
+      _, policy = self._inference(state)
+      return [(action, policy[action]) for action in state.legal_actions()]

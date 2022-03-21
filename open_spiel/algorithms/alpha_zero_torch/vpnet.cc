@@ -102,7 +102,8 @@ bool CreateGraphDef(const Game& game, double learning_rate, double weight_decay,
       /*nn_depth=*/nn_depth,
       /*nn_width=*/nn_width,
       /*learning_rate=*/learning_rate,
-      /*weight_decay=*/weight_decay};
+      /*weight_decay=*/weight_decay,
+      /*nn_model=*/nn_model};
 
   return SaveModelConfig(path, filename, net_config);
 }

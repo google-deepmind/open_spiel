@@ -43,9 +43,10 @@ For an overview of OpenSpiel and example uses of the core API, please check out
 our tutorials:
 
 *   [Motivation, Core API, Brief Intro to Replictor Dynamics and Imperfect
-    Information Games](https://www.youtube.com/watch?v=YE0E0F39lac) by Marc
+    Information Games](https://www.youtube.com/watch?v=8NCPqtPwlFQ) by Marc
     Lanctot.
-    [(slides)](http://mlanctot.info/files/open_spiel_tutorial-mar2021-kuleuven.pdf).
+    [(slides)](http://mlanctot.info/files/OpenSpiel_Tutorial_KU_Leuven_2022.pdf)
+    [(colab)](https://colab.research.google.com/github/deepmind/open_spiel/blob/master/open_spiel/colabs/OpenSpielTutorial.ipynb)
 *   [Motivation, Core API, Implementing CFR and REINFORCE on Kuhn poker, Leduc
     poker, and Goofspiel](https://www.youtube.com/watch?v=o6JNHoGUXCo) by Edward
     Lockhart.

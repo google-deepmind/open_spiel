@@ -364,7 +364,9 @@ bool ClobberState::MovesRemaining() const {
 bool ClobberState::IsTerminal() const { return outcome_ != kInvalidPlayer; }
 
 std::vector<double> ClobberState::Returns() const {
-  if (outcome_ == Player{0}) {
+  if (outcome_ == kInvalidPlayer) {
+    return {0., 0.};
+  } else if (outcome_ == Player{0}) {
     return {1.0, -1.0};
   } else {
     return {-1.0, 1.0};

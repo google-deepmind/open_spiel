@@ -127,7 +127,7 @@ class _CFRSolverBase(object):
       for i in range(num_iterations):
         solver.evaluate_and_update_policy()
         solver.current_policy()  # Access the current policy
-        solver.average_policy()  # Accsss the average policy
+        solver.average_policy()  # Access the average policy
   ```
   """
 

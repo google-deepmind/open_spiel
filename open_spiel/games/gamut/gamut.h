@@ -21,7 +21,9 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
+#include "open_spiel/matrix_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/tensor_game.h"
 
 namespace open_spiel {
 namespace gamut {
@@ -47,6 +49,14 @@ class GamutGenerator {
   // function.
   std::shared_ptr<const Game> GenerateGame(const std::string& cmdline_args);
   std::shared_ptr<const Game> GenerateGame(
+      const std::vector<std::string>& cmdline_args);
+
+  // Same as above; returns a MatrixGame subtype for two-player games.
+  std::shared_ptr<const matrix_game::MatrixGame> GenerateMatrixGame(
+      const std::vector<std::string>& cmdline_args);
+
+  // Same as above; returns a MatrixGame subtype for games with >= 2 players.
+  std::shared_ptr<const tensor_game::TensorGame> GenerateTensorGame(
       const std::vector<std::string>& cmdline_args);
 
  private:

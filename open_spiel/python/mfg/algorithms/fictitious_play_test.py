@@ -11,12 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for fictitious play."""
 
 from absl.testing import absltest
 
 from open_spiel.python import policy
+from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import dqn
 from open_spiel.python.mfg import value
@@ -65,8 +65,10 @@ class FictitiousPlayTest(absltest.TestCase):
         epsilon_start=0.02,
         epsilon_end=0.01)
 
+    br_policy = rl_agent_policy.RLAgentPolicy(
+        game, dqn_agent, 0, use_observation=True)
     for _ in range(10):
-      dfp.iteration(rl_br_agent=dqn_agent)
+      dfp.iteration(br_policy=br_policy)
 
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
@@ -132,8 +134,10 @@ class FictitiousPlayTest(absltest.TestCase):
         epsilon_start=0.02,
         epsilon_end=0.01)
 
+    br_policy = rl_agent_policy.RLAgentPolicy(
+        game, dqn_agent, 0, use_observation=True)
     for _ in range(10):
-      dfp.iteration(rl_br_agent=dqn_agent)
+      dfp.iteration(br_policy=br_policy)
 
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)

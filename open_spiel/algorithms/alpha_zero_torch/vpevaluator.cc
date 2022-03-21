@@ -77,7 +77,11 @@ std::vector<double> VPNetEvaluator::Evaluate(const State& state) {
 }
 
 open_spiel::ActionsAndProbs VPNetEvaluator::Prior(const State& state) {
-  return Inference(state).policy;
+  if (state.IsChanceNode()) {
+    return state.ChanceOutcomes();
+  } else {
+    return Inference(state).policy;
+  }
 }
 
 VPNetModel::InferenceOutputs VPNetEvaluator::Inference(const State& state) {
