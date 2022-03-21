@@ -17,6 +17,7 @@
 from absl.testing import absltest
 
 from open_spiel.python import rl_environment
+import random
 import numpy as np
 import pyspiel
 import torch
@@ -122,6 +123,7 @@ class DQNTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
+  random.seed(SEED)
   torch.manual_seed(SEED)
   np.random.seed(SEED)
   absltest.main()

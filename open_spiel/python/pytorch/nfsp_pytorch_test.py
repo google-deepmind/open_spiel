@@ -19,6 +19,7 @@ from absl.testing import absltest
 from open_spiel.python import rl_environment
 from open_spiel.python.pytorch import nfsp
 
+import random
 import torch
 
 SEED = 24984617
@@ -86,5 +87,6 @@ class ReservoirBufferTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
+  random.seed(SEED)
   torch.manual_seed(SEED)
   absltest.main()
