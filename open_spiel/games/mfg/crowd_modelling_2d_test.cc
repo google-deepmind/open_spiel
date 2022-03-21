@@ -50,6 +50,8 @@ void TestLoadWithParams2() {
   auto game = LoadGame(
       "mfg_crowd_modelling_2d(size=100,horizon=1000,forbidden_states=[0|0;0|1]"
       ",initial_distribution=[0|2;0|3],initial_distribution_value=[0.5;0.5]"
+      ",positional_reward=[1|3;1|4],positional_reward_value=[0.2;0.8]"
+      ",noise_intensity=0.5,crowd_aversion_coef=0.4,with_congestion=true"
       ")");
   auto state = game->NewInitialState();
   SPIEL_CHECK_EQ(game->ObservationTensorShape()[0], 1000 + 2 * 100 + 1);
@@ -69,13 +71,37 @@ void TestReward() {
   SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
   // This expected reward assumes that the game is initialized with
   // a uniform state distribution.
-  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 1. + std::log(100));
-  SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 1. + std::log(100));
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 6.60517);
+  SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 6.60517);
 
   state->ApplyAction(2);
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
   SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 0.);
-  SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 1. + std::log(100));
+  SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 6.60517);
+}
+
+void TestDistRewardOnly() {
+  auto game = LoadGame(
+      "mfg_crowd_modelling_2d(size=10,horizon=20"
+      ",only_distribution_reward=true)");
+  auto state = game->NewInitialState();
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  state->ApplyAction(55);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 4.60517);
+  SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 4.60517);
+}
+
+void TestPositionalReward() {
+  auto game = LoadGame(
+      "mfg_crowd_modelling_2d(size=10,horizon=20"
+      ",positional_reward=[1|2;2|2],positional_reward_value=[0.5;0.5])");
+  auto state = game->NewInitialState();
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  state->ApplyAction(55);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  SPIEL_CHECK_FLOAT_EQ(state->Rewards()[0], 5.30517);
+  SPIEL_CHECK_FLOAT_EQ(state->Returns()[0], 5.30517);
 }
 
 void TestProcess() {
@@ -118,6 +144,28 @@ void TestLegalActions() {
   SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({2, 3, 4}));
 }
 
+void TestNoiseIntensity() {
+  // Same as the setting in TestLegalActions() test above, except the noise
+  // intensity.
+  auto game = LoadGame(
+      "mfg_crowd_modelling_2d(size=5,horizon=10,forbidden_states=[0|0;0|1;1|0]"
+      ",initial_distribution=[1|1],initial_distribution_value=[1.0]"
+      ",noise_intensity=0.5)");
+  auto state = game->NewInitialState();
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({6}));
+  state->ApplyAction(6);
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({2, 3, 4}));
+  state->ApplyAction(3);
+  // Now we are at a chance node.
+  SPIEL_CHECK_EQ(state->LegalActions(), std::vector<Action>({0, 1, 2, 3, 4}));
+  // Neutral action should have a probability of 0.5+0.1 and others 0.1, i.e.
+  // 0.5 / 5.
+  ActionsAndProbs expected_outcomes(
+      {{0, 0.1}, {1, 0.1}, {2, 0.6}, {3, 0.1}, {4, 0.1}});
+  SPIEL_CHECK_EQ(state->ChanceOutcomes(), expected_outcomes);
+}
+
 }  // namespace
 }  // namespace crowd_modelling_2d
 }  // namespace open_spiel
@@ -128,7 +176,9 @@ int main(int argc, char** argv) {
   open_spiel::crowd_modelling_2d::TestLoadWithParams();
   open_spiel::crowd_modelling_2d::TestLoadWithParams2();
   open_spiel::crowd_modelling_2d::TestRandomPlay();
-  // TODO(perolat): enable TestReward once it works.
-  // open_spiel::crowd_modelling_2d::TestReward();
+  open_spiel::crowd_modelling_2d::TestReward();
+  open_spiel::crowd_modelling_2d::TestDistRewardOnly();
+  open_spiel::crowd_modelling_2d::TestPositionalReward();
   open_spiel::crowd_modelling_2d::TestProcess();
+  open_spiel::crowd_modelling_2d::TestNoiseIntensity();
 }

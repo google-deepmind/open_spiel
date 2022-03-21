@@ -45,6 +45,7 @@ class TurnBasedSimultaneousState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
+  std::vector<double> Rewards() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
                               absl::Span<float> values) const override;
@@ -76,7 +77,7 @@ class TurnBasedSimultaneousState : public State {
   Player current_player_;
 
   // Are we currently rolling out a simultaneous move node?
-  bool rollout_mode_;
+  enum { kNoRollout = 0, kStartRollout, kMidRollout } rollout_mode_;
 };
 
 class TurnBasedSimultaneousGame : public Game {

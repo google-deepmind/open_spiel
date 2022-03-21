@@ -29,8 +29,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/circular_buffer.h"
 
-// Note: This code is still experimental. Currently it does not appear to be
-// learning catch (see dqn_torch_example.cc).
+// Note: This implementation has only been lightly tested on a few small games.
 
 namespace open_spiel {
 namespace algorithms {

@@ -47,7 +47,8 @@ class DQNTest(absltest.TestCase):
                     replay_buffer_capacity=100,
                     batch_size=5,
                     epsilon_start=0.02,
-                    epsilon_end=0.01)
+                    epsilon_end=0.01,
+                    gradient_clipping=1.0)
     total_reward = 0
 
     for _ in range(100):

@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Mean Field Crowd Modelling 2D"
 GameType.max_num_players = 1
 GameType.min_num_players = 1
-GameType.parameter_specification = ["forbidden_states", "horizon", "initial_distribution", "initial_distribution_value", "only_distribution_reward", "size"]
+GameType.parameter_specification = ["crowd_aversion_coef", "forbidden_states", "horizon", "initial_distribution", "initial_distribution_value", "noise_intensity", "only_distribution_reward", "positional_reward", "positional_reward_value", "size", "with_congestion"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 5
 PolicyTensorShape() = [5]
 MaxChanceOutcomes() = 100
-GetParameters() = {forbidden_states=[],horizon=10,initial_distribution=[],initial_distribution_value=[],only_distribution_reward=False,size=10}
+GetParameters() = {crowd_aversion_coef=1.0,forbidden_states=[],horizon=10,initial_distribution=[],initial_distribution_value=[],noise_intensity=1.0,only_distribution_reward=False,positional_reward=[],positional_reward_value=[],size=10,with_congestion=False}
 NumPlayers() = 1
 MinUtility() = -inf
 MaxUtility() = inf

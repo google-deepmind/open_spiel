@@ -134,6 +134,10 @@ target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")
+if (WIN32)
+  # Python does not seem able to import the module without this change.
+  set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
+endif()
 
 # Optional pyspiel-related modules, which can specify their own python tests.
 if (OPEN_SPIEL_BUILD_WITH_EIGEN)
@@ -174,6 +178,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
+  algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
   algorithms/noisy_policy_test.py
@@ -272,9 +277,10 @@ endif()
 # These require extra dependencies like cvxopt, nashpy, or matplotlib
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
+      algorithms/adidas_test.py
       algorithms/double_oracle_test.py
-      algorithms/lp_solver_test.py
       algorithms/jpsro_test.py
+      algorithms/lp_solver_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
       algorithms/value_iteration_test.py

@@ -27,7 +27,7 @@ ABSL_FLAG(std::string, graph_def, "",
           ("Where to get the graph. This could be from export_model.py, or "
            "from a checkpoint. If this is empty it'll create one."));
 ABSL_FLAG(std::string, nn_model, "resnet",
-          "Model torso type, currently only resnet is available.");
+          "Model torso type, can be resnet or mlp.");
 ABSL_FLAG(int, nn_width, 128, "Width of the model, passed to export_model.py.");
 ABSL_FLAG(int, nn_depth, 10, "Depth of the model, passed to export_model.py.");
 ABSL_FLAG(double, uct_c, 2, "UCT exploration constant.");

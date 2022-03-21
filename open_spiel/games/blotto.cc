@@ -147,7 +147,9 @@ std::string BlottoState::ToString() const {
 
 bool BlottoState::IsTerminal() const { return !joint_action_.empty(); }
 
-std::vector<double> BlottoState::Returns() const { return returns_; }
+std::vector<double> BlottoState::Returns() const {
+  return IsTerminal() ? returns_ : std::vector<double>(num_players_, 0.);
+}
 
 std::unique_ptr<State> BlottoState::Clone() const {
   return std::unique_ptr<State>(new BlottoState(*this));

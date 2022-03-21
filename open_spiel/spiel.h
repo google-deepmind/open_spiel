@@ -68,7 +68,12 @@ struct GameType {
   // Either all possible chance outcomes are explicitly returned as
   // ChanceOutcomes(), and the result of ApplyAction() is deterministic. Or
   // just one ChanceOutcome is returned, and the result of ApplyAction() is
-  // stochastic.
+  // stochastic. If in doubt, it is better to implement stochastic games with
+  // kExplicitStochastic, as this makes more information available to any
+  // learning algorithms you choose to use (i.e. the whole chance outcome
+  // distribution is visible to the algorithm, rather than just the sampled
+  // outcome). For more discussion of this field, see the github issue:
+  // https://github.com/deepmind/open_spiel/issues/792.
   enum class ChanceMode {
     kDeterministic,       // No chance nodes
     kExplicitStochastic,  // Has at least one chance node, all with

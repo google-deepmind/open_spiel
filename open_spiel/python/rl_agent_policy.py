@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Joint policy denoted by the RL agents of a game."""
 
 from typing import Dict
@@ -59,6 +58,10 @@ class JointRLAgentPolicy(policy.Policy):
         player_id = state.current_player()
       else:
         assert player_id == state.current_player()
+
+    # Make sure that player_id is an integer and not an enum as it is used to
+    # index lists.
+    player_id = int(player_id)
 
     legal_actions = state.legal_actions(player_id)
 

@@ -26,11 +26,13 @@ The environment is configurable in the following high-level ways:
 """
 
 import enum
+import functools
 from typing import Any, List, Mapping, Optional, Tuple
 import numpy as np
 
 from open_spiel.python.observation import IIGObserverForPublicInfoGame
 import pyspiel
+from open_spiel.python.utils import shared_value
 
 
 class Geometry(enum.IntEnum):
@@ -80,6 +82,17 @@ def get_param(param_name, params):
   return params.get(param_name, _DEFAULT_PARAMS[param_name])
 
 
+@functools.lru_cache(maxsize=None)
+def _state_to_str(x, y, t, population, player_id):
+  """A string that uniquely identify (pos, t, population, player_id)."""
+  if int(player_id) >= 0:
+    return f"(pop={population}, t={t}, pos=[{x} {y}])"
+  if player_id == pyspiel.PlayerId.MEAN_FIELD:
+    return f"(pop={population}, t={t}_a, pos=[{x} {y}])"
+  if player_id == pyspiel.PlayerId.CHANCE:
+    return f"(pop={population}, t={t}_a_mu, pos=[{x} {y}])"
+
+
 class MFGPredatorPreyGame(pyspiel.Game):
   """Predator-prey multi-population MFG."""
 
@@ -96,14 +109,20 @@ class MFGPredatorPreyGame(pyspiel.Game):
           f"square matrix: {flat_reward_matrix}")
     self.reward_matrix = flat_reward_matrix.reshape([num_players, num_players])
     self.geometry = get_param("geometry", params)
+    num_states = self.size**2
     game_info = pyspiel.GameInfo(
         num_distinct_actions=_NUM_ACTIONS,
-        max_chance_outcomes=max(self.size * self.size, _NUM_CHANCE),
+        max_chance_outcomes=max(num_states, _NUM_CHANCE),
         num_players=num_players,
         min_utility=-np.inf,
         max_utility=+np.inf,
         utility_sum=0.0,
         max_game_length=self.horizon)
+
+    # Represents the current probability distribution over game states
+    # (when grouped for each population). Initialized with a uniform
+    # distribution.
+    self.initial_distribution = [1. / num_states] * (num_states * num_players)
     super().__init__(_GAME_TYPE, game_info, params)
 
   def new_initial_state(self):
@@ -164,9 +183,9 @@ class MFGPredatorPreyState(pyspiel.State):
 
     Args:
       game: MFGPredatorPreyGame for which a state should be created.
-      population: ID of the population to create this state for. Must be in
-        [0, num_players()) or None.
-        States with population=None cannot be used to perform game actions.
+      population: ID of the population to create this state for. Must be in [0,
+        num_players()) or None. States with population=None cannot be used to
+        perform game actions.
     """
     super().__init__(game)
     # Initial state where the initial position is chosen according to
@@ -188,12 +207,7 @@ class MFGPredatorPreyState(pyspiel.State):
     self.reward_matrix = game.reward_matrix
     self.geometry = game.geometry
     self._returns = np.zeros([self.num_players()])
-
-    # Represents the current probability distribution over game states
-    # (when grouped for each population). Initialized with a uniform
-    # distribution.
-    self._distribution = [1. / self.num_states] * (
-        self.num_states * self.num_players())
+    self._distribution = shared_value.SharedValue(game.initial_distribution)
 
   @property
   def pos(self):
@@ -207,15 +221,10 @@ class MFGPredatorPreyState(pyspiel.State):
     """A string that uniquely identify (pos, t, population, player_id)."""
     if self._is_position_init:
       return f"position_init_{population}"
-    assert isinstance(pos, np.ndarray), "Got type {type(pos)}"
+    assert isinstance(pos, np.ndarray), f"Got type {type(pos)}"
     assert len(pos.shape) == 1, f"Got {len(pos.shape)}, expected 1 (pos={pos})."
     assert pos.shape[0] == 2, f"Got {pos.shape[0]}, expected 2 (pos={pos})."
-    if int(player_id) >= 0:
-      return f"(pop={population}, t={t}, pos={pos})"
-    if player_id == pyspiel.PlayerId.MEAN_FIELD:
-      return f"(pop={population}, t={t}_a, pos={pos})"
-    if player_id == pyspiel.PlayerId.CHANCE:
-      return f"(pop={population}, t={t}_a_mu, pos={pos})"
+    return _state_to_str(pos[0], pos[1], t, population, player_id)
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every perfect-information sequential-move game.
@@ -330,10 +339,10 @@ class MFGPredatorPreyState(pyspiel.State):
     assert 0 <= population < self.num_players(), population
     # This logic needs to match the ordering defined in distribution_support().
     index = population + self.num_players() * (pos[1] + self.size * pos[0])
-    assert 0 <= index < len(self._distribution), (
-        f"Invalid index {index} vs dist length: {len(self._distribution)}, "
+    assert 0 <= index < len(self._distribution.value), (
+        f"Invalid index {index} vs dist length: {len(self._distribution.value)}, "
         f"population={population}, pos={pos}, state={self}")
-    return self._distribution[index]
+    return self._distribution.value[index]
 
   def update_distribution(self, distribution):
     """This function is central and specific to the logic of the MFG.
@@ -351,7 +360,7 @@ class MFGPredatorPreyState(pyspiel.State):
     if self._player_id != pyspiel.PlayerId.MEAN_FIELD:
       raise ValueError(
           "update_distribution should only be called at a MEAN_FIELD state.")
-    self._distribution = distribution.copy()
+    self._distribution = shared_value.SharedValue(distribution)
     self._player_id = self._population
 
   def is_terminal(self):

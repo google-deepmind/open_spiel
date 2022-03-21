@@ -35,7 +35,6 @@
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
 #include "open_spiel/spiel.h"
 
-
 namespace open_spiel {
 namespace crowd_modelling_2d {
 
@@ -45,6 +44,12 @@ inline constexpr int kDefaultSize = 10;
 inline constexpr int kNumActions = 5;
 inline constexpr int kNumChanceActions = 5;
 inline constexpr bool kDefaultOnlyDistributionReward = false;
+inline constexpr bool kDefaultWithCongestion = false;
+// Noise intensity is distributed uniformly among the legal actions in the
+// chance node. Neutral action will get an additional probability of 1 -
+// noise_intensity.
+inline constexpr double kDefaultNoiseIntensity = 1.0;
+inline constexpr double kDefaultCrowdAversionCoef = 1.0;
 
 // Example string format: "[0|0;0|1]"
 inline constexpr const char* kDefaultForbiddenStates = "[]";
@@ -52,6 +57,10 @@ inline constexpr const char* kDefaultForbiddenStates = "[]";
 inline constexpr const char* kDefaultInitialDistribution = "[]";
 // Example string format: "[0.5;0.5]"
 inline constexpr const char* kDefaultInitialDistributionValue = "[]";
+// Example string format: "[0|2;0|3]"
+inline constexpr const char* kDefaultPositionalReward = "[]";
+// Example string format: "[1.5;2.5]"
+inline constexpr const char* kDefaultPositionalRewardValue = "[]";
 
 // Action that leads to no displacement on the torus of the game.
 inline constexpr int kNeutralAction = 2;
@@ -73,23 +82,31 @@ std::vector<absl::string_view> ProcessStringParam(
 // The game stops after a non-initial chance node when the horizon is reached.
 class CrowdModelling2dState : public State {
  public:
-  // forbidden_states and initial_distribution are formated like
-  // '[int|int;...;int|int]'. Example : "[]" or "[0|0;0|1]".
-  // initial_distribution_value is formated like '[float;...;float]'. Example :
-  // "[]" or "[0.5;0.5]"
-  CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
-                        bool only_distribution_reward,
-                        const std::string& forbidden_states,
-                        const std::string& initial_distribution,
-                        const std::string& initial_distribution_value);
+  // forbidden_states, initial_distribution and positional_reward are formated
+  // like '[int|int;...;int|int]'. Example : "[]" or "[0|0;0|1]".
+  // initial_distribution_value and positional_reward_value are formated like
+  // '[float;...;float]'. Example : "[]" or "[0.5;0.5]"
   CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
                         bool only_distribution_reward,
                         const std::string& forbidden_states,
                         const std::string& initial_distribution,
                         const std::string& initial_distribution_value,
+                        const std::string& positional_reward,
+                        const std::string& positional_reward_value,
+                        bool with_congestion, double noise_intensity,
+                        double crowd_aversion_coef);
+  CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
+                        bool only_distribution_reward,
+                        const std::string& forbidden_states,
+                        const std::string& initial_distribution,
+                        const std::string& initial_distribution_value,
+                        const std::string& positional_reward,
+                        const std::string& positional_reward_value,
                         Player current_player, bool is_chance_init_, int x,
                         int y, int t, int last_action, double return_value,
-                        const std::vector<double>& distribution);
+                        const std::vector<double>& distribution,
+                        bool with_congestion, double noise_intensity,
+                        double crowd_aversion_coef);
 
   CrowdModelling2dState(const CrowdModelling2dState&) = default;
   CrowdModelling2dState& operator=(const CrowdModelling2dState&) = default;
@@ -138,8 +155,13 @@ class CrowdModelling2dState : public State {
   const bool only_distribution_reward_ = false;
   ActionsAndProbs initial_distribution_action_prob_;
   std::vector<std::pair<int, int>> forbidden_states_xy_;
+  std::vector<std::pair<int, int>> positional_reward_xy_;
+  std::vector<float> positional_reward_value_;
   int last_action_ = kNeutralAction;
   double return_value_ = 0.;
+  bool with_congestion_;
+  double noise_intensity_;
+  double crowd_aversion_coef_;
 
   // kActionToMoveX[action] and kActionToMoveY[action] is the displacement on
   // the torus of the game for 'action'.
@@ -156,7 +178,9 @@ class CrowdModelling2dGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<CrowdModelling2dState>(
         shared_from_this(), size_, horizon_, only_distribution_reward_,
-        forbidden_states_, initial_distribution_, initial_distribution_value_);
+        forbidden_states_, initial_distribution_, initial_distribution_value_,
+        positional_reward_, positional_reward_value_, with_congestion_,
+        noise_intensity_, crowd_aversion_coef_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override {
@@ -185,6 +209,11 @@ class CrowdModelling2dGame : public Game {
   std::string forbidden_states_;            // Default "", example "[0|0;0|1]"
   std::string initial_distribution_;        // Default "", example  "[0|2;0|3]"
   std::string initial_distribution_value_;  // Default "", example "[0.5;0.5]"
+  std::string positional_reward_;           // Default "", example  "[0|2;0|3]"
+  std::string positional_reward_value_;     // Default "", example "[1.5;2.5]"
+  const bool with_congestion_;
+  const double noise_intensity_;
+  const double crowd_aversion_coef_;
 };
 
 }  // namespace crowd_modelling_2d

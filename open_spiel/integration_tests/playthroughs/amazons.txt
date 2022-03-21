@@ -1,0 +1,797 @@
+game: amazons
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Amazons"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "amazons"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 36
+PolicyTensorShape() = [36]
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [4, 6, 6]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 144
+MaxGameLength() = 108
+ToString() = "amazons()"
+
+# State 0
+# .X..X.
+# X....X
+# ......
+# ......
+# O....O
+# .O..O.
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = ".X..X.\nX....X\n......\n......\nO....O\n.O..O."
+ObservationString(1) = ".X..X.\nX....X\n......\n......\nO....O\n.O..O."
+ObservationTensor(0):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 4, 6, 11]
+StringLegalActions() = ["X From (1, 2)", "X From (1, 5)", "X From (2, 1)", "X From (2, 6)"]
+
+# Apply action "X From (2, 1)"
+action: 6
+
+# State 1
+# .X..X.
+# .....X
+# ......
+# ......
+# O....O
+# .O..O.
+IsTerminal() = False
+History() = [6]
+HistoryString() = "6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "6"
+InformationStateString(1) = "6"
+ObservationString(0) = ".X..X.\n.....X\n......\n......\nO....O\n.O..O."
+ObservationString(1) = ".X..X.\n.....X\n......\n......\nO....O\n.O..O."
+ObservationTensor(0):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 7, 8, 9, 10, 12, 13, 18, 20, 27]
+StringLegalActions() = ["X To (1, 1)", "X To (2, 2)", "X To (2, 3)", "X To (2, 4)", "X To (2, 5)", "X To (3, 1)", "X To (3, 2)", "X To (4, 1)", "X To (4, 3)", "X To (5, 4)"]
+
+# Apply action "X To (3, 1)"
+action: 12
+
+# State 2
+# .X..X.
+# .....X
+# X.....
+# ......
+# O....O
+# .O..O.
+IsTerminal() = False
+History() = [6, 12]
+HistoryString() = "6, 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "6, 12"
+InformationStateString(1) = "6, 12"
+ObservationString(0) = ".X..X.\n.....X\nX.....\n......\nO....O\n.O..O."
+ObservationString(1) = ".X..X.\n.....X\nX.....\n......\nO....O\n.O..O."
+ObservationTensor(0):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◉◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◉◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 2, 6, 7, 13, 14, 15, 16, 17, 18, 19, 26, 33]
+StringLegalActions() = ["X Shoot:  (1, 1)", "X Shoot:  (1, 3)", "X Shoot:  (2, 1)", "X Shoot:  (2, 2)", "X Shoot:  (3, 2)", "X Shoot:  (3, 3)", "X Shoot:  (3, 4)", "X Shoot:  (3, 5)", "X Shoot:  (3, 6)", "X Shoot:  (4, 1)", "X Shoot:  (4, 2)", "X Shoot:  (5, 3)", "X Shoot:  (6, 4)"]
+
+# Apply action "X Shoot:  (3, 3)"
+action: 14
+
+# State 3
+# .X..X.
+# .....X
+# X.#...
+# ......
+# O....O
+# .O..O.
+IsTerminal() = False
+History() = [6, 12, 14]
+HistoryString() = "6, 12, 14"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "6, 12, 14"
+InformationStateString(1) = "6, 12, 14"
+ObservationString(0) = ".X..X.\n.....X\nX.#...\n......\nO....O\n.O..O."
+ObservationString(1) = ".X..X.\n.....X\nX.#...\n......\nO....O\n.O..O."
+ObservationTensor(0):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◯◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◉◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◯◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◉◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◯◉◉◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [24, 29, 31, 34]
+StringLegalActions() = ["O From (5, 1)", "O From (5, 6)", "O From (6, 2)", "O From (6, 5)"]
+
+# Apply action "O From (6, 2)"
+action: 31
+
+# State 4
+# .X..X.
+# .....X
+# X.#...
+# ......
+# O....O
+# ....O.
+IsTerminal() = False
+History() = [6, 12, 14, 31]
+HistoryString() = "6, 12, 14, 31"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "6, 12, 14, 31"
+InformationStateString(1) = "6, 12, 14, 31"
+ObservationString(0) = ".X..X.\n.....X\nX.#...\n......\nO....O\n....O."
+ObservationString(1) = ".X..X.\n.....X\nX.#...\n......\nO....O\n....O."
+ObservationTensor(0):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◯◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◉◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◯◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◉◯◯◯
+◉◉◉◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [7, 13, 16, 19, 21, 25, 26, 30, 32, 33]
+StringLegalActions() = ["O To (2, 2)", "O To (3, 2)", "O To (3, 5)", "O To (4, 2)", "O To (4, 4)", "O To (5, 2)", "O To (5, 3)", "O To (6, 1)", "O To (6, 3)", "O To (6, 4)"]
+
+# Apply action "O To (4, 2)"
+action: 19
+
+# State 5
+# .X..X.
+# .....X
+# X.#...
+# .O....
+# O....O
+# ....O.
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19]
+HistoryString() = "6, 12, 14, 31, 19"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "6, 12, 14, 31, 19"
+InformationStateString(1) = "6, 12, 14, 31, 19"
+ObservationString(0) = ".X..X.\n.....X\nX.#...\n.O....\nO....O\n....O."
+ObservationString(1) = ".X..X.\n.....X\nX.#...\n.O....\nO....O\n....O."
+ObservationTensor(0):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◯◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◉◯◯◯
+◉◯◉◉◉◉  ◯◉◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◉◉◯◉  ◯◯◯◯◯◯  ◯◉◯◯◉◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◯◯◯◯◯◯
+◯◉◯◉◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯  ◯◯◉◯◯◯
+◉◯◉◉◉◉  ◯◉◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◉◉◉◉◯  ◉◯◯◯◯◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [7, 13, 18, 20, 21, 22, 23, 25, 26, 31, 33]
+StringLegalActions() = ["O Shoot:  (2, 2)", "O Shoot:  (3, 2)", "O Shoot:  (4, 1)", "O Shoot:  (4, 3)", "O Shoot:  (4, 4)", "O Shoot:  (4, 5)", "O Shoot:  (4, 6)", "O Shoot:  (5, 2)", "O Shoot:  (5, 3)", "O Shoot:  (6, 2)", "O Shoot:  (6, 4)"]
+
+# Apply action "O Shoot:  (3, 2)"
+action: 13
+
+# State 6
+# Apply action "X From (3, 1)"
+action: 12
+
+# State 7
+# Apply action "X To (1, 1)"
+action: 0
+
+# State 8
+# Apply action "X Shoot:  (2, 1)"
+action: 6
+
+# State 9
+# Apply action "O From (5, 1)"
+action: 24
+
+# State 10
+# Apply action "O To (4, 1)"
+action: 18
+
+# State 11
+# Apply action "O Shoot:  (6, 1)"
+action: 30
+
+# State 12
+# Apply action "X From (1, 5)"
+action: 4
+
+# State 13
+# Apply action "X To (1, 6)"
+action: 5
+
+# State 14
+# Apply action "X Shoot:  (1, 5)"
+action: 4
+
+# State 15
+# Apply action "O From (5, 6)"
+action: 29
+
+# State 16
+# Apply action "O To (6, 6)"
+action: 35
+
+# State 17
+# Apply action "O Shoot:  (5, 6)"
+action: 29
+
+# State 18
+# Apply action "X From (1, 2)"
+action: 1
+
+# State 19
+# X...#X
+# #....X
+# .##...
+# OO....
+# .....#
+# #...OO
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1"
+ObservationString(0) = "X...#X\n#....X\n.##...\nOO....\n.....#\n#...OO"
+ObservationString(1) = "X...#X\n#....X\n.##...\nOO....\n.....#\n#...OO"
+ObservationTensor(0):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◉◯◯◯◯◯
+◉◯◯◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◉◉◯◯◯
+◯◯◉◉◉◉  ◉◉◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉
+◯◉◉◉◯◯  ◯◯◯◯◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+ObservationTensor(1):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◉◯◯◯◯◯
+◉◯◯◉◉◉  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◉◉◯◯◯
+◯◯◉◉◉◉  ◉◉◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉
+◯◉◉◉◯◯  ◯◯◯◯◉◉  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [2, 3, 7, 8, 15, 22]
+StringLegalActions() = ["X To (1, 3)", "X To (1, 4)", "X To (2, 2)", "X To (2, 3)", "X To (3, 4)", "X To (4, 5)"]
+
+# Apply action "X To (3, 4)"
+action: 15
+
+# State 20
+# Apply action "X Shoot:  (5, 4)"
+action: 27
+
+# State 21
+# Apply action "O From (6, 6)"
+action: 35
+
+# State 22
+# X...#X
+# #....X
+# .##X..
+# OO....
+# ...#.#
+# #...O.
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35"
+ObservationString(0) = "X...#X\n#....X\n.##X..\nOO....\n...#.#\n#...O."
+ObservationString(1) = "X...#X\n#....X\n.##X..\nOO....\n...#.#\n#...O."
+ObservationTensor(0):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◉◯◯◯◯◯
+◉◯◯◯◉◉  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◯◉◉◯◯◯
+◯◯◉◉◉◉  ◉◉◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◉
+◯◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+ObservationTensor(1):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◉◉◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◉  ◉◯◯◯◯◯
+◉◯◯◯◉◉  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◯◉◉◯◯◯
+◯◯◉◉◉◉  ◉◉◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◉◉◉◯◉◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◉
+◯◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [21, 28]
+StringLegalActions() = ["O To (4, 4)", "O To (5, 5)"]
+
+# Apply action "O To (4, 4)"
+action: 21
+
+# State 23
+# Apply action "O Shoot:  (3, 5)"
+action: 16
+
+# State 24
+# Apply action "X From (1, 6)"
+action: 5
+
+# State 25
+# Apply action "X To (2, 5)"
+action: 10
+
+# State 26
+# Apply action "X Shoot:  (3, 6)"
+action: 17
+
+# State 27
+# Apply action "O From (4, 2)"
+action: 19
+
+# State 28
+# Apply action "O To (5, 3)"
+action: 26
+
+# State 29
+# Apply action "O Shoot:  (5, 1)"
+action: 24
+
+# State 30
+# Apply action "X From (2, 6)"
+action: 11
+
+# State 31
+# Apply action "X To (1, 6)"
+action: 5
+
+# State 32
+# Apply action "X Shoot:  (2, 6)"
+action: 11
+
+# State 33
+# Apply action "O From (4, 1)"
+action: 18
+
+# State 34
+# Apply action "O To (4, 3)"
+action: 20
+
+# State 35
+# Apply action "O Shoot:  (5, 2)"
+action: 25
+
+# State 36
+# Apply action "X From (2, 5)"
+action: 10
+
+# State 37
+# Apply action "X To (2, 3)"
+action: 8
+
+# State 38
+# X...#X
+# #.X..#
+# .##X##
+# ..OO..
+# ##O#.#
+# #...O.
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8"
+ObservationString(0) = "X...#X\n#.X..#\n.##X##\n..OO..\n##O#.#\n#...O."
+ObservationString(1) = "X...#X\n#.X..#\n.##X##\n..OO..\n##O#.#\n#...O."
+ObservationTensor(0):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◯◉◉◯  ◯◯◯◯◯◯  ◯◯◉◯◯◯  ◉◯◯◯◯◉
+◉◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◯◉◉◯◉◉
+◉◉◯◯◉◉  ◯◯◉◉◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◯◯◯◉◯  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◉◉◯◉◯◉
+◯◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+ObservationTensor(1):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◯◉◉◯  ◯◯◯◯◯◯  ◯◯◉◯◯◯  ◉◯◯◯◯◉
+◉◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◯◉◉◯◉◉
+◉◉◯◯◉◉  ◯◯◉◉◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◯◯◯◉◯  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◉◉◯◉◯◉
+◯◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [1, 2, 3, 7, 9, 10]
+StringLegalActions() = ["X Shoot:  (1, 2)", "X Shoot:  (1, 3)", "X Shoot:  (1, 4)", "X Shoot:  (2, 2)", "X Shoot:  (2, 4)", "X Shoot:  (2, 5)"]
+
+# Apply action "X Shoot:  (2, 5)"
+action: 10
+
+# State 39
+# Apply action "O From (4, 4)"
+action: 21
+
+# State 40
+# Apply action "O To (5, 5)"
+action: 28
+
+# State 41
+# X...#X
+# #.X.##
+# .##X##
+# ..O...
+# ##O#O#
+# #...O.
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28"
+ObservationString(0) = "X...#X\n#.X.##\n.##X##\n..O...\n##O#O#\n#...O."
+ObservationString(1) = "X...#X\n#.X.##\n.##X##\n..O...\n##O#O#\n#...O."
+ObservationTensor(0):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◯◉◯◯  ◯◯◯◯◯◯  ◯◯◉◯◯◯  ◉◯◯◯◉◉
+◉◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◯◉◉◯◉◉
+◉◉◯◉◉◉  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◯◯◯◯◯  ◯◯◉◯◉◯  ◯◯◯◯◯◯  ◉◉◯◉◯◉
+◯◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+ObservationTensor(1):
+◯◉◉◉◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◯◯◯◉◯
+◯◉◯◉◯◯  ◯◯◯◯◯◯  ◯◯◉◯◯◯  ◉◯◯◯◉◉
+◉◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◯◉◉◯◉◉
+◉◉◯◉◉◉  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯
+◯◯◯◯◯◯  ◯◯◉◯◉◯  ◯◯◯◯◯◯  ◉◉◯◉◯◉
+◯◉◉◉◯◉  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [21, 22, 23, 33, 35]
+StringLegalActions() = ["O Shoot:  (4, 4)", "O Shoot:  (4, 5)", "O Shoot:  (4, 6)", "O Shoot:  (6, 4)", "O Shoot:  (6, 6)"]
+
+# Apply action "O Shoot:  (6, 4)"
+action: 33
+
+# State 42
+# Apply action "X From (3, 4)"
+action: 15
+
+# State 43
+# Apply action "X To (2, 4)"
+action: 9
+
+# State 44
+# Apply action "X Shoot:  (1, 3)"
+action: 2
+
+# State 45
+# Apply action "O From (5, 3)"
+action: 26
+
+# State 46
+# Apply action "O To (4, 2)"
+action: 19
+
+# State 47
+# Apply action "O Shoot:  (3, 1)"
+action: 12
+
+# State 48
+# Apply action "X From (2, 3)"
+action: 8
+
+# State 49
+# Apply action "X To (2, 2)"
+action: 7
+
+# State 50
+# Apply action "X Shoot:  (1, 2)"
+action: 1
+
+# State 51
+# Apply action "O From (4, 2)"
+action: 19
+
+# State 52
+# Apply action "O To (5, 3)"
+action: 26
+
+# State 53
+# Apply action "O Shoot:  (6, 3)"
+action: 32
+
+# State 54
+# Apply action "X From (2, 4)"
+action: 9
+
+# State 55
+# Apply action "X To (1, 4)"
+action: 3
+
+# State 56
+# Apply action "X Shoot:  (4, 4)"
+action: 21
+
+# State 57
+# Apply action "O From (5, 3)"
+action: 26
+
+# State 58
+# Apply action "O To (6, 2)"
+action: 31
+
+# State 59
+# Apply action "O Shoot:  (5, 3)"
+action: 26
+
+# State 60
+# X##X#X
+# #X..##
+# ###.##
+# ..O#..
+# ####O#
+# #O##O.
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26"
+ObservationString(0) = "X##X#X\n#X..##\n###.##\n..O#..\n####O#\n#O##O."
+ObservationString(1) = "X##X#X\n#X..##\n###.##\n..O#..\n####O#\n#O##O."
+ObservationTensor(0):
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◯◯◉◯◉  ◯◉◉◯◉◯
+◯◯◉◉◯◯  ◯◯◯◯◯◯  ◯◉◯◯◯◯  ◉◯◯◯◉◉
+◯◯◯◉◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◉◉◯◉◉
+◉◉◯◯◉◉  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯
+◯◯◯◯◯◯  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◉◉◉◯◉
+◯◯◯◯◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◉◯◉◉◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◯◯◉◯◉  ◯◉◉◯◉◯
+◯◯◉◉◯◯  ◯◯◯◯◯◯  ◯◉◯◯◯◯  ◉◯◯◯◉◉
+◯◯◯◉◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◉◉◯◉◉
+◉◉◯◯◉◉  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯
+◯◯◯◯◯◯  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◉◉◉◯◉
+◯◯◯◯◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◉◯◉◉◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [3, 7]
+StringLegalActions() = ["X From (1, 4)", "X From (2, 2)"]
+
+# Apply action "X From (1, 4)"
+action: 3
+
+# State 61
+# Apply action "X To (3, 4)"
+action: 15
+
+# State 62
+# Apply action "X Shoot:  (1, 4)"
+action: 3
+
+# State 63
+# X####X
+# #X..##
+# ###X##
+# ..O#..
+# ####O#
+# #O##O.
+IsTerminal() = False
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3"
+ObservationString(0) = "X####X\n#X..##\n###X##\n..O#..\n####O#\n#O##O."
+ObservationString(1) = "X####X\n#X..##\n###X##\n..O#..\n####O#\n#O##O."
+ObservationTensor(0):
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◉◉◉◉◯
+◯◯◉◉◯◯  ◯◯◯◯◯◯  ◯◉◯◯◯◯  ◉◯◯◯◉◉
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◉◉◉◯◉◉
+◉◉◯◯◉◉  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯
+◯◯◯◯◯◯  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◉◉◉◯◉
+◯◯◯◯◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◉◯◉◉◯◯
+ObservationTensor(1):
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◉◉◉◉◯
+◯◯◉◉◯◯  ◯◯◯◯◯◯  ◯◉◯◯◯◯  ◉◯◯◯◉◉
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯  ◉◉◉◯◉◉
+◉◉◯◯◉◉  ◯◯◉◯◯◯  ◯◯◯◯◯◯  ◯◯◯◉◯◯
+◯◯◯◯◯◯  ◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◉◉◉◯◉
+◯◯◯◯◯◉  ◯◉◯◯◉◯  ◯◯◯◯◯◯  ◉◯◉◉◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [20, 28, 34]
+StringLegalActions() = ["O From (4, 3)", "O From (5, 5)", "O From (6, 5)"]
+
+# Apply action "O From (6, 5)"
+action: 34
+
+# State 64
+# Apply action "O To (6, 6)"
+action: 35
+
+# State 65
+# Apply action "O Shoot:  (6, 5)"
+action: 34
+
+# State 66
+# Apply action "X From (3, 4)"
+action: 15
+
+# State 67
+# Apply action "X To (2, 4)"
+action: 9
+
+# State 68
+# Apply action "X Shoot:  (3, 4)"
+action: 15
+
+# State 69
+# Apply action "O From (5, 5)"
+action: 28
+
+# State 70
+# Apply action "O To (4, 5)"
+action: 22
+
+# State 71
+# Apply action "O Shoot:  (5, 5)"
+action: 28
+
+# State 72
+# Apply action "X From (2, 2)"
+action: 7
+
+# State 73
+# Apply action "X To (2, 3)"
+action: 8
+
+# State 74
+# Apply action "X Shoot:  (2, 2)"
+action: 7
+
+# State 75
+# Apply action "O From (4, 5)"
+action: 22
+
+# State 76
+# Apply action "O To (4, 6)"
+action: 23
+
+# State 77
+# Apply action "O Shoot:  (4, 5)"
+action: 22
+
+# State 78
+# X####X
+# ##XX##
+# ######
+# ..O##O
+# ######
+# #O###O
+IsTerminal() = True
+History() = [6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3, 34, 35, 34, 15, 9, 15, 28, 22, 28, 7, 8, 7, 22, 23, 22]
+HistoryString() = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3, 34, 35, 34, 15, 9, 15, 28, 22, 28, 7, 8, 7, 22, 23, 22"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3, 34, 35, 34, 15, 9, 15, 28, 22, 28, 7, 8, 7, 22, 23, 22"
+InformationStateString(1) = "6, 12, 14, 31, 19, 13, 12, 0, 6, 24, 18, 30, 4, 5, 4, 29, 35, 29, 1, 15, 27, 35, 21, 16, 5, 10, 17, 19, 26, 24, 11, 5, 11, 18, 20, 25, 10, 8, 10, 21, 28, 33, 15, 9, 2, 26, 19, 12, 8, 7, 1, 19, 26, 32, 9, 3, 21, 26, 31, 26, 3, 15, 3, 34, 35, 34, 15, 9, 15, 28, 22, 28, 7, 8, 7, 22, 23, 22"
+ObservationString(0) = "X####X\n##XX##\n######\n..O##O\n######\n#O###O"
+ObservationString(1) = "X####X\n##XX##\n######\n..O##O\n######\n#O###O"
+ObservationTensor(0):
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◉◉◉◉◯
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◉◉◯◯  ◉◉◯◯◉◉
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◉◉◉◉◉
+◉◉◯◯◯◯  ◯◯◉◯◯◉  ◯◯◯◯◯◯  ◯◯◯◉◉◯
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◉◉◉◉◉
+◯◯◯◯◯◯  ◯◉◯◯◯◉  ◯◯◯◯◯◯  ◉◯◉◉◉◯
+ObservationTensor(1):
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◯◯◯◯◉  ◯◉◉◉◉◯
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◉◉◯◯  ◉◉◯◯◉◉
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◉◉◉◉◉
+◉◉◯◯◯◯  ◯◯◉◯◯◉  ◯◯◯◯◯◯  ◯◯◯◉◉◯
+◯◯◯◯◯◯  ◯◯◯◯◯◯  ◯◯◯◯◯◯  ◉◉◉◉◉◉
+◯◯◯◯◯◯  ◯◉◯◯◯◉  ◯◯◯◯◯◯  ◉◯◉◉◉◯
+Rewards() = [-1.0, 1.0]
+Returns() = [-1.0, 1.0]

@@ -8,7 +8,7 @@ GameType.max_num_players = 2
 GameType.min_num_players = 2
 GameType.parameter_specification = ["num_items"]
 GameType.provides_information_state_string = True
-GameType.provides_information_state_tensor = False
+GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = False
@@ -24,6 +24,9 @@ NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = 1.0
 UtilitySum() = None
+InformationStateTensorShape() = [37]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 37
 ObservationTensorShape() = [37]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 37
@@ -40,6 +43,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "ChanceNode -- no observation"
 InformationStateString(1) = "ChanceNode -- no observation"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "ChanceNode -- no observation"
 ObservationString(1) = "ChanceNode -- no observation"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -64,6 +69,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "Current turn: 0\nMy item: 9\nPhase: comm\nComm history: \nTrade history size: 0\n"
 InformationStateString(1) = "Current turn: 0\nMy item: 0\nPhase: comm\nComm history: \nTrade history size: 0\n"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationString(0) = "Current turn: 0\nMy item: 9\nPhase: comm\nComm history: \nTrade history size: 0\n"
 ObservationString(1) = "Current turn: 0\nMy item: 0\nPhase: comm\nComm history: \nTrade history size: 0\n"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
@@ -89,6 +96,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "Current turn: 1\nMy item: 9\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
 InformationStateString(1) = "Current turn: 1\nMy item: 0\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
+InformationStateTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯
 ObservationString(0) = "Current turn: 1\nMy item: 9\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
 ObservationString(1) = "Current turn: 1\nMy item: 0\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯
@@ -114,6 +123,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
 InformationStateString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯
 ObservationString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
 ObservationString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯
@@ -139,6 +150,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "Current turn: 1\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 1\nObserver's trade offer:  4:1\n"
 InformationStateString(1) = "Current turn: 1\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 1\n"
+InformationStateTensor(0): ◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯
+InformationStateTensor(1): ◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯
 ObservationString(0) = "Current turn: 1\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 1\nObserver's trade offer:  4:1\n"
 ObservationString(1) = "Current turn: 1\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 1\n"
 ObservationTensor(0): ◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯
@@ -164,6 +177,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  4:1\nOther players's trade offer:  2:8\n"
 InformationStateString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  2:8\nOther players's trade offer:  4:1\n"
+InformationStateTensor(0): ◉◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◉
+InformationStateTensor(1): ◉◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉
 ObservationString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  4:1\nOther players's trade offer:  2:8\n"
 ObservationString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  2:8\nOther players's trade offer:  4:1\n"
 ObservationTensor(0): ◉◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◉

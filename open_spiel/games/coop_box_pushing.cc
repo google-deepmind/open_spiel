@@ -260,9 +260,6 @@ void CoopBoxPushingState::AddReward(double reward) {
 }
 
 void CoopBoxPushingState::ResolveMoves() {
-  // Set the reward to 0, as it will be changed as a result of resolving moves.
-  reward_ = 0;
-
   // Check for successful move of the big box.
   if (moves_[0] == ActionType::kMoveForward &&
       moves_[1] == ActionType::kMoveForward &&
@@ -330,7 +327,8 @@ void CoopBoxPushingState::ResolveMoves() {
 }
 
 void CoopBoxPushingState::DoApplyAction(Action action) {
-  if (IsSimultaneousNode()) ApplyFlatJointAction(action);
+  reward_ = 0;
+  if (IsSimultaneousNode()) return ApplyFlatJointAction(action);
 
   if (action == kChanceSuccess) {
     // Success.
