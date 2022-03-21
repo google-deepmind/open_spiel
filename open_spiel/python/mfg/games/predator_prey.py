@@ -101,7 +101,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.size = get_param("size", params)
     self.horizon = get_param("horizon", params)
     flat_reward_matrix = np.fromstring(
-        get_param("reward_matrix", params), dtype=np.float64, sep=" ")
+        get_param("reward_matrix", params), dtype=float, sep=" ")
     num_players = get_param("players", params)
     if len(flat_reward_matrix) != num_players**2:
       raise ValueError(
