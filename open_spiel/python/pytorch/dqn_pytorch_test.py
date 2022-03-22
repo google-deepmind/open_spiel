@@ -43,10 +43,15 @@ class DQNTest(absltest.TestCase):
                     state_representation_size=
                     game.information_state_tensor_shape()[0],
                     num_actions=game.num_distinct_actions(),
+                    min_buffer_size_to_learn=10,
                     hidden_layers_sizes=[16],
                     replay_buffer_capacity=1000,
-                    batch_size=5,
-                    epsilon_start=0.25,
+                    update_target_network_every=100,
+                    learn_every=10,
+                    discount_factor=0.99,
+                    epsilon_decay_duration=1000,
+                    batch_size=32,
+                    epsilon_start=0.5,
                     epsilon_end=0.01)
     total_eval_reward = 0
     for _ in range(1000):

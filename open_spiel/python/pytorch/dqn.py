@@ -322,7 +322,7 @@ class DQN(rl_agent.AbstractAgent):
     next_info_states = torch.Tensor([t.next_info_state for t in transitions])
     are_final_steps = torch.Tensor([t.is_final_step for t in transitions])
     legal_actions_mask = torch.Tensor(
-        [t.legal_actions_mask for t in transitions])
+        np.array([t.legal_actions_mask for t in transitions]))
 
     self._q_values = self._q_network(info_states)
     self._target_q_values = self._target_q_network(next_info_states).detach()
