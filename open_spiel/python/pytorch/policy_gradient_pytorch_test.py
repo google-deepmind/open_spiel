@@ -20,6 +20,7 @@ from absl.testing import absltest
 from absl.testing import parameterized
 
 from open_spiel.python import rl_environment
+import numpy as np
 import pyspiel
 import torch
 from open_spiel.python.pytorch import policy_gradient
@@ -91,8 +92,8 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
             hidden_layers_sizes=[8, 8],
             batch_size=16,
             entropy_cost=0.001,
-            critic_learning_rate=0.01,
-            pi_learning_rate=0.01,
+            critic_learning_rate=0.001,
+            pi_learning_rate=0.001,
             num_critic_before_pi=4) for player_id in range(num_players)
     ]
 
@@ -131,5 +132,6 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
 
 if __name__ == "__main__":
+  np.random.seed(SEED)
   torch.manual_seed(SEED)
   absltest.main()
