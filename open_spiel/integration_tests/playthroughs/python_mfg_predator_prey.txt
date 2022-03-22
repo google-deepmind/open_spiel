@@ -83,8 +83,8 @@ ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).x: ◉◯◯◯◯
 ObservationTensor(2).y: ◯◯◯◯◉
 ObservationTensor(2).t: ◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [3.2188758248682 3.2188758248682 3.2188758248682]
-Returns() = [3.2188758248682 3.2188758248682 3.2188758248682]
+Rewards() = [3.2188758248682, 3.2188758248682, 3.2188758248682]
+Returns() = [3.2188758248682, 3.2188758248682, 3.2188758248682]
 LegalActions() = [0, 1, 2, 3, 4]
 StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
 
@@ -144,8 +144,8 @@ ObservationTensor(1).t: ◯◉◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).x: ◉◯◯◯◯
 ObservationTensor(2).y: ◯◯◯◯◉
 ObservationTensor(2).t: ◯◉◯◯◯◯◯◯◯◯◯
-Rewards() = [0 0 0]
-Returns() = [3.2188758248682 3.2188758248682 3.2188758248682]
+Rewards() = [0, 0, 0]
+Returns() = [3.2188758248682, 3.2188758248682, 3.2188758248682]
 DistributionSupport() = ['(pop=0, t=1_a, pos=[0 0])', '(pop=1, t=1_a, pos=[0 0])', '(pop=2, t=1_a, pos=[0 0])', '(pop=0, t=1_a, pos=[0 1])', '(pop=1, t=1_a, pos=[0 1])', '(pop=2, t=1_a, pos=[0 1])', '(pop=0, t=1_a, pos=[0 2])', '(pop=1, t=1_a, pos=[0 2])', '(pop=2, t=1_a, pos=[0 2])', '(pop=0, t=1_a, pos=[0 3])', '(pop=1, t=1_a, pos=[0 3])', '(pop=2, t=1_a, pos=[0 3])', '(pop=0, t=1_a, pos=[0 4])', '(pop=1, t=1_a, pos=[0 4])', '(pop=2, t=1_a, pos=[0 4])', '(pop=0, t=1_a, pos=[1 0])', '(pop=1, t=1_a, pos=[1 0])', '(pop=2, t=1_a, pos=[1 0])', '(pop=0, t=1_a, pos=[1 1])', '(pop=1, t=1_a, pos=[1 1])', '(pop=2, t=1_a, pos=[1 1])', '(pop=0, t=1_a, pos=[1 2])', '(pop=1, t=1_a, pos=[1 2])', '(pop=2, t=1_a, pos=[1 2])', '(pop=0, t=1_a, pos=[1 3])', '(pop=1, t=1_a, pos=[1 3])', '(pop=2, t=1_a, pos=[1 3])', '(pop=0, t=1_a, pos=[1 4])', '(pop=1, t=1_a, pos=[1 4])', '(pop=2, t=1_a, pos=[1 4])', '(pop=0, t=1_a, pos=[2 0])', '(pop=1, t=1_a, pos=[2 0])', '(pop=2, t=1_a, pos=[2 0])', '(pop=0, t=1_a, pos=[2 1])', '(pop=1, t=1_a, pos=[2 1])', '(pop=2, t=1_a, pos=[2 1])', '(pop=0, t=1_a, pos=[2 2])', '(pop=1, t=1_a, pos=[2 2])', '(pop=2, t=1_a, pos=[2 2])', '(pop=0, t=1_a, pos=[2 3])', '(pop=1, t=1_a, pos=[2 3])', '(pop=2, t=1_a, pos=[2 3])', '(pop=0, t=1_a, pos=[2 4])', '(pop=1, t=1_a, pos=[2 4])', '(pop=2, t=1_a, pos=[2 4])', '(pop=0, t=1_a, pos=[3 0])', '(pop=1, t=1_a, pos=[3 0])', '(pop=2, t=1_a, pos=[3 0])', '(pop=0, t=1_a, pos=[3 1])', '(pop=1, t=1_a, pos=[3 1])', '(pop=2, t=1_a, pos=[3 1])', '(pop=0, t=1_a, pos=[3 2])', '(pop=1, t=1_a, pos=[3 2])', '(pop=2, t=1_a, pos=[3 2])', '(pop=0, t=1_a, pos=[3 3])', '(pop=1, t=1_a, pos=[3 3])', '(pop=2, t=1_a, pos=[3 3])', '(pop=0, t=1_a, pos=[3 4])', '(pop=1, t=1_a, pos=[3 4])', '(pop=2, t=1_a, pos=[3 4])', '(pop=0, t=1_a, pos=[4 0])', '(pop=1, t=1_a, pos=[4 0])', '(pop=2, t=1_a, pos=[4 0])', '(pop=0, t=1_a, pos=[4 1])', '(pop=1, t=1_a, pos=[4 1])', '(pop=2, t=1_a, pos=[4 1])', '(pop=0, t=1_a, pos=[4 2])', '(pop=1, t=1_a, pos=[4 2])', '(pop=2, t=1_a, pos=[4 2])', '(pop=0, t=1_a, pos=[4 3])', '(pop=1, t=1_a, pos=[4 3])', '(pop=2, t=1_a, pos=[4 3])', '(pop=0, t=1_a, pos=[4 4])', '(pop=1, t=1_a, pos=[4 4])', '(pop=2, t=1_a, pos=[4 4])']
 
 # Set mean field distribution to be uniform
@@ -174,8 +174,8 @@ ObservationTensor(1).t: ◯◉◯◯◯◯◯◯◯◯◯
 ObservationTensor(2).x: ◉◯◯◯◯
 ObservationTensor(2).y: ◯◯◯◯◉
 ObservationTensor(2).t: ◯◉◯◯◯◯◯◯◯◯◯
-Rewards() = [4.31748811353631 4.31748811353631 4.31748811353631]
-Returns() = [7.53636393840451 7.53636393840451 7.53636393840451]
+Rewards() = [4.31748811353631, 4.31748811353631, 4.31748811353631]
+Returns() = [7.53636393840451, 7.53636393840451, 7.53636393840451]
 LegalActions() = [0, 1, 2, 3, 4]
 StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
 
@@ -209,8 +209,8 @@ ObservationTensor(1).t: ◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(2).x: ◯◉◯◯◯
 ObservationTensor(2).y: ◯◯◯◉◯
 ObservationTensor(2).t: ◯◯◉◯◯◯◯◯◯◯◯
-Rewards() = [0 0 0]
-Returns() = [7.53636393840451 7.53636393840451 7.53636393840451]
+Rewards() = [0, 0, 0]
+Returns() = [7.53636393840451, 7.53636393840451, 7.53636393840451]
 DistributionSupport() = ['(pop=0, t=2_a, pos=[0 0])', '(pop=1, t=2_a, pos=[0 0])', '(pop=2, t=2_a, pos=[0 0])', '(pop=0, t=2_a, pos=[0 1])', '(pop=1, t=2_a, pos=[0 1])', '(pop=2, t=2_a, pos=[0 1])', '(pop=0, t=2_a, pos=[0 2])', '(pop=1, t=2_a, pos=[0 2])', '(pop=2, t=2_a, pos=[0 2])', '(pop=0, t=2_a, pos=[0 3])', '(pop=1, t=2_a, pos=[0 3])', '(pop=2, t=2_a, pos=[0 3])', '(pop=0, t=2_a, pos=[0 4])', '(pop=1, t=2_a, pos=[0 4])', '(pop=2, t=2_a, pos=[0 4])', '(pop=0, t=2_a, pos=[1 0])', '(pop=1, t=2_a, pos=[1 0])', '(pop=2, t=2_a, pos=[1 0])', '(pop=0, t=2_a, pos=[1 1])', '(pop=1, t=2_a, pos=[1 1])', '(pop=2, t=2_a, pos=[1 1])', '(pop=0, t=2_a, pos=[1 2])', '(pop=1, t=2_a, pos=[1 2])', '(pop=2, t=2_a, pos=[1 2])', '(pop=0, t=2_a, pos=[1 3])', '(pop=1, t=2_a, pos=[1 3])', '(pop=2, t=2_a, pos=[1 3])', '(pop=0, t=2_a, pos=[1 4])', '(pop=1, t=2_a, pos=[1 4])', '(pop=2, t=2_a, pos=[1 4])', '(pop=0, t=2_a, pos=[2 0])', '(pop=1, t=2_a, pos=[2 0])', '(pop=2, t=2_a, pos=[2 0])', '(pop=0, t=2_a, pos=[2 1])', '(pop=1, t=2_a, pos=[2 1])', '(pop=2, t=2_a, pos=[2 1])', '(pop=0, t=2_a, pos=[2 2])', '(pop=1, t=2_a, pos=[2 2])', '(pop=2, t=2_a, pos=[2 2])', '(pop=0, t=2_a, pos=[2 3])', '(pop=1, t=2_a, pos=[2 3])', '(pop=2, t=2_a, pos=[2 3])', '(pop=0, t=2_a, pos=[2 4])', '(pop=1, t=2_a, pos=[2 4])', '(pop=2, t=2_a, pos=[2 4])', '(pop=0, t=2_a, pos=[3 0])', '(pop=1, t=2_a, pos=[3 0])', '(pop=2, t=2_a, pos=[3 0])', '(pop=0, t=2_a, pos=[3 1])', '(pop=1, t=2_a, pos=[3 1])', '(pop=2, t=2_a, pos=[3 1])', '(pop=0, t=2_a, pos=[3 2])', '(pop=1, t=2_a, pos=[3 2])', '(pop=2, t=2_a, pos=[3 2])', '(pop=0, t=2_a, pos=[3 3])', '(pop=1, t=2_a, pos=[3 3])', '(pop=2, t=2_a, pos=[3 3])', '(pop=0, t=2_a, pos=[3 4])', '(pop=1, t=2_a, pos=[3 4])', '(pop=2, t=2_a, pos=[3 4])', '(pop=0, t=2_a, pos=[4 0])', '(pop=1, t=2_a, pos=[4 0])', '(pop=2, t=2_a, pos=[4 0])', '(pop=0, t=2_a, pos=[4 1])', '(pop=1, t=2_a, pos=[4 1])', '(pop=2, t=2_a, pos=[4 1])', '(pop=0, t=2_a, pos=[4 2])', '(pop=1, t=2_a, pos=[4 2])', '(pop=2, t=2_a, pos=[4 2])', '(pop=0, t=2_a, pos=[4 3])', '(pop=1, t=2_a, pos=[4 3])', '(pop=2, t=2_a, pos=[4 3])', '(pop=0, t=2_a, pos=[4 4])', '(pop=1, t=2_a, pos=[4 4])', '(pop=2, t=2_a, pos=[4 4])']
 
 # Set mean field distribution to be uniform
@@ -239,8 +239,8 @@ ObservationTensor(1).t: ◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(2).x: ◯◉◯◯◯
 ObservationTensor(2).y: ◯◯◯◉◯
 ObservationTensor(2).t: ◯◯◉◯◯◯◯◯◯◯◯
-Rewards() = [4.31748811353631 4.31748811353631 4.31748811353631]
-Returns() = [11.8538520519408 11.8538520519408 11.8538520519408]
+Rewards() = [4.31748811353631, 4.31748811353631, 4.31748811353631]
+Returns() = [11.8538520519408, 11.8538520519408, 11.8538520519408]
 LegalActions() = [0, 1, 2, 3, 4]
 StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
 
@@ -274,8 +274,8 @@ ObservationTensor(1).t: ◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(2).x: ◯◯◯◉◯
 ObservationTensor(2).y: ◯◯◯◉◯
 ObservationTensor(2).t: ◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0 0 0]
-Returns() = [11.8538520519408 11.8538520519408 11.8538520519408]
+Rewards() = [0, 0, 0]
+Returns() = [11.8538520519408, 11.8538520519408, 11.8538520519408]
 DistributionSupport() = ['(pop=0, t=3_a, pos=[0 0])', '(pop=1, t=3_a, pos=[0 0])', '(pop=2, t=3_a, pos=[0 0])', '(pop=0, t=3_a, pos=[0 1])', '(pop=1, t=3_a, pos=[0 1])', '(pop=2, t=3_a, pos=[0 1])', '(pop=0, t=3_a, pos=[0 2])', '(pop=1, t=3_a, pos=[0 2])', '(pop=2, t=3_a, pos=[0 2])', '(pop=0, t=3_a, pos=[0 3])', '(pop=1, t=3_a, pos=[0 3])', '(pop=2, t=3_a, pos=[0 3])', '(pop=0, t=3_a, pos=[0 4])', '(pop=1, t=3_a, pos=[0 4])', '(pop=2, t=3_a, pos=[0 4])', '(pop=0, t=3_a, pos=[1 0])', '(pop=1, t=3_a, pos=[1 0])', '(pop=2, t=3_a, pos=[1 0])', '(pop=0, t=3_a, pos=[1 1])', '(pop=1, t=3_a, pos=[1 1])', '(pop=2, t=3_a, pos=[1 1])', '(pop=0, t=3_a, pos=[1 2])', '(pop=1, t=3_a, pos=[1 2])', '(pop=2, t=3_a, pos=[1 2])', '(pop=0, t=3_a, pos=[1 3])', '(pop=1, t=3_a, pos=[1 3])', '(pop=2, t=3_a, pos=[1 3])', '(pop=0, t=3_a, pos=[1 4])', '(pop=1, t=3_a, pos=[1 4])', '(pop=2, t=3_a, pos=[1 4])', '(pop=0, t=3_a, pos=[2 0])', '(pop=1, t=3_a, pos=[2 0])', '(pop=2, t=3_a, pos=[2 0])', '(pop=0, t=3_a, pos=[2 1])', '(pop=1, t=3_a, pos=[2 1])', '(pop=2, t=3_a, pos=[2 1])', '(pop=0, t=3_a, pos=[2 2])', '(pop=1, t=3_a, pos=[2 2])', '(pop=2, t=3_a, pos=[2 2])', '(pop=0, t=3_a, pos=[2 3])', '(pop=1, t=3_a, pos=[2 3])', '(pop=2, t=3_a, pos=[2 3])', '(pop=0, t=3_a, pos=[2 4])', '(pop=1, t=3_a, pos=[2 4])', '(pop=2, t=3_a, pos=[2 4])', '(pop=0, t=3_a, pos=[3 0])', '(pop=1, t=3_a, pos=[3 0])', '(pop=2, t=3_a, pos=[3 0])', '(pop=0, t=3_a, pos=[3 1])', '(pop=1, t=3_a, pos=[3 1])', '(pop=2, t=3_a, pos=[3 1])', '(pop=0, t=3_a, pos=[3 2])', '(pop=1, t=3_a, pos=[3 2])', '(pop=2, t=3_a, pos=[3 2])', '(pop=0, t=3_a, pos=[3 3])', '(pop=1, t=3_a, pos=[3 3])', '(pop=2, t=3_a, pos=[3 3])', '(pop=0, t=3_a, pos=[3 4])', '(pop=1, t=3_a, pos=[3 4])', '(pop=2, t=3_a, pos=[3 4])', '(pop=0, t=3_a, pos=[4 0])', '(pop=1, t=3_a, pos=[4 0])', '(pop=2, t=3_a, pos=[4 0])', '(pop=0, t=3_a, pos=[4 1])', '(pop=1, t=3_a, pos=[4 1])', '(pop=2, t=3_a, pos=[4 1])', '(pop=0, t=3_a, pos=[4 2])', '(pop=1, t=3_a, pos=[4 2])', '(pop=2, t=3_a, pos=[4 2])', '(pop=0, t=3_a, pos=[4 3])', '(pop=1, t=3_a, pos=[4 3])', '(pop=2, t=3_a, pos=[4 3])', '(pop=0, t=3_a, pos=[4 4])', '(pop=1, t=3_a, pos=[4 4])', '(pop=2, t=3_a, pos=[4 4])']
 
 # Set mean field distribution to be uniform
@@ -384,5 +384,5 @@ ObservationTensor(1).t: ◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(2).x: ◯◯◯◯◉
 ObservationTensor(2).y: ◯◯◯◉◯
 ObservationTensor(2).t: ◯◯◯◯◯◯◯◯◯◯◉
-Rewards() = [0 0 0]
-Returns() = [42.076268846695 42.076268846695 42.076268846695]
+Rewards() = [0, 0, 0]
+Returns() = [42.076268846695, 42.076268846695, 42.076268846695]

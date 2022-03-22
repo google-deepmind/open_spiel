@@ -44,20 +44,24 @@ class DQNTest(absltest.TestCase):
                     game.information_state_tensor_shape()[0],
                     num_actions=game.num_distinct_actions(),
                     hidden_layers_sizes=[16],
-                    replay_buffer_capacity=100,
+                    replay_buffer_capacity=1000,
                     batch_size=5,
-                    epsilon_start=0.1,
+                    epsilon_start=0.25,
                     epsilon_end=0.01)
-    total_reward = 0
-
+    total_eval_reward = 0
     for _ in range(1000):
       time_step = env.reset()
       while not time_step.last():
         agent_output = agent.step(time_step)
         time_step = env.step([agent_output.action])
-        total_reward += time_step.rewards[0]
       agent.step(time_step)
-    self.assertGreaterEqual(total_reward, 250)
+    for _ in range(1000):
+      time_step = env.reset()
+      while not time_step.last():
+        agent_output = agent.step(time_step, is_evaluation=True)
+        time_step = env.step([agent_output.action])
+        total_eval_reward += time_step.rewards[0]
+    self.assertGreaterEqual(total_eval_reward, 250)
 
   def test_run_tic_tac_toe(self):
     env = rl_environment.Environment("tic_tac_toe")
