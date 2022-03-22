@@ -63,8 +63,8 @@ ObservationString(0) = "(0, 0)"
 ObservationTensor(0).x: ◯
 ObservationTensor(0).t: ◯
 ObservationTensor(0): ◯◯
-Rewards() = [-5.062500000000002]
-Returns() = [-5.062500000000002]
+Rewards() = [-5.0625]
+Returns() = [-5.0625]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6"]
 
@@ -104,8 +104,8 @@ ObservationString(0) = "(2, 1)_a"
 ObservationTensor(0).x = [2]
 ObservationTensor(0).t: ◉
 ObservationTensor(0) = [2.0, 1.0]
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 DistributionSupport() = ['(0, 1)_a', '(1, 1)_a', '(2, 1)_a', '(3, 1)_a', '(4, 1)_a', '(5, 1)_a', '(6, 1)_a', '(7, 1)_a', '(8, 1)_a', '(9, 1)_a']
 
 # Set mean field distribution to be uniform
@@ -124,8 +124,8 @@ ObservationString(0) = "(2, 1)"
 ObservationTensor(0).x = [2]
 ObservationTensor(0).t: ◉
 ObservationTensor(0) = [2.0, 1.0]
-Rewards() = [-1.562500000000001]
-Returns() = [-1.562500000000001]
+Rewards() = [-1.5625]
+Returns() = [-1.5625]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6"]
 
@@ -149,8 +149,8 @@ ObservationString(0) = "(7, 2)_a"
 ObservationTensor(0).x = [7]
 ObservationTensor(0).t = [2.0]
 ObservationTensor(0) = [7.0, 2.0]
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 DistributionSupport() = ['(0, 2)_a', '(1, 2)_a', '(2, 2)_a', '(3, 2)_a', '(4, 2)_a', '(5, 2)_a', '(6, 2)_a', '(7, 2)_a', '(8, 2)_a', '(9, 2)_a']
 
 # Set mean field distribution to be uniform
@@ -169,8 +169,8 @@ ObservationString(0) = "(7, 2)"
 ObservationTensor(0).x = [7]
 ObservationTensor(0).t = [2.0]
 ObservationTensor(0) = [7.0, 2.0]
-Rewards() = [-5.987499999999999]
-Returns() = [-5.987499999999999]
+Rewards() = [-5.9875]
+Returns() = [-5.9875]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["0", "1", "2", "3", "4", "5", "6"]
 
@@ -194,8 +194,8 @@ ObservationString(0) = "(2, 3)_a"
 ObservationTensor(0).x = [2]
 ObservationTensor(0).t = [3.0]
 ObservationTensor(0) = [2.0, 3.0]
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 DistributionSupport() = ['(0, 3)_a', '(1, 3)_a', '(2, 3)_a', '(3, 3)_a', '(4, 3)_a', '(5, 3)_a', '(6, 3)_a', '(7, 3)_a', '(8, 3)_a', '(9, 3)_a']
 
 # Set mean field distribution to be uniform
@@ -294,5 +294,5 @@ ObservationString(0) = "(1, 10)_a"
 ObservationTensor(0).x: ◉
 ObservationTensor(0).t = [10.0]
 ObservationTensor(0) = [1.0, 10.0]
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]

@@ -52,8 +52,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0 0]
+Returns() = [0 0]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -146,8 +146,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-0.1, -0.1]
+Rewards() = [-0.1 -0.1]
+Returns() = [-0.1 -0.1]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -190,8 +190,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-0.2, -0.2]
+Rewards() = [-0.1 -0.1]
+Returns() = [-0.2 -0.2]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -346,8 +346,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-0.9999999999999999, -0.9999999999999999]
+Rewards() = [-0.1 -0.1]
+Returns() = [-1 -1]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -534,8 +534,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "wall"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-2.0000000000000004, -2.0000000000000004]
+Rewards() = [-0.1 -0.1]
+Returns() = [-2 -2]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -722,8 +722,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-3.0000000000000013, -3.0000000000000013]
+Rewards() = [-0.1 -0.1]
+Returns() = [-3 -3]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -910,8 +910,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "small box"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◉◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-4.000000000000002, -4.000000000000002]
+Rewards() = [-0.1 -0.1]
+Returns() = [-4 -4]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -1098,8 +1098,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "small box"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◉◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-4.999999999999998, -4.999999999999998]
+Rewards() = [-0.1 -0.1]
+Returns() = [-5 -5]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -1286,8 +1286,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "field"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◉◯◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-5.999999999999995, -5.999999999999995]
+Rewards() = [-0.1 -0.1]
+Returns() = [-5.99999999999999 -5.99999999999999]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -1474,8 +1474,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "small box"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◉◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-6.999999999999991, -6.999999999999991]
+Rewards() = [-0.1 -0.1]
+Returns() = [-6.99999999999999 -6.99999999999999]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -1662,8 +1662,8 @@ ObservationString(0) = "field"
 ObservationString(1) = "wall"
 ObservationTensor(0): ◉◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-7.999999999999988, -7.999999999999988]
+Rewards() = [-0.1 -0.1]
+Returns() = [-7.99999999999999 -7.99999999999999]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -1850,8 +1850,8 @@ ObservationString(0) = "big box"
 ObservationString(1) = "wall"
 ObservationTensor(0): ◯◯◯◯◉
 ObservationTensor(1): ◯◉◯◯◯
-Rewards() = [-10.1, -10.1]
-Returns() = [-34.0, -34.0]
+Rewards() = [-10.1 -10.1]
+Returns() = [-34 -34]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["turn left", "turn right", "move forward", "stay"]
@@ -2038,5 +2038,5 @@ ObservationString(0) = "big box"
 ObservationString(1) = "wall"
 ObservationTensor(0): ◯◯◯◯◉
 ObservationTensor(1): ◯◉◯◯◯
-Rewards() = [-0.1, -0.1]
-Returns() = [-55.000000000000014, -55.000000000000014]
+Rewards() = [-0.1 -0.1]
+Returns() = [-55 -55]

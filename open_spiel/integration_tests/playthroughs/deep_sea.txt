@@ -49,8 +49,8 @@ ObservationTensor(0): ◉◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["LEFT", "RIGHT"]
 
@@ -76,8 +76,8 @@ ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["LEFT", "RIGHT"]
 

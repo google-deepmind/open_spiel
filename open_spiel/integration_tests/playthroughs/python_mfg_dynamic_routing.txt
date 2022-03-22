@@ -65,7 +65,7 @@ ObservationTensor(0).location: ◯◉◯◯◯◯◯◯
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◯
-Rewards() = [0.0]
+Rewards() = [0]
 Returns() = [0]
 LegalActions() = [2, 3]
 StringLegalActions() = ["Vehicle 0 would like to move to A->B.", "Vehicle 0 would like to move to A->C."]
@@ -87,7 +87,7 @@ ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◯◉◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◯
-Rewards() = [0.0]
+Rewards() = [0]
 Returns() = [0]
 DistributionSupport() = ["Location=A->C, waiting_time=-1, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=0, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=1, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=2, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=3, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=4, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=5, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=6, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=7, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=8, t=1_mean_field, destination='D->E'", "Location=A->C, waiting_time=9, t=1_mean_field, destination='D->E'"]
 
@@ -108,7 +108,7 @@ ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◯◉◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
-Rewards() = [0.0]
+Rewards() = [0]
 Returns() = [0]
 LegalActions() = [0]
 StringLegalActions() = ["Vehicle 0 reach a sink node or its destination."]
@@ -130,7 +130,7 @@ ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
-Rewards() = [0.0]
+Rewards() = [0]
 Returns() = [0]
 DistributionSupport() = ["Location=A->C, waiting_time=-1, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=0, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=1, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=2, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=3, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=4, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=5, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=6, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=7, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=8, t=2_mean_field, destination='D->E'", "Location=A->C, waiting_time=9, t=2_mean_field, destination='D->E'"]
 
@@ -151,7 +151,7 @@ ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
-Rewards() = [0.0]
+Rewards() = [0]
 Returns() = [0]
 LegalActions() = [0]
 StringLegalActions() = ["Vehicle 0 reach a sink node or its destination."]
@@ -173,7 +173,7 @@ ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
-Rewards() = [0.0]
+Rewards() = [0]
 Returns() = [0]
 DistributionSupport() = ["Location=A->C, waiting_time=-1, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=0, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=1, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=2, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=3, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=4, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=5, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=6, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=7, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=8, t=3_mean_field, destination='D->E'", "Location=A->C, waiting_time=9, t=3_mean_field, destination='D->E'"]
 
@@ -246,5 +246,5 @@ ObservationTensor(0).location: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
 ObservationTensor(0).time: ◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).waiting: ◯
-Rewards() = [-4.0]
-Returns() = [-4.0]
+Rewards() = [-4]
+Returns() = [-4]

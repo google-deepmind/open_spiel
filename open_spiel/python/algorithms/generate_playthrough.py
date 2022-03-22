@@ -34,6 +34,7 @@ from open_spiel.python.observation import make_observation
 import pyspiel
 
 
+
 def _escape(x):
   """Returns a newline-free backslash-escaped version of the given string."""
   x = x.replace("\\", R"\\")
@@ -73,6 +74,14 @@ def _format_vec(vec):
 
 def _format_matrix(mat):
   return np.char.array([_format_vec(row) for row in mat])
+
+
+def _format_float(x):
+  return "{:.15g}".format(x)
+
+
+def _format_float_vector(v):
+  return "[" + " ".join([_format_float(x) for x in v]) + "]"
 
 
 def _format_tensor(tensor, tensor_name, max_cols=120):
@@ -378,8 +387,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
-      add_line("Rewards() = {}".format(state.rewards()))
-      add_line("Returns() = {}".format(state.returns()))
+      add_line("Rewards() = {}".format(_format_float_vector(state.rewards())))
+      add_line("Returns() = {}".format(_format_float_vector(state.returns())))
     if state.is_terminal():
       break
     if state.is_chance_node():
