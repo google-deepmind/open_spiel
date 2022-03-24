@@ -4,14 +4,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow.compat.v1 as tf
-
+from absl.testing import absltest
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import tabular_qlearner
 import pyspiel
-
-# Temporarily disable TF2 behavior until code is updated.
-tf.disable_v2_behavior()
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
@@ -23,7 +19,7 @@ SIMPLE_EFG_DATA = """
 """
 
 
-class QlearnerTest(tf.test.TestCase):
+class QlearnerTest(absltest.TestCase):
 
     def test_simple_game(self):
         game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
@@ -43,4 +39,4 @@ class QlearnerTest(tf.test.TestCase):
 
 
 if __name__ == "__main__":
-    tf.test.main()
+    absltest.main()
