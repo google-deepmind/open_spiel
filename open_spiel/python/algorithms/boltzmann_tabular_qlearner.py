@@ -26,7 +26,7 @@ from open_spiel.python import rl_tools
 from open_spiel.python.algorithms import tabular_qlearner
 
 
-class BoltzmannQLearner(tabular_qlearner.Qlearner):
+class BoltzmannQLearner(tabular_qlearner.QLearner):
     """Tabular Boltzmann Q-Learning agent.
 
     See open_spiel/python/examples/tic_tac_toe_qlearner.py for an usage example.
@@ -40,7 +40,7 @@ class BoltzmannQLearner(tabular_qlearner.Qlearner):
                  num_actions,
                  step_size=0.1,
                  discount_factor=1.0,
-                 temperature_schedule=rl_tools.ConstantSchedule(1.),
+                 temperature_schedule=rl_tools.ConstantSchedule(.5),
                  centralized=False):
         super().__init__(
             player_id,
