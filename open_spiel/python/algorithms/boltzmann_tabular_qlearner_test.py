@@ -7,7 +7,11 @@ from __future__ import print_function
 from absl.testing import absltest
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import boltzmann_tabular_qlearner
+import numpy as np
 import pyspiel
+
+# Fixed seed to make test non stochastic.
+SEED = 10000
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
@@ -29,14 +33,24 @@ class BoltzmannQlearnerTest(absltest.TestCase):
         total_reward = 0
 
         for _ in range(100):
-            time_step = env.reset()
-            while not time_step.last():
-                agent_output = agent.step(time_step)
-                time_step = env.step([agent_output.action])
-                total_reward += time_step.rewards[0]
-            agent.step(time_step)
-        self.assertGreaterEqual(total_reward, 75)
+            total_eval_reward = 0
+            for _ in range(1000):
+                time_step = env.reset()
+                while not time_step.last():
+                    agent_output = agent.step(time_step)
+                    time_step = env.step([agent_output.action])
+                    total_reward += time_step.rewards[0]
+                agent.step(time_step)
+            self.assertGreaterEqual(total_reward, 75)
+            for _ in range(1000):
+                time_step = env.reset()
+                while not time_step.last():
+                    agent_output = agent.step(time_step, is_evaluation=True)
+                    time_step = env.step([agent_output.action])
+                    total_eval_reward += time_step.rewards[0]
+            self.assertGreaterEqual(total_eval_reward, 250)
 
 
 if __name__ == "__main__":
+    np.random.seed(SEED)
     absltest.main()
