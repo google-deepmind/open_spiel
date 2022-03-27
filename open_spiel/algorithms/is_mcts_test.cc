@@ -27,7 +27,7 @@ namespace {
 
 constexpr const int kSeed = 93879211;
 
-void PlayGame(const Game &game, algorithms::ISMCTSBot *bot, std::mt19937 *rng) {
+void PlayGame(const Game& game, algorithms::ISMCTSBot* bot, std::mt19937* rng) {
   std::unique_ptr<State> state = game.NewInitialState();
   while (!state->IsTerminal()) {
     std::cout << "State:" << std::endl;
@@ -52,15 +52,15 @@ void PlayGame(const Game &game, algorithms::ISMCTSBot *bot, std::mt19937 *rng) {
   std::cout << "Returns: " << absl::StrJoin(state->Returns(), " ") << std::endl;
 }
 
-void ISMCTSTest_PlayGame(const std::string &game_name) {
+void ISMCTSTest_PlayGame(const std::string& game_name) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
   auto evaluator =
       std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);
 
   for (algorithms::ISMCTSFinalPolicyType type:
-      {algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
-       algorithms::ISMCTSFinalPolicyType::kMaxVisitCount,
-       algorithms::ISMCTSFinalPolicyType::kMaxValue}) {
+       {algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
+        algorithms::ISMCTSFinalPolicyType::kMaxVisitCount,
+        algorithms::ISMCTSFinalPolicyType::kMaxValue}) {
     auto bot1 = std::make_unique<algorithms::ISMCTSBot>(
         kSeed, evaluator, 5.0, 1000, algorithms::kUnlimitedNumWorldSamples,
         type, false, false);
@@ -101,7 +101,7 @@ void ISMCTS_LeducObservationTest() {
 }  // namespace
 }  // namespace open_spiel
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   open_spiel::ISMCTS_BasicPlayGameTest_Kuhn();
   open_spiel::ISMCTS_BasicPlayGameTest_Leduc();
   open_spiel::ISMCTS_LeducObservationTest();
