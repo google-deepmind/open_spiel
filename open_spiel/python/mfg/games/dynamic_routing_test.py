@@ -243,6 +243,8 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     """Check that a vehicle cannot choose to move if it cannot move yet."""
     # TODO(cabannes): test apply_actions().
 
+  @absltest.skip(
+      "Test of OMD on Sioux Falls is disabled as it takes a long time to run.")
   def test_online_mirror_descent_sioux_falls_dummy(self):
     """Test that online mirror descent can be used on the Sioux Falls game."""
     mfg_game = factory.create_game_with_setting(
@@ -251,9 +253,7 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     omd = mirror_descent.MirrorDescent(mfg_game)
     for _ in range(_NUMBER_OF_ITERATIONS_TESTS):
       omd.iteration()
-    # Nash conv computation is disabled for this test as it takes a long time to
-    # run.
-    # nash_conv.NashConv(mfg_game, omd.get_policy())
+    nash_conv.NashConv(mfg_game, omd.get_policy())
 
 
 if __name__ == "__main__":
