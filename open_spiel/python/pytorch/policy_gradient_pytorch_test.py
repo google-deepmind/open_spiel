@@ -36,6 +36,7 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
                         ("kuhn_poker", "leduc_poker")))
   def test_run_game(self, loss_str, game_name):
     env = rl_environment.Environment(game_name)
+    env.seed(SEED)
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
@@ -45,7 +46,7 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
             info_state_size=info_state_size,
             num_actions=num_actions,
             loss_str=loss_str,
-            hidden_layers_sizes=[8, 8],
+            hidden_layers_sizes=[32, 32],
             batch_size=16,
             entropy_cost=0.001,
             critic_learning_rate=0.01,
@@ -78,9 +79,10 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
         "ranks": 3,
         "hand_size": 2,
         "max_information_tokens": 3,
-        "discount": 0.
+        "discount": 0.99
     }
     env = rl_environment.Environment(game, **env_configs)
+    env.seed(SEED)
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
