@@ -19,14 +19,6 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: macos-11
-          OS_PYTHON_VERSION: "3.9"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Standard or older platforms with older Python versions.
         - os: macos-10.15
           OS_PYTHON_VERSION: "3.9"
           TRAVIS_USE_NOX: 0
@@ -34,6 +26,7 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+        # Standard or older platforms with older Python versions.
         - os: macos-10.15
           OS_PYTHON_VERSION: "3.8"
           TRAVIS_USE_NOX: 0
