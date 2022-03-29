@@ -141,6 +141,12 @@ class SheriffGame final : public Game {
   double UtilitySum() const override;
   int MaxGameLength() const override;
   std::string ActionToString(Player player, Action action_id) const override;
+  std::vector<int> InformationStateTensorShape() const override;
+
+  // Information about the specific variant being played.
+  uint32_t num_rounds() const { return conf.num_rounds; }
+  uint32_t max_items() const { return conf.max_items; }
+  uint32_t max_bribe() const { return conf.max_bribe; }
 
   // Action (de)serialization routines
   // =================================
@@ -193,6 +199,8 @@ class SheriffState final : public State {
   std::unique_ptr<State> Clone() const override;
   std::string InformationStateString(Player player) const override;
   void UndoAction(Player player, Action action_id) override;
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
 
  protected:
   void DoApplyAction(Action action_id) override;
