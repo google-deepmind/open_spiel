@@ -130,7 +130,7 @@ constexpr std::array<std::array<int, 10>, 4> col_offsets = {
      {0, 0, -1, 1, 0, 0, 0, -1, -1, 0}}};
 }  // namespace
 
-LaserTagState::LaserTagState(std::shared_ptr<const Game> game, const Grid &grid)
+LaserTagState::LaserTagState(std::shared_ptr<const Game> game, const Grid& grid)
     : SimMoveState(game), grid_(grid) {
   GameParameters params = game_->GetParameters();
   auto it = params.find("fully_obs");
@@ -513,10 +513,9 @@ void LaserTagState::ObservationTensor(int player,
   }
 }
 
-void LaserTagState::FullObservationTensor(absl::Span<float> values) const{
-
+void LaserTagState::FullObservationTensor(absl::Span<float> values) const {
   TensorView<3> view(values, {kCellStates, grid_.num_rows, grid_.num_cols},
-		     true);
+                     true);
 
   for (int r = 0; r < grid_.num_rows; r++) {
     for (int c = 0; c < grid_.num_cols; c++) {
@@ -528,15 +527,14 @@ void LaserTagState::FullObservationTensor(absl::Span<float> values) const{
 }
 
 void LaserTagState::PartialObservationTensor(int player,
-					     absl::Span<float> values) const{
-  /* Get observation tensor for player with partial observability.
-
-     Properties of the observation grid
-     1. Player is always located in center row obs_back_ rows from the bottom
-        row.
-     2. If any cell of the players field of vision is outside the grid, then
-        these cells are treated as obstacles.
-   */
+                                             absl::Span<float> values) const {
+  // Get observation tensor for player with partial observability.
+  //
+  //   Properties of the observation grid
+  //   1. Player is always located in center row obs_back_ rows from the bottom
+  //      row.
+  //   2. If any cell of the players field of vision is outside the grid, then
+  //      these cells are treated as obstacles.
 
   int num_obs_rows = obs_front_ + obs_back_ + 1;
   int num_obs_cols = obs_side_ * 2 + 1;
@@ -550,33 +548,32 @@ void LaserTagState::PartialObservationTensor(int player,
   int plane = -1;
   for (int r = 0; r < num_obs_rows; r++) {
     for (int c = 0; c < num_obs_cols; c++) {
-
       // map from player observation grid to game grid
       switch (player_facing_[player]) {
-	case kNorth:
-	  grid_row = player_row + r - obs_front_;
-	  grid_col = player_col + c - obs_side_;
-	  break;
-	case kSouth:
-	  grid_row = player_row + obs_front_ - r;
+        case kNorth:
+          grid_row = player_row + r - obs_front_;
+          grid_col = player_col + c - obs_side_;
+          break;
+        case kSouth:
+          grid_row = player_row + obs_front_ - r;
           grid_col = player_col + obs_side_ - c;
           break;
-	case kEast:
-	  grid_row = player_row + c - obs_side_;
+        case kEast:
+          grid_row = player_row + c - obs_side_;
           grid_col = player_col + obs_front_ - r;
           break;
-	case kWest:
-	  grid_row = player_row + obs_side_ - c;
-	  grid_col = player_col + r - obs_front_;
-	  break;
+        case kWest:
+          grid_row = player_row + obs_side_ - c;
+          grid_col = player_col + r - obs_front_;
+          break;
       }
 
       if (0 <= grid_row && grid_row < grid_.num_rows
-	  && 0 <= grid_col && grid_col < grid_.num_cols) {
-	plane = observation_plane(grid_row, grid_col);
+          && 0 <= grid_col && grid_col < grid_.num_cols) {
+        plane = observation_plane(grid_row, grid_col);
       } else {
-	// observed cell out-of-bounds of game grid
-	plane = 3;    // '*'
+        // observed cell out-of-bounds of game grid
+        plane = 3;    // '*'
       }
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
       view[{plane, r, c}] = 1.0;
@@ -620,8 +617,11 @@ double LaserTagGame::MaxUtility() const {
 }
 
 std::vector<int> LaserTagGame::ObservationTensorShape() const {
-  if (fully_obs_) return {kCellStates, grid_.num_rows, grid_.num_cols};
-  return {kCellStates, obs_front_ + obs_back_ + 1, obs_side_ * 2 + 1};
+  if (fully_obs_) {
+    return {kCellStates, grid_.num_rows, grid_.num_cols};
+  } else {
+    return {kCellStates, obs_front_ + obs_back_ + 1, obs_side_ * 2 + 1};
+  }
 }
 
 namespace {
@@ -659,7 +659,7 @@ Grid ParseGrid(const std::string& grid_string) {
 }
 }  // namespace
 
-LaserTagGame::LaserTagGame(const GameParameters &params)
+LaserTagGame::LaserTagGame(const GameParameters& params)
     : SimMoveGame(GameTypeForParams(params), params),
       grid_(ParseGrid(ParameterValue<std::string>("grid"))),
       horizon_(ParameterValue<int>("horizon")),
