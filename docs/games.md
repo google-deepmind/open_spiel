@@ -20,6 +20,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Cliff Walking](#cliff-walking)
 <font color="orange"><b>~</b></font>         | [Clobber](#clobber)
 <font color="orange"><b>~</b></font>         | [Coin Game](#coin-game)
+<font color="orange"><b>~</b></font>         | [Colored Trails](#colored-trails)
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
@@ -191,6 +192,19 @@ Status                                       | Game
 *   2 players.
 *   [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent
     Reinforcement Learning](https://arxiv.org/abs/1802.09640)
+
+### Colored Trails
+
+*   Agents negotiations for chips that they they play on a colored grid to move
+    closer to the goal.
+*   Agents on a grid.
+*   Research game.
+*   Non-deterministic (randomized board & chip configuration).
+*   Imperfect information.
+*   3 players.
+*   [Ya'akov et al. '10](https://dash.harvard.edu/handle/1/4726287),
+    [Fecici & Pfeffer '08](https://dl.acm.org/doi/10.5555/1402383.1402431),
+    [de Jong et al. '11](https://www.ifaamas.org/Proceedings/aamas2011/papers/C4_R57.pdf)
 
 ### Connect Four
 
