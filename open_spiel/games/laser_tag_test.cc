@@ -169,6 +169,7 @@ std::vector<float> get_obs_tensor_from_string(const std::string& obs_string,
         break;
       default:
         // Reached 'O' in "Orientations"
+        SPIEL_CHECK_EQ(obs_string[i], 'O');
         return tensor;
     }
   }
