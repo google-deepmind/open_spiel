@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
@@ -102,11 +103,7 @@ class LaserTagState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
-  std::string ObservationString(int player) const override {
-    SPIEL_CHECK_GE(player, 0);
-    SPIEL_CHECK_LT(player, num_players_);
-    return ToString();
-  }
+  std::string ObservationString(int player) const override;
   void ObservationTensor(int player, absl::Span<float> values) const override;
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
@@ -128,6 +125,8 @@ class LaserTagState : public SimMoveState {
   bool ResolveMove(int player, int move);  // Return true if there was a tag
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
+  std::vector<int> map_observation_to_grid(int player, int r, int c) const;
+  std::string PartialObservationString(int player) const;
   void FullObservationTensor(absl::Span<float> values) const;
   void PartialObservationTensor(int player, absl::Span<float> values) const;
 

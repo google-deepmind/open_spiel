@@ -468,6 +468,59 @@ std::string LaserTagState::ToString() const {
   return result;
 }
 
+std::string LaserTagState::ObservationString(int player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  if (fully_obs_) {
+    return ToString();
+  } else {
+    return PartialObservationString(player);
+  }
+}
+
+std::string LaserTagState::PartialObservationString(int player) const {
+  std::string result = "";
+
+  std::vector<int> grid_position = {-1, -1};
+  std::vector<bool> player_visible = {false, false};
+  char value = ' ';
+  for (int r = 0; r < obs_front_ + obs_back_ + 1; r++) {
+    for (int c = 0; c < obs_side_ * 2 + 1; c++) {
+      grid_position = map_observation_to_grid(player, r, c);
+
+      if (grid_position[0] < 0) {
+        // observed cell out-of-bounds of game grid
+        result += "*";
+      } else {
+        value = field(grid_position[0], grid_position[1]);
+        result += value;
+        if (value == 'A') {
+          player_visible[0] = true;
+        } else if (value == 'B') {
+          player_visible[1] = true;
+        }
+      }
+    }
+
+    absl::StrAppend(&result, "\n");
+  }
+
+  absl::StrAppend(&result, "Orientations:");
+  for (int p = 0; p < num_players_; p++) {
+    if (player_visible[p]) {
+      absl::StrAppend(&result, " ", player_facing_[p]);
+    } else {
+      absl::StrAppend(&result, " -1");
+    }
+  }
+
+  absl::StrAppend(&result, "\n");
+
+  if (IsChanceNode()) absl::StrAppend(&result, "Chance Node");
+  return result;
+}
+
 bool LaserTagState::IsTerminal() const {
   return ((horizon_ >= 0 && total_moves_ >= horizon_) ||
           (horizon_ < 0 && num_tags_ > 0));
@@ -499,6 +552,40 @@ int LaserTagState::observation_plane(int r, int c) const {
   }
 
   return plane;
+}
+
+std::vector<int> LaserTagState::map_observation_to_grid(int player, int r,
+                                                        int c) const {
+  // Maps from observation tensor position to game grid position
+  // Returns [-1, -1] if the result if outside of game grid bounds
+  int grid_row = -1;
+  int grid_col = -1;
+  switch (player_facing_[player]) {
+  case kNorth:
+    grid_row = player_row_[player] + r - obs_front_;
+    grid_col = player_col_[player] + c - obs_side_;
+    break;
+  case kSouth:
+    grid_row = player_row_[player] + obs_front_ - r;
+    grid_col = player_col_[player] + obs_side_ - c;
+    break;
+  case kEast:
+    grid_row = player_row_[player] + c - obs_side_;
+    grid_col = player_col_[player] + obs_front_ - r;
+    break;
+  case kWest:
+    grid_row = player_row_[player] + obs_side_ - c;
+    grid_col = player_col_[player] + r - obs_front_;
+    break;
+  }
+
+  if (0 <= grid_row && grid_row < grid_.num_rows
+      && 0 <= grid_col && grid_col < grid_.num_cols) {
+    return {grid_row, grid_col};
+  } else {
+    // observed cell out-of-bounds of game grid
+    return {-1, -1};
+  }
 }
 
 void LaserTagState::ObservationTensor(int player,
@@ -535,46 +622,23 @@ void LaserTagState::PartialObservationTensor(int player,
   //      row.
   //   2. If any cell of the players field of vision is outside the grid, then
   //      these cells are treated as obstacles.
-
   int num_obs_rows = obs_front_ + obs_back_ + 1;
   int num_obs_cols = obs_side_ * 2 + 1;
   TensorView<3> view(values, {kCellStates, num_obs_rows, num_obs_cols}, true);
 
-  int player_row = player_row_[player];
-  int player_col = player_col_[player];
-
-  int grid_row = -1;
-  int grid_col = -1;
+  std::vector<int> grid_position = {-1, -1};
   int plane = -1;
   for (int r = 0; r < num_obs_rows; r++) {
     for (int c = 0; c < num_obs_cols; c++) {
-      // map from player observation grid to game grid
-      switch (player_facing_[player]) {
-        case kNorth:
-          grid_row = player_row + r - obs_front_;
-          grid_col = player_col + c - obs_side_;
-          break;
-        case kSouth:
-          grid_row = player_row + obs_front_ - r;
-          grid_col = player_col + obs_side_ - c;
-          break;
-        case kEast:
-          grid_row = player_row + c - obs_side_;
-          grid_col = player_col + obs_front_ - r;
-          break;
-        case kWest:
-          grid_row = player_row + obs_side_ - c;
-          grid_col = player_col + r - obs_front_;
-          break;
-      }
+      grid_position = map_observation_to_grid(player, r, c);
 
-      if (0 <= grid_row && grid_row < grid_.num_rows
-          && 0 <= grid_col && grid_col < grid_.num_cols) {
-        plane = observation_plane(grid_row, grid_col);
-      } else {
+      if (grid_position[0] < 0) {
         // observed cell out-of-bounds of game grid
         plane = 3;    // '*'
+      } else {
+        plane = observation_plane(grid_position[0], grid_position[1]);
       }
+
       SPIEL_CHECK_TRUE(plane >= 0 && plane < kCellStates);
       view[{plane, r, c}] = 1.0;
     }
