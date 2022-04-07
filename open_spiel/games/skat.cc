@@ -416,7 +416,7 @@ void SkatState::EndBidding(Player winner, SkatGameType game_type) {
     current_player_ = winner;
     game_type_ = game_type;
     // Winner takes up Skat cards.
-    for (int card = 0; card <= kNumCards; card++) {
+    for (int card = 0; card < kNumCards; card++) {
       if (card_locations_[card] == kSkat) {
         card_locations_[card] = PlayerToLocation(winner);
       }
@@ -426,7 +426,7 @@ void SkatState::EndBidding(Player winner, SkatGameType game_type) {
 
 int SkatState::CardsInSkat() const {
   int cards_in_skat = 0;
-  for (int card = 0; card <= kNumCards; card++) {
+  for (int card = 0; card < kNumCards; card++) {
     if (card_locations_[card] == kSkat) cards_in_skat++;
   }
   return cards_in_skat;
