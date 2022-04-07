@@ -1,0 +1,266 @@
+game: bargaining
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Bargaining"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["instances_file"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "bargaining"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 121
+PolicyTensorShape() = [121]
+MaxChanceOutcomes() = 10
+GetParameters() = {instances_file=}
+NumPlayers() = 2
+MinUtility() = 0.0
+MaxUtility() = 10.0
+UtilitySum() = None
+InformationStateTensorShape() = [309]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 309
+ObservationTensorShape() = [93]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 93
+MaxGameLength() = 10
+ToString() = "bargaining()"
+
+# State 0
+# Initial chance node
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "Initial chance node"
+InformationStateString(1) = "Initial chance node"
+InformationStateTensor(0): zeros(309)
+InformationStateTensor(1): zeros(309)
+ObservationString(0) = "Initial chance node"
+ObservationString(1) = "Initial chance node"
+ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+StringLegalActions() = ["Chance outcome 0", "Chance outcome 1", "Chance outcome 2", "Chance outcome 3", "Chance outcome 4", "Chance outcome 5", "Chance outcome 6", "Chance outcome 7", "Chance outcome 8", "Chance outcome 9"]
+
+# Apply action "Chance outcome 8"
+action: 8
+
+# State 1
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 0
+IsTerminal() = False
+History() = [8]
+HistoryString() = "8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\n"
+InformationStateTensor(0): binvec(309, 0x100181e181c0380700000000000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x100181e181ffe00400000000000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nNumber of offers: 0\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nNumber of offers: 0\n"
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55]
+StringLegalActions() = ["Offer: 0 0 0", "Offer: 1 0 0", "Offer: 0 1 0", "Offer: 1 1 0", "Offer: 0 2 0", "Offer: 1 2 0", "Offer: 0 3 0", "Offer: 1 3 0", "Offer: 0 0 1", "Offer: 1 0 1", "Offer: 0 1 1", "Offer: 1 1 1", "Offer: 0 2 1", "Offer: 1 2 1", "Offer: 0 3 1", "Offer: 1 3 1"]
+
+# Apply action "Offer: 1 2 1"
+action: 50
+
+# State 2
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 0
+# P0 offers: Offer: 1 2 1
+IsTerminal() = False
+History() = [8, 50]
+HistoryString() = "8, 50"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\n"
+InformationStateTensor(0): binvec(309, 0x80181e181c0380700c0e0c0000000000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x80181e181ffe00400c0e0c0000000000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nNumber of offers: 1\nP0 offers: Offer: 1 2 1\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nNumber of offers: 1\nP0 offers: Offer: 1 2 1\n"
+ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
+StringLegalActions() = ["Offer: 0 0 0", "Offer: 1 0 0", "Offer: 0 1 0", "Offer: 1 1 0", "Offer: 0 2 0", "Offer: 1 2 0", "Offer: 0 3 0", "Offer: 1 3 0", "Offer: 0 0 1", "Offer: 1 0 1", "Offer: 0 1 1", "Offer: 1 1 1", "Offer: 0 2 1", "Offer: 1 2 1", "Offer: 0 3 1", "Offer: 1 3 1", "Agree"]
+
+# Apply action "Offer: 0 2 0"
+action: 15
+
+# State 3
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 0
+# P0 offers: Offer: 1 2 1
+# P1 offers: Offer: 0 2 0
+IsTerminal() = False
+History() = [8, 50, 15]
+HistoryString() = "8, 50, 15"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\n"
+InformationStateTensor(0): binvec(309, 0x40181e181c0380700c0e0c080e080000000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x40181e181ffe00400c0e0c080e080000000000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nNumber of offers: 2\nP1 offers: Offer: 0 2 0\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nNumber of offers: 2\nP1 offers: Offer: 0 2 0\n"
+ObservationTensor(0): ◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◉◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◉◯◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
+StringLegalActions() = ["Offer: 0 0 0", "Offer: 1 0 0", "Offer: 0 1 0", "Offer: 1 1 0", "Offer: 0 2 0", "Offer: 1 2 0", "Offer: 0 3 0", "Offer: 1 3 0", "Offer: 0 0 1", "Offer: 1 0 1", "Offer: 0 1 1", "Offer: 1 1 1", "Offer: 0 2 1", "Offer: 1 2 1", "Offer: 0 3 1", "Offer: 1 3 1", "Agree"]
+
+# Apply action "Offer: 1 3 1"
+action: 55
+
+# State 4
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 0
+# P0 offers: Offer: 1 2 1
+# P1 offers: Offer: 0 2 0
+# P0 offers: Offer: 1 3 1
+IsTerminal() = False
+History() = [8, 50, 15, 55]
+HistoryString() = "8, 50, 15, 55"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\n"
+InformationStateTensor(0): binvec(309, 0x20181e181c0380700c0e0c080e080c0f0c0000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x20181e181ffe00400c0e0c080e080c0f0c0000000000000000000000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nNumber of offers: 3\nP0 offers: Offer: 1 3 1\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nNumber of offers: 3\nP0 offers: Offer: 1 3 1\n"
+ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
+StringLegalActions() = ["Offer: 0 0 0", "Offer: 1 0 0", "Offer: 0 1 0", "Offer: 1 1 0", "Offer: 0 2 0", "Offer: 1 2 0", "Offer: 0 3 0", "Offer: 1 3 0", "Offer: 0 0 1", "Offer: 1 0 1", "Offer: 0 1 1", "Offer: 1 1 1", "Offer: 0 2 1", "Offer: 1 2 1", "Offer: 0 3 1", "Offer: 1 3 1", "Agree"]
+
+# Apply action "Offer: 0 1 1"
+action: 43
+
+# State 5
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 0
+# P0 offers: Offer: 1 2 1
+# P1 offers: Offer: 0 2 0
+# P0 offers: Offer: 1 3 1
+# P1 offers: Offer: 0 1 1
+IsTerminal() = False
+History() = [8, 50, 15, 55, 43]
+HistoryString() = "8, 50, 15, 55, 43"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\nP1 offers: Offer: 0 1 1\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\nP1 offers: Offer: 0 1 1\n"
+InformationStateTensor(0): binvec(309, 0x10181e181c0380700c0e0c080e080c0f0c080c0c0000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x10181e181ffe00400c0e0c080e080c0f0c080c0c0000000000000000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nNumber of offers: 4\nP1 offers: Offer: 0 1 1\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nNumber of offers: 4\nP1 offers: Offer: 0 1 1\n"
+ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
+StringLegalActions() = ["Offer: 0 0 0", "Offer: 1 0 0", "Offer: 0 1 0", "Offer: 1 1 0", "Offer: 0 2 0", "Offer: 1 2 0", "Offer: 0 3 0", "Offer: 1 3 0", "Offer: 0 0 1", "Offer: 1 0 1", "Offer: 0 1 1", "Offer: 1 1 1", "Offer: 0 2 1", "Offer: 1 2 1", "Offer: 0 3 1", "Offer: 1 3 1", "Agree"]
+
+# Apply action "Offer: 1 0 1"
+action: 37
+
+# State 6
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 0
+# P0 offers: Offer: 1 2 1
+# P1 offers: Offer: 0 2 0
+# P0 offers: Offer: 1 3 1
+# P1 offers: Offer: 0 1 1
+# P0 offers: Offer: 1 0 1
+IsTerminal() = False
+History() = [8, 50, 15, 55, 43, 37]
+HistoryString() = "8, 50, 15, 55, 43, 37"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\nP1 offers: Offer: 0 1 1\nP0 offers: Offer: 1 0 1\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\nP1 offers: Offer: 0 1 1\nP0 offers: Offer: 1 0 1\n"
+InformationStateTensor(0): binvec(309, 0x8181e181c0380700c0e0c080e080c0f0c080c0c0c080c0000000000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x8181e181ffe00400c0e0c080e080c0f0c080c0c0c080c0000000000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 0\nNumber of offers: 5\nP0 offers: Offer: 1 0 1\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 0\nNumber of offers: 5\nP0 offers: Offer: 1 0 1\n"
+ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
+ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
+Rewards() = [0.0, 0.0]
+Returns() = [0.0, 0.0]
+LegalActions() = [0, 1, 8, 9, 15, 16, 21, 22, 36, 37, 43, 44, 49, 50, 54, 55, 120]
+StringLegalActions() = ["Offer: 0 0 0", "Offer: 1 0 0", "Offer: 0 1 0", "Offer: 1 1 0", "Offer: 0 2 0", "Offer: 1 2 0", "Offer: 0 3 0", "Offer: 1 3 0", "Offer: 0 0 1", "Offer: 1 0 1", "Offer: 0 1 1", "Offer: 1 1 1", "Offer: 0 2 1", "Offer: 1 2 1", "Offer: 0 3 1", "Offer: 1 3 1", "Agree"]
+
+# Apply action "Offer: 1 0 0"
+action: 1
+
+# State 7
+# Apply action "Agree"
+action: 120
+
+# State 8
+# Pool:    1 3 1
+# P0 vals: 2 2 2
+# P1 vals: 10 0 0
+# Agreement reached? 1
+# P0 offers: Offer: 1 2 1
+# P1 offers: Offer: 0 2 0
+# P0 offers: Offer: 1 3 1
+# P1 offers: Offer: 0 1 1
+# P0 offers: Offer: 1 0 1
+# P1 offers: Offer: 1 0 0
+IsTerminal() = True
+History() = [8, 50, 15, 55, 43, 37, 1, 120]
+HistoryString() = "8, 50, 15, 55, 43, 37, 1, 120"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 1\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\nP1 offers: Offer: 0 1 1\nP0 offers: Offer: 1 0 1\nP1 offers: Offer: 1 0 0\n"
+InformationStateString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 1\nP0 offers: Offer: 1 2 1\nP1 offers: Offer: 0 2 0\nP0 offers: Offer: 1 3 1\nP1 offers: Offer: 0 1 1\nP0 offers: Offer: 1 0 1\nP1 offers: Offer: 1 0 0\n"
+InformationStateTensor(0): binvec(309, 0x104181e181c0380700c0e0c080e080c0f0c080c0c0c080c0c08080000000000000000000000000)
+InformationStateTensor(1): binvec(309, 0x104181e181ffe00400c0e0c080e080c0f0c080c0c0c080c0c08080000000000000000000000000)
+ObservationString(0) = "Pool: 1 3 1\nMy values: 2 2 2\nAgreement reached? 1\nNumber of offers: 6\nP1 offers: Offer: 1 0 0\n"
+ObservationString(1) = "Pool: 1 3 1\nMy values: 10 0 0\nAgreement reached? 1\nNumber of offers: 6\nP1 offers: Offer: 1 0 0\n"
+ObservationTensor(0): ◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◯◯◯◯◉◉◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+Rewards() = [8.0, 10.0]
+Returns() = [8.0, 10.0]

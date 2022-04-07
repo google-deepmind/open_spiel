@@ -3,6 +3,8 @@ set(GAME_SOURCES
   amazons.h
   backgammon.cc
   backgammon.h
+  bargaining.cc
+  bargaining.h
   battleship.cc
   battleship.h
   battleship_types.h
@@ -245,6 +247,12 @@ add_test(amazons_test amazons_test)
 add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
+
+add_executable(bargaining_instance_generator bargaining_instance_generator.cc
+               ${OPEN_SPIEL_OBJECTS})
+add_executable(bargaining_test bargaining_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(bargaining_test bargaining_test)
 
 add_executable(battleship_test battleship_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

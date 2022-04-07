@@ -11,6 +11,7 @@ Status                                       | Game
 -------------------------------------------- | ----
 <font color="orange"><b>~</b></font>         | [Amazons](#amazons)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
+<font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
@@ -93,6 +94,16 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
+
+### Bargaining
+
+*   Agents negotiate for items in a pool with different (hidden) valuations.
+*   Research game.
+*   Non-deterministic (randomized pool and valuations).
+*   Imperfect information.
+*   2 players.
+*   [Lewis et al. '17](https://arxiv.org/abs/1706.05125),
+    [DeVault et al. '15](https://www.aaai.org/ocs/index.php/SSS/SSS15/paper/viewFile/10335/10100)
 
 ### Battleship
 

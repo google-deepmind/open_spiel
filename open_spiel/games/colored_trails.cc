@@ -258,17 +258,6 @@ void ColoredTrailsState::InformationStateTensor(
     return;
   }
 
-  /*
-    num_players_ +   // Who is observing
-    1 +              // is it terminal?
-    num_colors_ * board_size_ * board_size_  +  // board
-    board_size_ * (num_players_ + 1) +          // player + flag positions
-    // thermometer of bits representation of the chips (proposer + receiver)
-    (kNumChipsUpperBound + 1) * num_colors_ * 2 +
-    // thermometer of bits representation of the proposals
-    // 0 to upperboard of chip combos for each in X for Y, and max two proposals
-    (kNumChipsUpperBound + 1) * num_colors_ * 2 * num_players_
-  */
   int offset = 0;
 
   // Player.

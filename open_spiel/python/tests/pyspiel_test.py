@@ -26,6 +26,7 @@ import pyspiel
 EXPECTED_GAMES = frozenset([
     "amazons",
     "backgammon",
+    "bargaining",
     "battleship",
     "blackjack",
     "blotto",
