@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Fictitious play on an MFG game."""
+import os
 from typing import Sequence
 
 from absl import flags
 
+from open_spiel.python.mfg import utils
 from open_spiel.python.mfg.algorithms import fictitious_play
 from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.games import factory
@@ -33,10 +35,12 @@ flags.DEFINE_integer('num_iterations', 100,
 
 flags.DEFINE_float('learning_rate', None,
                    'Learning rate. If not, it will be set to 1/iteration.')
-flags.DEFINE_string(
+_LOGDIR = flags.DEFINE_string(
     'logdir', None,
     'Logging dir to use for TF summary files. If None, the metrics will only '
     'be logged to stderr.')
+_LOG_DISTRIBUTION = flags.DEFINE_bool('log_distribution', False,
+                                      'Enables logging of the distribution.')
 
 
 def main(argv: Sequence[str]) -> None:
@@ -46,9 +50,9 @@ def main(argv: Sequence[str]) -> None:
   game = factory.create_game_with_setting(FLAGS.game_name, FLAGS.setting)
 
   # Metrics writer will also log the metrics to stderr.
-  just_logging = FLAGS.logdir is None
+  just_logging = _LOGDIR.value is None
   writer = metrics.create_default_writer(
-      logdir=FLAGS.logdir, just_logging=just_logging)
+      logdir=_LOGDIR.value, just_logging=just_logging)
 
   # Save the parameters.
   learning_rate = FLAGS.learning_rate
@@ -59,8 +63,12 @@ def main(argv: Sequence[str]) -> None:
   for it in range(FLAGS.num_iterations):
     fp.iteration(learning_rate=learning_rate)
     fp_policy = fp.get_policy()
-    exploitability = nash_conv.NashConv(game, fp_policy).nash_conv()
+    nash_conv_fp = nash_conv.NashConv(game, fp_policy)
+    exploitability = nash_conv_fp.nash_conv()
     writer.write_scalars(it, {'exploitability': exploitability})
+    if _LOG_DISTRIBUTION.value and not just_logging:
+      filename = os.path.join(_LOGDIR.value, f'distribution_{it}.pkl')
+      utils.save_parametric_distribution(nash_conv_fp.distribution, filename)
 
   writer.flush()
 
