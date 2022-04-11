@@ -14,16 +14,15 @@
 """Run deep online mirror descent algorithm with Munchausen DQN agents."""
 
 import os
-import pickle
 from typing import Sequence
 
 from absl import flags
 import jax
 from jax.config import config
 
-from open_spiel.python.utils import gfile
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
+from open_spiel.python.mfg import utils
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import munchausen_deep_mirror_descent
 from open_spiel.python.mfg.algorithms import nash_conv
@@ -92,14 +91,6 @@ flags.DEFINE_string(
     "be logged to stderr.")
 flags.DEFINE_bool("log_distribution", False,
                   "Enables logging of the distribution.")
-
-
-def save_distribution(filename: str, dist: distribution.DistributionPolicy):
-  """Saves the distribution to a file."""
-  with gfile.Open(filename, "wb") as f:
-    # This will be a mapping from the string representation of the states to
-    # the probabilities.
-    pickle.dump(dist.distribution, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def main(argv: Sequence[str]) -> None:
@@ -191,7 +182,7 @@ def main(argv: Sequence[str]) -> None:
       # We log distribution directly to a Pickle file as it may be large for
       # logging as a metric.
       filename = os.path.join(FLAGS.logdir, f"distribution_{it}.pkl")
-      save_distribution(filename, md.distribution)
+      utils.save_parametric_distribution(md.distribution, filename)
     logging_fn(it, 0, m)
 
   log_metrics(0)

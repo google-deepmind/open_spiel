@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Mirror Descent (https://arxiv.org/pdf/2103.00623.pdf)."""
 from typing import Optional
 
@@ -91,8 +90,8 @@ class MirrorDescent(object):
     self._md_step = 0
     self._lr = lr
 
-    self._state_value = (state_value if state_value
-                         else value.TabularValueFunction(game))
+    self._state_value = (
+        state_value if state_value else value.TabularValueFunction(game))
     self._cumulative_state_value = value.TabularValueFunction(game)
 
   def eval_state(self, state, learning_rate):
@@ -159,3 +158,7 @@ class MirrorDescent(object):
 
   def get_policy(self):
     return self._policy
+
+  @property
+  def distribution(self) -> distribution.DistributionPolicy:
+    return self._distribution
