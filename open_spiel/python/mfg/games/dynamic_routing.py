@@ -127,7 +127,8 @@ class MeanFieldRoutingGame(pyspiel.Game):
   they first reach their destination. See module docstring for more information.
 
   Attributes inherited from GameInfo:
-    max_chance_outcome: 0, the game is deterministic.
+    max_chance_outcomes: maximum number of chance actions. Set to the length of
+      od_demand, i.e. the number of `OriginDestinationDemand`s.
     max_game_length: maximum number of time step played. Passed during
       construction.
     max_utility: maximum utility is the opposite of the minimum travel
