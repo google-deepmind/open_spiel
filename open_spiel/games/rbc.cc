@@ -78,12 +78,14 @@ chess::ObservationTable ComputeObservationTable(const chess::ChessBoard& board,
   if (sense_location < 0) return observability_table;
 
   // All pieces under the sense window.
-  int inner_size = board_size - sense_size + 1;
-  chess::Square sense_sq = chess::IndexToSquare(sense_location, inner_size);
-  SPIEL_DCHECK_LE(sense_sq.x + sense_size, board_size);
-  SPIEL_DCHECK_LE(sense_sq.y + sense_size, board_size);
-  for (int8_t x = sense_sq.x; x < sense_sq.x + sense_size; ++x) {
-    for (int8_t y = sense_sq.y; y < sense_sq.y + sense_size; ++y) {
+  chess::Square sense_sq = chess::IndexToSquare(sense_location, board_size);
+  // Find min and max bounds for the sense window
+  int8_t left_sense_sq_x = std::min(sense_sq.x - sense_size/2, 0);
+  int8_t right_sense_sq_x = std::max(sense_sq.x + sense_size/2, board_size - 1);
+  int8_t bottom_sense_sq_y = std::min(sense_sq.y - sense_size/2, 0);
+  int8_t top_sense_sq_y = std::max(sense_sq.y + sense_size/2, board_size - 1);
+  for (int8_t x = left_sense_sq_x; x <= right_sense_sq_x; ++x) {
+    for (int8_t y = bottom_sense_sq_y; y <= top_sense_sq_y; ++y) {
       const chess::Square sq{x, y};
       size_t index = chess::SquareToIndex(sq, board_size);
       observability_table[index] = true;
@@ -238,17 +240,19 @@ class RbcObserver : public Observer {
     const std::string type_string = chess::PieceTypeToString(
         piece_type, /*uppercase=*/color == chess::Color::kWhite);
     const int board_size = board.BoardSize();
-    int inner_size = board_size - sense_size + 1;
     chess::Square sense_square =
-        chess::IndexToSquare(sense_location, inner_size);
+        chess::IndexToSquare(sense_location, board_size);
     auto out = allocator->Get(prefix + "_" + type_string + "_pieces",
                               {board_size, board_size});
 
     if (sense_location < 0) return;  // No sense window specified.
-    SPIEL_DCHECK_LE(sense_square.x + sense_size, board_size);
-    SPIEL_DCHECK_LE(sense_square.y + sense_size, board_size);
-    for (int8_t x = sense_square.x; x < sense_square.x + sense_size; ++x) {
-      for (int8_t y = sense_square.y; y < sense_square.y + sense_size; ++y) {
+    // Find min and max bounds for the sense window
+    int8_t left_sense_sq_x = std::min(sense_square.x - sense_size/2, 0);
+    int8_t right_sense_sq_x = std::max(sense_square.x + sense_size/2, board_size - 1);
+    int8_t bottom_sense_sq_y = std::min(sense_square.y - sense_size/2, 0);
+    int8_t top_sense_sq_y = std::max(sense_square.y + sense_size/2, board_size - 1);
+    for (int8_t x = left_sense_sq_x; x <= right_sense_sq_x; ++x) {
+      for (int8_t y = bottom_sense_sq_y; y <= top_sense_sq_y; ++y) {
         const chess::Square square{x, y};
         const chess::Piece& piece_on_board = board.at(square);
         const bool write_square =
@@ -419,7 +423,7 @@ void RbcState::MaybeGenerateLegalActions() const {
 
     if (phase_ == MovePhase::kSensing) {
       int num_possible_sense_locations =
-          game()->inner_size() * game()->inner_size();
+          game()->board_size() * game()->board_size();
       cached_legal_actions_->resize(num_possible_sense_locations);
       absl::c_iota(*cached_legal_actions_, 0);
     } else {
@@ -444,7 +448,7 @@ std::vector<Action> RbcState::LegalActions() const {
 std::string RbcState::ActionToString(Player player, Action action) const {
   if (phase_ == MovePhase::kSensing) {
     std::string from = chess::SquareToString(
-        chess::IndexToSquare(action, game()->inner_size()));
+        chess::IndexToSquare(action, game()->board_size()));
     return absl::StrCat("Sense ", from);
   } else {
     if (action == chess::kPassAction) return "pass";

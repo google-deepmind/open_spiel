@@ -80,12 +80,8 @@
 // >  three square window centered at the chosen square is revealed to the
 // >  sensing player."
 //
-// Sensing is done as picking a sensing window that fully fits within the
-// chessboard and is not centered on an underlying square. The centering can
-// make the sensing window smaller (as a rectangle near the border of the
-// chessboard) which gives strictly less information than a better placed window
-// (that remains a full square). This modification eliminates strategically
-// useless sensing actions.
+// Sensing is done as picking a sensing window that completely or partially fits
+// within the chessboard and is centered on an underlying square.
 //
 // > "If the move was modified [..] then the modified move is made, and
 // >  the current player is notified of the modified move in the move results."
@@ -209,7 +205,6 @@ class RbcState : public State {
   // How to interpret current actions.
   MovePhase phase_;
   // Which place was the last sensing made at? (for each player).
-  // See also RbcGame::inner_size()
   std::array<int, 2> sense_location_ = {kSenseLocationNonSpecified,
                                         kSenseLocationNonSpecified};
   bool move_captured_ = false;
@@ -269,11 +264,6 @@ class RbcGame : public Game {
 
   int board_size() const { return board_size_; }
   int sense_size() const { return sense_size_; }
-  // Sensing is done only within the board, as it makes no sense for
-  // any player to do non-efficient sensing that goes outside of the board.
-  // The sense location is encoded as coordinates within this smaller
-  // inner square.
-  int inner_size() const { return board_size_ - sense_size_ + 1; }
 
  private:
   const int board_size_;
