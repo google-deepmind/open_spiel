@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Class of Optimization Oracles generating best response against opponents.
 
 Oracles are as defined in (Lanctot et Al., 2017,

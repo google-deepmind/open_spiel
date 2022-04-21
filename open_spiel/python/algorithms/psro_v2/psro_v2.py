@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Modular implementations of the PSRO meta algorithm.
 
 Allows the use of Restricted Nash Response, Nash Response, Uniform Response,

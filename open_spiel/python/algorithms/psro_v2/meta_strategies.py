@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Meta-strategy solvers for PSRO."""
 
 import numpy as np

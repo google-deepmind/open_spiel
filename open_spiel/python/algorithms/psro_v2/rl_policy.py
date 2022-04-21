@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """DQN as a policy.
 
 Treating RL Oracles as policies allows us to streamline their use with tabular

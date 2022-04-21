@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Tests for open_spiel.python.algorithms.psro_v2.best_response_oracle."""
 
 from absl.testing import absltest
