@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Simple AlphaZero tic tac toe example.
 
 Take a look at the log-learner.txt in the output directory.
