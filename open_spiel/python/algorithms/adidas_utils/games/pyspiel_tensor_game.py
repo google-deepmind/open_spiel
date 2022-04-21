@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Wrapper for loading pyspiel games as payoff tensors."""
 
 from absl import logging  # pylint:disable=unused-import

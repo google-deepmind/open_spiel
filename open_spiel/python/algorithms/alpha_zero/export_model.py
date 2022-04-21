@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Export the model's Tensorflow graph as a protobuf."""
 
 from absl import app
