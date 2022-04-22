@@ -67,4 +67,3 @@ def marl_path_finding_example(unused_arg):
 
 if __name__ == "__main__":
   app.run(marl_path_finding_example)
-  
