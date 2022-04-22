@@ -15,10 +15,13 @@
 #include "open_spiel/game_transforms/repeated_game.h"
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
 namespace {
+
+constexpr bool kDefaultEnableInformationStateTensor = false;
 
 // These parameters represent the most general case. Game specific params are
 // parsed once the actual stage game is supplied.
@@ -33,7 +36,7 @@ const GameType kGameType{
     /*max_num_players=*/100,
     /*min_num_players=*/1,
     /*provides_information_state_string=*/false,
-    /*provides_information_state_tensor=*/false,
+    /*provides_information_state_tensor=*/kDefaultEnableInformationStateTensor,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
@@ -125,6 +128,24 @@ std::string RepeatedState::ObservationString(Player /*player*/) const {
   return rv;
 }
 
+void RepeatedState::InformationStateTensor(Player player,
+                                           absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
+  std::fill(values.begin(), values.end(), 0.0);
+  if (actions_history_.empty()) return;
+
+  auto ptr = values.begin();
+  for (int j = 0; j < actions_history_.size(); ++j) {
+    for (int i = 0; i < num_players_; ++i) {
+      ptr[actions_history_[j][i]] = 1;
+      ptr += stage_game_state_->LegalActions(i).size();
+    }
+  }
+}
+
 void RepeatedState::ObservationTensor(Player player,
                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -142,6 +163,16 @@ void RepeatedState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(ptr, values.end());
 }
 
+void RepeatedState::ObliviousObservationTensor(Player player,
+                                               absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  std::fill(values.begin(), values.end(), 1.0);
+  if (actions_history_.empty()) return;
+}
+
 std::vector<Action> RepeatedState::LegalActions(Player player) const {
   if (IsTerminal()) return {};
   return stage_game_state_->LegalActions(player);
@@ -157,7 +188,7 @@ std::unique_ptr<State> RepeatedState::Clone() const {
 }
 
 namespace {
-GameType ConvertType(GameType type) {
+GameType ConvertType(GameType type, bool enable_info_state_tensor) {
   type.short_name = kGameType.short_name;
   type.long_name = "Repeated " + type.long_name;
   type.dynamics = kGameType.dynamics;
@@ -165,7 +196,7 @@ GameType ConvertType(GameType type) {
   type.reward_model = kGameType.reward_model;
   type.parameter_specification = kGameType.parameter_specification;
   type.provides_information_state_string = false;
-  type.provides_information_state_tensor = false;
+  type.provides_information_state_tensor = enable_info_state_tensor;
   type.provides_observation_string = true;
   type.provides_observation_tensor = true;
   return type;
@@ -174,7 +205,12 @@ GameType ConvertType(GameType type) {
 
 RepeatedGame::RepeatedGame(std::shared_ptr<const Game> stage_game,
                            const GameParameters& params)
-    : SimMoveGame(ConvertType(stage_game->GetType()), params),
+    : SimMoveGame(ConvertType(stage_game->GetType(),
+                              open_spiel::ParameterValue(params,
+                                                         "enable_infostate",
+                                  absl::optional<bool>(
+                                      kDefaultEnableInformationStateTensor))),
+                  params),
       stage_game_(stage_game),
       num_repetitions_(ParameterValue<int>("num_repetitions")) {}
 
@@ -204,6 +240,15 @@ std::shared_ptr<const Game> CreateRepeatedGame(
 std::unique_ptr<State> RepeatedGame::NewInitialState() const {
   return std::unique_ptr<State>(
       new RepeatedState(shared_from_this(), stage_game_, num_repetitions_));
+}
+
+std::vector<int> RepeatedGame::InformationStateTensorShape() const {
+  int player_actions_size = 0;
+  for (int i = 0; i < NumPlayers(); ++i) {
+    player_actions_size +=
+        stage_game_->NewInitialState()->LegalActions(i).size();
+  }
+  return {num_repetitions_ * player_actions_size};
 }
 
 std::vector<int> RepeatedGame::ObservationTensorShape() const {

@@ -1,0 +1,197 @@
+game: colored_trails
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Colored Trails"
+GameType.max_num_players = 3
+GameType.min_num_players = 3
+GameType.parameter_specification = ["board_size", "boards_file", "num_colors", "players"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "colored_trails"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 93123
+PolicyTensorShape() = [93123]
+MaxChanceOutcomes() = 10
+GetParameters() = {board_size=4,boards_file=,num_colors=5,players=3}
+NumPlayers() = 3
+MinUtility() = -400.0
+MaxUtility() = 80.0
+UtilitySum() = None
+InformationStateTensorShape() = [463]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 463
+ObservationTensorShape() = [463]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 463
+MaxGameLength() = 3
+ToString() = "colored_trails()"
+
+# State 0
+# Initial chance node
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 0\nPos: -1 -1 -1 -1\nMy chips: \nResponder chips: \n"
+InformationStateString(1) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 1\nPos: -1 -1 -1 -1\nMy chips: \nResponder chips: \n"
+InformationStateString(2) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 2\nPos: -1 -1 -1 -1\nP0 chips: \nP1 chips: \n"
+InformationStateTensor(0): zeros(463)
+InformationStateTensor(1): zeros(463)
+InformationStateTensor(2): zeros(463)
+ObservationString(0) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 0\nPos: -1 -1 -1 -1\nMy chips: \nResponder chips: \n"
+ObservationString(1) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 1\nPos: -1 -1 -1 -1\nMy chips: \nResponder chips: \n"
+ObservationString(2) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 2\nPos: -1 -1 -1 -1\nP0 chips: \nP1 chips: \n"
+ObservationTensor(0): zeros(463)
+ObservationTensor(1): zeros(463)
+ObservationTensor(2): zeros(463)
+ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+StringLegalActions() = ["Chance outcome 0", "Chance outcome 1", "Chance outcome 2", "Chance outcome 3", "Chance outcome 4", "Chance outcome 5", "Chance outcome 6", "Chance outcome 7", "Chance outcome 8", "Chance outcome 9"]
+
+# Apply action "Chance outcome 5"
+action: 5
+
+# State 1
+# Move Number: 1
+# BACB
+# BEAA
+# DBDC
+# ECAE
+#
+# Pos: 0 7 5 13
+IsTerminal() = False
+History() = [5]
+HistoryString() = "5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: ACCCEEE\n"
+InformationStateString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: BCDDEE\nResponder chips: ACCCEEE\n"
+InformationStateString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: BCDDEE\n"
+InformationStateTensor(0): binvec(463, 0x422044203080902204900c00000800200000260301e0e040201008040201808078201e0000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(463, 0x222044203080902204900c0000080020000024030180e070201008040201808078201e0000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(463, 0x122044203080902204900c00000800200000260301e0e04020180c070381808078201e0000000000000000000000000000000000000000000000)
+ObservationString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: ACCCEEE\n"
+ObservationString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: BCDDEE\nResponder chips: ACCCEEE\n"
+ObservationString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: BCDDEE\n"
+ObservationTensor(0): binvec(463, 0x422044203080902204900c00000800200000260301e0e040201008040201808078201e0000000000000000000000000000000000000000000000)
+ObservationTensor(1): binvec(463, 0x222044203080902204900c0000080020000024030180e070201008040201808078201e0000000000000000000000000000000000000000000000)
+ObservationTensor(2): binvec(463, 0x122044203080902204900c00000800200000260301e0e04020180c070381808078201e0000000000000000000000000000000000000000000000)
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [330, 331, 332, 383, 384, 385, 409, 410, 411, 443, 444, 445, 486, 487, 488, 3952, 3953, 3955, 3956, 3957, 3959, 3963, 3964, 4439, 4442, 4450, 4451, 4926, 4928, 4929, 4934, 4935, 4936, 4937, 4938, 5901, 5903, 5904, 5906, 5909, 5910, 5912, 5915, 5919, 6553, 6556, 6560, 6561, 6568, 6569, 6570, 6711, 6713, 6714, 6715, 6716, 6717, 6718, 6719, 6720, 6721, 6722, 6723, 6724, 6725, 6726, 6727, 6728, 7030, 7036, 7046, 7192, 7196, 7204, 7205, 7222, 7223, 7224, 7680, 7683, 7687, 7688, 7695, 7696, 7697, 7998, 7999, 8003, 8004, 8005, 8012, 8013, 8014, 8015, 8161, 8164, 8165, 8170, 8171, 8172, 8173, 8174, 8185, 8186, 8187, 8188, 8189, 8190, 8191, 8192, 8193, 9464, 9466, 9469, 9470, 9472, 9475, 9479, 9482, 9485, 9489, 10761, 10765, 10801, 10809, 10810, 10817, 10818, 10819, 10830, 10831, 10832, 10960, 10964, 10965, 10966, 10967, 10968, 10969, 10970, 10971, 11041, 11042, 11043, 11044, 11045, 11046, 11047, 11049, 11050, 11051, 11083, 11088, 11089, 11090, 11091, 11092, 11093, 11094, 11095, 11096, 11097, 11098, 11099, 11100, 11101, 11102, 11103, 11104, 11106, 11107, 11108, 11109, 11110, 11111, 11112, 11113, 11114, 11494, 11504, 11659, 11669, 11815, 11828, 11829, 11846, 11847, 11848, 11879, 11880, 11881, 12304, 12312, 12313, 12320, 12321, 12322, 12333, 12334, 12335, 12627, 12631, 12667, 12675, 12676, 12683, 12684, 12685, 12696, 12697, 12698, 13076, 13077, 13078, 13085, 13086, 13087, 13088, 13100, 13101, 13102, 13241, 13242, 13243, 13250, 13251, 13252, 13253, 13265, 13266, 13267, 15080, 15082, 15085, 15089, 15092, 15095, 15099, 15110, 15114, 17279, 17324, 17360, 17377, 17378, 17379, 17390, 17391, 17392, 17409, 17410, 17411, 17520, 17527, 17528, 17529, 17530, 17531, 17532, 17534, 17535, 17536, 17603, 17609, 17616, 17617, 17618, 17619, 17620, 17621, 17623, 17624, 17625, 17708, 17709, 17710, 17711, 17713, 17714, 17715, 17719, 17720, 17753, 17754, 17755, 17756, 17758, 17759, 17760, 17764, 17765, 18310, 18475, 18640, 19276, 19293, 19294, 19295, 19306, 19307, 19308, 19325, 19326, 19327, 19605, 19641, 19658, 19659, 19660, 19671, 19672, 19673, 19690, 19691, 19692, 20055, 20100, 20651, 20652, 20653, 20654, 20666, 20667, 20668, 20687, 20688, 20816, 20817, 20818, 20819, 20831, 20832, 20833, 20852, 20853, 23242, 23245, 23249, 23260, 23264, 23285, 26922, 26933, 26934, 26935, 26937, 26938, 26939, 26942, 26943, 26944, 27013, 27024, 27025, 27026, 27028, 27029, 27030, 27033, 27034, 27035, 27249, 27250, 27251, 27255, 27256, 27262, 27294, 27295, 27296, 27300, 27301, 27307, 29498, 29529, 29530, 29531, 29548, 29549, 29550, 29574, 29575, 29576, 31272, 31273, 31274, 31293, 31294, 31321, 31437, 31438, 31439, 31458, 31459, 31486, 34497, 34501, 34522, 39852, 39868, 39869, 39870, 39873, 39874, 39875, 39879, 39880, 39881, 40260, 40261, 40267, 40305, 40306, 40312, 45548, 45549, 45576, 45713, 45714, 45741, 49455, 57405, 57450, 64156, 64321]
+StringLegalActions() = ["Proposer 0: A for C", "Proposer 0: A for CC", "Proposer 0: A for CCC", "Proposer 0: A for CCCE", "Proposer 0: A for CCCEE", "Proposer 0: A for CCCEEE", "Proposer 0: A for CCE", "Proposer 0: A for CCEE", "Proposer 0: A for CCEEE", "Proposer 0: A for CE", "Proposer 0: A for CEE", "Proposer 0: A for CEEE", "Proposer 0: A for E", "Proposer 0: A for EE", "Proposer 0: A for EEE", "Proposer 0: B for A", "Proposer 0: B for C", "Proposer 0: B for E", "Proposer 0: AB for C", "Proposer 0: AB for CC", "Proposer 0: AB for CE", "Proposer 0: AB for E", "Proposer 0: AB for EE", "Proposer 0: C for A", "Proposer 0: C for E", "Proposer 0: AC for E", "Proposer 0: AC for EE", "Proposer 0: D for A", "Proposer 0: D for C", "Proposer 0: D for E", "Proposer 0: AD for C", "Proposer 0: AD for CC", "Proposer 0: AD for CE", "Proposer 0: AD for E", "Proposer 0: AD for EE", "Proposer 0: B for AC", "Proposer 0: B for AE", "Proposer 0: B for CC", "Proposer 0: B for CE", "Proposer 0: B for EE", "Proposer 0: AB for CCC", "Proposer 0: AB for CCE", "Proposer 0: AB for CEE", "Proposer 0: AB for EEE", "Proposer 0: BC for A", "Proposer 0: BC for AE", "Proposer 0: BC for E", "Proposer 0: BC for EE", "Proposer 0: ABC for E", "Proposer 0: ABC for EE", "Proposer 0: ABC for EEE", "Proposer 0: BD for A", "Proposer 0: BD for AC", "Proposer 0: BD for AE", "Proposer 0: BD for C", "Proposer 0: BD for CC", "Proposer 0: BD for CE", "Proposer 0: BD for E", "Proposer 0: BD for EE", "Proposer 0: ABD for C", "Proposer 0: ABD for CC", "Proposer 0: ABD for CCC", "Proposer 0: ABD for CCE", "Proposer 0: ABD for CE", "Proposer 0: ABD for CEE", "Proposer 0: ABD for E", "Proposer 0: ABD for EE", "Proposer 0: ABD for EEE", "Proposer 0: C for AE", "Proposer 0: C for EE", "Proposer 0: AC for EEE", "Proposer 0: CC for A", "Proposer 0: CC for AE", "Proposer 0: CC for E", "Proposer 0: CC for EE", "Proposer 0: ACC for E", "Proposer 0: ACC for EE", "Proposer 0: ACC for EEE", "Proposer 0: CD for A", "Proposer 0: CD for AE", "Proposer 0: CD for E", "Proposer 0: CD for EE", "Proposer 0: ACD for E", "Proposer 0: ACD for EE", "Proposer 0: ACD for EEE", "Proposer 0: D for AC", "Proposer 0: D for AE", "Proposer 0: D for CC", "Proposer 0: D for CE", "Proposer 0: D for EE", "Proposer 0: AD for CCC", "Proposer 0: AD for CCE", "Proposer 0: AD for CEE", "Proposer 0: AD for EEE", "Proposer 0: DD for A", "Proposer 0: DD for AC", "Proposer 0: DD for AE", "Proposer 0: DD for C", "Proposer 0: DD for CC", "Proposer 0: DD for CE", "Proposer 0: DD for E", "Proposer 0: DD for EE", "Proposer 0: ADD for C", "Proposer 0: ADD for CC", "Proposer 0: ADD for CCC", "Proposer 0: ADD for CCE", "Proposer 0: ADD for CE", "Proposer 0: ADD for CEE", "Proposer 0: ADD for E", "Proposer 0: ADD for EE", "Proposer 0: ADD for EEE", "Proposer 0: B for ACC", "Proposer 0: B for ACE", "Proposer 0: B for AEE", "Proposer 0: B for CCC", "Proposer 0: B for CCE", "Proposer 0: B for CEE", "Proposer 0: B for EEE", "Proposer 0: AB for CCCE", "Proposer 0: AB for CCEE", "Proposer 0: AB for CEEE", "Proposer 0: BC for AEE", "Proposer 0: BC for EEE", "Proposer 0: BCC for A", "Proposer 0: BCC for AE", "Proposer 0: BCC for AEE", "Proposer 0: BCC for E", "Proposer 0: BCC for EE", "Proposer 0: BCC for EEE", "Proposer 0: ABCC for E", "Proposer 0: ABCC for EE", "Proposer 0: ABCC for EEE", "Proposer 0: BCD for A", "Proposer 0: BCD for AE", "Proposer 0: BCD for AEE", "Proposer 0: BCD for E", "Proposer 0: BCD for EE", "Proposer 0: BCD for EEE", "Proposer 0: ABCD for E", "Proposer 0: ABCD for EE", "Proposer 0: ABCD for EEE", "Proposer 0: BD for ACC", "Proposer 0: BD for ACE", "Proposer 0: BD for AEE", "Proposer 0: BD for CCC", "Proposer 0: BD for CCE", "Proposer 0: BD for CEE", "Proposer 0: BD for EEE", "Proposer 0: ABD for CCCE", "Proposer 0: ABD for CCEE", "Proposer 0: ABD for CEEE", "Proposer 0: BDD for A", "Proposer 0: BDD for AC", "Proposer 0: BDD for ACC", "Proposer 0: BDD for ACE", "Proposer 0: BDD for AE", "Proposer 0: BDD for AEE", "Proposer 0: BDD for C", "Proposer 0: BDD for CC", "Proposer 0: BDD for CCC", "Proposer 0: BDD for CCE", "Proposer 0: BDD for CE", "Proposer 0: BDD for CEE", "Proposer 0: BDD for E", "Proposer 0: BDD for EE", "Proposer 0: BDD for EEE", "Proposer 0: ABDD for C", "Proposer 0: ABDD for CC", "Proposer 0: ABDD for CCC", "Proposer 0: ABDD for CCCE", "Proposer 0: ABDD for CCE", "Proposer 0: ABDD for CCEE", "Proposer 0: ABDD for CE", "Proposer 0: ABDD for CEE", "Proposer 0: ABDD for CEEE", "Proposer 0: ABDD for E", "Proposer 0: ABDD for EE", "Proposer 0: ABDD for EEE", "Proposer 0: C for AEE", "Proposer 0: C for EEE", "Proposer 0: CC for AEE", "Proposer 0: CC for EEE", "Proposer 0: CCC for A", "Proposer 0: CCC for AE", "Proposer 0: CCC for AEE", "Proposer 0: CCC for E", "Proposer 0: CCC for EE", "Proposer 0: CCC for EEE", "Proposer 0: ACCC for E", "Proposer 0: ACCC for EE", "Proposer 0: ACCC for EEE", "Proposer 0: CCD for A", "Proposer 0: CCD for AE", "Proposer 0: CCD for AEE", "Proposer 0: CCD for E", "Proposer 0: CCD for EE", "Proposer 0: CCD for EEE", "Proposer 0: ACCD for E", "Proposer 0: ACCD for EE", "Proposer 0: ACCD for EEE", "Proposer 0: CD for AEE", "Proposer 0: CD for EEE", "Proposer 0: CDD for A", "Proposer 0: CDD for AE", "Proposer 0: CDD for AEE", "Proposer 0: CDD for E", "Proposer 0: CDD for EE", "Proposer 0: CDD for EEE", "Proposer 0: ACDD for E", "Proposer 0: ACDD for EE", "Proposer 0: ACDD for EEE", "Proposer 0: D for ACC", "Proposer 0: D for ACE", "Proposer 0: D for AEE", "Proposer 0: D for CCC", "Proposer 0: D for CCE", "Proposer 0: D for CEE", "Proposer 0: D for EEE", "Proposer 0: AD for CCCE", "Proposer 0: AD for CCEE", "Proposer 0: AD for CEEE", "Proposer 0: DD for ACC", "Proposer 0: DD for ACE", "Proposer 0: DD for AEE", "Proposer 0: DD for CCC", "Proposer 0: DD for CCE", "Proposer 0: DD for CEE", "Proposer 0: DD for EEE", "Proposer 0: ADD for CCCE", "Proposer 0: ADD for CCEE", "Proposer 0: ADD for CEEE", "Proposer 0: B for ACCC", "Proposer 0: B for ACCE", "Proposer 0: B for ACEE", "Proposer 0: B for AEEE", "Proposer 0: B for CCCE", "Proposer 0: B for CCEE", "Proposer 0: B for CEEE", "Proposer 0: AB for CCCEE", "Proposer 0: AB for CCEEE", "Proposer 0: BC for AEEE", "Proposer 0: BCC for AEEE", "Proposer 0: BCCC for A", "Proposer 0: BCCC for AE", "Proposer 0: BCCC for AEE", "Proposer 0: BCCC for AEEE", "Proposer 0: BCCC for E", "Proposer 0: BCCC for EE", "Proposer 0: BCCC for EEE", "Proposer 0: ABCCC for E", "Proposer 0: ABCCC for EE", "Proposer 0: ABCCC for EEE", "Proposer 0: BCCD for A", "Proposer 0: BCCD for AE", "Proposer 0: BCCD for AEE", "Proposer 0: BCCD for AEEE", "Proposer 0: BCCD for E", "Proposer 0: BCCD for EE", "Proposer 0: BCCD for EEE", "Proposer 0: ABCCD for E", "Proposer 0: ABCCD for EE", "Proposer 0: ABCCD for EEE", "Proposer 0: BCD for AEEE", "Proposer 0: BCDD for A", "Proposer 0: BCDD for AE", "Proposer 0: BCDD for AEE", "Proposer 0: BCDD for AEEE", "Proposer 0: BCDD for E", "Proposer 0: BCDD for EE", "Proposer 0: BCDD for EEE", "Proposer 0: ABCDD for E", "Proposer 0: ABCDD for EE", "Proposer 0: ABCDD for EEE", "Proposer 0: BD for ACCC", "Proposer 0: BD for ACCE", "Proposer 0: BD for ACEE", "Proposer 0: BD for AEEE", "Proposer 0: BD for CCCE", "Proposer 0: BD for CCEE", "Proposer 0: BD for CEEE", "Proposer 0: ABD for CCCEE", "Proposer 0: ABD for CCEEE", "Proposer 0: BDD for ACCC", "Proposer 0: BDD for ACCE", "Proposer 0: BDD for ACEE", "Proposer 0: BDD for AEEE", "Proposer 0: BDD for CCCE", "Proposer 0: BDD for CCEE", "Proposer 0: BDD for CEEE", "Proposer 0: ABDD for CCCEE", "Proposer 0: ABDD for CCEEE", "Proposer 0: C for AEEE", "Proposer 0: CC for AEEE", "Proposer 0: CCC for AEEE", "Proposer 0: CCCD for A", "Proposer 0: CCCD for AE", "Proposer 0: CCCD for AEE", "Proposer 0: CCCD for AEEE", "Proposer 0: CCCD for E", "Proposer 0: CCCD for EE", "Proposer 0: CCCD for EEE", "Proposer 0: ACCCD for E", "Proposer 0: ACCCD for EE", "Proposer 0: ACCCD for EEE", "Proposer 0: CCD for AEEE", "Proposer 0: CCDD for A", "Proposer 0: CCDD for AE", "Proposer 0: CCDD for AEE", "Proposer 0: CCDD for AEEE", "Proposer 0: CCDD for E", "Proposer 0: CCDD for EE", "Proposer 0: CCDD for EEE", "Proposer 0: ACCDD for E", "Proposer 0: ACCDD for EE", "Proposer 0: ACCDD for EEE", "Proposer 0: CD for AEEE", "Proposer 0: CDD for AEEE", "Proposer 0: D for ACCC", "Proposer 0: D for ACCE", "Proposer 0: D for ACEE", "Proposer 0: D for AEEE", "Proposer 0: D for CCCE", "Proposer 0: D for CCEE", "Proposer 0: D for CEEE", "Proposer 0: AD for CCCEE", "Proposer 0: AD for CCEEE", "Proposer 0: DD for ACCC", "Proposer 0: DD for ACCE", "Proposer 0: DD for ACEE", "Proposer 0: DD for AEEE", "Proposer 0: DD for CCCE", "Proposer 0: DD for CCEE", "Proposer 0: DD for CEEE", "Proposer 0: ADD for CCCEE", "Proposer 0: ADD for CCEEE", "Proposer 0: B for ACCCE", "Proposer 0: B for ACCEE", "Proposer 0: B for ACEEE", "Proposer 0: B for CCCEE", "Proposer 0: B for CCEEE", "Proposer 0: AB for CCCEEE", "Proposer 0: BCCCD for A", "Proposer 0: BCCCD for AE", "Proposer 0: BCCCD for AEE", "Proposer 0: BCCCD for AEEE", "Proposer 0: BCCCD for E", "Proposer 0: BCCCD for EE", "Proposer 0: BCCCD for EEE", "Proposer 0: ABCCCD for E", "Proposer 0: ABCCCD for EE", "Proposer 0: ABCCCD for EEE", "Proposer 0: BCCDD for A", "Proposer 0: BCCDD for AE", "Proposer 0: BCCDD for AEE", "Proposer 0: BCCDD for AEEE", "Proposer 0: BCCDD for E", "Proposer 0: BCCDD for EE", "Proposer 0: BCCDD for EEE", "Proposer 0: ABCCDD for E", "Proposer 0: ABCCDD for EE", "Proposer 0: ABCCDD for EEE", "Proposer 0: BD for ACCCE", "Proposer 0: BD for ACCEE", "Proposer 0: BD for ACEEE", "Proposer 0: BD for CCCEE", "Proposer 0: BD for CCEEE", "Proposer 0: ABD for CCCEEE", "Proposer 0: BDD for ACCCE", "Proposer 0: BDD for ACCEE", "Proposer 0: BDD for ACEEE", "Proposer 0: BDD for CCCEE", "Proposer 0: BDD for CCEEE", "Proposer 0: ABDD for CCCEEE", "Proposer 0: CCCDD for A", "Proposer 0: CCCDD for AE", "Proposer 0: CCCDD for AEE", "Proposer 0: CCCDD for AEEE", "Proposer 0: CCCDD for E", "Proposer 0: CCCDD for EE", "Proposer 0: CCCDD for EEE", "Proposer 0: ACCCDD for E", "Proposer 0: ACCCDD for EE", "Proposer 0: ACCCDD for EEE", "Proposer 0: D for ACCCE", "Proposer 0: D for ACCEE", "Proposer 0: D for ACEEE", "Proposer 0: D for CCCEE", "Proposer 0: D for CCEEE", "Proposer 0: AD for CCCEEE", "Proposer 0: DD for ACCCE", "Proposer 0: DD for ACCEE", "Proposer 0: DD for ACEEE", "Proposer 0: DD for CCCEE", "Proposer 0: DD for CCEEE", "Proposer 0: ADD for CCCEEE", "Proposer 0: B for ACCCEE", "Proposer 0: B for ACCEEE", "Proposer 0: B for CCCEEE", "Proposer 0: BCCCDD for A", "Proposer 0: BCCCDD for AE", "Proposer 0: BCCCDD for AEE", "Proposer 0: BCCCDD for AEEE", "Proposer 0: BCCCDD for E", "Proposer 0: BCCCDD for EE", "Proposer 0: BCCCDD for EEE", "Proposer 0: ABCCCDD for E", "Proposer 0: ABCCCDD for EE", "Proposer 0: ABCCCDD for EEE", "Proposer 0: BD for ACCCEE", "Proposer 0: BD for ACCEEE", "Proposer 0: BD for CCCEEE", "Proposer 0: BDD for ACCCEE", "Proposer 0: BDD for ACCEEE", "Proposer 0: BDD for CCCEEE", "Proposer 0: D for ACCCEE", "Proposer 0: D for ACCEEE", "Proposer 0: D for CCCEEE", "Proposer 0: DD for ACCCEE", "Proposer 0: DD for ACCEEE", "Proposer 0: DD for CCCEEE", "Proposer 0: B for ACCCEEE", "Proposer 0: BD for ACCCEEE", "Proposer 0: BDD for ACCCEEE", "Proposer 0: D for ACCCEEE", "Proposer 0: DD for ACCCEEE"]
+
+# Apply action "Proposer 0: ABDD for C"
+action: 11102
+
+# State 2
+# Move Number: 2
+# BACB
+# BEAA
+# DBDC
+# ECAE
+#
+# Pos: 0 7 5 13
+# Proposal 0: ABDD for C
+IsTerminal() = False
+History() = [5, 11102]
+HistoryString() = "5, 11102"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: ACCCEEE\n"
+InformationStateString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: BCDDEE\nResponder chips: ACCCEEE\n"
+InformationStateString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: BCDDEE\n"
+InformationStateTensor(0): binvec(463, 0x422044203080902204900c00000800200000260301e0e040201008040201808078201e0000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(463, 0x222044203080902204900c0000080020000024030180e070201008040201808078201e0000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(463, 0x122044203080902204900c00000800200000260301e0e04020180c070381808078201e0000000000000000000000000000000000000000000000)
+ObservationString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: ACCCEEE\n"
+ObservationString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: BCDDEE\nResponder chips: ACCCEEE\n"
+ObservationString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: BCDDEE\n"
+ObservationTensor(0): binvec(463, 0x422044203080902204900c00000800200000260301e0e040201008040201808078201e0000000000000000000000000000000000000000000000)
+ObservationTensor(1): binvec(463, 0x222044203080902204900c0000080020000024030180e070201008040201808078201e0000000000000000000000000000000000000000000000)
+ObservationTensor(2): binvec(463, 0x122044203080902204900c00000800200000260301e0e04020180c070381808078201e0000000000000000000000000000000000000000000000)
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [3952, 3953, 3955, 4439, 4442, 4926, 4928, 4929, 5413, 5415, 5901, 5903, 5904, 5906, 5909, 6553, 6556, 6560, 6561, 6711, 6713, 6714, 6715, 6716, 6717, 6718, 6719, 6869, 6871, 6873, 6874, 7030, 7036, 7680, 7683, 7687, 7688, 7838, 7998, 7999, 8003, 8004, 8005, 8161, 8164, 8165, 8170, 8171, 8172, 8173, 8174, 8649, 8652, 8656, 8657, 8809, 8814, 8972, 8975, 8981, 8982, 9464, 9466, 9469, 9470, 9472, 9475, 9479, 10761, 10765, 10960, 10964, 10965, 10966, 10967, 10968, 10999, 11041, 11042, 11043, 11044, 11045, 11046, 11047, 11083, 11088, 11089, 11090, 11091, 11092, 11093, 11094, 11095, 11096, 11097, 11098, 11099, 11100, 11101, 11242, 11246, 11247, 11248, 11249, 11250, 11284, 11287, 11326, 11331, 11332, 11336, 11337, 11338, 11494, 11504, 12627, 12631, 12667, 12675, 12676, 12683, 12684, 12685, 12826, 12910, 13076, 13077, 13078, 13085, 13086, 13087, 13088, 13241, 13242, 13243, 13250, 13251, 13252, 13253, 13888, 13896, 13897, 13904, 13905, 13906, 14052, 14056, 14092, 14100, 14101, 14108, 14109, 14110, 14258, 14267, 14423, 14432, 15080, 15082, 15085, 15089, 15092, 15095, 15099, 17279, 17603, 17609, 17616, 17617, 17618, 17619, 17620, 17621, 17649, 17662, 17708, 17709, 17710, 17711, 17713, 17714, 17715, 17753, 17754, 17755, 17756, 17758, 17759, 17760, 17952, 17959, 17960, 17961, 17962, 17963, 17964, 17995, 18001, 18008, 18009, 18010, 18011, 18012, 18013, 18047, 18092, 18310, 20055, 20100, 20296, 20345, 20651, 20652, 20653, 20654, 20666, 20667, 20668, 20816, 20817, 20818, 20819, 20831, 20832, 20833, 21789, 21825, 21842, 21843, 21844, 21855, 21856, 21857, 21994, 22039, 22251, 22416, 23242, 23245, 23249, 23260, 23264, 27168, 27174, 27249, 27250, 27251, 27255, 27256, 27294, 27295, 27296, 27300, 27301, 27584, 27595, 27596, 27597, 27599, 27600, 27601, 30845, 31272, 31273, 31274, 31293, 31294, 31437, 31438, 31439, 31458, 31459, 34497, 34501, 34522, 40160, 40260, 40261, 40267, 40305, 40306, 40312, 45548, 45549, 45576, 45713, 45714, 45741, 49455, 57405, 57450, 64156, 64321]
+StringLegalActions() = ["Proposer 1: B for A", "Proposer 1: B for C", "Proposer 1: B for E", "Proposer 1: C for A", "Proposer 1: C for E", "Proposer 1: D for A", "Proposer 1: D for C", "Proposer 1: D for E", "Proposer 1: E for A", "Proposer 1: E for C", "Proposer 1: B for AC", "Proposer 1: B for AE", "Proposer 1: B for CC", "Proposer 1: B for CE", "Proposer 1: B for EE", "Proposer 1: BC for A", "Proposer 1: BC for AE", "Proposer 1: BC for E", "Proposer 1: BC for EE", "Proposer 1: BD for A", "Proposer 1: BD for AC", "Proposer 1: BD for AE", "Proposer 1: BD for C", "Proposer 1: BD for CC", "Proposer 1: BD for CE", "Proposer 1: BD for E", "Proposer 1: BD for EE", "Proposer 1: BE for A", "Proposer 1: BE for AC", "Proposer 1: BE for C", "Proposer 1: BE for CC", "Proposer 1: C for AE", "Proposer 1: C for EE", "Proposer 1: CD for A", "Proposer 1: CD for AE", "Proposer 1: CD for E", "Proposer 1: CD for EE", "Proposer 1: CE for A", "Proposer 1: D for AC", "Proposer 1: D for AE", "Proposer 1: D for CC", "Proposer 1: D for CE", "Proposer 1: D for EE", "Proposer 1: DD for A", "Proposer 1: DD for AC", "Proposer 1: DD for AE", "Proposer 1: DD for C", "Proposer 1: DD for CC", "Proposer 1: DD for CE", "Proposer 1: DD for E", "Proposer 1: DD for EE", "Proposer 1: DE for A", "Proposer 1: DE for AC", "Proposer 1: DE for C", "Proposer 1: DE for CC", "Proposer 1: E for AC", "Proposer 1: E for CC", "Proposer 1: EE for A", "Proposer 1: EE for AC", "Proposer 1: EE for C", "Proposer 1: EE for CC", "Proposer 1: B for ACC", "Proposer 1: B for ACE", "Proposer 1: B for AEE", "Proposer 1: B for CCC", "Proposer 1: B for CCE", "Proposer 1: B for CEE", "Proposer 1: B for EEE", "Proposer 1: BC for AEE", "Proposer 1: BC for EEE", "Proposer 1: BCD for A", "Proposer 1: BCD for AE", "Proposer 1: BCD for AEE", "Proposer 1: BCD for E", "Proposer 1: BCD for EE", "Proposer 1: BCD for EEE", "Proposer 1: BCE for A", "Proposer 1: BD for ACC", "Proposer 1: BD for ACE", "Proposer 1: BD for AEE", "Proposer 1: BD for CCC", "Proposer 1: BD for CCE", "Proposer 1: BD for CEE", "Proposer 1: BD for EEE", "Proposer 1: BDD for A", "Proposer 1: BDD for AC", "Proposer 1: BDD for ACC", "Proposer 1: BDD for ACE", "Proposer 1: BDD for AE", "Proposer 1: BDD for AEE", "Proposer 1: BDD for C", "Proposer 1: BDD for CC", "Proposer 1: BDD for CCC", "Proposer 1: BDD for CCE", "Proposer 1: BDD for CE", "Proposer 1: BDD for CEE", "Proposer 1: BDD for E", "Proposer 1: BDD for EE", "Proposer 1: BDD for EEE", "Proposer 1: BDE for A", "Proposer 1: BDE for AC", "Proposer 1: BDE for ACC", "Proposer 1: BDE for C", "Proposer 1: BDE for CC", "Proposer 1: BDE for CCC", "Proposer 1: BE for ACC", "Proposer 1: BE for CCC", "Proposer 1: BEE for A", "Proposer 1: BEE for AC", "Proposer 1: BEE for ACC", "Proposer 1: BEE for C", "Proposer 1: BEE for CC", "Proposer 1: BEE for CCC", "Proposer 1: C for AEE", "Proposer 1: C for EEE", "Proposer 1: CD for AEE", "Proposer 1: CD for EEE", "Proposer 1: CDD for A", "Proposer 1: CDD for AE", "Proposer 1: CDD for AEE", "Proposer 1: CDD for E", "Proposer 1: CDD for EE", "Proposer 1: CDD for EEE", "Proposer 1: CDE for A", "Proposer 1: CEE for A", "Proposer 1: D for ACC", "Proposer 1: D for ACE", "Proposer 1: D for AEE", "Proposer 1: D for CCC", "Proposer 1: D for CCE", "Proposer 1: D for CEE", "Proposer 1: D for EEE", "Proposer 1: DD for ACC", "Proposer 1: DD for ACE", "Proposer 1: DD for AEE", "Proposer 1: DD for CCC", "Proposer 1: DD for CCE", "Proposer 1: DD for CEE", "Proposer 1: DD for EEE", "Proposer 1: DDE for A", "Proposer 1: DDE for AC", "Proposer 1: DDE for ACC", "Proposer 1: DDE for C", "Proposer 1: DDE for CC", "Proposer 1: DDE for CCC", "Proposer 1: DE for ACC", "Proposer 1: DE for CCC", "Proposer 1: DEE for A", "Proposer 1: DEE for AC", "Proposer 1: DEE for ACC", "Proposer 1: DEE for C", "Proposer 1: DEE for CC", "Proposer 1: DEE for CCC", "Proposer 1: E for ACC", "Proposer 1: E for CCC", "Proposer 1: EE for ACC", "Proposer 1: EE for CCC", "Proposer 1: B for ACCC", "Proposer 1: B for ACCE", "Proposer 1: B for ACEE", "Proposer 1: B for AEEE", "Proposer 1: B for CCCE", "Proposer 1: B for CCEE", "Proposer 1: B for CEEE", "Proposer 1: BC for AEEE", "Proposer 1: BCD for AEEE", "Proposer 1: BCDD for A", "Proposer 1: BCDD for AE", "Proposer 1: BCDD for AEE", "Proposer 1: BCDD for AEEE", "Proposer 1: BCDD for E", "Proposer 1: BCDD for EE", "Proposer 1: BCDD for EEE", "Proposer 1: BCDE for A", "Proposer 1: BCEE for A", "Proposer 1: BD for ACCC", "Proposer 1: BD for ACCE", "Proposer 1: BD for ACEE", "Proposer 1: BD for AEEE", "Proposer 1: BD for CCCE", "Proposer 1: BD for CCEE", "Proposer 1: BD for CEEE", "Proposer 1: BDD for ACCC", "Proposer 1: BDD for ACCE", "Proposer 1: BDD for ACEE", "Proposer 1: BDD for AEEE", "Proposer 1: BDD for CCCE", "Proposer 1: BDD for CCEE", "Proposer 1: BDD for CEEE", "Proposer 1: BDDE for A", "Proposer 1: BDDE for AC", "Proposer 1: BDDE for ACC", "Proposer 1: BDDE for ACCC", "Proposer 1: BDDE for C", "Proposer 1: BDDE for CC", "Proposer 1: BDDE for CCC", "Proposer 1: BDE for ACCC", "Proposer 1: BDEE for A", "Proposer 1: BDEE for AC", "Proposer 1: BDEE for ACC", "Proposer 1: BDEE for ACCC", "Proposer 1: BDEE for C", "Proposer 1: BDEE for CC", "Proposer 1: BDEE for CCC", "Proposer 1: BE for ACCC", "Proposer 1: BEE for ACCC", "Proposer 1: C for AEEE", "Proposer 1: CD for AEEE", "Proposer 1: CDD for AEEE", "Proposer 1: CDDE for A", "Proposer 1: CDEE for A", "Proposer 1: D for ACCC", "Proposer 1: D for ACCE", "Proposer 1: D for ACEE", "Proposer 1: D for AEEE", "Proposer 1: D for CCCE", "Proposer 1: D for CCEE", "Proposer 1: D for CEEE", "Proposer 1: DD for ACCC", "Proposer 1: DD for ACCE", "Proposer 1: DD for ACEE", "Proposer 1: DD for AEEE", "Proposer 1: DD for CCCE", "Proposer 1: DD for CCEE", "Proposer 1: DD for CEEE", "Proposer 1: DDE for ACCC", "Proposer 1: DDEE for A", "Proposer 1: DDEE for AC", "Proposer 1: DDEE for ACC", "Proposer 1: DDEE for ACCC", "Proposer 1: DDEE for C", "Proposer 1: DDEE for CC", "Proposer 1: DDEE for CCC", "Proposer 1: DE for ACCC", "Proposer 1: DEE for ACCC", "Proposer 1: E for ACCC", "Proposer 1: EE for ACCC", "Proposer 1: B for ACCCE", "Proposer 1: B for ACCEE", "Proposer 1: B for ACEEE", "Proposer 1: B for CCCEE", "Proposer 1: B for CCEEE", "Proposer 1: BCDDE for A", "Proposer 1: BCDEE for A", "Proposer 1: BD for ACCCE", "Proposer 1: BD for ACCEE", "Proposer 1: BD for ACEEE", "Proposer 1: BD for CCCEE", "Proposer 1: BD for CCEEE", "Proposer 1: BDD for ACCCE", "Proposer 1: BDD for ACCEE", "Proposer 1: BDD for ACEEE", "Proposer 1: BDD for CCCEE", "Proposer 1: BDD for CCEEE", "Proposer 1: BDDEE for A", "Proposer 1: BDDEE for AC", "Proposer 1: BDDEE for ACC", "Proposer 1: BDDEE for ACCC", "Proposer 1: BDDEE for C", "Proposer 1: BDDEE for CC", "Proposer 1: BDDEE for CCC", "Proposer 1: CDDEE for A", "Proposer 1: D for ACCCE", "Proposer 1: D for ACCEE", "Proposer 1: D for ACEEE", "Proposer 1: D for CCCEE", "Proposer 1: D for CCEEE", "Proposer 1: DD for ACCCE", "Proposer 1: DD for ACCEE", "Proposer 1: DD for ACEEE", "Proposer 1: DD for CCCEE", "Proposer 1: DD for CCEEE", "Proposer 1: B for ACCCEE", "Proposer 1: B for ACCEEE", "Proposer 1: B for CCCEEE", "Proposer 1: BCDDEE for A", "Proposer 1: BD for ACCCEE", "Proposer 1: BD for ACCEEE", "Proposer 1: BD for CCCEEE", "Proposer 1: BDD for ACCCEE", "Proposer 1: BDD for ACCEEE", "Proposer 1: BDD for CCCEEE", "Proposer 1: D for ACCCEE", "Proposer 1: D for ACCEEE", "Proposer 1: D for CCCEEE", "Proposer 1: DD for ACCCEE", "Proposer 1: DD for ACCEEE", "Proposer 1: DD for CCCEEE", "Proposer 1: B for ACCCEEE", "Proposer 1: BD for ACCCEEE", "Proposer 1: BDD for ACCCEEE", "Proposer 1: D for ACCCEEE", "Proposer 1: DD for ACCCEEE"]
+
+# Apply action "Proposer 1: BDD for ACCCE"
+action: 27294
+
+# State 3
+# Move Number: 3
+# BACB
+# BEAA
+# DBDC
+# ECAE
+#
+# Pos: 0 7 5 13
+# Proposal 0: ABDD for C
+# Proposal 1: BDD for ACCCE
+IsTerminal() = False
+History() = [5, 11102, 27294]
+HistoryString() = "5, 11102, 27294"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+InformationStateString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: ACCCEEE\n"
+InformationStateString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: BCDDEE\nResponder chips: ACCCEEE\n"
+InformationStateString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: BCDDEE\nProposal 0: ABDD for C\nProposal 1: BDD for ACCCE\n"
+InformationStateTensor(0): binvec(463, 0x422044203080902204900c00000800200000260301e0e040201008040201808078201e0000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(463, 0x222044203080902204900c0000080020000024030180e070201008040201808078201e0000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(463, 0x122044203080902204900c00000800200000260301e0e04020180c070381808078201e0c060201c0804020180804020180807020180807820180)
+ObservationString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: ACCCEEE\n"
+ObservationString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: BCDDEE\nResponder chips: ACCCEEE\n"
+ObservationString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: BCDDEE\nProposal 0: ABDD for C\nProposal 1: BDD for ACCCE\n"
+ObservationTensor(0): binvec(463, 0x422044203080902204900c00000800200000260301e0e040201008040201808078201e0000000000000000000000000000000000000000000000)
+ObservationTensor(1): binvec(463, 0x222044203080902204900c0000080020000024030180e070201008040201808078201e0000000000000000000000000000000000000000000000)
+ObservationTensor(2): binvec(463, 0x122044203080902204900c00000800200000260301e0e04020180c070381808078201e0c060201c0804020180804020180807020180807820180)
+Rewards() = [0.0, 0.0, 0.0]
+Returns() = [0.0, 0.0, 0.0]
+LegalActions() = [93120, 93121, 93122]
+StringLegalActions() = ["Deal: trade with proposer 0", "Deal: trade with proposer 1", "No Deal!"]
+
+# Apply action "Deal: trade with proposer 1"
+action: 93121
+
+# State 4
+# Move Number: 4
+# BACB
+# BEAA
+# DBDC
+# ECAE
+#
+# Pos: 0 7 5 13
+# Proposal 0: ABDD for C
+# Proposal 1: BDD for ACCCE
+IsTerminal() = True
+History() = [5, 11102, 27294, 93121]
+HistoryString() = "5, 11102, 27294, 93121"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: BDDEE\n"
+InformationStateString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: ACCCCEEE\nResponder chips: BDDEE\n"
+InformationStateString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: ACCCCEEE\n"
+InformationStateTensor(0): binvec(463, 0x4a2044203080902204900c00000800200000260301e0e04020100804020100c040381c0000000000000000000000000000000000000000000000)
+InformationStateTensor(1): binvec(463, 0x2a2044203080902204900c00000800200000260201f0807820100804020100c040381c0000000000000000000000000000000000000000000000)
+InformationStateTensor(2): binvec(463, 0x1a2044203080902204900c00000800200000260301e0e04030100f8403c100c040381c0000000000000000000000000000000000000000000000)
+ObservationString(0) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 0\nPos: 0 7 5 13\nMy chips: ABCCCDD\nResponder chips: BDDEE\n"
+ObservationString(1) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 1\nPos: 0 7 5 13\nMy chips: ACCCCEEE\nResponder chips: BDDEE\n"
+ObservationString(2) = "BACB\nBEAA\nDBDC\nECAE\n\nPlayer: 2\nPos: 0 7 5 13\nP0 chips: ABCCCDD\nP1 chips: ACCCCEEE\n"
+ObservationTensor(0): binvec(463, 0x4a2044203080902204900c00000800200000260301e0e04020100804020100c040381c0000000000000000000000000000000000000000000000)
+ObservationTensor(1): binvec(463, 0x2a2044203080902204900c00000800200000260201f0807820100804020100c040381c0000000000000000000000000000000000000000000000)
+ObservationTensor(2): binvec(463, 0x1a2044203080902204900c00000800200000260301e0e04030100f8403c100c040381c0000000000000000000000000000000000000000000000)
+Rewards() = [0.0, 35.0, -5.0]
+Returns() = [0.0, 35.0, -5.0]

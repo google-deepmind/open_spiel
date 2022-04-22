@@ -21,8 +21,13 @@ with currently the following implementations:
 The main way of using a distribution is to call `value(state)`.
 """
 
+import abc
+from typing import Any, Optional
 
-class Distribution(object):
+import pyspiel
+
+
+class Distribution(abc.ABC):
   """Base class for distributions.
 
   This represents a probability distribution over the states of a game.
@@ -31,7 +36,7 @@ class Distribution(object):
     game: the game for which this distribution is derives
   """
 
-  def __init__(self, game):
+  def __init__(self, game: pyspiel.Game):
     """Initializes a distribution.
 
     Args:
@@ -39,7 +44,8 @@ class Distribution(object):
     """
     self.game = game
 
-  def value(self, state):
+  @abc.abstractmethod
+  def value(self, state: pyspiel.State) -> float:
     """Returns the probability of the distribution on the state.
 
     Args:
@@ -50,7 +56,10 @@ class Distribution(object):
     """
     raise NotImplementedError()
 
-  def value_str(self, state_str, default_value=None):
+  @abc.abstractmethod
+  def value_str(self,
+                state_str: str,
+                default_value: Optional[float] = None) -> float:
     """Returns the probability of the distribution on the state string given.
 
     Args:
@@ -63,7 +72,7 @@ class Distribution(object):
     """
     raise NotImplementedError()
 
-  def __call__(self, state):
+  def __call__(self, state: pyspiel.State) -> float:
     """Turns the distribution into a callable.
 
     Args:
@@ -73,3 +82,15 @@ class Distribution(object):
       Float: probability.
     """
     return self.value(state)
+
+
+class ParametricDistribution(Distribution):
+  """A parametric distribution."""
+
+  @abc.abstractmethod
+  def get_params(self) -> Any:
+    """Returns the distribution parameters."""
+
+  @abc.abstractmethod
+  def set_params(self, params: Any):
+    """Sets the distribution parameters."""

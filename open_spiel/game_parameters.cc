@@ -151,7 +151,7 @@ GameParameters DeserializeGameParameters(
   return game_params;
 }
 
-inline std::string GameParametersToString(const GameParameters& game_params) {
+std::string GameParametersToString(const GameParameters& game_params) {
   std::string str;
   if (game_params.empty()) return "";
   if (game_params.count("name")) str = game_params.at("name").string_value();

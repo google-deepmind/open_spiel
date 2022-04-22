@@ -11,6 +11,7 @@ Status                                       | Game
 -------------------------------------------- | ----
 <font color="orange"><b>~</b></font>         | [Amazons](#amazons)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
+<font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
@@ -20,6 +21,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Cliff Walking](#cliff-walking)
 <font color="orange"><b>~</b></font>         | [Clobber](#clobber)
 <font color="orange"><b>~</b></font>         | [Coin Game](#coin-game)
+<font color="orange"><b>~</b></font>         | [Colored Trails](#colored-trails)
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
@@ -92,6 +94,16 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
+
+### Bargaining
+
+*   Agents negotiate for items in a pool with different (hidden) valuations.
+*   Research game.
+*   Non-deterministic (randomized pool and valuations).
+*   Imperfect information.
+*   2 players.
+*   [Lewis et al. '17](https://arxiv.org/abs/1706.05125),
+    [DeVault et al. '15](https://www.aaai.org/ocs/index.php/SSS/SSS15/paper/viewFile/10335/10100)
 
 ### Battleship
 
@@ -191,6 +203,19 @@ Status                                       | Game
 *   2 players.
 *   [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent
     Reinforcement Learning](https://arxiv.org/abs/1802.09640)
+
+### Colored Trails
+
+*   Agents negotiations for chips that they they play on a colored grid to move
+    closer to the goal.
+*   Agents on a grid.
+*   Research game.
+*   Non-deterministic (randomized board & chip configuration).
+*   Imperfect information.
+*   3 players.
+*   [Ya'akov et al. '10](https://dash.harvard.edu/handle/1/4726287),
+    [Fecici & Pfeffer '08](https://dl.acm.org/doi/10.5555/1402383.1402431),
+    [de Jong et al. '11](https://www.ifaamas.org/Proceedings/aamas2011/papers/C4_R57.pdf)
 
 ### Connect Four
 

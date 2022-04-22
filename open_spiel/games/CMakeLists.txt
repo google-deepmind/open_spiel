@@ -3,6 +3,8 @@ set(GAME_SOURCES
   amazons.h
   backgammon.cc
   backgammon.h
+  bargaining.cc
+  bargaining.h
   battleship.cc
   battleship.h
   battleship_types.h
@@ -33,6 +35,9 @@ set(GAME_SOURCES
   clobber.h
   coin_game.cc
   coin_game.h
+  colored_trails.cc
+  colored_trails.h
+  colored_trails/colored_trails_utils.cc
   connect_four.cc
   connect_four.h
   coop_box_pushing.cc
@@ -243,6 +248,12 @@ add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
 
+add_executable(bargaining_instance_generator bargaining_instance_generator.cc
+               ${OPEN_SPIEL_OBJECTS})
+add_executable(bargaining_test bargaining_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(bargaining_test bargaining_test)
+
 add_executable(battleship_test battleship_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(battleship_test battleship_test)
@@ -283,6 +294,14 @@ add_executable(coin_game_test coin_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(coin_game_test coin_game_test)
+
+add_executable(colored_trails_board_generator
+               colored_trails/colored_trails_board_generator.cc
+               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
+
+add_executable(colored_trails_test colored_trails_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(colored_trails_test colored_trails_test)
 
 add_executable(connect_four_test connect_four_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
