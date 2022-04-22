@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tabular Q-learning agent."""
+"""Tabular Multiagent Q-learning agent."""
 
 from __future__ import absolute_import
 from __future__ import division
