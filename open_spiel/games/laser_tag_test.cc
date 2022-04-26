@@ -14,6 +14,10 @@
 
 #include "open_spiel/games/laser_tag.h"
 
+#include <memory>
+#include <string>
+
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -132,6 +136,318 @@ void BasicLaserTagTestsBigGrid() {
       10);
 }
 
+void BasicPartiallyObservableLaserTagTests() {
+  testing::ChanceOutcomesTest(
+      *LoadGame("laser_tag", {{"fully_obs", GameParameter(false)}}));
+
+  testing::RandomSimTest(
+      *LoadGame("laser_tag", {{"fully_obs", GameParameter(false)}}), 100);
+}
+
+std::vector<float> get_obs_tensor_from_string(const std::string& obs_string,
+                                              int obs_grid_size) {
+  std::vector<float> tensor(4 * obs_grid_size, 0.0);
+
+  int num_newlines = 0;
+  for (int i = 0; i < obs_string.length(); i++) {
+    switch (obs_string[i]) {
+      case 'A':
+        tensor[i - num_newlines] = 1.0;
+        break;
+      case 'B':
+        tensor[obs_grid_size + i - num_newlines] = 1.0;
+        break;
+      case '.':
+        tensor[2 * obs_grid_size + i - num_newlines] = 1.0;
+        break;
+      case '*':
+        tensor[3 * obs_grid_size + i - num_newlines] = 1.0;
+        break;
+      case '\n':
+        num_newlines += 1;
+        break;
+      default:
+        // Reached 'O' in "Orientations"
+        SPIEL_CHECK_EQ(obs_string[i], 'O');
+        return tensor;
+    }
+  }
+  return tensor;
+}
+
+void PartiallyObservableLaserTagDefaultObsTests() {
+  float tolerence = 0.0001;
+  std::shared_ptr<const Game> game =
+      LoadGame("laser_tag", {{"fully_obs", GameParameter(false)},
+                             {"obs_front", GameParameter(17)},
+                             {"obs_back", GameParameter(2)},
+                             {"obs_side", GameParameter(10)},
+                             {"grid", GameParameter(laser_tag::kDefaultGrid)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B top-right
+  state->ApplyAction(kTopLeftSpawnOutcome);   // Spawn A top-left
+
+  // A.....B
+  // .......
+  // ..*.*..
+  // .**.**.
+  // ..*.*..
+  // .......
+  // .......
+  //
+  // Both A and B facing south
+
+  int obs_grid_size = (17 + 2 + 1) * (2 * 10 + 1);
+  std::string expected_obs_string_A =
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "****.......**********\n"
+      "****.......**********\n"
+      "****..*.*..**********\n"
+      "****.**.**.**********\n"
+      "****..*.*..**********\n"
+      "****.......**********\n"
+      "****B.....A**********\n"
+      "*********************\n"
+      "*********************\n"
+      "Orientations: 1 1\n";
+  std::vector<float> expected_obs_tensor_A =
+      get_obs_tensor_from_string(expected_obs_string_A, obs_grid_size);
+
+  std::string expected_obs_string_B =
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "**********.......****\n"
+      "**********.......****\n"
+      "**********..*.*..****\n"
+      "**********.**.**.****\n"
+      "**********..*.*..****\n"
+      "**********.......****\n"
+      "**********B.....A****\n"
+      "*********************\n"
+      "*********************\n"
+      "Orientations: 1 1\n";
+  std::vector<float> expected_obs_tensor_B =
+      get_obs_tensor_from_string(expected_obs_string_B, obs_grid_size);
+
+  SPIEL_CHECK_EQ(expected_obs_string_A, state->ObservationString(0));
+  SPIEL_CHECK_EQ(expected_obs_string_B, state->ObservationString(1));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_A, state->ObservationTensor(0), tolerence));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_B, state->ObservationTensor(1), tolerence));
+
+  state->ApplyActions({2, 2});             // A: Move forward, B: Move forward.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  state->ApplyActions({0, 1});             // A: Turn left, B: Turn right.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  state->ApplyActions({2, 2});             // A: Move forward, B: Move forward.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  state->ApplyActions({2, 2});             // A: Move forward, B: Move forward.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  // .......
+  // ..A.B..
+  // ..*.*..
+  // .**.**.
+  // ..*.*..
+  // .......
+  // .......
+  //
+  // A facing east, B facing west
+
+  expected_obs_string_A =
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********.......*****\n"
+      "*********...*...*****\n"
+      "*********.B***..*****\n"
+      "*********.......*****\n"
+      "*********.A***..*****\n"
+      "*********...*...*****\n"
+      "*********.......*****\n"
+      "Orientations: 2 3\n";
+  expected_obs_tensor_A =
+      get_obs_tensor_from_string(expected_obs_string_A, obs_grid_size);
+
+  expected_obs_string_B =
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*********************\n"
+      "*****.......*********\n"
+      "*****...*...*********\n"
+      "*****..***A.*********\n"
+      "*****.......*********\n"
+      "*****..***B.*********\n"
+      "*****...*...*********\n"
+      "*****.......*********\n"
+      "Orientations: 2 3\n";
+  expected_obs_tensor_B =
+      get_obs_tensor_from_string(expected_obs_string_B, obs_grid_size);
+
+  SPIEL_CHECK_EQ(expected_obs_string_A, state->ObservationString(0));
+  SPIEL_CHECK_EQ(expected_obs_string_B, state->ObservationString(1));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_A, state->ObservationTensor(0), tolerence));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_B, state->ObservationTensor(1), tolerence));
+}
+
+void PartiallyObservableLaserTagSmallObsTests() {
+  float tolerence = 0.0001;
+  std::shared_ptr<const Game> game =
+      LoadGame("laser_tag", {{"fully_obs", GameParameter(false)},
+                             {"obs_front", GameParameter(2)},
+                             {"obs_back", GameParameter(1)},
+                             {"obs_side", GameParameter(1)},
+                             {"grid", GameParameter(laser_tag::kDefaultGrid)}});
+  std::unique_ptr<State> state = game->NewInitialState();
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B top-right
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(kTopLeftSpawnOutcome);  // Spawn A top-left
+
+  // A.....B
+  // .......
+  // ..*.*..
+  // .**.**.
+  // ..*.*..
+  // .......
+  // .......
+  //
+  // Both A and B facing south
+
+  std::string expected_obs_string_A =
+      "..*\n"
+      "..*\n"
+      ".A*\n"
+      "***\n"
+      "Orientations: 1 -1\n";
+  std::vector<float> expected_obs_tensor_A = {
+      0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,  // Plane 0: A
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Plane 1: B
+      1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0,  // Plane 2: .
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1   // Plane 3: *
+  };
+
+  std::string expected_obs_string_B =
+      "*..\n"
+      "*..\n"
+      "*B.\n"
+      "***\n"
+      "Orientations: -1 1\n";
+  std::vector<float> expected_obs_tensor_B = {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Plane 0: A
+      0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,  // Plane 1: B
+      0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0,  // Plane 2: .
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1   // Plane 3: *
+  };
+
+  SPIEL_CHECK_EQ(expected_obs_string_A, state->ObservationString(0));
+  SPIEL_CHECK_EQ(expected_obs_string_B, state->ObservationString(1));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_A, state->ObservationTensor(0), tolerence));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_B, state->ObservationTensor(1), tolerence));
+
+  state->ApplyActions({2, 2});             // A: Move forward, B: Move forward.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  state->ApplyActions({0, 1});             // A: Turn left, B: Turn right.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  state->ApplyActions({2, 2});             // A: Move forward, B: Move forward.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  state->ApplyActions({2, 2});             // A: Move forward, B: Move forward.
+  state->ApplyAction(kChanceInit0Action);  // chance node: player 0 first
+
+  // .......
+  // ..A.B..
+  // ..*.*..
+  // .**.**.
+  // ..*.*..
+  // .......
+  // .......
+  //
+  // A facing east, B facing west
+
+  expected_obs_string_A =
+      ".B*\n"
+      "...\n"
+      ".A*\n"
+      "...\n"
+      "Orientations: 2 3\n";
+  expected_obs_tensor_A = {
+      0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,  // Plane 0: A
+      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Plane 1: B
+      1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1,  // Plane 2: .
+      0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0   // Plane 3: *
+  };
+
+  expected_obs_string_B =
+      "*A.\n"
+      "...\n"
+      "*B.\n"
+      "...\n"
+      "Orientations: 2 3\n";
+  expected_obs_tensor_B = {
+      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // Plane 0: A
+      0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,  // Plane 1: B
+      0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,  // Plane 2: .
+      1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0   // Plane 3: *
+  };
+
+  SPIEL_CHECK_EQ(expected_obs_string_A, state->ObservationString(0));
+  SPIEL_CHECK_EQ(expected_obs_string_B, state->ObservationString(1));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_A, state->ObservationTensor(0), tolerence));
+  SPIEL_CHECK_TRUE(
+      AllNear(expected_obs_tensor_B, state->ObservationTensor(1), tolerence));
+}
+
 }  // namespace
 }  // namespace laser_tag
 }  // namespace open_spiel
@@ -145,4 +461,7 @@ int main(int argc, char **argv) {
   laser_tag::SimpleTagTests(1000, false, laser_tag::kDefaultGrid);
   laser_tag::BasicLaserTagTests();
   laser_tag::BasicLaserTagTestsBigGrid();
+  laser_tag::BasicPartiallyObservableLaserTagTests();
+  laser_tag::PartiallyObservableLaserTagSmallObsTests();
+  laser_tag::PartiallyObservableLaserTagDefaultObsTests();
 }

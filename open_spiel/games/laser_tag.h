@@ -18,17 +18,24 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
 
 // A fully observable version of the first-person gridworld laser tag game from
-// [1,2]. This version is not first-person and not partially observable, but
-// the mechanics are otherwise identical. The current grid is "small2" from [2].
+// [1,2] with identical mechanics. This implementation includes support for
+// both fully observable (the default) and first-person partially observable
+// modes. The current grid is "small2" from [2].
 //
-// TODO:
-//   - implement partial observability (option for first-person observations)
+// When run in partially observable mode each agent has a local field-of-view,
+// and sees (by default) 17 spaces in front, 10 to either side, and 2 spaces
+// behind (per [2]). Each agent's observation is encoded as a 4x20x21 tensor,
+// where each plane encodes the presence of player A, player B, empty, obstacle,
+// respectively (same as fully observable tensor observations). The dimensions
+// - front, side, and back - of the field of vision can be changed (see
+// parameters below).
 //
 // [1] Leibo et al. Multi-agent Reinforcement Learning in Sequential Social
 //     Dilemmas. https://arxiv.org/abs/1702.03037
@@ -45,6 +52,17 @@
 //       "grid"       string  String representation of grid.
 //                            Empty spaces are '.', obstacles are '*', spawn
 //                            points are 'S' (there must be four of these).
+//       "fully_obs"  bool    If set, the environment is full observable.
+//                            Otherwise, the environment is partially
+//                            observable (default = true)
+//       "obs_front"  int     Number of squares each agent sees in front of
+//                            themself (only used if fully_obs=false)
+//                            (default=17)
+//       "obs_back"   int     Number of squares each agent sees behind themself
+//                            (only used if fully_obs=false) (default=2)
+//       "obs_side"   int     Number of squares each agent sees to either side
+//                            of themself (only used if fully_obs=false)
+//                            (default=10)
 
 namespace open_spiel {
 namespace laser_tag {
@@ -85,11 +103,7 @@ class LaserTagState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
-  std::string ObservationString(int player) const override {
-    SPIEL_CHECK_GE(player, 0);
-    SPIEL_CHECK_LT(player, num_players_);
-    return ToString();
-  }
+  std::string ObservationString(int player) const override;
   void ObservationTensor(int player, absl::Span<float> values) const override;
   int CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : cur_player_;
@@ -111,6 +125,10 @@ class LaserTagState : public SimMoveState {
   bool ResolveMove(int player, int move);  // Return true if there was a tag
   bool InBounds(int r, int c) const;
   int observation_plane(int r, int c) const;
+  std::vector<int> map_observation_to_grid(int player, int r, int c) const;
+  std::string PartialObservationString(int player) const;
+  void FullObservationTensor(absl::Span<float> values) const;
+  void PartialObservationTensor(int player, absl::Span<float> values) const;
 
   const Grid& grid_;
 
@@ -120,6 +138,10 @@ class LaserTagState : public SimMoveState {
   int total_moves_ = -1;
   int horizon_ = -1;
   bool zero_sum_rewards_ = false;
+  bool fully_obs_ = false;
+  int obs_front_ = -1;
+  int obs_back_ = -1;
+  int obs_side_ = -1;
   std::vector<int> needs_respawn_ = {0, 1};
   std::array<int, 2> player_row_ = {{-1, -1}};   // Players' rows.
   std::array<int, 2> player_col_ = {{-1, -1}};   // Players' cols.
@@ -151,6 +173,10 @@ class LaserTagGame : public SimMoveGame {
   Grid grid_;
   int horizon_;
   bool zero_sum_;
+  bool fully_obs_;
+  int obs_front_;
+  int obs_back_;
+  int obs_side_;
 };
 
 }  // namespace laser_tag
