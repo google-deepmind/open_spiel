@@ -27,7 +27,6 @@ from open_spiel.python import rl_agent
 from open_spiel.python import rl_tools
 from open_spiel.python.algorithms.jpsro import _mgce, _mgcce
 from open_spiel.python.examples.matrix_nash import lemke_howson_solve
-import pyspiel
 
 def valuedict():
   return collections.defaultdict(float)
