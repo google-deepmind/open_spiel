@@ -53,8 +53,8 @@ ObservationString(2) = "Non-terminal"
 ObservationTensor(0): ◯
 ObservationTensor(1): ◯
 ObservationTensor(2): ◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions(0) = [0, 1]
 LegalActions(1) = [0, 1]
 LegalActions(2) = [0, 1]
@@ -85,5 +85,5 @@ ObservationString(2) = "Terminal. History string: 1, 1, 0"
 ObservationTensor(0): ◉
 ObservationTensor(1): ◉
 ObservationTensor(2): ◉
-Rewards() = [1.0, -1.0, 1.0]
-Returns() = [1.0, -1.0, 1.0]
+Rewards() = [1, -1, 1]
+Returns() = [1, -1, 1]

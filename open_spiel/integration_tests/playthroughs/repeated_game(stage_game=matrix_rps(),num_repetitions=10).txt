@@ -42,8 +42,8 @@ ObservationString(0) = ""
 ObservationString(1) = ""
 ObservationTensor(0): ◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2]
 LegalActions(1) = [0, 1, 2]
 StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
@@ -67,8 +67,8 @@ ObservationString(0) = "Rock Rock "
 ObservationString(1) = "Rock Rock "
 ObservationTensor(0): ◉◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2]
 LegalActions(1) = [0, 1, 2]
 StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
@@ -95,8 +95,8 @@ ObservationString(0) = "Scissors Scissors "
 ObservationString(1) = "Scissors Scissors "
 ObservationTensor(0): ◯◯◉◯◯◉
 ObservationTensor(1): ◯◯◉◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2]
 LegalActions(1) = [0, 1, 2]
 StringLegalActions(0) = ["Rock", "Paper", "Scissors"]
@@ -175,5 +175,5 @@ ObservationString(0) = "Rock Scissors "
 ObservationString(1) = "Rock Scissors "
 ObservationTensor(0): ◉◯◯◯◯◉
 ObservationTensor(1): ◉◯◯◯◯◉
-Rewards() = [1.0, -1.0]
-Returns() = [3.0, -3.0]
+Rewards() = [1, -1]
+Returns() = [3, -3]

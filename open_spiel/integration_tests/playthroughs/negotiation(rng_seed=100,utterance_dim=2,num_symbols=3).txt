@@ -68,8 +68,8 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10]
 StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal: [0, 0, 2]", "Proposal: [0, 0, 3]", "Proposal: [0, 0, 4]", "Proposal: [0, 1, 0]", "Proposal: [0, 1, 1]", "Proposal: [0, 1, 2]", "Proposal: [0, 1, 3]", "Proposal: [0, 1, 4]"]
 
@@ -95,8 +95,8 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0, 9\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [217, 218, 219, 220, 221, 222, 223, 224, 225]
 StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utterance: [0, 2]", ", Utterance: [1, 0]", ", Utterance: [1, 1]", ", Utterance: [1, 2]", ", Utterance: [2, 0]", ", Utterance: [2, 1]", ", Utterance: [2, 2]"]
 
@@ -122,8 +122,8 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
 ObservationTensor(1): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0, 9, 223\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 216]
 StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal: [0, 0, 2]", "Proposal: [0, 0, 3]", "Proposal: [0, 0, 4]", "Proposal: [0, 1, 0]", "Proposal: [0, 1, 1]", "Proposal: [0, 1, 2]", "Proposal: [0, 1, 3]", "Proposal: [0, 1, 4]", "Proposal: Agreement reached!"]
 
@@ -150,8 +150,8 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯
 ObservationTensor(1): ◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0, 9, 223, 1\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [217, 218, 219, 220, 221, 222, 223, 224, 225]
 StringLegalActions() = [", Utterance: [0, 0]", ", Utterance: [0, 1]", ", Utterance: [0, 2]", ", Utterance: [1, 0]", ", Utterance: [1, 1]", ", Utterance: [1, 2]", ", Utterance: [2, 0]", ", Utterance: [2, 1]", ", Utterance: [2, 2]"]
 
@@ -178,8 +178,8 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉
 ObservationTensor(1): ◉◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0, 9, 223, 1, 225\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 216]
 StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal: [0, 0, 2]", "Proposal: [0, 0, 3]", "Proposal: [0, 0, 4]", "Proposal: [0, 1, 0]", "Proposal: [0, 1, 1]", "Proposal: [0, 1, 2]", "Proposal: [0, 1, 3]", "Proposal: [0, 1, 4]", "Proposal: Agreement reached!"]
 
@@ -211,8 +211,8 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯
 ObservationTensor(1): ◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0, 9, 223, 1, 225, 7, 220\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 216]
 StringLegalActions() = ["Proposal: [0, 0, 0]", "Proposal: [0, 0, 1]", "Proposal: [0, 0, 2]", "Proposal: [0, 0, 3]", "Proposal: [0, 0, 4]", "Proposal: [0, 1, 0]", "Proposal: [0, 1, 1]", "Proposal: [0, 1, 2]", "Proposal: [0, 1, 3]", "Proposal: [0, 1, 4]", "Proposal: Agreement reached!"]
 
@@ -245,5 +245,5 @@ ObservationString(1) = "Max steps: 4\nItem pool: 0 1 4\nAgent 1 util vec: 1 9 6\
 ObservationTensor(0): ◯◯◉◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
 ObservationTensor(1): ◯◯◉◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◉◯◯
 SerializeState() = "4\n0 1 4\n2 9 4\n1 9 6\n0, 9, 223, 1, 225, 7, 220, 9, 223\n"
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

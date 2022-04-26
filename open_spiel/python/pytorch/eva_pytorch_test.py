@@ -14,17 +14,15 @@
 
 """Tests for open_spiel.python.algorithms.eva."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
+from absl.testing import absltest
 from absl.testing import parameterized
-
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+import torch
 
 from open_spiel.python import rl_environment
 from open_spiel.python.pytorch import eva
+
+
+SEED = 24984617
 
 
 class EVATest(parameterized.TestCase):
@@ -64,15 +62,15 @@ class EVATest(parameterized.TestCase):
       agent.step(time_step)
 
 
-class QueryableFixedSizeRingBufferTest(TestCase):
+class QueryableFixedSizeRingBufferTest(absltest.TestCase):
 
   def test_replay_buffer_add(self):
     replay_buffer = eva.QueryableFixedSizeRingBuffer(replay_buffer_capacity=10)
-    self.assertEqual(len(replay_buffer), 0)
+    self.assertEmpty(replay_buffer)
     replay_buffer.add("entry1")
-    self.assertEqual(len(replay_buffer), 1)
+    self.assertLen(replay_buffer, 1)
     replay_buffer.add("entry2")
-    self.assertEqual(len(replay_buffer), 2)
+    self.assertLen(replay_buffer, 2)
 
     self.assertIn("entry1", replay_buffer)
     self.assertIn("entry2", replay_buffer)
@@ -82,7 +80,7 @@ class QueryableFixedSizeRingBufferTest(TestCase):
     replay_buffer.add("entry1")
     replay_buffer.add("entry2")
     replay_buffer.add("entry3")
-    self.assertEqual(len(replay_buffer), 2)
+    self.assertLen(replay_buffer, 2)
 
     self.assertIn("entry2", replay_buffer)
     self.assertIn("entry3", replay_buffer)
@@ -103,4 +101,5 @@ class QueryableFixedSizeRingBufferTest(TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  torch.manual_seed(SEED)
+  absltest.main()

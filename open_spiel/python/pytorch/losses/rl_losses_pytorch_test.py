@@ -14,20 +14,17 @@
 
 """Tests for open_spiel.python.pytorch.losses.rl_losses."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
+from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
 import torch
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
 
 from open_spiel.python.pytorch.losses import rl_losses
 
+SEED = 24984617
 
-class RLLossesTest(parameterized.TestCase, TestCase):
+
+class RLLossesTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.named_parameters(('no_entropy_cost', 0.),
                                   ('with_entropy_cost', 1.))
@@ -101,4 +98,5 @@ class RLLossesTest(parameterized.TestCase, TestCase):
 
 
 if __name__ == '__main__':
-  run_tests()
+  torch.manual_seed(SEED)
+  absltest.main()

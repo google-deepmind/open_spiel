@@ -152,8 +152,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -282,8 +282,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◉◯
                                              ◯◯◉◯
                                              ◯◯◉◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
 StringLegalActions() = ["pass", "a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2d3", "d2c3"]
 
@@ -412,8 +412,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -542,8 +542,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
 StringLegalActions() = ["pass", "a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3d2", "c3b2", "d3d2", "d3c2"]
 
@@ -672,8 +672,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -806,8 +806,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -988,8 +988,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -1122,8 +1122,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -1320,8 +1320,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -1454,8 +1454,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -1652,8 +1652,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -1786,8 +1786,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense a2", "Sense b2"]
 
@@ -1936,5 +1936,5 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
                                              ◯◯◯◯
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]

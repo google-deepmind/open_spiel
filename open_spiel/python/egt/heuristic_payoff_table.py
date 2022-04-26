@@ -14,10 +14,6 @@
 
 """An object to store the heuristic payoff table for a game."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import abc
 import collections
 
@@ -314,7 +310,10 @@ class _PayoffTableInterface(metaclass=abc.ABCMeta):
     if not all([p >= 0 for p in strategy]):
       raise ValueError("The strategy probabilities should all be >= 0.")
 
-    distributions = self._distributions
+    distributions = self._distributions.astype(int)
+    if not np.all(np.isclose(self._distributions, distributions, 1e-10)):
+      raise ValueError("Conversion to integers for distributions failed.")
+
     # Multinomial coefficients (one per distribution).
     coefficients = _multinomial_coefficients(distributions)
     # Probabilities of sampling each distribution given population composition.

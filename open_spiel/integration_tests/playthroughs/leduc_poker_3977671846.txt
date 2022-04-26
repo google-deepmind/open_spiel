@@ -182,8 +182,8 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◉◯◯◯◯◯
 ObservationTensor(1).community_card: ◯◯◯◯◯◯
 ObservationTensor(1).pot_contribution: ◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -235,8 +235,8 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◉◯◯◯◯◯
 ObservationTensor(1).community_card: ◯◯◯◯◯◯
 ObservationTensor(1).pot_contribution: ◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -288,8 +288,8 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◉◯◯◯◯◯
 ObservationTensor(1).community_card: ◯◯◯◯◯◯
 ObservationTensor(1).pot_contribution = [1.0, 3.0]
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Fold", "Call", "Raise"]
 
@@ -345,8 +345,8 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◉◯◯◯◯◯
 ObservationTensor(1).community_card: ◯◯◯◉◯◯
 ObservationTensor(1).pot_contribution = [3.0, 3.0]
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -398,8 +398,8 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◉◯◯◯◯◯
 ObservationTensor(1).community_card: ◯◯◯◉◯◯
 ObservationTensor(1).pot_contribution = [3.0, 3.0]
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -451,5 +451,5 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◉◯◯◯◯◯
 ObservationTensor(1).community_card: ◯◯◯◉◯◯
 ObservationTensor(1).pot_contribution = [3.0, 3.0]
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

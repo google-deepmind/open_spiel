@@ -258,8 +258,8 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -335,8 +335,8 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -412,8 +412,8 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution = [1.0, 3.0, 1.0]
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Fold", "Call", "Raise"]
 
@@ -489,8 +489,8 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution = [1.0, 3.0, 3.0]
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Fold", "Call", "Raise"]
 
@@ -570,8 +570,8 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◉◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution = [1.0, 3.0, 3.0]
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [1, 2]
 StringLegalActions() = ["Call", "Raise"]
 
@@ -647,8 +647,8 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◉◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution = [1.0, 7.0, 3.0]
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["Fold", "Call", "Raise"]
 
@@ -724,5 +724,5 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◉◯◯◯◯
 ObservationTensor(2).community_card: ◯◉◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution = [1.0, 7.0, 7.0]
-Rewards() = [-1.0, 0.5, 0.5]
-Returns() = [-1.0, 0.5, 0.5]
+Rewards() = [-1, 0.5, 0.5]
+Returns() = [-1, 0.5, 0.5]

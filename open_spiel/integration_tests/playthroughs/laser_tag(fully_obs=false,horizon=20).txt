@@ -223,8 +223,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◉◯◉◯◯◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -296,8 +296,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◯◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◉◯◉◯◯◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -369,8 +369,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◯◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◉◯◉◯◯◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -498,8 +498,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◉◉◉◉◯◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◉◯◉◯◉◉◯◯◯◯  ◉◉◉◉◉◉◉◉◉◉◯◯◉◯◉◯◯◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -643,5 +643,5 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◉◉◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯◉◯◯◯◉◉◉◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◉◉◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯  ◉◉◉◉◯◯◉◉◉◯◯◉◉◉◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯  ◯◯◯◯◉◉◉◉◉◉◉◯◯◯◯◯◯◯◯◯◯  ◉◉◉◉◯◯◯◯◯◯◯◉◉◉◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

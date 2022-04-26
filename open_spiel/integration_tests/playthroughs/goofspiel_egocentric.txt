@@ -101,8 +101,8 @@ ObservationTensor(1).win_sequence: ◯◯
                                    ◯◯
                                    ◯◯
                                    ◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4"]
@@ -179,8 +179,8 @@ ObservationTensor(1).win_sequence: ◉◯
                                    ◯◯
                                    ◯◯
                                    ◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 3]
 LegalActions(1) = [0, 1, 2]
 StringLegalActions(0) = ["[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 4"]
@@ -257,8 +257,8 @@ ObservationTensor(1).win_sequence: ◉◯
                                    ◯◉
                                    ◯◯
                                    ◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 3]
 LegalActions(1) = [1, 2]
 StringLegalActions(0) = ["[P0]Bid: 1", "[P0]Bid: 4"]
@@ -335,5 +335,5 @@ ObservationTensor(1).win_sequence: ◉◯
                                    ◯◉
                                    ◯◉
                                    ◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

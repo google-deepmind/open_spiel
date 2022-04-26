@@ -95,8 +95,8 @@ ObservationString(0) = "HAHK"
 ObservationString(1) = "SASJ"
 ObservationTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["Pass", "1H", "1S", "1NT", "2H", "2S", "2NT"]
 
@@ -119,8 +119,8 @@ ObservationString(0) = "HAHK 2S:Us"
 ObservationString(1) = "SASJ 2S:Pd"
 ObservationTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 6]
 StringLegalActions() = ["Pass", "2NT"]
 
@@ -143,8 +143,8 @@ ObservationString(0) = "HAHK 2NT:Pd"
 ObservationString(1) = "SASJ 2NT:Us"
 ObservationTensor(0): ◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1): ◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0]
 StringLegalActions() = ["Pass"]
 
@@ -167,5 +167,5 @@ ObservationString(0) = "HAHK 2NT:Pd"
 ObservationString(1) = "SASJ 2NT:Us"
 ObservationTensor(0): ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◉◯◯◉◉◯◯◯◯◯◯
-Rewards() = [25.833333333333332, 25.833333333333332]
-Returns() = [25.833333333333332, 25.833333333333332]
+Rewards() = [25.8333333333333, 25.8333333333333]
+Returns() = [25.8333333333333, 25.8333333333333]

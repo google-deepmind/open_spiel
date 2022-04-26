@@ -266,8 +266,8 @@ ObservationTensor(1).private_unknown_squares: ◯◉◉◉
                                               ◯◉◉◉
 ObservationTensor(1).private_left_castling: ◉◯
 ObservationTensor(1).private_right_castling: ◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 117, 701, 714, 1197, 1285, 1298, 1882]
 StringLegalActions() = ["Rb1", "axb3", "bxc3", "bxa3", "Kb1", "cxd3", "cxb3", "dxc3"]
 
@@ -510,8 +510,8 @@ ObservationTensor(1).private_unknown_squares: ◯◯◉◯
                                               ◯◉◉◉
 ObservationTensor(1).private_left_castling: ◉◯
 ObservationTensor(1).private_right_castling: ◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1285, 1298, 1882]
 StringLegalActions() = ["Rb4", "a2", "axb2", "Kb4", "Kxb3", "cxd2", "cxb2", "dxc2"]
 
@@ -754,8 +754,8 @@ ObservationTensor(1).private_unknown_squares: ◯◯◉◯
                                               ◯◉◉◉
 ObservationTensor(1).private_left_castling: ◉◯
 ObservationTensor(1).private_right_castling: ◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [16, 17, 30, 714, 730, 731, 732, 733, 734, 735, 736, 737, 738, 746, 774, 787, 1197, 1212, 1257, 1285, 1768]
 StringLegalActions() = ["Ra2", "Rxa3", "Rb1", "bxa3", "b4=R", "bxc4=R", "bxa4=R", "b4=B", "bxc4=B", "bxa4=B", "b4=N", "bxc4=N", "bxa4=N", "b4=Q", "bxc4=Q", "bxa4=Q", "Kb1", "Kxd2", "c3", "cxd3", "Rxd2"]
 
@@ -998,8 +998,8 @@ ObservationTensor(1).private_unknown_squares: ◯◯◉◯
                                               ◯◉◉◉
 ObservationTensor(1).private_left_castling: ◉◯
 ObservationTensor(1).private_right_castling: ◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1184, 1197, 1212, 1225, 1768, 1900, 1903, 1906, 1955]
 StringLegalActions() = ["Rb4", "a2", "axb2", "Kc3", "Kb4", "Kxd3", "Kxb3", "Rxd3", "dxc1=R", "dxc1=B", "dxc1=N", "dxc1=Q"]
 
@@ -1242,5 +1242,5 @@ ObservationTensor(1).private_unknown_squares: ◉◯◉◯
                                               ◉◯◉◉
 ObservationTensor(1).private_left_castling: ◉◯
 ObservationTensor(1).private_right_castling: ◉◯
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]

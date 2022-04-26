@@ -82,8 +82,8 @@ class TicTacToeTest(absltest.TestCase):
             '+ ToString() = "python_tic_tac_toe()"\n',
             "- CurrentPlayer() = -4\n",
             "+ CurrentPlayer() = PlayerId.TERMINAL\n",
-            "- Returns() = [0.0, 0.0]\n",
-            "+ Returns() = [0.0, -0.0]\n",
+            "- Returns() = [0, 0]\n",
+            "+ Returns() = [0, -0]\n",
         })
 
   def test_observation_tensors_same(self):

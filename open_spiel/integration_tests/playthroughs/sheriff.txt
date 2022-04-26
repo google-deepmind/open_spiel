@@ -42,8 +42,8 @@ InformationStateString(0) = "T=0 num_illegal_items:none"
 InformationStateString(1) = "T=0 "
 InformationStateTensor(0): ◉◯◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [2, 3, 4, 5]
 StringLegalActions() = ["PlaceIllegalItems(num=0)", "PlaceIllegalItems(num=1)", "PlaceIllegalItems(num=2)", "PlaceIllegalItems(num=3)"]
 
@@ -64,8 +64,8 @@ InformationStateString(0) = "T=1 num_illegal_items:1"
 InformationStateString(1) = "T=1 "
 InformationStateTensor(0): ◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◉◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [6, 7, 8, 9]
 StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
 
@@ -86,8 +86,8 @@ InformationStateString(0) = "T=2 num_illegal_items:1/bribe:3"
 InformationStateString(1) = "T=2 /bribe:3"
 InformationStateTensor(0): ◯◉◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFeedback(will_inspect=True)"]
 
@@ -108,8 +108,8 @@ InformationStateString(0) = "T=3 num_illegal_items:1/bribe:3/feedback:1"
 InformationStateString(1) = "T=3 /bribe:3/feedback:1"
 InformationStateTensor(0): ◉◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◉◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [6, 7, 8, 9]
 StringLegalActions() = ["Bribe(amount=0)", "Bribe(amount=1)", "Bribe(amount=2)", "Bribe(amount=3)"]
 
@@ -130,8 +130,8 @@ InformationStateString(0) = "T=4 num_illegal_items:1/bribe:3/feedback:1/bribe:3"
 InformationStateString(1) = "T=4 /bribe:3/feedback:1/bribe:3"
 InformationStateTensor(0): ◯◉◉◯◯◯◯◯◉◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFeedback(will_inspect=True)"]
 
@@ -156,8 +156,8 @@ InformationStateString(0) = "T=6 num_illegal_items:1/bribe:3/feedback:1/bribe:3/
 InformationStateString(1) = "T=6 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2"
 InformationStateTensor(0): ◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◯
 InformationStateTensor(1): ◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["InspectionFeedback(will_inspect=False)", "InspectionFeedback(will_inspect=True)"]
 
@@ -186,5 +186,5 @@ InformationStateString(0) = "T=9 num_illegal_items:1/bribe:3/feedback:1/bribe:3/
 InformationStateString(1) = "T=9 /bribe:3/feedback:1/bribe:3/feedback:0/bribe:2/feedback:0/bribe:3/feedback:1"
 InformationStateTensor(0): ◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◉◯◯◯◯◉◉◯◯◉◯◉◯◯◯◉◯
 InformationStateTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◯◯◉◯◉◯◯◯◉◯
-Rewards() = [-2.0, 2.0]
-Returns() = [-2.0, 2.0]
+Rewards() = [-2, 2]
+Returns() = [-2, 2]

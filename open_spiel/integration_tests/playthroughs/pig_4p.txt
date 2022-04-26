@@ -63,8 +63,8 @@ ObservationTensor(3): ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -144,8 +144,8 @@ ObservationTensor(3): ◯◯◉◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -225,8 +225,8 @@ ObservationTensor(3): ◯◯◯◯◉◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -266,8 +266,8 @@ ObservationTensor(3): ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -307,8 +307,8 @@ ObservationTensor(3): ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -352,8 +352,8 @@ ObservationTensor(3): ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -401,8 +401,8 @@ ObservationTensor(3): ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -446,8 +446,8 @@ ObservationTensor(3): ◯◯◯◯◉◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0]
+Returns() = [0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -495,5 +495,5 @@ ObservationTensor(3): ◉◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◉
                       ◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯
-Rewards() = [-0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333]
-Returns() = [-0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333]
+Rewards() = [-0.333333333333333, 1, -0.333333333333333, -0.333333333333333]
+Returns() = [-0.333333333333333, 1, -0.333333333333333, -0.333333333333333]

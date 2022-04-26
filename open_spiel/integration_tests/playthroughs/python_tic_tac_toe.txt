@@ -52,8 +52,8 @@ ObservationTensor(1):
 ◉◉◉  ◯◯◯  ◯◯◯
 ◉◉◉  ◯◯◯  ◯◯◯
 ◉◉◉  ◯◯◯  ◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, -0.0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,0)", "x(1,1)", "x(1,2)", "x(2,0)", "x(2,1)", "x(2,2)"]
 
@@ -82,8 +82,8 @@ ObservationTensor(1):
 ◉◉◉  ◯◯◯  ◯◯◯
 ◉◉◉  ◯◯◯  ◯◯◯
 ◉◉◯  ◯◯◯  ◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, -0.0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7]
 StringLegalActions() = ["o(0,0)", "o(0,1)", "o(0,2)", "o(1,0)", "o(1,1)", "o(1,2)", "o(2,0)", "o(2,1)"]
 
@@ -112,8 +112,8 @@ ObservationTensor(1):
 ◉◉◉  ◯◯◯  ◯◯◯
 ◯◉◉  ◉◯◯  ◯◯◯
 ◉◉◯  ◯◯◯  ◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, -0.0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 4, 5, 6, 7]
 StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,1)", "x(1,2)", "x(2,0)", "x(2,1)"]
 
@@ -142,8 +142,8 @@ ObservationTensor(1):
 ◉◉◉  ◯◯◯  ◯◯◯
 ◯◉◉  ◉◯◯  ◯◯◯
 ◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, -0.0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 4, 5, 7]
 StringLegalActions() = ["o(0,0)", "o(0,1)", "o(0,2)", "o(1,1)", "o(1,2)", "o(2,1)"]
 
@@ -172,8 +172,8 @@ ObservationTensor(1):
 ◯◉◉  ◉◯◯  ◯◯◯
 ◯◉◉  ◉◯◯  ◯◯◯
 ◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, -0.0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
 LegalActions() = [1, 2, 4, 5, 7]
 StringLegalActions() = ["x(0,1)", "x(0,2)", "x(1,1)", "x(1,2)", "x(2,1)"]
 
@@ -202,8 +202,8 @@ ObservationTensor(1):
 ◯◉◯  ◉◯◯  ◯◯◉
 ◯◉◉  ◉◯◯  ◯◯◯
 ◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, -0.0]
+Rewards() = [0, 0]
+Returns() = [0, -0]
 LegalActions() = [1, 4, 5, 7]
 StringLegalActions() = ["o(0,1)", "o(1,1)", "o(1,2)", "o(2,1)"]
 
@@ -236,5 +236,5 @@ ObservationTensor(1):
 ◯◯◯  ◉◉◯  ◯◯◉
 ◯◉◯  ◉◯◯  ◯◯◉
 ◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]

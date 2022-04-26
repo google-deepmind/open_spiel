@@ -248,8 +248,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -474,8 +474,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 89, 90, 117, 652, 656, 673, 674, 701, 714, 1257, 1258, 1285, 1298, 1841, 1842, 1869, 1882, 2425, 2426, 2453, 2466, 3009, 3010, 3037, 3050, 3572, 3576, 3593, 3594, 3621, 3634, 4177, 4178, 4218]
 StringLegalActions() = ["pass", "a2a3", "a2a4", "a2b3", "b1a3", "b1c3", "b2b3", "b2b4", "b2c3", "b2a3", "c2c3", "c2c4", "c2d3", "c2b3", "d2d3", "d2d4", "d2e3", "d2c3", "e2e3", "e2e4", "e2f3", "e2d3", "f2f3", "f2f4", "f2g3", "f2e3", "g1f3", "g1h3", "g2g3", "g2g4", "g2h3", "g2f3", "h2h3", "h2h4", "h2g3"]
 
@@ -700,8 +700,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -926,8 +926,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 89, 90, 117, 652, 656, 673, 674, 701, 714, 1257, 1258, 1285, 1298, 1841, 1842, 1869, 1882, 2425, 2426, 2453, 2466, 3009, 3010, 3037, 3050, 3572, 3576, 3593, 3594, 3621, 3634, 4177, 4178, 4218]
 StringLegalActions() = ["pass", "a7a6", "a7a5", "a7b6", "b8a6", "b8c6", "b7b6", "b7b5", "b7c6", "b7a6", "c7c6", "c7c5", "c7d6", "c7b6", "d7d6", "d7d5", "d7e6", "d7c6", "e7e6", "e7e5", "e7f6", "e7d6", "f7f6", "f7f5", "f7g6", "f7e6", "g8f6", "g8h6", "g7g6", "g7g5", "g7h6", "g7f6", "h7h6", "h7h5", "h7g6"]
 
@@ -1152,8 +1152,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -1382,8 +1382,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -1660,8 +1660,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -1890,8 +1890,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -2184,8 +2184,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -2414,8 +2414,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -2708,8 +2708,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -2938,8 +2938,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -3232,8 +3232,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -3462,8 +3462,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -3756,8 +3756,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -3986,8 +3986,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -4280,8 +4280,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -4510,8 +4510,8 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
 StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e1", "Sense f1", "Sense a2", "Sense b2", "Sense c2", "Sense d2", "Sense e2", "Sense f2", "Sense a3", "Sense b3", "Sense c3", "Sense d3", "Sense e3", "Sense f3", "Sense a4", "Sense b4", "Sense c4", "Sense d4", "Sense e4", "Sense f4", "Sense a5", "Sense b5", "Sense c5", "Sense d5", "Sense e5", "Sense f5", "Sense a6", "Sense b6", "Sense c6", "Sense d6", "Sense e6", "Sense f6"]
 
@@ -4804,5 +4804,5 @@ ObservationTensor(1).private_sense_P_pieces: ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
                                              ◯◯◯◯◯◯◯◯
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]

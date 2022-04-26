@@ -14,29 +14,29 @@
 
 """Tests for open_spiel.python.algorithms.rpg."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import itertools
 
+from absl.testing import absltest
 from absl.testing import parameterized
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+import numpy as np
+import torch
 
 from open_spiel.python import rl_environment
 import pyspiel
 from open_spiel.python.pytorch import policy_gradient
 from open_spiel.python.pytorch.losses import rl_losses
 
+SEED = 24984617
 
-class PolicyGradientTest(parameterized.TestCase, TestCase):
+
+class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
       itertools.product(("rpg", "qpg", "rm", "a2c"),
                         ("kuhn_poker", "leduc_poker")))
   def test_run_game(self, loss_str, game_name):
     env = rl_environment.Environment(game_name)
+    env.seed(SEED)
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
@@ -46,7 +46,7 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
             info_state_size=info_state_size,
             num_actions=num_actions,
             loss_str=loss_str,
-            hidden_layers_sizes=[8, 8],
+            hidden_layers_sizes=[32, 32],
             batch_size=16,
             entropy_cost=0.001,
             critic_learning_rate=0.01,
@@ -79,9 +79,10 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
         "ranks": 3,
         "hand_size": 2,
         "max_information_tokens": 3,
-        "discount": 0.
+        "discount": 0.99
     }
     env = rl_environment.Environment(game, **env_configs)
+    env.seed(SEED)
     info_state_size = env.observation_spec()["info_state"][0]
     num_actions = env.action_spec()["num_actions"]
 
@@ -93,8 +94,8 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
             hidden_layers_sizes=[8, 8],
             batch_size=16,
             entropy_cost=0.001,
-            critic_learning_rate=0.01,
-            pi_learning_rate=0.01,
+            critic_learning_rate=0.001,
+            pi_learning_rate=0.001,
             num_critic_before_pi=4) for player_id in range(num_players)
     ]
 
@@ -133,4 +134,6 @@ class PolicyGradientTest(parameterized.TestCase, TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  np.random.seed(SEED)
+  torch.manual_seed(SEED)
+  absltest.main()

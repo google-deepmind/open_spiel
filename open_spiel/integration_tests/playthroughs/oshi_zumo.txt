@@ -44,8 +44,8 @@ ObservationString(0) = "Coins: 10 10, Field: #...W...#\n"
 ObservationString(1) = "Coins: 10 10, Field: #...W...#\n"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4", "[P0]Bid: 5", "[P0]Bid: 6", "[P0]Bid: 7", "[P0]Bid: 8", "[P0]Bid: 9", "[P0]Bid: 10"]
@@ -68,8 +68,8 @@ ObservationString(0) = "Coins: 4 0, Field: #..W....#\n"
 ObservationString(1) = "Coins: 4 0, Field: #..W....#\n"
 ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4]
 LegalActions(1) = [0]
 StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4"]
@@ -92,8 +92,8 @@ ObservationString(0) = "Coins: 3 0, Field: #...W...#\n"
 ObservationString(1) = "Coins: 3 0, Field: #...W...#\n"
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
 ObservationTensor(1): ◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0]
 StringLegalActions(0) = ["[P0]Bid: 0", "[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3"]
@@ -124,5 +124,5 @@ ObservationString(0) = "Coins: 0 0, Field: #......W#\n"
 ObservationString(1) = "Coins: 0 0, Field: #......W#\n"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]

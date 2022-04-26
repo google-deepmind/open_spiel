@@ -14,19 +14,18 @@
 
 """Tests for open_spiel.python.algorithms.nfsp."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+import random
+from absl.testing import absltest
+import torch
 
 from open_spiel.python import rl_environment
 from open_spiel.python.pytorch import nfsp
 
 
-class NFSPTest(TestCase):
+SEED = 24984617
+
+
+class NFSPTest(absltest.TestCase):
 
   def test_run_kuhn(self):
     env = rl_environment.Environment("kuhn_poker")
@@ -53,15 +52,15 @@ class NFSPTest(TestCase):
         agent.step(time_step)
 
 
-class ReservoirBufferTest(TestCase):
+class ReservoirBufferTest(absltest.TestCase):
 
   def test_reservoir_buffer_add(self):
     reservoir_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=10)
-    self.assertEqual(len(reservoir_buffer), 0)
+    self.assertEmpty(reservoir_buffer)
     reservoir_buffer.add("entry1")
-    self.assertEqual(len(reservoir_buffer), 1)
+    self.assertLen(reservoir_buffer, 1)
     reservoir_buffer.add("entry2")
-    self.assertEqual(len(reservoir_buffer), 2)
+    self.assertLen(reservoir_buffer, 2)
 
     self.assertIn("entry1", reservoir_buffer)
     self.assertIn("entry2", reservoir_buffer)
@@ -72,7 +71,7 @@ class ReservoirBufferTest(TestCase):
     reservoir_buffer.add("entry2")
     reservoir_buffer.add("entry3")
 
-    self.assertEqual(len(reservoir_buffer), 2)
+    self.assertLen(reservoir_buffer, 2)
 
   def test_reservoir_buffer_sample(self):
     replay_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=3)
@@ -88,4 +87,6 @@ class ReservoirBufferTest(TestCase):
 
 
 if __name__ == "__main__":
-  run_tests()
+  random.seed(SEED)
+  torch.manual_seed(SEED)
+  absltest.main()

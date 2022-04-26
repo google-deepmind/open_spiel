@@ -84,8 +84,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: none\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: none\nPlayer 0 2NT: none\nPlayer 0 unassigned: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0xffffffffffffff00000000000000000000000000000000000000000000000008000000)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["HQHJ->Pass", "HQHJ->1H", "HQHJ->1S", "HQHJ->1NT", "HQHJ->2H", "HQHJ->2S", "HQHJ->2NT"]
 
@@ -111,8 +111,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: none\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: HQHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0xffffffffffffff00000000000000000000000000000000000800000000000004000000)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["HKHJ->Pass", "HKHJ->1H", "HKHJ->1S", "HKHJ->1NT", "HKHJ->2H", "HKHJ->2S", "HKHJ->2NT"]
 
@@ -138,8 +138,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: none\nPlayer 0 1H: none\nPlayer 0 1S: none\nPlayer 0 1NT: none\nPlayer 0 2H: none\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: none\nPlayer 0 unassigned: HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0xffffffffffffff00000000000000000000000000000000000c00000000000002000000)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["HKHQ->Pass", "HKHQ->1H", "HKHQ->1S", "HKHQ->1NT", "HKHQ->2H", "HKHQ->2S", "HKHQ->2NT"]
 
@@ -193,8 +193,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK\nPlayer 0 1H: SJHJ\nPlayer 0 1S: none\nPlayer 0 1NT: SJHA\nPlayer 0 2H: HAHJ HAHQ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ\nPlayer 0 unassigned: SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0xffffffffffffff24800000200000000000000400001800000c00000001000000020000)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["SQHJ->Pass", "SQHJ->1H", "SQHJ->1S", "SQHJ->1NT", "SQHJ->2H", "SQHJ->2S", "SQHJ->2NT"]
 
@@ -256,8 +256,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 Pass: HKHQ HAHK SJHK SQHJ SKHQ\nPlayer 0 1H: SJHJ SKHK\nPlayer 0 1S: SQHQ SKHJ\nPlayer 0 1NT: SJHA SKHA\nPlayer 0 2H: HAHJ HAHQ SQHK SKSJ\nPlayer 0 2S: HQHJ HKHJ\nPlayer 0 2NT: SJHQ SQHA SQSJ\nPlayer 0 unassigned: SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0xffffffffffffff24a08000200400001100000402001808100c00000001060000000080)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["SKSQ->Pass", "SKSQ->1H", "SKSQ->1S", "SKSQ->1NT", "SKSQ->2H", "SKSQ->2S", "SKSQ->2NT"]
 
@@ -313,8 +313,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ\nPlayer 1 unassigned: HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0x10106082fffffffc0000000000000000000000000000000000000000000000002000000)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0]
 StringLegalActions() = ["HKHQ->Pass"]
 
@@ -370,8 +370,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ\nPlayer 1 unassigned: SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0x10106082ffffffffff00000000000000000000000000000000000000000000000008000)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0]
 StringLegalActions() = ["SQHK->Pass"]
 
@@ -427,8 +427,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "Player 0\n2NT\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 Pass: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ\nPlayer 1 unassigned: SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0x10106082ffffffffffffc00000000000000000000000000000000000000000000000020)
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0]
 StringLegalActions() = ["SAHQ->Pass"]
 
@@ -467,5 +467,5 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 ObservationString(0) = "Player 0\nPass\nPlayer 0 possible: SJHQ SQHA SQSJ SKSQ SASQ\nPlayer 1 possible: HQHJ HKHJ HKHQ HAHJ HAHQ HAHK SJHJ SJHQ SJHK SJHA SQHJ SQHQ SQHK SQHA SQSJ SKHJ SKHQ SKHK SKHA SKSJ SKSQ SAHJ SAHQ SAHK SAHA SASJ SASQ SASK\n"
 ObservationTensor(0): binvec(287, 0x400106082fffffff00000000000000000000000000000000000000000000000000000000)
-Rewards() = [-19.999999999999996]
-Returns() = [-19.999999999999996]
+Rewards() = [-20]
+Returns() = [-20]

@@ -70,8 +70,8 @@ ObservationTensor(1):
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [19, 26, 37, 44]
 StringLegalActions() = ["d3", "c4", "f5", "e6"]
 
@@ -118,8 +118,8 @@ ObservationTensor(1):
 ◉◉◉◉◯◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◉◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [29, 43, 45]
 StringLegalActions() = ["f4", "d6", "f6"]
 
@@ -166,8 +166,8 @@ ObservationTensor(1):
 ◉◉◉◯◯◉◉◉  ◯◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [18, 26, 34, 42, 50]
 StringLegalActions() = ["c3", "c4", "c5", "c6", "c7"]
 
@@ -214,8 +214,8 @@ ObservationTensor(1):
 ◉◉◉◯◯◉◉◉  ◯◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [19, 29, 45]
 StringLegalActions() = ["d3", "f4", "f6"]
 
@@ -262,8 +262,8 @@ ObservationTensor(1):
 ◉◉◉◯◯◉◉◉  ◯◯◯◉◯◯◯◯  ◯◯◯◯◉◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 37, 42, 45, 51]
 StringLegalActions() = ["g4", "f5", "c6", "f6", "d7"]
 
@@ -310,8 +310,8 @@ ObservationTensor(1):
 ◉◉◉◯◯◯◉◉  ◯◯◯◉◯◯◯◯  ◯◯◯◯◉◉◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [19, 25, 46]
 StringLegalActions() = ["d3", "b4", "g6"]
 
@@ -414,8 +414,8 @@ ObservationTensor(1):
 ◉◯◯◯◯◯◉◉  ◯◉◉◉◉◉◯◯  ◯◯◯◯◯◯◯◯
 ◯◉◯◉◯◯◉◉  ◉◯◉◯◉◉◯◯  ◯◯◯◯◯◯◯◯
 ◉◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [9, 18, 30, 61, 62]
 StringLegalActions() = ["b2", "c3", "g4", "f8", "g8"]
 
@@ -462,8 +462,8 @@ ObservationTensor(1):
 ◉◯◯◯◯◯◉◉  ◯◉◉◯◉◉◯◯  ◯◯◯◉◯◯◯◯
 ◯◉◯◉◯◯◉◉  ◉◯◉◯◯◉◯◯  ◯◯◯◯◉◯◯◯
 ◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [24, 33, 51, 59, 60]
 StringLegalActions() = ["a4", "b5", "d7", "d8", "e8"]
 
@@ -582,8 +582,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◉◉  ◯◉◯◯◯◯◯◯  ◉◯◉◉◉◉◯◯
 ◯◯◯◯◯◯◯◉  ◯◉◉◉◯◉◉◯  ◉◯◯◯◉◯◯◯
 ◯◯◯◯◯◯◯◉  ◯◉◯◯◯◯◯◯  ◉◯◉◉◉◉◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [4, 5, 10, 14, 19, 20, 24, 46, 47, 55, 63]
 StringLegalActions() = ["e1", "f1", "c2", "g2", "d3", "e3", "a4", "g6", "h6", "h7", "h8"]
 
@@ -630,8 +630,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◉◉  ◯◉◯◯◯◯◯◯  ◉◯◉◉◉◉◯◯
 ◯◯◯◯◯◯◯◉  ◯◉◉◉◯◉◉◯  ◉◯◯◯◉◯◯◯
 ◯◯◯◯◯◯◯◉  ◯◉◯◯◯◯◯◯  ◉◯◉◉◉◉◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [7, 15, 19, 30, 31, 39, 46, 63]
 StringLegalActions() = ["h1", "h2", "d3", "g4", "h4", "h5", "g6", "h8"]
 
@@ -750,5 +750,5 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯◯  ◯◯◉◉◉◯◉◯  ◉◉◯◯◯◉◯◉
 ◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉◉  ◉◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉◉  ◉◯◯◯◯◯◯◯
-Rewards() = [-1.0, 1.0]
-Returns() = [-1.0, 1.0]
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

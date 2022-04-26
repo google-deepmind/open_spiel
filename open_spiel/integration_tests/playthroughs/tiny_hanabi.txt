@@ -94,8 +94,8 @@ ObservationString(0) = "p0:d1"
 ObservationString(1) = "p1:d1"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["p0a0", "p0a1", "p0a2"]
 
@@ -118,8 +118,8 @@ ObservationString(0) = "p0:d1 p0:a2"
 ObservationString(1) = "p1:d1 p0:a2"
 ObservationTensor(0): ◯◉◯◯◉◯◯◯
 ObservationTensor(1): ◯◉◯◯◉◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["p1a0", "p1a1", "p1a2"]
 
@@ -142,5 +142,5 @@ ObservationString(0) = "p0:d1 p0:a2 p1:a0"
 ObservationString(1) = "p1:d1 p0:a2 p1:a0"
 ObservationTensor(0): ◯◉◯◯◉◉◯◯
 ObservationTensor(1): ◯◉◯◯◉◉◯◯
-Rewards() = [10.0, 10.0]
-Returns() = [10.0, 10.0]
+Rewards() = [10, 10]
+Returns() = [10, 10]

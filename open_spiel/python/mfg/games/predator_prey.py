@@ -101,7 +101,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     self.size = get_param("size", params)
     self.horizon = get_param("horizon", params)
     flat_reward_matrix = np.fromstring(
-        get_param("reward_matrix", params), dtype=np.float, sep=" ")
+        get_param("reward_matrix", params), dtype=np.float64, sep=" ")
     num_players = get_param("players", params)
     if len(flat_reward_matrix) != num_players**2:
       raise ValueError(
@@ -206,7 +206,7 @@ class MFGPredatorPreyState(pyspiel.State):
     self.horizon = game.horizon
     self.reward_matrix = game.reward_matrix
     self.geometry = game.geometry
-    self._returns = np.zeros([self.num_players()])
+    self._returns = np.zeros([self.num_players()], dtype=np.float64)
     self._distribution = shared_value.SharedValue(game.initial_distribution)
 
   @property
@@ -388,7 +388,8 @@ class MFGPredatorPreyState(pyspiel.State):
     densities = np.array([
         self.get_pos_proba(self._pos, population)
         for population in range(self.num_players())
-    ])
+    ],
+                         dtype=np.float64)
     rew = -np.log(densities + eps) + np.dot(self.reward_matrix, densities)
     return list(rew)
 

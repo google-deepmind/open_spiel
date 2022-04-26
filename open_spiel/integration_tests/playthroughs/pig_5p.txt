@@ -74,8 +74,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -126,8 +126,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -229,8 +229,8 @@ ObservationTensor(4): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -281,8 +281,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -333,8 +333,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -385,8 +385,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -488,8 +488,8 @@ ObservationTensor(4): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -544,8 +544,8 @@ ObservationTensor(4): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -600,8 +600,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -652,8 +652,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -704,8 +704,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -760,8 +760,8 @@ ObservationTensor(4): ◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -820,8 +820,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -876,8 +876,8 @@ ObservationTensor(4): ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -956,8 +956,8 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -1044,5 +1044,5 @@ ObservationTensor(4): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
-Rewards() = [-0.25, 1.0, -0.25, -0.25, -0.25]
-Returns() = [-0.25, 1.0, -0.25, -0.25, -0.25]
+Rewards() = [-0.25, 1, -0.25, -0.25, -0.25]
+Returns() = [-0.25, 1, -0.25, -0.25, -0.25]
