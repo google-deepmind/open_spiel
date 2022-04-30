@@ -425,9 +425,9 @@ class PolicyGradient(rl_agent.AbstractAgent):
     else:
       # Q-loss otherwise.
       q_values = self._q_values_layer(torso_out)
-      action_indices = torch.stack([torch.range(q_values.shape[0]), action],
-                                   dim=-1)
-      value_predictions = torch.gather_nd(q_values, action_indices)
+      action_indices = torch.stack(
+          [torch.arange(q_values.shape[0], dtype=torch.long), action], dim=0)
+      value_predictions = q_values[list(action_indices)]
       critic_loss = torch.mean(F.mse_loss(value_predictions, return_))
       self.minimize_with_clipping(self._q_values_layer, self._critic_optimizer,
                                   critic_loss)
@@ -454,13 +454,13 @@ class PolicyGradient(rl_agent.AbstractAgent):
           baseline=baseline,
           actions=action,
           returns=return_)
-      self.minimize_with_clipping(self._baseline_layer, self._pi_optimizer,
+      self.minimize_with_clipping(self._policy_logits_layer, self._pi_optimizer,
                                   pi_loss)
     else:
       q_values = self._q_values_layer(torso_out)
       pi_loss = self.pg_class.loss(
           policy_logits=self._policy_logits, action_values=q_values)
-      self.minimize_with_clipping(self._q_values_layer, self._pi_optimizer,
+      self.minimize_with_clipping(self._policy_logits_layer, self._pi_optimizer,
                                   pi_loss)
     self._last_pi_loss_value = pi_loss
     return pi_loss
