@@ -34,7 +34,7 @@ source ./open_spiel/scripts/python_extra_deps.sh
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
 # ${PYBIN} -m pip install --force-reinstall virtualenv==20.0.23
-${PYBIN} -m pip install --upgrade virtualenv
+# ${PYBIN} -m pip install --upgrade virtualenv
 
 virtualenv -p ${PYBIN} ./venv
 source ./venv/bin/activate
