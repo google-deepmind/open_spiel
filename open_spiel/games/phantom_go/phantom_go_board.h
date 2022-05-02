@@ -110,7 +110,10 @@ class PhantomGoBoard {
   std::array<int, 2> GetStoneCount() const { return stone_count_; };
   std::string ObservationsToString() const;
   std::string ObservationToString(int player) const;
+  std::string LastMoveInformationToString() const;
+  bool LastMoveObservational() const { return !last_move_valid;}
   std::array<GoColor, kMaxBoardSize * kMaxBoardSize> GetObservationByID(int player_id) const;
+
 
   inline int board_size() const { return board_size_; }
 
@@ -231,6 +234,10 @@ class PhantomGoBoard {
   // On index 0 is stored count of black stones, on index 1 is stored count of white stones
   // so it equals the enum of GoColor, where kBlack is 0
   std::array<int, 2> stone_count_;
+
+  bool last_move_valid;
+  bool last_move_pass;
+  int last_move_captured;
 
   struct Vertex {
     VirtualPoint chain_head;

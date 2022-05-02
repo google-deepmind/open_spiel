@@ -204,9 +204,7 @@ std::string GoColorToString(GoColor c) {
         case GoColor::kBlack:return "B";
         case GoColor::kWhite:return "W";
         case GoColor::kEmpty:return "E";
-            //return "EMPTY";
         case GoColor::kGuard:return "G";
-            //return "GUARD";
         default:
             SpielFatalError(
                 absl::StrCat("Unknown color ", c, " in GoColorToString."));
@@ -267,6 +265,10 @@ void PhantomGoBoard::Clear() {
 
     stone_count_ = {0, 0};
 
+    last_move_valid = true;
+    last_move_pass = false;
+    last_move_captured = 0;
+
     for (int i = 0; i < board_.size(); ++i) {
         Vertex &v = board_[i];
         v.color = GoColor::kGuard;
@@ -296,15 +298,26 @@ void PhantomGoBoard::Clear() {
 bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
     if (p == kVirtualPass) {
         last_ko_point_ = kInvalidPoint;
+        last_move_captured = 0;
+        last_move_pass = true;
+        last_move_valid = true;
         return true;
+    }
+    else
+    {
+        last_move_pass = false;
     }
 
     observations_[(uint8_t) c][VirtualPointToBoardPoint(p, board_size_)] = board_[p].color;
 
-    //playing illegal moves will occur standardly during phantom go, it is even desired
+    //playing illegal moves will occur during phantom go, it is even desired
     if (!IsLegalMoveObserver(p, c)) {
+        last_move_captured = 0;
+        last_move_valid = false; //was a observational move
         return false;
     }
+
+    last_move_valid = true;
 
     stone_count_[(uint8_t) c]++;
 
@@ -323,6 +336,7 @@ bool PhantomGoBoard::PlayMove(VirtualPoint p, GoColor c) {
     int stones_captured = CaptureDeadChains(p, c);
 
     stone_count_[(uint8_t) OppColor(c)] -= stones_captured;
+    last_move_captured = stones_captured;
 
     observations_[(uint8_t) c][VirtualPointToBoardPoint(p, board_size_)] = c;
 
@@ -390,6 +404,10 @@ std::string PhantomGoBoard::ObservationsToString() const {
 
     ss << ObservationToString((uint8_t) GoColor::kBlack);
 
+    ss << "\n";
+
+    ss << LastMoveInformationToString();
+
     return ss.str();
 }
 
@@ -414,6 +432,7 @@ std::string PhantomGoBoard::ObservationToString(int player) const {
         }
         ss << letter;
     }
+
     ss << "\n";
     return ss.str();
 }
@@ -624,6 +643,30 @@ VirtualPoint PhantomGoBoard::Chain::single_liberty() const {
 std::string PhantomGoBoard::ToString() {
     std::ostringstream stream;
     stream << *this;
+    return stream.str();
+}
+std::string PhantomGoBoard::LastMoveInformationToString() const {
+    std::stringstream stream;
+    if(last_move_valid)
+    {
+        stream << "Previous move was valid";
+        if(last_move_pass)
+        {
+            stream << " and was a pass";
+        }
+        stream << "\n";
+    }
+    else
+    {
+        stream << "Previous move was observational\n";
+    }
+
+
+
+    if(last_move_captured > 0)
+    {
+        stream << "In previous move " << last_move_captured << " stones were captured\n";
+    }
     return stream.str();
 }
 

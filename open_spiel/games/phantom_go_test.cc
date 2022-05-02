@@ -111,78 +111,6 @@ void ConcreteActionsAreUsedInTheAPI() {
     }
 }
 
-//This test is implemented to visually analyte correctness of resampling
-
-void ResampleMetapositionTest() {
-    GameParameters params;
-    params["board_size"] = GameParameter(kBoardSize);
-    std::shared_ptr<const Game> game =
-        LoadGame("phantom_go", params);
-    PhantomGoState state(game, kBoardSize, kKomi, 0);
-
-    for (int i = 0; i < 150; i++) {
-        std::vector<Action> actions = state.LegalActions();
-        std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-        state.ApplyAction(actions[0]);
-        if (state.IsTerminal()) {
-            break;
-        }
-    }
-
-    std::unique_ptr<State> resampleState = state.ResampleFromMetaposition(0, nullptr);
-
-    PhantomGoState resampleState2 = down_cast<PhantomGoState>(*resampleState);
-
-    if(!PhantomGoState::equalMetaposition(state, resampleState2, 0))
-    {
-
-        std::cout << "Metapositions not equal\n";
-        std::cout << "Original state\n" << state.ToString();
-
-        std::cout << "Resampled state\n " << resampleState->ToString();
-
-    }
-}
-
-//This tests metaposition resampling on large ammounts of states
-//  with different lengths
-void ResampleFromMetapositionForceTest() {
-    std::cout << "Starting ResampleFromMetaposition visual Test\n";
-    GameParameters params;
-    params["board_size"] = GameParameter(kBoardSize);
-    /*std::shared_ptr<const Game> game =
-        LoadGame("phantom_go", params);
-    PhantomGoState state(game, kBoardSize, kKomi, 0);*/
-
-    for (int n = 10; n < 20; n++) {
-        std::cout << "Starting test for n " << n << "\n";
-        for (int x = 0; x < 2000; x++) {
-            std::shared_ptr<const Game> game =
-                LoadGame("phantom_go", params);
-            PhantomGoState state(game, kBoardSize, kKomi, 0);
-
-            for (int i = 0; i < n * 10; i++) {
-                if (state.IsTerminal()) {
-                    state.UndoAction(-1, -1);
-                    break;
-                }
-                std::vector<Action> actions = state.LegalActions();
-                std::shuffle(actions.begin(), actions.end(), std::mt19937(std::random_device()()));
-                for (long action: actions) {
-
-                    if (action != VirtualActionToAction(kVirtualPass, kBoardSize)) {
-                        state.ApplyAction(action);
-                        break;
-                    }
-                }
-
-            }
-            std::unique_ptr<State> resampleState = state.ResampleFromMetaposition(state.CurrentPlayer(), nullptr);
-
-        }
-    }
-}
-
 }  // namespace
 }  // namespace phantom_go
 }  // namespace open_spiel
@@ -194,7 +122,5 @@ int main(int argc, char **argv) {
     open_spiel::phantom_go::ConcreteActionsAreUsedInTheAPI();
     open_spiel::phantom_go::IllegalMoveTest();
     open_spiel::phantom_go::StoneCountTest();
-    //open_spiel::phantom_go::ResampleFromMetapositionForceTest();
-    //open_spiel::phantom_go::ResampleVisualTest();
 
 }

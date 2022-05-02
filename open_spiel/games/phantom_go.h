@@ -32,12 +32,14 @@
 //
 // Parameters:
 //  "komi"              float  compensation for white                  (default = 7.5)
-//  "board_size"        int    rows of the board, usually 9, 13 or 19  (default = 19)
+//  "board_size"        int    rows of the board, usually 9, 13 or 19  (default = 9)
 //  "handicap"          int    number of handicap stones for black     (default = 0)
 //  "max_game_length"   int    maximal lenght of a game                (default = board_size * board_size * 4)
 
 namespace open_spiel {
 namespace phantom_go {
+
+class PhantomGoObserver;
 
 // Constants.
 inline constexpr int NumPlayers() { return 2; }
@@ -80,6 +82,8 @@ class PhantomGoState : public State {
 
   std::array<int, 2> GetStoneCount() const;
 
+  int GetMaxGameLenght() const;
+
   static bool equalMetaposition(const PhantomGoState& state1, const PhantomGoState& state2, int playerID);
 
   std::string ActionToString(Player player, Action action) const override;
@@ -87,17 +91,6 @@ class PhantomGoState : public State {
 
   bool IsTerminal() const override;
 
-  //Two states are in a same metaposition, if the board is identical from players perspective / observation
-  std::unique_ptr<State> ResampleFromMetaposition(
-      int player_id, std::function<double()> rng) const;
-
-  std::unique_ptr<State> ResampleFromInfostate(
-      int player_id, std::function<double()> rng) const;
-
-  std::unique_ptr<State> ResampleFromMetapositionHard(
-      int player_id, std::function<double()> rng) const;
-
-  std::string InformationStateString(int player) const override;
   std::string ObservationString(int player) const override;
 
   // Four planes: black, white, empty, and a bias plane of bits indicating komi
@@ -142,6 +135,8 @@ class PhantomGoGame : public Game {
  public:
   explicit PhantomGoGame(const GameParameters &params);
 
+  std::shared_ptr<PhantomGoObserver> default_observer_;
+
   int NumDistinctActions() const override {
       return phantom_go::NumDistinctActions(board_size_);
   }
@@ -153,8 +148,9 @@ class PhantomGoGame : public Game {
 
   std::vector<int> ObservationTensorShape() const override {
       // Planes: black, white, empty, and a bias plane indicating komi (whether
-      // white is to play).
-      return {CellStates() + 1, board_size_, board_size_};
+      // white is to play)
+      // and 2 for stone count of white and black
+      return {2 +  board_size_ * board_size_ * (CellStates() + 1)};
   }
 
   TensorLayout ObservationTensorLayout() const override {
