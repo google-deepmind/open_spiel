@@ -32,13 +32,11 @@ class NashAveragingTest(absltest.TestCase):
     
 
     maxent_nash, nash_avg_value = nash_averaging(game)
-    for player_nash in maxent_nash:
-      for prob in player_nash:
-        self.assertAlmostEqual(prob, 1/3)
+    for prob in maxent_nash:
+      self.assertAlmostEqual(prob, 1/3)
     
-    for player_values in nash_avg_value:
-      for v in player_values:
-        self.assertAlmostEqual(v, 0)
+    for v in nash_avg_value:
+      self.assertAlmostEqual(v, 0)
 
 
 if __name__ == "__main__":
