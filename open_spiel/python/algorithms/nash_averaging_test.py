@@ -20,7 +20,7 @@ from __future__ import print_function
 from absl.testing import absltest
 import numpy as np
 
-from open_spiel.python.egt.nash_averaging import nash_averaging
+from open_spiel.python.algorithm.nash_averaging import nash_averaging
 import pyspiel
 
 class NashAveragingTest(absltest.TestCase):
@@ -40,5 +40,4 @@ class NashAveragingTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
-  np.random.seed(SEED)
   absltest.main()
