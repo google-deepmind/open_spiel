@@ -328,6 +328,20 @@ class TabularPolicy(Policy):
     """
     return self.action_probability_array[self.state_lookup[key]]
 
+  def to_dict(self):
+    """Returns a single dictionary representing the tabular policy.
+
+    Returns:
+      A dictionary of string keys to lists of (action, prob) pairs.
+    """
+    policy_dict = {}
+    num_actions = self.action_probability_array.shape[1]
+    for infostate_key, index in self.state_lookup.items():
+      probs = self.action_probability_array[index]
+      actions_and_probs = [(a, probs[a]) for a in range(num_actions)]
+      policy_dict[infostate_key] = actions_and_probs
+    return policy_dict
+
   def __copy__(self, copy_action_probability_array=True):
     """Returns a shallow copy of self.
 
