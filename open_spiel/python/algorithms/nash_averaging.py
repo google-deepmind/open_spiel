@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Nash averaging."""
+"""
+  Nash averaging.
+  Based on https://arxiv.org/pdf/1806.02643.pdf
+  An axiomatic strategy evaluation metric for 
+  Agent-vs-Agent or Agent-vs-Task two-player zero-sum games
+"""
 
 from cvxopt import solvers, matrix, spdiag, spmatrix, log
 import numpy as np
@@ -25,7 +30,7 @@ def max_entropy_nash(p_mat, eps=0.0):
   '''
     Solving for maxent symmetric nash for symmetric two-player zero-sum games
     convex programming:
-      max p^Tlog(p)
+      min p^Tlog(p)
       s.t. 
       p_mat.dot(p) <= p^T*p_mat*p
       p >= 0

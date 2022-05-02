@@ -182,6 +182,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
+  algorithms/nash_averaging_test.py
   algorithms/noisy_policy_test.py
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
