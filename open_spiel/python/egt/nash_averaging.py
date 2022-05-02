@@ -29,7 +29,7 @@ def max_entropy_nash(p_mat, eps=0.0):
       s.t. 
       p_mat.dot(p) <= p^T*p_mat*p
       p >= 0
-      1^T * p = 0
+      1^T * p = 1
 
     Args:
       p_mat: an N*N anti-symmetric payoff matrix
