@@ -71,6 +71,9 @@ def nash_averaging(game, eps=0.0, AvA=True):
       game: a pyspiel game
       eps: minimum probability mass for maxent nash
       AvA: whether it is Agent-vs-Agent or Agent-vs-Task
+    Returns:
+      maxent_nash: nash mixture for row player and column player
+      nash_avg_score: the expected payoff under maxent_nash
   
   '''
   p_mat = game_payoffs_array(game)
