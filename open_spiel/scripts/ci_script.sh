@@ -36,7 +36,8 @@ ${PYBIN} -m pip install --upgrade setuptools
 # ${PYBIN} -m pip install --force-reinstall virtualenv==20.0.23
 # ${PYBIN} -m pip install --upgrade virtualenv
 
-virtualenv -p ${PYBIN} ./venv
+# virtualenv -p ${PYBIN} ./venv
+${PYBIN} -m venv ./venv
 source ./venv/bin/activate
 
 python3 --version
