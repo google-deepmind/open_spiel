@@ -33,8 +33,6 @@ source ./open_spiel/scripts/python_extra_deps.sh
 
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
-# ${PYBIN} -m pip install --force-reinstall virtualenv==20.0.23
-# ${PYBIN} -m pip install --upgrade virtualenv
 
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:

@@ -11,8 +11,14 @@ jobs:
     strategy:
       matrix:
         include:
-        # Standard platforms with newest Python versions for the platform.
-        # Disabled until available on Github Actions CI.
+        # Standard (most current) platforms and versions.
+        - os: ubuntu-22.04
+          OS_PYTHON_VERSION: "3.10"
+          TRAVIS_USE_NOX: 0
+          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.10"
           TRAVIS_USE_NOX: 0
