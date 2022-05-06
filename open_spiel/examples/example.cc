@@ -91,10 +91,12 @@ int main(int argc, char** argv) {
       state->ApplyAction(action);
     } else if (state->IsMeanFieldNode()) {
       int num_states_distribution = state->DistributionSupport().size();
-      if (num_states_distribution) {
-        state->UpdateDistribution(std::vector<double>(
-            num_states_distribution, 1.0 / num_states_distribution));
-      }
+      state->UpdateDistribution(std::vector<double>(
+          num_states_distribution,
+          num_states_distribution > 0 ? 1.0 / num_states_distribution : 1.0));
+      std::cerr << "Call update distribution on a uniform distribution of "
+                << num_states_distribution << " states (length of "
+                << "DistributionSupport" << std::endl;
     } else if (state->IsSimultaneousNode()) {
       // open_spiel::Players choose simultaneously?
       std::vector<open_spiel::Action> joint_action;
