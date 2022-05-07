@@ -27,9 +27,9 @@
 //
 // Parameters:
 //   "enable_infostate"   bool     Enable the sequence of round outcomes as the
-//                                 information state tensor (default: false).
+//                                 information state tensor and string (default: false).
 //   "stage_game"         game     The game that will be repeated.
-//   "num_repititions"    int      Number of times that the game is repeated.
+//   "num_repetitions"    int      Number of times that the game is repeated.
 
 
 namespace open_spiel {
@@ -47,6 +47,7 @@ class RepeatedState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void InformationStateTensor(Player player,
                               absl::Span<float> values) const override;

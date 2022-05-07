@@ -21,7 +21,7 @@
 namespace open_spiel {
 namespace {
 
-constexpr bool kDefaultEnableInformationStateTensor = false;
+constexpr bool kDefaultEnableInformationState = false;
 
 // These parameters represent the most general case. Game specific params are
 // parsed once the actual stage game is supplied.
@@ -35,8 +35,8 @@ const GameType kGameType{
     GameType::RewardModel::kRewards,
     /*max_num_players=*/100,
     /*min_num_players=*/1,
-    /*provides_information_state_string=*/false,
-    /*provides_information_state_tensor=*/kDefaultEnableInformationStateTensor,
+    /*provides_information_state_string=*/kDefaultEnableInformationState,
+    /*provides_information_state_tensor=*/kDefaultEnableInformationState,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
@@ -117,6 +117,22 @@ std::vector<double> RepeatedState::Returns() const {
   return returns;
 }
 
+std::string RepeatedState::InformationStateString(Player /*player*/) const {
+  std::string rv;
+  if (actions_history_.empty()) return rv;
+  for (int j = 0; j < actions_history_.size(); ++j) {
+    for (int i = 0; i < num_players_; ++i) {
+      absl::StrAppend(
+        &rv, stage_game_state_->ActionToString(i, actions_history_[j][i]),
+        " ");
+    }
+    absl::StrAppend(
+      &rv, ";"
+    );
+  }  
+  return rv;  
+}
+
 std::string RepeatedState::ObservationString(Player /*player*/) const {
   std::string rv;
   if (actions_history_.empty()) return rv;
@@ -188,15 +204,15 @@ std::unique_ptr<State> RepeatedState::Clone() const {
 }
 
 namespace {
-GameType ConvertType(GameType type, bool enable_info_state_tensor) {
+GameType ConvertType(GameType type, bool enable_infostate) {
   type.short_name = kGameType.short_name;
   type.long_name = "Repeated " + type.long_name;
   type.dynamics = kGameType.dynamics;
   type.information = kGameType.information;
   type.reward_model = kGameType.reward_model;
   type.parameter_specification = kGameType.parameter_specification;
-  type.provides_information_state_string = false;
-  type.provides_information_state_tensor = enable_info_state_tensor;
+  type.provides_information_state_string = enable_infostate;
+  type.provides_information_state_tensor = enable_infostate;
   type.provides_observation_string = true;
   type.provides_observation_tensor = true;
   return type;
@@ -209,7 +225,7 @@ RepeatedGame::RepeatedGame(std::shared_ptr<const Game> stage_game,
                               open_spiel::ParameterValue(params,
                                                          "enable_infostate",
                                   absl::optional<bool>(
-                                      kDefaultEnableInformationStateTensor))),
+                                      kDefaultEnableInformationState))),
                   params),
       stage_game_(stage_game),
       num_repetitions_(ParameterValue<int>("num_repetitions")) {}

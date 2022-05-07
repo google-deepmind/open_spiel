@@ -104,12 +104,21 @@ void RepeatedRockPaperScissorsInfoStateEnabledTest() {
                  GameType::RewardModel::kRewards);
   SPIEL_CHECK_TRUE(repeated_game->GetType().provides_observation_tensor);
   SPIEL_CHECK_TRUE(repeated_game->GetType().provides_information_state_tensor);
+  SPIEL_CHECK_TRUE(repeated_game->GetType().provides_information_state_string);
 
   // One-hot encoding of each player's previous action.
   SPIEL_CHECK_EQ(repeated_game->ObservationTensorShape()[0], 6);
 
   // One-hot encoding of each player's previous action times num_repetitions.
   SPIEL_CHECK_EQ(repeated_game->InformationStateTensorShape()[0], 18);
+
+  //Check information_state_string
+  std::unique_ptr<State> state = repeated_game->NewInitialState();
+  SPIEL_CHECK_EQ(state->InformationStateString(), "");
+  state->ApplyActions({0,0});
+  SPIEL_CHECK_EQ(state->InformationStateString(), "Rock Rock ;");
+  state->ApplyActions({1,2});
+  SPIEL_CHECK_EQ(state->InformationStateString(), "Rock Rock ;Paper Scissors ;");
 
   RepeatedRockPaperScissorsTest(repeated_game);
 }
