@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-  Nash averaging.
+"""Nash averaging.
   Based on https://arxiv.org/pdf/1806.02643.pdf
   An axiomatic strategy evaluation metric for 
   Agent-vs-Agent or Agent-vs-Task two-player zero-sum games
