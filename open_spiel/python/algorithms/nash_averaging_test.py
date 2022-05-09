@@ -13,10 +13,6 @@
 # limitations under the License.
 """Tests for open_spiel.python.egt.nash_averaging."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import absltest
 import numpy as np
 
@@ -33,10 +29,12 @@ class NashAveragingTest(absltest.TestCase):
 
     maxent_nash, nash_avg_value = nash_averaging(game)
     with self.subTest("probability"):
-      self.assertSeqeunceAlmostEqual((1/3, 1/3, 1/3), maxent_nash)
+      np.testing.assert_array_almost_equal(
+          np.asarray([1/3, 1/3, 1/3]), maxent_nash.reshape(-1))
 
     with self.subTest("value"):
-      self.assertSeqeunceAlmostEqual((0, 0, 0), nash_avg_value)
+      np.testing.assert_array_almost_equal(
+          np.asarray([0., 0., 0.]), nash_avg_value.reshape(-1))
 
 
 if __name__ == "__main__":
