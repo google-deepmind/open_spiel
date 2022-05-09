@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Nash averaging.
+
   Based on https://arxiv.org/pdf/1806.02643.pdf
   An axiomatic strategy evaluation metric for 
   Agent-vs-Agent or Agent-vs-Task two-player zero-sum games
@@ -26,6 +27,7 @@ from open_spiel.python.egt.utils import game_payoffs_array
 
 def max_entropy_symmetric_nash(p_mat, eps=0.0):
   """Solving for the maxent symmetric nash for symmetric two-player zero-sum games
+  
     convex programming:
       min p^Tlog(p)
       s.t. 
