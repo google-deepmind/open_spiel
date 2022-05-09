@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tabular Multiagent Q-learning agent."""
+"""Tabular Multiagent Q-learning agent.
+
+Currently implementations include:
+Nash-Q: https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf
+Correlated-Q: https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf, where both CE-Q and CCE-Q are supported
+"""
 
 import abc
 import collections
@@ -85,7 +90,10 @@ class TwoPlayerNashSolver(JointActionSolver):
 
 class CorrelatedEqSolver(JointActionSolver):
 
-  """A joint action solver solving for correlated equilibrium"""
+  """A joint action solver solving for correlated equilibrium
+
+  uses python.algorithms.jspro._mgce and _mgcce for solving (coarse) correlated equilibrium
+  """
 
   def __init__(self, is_CCE=False):
     self._is_CCE = is_CCE
@@ -113,6 +121,7 @@ class MAQLearner(rl_agent.AbstractAgent):
                epsilon_schedule=rl_tools.ConstantSchedule(0.2),
                discount_factor=1.0):
     """Initialize the Multiagent joint-action Q-Learning agent.
+
     The joint_action_solver solves for one-step matrix game defined by Q-tables
     """
     self._player_id = player_id
@@ -139,6 +148,7 @@ class MAQLearner(rl_agent.AbstractAgent):
 
   def _epsilon_greedy(self, info_state, legal_actions, epsilon):
     """Returns a valid epsilon-greedy action and valid action probs.
+
     If the agent has not been to `info_state`, a valid random action is chosen.
     Args:
       info_state: hashable representation of the information state.
@@ -163,6 +173,7 @@ class MAQLearner(rl_agent.AbstractAgent):
 
   def step(self, time_step, actions=None, is_evaluation=False):
     """Returns the action to be taken and updates the Q-values if needed.
+
     Args:
       time_step: an instance of rl_environment.TimeStep.
       is_evaluation: bool, whether this is a training or evaluation call.

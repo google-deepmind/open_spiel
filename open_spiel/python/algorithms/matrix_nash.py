@@ -14,6 +14,7 @@
 
 
 """Find Nash equilibria for constant- or general-sum 2-player games.
+
 Non-matrix games are handled by computing the normal (bimatrix) form.
 The algorithms used are:
 * direct computation of pure equilibria.
@@ -26,10 +27,6 @@ The algorithms used are:
   equilibrium.
 The general-sum mixed-equilibrium algorithms are likely to work well for tens of
 actions, but less likely to scale beyond that.
-Example usage:
-```
-matrix_nash --game kuhn_poker
-```
 """
 
 import fractions
@@ -49,6 +46,7 @@ def to_fraction_str(x, lrsnash_max_denom):
 
 def lrs_solve(row_payoffs, col_payoffs, lrsnash_max_denom, lrsnash_path):
   """Find all Nash equilibria using the lrsnash solver.
+
   `lrsnash` uses reverse search vertex enumeration on rational polytopes.
   For more info, see: http://cgm.cs.mcgill.ca/~avis/C/lrslib/USERGUIDE.html#nash
   Args:
@@ -102,6 +100,7 @@ def lrs_solve(row_payoffs, col_payoffs, lrsnash_max_denom, lrsnash_path):
 
 def lemke_howson_solve(row_payoffs, col_payoffs):
   """Find Nash equilibria using the Lemke-Howson algorithm.
+
   The algorithm is not guaranteed to find all equilibria. Also it can yield
   wrong answers if the game is degenerate (but raises warnings in that case).
   Args:

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python spiel example."""
+"""Python example of multiagent-Q learners"""
 
 import logging
 from absl import app
@@ -21,8 +21,8 @@ import enum
 import numpy as np
 
 from open_spiel.python import rl_environment
-from open_spiel.python.algorithms.tabular_qlearner import *
-from open_spiel.python.algorithms.tabular_maqlearner import *
+from open_spiel.python.algorithms.tabular_qlearner import QLearner
+from open_spiel.python.algorithms.tabular_multiagent_qlearner import MAQLearner, TwoPlayerNashSolver
 
 
 class Action(enum.IntEnum):
@@ -44,6 +44,7 @@ def print_iteration(time_step, actions, state):
 
 def marl_path_finding_example(unused_arg):
   """Example usage of multiagent Q-learner
+
     Based on https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf
   """
 

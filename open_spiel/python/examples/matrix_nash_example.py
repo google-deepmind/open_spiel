@@ -32,16 +32,12 @@ actions, but less likely to scale beyond that.
 
 Example usage:
 ```
-matrix_nash --game kuhn_poker
+matrix_nash_example --game kuhn_poker
 ```
 """
 
-import fractions
+
 import itertools
-import os
-import subprocess
-import tempfile
-import warnings
 
 from absl import app
 from absl import flags
