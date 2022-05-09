@@ -135,7 +135,9 @@ class MAQLearner(rl_agent.AbstractAgent):
     self._q_values = [collections.defaultdict(
         valuedict) for _ in range(num_players)]
     self._prev_info_state = None
-    self._last_loss_value = None
+  
+  def restart_episode(self):
+    self._prev_info_state = None
 
   def _get_payoffs_array(self, info_state):
     payoffs_array = np.zeros(
