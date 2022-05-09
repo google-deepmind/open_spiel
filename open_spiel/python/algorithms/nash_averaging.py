@@ -25,7 +25,7 @@ import numpy as np
 from open_spiel.python.egt.utils import game_payoffs_array
 
 
-def max_entropy_nash(p_mat, eps=0.0):
+def max_entropy_symmetric_nash(p_mat, eps=0.0):
   """Solving for the maxent symmetric nash for symmetric two-player zero-sum games
     convex programming:
       min p^Tlog(p)
@@ -39,7 +39,7 @@ def max_entropy_nash(p_mat, eps=0.0):
       eps: minimum probability threshold
 
     Returns:
-      p*: a maxent nash  
+      p*: a maxent symmetric nash  
   """
   assert np.array_equal(p_mat, -p_mat.T) and eps >= 0 and eps <= 0.5
   N = len(p_mat)
@@ -90,7 +90,7 @@ def nash_averaging(game, eps=0.0, a_v_a=True):
     if not np.array_equal(p_mat[0], -p_mat[0].T):
       raise ValueError(
           "AvA only works for symmetric two-player zero-sum games.")
-    maxent_nash = np.array(max_entropy_nash(p_mat[0], eps=eps))
+    maxent_nash = np.array(max_entropy_symmetric_nash(p_mat[0], eps=eps))
     return maxent_nash, p_mat[0].dot(maxent_nash)
 
   # For AvT, see appendix D of the paper.
@@ -101,6 +101,6 @@ def nash_averaging(game, eps=0.0, a_v_a=True):
   A = np.zeros((M+N, M+N))
   A[:M, M:M+N] = p_mat[0]
   A[M:, :M] = -p_mat[0].T
-  maxent_nash = np.array(max_entropy_nash(A, eps=eps))
+  maxent_nash = np.array(max_entropy_symmetric_nash(A, eps=eps))
   pa, pe = maxent_nash[:M], maxent_nash[M:]
   return (pa, pe), (p_mat[0].dot(pe), -p_mat[0].T.dot(pa))
