@@ -14,10 +14,6 @@
 
 """Python spiel example."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
 from absl import app
 from absl import flags
@@ -27,6 +23,7 @@ import numpy as np
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms.tabular_qlearner import *
 from open_spiel.python.algorithms.tabular_maqlearner import *
+
 
 class Action(enum.IntEnum):
   STAY = 0
@@ -44,23 +41,26 @@ def print_iteration(time_step, actions, state):
   logging.info("Board state:\n %s", state)
   logging.info("-" * 80)
 
+
 def marl_path_finding_example(unused_arg):
-  """
-    Example usage of multiagent Q-learner
+  """Example usage of multiagent Q-learner
     Based on https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf
   """
 
   logging.info("Creating the Grid Game")
-  env = rl_environment.Environment("pathfinding", grid = "B.A\n...\na.b", players = 2, step_reward = -1.)
+  env = rl_environment.Environment(
+      "pathfinding", grid="B.A\n...\na.b", players=2, step_reward=-1.)
 
   qlearner = QLearner(0, env.game.num_distinct_actions())
-  nashqlearner = MAQLearner(1, 2, env.game.num_distinct_actions(), TwoPlayerNashSolver())
+  nashqlearner = MAQLearner(
+      1, 2, [env.game.num_distinct_actions()] * 2, TwoPlayerNashSolver())
 
   time_step = env.reset()
   actions = [None, None]
-  
+
   while not time_step.last():
-    actions = [qlearner.step(time_step).action, nashqlearner.step(time_step, actions).action]
+    actions = [qlearner.step(time_step).action,
+               nashqlearner.step(time_step, actions).action]
     time_step = env.step(actions)
     print_iteration(time_step, actions, env.get_state)
 
