@@ -382,9 +382,12 @@ void RbcState::DoApplyAction(Action action) {
       // Illegal move was chosen.
       illegal_move_attempted_ = true;
 
-      // Check why the move was illegal: if it is pawn two-squares-forward move,
+      // Check why the move was illegal:
+      // if it is pawn two-squares-forward move,
       // and there is an enemy piece blocking it, the attempt to move only one
       // square forward (if that would be a legal move).
+      // if it is pawn move to last rank, change to pawn move & queen promotion
+      // (if that would be a legal move)
       if (move.piece.type == chess::PieceType::kPawn &&
           abs(move.from.y - move.to.y) == 2) {
         const int dy = move.to.y - move.from.y > 0 ? 1 : -1;
@@ -392,6 +395,12 @@ void RbcState::DoApplyAction(Action action) {
         one_forward_move.to.y -= dy;
         move = Board().IsMoveLegal(one_forward_move) ? one_forward_move
                                                      : chess::kPassMove;
+      } else if (move.piece.type == chess::PieceType::kPawn &&
+                 Board().IsPawnPromotionRank(move.to)) {
+        chess::Move promote_move = move;
+        promote_move.promotion_type = chess::PieceType::kQueen;
+        move = Board().IsMoveLegal(promote_move) ? promote_move
+                                                 : chess::kPassMove;
       } else {
         // Treat the illegal move as a pass.
         move = chess::kPassMove;
