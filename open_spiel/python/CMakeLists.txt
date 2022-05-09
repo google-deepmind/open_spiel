@@ -212,6 +212,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/games/dynamic_routing_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
+  tests/game_transforms_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
   tests/policy_test.py
