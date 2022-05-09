@@ -25,10 +25,8 @@ import numpy as np
 from open_spiel.python.egt.utils import game_payoffs_array
 
 
-
 def max_entropy_nash(p_mat, eps=0.0):
-  '''
-    Solving for maxent symmetric nash for symmetric two-player zero-sum games
+  """Solving for the maxent symmetric nash for symmetric two-player zero-sum games
     convex programming:
       min p^Tlog(p)
       s.t. 
@@ -37,19 +35,22 @@ def max_entropy_nash(p_mat, eps=0.0):
       1^T * p = 1
 
     Args:
-      p_mat: an N*N anti-symmetric payoff matrix
+      p_mat: an N*N anti-symmetric payoff matrix for the row player
       eps: minimum probability threshold
 
     Returns:
       p*: a maxent nash  
-  '''
+  """
   assert np.array_equal(p_mat, -p_mat.T) and eps >= 0 and eps <= 0.5
-  N=len(p_mat)
+  N = len(p_mat)
   p_mat = matrix(p_mat)
   solvers.options["show_progress"] = False
+
   def F(x=None, z=None):
-    if x is None: return 2 * N, matrix(1/N, (N,1))
-    if min(x) <= eps or max(x) >= 1-eps: return None
+    if x is None:
+      return 2 * N, matrix(1/N, (N, 1))
+    if min(x) <= eps or max(x) >= 1-eps:
+      return None
     ev = x.T * p_mat * x
     f = matrix(0.0, (2*N+1, 1))
     df = matrix(0.0, (2*N+1, N))
@@ -67,36 +68,34 @@ def max_entropy_nash(p_mat, eps=0.0):
   b = matrix(1.0, (1, 1))
   return solvers.cp(F, A=A, b=b)['x']
 
-def nash_averaging(game, eps=0.0, AvA=True):
 
-  '''
-    Nash averaging, see https://arxiv.org/pdf/1806.02643.pdf
+def nash_averaging(game, eps=0.0, a_v_a=True):
+  """Nash averaging, see https://arxiv.org/pdf/1806.02643.pdf
 
     Args:
       game: a pyspiel game
       eps: minimum probability mass for maxent nash
-      AvA: whether it is Agent-vs-Agent or Agent-vs-Task
+      a_v_a: whether it is Agent-vs-Agent or Agent-vs-Task
     Returns:
       maxent_nash: nash mixture for row player and column player
       nash_avg_score: the expected payoff under maxent_nash
-  
-  '''
+  """
+
   p_mat = game_payoffs_array(game)
   if len(p_mat) != 2:
     raise ValueError("Nash Averaging works only for two players.")
   if np.max(np.abs(p_mat[0] + p_mat[1])) > 0:
-     raise ValueError("Must be zero-sum")
-  if AvA:
+    raise ValueError("Must be zero-sum")
+  if a_v_a:
     if not np.array_equal(p_mat[0], -p_mat[0].T):
-      raise ValueError("AvA only works for symmetric two-player zero-sum games.")
+      raise ValueError(
+          "AvA only works for symmetric two-player zero-sum games.")
     maxent_nash = np.array(max_entropy_nash(p_mat[0], eps=eps))
     return maxent_nash, p_mat[0].dot(maxent_nash)
 
-
-  '''
-    For AvT, see appendix D of the paper
-  '''
-
+  # For AvT, see appendix D of the paper.
+  # Here assumes the row player represents agents and the column player represents tasks.
+  # game does not have to be symmetric
 
   M, N = p_mat[0].shape
   A = np.zeros((M+N, M+N))
