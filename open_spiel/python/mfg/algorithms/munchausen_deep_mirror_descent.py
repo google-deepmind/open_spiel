@@ -16,7 +16,7 @@
 """Munchausen DQN Agent and deep online mirror descent implementation."""
 
 import collections
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from absl import logging
 import haiku as hk
@@ -184,7 +184,8 @@ class MunchausenDQN(rl_agent.AbstractAgent):
            time_step,
            is_evaluation=False,
            add_transition_record=True,
-           use_softmax=False):
+           use_softmax=False,
+           tau: Optional[float] = None):
     """Returns the action to be taken and updates the Q-network if needed.
 
     Args:
@@ -192,6 +193,8 @@ class MunchausenDQN(rl_agent.AbstractAgent):
       is_evaluation: bool, whether this is a training or evaluation call.
       add_transition_record: Whether to add to the replay buffer on this step.
       use_softmax: Uses soft-max action selection.
+      tau: Tau for soft-max action selection. If None, then the training value
+        will be used.
 
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
@@ -205,7 +208,8 @@ class MunchausenDQN(rl_agent.AbstractAgent):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
       if use_softmax:
-        action, probs = self._softmax(info_state, legal_actions)
+        action, probs = self._softmax(info_state, legal_actions,
+                                      self._tau if tau is None else tau)
       else:
         epsilon = self._get_epsilon(is_evaluation)
         action, probs = self._epsilon_greedy(info_state, legal_actions, epsilon)
@@ -408,14 +412,15 @@ class MunchausenDQN(rl_agent.AbstractAgent):
         (1 - decay_steps / self._epsilon_decay_duration)**self._epsilon_power)
     return decayed_epsilon
 
-  def _softmax(self, info_state, legal_actions):
+  def _softmax(self, info_state, legal_actions,
+               tau: float) -> Tuple[int, np.ndarray]:
     """Returns a valid soft-max action and action probabilities."""
     info_state = np.reshape(info_state, [1, -1])
     q_values = self.hk_network_apply(self._params_q_network, info_state)[0]
     legal_one_hot = self._to_one_hot(legal_actions)
     legal_q_values = q_values + (1 - legal_one_hot) * ILLEGAL_ACTION_PENALTY
     # Apply temperature and subtract the maximum value for numerical stability.
-    temp = legal_q_values / self._tau
+    temp = legal_q_values / tau
     unnormalized = np.exp(temp - np.amax(temp))
     probs = unnormalized / unnormalized.sum()
     action = self._rs.choice(legal_actions, p=probs[legal_actions])
@@ -437,12 +442,13 @@ class MunchausenDQN(rl_agent.AbstractAgent):
 class SoftMaxMunchausenDQN(rl_agent.AbstractAgent):
   """Wraps a Munchausen DQN agent to use soft-max action selection."""
 
-  def __init__(self, agent: MunchausenDQN):
+  def __init__(self, agent: MunchausenDQN, tau: Optional[float] = None):
     self._agent = agent
+    self._tau = tau
 
   def step(self, time_step, is_evaluation=False):
     return self._agent.step(
-        time_step, is_evaluation=is_evaluation, use_softmax=True)
+        time_step, is_evaluation=is_evaluation, use_softmax=True, tau=self._tau)
 
 
 class DeepOnlineMirrorDescent(object):
@@ -515,12 +521,27 @@ class DeepOnlineMirrorDescent(object):
 
   def _update_policy_and_distribution(self):
     """Updates the current soft-max policy and the distribution."""
-    self._policy = rl_agent_policy.JointRLAgentPolicy(self._game, {
-        idx: SoftMaxMunchausenDQN(agent)
-        for idx, agent in enumerate(self._agents)
-    }, self._use_observation)
+    self._policy = self.get_softmax_policy()
     self._distribution = distribution_std.DistributionPolicy(
         self._game, self._policy)
+
+  def get_softmax_policy(self,
+                         tau: Optional[float] = None
+                        ) -> rl_agent_policy.JointRLAgentPolicy:
+    """Returns the softmax policy with the specified tau.
+
+    Args:
+      tau: Tau for soft-max action selection, or None to use the value set in
+        the MunchausenDQN agents.
+
+    Returns:
+      A JointRLAgentPolicy.
+    """
+    return rl_agent_policy.JointRLAgentPolicy(
+        self._game, {
+            idx: SoftMaxMunchausenDQN(agent, tau=tau)
+            for idx, agent in enumerate(self._agents)
+        }, self._use_observation)
 
   def iteration(self):
     """An iteration of Mirror Descent."""
