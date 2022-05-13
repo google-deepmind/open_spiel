@@ -21,25 +21,25 @@ from open_spiel.python.algorithms.nash_averaging import nash_averaging
 import pyspiel
 
 # transitive game test case
-game1 = pyspiel.create_matrix_game(
+game_trans = pyspiel.create_matrix_game(
     [[0.0, -1.0, -1.0], [1.0, 0.0, -1.0], [1.0, 1.0, 0.0]],
     [[0.0, 1.0, 1.0], [-1.0, 0.0, 1.0], [-1.0, -1.0, 0.0]])
 
-eq1 = np.asarray([0., 0., 1.])
-value1 = np.asarray([-1., -1., 0.])
+eq_trans = np.asarray([0., 0., 1.])
+value_trans = np.asarray([-1., -1., 0.])
 
 # rock-paper-scissors test case
-game2 = pyspiel.create_matrix_game(
+game_rps = pyspiel.create_matrix_game(
     [[0.0, -1.0, 1.0], [1.0, 0.0, -1.0], [-1.0, 1.0, 0.0]],
     [[0.0, 1.0, -1.0], [-1.0, 0.0, 1.0], [1.0, -1.0, 0.0]])
-eq2 = np.asarray([1/3, 1/3, 1/3])
-value2 = np.asarray([0., 0., 0.])
+eq_rps = np.asarray([1/3, 1/3, 1/3])
+value_rps = np.asarray([0., 0., 0.])
 
 
 class NashAveragingTest(parameterized.TestCase):
   @parameterized.named_parameters(
-      ('transitive_game', game1, eq1, value1),
-      ('rps_game', game2, eq2, value2),
+      ('transitive_game', game_trans, eq_trans, value_trans),
+      ('rps_game', game_rps, eq_rps, value_rps),
   )
   def test_simple_games(self, game, eq, value):
 
