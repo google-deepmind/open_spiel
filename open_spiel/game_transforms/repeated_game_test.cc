@@ -134,6 +134,8 @@ void RepeatedPrisonersDilemaTest() {
   SPIEL_CHECK_EQ(repeated_game->GetType().min_num_players, 2);
   SPIEL_CHECK_EQ(repeated_game->GetType().utility,
                  GameType::Utility::kGeneralSum);
+  // repeated_game->UtilitySum() should raise an error. This is checked in
+  // game_transforms_test.py as it's simpler to catch the error from Python.
   SPIEL_CHECK_EQ(repeated_game->GetType().reward_model,
                  GameType::RewardModel::kRewards);
 

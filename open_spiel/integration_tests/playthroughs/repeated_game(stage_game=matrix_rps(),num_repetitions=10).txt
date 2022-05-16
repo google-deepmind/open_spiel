@@ -23,7 +23,7 @@ GetParameters() = {num_repetitions=10,stage_game=matrix_rps()}
 NumPlayers() = 2
 MinUtility() = -10.0
 MaxUtility() = 10.0
-UtilitySum() = None
+UtilitySum() = 0.0
 ObservationTensorShape() = [6]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 6
