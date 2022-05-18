@@ -13,10 +13,6 @@
 # limitations under the License.
 """Tests for open_spiel.python.algorithms.tabular_qlearner."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import absltest
 import numpy as np
 

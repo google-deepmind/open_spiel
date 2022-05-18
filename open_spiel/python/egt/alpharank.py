@@ -23,10 +23,6 @@ All equations and variable names correspond to the following paper:
 
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 import scipy.linalg as la
 

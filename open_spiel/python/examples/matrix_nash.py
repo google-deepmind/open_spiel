@@ -36,10 +36,6 @@ matrix_nash --game kuhn_poker
 ```
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import fractions
 import itertools
 import os

@@ -28,10 +28,6 @@ of units, except for the last connection. Before the last hidden layer
 a layer normalization is applied.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import random
 

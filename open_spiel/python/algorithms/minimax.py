@@ -20,10 +20,6 @@ games.
 See for example https://en.wikipedia.org/wiki/Alpha-beta_pruning
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import pyspiel
 
 

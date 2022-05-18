@@ -14,10 +14,6 @@
 
 """A bot that samples from legal actions based on a policy."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import pyspiel
 
 

@@ -14,10 +14,6 @@
 
 """Computes the value of a given policy."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from typing import List, Union
 
 import numpy as np

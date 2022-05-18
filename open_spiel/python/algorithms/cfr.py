@@ -22,10 +22,6 @@ One iteration of CFR consists of:
 The average policy is what converges to a Nash Equilibrium.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import attr
 import numpy as np

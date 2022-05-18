@@ -32,10 +32,6 @@ Since we are restricting ourselves to the uncontested bidding game, we have
 no support for Doubling, Redoubling, or the play of the cards.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import re
 
 import pyspiel

@@ -18,10 +18,6 @@ Turns a weighted sum of N policies into a realization-equivalent single
 policy by sweeping over the state space.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 from open_spiel.python import policy
 import pyspiel

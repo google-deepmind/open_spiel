@@ -17,10 +17,6 @@
 Example.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 from absl import flags
 import numpy as np
@@ -46,10 +42,10 @@ class TestPolicy(policy.Policy):
 def main(unused_argv):
   env = rl_environment.Environment(FLAGS.game_name)
 
-  policies = [[
+  policies = [[  # pylint: disable=g-complex-comprehension
       policy.TabularPolicy(env.game).copy_with_noise(alpha=float(i), beta=1.0)
       for i in range(2)
-  ] for _ in range(2)]  # pylint: disable=g-complex-comprehension
+  ] for _ in range(2)]
 
   probabilities = [
       list(np.ones(len(policies[i])) / len(policies[i])) for i in range(2)

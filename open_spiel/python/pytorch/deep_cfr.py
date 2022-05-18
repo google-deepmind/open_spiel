@@ -23,17 +23,13 @@ the strategy profiles of the game.  To train these networks a fixed ring buffer
 train the networks.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import math
 import random
 import numpy as np
 from scipy import stats
 import torch
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 from open_spiel.python import policy

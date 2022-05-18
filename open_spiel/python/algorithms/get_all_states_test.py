@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.algorithms.get_all_states."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import absltest
 
 from open_spiel.python.algorithms import get_all_states

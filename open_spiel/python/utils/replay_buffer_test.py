@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.utils.replay_buffer."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import absltest
 
 from open_spiel.python.utils.replay_buffer import ReplayBuffer

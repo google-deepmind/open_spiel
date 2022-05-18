@@ -31,10 +31,6 @@ objects expose a lower-level interface, which may be more efficient for
 some use cases.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import itertools
 from typing import Iterable
 

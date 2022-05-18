@@ -20,10 +20,6 @@ PRs improving the runtime are welcome.
 See the paper https://arxiv.org/abs/1603.01121 for more details.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import contextlib
 import enum

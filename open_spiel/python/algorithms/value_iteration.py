@@ -14,10 +14,6 @@
 
 """Value iteration algorithm for solving a game."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.algorithms import lp_solver
 import pyspiel

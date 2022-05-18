@@ -14,10 +14,6 @@
 
 """LP Solver for two-player zero-sum games."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import cvxopt
 import numpy as np
 from open_spiel.python.egt import utils

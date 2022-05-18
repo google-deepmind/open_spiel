@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.environment.cliff_walking."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import random
 from absl.testing import absltest
 from open_spiel.python import rl_environment

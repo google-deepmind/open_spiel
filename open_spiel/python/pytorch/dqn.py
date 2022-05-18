@@ -14,16 +14,12 @@
 
 """DQN agent implemented in PyTorch."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import math
 import numpy as np
 from scipy import stats
 import torch
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 from open_spiel.python import rl_agent

@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.algorithms.eva."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import parameterized
 import tensorflow.compat.v1 as tf
 
@@ -72,11 +68,11 @@ class QueryableFixedSizeRingBufferTest(tf.test.TestCase):
 
   def test_replay_buffer_add(self):
     replay_buffer = eva.QueryableFixedSizeRingBuffer(replay_buffer_capacity=10)
-    self.assertEqual(len(replay_buffer), 0)
+    self.assertEmpty(replay_buffer)
     replay_buffer.add("entry1")
-    self.assertEqual(len(replay_buffer), 1)
+    self.assertLen(replay_buffer, 1)
     replay_buffer.add("entry2")
-    self.assertEqual(len(replay_buffer), 2)
+    self.assertLen(replay_buffer, 2)
 
     self.assertIn("entry1", replay_buffer)
     self.assertIn("entry2", replay_buffer)
@@ -86,7 +82,7 @@ class QueryableFixedSizeRingBufferTest(tf.test.TestCase):
     replay_buffer.add("entry1")
     replay_buffer.add("entry2")
     replay_buffer.add("entry3")
-    self.assertEqual(len(replay_buffer), 2)
+    self.assertLen(replay_buffer, 2)
 
     self.assertIn("entry2", replay_buffer)
     self.assertIn("entry3", replay_buffer)

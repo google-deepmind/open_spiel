@@ -18,10 +18,6 @@ The algorithm does not support mean field games where the game evolution depends
 on the mean field distribution.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import itertools
 
 from open_spiel.python import games  # pylint:disable=unused-import

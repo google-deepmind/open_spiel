@@ -21,10 +21,6 @@ After about 10**5 training episodes, the agents reach a good policy: win rate
 against random opponents is around 99% for player 0 and 92% for player 1.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
 import sys
 from absl import app
