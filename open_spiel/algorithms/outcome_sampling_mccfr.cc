@@ -203,7 +203,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(
   double value_estimate = 0;
   for (int aidx = 0; aidx < legal_actions.size(); ++aidx) {
     value_estimate +=
-        info_state_copy.current_policy[sampled_aidx] * child_values[aidx];
+        info_state_copy.current_policy[aidx] * child_values[aidx];
   }
 
   if (player == update_player) {
