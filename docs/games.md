@@ -199,7 +199,7 @@ Status                                       | Game
 *   Agents on a grid.
 *   Research game.
 *   Non-deterministic.
-*   Perfect, incomplete information.
+*   Perfect, incomplete information (all players see the grid and their own preferences, but not the preferences of other players).
 *   2 players.
 *   [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent
     Reinforcement Learning](https://arxiv.org/abs/1802.09640)
