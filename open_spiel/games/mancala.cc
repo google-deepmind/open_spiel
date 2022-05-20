@@ -74,22 +74,29 @@ int MancalaState::GetOppositePit(int pit) const {
   return kTotalPits - pit;
 }
 
+int MancalaState::GetNextPit(Player player, int pit) const {
+  int next_pit = (pit + 1) % kTotalPits;
+  if(next_pit == GetPlayerHomePit(1 - player))
+    next_pit++;
+  return next_pit;
+}
+
 void MancalaState::DoApplyAction(Action move) {
   // SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   int num_beans = board_[move];
   board_[move] = 0;
+  int current_pit = move;
   for(int i = 0; i < num_beans; ++i){
-    board_[(move + i + 1) % kTotalPits]++;
+    current_pit = GetNextPit(current_player_, current_pit);
+    board_[current_pit]++;
+  }
+  if(board_[current_pit] == 1 && IsPlayerPit(current_player_, current_pit)){
+    board_[GetPlayerHomePit(current_player_)] += (1 + board_[GetOppositePit(current_pit)]);
+    board_[current_pit] = 0;
+    board_[GetOppositePit(current_pit)] = 0;
   }
 
-  int final_pit = (move + num_beans) % kTotalPits;
-  if(board_[final_pit] == 1 && IsPlayerPit(current_player_, final_pit)){
-    board_[GetPlayerHomePit(current_player_)] += (1 + board_[GetOppositePit(final_pit)]);
-    board_[final_pit] = 0;
-    board_[GetOppositePit(final_pit)] = 0;
-  }
-
-  if(final_pit != GetPlayerHomePit(current_player_))
+  if(current_pit != GetPlayerHomePit(current_player_))
     current_player_ = 1 - current_player_;
   num_moves_ += 1;
 }
