@@ -122,10 +122,11 @@ In a nutshell:
     pip3 install --upgrade setuptools testresources
     ```
 
-    If you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them, e.g.:
+    Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them, e.g.:
     ```bash
-    pip install --upgrade torch==1.11.0
+    pip install --upgrade torch==x.xx.x jax==x.x.x
     ```
+    where `x.xx.x` should be the desired version numbers (which can be found at the link above).
 
 4.  This sections differs depending on the installation procedure:
 
@@ -257,11 +258,11 @@ repositories.
 
 ### Installing Python dependencies
 
-#### Required dependencies
-
 Using a `virtualenv` to install python dependencies is highly recommended. For
 more information see:
 [https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+
+##### Required dependencies
 
 Install required dependencies (Python 3):
 
@@ -278,13 +279,14 @@ system-wide with:
 pip3 install --upgrade -r requirements.txt
 ```
 
-#### Optional dependencies
+##### Optional dependencies
 
-Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them. The installation scripts will not install nor upgrade these dependencies. [ref](https://github.com/deepmind/open_spiel/issues/833)
+Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them. The installation scripts will not install or upgrade these dependencies. e.g.:
 
 ```bash
-pip install --upgrade torch==1.11.0
+pip install --upgrade torch==x.xx.x jax==x.x.x
 ```
+where `x.xx.x` should be the desired version numbers (which can be found at the link above).
 
 ### Building and running tests
 
