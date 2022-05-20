@@ -86,6 +86,8 @@ set(GAME_SOURCES
   lewis_signaling.h
   liars_dice.cc
   liars_dice.h
+  mancala.cc
+  mancala.h
   markov_soccer.cc
   markov_soccer.h
   matching_pennies_3p.cc
@@ -402,6 +404,10 @@ add_executable(liars_dice_test liars_dice_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(liars_dice_test liars_dice_test)
+
+add_executable(mancala_test mancala_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(mancala_test mancala_test)
 
 add_executable(markov_soccer_test markov_soccer_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
