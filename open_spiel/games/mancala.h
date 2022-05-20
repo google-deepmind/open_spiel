@@ -85,6 +85,8 @@ class MancalaState : public State {
  private:
   void InitBoard();
   int GetPlayerHomePit(Player player) const;
+  bool IsPlayerPit(Player player, int pit) const;
+  int GetOppositePit(int pit) const;
   bool IsFull() const;                // Is the board full?
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;

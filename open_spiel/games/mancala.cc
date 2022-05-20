@@ -59,6 +59,21 @@ int MancalaState::GetPlayerHomePit(Player player) const {
   return 0;
 }
 
+bool MancalaState::IsPlayerPit(Player player, int pit) const {
+  if(player == 0){
+    if(pit < kTotalPits / 2 && pit > 0)
+      return true;
+    return false;
+  }
+  if(pit > kTotalPits / 2)
+    return true;
+  return false;
+}
+
+int MancalaState::GetOppositePit(int pit) const {
+  return kTotalPits - pit;
+}
+
 void MancalaState::DoApplyAction(Action move) {
   // SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   int num_beans = board_[move];
@@ -66,7 +81,15 @@ void MancalaState::DoApplyAction(Action move) {
   for(int i = 0; i < num_beans; ++i){
     board_[(move + i + 1) % kTotalPits]++;
   }
-  if((move + num_beans) % kTotalPits != GetPlayerHomePit(current_player_))
+
+  int final_pit = (move + num_beans) % kTotalPits;
+  if(board_[final_pit] == 1 && IsPlayerPit(current_player_, final_pit)){
+    board_[GetPlayerHomePit(current_player_)] += (1 + board_[GetOppositePit(final_pit)]);
+    board_[final_pit] = 0;
+    board_[GetOppositePit(final_pit)] = 0;
+  }
+
+  if(final_pit != GetPlayerHomePit(current_player_))
     current_player_ = 1 - current_player_;
   num_moves_ += 1;
 }
