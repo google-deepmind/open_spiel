@@ -37,6 +37,7 @@ inline constexpr int kNumPits = 6;
 inline constexpr int kNumRows = 3;
 inline constexpr int kNumCols = 3;
 inline constexpr int kNumCells = kNumRows * kNumCols;
+inline constexpr int kTotalPits = (kNumPits + 1) * 2;
 inline constexpr int kCellStates = 1 + kNumPlayers;  // empty, 'x', and 'o'.
 
 // https://math.stackexchange.com/questions/485752/tictactoe-state-space-choose-calculation/485852
@@ -83,6 +84,7 @@ class MancalaState : public State {
 
  private:
   void InitBoard();
+  int GetPlayerHomePit(Player player) const;
   bool IsFull() const;                // Is the board full?
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;

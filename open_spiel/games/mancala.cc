@@ -52,58 +52,47 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-CellState PlayerToState(Player player) {
-  switch (player) {
-    case 0:
-      return CellState::kCross;
-    case 1:
-      return CellState::kNought;
-    default:
-      SpielFatalError(absl::StrCat("Invalid player id ", player));
-      return CellState::kEmpty;
+int MancalaState::GetPlayerHomePit(Player player) const {
+  if(player == 0){
+    return kTotalPits / 2;
   }
-}
-
-std::string StateToString(CellState state) {
-  switch (state) {
-    case CellState::kEmpty:
-      return ".";
-    case CellState::kNought:
-      return "o";
-    case CellState::kCross:
-      return "x";
-    default:
-      SpielFatalError("Unknown state.");
-  }
+  return 0;
 }
 
 void MancalaState::DoApplyAction(Action move) {
   // SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
-  // board_[move] = PlayerToState(CurrentPlayer());
-  // if (HasLine(current_player_)) {
-  //   outcome_ = current_player_;
-  // }
-  current_player_ = 1 - current_player_;
+  int num_beans = board_[move];
+  board_[move] = 0;
+  for(int i = 0; i < num_beans; ++i){
+    board_[(move + i + 1) % kTotalPits]++;
+  }
+  if((move + num_beans) % kTotalPits != GetPlayerHomePit(current_player_))
+    current_player_ = 1 - current_player_;
   num_moves_ += 1;
 }
 
 std::vector<Action> MancalaState::LegalActions() const {
   if (IsTerminal()) return {};
-  // Can move in any empty cell.
   std::vector<Action> moves;
-  moves.push_back(0);
-  // for (int cell = 0; cell < kNumCells; ++cell) {
-  //   if (board_[cell] == CellState::kEmpty) {
-  //     moves.push_back(cell);
-  //   }
-  // }
+  if(current_player_ == 0){
+    for(int i = 0; i < kNumPits; ++i){
+      if(board_[i + 1] > 0){
+        moves.push_back(i + 1);
+      }
+    }
+  } else {
+    for(int i = 0; i < kNumPits; ++i){
+      if(board_[board_.size() - 1 - i] > 0){
+        moves.push_back(board_.size() - 1 - i);
+      }
+    }
+  }
   return moves;
 }
 
 std::string MancalaState::ActionToString(Player player,
                                            Action action_id) const {
-  return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id / kNumCols, ",", action_id % kNumCols, ")");
+  return absl::StrCat(action_id);
 }
 
 
@@ -147,12 +136,36 @@ std::string MancalaState::ToString() const {
 }
 
 bool MancalaState::IsTerminal() const {
-  return num_moves_ == 1;
-  // return outcome_ != kInvalidPlayer || IsFull();
+  bool player_0_has_moves = false;
+  bool player_1_has_moves = false;
+  for (int i = 0; i < kNumPits; ++i) {
+    if(board_[board_.size() - 1 - i] > 0){
+      player_1_has_moves = true;
+      break;
+    }    
+  }
+  for (int i = 0; i < kNumPits; ++i) {
+    if(board_[i + 1] > 0){
+      player_0_has_moves = true;
+      break;
+    }    
+  }
+  return !player_0_has_moves || !player_1_has_moves;
 }
 
 std::vector<double> MancalaState::Returns() const {
-  return {0.0, 0.0};
+  int player_0_bean_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalPits / 2 + 1, 0);
+  int player_1_bean_sum = std::accumulate(board_.begin() + kTotalPits / 2 + 1, board_.end(), 0) + board_[0];
+  if (player_0_bean_sum > player_1_bean_sum) {
+    // return {player_0_bean_sum, player_1_bean_sum};
+    return {1.0, -1.0};
+  } else if (player_0_bean_sum < player_1_bean_sum) {
+    // return {player_0_bean_sum, player_1_bean_sum};
+    return {-1.0, 1.0};
+  } else {
+    // return {player_0_bean_sum, player_1_bean_sum};
+    return {0.0, 0.0};
+  }
 }
 
 std::string MancalaState::InformationStateString(Player player) const {
