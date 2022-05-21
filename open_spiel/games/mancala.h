@@ -23,8 +23,8 @@
 
 #include "open_spiel/spiel.h"
 
-// Simple game of Noughts and Crosses:
-// https://en.wikipedia.org/wiki/Tic-tac-toe
+// Mancala
+// https://en.wikipedia.org/wiki/Mancala
 //
 // Parameters: none
 
@@ -34,21 +34,10 @@ namespace mancala {
 // Constants.
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumPits = 6;
-inline constexpr int kNumRows = 3;
-inline constexpr int kNumCols = 3;
-inline constexpr int kNumCells = kNumRows * kNumCols;
 inline constexpr int kTotalPits = (kNumPits + 1) * 2;
-inline constexpr int kCellStates = 1 + kNumPlayers;  // empty, 'x', and 'o'.
 
 // https://math.stackexchange.com/questions/485752/tictactoe-state-space-choose-calculation/485852
 inline constexpr int kNumberStates = 5478;
-
-// State of a cell.
-enum class CellState {
-  kEmpty,
-  kNought,  // O
-  kCross,   // X
-};
 
 // State of an in-play game.
 class MancalaState : public State {
@@ -72,11 +61,6 @@ class MancalaState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
-  int BoardAt(int cell) const { return board_[cell]; }
-  Player outcome() const { return outcome_; }
-
-  // Only used by Ultimate Tic-Tac-Toe.
-  void SetCurrentPlayer(Player player) { current_player_ = player; }
 
  protected:
   std::array<int, (kNumPits + 1) * 2> board_;
@@ -88,9 +72,7 @@ class MancalaState : public State {
   bool IsPlayerPit(Player player, int pit) const;
   int GetNextPit(Player player, int pit) const;
   int GetOppositePit(int pit) const;
-  bool IsFull() const;                // Is the board full?
   Player current_player_ = 0;         // Player zero goes first
-  Player outcome_ = kInvalidPlayer;
   int num_moves_ = 0;
 };
 
@@ -98,7 +80,7 @@ class MancalaState : public State {
 class MancalaGame : public Game {
  public:
   explicit MancalaGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override { return kTotalPits; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new MancalaState(shared_from_this()));
   }
@@ -107,21 +89,11 @@ class MancalaGame : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, kNumRows, kNumCols};
+    return {};
   }
-  int MaxGameLength() const override { return kNumCells; }
+  // There is arbitrarily chosen number to ensure the game is finite.
+  int MaxGameLength() const override { return 1000; }
 };
-
-CellState PlayerToState(Player player);
-std::string StateToString(CellState state);
-
-// Does this player have a line?
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player);
-
-inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  return stream << StateToString(state);
-}
 
 }  // namespace mancala
 }  // namespace open_spiel

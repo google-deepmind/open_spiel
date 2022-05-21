@@ -125,9 +125,6 @@ std::string MancalaState::ActionToString(Player player,
   return absl::StrCat(action_id);
 }
 
-
-bool MancalaState::IsFull() const { return num_moves_ == kNumCells; }
-
 void MancalaState::InitBoard() {
   std::fill(begin(board_), end(board_), 4);
   board_[0] = 0;
@@ -216,10 +213,10 @@ void MancalaState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   // Treat `values` as a 2-d tensor.
-  TensorView<2> view(values, {kCellStates, kNumCells}, true);
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
-  }
+  // TensorView<2> view(values, {kCellStates, kNumCells}, true);
+  // for (int cell = 0; cell < kNumCells; ++cell) {
+  //   view[{static_cast<int>(board_[cell]), cell}] = 1.0;
+  // }
 }
 
 void MancalaState::UndoAction(Player player, Action move) {
