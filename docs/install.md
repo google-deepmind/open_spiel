@@ -102,7 +102,7 @@ In a nutshell:
     ./install.sh
     ```
 
-3.  Install your Python dependencies, e.g. in Python 3 using
+3.  Install your [Python dependencies](#installing-python-dependencies), e.g. in Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):
 
     ```bash
@@ -114,13 +114,19 @@ In a nutshell:
 
     `pip` should be installed once and upgraded:
 
-    ```
+    ```bash
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     # Install pip deps as your user. Do not use the system's pip.
     python3 get-pip.py
     pip3 install --upgrade pip
     pip3 install --upgrade setuptools testresources
     ```
+
+    Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them, e.g.:
+    ```bash
+    pip install --upgrade torch==x.xx.x jax==x.x.x
+    ```
+    where `x.xx.x` should be the desired version numbers (which can be found at the link above).
 
 4.  This sections differs depending on the installation procedure:
 
@@ -256,7 +262,9 @@ Using a `virtualenv` to install python dependencies is highly recommended. For
 more information see:
 [https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
 
-Install dependencies (Python 3):
+##### Required dependencies
+
+Install required dependencies (Python 3):
 
 ```bash
 virtualenv -p python3 venv
@@ -270,6 +278,15 @@ system-wide with:
 ```bash
 pip3 install --upgrade -r requirements.txt
 ```
+
+##### Optional dependencies
+
+Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them. The installation scripts will not install or upgrade these dependencies. e.g.:
+
+```bash
+pip install --upgrade torch==x.xx.x jax==x.x.x
+```
+where `x.xx.x` should be the desired version numbers (which can be found at the link above).
 
 ### Building and running tests
 
