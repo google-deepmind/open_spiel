@@ -90,7 +90,9 @@ void MancalaState::DoApplyAction(Action move) {
     current_pit = GetNextPit(current_player_, current_pit);
     board_[current_pit]++;
   }
-  if(board_[current_pit] == 1 && IsPlayerPit(current_player_, current_pit)){
+
+  //capturing logic
+  if(board_[current_pit] == 1 && IsPlayerPit(current_player_, current_pit) && board_[GetOppositePit(current_pit)] > 0){
     board_[GetPlayerHomePit(current_player_)] += (1 + board_[GetOppositePit(current_pit)]);
     board_[current_pit] = 0;
     board_[GetOppositePit(current_pit)] = 0;

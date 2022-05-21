@@ -36,9 +36,6 @@ inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumPits = 6;
 inline constexpr int kTotalPits = (kNumPits + 1) * 2;
 
-// https://math.stackexchange.com/questions/485752/tictactoe-state-space-choose-calculation/485852
-inline constexpr int kNumberStates = 5478;
-
 // State of an in-play game.
 class MancalaState : public State {
  public:
