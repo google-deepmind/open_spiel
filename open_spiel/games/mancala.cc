@@ -82,7 +82,7 @@ int MancalaState::GetNextPit(Player player, int pit) const {
 }
 
 void MancalaState::DoApplyAction(Action move) {
-  // SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
+  SPIEL_CHECK_GT(board_[move], 0);
   int num_beans = board_[move];
   board_[move] = 0;
   int current_pit = move;
@@ -212,11 +212,12 @@ void MancalaState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // Treat `values` as a 2-d tensor.
-  // TensorView<2> view(values, {kCellStates, kNumCells}, true);
-  // for (int cell = 0; cell < kNumCells; ++cell) {
-  //   view[{static_cast<int>(board_[cell]), cell}] = 1.0;
-  // }
+  SPIEL_CHECK_EQ(values.size(), kTotalPits);
+  auto value_it = values.begin();
+  for (int count : board_) {
+    *value_it++ = count;
+  }
+  SPIEL_CHECK_EQ(value_it, values.end());
 }
 
 void MancalaState::UndoAction(Player player, Action move) {
