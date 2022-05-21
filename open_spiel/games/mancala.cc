@@ -184,13 +184,10 @@ std::vector<double> MancalaState::Returns() const {
   int player_0_bean_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalPits / 2 + 1, 0);
   int player_1_bean_sum = std::accumulate(board_.begin() + kTotalPits / 2 + 1, board_.end(), 0) + board_[0];
   if (player_0_bean_sum > player_1_bean_sum) {
-    // return {player_0_bean_sum, player_1_bean_sum};
     return {1.0, -1.0};
   } else if (player_0_bean_sum < player_1_bean_sum) {
-    // return {player_0_bean_sum, player_1_bean_sum};
     return {-1.0, 1.0};
   } else {
-    // return {player_0_bean_sum, player_1_bean_sum};
     return {0.0, 0.0};
   }
 }
@@ -221,9 +218,7 @@ void MancalaState::ObservationTensor(Player player,
 }
 
 void MancalaState::UndoAction(Player player, Action move) {
-  // board_[move] = CellState::kEmpty;
-  // current_player_ = player;
-  // outcome_ = kInvalidPlayer;
+  //Yet to implement Undo
   num_moves_ -= 1;
   history_.pop_back();
   --move_number_;
