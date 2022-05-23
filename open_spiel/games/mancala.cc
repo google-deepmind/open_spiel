@@ -53,14 +53,14 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
 int MancalaState::GetPlayerHomePit(Player player) const {
-  if(player == 0){
+  if(player == 0) {
     return kTotalPits / 2;
   }
   return 0;
 }
 
 bool MancalaState::IsPlayerPit(Player player, int pit) const {
-  if(player == 0){
+  if(player == 0) {
     if(pit < kTotalPits / 2 && pit > 0)
       return true;
     return false;
@@ -86,13 +86,13 @@ void MancalaState::DoApplyAction(Action move) {
   int num_beans = board_[move];
   board_[move] = 0;
   int current_pit = move;
-  for(int i = 0; i < num_beans; ++i){
+  for(int i = 0; i < num_beans; ++i) {
     current_pit = GetNextPit(current_player_, current_pit);
     board_[current_pit]++;
   }
 
   //capturing logic
-  if(board_[current_pit] == 1 && IsPlayerPit(current_player_, current_pit) && board_[GetOppositePit(current_pit)] > 0){
+  if(board_[current_pit] == 1 && IsPlayerPit(current_player_, current_pit) && board_[GetOppositePit(current_pit)] > 0) {
     board_[GetPlayerHomePit(current_player_)] += (1 + board_[GetOppositePit(current_pit)]);
     board_[current_pit] = 0;
     board_[GetOppositePit(current_pit)] = 0;
@@ -106,15 +106,15 @@ void MancalaState::DoApplyAction(Action move) {
 std::vector<Action> MancalaState::LegalActions() const {
   if (IsTerminal()) return {};
   std::vector<Action> moves;
-  if(current_player_ == 0){
-    for(int i = 0; i < kNumPits; ++i){
-      if(board_[i + 1] > 0){
+  if(current_player_ == 0) {
+    for(int i = 0; i < kNumPits; ++i) {
+      if(board_[i + 1] > 0) {
         moves.push_back(i + 1);
       }
     }
   } else {
-    for(int i = 0; i < kNumPits; ++i){
-      if(board_[board_.size() - 1 - i] > 0){
+    for(int i = 0; i < kNumPits; ++i) {
+      if(board_[board_.size() - 1 - i] > 0) {
         moves.push_back(board_.size() - 1 - i);
       }
     }
@@ -173,13 +173,13 @@ bool MancalaState::IsTerminal() const {
   bool player_0_has_moves = false;
   bool player_1_has_moves = false;
   for (int i = 0; i < kNumPits; ++i) {
-    if(board_[board_.size() - 1 - i] > 0){
+    if(board_[board_.size() - 1 - i] > 0) {
       player_1_has_moves = true;
       break;
     }    
   }
   for (int i = 0; i < kNumPits; ++i) {
-    if(board_[i + 1] > 0){
+    if(board_[i + 1] > 0) {
       player_0_has_moves = true;
       break;
     }    
