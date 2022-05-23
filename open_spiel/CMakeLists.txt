@@ -1,6 +1,8 @@
 # Version >= 3.12 required for new FindPython module
 # https://cmake.org/cmake/help/v3.12/release/3.12.html
-cmake_minimum_required (VERSION 3.12)
+# Version >= 3.17 required for CMAKE_CUDA_STANDARD
+# https://gitlab.kitware.com/cmake/cmake/-/issues/19123
+cmake_minimum_required (VERSION 3.17)
 project (open_spiel)
 
 # Define some nice terminal colors.
@@ -25,6 +27,9 @@ if(NOT WIN32)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CUDA_STANDARD 14)
+set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # Set default build type.
 set (BUILD_TYPE $ENV{BUILD_TYPE})
