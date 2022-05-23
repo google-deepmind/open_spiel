@@ -33,7 +33,6 @@ void BasicMancalaTests() {
   testing::LoadGameTest("mancala");
   testing::NoChanceOutcomesTest(*LoadGame("mancala"));
   testing::RandomSimTest(*LoadGame("mancala"), 100);
-  // testing::RandomSimTestWithUndo(*LoadGame("mancala"), 1);
 }
 
 // Board:
