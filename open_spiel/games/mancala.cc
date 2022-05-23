@@ -124,7 +124,7 @@ std::vector<Action> MancalaState::LegalActions() const {
 }
 
 std::string MancalaState::ActionToString(Player player,
-                                           Action action_id) const {
+                                         Action action_id) const {
   return absl::StrCat(action_id);
 }
 
@@ -152,14 +152,12 @@ std::string MancalaState::ToString() const {
   }
   absl::StrAppend(&str, "\n");
 
-  
   absl::StrAppend(&str, board_[0]);
   for (int i = 0; i < kNumPits * 2 - 1; ++i) {
     absl::StrAppend(&str, separator);
   }
   absl::StrAppend(&str, board_[board_.size() / 2]);
   absl::StrAppend(&str, "\n");
-
 
   absl::StrAppend(&str, separator);
   for (int i = 0; i < kNumPits; ++i) {
@@ -223,13 +221,6 @@ void MancalaState::ObservationTensor(Player player,
     *value_it++ = count;
   }
   SPIEL_CHECK_EQ(value_it, values.end());
-}
-
-void MancalaState::UndoAction(Player player, Action move) {
-  //Yet to implement Undo
-  num_moves_ -= 1;
-  history_.pop_back();
-  --move_number_;
 }
 
 std::unique_ptr<State> MancalaState::Clone() const {
