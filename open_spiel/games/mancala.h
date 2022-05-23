@@ -44,6 +44,8 @@ class MancalaState : public State {
   MancalaState(const MancalaState&) = default;
   MancalaState& operator=(const MancalaState&) = default;
 
+  void SetBoard(const std::array<int,  (kNumPits + 1) * 2>& board);
+  int BoardAt(int position) const { return board_[position]; }
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
@@ -64,7 +66,7 @@ class MancalaState : public State {
   void DoApplyAction(Action move) override;
 
  private:
-  void InitBoard();
+  void InitBoard();  
   int GetPlayerHomePit(Player player) const;
   bool IsPlayerPit(Player player, int pit) const;
   int GetNextPit(Player player, int pit) const;

@@ -119,6 +119,7 @@ std::vector<Action> MancalaState::LegalActions() const {
       }
     }
   }
+  std::sort(moves.begin(), moves.end());
   return moves;
 }
 
@@ -131,6 +132,10 @@ void MancalaState::InitBoard() {
   std::fill(begin(board_), end(board_), 4);
   board_[0] = 0;
   board_[board_.size() / 2] = 0;
+}
+
+void MancalaState::SetBoard(const std::array<int, (kNumPits + 1) * 2>& board) {
+  board_ = board;
 }
 
 MancalaState::MancalaState(std::shared_ptr<const Game> game) : State(game) {
@@ -183,15 +188,16 @@ bool MancalaState::IsTerminal() const {
 }
 
 std::vector<double> MancalaState::Returns() const {
-  int player_0_bean_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalPits / 2 + 1, 0);
-  int player_1_bean_sum = std::accumulate(board_.begin() + kTotalPits / 2 + 1, board_.end(), 0) + board_[0];
-  if (player_0_bean_sum > player_1_bean_sum) {
-    return {1.0, -1.0};
-  } else if (player_0_bean_sum < player_1_bean_sum) {
-    return {-1.0, 1.0};
-  } else {
-    return {0.0, 0.0};
+  if(IsTerminal()) {
+    int player_0_bean_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalPits / 2 + 1, 0);
+    int player_1_bean_sum = std::accumulate(board_.begin() + kTotalPits / 2 + 1, board_.end(), 0) + board_[0];
+    if (player_0_bean_sum > player_1_bean_sum) {
+      return {1.0, -1.0};
+    } else if (player_0_bean_sum < player_1_bean_sum) {
+      return {-1.0, 1.0};
+    }  
   }
+  return {0.0, 0.0};
 }
 
 std::string MancalaState::InformationStateString(Player player) const {
