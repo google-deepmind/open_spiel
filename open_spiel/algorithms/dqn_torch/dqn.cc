@@ -65,7 +65,7 @@ DQN::DQN(const DQNSettings& settings)
       loss_str_(settings.loss_str),
       exists_prev_(false),
       prev_state_(nullptr),
-      prev_action_(kInvalidAction),
+      prev_action_(0),
       step_counter_(0),
       rng_(settings.seed) {}
 
@@ -93,7 +93,7 @@ Action DQN::Step(const State& state, bool is_evaluation) {
     double epsilon = GetEpsilon(is_evaluation);
     action = EpsilonGreedy(info_state, legal_actions, epsilon);
   } else {
-    action = kInvalidAction;
+    action = 0;
   }
 
   if (!is_evaluation) {
@@ -113,7 +113,7 @@ Action DQN::Step(const State& state, bool is_evaluation) {
 
   if (state.IsTerminal()) {
     exists_prev_ = false;
-    prev_action_ = kInvalidAction;
+    prev_action_ = 0;
     prev_state_ = nullptr;
     return kInvalidAction;
   } else {
