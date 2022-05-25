@@ -146,7 +146,7 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
   Action action;
   if (legal_actions.empty()) {
     // In some simultaneous games, some players can have no legal actions.
-    return kInvalidAction;
+    return 0;
   } else if (legal_actions.size() == 1) {
     return legal_actions[0];
   }
