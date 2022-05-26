@@ -146,6 +146,35 @@ std::string BargainingState::InformationStateString(Player player) const {
   return str;
 }
 
+std::unique_ptr<State> BargainingState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::vector<int> valid_indices;
+  const int num_instances = parent_game_->AllInstances().size();
+  for (int i = 0; i < num_instances; ++i) {
+    const Instance& instance = parent_game_->GetInstance(i);
+    if (instance_.pool == instance.pool &&
+        instance_.values[player_id] == instance.values[player_id]) {
+      valid_indices.push_back(i);
+    }
+  }
+
+  SPIEL_CHECK_FALSE(valid_indices.empty());
+  int idx = static_cast<int>(rng() * valid_indices.size());
+  SPIEL_CHECK_GE(idx, 0);
+  SPIEL_CHECK_LT(idx, valid_indices.size());
+
+  int instance_idx = valid_indices[idx];
+  std::unique_ptr<State> state = parent_game_->NewInitialState();
+  for (Action action : History()) {
+    if (state->IsChanceNode()) {
+      state->ApplyAction(instance_idx);
+    } else {
+      state->ApplyAction(action);
+    }
+  }
+  return state;
+}
+
 void BargainingState::ObservationTensor(Player player,
                                         absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
@@ -268,6 +297,10 @@ int BargainingState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;
 }
 
+Action BargainingState::AgreeAction() const {
+  return parent_game_->AllOffers().size();
+}
+
 void BargainingState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
     instance_ = parent_game_->GetInstance(action);
@@ -277,7 +310,7 @@ void BargainingState::DoApplyAction(Action action) {
     if (action < all_offers.size()) {
       offers_.push_back(all_offers.at(action));
       cur_player_ = 1 - cur_player_;
-    } else if (action == all_offers.size()) {
+    } else if (action == AgreeAction()) {
       // Agree action.
       agreement_reached_ = true;
     }

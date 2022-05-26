@@ -90,6 +90,12 @@ std::string ReadContentsFromFile(const std::string& filename,
   return f.ReadContents();
 }
 
+void WriteContentsToFile(const std::string& filename, const std::string& mode,
+                         const std::string& contents) {
+  File f(filename, mode);
+  f.Write(contents);
+}
+
 bool Exists(const std::string& path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
