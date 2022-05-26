@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/random/random.h"
@@ -31,7 +32,8 @@ namespace open_spiel {
 namespace algorithms {
 namespace torch_dqn {
 
-constexpr const int kIllegalActionLogitsPenalty = -1e9;
+constexpr const float kIllegalActionLogitsPenalty =
+    std::numeric_limits<float>::lowest();
 
 Action RandomAgent::Step(const State& state, bool is_evaluation) {
   if (state.IsTerminal()) {
@@ -215,7 +217,6 @@ void DQN::Learn() {
         torch::from_blob(t.legal_actions_mask.data(),
                          {1, t.legal_actions_mask.size()},
                          torch::TensorOptions().dtype(torch::kInt32))
-            .to(torch::kInt64)
             .clone());
     actions.push_back(t.action);
     rewards.push_back(t.reward);
@@ -229,12 +230,12 @@ void DQN::Learn() {
   torch::Tensor target_q_values = target_q_network_->forward(
       next_info_states_tensor).detach();
 
-  torch::Tensor legal_action_masks_tensor = torch::stack(legal_actions_mask, 0);
-  torch::Tensor illegal_actions = 1.0 - legal_action_masks_tensor;
-  torch::Tensor illegal_logits = illegal_actions * kIllegalActionLogitsPenalty;
+  torch::Tensor illegal_action_masks_tensor = 1.0 - torch::stack(legal_actions_mask, 0);
+  torch::Tensor legal_q_values = torch::masked_fill(
+      target_q_values, illegal_action_masks_tensor, kIllegalActionLogitsPenalty);
 
-  torch::Tensor max_next_q = std::get<0>(
-      torch::max(target_q_values + illegal_logits, 2));
+  torch::Tensor max_next_q = std::get<0>(legal_q_values.max(2));
+
   torch::Tensor are_final_steps_tensor = torch::from_blob(
       are_final_steps.data(),
       {batch_size_},
