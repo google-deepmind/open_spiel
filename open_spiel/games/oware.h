@@ -25,7 +25,7 @@
 // family of Mancala games. Several variations of the game exist. This
 // implementation uses the basic rules as described here:
 // https://en.wikipedia.org/wiki/Oware or here:
-// http://www.joansala.com/auale/rules/en/
+// http://www.joansala.com/auale/rules/en/.
 //
 // In particular if the opponent has no seeds, the current player must make a
 // move to give the opponent seeds. If no such move exists the game ends and the
@@ -35,6 +35,8 @@
 //
 // When the game reaches a state which occurred before, it ends and both players
 // collect the remaining seeds in their respective rows.
+//
+// Note: The Kalah game is also available separately in mancala.{h,cc}.
 
 namespace open_spiel {
 namespace oware {
