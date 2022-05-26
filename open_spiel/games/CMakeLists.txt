@@ -74,6 +74,8 @@ set(GAME_SOURCES
   hearts.h
   hex.cc
   hex.h
+  kalah.cc
+  kalah.h
   kriegspiel.cc
   kriegspiel.h
   kuhn_poker.cc
@@ -86,8 +88,6 @@ set(GAME_SOURCES
   lewis_signaling.h
   liars_dice.cc
   liars_dice.h
-  mancala.cc
-  mancala.h
   markov_soccer.cc
   markov_soccer.h
   matching_pennies_3p.cc
@@ -405,9 +405,9 @@ add_executable(liars_dice_test liars_dice_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:algorithms>)
 add_test(liars_dice_test liars_dice_test)
 
-add_executable(mancala_test mancala_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(kalah_test kalah_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
-add_test(mancala_test mancala_test)
+add_test(kalah_test kalah_test)
 
 add_executable(markov_soccer_test markov_soccer_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>

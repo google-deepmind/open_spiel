@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/mancala.h"
+#include "open_spiel/games/kalah.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
-namespace mancala {
+namespace kalah {
 namespace {
 
 namespace testing = open_spiel::testing;
 
 void BasicSerializationTest() {
-  std::shared_ptr<const Game> game = LoadGame("mancala");
+  std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
   std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
-void BasicMancalaTests() {
-  testing::LoadGameTest("mancala");
-  testing::NoChanceOutcomesTest(*LoadGame("mancala"));
-  testing::RandomSimTest(*LoadGame("mancala"), 100);
+void BasicKalahTests() {
+  testing::LoadGameTest("kalah");
+  testing::NoChanceOutcomesTest(*LoadGame("kalah"));
+  testing::RandomSimTest(*LoadGame("kalah"), 100);
 }
 
 // Board:
@@ -41,9 +41,9 @@ void BasicMancalaTests() {
 // -0-0-1-0-0-0-
 // Player 0 taking action 3 should capture the opponents 4 beans
 void CaptureWhenOppositePitNotEmptyTest() {
-  std::shared_ptr<const Game> game = LoadGame("mancala");
+  std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
-  MancalaState* mstate = static_cast<MancalaState*>(state.get());
+  KalahState* mstate = static_cast<KalahState*>(state.get());
   mstate->SetBoard({0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0});
 
   // Check for exactly one legal move.
@@ -64,9 +64,9 @@ void CaptureWhenOppositePitNotEmptyTest() {
 // -0-0-1-0-0-0-
 // Player 0 taking action 3 should not result in any captures
 void DoNotCaptureWhenOppositePitIsEmptyTest() {
-  std::shared_ptr<const Game> game = LoadGame("mancala");
+  std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
-  MancalaState* mstate = static_cast<MancalaState*>(state.get());
+  KalahState* mstate = static_cast<KalahState*>(state.get());
   mstate->SetBoard({0, 0, 0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0});
 
   // Check for exactly one legal move.
@@ -90,9 +90,9 @@ void DoNotCaptureWhenOppositePitIsEmptyTest() {
 // -1-0-0-0-0-8-
 // Player 0 taking action 6 should not put beans in opponents home pit
 void DoNotAddBeanToOpponentsHomePitTest() {
-  std::shared_ptr<const Game> game = LoadGame("mancala");
+  std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
-  MancalaState* mstate = static_cast<MancalaState*>(state.get());
+  KalahState* mstate = static_cast<KalahState*>(state.get());
   mstate->SetBoard({0, 1, 0, 0, 0, 0, 8, 0, 1, 0, 0, 0, 0, 0});
 
   // Check for exactly two legal move.
@@ -112,13 +112,13 @@ void DoNotAddBeanToOpponentsHomePitTest() {
 }
 
 }  // namespace
-}  // namespace mancala
+}  // namespace kalah
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::mancala::BasicSerializationTest();
-  open_spiel::mancala::BasicMancalaTests();
-  open_spiel::mancala::CaptureWhenOppositePitNotEmptyTest();
-  open_spiel::mancala::DoNotCaptureWhenOppositePitIsEmptyTest();
-  open_spiel::mancala::DoNotAddBeanToOpponentsHomePitTest();
+  open_spiel::kalah::BasicSerializationTest();
+  open_spiel::kalah::BasicKalahTests();
+  open_spiel::kalah::CaptureWhenOppositePitNotEmptyTest();
+  open_spiel::kalah::DoNotCaptureWhenOppositePitIsEmptyTest();
+  open_spiel::kalah::DoNotAddBeanToOpponentsHomePitTest();
 }

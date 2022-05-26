@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/mancala.h"
+#include "open_spiel/games/kalah.h"
 
 #include <algorithm>
 #include <memory>
@@ -23,13 +23,13 @@
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
-namespace mancala {
+namespace kalah {
 namespace {
 
 // Facts about the game.
 const GameType kGameType{
-    /*short_name=*/"mancala",
-    /*long_name=*/"Mancala",
+    /*short_name=*/"kalah",
+    /*long_name=*/"Kalah",
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kDeterministic,
     GameType::Information::kPerfectInformation,
@@ -45,21 +45,21 @@ const GameType kGameType{
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new MancalaGame(params));
+  return std::shared_ptr<const Game>(new KalahGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-int MancalaState::GetPlayerHomePit(Player player) const {
+int KalahState::GetPlayerHomePit(Player player) const {
   if(player == 0) {
     return kTotalPits / 2;
   }
   return 0;
 }
 
-bool MancalaState::IsPlayerPit(Player player, int pit) const {
+bool KalahState::IsPlayerPit(Player player, int pit) const {
   if(player == 0) {
     if(pit < kTotalPits / 2 && pit > 0)
       return true;
@@ -70,18 +70,18 @@ bool MancalaState::IsPlayerPit(Player player, int pit) const {
   return false;
 }
 
-int MancalaState::GetOppositePit(int pit) const {
+int KalahState::GetOppositePit(int pit) const {
   return kTotalPits - pit;
 }
 
-int MancalaState::GetNextPit(Player player, int pit) const {
+int KalahState::GetNextPit(Player player, int pit) const {
   int next_pit = (pit + 1) % kTotalPits;
   if(next_pit == GetPlayerHomePit(1 - player))
     next_pit++;
   return next_pit;
 }
 
-void MancalaState::DoApplyAction(Action move) {
+void KalahState::DoApplyAction(Action move) {
   SPIEL_CHECK_GT(board_[move], 0);
   int num_beans = board_[move];
   board_[move] = 0;
@@ -103,7 +103,7 @@ void MancalaState::DoApplyAction(Action move) {
   num_moves_ += 1;
 }
 
-std::vector<Action> MancalaState::LegalActions() const {
+std::vector<Action> KalahState::LegalActions() const {
   if (IsTerminal()) return {};
   std::vector<Action> moves;
   if(current_player_ == 0) {
@@ -123,26 +123,26 @@ std::vector<Action> MancalaState::LegalActions() const {
   return moves;
 }
 
-std::string MancalaState::ActionToString(Player player,
+std::string KalahState::ActionToString(Player player,
                                          Action action_id) const {
   return absl::StrCat(action_id);
 }
 
-void MancalaState::InitBoard() {
+void KalahState::InitBoard() {
   std::fill(begin(board_), end(board_), 4);
   board_[0] = 0;
   board_[board_.size() / 2] = 0;
 }
 
-void MancalaState::SetBoard(const std::array<int, (kNumPits + 1) * 2>& board) {
+void KalahState::SetBoard(const std::array<int, (kNumPits + 1) * 2>& board) {
   board_ = board;
 }
 
-MancalaState::MancalaState(std::shared_ptr<const Game> game) : State(game) {
+KalahState::KalahState(std::shared_ptr<const Game> game) : State(game) {
   InitBoard();
 }
 
-std::string MancalaState::ToString() const {
+std::string KalahState::ToString() const {
   std::string str;
   std::string separator = "-";
   absl::StrAppend(&str, separator);
@@ -167,7 +167,7 @@ std::string MancalaState::ToString() const {
   return str;
 }
 
-bool MancalaState::IsTerminal() const {
+bool KalahState::IsTerminal() const {
   bool player_0_has_moves = false;
   bool player_1_has_moves = false;
   for (int i = 0; i < kNumPits; ++i) {
@@ -185,7 +185,7 @@ bool MancalaState::IsTerminal() const {
   return !player_0_has_moves || !player_1_has_moves;
 }
 
-std::vector<double> MancalaState::Returns() const {
+std::vector<double> KalahState::Returns() const {
   if(IsTerminal()) {
     int player_0_bean_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalPits / 2 + 1, 0);
     int player_1_bean_sum = std::accumulate(board_.begin() + kTotalPits / 2 + 1, board_.end(), 0) + board_[0];
@@ -198,19 +198,19 @@ std::vector<double> MancalaState::Returns() const {
   return {0.0, 0.0};
 }
 
-std::string MancalaState::InformationStateString(Player player) const {
+std::string KalahState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string MancalaState::ObservationString(Player player) const {
+std::string KalahState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void MancalaState::ObservationTensor(Player player,
+void KalahState::ObservationTensor(Player player,
                                        absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -223,12 +223,12 @@ void MancalaState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(value_it, values.end());
 }
 
-std::unique_ptr<State> MancalaState::Clone() const {
-  return std::unique_ptr<State>(new MancalaState(*this));
+std::unique_ptr<State> KalahState::Clone() const {
+  return std::unique_ptr<State>(new KalahState(*this));
 }
 
-MancalaGame::MancalaGame(const GameParameters& params)
+KalahGame::KalahGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
-}  // namespace mancala
+}  // namespace kalah
 }  // namespace open_spiel

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_MANCALA_H_
-#define OPEN_SPIEL_GAMES_MANCALA_H_
+#ifndef OPEN_SPIEL_GAMES_KALAH_H_
+#define OPEN_SPIEL_GAMES_KALAH_H_
 
 #include <array>
 #include <map>
@@ -23,13 +23,13 @@
 
 #include "open_spiel/spiel.h"
 
-// Mancala
-// https://en.wikipedia.org/wiki/Mancala
-//
-// Parameters: none
+// Kalah is a strategy game within the
+// family of Mancala games. Several variations of the game exist. This
+// implementation uses the basic rules as described here:
+// https://en.wikipedia.org/wiki/Kalah
 
 namespace open_spiel {
-namespace mancala {
+namespace kalah {
 
 // Constants.
 inline constexpr int kNumPlayers = 2;
@@ -37,12 +37,12 @@ inline constexpr int kNumPits = 6;
 inline constexpr int kTotalPits = (kNumPits + 1) * 2;
 
 // State of an in-play game.
-class MancalaState : public State {
+class KalahState : public State {
  public:
-  MancalaState(std::shared_ptr<const Game> game);
+  KalahState(std::shared_ptr<const Game> game);
 
-  MancalaState(const MancalaState&) = default;
-  MancalaState& operator=(const MancalaState&) = default;
+  KalahState(const KalahState&) = default;
+  KalahState& operator=(const KalahState&) = default;
 
   void SetBoard(const std::array<int,  (kNumPits + 1) * 2>& board);
   int BoardAt(int position) const { return board_[position]; }
@@ -75,12 +75,12 @@ class MancalaState : public State {
 };
 
 // Game object.
-class MancalaGame : public Game {
+class KalahGame : public Game {
  public:
-  explicit MancalaGame(const GameParameters& params);
+  explicit KalahGame(const GameParameters& params);
   int NumDistinctActions() const override { return kTotalPits; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new MancalaState(shared_from_this()));
+    return std::unique_ptr<State>(new KalahState(shared_from_this()));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -93,7 +93,7 @@ class MancalaGame : public Game {
   int MaxGameLength() const override { return 1000; }
 };
 
-}  // namespace mancala
+}  // namespace kalah
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_MANCALA_H_
+#endif  // OPEN_SPIEL_GAMES_KALAH_H_
