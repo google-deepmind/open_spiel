@@ -338,8 +338,6 @@ bool CheckBeliefs(const State& ground_truth_state,
     if (Near(beliefs.second[i], 0.0, 1e-5)) {
       continue;
     }
-    SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
-                   beliefs.first[i]->FullHistory().size());
     SPIEL_CHECK_EQ(infostate,
                    beliefs.first[i]->InformationStateString(player_id));
     SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
