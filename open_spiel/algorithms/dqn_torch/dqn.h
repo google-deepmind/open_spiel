@@ -108,7 +108,8 @@ class DQN : public Agent {
   void AddTransition(const State& prev_state, Action prev_action,
                      const State& state);
   Action EpsilonGreedy(std::vector<float> info_state,
-                       std::vector<Action> legal_actions, double epsilon);
+                       std::vector<Action> legal_actions,
+                       double epsilon);
   void Learn();
 
   int seed_;

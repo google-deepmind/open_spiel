@@ -65,6 +65,7 @@ DQN::DQN(const DQNSettings& settings)
       loss_str_(settings.loss_str),
       exists_prev_(false),
       prev_state_(nullptr),
+      prev_action_(0),
       step_counter_(0),
       rng_(settings.seed) {}
 
@@ -127,9 +128,6 @@ Action DQN::Step(const State& state, bool is_evaluation) {
 void DQN::AddTransition(const State& prev_state,
                         Action prev_action,
                         const State& state) {
-  // std::cout << "Adding transition: prev_action = " << prev_action
-  //           << ", player id = " << player_id_
-  //           << ", reward = " << state.PlayerReward(player_id_) << std::endl;
   Transition transition = {
     /*info_state=*/GetInfoState(prev_state, player_id_, use_observation_),
     /*action=*/prev_action_,
@@ -153,25 +151,26 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
 
   if (absl::Uniform(rng_, 0.0, 1.0) < epsilon) {
     ActionsAndProbs actions_probs;
-    std::vector<double> probs(legal_actions.size(), 1.0/legal_actions.size());
+    std::vector<double> probs(legal_actions.size(), 1.0 / legal_actions.size());
     for (int i = 0; i < legal_actions.size(); i++) {
       actions_probs.push_back({legal_actions[i], probs[i]});
     }
     action = SampleAction(actions_probs, rng_).first;
   } else {
-    torch::Tensor info_state_tensor = torch::from_blob(
-        info_state.data(),
-        {info_state.size()},
-        torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
+    torch::Tensor info_state_tensor =
+        torch::from_blob(info_state.data(), {info_state.size()},
+                         torch::dtype(torch::kFloat32))
+            .view({1, -1});
     q_network_->eval();
-    torch::Tensor q_value = q_network_->forward(info_state_tensor);
+    torch::Tensor q_values = q_network_->forward(info_state_tensor).detach();
     torch::Tensor legal_actions_mask =
-        torch::full({num_actions_}, kIllegalActionLogitsPenalty,
-                    torch::TensorOptions().dtype(torch::kFloat32));
-    for (Action a : legal_actions) {
-      legal_actions_mask[a] = 0;
+        torch::full({num_actions_}, true, torch::dtype(torch::kBool));
+    for (const auto& action : legal_actions) {
+      legal_actions_mask[action] = false;
     }
-    action = (q_value.detach() + legal_actions_mask).argmax(1).item().toInt();
+    torch::Tensor legal_q_values = torch::masked_fill(
+        q_values, legal_actions_mask, kIllegalActionLogitsPenalty);
+    action = legal_q_values.argmax(1).item().toInt();
   }
   return action;
 }
