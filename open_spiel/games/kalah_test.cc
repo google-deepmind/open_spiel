@@ -40,7 +40,7 @@ void BasicKalahTests() {
 // 0-----------0
 // -0-0-1-0-0-0-
 // Player 0 taking action 3 should capture the opponents 4 beans
-void CaptureWhenOppositePitNotEmptyTest() {
+void CaptureWhenOppositeHouseNotEmptyTest() {
   std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
   KalahState* mstate = static_cast<KalahState*>(state.get());
@@ -54,7 +54,7 @@ void CaptureWhenOppositePitNotEmptyTest() {
   SPIEL_CHECK_EQ(legal_actions[0], 3);
   
   mstate->ApplyAction(legal_actions[0]);
-  // Check if Player 0 home pit has 5 beans
+  // Check if Player 0 store has 5 beans
   SPIEL_CHECK_EQ(mstate->BoardAt(7), 5);
 }
 
@@ -63,7 +63,7 @@ void CaptureWhenOppositePitNotEmptyTest() {
 // 0-----------0
 // -0-0-1-0-0-0-
 // Player 0 taking action 3 should not result in any captures
-void DoNotCaptureWhenOppositePitIsEmptyTest() {
+void DoNotCaptureWhenOppositeHouseIsEmptyTest() {
   std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
   KalahState* mstate = static_cast<KalahState*>(state.get());
@@ -88,8 +88,8 @@ void DoNotCaptureWhenOppositePitIsEmptyTest() {
 // -0-0-0-0-0-1-
 // 0-----------0
 // -1-0-0-0-0-8-
-// Player 0 taking action 6 should not put beans in opponents home pit
-void DoNotAddBeanToOpponentsHomePitTest() {
+// Player 0 taking action 6 should not put seeds in opponents store
+void DoNotAddSeedToOpponentsStoreTest() {
   std::shared_ptr<const Game> game = LoadGame("kalah");
   std::unique_ptr<State> state = game->NewInitialState();
   KalahState* mstate = static_cast<KalahState*>(state.get());
@@ -104,7 +104,7 @@ void DoNotAddBeanToOpponentsHomePitTest() {
   SPIEL_CHECK_EQ(legal_actions[1], 6);
   
   mstate->ApplyAction(legal_actions[1]);
-  // Check if no bean is put into opponents home pit
+  // Check if no bean is put into opponents store
   SPIEL_CHECK_EQ(mstate->BoardAt(0), 0);
   SPIEL_CHECK_EQ(mstate->BoardAt(7), 1);
   SPIEL_CHECK_EQ(mstate->BoardAt(8), 2);
@@ -118,7 +118,7 @@ void DoNotAddBeanToOpponentsHomePitTest() {
 int main(int argc, char** argv) {
   open_spiel::kalah::BasicSerializationTest();
   open_spiel::kalah::BasicKalahTests();
-  open_spiel::kalah::CaptureWhenOppositePitNotEmptyTest();
-  open_spiel::kalah::DoNotCaptureWhenOppositePitIsEmptyTest();
-  open_spiel::kalah::DoNotAddBeanToOpponentsHomePitTest();
+  open_spiel::kalah::CaptureWhenOppositeHouseNotEmptyTest();
+  open_spiel::kalah::DoNotCaptureWhenOppositeHouseIsEmptyTest();
+  open_spiel::kalah::DoNotAddSeedToOpponentsStoreTest();
 }

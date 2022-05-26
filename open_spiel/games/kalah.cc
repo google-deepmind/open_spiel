@@ -52,53 +52,53 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 }  // namespace
 
-int KalahState::GetPlayerHomePit(Player player) const {
+int KalahState::GetPlayerStore(Player player) const {
   if(player == 0) {
-    return kTotalPits / 2;
+    return kTotalHouses / 2;
   }
   return 0;
 }
 
-bool KalahState::IsPlayerPit(Player player, int pit) const {
+bool KalahState::IsPlayerHouse(Player player, int house) const {
   if(player == 0) {
-    if(pit < kTotalPits / 2 && pit > 0)
+    if(house < kTotalHouses / 2 && house > 0)
       return true;
     return false;
   }
-  if(pit > kTotalPits / 2)
+  if(house > kTotalHouses / 2)
     return true;
   return false;
 }
 
-int KalahState::GetOppositePit(int pit) const {
-  return kTotalPits - pit;
+int KalahState::GetOppositeHouse(int house) const {
+  return kTotalHouses - house;
 }
 
-int KalahState::GetNextPit(Player player, int pit) const {
-  int next_pit = (pit + 1) % kTotalPits;
-  if(next_pit == GetPlayerHomePit(1 - player))
-    next_pit++;
-  return next_pit;
+int KalahState::GetNextHouse(Player player, int house) const {
+  int next_house = (house + 1) % kTotalHouses;
+  if(next_house == GetPlayerStore(1 - player))
+    next_house++;
+  return next_house;
 }
 
 void KalahState::DoApplyAction(Action move) {
   SPIEL_CHECK_GT(board_[move], 0);
-  int num_beans = board_[move];
+  int num_seeds = board_[move];
   board_[move] = 0;
-  int current_pit = move;
-  for(int i = 0; i < num_beans; ++i) {
-    current_pit = GetNextPit(current_player_, current_pit);
-    board_[current_pit]++;
+  int current_house = move;
+  for(int i = 0; i < num_seeds; ++i) {
+    current_house = GetNextHouse(current_player_, current_house);
+    board_[current_house]++;
   }
 
   //capturing logic
-  if(board_[current_pit] == 1 && IsPlayerPit(current_player_, current_pit) && board_[GetOppositePit(current_pit)] > 0) {
-    board_[GetPlayerHomePit(current_player_)] += (1 + board_[GetOppositePit(current_pit)]);
-    board_[current_pit] = 0;
-    board_[GetOppositePit(current_pit)] = 0;
+  if(board_[current_house] == 1 && IsPlayerHouse(current_player_, current_house) && board_[GetOppositeHouse(current_house)] > 0) {
+    board_[GetPlayerStore(current_player_)] += (1 + board_[GetOppositeHouse(current_house)]);
+    board_[current_house] = 0;
+    board_[GetOppositeHouse(current_house)] = 0;
   }
 
-  if(current_pit != GetPlayerHomePit(current_player_))
+  if(current_house != GetPlayerStore(current_player_))
     current_player_ = 1 - current_player_;
   num_moves_ += 1;
 }
@@ -107,13 +107,13 @@ std::vector<Action> KalahState::LegalActions() const {
   if (IsTerminal()) return {};
   std::vector<Action> moves;
   if(current_player_ == 0) {
-    for(int i = 0; i < kNumPits; ++i) {
+    for(int i = 0; i < kNumHouses; ++i) {
       if(board_[i + 1] > 0) {
         moves.push_back(i + 1);
       }
     }
   } else {
-    for(int i = 0; i < kNumPits; ++i) {
+    for(int i = 0; i < kNumHouses; ++i) {
       if(board_[board_.size() - 1 - i] > 0) {
         moves.push_back(board_.size() - 1 - i);
       }
@@ -134,7 +134,7 @@ void KalahState::InitBoard() {
   board_[board_.size() / 2] = 0;
 }
 
-void KalahState::SetBoard(const std::array<int, (kNumPits + 1) * 2>& board) {
+void KalahState::SetBoard(const std::array<int, (kNumHouses + 1) * 2>& board) {
   board_ = board;
 }
 
@@ -146,21 +146,21 @@ std::string KalahState::ToString() const {
   std::string str;
   std::string separator = "-";
   absl::StrAppend(&str, separator);
-  for (int i = 0; i < kNumPits; ++i) {
+  for (int i = 0; i < kNumHouses; ++i) {
     absl::StrAppend(&str, board_[board_.size() - 1 - i]);
     absl::StrAppend(&str, separator);
   }
   absl::StrAppend(&str, "\n");
 
   absl::StrAppend(&str, board_[0]);
-  for (int i = 0; i < kNumPits * 2 - 1; ++i) {
+  for (int i = 0; i < kNumHouses * 2 - 1; ++i) {
     absl::StrAppend(&str, separator);
   }
   absl::StrAppend(&str, board_[board_.size() / 2]);
   absl::StrAppend(&str, "\n");
 
   absl::StrAppend(&str, separator);
-  for (int i = 0; i < kNumPits; ++i) {
+  for (int i = 0; i < kNumHouses; ++i) {
     absl::StrAppend(&str, board_[i + 1]);
     absl::StrAppend(&str, separator);
   }
@@ -170,13 +170,13 @@ std::string KalahState::ToString() const {
 bool KalahState::IsTerminal() const {
   bool player_0_has_moves = false;
   bool player_1_has_moves = false;
-  for (int i = 0; i < kNumPits; ++i) {
+  for (int i = 0; i < kNumHouses; ++i) {
     if(board_[board_.size() - 1 - i] > 0) {
       player_1_has_moves = true;
       break;
     }    
   }
-  for (int i = 0; i < kNumPits; ++i) {
+  for (int i = 0; i < kNumHouses; ++i) {
     if(board_[i + 1] > 0) {
       player_0_has_moves = true;
       break;
@@ -187,11 +187,11 @@ bool KalahState::IsTerminal() const {
 
 std::vector<double> KalahState::Returns() const {
   if(IsTerminal()) {
-    int player_0_bean_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalPits / 2 + 1, 0);
-    int player_1_bean_sum = std::accumulate(board_.begin() + kTotalPits / 2 + 1, board_.end(), 0) + board_[0];
-    if (player_0_bean_sum > player_1_bean_sum) {
+    int player_0_seed_sum = std::accumulate(board_.begin() + 1, board_.begin() + kTotalHouses / 2 + 1, 0);
+    int player_1_seed_sum = std::accumulate(board_.begin() + kTotalHouses / 2 + 1, board_.end(), 0) + board_[0];
+    if (player_0_seed_sum > player_1_seed_sum) {
       return {1.0, -1.0};
-    } else if (player_0_bean_sum < player_1_bean_sum) {
+    } else if (player_0_seed_sum < player_1_seed_sum) {
       return {-1.0, 1.0};
     }  
   }
@@ -215,7 +215,7 @@ void KalahState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  SPIEL_CHECK_EQ(values.size(), kTotalPits);
+  SPIEL_CHECK_EQ(values.size(), kTotalHouses);
   auto value_it = values.begin();
   for (int count : board_) {
     *value_it++ = count;

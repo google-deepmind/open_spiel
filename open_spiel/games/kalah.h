@@ -33,8 +33,8 @@ namespace kalah {
 
 // Constants.
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kNumPits = 6;
-inline constexpr int kTotalPits = (kNumPits + 1) * 2;
+inline constexpr int kNumHouses = 6;
+inline constexpr int kTotalHouses = (kNumHouses + 1) * 2;
 
 // State of an in-play game.
 class KalahState : public State {
@@ -44,7 +44,7 @@ class KalahState : public State {
   KalahState(const KalahState&) = default;
   KalahState& operator=(const KalahState&) = default;
 
-  void SetBoard(const std::array<int,  (kNumPits + 1) * 2>& board);
+  void SetBoard(const std::array<int,  (kNumHouses + 1) * 2>& board);
   int BoardAt(int position) const { return board_[position]; }
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
@@ -61,15 +61,15 @@ class KalahState : public State {
   std::vector<Action> LegalActions() const override;
 
  protected:
-  std::array<int, (kNumPits + 1) * 2> board_;
+  std::array<int, (kNumHouses + 1) * 2> board_;
   void DoApplyAction(Action move) override;
 
  private:
   void InitBoard();  
-  int GetPlayerHomePit(Player player) const;
-  bool IsPlayerPit(Player player, int pit) const;
-  int GetNextPit(Player player, int pit) const;
-  int GetOppositePit(int pit) const;
+  int GetPlayerStore(Player player) const;
+  bool IsPlayerHouse(Player player, int house) const;
+  int GetNextHouse(Player player, int house) const;
+  int GetOppositeHouse(int house) const;
   Player current_player_ = 0;         // Player zero goes first
   int num_moves_ = 0;
 };
@@ -78,7 +78,7 @@ class KalahState : public State {
 class KalahGame : public Game {
  public:
   explicit KalahGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kTotalPits; }
+  int NumDistinctActions() const override { return kTotalHouses; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new KalahState(shared_from_this()));
   }
@@ -87,7 +87,7 @@ class KalahGame : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kTotalPits};
+    return {kTotalHouses};
   }
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
