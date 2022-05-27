@@ -18,6 +18,7 @@ import collections
 import math
 import numpy as np
 from scipy import stats
+from sys import float_info
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -29,7 +30,7 @@ Transition = collections.namedtuple(
     "Transition",
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
-ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
+ILLEGAL_ACTION_LOGITS_PENALTY = float_info.min
 
 
 class SonnetLinear(nn.Module):
@@ -323,9 +324,11 @@ class DQN(rl_agent.AbstractAgent):
     self._q_values = self._q_network(info_states)
     self._target_q_values = self._target_q_network(next_info_states).detach()
 
-    illegal_actions = 1 - legal_actions_mask
-    illegal_logits = illegal_actions * ILLEGAL_ACTION_LOGITS_PENALTY
-    max_next_q = torch.max(self._target_q_values + illegal_logits, dim=1)[0]
+    illegal_actions_mask = 1 - legal_actions_mask
+    legal_target_q_values = self._target_q_values.masked_fill(
+        illegal_actions_mask, ILLEGAL_ACTION_LOGITS_PENALTY)
+    max_next_q = torch.max(legal_target_q_values, dim=1)[0]
+
     target = (
         rewards + (1 - are_final_steps) * self._discount_factor * max_next_q)
     action_indices = torch.stack([
