@@ -22,6 +22,7 @@ namespace open_spiel {
 namespace {
 
 constexpr bool kDefaultEnableInformationState = false;
+constexpr int kDefaultRecall = 1;
 
 // These parameters represent the most general case. Game specific params are
 // parsed once the actual stage game is supplied.
@@ -43,8 +44,9 @@ const GameType kGameType{
     {{"stage_game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
      {"num_repetitions",
-      GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/true)}},
-    /*default_loadable=*/false};
+      GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/true)},
+     {"recall", GameParameter(kDefaultRecall)}},
+     /*default_loadable=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return CreateRepeatedGame(*LoadGame(params.at("stage_game").game_value()),
@@ -57,11 +59,13 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RepeatedState::RepeatedState(std::shared_ptr<const Game> game,
                              std::shared_ptr<const Game> stage_game,
-                             int num_repetitions)
+                             int num_repetitions,
+                             int recall)
     : SimMoveState(game),
       stage_game_(stage_game),
       stage_game_state_(stage_game->NewInitialState()),
-      num_repetitions_(num_repetitions) {
+      num_repetitions_(num_repetitions),
+      recall_(recall) {
   actions_history_.reserve(num_repetitions_);
   rewards_history_.reserve(num_repetitions_);
 }
@@ -133,11 +137,20 @@ std::string RepeatedState::InformationStateString(Player /*player*/) const {
 
 std::string RepeatedState::ObservationString(Player /*player*/) const {
   std::string rv;
-  if (actions_history_.empty()) return rv;
-  for (int i = 0; i < num_players_; ++i) {
-    absl::StrAppend(
-        &rv, stage_game_state_->ActionToString(i, actions_history_.back()[i]),
-        " ");
+  if (actions_history_.empty()) { return rv; }
+
+  // Starting from the back of the history, show each player's moves:
+  for (int j = 0;
+       j < recall_ && static_cast<int>(actions_history_.size()) - 1 - j >= 0;
+       ++j) {
+    int hist_idx = actions_history_.size() - 1 - j;
+    SPIEL_CHECK_GE(hist_idx, 0);
+    SPIEL_CHECK_LT(hist_idx, actions_history_.size());
+    for (int i = 0; i < num_players_; ++i) {
+      absl::StrAppend(&rv,
+          stage_game_state_->ActionToString(i, actions_history_[hist_idx][i]),
+          " ");
+    }
   }
   return rv;
 }
@@ -170,11 +183,20 @@ void RepeatedState::ObservationTensor(Player player,
   if (actions_history_.empty()) return;
 
   auto ptr = values.begin();
-  for (int i = 0; i < num_players_; ++i) {
-    ptr[actions_history_.back()[i]] = 1;
-    ptr += stage_game_state_->LegalActions(i).size();
+  // Starting from the back of the history, show each player's moves:
+  for (int j = 0;
+       j < recall_ && static_cast<int>(actions_history_.size()) - 1 - j >= 0;
+       j++) {
+    int hist_idx = static_cast<int>(actions_history_.size()) - 1 - j;
+    SPIEL_CHECK_GE(hist_idx, 0);
+    SPIEL_CHECK_LT(hist_idx, actions_history_.size());
+    for (int i = 0; i < num_players_; ++i) {
+      ptr[actions_history_[hist_idx][i]] = 1;
+      ptr += stage_game_state_->LegalActions(i).size();
+    }
   }
-  SPIEL_CHECK_EQ(ptr, values.end());
+
+  SPIEL_CHECK_LE(ptr, values.end());
 }
 
 void RepeatedState::ObliviousObservationTensor(Player player,
@@ -227,7 +249,10 @@ RepeatedGame::RepeatedGame(std::shared_ptr<const Game> stage_game,
                   absl::optional<bool>(kDefaultEnableInformationState))),
           params),
       stage_game_(stage_game),
-      num_repetitions_(ParameterValue<int>("num_repetitions")) {}
+      num_repetitions_(ParameterValue<int>("num_repetitions")),
+      recall_(ParameterValue<int>("recall", kDefaultRecall)) {
+  SPIEL_CHECK_GE(recall_, 1);
+}
 
 std::shared_ptr<const Game> CreateRepeatedGame(const Game& stage_game,
                                                const GameParameters& params) {
@@ -254,7 +279,8 @@ std::shared_ptr<const Game> CreateRepeatedGame(
 
 std::unique_ptr<State> RepeatedGame::NewInitialState() const {
   return std::unique_ptr<State>(
-      new RepeatedState(shared_from_this(), stage_game_, num_repetitions_));
+      new RepeatedState(shared_from_this(), stage_game_,
+                        num_repetitions_, recall_));
 }
 
 std::vector<int> RepeatedGame::InformationStateTensorShape() const {
@@ -269,7 +295,7 @@ std::vector<int> RepeatedGame::InformationStateTensorShape() const {
 std::vector<int> RepeatedGame::ObservationTensorShape() const {
   int size = 0;
   for (int i = 0; i < NumPlayers(); ++i)
-    size += stage_game_->NewInitialState()->LegalActions(i).size();
+    size += recall_ * stage_game_->NewInitialState()->LegalActions(i).size();
   return {size};
 }
 

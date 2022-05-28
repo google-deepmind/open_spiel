@@ -31,13 +31,17 @@
 //                                 false).
 //   "stage_game"         game     The game that will be repeated.
 //   "num_repetitions"    int      Number of times that the game is repeated.
+//   "recall"             int      Number of previous steps that defines the
+//                                 observations when enable_infostate is false
+//                                 (default: 1).
 
 namespace open_spiel {
 
 class RepeatedState : public SimMoveState {
  public:
   RepeatedState(std::shared_ptr<const Game> game,
-                std::shared_ptr<const Game> stage_game, int num_repetitions);
+                std::shared_ptr<const Game> stage_game, int num_repetitions,
+                int recall);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : kSimultaneousPlayerId;
@@ -68,6 +72,7 @@ class RepeatedState : public SimMoveState {
   // to state functions (e.g. LegalActions()).
   std::shared_ptr<const State> stage_game_state_;
   int num_repetitions_;
+  int recall_;
   std::vector<std::vector<Action>> actions_history_{};
   std::vector<std::vector<double>> rewards_history_{};
 };
@@ -99,6 +104,7 @@ class RepeatedGame : public SimMoveGame {
  private:
   std::shared_ptr<const Game> stage_game_;
   const int num_repetitions_;
+  const int recall_;
 };
 
 // Creates a repeated game based on the stage game.
