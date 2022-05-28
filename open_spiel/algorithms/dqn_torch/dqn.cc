@@ -105,8 +105,9 @@ Action DQN::Step(const State& state, bool is_evaluation) {
       Learn();
     }
     if (step_counter_ % update_target_network_every_ == 0) {
-      torch::save(q_network_, "q_network.pt");
-      torch::load(target_q_network_, "q_network.pt");
+      std::stringstream stream;
+      torch::save(q_network_, stream);
+      torch::load(target_q_network_, stream);
     }
     if (exists_prev_) {
       AddTransition(*prev_state_, prev_action_, state);
