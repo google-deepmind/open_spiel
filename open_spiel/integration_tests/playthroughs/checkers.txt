@@ -1,0 +1,329 @@
+game: checkers
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Checkers"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["columns", "rows"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "checkers"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 120
+PolicyTensorShape() = [120]
+MaxChanceOutcomes() = 0
+GetParameters() = {columns=6,rows=5}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [3, 5, 6]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 90
+MaxGameLength() = 29
+ToString() = "checkers()"
+
+# State 0
+# 5oxoxox
+# 4xoxoxo
+# 3oxoxox
+# 2xoxoxo
+# 1oxoxox
+#  abcdef
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = "5oxoxox\n4xoxoxo\n3oxoxox\n2xoxoxo\n1oxoxox\n abcdef\n"
+ObservationString(1) = "5oxoxox\n4xoxoxo\n3oxoxox\n2xoxoxo\n1oxoxox\n abcdef\n"
+ObservationTensor(0):
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+ObservationTensor(1):
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2, 9, 10, 11, 17, 18, 19, 28, 29, 30, 31, 36, 37, 38, 39, 44, 46, 47, 48, 49, 50, 56, 57, 58, 59, 64, 65, 66, 67, 76, 77, 78, 79, 84, 85, 86, 87, 92, 94, 95, 96, 97, 104, 105, 107, 112, 113, 115]
+StringLegalActions() = ["a5b5", "a5a4", "c5d5", "c5c4", "c5b5", "e5f5", "e5e4", "e5d5", "b4b5", "b4c4", "b4b3", "b4a4", "d4d5", "d4e4", "d4d3", "d4c4", "f4f5", "f4f3", "f4e4", "a3a4", "a3b3", "a3a2", "c3c4", "c3d3", "c3c2", "c3b3", "e3e4", "e3f3", "e3e2", "e3d3", "b2b3", "b2c2", "b2b1", "b2a2", "d2d3", "d2e2", "d2d1", "d2c2", "f2f3", "f2f1", "f2e2", "a1a2", "a1b1", "c1c2", "c1d1", "c1b1", "e1e2", "e1f1", "e1d1"]
+
+# Apply action "b2c2"
+action: 77
+
+# State 1
+# 5oxoxox
+# 4xoxoxo
+# 3oxoxox
+# 2x.ooxo
+# 1oxoxox
+#  abcdef
+IsTerminal() = False
+History() = [77]
+HistoryString() = "77"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "77"
+InformationStateString(1) = "77"
+ObservationString(0) = "5oxoxox\n4xoxoxo\n3oxoxox\n2x.ooxo\n1oxoxox\n abcdef\n"
+ObservationString(1) = "5oxoxox\n4xoxoxo\n3oxoxox\n2x.ooxo\n1oxoxox\n abcdef\n"
+ObservationTensor(0):
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◯◉◉◯◉  ◉◯◯◯◉◯  ◯◉◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+ObservationTensor(1):
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◯◯◉◯  ◯◯◉◉◯◉  ◯◉◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [5, 6, 7, 13, 14, 15, 22, 23, 24, 25, 26, 32, 33, 34, 35, 40, 41, 42, 43, 52, 53, 55, 60, 61, 62, 63, 68, 70, 71, 72, 74, 88, 89, 90, 91, 101, 103, 108, 109, 111, 116, 119]
+StringLegalActions() = ["b5c5", "b5b4", "b5a5", "d5e5", "d5d4", "d5c5", "f5f4", "f5e5", "a4a5", "a4b4", "a4a3", "c4c5", "c4d4", "c4c3", "c4b4", "e4e5", "e4f4", "e4e3", "e4d4", "b3b4", "b3c3", "b3a3", "d3d4", "d3e3", "d3d2", "d3c3", "f3f4", "f3f2", "f3e3", "a2a3", "a2a1", "e2e3", "e2f2", "e2e1", "e2d2", "b1c1", "b1a1", "d1d2", "d1e1", "d1c1", "f1f2", "f1e1"]
+
+# Apply action "b5a5"
+action: 7
+
+# State 2
+# 5x.oxox
+# 4xoxoxo
+# 3oxoxox
+# 2x.ooxo
+# 1oxoxox
+#  abcdef
+IsTerminal() = False
+History() = [77, 7]
+HistoryString() = "77, 7"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "77, 7"
+InformationStateString(1) = "77, 7"
+ObservationString(0) = "5x.oxox\n4xoxoxo\n3oxoxox\n2x.ooxo\n1oxoxox\n abcdef\n"
+ObservationString(1) = "5x.oxox\n4xoxoxo\n3oxoxox\n2x.ooxo\n1oxoxox\n abcdef\n"
+ObservationTensor(0):
+◯◯◉◯◉◯  ◉◯◯◉◯◉  ◯◉◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◯◉◉◯◉  ◉◯◯◯◉◯  ◯◉◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◯◉◯◉  ◯◯◉◯◉◯  ◯◉◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◯◯◉◯  ◯◯◉◉◯◉  ◯◉◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [9, 10, 17, 18, 19, 29, 30, 31, 36, 37, 38, 39, 44, 46, 47, 48, 49, 50, 56, 57, 59, 64, 65, 66, 67, 84, 85, 86, 92, 94, 95, 96, 97, 105, 107, 112, 113, 115]
+StringLegalActions() = ["c5d5", "c5c4", "e5f5", "e5e4", "e5d5", "b4c4", "b4b3", "b4a4", "d4d5", "d4e4", "d4d3", "d4c4", "f4f5", "f4f3", "f4e4", "a3a4", "a3b3", "a3a2", "c3c4", "c3d3", "c3b3", "e3e4", "e3f3", "e3e2", "e3d3", "d2d3", "d2e2", "d2d1", "f2f3", "f2f1", "f2e2", "a1a2", "a1b1", "c1d1", "c1b1", "e1e2", "e1f1", "e1d1"]
+
+# Apply action "d4c4"
+action: 39
+
+# State 3
+# 5x.oxox
+# 4xoo.xo
+# 3oxoxox
+# 2x.ooxo
+# 1oxoxox
+#  abcdef
+IsTerminal() = False
+History() = [77, 7, 39]
+HistoryString() = "77, 7, 39"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "77, 7, 39"
+InformationStateString(1) = "77, 7, 39"
+ObservationString(0) = "5x.oxox\n4xoo.xo\n3oxoxox\n2x.ooxo\n1oxoxox\n abcdef\n"
+ObservationString(1) = "5x.oxox\n4xoo.xo\n3oxoxox\n2x.ooxo\n1oxoxox\n abcdef\n"
+ObservationTensor(0):
+◯◯◉◯◉◯  ◉◯◯◉◯◉  ◯◉◯◯◯◯
+◯◉◉◯◯◉  ◉◯◯◯◉◯  ◯◯◯◉◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◯◉◉◯◉  ◉◯◯◯◉◯  ◯◉◯◯◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+ObservationTensor(1):
+◉◯◯◉◯◉  ◯◯◉◯◉◯  ◯◉◯◯◯◯
+◉◯◯◯◉◯  ◯◉◉◯◯◉  ◯◯◯◉◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◯◯◉◯  ◯◯◉◉◯◉  ◯◉◯◯◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [13, 15, 22, 23, 25, 26, 40, 41, 42, 52, 53, 55, 61, 62, 63, 68, 70, 71, 72, 74, 88, 89, 90, 91, 101, 103, 108, 109, 111, 116, 119]
+StringLegalActions() = ["d5e5", "d5c5", "f5f4", "f5e5", "a4b4", "a4a3", "e4e5", "e4f4", "e4e3", "b3b4", "b3c3", "b3a3", "d3e3", "d3d2", "d3c3", "f3f4", "f3f2", "f3e3", "a2a3", "a2a1", "e2e3", "e2f2", "e2e1", "e2d2", "b1c1", "b1a1", "d1d2", "d1e1", "d1c1", "f1f2", "f1e1"]
+
+# Apply action "b1a1"
+action: 103
+
+# State 4
+# 5x.oxox
+# 4xoo.xo
+# 3oxoxox
+# 2x.ooxo
+# 1x.oxox
+#  abcdef
+IsTerminal() = False
+History() = [77, 7, 39, 103]
+HistoryString() = "77, 7, 39, 103"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "77, 7, 39, 103"
+InformationStateString(1) = "77, 7, 39, 103"
+ObservationString(0) = "5x.oxox\n4xoo.xo\n3oxoxox\n2x.ooxo\n1x.oxox\n abcdef\n"
+ObservationString(1) = "5x.oxox\n4xoo.xo\n3oxoxox\n2x.ooxo\n1x.oxox\n abcdef\n"
+ObservationTensor(0):
+◯◯◉◯◉◯  ◉◯◯◉◯◉  ◯◉◯◯◯◯
+◯◉◉◯◯◉  ◉◯◯◯◉◯  ◯◯◯◉◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◯◉◉◯◉  ◉◯◯◯◉◯  ◯◉◯◯◯◯
+◯◯◉◯◉◯  ◉◯◯◉◯◉  ◯◉◯◯◯◯
+ObservationTensor(1):
+◉◯◯◉◯◉  ◯◯◉◯◉◯  ◯◉◯◯◯◯
+◉◯◯◯◉◯  ◯◉◉◯◯◉  ◯◯◯◉◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◯◯◉◯  ◯◯◉◉◯◉  ◯◉◯◯◯◯
+◉◯◯◉◯◉  ◯◯◉◯◉◯  ◯◉◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [9, 17, 18, 19, 30, 31, 44, 46, 47, 48, 49, 50, 57, 59, 64, 65, 66, 67, 84, 85, 86, 92, 94, 95, 105, 112, 113, 115]
+StringLegalActions() = ["c5d5", "e5f5", "e5e4", "e5d5", "b4b3", "b4a4", "f4f5", "f4f3", "f4e4", "a3a4", "a3b3", "a3a2", "c3d3", "c3b3", "e3e4", "e3f3", "e3e2", "e3d3", "d2d3", "d2e2", "d2d1", "f2f3", "f2f1", "f2e2", "c1d1", "e1e2", "e1f1", "e1d1"]
+
+# Apply action "e1d1"
+action: 115
+
+# State 5
+# 5x.oxox
+# 4xoo.xo
+# 3oxoxox
+# 2x.ooxo
+# 1x.oo.x
+#  abcdef
+IsTerminal() = False
+History() = [77, 7, 39, 103, 115]
+HistoryString() = "77, 7, 39, 103, 115"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "77, 7, 39, 103, 115"
+InformationStateString(1) = "77, 7, 39, 103, 115"
+ObservationString(0) = "5x.oxox\n4xoo.xo\n3oxoxox\n2x.ooxo\n1x.oo.x\n abcdef\n"
+ObservationString(1) = "5x.oxox\n4xoo.xo\n3oxoxox\n2x.ooxo\n1x.oo.x\n abcdef\n"
+ObservationTensor(0):
+◯◯◉◯◉◯  ◉◯◯◉◯◉  ◯◉◯◯◯◯
+◯◉◉◯◯◉  ◉◯◯◯◉◯  ◯◯◯◉◯◯
+◉◯◉◯◉◯  ◯◉◯◉◯◉  ◯◯◯◯◯◯
+◯◯◉◉◯◉  ◉◯◯◯◉◯  ◯◉◯◯◯◯
+◯◯◉◉◯◯  ◉◯◯◯◯◉  ◯◉◯◯◉◯
+ObservationTensor(1):
+◉◯◯◉◯◉  ◯◯◉◯◉◯  ◯◉◯◯◯◯
+◉◯◯◯◉◯  ◯◉◉◯◯◉  ◯◯◯◉◯◯
+◯◉◯◉◯◉  ◉◯◉◯◉◯  ◯◯◯◯◯◯
+◉◯◯◯◉◯  ◯◯◉◉◯◉  ◯◉◯◯◯◯
+◉◯◯◯◯◉  ◯◯◉◉◯◯  ◯◉◯◯◉◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [13, 15, 22, 23, 25, 26, 40, 41, 42, 52, 53, 55, 61, 62, 63, 68, 70, 71, 72, 88, 89, 91, 116]
+StringLegalActions() = ["d5e5", "d5c5", "f5f4", "f5e5", "a4b4", "a4a3", "e4e5", "e4f4", "e4e3", "b3b4", "b3c3", "b3a3", "d3e3", "d3d2", "d3c3", "f3f4", "f3f2", "f3e3", "a2a3", "e2e3", "e2f2", "e2d2", "f1f2"]
+
+# Apply action "f5e5"
+action: 23
+
+# State 6
+# Apply action "a3a4"
+action: 48
+
+# State 7
+# Apply action "e2f2"
+action: 89
+
+# State 8
+# Apply action "c5d5"
+action: 9
+
+# State 9
+# Apply action "b3b4"
+action: 52
+
+# State 10
+# Apply action "f4e4"
+action: 47
+
+# State 11
+# Apply action "a5a4"
+action: 2
+
+# State 12
+# Apply action "e4e5"
+action: 40
+
+# State 13
+# Apply action "f3e3"
+action: 71
+
+# State 14
+# Apply action "c3d3"
+action: 57
+
+# State 15
+# Apply action "b4c4"
+action: 29
+
+# State 16
+# Apply action "d3e3"
+action: 61
+
+# State 17
+# 5...oo.
+# 4x.x...
+# 3....o.
+# 2x.oo.x
+# 1x.oo.x
+#  abcdef
+IsTerminal() = True
+History() = [77, 7, 39, 103, 115, 23, 48, 89, 9, 52, 47, 2, 40, 71, 57, 29, 61]
+HistoryString() = "77, 7, 39, 103, 115, 23, 48, 89, 9, 52, 47, 2, 40, 71, 57, 29, 61"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "77, 7, 39, 103, 115, 23, 48, 89, 9, 52, 47, 2, 40, 71, 57, 29, 61"
+InformationStateString(1) = "77, 7, 39, 103, 115, 23, 48, 89, 9, 52, 47, 2, 40, 71, 57, 29, 61"
+ObservationString(0) = "5...oo.\n4x.x...\n3....o.\n2x.oo.x\n1x.oo.x\n abcdef\n"
+ObservationString(1) = "5...oo.\n4x.x...\n3....o.\n2x.oo.x\n1x.oo.x\n abcdef\n"
+ObservationTensor(0):
+◯◯◯◉◉◯  ◯◯◯◯◯◯  ◉◉◉◯◯◉
+◯◯◯◯◯◯  ◉◯◉◯◯◯  ◯◉◯◉◉◉
+◯◯◯◯◉◯  ◯◯◯◯◯◯  ◉◉◉◉◯◉
+◯◯◉◉◯◯  ◉◯◯◯◯◉  ◯◉◯◯◉◯
+◯◯◉◉◯◯  ◉◯◯◯◯◉  ◯◉◯◯◉◯
+ObservationTensor(1):
+◯◯◯◯◯◯  ◯◯◯◉◉◯  ◉◉◉◯◯◉
+◉◯◉◯◯◯  ◯◯◯◯◯◯  ◯◉◯◉◉◉
+◯◯◯◯◯◯  ◯◯◯◯◉◯  ◉◉◉◉◯◉
+◉◯◯◯◯◉  ◯◯◉◉◯◯  ◯◉◯◯◉◯
+◉◯◯◯◯◉  ◯◯◉◉◯◯  ◯◉◯◯◉◯
+Rewards() = [1, -1]
+Returns() = [1, -1]
