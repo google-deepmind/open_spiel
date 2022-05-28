@@ -273,10 +273,8 @@ void DQN::Learn() {
 
 void DQN::Load(const std::string& data_path,
                const std::string& optimizer_data_path) {
-  if (!data_path.empty()) {
-    torch::load(q_network_, data_path);
-    torch::load(target_q_network_, data_path);
-  }
+  torch::load(q_network_, data_path);
+  torch::load(target_q_network_, data_path);
   if (!optimizer_data_path.empty()) {
     torch::load(optimizer_, optimizer_data_path);
   }
@@ -284,9 +282,7 @@ void DQN::Load(const std::string& data_path,
 
 void DQN::Save(const std::string& data_path,
                const std::string& optimizer_data_path) {
-  if (!data_path.empty()) {
-    torch::save(q_network_, data_path);
-  }
+  torch::save(q_network_, data_path);
   if (!optimizer_data_path.empty()) {
     torch::save(optimizer_, optimizer_data_path);
   }
