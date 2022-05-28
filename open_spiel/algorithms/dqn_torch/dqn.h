@@ -101,6 +101,13 @@ class DQN : public Agent {
 
   double GetEpsilon(bool is_evaluation, int power = 1.0);
   int seed() const { return seed_; }
+  
+  // Load checkpoint/trained model and optimizer
+  void Load(const std::string& data_path,
+            const std::string& optimizer_data_path = "");
+  // Save checkpoint/trained model and optimizer
+  void Save(const std::string& data_path,
+            const std::string& optimizer_data_path = "");
 
  private:
   std::vector<float> GetInfoState(const State& state, Player player_id,
