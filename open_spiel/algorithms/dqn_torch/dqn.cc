@@ -165,13 +165,13 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
             .view({1, -1});
     q_network_->eval();
     torch::Tensor q_values = q_network_->forward(info_state_tensor).detach();
-    torch::Tensor legal_actions_mask =
+    torch::Tensor illegal_actions_mask =
         torch::full({num_actions_}, true, torch::dtype(torch::kBool));
     for (const auto& action : legal_actions) {
-      legal_actions_mask[action] = false;
+      illegal_actions_mask[action] = false;
     }
     torch::Tensor legal_q_values = torch::masked_fill(
-        q_values, legal_actions_mask, kIllegalActionLogitsPenalty);
+        q_values, illegal_actions_mask, kIllegalActionLogitsPenalty);
     action = legal_q_values.argmax(1).item().toInt();
   }
   return action;
