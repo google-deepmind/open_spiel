@@ -94,12 +94,12 @@ impl State {
         ret == 1
     }
 
-    pub fn num_players(&self) -> usize {
-        unsafe { StateNumPlayers(self.state) as usize }
+    pub fn num_players(&self) -> i32 {
+        unsafe { StateNumPlayers(self.state) }
     }
 
     pub fn returns(&self) -> Vec<f64> {
-        let length = self.num_players();
+        let length = self.num_players() as usize;
         let mut returns_vec = Vec::with_capacity(length);
         unsafe {
             StateReturns(self.state, returns_vec.as_mut_ptr());
