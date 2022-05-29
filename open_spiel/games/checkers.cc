@@ -33,6 +33,7 @@ namespace {
 inline constexpr int kCellStates = 1 + kNumPlayers;  // Empty, White, and Black.
 inline constexpr int kDefaultRows = 8;
 inline constexpr int kDefaultColumns = 8;
+inline constexpr int kNumRowsOfPieces = 3;
 
 // Number of unique directions each piece can take.
 constexpr int kNumDirections = 4;
@@ -41,8 +42,8 @@ constexpr int kNumDirections = 4;
 // Index 1: Direction is right (east), towards increasing x.
 // Index 2: Direction is down (south), towards increasing y.
 // Index 3: Direction is left (west), towards decreasing x.
-constexpr std::array<int, kNumDirections> kDirRowOffsets = {{-1, 0, 1, 0}};
-constexpr std::array<int, kNumDirections> kDirColumnOffsets = {{0, 1, 0, -1}};
+constexpr std::array<int, kNumDirections> kDirRowOffsets = {{-1, -1, 1, 1}};
+constexpr std::array<int, kNumDirections> kDirColumnOffsets = {{-1, 1, 1, -1}};
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"checkers",
@@ -164,9 +165,11 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
     for (int column = 0; column < columns_; column++) {
       if ((IsEven(row + (rows_ - 1)) && IsEven(column)) ||
           (!IsEven(row + (rows_ - 1)) && !IsEven(column))) {
-        SetBoard(row, column, CellState::kWhite);
-      } else {
-        SetBoard(row, column, CellState::kBlack);
+        if (row >= 0 && row < kNumRowsOfPieces) {
+          SetBoard(row, column, CellState::kBlack);
+        } else if (row >= (kDefaultRows - kNumRowsOfPieces)) {
+          SetBoard(row, column, CellState::kWhite);
+        }
       }
     }
   }
@@ -216,16 +219,15 @@ void CheckersState::DoApplyAction(Action action) {
 
   SPIEL_CHECK_TRUE(InBounds(start_row, start_column));
   SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
-  SPIEL_CHECK_EQ(BoardAt(start_row, start_column),
-                 OpponentState(BoardAt(end_row, end_column)));
+  SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
 
   SetBoard(end_row, end_column, BoardAt(start_row, start_column));
   SetBoard(start_row, start_column, CellState::kEmpty);
 
   // Does the other player have any moves left?
-  if (!MovesRemaining()) {
-    outcome_ = current_player_;
-  }
+  // if (!MovesRemaining()) {
+  //   outcome_ = current_player_;
+  // }
 
   current_player_ = 1 - current_player_;
   num_moves_++;
@@ -251,12 +253,7 @@ std::string CheckersState::ActionToString(Player player,
 
 std::vector<Action> CheckersState::LegalActions() const {
   std::vector<Action> move_list;
-
-  if (IsTerminal()) {
-    return move_list;
-  }
-
-  CellState current_player_state = PlayerToState(CurrentPlayer());
+  CellState current_player_state = PlayerToState(current_player_);
   std::vector<int> action_bases = {rows_, columns_, kNumDirections};
   std::vector<int> action_values = {0, 0, 0};
 
@@ -264,6 +261,9 @@ std::vector<Action> CheckersState::LegalActions() const {
     for (int column = 0; column < columns_; column++) {
       if (BoardAt(row, column) == current_player_state) {
         for (int direction = 0; direction < kNumDirections; direction++) {
+          if ((current_player_ == 0 && direction > 1) || (current_player_ == 1 && direction < 2)) {
+            continue;
+          }
           int adjacent_row = row + kDirRowOffsets[direction];
           int adjacent_column = column + kDirColumnOffsets[direction];
 
@@ -271,7 +271,7 @@ std::vector<Action> CheckersState::LegalActions() const {
             CellState adjacent_state = BoardAt(adjacent_row, adjacent_column);
             CellState opponent_state = OpponentState(current_player_state);
 
-            if (adjacent_state == opponent_state) {
+            if (adjacent_state == CellState::kEmpty) {
               // The adjacent cell is in bounds and contains the opponent
               // player, therefore playing to this adjacent cell would be
               // a valid move.
@@ -287,9 +287,18 @@ std::vector<Action> CheckersState::LegalActions() const {
       }
     }
   }
-
   return move_list;
 }
+
+// std::vector<Action> CheckersState::LegalActions() const {
+//   return GetLegalActions();
+
+//   // if (IsTerminal()) {
+//   //   return move_list;
+//   // }
+
+  
+// }
 
 bool CheckersState::InBounds(int row, int column) const {
   return (row >= 0 && row < rows_ && column >= 0 && column < columns_);
@@ -361,7 +370,9 @@ bool CheckersState::MovesRemaining() const {
   return false;
 }
 
-bool CheckersState::IsTerminal() const { return outcome_ != kInvalidPlayer; }
+bool CheckersState::IsTerminal() const { 
+  return LegalActions().empty();
+}
 
 std::vector<double> CheckersState::Returns() const {
   if (outcome_ == kInvalidPlayer) {
