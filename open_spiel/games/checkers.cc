@@ -219,10 +219,18 @@ void CheckersState::DoApplyAction(Action action) {
 
   SPIEL_CHECK_TRUE(InBounds(start_row, start_column));
   SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
-  SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
+  // SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
 
-  SetBoard(end_row, end_column, BoardAt(start_row, start_column));
-  SetBoard(start_row, start_column, CellState::kEmpty);
+  if (BoardAt(end_row, end_column) == CellState::kEmpty) {
+    SetBoard(end_row, end_column, BoardAt(start_row, start_column));
+    SetBoard(start_row, start_column, CellState::kEmpty);
+  } else {    
+    SetBoard(end_row, end_column, CellState::kEmpty);
+    int capture_end_row = end_row + kDirRowOffsets[direction];
+    int capture_end_column = end_column + kDirColumnOffsets[direction];
+    SetBoard(capture_end_row, capture_end_column, BoardAt(start_row, start_column));
+    SetBoard(start_row, start_column, CellState::kEmpty);
+  }
 
   // Does the other player have any moves left?
   // if (!MovesRemaining()) {
@@ -252,7 +260,7 @@ std::string CheckersState::ActionToString(Player player,
 }
 
 std::vector<Action> CheckersState::LegalActions() const {
-  std::vector<Action> move_list;
+  std::vector<Action> move_list, capture_move_list;
   CellState current_player_state = PlayerToState(current_player_);
   std::vector<int> action_bases = {rows_, columns_, kNumDirections};
   std::vector<int> action_values = {0, 0, 0};
@@ -281,11 +289,25 @@ std::vector<Action> CheckersState::LegalActions() const {
 
               move_list.push_back(
                   RankActionMixedBase(action_bases, action_values));
+            } else if (adjacent_state == opponent_state) {
+              int jumping_row = adjacent_row + kDirRowOffsets[direction];
+              int jumping_column = adjacent_column + kDirColumnOffsets[direction];
+              if (InBounds(jumping_row, jumping_column)) {
+                action_values[0] = row;
+                action_values[1] = column;
+                action_values[2] = direction;
+
+                capture_move_list.push_back(
+                    RankActionMixedBase(action_bases, action_values));
+              }
             }
           }
         }
       }
     }
+  }
+  if (!capture_move_list.empty()) {
+    return capture_move_list;
   }
   return move_list;
 }
