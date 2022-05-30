@@ -161,6 +161,7 @@ extern "C" {
 extern "C" {
     pub fn StateObservationTensor(
         state_ptr: *const ::std::os::raw::c_void,
+        player: ::std::os::raw::c_int,
         obs_buf: *mut ::std::os::raw::c_float,
         length: ::std::os::raw::c_int,
     );
@@ -168,6 +169,7 @@ extern "C" {
 extern "C" {
     pub fn StateInformationStateTensor(
         state_ptr: *const ::std::os::raw::c_void,
+        player: ::std::os::raw::c_int,
         infostate_buf: *mut ::std::os::raw::c_float,
         length: ::std::os::raw::c_int,
     );

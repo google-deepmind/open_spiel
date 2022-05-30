@@ -167,21 +167,36 @@ impl State {
         convert_and_free_cstring(c_buf, length)
     }
 
-    pub fn observation_tensor(&self) -> Vec<f32> {
+    pub fn current_observation_tensor(&self) -> Vec<f32> {
+        self.observation_tensor(self.current_player())
+    }
+
+    pub fn current_information_state_tensor(&self) -> Vec<f32> {
+        self.information_state_tensor(self.current_player())
+    }
+
+    pub fn observation_tensor(&self, player: i32) -> Vec<f32> {
+        assert!(player >= 0);
         let length = unsafe { StateObservationTensorSize(self.state) as usize };
         let mut obs_vec = Vec::with_capacity(length);
         unsafe {
-            StateObservationTensor(self.state, obs_vec.as_mut_ptr(), length as i32);
+            StateObservationTensor(self.state, player, obs_vec.as_mut_ptr(), length as i32);
             obs_vec.set_len(length);
         }
         obs_vec
     }
 
-    pub fn information_state_tensor(&self) -> Vec<f32> {
+    pub fn information_state_tensor(&self, player: i32) -> Vec<f32> {
+        assert!(player >= 0);
         let length = unsafe { StateInformationStateTensorSize(self.state) as usize };
         let mut infostate_vec = Vec::with_capacity(length);
         unsafe {
-            StateInformationStateTensor(self.state, infostate_vec.as_mut_ptr(), length as i32);
+            StateInformationStateTensor(
+                self.state,
+                player,
+                infostate_vec.as_mut_ptr(),
+                length as i32,
+            );
             infostate_vec.set_len(length);
         }
         infostate_vec

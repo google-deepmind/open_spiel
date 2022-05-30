@@ -275,24 +275,16 @@ int StateObservationTensorSize(const void* state_ptr) {
   return parent_game->ObservationTensorSize();
 }
 
-void StateObservationTensor(const void* state_ptr, float* obs_buf, int length) {
+void StateObservationTensor(const void* state_ptr, int player, float* obs_buf,
+                            int length) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
-  open_spiel::Player cur_player = state->CurrentPlayer();
-  // Currently turn-based games are assumed. See README.md for how to remove
-  // this restriction.
-  SPIEL_CHECK_GE(cur_player, 0);
-  state->ObservationTensor(cur_player, absl::MakeSpan(obs_buf, length));
+  state->ObservationTensor(player, absl::MakeSpan(obs_buf, length));
 }
 
-void StateInformationStateTensor(const void* state_ptr, float* infostate_buf,
-                                 int length) {
+void StateInformationStateTensor(const void* state_ptr, int player,
+                                 float* infostate_buf, int length) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
-  open_spiel::Player cur_player = state->CurrentPlayer();
-  // Currently turn-based games are assumed. See README.md for how to remove
-  // this restriction.
-  SPIEL_CHECK_GE(cur_player, 0);
-  state->InformationStateTensor(cur_player,
-                                absl::MakeSpan(infostate_buf, length));
+  state->InformationStateTensor(player, absl::MakeSpan(infostate_buf, length));
 }
 
 /* Bot functions */

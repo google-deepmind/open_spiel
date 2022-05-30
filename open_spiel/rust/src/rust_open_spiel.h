@@ -65,9 +65,10 @@ char* StateInformationStateString(const void* state_ptr,
                                   unsigned long* length); /* NOLINT */
 int StateInformationStateTensorSize(const void* state_ptr);
 int StateObservationTensorSize(const void* state_ptr);
-void StateObservationTensor(const void* state_ptr, float* obs_buf, int length);
-void StateInformationStateTensor(const void* state_ptr, float* infostate_buf,
-                                 int length);
+void StateObservationTensor(const void* state_ptr, int player, float* obs_buf,
+                            int length);
+void StateInformationStateTensor(const void* state_ptr, int player,
+                                 float* infostate_buf, int length);
 
 /* Bot functions */
 void DeleteBot(void* bot_ptr);
