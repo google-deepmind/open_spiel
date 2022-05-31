@@ -70,6 +70,12 @@ enum class CellState {
   kBlack,  // Represented by 'x'.
 };
 
+// Types of moves.
+enum MoveType {
+  kNormal = 0,  // Represented by '0'.
+  kCapture = 1,  // Represented by '1'.
+};
+
 // State of an in-play game.
 class CheckersState : public State {
  public:

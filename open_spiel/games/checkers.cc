@@ -38,6 +38,8 @@ inline constexpr int kNumRowsOfPieces = 3;
 // Number of unique directions each piece can take.
 constexpr int kNumDirections = 4;
 
+constexpr int kNumMoveType = 2;
+
 // Index 0: Direction is up (north), towards decreasing y.
 // Index 1: Direction is right (east), towards increasing x.
 // Index 2: Direction is down (south), towards increasing y.
@@ -209,11 +211,12 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
 
 void CheckersState::DoApplyAction(Action action) {
   std::vector<int> values =
-      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections});
+      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType});
 
   const int start_row = values[0];
   const int start_column = values[1];
   const int direction = values[2];
+  const int move_type = values[3];
   const int end_row = start_row + kDirRowOffsets[direction];
   const int end_column = start_column + kDirColumnOffsets[direction];
 
@@ -221,36 +224,47 @@ void CheckersState::DoApplyAction(Action action) {
   SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
   // SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
 
-  if (BoardAt(end_row, end_column) == CellState::kEmpty) {
-    SetBoard(end_row, end_column, BoardAt(start_row, start_column));
-    SetBoard(start_row, start_column, CellState::kEmpty);
-  } else {    
-    SetBoard(end_row, end_column, CellState::kEmpty);
-    int capture_end_row = end_row + kDirRowOffsets[direction];
-    int capture_end_column = end_column + kDirColumnOffsets[direction];
-    SetBoard(capture_end_row, capture_end_column, BoardAt(start_row, start_column));
-    SetBoard(start_row, start_column, CellState::kEmpty);
+  switch (move_type) {
+    case MoveType::kNormal:
+      SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
+      SetBoard(end_row, end_column, BoardAt(start_row, start_column));
+      SetBoard(start_row, start_column, CellState::kEmpty);
+      break;
+    case MoveType::kCapture:
+      SPIEL_CHECK_EQ(BoardAt(end_row, end_column), OpponentState(PlayerToState(current_player_)));
+      SetBoard(end_row, end_column, CellState::kEmpty);
+      int capture_end_row = end_row + kDirRowOffsets[direction];
+      int capture_end_column = end_column + kDirColumnOffsets[direction];
+      SPIEL_CHECK_EQ(BoardAt(capture_end_row, capture_end_column), CellState::kEmpty);
+      SetBoard(capture_end_row, capture_end_column, BoardAt(start_row, start_column));
+      SetBoard(start_row, start_column, CellState::kEmpty);
+      break;
   }
 
-  // Does the other player have any moves left?
-  // if (!MovesRemaining()) {
-  //   outcome_ = current_player_;
-  // }
+  if (move_type == MoveType::kCapture) {
+    std::vector<Action> moves = LegalActions();
+    if (moves.size() > 0) {
+      if (UnrankActionMixedBase(moves[0], {rows_, columns_, kNumDirections, kNumMoveType})[3] == MoveType::kCapture) {
+        current_player_ = 1 - current_player_;        
+      }
+    }
+  }
+  current_player_ = 1 - current_player_;  
 
-  current_player_ = 1 - current_player_;
   num_moves_++;
 }
 
 std::string CheckersState::ActionToString(Player player,
                                          Action action_id) const {
   std::vector<int> values =
-      UnrankActionMixedBase(action_id, {rows_, columns_, kNumDirections});
+      UnrankActionMixedBase(action_id, {rows_, columns_, kNumDirections, kNumMoveType});
 
   const int start_row = values[0];
   const int start_column = values[1];
   const int direction = values[2];
-  const int end_row = start_row + kDirRowOffsets[direction];
-  const int end_column = start_column + kDirColumnOffsets[direction];
+  const int move_type = values[3];
+  const int end_row = start_row + kDirRowOffsets[direction] * (move_type + 1);
+  const int end_column = start_column + kDirColumnOffsets[direction] * (move_type + 1);
 
   std::string action_string =
       absl::StrCat(ColumnLabel(start_column), RowLabel(rows_, start_row),
@@ -262,8 +276,8 @@ std::string CheckersState::ActionToString(Player player,
 std::vector<Action> CheckersState::LegalActions() const {
   std::vector<Action> move_list, capture_move_list;
   CellState current_player_state = PlayerToState(current_player_);
-  std::vector<int> action_bases = {rows_, columns_, kNumDirections};
-  std::vector<int> action_values = {0, 0, 0};
+  std::vector<int> action_bases = {rows_, columns_, kNumDirections, kNumMoveType};
+  std::vector<int> action_values = {0, 0, 0, 0};
 
   for (int row = 0; row < rows_; row++) {
     for (int column = 0; column < columns_; column++) {
@@ -286,17 +300,18 @@ std::vector<Action> CheckersState::LegalActions() const {
               action_values[0] = row;
               action_values[1] = column;
               action_values[2] = direction;
+              action_values[3] = MoveType::kNormal;
 
               move_list.push_back(
                   RankActionMixedBase(action_bases, action_values));
             } else if (adjacent_state == opponent_state) {
               int jumping_row = adjacent_row + kDirRowOffsets[direction];
               int jumping_column = adjacent_column + kDirColumnOffsets[direction];
-              if (InBounds(jumping_row, jumping_column)) {
+              if (InBounds(jumping_row, jumping_column) && BoardAt(jumping_row, jumping_column) == CellState::kEmpty ) {
                 action_values[0] = row;
                 action_values[1] = column;
                 action_values[2] = direction;
-
+                action_values[3] = MoveType::kCapture;
                 capture_move_list.push_back(
                     RankActionMixedBase(action_bases, action_values));
               }
@@ -440,7 +455,7 @@ void CheckersState::ObservationTensor(Player player,
 
 void CheckersState::UndoAction(Player player, Action action) {
   std::vector<int> values =
-      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections});
+      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType});
 
   const int start_row = values[0];
   const int start_column = values[1];
