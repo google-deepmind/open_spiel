@@ -52,6 +52,8 @@ set(GAME_SOURCES
   dark_hex.h
   deep_sea.cc
   deep_sea.h
+  dynamic_routing/dynamic_routing_utils.cc
+  dynamic_routing/dynamic_routing_utils.h
   efg_game.cc
   efg_game.h
   efg_game_data.cc
@@ -344,6 +346,10 @@ add_test(dark_hex_test dark_hex_test)
 add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(deep_sea_test deep_sea_test)
+
+add_executable(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dynamic_routing_utils_test dynamic_routing_utils_test)
 
 add_executable(efg_game_test efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
