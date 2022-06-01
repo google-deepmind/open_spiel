@@ -31,8 +31,6 @@ namespace {
 
 // Constants.
 inline constexpr int kCellStates = 1 + kNumPlayers;  // Empty, White, and Black.
-inline constexpr int kDefaultRows = 8;
-inline constexpr int kDefaultColumns = 8;
 inline constexpr int kNumRowsOfPieces = 3;
 
 // Number of unique directions each piece can take.
@@ -101,7 +99,11 @@ std::string StateToString(CellState state) {
     case CellState::kWhite:
       return "o";
     case CellState::kBlack:
-      return "x";
+      return "+";
+    case CellState::kWhiteCrowned:
+      return "ō";
+    case CellState::kBlackCrowned:
+      return "∓";
     default:
       SpielFatalError("Unknown state.");
   }
@@ -112,8 +114,12 @@ CellState StringToState(std::string str) {
     return CellState::kEmpty;
   } else if (str == "o") {
     return CellState::kWhite;
-  } else if (str == "x") {
+  } else if (str == "+") {
     return CellState::kBlack;
+    } else if (str == "ō") {
+    return CellState::kWhiteCrowned;
+  } else if (str == "∓") {
+    return CellState::kBlackCrowned;
   } else {
     SpielFatalError("Unknown state.");
   }

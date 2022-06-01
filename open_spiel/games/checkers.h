@@ -62,12 +62,17 @@ namespace open_spiel {
 namespace checkers {
 
 inline constexpr int kNumPlayers = 2;
+inline constexpr int kDefaultRows = 8;
+inline constexpr int kDefaultColumns = 8;
+
 
 // State of a cell.
 enum class CellState {
-  kEmpty,  // Represented by ' '.
-  kWhite,  // Represented by 'o'.
-  kBlack,  // Represented by 'x'.
+  kEmpty,         // Represented by ' '.
+  kWhite,         // Represented by 'o'.
+  kBlack,         // Represented by '+'.
+  kWhiteCrowned,  // Represented by 'ō'.
+  kBlackCrowned,  // Represented by '∓'.
 };
 
 // Types of moves.
@@ -100,6 +105,12 @@ class CheckersState : public State {
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
   void SetBoard(int row, int column, CellState state) {
+    if (row == 0 && state == CellState::kWhite) {
+      state = CellState::kWhiteCrowned;
+    }
+    if (row == kDefaultRows - 1 && state == CellState::kBlack) {
+      state = CellState::kBlackCrowned;
+    }
     board_[row * columns_ + column] = state;
   }
   CellState BoardAt(int row, int column) const {
