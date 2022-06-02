@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,6 +26,7 @@
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/spiel_utils.h"
@@ -61,7 +61,7 @@ absl::flat_hash_map<std::string, float> AssignExistingOrDefaultValues(
 }  // namespace
 
 std::string RoadSectionFromNodes(absl::string_view origin,
-                               absl::string_view destination) {
+                                 absl::string_view destination) {
   return absl::StrCat(origin, "->", destination);
 }
 

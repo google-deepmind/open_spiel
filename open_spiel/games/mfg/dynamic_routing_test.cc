@@ -335,9 +335,6 @@ void TestPreEndedGameWithLineNetwork() {
 }
 
 void TestRandomPlayWithLineNetwork() {
-  testing::LoadGameTest(
-      "mfg_dynamic_routing(max_num_time_step=10,time_step_length=0.5,"
-      "network_name=line)");
   testing::RandomSimTest(
       *LoadGame("mfg_dynamic_routing(max_num_time_step=10,time_step_length=0.5,"
                 "network_name=line,perform_sanity_checks=true)"),
@@ -345,9 +342,6 @@ void TestRandomPlayWithLineNetwork() {
 }
 
 void TestRandomPlayWithBraessNetwork() {
-  testing::LoadGameTest(
-      "mfg_dynamic_routing(max_num_time_step=10,time_step_length=0.5,"
-      "network_name=braess)");
   testing::RandomSimTest(
       *LoadGame("mfg_dynamic_routing(max_num_time_step=10,time_step_length=0.5,"
                 "network_name=braess,perform_sanity_checks=true)"),

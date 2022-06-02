@@ -23,9 +23,9 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
@@ -39,7 +39,7 @@ inline constexpr int kNoPossibleAction = 0;
 
 // Creates a road section "A->B" from two nodes "A" and "B".
 std::string RoadSectionFromNodes(absl::string_view origin,
-                               absl::string_view destination);
+                                 absl::string_view destination);
 
 // Creates a vector of two nodes {"A", "B"} from a road section "A->B".
 std::vector<std::string> NodesFromRoadSection(std::string road_section);

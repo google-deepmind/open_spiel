@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for open_spiel.python.pybind11.pyspiel."""
 
 import os
@@ -241,8 +240,8 @@ class PyspielTest(absltest.TestCase):
     self.assertEqual(pyspiel.game_parameters_to_string({}), "")
 
   def test_game_parameters_to_string_simple(self):
-    self.assertEqual(pyspiel.game_parameters_to_string({"name": "foo"}),
-                     "foo()")
+    self.assertEqual(
+        pyspiel.game_parameters_to_string({"name": "foo"}), "foo()")
 
   def test_game_parameters_to_string_with_options(self):
     self.assertEqual(
