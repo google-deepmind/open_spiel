@@ -30,7 +30,7 @@ namespace checkers {
 namespace {
 
 // Constants.
-inline constexpr int kCellStates = 1 + kNumPlayers;  // Empty, White, and Black.
+inline constexpr int kCellStates = 5;  // Empty, White, WhiteCrowned, Black and BlackCrowned.
 inline constexpr int kNumRowsOfPieces = 3;
 
 // Number of unique directions each piece can take.
@@ -408,10 +408,25 @@ std::string CheckersState::ToString() const {
 }
 
 int CheckersState::ObservationPlane(CellState state, Player player) const {
-  if (state == CellState::kEmpty) {
-    return 2;
+  int state_value;
+  switch (state) {
+    case CellState::kWhite:
+      state_value = 0;
+    case CellState::kWhiteCrowned:
+      state_value = 1;
+    case CellState::kBlackCrowned:
+      state_value = 2;
+    case CellState::kBlack:
+      state_value = 3;
+    case CellState::kEmpty:
+    default:
+      return 4;
   }
-  return (StateToPlayer(state) + player) % 2;
+  if(player == Player{0}) {
+    return state_value;
+  } else {
+    return 3 - state_value;
+  }
 }
 
 bool CheckersState::MovesRemaining() const {
@@ -473,7 +488,7 @@ void CheckersState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  TensorView<kCellStates> view(values, {kNumPlayers + 1, rows_, columns_},
+  TensorView<kCellStates> view(values, {kCellStates, rows_, columns_},
                                true);
 
   // Observation Tensor Representation:
