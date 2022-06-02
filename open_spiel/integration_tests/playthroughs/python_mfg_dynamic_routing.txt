@@ -61,30 +61,30 @@ IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "0"
 ObservationString(0) = "Location=O->A, waiting_time=0, t=0, destination='D->E'"
-ObservationTensor(0).location: ◯◉◯◯◯◯◯◯
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).location: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◯
 Rewards() = [0]
 Returns() = [0]
-LegalActions() = [2, 3]
+LegalActions() = [1, 2]
 StringLegalActions() = ["Vehicle 0 would like to move to A->B.", "Vehicle 0 would like to move to A->C."]
 
 # Apply action "Vehicle 0 would like to move to A->C."
-action: 3
+action: 2
 
 # State 2
 # Location=A->C, waiting_time=-1, t=1_mean_field, destination='D->E'
 IsTerminal() = False
-History() = [0, 3]
-HistoryString() = "0, 3"
+History() = [0, 2]
+HistoryString() = "0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
-InformationStateString(0) = "0, 3"
+InformationStateString(0) = "0, 2"
 ObservationString(0) = "Location=A->C, waiting_time=-1, t=1_mean_field, destination='D->E'"
-ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◯◉◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◯
 Rewards() = [0]
@@ -97,15 +97,15 @@ action: update_distribution
 # State 3
 # Location=A->C, waiting_time=3, t=1, destination='D->E'
 IsTerminal() = False
-History() = [0, 3]
-HistoryString() = "0, 3"
+History() = [0, 2]
+HistoryString() = "0, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
-InformationStateString(0) = "0, 3"
+InformationStateString(0) = "0, 2"
 ObservationString(0) = "Location=A->C, waiting_time=3, t=1, destination='D->E'"
-ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◯◉◯◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
 Rewards() = [0]
@@ -119,15 +119,15 @@ action: 0
 # State 4
 # Location=A->C, waiting_time=2, t=2_mean_field, destination='D->E'
 IsTerminal() = False
-History() = [0, 3, 0]
-HistoryString() = "0, 3, 0"
+History() = [0, 2, 0]
+HistoryString() = "0, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
-InformationStateString(0) = "0, 3, 0"
+InformationStateString(0) = "0, 2, 0"
 ObservationString(0) = "Location=A->C, waiting_time=2, t=2_mean_field, destination='D->E'"
-ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
 Rewards() = [0]
@@ -140,15 +140,15 @@ action: update_distribution
 # State 5
 # Location=A->C, waiting_time=2, t=2, destination='D->E'
 IsTerminal() = False
-History() = [0, 3, 0]
-HistoryString() = "0, 3, 0"
+History() = [0, 2, 0]
+HistoryString() = "0, 2, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
-InformationStateString(0) = "0, 3, 0"
+InformationStateString(0) = "0, 2, 0"
 ObservationString(0) = "Location=A->C, waiting_time=2, t=2, destination='D->E'"
-ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◯◯◉◯◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
 Rewards() = [0]
@@ -162,15 +162,15 @@ action: 0
 # State 6
 # Location=A->C, waiting_time=1, t=3_mean_field, destination='D->E'
 IsTerminal() = False
-History() = [0, 3, 0, 0]
-HistoryString() = "0, 3, 0, 0"
+History() = [0, 2, 0, 0]
+HistoryString() = "0, 2, 0, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.MEAN_FIELD
-InformationStateString(0) = "0, 3, 0, 0"
+InformationStateString(0) = "0, 2, 0, 0"
 ObservationString(0) = "Location=A->C, waiting_time=1, t=3_mean_field, destination='D->E'"
-ObservationTensor(0).location: ◯◯◯◉◯◯◯◯
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+ObservationTensor(0).location: ◯◯◉◯◯◯◯◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◯◯◯◉◯◯◯◯◯◯◯
 ObservationTensor(0).waiting: ◉
 Rewards() = [0]
@@ -190,7 +190,7 @@ action: update_distribution
 
 # State 9
 # Apply action "Vehicle 0 would like to move to C->D."
-action: 6
+action: 5
 
 # State 10
 # Set mean field distribution to be uniform
@@ -222,7 +222,7 @@ action: update_distribution
 
 # State 17
 # Apply action "Vehicle 0 would like to move to D->E."
-action: 7
+action: 6
 
 # State 18
 # Set mean field distribution to be uniform
@@ -233,17 +233,17 @@ action: update_distribution
 action: 0
 
 # State 20
-# Arrived at D->E, with travel time 8, t=10_mean_field
+# Arrived at D->E, with arrival time 8, t=10_mean_field
 IsTerminal() = True
-History() = [0, 3, 0, 0, 0, 6, 0, 0, 0, 7, 0]
-HistoryString() = "0, 3, 0, 0, 0, 6, 0, 0, 0, 7, 0"
+History() = [0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0]
+HistoryString() = "0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = PlayerId.TERMINAL
-InformationStateString(0) = "0, 3, 0, 0, 0, 6, 0, 0, 0, 7, 0"
-ObservationString(0) = "Arrived at D->E, with travel time 8, t=10_mean_field"
-ObservationTensor(0).location: ◯◯◯◯◯◯◯◉
-ObservationTensor(0).destination: ◯◯◯◯◯◯◯◉
+InformationStateString(0) = "0, 2, 0, 0, 0, 5, 0, 0, 0, 6, 0"
+ObservationString(0) = "Arrived at D->E, with arrival time 8, t=10_mean_field"
+ObservationTensor(0).location: ◯◯◯◯◯◯◉◯
+ObservationTensor(0).destination: ◯◯◯◯◯◯◉◯
 ObservationTensor(0).time: ◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(0).waiting: ◯
 Rewards() = [-4]

@@ -72,7 +72,7 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
                              {"max_num_time_step": 5})
     self.assertEqual(game.max_game_length(), 5)
 
-  # TODO(open_spiel): enable ficticious_play with game where the dynamics depend
+  # TODO(cabannes): enable ficticious_play with game where the dynamics depend
   # on the distribution.
   # def test_ficticious_play(self):
   #   """Test that ficticious play can be used on this game."""
@@ -118,10 +118,10 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
         elif len(legal_actions) == 1:
           return {legal_actions[0]: 1.0}
         else:
-          if legal_actions[0] == 2:
-            return {2: 0.75, 3: 0.25}
-          elif legal_actions[0] == 4:
-            return {4: 2 / 3, 5: 1 / 3}
+          if legal_actions[0] == 1:
+            return {1: 0.75, 2: 0.25}
+          elif legal_actions[0] == 3:
+            return {3: 2 / 3, 4: 1 / 3}
         raise ValueError(f"{legal_actions} is not correct.")
 
     ne_policy = NashEquilibriumBraess(mfg_game, 1)
@@ -140,10 +140,10 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
         elif len(legal_actions) == 1:
           return {legal_actions[0]: 1.0}
         else:
-          if legal_actions[0] == 2:
-            return {2: 0.5, 3: 0.5}
-          elif legal_actions[0] == 4:
-            return {5: 1.0}
+          if legal_actions[0] == 1:
+            return {1: 0.5, 2: 0.5}
+          elif legal_actions[0] == 3:
+            return {4: 1.0}
         raise ValueError(f"{legal_actions} is not correct.")
 
     so_policy = SocialOptimumBraess(mfg_game, 1)
@@ -217,18 +217,18 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     state.apply_action(0)
     self.assertEqual(state.current_player(), 0)
 
-    location, destination = 1, 7
+    location, destination = 7, 6
     self.assertEqual(state.get_location_as_int(), location)
     self.assertEqual(state.get_destination_as_int(), destination)
 
     py_obs.set_from(state, state.current_player())
     obs_size = num_locations * 2 + steps + 2
     expected_tensor = np.zeros(obs_size)
-    # location = 1
-    # destination + num_locations = 15
+    # location = 7
+    # destination + num_locations = 14
     # time + 2 * num_locations = 16
     # waiting bit at last index.
-    expected_tensor[[1, 15, 16]] = 1
+    expected_tensor[[7, 14, 16]] = 1
     npt.assert_array_equal(py_obs.tensor, expected_tensor)
 
   def test_apply_actions_error_no_movement_with_negative_waiting_time(self):

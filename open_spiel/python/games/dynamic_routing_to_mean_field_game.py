@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Mean field routing game policy used in N-playerrouting game.
 
 The policy class DerivedNPlayerPolicyFromMeanFieldPolicy convert a mean field
@@ -101,8 +100,8 @@ class DerivedNPlayerPolicyFromMeanFieldPolicy(policy.Policy):
         player_id in n_player_state._vehicle_at_destination)
     mfg_state._vehicle_destination = n_player_state._vehicle_destinations[
         player_id]
-    mfg_state._vehicle_final_travel_time = (
-        n_player_state._vehicle_final_travel_times[player_id])
+    mfg_state._vehicle_final_arrival_time = (
+        n_player_state._vehicle_final_arrival_times[player_id])
     mfg_state._vehicle_location = n_player_state._vehicle_locations[player_id]
     mfg_state._vehicle_without_legal_action = (
         player_id in n_player_state._vehicle_without_legal_actions)
