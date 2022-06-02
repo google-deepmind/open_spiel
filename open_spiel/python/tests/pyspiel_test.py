@@ -77,6 +77,7 @@ EXPECTED_GAMES = frozenset([
     "mean_field_lin_quad",
     "mfg_crowd_modelling",
     "mfg_crowd_modelling_2d",
+    "mfg_dynamic_routing",
     "mfg_garnet",
     "misere",
     "morpion_solitaire",

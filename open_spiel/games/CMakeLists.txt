@@ -101,6 +101,8 @@ set(GAME_SOURCES
   mfg/crowd_modelling.h
   mfg/crowd_modelling_2d.cc
   mfg/crowd_modelling_2d.h
+  mfg/dynamic_routing.cc
+  mfg/dynamic_routing.h
   mfg/garnet.cc
   mfg/garnet.h
   morpion_solitaire.cc
@@ -352,6 +354,10 @@ add_test(deep_sea_test deep_sea_test)
 add_executable(dynamic_routing_data_test dynamic_routing/dynamic_routing_data_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(dynamic_routing_data_test dynamic_routing_data_test)
+
+add_executable(dynamic_routing_test mfg/dynamic_routing_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dynamic_routing_test dynamic_routing_test)
 
 add_executable(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
