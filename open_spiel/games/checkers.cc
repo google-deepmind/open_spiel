@@ -277,9 +277,12 @@ void CheckersState::DoApplyAction(Action action) {
       current_player_ = 1 - current_player_;
     }
   }
-  current_player_ = 1 - current_player_;  
-
+  current_player_ = 1 - current_player_;
   num_moves_++;
+
+  if (LegalActions().empty()) {
+    outcome_ = 1 - current_player_;
+  }
 }
 
 std::string CheckersState::ActionToString(Player player,
