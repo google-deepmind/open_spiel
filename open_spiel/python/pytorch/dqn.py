@@ -400,3 +400,34 @@ class DQN(rl_agent.AbstractAgent):
         for tq_model in target_q_network.model:
           tq_model.weight *= (1 + sigma * torch.randn(tq_model.weight.shape))
     return copied_object
+
+  def save(self, data_path, optimizer_data_path=None):
+    """Save checkpoint/trained model and optimizer.
+
+    Args:
+      data_path: Path for saving model. It can be relative or absolute but the
+        filename should be included. For example: q_network.pt or
+        /path/to/q_network.pt
+      optimizer_data_path: Path for saving the optimizer states. It can be
+        relative or absolute but the filename should be included. For example:
+        optimizer.pt or /path/to/optimizer.pt
+    """
+    torch.save(self._q_network, data_path)
+    if optimizer_data_path is not None:
+      torch.save(self._optimizer, optimizer_data_path)
+
+  def load(self, data_path, optimizer_data_path=None):
+    """Load checkpoint/trained model and optimizer.
+
+    Args:
+      data_path: Path for loading model. It can be relative or absolute but the
+        filename should be included. For example: q_network.pt or
+        /path/to/q_network.pt
+      optimizer_data_path: Path for loading the optimizer states. It can be
+        relative or absolute but the filename should be included. For example:
+        optimizer.pt or /path/to/optimizer.pt
+    """
+    torch.load(self._q_network, data_path)
+    torch.load(self._target_q_network, data_path)
+    if optimizer_data_path is not None:
+      torch.load(self._optimizer, optimizer_data_path)
