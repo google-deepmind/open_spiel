@@ -30,13 +30,12 @@ namespace checkers {
 namespace {
 
 // Constants.
-inline constexpr int kCellStates = 5;  // Empty, White, WhiteCrowned, Black and BlackCrowned.
-inline constexpr int kNumRowsOfPieces = 3;
+inline constexpr int kNumRowsWithPieces = 3;
 
 // Number of unique directions each piece can take.
-constexpr int kNumDirections = 4;
+inline constexpr int kNumDirections = 4;
 
-constexpr int kNumMoveType = 2;
+inline constexpr int kNumMoveType = 2;
 
 // Index 0: Direction is up (north), towards decreasing y.
 // Index 1: Direction is right (east), towards increasing x.
@@ -187,11 +186,10 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
   // the first player (White, or 'o') in the bottom left corner.
   for (int row = rows_ - 1; row >= 0; row--) {
     for (int column = 0; column < columns_; column++) {
-      if ((IsEven(row + (rows_ - 1)) && IsEven(column)) ||
-          (!IsEven(row + (rows_ - 1)) && !IsEven(column))) {
-        if (row >= 0 && row < kNumRowsOfPieces) {
+      if ((row + column) % 2 == 1) {
+        if (row >= 0 && row < kNumRowsWithPieces) {
           SetBoard(row, column, CellState::kBlack);
-        } else if (row >= (kDefaultRows - kNumRowsOfPieces)) {
+        } else if (row >= (kDefaultRows - kNumRowsWithPieces)) {
           SetBoard(row, column, CellState::kWhite);
         }
       }
@@ -412,12 +410,16 @@ int CheckersState::ObservationPlane(CellState state, Player player) const {
   switch (state) {
     case CellState::kWhite:
       state_value = 0;
+      break;
     case CellState::kWhiteCrowned:
       state_value = 1;
+      break;
     case CellState::kBlackCrowned:
       state_value = 2;
+      break;
     case CellState::kBlack:
       state_value = 3;
+      break;
     case CellState::kEmpty:
     default:
       return 4;
@@ -488,7 +490,7 @@ void CheckersState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  TensorView<kCellStates> view(values, {kCellStates, rows_, columns_},
+  TensorView<3> view(values, {kCellStates, rows_, columns_},
                                true);
 
   // Observation Tensor Representation:
@@ -534,7 +536,25 @@ CheckersGame::CheckersGame(const GameParameters& params)
       columns_(ParameterValue<int>("columns")) {}
 
 int CheckersGame::NumDistinctActions() const {
-  return rows_ * columns_ * kNumDirections;
+  // int num_moves = 0;
+  // for (int row = rows_ - 1; row >= 0; row--) {
+  //   for (int column = 0; column < columns_; column++) {
+  //     if ((row + column) % 2 == 1) {
+  //       for (int direction = 0; direction < kNumDirections; direction++) {
+  //         int adjacent_row = row + kDirRowOffsets[direction];
+  //         int adjacent_column = column + kDirColumnOffsets[direction];
+  //         if (adjacent_row >= 0 && adjacent_row < rows_ && adjacent_column >= 0 && adjacent_column < columns_)
+  //           num_moves++;
+  //         int capture_row = adjacent_row + kDirRowOffsets[direction];
+  //         int capture_column = adjacent_column + kDirColumnOffsets[direction];
+  //         if (capture_row >= 0 && capture_row < rows_ && capture_column >= 0 && capture_column < columns_)
+  //           num_moves++;
+  //       }
+  //     }
+  //   }
+  // }
+  // return num_moves;
+  return rows_ * columns_ * kNumDirections * kNumMoveType;
 }
 
 }  // namespace checkers

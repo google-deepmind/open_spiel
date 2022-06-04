@@ -23,16 +23,24 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
-double ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
-               int plane, int x, int y) {
-  return v[plane * shape[1] * shape[2] + y * shape[2] + x];
+void BasicSerializationTest() {
+  std::shared_ptr<const Game> game = LoadGame("checkers");
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
+void BasicCheckersTests() {
+  testing::LoadGameTest("checkers");
+  testing::NoChanceOutcomesTest(*LoadGame("checkers"));
+  testing::RandomSimTest(*LoadGame("checkers"), 100);
+}
 
 }  // namespace
 }  // namespace checkers
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  
+  open_spiel::checkers::BasicSerializationTest();
+  open_spiel::checkers::BasicCheckersTests(); 
 }

@@ -64,6 +64,7 @@ namespace checkers {
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultRows = 8;
 inline constexpr int kDefaultColumns = 8;
+inline constexpr int kCellStates = 5;  // Empty, White, WhiteCrowned, Black and BlackCrowned.
 
 
 // State of a cell.
@@ -161,13 +162,10 @@ class CheckersGame : public Game {
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kNumPlayers + 1, rows_, columns_};
+    return {kCellStates, rows_, columns_};
   }
-  // On every turn, one piece is taken out. The longest game occurs
-  // when the last player takes out the only remaining opponenent's
-  // piece with their last piece. Therefore, there is still one piece on
-  // the board. Hence, the maximum number of moves is # of cells - 1.
-  int MaxGameLength() const override { return rows_ * columns_ - 1; }
+  // There is arbitrarily chosen number to ensure the game is finite.
+  int MaxGameLength() const override { return 1000; }
 
  private:
   int rows_;
