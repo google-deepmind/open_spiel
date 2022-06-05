@@ -50,7 +50,7 @@ class StackelbergLPTest(parameterized.TestCase):
       nashpy_game = nash.Game(p_mat[0], p_mat[1])
       for eq in nashpy_game.support_enumeration():
         leader_nash_value = eq[0].reshape(1, -1).dot(p_mat[0]).dot(eq[1].reshape(-1, 1))
-        self.assertGreaterEqual(commit_value, leader_nash_value)
+        self.assertGreaterEqual(leader_eq_value, leader_nash_value)
 
 if __name__ == "__main__":
   absltest.main()     
