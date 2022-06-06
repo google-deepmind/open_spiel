@@ -30,20 +30,20 @@ from typing import Any, Optional
 NO_POSSIBLE_ACTION = 0
 
 
-def _road_section_from_nodes(origin: str, destination: str) -> str:
+def _road_section_from_nodes(origin: str, destination: str):
   """Create a road section 'A->B' from two nodes 'A' and 'B'."""
   return f"{origin}->{destination}"
 
 
-def _nodes_from_road_section(movement: str) -> tuple[str, str]:
+def _nodes_from_road_section(movement: str):
   """Split a road section 'A->B' to two nodes 'A' and 'B'."""
   origin, destination = movement.split("->")
   return origin, destination
 
 
-def assign_dictionary_input_to_object(dict_object: dict[str, Any],
-                                      road_sections: Collection[str],
-                                      default_value: Any) -> dict[str, Any]:
+def assign_dictionary_input_to_object(dict_object,
+                                      road_sections,
+                                      default_value):
   """Check dictionary has road sections has key or return default_value dict."""
   if dict_object:
     assert set(dict_object) == set(road_sections), (
@@ -99,12 +99,12 @@ class Network:
   _road_section_by_action: dict[int, str]
 
   def __init__(self,
-               adjacency_list: dict[str, Collection[str]],
-               node_position: Optional[dict[str, tuple[float, float]]] = None,
-               bpr_a_coefficient: Optional[dict[str, float]] = None,
-               bpr_b_coefficient: Optional[dict[str, float]] = None,
-               capacity: Optional[dict[str, float]] = None,
-               free_flow_travel_time: Optional[dict[str, float]] = None):
+               adjacency_list,
+               node_position=None,
+               bpr_a_coefficiental=None,
+               bpr_b_coefficient=None,
+               capacity=None,
+               free_flow_travel_time=None):
     self._adjacency_list = adjacency_list
     self._action_by_road_section = self._create_action_by_road_section()
     self._road_section_by_action = {
@@ -138,7 +138,7 @@ class Network:
     assert hasattr(self, "_capacity")
     assert hasattr(self, "_free_flow_travel_time")
 
-  def _create_action_by_road_section(self) -> tuple[set[str], dict[int, str]]:
+  def _create_action_by_road_section(self):
     """Create dictionary that maps movement to action.
 
     The dictionary that maps movement to action is used to define the action
@@ -177,7 +177,7 @@ class Network:
     """Returns the road sections as a list."""
     return list(self._action_by_road_section)
 
-  def get_successors(self, node: str) -> Collection[str]:
+  def get_successors(self, node: str):
     """Returns the successor nodes of the node."""
     return self._adjacency_list[node]
 
@@ -197,15 +197,14 @@ class Network:
       raise KeyError(f"{start_section} is not a network node.")
     return not self.get_successors(end_section_node)
 
-  def check_list_of_vehicles_is_correct(self, vehicles: Collection["Vehicle"]):
+  def check_list_of_vehicles_is_correct(self, vehicles):
     """Assert that vehicles have valid origin and destination."""
     for vehicle in vehicles:
       if (vehicle.origin not in self._action_by_road_section or
           vehicle.destination not in self._action_by_road_section):
         raise ValueError(f"Incorrect origin or destination for {vehicle}")
 
-  def check_list_of_od_demand_is_correct(
-      self, vehicles: Collection["OriginDestinationDemand"]):
+  def check_list_of_od_demand_is_correct(self, vehicles):
     """Assert that OD demands have valid origin and destination."""
     for vehicle in vehicles:
       if (vehicle.origin not in self._action_by_road_section or
@@ -256,7 +255,7 @@ class Network:
           f" {end_section_node}: {successors}.")
 
   def return_position_of_road_section(self,
-                                      road_section: str) -> tuple[float, float]:
+                                      road_section: str):
     """Returns position of the middle of theroad section as (x,y)."""
     assert self._node_position is not None, (
         "The network should have node positions in order to be plot.")
