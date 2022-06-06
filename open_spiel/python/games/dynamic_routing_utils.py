@@ -21,6 +21,8 @@ This module has three main classes:
 - OriginDestinationDemand
 """
 
+from __future__ import annotations
+
 from collections.abc import Collection
 from typing import Any, Optional
 
