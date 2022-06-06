@@ -255,8 +255,7 @@ class Network:
     d_x, d_y = self._node_position[d_link]
     return (o_x + d_x) / 2, (o_y + d_y) / 2
 
-  def return_list_for_matplotlib_quiver(
-      self) -> tuple[list[float], list[float], list[float], list[float]]:
+  def return_list_for_matplotlib_quiver(self):
     """Returns 4 list of encoding the positions of the road sections.
 
     ```python3
