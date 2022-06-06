@@ -41,9 +41,9 @@ def _nodes_from_road_section(movement: str):
   return origin, destination
 
 
-def assign_dictionary_input_to_object(dict_object: dict[str, Any],
+def assign_dictionary_input_to_object(dict_object,
                                       road_sections: Collection[str],
-                                      default_value: Any) -> dict[str, Any]:
+                                      default_value: Any):
   """Check dictionary has road sections has key or return default_value dict."""
   if dict_object:
     assert set(dict_object) == set(road_sections), (
@@ -138,7 +138,7 @@ class Network:
     assert hasattr(self, "_capacity")
     assert hasattr(self, "_free_flow_travel_time")
 
-  def _create_action_by_road_section(self) -> tuple[set[str], dict[int, str]]:
+  def _create_action_by_road_section(self):
     """Create dictionary that maps movement to action.
 
     The dictionary that maps movement to action is used to define the action
