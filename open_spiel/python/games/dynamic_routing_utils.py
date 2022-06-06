@@ -89,15 +89,6 @@ class Network:
     y position of the node. None by default.
     _road_section_by_action: dictionary that maps action id to road section.
   """
-  _a: dict[str, float]
-  _b: dict[str, float]
-  _action_by_road_section: dict[str, int]
-  _adjacency_list: dict[str, Collection[str]]
-  _capacity: dict[str, float]
-  _free_flow_travel_time: dict[str, float]
-  _node_position: dict[str, tuple[float, float]]
-  _road_section_by_action: dict[int, str]
-
   def __init__(self,
                adjacency_list,
                node_position=None,
