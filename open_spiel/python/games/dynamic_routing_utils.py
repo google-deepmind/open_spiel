@@ -35,7 +35,7 @@ def _road_section_from_nodes(origin: str, destination: str) -> str:
   return f"{origin}->{destination}"
 
 
-def _nodes_from_road_section(movement: str) -> tuple[str, str]:
+def _nodes_from_road_section(movement: str):
   """Split a road section 'A->B' to two nodes 'A' and 'B'."""
   origin, destination = movement.split("->")
   return origin, destination
