@@ -164,7 +164,7 @@ class Network:
     """
     return 1 + self.num_links()
 
-  def links(self) -> list[str]:
+  def links(self):
     """Returns the road sections as a list."""
     return list(self._action_by_road_section)
 
