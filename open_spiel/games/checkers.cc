@@ -193,6 +193,7 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
   SPIEL_CHECK_LE(rows_, 99);     // Only supports 1 and 2 digit row numbers.
   SPIEL_CHECK_LE(columns_, 26);  // Only 26 letters to represent columns.
 
+  moves_without_capture_ = 0;
   board_ = std::vector<CellState>(rows_ * columns_, CellState::kEmpty);
 
   // Put the pieces on the board (checkerboard pattern) starting with
@@ -255,6 +256,7 @@ void CheckersState::DoApplyAction(Action action) {
   
   int end_row, end_column;
   bool multiple_jump = false;
+  moves_without_capture_++;
 
   switch (move_type) {
     case MoveType::kNormal:
@@ -273,6 +275,7 @@ void CheckersState::DoApplyAction(Action action) {
       SetBoard((start_row + end_row) / 2, (start_column + end_column) / 2, CellState::kEmpty);
       SetBoard(end_row, end_column, BoardAt(start_row, start_column));
       SetBoard(start_row, start_column, CellState::kEmpty);
+      moves_without_capture_ = 0;
 
       // Check if multiple jump is possible
       std::vector<Action> moves = LegalActions();
@@ -291,12 +294,11 @@ void CheckersState::DoApplyAction(Action action) {
 
   if (!multiple_jump) {
     current_player_ = 1 - current_player_; 
-  }  
-  // move_number_++;
+  }
 
   if (LegalActions().empty()) {
     outcome_ = 1 - current_player_;
-  }
+  }  
 }
 
 std::string CheckersState::ActionToString(Player player,
@@ -441,17 +443,18 @@ int CheckersState::ObservationPlane(CellState state, Player player) const {
 }
 
 bool CheckersState::IsTerminal() const { 
-  return LegalActions().empty();
+  return LegalActions().empty() || moves_without_capture_ >= kMaxMovesWithoutCapture;
 }
 
 std::vector<double> CheckersState::Returns() const {
-  if (outcome_ == kInvalidPlayer) {
+  if (outcome_ == kInvalidPlayer || moves_without_capture_ >= kMaxMovesWithoutCapture) {
     return {0., 0.};
   } else if (outcome_ == Player{0}) {
     return {1.0, -1.0};
-  } else {
+  } else if (outcome_ == Player{1}){
     return {-1.0, 1.0};
   }
+  return {0., 0.};
 }
 
 std::string CheckersState::InformationStateString(Player player) const {

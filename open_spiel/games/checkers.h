@@ -15,42 +15,12 @@
 #ifndef OPEN_SPIEL_GAMES_CHECKERS_H_
 #define OPEN_SPIEL_GAMES_CHECKERS_H_
 
-// Implementation of the board game Clobber.
-// https://en.wikipedia.org/wiki/Clobber
+// Implementation of the board game Checkers.
+// https://en.wikipedia.org/wiki/Checkers
 //
 // Some notes about this implementation:
-// - The two players:
-//     Clobber is a two player game. The two players in this
-//     implementation are 'o' (White, 0) and 'x' (Black, 1). In the
-//     default board of any size, the bottom left corner is always
-//     'o' and continues in a checkerboard pattern from there. 'o'
-//     moves first in the default board.
-// - Custom boards:
-//     A custom board can be used to initialize a state when calling
-//     either the CheckersState(rows, columns, board_string) constructer
-//     or CheckersGame's method NewInitialString(board_string). Where
-//     'rows' and 'columns' are the number of rows and columns on the
-//     board respectively, and 'board_string' is a string representing
-//     the board. The format of board string is as follows:
-//       - The first character is either a '0' or '1', this indicates
-//         which player's turn it is (white or black respectively).
-//       - The next characters are either 'o', 'x', or '.' which
-//         represent white pieces, black pieces, or empty cells
-//         respectively. There must be rows * columns number of these
-//         characters following the first character.
-//     For example, a state initialized from "1x.o.xo.x." on a game with
-//     3 rows and 3 columns would have 'x' (Black, 1) play first on a
-//     3x3 board with configuration:
-//         x.o
-//         .xo
-//         .x.
-// - Observation tensor:
-//     This version implements a 3-plane observation tensor. Each plane
-//     has equal dimensions as the board. The first plane contains 1's\
-//     where the current player's pieces are, and 0's elsewhere. The
-//     next plane contains 1's where their opponent's pieces are, and
-//     0's elsewhere. Finally, the last plane consists of 1's where the
-//     empty cells are, and 0's elsewhere.
+// - Drawing: 
+//     Game is drawn if no pieces have been removed in 40 moves
 
 #include <memory>
 #include <string>
@@ -64,6 +34,7 @@ namespace checkers {
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultRows = 8;
 inline constexpr int kDefaultColumns = 8;
+inline constexpr int kMaxMovesWithoutCapture = 40;
 inline constexpr int kCellStates = 5;  // Empty, White, WhiteCrowned, Black and BlackCrowned.
 
 
@@ -144,9 +115,9 @@ class CheckersState : public State {
 
   Player current_player_ = 0;  // Player zero (White, 'o') goes first.
   Player outcome_ = kInvalidPlayer;
-  // int move_number_ = 0;
   int rows_;
   int columns_;
+  int moves_without_capture_;
   std::vector<CellState> board_;
 };
 
