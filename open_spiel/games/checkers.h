@@ -78,8 +78,14 @@ enum class CellState {
 
 // Types of moves.
 enum MoveType {
-  kNormal = 0,  // Represented by '0'.
-  kCapture = 1,  // Represented by '1'.
+  kNormal = 0,
+  kCapture = 1,
+};
+
+// Types of pieces.
+enum PieceType {
+  kMan = 0,
+  kKing = 1,
 };
 
 // State of an in-play game.
@@ -138,7 +144,7 @@ class CheckersState : public State {
 
   Player current_player_ = 0;  // Player zero (White, 'o') goes first.
   Player outcome_ = kInvalidPlayer;
-  int num_moves_ = 0;
+  // int move_number_ = 0;
   int rows_;
   int columns_;
   std::vector<CellState> board_;

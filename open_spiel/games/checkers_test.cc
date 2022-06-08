@@ -34,6 +34,7 @@ void BasicCheckersTests() {
   testing::LoadGameTest("checkers");
   testing::NoChanceOutcomesTest(*LoadGame("checkers"));
   testing::RandomSimTest(*LoadGame("checkers"), 100);
+  // testing::RandomSimTestWithUndo(*LoadGame("checkers"), 10);
 }
 
 }  // namespace
