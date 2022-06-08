@@ -88,7 +88,19 @@ CellState CrownState(CellState state) {
       return CellState::kBlackCrowned;
     default:
       SpielFatalError(absl::StrCat("Invalid state"));
-      return CellState::kEmpty;
+  }
+}
+
+PieceType StateToPiece(CellState state) {
+  switch (state) {
+    case CellState::kWhite:
+    case CellState::kBlack:
+      return PieceType::kMan;
+    case CellState::kWhiteCrowned:
+    case CellState::kBlackCrowned:
+      return PieceType::kKing;
+    default:
+      SpielFatalError(absl::StrCat("Invalid state"));
   }
 }
 
@@ -232,7 +244,7 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
 
 void CheckersState::DoApplyAction(Action action) {
   std::vector<int> values =
-      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType});
+      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
 
   const int start_row = values[0];
   const int start_column = values[1];
@@ -266,7 +278,7 @@ void CheckersState::DoApplyAction(Action action) {
       std::vector<Action> moves = LegalActions();
       std::vector<Action> moves_for_last_moved_piece;
       for (Action action: moves) {
-        std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType});
+        std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
         if(move[0] == end_row && move[1] == end_column && move[3] == MoveType::kCapture) {
           moves_for_last_moved_piece.push_back(action);
         }
@@ -290,7 +302,7 @@ void CheckersState::DoApplyAction(Action action) {
 std::string CheckersState::ActionToString(Player player,
                                          Action action_id) const {
   std::vector<int> values =
-      UnrankActionMixedBase(action_id, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType});
+      UnrankActionMixedBase(action_id, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
 
   const int start_row = values[0];
   const int start_column = values[1];
@@ -312,8 +324,8 @@ std::vector<Action> CheckersState::LegalActions() const {
   std::vector<Action> move_list, capture_move_list;
   CellState current_player_state = PlayerToState(current_player_);
   CellState current_player_crowned = CrownState(current_player_state);
-  std::vector<int> action_bases = {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType};
-  std::vector<int> action_values = {0, 0, 0, 0, 0};
+  std::vector<int> action_bases = {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType};
+  std::vector<int> action_values = {0, 0, 0, 0, 0, 0};
 
   for (int row = 0; row < rows_; row++) {
     for (int column = 0; column < columns_; column++) {
@@ -337,6 +349,7 @@ std::vector<Action> CheckersState::LegalActions() const {
               action_values[2] = direction;
               action_values[3] = MoveType::kNormal;
               action_values[4] = PieceType::kMan;
+              action_values[5] = StateToPiece(BoardAt(row, column));
               move_list.push_back(
                   RankActionMixedBase(action_bases, action_values));
             } else if (adjacent_state == opponent_state || adjacent_state == opponent_state_crowned) {
@@ -347,7 +360,8 @@ std::vector<Action> CheckersState::LegalActions() const {
                 action_values[1] = column;
                 action_values[2] = direction;
                 action_values[3] = MoveType::kCapture;
-                action_values[4] = adjacent_state == opponent_state ? PieceType::kMan : PieceType::kKing;
+                action_values[4] = StateToPiece(adjacent_state);
+                action_values[5] = StateToPiece(BoardAt(row, column));
                 capture_move_list.push_back(
                     RankActionMixedBase(action_bases, action_values));
               }
@@ -476,36 +490,37 @@ void CheckersState::ObservationTensor(Player player,
 
 void CheckersState::UndoAction(Player player, Action action) {
   std::vector<int> values =
-      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType});
+      UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
 
   const int start_row = values[0];
   const int start_column = values[1];
   const int direction = values[2];
   const int move_type = values[3];
-  const int piece_type = values[4];
+  const int captured_piece_type = values[4];
+  const int player_piece_type = values[5];
   
   current_player_ = player;
   outcome_ = kInvalidPlayer;
   move_number_--;
 
   int end_row, end_column;
-  bool multiple_jump = false;
+  CellState player_piece = player_piece_type == PieceType::kMan ? PlayerToState(player) : CrownState(PlayerToState(player));
 
   switch (move_type) {
     case MoveType::kNormal:
       end_row = start_row + kDirRowOffsets[direction];
       end_column = start_column + kDirColumnOffsets[direction];
-      SetBoard(start_row, start_column, BoardAt(end_row, end_column));
+      SetBoard(start_row, start_column, player_piece);
       SetBoard(end_row, end_column, CellState::kEmpty);
       break;
     case MoveType::kCapture:
       end_row = start_row + kDirRowOffsets[direction] * 2;
       end_column = start_column + kDirColumnOffsets[direction] * 2;
-      SetBoard(start_row, start_column, BoardAt(end_row, end_column));
+      SetBoard(start_row, start_column, player_piece);
       SetBoard(end_row, end_column, CellState::kEmpty);
       CellState captured_piece = OpponentState(PlayerToState(player));
       SetBoard((start_row + end_row) / 2, (start_column + end_column) / 2, 
-        piece_type == 0 ? captured_piece : CrownState(captured_piece));
+        captured_piece_type == PieceType::kMan ? captured_piece : CrownState(captured_piece));
       break;
   }
   history_.pop_back();
@@ -517,7 +532,7 @@ CheckersGame::CheckersGame(const GameParameters& params)
       columns_(ParameterValue<int>("columns")) {}
 
 int CheckersGame::NumDistinctActions() const {  
-  return rows_ * columns_ * kNumDirections * kNumMoveType * kNumPieceType;
+  return rows_ * columns_ * kNumDirections * kNumMoveType * kNumPieceType * kNumPieceType;
 }
 
 }  // namespace checkers
