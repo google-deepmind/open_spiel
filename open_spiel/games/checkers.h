@@ -37,7 +37,6 @@ inline constexpr int kDefaultColumns = 8;
 inline constexpr int kMaxMovesWithoutCapture = 40;
 inline constexpr int kCellStates = 5;  // Empty, White, WhiteCrowned, Black and BlackCrowned.
 
-
 // State of a cell.
 enum class CellState {
   kEmpty,         // Represented by ' '.

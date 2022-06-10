@@ -287,7 +287,7 @@ void CheckersState::DoApplyAction(Action action) {
       std::vector<Action> moves_for_last_moved_piece;
       for (Action action: moves) {
         std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
-        if(move[0] == end_row && move[1] == end_column && move[3] == MoveType::kCapture) {
+        if (move[0] == end_row && move[1] == end_column && move[3] == MoveType::kCapture) {
           moves_for_last_moved_piece.push_back(action);
         }
       }    
@@ -324,8 +324,6 @@ std::string CheckersState::ActionToString(Player player,
 
   return action_string;
 }
-
-
 
 std::vector<Action> CheckersState::LegalActions() const {
   if (moves_without_capture_ >= kMaxMovesWithoutCapture) {
@@ -443,7 +441,7 @@ int CheckersState::ObservationPlane(CellState state, Player player) const {
     default:
       return 4;
   }
-  if(player == Player{0}) {
+  if (player == Player{0}) {
     return state_value;
   } else {
     return 3 - state_value;
