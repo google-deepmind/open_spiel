@@ -354,12 +354,12 @@ std::vector<Action> CheckersState::LegalActions() const {
             CellState opponent_state_crowned = CrownState(opponent_state);
 
             if (adjacent_state == CellState::kEmpty) {
-              action_values[0] = row;
-              action_values[1] = column;
-              action_values[2] = direction;
-              action_values[3] = MoveType::kNormal;
-              action_values[4] = PieceType::kMan;
-              action_values[5] = StateToPiece(BoardAt(row, column));
+              action_values[0] = row;                                 // Initial row value of player piece
+              action_values[1] = column;                              // Initial column value of player piece
+              action_values[2] = direction;                           // Direction of move for player piece
+              action_values[3] = MoveType::kNormal;                   // Type of move
+              action_values[4] = PieceType::kMan;                     // Type of captured piece if any. kMan by default
+              action_values[5] = StateToPiece(BoardAt(row, column));  // Type of player piece
               move_list.push_back(
                   RankActionMixedBase(action_bases, action_values));
             } else if (adjacent_state == opponent_state || adjacent_state == opponent_state_crowned) {

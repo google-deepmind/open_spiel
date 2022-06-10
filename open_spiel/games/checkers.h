@@ -94,18 +94,7 @@ class CheckersState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-  // Returns the appropriate plane for the cell's state and current
-  // player. If the cell's state is Empty, the plane is 2. Otherwise, the
-  // plane depends on both the state and the player. This method ensures
-  // that whichever player's turn it is, their pieces will be on plane 0,
-  // and their opponents will be on plane 1.
   int ObservationPlane(CellState state, Player player) const;
-
-  // This method takes advantage of the fact that in Clobber, a player
-  // has a move if-and-only-if the oppposing player also has that move.
-  // Therefore, at each board cell, just check if any adjacent cell has
-  // the opponent's piece on it.
-  bool MovesRemaining() const;
 
   Player current_player_ = 0;  // Player zero (White, 'o') goes first.
   Player outcome_ = kInvalidPlayer;
