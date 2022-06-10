@@ -125,9 +125,9 @@ std::string StateToString(CellState state) {
     case CellState::kBlack:
       return "+";
     case CellState::kWhiteCrowned:
-      return "ō";
+      return "8";
     case CellState::kBlackCrowned:
-      return "∓";
+      return "*";
     default:
       SpielFatalError("Unknown state.");
   }
@@ -140,12 +140,12 @@ CellState StringToState(std::string str) {
     return CellState::kWhite;
   } else if (str == "+") {
     return CellState::kBlack;
-    } else if (str == "ō") {
+    } else if (str == "8") {
     return CellState::kWhiteCrowned;
-  } else if (str == "∓") {
+  } else if (str == "*") {
     return CellState::kBlackCrowned;
   } else {
-    SpielFatalError("Unknown state.");
+    SpielFatalError(absl::StrCat("Unknown state ", str));
   }
 }
 
@@ -238,9 +238,9 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
 
   // If the given state is terminal, the current player
   // cannot play. Therefore, the other player wins.
-  // if (!MovesRemaining()) {
-  //   outcome_ = 1 - current_player_;
-  // }
+  if (LegalActions().empty()) {
+    outcome_ = 1 - current_player_;
+  }
 }
 
 void CheckersState::DoApplyAction(Action action) {

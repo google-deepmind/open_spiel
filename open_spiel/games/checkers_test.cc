@@ -37,11 +37,32 @@ void BasicCheckersTests() {
   testing::RandomSimTestWithUndo(*LoadGame("checkers"), 10);
 }
 
+// Board:
+// 8........
+// 7..*.....
+// 6........
+// 5....+.o.
+// 4.....o..
+// 3+.......
+// 2........
+// 1o.o.....
+//  abcdefgh
+// Player 0 should only have moves to do a double jump and crown a piece at b8 
+void MultipleJumpTest() {
+  std::shared_ptr<const Game> checkers = LoadGame("checkers(rows=8,columns=8)");
+  CheckersState cstate(checkers, 8, 8, "0..........*.................+.o......o..+...............o.o.....");
+  
+  cstate.ApplyAction(cstate.LegalActions()[0]);
+  cstate.ApplyAction(cstate.LegalActions()[0]);
+  SPIEL_CHECK_EQ(cstate.BoardAt(0, 1), CellState::kWhiteCrowned);
+}
+
 }  // namespace
 }  // namespace checkers
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::checkers::BasicSerializationTest();
-  open_spiel::checkers::BasicCheckersTests(); 
+  open_spiel::checkers::BasicCheckersTests();
+  open_spiel::checkers::MultipleJumpTest();
 }
