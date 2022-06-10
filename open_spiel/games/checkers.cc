@@ -91,6 +91,16 @@ CellState CrownState(CellState state) {
   }
 }
 
+CellState CrownStateIfLastRowReached(int row, CellState state) {
+  if (row == 0 && state == CellState::kWhite) {
+    state = CellState::kWhiteCrowned;
+  }
+  if (row == kDefaultRows - 1 && state == CellState::kBlack) {
+    state = CellState::kBlackCrowned;
+  }
+  return state;
+}
+
 PieceType StateToPiece(CellState state) {
   switch (state) {
     case CellState::kWhite:
@@ -112,7 +122,6 @@ CellState PlayerToState(Player player) {
       return CellState::kBlack;
     default:
       SpielFatalError(absl::StrCat("Invalid player id ", player));
-      return CellState::kEmpty;
   }
 }
 
@@ -152,8 +161,6 @@ CellState StringToState(std::string str) {
 CellState OpponentState(CellState state) {
   return PlayerToState(1 - StateToPlayer(state));
 }
-
-bool IsEven(int num) { return num % 2 == 0; }
 
 std::string RowLabel(int rows, int row) {
   int row_number = 1 + (rows - 1 - row);
@@ -196,8 +203,6 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
   moves_without_capture_ = 0;
   board_ = std::vector<CellState>(rows_ * columns_, CellState::kEmpty);
 
-  // Put the pieces on the board (checkerboard pattern) starting with
-  // the first player (White, or 'o') in the bottom left corner.
   for (int row = rows_ - 1; row >= 0; row--) {
     for (int column = 0; column < columns_; column++) {
       if ((row + column) % 2 == 1) {
@@ -225,8 +230,8 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
   board_ = std::vector<CellState>(rows_ * columns_, CellState::kEmpty);
   current_player_ = board_string[0] - '0';
 
-  // Create the board from the board string. The character 'o' is White
-  // (first player), 'x' is Black (second player), and the character '.'
+  // Create the board from the board string. The characters 'o', '8' are White
+  // (first player) & '+', '*' are Black (second player), and the character '.'
   // is an Empty cell. Population goes from top left to bottom right.
   for (int row = 0; row < rows_; row++) {
     for (int column = 0; column < columns_; column++) {
@@ -264,7 +269,7 @@ void CheckersState::DoApplyAction(Action action) {
       end_column = start_column + kDirColumnOffsets[direction];
       SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
       SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
-      SetBoard(end_row, end_column, BoardAt(start_row, start_column));
+      SetBoard(end_row, end_column, CrownStateIfLastRowReached(end_row, BoardAt(start_row, start_column)));
       SetBoard(start_row, start_column, CellState::kEmpty);
       break;
     case MoveType::kCapture:
@@ -273,7 +278,7 @@ void CheckersState::DoApplyAction(Action action) {
       SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
       SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
       SetBoard((start_row + end_row) / 2, (start_column + end_column) / 2, CellState::kEmpty);
-      SetBoard(end_row, end_column, BoardAt(start_row, start_column));
+      SetBoard(end_row, end_column, CrownStateIfLastRowReached(end_row, BoardAt(start_row, start_column)));
       SetBoard(start_row, start_column, CellState::kEmpty);
       moves_without_capture_ = 0;
 

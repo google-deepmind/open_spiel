@@ -82,13 +82,7 @@ class CheckersState : public State {
   }
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
-  void SetBoard(int row, int column, CellState state) {
-    if (row == 0 && state == CellState::kWhite) {
-      state = CellState::kWhiteCrowned;
-    }
-    if (row == kDefaultRows - 1 && state == CellState::kBlack) {
-      state = CellState::kBlackCrowned;
-    }
+  void SetBoard(int row, int column, CellState state) {    
     board_[row * columns_ + column] = state;
   }
   CellState BoardAt(int row, int column) const {
