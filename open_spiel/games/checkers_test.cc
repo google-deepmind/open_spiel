@@ -55,6 +55,27 @@ void MultipleJumpTest() {
   cstate.ApplyAction(cstate.LegalActions()[0]);
   cstate.ApplyAction(cstate.LegalActions()[0]);
   SPIEL_CHECK_EQ(cstate.BoardAt(0, 1), CellState::kWhiteCrowned);
+  SPIEL_CHECK_EQ(cstate.BoardAt(1, 2), CellState::kEmpty);
+  SPIEL_CHECK_EQ(cstate.BoardAt(3, 4), CellState::kEmpty);
+}
+
+// Board:
+// 8...8....
+// 7........
+// 6........
+// 5....+...
+// 4........
+// 3+.......
+// 2........
+// 1........
+//  abcdefgh
+// Player 0 should be able to move the crowned piece backwards 
+void CrownedPieceCanMoveBackwardsTest() {
+  std::shared_ptr<const Game> checkers = LoadGame("checkers(rows=8,columns=8)");
+  CheckersState cstate(checkers, 8, 8, "0...8........................+...........+.......................");
+  
+  cstate.ApplyAction(cstate.LegalActions()[0]);
+  SPIEL_CHECK_EQ(cstate.BoardAt(1, 4), CellState::kWhiteCrowned);  
 }
 
 }  // namespace
@@ -65,4 +86,5 @@ int main(int argc, char** argv) {
   open_spiel::checkers::BasicSerializationTest();
   open_spiel::checkers::BasicCheckersTests();
   open_spiel::checkers::MultipleJumpTest();
+  open_spiel::checkers::CrownedPieceCanMoveBackwardsTest();
 }

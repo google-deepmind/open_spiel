@@ -323,6 +323,9 @@ std::string CheckersState::ActionToString(Player player,
 
 
 std::vector<Action> CheckersState::LegalActions() const {
+  if (moves_without_capture_ >= kMaxMovesWithoutCapture) {
+    return {};
+  }
   std::vector<Action> move_list, capture_move_list;
   CellState current_player_state = PlayerToState(current_player_);
   CellState current_player_crowned = CrownState(current_player_state);
@@ -443,7 +446,7 @@ int CheckersState::ObservationPlane(CellState state, Player player) const {
 }
 
 bool CheckersState::IsTerminal() const { 
-  return LegalActions().empty() || moves_without_capture_ >= kMaxMovesWithoutCapture;
+  return LegalActions().empty();
 }
 
 std::vector<double> CheckersState::Returns() const {
