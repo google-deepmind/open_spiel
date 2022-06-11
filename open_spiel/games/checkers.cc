@@ -216,20 +216,9 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
   }
 }
 
-CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
-                           int columns, const std::string& board_string)
-    : State(game), rows_(rows), columns_(columns) {
-  SPIEL_CHECK_GE(rows_, 1);
-  SPIEL_CHECK_GE(columns_, 1);
-  SPIEL_CHECK_LE(rows_, 99);     // Only supports 1 and 2 digit row numbers.
-  SPIEL_CHECK_LE(columns_, 26);  // Only 26 letters to represent columns.
-  SPIEL_CHECK_GE(board_string[0], '0');
-  SPIEL_CHECK_LE(board_string[0], '1');
+void CheckersState::SetCustomBoard(const std::string board_string) {
   SPIEL_CHECK_EQ(rows_ * columns_, board_string.length() - 1);
-
-  board_ = std::vector<CellState>(rows_ * columns_, CellState::kEmpty);
   current_player_ = board_string[0] - '0';
-
   // Create the board from the board string. The characters 'o', '8' are White
   // (first player) & '+', '*' are Black (second player), and the character '.'
   // is an Empty cell. Population goes from top left to bottom right.
@@ -239,12 +228,6 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
       CellState state = StringToState(std::string(1, state_character));
       SetBoard(row, column, state);
     }
-  }
-
-  // If the given state is terminal, the current player
-  // cannot play. Therefore, the other player wins.
-  if (LegalActions().empty()) {
-    outcome_ = 1 - current_player_;
   }
 }
 

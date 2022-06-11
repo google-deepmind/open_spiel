@@ -63,8 +63,6 @@ class CheckersState : public State {
  public:
   explicit CheckersState(std::shared_ptr<const Game> game, int rows,
                         int columns);
-  explicit CheckersState(std::shared_ptr<const Game> game, int rows, int columns,
-                        const std::string& board_string);
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
@@ -81,6 +79,7 @@ class CheckersState : public State {
   }
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
+  void SetCustomBoard(const std::string board_string);
   void SetBoard(int row, int column, CellState state) {    
     board_[row * columns_ + column] = state;
   }
@@ -108,11 +107,6 @@ class CheckersGame : public Game {
  public:
   explicit CheckersGame(const GameParameters& params);
   int NumDistinctActions() const override;
-  std::unique_ptr<State> NewInitialState(
-      const std::string& board_string) const override {
-    return absl::make_unique<CheckersState>(shared_from_this(), rows_, columns_,
-                                           board_string);
-  }
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<CheckersState>(shared_from_this(), rows_, columns_);
   }

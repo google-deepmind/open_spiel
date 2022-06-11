@@ -49,14 +49,15 @@ void BasicCheckersTests() {
 //  abcdefgh
 // Player 0 should only have moves to do a double jump and crown a piece at b8 
 void MultipleJumpTest() {
-  std::shared_ptr<const Game> checkers = LoadGame("checkers(rows=8,columns=8)");
-  CheckersState cstate(checkers, 8, 8, "0..........*.................+.o......o..+...............o.o.....");
-  
-  cstate.ApplyAction(cstate.LegalActions()[0]);
-  cstate.ApplyAction(cstate.LegalActions()[0]);
-  SPIEL_CHECK_EQ(cstate.BoardAt(0, 1), CellState::kWhiteCrowned);
-  SPIEL_CHECK_EQ(cstate.BoardAt(1, 2), CellState::kEmpty);
-  SPIEL_CHECK_EQ(cstate.BoardAt(3, 4), CellState::kEmpty);
+  std::shared_ptr<const Game> game = LoadGame("checkers");
+  std::unique_ptr<State> state = game->NewInitialState();
+  CheckersState* cstate = static_cast<CheckersState*>(state.get());
+  cstate->SetCustomBoard("0..........*.................+.o......o..+...............o.o.....");
+  cstate->ApplyAction(cstate->LegalActions()[0]);
+  cstate->ApplyAction(cstate->LegalActions()[0]);
+  SPIEL_CHECK_EQ(cstate->BoardAt(0, 1), CellState::kWhiteCrowned);
+  SPIEL_CHECK_EQ(cstate->BoardAt(1, 2), CellState::kEmpty);
+  SPIEL_CHECK_EQ(cstate->BoardAt(3, 4), CellState::kEmpty);  
 }
 
 // Board:
@@ -71,11 +72,13 @@ void MultipleJumpTest() {
 //  abcdefgh
 // Player 0 should be able to move the crowned piece backwards 
 void CrownedPieceCanMoveBackwardsTest() {
-  std::shared_ptr<const Game> checkers = LoadGame("checkers(rows=8,columns=8)");
-  CheckersState cstate(checkers, 8, 8, "0...8........................+...........+.......................");
-  
-  cstate.ApplyAction(cstate.LegalActions()[0]);
-  SPIEL_CHECK_EQ(cstate.BoardAt(1, 4), CellState::kWhiteCrowned);  
+  std::shared_ptr<const Game> game = LoadGame("checkers");
+  std::unique_ptr<State> state = game->NewInitialState();
+  CheckersState* cstate = static_cast<CheckersState*>(state.get());
+  cstate->SetCustomBoard("0...8........................+...........+.......................");
+  std::vector<Action> legal_actions = cstate->LegalActions();
+  cstate->ApplyAction(legal_actions[0]);
+  SPIEL_CHECK_EQ(cstate->BoardAt(1, 4), CellState::kWhiteCrowned);  
 }
 
 }  // namespace
