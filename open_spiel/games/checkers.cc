@@ -244,6 +244,7 @@ void CheckersState::DoApplyAction(Action action) {
   
   int end_row, end_column;
   bool multiple_jump = false;
+  multiple_jump_piece_ = 0;
   moves_without_capture_++;
 
   switch (move_type) {
@@ -276,6 +277,7 @@ void CheckersState::DoApplyAction(Action action) {
       }    
       if (moves_for_last_moved_piece.size() > 0) {
         multiple_jump = true;
+        multiple_jump_piece_ = end_row * rows_ + end_column;
       }
       break;
   }
@@ -365,6 +367,19 @@ std::vector<Action> CheckersState::LegalActions() const {
 
   // If capture moves are possible, it's mandatory to play them.
   if (!capture_move_list.empty()) {
+    if (multiple_jump_piece_ > 0) {
+      int multiple_jump_piece_row = multiple_jump_piece_ / rows_;
+      int multiple_jump_piece_column = multiple_jump_piece_ % rows_;
+      std::vector<Action> multiple_move_list;
+      for (Action action: capture_move_list) {
+        std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
+        if (move[0] == multiple_jump_piece_row && move[1] == multiple_jump_piece_column) {
+          multiple_move_list.push_back(action);
+        }
+      }
+      SPIEL_CHECK_GT(multiple_move_list.size(), 0);
+      return multiple_move_list;
+    }
     return capture_move_list;
   }
   return move_list;

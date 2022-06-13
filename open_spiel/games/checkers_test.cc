@@ -44,16 +44,19 @@ void BasicCheckersTests() {
 // 5....+.o.
 // 4.....o..
 // 3+.......
-// 2........
+// 2...+....
 // 1o.o.....
 //  abcdefgh
-// Player 0 should only have moves to do a double jump and crown a piece at b8 
+// Player 0 should be able to do a double jump and crown a piece at b8 
 void MultipleJumpTest() {
   std::shared_ptr<const Game> game = LoadGame("checkers");
   std::unique_ptr<State> state = game->NewInitialState();
   CheckersState* cstate = static_cast<CheckersState*>(state.get());
-  cstate->SetCustomBoard("0..........*.................+.o......o..+...............o.o.....");
+  cstate->SetCustomBoard("0..........*.................+.o......o..+..........+....o.o.....");
   cstate->ApplyAction(cstate->LegalActions()[0]);
+  // Confirm that player 0 is given only one action (f4 token is in the middle of a multiple jump) 
+  // and there's a capture opportunity for c1 piece as well (which cannot be moved in this extra move)
+  SPIEL_CHECK_EQ(cstate->LegalActions().size(), 1);
   cstate->ApplyAction(cstate->LegalActions()[0]);
   SPIEL_CHECK_EQ(cstate->BoardAt(0, 1), CellState::kWhiteCrowned);
   SPIEL_CHECK_EQ(cstate->BoardAt(1, 2), CellState::kEmpty);
