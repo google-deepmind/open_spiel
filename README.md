@@ -56,7 +56,7 @@ our tutorials:
 If you use OpenSpiel in your research, please cite the paper using the following
 BibTeX:
 
-```
+```bibtex
 @article{LanctotEtAl2019OpenSpiel,
   title     = {{OpenSpiel}: A Framework for Reinforcement Learning in Games},
   author    = {Marc Lanctot and Edward Lockhart and Jean-Baptiste Lespiau and
