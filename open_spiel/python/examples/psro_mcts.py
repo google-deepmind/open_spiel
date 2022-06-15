@@ -175,8 +175,8 @@ class AgainstMixtureMCTSBot(MCTSBot):
       if self._is_joint:
         norm_prob = np.array(self._cur_weights) + self._epsilon
         norm_prob = norm_prob/np.sum(norm_prob)
-        self._cur_policies = self._random_state.choice(
-            self._player_policies, p=norm_prob)
+        chosen_idx = self._random_state.choice(len(self._player_policies), p=norm_prob)
+        self._cur_policies = self._player_policies[chosen_idx]
       else:
         norm_probs = [
             np.array(weights) + self._epsilon for weights in self._cur_weights]
