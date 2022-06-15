@@ -39,8 +39,6 @@ from open_spiel.python.policy import Policy
 import copy
 from enum import Enum
 
-
-import random
 import numpy as np
 
 
