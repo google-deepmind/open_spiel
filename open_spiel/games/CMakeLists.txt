@@ -60,6 +60,8 @@ set(GAME_SOURCES
   efg_game.h
   efg_game_data.cc
   efg_game_data.h
+  euchre.cc
+  euchre.h
   first_sealed_auction.cc
   first_sealed_auction.h
   gin_rummy.cc
@@ -366,6 +368,10 @@ add_test(dynamic_routing_utils_test dynamic_routing_utils_test)
 add_executable(efg_game_test efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(efg_game_test efg_game_test)
+
+add_executable(euchre_test euchre_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(euchre_test euchre_test)
 
 add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                ${OPEN_SPIEL_OBJECTS}

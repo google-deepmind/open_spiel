@@ -27,6 +27,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
+<font color="orange"><b>~</b></font>         | [Euchre](#euchre)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
 ![](_static/green_circ10.png "green circle") | [Go](#go)
@@ -272,6 +273,16 @@ Status                                       | Game
 *   Perfect information.
 *   1 players.
 *   [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
+
+### Euchre
+
+*   Trick-taking card game where players compete in pairs.
+*   Card game.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Euchre)
 
 ### First-price Sealed-Bid Auction
 
