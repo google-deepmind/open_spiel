@@ -34,7 +34,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Goofspiel](#goofspiel)
 ![](_static/green_circ10.png "green circle") | [Hanabi](#hanabi)
 ![](_static/green_circ10.png "green circle") | [Havannah](#havannah)
-<font color="orange"><b>~</b></font>         | [Hearts](#hearts)
+![](_static/green_circ10.png "green circle") | [Hearts](#hearts)
 <font color="orange"><b>~</b></font>         | [Hex](#hex)
 <font color="orange"><b>~</b></font>         | [Kriegspiel](#Kriegspiel)
 ![](_static/green_circ10.png "green circle") | [Kuhn poker](#kuhn-poker)
