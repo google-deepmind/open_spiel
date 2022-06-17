@@ -15,7 +15,9 @@
 #include "open_spiel/games/euchre.h"
 
 #include <algorithm>
+#include <iterator>
 #include <map>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
@@ -41,7 +43,7 @@ const GameType kGameType{
     /*max_num_players=*/kNumPlayers,
     /*min_num_players=*/kNumPlayers,
     /*provides_information_state_string=*/false,
-    /*provides_information_state_tensor=*/false,
+    /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/false,
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
@@ -229,6 +231,87 @@ std::string EuchreState::FormatPoints() const {
   for (int i = 0; i < kNumPlayers; ++i)
     absl::StrAppend(&rv, "\n", DirString(i), ": ", points_[i]);
   return rv;
+}
+
+void EuchreState::InformationStateTensor(Player player,
+                                         absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+
+  std::fill(values.begin(), values.end(), 0.0);
+  SPIEL_CHECK_EQ(values.size(), kInformationStateTensorSize);
+  if (upcard_ == kInvalidAction) return;
+  auto ptr = values.begin();
+  // Dealer position
+  ptr[static_cast<int>(dealer_)] = 1;
+  ptr += kNumPlayers;
+  // Upcard
+  ptr[upcard_] = 1;
+  ptr += kNumCards;
+  // Bidding [Clubs, Diamonds, Hearts, Spades, Pass]
+  for (int i = 0; i < num_passes_; ++i) {
+    ptr[kNumSuits + 1] = 1;
+    ptr += (kNumSuits + 1);
+  }
+  if (num_passes_ == 2 * kNumPlayers) return;
+  if (trump_suit_ != Suit::kInvalidSuit) {
+    ptr[static_cast<int>(trump_suit_)] = 1;
+  }
+  ptr += (kNumSuits + 1);
+  for (int i = 0; i < 2 * kNumPlayers - num_passes_ - 1; ++i)
+    ptr += (kNumSuits + 1);
+  // Go alone
+  if (declarer_go_alone_) ptr[0] = 1;
+  if (lone_defender_ == first_defender_) ptr[1] = 1;
+  if (lone_defender_ == second_defender_) ptr[2] = 1;
+  ptr += 3;
+  // Current hand
+  for (int i = 0; i < kNumCards; ++i)
+    if (holder_[i] == player) ptr[i] = 1;
+  ptr += kNumCards;
+  // History of tricks, presented in the format: N E S W N E S
+  int current_trick = std::min(num_cards_played_ / num_active_players_,
+                               static_cast<int>(tricks_.size() - 1));
+  for (int i = 0; i < current_trick; ++i) {
+    Player leader = tricks_[i].Leader();
+    ptr += leader * kNumCards;
+    int offset = 0;
+    for (auto card : tricks_[i].Cards()) {
+      ptr[card] = 1;
+      ptr += kNumCards;
+      ++offset;
+      while (!active_players_[(leader + offset) % kNumPlayers]) {
+        ptr += kNumCards;
+        ++offset;
+      }
+    }
+    SPIEL_CHECK_EQ(offset, kNumPlayers);
+    ptr += (kNumPlayers - leader - 1) * kNumCards;
+  }
+  Player leader = tricks_[current_trick].Leader();
+  int offset = 0;
+  if (leader != kInvalidPlayer) {
+    auto cards = tricks_[current_trick].Cards();
+    ptr += leader * kNumCards;
+    for (auto card : cards) {
+      ptr[card] = 1;
+      ptr += kNumCards;
+      ++offset;
+      while (!active_players_[(leader + offset) % kNumPlayers]) {
+        ptr += kNumCards;
+        ++offset;
+      }
+    }
+  }
+  // Current trick may contain less than four cards.
+  if (offset < kNumPlayers) {
+    ptr += (kNumPlayers - offset) * kNumCards;
+  }
+  // Move to the end of current trick.
+  ptr += (kNumPlayers - std::max(leader, 0) - 1) * kNumCards;
+  // Skip over unplayed tricks.
+  ptr += (kNumTricks - current_trick - 1) * kTrickTensorSize;
+  SPIEL_CHECK_EQ(ptr, values.end());
 }
 
 std::vector<Action> EuchreState::LegalActions() const {
@@ -440,7 +523,9 @@ void EuchreState::ApplyBiddingAction(int action) {
   } else {
     // Trump suit selected.
     declarer_ = current_player_;
+    first_defender_ = (declarer_ + 1) % kNumPlayers;
     declarer_partner_ = (declarer_ + 2) % kNumPlayers;
+    second_defender_ = (declarer_ + 3) % kNumPlayers;
     switch (action) {
       case kClubsTrumpAction:
         trump_suit_ = Suit::kClubs;

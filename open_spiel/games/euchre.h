@@ -61,7 +61,6 @@ inline constexpr int kFullHandSize = 5;
 inline constexpr int kMaxScore = 4;
 inline constexpr int kMinScore = -4;
 inline constexpr int kTrickTensorSize = kNumCards * 7;  // N E S W N E S
-// TODO(jhtschultz) Infomation state tensor not implemented yet.
 inline constexpr int kInformationStateTensorSize =
     kNumPlayers                       // Dealer
     + kNumCards                       // Upcard
@@ -125,6 +124,8 @@ class EuchreState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
   std::vector<double> Returns() const override;
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new EuchreState(*this));
   }
@@ -165,7 +166,7 @@ class EuchreState : public State {
   std::string FormatPlay() const;
   std::string FormatPoints() const;
 
-  const bool allow_lone_defender_;  // TODO keeping for reference
+  const bool allow_lone_defender_;
 
   int num_cards_dealt_ = 0;
   int num_cards_played_ = 0;
@@ -175,7 +176,9 @@ class EuchreState : public State {
   Suit trump_suit_ = Suit::kInvalidSuit;
   int left_bower_ = kInvalidAction;
   Player declarer_ = kInvalidPlayer;
+  Player first_defender_ = kInvalidPlayer;
   Player declarer_partner_ = kInvalidPlayer;
+  Player second_defender_ = kInvalidPlayer;
   absl::optional<bool> declarer_go_alone_;
   Player lone_defender_ = kInvalidPlayer;
   std::vector<bool> active_players_ = std::vector<bool>(kNumPlayers, true);
@@ -201,6 +204,9 @@ class EuchreGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinScore; }
   double MaxUtility() const override { return kMaxScore; }
+  std::vector<int> InformationStateTensorShape() const override {
+    return {kInformationStateTensorSize};
+  }
   int MaxGameLength() const override {
     return (2 * kNumPlayers) +        // Max 2 rounds of bidding
         1 +                           // Declarer go alone?
