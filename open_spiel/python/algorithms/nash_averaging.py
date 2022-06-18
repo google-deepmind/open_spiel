@@ -11,55 +11,75 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Nash averaging.
 
-Based on https://arxiv.org/abs/1806.02643. An axiomatic strategy evaluation
-metric for Agent-vs-Agent or Agent-vs-Task two-player zero-sum games.
+  Based on https://arxiv.org/pdf/1806.02643.pdf
+  An axiomatic strategy evaluation metric for 
+  Agent-vs-Agent or Agent-vs-Task two-player zero-sum games
 """
 
-import cvxpy as cp
+from cvxopt import solvers, matrix, spdiag, spmatrix, log
 import numpy as np
 
 from open_spiel.python.egt.utils import game_payoffs_array
 
 
-def _max_entropy_symmetric_nash(p_mat, eps=1e-9):
-  """Solving for the maxent symmetric nash for symmetric 2P zero-sum games.
-  convex programming:
-    min p^Tlog(p)
-    s.t.
-    p_mat.dot(p) <= 0, since game value must be 0
-    p >= 0
-    1^T * p = 1
-  Args:
-    p_mat: an N*N anti-symmetric payoff matrix for the row player
-    eps: minimum probability threshold
-  Returns:
-    p*: a maxent symmetric nash
+def _max_entropy_symmetric_nash(p_mat, eps=0.0):
+  """Solving for the maxent symmetric nash for symmetric two-player zero-sum games
+
+    convex programming:
+      min p^Tlog(p)
+      s.t. 
+      p_mat.dot(p) <= p^T*p_mat*p
+      p >= 0
+      1^T * p = 1
+
+    Args:
+      p_mat: an N*N anti-symmetric payoff matrix for the row player
+      eps: minimum probability threshold
+
+    Returns:
+      p*: a maxent symmetric nash  
   """
   assert np.array_equal(p_mat, -p_mat.T) and eps >= 0 and eps <= 0.5
-  n = len(p_mat)
-  x = cp.Variable(shape=n)
-  obj = cp.Maximize(cp.sum(cp.entr(x)))
-  A = np.ones(n).reshape((1, n))
-  b = A @ np.ones(n)/n
-  constraints = [p_mat@x <= np.zeros(n), A@x == b, x >= eps*np.ones(n)]
-  prob = cp.Problem(obj, constraints)
-  prob.solve()
-  return x.value.reshape((-1, 1))
+  N = len(p_mat)
+  p_mat = matrix(p_mat)
+  solvers.options["show_progress"] = False
+
+  def F(x=None, z=None):
+    if x is None:
+      return 2 * N, matrix(1/N, (N, 1))
+    if min(x) <= eps or max(x) >= 1-eps:
+      return None
+    ev = x.T * p_mat * x
+    f = matrix(0.0, (2*N+1, 1))
+    df = matrix(0.0, (2*N+1, N))
+    f[0] = x.T * log(x)
+    df[0, :] = (log(x) + 1).T
+    f[1:N+1] = p_mat * x - ev
+    df[1:N+1, :] = p_mat
+    f[N+1:] = -x+eps
+    df[N+1:, :] = -spmatrix(1.0, range(N), range(N))
+    if z is None:
+      return f, df
+    H = spdiag(z[0] * x**(-1))
+    return f, df, H
+  A = matrix(1.0, (1, N))
+  b = matrix(1.0, (1, 1))
+  return solvers.cp(F, A=A, b=b)['x']
 
 
-def nash_averaging(game, eps=1e-9, a_v_a=True):
-  """Nash averaging, see https://arxiv.org/abs/1806.02643.
+def nash_averaging(game, eps=0.0, a_v_a=True):
+  """Nash averaging, see https://arxiv.org/pdf/1806.02643.pdf
 
-  Args:
-    game: a pyspiel game
-    eps: minimum probability mass for maxent nash
-    a_v_a: whether it is Agent-vs-Agent or Agent-vs-Task
-
-  Returns:
-    maxent_nash: nash mixture for row player and column player
-    nash_avg_score: the expected payoff under maxent_nash
+    Args:
+      game: a pyspiel game
+      eps: minimum probability mass for maxent nash
+      a_v_a: whether it is Agent-vs-Agent or Agent-vs-Task
+    Returns:
+      maxent_nash: nash mixture for row player and column player
+      nash_avg_score: the expected payoff under maxent_nash
   """
 
   p_mat = game_payoffs_array(game)
@@ -75,13 +95,12 @@ def nash_averaging(game, eps=1e-9, a_v_a=True):
     return maxent_nash, p_mat[0].dot(maxent_nash)
 
   # For AvT, see appendix D of the paper.
-  # Here assumes the row player represents agents and the column player
-  # represents tasks.
+  # Here assumes the row player represents agents and the column player represents tasks.
   # game does not have to be symmetric
 
-  m, n = p_mat[0].shape
-  a_mat = np.block([[np.zeros(shape=(m, m)), p_mat[0]],
-                    [-p_mat[0].T, np.zeros(shape=(n, n))]])
-  maxent_nash = np.array(_max_entropy_symmetric_nash(a_mat, eps=eps))
-  pa, pe = maxent_nash[:m], maxent_nash[m:]
+  M, N = p_mat[0].shape
+  A = np.block([[np.zeros(shape=(M, M)), p_mat[0]],
+               [-p_mat[0].T, np.zeros(shape=(N, N))]])
+  maxent_nash = np.array(_max_entropy_symmetric_nash(A, eps=eps))
+  pa, pe = maxent_nash[:M], maxent_nash[M:]
   return (pa, pe), (p_mat[0].dot(pe), -p_mat[0].T.dot(pa))
