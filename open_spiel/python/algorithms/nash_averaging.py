@@ -42,8 +42,7 @@ def _max_entropy_symmetric_nash(p_mat, eps=1e-9):
   x = cp.Variable(shape=n)
   obj = cp.Maximize(cp.sum(cp.entr(x)))
   A = np.ones(n).reshape((1, n))
-  b = A @ np.ones(n)/n
-  constraints = [p_mat@x <= np.zeros(n), A@x == b, x >= eps*np.ones(n)]
+  constraints = [p_mat@x <= 0, A@x == 1, x >= eps*np.ones(n)]
   prob = cp.Problem(obj, constraints)
   prob.solve()
   return x.value.reshape((-1, 1))
