@@ -17,7 +17,6 @@
 #include <algorithm>  // std::max
 #include <limits>
 
-#include "open_spiel/games/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

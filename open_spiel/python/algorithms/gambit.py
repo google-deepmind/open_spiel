@@ -22,10 +22,6 @@ See `examples/gambit_example.py` for an example of usage.
 
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

@@ -24,10 +24,6 @@ non-parametric model is used to compute the policy.
 
 # pylint: disable=protected-access
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import copy
 import numpy as np

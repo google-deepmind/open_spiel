@@ -111,6 +111,14 @@ class BargainingState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
+
+  // Extra methods not part of the general API.
+  Instance instance() const { return instance_; }
+
+  Action AgreeAction() const;
+
  protected:
   void DoApplyAction(Action action) override;
 

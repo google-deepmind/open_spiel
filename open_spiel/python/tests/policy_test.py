@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.policy."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -26,6 +22,8 @@ from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python import policy
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
+
+SEED = 187461917
 
 _TIC_TAC_TOE_STATES = [
     {
@@ -236,6 +234,84 @@ class TabularPolicyTest(parameterized.TestCase):
         "0b": 11,
     }
     self.assertEqual(expected, tabular_policy.state_lookup)
+
+  def test_partial_tabular_policy_empty_uniform(self):
+    """Tests that a partial tabular policy works for an empty policy."""
+    game = pyspiel.load_game("kuhn_poker")
+    # python tabular policy is initialized to uniform
+    python_tabular_policy = policy.TabularPolicy(game)
+    partial_pyspiel_policy = pyspiel.PartialTabularPolicy()
+    self.assertNotEmpty(python_tabular_policy.state_lookup)
+    all_states = get_all_states.get_all_states(game,
+                                               depth_limit=-1,
+                                               include_terminals=False,
+                                               include_chance_states=False,
+                                               include_mean_field_states=False)
+    self.assertNotEmpty(all_states)
+    for _, state in all_states.items():
+      tabular_probs = python_tabular_policy.action_probabilities(state)
+      state_policy = partial_pyspiel_policy.get_state_policy(state)
+      self.assertLen(state_policy, 2)
+      for a, p in state_policy:
+        self.assertAlmostEqual(p, tabular_probs[a])
+
+  def test_partial_tabular_policy_set_full(self):
+    """Tests the partial tabular policy works for a complete policy."""
+    game = pyspiel.load_game("kuhn_poker")
+    # python tabular policy is initialized to uniform
+    python_tabular_policy = policy.TabularPolicy(game)
+    partial_pyspiel_policy = pyspiel.PartialTabularPolicy()
+    self.assertNotEmpty(python_tabular_policy.state_lookup)
+    all_states = get_all_states.get_all_states(game,
+                                               depth_limit=-1,
+                                               include_terminals=False,
+                                               include_chance_states=False,
+                                               include_mean_field_states=False)
+    self.assertNotEmpty(all_states)
+    policy_dict = python_tabular_policy.to_dict()
+    partial_pyspiel_policy = pyspiel.PartialTabularPolicy(policy_dict)
+    for _, state in all_states.items():
+      tabular_probs = python_tabular_policy.action_probabilities(state)
+      state_policy = partial_pyspiel_policy.get_state_policy(state)
+      self.assertLen(state_policy, 2)
+      for a, p in state_policy:
+        self.assertAlmostEqual(p, tabular_probs[a])
+
+  def test_partial_tabular_policy_override_fallback(self):
+    """Tests the partial tabular policy for a truly partial policy.
+
+    Specifically: assigns a full policy, overrides some entries, and
+    removes others. Checks that the overridden ones return correctly and that
+    the missing ones return the fallback.
+    """
+    game = pyspiel.load_game("kuhn_poker")
+    # python tabular policy is initialized to uniform
+    python_tabular_policy = policy.TabularPolicy(game)
+    partial_pyspiel_policy = pyspiel.PartialTabularPolicy()
+    self.assertNotEmpty(python_tabular_policy.state_lookup)
+    all_states = get_all_states.get_all_states(game,
+                                               depth_limit=-1,
+                                               include_terminals=False,
+                                               include_chance_states=False,
+                                               include_mean_field_states=False)
+    self.assertNotEmpty(all_states)
+    policy_dict = python_tabular_policy.to_dict()
+    partial_pyspiel_policy = pyspiel.PartialTabularPolicy(policy_dict)
+    perturbed_policy_dict = {}
+    for key in policy_dict:
+      if np.random.uniform() < 0.5:
+        perturbed_policy_dict[key] = [(0, 1.0)]
+    partial_pyspiel_policy = pyspiel.PartialTabularPolicy(perturbed_policy_dict)
+    for _, state in all_states.items():
+      infostate_key = state.information_state_string()
+      state_policy = partial_pyspiel_policy.get_state_policy(state)
+      if infostate_key in perturbed_policy_dict:
+        self.assertLen(state_policy, 1)
+        self.assertAlmostEqual(state_policy[0][1], 1.0)
+      else:
+        tabular_probs = python_tabular_policy.action_probabilities(state)
+        for a, p in state_policy:
+          self.assertAlmostEqual(p, tabular_probs[a])
 
   def test_states(self):
     game = pyspiel.load_game("leduc_poker")
@@ -497,4 +573,5 @@ class ChildTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
+  np.random.seed(SEED)
   absltest.main()

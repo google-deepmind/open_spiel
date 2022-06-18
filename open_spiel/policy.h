@@ -267,8 +267,40 @@ class TabularPolicy : public Policy {
   // A ToString where the keys are sorted.
   const std::string ToStringSorted() const;
 
- private:
+ protected:
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;
+};
+
+// A partial tabular policy is one that is not entirely complete: only a subset
+// of the full table is included. When called on state that is not in the table,
+// a specific fallback policy is queried instead.
+class PartialTabularPolicy : public TabularPolicy {
+ public:
+  // Creates an empty partial tabular policy with a uniform fallback policy.
+  PartialTabularPolicy();
+
+  // Creates a partial tabular policy with the specified table with a uniform
+  // fallback policy.
+  PartialTabularPolicy(
+      const std::unordered_map<std::string, ActionsAndProbs>& table);
+
+  // Creates a partial tabular policy with the specified table with the
+  // specified fallback policy.
+  PartialTabularPolicy(
+      const std::unordered_map<std::string, ActionsAndProbs>& table,
+      std::shared_ptr<Policy> fallback_policy);
+
+  // These retrieval methods are all modified in the same way: they first check
+  // if the key is in the table. If so, they return the state policy from the
+  // table. Otherwise, they forward the call to the fallback policy.
+  ActionsAndProbs GetStatePolicy(const State& state) const override;
+  ActionsAndProbs GetStatePolicy(const State& state, Player player)
+      const override;
+  ActionsAndProbs GetStatePolicy(const std::string& info_state)
+      const override;
+
+ private:
+  std::shared_ptr<Policy> fallback_policy_;
 };
 
 std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(

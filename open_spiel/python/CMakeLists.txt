@@ -84,6 +84,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/bots.h
   pybind11/games_backgammon.cc
   pybind11/games_backgammon.h
+  pybind11/games_bargaining.cc
+  pybind11/games_bargaining.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_chess.cc
@@ -106,6 +108,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h
+  pybind11/utils.cc
+  pybind11/utils.h
   )
 
 if (OPEN_SPIEL_BUILD_WITH_HIGC)
@@ -212,6 +216,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/games/dynamic_routing_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
+  tests/game_transforms_test.py
   tests/games_bridge_test.py
   tests/games_sim_test.py
   tests/policy_test.py
@@ -286,6 +291,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/nash_averaging_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
+      algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py

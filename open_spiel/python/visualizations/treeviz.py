@@ -28,10 +28,6 @@ pip install pygraphviz
 ```
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import pyspiel
 
@@ -42,7 +38,7 @@ except (ImportError, Exception) as e:
   raise ImportError(
       str(e) + "\nPlease make sure to install the following dependencies:\n"
       "sudo apt-get install graphviz libgraphviz-dev\n"
-      "pip install pygraphviz")
+      "pip install pygraphviz") from None
 # pylint: enable=g-import-not-at-top
 
 _PLAYER_SHAPES = {0: "square", 1: "ellipse"}

@@ -18,10 +18,6 @@ The two agents are trained by playing against each other. Then, the game
 can be played against the DQN agent from the command line.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
 import sys
 from absl import app

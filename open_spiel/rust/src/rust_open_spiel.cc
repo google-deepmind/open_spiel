@@ -20,10 +20,14 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_bots.h"
 
 using ::open_spiel::Action;
 using ::open_spiel::ActionsAndProbs;
+using ::open_spiel::Bot;
+using ::open_spiel::BotRegisterer;
 using ::open_spiel::Game;
 using ::open_spiel::GameParameter;
 using ::open_spiel::GameParameters;
@@ -271,24 +275,53 @@ int StateObservationTensorSize(const void* state_ptr) {
   return parent_game->ObservationTensorSize();
 }
 
-void StateObservationTensor(const void* state_ptr, float* obs_buf, int length) {
+void StateObservationTensor(const void* state_ptr, int player, float* obs_buf,
+                            int length) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
-  open_spiel::Player cur_player = state->CurrentPlayer();
-  // Currently turn-based games are assumed. See README.md for how to remove
-  // this restriction.
-  SPIEL_CHECK_GE(cur_player, 0);
-  state->ObservationTensor(cur_player, absl::MakeSpan(obs_buf, length));
+  state->ObservationTensor(player, absl::MakeSpan(obs_buf, length));
 }
 
-void StateInformationStateTensor(const void* state_ptr, float* infostate_buf,
-                                 int length) {
+void StateInformationStateTensor(const void* state_ptr, int player,
+                                 float* infostate_buf, int length) {
   const State* state = reinterpret_cast<const State*>(state_ptr);
-  open_spiel::Player cur_player = state->CurrentPlayer();
-  // Currently turn-based games are assumed. See README.md for how to remove
-  // this restriction.
-  SPIEL_CHECK_GE(cur_player, 0);
-  state->InformationStateTensor(cur_player,
-                                absl::MakeSpan(infostate_buf, length));
+  state->InformationStateTensor(player, absl::MakeSpan(infostate_buf, length));
+}
+
+/* Bot functions */
+void DeleteBot(void* bot_ptr) {
+  Bot* bot = reinterpret_cast<Bot*>(bot_ptr);
+  delete bot;
+}
+
+long BotStep(void* bot_ptr, const void* state_ptr) { /* NOLINT */
+  Bot* bot = reinterpret_cast<Bot*>(bot_ptr);
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  return bot->Step(*state);
+}
+
+void BotInformAction(void* bot_ptr, const void* state_ptr, int player_id,
+                     long action) { /* NOLINT */
+  Bot* bot = reinterpret_cast<Bot*>(bot_ptr);
+  const State* state = reinterpret_cast<const State*>(state_ptr);
+  bot->InformAction(*state, player_id, action);
+}
+
+void BotRestart(void* bot_ptr) {
+  Bot* bot = reinterpret_cast<Bot*>(bot_ptr);
+  bot->Restart();
+}
+
+/* BotRegisterer functions */
+void* BotRegistererCreateByName(const char* bot_name_ptr, const void* game_ptr,
+                                int player_id, const void* params_ptr) {
+  const std::string bot_name(bot_name_ptr);
+  const GamePointerHolder* game =
+      reinterpret_cast<const GamePointerHolder*>(game_ptr);
+  const GameParameters* params =
+      reinterpret_cast<const GameParameters*>(params_ptr);
+  std::unique_ptr<Bot> bot =
+      BotRegisterer::CreateByName(bot_name, game->ptr, player_id, *params);
+  return reinterpret_cast<void*>(bot.release());
 }
 
 } /* extern "C" */

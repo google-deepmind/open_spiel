@@ -199,6 +199,7 @@ else
         -DCMAKE_CXX_COMPILER=${CXX}                  \
         -DCMAKE_PREFIX_PATH=${LIBCXXWRAP_JULIA_DIR}  \
         -DBUILD_TYPE=Testing                         \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
         ../open_spiel
 
   if [ "$ARG_test_only" != "all" ]

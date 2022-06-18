@@ -13,10 +13,6 @@
 # limitations under the License.
 """DQN agent implemented in JAX."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 
 import haiku as hk

@@ -18,10 +18,6 @@ Adapted from the Travis Ebesu's blog post:
 https://tebesu.github.io/posts/Training-a-TensorFlow-graph-in-C++-API
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 from absl import flags
 import numpy as np

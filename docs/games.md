@@ -41,6 +41,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
 <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
+<font color="orange"><b>~</b></font>         | [Mancala](#mancala)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean_field_game_garnet)
@@ -199,7 +200,8 @@ Status                                       | Game
 *   Agents on a grid.
 *   Research game.
 *   Non-deterministic.
-*   Perfect, incomplete information.
+*   Imperfect information (all players see the grid and their own preferences,
+    but not the preferences of other players).
 *   2 players.
 *   [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent
     Reinforcement Learning](https://arxiv.org/abs/1802.09640)
@@ -424,6 +426,16 @@ Status                                       | Game
 *   Imperfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
+
+### Mancala
+
+*   Players take turns sowing beans on the board and try to capture more beans than the opponent
+*   Idiosyncratic format.
+*   Traditional game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Kalah)
 
 ### Markov Soccer
 

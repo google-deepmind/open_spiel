@@ -19,10 +19,6 @@ Note that there are some pure Python implementations of some of these algorithms
 in python/algorithms as well.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import pickle
 from absl import app
 from absl import flags

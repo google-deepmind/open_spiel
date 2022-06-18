@@ -25,10 +25,6 @@ The BatchA2C loss uses code from the `TRFL` library:
 https://github.com/deepmind/trfl/blob/master/trfl/discrete_policy_gradient_ops.py
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import torch
 import torch.nn.functional as F
 

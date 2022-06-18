@@ -14,10 +14,6 @@
 
 """Solving matrix games with LP solver."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 from open_spiel.python.algorithms import lp_solver
 import pyspiel

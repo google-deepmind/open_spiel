@@ -23,10 +23,6 @@ Finally, a weighted average between the parametric (DQN in this case) and the
 non-parametric model is used to compute the policy.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import copy
 import numpy as np

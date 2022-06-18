@@ -30,10 +30,12 @@
 #include "open_spiel/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
+#include "pybind11/include/pybind11/detail/common.h"
 
 namespace open_spiel {
 namespace {
 
+using ::open_spiel::ActionsAndProbs;
 using ::open_spiel::algorithms::Exploitability;
 using ::open_spiel::algorithms::NashConv;
 using ::open_spiel::algorithms::TabularBestResponse;
@@ -90,6 +92,29 @@ void init_pyspiel_policy(py::module& m) {
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
+
+  py::class_<open_spiel::PartialTabularPolicy,
+             std::shared_ptr<open_spiel::PartialTabularPolicy>,
+             open_spiel::TabularPolicy>(
+      m, "PartialTabularPolicy")
+      .def(py::init<>())
+      .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
+      .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&,
+                    std::shared_ptr<Policy>>())
+      .def("get_state_policy",
+          (ActionsAndProbs(open_spiel::Policy::*)(const State&) const)
+          &open_spiel::PartialTabularPolicy::GetStatePolicy)
+      .def("get_state_policy",
+          (ActionsAndProbs(open_spiel::Policy::*)(const State&, Player) const)
+          &open_spiel::PartialTabularPolicy::GetStatePolicy)
+      .def("get_state_policy",
+           (ActionsAndProbs(open_spiel::Policy::*)(const std::string&) const)
+          &open_spiel::PartialTabularPolicy::GetStatePolicy)
+      .def("set_prob", &open_spiel::PartialTabularPolicy::SetProb)
+      .def("set_state_policy",
+           &open_spiel::PartialTabularPolicy::SetStatePolicy)
+      .def("policy_table",
+           py::overload_cast<>(&open_spiel::PartialTabularPolicy::PolicyTable));
 
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
   py::class_<open_spiel::UniformPolicy,
@@ -214,7 +239,7 @@ void init_pyspiel_policy(py::module& m) {
       .def("compute_best_responses",  // Takes no arguments.
            &TabularBestResponseMDP::ComputeBestResponses)
       .def("compute_best_response",   // Takes one argument: Player max_player.
-           &TabularBestResponseMDP::ComputeBestResponses)
+           &TabularBestResponseMDP::ComputeBestResponse, py::arg("max_player"))
       .def("nash_conv", &TabularBestResponseMDP::NashConv)
       .def("exploitability", &TabularBestResponseMDP::Exploitability);
 

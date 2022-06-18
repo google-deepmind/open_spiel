@@ -14,10 +14,6 @@
 
 """Tabular Q-Learning on Lewis Signaling Game."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import copy
 from absl import app
 from absl import flags
@@ -160,7 +156,7 @@ def main(_):
     except ValueError:
       raise ValueError(
           "There should be {} (states * actions) elements in payoff. Found {} elements"
-          .format(num_states * num_states, len(payoffs_list)))
+          .format(num_states * num_states, len(payoffs_list))) from None
 
   env_configs = {
       "num_states": num_states,
@@ -194,7 +190,7 @@ def main(_):
     # pylint: disable=g-import-not-at-top
     import matplotlib as mpl
     import matplotlib.pyplot as plt
-    import scipy.stats as stats
+    from scipy import stats
 
     params = {
         "font.size": 12,

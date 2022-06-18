@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Repeated Rock, Paper, Scissors"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["num_repetitions", "stage_game"]
+GameType.parameter_specification = ["num_repetitions", "recall", "stage_game"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,11 +19,11 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 3
 PolicyTensorShape() = [3]
 MaxChanceOutcomes() = 0
-GetParameters() = {num_repetitions=10,stage_game=matrix_rps()}
+GetParameters() = {num_repetitions=10,recall=1,stage_game=matrix_rps()}
 NumPlayers() = 2
 MinUtility() = -10.0
 MaxUtility() = 10.0
-UtilitySum() = None
+UtilitySum() = 0.0
 ObservationTensorShape() = [6]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 6

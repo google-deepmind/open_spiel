@@ -14,12 +14,8 @@
 
 """Python implementation for Monte Carlo Counterfactual Regret Minimization."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
-import open_spiel.python.algorithms.mccfr as mccfr
+from open_spiel.python.algorithms import mccfr
 import pyspiel
 
 
@@ -120,7 +116,7 @@ class OutcomeSamplingSolver(mccfr.MCCFRSolverBase):
           sample_policy[aidx])
     value_estimate = 0
     for aidx in range(num_legal_actions):
-      value_estimate += policy[sampled_aidx] * child_values[aidx]
+      value_estimate += policy[aidx] * child_values[aidx]
 
     if cur_player == update_player:
       # Now the regret and avg strategy updates.

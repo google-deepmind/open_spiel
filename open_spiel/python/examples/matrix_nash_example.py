@@ -32,20 +32,12 @@ actions, but less likely to scale beyond that.
 
 Example usage:
 ```
-matrix_nash --game kuhn_poker
+matrix_nash_example --game kuhn_poker
 ```
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
-import fractions
 import itertools
-import os
-import subprocess
-import tempfile
-import warnings
 
 from absl import app
 from absl import flags
@@ -53,6 +45,7 @@ import nashpy
 import numpy as np
 
 from open_spiel.python.algorithms import lp_solver
+from open_spiel.python.algorithms import matrix_nash
 from open_spiel.python.egt import utils
 import pyspiel
 
@@ -73,105 +66,6 @@ flags.DEFINE_string("lrsnash_path", None,
 flags.DEFINE_integer(
     "lrsnash_max_denom", 1000, "Maximum denominator to use "
     "when converting payoffs to rationals for lrsnash solver.")
-
-
-@np.vectorize
-def _to_fraction_str(x):
-  return str(fractions.Fraction(x).limit_denominator(FLAGS.lrsnash_max_denom))
-
-
-def lrs_solve(row_payoffs, col_payoffs):
-  """Find all Nash equilibria using the lrsnash solver.
-
-  `lrsnash` uses reverse search vertex enumeration on rational polytopes.
-  For more info, see: http://cgm.cs.mcgill.ca/~avis/C/lrslib/USERGUIDE.html#nash
-
-  Args:
-    row_payoffs: payoffs for row player
-    col_payoffs: payoffs for column player
-
-  Yields:
-    (row_mixture, col_mixture), numpy vectors of float64s.
-  """
-  num_rows, num_cols = row_payoffs.shape
-  game_file, game_file_path = tempfile.mkstemp()
-  try:
-    game_file = os.fdopen(game_file, "w")
-
-    # write dimensions
-    game_file.write("%d %d\n\n" % (num_rows, num_cols))
-
-    # write row-player payoff matrix as fractions
-    for row in range(num_rows):
-      game_file.write(" ".join(_to_fraction_str(row_payoffs[row])) + "\n")
-    game_file.write("\n")
-
-    # write col-player payoff matrix as fractions
-    for row in range(num_rows):
-      game_file.write(" ".join(_to_fraction_str(col_payoffs[row])) + "\n")
-    game_file.write("\n")
-    game_file.close()
-    lrs = subprocess.Popen(
-        [FLAGS.lrsnash_path or "lrsnash", "-s", game_file_path],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT)
-    col_mixtures = []
-    for line in lrs.stdout:
-      if len(line) <= 1 or line[:1] == b"*":
-        continue
-      line = np.asfarray([fractions.Fraction(x) for x in line.decode().split()])
-      if line[0] == 2:  # col-player
-        col_mixtures.append(line[1:-1])
-      else:  # row-player
-        row_mixture = line[1:-1]
-        # row-mixture forms a Nash with every col-mixture listed directly above
-        for col_mixture in col_mixtures:
-          yield (row_mixture, col_mixture)
-        col_mixtures = []
-  finally:
-    os.remove(game_file_path)
-
-
-def lemke_howson_solve(row_payoffs, col_payoffs):
-  """Find Nash equilibria using the Lemke-Howson algorithm.
-
-  The algorithm is not guaranteed to find all equilibria. Also it can yield
-  wrong answers if the game is degenerate (but raises warnings in that case).
-
-  Args:
-    row_payoffs: payoffs for row player
-    col_payoffs: payoffs for column player
-
-  Yields:
-    (row_mixture, col_mixture), numpy vectors of float64s.
-  """
-
-  showwarning = warnings.showwarning
-  warned_degenerate = [False]
-
-  def showwarning_check_degenerate(message, *args, **kwargs):
-    if "Your game could be degenerate." in str(message):
-      warned_degenerate[0] = True
-    showwarning(message, *args, **kwargs)
-
-  try:
-    warnings.showwarning = showwarning_check_degenerate
-    for row_mixture, col_mixture in nashpy.Game(
-        row_payoffs, col_payoffs).lemke_howson_enumeration():
-      if warned_degenerate[0]:
-        # attempt to discard obviously-wrong results
-        if (row_mixture.shape != row_payoffs.shape[:1] or
-            col_mixture.shape != row_payoffs.shape[1:]):
-          warnings.warn("Discarding ill-shaped solution.")
-          continue
-        if (not np.isfinite(row_mixture).all() or
-            not np.isfinite(col_mixture).all()):
-          warnings.warn("Discarding non-finite solution.")
-          continue
-      yield row_mixture, col_mixture
-  finally:
-    warnings.showwarning = showwarning
 
 
 def main(_):
@@ -259,14 +153,16 @@ def main(_):
     equilibria = gen()
   elif FLAGS.solver == "lrsnash":
     print("using lrsnash solver")
-    equilibria = lrs_solve(row_payoffs, col_payoffs)
+    equilibria = matrix_nash.lrs_solve(row_payoffs, col_payoffs,
+                                       FLAGS.lrsnash_max_denom,
+                                       FLAGS.lrsnash_path)
   elif FLAGS.solver == "nashpy":
     if FLAGS.mode == "all":
       print("using nashpy vertex enumeration")
       equilibria = nashpy.Game(row_payoffs, col_payoffs).vertex_enumeration()
     else:
       print("using nashpy Lemke-Howson solver")
-      equilibria = lemke_howson_solve(row_payoffs, col_payoffs)
+      equilibria = matrix_nash.lemke_howson_solve(row_payoffs, col_payoffs)
   print("equilibria:" if FLAGS.mode == "all" else "an equilibrium:")
   equilibria = iter(equilibria)
   # check that there's at least one equilibrium

@@ -32,14 +32,15 @@ value_trans = np.asarray([-1., -1., 0.])
 game_rps = pyspiel.create_matrix_game(
     [[0.0, -1.0, 1.0], [1.0, 0.0, -1.0], [-1.0, 1.0, 0.0]],
     [[0.0, 1.0, -1.0], [-1.0, 0.0, 1.0], [1.0, -1.0, 0.0]])
-eq_rps = np.asarray([1/3, 1/3, 1/3])
+eq_rps = np.asarray([1 / 3, 1 / 3, 1 / 3])
 value_rps = np.asarray([0., 0., 0.])
 
 
 class NashAveragingTest(parameterized.TestCase):
+
   @parameterized.named_parameters(
-      ('transitive_game', game_trans, eq_trans, value_trans),
-      ('rps_game', game_rps, eq_rps, value_rps),
+      ("transitive_game", game_trans, eq_trans, value_trans),
+      ("rps_game", game_rps, eq_rps, value_rps),
   )
   def test_simple_games(self, game, eq, value):
 

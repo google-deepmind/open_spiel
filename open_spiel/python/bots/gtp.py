@@ -14,10 +14,6 @@
 
 """A bot that uses an external agent over the Go Text Protocol."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import subprocess
 import time
 

@@ -25,10 +25,6 @@ http://theory.stanford.edu/~megiddo/pdf/stoc94.pdf. Specifically, we construct
 and solve equations (8) and (9) from this paper.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from open_spiel.python import policy
 from open_spiel.python.algorithms import lp_solver
 import pyspiel

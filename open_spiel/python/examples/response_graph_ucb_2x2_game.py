@@ -14,10 +14,6 @@
 
 """Example of ResponseGraphUCB run on a 2x2 game."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 import matplotlib.pyplot as plt
 import numpy as np

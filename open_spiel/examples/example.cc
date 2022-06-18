@@ -89,6 +89,14 @@ int main(int argc, char** argv) {
                 << state->ActionToString(open_spiel::kChancePlayerId, action)
                 << std::endl;
       state->ApplyAction(action);
+    } else if (state->IsMeanFieldNode()) {
+      int num_states_distribution = state->DistributionSupport().size();
+      state->UpdateDistribution(std::vector<double>(
+          num_states_distribution,
+          num_states_distribution > 0 ? 1.0 / num_states_distribution : 1.0));
+      std::cerr << "Call update distribution on a uniform distribution of "
+                << num_states_distribution << " states (length of "
+                << "DistributionSupport" << std::endl;
     } else if (state->IsSimultaneousNode()) {
       // open_spiel::Players choose simultaneously?
       std::vector<open_spiel::Action> joint_action;
@@ -115,7 +123,7 @@ int main(int argc, char** argv) {
         }
 
         open_spiel::Action action = 0;
-        if (!actions.empty()){
+        if (!actions.empty()) {
           absl::uniform_int_distribution<> dis(0, actions.size() - 1);
           action = actions[dis(rng)];
         }

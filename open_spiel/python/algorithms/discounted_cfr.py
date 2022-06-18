@@ -32,10 +32,6 @@ WARNING: This was contributed on Github, and the OpenSpiel team is not aware it
 has been verified we can reproduce the paper results.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 
 from open_spiel.python.algorithms import cfr

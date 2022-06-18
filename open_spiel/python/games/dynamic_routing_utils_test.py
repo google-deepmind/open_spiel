@@ -35,10 +35,10 @@ class NetworkTest(absltest.TestCase):
     self.assertEqual(self.network.get_successors("D"), [])
     self.assertTrue(self.network.is_location_at_sink_node("A->D"))
     self.assertFalse(self.network.is_location_at_sink_node("O->A"))
-    self.assertEqual(self.network.get_action_id_from_movement("O", "A"), 1)
-    self.assertEqual(self.network.get_action_id_from_movement("A", "D"), 2)
-    self.assertEqual(self.network.get_road_section_from_action_id(1), "O->A")
-    self.assertEqual(self.network.get_road_section_from_action_id(2), "A->D")
+    self.assertEqual(self.network.get_action_id_from_movement("A", "D"), 1)
+    self.assertEqual(self.network.get_action_id_from_movement("O", "A"), 2)
+    self.assertEqual(self.network.get_road_section_from_action_id(1), "A->D")
+    self.assertEqual(self.network.get_road_section_from_action_id(2), "O->A")
 
   def test_get_successors_with_wrong_node(self):
     """Test get successors on non existing node."""

@@ -14,10 +14,6 @@
 
 """Compute the value of action given a policy vs a best responder."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 
 from open_spiel.python import policy

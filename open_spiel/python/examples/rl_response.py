@@ -19,10 +19,6 @@ Timbers et al. '20 (https://arxiv.org/abs/2004.09677), but only using RL
 directly rather than RL+Search.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import app
 from absl import flags
 import numpy as np

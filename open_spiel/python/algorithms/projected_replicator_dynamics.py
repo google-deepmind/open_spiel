@@ -18,10 +18,6 @@ This is an N-player implementation of the Projected Replicator Dynamics
 algorithm described in Lanctot et al., 2017: https://arxiv.org/abs/1711.00832.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 
 

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for open_spiel.python.pybind11.pyspiel."""
 
 import os
@@ -63,6 +62,7 @@ EXPECTED_GAMES = frozenset([
     "leduc_poker",
     "liars_dice",
     "liars_dice_ir",
+    "mancala",
     "markov_soccer",
     "matching_pennies_3p",
     "matrix_cd",
@@ -76,6 +76,7 @@ EXPECTED_GAMES = frozenset([
     "mean_field_lin_quad",
     "mfg_crowd_modelling",
     "mfg_crowd_modelling_2d",
+    "mfg_dynamic_routing",
     "mfg_garnet",
     "misere",
     "morpion_solitaire",
@@ -239,8 +240,8 @@ class PyspielTest(absltest.TestCase):
     self.assertEqual(pyspiel.game_parameters_to_string({}), "")
 
   def test_game_parameters_to_string_simple(self):
-    self.assertEqual(pyspiel.game_parameters_to_string({"name": "foo"}),
-                     "foo()")
+    self.assertEqual(
+        pyspiel.game_parameters_to_string({"name": "foo"}), "foo()")
 
   def test_game_parameters_to_string_with_options(self):
     self.assertEqual(

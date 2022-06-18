@@ -92,7 +92,7 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
   elif len(tensor.shape) == 1:
     return ["{}: {}".format(tensor_name, _format_vec(tensor))]
   elif len(tensor.shape) == 2:
-    if len(tensor_name) + tensor.shape[0] + 2 < max_cols:
+    if len(tensor_name) + tensor.shape[1] + 2 < max_cols:
       lines = ["{}: {}".format(tensor_name, _format_vec(tensor[0]))]
       prefix = " " * (len(tensor_name) + 2)
     else:

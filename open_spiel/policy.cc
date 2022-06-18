@@ -204,6 +204,50 @@ const std::string TabularPolicy::ToStringSorted() const {
   return str;
 }
 
+PartialTabularPolicy::PartialTabularPolicy()
+    : TabularPolicy(),
+      fallback_policy_(std::make_shared<UniformPolicy>()) {}
+
+PartialTabularPolicy::PartialTabularPolicy(
+      const std::unordered_map<std::string, ActionsAndProbs>& table)
+    : TabularPolicy(table),
+      fallback_policy_(std::make_shared<UniformPolicy>()) {}
+
+PartialTabularPolicy::PartialTabularPolicy(
+      const std::unordered_map<std::string, ActionsAndProbs>& table,
+      std::shared_ptr<Policy> fallback_policy)
+    : TabularPolicy(table),
+      fallback_policy_(fallback_policy) {}
+
+ActionsAndProbs PartialTabularPolicy::GetStatePolicy(const State& state) const {
+  auto iter = policy_table_.find(state.InformationStateString());
+  if (iter == policy_table_.end()) {
+    return fallback_policy_->GetStatePolicy(state);
+  } else {
+    return iter->second;
+  }
+}
+
+ActionsAndProbs PartialTabularPolicy::GetStatePolicy(const State& state,
+                                                     Player player) const {
+  auto iter = policy_table_.find(state.InformationStateString(player));
+  if (iter == policy_table_.end()) {
+    return fallback_policy_->GetStatePolicy(state);
+  } else {
+    return iter->second;
+  }
+}
+
+ActionsAndProbs PartialTabularPolicy::GetStatePolicy(
+    const std::string& info_state) const {
+  auto iter = policy_table_.find(info_state);
+  if (iter == policy_table_.end()) {
+    return fallback_policy_->GetStatePolicy(info_state);
+  } else {
+    return iter->second;
+  }
+}
+
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
                                     bool initialize_to_uniform) {
   std::unordered_map<std::string, ActionsAndProbs> policy;

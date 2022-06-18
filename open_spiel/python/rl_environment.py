@@ -45,10 +45,6 @@ defaults to -2 (module level constant `SIMULTANEOUS_PLAYER_ID`).
 See open_spiel/python/examples/rl_example.py for example usages.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 
 import enum

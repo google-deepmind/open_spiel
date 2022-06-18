@@ -17,7 +17,7 @@
 set -e
 set -x
 
-# Python 3.9 not default on Ubuntu yet.
+# Python 3.9 not default on Ubuntu yet (Ubuntu 20.04).
 OS=`uname -a | awk '{print $1}'`
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
@@ -33,9 +33,14 @@ source ./open_spiel/scripts/python_extra_deps.sh
 
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
-${PYBIN} -m pip install --force-reinstall virtualenv==20.0.23
 
-virtualenv -p ${PYBIN} ./venv
+if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
+  # Ubuntu 22.04 must execute the virtual env this way:
+  ${PYBIN} -m venv ./venv
+else
+  # Ubuntu 20.04 and earlier
+  virtualenv -p ${PYBIN} ./venv
+fi
 source ./venv/bin/activate
 
 python3 --version

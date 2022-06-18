@@ -14,10 +14,6 @@
 
 """Tests for open_spiel.python.algorithms.masked_softmax."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import math
 
 from absl.testing import absltest

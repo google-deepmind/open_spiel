@@ -76,7 +76,7 @@ def _state_to_str(
     player_id: int,
     waiting_time: int,
     destination: str,
-    final_travel_time: float,
+    final_arrival_time: float,
 ) -> str:
   """Convert the state to a string representation.
 
@@ -93,7 +93,7 @@ def _state_to_str(
     player_id: the current node type as a player id.
     waiting_time: the representative player waiting time.
     destination: the destination of the representative player.
-    final_travel_time: time of arrival.
+    final_arrival_time: time of arrival.
 
   Returns:
     state_string: string representing uniquely the mean field game.
@@ -109,9 +109,9 @@ def _state_to_str(
   else:
     raise ValueError(
         "Player id should be DEFAULT_PLAYER_ID, MEAN_FIELD or CHANCE")
-  if final_travel_time:
-    return (f"Arrived at {location}, with travel time "
-            f"{final_travel_time}, t={time}")
+  if final_arrival_time:
+    return (f"Arrived at {location}, with arrival time "
+            f"{final_arrival_time}, t={time}")
   return (f"Location={location}, waiting_time={waiting_time},"
           f" t={time}, destination='{destination}'")
 
@@ -123,17 +123,18 @@ class MeanFieldRoutingGame(pyspiel.Game):
   current waiting time and destination. When the waiting time is negative, the
   vehicle choose on with successor link it would like to go. When arriving on
   the link, a waiting time is assigned to the player based on the distribution
-  of players on the link. The vehicle travel time is equal to the time step when
-  they first reach their destination. See module docstring for more information.
+  of players on the link. The vehicle arrival time is equal to the time step
+  when they first reach their destination. See module docstring for more
+  information.
 
   Attributes inherited from GameInfo:
     max_chance_outcomes: maximum number of chance actions. Set to the length of
       od_demand, i.e. the number of `OriginDestinationDemand`s.
     max_game_length: maximum number of time step played. Passed during
       construction.
-    max_utility: maximum utility is the opposite of the minimum travel
+    max_utility: maximum utility is the opposite of the minimum arrival
       time. Set to 0.
-    min_utility: minimum utility is the opposite of the maximum travel
+    min_utility: minimum utility is the opposite of the maximum arrival
       time. Set to - max_game_length - 1.
     num_distinct_actions: maximum number of possible actions. This is
       equal to the number of links + 1 (corresponding to having no
@@ -215,7 +216,7 @@ class MeanFieldRoutingGame(pyspiel.Game):
     if section is None:
       return 0
     start_node, end_node = (
-        dynamic_routing_utils._road_section_to_nodes(section))  # pylint:disable=protected-access
+        dynamic_routing_utils._nodes_from_road_section(section))  # pylint:disable=protected-access
     return self.network.get_action_id_from_movement(start_node, end_node)
 
 
@@ -229,9 +230,9 @@ class MeanFieldRoutingGameState(pyspiel.State):
     _is_chance_init: boolean that encodes weither the current node is the
       initial chance node.
     _is_terminal: boolean that encodes weither the game is over.
-    _max_travel_time: int that encodes maximum travel time on any link in number
-      of time steps. Needed to enumerate all the possible state of a vehicle
-      being on a link to compute volume of cars on the link.
+    _max_arrival_time: int that encodes maximum arrival time on any link in
+      number of time steps. Needed to enumerate all the possible state of a
+      vehicle being on a link to compute volume of cars on the link.
     _max_waiting_time: maximum time a vehicle can wait on a time. This is done
       in order to limit the number of possible state with a vehicle on a
       specific link.
@@ -246,9 +247,9 @@ class MeanFieldRoutingGameState(pyspiel.State):
       corresponding to this state. It is associated to the representative
       vehicle after the initial chance node according to the od_demand
       distribution.
-    _vehicle_final_travel_time: the travel time of the representative vehicle,
-      the travel is either 0 if the vehicle is still in the network or its
-      travel time if the vehicle has reached its destination.
+    _vehicle_final_arrival_time: the arrival time of the representative vehicle,
+      the arrival is either 0 if the vehicle is still in the network or its
+      arrival time if the vehicle has reached its destination.
     _vehicle_location: current location of the vehicle as a network road
       section.
     _vehicle_without_legal_action: boolean that encodes if the representative
@@ -261,13 +262,13 @@ class MeanFieldRoutingGameState(pyspiel.State):
   _current_time_step: int
   _is_chance_init: bool
   _is_terminal: bool
-  _max_travel_time: int
+  _max_arrival_time: int
   _max_waiting_time: int
   _normed_density_on_vehicle_link: float
   _time_step_length: float
   _vehicle_at_destination: bool
   _vehicle_destination: Optional[str]
-  _vehicle_final_travel_time: float
+  _vehicle_final_arrival_time: float
   _vehicle_location: Optional[str]
   _vehicle_without_legal_action: bool
   _waiting_time: int
@@ -284,13 +285,13 @@ class MeanFieldRoutingGameState(pyspiel.State):
     self._player_id = pyspiel.PlayerId.CHANCE
     self._time_step_length = time_step_length
     self._vehicle_at_destination = False
-    self._vehicle_final_travel_time = 0.0
+    self._vehicle_final_arrival_time = 0.0
     self._vehicle_without_legal_action = False
     self._vehicle_location = None
     self._vehicle_destination = None
-    self._max_travel_time = self.get_game().max_game_length()
+    self._max_arrival_time = self.get_game().max_game_length()
     # TODO(cabannes): cap maximum link waiting time to faster simulations.
-    self._max_waiting_time = self._max_travel_time
+    self._max_waiting_time = self._max_arrival_time
     self._waiting_time = WAITING_TIME_NOT_ASSIGNED
 
   @property
@@ -318,7 +319,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
         player_id,
         waiting_time,
         destination or self._vehicle_destination,
-        self._vehicle_final_travel_time,
+        self._vehicle_final_arrival_time,
     )
 
   def distribution_support(self) -> List[str]:
@@ -344,7 +345,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
             waiting_time=waiting_time,
             destination=destination)
         for waiting_time in range(WAITING_TIME_NOT_ASSIGNED,
-                                  self._max_travel_time)
+                                  self._max_arrival_time)
         for destination in {od._destination for od in od_demand}  # pylint:disable=protected-access
     ]
     assert len(set(dist)) == len(dist), (
@@ -417,7 +418,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
       return [dynamic_routing_utils.NO_POSSIBLE_ACTION]
     if self._waiting_time > 0:
       return [dynamic_routing_utils.NO_POSSIBLE_ACTION]
-    _, end_section_node = dynamic_routing_utils._road_section_to_nodes(  # pylint:disable=protected-access
+    _, end_section_node = dynamic_routing_utils._nodes_from_road_section(  # pylint:disable=protected-access
         self._vehicle_location)
     successors = self.get_game().network.get_successors(end_section_node)
     if self.get_game().perform_sanity_checks:
@@ -475,14 +476,14 @@ class MeanFieldRoutingGameState(pyspiel.State):
               self.get_game().network.get_road_section_from_action_id(action))
           # Has the vehicle just reached its destination?
           if self._vehicle_location == self._vehicle_destination:
-            self._vehicle_final_travel_time = self._current_time_step
+            self._vehicle_final_arrival_time = self._current_time_step
             self._vehicle_at_destination = True
             self._vehicle_without_legal_action = True
           # Will the vehicle have a legal action for next time step?
           elif self.get_game().network.is_location_at_sink_node(
               self._vehicle_location):
             self._vehicle_without_legal_action = True
-            self._vehicle_final_travel_time = -self.get_game().min_utility()
+            self._vehicle_final_arrival_time = -self.get_game().min_utility()
           else:
             self._waiting_time = WAITING_TIME_NOT_ASSIGNED
       self._current_time_step += 1
@@ -497,7 +498,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     if self._current_time_step >= self.get_game().max_game_length():
       self._is_terminal = True
       if not self._vehicle_at_destination:
-        self._vehicle_final_travel_time = -self.get_game().min_utility()
+        self._vehicle_final_arrival_time = -self.get_game().min_utility()
 
   def _action_to_string(self, player, action) -> str:
     """Action -> string."""
@@ -526,7 +527,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     """Total reward for each player over the course of the game so far."""
     if not self._is_terminal:
       return [0]
-    return [-self._vehicle_final_travel_time * self._time_step_length]
+    return [-self._vehicle_final_arrival_time * self._time_step_length]
 
   def get_location_as_int(self) -> int:
     """Returns the vehicle location.

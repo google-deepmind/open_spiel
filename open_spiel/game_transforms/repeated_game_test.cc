@@ -91,6 +91,51 @@ void RepeatedRockPaperScissorsDefaultsTest() {
   RepeatedRockPaperScissorsTest(repeated_game);
 }
 
+void RepeatedRockPaperScissorsRecallTwoTest() {
+  GameParameters params;
+  params["num_repetitions"] = GameParameter(1000);
+  params["recall"] = GameParameter(2);
+  std::shared_ptr<const Game> repeated_game =
+      CreateRepeatedGame("matrix_rps", params);
+  SPIEL_CHECK_EQ(repeated_game->GetType().max_num_players, 2);
+  SPIEL_CHECK_EQ(repeated_game->GetType().min_num_players, 2);
+  SPIEL_CHECK_EQ(repeated_game->GetType().utility, GameType::Utility::kZeroSum);
+  SPIEL_CHECK_EQ(repeated_game->GetType().reward_model,
+                 GameType::RewardModel::kRewards);
+  SPIEL_CHECK_TRUE(repeated_game->GetType().provides_observation_tensor);
+  SPIEL_CHECK_FALSE(repeated_game->GetType().provides_information_state_tensor);
+
+  // One-hot encoding of each player's previous action.
+  SPIEL_CHECK_EQ(repeated_game->ObservationTensorShape()[0], 12);
+
+  std::vector<std::vector<int>> observation_tensors = {
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  // first
+      {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},  // second
+      {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0}   // subsequent...
+  };
+  std::vector<std::string> observation_strings = {
+      "",                          // first observation
+      "Rock Rock ",                // second
+      "Rock Rock Rock Rock "       // subsequent...
+  };
+
+  std::unique_ptr<State> state = repeated_game->NewInitialState();
+  int step = 0;
+  while (!state->IsTerminal()) {
+    int obs_idx = std::min(step, 2);
+    SPIEL_CHECK_EQ(state->ObservationString(0), observation_strings[obs_idx]);
+    SPIEL_CHECK_EQ(state->ObservationString(1), observation_strings[obs_idx]);
+    SPIEL_CHECK_TRUE(absl::c_equal(state->ObservationTensor(0),
+                                   observation_tensors[obs_idx]));
+    SPIEL_CHECK_TRUE(absl::c_equal(state->ObservationTensor(1),
+                                   observation_tensors[obs_idx]));
+    state->ApplyActions({0, 0});
+    step += 1;
+  }
+
+  SPIEL_CHECK_EQ(step, 1000);
+}
+
 void RepeatedRockPaperScissorsInfoStateEnabledTest() {
   GameParameters params;
   params["num_repetitions"] = GameParameter(3);
@@ -104,12 +149,22 @@ void RepeatedRockPaperScissorsInfoStateEnabledTest() {
                  GameType::RewardModel::kRewards);
   SPIEL_CHECK_TRUE(repeated_game->GetType().provides_observation_tensor);
   SPIEL_CHECK_TRUE(repeated_game->GetType().provides_information_state_tensor);
+  SPIEL_CHECK_TRUE(repeated_game->GetType().provides_information_state_string);
 
   // One-hot encoding of each player's previous action.
   SPIEL_CHECK_EQ(repeated_game->ObservationTensorShape()[0], 6);
 
   // One-hot encoding of each player's previous action times num_repetitions.
   SPIEL_CHECK_EQ(repeated_game->InformationStateTensorShape()[0], 18);
+
+  // Check information_state_string
+  std::unique_ptr<State> state = repeated_game->NewInitialState();
+  SPIEL_CHECK_EQ(state->InformationStateString(), "");
+  state->ApplyActions({0, 0});
+  SPIEL_CHECK_EQ(state->InformationStateString(), "Rock Rock ;");
+  state->ApplyActions({1, 2});
+  SPIEL_CHECK_EQ(state->InformationStateString(),
+                 "Rock Rock ;Paper Scissors ;");
 
   RepeatedRockPaperScissorsTest(repeated_game);
 }
@@ -124,6 +179,8 @@ void RepeatedPrisonersDilemaTest() {
   SPIEL_CHECK_EQ(repeated_game->GetType().min_num_players, 2);
   SPIEL_CHECK_EQ(repeated_game->GetType().utility,
                  GameType::Utility::kGeneralSum);
+  // repeated_game->UtilitySum() should raise an error. This is checked in
+  // game_transforms_test.py as it's simpler to catch the error from Python.
   SPIEL_CHECK_EQ(repeated_game->GetType().reward_model,
                  GameType::RewardModel::kRewards);
 
@@ -155,6 +212,7 @@ void RepeatedPrisonersDilemaTest() {
 int main(int argc, char** argv) {
   open_spiel::BasicRepeatedGameTest();
   open_spiel::RepeatedRockPaperScissorsDefaultsTest();
+  open_spiel::RepeatedRockPaperScissorsRecallTwoTest();
   open_spiel::RepeatedRockPaperScissorsInfoStateEnabledTest();
   open_spiel::RepeatedPrisonersDilemaTest();
 }
