@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_UTILS_CIRCULAR_BUFFER_H_
 
 #include <algorithm>
+#include <iterator>
 #include <random>
 #include <vector>
 
