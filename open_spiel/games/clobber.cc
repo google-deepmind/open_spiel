@@ -390,7 +390,7 @@ void ClobberState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  TensorView<kCellStates> view(values, {kNumPlayers + 1, rows_, columns_},
+  TensorView<3> view(values, {kCellStates, rows_, columns_},
                                true);
 
   // Observation Tensor Representation:
