@@ -92,14 +92,12 @@ MeanFieldRoutingGame::MeanFieldRoutingGame(const GameParameters& params)
   network_ = std::move(data->network_);
   od_demand_ = std::move(data->od_demand_);
   network_->CheckListOfOdDemandIsCorrect(od_demand_.get());
-  game_info_ = {
-      .num_distinct_actions = network_->num_actions(),
-      .max_chance_outcomes = static_cast<int>(od_demand_->size()),
-      .num_players = kNumPlayers,
-      .min_utility = static_cast<double>(-max_num_time_step - 1),
-      .max_utility = 0,
-      .max_game_length = max_num_time_step,
-  };
+  game_info_.num_distinct_actions = network_->num_actions();
+  game_info_.max_chance_outcomes = static_cast<int>(od_demand_->size());
+  game_info_.num_players = kNumPlayers;
+  game_info_.min_utility = static_cast<double>(-max_num_time_step - 1);
+  game_info_.max_utility = 0;
+  game_info_.max_game_length = max_num_time_step;
 }
 
 std::unique_ptr<State> MeanFieldRoutingGame::DeserializeState(
