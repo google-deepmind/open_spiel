@@ -47,6 +47,9 @@ void init_pyspiel_games_euchre(py::module& m) {
       .def("active_players", &EuchreState::ActivePlayers)
       .def("dealer", &EuchreState::Dealer)
       .def("current_phase", &EuchreState::CurrentPhase)
+      .def("card_holder", &EuchreState::CardHolder)
+      .def("card_rank", &EuchreState::CardRank)
+      .def("card_string", &EuchreState::CardString)
       // Pickle support
       .def(py::pickle(
           [](const EuchreState& state) {  // __getstate__

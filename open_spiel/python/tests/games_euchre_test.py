@@ -43,6 +43,11 @@ class GamesEuchreTest(absltest.TestCase):
     self.assertEqual(state.active_players(), [True, True, True, True])
     self.assertEqual(state.dealer(), pyspiel.INVALID_ACTION)
     self.assertEqual(state.current_phase(), 0)
+    self.assertEqual(state.card_holder(), [None] * 24)
+    self.assertEqual(state.card_rank(3), 0)
+    self.assertEqual(state.card_rank(4), 1)
+    self.assertEqual(state.card_string(0), 'C9')
+    self.assertEqual(state.card_string(23), 'SA')
 
 
 if __name__ == '__main__':

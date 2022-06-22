@@ -148,6 +148,12 @@ class EuchreState : public State {
   std::vector<bool> ActivePlayers() const { return active_players_; }
   Player Dealer() const { return dealer_; }
   int CurrentPhase() const { return static_cast<int>(phase_); }
+  std::array<absl::optional<Player>, kNumCards> CardHolder() const {
+    return holder_;
+  }
+  int CardRank(int card) const { return euchre::CardRank(card); }
+  std::string CardString(int card) const { return euchre::CardString(card); }
+
 
  protected:
   void DoApplyAction(Action action) override;
