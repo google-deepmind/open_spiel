@@ -57,7 +57,7 @@ void ISMCTSTest_PlayGame(const std::string& game_name) {
   auto evaluator =
       std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);
 
-  for (algorithms::ISMCTSFinalPolicyType type:
+  for (algorithms::ISMCTSFinalPolicyType type :
        {algorithms::ISMCTSFinalPolicyType::kNormalizedVisitCount,
         algorithms::ISMCTSFinalPolicyType::kMaxVisitCount,
         algorithms::ISMCTSFinalPolicyType::kMaxValue}) {
