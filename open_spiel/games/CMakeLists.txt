@@ -465,7 +465,7 @@ add_executable(nfg_game_test nfg_game_test.cc ${OPEN_SPIEL_OBJECTS}
 add_test(nfg_game_test nfg_game_test)
 
 add_executable(nim_test nim_test.cc ${OPEN_SPIEL_OBJECTS}
-        $<TARGET_OBJECTS:tests>)
+               $<TARGET_OBJECTS:tests>)
 add_test(nim_test nim_test)
 
 add_executable(oh_hell_test oh_hell_test.cc ${OPEN_SPIEL_OBJECTS}

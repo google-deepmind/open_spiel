@@ -19,8 +19,8 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace nim {
@@ -80,6 +80,9 @@ NimGame::NimGame(const GameParameters &params)
 }
 
 int NimGame::NumDistinctActions() const {
+  if (piles_.empty()) {
+    return 0;
+  }
   // action_id = (take - 1) * num_piles_ + pile_idx < (max_take - 1) * num_piles_ + num_piles = max_take * num_piles_
   int max_take = *std::max_element(piles_.begin(), piles_.end());
   return num_piles_ * max_take + 1;
@@ -197,7 +200,6 @@ void NimState::ObservationTensor(Player player,
   for (std::size_t pile_idx = 0; pile_idx < piles_.size(); pile_idx++) {
     WriteIntToObservation(values, offset, piles_[pile_idx]);
   }
-  return values;
 }
 
 void NimState::UndoAction(Player player, Action move) {
