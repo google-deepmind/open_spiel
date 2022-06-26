@@ -113,6 +113,8 @@ set(GAME_SOURCES
   negotiation.h
   nfg_game.cc
   nfg_game.h
+  nim.cc
+  nim.h
   oh_hell.cc
   oh_hell.h
   oshi_zumo.cc
@@ -461,6 +463,10 @@ add_executable(nfg_game_test nfg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(nfg_game_test nfg_game_test)
+
+add_executable(nim_test nim_test.cc ${OPEN_SPIEL_OBJECTS}
+        $<TARGET_OBJECTS:tests>)
+add_test(nim_test nim_test)
 
 add_executable(oh_hell_test oh_hell_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
