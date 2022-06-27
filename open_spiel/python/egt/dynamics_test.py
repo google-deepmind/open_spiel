@@ -63,7 +63,8 @@ class _InternalTest(absltest.TestCase):
     expected_2 = np.asarray([expected_0, expected_1, expected_2])
     np.testing.assert_array_equal(expected, expected_2)
 
-    np.testing.assert_array_equal(expected, _sum_j_x_j_ln_x_j_over_x_i(x))
+    np.testing.assert_array_almost_equal(expected,
+                                         _sum_j_x_j_ln_x_j_over_x_i(x))
 
 
 class DynamicsTest(parameterized.TestCase):

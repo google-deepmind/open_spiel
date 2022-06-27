@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2022 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -132,6 +132,29 @@ class EuchreState : public State {
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
+  int NumCardsDealt() const { return num_cards_dealt_; }
+  int NumCardsPlayed() const { return num_cards_played_; }
+  int NumPasses() const { return num_passes_; }
+  int Upcard() const { return upcard_; }
+  int Discard() const { return discard_; }
+  int TrumpSuit() const { return static_cast<int>(trump_suit_); }
+  int LeftBower() const { return left_bower_; }
+  int Declarer() const { return declarer_; }
+  int FirstDefender() const { return first_defender_; }
+  int DeclarerPartner() const { return declarer_partner_; }
+  int SecondDefender() const { return second_defender_; }
+  absl::optional<bool> DeclarerGoAlone() const { return declarer_go_alone_; }
+  Player LoneDefender() const { return lone_defender_; }
+  std::vector<bool> ActivePlayers() const { return active_players_; }
+  Player Dealer() const { return dealer_; }
+  int CurrentPhase() const { return static_cast<int>(phase_); }
+  std::array<absl::optional<Player>, kNumCards> CardHolder() const {
+    return holder_;
+  }
+  int CardRank(int card) const { return euchre::CardRank(card); }
+  std::string CardString(int card) const { return euchre::CardString(card); }
+
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -218,6 +241,9 @@ class EuchreGame : public Game {
         (kNumPlayers * kNumTricks) +  // Deal hands
         1;                            // Upcard
   }
+
+  int MaxBids() const { return kMaxBids; }
+  int NumCards() const { return kNumCards; }
 
  private:
   const bool allow_lone_defender_;

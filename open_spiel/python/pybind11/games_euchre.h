@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/spiel.h"
-#include "open_spiel/tests/basic_tests.h"
+#ifndef OPEN_SPIEL_PYTHON_PYBIND11_GAMES_EUCHRE_H_
+#define OPEN_SPIEL_PYTHON_PYBIND11_GAMES_EUCHRE_H_
 
+#include "open_spiel/python/pybind11/pybind11.h"
+
+// Initialize the Python interface for euchre.
 namespace open_spiel {
-namespace euchre {
-namespace {
-
-void BasicGameTests() {
-  testing::LoadGameTest("euchre");
-  testing::ChanceOutcomesTest(*LoadGame("euchre"));
-  testing::RandomSimTest(*LoadGame("euchre"), 10);
+void init_pyspiel_games_euchre(::pybind11::module &m);
 }
 
-
-}  // namespace
-}  // namespace euchre
-}  // namespace open_spiel
-
-int main(int argc, char** argv) {
-  open_spiel::euchre::BasicGameTests();
-}
+#endif  // OPEN_SPIEL_PYTHON_PYBIND11_GAMES_EUCHRE_H_

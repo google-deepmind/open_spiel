@@ -15,13 +15,14 @@
 #ifndef OPEN_SPIEL_GAME_PARAMETERS_H_
 #define OPEN_SPIEL_GAME_PARAMETERS_H_
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "open_spiel/spiel_utils.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
@@ -157,6 +158,9 @@ class GameParameter {
       case Type::kUnset:
         return rhs.type_ == Type::kUnset;
     }
+    std::cerr << "Unrecognized parameter type in operator=="
+              << ", returning false." << std::endl;
+    return false;
   }
   bool operator!=(const GameParameter& rhs) const { return !(*this == rhs); }
 

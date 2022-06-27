@@ -90,6 +90,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_bridge.h
   pybind11/games_chess.cc
   pybind11/games_chess.h
+  pybind11/games_euchre.cc
+  pybind11/games_euchre.h
   pybind11/games_kuhn_poker.cc
   pybind11/games_kuhn_poker.h
   pybind11/games_leduc_poker.cc
@@ -218,6 +220,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/bot_test.py
   tests/game_transforms_test.py
   tests/games_bridge_test.py
+  tests/games_euchre_test.py
   tests/games_sim_test.py
   tests/policy_test.py
   tests/pyspiel_test.py

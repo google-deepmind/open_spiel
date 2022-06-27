@@ -82,7 +82,7 @@ std::vector<Action> PyState::LegalActions(Player player) const {
                                 LegalActions, player);
   } else if (player < 0) {
     SpielFatalError(
-        absl::StrCat("Called LegalActions for psuedo-player ", player));
+        absl::StrCat("Called LegalActions for pseudo-player ", player));
   } else {
     return {};
   }
