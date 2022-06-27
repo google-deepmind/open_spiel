@@ -380,6 +380,10 @@ std::string AmazonsState::ActionToString(Player player, Action action) const {
       return absl::StrCat(StateToString(PlayerToState(player)),
                           " Shoot:  ", str);
   }
+
+  std::cerr << "Unhandled case in AmazonState::ActionToString, "
+            << "returning empty string." << std::endl;
+  return "";
 }
 
 // Looks okay
