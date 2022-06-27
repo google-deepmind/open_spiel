@@ -42,7 +42,15 @@ void init_pyspiel_games_euchre(py::module& m) {
       .def("first_defender", &EuchreState::FirstDefender)
       .def("declarer_partner", &EuchreState::DeclarerPartner)
       .def("second_defender", &EuchreState::SecondDefender)
-      .def("declarer_go_alone", &EuchreState::DeclarerGoAlone)
+      .def("declarer_go_alone", [](const EuchreState& state) {
+        // absl::optional not directly supported in pybind11.
+        absl::optional<bool> declarer_go_alone = state.DeclarerGoAlone();
+        if (declarer_go_alone.has_value()) {
+          return declarer_go_alone.value();
+        } else {
+          return py::none;
+        }
+      })
       .def("lone_defender", &EuchreState::LoneDefender)
       .def("active_players", &EuchreState::ActivePlayers)
       .def("dealer", &EuchreState::Dealer)
