@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_GAME_PARAMETERS_H_
 #define OPEN_SPIEL_GAME_PARAMETERS_H_
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -157,6 +158,9 @@ class GameParameter {
       case Type::kUnset:
         return rhs.type_ == Type::kUnset;
     }
+    std::cerr << "Unrecognized parameter type in operator=="
+              << ", returning false." << std::endl;
+    return false;
   }
   bool operator!=(const GameParameter& rhs) const { return !(*this == rhs); }
 
