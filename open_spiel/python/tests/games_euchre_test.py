@@ -38,7 +38,7 @@ class GamesEuchreTest(absltest.TestCase):
     self.assertEqual(state.first_defender(), pyspiel.PlayerId.INVALID)
     self.assertEqual(state.declarer_partner(), pyspiel.PlayerId.INVALID)
     self.assertEqual(state.second_defender(), pyspiel.PlayerId.INVALID)
-    self.assertIsNone(state.declarer_go_alone(), None)
+    self.assertFalse(state.declarer_go_alone_has_value())
     self.assertEqual(state.lone_defender(), pyspiel.PlayerId.INVALID)
     self.assertEqual(state.active_players(), [True, True, True, True])
     self.assertEqual(state.dealer(), pyspiel.INVALID_ACTION)
