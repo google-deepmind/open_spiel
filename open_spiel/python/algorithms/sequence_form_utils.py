@@ -102,8 +102,6 @@ def _construct_vars(state, infosets, infoset_actions_to_seq,
         infosets: a list of dicts, one per player, that maps infostate to an id. The
             dicts are filled by this function and should initially only contain root
             values.
-        leaves: a list of dicts, one per player, that includes all terminal decision
-            nodes for the player.
         infoset_actions_to_seq: a list of dicts, one per player, that maps a string of
             (infostate, action) pair to an id. The dicts are filled by this function
             and should inirially only contain the root values.

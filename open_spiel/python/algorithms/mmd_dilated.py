@@ -97,6 +97,11 @@ class MMDDilatedEnt(object):
     ```python
         gap = mmd.get_gap()
     ```
+    The policy (i.e. behavioural form policy) can be retrieved:
+    ```python
+        policies = mmd.get_policies()
+    ```
+
     The average sequences and policies can be retrieved:
 
     ```python
@@ -114,7 +119,7 @@ class MMDDilatedEnt(object):
 
         Args:
             game: a zeros-um spiel game with two players.
-            alpha: weight dilated entropy regularization. If alpha > 0
+            alpha: weight of dilated entropy regularization. If alpha > 0
                 MMD will converge to an alpha-QRE. If alpha = 0 mmd will converge
                 to Nash on average.
             stepsize: MMD stepsize. Will be set automatically if None.
