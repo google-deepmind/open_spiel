@@ -48,7 +48,7 @@ void init_pyspiel_games_euchre(py::module& m) {
         if (declarer_go_alone.has_value()) {
           return declarer_go_alone.value();
         } else {
-          return py::none;
+          return py::none();
         }
       })
       .def("lone_defender", &EuchreState::LoneDefender)
