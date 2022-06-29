@@ -22,6 +22,7 @@ from open_spiel.python.algorithms.sequence_form_utils import uniform_random_seq,
 from open_spiel.python.algorithms.sequence_form_utils import is_root, _EMPTY_INFOSET_ACTION_KEYS, _EMPTY_INFOSET_KEYS
 from open_spiel.python import policy
 import copy
+import warnings
 
 def neg_entropy(probs):
     return -entropy(probs)
@@ -81,7 +82,9 @@ class MMDDilatedEnt(object):
     two-player zero-sum extensive-form game. If \alpha is set
     to zero then the method is equivalent to mirror descent ascent
     over the sequence form with dilated entropy and the policies
-    will converge on average to a nash equilibrium.
+    will converge on average to a nash equilibrium with
+    the appropriate stepsize schedule (or approximate equilirbrium
+    for fixed stepsize).
 
     The main iteration loop is implemented in `update_sequences`:
 
@@ -145,6 +148,9 @@ class MMDDilatedEnt(object):
             self.stepsize = stepsize
         else:
             self.stepsize = self.alpha/(np.max(np.abs(self.payoff_mat))**2)
+
+        if self.stepsize == 0.:
+            warnings.warn("MMD stepsize is 0, probably because alpha = 0.")
 
         self.sequences = uniform_random_seq(game, self.infoset_actions_to_seq)
         self.avg_sequences = copy.deepcopy(self.sequences)

@@ -1,5 +1,5 @@
 """ Example of using MMD with dilated entropy
-    to compute a Nash Eq in Kuhn Poker """
+    to compute approximate Nash Eq in Kuhn Poker """
 
 
 from absl import app
@@ -7,7 +7,6 @@ from absl import flags
 
 from open_spiel.python.algorithms import mmd_dilated
 from open_spiel.python.algorithms import exploitability
-
 import pyspiel
 
 FLAGS = flags.FLAGS
@@ -19,6 +18,7 @@ flags.DEFINE_integer("print_freq", 100, "How often to print the exploitability")
 
 def main(_):
   game = pyspiel.load_game(FLAGS.game)
+  # need to manually set stepsize if alpha = 0
   mmd = mmd_dilated.MMDDilatedEnt(game, alpha=0, stepsize=1)
 
   for i in range(FLAGS.iterations):
