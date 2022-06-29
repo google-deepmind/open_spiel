@@ -19,6 +19,7 @@
 #include "open_spiel/games/euchre.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
+#include "pybind11_abseil/absl_casters.h"
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::euchre::EuchreGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::euchre::EuchreState);
