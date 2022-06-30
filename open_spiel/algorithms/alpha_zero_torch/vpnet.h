@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -144,7 +144,7 @@ class VPNetModel {
   // members' (model_config_, model_, model_optimizer_) declaration in
   // the order shown below so the member initialization list works.
   ModelConfig model_config_;
-  ResModel model_;
+  Model model_;
   torch::optim::Adam model_optimizer_;
   torch::Device torch_device_;
 };

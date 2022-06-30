@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
@@ -37,8 +38,8 @@ const GameType kGameType{
     GameType::Information::kPerfectInformation,
     GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
+    /*max_num_players=*/kMaxNumPlayers,
+    /*min_num_players=*/kMinNumPlayers,
     /*provides_information_state_string=*/true,
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
@@ -50,6 +51,7 @@ const GameType kGameType{
         {"wall_count",
          GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
         {"ansi_color_output", GameParameter(false)},
+        {"players", GameParameter(kMinNumPlayers, false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -144,15 +146,56 @@ QuoridorState::QuoridorState(std::shared_ptr<const Game> game, int board_size,
       board_diameter_(board_size * 2 - 1),
       ansi_color_output_(ansi_color_output) {
   board_.resize(board_diameter_ * board_diameter_, kPlayerNone);
-  wall_count_[kPlayer1] = wall_count;
-  wall_count_[kPlayer2] = wall_count;
-  int start_x = board_size - (board_size % 2);
-  player_loc_[kPlayer1] = GetMove(start_x, board_diameter_ - 1);
-  player_loc_[kPlayer2] = GetMove(start_x, 0);
-  SetPlayer(player_loc_[kPlayer1], kPlayer1, kPlayerNone);
-  SetPlayer(player_loc_[kPlayer2], kPlayer2, kPlayerNone);
-  end_zone_[kPlayer1] = player_loc_[kPlayer2].y;
-  end_zone_[kPlayer2] = player_loc_[kPlayer1].y;
+  players_.resize(num_players_);
+  // Account for order of turns (order of play is clockwise)
+  if (num_players_ == 2) {
+    players_[0] = kPlayer1;
+    players_[1] = kPlayer2;
+  } else if (num_players_ == 3) {
+    players_[0] = kPlayer1;
+    players_[1] = kPlayer3;
+    players_[2] = kPlayer2;
+  } else if (num_players_ == 4) {
+    players_[0] = kPlayer1;
+    players_[1] = kPlayer3;
+    players_[2] = kPlayer2;
+    players_[3] = kPlayer4;
+  }
+  wall_count_.resize(num_players_);
+  player_loc_.resize(num_players_);
+  end_zone_.resize(num_players_);
+  for (int i = 0; i < num_players_; ++i) {
+    wall_count_[players_[i]] = wall_count;
+    InitializePlayer(players_[i]);
+  }
+}
+
+void QuoridorState::InitializePlayer(QuoridorPlayer p) {
+  int center_field = board_size_ - (board_size_ % 2);
+  if (p == kPlayer1) {
+    player_loc_[p] = GetMove(center_field, board_diameter_ - 1);
+    SetPlayer(player_loc_[p], p, kPlayerNone);
+    end_zone_[p] = 0;
+    return;
+  }
+  if (p == kPlayer2) {
+    player_loc_[p] = GetMove(center_field, 0);
+    SetPlayer(player_loc_[p], kPlayer2, kPlayerNone);
+    end_zone_[p] = board_diameter_ - 1;
+    return;
+  }
+  if (p == kPlayer3) {
+    player_loc_[p] = GetMove(0, center_field);
+    SetPlayer(player_loc_[p], p, kPlayerNone);
+    end_zone_[p] = board_diameter_ - 1;
+    return;
+  }
+  if (p == kPlayer4) {
+    player_loc_[p] = GetMove(board_diameter_ - 1, center_field);
+    SetPlayer(player_loc_[p], p, kPlayerNone);
+    end_zone_[p] = 0;
+    return;
+  }
 }
 
 Move QuoridorState::ActionToMove(Action action_id) const {
@@ -178,8 +221,9 @@ std::vector<Action> QuoridorState::LegalActions() const {
   // Wall placements.
   if (wall_count_[current_player_] > 0) {
     SearchState search_state(board_diameter_);
-    SearchShortestPath(kPlayer1, &search_state);
-    SearchShortestPath(kPlayer2, &search_state);
+    for (int i = 0; i < num_players_; ++i) {
+      SearchShortestPath(players_[i], &search_state);
+    }
     for (int y = 0; y < board_diameter_ - 2; y += 2) {
       for (int x = 0; x < board_diameter_ - 2; x += 2) {
         Move h = GetMove(x, y + 1);
@@ -192,6 +236,11 @@ std::vector<Action> QuoridorState::LegalActions() const {
         }
       }
     }
+  }
+
+  // If no action is possible add 'pass' action to list of moves
+  if (moves.empty()) {
+    moves.push_back(cur.xy);
   }
 
   std::sort(moves.begin(), moves.end());
@@ -213,23 +262,33 @@ void QuoridorState::AddActions(Move cur, Offset offset,
     moves->push_back(forward.xy);
     return;
   }
+
   // Other player, so which jumps are valid?
 
   if (!IsWall(cur + offset * 3)) {
-    // A normal jump is allowed. We know that spot is empty.
-    moves->push_back((cur + offset * 4).xy);
-    return;
+    // In two-players: A normal jump is allowed. We know that spot is empty.
+    // In >2 players, must check.
+    if (GetPlayer(cur + offset * 4) == kPlayerNone) {
+      moves->push_back((cur + offset * 4).xy);
+      return;
+    } else {
+      return;
+    }
   }
   // We are jumping over the other player against a wall, which side jumps are
   // valid?
 
   Offset left = offset.rotate_left();
   if (!IsWall(forward + left)) {
-    moves->push_back((forward + left * 2).xy);
+    if (GetPlayer(forward + left * 2) == kPlayerNone) {
+      moves->push_back((forward + left * 2).xy);
+    }
   }
   Offset right = offset.rotate_right();
   if (!IsWall(forward + right)) {
-    moves->push_back((forward + right * 2).xy);
+    if (GetPlayer(forward + right * 2) == kPlayerNone) {
+      moves->push_back((forward + right * 2).xy);
+    }
   }
 }
 
@@ -267,8 +326,12 @@ bool QuoridorState::IsValidWall(Move m, SearchState* search_state) const {
   if (count <= 1) return true;
 
   // Do a full search to verify both players can get to their respective goals.
-  return (SearchEndZone(kPlayer1, m, m + offset * 2, search_state) &&
-          SearchEndZone(kPlayer2, m, m + offset * 2, search_state));
+  bool pathExists = true;
+  for (int i = 0; i < num_players_; ++i) {
+    pathExists = pathExists &&
+                 SearchEndZone(players_[i], m, m + offset * 2, search_state);
+  }
+  return pathExists;
 }
 
 bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
@@ -284,7 +347,15 @@ bool QuoridorState::SearchEndZone(QuoridorPlayer p, Move wall1, Move wall2,
       Move wall = c + dir;
       if (!IsWall(wall) && wall != wall1 && wall != wall2) {
         Move move = c + dir * 2;
-        if (move.y == goal) {
+        int moveCoord;
+        if (p == kPlayer1 || p == kPlayer2) {
+          moveCoord = move.y;
+        } else if (p == kPlayer3 || p == kPlayer4) {
+          moveCoord = move.x;
+        } else {
+          SpielFatalError("Case not handled for player in SearchEndZone.");
+        }
+        if (moveCoord == goal) {
           return true;
         }
         search_state->Push(goal_dir * (goal - move.y), move);
@@ -315,13 +386,22 @@ void QuoridorState::SearchShortestPath(QuoridorPlayer p,
       Move wall = c + dir;
       if (!IsWall(wall)) {
         Move move = c + dir * 2;
-        if (move.y == goal) {
+        int moveCoord;
+        if (p == kPlayer1 || p == kPlayer2) {
+          moveCoord = move.y;
+        } else if (p == kPlayer3 || p == kPlayer4) {
+          moveCoord = move.x;
+        } else {
+          SpielFatalError("Case not handled for player in SearchShortestPath");
+        }
+        if (moveCoord == goal) {
           search_state->SetDist(move, dist + 1);
           search_state->ClearSearchQueue();  // Break out of the search.
           goal_found = move;
           break;
         }
-        if (search_state->Push(dist + 1 + goal_dir * (goal - move.y), move)) {
+        if (search_state->Push(dist + 1 + goal_dir * (goal - moveCoord),
+                               move)) {
           search_state->SetDist(move, dist + 1);
         }
       }
@@ -359,42 +439,60 @@ std::string QuoridorState::ToString() const {
   // Generates something like:
   // Board size: 5, walls: 0, 0
   //    a   b   c   d   e
-  //  1 . | .   .   .   .
+  //  1 . | .   .   .   . 1
   //      +        ---+---
-  //  2 . | . | .   .   .
+  //  2 . | . | .   .   . 2
   //          +
-  //  3 .   . | O   @   .
+  //  3 .   . | O   @   . 3
   //   ---+---
-  //  4 . | .   .   .   .
+  //  4 . | .   .   .   . 4
   //      +    ---+---
-  //  5 . | .   .   .   .
+  //  5 . | .   .   .   . 5
+  //    a   b   c   d   e
 
-  std::string white = " O ";
-  std::string black = " @ ";
-  std::string coord = "";
-  std::string reset = "";
+  std::string reset;
+  std::array<std::string, 4> colors, coords;
   if (ansi_color_output_) {
     std::string esc = "\033";
     reset = esc + "[0m";
-    coord = esc + "[1;37m";                  // bright white
-    white = esc + "[1;33m" + " @ " + reset;  // bright yellow
-    black = esc + "[1;34m" + " @ " + reset;  // bright blue
+    coords[0] = esc + "[1;33m";
+    coords[1] = esc + "[1;34m";
+    coords[2] = esc + "[1;35m";
+    coords[3] = esc + "[1;36m";
+    colors[0] = esc + "[1;33m" + " O " + reset;
+    colors[1] = esc + "[1;34m" + " @ " + reset;
+    colors[2] = esc + "[1;35m" + " # " + reset;
+    colors[3] = esc + "[1;36m" + " % " + reset;
+  } else {
+    std::string reset = "";
+    coords[0] = "";
+    coords[1] = "";
+    coords[2] = "";
+    coords[3] = "";
+    colors[0] = " 0 ";
+    colors[1] = " @ ";
+    colors[2] = " # ";
+    colors[3] = " % ";
   }
 
   std::ostringstream out;
-  out << "Board size: " << board_size_ << ", walls: " << wall_count_[kPlayer1]
-      << ", " << wall_count_[kPlayer2] << "\n";
+  out << "Board size: " << board_size_ << ", walls: ";
+  for (int i = 0; i < num_players_; ++i) {
+    out << wall_count_[players_[i]];
+    if (i < num_players_ - 1) out << ", ";
+  }
+  out << "\n";
 
   // Top x coords.
   for (int x = 0; x < board_size_; ++x) {
-    out << "   " << coord << static_cast<char>('a' + x);
+    out << "   " << coords[1] << static_cast<char>('a' + x);
   }
   out << reset << '\n';
 
   for (int y = 0; y < board_diameter_; ++y) {
     if (y % 2 == 0) {
       if (y / 2 + 1 < 10) out << " ";
-      out << coord << (y / 2 + 1) << reset;  // Leading y coord.
+      out << coords[2] << (y / 2 + 1) << reset;  // Leading y coord.
     } else {
       out << "  ";  // Wall lines.
     }
@@ -402,7 +500,16 @@ std::string QuoridorState::ToString() const {
     for (int x = 0; x < board_diameter_; ++x) {
       QuoridorPlayer p = GetPlayer(GetMove(x, y));
       if (x % 2 == 0 && y % 2 == 0) {
-        out << (p == kPlayer1 ? white : p == kPlayer2 ? black : " . ");
+        bool playerFound = false;
+        for (int i = 0; i < num_players_; ++i) {
+          if (p == players_[i]) {
+            out << colors[players_[i]];
+            playerFound = true;
+          }
+        }
+        if (!playerFound) {
+          out << " . ";
+        }
       } else if (x % 2 == 1 && y % 2 == 1) {
         out << (p == kPlayerWall ? "+" : " ");
       } else if (x % 2 == 1) {
@@ -411,16 +518,34 @@ std::string QuoridorState::ToString() const {
         out << (p == kPlayerWall ? "---" : "   ");
       }
     }
+    if (y % 2 == 0) {
+      if (y / 2 + 1 < 10) out << " ";
+      out << coords[3] << (y / 2 + 1) << reset;  // y coord on the right.
+    } else {
+      out << "  ";  // Wall lines.
+    }
     out << '\n';
   }
+  // Bottom x coords.
+  for (int x = 0; x < board_size_; ++x) {
+    out << "   " << coords[0] << static_cast<char>('a' + x);
+  }
+  out << reset << '\n';
   return out.str();
 }
 
 std::vector<double> QuoridorState::Returns() const {
-  if (outcome_ == kPlayer1) return {1, -1};
-  if (outcome_ == kPlayer2) return {-1, 1};
-  if (outcome_ == kPlayerDraw) return {0, 0};
-  return {0, 0};  // Unfinished
+  std::vector<double> res(num_players_, 0.0);
+  for (int i = 0; i < num_players_; ++i) {
+    if (outcome_ == players_[i]) {
+      // If someone as won, set their reward to +1 and all the others to
+      // -1 / (num_players - 1).
+      std::fill(res.begin(), res.end(), -1.0 / (num_players_ - 1));
+      res[i] = 1.0;
+      break;
+    }
+  }
+  return res;
 }
 
 std::string QuoridorState::InformationStateString(Player player) const {
@@ -441,20 +566,25 @@ void QuoridorState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   TensorView<2> view(
-      values, {kCellStates + kNumPlayers, static_cast<int>(board_.size())},
+      values, {NumCellStates() + num_players_, static_cast<int>(board_.size())},
       true);
 
   for (int i = 0; i < board_.size(); ++i) {
-    if (board_[i] < kCellStates) {
+    if (board_[i] < NumCellStates()) {
       view[{static_cast<int>(board_[i]), i}] = 1.0;
     }
-    view[{kCellStates + kPlayer1, i}] = wall_count_[kPlayer1];
-    view[{kCellStates + kPlayer2, i}] = wall_count_[kPlayer2];
+    for (int j = 0; j < num_players_; ++j) {
+      view[{NumCellStates() + players_[j], i}] = wall_count_[players_[j]];
+    }
   }
 }
 
 void QuoridorState::DoApplyAction(Action action) {
-  SPIEL_CHECK_EQ(board_[action], kPlayerNone);
+  // If players is forced to pass it is valid to stay in place, on a field where
+  // there is already a player
+  if (board_[action] != current_player_) {
+    SPIEL_CHECK_EQ(board_[action], kPlayerNone);
+  }
   SPIEL_CHECK_EQ(outcome_, kPlayerNone);
 
   Move move = ActionToMove(action);
@@ -471,7 +601,15 @@ void QuoridorState::DoApplyAction(Action action) {
     SetPlayer(move, current_player_, kPlayerNone);
     player_loc_[current_player_] = move;
 
-    if (move.y == end_zone_[current_player_]) {
+    int end_zone_coord;
+    if (current_player_ == kPlayer1 || current_player_ == kPlayer2) {
+      end_zone_coord = move.y;
+    } else {
+      end_zone_coord = move.x;
+    }
+
+    outcome_ = kPlayerNone;
+    if (end_zone_coord == end_zone_[current_player_]) {
       outcome_ = current_player_;
     }
   }
@@ -481,7 +619,9 @@ void QuoridorState::DoApplyAction(Action action) {
     outcome_ = kPlayerDraw;
   }
 
-  current_player_ = (current_player_ == kPlayer1 ? kPlayer2 : kPlayer1);
+  current_player_index_ += 1;
+  if (current_player_index_ == num_players_) current_player_index_ = 0;
+  current_player_ = players_[current_player_index_];
 }
 
 std::unique_ptr<State> QuoridorState::Clone() const {
@@ -493,7 +633,8 @@ QuoridorGame::QuoridorGame(const GameParameters& params)
       board_size_(ParameterValue<int>("board_size")),
       wall_count_(
           ParameterValue<int>("wall_count", board_size_ * board_size_ / 8)),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output")) {}
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")),
+      num_players_(ParameterValue<int>("players")) {}
 
 }  // namespace quoridor
 }  // namespace open_spiel

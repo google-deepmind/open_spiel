@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/games/universal_poker.h"
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -22,15 +23,17 @@
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
-#include "open_spiel/utils/init.h"
 #include "open_spiel/utils/file.h"
+#include "open_spiel/utils/init.h"
 
 ABSL_FLAG(std::string, subgames_data_dir, "universal_poker/endgames",
           "Directory containing the subgames data.");
@@ -639,6 +642,7 @@ void TestSubgameCreation() {
   test_game(3750, "JsKs5cQs7d", uniform_reaches);
   test_game(3750, "JsKs5cQs7d", ReadSubgameReachProbs("subgame4"));
 }
+
 void TestRandomSubgameCreation() {
   std::mt19937 rng;
   MakeRandomSubgame(rng);
@@ -650,6 +654,39 @@ void TestRandomSubgameCreation() {
     uniform_reaches.push_back(1. / (2 * kSubgameUniqueHands));
   }
   MakeRandomSubgame(rng, 100, "7s9h9cTc", uniform_reaches);
+}
+
+void TestHalfCallHalfRaise() {
+  std::string bot_string =
+      "uniform_restricted_actions(policy_name=HalfCallHalfRaise)";
+  for (const std::string& game_string :
+           std::vector<std::string>({ HulhGameString("fullgame"),
+                                      "leduc_poker" })) {
+    std::shared_ptr<const Game> game = LoadGame(game_string);
+    std::vector<std::unique_ptr<Bot>> owned_bots;
+    owned_bots.push_back(LoadBot(bot_string, game, /*player_id=*/0));
+    owned_bots.push_back(LoadBot(bot_string, game, /*player_id=*/1));
+    std::vector<Bot*> bots = {owned_bots[0].get(), owned_bots[1].get()};
+    EvaluateBots(*game, bots);
+  }
+}
+
+void TestFixedPreferenceBots() {
+  for (std::string bot_string : {
+           "uniform_restricted_actions(policy_name=AlwaysCall)",
+           "uniform_restricted_actions(policy_name=AlwaysRaise)",
+           "uniform_restricted_actions(policy_name=AlwaysFold)",
+       }) {
+    for (std::string game_string : {HunlGameString("fcpa"),
+                                    HulhGameString("fullgame")}) {
+      std::shared_ptr<const Game> game = LoadGame(game_string);
+      std::vector<std::unique_ptr<Bot>> owned_bots;
+      owned_bots.push_back(LoadBot(bot_string, game, /*player_id=*/0));
+      owned_bots.push_back(LoadBot(bot_string, game, /*player_id=*/1));
+      std::vector<Bot*> bots = {owned_bots[0].get(), owned_bots[1].get()};
+      EvaluateBots(*game, bots);
+    }
+  }
 }
 
 }  // namespace
@@ -678,4 +715,6 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::TestHoleIndexCalculation();
   open_spiel::universal_poker::TestSubgameCreation();
   open_spiel::universal_poker::TestRandomSubgameCreation();
+  open_spiel::universal_poker::TestHalfCallHalfRaise();
+  open_spiel::universal_poker::TestFixedPreferenceBots();
 }

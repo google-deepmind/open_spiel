@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,18 +51,15 @@ class RoshamboBot : public Bot {
  public:
   explicit RoshamboBot(int player_id, std::string bot_name);
   Action Step(const State& state) override;
-  void InformActions(const State& state,
-                     const std::vector<Action>& actions) override;
-  void Restart() override;
 
  private:
   Player player_id_;
+  Player opponent_id_;
   std::string bot_name_;
-  std::vector<int> my_history_;
-  std::vector<int> opp_history_;
 };
 
 std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name);
+std::vector<std::string> RoshamboBotNames();
 
 }  // namespace roshambo
 }  // namespace open_spiel

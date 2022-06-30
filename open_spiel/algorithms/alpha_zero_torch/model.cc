@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,7 @@ std::istream& operator>>(std::istream& stream, ModelConfig& config) {
 
   stream >> channels >> height >> width >> config.number_of_actions >>
       config.nn_depth >> config.nn_width >> config.learning_rate >>
-      config.weight_decay;
+      config.weight_decay >> config.nn_model;
 
   config.observation_tensor_shape = {channels, height, width};
 
@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream& stream, const ModelConfig& config) {
          << config.observation_tensor_shape[2] << " "
          << config.number_of_actions << " " << config.nn_depth << " "
          << config.nn_width << " " << config.learning_rate << " "
-         << config.weight_decay;
+         << config.weight_decay << " " << config.nn_model;
   return stream;
 }
 
@@ -208,58 +208,119 @@ std::vector<torch::Tensor> ResOutputBlockImpl::forward(torch::Tensor x,
   return {value_output, policy_logits};
 }
 
-ResModelImpl::ResModelImpl(const ModelConfig& config, const std::string& device)
+MLPOutputBlockImpl::MLPOutputBlockImpl(const int nn_width,
+                                       const int policy_linear_out_features)
+    : value_linear1_(torch::nn::LinearOptions(
+                         /*in_features=*/nn_width,
+                         /*out_features=*/nn_width)
+                         .bias(true)),
+      value_linear2_(torch::nn::LinearOptions(
+                         /*in_features=*/nn_width,
+                         /*out_features=*/1)
+                         .bias(true)),
+      policy_linear1_(torch::nn::LinearOptions(
+                          /*input_channels=*/nn_width,
+                          /*output_channels=*/nn_width)
+                          .bias(true)),
+      policy_linear2_(torch::nn::LinearOptions(
+                          /*in_features=*/nn_width,
+                          /*out_features=*/policy_linear_out_features)
+                          .bias(true)) {
+  register_module("value_linear_1", value_linear1_);
+  register_module("value_linear_2", value_linear2_);
+  register_module("policy_linear_1", policy_linear1_);
+  register_module("policy_linear_2", policy_linear2_);
+}
+
+std::vector<torch::Tensor> MLPOutputBlockImpl::forward(torch::Tensor x,
+                                                       torch::Tensor mask) {
+  torch::Tensor value_output = torch::relu(value_linear1_(x));
+  value_output = torch::tanh(value_linear2_(value_output));
+
+  torch::Tensor policy_logits = torch::relu(policy_linear1_(x));
+  policy_logits = policy_linear2_(policy_logits);
+  policy_logits = torch::where(mask, policy_logits,
+                               -(1 << 16) * torch::ones_like(policy_logits));
+
+  return {value_output, policy_logits};
+}
+
+ModelImpl::ModelImpl(const ModelConfig& config, const std::string& device)
     : device_(device),
       num_torso_blocks_(config.nn_depth),
       weight_decay_(config.weight_decay) {
-  int channels = config.observation_tensor_shape[0];
-  int height = config.observation_tensor_shape[1];
-  int width = config.observation_tensor_shape[2];
+  // Save config.nn_model to class
+  nn_model_ = config.nn_model;
 
-  ResInputBlockConfig input_config = {/*input_channels=*/channels,
-                                      /*input_height=*/height,
-                                      /*input_width=*/width,
-                                      /*filters=*/config.nn_width,
-                                      /*kernel_size=*/3,
-                                      /*padding=*/1};
-
-  ResTorsoBlockConfig residual_config = {/*input_channels=*/config.nn_width,
-                                         /*filters=*/config.nn_width,
-                                         /*kernel_size=*/3,
-                                         /*padding=*/1};
-
-  ResOutputBlockConfig output_config = {
-      /*input_channels=*/config.nn_width,
-      /*value_filters=*/1,
-      /*policy_filters=*/2,
-      /*kernel_size=*/1,
-      /*padding=*/0,
-      /*value_linear_in_features=*/1 * width * height,
-      /*value_linear_out_features=*/config.nn_width,
-      /*policy_linear_in_features=*/2 * width * height,
-      /*policy_linear_out_features=*/config.number_of_actions,
-      /*value_observation_size=*/1 * width * height,
-      /*policy_observation_size=*/2 * width * height};
-
-  layers_->push_back(ResInputBlock(input_config));
-  for (int i = 0; i < num_torso_blocks_; i++) {
-    layers_->push_back(ResTorsoBlock(residual_config, i));
+  int input_size = 1;
+  for (const auto& num : config.observation_tensor_shape) {
+    if (num > 0) {
+      input_size *= num;
+    }
   }
-  layers_->push_back(ResOutputBlock(output_config));
+  int channels = config.observation_tensor_shape[0];
+  // Decide if resnet or MLP
+  if (config.nn_model == "resnet") {
+    int height = config.observation_tensor_shape[1];
+    int width = config.observation_tensor_shape[2];
 
-  register_module("layers", layers_);
+    ResInputBlockConfig input_config = {/*input_channels=*/channels,
+                                        /*input_height=*/height,
+                                        /*input_width=*/width,
+                                        /*filters=*/config.nn_width,
+                                        /*kernel_size=*/3,
+                                        /*padding=*/1};
+
+    ResTorsoBlockConfig residual_config = {/*input_channels=*/config.nn_width,
+                                           /*filters=*/config.nn_width,
+                                           /*kernel_size=*/3,
+                                           /*padding=*/1};
+
+    ResOutputBlockConfig output_config = {
+        /*input_channels=*/config.nn_width,
+        /*value_filters=*/1,
+        /*policy_filters=*/2,
+        /*kernel_size=*/1,
+        /*padding=*/0,
+        /*value_linear_in_features=*/1 * width * height,
+        /*value_linear_out_features=*/config.nn_width,
+        /*policy_linear_in_features=*/2 * width * height,
+        /*policy_linear_out_features=*/config.number_of_actions,
+        /*value_observation_size=*/1 * width * height,
+        /*policy_observation_size=*/2 * width * height};
+
+    layers_->push_back(ResInputBlock(input_config));
+    for (int i = 0; i < num_torso_blocks_; i++) {
+      layers_->push_back(ResTorsoBlock(residual_config, i));
+    }
+    layers_->push_back(ResOutputBlock(output_config));
+
+    register_module("layers", layers_);
+
+  } else if (config.nn_model == "mlp") {
+    layers_->push_back(torch::nn::Linear(input_size, config.nn_width));
+    for (int i = 0; i < num_torso_blocks_; i++) {
+      layers_->push_back(torch::nn::Linear(config.nn_width, config.nn_width));
+    }
+    layers_->push_back(
+        MLPOutputBlock(config.nn_width, config.number_of_actions));
+
+    register_module("layers", layers_);
+  } else {
+    throw std::runtime_error("Unknown nn_model: " + config.nn_model);
+  }
 }
 
-std::vector<torch::Tensor> ResModelImpl::forward(torch::Tensor x,
-                                                 torch::Tensor mask) {
+std::vector<torch::Tensor> ModelImpl::forward(torch::Tensor x,
+                                              torch::Tensor mask) {
   std::vector<torch::Tensor> output = this->forward_(x, mask);
   return {output[0], torch::softmax(output[1], 1)};
 }
 
-std::vector<torch::Tensor> ResModelImpl::losses(torch::Tensor inputs,
-                                                torch::Tensor masks,
-                                                torch::Tensor policy_targets,
-                                                torch::Tensor value_targets) {
+std::vector<torch::Tensor> ModelImpl::losses(torch::Tensor inputs,
+                                             torch::Tensor masks,
+                                             torch::Tensor policy_targets,
+                                             torch::Tensor value_targets) {
   std::vector<torch::Tensor> output = this->forward_(inputs, masks);
 
   torch::Tensor value_predictions = output[0];
@@ -296,17 +357,31 @@ std::vector<torch::Tensor> ResModelImpl::losses(torch::Tensor inputs,
   return {policy_loss, value_loss, l2_regularization_loss};
 }
 
-std::vector<torch::Tensor> ResModelImpl::forward_(torch::Tensor x,
-                                                  torch::Tensor mask) {
+std::vector<torch::Tensor> ModelImpl::forward_(torch::Tensor x,
+                                               torch::Tensor mask) {
   std::vector<torch::Tensor> output;
-  for (int i = 0; i < num_torso_blocks_ + 2; i++) {
-    if (i == 0) {
-      x = layers_[i]->as<ResInputBlock>()->forward(x);
-    } else if (i >= num_torso_blocks_ + 1) {
-      output = layers_[i]->as<ResOutputBlock>()->forward(x, mask);
-    } else {
-      x = layers_[i]->as<ResTorsoBlock>()->forward(x);
+  if (this->nn_model_ == "resnet") {
+    for (int i = 0; i < num_torso_blocks_ + 2; i++) {
+      if (i == 0) {
+        x = layers_[i]->as<ResInputBlock>()->forward(x);
+      } else if (i >= num_torso_blocks_ + 1) {
+        output = layers_[i]->as<ResOutputBlock>()->forward(x, mask);
+      } else {
+        x = layers_[i]->as<ResTorsoBlock>()->forward(x);
+      }
     }
+  } else if (this->nn_model_ == "mlp") {
+    for (int i = 0; i < num_torso_blocks_ + 2; i++) {
+      if (i == 0) {
+        x = layers_[i]->as<torch::nn::Linear>()->forward(x);
+      } else if (i >= num_torso_blocks_ + 1) {
+        output = layers_[i]->as<MLPOutputBlockImpl>()->forward(x, mask);
+      } else {
+        x = layers_[i]->as<torch::nn::Linear>()->forward(x);
+      }
+    }
+  } else {
+    throw std::runtime_error("Unknown nn_model: " + this->nn_model_);
   }
   return output;
 }

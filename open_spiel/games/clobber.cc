@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -364,7 +364,9 @@ bool ClobberState::MovesRemaining() const {
 bool ClobberState::IsTerminal() const { return outcome_ != kInvalidPlayer; }
 
 std::vector<double> ClobberState::Returns() const {
-  if (outcome_ == Player{0}) {
+  if (outcome_ == kInvalidPlayer) {
+    return {0., 0.};
+  } else if (outcome_ == Player{0}) {
     return {1.0, -1.0};
   } else {
     return {-1.0, 1.0};
@@ -388,7 +390,7 @@ void ClobberState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  TensorView<kCellStates> view(values, {kNumPlayers + 1, rows_, columns_},
+  TensorView<3> view(values, {kCellStates, rows_, columns_},
                                true);
 
   // Observation Tensor Representation:

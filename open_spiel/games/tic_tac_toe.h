@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,8 +44,8 @@ inline constexpr int kNumberStates = 5478;
 // State of a cell.
 enum class CellState {
   kEmpty,
-  kNought,
-  kCross,
+  kNought,  // O
+  kCross,   // X
 };
 
 // State of an in-play game.
@@ -74,6 +74,10 @@ class TicTacToeState : public State {
   CellState BoardAt(int row, int column) const {
     return board_[row * kNumCols + column];
   }
+  Player outcome() const { return outcome_; }
+
+  // Only used by Ultimate Tic-Tac-Toe.
+  void SetCurrentPlayer(Player player) { current_player_ = player; }
 
  protected:
   std::array<CellState, kNumCells> board_;
@@ -107,6 +111,10 @@ class TicTacToeGame : public Game {
 
 CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
+
+// Does this player have a line?
+bool BoardHasLine(const std::array<CellState, kNumCells>& board,
+                  const Player player);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
   return stream << StateToString(state);

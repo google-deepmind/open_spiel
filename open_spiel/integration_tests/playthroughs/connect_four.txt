@@ -61,8 +61,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
 
@@ -100,8 +100,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
 
@@ -139,8 +139,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
 
@@ -178,8 +178,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
 
@@ -217,8 +217,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["x0", "x1", "x2", "x3", "x4", "x5", "x6"]
 
@@ -256,8 +256,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["o0", "o1", "o2", "o3", "o4", "o5", "o6"]
 
@@ -339,5 +339,5 @@ ObservationTensor(1):
 ◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◯◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯  ◯◉◉◉◉◉◉
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉
-Rewards() = [1.0, -1.0]
-Returns() = [1.0, -1.0]
+Rewards() = [1, -1]
+Returns() = [1, -1]

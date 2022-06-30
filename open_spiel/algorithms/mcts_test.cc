@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,14 +23,17 @@
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
 
+using open_spiel::algorithms::Evaluator;
+using open_spiel::algorithms::RandomRolloutEvaluator;
+
 namespace open_spiel {
 namespace {
 
 constexpr double UCT_C = 2;
 
-std::unique_ptr<open_spiel::Bot> InitBot(
-    const open_spiel::Game& game, int max_simulations,
-    std::shared_ptr<open_spiel::algorithms::Evaluator> evaluator) {
+std::unique_ptr<open_spiel::Bot> InitBot(const open_spiel::Game& game,
+                                         int max_simulations,
+                                         std::shared_ptr<Evaluator> evaluator) {
   return std::make_unique<open_spiel::algorithms::MCTSBot>(
       game, std::move(evaluator), UCT_C, max_simulations,
       /*max_memory_mb=*/5, /*solve=*/true, /*seed=*/42, /*verbose=*/false);
@@ -39,8 +42,7 @@ std::unique_ptr<open_spiel::Bot> InitBot(
 void MCTSTest_CanPlayTicTacToe() {
   auto game = LoadGame("tic_tac_toe");
   int max_simulations = 100;
-  auto evaluator =
-      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(20, 42);
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
   auto bot0 = InitBot(*game, max_simulations, evaluator);
   auto bot1 = InitBot(*game, max_simulations, evaluator);
   auto results =
@@ -48,11 +50,23 @@ void MCTSTest_CanPlayTicTacToe() {
   SPIEL_CHECK_EQ(results[0] + results[1], 0);
 }
 
+void MCTSTest_CanPlayTicTacToe_LowSimulations() {
+  auto game = LoadGame("tic_tac_toe");
+  // Setting max_simulations to 0 or 1 is equivalent to sampling from the prior.
+  for (const int max_simulations : {0, 1}) {
+    auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
+    auto bot0 = InitBot(*game, max_simulations, evaluator);
+    auto bot1 = InitBot(*game, max_simulations, evaluator);
+    auto results = EvaluateBots(game->NewInitialState().get(),
+                                {bot0.get(), bot1.get()}, 42);
+    SPIEL_CHECK_EQ(results[0] + results[1], 0);
+  }
+}
+
 void MCTSTest_CanPlayBothSides() {
   auto game = LoadGame("tic_tac_toe");
   int max_simulations = 100;
-  auto evaluator =
-      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(20, 42);
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
   auto bot = InitBot(*game, max_simulations, evaluator);
   auto results =
       EvaluateBots(game->NewInitialState().get(), {bot.get(), bot.get()}, 42);
@@ -62,8 +76,7 @@ void MCTSTest_CanPlayBothSides() {
 void MCTSTest_CanPlaySinglePlayer() {
   auto game = LoadGame("catch");
   int max_simulations = 100;
-  auto evaluator =
-      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(20, 42);
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
   auto bot = InitBot(*game, max_simulations, evaluator);
   auto results = EvaluateBots(game->NewInitialState().get(), {bot.get()}, 42);
   SPIEL_CHECK_GT(results[0], 0);
@@ -72,8 +85,7 @@ void MCTSTest_CanPlaySinglePlayer() {
 void MCTSTest_CanPlayThreePlayerStochasticGames() {
   auto game = LoadGame("pig(players=3,winscore=20,horizon=30)");
   int max_simulations = 1000;
-  auto evaluator =
-      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(20, 42);
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
   auto bot0 = InitBot(*game, max_simulations, evaluator);
   auto bot1 = InitBot(*game, max_simulations, evaluator);
   auto bot2 = InitBot(*game, max_simulations, evaluator);
@@ -98,8 +110,7 @@ SearchTicTacToeState(const absl::string_view initial_actions) {
   for (const auto& action_str : absl::StrSplit(initial_actions, ' ')) {
     state->ApplyAction(GetAction(*state, action_str));
   }
-  auto evaluator =
-      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(20, 42);
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
   algorithms::MCTSBot bot(*game, evaluator, UCT_C,
                           /*max_simulations=*/ 10000,
                           /*max_memory_mb=*/ 10,
@@ -143,8 +154,7 @@ void MCTSTest_SolveWin() {
 void MCTSTest_GarbageCollect() {
   auto game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
-  auto evaluator =
-      std::make_shared<open_spiel::algorithms::RandomRolloutEvaluator>(1, 42);
+  auto evaluator = std::make_shared<RandomRolloutEvaluator>(1, 42);
   algorithms::MCTSBot bot(*game, evaluator, UCT_C,
                           /*max_simulations=*/ 1000000,
                           /*max_memory_mb=*/ 1,
@@ -161,6 +171,7 @@ void MCTSTest_GarbageCollect() {
 
 int main(int argc, char** argv) {
   open_spiel::MCTSTest_CanPlayTicTacToe();
+  open_spiel::MCTSTest_CanPlayTicTacToe_LowSimulations();
   open_spiel::MCTSTest_CanPlayBothSides();
   open_spiel::MCTSTest_CanPlaySinglePlayer();
   open_spiel::MCTSTest_CanPlayThreePlayerStochasticGames();

@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -223,12 +223,10 @@ HistoryDistribution GetStateDistribution(const State& state,
         } else {
           // Check for expansion of this candidate. To expand this candidate,
           // the (infostate, action) pair must be contained in the map.
-          for (Action action : states[idx]->LegalActions()) {
-            auto iter = infostate_action_map.find(my_infostate_str);
-            if (iter != infostate_action_map.end() && action == iter->second) {
-              states.push_back(states[idx]->Child(action));
-              probs.push_back(probs[idx]);
-            }
+          auto iter = infostate_action_map.find(my_infostate_str);
+          if (iter != infostate_action_map.end() && iter->second) {
+            states.push_back(states[idx]->Child(iter->second));
+            probs.push_back(probs[idx]);
           }
         }
       } else {
@@ -338,8 +336,6 @@ bool CheckBeliefs(const State& ground_truth_state,
     if (Near(beliefs.second[i], 0.0, 1e-5)) {
       continue;
     }
-    SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),
-                   beliefs.first[i]->FullHistory().size());
     SPIEL_CHECK_EQ(infostate,
                    beliefs.first[i]->InformationStateString(player_id));
     SPIEL_CHECK_EQ(ground_truth_state.FullHistory().size(),

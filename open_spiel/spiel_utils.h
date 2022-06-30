@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -277,6 +277,16 @@ bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, ")"))
 
+// A verbose checker that will print state info:
+// Use as SPIEL_CHECK_TRUE_WSI(bool cond, const std::string& error_message,
+//                             const Game& game_ref, const State& state_ref)
+#define SPIEL_CHECK_TRUE_WSI(x, e, g, s)                         \
+  while (!(x))                                                   \
+  open_spiel::SpielFatalErrorWithStateInfo(                      \
+      open_spiel::internal::SpielStrCat(                         \
+      __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, "): ", e),    \
+      (g), (s))
+
 #define SPIEL_CHECK_FALSE(x)                                     \
   while (x)                                                      \
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
@@ -406,6 +416,19 @@ inline To down_cast(From& f) {
   return *static_cast<ToAsPointer>(&f);
 }
 
+// Creates a sampler from a std::function<double()> conforming to the
+// probabilities received. absl::discrete_distribution requires a URBG as a
+// source of randomness (as opposed to a std::function<double()>) so cannot
+// be used directly.
+class SamplerFromRng {
+ public:
+  explicit SamplerFromRng(std::function<double()> rng) : rng_(std::move(rng)) {}
+
+  int operator()(absl::Span<const double> probs);
+
+ private:
+  std::function<double()> rng_;
+};
 
 }  // namespace open_spiel
 

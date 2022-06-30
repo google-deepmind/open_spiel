@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,6 +57,9 @@ struct ISMCTSNode {
   int total_visits;
 };
 
+using InfostateResampler = std::function<std::unique_ptr<State>(
+    const State& state, Player pl, std::function<double()> rng)>;
+
 class ISMCTSBot : public Bot {
  public:
   // Construct an IS-MCTS bot. The parameter max_world_samples controls how many
@@ -95,6 +98,8 @@ class ISMCTSBot : public Bot {
   // Bot maintains no history, so these are empty.
   void Restart() override {}
   void RestartAt(const State& state) override {}
+  // Set a custom resampling function.
+  void SetResampler(InfostateResampler cb) { resampler_cb_ = cb; }
 
  private:
   void Reset();
@@ -102,6 +107,9 @@ class ISMCTSBot : public Bot {
 
   ISMCTSStateKey GetStateKey(const State& state) const;
   std::unique_ptr<State> SampleRootState(const State& state);
+  // Dispatch to either domain-specific implementation,
+  // or a specially supplied one via SetResampler()
+  std::unique_ptr<State> ResampleFromInfostate(const State& state);
   ISMCTSNode* CreateNewNode(const State& state);
   ISMCTSNode* LookupNode(const State& state);
   ISMCTSNode* LookupOrCreateNode(const State& state);
@@ -141,6 +149,7 @@ class ISMCTSBot : public Bot {
   const bool use_observation_string_;
   const bool allow_inconsistent_action_sets_;
   ISMCTSNode* root_node_;
+  InfostateResampler resampler_cb_;
 };
 
 }  // namespace algorithms

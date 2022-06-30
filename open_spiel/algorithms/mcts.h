@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -139,6 +139,10 @@ struct SearchNode {
   // The state is needed to convert the action to a string.
   std::string ToString(const State& state) const;
   std::string ChildrenStr(const State& state) const;
+
+  Action SampleFromPrior(const State& state,
+                         Evaluator* evaluator,
+                         std::mt19937* rng) const;
 };
 
 // A SpielBot that uses the MCTS algorithm as its policy.
@@ -155,13 +159,14 @@ class MCTSBot : public Bot {
   // std::shared_ptr<Evaluator> in the constructor leads to the Julia API test
   // failing. We don't know why right now, but intend to fix this.
   MCTSBot(
-      const Game& game, std::shared_ptr<Evaluator> evaluator,
-      double uct_c, int max_simulations,
+      const Game& game, std::shared_ptr<Evaluator> evaluator, double uct_c,
+      int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
       int seed, bool verbose,
       ChildSelectionPolicy child_selection_policy = ChildSelectionPolicy::UCT,
-      double dirichlet_alpha = 0, double dirichlet_epsilon = 0);
+      double dirichlet_alpha = 0, double dirichlet_epsilon = 0,
+      bool dont_return_chance_node = false);
   ~MCTSBot() = default;
 
   void Restart() override {}
@@ -207,6 +212,7 @@ class MCTSBot : public Bot {
   double max_utility_;
   double dirichlet_alpha_;
   double dirichlet_epsilon_;
+  bool dont_return_chance_node_;
   std::mt19937 rng_;
   const ChildSelectionPolicy child_selection_policy_;
   std::shared_ptr<Evaluator> evaluator_;

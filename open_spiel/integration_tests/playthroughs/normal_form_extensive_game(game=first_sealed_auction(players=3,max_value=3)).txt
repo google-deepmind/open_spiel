@@ -44,8 +44,8 @@ InformationStateString(2) = "Observing player: 2. Non-terminal"
 InformationStateTensor(0): ◯
 InformationStateTensor(1): ◯
 InformationStateTensor(2): ◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5]
 LegalActions(1) = [0, 1, 2, 3, 4, 5]
 LegalActions(2) = [0, 1, 2, 3, 4, 5]
@@ -135,5 +135,5 @@ InformationStateString(2) = "Observing player: 2. Terminal. History string: 0, 0
 InformationStateTensor(0): ◉
 InformationStateTensor(1): ◉
 InformationStateTensor(2): ◉
-Rewards() = [0.4444444444444444, 0.4444444444444444, 1.0]
-Returns() = [0.4444444444444444, 0.4444444444444444, 1.0]
+Rewards() = [0.444444444444444, 0.444444444444444, 1]
+Returns() = [0.444444444444444, 0.444444444444444, 1]

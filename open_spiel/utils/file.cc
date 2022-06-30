@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +16,17 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #ifdef _WIN32
 // https://stackoverflow.com/a/42906151
 #include <windows.h>
+#include <direct.h>
+#include <stdio.h>
 #define mkdir(dir, mode) _mkdir(dir)
 #define unlink(file) _unlink(file)
 #define rmdir(dir) _rmdir(dir)
+#else
+#include <unistd.h>
 #endif
 
 #include <cstdio>
@@ -85,6 +88,12 @@ std::string ReadContentsFromFile(const std::string& filename,
                                  const std::string& mode) {
   File f(filename, mode);
   return f.ReadContents();
+}
+
+void WriteContentsToFile(const std::string& filename, const std::string& mode,
+                         const std::string& contents) {
+  File f(filename, mode);
+  f.Write(contents);
 }
 
 bool Exists(const std::string& path) {

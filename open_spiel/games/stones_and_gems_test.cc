@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,14 +33,14 @@ void BasicStonesNGemsTests() {
 
 void BasicStonesNGemsTestsWithParams() {
   constexpr const char kTestDefaultGrid[] =
-      "6,7,20,2\n"
-      "19,19,19,19,19,19\n"
-      "19,01,01,01,01,19\n"
-      "19,02,02,01,01,19\n"
-      "19,01,01,01,01,19\n"
-      "19,00,03,01,02,19\n"
-      "19,05,02,05,01,07\n"
-      "19,19,19,19,19,19";
+      "6|7|20|2\n"
+      "19|19|19|19|19|19\n"
+      "19|01|01|01|01|19\n"
+      "19|02|02|01|01|19\n"
+      "19|01|01|01|01|19\n"
+      "19|00|03|01|02|19\n"
+      "19|05|02|05|01|07\n"
+      "19|19|19|19|19|19";
 
   testing::ChanceOutcomesTest(
       *LoadGame("stones_and_gems",
@@ -53,14 +53,14 @@ void BasicStonesNGemsTestsWithParams() {
 
 void ExtendedStonesNGemsTest() {
   constexpr const char kTestDefaultGrid[] =
-      "6,7,20,2\n"
-      "19,19,19,19,19,19\n"
-      "19,01,01,01,03,19\n"
-      "19,02,02,01,01,19\n"
-      "19,01,01,01,02,19\n"
-      "19,00,03,01,02,19\n"
-      "19,05,02,05,01,07\n"
-      "19,19,19,19,19,19";
+      "6|7|20|2\n"
+      "19|19|19|19|19|19\n"
+      "19|01|01|01|03|19\n"
+      "19|02|02|01|01|19\n"
+      "19|01|01|01|02|19\n"
+      "19|00|03|01|02|19\n"
+      "19|05|02|05|01|07\n"
+      "19|19|19|19|19|19";
 
   constexpr const char kStateToString[] =
       "SSSSSS\n"
@@ -74,13 +74,13 @@ void ExtendedStonesNGemsTest() {
 
   constexpr const char kStateSerialize[] =
       "6,7,20,20,0,10,0,50,-1,1,2,0,0,0,1,42,0\n"
-      "19,19,19,19,19,19\n"
-      "19,1,1,1,3,19\n"
-      "19,2,2,1,1,19\n"
-      "19,1,1,1,2,19\n"
-      "19,0,3,1,2,19\n"
-      "19,5,2,5,1,7\n"
-      "19,19,19,19,19,19";
+      "19,1,19,2,19,3,19,4,19,5,19,6\n"
+      "19,7,1,8,1,9,1,10,3,11,19,12\n"
+      "19,13,2,14,2,15,1,16,1,17,19,18\n"
+      "19,19,1,20,1,21,1,22,2,23,19,24\n"
+      "19,25,0,26,3,27,1,28,2,29,19,30\n"
+      "19,31,5,32,2,33,5,34,1,35,7,36\n"
+      "19,37,19,38,19,39,19,40,19,41,19,42";
 
   // observation tensor index along with corresponding IDs
   const int offset = 6 * 7;

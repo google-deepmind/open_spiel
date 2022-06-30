@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/policy.h"
@@ -184,6 +186,10 @@ class UniformRandomBotFactory : public BotFactory {
     if (IsParameterSpecified(bot_params, "seed")) {
       const GameParameter& seed_param = bot_params.at("seed");
       seed = seed_param.int_value();
+    } else {
+      absl::BitGen gen;
+      seed = absl::Uniform<int>(gen, std::numeric_limits<int>::min(),
+                                std::numeric_limits<int>::max());
     }
     return MakeUniformRandomBot(player_id, seed);
   }

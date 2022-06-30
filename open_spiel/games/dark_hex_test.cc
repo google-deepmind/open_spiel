@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,8 +23,8 @@ namespace testing = open_spiel::testing;
 
 void GameBlackWinWithCollisionAndObs() {
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"row_size", GameParameter(3)},
-                            {"col_size", GameParameter(3)},
+      LoadGame("dark_hex", {{"num_cols", GameParameter(3)},
+                            {"num_rows", GameParameter(3)},
                             {"obstype", GameParameter("reveal-numturns")}});
   std::unique_ptr<State> state = game->NewInitialState();
   std::vector<Action> lm = state->LegalActions();  // initial legal moves
@@ -80,7 +80,7 @@ void GameBlackWinsMaximumCollisions() {
   //   . . .   . . .   . . .   . . .   . . .
   std::shared_ptr<const Game> game = LoadGame(
       "dark_hex",
-      {{"row_size", GameParameter(3)}, {"col_size", GameParameter(3)}});
+      {{"num_cols", GameParameter(3)}, {"num_rows", GameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   std::array play_seq = {0, 1, 4, 2, 7, 5, 8, 6};  // 3 is the terminal move
   for (int i = 0; i < play_seq.size(); ++i) {
@@ -97,7 +97,7 @@ void GameBlackWinsMaximumCollisions() {
 void GameUnevenBoardBlackWin() {
   std::shared_ptr<const Game> game = LoadGame(
       "dark_hex",
-      {{"row_size", GameParameter(4)}, {"col_size", GameParameter(3)}});
+      {{"num_cols", GameParameter(4)}, {"num_rows", GameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(8);
   state->ApplyAction(5);
@@ -115,7 +115,7 @@ void GameUnevenBoardBlackWin() {
 void GameUnevenBoardWhiteWin() {
   std::shared_ptr<const Game> game = LoadGame(
       "dark_hex",
-      {{"row_size", GameParameter(4)}, {"col_size", GameParameter(3)}});
+      {{"num_cols", GameParameter(4)}, {"num_rows", GameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(8);
   state->ApplyAction(5);
@@ -136,7 +136,7 @@ void GameUnevenBoardWhiteWin() {
 void ClassicalDarkHexTests() {
   testing::LoadGameTest("dark_hex");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex"));
-  testing::RandomSimTest(*LoadGame("dark_hex(row_size=5,col_size=5)"), 10);
+  testing::RandomSimTest(*LoadGame("dark_hex(num_cols=5,num_rows=5)"), 10);
   testing::LoadGameTest("dark_hex(obstype=reveal-numturns)");
   GameBlackWinWithCollisionAndObs();
   GameBlackWinsMaximumCollisions();
@@ -146,8 +146,8 @@ void ClassicalDarkHexTests() {
 
 void AbruptDHCustomTest() {
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"row_size", GameParameter(2)},
-                            {"col_size", GameParameter(2)},
+      LoadGame("dark_hex", {{"num_cols", GameParameter(2)},
+                            {"num_rows", GameParameter(2)},
                             {"gameversion", GameParameter("adh")}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(0);
@@ -163,7 +163,7 @@ void AbruptDarkHexTests() {
   testing::LoadGameTest("dark_hex(gameversion=adh)");
   testing::NoChanceOutcomesTest(*LoadGame("dark_hex(gameversion=adh)"));
   testing::RandomSimTest(
-      *LoadGame("dark_hex(row_size=3,col_size=3,gameversion=adh)"), 3);
+      *LoadGame("dark_hex(num_cols=3,num_rows=3,gameversion=adh)"), 3);
   AbruptDHCustomTest();
 }
 

@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -174,6 +174,15 @@ std::string SearchNode::ToString(const State& state) const {
       children.size());
 }
 
+Action SearchNode::SampleFromPrior(const State& state,
+                                   Evaluator* evaluator,
+                                   std::mt19937* rng) const {
+  std::unique_ptr<State> working_state = state.Clone();
+  ActionsAndProbs prior = evaluator->Prior(*working_state);
+  Action chosen_action = SampleAction(prior, *rng).first;
+  return chosen_action;
+}
+
 std::vector<double> dirichlet_noise(int count, double alpha,
                                     std::mt19937* rng) {
   std::vector<double> noise;
@@ -195,7 +204,8 @@ MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
                  double uct_c, int max_simulations, int64_t max_memory_mb,
                  bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
-                 double dirichlet_alpha, double dirichlet_epsilon)
+                 double dirichlet_alpha, double dirichlet_epsilon,
+                 bool dont_return_chance_node)
     : uct_c_{uct_c},
       max_simulations_{max_simulations},
       max_nodes_((max_memory_mb << 20) / sizeof(SearchNode) + 1),
@@ -206,6 +216,7 @@ MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
       max_utility_(game.MaxUtility()),
       dirichlet_alpha_(dirichlet_alpha),
       dirichlet_epsilon_(dirichlet_epsilon),
+      dont_return_chance_node_(dont_return_chance_node),
       rng_(seed),
       child_selection_policy_(child_selection_policy),
       evaluator_(evaluator) {
@@ -219,32 +230,36 @@ MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
 Action MCTSBot::Step(const State& state) {
   absl::Time start = absl::Now();
   std::unique_ptr<SearchNode> root = MCTSearch(state);
-  SPIEL_CHECK_GT(root->children.size(), 0);
 
-  const SearchNode& best = root->BestChild();
+  if (max_simulations_ <= 1) {
+    // sample from prior
+    return root->SampleFromPrior(state, evaluator_.get(), &rng_);
+  } else {
+    // return best action
+    const SearchNode& best = root->BestChild();
 
-  if (verbose_) {
-    double seconds = absl::ToDoubleSeconds(absl::Now() - start);
-    std::cerr
-        << absl::StrFormat(
-               ("Finished %d sims in %.3f secs, %.1f sims/s, "
-                "tree size: %d nodes / %d mb."),
-               root->explore_count, seconds, (root->explore_count / seconds),
-               nodes_, MemoryUsedMb(nodes_))
-        << std::endl;
-    std::cerr << "Root:" << std::endl;
-    std::cerr << root->ToString(state) << std::endl;
-    std::cerr << "Children:" << std::endl;
-    std::cerr << root->ChildrenStr(state) << std::endl;
-    if (!best.children.empty()) {
-      std::unique_ptr<State> chosen_state = state.Clone();
-      chosen_state->ApplyAction(best.action);
-      std::cerr << "Children of chosen:" << std::endl;
-      std::cerr << best.ChildrenStr(*chosen_state) << std::endl;
+    if (verbose_) {
+      double seconds = absl::ToDoubleSeconds(absl::Now() - start);
+      std::cerr << absl::StrFormat(
+                       ("Finished %d sims in %.3f secs, %.1f sims/s, "
+                        "tree size: %d nodes / %d mb."),
+                       root->explore_count, seconds,
+                       (root->explore_count / seconds), nodes_,
+                       MemoryUsedMb(nodes_))
+                << std::endl;
+      std::cerr << "Root:" << std::endl;
+      std::cerr << root->ToString(state) << std::endl;
+      std::cerr << "Children:" << std::endl;
+      std::cerr << root->ChildrenStr(state) << std::endl;
+      if (!best.children.empty()) {
+        std::unique_ptr<State> chosen_state = state.Clone();
+        chosen_state->ApplyAction(best.action);
+        std::cerr << "Children of chosen:" << std::endl;
+        std::cerr << best.ChildrenStr(*chosen_state) << std::endl;
+      }
     }
+    return best.action;
   }
-
-  return best.action;
 }
 
 std::pair<ActionsAndProbs, Action> MCTSBot::StepWithPolicy(const State& state) {
@@ -258,7 +273,8 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
   visit_path->push_back(root);
   std::unique_ptr<State> working_state = state.Clone();
   SearchNode* current_node = root;
-  while (!working_state->IsTerminal() && current_node->explore_count > 0) {
+  while ((!working_state->IsTerminal() && current_node->explore_count > 0) ||
+         (working_state->IsChanceNode() && dont_return_chance_node_)) {
     if (current_node->children.empty()) {
       // For a new node, initialize its state, then choose a child as normal.
       ActionsAndProbs legal_actions = evaluator_->Prior(*working_state);
@@ -281,41 +297,50 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
       nodes_ += current_node->children.capacity();
     }
 
-    SearchNode* chosen_child = nullptr;
-    if (working_state->IsChanceNode()) {
-      // For chance nodes, rollout according to chance node's probability
-      // distribution
-      Action chosen_action =
-          SampleAction(working_state->ChanceOutcomes(), rng_).first;
-
-      for (SearchNode& child : current_node->children) {
-        if (child.action == chosen_action) {
-          chosen_child = &child;
-          break;
-        }
-      }
+    Action selected_action;
+    if (current_node->children.empty()) {
+      // no children, sample from prior
+      selected_action = current_node->SampleFromPrior(state, evaluator_.get(),
+                                                      &rng_);
     } else {
-      // Otherwise choose node with largest UCT value.
-      double max_value = -std::numeric_limits<double>::infinity();
-      for (SearchNode& child : current_node->children) {
-        double val;
-        switch (child_selection_policy_) {
-          case ChildSelectionPolicy::UCT:
-            val = child.UCTValue(current_node->explore_count, uct_c_);
+      // look at children
+      SearchNode* chosen_child = nullptr;
+      if (working_state->IsChanceNode()) {
+        // For chance nodes, rollout according to chance node's probability
+        // distribution
+        Action chosen_action =
+            SampleAction(working_state->ChanceOutcomes(), rng_).first;
+
+        for (SearchNode& child : current_node->children) {
+          if (child.action == chosen_action) {
+            chosen_child = &child;
             break;
-          case ChildSelectionPolicy::PUCT:
-            val = child.PUCTValue(current_node->explore_count, uct_c_);
-            break;
+          }
         }
-        if (val > max_value) {
-          max_value = val;
-          chosen_child = &child;
+      } else {
+        // Otherwise choose node with largest UCT value.
+        double max_value = -std::numeric_limits<double>::infinity();
+        for (SearchNode& child : current_node->children) {
+          double val;
+          switch (child_selection_policy_) {
+            case ChildSelectionPolicy::UCT:
+              val = child.UCTValue(current_node->explore_count, uct_c_);
+              break;
+            case ChildSelectionPolicy::PUCT:
+              val = child.PUCTValue(current_node->explore_count, uct_c_);
+              break;
+          }
+          if (val > max_value) {
+            max_value = val;
+            chosen_child = &child;
+          }
         }
       }
+      selected_action = chosen_child->action;
+      current_node = chosen_child;
     }
 
-    working_state->ApplyAction(chosen_child->action);
-    current_node = chosen_child;
+    working_state->ApplyAction(selected_action);
     visit_path->push_back(current_node);
   }
 

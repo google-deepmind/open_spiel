@@ -56,3 +56,5 @@ open_spiel/cmake-build-debug/
 
 # Swift generated build file
 Package.resolved
+# Visual Studio generated files
+open_spiel/.vs

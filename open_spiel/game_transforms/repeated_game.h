@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,14 +23,25 @@
 #include "open_spiel/spiel.h"
 
 // Transform for creating a repeated game from a normal-form game.
-// https://en.wikipedia.org/wiki/Repeated_game
+// https://en.wikipedia.org/wiki/Repeated_game.
+//
+// Parameters:
+//   "enable_infostate"   bool     Enable the sequence of round outcomes as the
+//                                 information state tensor and string (default:
+//                                 false).
+//   "stage_game"         game     The game that will be repeated.
+//   "num_repetitions"    int      Number of times that the game is repeated.
+//   "recall"             int      Number of previous steps that defines the
+//                                 observations when enable_infostate is false
+//                                 (default: 1).
 
 namespace open_spiel {
 
 class RepeatedState : public SimMoveState {
  public:
   RepeatedState(std::shared_ptr<const Game> game,
-                std::shared_ptr<const Game> stage_game, int num_repetitions);
+                std::shared_ptr<const Game> stage_game, int num_repetitions,
+                int recall);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : kSimultaneousPlayerId;
@@ -40,7 +51,10 @@ class RepeatedState : public SimMoveState {
   bool IsTerminal() const override;
   std::vector<double> Rewards() const override;
   std::vector<double> Returns() const override;
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
@@ -50,11 +64,15 @@ class RepeatedState : public SimMoveState {
   void DoApplyActions(const std::vector<Action>& actions) override;
 
  private:
+  void ObliviousObservationTensor(Player player,
+                                  absl::Span<float> values) const;
+
   std::shared_ptr<const Game> stage_game_;
   // Store a reference initial state of the stage game for efficient calls
   // to state functions (e.g. LegalActions()).
   std::shared_ptr<const State> stage_game_state_;
   int num_repetitions_;
+  int recall_;
   std::vector<std::vector<Action>> actions_history_{};
   std::vector<std::vector<double>> rewards_history_{};
 };
@@ -75,6 +93,10 @@ class RepeatedGame : public SimMoveGame {
   double MaxUtility() const override {
     return stage_game_->MaxUtility() * num_repetitions_;
   }
+  double UtilitySum() const override {
+    return stage_game_->UtilitySum() * num_repetitions_;
+  }
+  std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
 
   const Game* StageGame() const { return stage_game_.get(); }
@@ -82,6 +104,7 @@ class RepeatedGame : public SimMoveGame {
  private:
   std::shared_ptr<const Game> stage_game_;
   const int num_repetitions_;
+  const int recall_;
 };
 
 // Creates a repeated game based on the stage game.

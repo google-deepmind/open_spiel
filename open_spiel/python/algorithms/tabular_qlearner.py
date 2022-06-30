@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +13,6 @@
 # limitations under the License.
 
 """Tabular Q-learning agent."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import collections
 import numpy as np
@@ -77,6 +73,22 @@ class QLearner(rl_agent.AbstractAgent):
     action = np.random.choice(range(self._num_actions), p=probs)
     return action, probs
 
+  def _get_action_probs(self, info_state, legal_actions, epsilon):
+    """Returns a selected action and the probabilities of legal actions.
+
+    To be overwritten by subclasses that implement other action selection
+    methods.
+
+    Args:
+      info_state: hashable representation of the information state.
+      legal_actions: list of actions at `info_state`.
+      epsilon: float: current value of the epsilon schedule or 0 in case
+        evaluation. QLearner uses it as the exploration parameter in
+        epsilon-greedy, but subclasses are free to interpret in different ways
+        (e.g. as temperature in softmax).
+    """
+    return self._epsilon_greedy(info_state, legal_actions, epsilon)
+
   def step(self, time_step, is_evaluation=False):
     """Returns the action to be taken and updates the Q-values if needed.
 
@@ -99,8 +111,7 @@ class QLearner(rl_agent.AbstractAgent):
     # Act step: don't act at terminal states.
     if not time_step.last():
       epsilon = 0.0 if is_evaluation else self._epsilon
-      action, probs = self._epsilon_greedy(
-          info_state, legal_actions, epsilon=epsilon)
+      action, probs = self._get_action_probs(info_state, legal_actions, epsilon)
 
     # Learn step: don't learn during evaluation or at first agent steps.
     if self._prev_info_state and not is_evaluation:

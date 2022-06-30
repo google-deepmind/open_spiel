@@ -1,25 +1,19 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """DQN agent implemented in JAX."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
-import random
 
 import haiku as hk
 import jax
@@ -29,73 +23,19 @@ import optax
 import rlax
 
 from open_spiel.python import rl_agent
+from open_spiel.python.utils.replay_buffer import ReplayBuffer
 
 Transition = collections.namedtuple(
     "Transition",
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
+# Penalty for illegal actions in action selection. In epsilon-greedy, this will
+# prevent them from being selected.
 ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
 
 
-# TODO(perolat): refactor the replay with the NFSP Pytorch implementation
-class ReplayBuffer(object):
-  """ReplayBuffer of fixed size with a FIFO replacement policy.
-
-  Stored transitions can be sampled uniformly.
-
-  The underlying datastructure is a ring buffer, allowing 0(1) adding and
-  sampling.
-  """
-
-  def __init__(self, replay_buffer_capacity):
-    self._replay_buffer_capacity = replay_buffer_capacity
-    self._data = []
-    self._next_entry_index = 0
-
-  def add(self, element):
-    """Adds `element` to the buffer.
-
-    If the buffer is full, the oldest element will be replaced.
-
-    Args:
-      element: data to be added to the buffer.
-    """
-    if len(self._data) < self._replay_buffer_capacity:
-      self._data.append(element)
-    else:
-      self._data[self._next_entry_index] = element
-      self._next_entry_index += 1
-      self._next_entry_index %= self._replay_buffer_capacity
-
-  def sample(self, num_samples):
-    """Returns `num_samples` uniformly sampled from the buffer.
-
-    Args:
-      num_samples: `int`, number of samples to draw.
-
-    Returns:
-      An iterable over `num_samples` random elements of the buffer.
-
-    Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
-    """
-    if len(self._data) < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
-
-  def __len__(self):
-    return len(self._data)
-
-  def __iter__(self):
-    return iter(self._data)
-
-
 class DQN(rl_agent.AbstractAgent):
-  """DQN Agent implementation in JAX.
-
-  See open_spiel/python/examples/breakthrough_dqn.py for an usage example.
-  """
+  """DQN Agent implementation in JAX."""
 
   def __init__(self,
                player_id,
@@ -115,7 +55,9 @@ class DQN(rl_agent.AbstractAgent):
                epsilon_decay_duration=int(1e6),
                optimizer_str="sgd",
                loss_str="mse",
-               huber_loss_parameter=1.0):
+               huber_loss_parameter=1.0,
+               seed=42,
+               gradient_clipping=None):
     """Initialize the DQN agent."""
 
     # This call to locals() is used to store every argument used to initialize
@@ -160,10 +102,8 @@ class DQN(rl_agent.AbstractAgent):
     self.hk_network = hk.without_apply_rng(hk.transform(network))
     self.hk_network_apply = jax.jit(self.hk_network.apply)
 
-    rng = jax.random.PRNGKey(42)
-    x = jnp.ones([1, state_representation_size])
-    self.params_q_network = self.hk_network.init(rng, x)
-    self.params_target_q_network = self.hk_network.init(rng, x)
+    rng = jax.random.PRNGKey(seed)
+    self._create_networks(rng, state_representation_size)
 
     if loss_str == "mse":
       self.loss_func = lambda x: jnp.mean(x**2)
@@ -173,18 +113,31 @@ class DQN(rl_agent.AbstractAgent):
           rlax.huber_loss(x, self.huber_loss_parameter))
     else:
       raise ValueError("Not implemented, choose from 'mse', 'huber'.")
+
     if optimizer_str == "adam":
-      opt_init, opt_update = optax.chain(
-          optax.scale_by_adam(b1=0.9, b2=0.999, eps=1e-8),
-          optax.scale(learning_rate))
+      optimizer = optax.adam(learning_rate)
     elif optimizer_str == "sgd":
-      opt_init, opt_update = optax.sgd(learning_rate)
+      optimizer = optax.sgd(learning_rate)
     else:
       raise ValueError("Not implemented, choose from 'adam' and 'sgd'.")
+
+    # Clipping the gradients prevent divergence and allow more stable training.
+    if gradient_clipping:
+      optimizer = optax.chain(optimizer,
+                              optax.clip_by_global_norm(gradient_clipping))
+
+    opt_init, opt_update = optimizer.init, optimizer.update
+
     self._opt_update_fn = self._get_update_func(opt_update)
     self._opt_state = opt_init(self.params_q_network)
     self._loss_and_grad = jax.value_and_grad(self._loss, has_aux=False)
     self._jit_update = jax.jit(self.get_update())
+
+  def _create_networks(self, rng, state_representation_size):
+    """Called to create the networks."""
+    x = jnp.ones([1, state_representation_size])
+    self.params_q_network = self.hk_network.init(rng, x)
+    self.params_target_q_network = self.hk_network.init(rng, x)
 
   def _get_update_func(self, opt_update):
 
@@ -195,6 +148,11 @@ class DQN(rl_agent.AbstractAgent):
       return new_params, opt_state
 
     return update
+
+  def _get_action_probs(self, info_state, legal_actions, is_evaluation=False):
+    """Returns a selected action and the probabilities of legal actions."""
+    epsilon = self._get_epsilon(is_evaluation)
+    return self._epsilon_greedy(info_state, legal_actions, epsilon)
 
   def step(self, time_step, is_evaluation=False, add_transition_record=True):
     """Returns the action to be taken and updates the Q-network if needed.
@@ -209,13 +167,13 @@ class DQN(rl_agent.AbstractAgent):
     """
 
     # Act step: don't act at terminal info states or if its not our turn.
-    if (not time_step.last()) and (
-        time_step.is_simultaneous_move() or
-        self.player_id == time_step.current_player()):
+    if (not time_step.last()) and (time_step.is_simultaneous_move() or
+                                   self.player_id
+                                   == time_step.current_player()):
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
-      epsilon = self._get_epsilon(is_evaluation)
-      action, probs = self._epsilon_greedy(info_state, legal_actions, epsilon)
+      action, probs = self._get_action_probs(
+          info_state, legal_actions, is_evaluation=is_evaluation)
     else:
       action = None
       probs = []
@@ -315,8 +273,12 @@ class DQN(rl_agent.AbstractAgent):
 
     q_values = self.hk_network.apply(param, info_states)
     target_q_values = self.hk_network.apply(param_target, next_info_states)
-
-    max_next_q = jnp.max(target_q_values + jnp.log(legal_actions_mask), axis=-1)
+    # Sum a large negative constant to illegal action logits before taking the
+    # max. This prevents illegal action values from being considered as target.
+    max_next_q = jnp.max(
+        target_q_values +
+        (1 - legal_actions_mask) * ILLEGAL_ACTION_LOGITS_PENALTY,
+        axis=-1)
     max_next_q = jax.numpy.where(
         1 - are_final_steps, x=max_next_q, y=jnp.zeros_like(max_next_q))
     target = (
@@ -365,8 +327,7 @@ class DQN(rl_agent.AbstractAgent):
     rewards = np.asarray([t.reward for t in transitions])
     next_info_states = np.asarray([t.next_info_state for t in transitions])
     are_final_steps = np.asarray([t.is_final_step for t in transitions])
-    legal_actions_mask = np.asarray(
-        [t.legal_actions_mask for t in transitions])
+    legal_actions_mask = np.asarray([t.legal_actions_mask for t in transitions])
 
     self.params_q_network, self._opt_state, loss_val = self._jit_update(
         self.params_q_network, self.params_target_q_network, self._opt_state,

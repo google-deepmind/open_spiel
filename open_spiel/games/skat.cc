@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -416,7 +416,7 @@ void SkatState::EndBidding(Player winner, SkatGameType game_type) {
     current_player_ = winner;
     game_type_ = game_type;
     // Winner takes up Skat cards.
-    for (int card = 0; card <= kNumCards; card++) {
+    for (int card = 0; card < kNumCards; card++) {
       if (card_locations_[card] == kSkat) {
         card_locations_[card] = PlayerToLocation(winner);
       }
@@ -426,7 +426,7 @@ void SkatState::EndBidding(Player winner, SkatGameType game_type) {
 
 int SkatState::CardsInSkat() const {
   int cards_in_skat = 0;
-  for (int card = 0; card <= kNumCards; card++) {
+  for (int card = 0; card < kNumCards; card++) {
     if (card_locations_[card] == kSkat) cards_in_skat++;
   }
   return cards_in_skat;

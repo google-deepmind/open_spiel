@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,11 @@
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+
+// Optional headers.
+#if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
+#include "open_spiel/bots/roshambo/roshambo_bot.h"
+#endif
 
 namespace open_spiel {
 namespace {
@@ -269,5 +274,14 @@ void init_pyspiel_bots(py::module& m) {
         py::overload_cast<const Game&, Player, int, std::shared_ptr<Policy>>(
             open_spiel::MakePolicyBot),
         "A bot that samples from a policy.");
+
+#if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
+  m.attr("ROSHAMBO_NUM_THROWS") = py::int_(open_spiel::roshambo::kNumThrows);
+  m.attr("ROSHAMBO_NUM_BOTS") = py::int_(open_spiel::roshambo::kNumBots);
+  // no arguments; returns vector of strings
+  m.def("roshambo_bot_names", open_spiel::roshambo::RoshamboBotNames);
+  // args: player_int (int), bot name (string), returns bot
+  m.def("make_roshambo_bot", open_spiel::roshambo::MakeRoshamboBot);
+#endif
 }
 }  // namespace open_spiel

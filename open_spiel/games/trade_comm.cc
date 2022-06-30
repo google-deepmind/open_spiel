@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,7 +43,7 @@ const GameType kGameType{/*short_name=*/"trade_comm",
                          /*max_num_players=*/2,
                          /*min_num_players=*/2,
                          /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/false,
+                         /*provides_information_state_tensor=*/true,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
@@ -151,9 +151,10 @@ std::string TradeCommState::ObservationString(Player player) const {
 }
 
 std::string TradeCommState::InformationStateString(Player player) const {
-  // Warning: This assumes that the game is one step.
-  SPIEL_CHECK_LE(game_->MaxGameLength(), 4);
-  return TradeCommState::ObservationString(player);
+  // Currently the observation and information state are the same, since the
+  // game only contains one step of each phase. This may change in the
+  // multi-step game in the future.
+  return ObservationString(player);
 }
 
 void TradeCommState::ObservationTensor(Player player,
@@ -161,7 +162,7 @@ void TradeCommState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
   std::fill(values.begin(), values.end(), 0);
 
   if (IsChanceNode()) {
@@ -206,6 +207,15 @@ void TradeCommState::ObservationTensor(Player player,
 
   SPIEL_CHECK_EQ(offset, values.size());
 }
+
+void TradeCommState::InformationStateTensor(Player player,
+                                            absl::Span<float> values) const {
+  // Currently the observation and information state are the same, since the
+  // game only contains one step of each phase. This may change in the
+  // multi-step game in the future.
+  ObservationTensor(player, values);
+}
+
 
 TradeCommState::TradeCommState(std::shared_ptr<const Game> game, int num_items)
     : State(game),
@@ -308,6 +318,7 @@ int TradeCommGame::NumDistinctActions() const {
          num_items_ * num_items_;  // 1:1 trades
 }
 
+
 std::vector<int> TradeCommGame::ObservationTensorShape() const {
   return {
       2 +           // one hot vector for whose turn it is
@@ -318,6 +329,13 @@ std::vector<int> TradeCommGame::ObservationTensorShape() const {
       num_items_ +  // one-hot vector for the utterance the player observed
       3             // trade history size
   };
+}
+
+std::vector<int> TradeCommGame::InformationStateTensorShape() const {
+  // Currently the observation and information state are the same, since the
+  // game only contains one step of each phase. This may change in the
+  // multi-step game in the future.
+  return ObservationTensorShape();
 }
 
 }  // namespace trade_comm

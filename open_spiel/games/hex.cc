@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,8 +42,8 @@ const GameType kGameType{/*short_name=*/"hex",
                          /*parameter_specification=*/
                          {
                              {"board_size", GameParameter(kDefaultBoardSize)},
-                             {"row_size", GameParameter(kDefaultBoardSize)},
-                             {"col_size", GameParameter(kDefaultBoardSize)},
+                             {"num_cols", GameParameter(kDefaultBoardSize)},
+                             {"num_rows", GameParameter(kDefaultBoardSize)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -77,60 +77,57 @@ CellState HexState::PlayerAndActionToState(Player player, Action move) const {
   // We know the colour from the argument player
   // For connectedness to the edges, we check if the move is in first/last
   // row/column, or if any of the neighbours are the same colour and connected.
-  switch (player) {
-    case 0: {
-      bool north_connected = false;
-      bool south_connected = false;
-      if (move < row_size_) {  // First row
+  if (player == 0) {
+    bool north_connected = false;
+    bool south_connected = false;
+    if (move < num_cols_) {  // First row
+      north_connected = true;
+    } else if (move >= (board_.size() - num_cols_)) {  // Last row
+      south_connected = true;
+    }
+    for (int neighbour : AdjacentCells(move)) {
+      if (board_[neighbour] == CellState::kBlackNorth) {
         north_connected = true;
-      } else if (move >= row_size_ * (col_size_ - 1)) {  // Last row
+      } else if (board_[neighbour] == CellState::kBlackSouth) {
         south_connected = true;
       }
-      for (int neighbour : AdjacentCells(move)) {
-        if (board_[neighbour] == CellState::kBlackNorth) {
-          north_connected = true;
-        } else if (board_[neighbour] == CellState::kBlackSouth) {
-          south_connected = true;
-        }
-      }
-      if (north_connected && south_connected) {
-        return CellState::kBlackWin;
-      } else if (north_connected) {
-        return CellState::kBlackNorth;
-      } else if (south_connected) {
-        return CellState::kBlackSouth;
-      } else {
-        return CellState::kBlack;
-      }
     }
-    case 1: {
-      bool west_connected = false;
-      bool east_connected = false;
-      if (move % row_size_ == 0) {  // First column
+    if (north_connected && south_connected) {
+      return CellState::kBlackWin;
+    } else if (north_connected) {
+      return CellState::kBlackNorth;
+    } else if (south_connected) {
+      return CellState::kBlackSouth;
+    } else {
+      return CellState::kBlack;
+    }
+  } else if (player == 1) {
+    bool west_connected = false;
+    bool east_connected = false;
+    if (move % num_cols_ == 0) {  // First column
+      west_connected = true;
+    } else if (move % num_cols_ == num_cols_ - 1) {  // Last column
+      east_connected = true;
+    }
+    for (int neighbour : AdjacentCells(move)) {
+      if (board_[neighbour] == CellState::kWhiteWest) {
         west_connected = true;
-      } else if (move % row_size_ == row_size_ - 1) {  // Last column
+      } else if (board_[neighbour] == CellState::kWhiteEast) {
         east_connected = true;
       }
-      for (int neighbour : AdjacentCells(move)) {
-        if (board_[neighbour] == CellState::kWhiteWest) {
-          west_connected = true;
-        } else if (board_[neighbour] == CellState::kWhiteEast) {
-          east_connected = true;
-        }
-      }
-      if (west_connected && east_connected) {
-        return CellState::kWhiteWin;
-      } else if (west_connected) {
-        return CellState::kWhiteWest;
-      } else if (east_connected) {
-        return CellState::kWhiteEast;
-      } else {
-        return CellState::kWhite;
-      }
     }
-    default:
-      SpielFatalError(absl::StrCat("Invalid player id ", player));
-      return CellState::kEmpty;
+    if (west_connected && east_connected) {
+      return CellState::kWhiteWin;
+    } else if (west_connected) {
+      return CellState::kWhiteWest;
+    } else if (east_connected) {
+      return CellState::kWhiteEast;
+    } else {
+      return CellState::kWhite;
+    }
+  } else {
+    SpielFatalError(absl::StrCat("Invalid player id ", player));
+    return CellState::kEmpty;
   }
 }
 
@@ -212,59 +209,40 @@ std::string HexState::ActionToString(Player player, Action action_id) const {
   // This does not comply with the Hex Text Protocol
   // TODO(author8): Make compliant with HTP
   return absl::StrCat(StateToString(PlayerAndActionToState(player, action_id)),
-                      "(", action_id % col_size_, ",", action_id / row_size_,
+                      "(", action_id % num_cols_, ",", action_id / num_cols_,
                       ")");
 }
 
-std::vector<int> HexState::AdjacentCellsBoardSize2(int cell) const {
-  if (cell == 0 || cell == 3) {
-    return {1, 2};
-  } else if (cell == 1) {
-    return {0, 2, 3};
-  } else if (cell == 2) {
-    return {0, 1, 3};
-  } else {
-    SpielFatalError(absl::StrCat("Unexpected cell value: ", cell));
-  }
-}
-
 std::vector<int> HexState::AdjacentCells(int cell) const {
-  if (row_size_ == 2) {
-    // Special case for board size 2 where connections can form between the two
-    // edges of the board.
-    return AdjacentCellsBoardSize2(cell);
-  }
   std::vector<int> neighbours = {};
-  neighbours = {cell - row_size_, cell - row_size_ + 1, cell - 1,
-                cell + 1,         cell + row_size_ - 1, cell + row_size_};
-  for (int i = kMaxNeighbours - 1; i >= 0; i--) {
-    // Check for invalid neighbours and remove
-    // Iterate in reverse to avoid changing the index of a candidate neighbour
-    if (neighbours[i] < 0 || (neighbours[i] >= row_size_ * col_size_) ||
-        (neighbours[i] % row_size_ == 0 && cell % row_size_ == row_size_ - 1) ||
-        (neighbours[i] % row_size_ == row_size_ - 1 && cell % row_size_ == 0)) {
-      neighbours.erase(neighbours.begin() + i);
-    }
-  }
+  bool north_edge = (cell < num_cols_);
+  bool south_edge = (cell >= (board_.size() - num_cols_));
+  bool west_edge = (cell % num_cols_ == 0);
+  bool east_edge = (cell % num_cols_ == num_cols_ - 1);
+  if (!north_edge) { neighbours.push_back(cell - num_cols_); }
+  if (!north_edge && !east_edge) { neighbours.push_back(cell - num_cols_ + 1); }
+  if (!east_edge) { neighbours.push_back(cell + 1); }
+  if (!south_edge) { neighbours.push_back(cell + num_cols_); }
+  if (!south_edge && !west_edge) { neighbours.push_back(cell + num_cols_ - 1); }
+  if (!west_edge) { neighbours.push_back(cell - 1); }
   return neighbours;
 }
 
-HexState::HexState(std::shared_ptr<const Game> game, int row_size, int col_size)
-    : State(game),
-      row_size_(row_size > col_size ? row_size : col_size),
-      col_size_(row_size < col_size ? row_size : col_size) {
-  // for all row_sizes & col_sizes -> row_sizes_ >= col_sizes_
-  board_.resize(row_size * col_size, CellState::kEmpty);
+HexState::HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows)
+    : State(game), num_cols_(num_cols), num_rows_(num_rows) {
+  // for all num_colss & num_rowss -> num_colss_ >= num_rowss_
+  board_.resize(num_cols * num_rows, CellState::kEmpty);
 }
 
 std::string HexState::ToString() const {
   std::string str;
   // Each cell has the cell plus a space
   // nth line has n spaces, and 1 "\n", except last line has no "\n"
-  str.reserve(2 * row_size_ * col_size_ + col_size_ * (row_size_ + 1) / 2 - 1);
+  str.reserve(num_cols_ * num_rows_ * 2 + num_rows_ * (num_rows_ + 1) / 2 - 1);
   int line_num = 0;
   for (int cell = 0; cell < board_.size(); ++cell) {
-    if (cell && !(cell % col_size_)) {
+    // if it's the first cell in a new row
+    if (cell && cell % num_cols_ == 0) {
       absl::StrAppend(&str, "\n");
       line_num++;
       absl::StrAppend(&str, std::string(line_num, ' '));
@@ -312,11 +290,11 @@ std::unique_ptr<State> HexState::Clone() const {
 
 HexGame::HexGame(const GameParameters& params)
     : Game(kGameType, params),
-      // Use board_size as the default value of row_size and col_size
-      row_size_(
-          ParameterValue<int>("row_size", ParameterValue<int>("board_size"))),
-      col_size_(
-          ParameterValue<int>("col_size", ParameterValue<int>("board_size"))) {}
+      // Use board_size as the default value of num_cols and num_rows
+      num_cols_(
+          ParameterValue<int>("num_cols", ParameterValue<int>("board_size"))),
+      num_rows_(
+          ParameterValue<int>("num_rows", ParameterValue<int>("board_size"))) {}
 
 }  // namespace hex
 }  // namespace open_spiel

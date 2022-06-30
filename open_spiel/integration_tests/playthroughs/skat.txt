@@ -230,8 +230,8 @@ ObservationString(2) = "PlPos:2|Phase:bidding|Hand:🃇 🂺 🂻 🂧 🂨 🂩
 ObservationTensor(0): binvec(299, 0x4859a00c6102040000000001000000000000000000000000000000000000000000000000000)
 ObservationTensor(1): binvec(299, 0x28a654210902040000000001000000000000000000000000000000000000000000000000000)
 ObservationTensor(2): binvec(299, 0x19000bd21302040000000001000000000000000000000000000000000000000000000000000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [32, 33, 34, 35, 36, 37, 38]
 StringLegalActions() = ["unknown/pass", "diamonds", "hearts", "spades", "clubs", "grand", "null"]
 
@@ -260,8 +260,8 @@ ObservationString(2) = "PlPos:2|Phase:discarding cards|Hand:🃇 🂺 🂻 🂧 
 ObservationTensor(0): binvec(299, 0x4459a00ce482040800000000800000000000000000000000000000000000000000000000000)
 ObservationTensor(1): binvec(299, 0x24a654210882040800000000800000000000000000000000000000000000000000000000000)
 ObservationTensor(2): binvec(299, 0x15000bd21282040800000000800000000000000000000000000000000000000000000000000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [2, 4, 5, 8, 9, 11, 21, 22, 25, 26, 27, 30]
 StringLegalActions() = ["D9", "DK", "DT", "H7", "H8", "HQ", "ST", "SA", "C8", "C9", "CQ", "CA"]
 
@@ -290,8 +290,8 @@ ObservationString(2) = "PlPos:2|Phase:discarding cards|Hand:🃇 🂺 🂻 🂧 
 ObservationTensor(0): binvec(299, 0x4419a00ce482040840000000800000000000000000000000000000000000000000000000000)
 ObservationTensor(1): binvec(299, 0x24a654210882040800000000800000000000000000000000000000000000000000000000000)
 ObservationTensor(2): binvec(299, 0x15000bd21282040800000000800000000000000000000000000000000000000000000000000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [4, 5, 8, 9, 11, 21, 22, 25, 26, 27, 30]
 StringLegalActions() = ["DK", "DT", "H7", "H8", "HQ", "ST", "SA", "C8", "C9", "CQ", "CA"]
 
@@ -328,8 +328,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂺 🂻 🂧 🂨 🂩
 ObservationTensor(0): binvec(299, 0x4219200ce082040840800000820000000100000000000000000000000000000000000000000)
 ObservationTensor(1): binvec(299, 0x22a654210882040800000000820000000100000000000000000000000000000000000000000)
 ObservationTensor(2): binvec(299, 0x13000bd21282040800000000820000000100000000000000000000000000000000000000000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [24, 29]
 StringLegalActions() = ["C7", "CT"]
 
@@ -362,8 +362,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂺 🂻 🂧 🂨 🂩
 ObservationTensor(0): binvec(299, 0x4219200ce082040840800000820000000100000040000000000000000000000000000000000)
 ObservationTensor(1): binvec(299, 0x22a654200882040800000000820000000100000040000000000000000000000000000000000)
 ObservationTensor(2): binvec(299, 0x13000bd21282040800000000820000000100000040000000000000000000000000000000000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [28]
 StringLegalActions() = ["CK"]
 
@@ -401,8 +401,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂺 🂻 🂧 🂨 🂩
 ObservationTensor(0): binvec(299, 0x4211200ce082040840800000820200000000000000000000004000000020000008000000008)
 ObservationTensor(1): binvec(299, 0x22a654200882040800000000820200000000000000000000004000000020000008000000008)
 ObservationTensor(2): binvec(299, 0x13000bd20282040800000000820200000000000000000000004000000020000008000000008)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [1, 3, 6, 7]
 StringLegalActions() = ["D8", "DQ", "DA", "DJ"]
 
@@ -436,8 +436,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂺 🂻 🂧 🂨 🂩
 ObservationTensor(0): binvec(299, 0x4211200ce082040840800000820200000000800000000000004000000020000008000000008)
 ObservationTensor(1): binvec(299, 0x22a454200882040800000000820200000000800000000000004000000020000008000000008)
 ObservationTensor(2): binvec(299, 0x13000bd20282040800000000820200000000800000000000004000000020000008000000008)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 15, 23, 31]
 StringLegalActions() = ["D7", "HJ", "SJ", "CJ"]
 
@@ -471,8 +471,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂺 🂧 🂨 🂩 🂮
 ObservationTensor(0): binvec(299, 0x4211200ce082040840800000808000000000000000000000004040000000100000000010000)
 ObservationTensor(1): binvec(299, 0x22a454200882040800000000808000000000000000000000004040000000100000000010000)
 ObservationTensor(2): binvec(299, 0x130009d20282040800000000808000000000000000000000004040000000100000000010000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 13, 16, 17, 18, 20, 23, 31]
 StringLegalActions() = ["D7", "HT", "S7", "S8", "S9", "SK", "SJ", "CJ"]
 
@@ -510,8 +510,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂺 🂧 🂩 🂮 🂫
 ObservationTensor(0): binvec(299, 0x42112004e082040840800000808000200000000200000000004040000000100000000010000)
 ObservationTensor(1): binvec(299, 0x22a454200882040800000000808000200000000200000000004040000000100000000010000)
 ObservationTensor(2): binvec(299, 0x130009520282040800000000808000200000000200000000004040000000100000000010000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [19]
 StringLegalActions() = ["SQ"]
 
@@ -593,8 +593,8 @@ ObservationString(2) = "PlPos:2|Phase:playing|Hand:🃇 🂧 🃛 |Bids:diamonds
 ObservationTensor(0): binvec(299, 0x42010000c082040840800000820000000000000000000000001000008000000020000080000)
 ObservationTensor(1): binvec(299, 0x228404000082040800000000820000000000000000000000001000008000000020000080000)
 ObservationTensor(2): binvec(299, 0x130001000282040800000000820000000000000000000000001000008000000020000080000)
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [8, 25, 26]
 StringLegalActions() = ["H7", "C8", "C9"]
 
@@ -660,5 +660,5 @@ ObservationString(2) = "PlPos:2|Phase:game over|Hand:|Bids:diamonds unknown/pass
 ObservationTensor(0): binvec(299, 0x400000000082040840800000800000000000000000000000001800000000000002002000000)
 ObservationTensor(1): binvec(299, 0x200000000082040800000000800000000000000000000000001800000000000002002000000)
 ObservationTensor(2): binvec(299, 0x100000000082040800000000800000000000000000000000001800000000000002002000000)
-Rewards() = [-0.10833333333333334, 0.05416666666666667, 0.05416666666666667]
-Returns() = [-0.10833333333333334, 0.05416666666666667, 0.05416666666666667]
+Rewards() = [-0.108333333333333, 0.0541666666666667, 0.0541666666666667]
+Returns() = [-0.108333333333333, 0.0541666666666667, 0.0541666666666667]

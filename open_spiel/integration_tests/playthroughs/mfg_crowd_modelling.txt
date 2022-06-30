@@ -59,8 +59,8 @@ CurrentPlayer() = 0
 InformationStateString(0) = "4"
 ObservationString(0) = "(4, 0)"
 ObservationTensor(0): ◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [3.1025850929940457]
-Returns() = [3.1025850929940457]
+Rewards() = [3.10258509299405]
+Returns() = [3.10258509299405]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["-1", "0", "1"]
 
@@ -96,8 +96,8 @@ CurrentPlayer() = -5
 InformationStateString(0) = "4, 2, 2"
 ObservationString(0) = "(6, 1)_a"
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [3.1025850929940457]
+Rewards() = [0]
+Returns() = [3.10258509299405]
 DistributionSupport() = ['(0, 1)_a', '(1, 1)_a', '(2, 1)_a', '(3, 1)_a', '(4, 1)_a', '(5, 1)_a', '(6, 1)_a', '(7, 1)_a', '(8, 1)_a', '(9, 1)_a']
 
 # Set mean field distribution to be uniform
@@ -114,8 +114,8 @@ CurrentPlayer() = 0
 InformationStateString(0) = "4, 2, 2"
 ObservationString(0) = "(6, 1)"
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯
-Rewards() = [3.0025850929940456]
-Returns() = [6.105170185988092]
+Rewards() = [3.00258509299405]
+Returns() = [6.10517018598809]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["-1", "0", "1"]
 
@@ -137,8 +137,8 @@ CurrentPlayer() = -5
 InformationStateString(0) = "4, 2, 2, 1, 1"
 ObservationString(0) = "(6, 2)_a"
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [6.105170185988092]
+Rewards() = [0]
+Returns() = [6.10517018598809]
 DistributionSupport() = ['(0, 2)_a', '(1, 2)_a', '(2, 2)_a', '(3, 2)_a', '(4, 2)_a', '(5, 2)_a', '(6, 2)_a', '(7, 2)_a', '(8, 2)_a', '(9, 2)_a']
 
 # Set mean field distribution to be uniform
@@ -155,8 +155,8 @@ CurrentPlayer() = 0
 InformationStateString(0) = "4, 2, 2, 1, 1"
 ObservationString(0) = "(6, 2)"
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯
-Rewards() = [3.1025850929940457]
-Returns() = [9.207755278982138]
+Rewards() = [3.10258509299405]
+Returns() = [9.20775527898214]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["-1", "0", "1"]
 
@@ -178,8 +178,8 @@ CurrentPlayer() = -5
 InformationStateString(0) = "4, 2, 2, 1, 1, 2, 0"
 ObservationString(0) = "(6, 3)_a"
 ObservationTensor(0): ◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0]
-Returns() = [9.207755278982138]
+Rewards() = [0]
+Returns() = [9.20775527898214]
 DistributionSupport() = ['(0, 3)_a', '(1, 3)_a', '(2, 3)_a', '(3, 3)_a', '(4, 3)_a', '(5, 3)_a', '(6, 3)_a', '(7, 3)_a', '(8, 3)_a', '(9, 3)_a']
 
 # Set mean field distribution to be uniform
@@ -276,5 +276,5 @@ CurrentPlayer() = -4
 InformationStateString(0) = "4, 2, 2, 1, 1, 2, 0, 0, 2, 0, 1, 0, 1, 1, 2, 0, 1, 1, 2, 2, 0"
 ObservationString(0) = "(5, 10)_a"
 ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
-Rewards() = [0.0]
-Returns() = [31.02585092994046]
+Rewards() = [0]
+Returns() = [31.0258509299405]

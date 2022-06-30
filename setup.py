@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """The setup script for setuptools.
 
 See https://setuptools.readthedocs.io/en/latest/setuptools.html
@@ -136,7 +135,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="1.0.2",
+    version="1.1.1",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",
@@ -145,9 +144,8 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/deepmind/open_spiel",
     install_requires=_get_requirements(req_file),
-    python_requires=">=3",
+    python_requires=">=3.7",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
     zip_safe=False,
-    packages=setuptools.find_packages(include=["open_spiel", "open_spiel.*"])
-)
+    packages=setuptools.find_packages(include=["open_spiel", "open_spiel.*"]))

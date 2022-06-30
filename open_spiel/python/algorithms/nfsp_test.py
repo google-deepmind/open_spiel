@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +13,6 @@
 # limitations under the License.
 
 """Tests for open_spiel.python.algorithms.nfsp."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import tensorflow.compat.v1 as tf
 
@@ -63,11 +59,11 @@ class ReservoirBufferTest(tf.test.TestCase):
 
   def test_reservoir_buffer_add(self):
     reservoir_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=10)
-    self.assertEqual(len(reservoir_buffer), 0)
+    self.assertEmpty(reservoir_buffer)
     reservoir_buffer.add("entry1")
-    self.assertEqual(len(reservoir_buffer), 1)
+    self.assertLen(reservoir_buffer, 1)
     reservoir_buffer.add("entry2")
-    self.assertEqual(len(reservoir_buffer), 2)
+    self.assertLen(reservoir_buffer, 2)
 
     self.assertIn("entry1", reservoir_buffer)
     self.assertIn("entry2", reservoir_buffer)
@@ -78,7 +74,7 @@ class ReservoirBufferTest(tf.test.TestCase):
     reservoir_buffer.add("entry2")
     reservoir_buffer.add("entry3")
 
-    self.assertEqual(len(reservoir_buffer), 2)
+    self.assertLen(reservoir_buffer, 2)
 
   def test_reservoir_buffer_sample(self):
     replay_buffer = nfsp.ReservoirBuffer(reservoir_buffer_capacity=3)

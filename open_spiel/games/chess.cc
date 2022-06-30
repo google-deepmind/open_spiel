@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -199,7 +199,7 @@ Action MoveToAction(const Move& move, int board_size) {
       auto itr = absl::c_find_if(
           kUnderPromotionDirectionToOffset,
           [offset](Offset o) { return o.x_offset == offset.x_offset; });
-      SPIEL_CHECK_NE(itr, kUnderPromotionDirectionToOffset.end());
+      SPIEL_CHECK_TRUE(itr != kUnderPromotionDirectionToOffset.end());
       direction_index =
           std::distance(kUnderPromotionDirectionToOffset.begin(), itr);
     }

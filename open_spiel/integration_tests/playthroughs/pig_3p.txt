@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Pig"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["diceoutcomes", "horizon", "players", "winscore"]
+GameType.parameter_specification = ["diceoutcomes", "horizon", "piglet", "players", "winscore"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -16,10 +16,10 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "pig"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 6
-PolicyTensorShape() = [6]
+NumDistinctActions() = 2
+PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 6
-GetParameters() = {diceoutcomes=6,horizon=10,players=3,winscore=10}
+GetParameters() = {diceoutcomes=6,horizon=10,piglet=False,players=3,winscore=10}
 NumPlayers() = 3
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -54,8 +54,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -86,8 +86,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -149,8 +149,8 @@ ObservationTensor(2): ◯◯◯◯◉◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -181,8 +181,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -244,8 +244,8 @@ ObservationTensor(2): ◯◯◯◉◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -276,8 +276,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -308,8 +308,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -340,8 +340,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -380,8 +380,8 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◉◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["roll", "stop"]
 
@@ -412,5 +412,5 @@ ObservationTensor(2): ◉◯◯◯◯◯◯◯◯◯◯
                       ◉◯◯◯◯◯◯◯◯◯◯
                       ◯◯◯◯◉◯◯◯◯◯◯
                       ◯◯◯◯◯◯◯◉◯◯◯
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]

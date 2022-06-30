@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -1069,7 +1069,7 @@ def add_new_policies(
       for policy_id, policy_ in enumerate(per_player_policies[player]):
         if np.all(  # New policy is not novel.
             new_policy.action_probability_array ==
-            policy_.action_probability_array):
+            policy_.action_probability_array):  # pytype: disable=attribute-error  # py39-upgrade
           logging.debug("Player %d's new policy is not novel.", player)
           repeat_policies.append(new_policy)
           repeat_gaps.append(new_gap)

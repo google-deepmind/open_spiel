@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -71,7 +71,9 @@ InitBot(std::string type, const open_spiel::Game &game,
         game, std::move(az_evaluator), absl::GetFlag(FLAGS_uct_c),
         absl::GetFlag(FLAGS_max_simulations),
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
-        absl::GetFlag(FLAGS_verbose));
+        absl::GetFlag(FLAGS_verbose),
+        open_spiel::algorithms::ChildSelectionPolicy::UCT, 0, 0,
+        /*dont_return_chance_node=*/true);
   }
   if (type == "human") {
     return std::make_unique<open_spiel::HumanBot>();
@@ -130,21 +132,32 @@ PlayGame(const open_spiel::Game &game,
   }
 
   while (!state->IsTerminal()) {
-    open_spiel::Player current_player = state->CurrentPlayer();
-    open_spiel::Player opponent_player = 1 - current_player;
+    open_spiel::Player player = state->CurrentPlayer();
 
-    // The state must be a decision node, ask the right bot to make its action.
-    open_spiel::Action action = bots[current_player]->Step(*state);
-
+    open_spiel::Action action;
+    if (state->IsChanceNode()) {
+      // Chance node; sample one according to underlying distribution.
+      open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
+      action = open_spiel::SampleAction(outcomes, rng).first;
+    } else {
+      // The state must be a decision node, ask the right bot to make its
+      // action.
+      action = bots[player]->Step(*state);
+    }
     if (!quiet)
-      std::cerr << "Player " << current_player << " chose action: "
-                << state->ActionToString(current_player, action) << std::endl;
+      std::cerr << "Player " << player
+                << " chose action: " << state->ActionToString(player, action)
+                << std::endl;
 
     // Inform the other bot of the action performed.
-    bots[opponent_player]->InformAction(*state, current_player, action);
+    for (open_spiel::Player p = 0; p < bots.size(); ++p) {
+      if (p != player) {
+        bots[p]->InformAction(*state, player, action);
+      }
+    }
 
     // Update history and get the next state.
-    history.push_back(state->ActionToString(current_player, action));
+    history.push_back(state->ActionToString(player, action));
     state->ApplyAction(action);
 
     if (!quiet)
@@ -176,8 +189,6 @@ int main(int argc, char **argv) {
     open_spiel::SpielFatalError("Game must have terminal rewards.");
   if (game_type.dynamics != open_spiel::GameType::Dynamics::kSequential)
     open_spiel::SpielFatalError("Game must have sequential turns.");
-  if (game_type.chance_mode != open_spiel::GameType::ChanceMode::kDeterministic)
-    open_spiel::SpielFatalError("Game must be deterministic.");
   if (absl::GetFlag(FLAGS_az_path).empty())
     open_spiel::SpielFatalError("AlphaZero path must be specified.");
   if (absl::GetFlag(FLAGS_player1) != "az" &&

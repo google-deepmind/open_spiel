@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Various general utility functions."""
 
 import random
@@ -184,9 +183,9 @@ def get_alpharank_marginals(payoff_tables, pi):
     num_profiles = alpharank_utils.get_num_profiles(num_strats_per_population)
     pi_marginals = [np.zeros(n) for n in num_strats_per_population]
     for i_strat in range(num_profiles):
-      strat_profile =\
+      strat_profile = (
           alpharank_utils.get_strat_profile_from_id(num_strats_per_population,
-                                                    i_strat)
+                                                    i_strat))
       for i_player in range(num_populations):
         pi_marginals[i_player][strat_profile[i_player]] += pi[i_strat]
     return pi_marginals
@@ -198,8 +197,8 @@ def remove_epsilon_negative_probs(probs, epsilon=1e-9):
     # Ensures these negative probabilities aren't large in magnitude, as that is
     # unexpected and likely not due to numerical precision issues
     print("Probabilities received were: {}".format(probs[probs < 0]))
-    assert np.alltrue(np.min(probs[probs < 0]) > -1.*epsilon),\
-        "Negative Probabilities received were: {}".format(probs[probs < 0])
+    assert np.alltrue(np.min(probs[probs < 0]) > -1.*epsilon), (
+        "Negative Probabilities received were: {}".format(probs[probs < 0]))
 
     probs[probs < 0] = 0
     probs = probs / np.sum(probs)
@@ -269,9 +268,9 @@ def alpharank_strategy(solver, return_joint=False, **unused_kwargs):
 
 
 def get_strategy_profile_ids(payoff_tables):
-  num_strats_per_population =\
-    alpharank_utils.get_num_strats_per_population(payoff_tables,
-                                                  payoffs_are_hpt_format=False)
+  num_strats_per_population = (
+      alpharank_utils.get_num_strats_per_population(
+          payoff_tables, payoffs_are_hpt_format=False))
   return range(alpharank_utils.get_num_profiles(num_strats_per_population))
 
 
@@ -288,9 +287,9 @@ def get_joint_policies_from_id_list(payoff_tables, policies, profile_id_list):
     selected_joint_policies: A list, with each element being a joint policy
       instance (i.e., a list of policies, one per player).
   """
-  num_strats_per_population =\
-    alpharank_utils.get_num_strats_per_population(payoff_tables,
-                                                  payoffs_are_hpt_format=False)
+  num_strats_per_population = (
+      alpharank_utils.get_num_strats_per_population(
+          payoff_tables, payoffs_are_hpt_format=False))
   np.testing.assert_array_equal(num_strats_per_population,
                                 [len(p) for p in policies])
   num_players = len(policies)

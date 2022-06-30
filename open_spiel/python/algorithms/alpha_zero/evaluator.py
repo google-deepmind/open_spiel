@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,20 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """An MCTS Evaluator for an AlphaZero model."""
 
 import numpy as np
@@ -47,8 +33,6 @@ class AlphaZeroEvaluator(mcts.Evaluator):
       raise ValueError("Game must have terminal rewards.")
     if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
       raise ValueError("Game must have sequential turns.")
-    if game_type.chance_mode != pyspiel.GameType.ChanceMode.DETERMINISTIC:
-      raise ValueError("Game must be deterministic.")
 
     self._model = model
     self._cache = lru_cache.LRUCache(cache_size)
@@ -78,6 +62,9 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     return np.array([value, -value])
 
   def prior(self, state):
-    """Returns the probabilities for all actions."""
-    _, policy = self._inference(state)
-    return [(action, policy[action]) for action in state.legal_actions()]
+    if state.is_chance_node():
+      return state.chance_outcomes()
+    else:
+      # Returns the probabilities for all actions.
+      _, policy = self._inference(state)
+      return [(action, policy[action]) for action in state.legal_actions()]

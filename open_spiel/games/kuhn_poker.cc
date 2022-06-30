@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -377,13 +377,13 @@ KuhnGame::KuhnGame(const GameParameters& params)
   default_observer_ = std::make_shared<KuhnObserver>(kDefaultObsType);
   info_state_observer_ = std::make_shared<KuhnObserver>(kInfoStateObsType);
   private_observer_ = std::make_shared<KuhnObserver>(
-      IIGObservationType{.public_info = false,
-                         .perfect_recall = false,
-                         .private_info = PrivateInfoType::kSinglePlayer});
+      IIGObservationType{/*public_info*/false,
+                         /*perfect_recall*/false,
+                         /*private_info*/PrivateInfoType::kSinglePlayer});
   public_observer_ = std::make_shared<KuhnObserver>(
-      IIGObservationType{.public_info = true,
-                         .perfect_recall = false,
-                         .private_info = PrivateInfoType::kNone});
+      IIGObservationType{/*public_info*/true,
+                         /*perfect_recall*/false,
+                         /*private_info*/PrivateInfoType::kNone});
 }
 
 std::unique_ptr<State> KuhnGame::NewInitialState() const {

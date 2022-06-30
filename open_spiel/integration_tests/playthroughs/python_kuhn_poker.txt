@@ -139,8 +139,8 @@ ObservationTensor(0).pot_contribution: ◉◉
 ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◯◯◉
 ObservationTensor(1).pot_contribution: ◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -178,8 +178,8 @@ ObservationTensor(0).pot_contribution: ◉◉
 ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◯◯◉
 ObservationTensor(1).pot_contribution: ◉◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -217,5 +217,5 @@ ObservationTensor(0).pot_contribution: ◉◉
 ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_card: ◯◯◉
 ObservationTensor(1).pot_contribution: ◉◉
-Rewards() = [-1.0, 1.0]
-Returns() = [-1.0, 1.0]
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

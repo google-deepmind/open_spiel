@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <string>
 
@@ -101,6 +102,20 @@ std::shared_ptr<const Game> GamutGenerator::GenerateGame(
     file::Remove(tmp_filename);
   }
   return game;
+}
+
+std::shared_ptr<const matrix_game::MatrixGame>
+GamutGenerator::GenerateMatrixGame(
+    const std::vector<std::string>& cmdline_args) {
+  return std::dynamic_pointer_cast<const matrix_game::MatrixGame>(
+      GenerateGame(cmdline_args));
+}
+
+std::shared_ptr<const tensor_game::TensorGame>
+GamutGenerator::GenerateTensorGame(
+    const std::vector<std::string>& cmdline_args) {
+  return std::dynamic_pointer_cast<const tensor_game::TensorGame>(
+      GenerateGame(cmdline_args));
 }
 
 }  // namespace gamut

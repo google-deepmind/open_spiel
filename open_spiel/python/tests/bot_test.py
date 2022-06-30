@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,8 @@
 
 """Test that Python and C++ bots can be called by a C++ algorithm."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
+import os
 from absl.testing import absltest
-
 import numpy as np
 
 from open_spiel.python.bots import uniform_random
@@ -27,7 +23,9 @@ import pyspiel
 
 # Specify bot names in alphabetical order, to make it easier to read.
 SPIEL_BOTS_LIST = [
+    # Chooses actions in a fixed order.
     "fixed_action_preference",
+
     "uniform_random",
 ]
 
@@ -48,7 +46,10 @@ class BotTest(absltest.TestCase):
     np.testing.assert_allclose(average_results, [0.125, -0.125], atol=0.1)
 
   def test_registered_bots(self):
-    self.assertCountEqual(pyspiel.registered_bots(), SPIEL_BOTS_LIST)
+    expected = SPIEL_BOTS_LIST[:]
+    if os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON":
+      expected.append("uniform_restricted_actions")
+    self.assertCountEqual(pyspiel.registered_bots(), expected)
 
   def test_cpp_mcts_bot(self):
     game = pyspiel.load_game("tic_tac_toe")
@@ -90,6 +91,31 @@ class BotTest(absltest.TestCase):
     ]
     result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
     self.assertEqual(result, [1, -1])  # Player 0 wins.
+
+  def test_roshambo_bot(self):
+    if hasattr(pyspiel, "make_roshambo_bot"):
+      game = pyspiel.load_game("repeated_game(stage_game=matrix_rps()," +
+                               "num_repetitions=" +
+                               f"{pyspiel.ROSHAMBO_NUM_THROWS})")
+      num_players = 2
+      bots = [
+          pyspiel.make_roshambo_bot(0, "rotatebot"),
+          pyspiel.make_roshambo_bot(1, "copybot")
+      ]
+      state = game.new_initial_state()
+      for i in range(pyspiel.ROSHAMBO_NUM_THROWS):
+        joint_action = [-1] * num_players
+        for p in range(num_players):
+          joint_action[p] = bots[p].step(state)
+        state.apply_actions(joint_action)
+        if i == 0:
+          # copybot wins the first round
+          self.assertListEqual(state.returns(), [-1, 1])
+        else:
+          # the rest are a draw
+          self.assertListEqual(state.rewards(), [0, 0])
+      self.assertTrue(state.is_terminal())
+      self.assertListEqual(state.returns(), [-1, 1])
 
 
 if __name__ == "__main__":

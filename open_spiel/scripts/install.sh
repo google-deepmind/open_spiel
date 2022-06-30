@@ -107,11 +107,7 @@ fi
 
 DIR="open_spiel/abseil-cpp"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b '20200923.3' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
-  # TODO(author5): finally update absl to a newer version and remove this
-  # workaround. Required to fix: https://github.com/deepmind/open_spiel/issues/716.
-  # See https://github.com/deepmind/open_spiel/pull/722 for discussion.
-  patch -u ${MYDIR}/open_spiel/abseil-cpp/absl/debugging/failure_signal_handler.cc ${MYDIR}/open_spiel/scripts/patches/absl_failure_signal_handler.cc.patch
+  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
 fi
 
 # Optional dependencies.
@@ -229,6 +225,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi
+  if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
+    EXT_DEPS="${EXT_DEPS} rust-all cargo"
+  fi
 
   APT_GET=`which apt-get`
   if [ "$APT_GET" = "" ]
@@ -249,6 +248,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo "System wide packages missing. Installing them..."
     sudo apt-get -y update
     sudo apt-get -y install $EXT_DEPS
+  fi
+  if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
+    cargo install bindgen
   fi
 
   if [[ "$TRAVIS" ]]; then
@@ -272,6 +274,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     [[ -x `which go` ]] || brew install golang || echo "** Warning: failed 'brew install golang' -- continuing"
+  fi
+  if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
+    [[ -x `which rustc` ]] || brew install rust || echo "** Warning: failed 'brew install rust' -- continuing"
+    cargo install bindgen
   fi
 
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py

@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -260,9 +260,6 @@ void CoopBoxPushingState::AddReward(double reward) {
 }
 
 void CoopBoxPushingState::ResolveMoves() {
-  // Set the reward to 0, as it will be changed as a result of resolving moves.
-  reward_ = 0;
-
   // Check for successful move of the big box.
   if (moves_[0] == ActionType::kMoveForward &&
       moves_[1] == ActionType::kMoveForward &&
@@ -330,7 +327,8 @@ void CoopBoxPushingState::ResolveMoves() {
 }
 
 void CoopBoxPushingState::DoApplyAction(Action action) {
-  if (IsSimultaneousNode()) ApplyFlatJointAction(action);
+  reward_ = 0;
+  if (IsSimultaneousNode()) return ApplyFlatJointAction(action);
 
   if (action == kChanceSuccess) {
     // Success.

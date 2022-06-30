@@ -200,8 +200,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
 StringLegalActions() = ["a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2d3", "d2c3"]
 
@@ -378,8 +378,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◉◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1882]
 StringLegalActions() = ["a1b1", "a2a3", "a2b3", "b2b3", "b2c3", "b2a3", "c1b1", "c2c3", "c2d3", "c2b3", "d2c3"]
 
@@ -556,8 +556,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
 StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3d2", "c3b2", "d3d2", "d3c2"]
 
@@ -734,8 +734,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1841, 1882]
 StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3b2", "d3d2", "d3c2"]
 
@@ -912,8 +912,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1882]
 StringLegalActions() = ["a4b4", "a3a2", "a3b2", "c4b4", "c4b3", "c3c2", "c3b2", "d3c2"]
 
@@ -1090,8 +1090,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [16, 17, 18, 30, 701, 714, 730, 731, 732, 733, 734, 735, 736, 737, 738, 746, 774, 787, 1197, 1257, 1285, 1841, 1882]
 StringLegalActions() = ["a1a2", "a1a3", "a1a4", "a1b1", "b2c3", "b2a3", "b3b4r", "b3c4r", "b3a4r", "b3b4b", "b3c4b", "b3a4b", "b3b4n", "b3c4n", "b3a4n", "b3b4q", "b3c4q", "b3a4q", "c1b1", "c2c3", "c2d3", "d2d3", "d2c3"]
 
@@ -1296,8 +1296,8 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◉◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [117, 1781, 1841]
 StringLegalActions() = ["a3b2", "d4c4", "d3d2"]
 
@@ -1490,5 +1490,5 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◉◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
-Rewards() = [-1.0, 1.0]
-Returns() = [-1.0, 1.0]
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

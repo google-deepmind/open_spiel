@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
 """Double Oracle algorithm.
 
 Solves two-player zero-sum games, for more information see:
@@ -61,8 +60,8 @@ class DoubleOracleSolver(object):
     self.subgame_strategies = [[], []]
     self.enforce_symmetry = enforce_symmetry
     if self.enforce_symmetry:
-      assert utils.is_symmetric_matrix_game(self.payoffs),\
-          "enforce_symmetry is True, but payoffs are asymmetric!"
+      assert utils.is_symmetric_matrix_game(self.payoffs), (
+          "enforce_symmetry is True, but payoffs are asymmetric!")
 
   def subgame_payoffs(self):
     # Select payoffs from the full game according to the subgame strategies.
@@ -82,8 +81,8 @@ class DoubleOracleSolver(object):
       best_response: For both players from the original set of pure strategies.
       best_response_utility: Corresponding utility for both players.
     """
-    assert lens(subgame_solution) == lens(self.subgame_strategies), \
-        "{} != {}".format(lens(subgame_solution), lens(self.subgame_strategies))
+    assert lens(subgame_solution) == lens(self.subgame_strategies), (
+        f"{lens(subgame_solution)} != {lens(self.subgame_strategies)}")
     best_response = [None, None]
     best_response_utility = [None, None]
     n_best_responders = 1 if self.enforce_symmetry else 2
@@ -141,13 +140,13 @@ class DoubleOracleSolver(object):
       value: Estimated value of the game.
     """
     if self.enforce_symmetry and initial_strategies:
-      assert np.array_equal(initial_strategies[0], initial_strategies[1]),\
-          (f"Players must use same initial_strategies as symmetry is enforced."
-           f"\ninitial_strategies[0]: {initial_strategies[0]}, "
-           f"\ninitial_strategies[1]: {initial_strategies[1]}")
+      assert np.array_equal(initial_strategies[0], initial_strategies[1]), (
+          f"Players must use same initial_strategies as symmetry is enforced."
+          f"\ninitial_strategies[0]: {initial_strategies[0]}, "
+          f"\ninitial_strategies[1]: {initial_strategies[1]}")
 
-    self.subgame_strategies = initial_strategies \
-        if initial_strategies else [[0], [0]]
+    self.subgame_strategies = (initial_strategies if initial_strategies
+                               else [[0], [0]])
     iteration = 0
     while iteration < max_steps:
       if yield_subgame:

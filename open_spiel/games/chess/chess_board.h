@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -249,7 +249,7 @@ enum PseudoLegalMoveSettings {
 inline constexpr open_spiel::Action kPassAction = 0;
 inline const chess::Move kPassMove =
     Move(Square{-1, -1}, Square{-1, -1},
-         Piece{.color = Color::kEmpty, .type = PieceType::kEmpty});
+         Piece{Color::kEmpty, PieceType::kEmpty});
 
 class ChessBoard {
  public:

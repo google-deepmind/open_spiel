@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,6 +27,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -906,6 +907,14 @@ double UniversalPokerState::GetTotalReward(Player player) const {
   return acpc_state_.ValueOfState(player);
 }
 
+std::unique_ptr<State> UniversalPokerState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::unique_ptr<HistoryDistribution> potential_histories =
+      GetHistoriesConsistentWithInfostate(player_id);
+  const int index = SamplerFromRng(rng)(potential_histories->second);
+  return std::move(potential_histories->first[index]);
+}
+
 std::unique_ptr<HistoryDistribution>
 UniversalPokerState::GetHistoriesConsistentWithInfostate(int player_id) const {
   // This is only implemented for 2 players.
@@ -1388,6 +1397,65 @@ std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting) {
   os << BettingAbstractionToString(betting);
   return os;
 }
+
+class UniformRestrictedActionsFactory : public BotFactory {
+  // Asks the bot whether it can play the game as the given player.
+  bool CanPlayGame(const Game &game, Player player_id) const override {
+    return absl::StrContains(game.GetType().short_name, "poker");
+  }
+
+  // Creates an instance of the bot for a given game and a player
+  // for which it should play.
+  std::unique_ptr<Bot> Create(std::shared_ptr<const Game> game,
+                              Player player_id,
+                              const GameParameters &bot_params) const override {
+    SPIEL_CHECK_GT(bot_params.count("policy_name"), 0);
+    absl::string_view policy_name = bot_params.at("policy_name").string_value();
+    if (policy_name == "AlwaysCall") {
+      return MakePolicyBot(/*seed=*/0,
+                           std::make_shared<UniformRestrictedActions>(
+                               std::vector<ActionType>({ActionType::kCall})));
+
+    } else if (policy_name == "HalfCallHalfRaise") {
+      std::vector<ActionType> actions = {ActionType::kCall};
+
+      // First, we check if it's universal poker. Add the bet action if it's a
+      // limit ACPC game or Leduc poker.
+      if (game->GetType().short_name == "universal_poker") {
+        const auto *up_game = down_cast<const UniversalPokerGame*>(game.get());
+        if (up_game->GetACPCGame()->IsLimitGame()) {
+          actions.push_back(ActionType::kBet);
+        }
+      } else if (game->GetType().short_name == "leduc_poker") {
+        // Add the betting
+        actions.push_back(ActionType::kBet);
+      } else {
+        SpielFatalError(
+            absl::StrCat("HalfCallHalfRaise is not implemented for other "
+                         "environments, such as: ",
+                         game->GetType().short_name,
+                         ", it is only implemented for Leduc and HUL."));
+      }
+      return MakePolicyBot(
+          /*seed=*/0, std::make_shared<UniformRestrictedActions>(actions));
+
+    } else if (policy_name == "AlwaysFold") {
+      return MakePolicyBot(/*seed=*/0,
+                           std::make_shared<UniformRestrictedActions>(
+                               std::vector<ActionType>({ActionType::kFold})));
+
+    } else if (policy_name == "AlwaysRaise") {
+      return MakePolicyBot(/*seed=*/0,
+                           std::make_shared<UniformRestrictedActions>(
+                               std::vector<ActionType>({ActionType::kBet})));
+    } else {
+      SpielFatalError(absl::StrCat("Unknown policy_name: ", policy_name));
+    }
+  }
+};
+
+REGISTER_SPIEL_BOT("uniform_restricted_actions",
+                   UniformRestrictedActionsFactory);
 
 }  // namespace universal_poker
 }  // namespace open_spiel

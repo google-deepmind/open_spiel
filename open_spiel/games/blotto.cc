@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -147,7 +147,9 @@ std::string BlottoState::ToString() const {
 
 bool BlottoState::IsTerminal() const { return !joint_action_.empty(); }
 
-std::vector<double> BlottoState::Returns() const { return returns_; }
+std::vector<double> BlottoState::Returns() const {
+  return IsTerminal() ? returns_ : std::vector<double>(num_players_, 0.);
+}
 
 std::unique_ptr<State> BlottoState::Clone() const {
   return std::unique_ptr<State>(new BlottoState(*this));

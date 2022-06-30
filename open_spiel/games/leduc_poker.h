@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -96,6 +96,14 @@ class LeducState : public State {
   int raises() const { return num_raises_; }
   int private_card(Player player) const { return private_cards_[player]; }
   std::vector<Action> LegalActions() const override;
+
+  // Gets the private cards.
+  std::vector<int> GetPrivateCards() const { return private_cards_; }
+
+  // Sets the private cards to specific ones. Note that this function does not
+  // change the history, so any functions relying on the history will not longer
+  // work properly.
+  void SetPrivateCards(const std::vector<int>& new_private_cards);
 
   // Returns a vector of MaxGameLength containing all of the betting actions
   // taken so far. If the round has ended, the actions are kInvalidAction.

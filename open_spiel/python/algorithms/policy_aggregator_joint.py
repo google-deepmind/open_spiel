@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -176,12 +176,12 @@ class JointPolicyAggregator(object):
       return
 
     if state.is_simultaneous_node():
-      assert self._game_type.dynamics ==\
-        pyspiel.GameType.Dynamics.SIMULTANEOUS, "Game must be simultaneous-move"
-      assert self._game_type.chance_mode ==\
-        pyspiel.GameType.ChanceMode.DETERMINISTIC, "Chance nodes not supported"
-      assert self._game_type.information ==\
-        pyspiel.GameType.Information.ONE_SHOT, "Only one-shot NFGs supported"
+      assert (self._game_type.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS
+             ), "Game must be simultaneous-move"
+      assert (self._game_type.chance_mode == pyspiel.GameType.ChanceMode
+              .DETERMINISTIC), "Chance nodes not supported"
+      assert (self._game_type.information == pyspiel.GameType.Information
+              .ONE_SHOT), "Only one-shot NFGs supported"
       policies = _aggregate_at_state(self._joint_policies, state, pid)
       state_key = self._state_key(state, pid)
 

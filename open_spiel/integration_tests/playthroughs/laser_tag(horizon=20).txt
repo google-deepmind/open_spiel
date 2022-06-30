@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Laser Tag"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["grid", "horizon", "zero_sum"]
+GameType.parameter_specification = ["fully_obs", "grid", "horizon", "obs_back", "obs_front", "obs_side", "zero_sum"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 10
 PolicyTensorShape() = [10]
 MaxChanceOutcomes() = 6
-GetParameters() = {grid=S.....S\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nS.....S,horizon=20,zero_sum=False}
+GetParameters() = {fully_obs=True,grid=S.....S\n.......\n..*.*..\n.**.**.\n..*.*..\n.......\nS.....S,horizon=20,obs_back=2,obs_front=17,obs_side=10,zero_sum=False}
 NumPlayers() = 2
 MinUtility() = -20.0
 MaxUtility() = 20.0
@@ -145,8 +145,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -192,8 +192,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -239,8 +239,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -342,8 +342,8 @@ ObservationTensor(1):
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◉◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◯  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 LegalActions(1) = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions(0) = ["left turn", "right turn", "move forward", "move backward", "step left", "step right", "stand", "step forward and left turn", "step forward and right turn", "fire"]
@@ -461,5 +461,5 @@ ObservationTensor(1):
 ◯◯◯◯◯◉◯  ◯◯◯◯◯◯◯  ◉◉◯◉◯◯◉  ◯◯◉◯◉◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯  ◉◉◉◉◉◉◉  ◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

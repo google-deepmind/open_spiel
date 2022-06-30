@@ -1,0 +1,312 @@
+game: mancala
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Mancala"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "mancala"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 14
+PolicyTensorShape() = [14]
+MaxChanceOutcomes() = 0
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [14]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 14
+MaxGameLength() = 1000
+ToString() = "mancala()"
+
+# State 0
+# -4-4-4-4-4-4-
+# 0-----------0
+# -4-4-4-4-4-4-
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "-4-4-4-4-4-4-\n0-----------0\n-4-4-4-4-4-4-"
+ObservationString(1) = "-4-4-4-4-4-4-\n0-----------0\n-4-4-4-4-4-4-"
+ObservationTensor(0) = [0.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 0.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+ObservationTensor(1) = [0.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 0.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2, 3, 4, 5, 6]
+StringLegalActions() = ["1", "2", "3", "4", "5", "6"]
+
+# Apply action "2"
+action: 2
+
+# State 1
+# -4-4-4-4-4-4-
+# 0-----------0
+# -4-0-5-5-5-5-
+IsTerminal() = False
+History() = [2]
+HistoryString() = "2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "-4-4-4-4-4-4-\n0-----------0\n-4-0-5-5-5-5-"
+ObservationString(1) = "-4-4-4-4-4-4-\n0-----------0\n-4-0-5-5-5-5-"
+ObservationTensor(0) = [0.0, 4.0, 0.0, 5.0, 5.0, 5.0, 5.0, 0.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+ObservationTensor(1) = [0.0, 4.0, 0.0, 5.0, 5.0, 5.0, 5.0, 0.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [8, 9, 10, 11, 12, 13]
+StringLegalActions() = ["8", "9", "10", "11", "12", "13"]
+
+# Apply action "12"
+action: 12
+
+# State 2
+# -5-0-4-4-4-4-
+# 1-----------0
+# -5-1-5-5-5-5-
+IsTerminal() = False
+History() = [2, 12]
+HistoryString() = "2, 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "-5-0-4-4-4-4-\n1-----------0\n-5-1-5-5-5-5-"
+ObservationString(1) = "-5-0-4-4-4-4-\n1-----------0\n-5-1-5-5-5-5-"
+ObservationTensor(0) = [1.0, 5.0, 1.0, 5.0, 5.0, 5.0, 5.0, 0.0, 4.0, 4.0, 4.0, 4.0, 0.0, 5.0]
+ObservationTensor(1) = [1.0, 5.0, 1.0, 5.0, 5.0, 5.0, 5.0, 0.0, 4.0, 4.0, 4.0, 4.0, 0.0, 5.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2, 3, 4, 5, 6]
+StringLegalActions() = ["1", "2", "3", "4", "5", "6"]
+
+# Apply action "4"
+action: 4
+
+# State 3
+# -5-0-4-4-5-5-
+# 1-----------1
+# -5-1-5-0-6-6-
+IsTerminal() = False
+History() = [2, 12, 4]
+HistoryString() = "2, 12, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "-5-0-4-4-5-5-\n1-----------1\n-5-1-5-0-6-6-"
+ObservationString(1) = "-5-0-4-4-5-5-\n1-----------1\n-5-1-5-0-6-6-"
+ObservationTensor(0) = [1.0, 5.0, 1.0, 5.0, 0.0, 6.0, 6.0, 1.0, 5.0, 5.0, 4.0, 4.0, 0.0, 5.0]
+ObservationTensor(1) = [1.0, 5.0, 1.0, 5.0, 0.0, 6.0, 6.0, 1.0, 5.0, 5.0, 4.0, 4.0, 0.0, 5.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [8, 9, 10, 11, 13]
+StringLegalActions() = ["8", "9", "10", "11", "13"]
+
+# Apply action "9"
+action: 9
+
+# State 4
+# -6-1-5-5-0-5-
+# 2-----------1
+# -5-1-5-0-6-6-
+IsTerminal() = False
+History() = [2, 12, 4, 9]
+HistoryString() = "2, 12, 4, 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "-6-1-5-5-0-5-\n2-----------1\n-5-1-5-0-6-6-"
+ObservationString(1) = "-6-1-5-5-0-5-\n2-----------1\n-5-1-5-0-6-6-"
+ObservationTensor(0) = [2.0, 5.0, 1.0, 5.0, 0.0, 6.0, 6.0, 1.0, 5.0, 0.0, 5.0, 5.0, 1.0, 6.0]
+ObservationTensor(1) = [2.0, 5.0, 1.0, 5.0, 0.0, 6.0, 6.0, 1.0, 5.0, 0.0, 5.0, 5.0, 1.0, 6.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [8, 10, 11, 12, 13]
+StringLegalActions() = ["8", "10", "11", "12", "13"]
+
+# Apply action "8"
+action: 8
+
+# State 5
+# -7-2-6-6-1-0-
+# 2-----------1
+# -5-1-5-0-6-6-
+IsTerminal() = False
+History() = [2, 12, 4, 9, 8]
+HistoryString() = "2, 12, 4, 9, 8"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "-7-2-6-6-1-0-\n2-----------1\n-5-1-5-0-6-6-"
+ObservationString(1) = "-7-2-6-6-1-0-\n2-----------1\n-5-1-5-0-6-6-"
+ObservationTensor(0) = [2.0, 5.0, 1.0, 5.0, 0.0, 6.0, 6.0, 1.0, 0.0, 1.0, 6.0, 6.0, 2.0, 7.0]
+ObservationTensor(1) = [2.0, 5.0, 1.0, 5.0, 0.0, 6.0, 6.0, 1.0, 0.0, 1.0, 6.0, 6.0, 2.0, 7.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 2, 3, 5, 6]
+StringLegalActions() = ["1", "2", "3", "5", "6"]
+
+# Apply action "3"
+action: 3
+
+# State 6
+# Apply action "12"
+action: 12
+
+# State 7
+# Apply action "13"
+action: 13
+
+# State 8
+# Apply action "6"
+action: 6
+
+# State 9
+# Apply action "8"
+action: 8
+
+# State 10
+# Apply action "5"
+action: 5
+
+# State 11
+# Apply action "12"
+action: 12
+
+# State 12
+# Apply action "9"
+action: 9
+
+# State 13
+# Apply action "4"
+action: 4
+
+# State 14
+# Apply action "11"
+action: 11
+
+# State 15
+# Apply action "4"
+action: 4
+
+# State 16
+# Apply action "8"
+action: 8
+
+# State 17
+# Apply action "1"
+action: 1
+
+# State 18
+# -5-2-0-11-2-1-
+# 6-----------5
+# -0-4-3-1-4-4-
+IsTerminal() = False
+History() = [2, 12, 4, 9, 8, 3, 12, 13, 6, 8, 5, 12, 9, 4, 11, 4, 8, 1]
+HistoryString() = "2, 12, 4, 9, 8, 3, 12, 13, 6, 8, 5, 12, 9, 4, 11, 4, 8, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "-5-2-0-11-2-1-\n6-----------5\n-0-4-3-1-4-4-"
+ObservationString(1) = "-5-2-0-11-2-1-\n6-----------5\n-0-4-3-1-4-4-"
+ObservationTensor(0) = [6.0, 0.0, 4.0, 3.0, 1.0, 4.0, 4.0, 5.0, 1.0, 2.0, 11.0, 0.0, 2.0, 5.0]
+ObservationTensor(1) = [6.0, 0.0, 4.0, 3.0, 1.0, 4.0, 4.0, 5.0, 1.0, 2.0, 11.0, 0.0, 2.0, 5.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [8, 9, 10, 12, 13]
+StringLegalActions() = ["8", "9", "10", "12", "13"]
+
+# Apply action "12"
+action: 12
+
+# State 19
+# Apply action "8"
+action: 8
+
+# State 20
+# Apply action "3"
+action: 3
+
+# State 21
+# Apply action "9"
+action: 9
+
+# State 22
+# Apply action "4"
+action: 4
+
+# State 23
+# Apply action "11"
+action: 11
+
+# State 24
+# -6-1-0-12-0-0-
+# 12-----------5
+# -0-0-0-0-6-6-
+IsTerminal() = False
+History() = [2, 12, 4, 9, 8, 3, 12, 13, 6, 8, 5, 12, 9, 4, 11, 4, 8, 1, 12, 8, 3, 9, 4, 11]
+HistoryString() = "2, 12, 4, 9, 8, 3, 12, 13, 6, 8, 5, 12, 9, 4, 11, 4, 8, 1, 12, 8, 3, 9, 4, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "-6-1-0-12-0-0-\n12-----------5\n-0-0-0-0-6-6-"
+ObservationString(1) = "-6-1-0-12-0-0-\n12-----------5\n-0-0-0-0-6-6-"
+ObservationTensor(0) = [12.0, 0.0, 0.0, 0.0, 0.0, 6.0, 6.0, 5.0, 0.0, 0.0, 12.0, 0.0, 1.0, 6.0]
+ObservationTensor(1) = [12.0, 0.0, 0.0, 0.0, 0.0, 6.0, 6.0, 5.0, 0.0, 0.0, 12.0, 0.0, 1.0, 6.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [5, 6]
+StringLegalActions() = ["5", "6"]
+
+# Apply action "6"
+action: 6
+
+# State 25
+# Apply action "9"
+action: 9
+
+# State 26
+# Apply action "5"
+action: 5
+
+# State 27
+# Apply action "12"
+action: 12
+
+# State 28
+# Apply action "11"
+action: 11
+
+# State 29
+# Apply action "6"
+action: 6
+
+# State 30
+# -8-1-0-15-1-2-
+# 13-----------8
+# -0-0-0-0-0-0-
+IsTerminal() = True
+History() = [2, 12, 4, 9, 8, 3, 12, 13, 6, 8, 5, 12, 9, 4, 11, 4, 8, 1, 12, 8, 3, 9, 4, 11, 6, 9, 5, 12, 11, 6]
+HistoryString() = "2, 12, 4, 9, 8, 3, 12, 13, 6, 8, 5, 12, 9, 4, 11, 4, 8, 1, 12, 8, 3, 9, 4, 11, 6, 9, 5, 12, 11, 6"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "-8-1-0-15-1-2-\n13-----------8\n-0-0-0-0-0-0-"
+ObservationString(1) = "-8-1-0-15-1-2-\n13-----------8\n-0-0-0-0-0-0-"
+ObservationTensor(0) = [13.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.0, 2.0, 1.0, 15.0, 0.0, 1.0, 8.0]
+ObservationTensor(1) = [13.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8.0, 2.0, 1.0, 15.0, 0.0, 1.0, 8.0]
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

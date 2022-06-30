@@ -8,7 +8,7 @@ GameType.max_num_players = 2
 GameType.min_num_players = 2
 GameType.parameter_specification = ["num_items"]
 GameType.provides_information_state_string = True
-GameType.provides_information_state_tensor = False
+GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = False
@@ -24,6 +24,9 @@ NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = 1.0
 UtilitySum() = None
+InformationStateTensorShape() = [37]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 37
 ObservationTensorShape() = [37]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 37
@@ -40,6 +43,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "ChanceNode -- no observation"
 InformationStateString(1) = "ChanceNode -- no observation"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "ChanceNode -- no observation"
 ObservationString(1) = "ChanceNode -- no observation"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
@@ -64,12 +69,14 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "Current turn: 0\nMy item: 9\nPhase: comm\nComm history: \nTrade history size: 0\n"
 InformationStateString(1) = "Current turn: 0\nMy item: 0\nPhase: comm\nComm history: \nTrade history size: 0\n"
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationString(0) = "Current turn: 0\nMy item: 9\nPhase: comm\nComm history: \nTrade history size: 0\n"
 ObservationString(1) = "Current turn: 0\nMy item: 0\nPhase: comm\nComm history: \nTrade history size: 0\n"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions() = ["Utter 0", "Utter 1", "Utter 2", "Utter 3", "Utter 4", "Utter 5", "Utter 6", "Utter 7", "Utter 8", "Utter 9"]
 
@@ -89,12 +96,14 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "Current turn: 1\nMy item: 9\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
 InformationStateString(1) = "Current turn: 1\nMy item: 0\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
+InformationStateTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯
 ObservationString(0) = "Current turn: 1\nMy item: 9\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
 ObservationString(1) = "Current turn: 1\nMy item: 0\nPhase: comm\nComm history:  8\nTrade history size: 0\n"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions() = ["Utter 0", "Utter 1", "Utter 2", "Utter 3", "Utter 4", "Utter 5", "Utter 6", "Utter 7", "Utter 8", "Utter 9"]
 
@@ -114,12 +123,14 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
 InformationStateString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
+InformationStateTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯
+InformationStateTensor(1): ◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯
 ObservationString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
 ObservationString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 0\n"
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
 StringLegalActions() = ["Trade 0:0", "Trade 0:1", "Trade 0:2", "Trade 0:3", "Trade 0:4", "Trade 0:5", "Trade 0:6", "Trade 0:7", "Trade 0:8", "Trade 0:9", "Trade 1:0", "Trade 1:1", "Trade 1:2", "Trade 1:3", "Trade 1:4", "Trade 1:5", "Trade 1:6", "Trade 1:7", "Trade 1:8", "Trade 1:9", "Trade 2:0", "Trade 2:1", "Trade 2:2", "Trade 2:3", "Trade 2:4", "Trade 2:5", "Trade 2:6", "Trade 2:7", "Trade 2:8", "Trade 2:9", "Trade 3:0", "Trade 3:1", "Trade 3:2", "Trade 3:3", "Trade 3:4", "Trade 3:5", "Trade 3:6", "Trade 3:7", "Trade 3:8", "Trade 3:9", "Trade 4:0", "Trade 4:1", "Trade 4:2", "Trade 4:3", "Trade 4:4", "Trade 4:5", "Trade 4:6", "Trade 4:7", "Trade 4:8", "Trade 4:9", "Trade 5:0", "Trade 5:1", "Trade 5:2", "Trade 5:3", "Trade 5:4", "Trade 5:5", "Trade 5:6", "Trade 5:7", "Trade 5:8", "Trade 5:9", "Trade 6:0", "Trade 6:1", "Trade 6:2", "Trade 6:3", "Trade 6:4", "Trade 6:5", "Trade 6:6", "Trade 6:7", "Trade 6:8", "Trade 6:9", "Trade 7:0", "Trade 7:1", "Trade 7:2", "Trade 7:3", "Trade 7:4", "Trade 7:5", "Trade 7:6", "Trade 7:7", "Trade 7:8", "Trade 7:9", "Trade 8:0", "Trade 8:1", "Trade 8:2", "Trade 8:3", "Trade 8:4", "Trade 8:5", "Trade 8:6", "Trade 8:7", "Trade 8:8", "Trade 8:9", "Trade 9:0", "Trade 9:1", "Trade 9:2", "Trade 9:3", "Trade 9:4", "Trade 9:5", "Trade 9:6", "Trade 9:7", "Trade 9:8", "Trade 9:9"]
 
@@ -139,12 +150,14 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "Current turn: 1\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 1\nObserver's trade offer:  4:1\n"
 InformationStateString(1) = "Current turn: 1\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 1\n"
+InformationStateTensor(0): ◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯
+InformationStateTensor(1): ◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯
 ObservationString(0) = "Current turn: 1\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 1\nObserver's trade offer:  4:1\n"
 ObservationString(1) = "Current turn: 1\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 1\n"
 ObservationTensor(0): ◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
 StringLegalActions() = ["Trade 0:0", "Trade 0:1", "Trade 0:2", "Trade 0:3", "Trade 0:4", "Trade 0:5", "Trade 0:6", "Trade 0:7", "Trade 0:8", "Trade 0:9", "Trade 1:0", "Trade 1:1", "Trade 1:2", "Trade 1:3", "Trade 1:4", "Trade 1:5", "Trade 1:6", "Trade 1:7", "Trade 1:8", "Trade 1:9", "Trade 2:0", "Trade 2:1", "Trade 2:2", "Trade 2:3", "Trade 2:4", "Trade 2:5", "Trade 2:6", "Trade 2:7", "Trade 2:8", "Trade 2:9", "Trade 3:0", "Trade 3:1", "Trade 3:2", "Trade 3:3", "Trade 3:4", "Trade 3:5", "Trade 3:6", "Trade 3:7", "Trade 3:8", "Trade 3:9", "Trade 4:0", "Trade 4:1", "Trade 4:2", "Trade 4:3", "Trade 4:4", "Trade 4:5", "Trade 4:6", "Trade 4:7", "Trade 4:8", "Trade 4:9", "Trade 5:0", "Trade 5:1", "Trade 5:2", "Trade 5:3", "Trade 5:4", "Trade 5:5", "Trade 5:6", "Trade 5:7", "Trade 5:8", "Trade 5:9", "Trade 6:0", "Trade 6:1", "Trade 6:2", "Trade 6:3", "Trade 6:4", "Trade 6:5", "Trade 6:6", "Trade 6:7", "Trade 6:8", "Trade 6:9", "Trade 7:0", "Trade 7:1", "Trade 7:2", "Trade 7:3", "Trade 7:4", "Trade 7:5", "Trade 7:6", "Trade 7:7", "Trade 7:8", "Trade 7:9", "Trade 8:0", "Trade 8:1", "Trade 8:2", "Trade 8:3", "Trade 8:4", "Trade 8:5", "Trade 8:6", "Trade 8:7", "Trade 8:8", "Trade 8:9", "Trade 9:0", "Trade 9:1", "Trade 9:2", "Trade 9:3", "Trade 9:4", "Trade 9:5", "Trade 9:6", "Trade 9:7", "Trade 9:8", "Trade 9:9"]
 
@@ -164,9 +177,11 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  4:1\nOther players's trade offer:  2:8\n"
 InformationStateString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  2:8\nOther players's trade offer:  4:1\n"
+InformationStateTensor(0): ◉◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◉
+InformationStateTensor(1): ◉◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉
 ObservationString(0) = "Current turn: 0\nMy item: 9\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  4:1\nOther players's trade offer:  2:8\n"
 ObservationString(1) = "Current turn: 0\nMy item: 0\nPhase: trade\nComm history:  8 2\nTrade history size: 2\nObserver's trade offer:  2:8\nOther players's trade offer:  4:1\n"
 ObservationTensor(0): ◉◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1): ◉◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

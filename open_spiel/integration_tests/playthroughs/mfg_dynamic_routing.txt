@@ -1,0 +1,215 @@
+game: mfg_dynamic_routing
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.MEAN_FIELD
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Cpp Mean Field Dynamic Routing"
+GameType.max_num_players = 1
+GameType.min_num_players = 1
+GameType.parameter_specification = ["max_num_time_step", "network_name", "perform_sanity_checks", "players", "time_step_length"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = False
+GameType.provides_factored_observation_string = True
+GameType.reward_model = RewardModel.REWARDS
+GameType.short_name = "mfg_dynamic_routing"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 8
+PolicyTensorShape() = [8]
+MaxChanceOutcomes() = 1
+GetParameters() = {max_num_time_step=10,network_name=braess,perform_sanity_checks=True,time_step_length=1.0}
+NumPlayers() = 1
+MinUtility() = -11.0
+MaxUtility() = 0.0
+UtilitySum() = None
+MaxGameLength() = 10
+ToString() = "mfg_dynamic_routing()"
+
+# State 0
+# Before initial chance node.
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = ""
+ObservationString(0) = "Before initial chance node."
+ChanceOutcomes() = [(0, 1.0)]
+LegalActions() = [0]
+StringLegalActions() = ["Vehicle is assigned to population 0"]
+
+# Apply action "Vehicle is assigned to population 0"
+action: 0
+
+# State 1
+# Location=O->A, waiting time=0, t=0_default, destination=D->E, return=0.00
+IsTerminal() = False
+History() = [0]
+HistoryString() = "0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "0"
+ObservationString(0) = "Location=O->A, waiting time=0, t=0_default, destination=D->E, return=0.00"
+Rewards() = [0]
+Returns() = [0]
+LegalActions() = [1, 2]
+StringLegalActions() = ["Vehicle 0 would like to move to A->B.", "Vehicle 0 would like to move to A->C."]
+
+# Apply action "Vehicle 0 would like to move to A->C."
+action: 2
+
+# State 2
+# Location=A->C, waiting time=-1, t=1_mean_field, destination=D->E, return=0.00
+IsTerminal() = False
+History() = [0, 2]
+HistoryString() = "0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -5
+InformationStateString(0) = "0, 2"
+ObservationString(0) = "Location=A->C, waiting time=-1, t=1_mean_field, destination=D->E, return=0.00"
+Rewards() = [0]
+Returns() = [0]
+DistributionSupport() = ['Location=A->C, waiting time=-1, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=0, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=1, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=2, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=3, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=4, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=5, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=6, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=7, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=8, t=1_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=9, t=1_mean_field, destination=D->E, return=0.00']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 3
+# Location=A->C, waiting time=1, t=1_default, destination=D->E, return=0.00
+IsTerminal() = False
+History() = [0, 2]
+HistoryString() = "0, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "0, 2"
+ObservationString(0) = "Location=A->C, waiting time=1, t=1_default, destination=D->E, return=0.00"
+Rewards() = [0]
+Returns() = [0]
+LegalActions() = [0]
+StringLegalActions() = ["Vehicle 0 reach a sink node or its destination."]
+
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 4
+# Location=A->C, waiting time=0, t=2_mean_field, destination=D->E, return=0.00
+IsTerminal() = False
+History() = [0, 2, 0]
+HistoryString() = "0, 2, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -5
+InformationStateString(0) = "0, 2, 0"
+ObservationString(0) = "Location=A->C, waiting time=0, t=2_mean_field, destination=D->E, return=0.00"
+Rewards() = [0]
+Returns() = [0]
+DistributionSupport() = ['Location=A->C, waiting time=-1, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=0, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=1, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=2, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=3, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=4, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=5, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=6, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=7, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=8, t=2_mean_field, destination=D->E, return=0.00', 'Location=A->C, waiting time=9, t=2_mean_field, destination=D->E, return=0.00']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 5
+# Location=A->C, waiting time=0, t=2_default, destination=D->E, return=0.00
+IsTerminal() = False
+History() = [0, 2, 0]
+HistoryString() = "0, 2, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "0, 2, 0"
+ObservationString(0) = "Location=A->C, waiting time=0, t=2_default, destination=D->E, return=0.00"
+Rewards() = [0]
+Returns() = [0]
+LegalActions() = [5]
+StringLegalActions() = ["Vehicle 0 would like to move to C->D."]
+
+# Apply action "Vehicle 0 would like to move to C->D."
+action: 5
+
+# State 6
+# Location=C->D, waiting time=-1, t=3_mean_field, destination=D->E, return=0.00
+IsTerminal() = False
+History() = [0, 2, 0, 5]
+HistoryString() = "0, 2, 0, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -5
+InformationStateString(0) = "0, 2, 0, 5"
+ObservationString(0) = "Location=C->D, waiting time=-1, t=3_mean_field, destination=D->E, return=0.00"
+Rewards() = [0]
+Returns() = [0]
+DistributionSupport() = ['Location=C->D, waiting time=-1, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=0, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=1, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=2, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=3, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=4, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=5, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=6, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=7, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=8, t=3_mean_field, destination=D->E, return=0.00', 'Location=C->D, waiting time=9, t=3_mean_field, destination=D->E, return=0.00']
+
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 7
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 8
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 9
+# Apply action "Vehicle 0 would like to move to D->E."
+action: 6
+
+# State 10
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 11
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 12
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 13
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 14
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 15
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 16
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 17
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 18
+# Set mean field distribution to be uniform
+action: update_distribution
+
+# State 19
+# Apply action "Vehicle 0 reach a sink node or its destination."
+action: 0
+
+# State 20
+# Arrived at D->E, with travel time 4.000000, t=10_terminal, return=-4.00
+IsTerminal() = True
+History() = [0, 2, 0, 5, 0, 6, 0, 0, 0, 0, 0]
+HistoryString() = "0, 2, 0, 5, 0, 6, 0, 0, 0, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "0, 2, 0, 5, 0, 6, 0, 0, 0, 0, 0"
+ObservationString(0) = "Arrived at D->E, with travel time 4.000000, t=10_terminal, return=-4.00"
+Rewards() = [-4]
+Returns() = [-4]

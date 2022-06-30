@@ -93,8 +93,8 @@ ObservationTensor(0): ◯◉◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◉◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
 
@@ -129,8 +129,8 @@ ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◉◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
 
@@ -165,8 +165,8 @@ ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◉◯◯◯
-Rewards() = [0.0]
-Returns() = [0.0]
+Rewards() = [0]
+Returns() = [0]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["LEFT", "STAY", "RIGHT"]
 
@@ -225,5 +225,5 @@ ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◉◯◯◯
-Rewards() = [1.0]
-Returns() = [1.0]
+Rewards() = [1]
+Returns() = [1]

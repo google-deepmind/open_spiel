@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,10 +13,6 @@
 # limitations under the License.
 
 """Tests for open_spiel.python.egt.dynamics."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import math
 from absl.testing import absltest
@@ -45,8 +41,8 @@ def _sum_j_x_j_ln_x_j_over_x_i(x):
 
 def _q_learning_dynamics(composition, payoff, temperature):
   r"""An equivalent implementation of `dynamics.boltzmannq`."""
-  return 1 / temperature * dynamics.replicator(composition, payoff) + \
-    composition * _sum_j_x_j_ln_x_j_over_x_i(composition)
+  return 1 / temperature * dynamics.replicator(composition, payoff) + (
+      composition * _sum_j_x_j_ln_x_j_over_x_i(composition))
 
 
 class _InternalTest(absltest.TestCase):
@@ -67,7 +63,8 @@ class _InternalTest(absltest.TestCase):
     expected_2 = np.asarray([expected_0, expected_1, expected_2])
     np.testing.assert_array_equal(expected, expected_2)
 
-    np.testing.assert_array_equal(expected, _sum_j_x_j_ln_x_j_over_x_i(x))
+    np.testing.assert_array_almost_equal(expected,
+                                         _sum_j_x_j_ln_x_j_over_x_i(x))
 
 
 class DynamicsTest(parameterized.TestCase):

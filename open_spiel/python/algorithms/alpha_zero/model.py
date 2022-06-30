@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,20 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """An AlphaZero style model with a policy and value head."""
 
 import collections
@@ -280,8 +266,8 @@ class Model(object):
     policy_logits = tfkl.Dense(output_size, name="policy")(policy_head)
     policy_logits = tf.where(legals_mask, policy_logits,
                              -1e32 * tf.ones_like(policy_logits))
-    policy_softmax = tf.identity(tfkl.Softmax()(policy_logits),
-                                 name="policy_softmax")
+    unused_policy_softmax = tf.identity(tfkl.Softmax()(policy_logits),
+                                        name="policy_softmax")
     policy_targets = tf.placeholder(
         shape=[None, output_size], dtype=tf.float32, name="policy_targets")
     policy_loss = tf.reduce_mean(
@@ -321,7 +307,7 @@ class Model(object):
     total_loss = policy_loss + value_loss + l2_reg_loss
     optimizer = tf.train.AdamOptimizer(learning_rate)
     with tf.control_dependencies(bn_updates):
-      train = optimizer.minimize(total_loss, name="train")
+      unused_train = optimizer.minimize(total_loss, name="train")
 
   @property
   def num_trainable_variables(self):

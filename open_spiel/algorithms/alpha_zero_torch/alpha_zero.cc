@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -110,40 +110,47 @@ Trajectory PlayGame(Logger* logger, int game_num, const open_spiel::Game& game,
   Trajectory trajectory;
 
   while (true) {
-    open_spiel::Player player = state->CurrentPlayer();
-    std::unique_ptr<SearchNode> root = (*bots)[player]->MCTSearch(*state);
-    open_spiel::ActionsAndProbs policy;
-    policy.reserve(root->children.size());
-    for (const SearchNode& c : root->children) {
-      policy.emplace_back(c.action,
-                          std::pow(c.explore_count, 1.0 / temperature));
-    }
-    NormalizePolicy(&policy);
-    open_spiel::Action action;
-    if (history.size() >= temperature_drop) {
-      action = root->BestChild().action;
+    if (state->IsChanceNode()) {
+      open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
+      open_spiel::Action action =
+          open_spiel::SampleAction(outcomes, *rng).first;
+      state->ApplyAction(action);
     } else {
-      action = open_spiel::SampleAction(policy, *rng).first;
-    }
+      open_spiel::Player player = state->CurrentPlayer();
+      std::unique_ptr<SearchNode> root = (*bots)[player]->MCTSearch(*state);
+      open_spiel::ActionsAndProbs policy;
+      policy.reserve(root->children.size());
+      for (const SearchNode& c : root->children) {
+        policy.emplace_back(c.action,
+                            std::pow(c.explore_count, 1.0 / temperature));
+      }
+      NormalizePolicy(&policy);
+      open_spiel::Action action;
+      if (history.size() >= temperature_drop) {
+        action = root->BestChild().action;
+      } else {
+        action = open_spiel::SampleAction(policy, *rng).first;
+      }
 
-    double root_value = root->total_reward / root->explore_count;
-    trajectory.states.push_back(Trajectory::State{
-        state->ObservationTensor(), player, state->LegalActions(), action,
-        std::move(policy), root_value});
-    std::string action_str = state->ActionToString(player, action);
-    history.push_back(action_str);
-    state->ApplyAction(action);
-    if (verbose) {
-      logger->Print("Player: %d, action: %s", player, action_str);
-    }
-    if (state->IsTerminal()) {
-      trajectory.returns = state->Returns();
-      break;
-    } else if (std::abs(root_value) > cutoff_value) {
-      trajectory.returns.resize(2);
-      trajectory.returns[player] = root_value;
-      trajectory.returns[1 - player] = -root_value;
-      break;
+      double root_value = root->total_reward / root->explore_count;
+      trajectory.states.push_back(Trajectory::State{
+          state->ObservationTensor(), player, state->LegalActions(), action,
+          std::move(policy), root_value});
+      std::string action_str = state->ActionToString(player, action);
+      history.push_back(action_str);
+      state->ApplyAction(action);
+      if (verbose) {
+        logger->Print("Player: %d, action: %s", player, action_str);
+      }
+      if (state->IsTerminal()) {
+        trajectory.returns = state->Returns();
+        break;
+      } else if (std::abs(root_value) > cutoff_value) {
+        trajectory.returns.resize(2);
+        trajectory.returns[player] = root_value;
+        trajectory.returns[1 - player] = -root_value;
+        break;
+      }
     }
   }
 
@@ -164,7 +171,8 @@ std::unique_ptr<MCTSBot> InitAZBot(const AlphaZeroConfig& config,
       /*seed=*/0,
       /*verbose=*/false, ChildSelectionPolicy::PUCT,
       evaluation ? 0 : config.policy_alpha,
-      evaluation ? 0 : config.policy_epsilon);
+      evaluation ? 0 : config.policy_epsilon,
+      /*dont_return_chance_node*/ true);
 }
 
 // An actor thread runner that generates games and returns trajectories.
@@ -265,7 +273,10 @@ void evaluator(const open_spiel::Game& game, const AlphaZeroConfig& config,
         /*max_memory_mb=*/1000,
         /*solve=*/true,
         /*seed=*/num * 1000 + game_num,
-        /*verbose=*/false, ChildSelectionPolicy::UCT));
+        /*verbose=*/false, ChildSelectionPolicy::UCT,
+        /*dirichlet_alpha=*/0,
+        /*dirichlet_epsilon=*/0,
+        /*dont_return_chance_node=*/true));
     if (az_player == 1) {
       std::swap(bots[0], bots[1]);
     }
@@ -493,8 +504,6 @@ bool AlphaZero(AlphaZeroConfig config, StopToken* stop, bool resuming) {
     open_spiel::SpielFatalError("Game must have terminal rewards.");
   if (game_type.dynamics != open_spiel::GameType::Dynamics::kSequential)
     open_spiel::SpielFatalError("Game must have sequential turns.");
-  if (game_type.chance_mode != open_spiel::GameType::ChanceMode::kDeterministic)
-    open_spiel::SpielFatalError("Game must be deterministic.");
 
   file::Mkdirs(config.path);
   if (!file::IsDirectory(config.path)) {

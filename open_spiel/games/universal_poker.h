@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -94,6 +94,8 @@ class UniversalPokerState : public State {
       Action action) const override {
     return {action};
   }
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const;
 
   const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
   const BettingAbstraction &betting() const { return betting_abstraction_; }
@@ -211,6 +213,8 @@ class UniversalPokerGame : public Game {
 
   int big_blind() const { return big_blind_; }
   double MaxCommitment() const;
+  const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
+  std::string parseParameters(const GameParameters &map);
 
  private:
   std::string gameDesc_;
@@ -222,10 +226,6 @@ class UniversalPokerGame : public Game {
   BettingAbstraction betting_abstraction_ = BettingAbstraction::kFULLGAME;
   int big_blind_;
   int max_stack_size_;
-
- public:
-  const acpc_cpp::ACPCGame *GetACPCGame() const { return &acpc_game_; }
-  std::string parseParameters(const GameParameters &map);
 };
 
 // Only supported for UniversalPoker. Randomly plays an action from a fixed list

@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -77,6 +77,19 @@ std::string StateToString(CellState state) {
   }
 }
 
+bool BoardHasLine(const std::array<CellState, kNumCells>& board,
+                  const Player player) {
+  CellState c = PlayerToState(player);
+  return (board[0] == c && board[1] == c && board[2] == c) ||
+         (board[3] == c && board[4] == c && board[5] == c) ||
+         (board[6] == c && board[7] == c && board[8] == c) ||
+         (board[0] == c && board[3] == c && board[6] == c) ||
+         (board[1] == c && board[4] == c && board[7] == c) ||
+         (board[2] == c && board[5] == c && board[8] == c) ||
+         (board[0] == c && board[4] == c && board[8] == c) ||
+         (board[2] == c && board[4] == c && board[6] == c);
+}
+
 void TicTacToeState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   board_[move] = PlayerToState(CurrentPlayer());
@@ -106,15 +119,7 @@ std::string TicTacToeState::ActionToString(Player player,
 }
 
 bool TicTacToeState::HasLine(Player player) const {
-  CellState c = PlayerToState(player);
-  return (board_[0] == c && board_[1] == c && board_[2] == c) ||
-         (board_[3] == c && board_[4] == c && board_[5] == c) ||
-         (board_[6] == c && board_[7] == c && board_[8] == c) ||
-         (board_[0] == c && board_[3] == c && board_[6] == c) ||
-         (board_[1] == c && board_[4] == c && board_[7] == c) ||
-         (board_[2] == c && board_[5] == c && board_[8] == c) ||
-         (board_[0] == c && board_[4] == c && board_[8] == c) ||
-         (board_[2] == c && board_[4] == c && board_[6] == c);
+  return BoardHasLine(board_, player);
 }
 
 bool TicTacToeState::IsFull() const { return num_moves_ == kNumCells; }

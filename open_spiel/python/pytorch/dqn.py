@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,79 +14,23 @@
 
 """DQN agent implemented in PyTorch."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import math
-import random
+import sys
 import numpy as np
 from scipy import stats
 import torch
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 from open_spiel.python import rl_agent
+from open_spiel.python.utils.replay_buffer import ReplayBuffer
 
 Transition = collections.namedtuple(
     "Transition",
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
-ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
-
-
-class ReplayBuffer(object):
-  """ReplayBuffer of fixed size with a FIFO replacement policy.
-
-  Stored transitions can be sampled uniformly.
-
-  The underlying datastructure is a ring buffer, allowing 0(1) adding and
-  sampling.
-  """
-
-  def __init__(self, replay_buffer_capacity):
-    self._replay_buffer_capacity = replay_buffer_capacity
-    self._data = []
-    self._next_entry_index = 0
-
-  def add(self, element):
-    """Adds `element` to the buffer.
-
-    If the buffer is full, the oldest element will be replaced.
-
-    Args:
-      element: data to be added to the buffer.
-    """
-    if len(self._data) < self._replay_buffer_capacity:
-      self._data.append(element)
-    else:
-      self._data[self._next_entry_index] = element
-      self._next_entry_index += 1
-      self._next_entry_index %= self._replay_buffer_capacity
-
-  def sample(self, num_samples):
-    """Returns `num_samples` uniformly sampled from the buffer.
-
-    Args:
-      num_samples: `int`, number of samples to draw.
-
-    Returns:
-      An iterable over `num_samples` random elements of the buffer.
-
-    Raises:
-      ValueError: If there are less than `num_samples` elements in the buffer
-    """
-    if len(self._data) < num_samples:
-      raise ValueError("{} elements could not be sampled from size {}".format(
-          num_samples, len(self._data)))
-    return random.sample(self._data, num_samples)
-
-  def __len__(self):
-    return len(self._data)
-
-  def __iter__(self):
-    return iter(self._data)
+ILLEGAL_ACTION_LOGITS_PENALTY = sys.float_info.min
 
 
 class SonnetLinear(nn.Module):
@@ -375,14 +319,16 @@ class DQN(rl_agent.AbstractAgent):
     next_info_states = torch.Tensor([t.next_info_state for t in transitions])
     are_final_steps = torch.Tensor([t.is_final_step for t in transitions])
     legal_actions_mask = torch.Tensor(
-        [t.legal_actions_mask for t in transitions])
+        np.array([t.legal_actions_mask for t in transitions]))
 
     self._q_values = self._q_network(info_states)
     self._target_q_values = self._target_q_network(next_info_states).detach()
 
-    illegal_actions = 1 - legal_actions_mask
-    illegal_logits = illegal_actions * ILLEGAL_ACTION_LOGITS_PENALTY
-    max_next_q = torch.max(self._target_q_values + illegal_logits, dim=1)[0]
+    illegal_actions_mask = 1 - legal_actions_mask
+    legal_target_q_values = self._target_q_values.masked_fill(
+        illegal_actions_mask, ILLEGAL_ACTION_LOGITS_PENALTY)
+    max_next_q = torch.max(legal_target_q_values, dim=1)[0]
+
     target = (
         rewards + (1 - are_final_steps) * self._discount_factor * max_next_q)
     action_indices = torch.stack([
@@ -454,3 +400,34 @@ class DQN(rl_agent.AbstractAgent):
         for tq_model in target_q_network.model:
           tq_model.weight *= (1 + sigma * torch.randn(tq_model.weight.shape))
     return copied_object
+
+  def save(self, data_path, optimizer_data_path=None):
+    """Save checkpoint/trained model and optimizer.
+
+    Args:
+      data_path: Path for saving model. It can be relative or absolute but the
+        filename should be included. For example: q_network.pt or
+        /path/to/q_network.pt
+      optimizer_data_path: Path for saving the optimizer states. It can be
+        relative or absolute but the filename should be included. For example:
+        optimizer.pt or /path/to/optimizer.pt
+    """
+    torch.save(self._q_network, data_path)
+    if optimizer_data_path is not None:
+      torch.save(self._optimizer, optimizer_data_path)
+
+  def load(self, data_path, optimizer_data_path=None):
+    """Load checkpoint/trained model and optimizer.
+
+    Args:
+      data_path: Path for loading model. It can be relative or absolute but the
+        filename should be included. For example: q_network.pt or
+        /path/to/q_network.pt
+      optimizer_data_path: Path for loading the optimizer states. It can be
+        relative or absolute but the filename should be included. For example:
+        optimizer.pt or /path/to/optimizer.pt
+    """
+    torch.load(self._q_network, data_path)
+    torch.load(self._target_q_network, data_path)
+    if optimizer_data_path is not None:
+      torch.load(self._optimizer, optimizer_data_path)

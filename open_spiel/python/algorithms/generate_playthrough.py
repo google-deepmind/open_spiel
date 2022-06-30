@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -75,6 +75,14 @@ def _format_matrix(mat):
   return np.char.array([_format_vec(row) for row in mat])
 
 
+def _format_float(x):
+  return "{:.15g}".format(x)
+
+
+def _format_float_vector(v):
+  return "[" + ", ".join([_format_float(x) for x in v]) + "]"
+
+
 def _format_tensor(tensor, tensor_name, max_cols=120):
   """Formats a tensor in an easy-to-view format as a list of lines."""
   if ((not tensor.shape) or (tensor.shape == (0,)) or (len(tensor.shape) > 3) or
@@ -84,7 +92,7 @@ def _format_tensor(tensor, tensor_name, max_cols=120):
   elif len(tensor.shape) == 1:
     return ["{}: {}".format(tensor_name, _format_vec(tensor))]
   elif len(tensor.shape) == 2:
-    if len(tensor_name) + tensor.shape[0] + 2 < max_cols:
+    if len(tensor_name) + tensor.shape[1] + 2 < max_cols:
       lines = ["{}: {}".format(tensor_name, _format_vec(tensor[0]))]
       prefix = " " * (len(tensor_name) + 2)
     else:
@@ -378,8 +386,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     if game_type.chance_mode == pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC:
       add_line('SerializeState() = "{}"'.format(_escape(state.serialize())))
     if not state.is_chance_node():
-      add_line("Rewards() = {}".format(state.rewards()))
-      add_line("Returns() = {}".format(state.returns()))
+      add_line("Rewards() = {}".format(_format_float_vector(state.rewards())))
+      add_line("Returns() = {}".format(_format_float_vector(state.returns())))
     if state.is_terminal():
       break
     if state.is_chance_node():

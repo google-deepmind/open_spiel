@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,8 @@
 #include <algorithm>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace sheriff {
@@ -36,7 +38,7 @@ const GameType kGameType{
     /* max_num_players = */ 2,
     /* min_num_players = */ 2,
     /* provides_information_state_string = */ true,
-    /* provides_information_state_tensor = */ false,
+    /* provides_information_state_tensor = */ true,
     /* provides_observation_string = */ false,
     /* provides_observation_tensor = */ false,
     /* parameter_specification = */
@@ -218,6 +220,70 @@ std::string SheriffState::InformationStateString(Player player) const {
   }
 
   return infostring;
+}
+
+std::vector<int> SheriffGame::InformationStateTensorShape() const {
+  return {
+    2 +                                      // Whose turn?
+    2 +                                      // Who is observing?
+    static_cast<int>(conf.num_rounds) + 1 +  // Move number (0 to rounds)
+    static_cast<int>(conf.max_items) + 1 +   // Number of items (0 to max)
+    // Each round, a bribe in { 0, 1, ...,  max_bribe } plus one bit for yes/no
+    static_cast<int>(conf.num_rounds) *
+        (static_cast<int>(conf.max_bribe) + 1 + 1)
+  };
+}
+
+void SheriffState::InformationStateTensor(
+    Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_TRUE(player >= 0 && player < NumPlayers());
+
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
+  std::fill(values.begin(), values.end(), 0);
+
+  // Two-player game.
+  SPIEL_CHECK_TRUE(player == 0 || player == 1);
+
+  int offset = 0;
+  const int num_players = game_->NumPlayers();
+  const Player cur_player = CurrentPlayer();
+  const auto* parent_game = down_cast<const SheriffGame*>(game_.get());
+
+  // Set a bit to indicate whose turn it is.
+  if (cur_player != kTerminalPlayerId) {
+    values[cur_player] = 1;
+  }
+  offset += num_players;
+
+  // Set a bit to indicate whose is observing
+  values[offset + player] = 1;
+  offset += num_players;
+
+  // Move number
+  values[offset + MoveNumber()] = 1;
+  offset += parent_game->num_rounds() + 1;
+
+  // Number of items chosen by the smuggler
+  if (player == kSmuggler) {
+    int index = (num_illegal_items_ ? *num_illegal_items_ : 0);
+    values[offset + index] = 1;
+  }
+  offset += parent_game->max_items() + 1;
+
+  SPIEL_CHECK_GE(inspection_feedback_.size() + 1, bribes_.size());
+  SPIEL_CHECK_LE(inspection_feedback_.size(), bribes_.size());
+  for (size_t index = 0; index < bribes_.size(); ++index) {
+    int inner_offset = index * (parent_game->max_bribe() + 2);
+    values[offset + inner_offset + bribes_.at(index)] = 1;
+
+    if (index < inspection_feedback_.size()) {
+      int bool_bit = inspection_feedback_.at(index) ? 0 : 1;
+      values[offset + inner_offset + parent_game->max_bribe() + 1] = bool_bit;
+    }
+  }
+  offset += parent_game->num_rounds() * (parent_game->max_bribe() + 2);
+
+  SPIEL_CHECK_EQ(offset, values.size());
 }
 
 void SheriffState::UndoAction(Player player, Action action_id) {

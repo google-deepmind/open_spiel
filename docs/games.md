@@ -9,7 +9,9 @@ we verified against known values and/or reproduced results from papers.
 
 Status                                       | Game
 -------------------------------------------- | ----
+<font color="orange"><b>~</b></font>         | [Amazons](#amazons)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
+<font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
@@ -19,18 +21,20 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Cliff Walking](#cliff-walking)
 <font color="orange"><b>~</b></font>         | [Clobber](#clobber)
 <font color="orange"><b>~</b></font>         | [Coin Game](#coin-game)
+<font color="orange"><b>~</b></font>         | [Colored Trails](#colored-trails)
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
+<font color="orange"><b>~</b></font>         | [Euchre](#euchre)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
 ![](_static/green_circ10.png "green circle") | [Go](#go)
 ![](_static/green_circ10.png "green circle") | [Goofspiel](#goofspiel)
 ![](_static/green_circ10.png "green circle") | [Hanabi](#hanabi)
 ![](_static/green_circ10.png "green circle") | [Havannah](#havannah)
-<font color="orange"><b>~</b></font>         | [Hearts](#hearts)
+![](_static/green_circ10.png "green circle") | [Hearts](#hearts)
 <font color="orange"><b>~</b></font>         | [Hex](#hex)
 <font color="orange"><b>~</b></font>         | [Kriegspiel](#Kriegspiel)
 ![](_static/green_circ10.png "green circle") | [Kuhn poker](#kuhn-poker)
@@ -38,17 +42,21 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
 <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
+<font color="orange"><b>~</b></font>         | [Mancala](#mancala)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean-field-game--garnet)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean-field-game--crowd-modelling)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean-field-game--crowd-modelling-2d)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean-field-game--predator-prey)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean_field_game_garnet)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean_field_game_crowd_modelling)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean_field_game_crowd_modelling_2d)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : linear quadratic](#mean-field-game--linear-quadratic)
+![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean_field_game_predator_prey)
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
+<font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
+<font color="orange"><b>~</b></font>         | [Pathfinding](#pathfinding)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
 <font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
@@ -64,9 +72,20 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Tiny Bridge](#tiny-bridge)
 ![](_static/green_circ10.png "green circle") | [Tiny Hanabi](#tiny-hanabi)
 ![](_static/green_circ10.png "green circle") | [Trade Comm](#trade-comm)
+<font color="orange"><b>~</b></font>         | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Y](#y)
 
 ## Details
+
+### Amazons
+
+*   Move pieces on a board trying to block opponents from moving.
+*   Pieces on a grid.
+*   Modern game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Game_of_the_Amazons)
 
 ### Backgammon
 
@@ -77,6 +96,16 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Backgammon)
+
+### Bargaining
+
+*   Agents negotiate for items in a pool with different (hidden) valuations.
+*   Research game.
+*   Non-deterministic (randomized pool and valuations).
+*   Imperfect information.
+*   2 players.
+*   [Lewis et al. '17](https://arxiv.org/abs/1706.05125),
+    [DeVault et al. '15](https://www.aaai.org/ocs/index.php/SSS/SSS15/paper/viewFile/10335/10100)
 
 ### Battleship
 
@@ -172,10 +201,24 @@ Status                                       | Game
 *   Agents on a grid.
 *   Research game.
 *   Non-deterministic.
-*   Perfect, incomplete information.
+*   Imperfect information (all players see the grid and their own preferences,
+    but not the preferences of other players).
 *   2 players.
 *   [Raileanu et al. '18, Modeling Others using Oneself in Multi-Agent
     Reinforcement Learning](https://arxiv.org/abs/1802.09640)
+
+### Colored Trails
+
+*   Agents negotiations for chips that they they play on a colored grid to move
+    closer to the goal.
+*   Agents on a grid.
+*   Research game.
+*   Non-deterministic (randomized board & chip configuration).
+*   Imperfect information.
+*   3 players.
+*   [Ya'akov et al. '10](https://dash.harvard.edu/handle/1/4726287),
+    [Fecici & Pfeffer '08](https://dl.acm.org/doi/10.5555/1402383.1402431),
+    [de Jong et al. '11](https://www.ifaamas.org/Proceedings/aamas2011/papers/C4_R57.pdf)
 
 ### Connect Four
 
@@ -230,6 +273,16 @@ Status                                       | Game
 *   Perfect information.
 *   1 players.
 *   [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
+
+### Euchre
+
+*   Trick-taking card game where players compete in pairs.
+*   Card game.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Euchre)
 
 ### First-price Sealed-Bid Auction
 
@@ -385,6 +438,16 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
 
+### Mancala
+
+*   Players take turns sowing beans on the board and try to capture more beans than the opponent
+*   Idiosyncratic format.
+*   Traditional game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Kalah)
+
 ### Markov Soccer
 
 *   Agents must take the ball to their goal, and can 'tackle' the opponent by
@@ -409,8 +472,8 @@ Status                                       | Game
 
 ### Mean Field Game : routing
 
-*   Representative player chooses at each nodes where they go. They has an
-    origin, a destination and a departure time and choose their route to
+*   Representative player chooses at each node where they go. They has an
+    origin, a destination and a departure time and chooses their route to
     minimize their travel time. Time spent on each link is a function of the
     distribution of players on the link when the player reaches the link.
 *   Network with choice of route.
@@ -420,6 +483,32 @@ Status                                       | Game
 *   Perfect information.
 *   [Cabannes et. al. '21, Solving N-player dynamic routing games with
     congestion: a mean field approach](https://arxiv.org/pdf/2110.11943.pdf).
+
+### Mean Field Game : Linear-Quadratic
+
+*   Players are uniformly distributed and are then incentivized to gather at the
+    same point (The lower the distanbce wrt. the distribution mean position, the
+    higher the reward). A mean-reverting term pushes the players towards the
+    distribution, a gaussian noise term perturbs them. The players' actions
+    alter their states linearly (alpha * a * dt) and the cost thereof is
+    quadratic (K * a^2 * dt), hence the name. There exists an exact, closed form
+    solution for the fully continuous version of this game.
+*   Research game.
+*   Mean-field (with a unique player).
+*   Explicit stochastic game (only for initial node).
+*   Perfect information.
+*   [Perrin & al. 2019 (https://arxiv.org/abs/2007.03458)]
+
+### Morpion Solitaire (4D)
+
+*   A single player game where player aims to maximize lines drawn on a grid,
+    under certain limitations.
+*   Uses tokens on a grid.
+*   Traditional game.
+*   Deterministic
+*   Perfect information.
+*   1 player.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Join_Five)
 
 ### Negotiation
 
@@ -462,6 +551,20 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Oware)
+
+### Pathfinding
+
+*   Agents must move to their desitnation.
+*   Agents on a grid. Single-agent game is the classic examples from Sutton &
+    Barto.
+*   Research game.
+*   Non-deterministic (in multiagent, collisions resolved by chance nodes).
+*   Perfect information.
+*   1-10 players.
+*   Similar games appeared in
+    [Austerweil et al. '15](http://miaoliu.scripts.mit.edu/SSS-16/wp-content/uploads/2016/01/paper.pdf),
+    [Greenwald & Hall '03](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf),
+    and [Littman '01](https://jmvidal.cse.sc.edu/library/littman01a.pdf).
 
 ### Pentago
 
@@ -516,7 +619,9 @@ Status                                       | Game
 *   Modern game.
 *   Deterministic.
 *   Perfect information.
-*   2-4 players.
+*   2-4 players. (Note, from Wikipedia: "Though it can be played with 3 players,
+    it's advised against. Since the 3rd player doesn't have player on the
+    opposite side, they have an advantage.")
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
 
 ### Reconnaissance Blind Chess
@@ -535,7 +640,7 @@ Status                                       | Game
 
 ### Routing game
 
-*   Players choose at each nodes where they go. They have an origin, a
+*   Players choose at each node where they go. They have an origin, a
     destination and a departure time and choose their route to minimize their
     travel time. Time spent on each link is a function of the number of players
     on the link when the player reaches the link.
@@ -632,6 +737,15 @@ Status                                       | Game
 *   Imperfect information.
 *   2 players.
 *   A simple emergent communication game based on trading.
+
+### Ultimate Tic-Tac-Toe
+
+*   Players try and form a pattern in local boards and a meta-board.
+*   Uses tokens on a grid.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
 
 ### Y
 

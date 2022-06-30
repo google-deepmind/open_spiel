@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -236,24 +236,19 @@ int GetCardIndex(RankType rank, SuitType suit) {
 }
 
 int GetMaxSize(LocationType location) {
-  switch (location) {
-    case LocationType::kDeck... LocationType::kWaste: {
-      // Cards can only be removed from the waste_&  there are 24 cards_ in it
-      // at the start of the game
-      return kMaxSizeWaste;
-    }
-    case LocationType::kFoundation: {
-      // There are 13 cards_ in a suit_
-      return kMaxSizeFoundation;
-    }
-    case LocationType::kTableau: {
-      // There are a maximum of 6 hidden cards and 13 non-hidden cards in a
-      // tableau (1 for each rank)
-      return kMaxSizeTableau;
-    }
-    default: {
-      return 0;
-    }
+  if (location >= LocationType::kDeck && location <= LocationType::kWaste) {
+    // Cards can only be removed from the waste_&  there are 24 cards_ in it
+    // at the start of the game
+    return kMaxSizeWaste;
+  } else if (location == LocationType::kFoundation) {
+    // There are 13 cards_ in a suit_
+    return kMaxSizeFoundation;
+  } else if (location == LocationType::kTableau) {
+    // There are a maximum of 6 hidden cards and 13 non-hidden cards in a
+    // tableau (1 for each rank)
+    return kMaxSizeTableau;
+  } else {
+    return 0;
   }
 }
 
@@ -380,53 +375,43 @@ std::vector<Card> Card::LegalChildren() const {
 
     switch (location_) {
       case LocationType::kTableau: {
-        switch (rank_) {
-          case RankType::kNone: {
-            if (suit_ == SuitType::kNone) {
-              // Empty tableaus can accept a king of any suit
-              child_rank = RankType::kK;
-              child_suits = kSuits;
-              break;
-            } else {
-              return {};
-            }
-          }
-          case RankType::k2... RankType::kK: {
-            // Ordinary cards (except aces) can accept cards of an opposite
-            // suit that is one rank lower
-            child_rank = static_cast<RankType>(static_cast<int>(rank_) - 1);
-            child_suits = GetOppositeSuits(suit_);
+        if (rank_ == RankType::kNone) {
+          if (suit_ == SuitType::kNone) {
+            // Empty tableaus can accept a king of any suit
+            child_rank = RankType::kK;
+            child_suits = kSuits;
             break;
-          }
-          default: {
-            // This will catch RankType::kA and RankType::kHidden
+          } else {
             return {};
           }
+        } else if (rank_ >= RankType::k2 && rank_ <= RankType::kK) {
+          // Ordinary cards (except aces) can accept cards of an opposite
+          // suit that is one rank lower
+          child_rank = static_cast<RankType>(static_cast<int>(rank_) - 1);
+          child_suits = GetOppositeSuits(suit_);
+          break;
+        } else {
+          // This will catch RankType::kA and RankType::kHidden
+          return {};
         }
         break;
       }
       case LocationType::kFoundation: {
-        switch (rank_) {
-          case RankType::kNone: {
-            if (suit_ != SuitType::kNone) {
-              child_rank = static_cast<RankType>(static_cast<int>(rank_) + 1);
-              child_suits = {suit_};
-              break;
-            } else {
-              return {};
-            }
-          }
-          case RankType::kA... RankType::kQ: {
-            // Cards (except kings) can accept a card of the same suit that is
-            // one rank higher
+        if (rank_ == RankType::kNone) {
+          if (suit_ != SuitType::kNone) {
             child_rank = static_cast<RankType>(static_cast<int>(rank_) + 1);
             child_suits = {suit_};
-            break;
-          }
-          default: {
-            // This could catch RankType::kK and RankType::kHidden
+          } else {
             return {};
           }
+        } else if (rank_ >= RankType::kA && rank_ <= RankType::kQ) {
+          // Cards (except kings) can accept a card of the same suit that is
+          // one rank higher
+          child_rank = static_cast<RankType>(static_cast<int>(rank_) + 1);
+          child_suits = {suit_};
+        } else {
+          // This could catch RankType::kK and RankType::kHidden
+          return {};
         }
         break;
       }
@@ -822,61 +807,49 @@ Move::Move(Action action) {
   // groups (e.g. 1-132 are regular moves, 133-136 are the action ids of moves
   // that move an ace to an empty foundation, etc.)
 
-  switch (action) {
-    case 1 ... 132: {
-      // Handles ordinary moves
-      target_rank = ((action - 1) / 3) % 11 + 2;
-      target_suit = ((action - 1) / 33) + 1;
-      residual = ((action - 1) % 3);
-      if (residual == 0) {
-        source_rank = target_rank + 1;
-        source_suit = target_suit;
-      } else {
-        opposite_suits = GetOppositeSuits(static_cast<SuitType>(target_suit));
-        source_rank = target_rank - 1;
-        source_suit = static_cast<int>(opposite_suits[residual - 1]);
-      }
-      break;
-    }
-    case 133 ... 136: {
-      // Handles ace to empty foundation moves
-      target_rank = 0;
-      target_suit = action - 132;
-      source_rank = 1;
+  if (action >= 1 && action <= 132) {
+    // Handles ordinary moves
+    target_rank = ((action - 1) / 3) % 11 + 2;
+    target_suit = ((action - 1) / 33) + 1;
+    residual = ((action - 1) % 3);
+    if (residual == 0) {
+      source_rank = target_rank + 1;
       source_suit = target_suit;
-      break;
-    }
-    case 137 ... 140: {
-      // Handles king to empty tableau moves
-      target_rank = 0;
-      target_suit = 0;
-      source_rank = 13;
-      source_suit = action - 136;
-      break;
-    }
-    case 141 ... 144: {
-      // Handles moves with ace targets
-      target_rank = 1;
-      target_suit = action - 140;
-      source_rank = 2;
-      source_suit = target_suit;
-      break;
-    }
-    case 145 ... 152: {
-      // Handles moves with king targets
-      target_rank = 13;
-      target_suit = (action - 143) / 2;
-
-      residual = (action - 143) % 2;
+    } else {
       opposite_suits = GetOppositeSuits(static_cast<SuitType>(target_suit));
+      source_rank = target_rank - 1;
+      source_suit = static_cast<int>(opposite_suits[residual - 1]);
+    }
+  } else if (action >= 133 && action <= 136) {
+    // Handles ace to empty foundation moves
+    target_rank = 0;
+    target_suit = action - 132;
+    source_rank = 1;
+    source_suit = target_suit;
+  } else if (action >= 137 && action <= 140) {
+    // Handles king to empty tableau moves
+    target_rank = 0;
+    target_suit = 0;
+    source_rank = 13;
+    source_suit = action - 136;
+  } else if (action >= 141 && action <= 144) {
+    // Handles moves with ace targets
+    target_rank = 1;
+    target_suit = action - 140;
+    source_rank = 2;
+    source_suit = target_suit;
+  } else if (action >= 145 && action <= 152) {
+    // Handles moves with king targets
+    target_rank = 13;
+    target_suit = (action - 143) / 2;
 
-      source_rank = 12;
-      source_suit = static_cast<int>(opposite_suits[residual]);
-      break;
-    }
-    default: {
-      SpielFatalError("action provided does not correspond with a move");
-    }
+    residual = (action - 143) % 2;
+    opposite_suits = GetOppositeSuits(static_cast<SuitType>(target_suit));
+
+    source_rank = 12;
+    source_suit = static_cast<int>(opposite_suits[residual]);
+  } else {
+    SpielFatalError("action provided does not correspond with a move");
   }
 
   target_ = Card(false, static_cast<SuitType>(target_suit),
@@ -1072,23 +1045,18 @@ std::string SolitaireState::ToString() const {
 
 std::string SolitaireState::ActionToString(Player player,
                                            Action action_id) const {
-  switch (action_id) {
-    case kEnd: {
-      return "kEnd";
-    }
-    case kRevealStart ... kRevealEnd: {
-      auto revealed_card = Card(static_cast<int>(action_id));
-      std::string result;
-      absl::StrAppend(&result, "Reveal", revealed_card.ToString(is_colored_));
-      return result;
-    }
-    case kMoveStart ... kMoveEnd: {
-      auto move = Move(action_id);
-      return move.ToString(is_colored_);
-    }
-    default: {
-      return "Missing Action";
-    }
+  if (action_id == kEnd) {
+    return "kEnd";
+  } else if (action_id >= kRevealStart && action_id <= kRevealEnd) {
+    auto revealed_card = Card(static_cast<int>(action_id));
+    std::string result;
+    absl::StrAppend(&result, "Reveal", revealed_card.ToString(is_colored_));
+    return result;
+  } else if (action_id >= kMoveStart && action_id <= kMoveEnd) {
+    auto move = Move(action_id);
+    return move.ToString(is_colored_);
+  } else {
+    return "Missing Action";
   }
 }
 
@@ -1157,49 +1125,40 @@ void SolitaireState::ObservationTensor(Player player,
 }
 
 void SolitaireState::DoApplyAction(Action action) {
-  switch (action) {
-    case kEnd: {
-      is_finished_ = true;
-      current_rewards_ = 0;
-      break;
-    }
-    case kRevealStart ... kRevealEnd: {
-      auto revealed_card = Card(static_cast<int>(action));
-      bool found_card = false;
+  if (action == kEnd) {
+    is_finished_ = true;
+    current_rewards_ = 0;
+  } else if (action >= kRevealStart && action <= kRevealEnd) {
+    auto revealed_card = Card(static_cast<int>(action));
+    bool found_card = false;
 
-      for (auto& tableau : tableaus_) {
-        if (!tableau.GetIsEmpty() && tableau.GetLastCard().GetHidden()) {
-          tableau.Reveal(revealed_card);
-          card_map_.insert_or_assign(tableau.GetLastCard(), tableau.GetID());
-          found_card = true;
-          break;
-        }
+    for (auto& tableau : tableaus_) {
+      if (!tableau.GetIsEmpty() && tableau.GetLastCard().GetHidden()) {
+        tableau.Reveal(revealed_card);
+        card_map_.insert_or_assign(tableau.GetLastCard(), tableau.GetID());
+        found_card = true;
+        break;
       }
-      if (!found_card && !waste_.GetIsEmpty()) {
-        waste_.Reveal(revealed_card);
-        card_map_.insert_or_assign(revealed_card, waste_.GetID());
-      }
-      revealed_cards_.push_back(action);
-      break;
     }
-    case kMoveStart ... kMoveEnd: {
-      Move selected_move = Move(action);
-      is_reversible_ = IsReversible(selected_move.GetSource(),
-                                    GetPile(selected_move.GetSource()));
+    if (!found_card && !waste_.GetIsEmpty()) {
+      waste_.Reveal(revealed_card);
+      card_map_.insert_or_assign(revealed_card, waste_.GetID());
+    }
+    revealed_cards_.push_back(action);
+  } else if (action >= kMoveStart && action <= kMoveEnd) {
+    Move selected_move = Move(action);
+    is_reversible_ = IsReversible(selected_move.GetSource(),
+                                  GetPile(selected_move.GetSource()));
 
-      if (is_reversible_) {
-        std::string current_observation = ObservationString(0);
-        previous_states_.insert(hasher(current_observation));
-      } else {
-        previous_states_.clear();
-      }
+    if (is_reversible_) {
+      std::string current_observation = ObservationString(0);
+      previous_states_.insert(hasher(current_observation));
+    } else {
+      previous_states_.clear();
+    }
 
-      MoveCards(selected_move);
-      current_returns_ += current_rewards_;
-      break;
-    }
-    default: {
-    }
+    MoveCards(selected_move);
+    current_returns_ += current_rewards_;
   }
 
   ++current_depth_;
@@ -1358,19 +1317,14 @@ const Pile* SolitaireState::GetPile(const Card& card) const {
     pile_id = card_map_.at(card);
   }
 
-  switch (pile_id) {
-    case PileID::kWaste: {
-      return &waste_;
-    }
-    case PileID::kSpades... PileID::kDiamonds: {
-      return &foundations_.at(static_cast<int>(pile_id) - 1);
-    }
-    case PileID::k1stTableau... PileID::k7thTableau: {
-      return &tableaus_.at(static_cast<int>(pile_id) - 5);
-    }
-    default: {
-      SpielFatalError("The pile containing the card wasn't found");
-    }
+  if (pile_id == PileID::kWaste) {
+    return &waste_;
+  } else if (pile_id >= PileID::kSpades && pile_id <= PileID::kDiamonds) {
+    return &foundations_.at(static_cast<int>(pile_id) - 1);
+  } else if (pile_id >= PileID::k1stTableau && pile_id <= PileID::k7thTableau) {
+    return &tableaus_.at(static_cast<int>(pile_id) - 5);
+  } else {
+    SpielFatalError("The pile containing the card wasn't found");
   }
 }
 
@@ -1397,19 +1351,14 @@ Pile* SolitaireState::GetPile(const Card& card) {
     pile_id = card_map_.at(card);
   }
 
-  switch (pile_id) {
-    case PileID::kWaste: {
-      return &waste_;
-    }
-    case PileID::kSpades... PileID::kDiamonds: {
-      return &foundations_.at(static_cast<int>(pile_id) - 1);
-    }
-    case PileID::k1stTableau... PileID::k7thTableau: {
-      return &tableaus_.at(static_cast<int>(pile_id) - 5);
-    }
-    default: {
-      SpielFatalError("The pile containing the card wasn't found");
-    }
+  if (pile_id == PileID::kWaste) {
+    return &waste_;
+  } else if (pile_id >= PileID::kSpades && pile_id <= PileID::kDiamonds) {
+    return &foundations_.at(static_cast<int>(pile_id) - 1);
+  } else if (pile_id >= PileID::k1stTableau && pile_id <= PileID::k7thTableau) {
+    return &tableaus_.at(static_cast<int>(pile_id) - 5);
+  } else {
+    SpielFatalError("The pile containing the card wasn't found");
   }
 }
 

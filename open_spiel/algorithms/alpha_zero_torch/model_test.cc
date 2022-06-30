@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,7 +41,7 @@ void TestModelCreation() {
       /*nn_width=*/128,
       /*learning_rate=*/0.001,
       /*weight_decay=*/0.001};
-  ResModel net(net_config, "cpu:0");
+  Model net(net_config, "cpu:0");
 
   std::cout << "Good! The network looks like:\n" << net << std::endl;
 }
@@ -66,7 +66,7 @@ void TestModelInference() {
       /*nn_width=*/128,
       /*learning_rate=*/0.001,
       /*weight_decay=*/0.001};
-  ResModel net(net_config, "cpu:0");
+  Model net(net_config, "cpu:0");
 
   std::vector<float> observation_vector = state->ObservationTensor();
   torch::Tensor observation_tensor = torch::from_blob(

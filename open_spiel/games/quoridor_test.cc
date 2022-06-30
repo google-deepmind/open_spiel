@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,11 @@ void BasicQuoridorTests() {
         *LoadGame(absl::StrCat("quoridor(board_size=", i, ")")), 5);
   }
 
+  for (int i = 2; i <= 4; i++) {
+    testing::RandomSimTest(
+        *LoadGame(absl::StrCat("quoridor(board_size=9,players=", i, ")")), 5);
+  }
+
   testing::RandomSimTest(*LoadGame("quoridor(board_size=9,wall_count=5)"), 3);
 
   // Ansi colors!
@@ -42,7 +47,14 @@ void BasicQuoridorTests() {
                              {"ansi_color_output", GameParameter(true)}}),
       3);
   testing::RandomSimTest(
+      *LoadGame("quoridor", {{"board_size", GameParameter(9)},
+                             {"ansi_color_output", GameParameter(true)},
+                             {"players", GameParameter(3)}}),
+      3);
+  testing::RandomSimTest(
       *LoadGame("quoridor(board_size=5,ansi_color_output=True)"), 3);
+  testing::RandomSimTest(
+      *LoadGame("quoridor(board_size=5,ansi_color_output=True,players=3)"), 3);
 }
 
 }  // namespace

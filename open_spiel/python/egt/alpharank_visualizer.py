@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,14 +19,10 @@ All equations and variable names correspond to the following paper:
 
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from absl import logging
 
 try:
-  import matplotlib.patches as patches  # pylint: disable=g-import-not-at-top
+  from matplotlib import patches  # pylint: disable=g-import-not-at-top
   import matplotlib.patheffects as PathEffects  # pylint: disable=g-import-not-at-top
   import matplotlib.pyplot as plt  # pylint: disable=g-import-not-at-top
 except ImportError as e:
@@ -35,7 +31,7 @@ except ImportError as e:
                "and there is a workaround (run sudo apt install "
                "python-backports.functools-lru-cache. See: "
                "https://github.com/matplotlib/matplotlib/issues/9344.")
-  raise ImportError(str(e))
+  raise e
 
 import networkx as nx  # pylint: disable=g-import-not-at-top
 import numpy as np

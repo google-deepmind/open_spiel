@@ -16,6 +16,7 @@ endif()
 
 message(NOTICE "Python executable: ${Python3_EXECUTABLE}")
 message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
+message(NOTICE "Python library dirs: ${Python3_LIBRARY_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
 if(Python3_VERSION VERSION_LESS "3.6.0")
@@ -83,12 +84,18 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/bots.h
   pybind11/games_backgammon.cc
   pybind11/games_backgammon.h
+  pybind11/games_bargaining.cc
+  pybind11/games_bargaining.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_chess.cc
   pybind11/games_chess.h
+  pybind11/games_euchre.cc
+  pybind11/games_euchre.h
   pybind11/games_kuhn_poker.cc
   pybind11/games_kuhn_poker.h
+  pybind11/games_leduc_poker.cc
+  pybind11/games_leduc_poker.h
   pybind11/games_negotiation.cc
   pybind11/games_negotiation.h
   pybind11/games_tarok.cc
@@ -103,9 +110,16 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h
-  pybind11/referee.cc
-  pybind11/referee.h
+  pybind11/utils.cc
+  pybind11/utils.h
   )
+
+if (OPEN_SPIEL_BUILD_WITH_HIGC)
+  set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      pybind11/referee.cc
+      pybind11/referee.h
+  )
+endif()
 
 # Optional pyspiel sub-modules, which can specify their python bindings.
 if (OPEN_SPIEL_BUILD_WITH_GAMUT)
@@ -122,9 +136,14 @@ if (OPEN_SPIEL_BUILD_WITH_XINXIN)
 endif()
 
 add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
+target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")
+if (WIN32)
+  # Python does not seem able to import the module without this change.
+  set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
+endif()
 
 # Optional pyspiel-related modules, which can specify their own python tests.
 if (OPEN_SPIEL_BUILD_WITH_EIGEN)
@@ -156,6 +175,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/action_value_test.py
   algorithms/action_value_vs_best_response_test.py
   algorithms/best_response_test.py
+  algorithms/boltzmann_tabular_qlearner_test.py
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/evaluate_bots_test.py
@@ -165,6 +185,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
+  algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
   algorithms/noisy_policy_test.py
@@ -173,6 +194,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/policy_aggregator_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
+  algorithms/tabular_qlearner_test.py
   bots/bluechip_bridge_test.py
   bots/bluechip_bridge_uncontested_bidding_test.py
   bots/is_mcts_test.py
@@ -187,7 +209,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_utils_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
-  mfg/algorithms/fictitious_play_test.py
   mfg/algorithms/mirror_descent_test.py
   mfg/algorithms/greedy_policy_test.py
   mfg/algorithms/nash_conv_test.py
@@ -197,7 +218,9 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/games/dynamic_routing_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
+  tests/game_transforms_test.py
   tests/games_bridge_test.py
+  tests/games_euchre_test.py
   tests/games_sim_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
@@ -216,6 +239,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    mfg/algorithms/fictitious_play_test.py
   )
 endif()
 
@@ -263,11 +287,14 @@ endif()
 # These require extra dependencies like cvxopt, nashpy, or matplotlib
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
+      algorithms/adidas_test.py
       algorithms/double_oracle_test.py
-      algorithms/lp_solver_test.py
       algorithms/jpsro_test.py
+      algorithms/lp_solver_test.py
+      algorithms/nash_averaging_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
+      algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py

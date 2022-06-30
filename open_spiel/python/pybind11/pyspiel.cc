@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,9 +31,12 @@
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
 #include "open_spiel/python/pybind11/games_backgammon.h"
+#include "open_spiel/python/pybind11/games_bargaining.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_chess.h"
+#include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
+#include "open_spiel/python/pybind11/games_leduc_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
 #include "open_spiel/python/pybind11/observer.h"
@@ -41,6 +44,7 @@
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_games.h"
 #include "open_spiel/python/pybind11/referee.h"
+#include "open_spiel/python/pybind11/utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -88,6 +92,9 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
+
+  m.def("game_parameters_to_string", GameParametersToString,
+        "Converts a GameParameter dictionary to string.");
 
   py::enum_<PrivateInfoType>(m, "PrivateInfoType")
       .value("ALL_PLAYERS", PrivateInfoType::kAllPlayers)
@@ -606,15 +613,18 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_policy(m);           // Policies and policy-related algorithms.
   init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
-  init_pyspiel_referee(m);                  // Referee.
   init_pyspiel_game_transforms(m);          // Game transformations.
   init_pyspiel_games_backgammon(m);         // Backgammon game.
+  init_pyspiel_games_bargaining(m);         // Bargaining game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
   init_pyspiel_games_chess(m);   // Chess game.
+  init_pyspiel_games_euchre(m);  // Game-specific functions for euchre.
   init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
+  init_pyspiel_games_leduc_poker(m);  // Leduc poker game.
   init_pyspiel_games_negotiation(m);  // Negotiation game.
   init_pyspiel_games_tarok(m);   // Game-specific functions for tarok.
   init_pyspiel_observer(m);      // Observers and observations.
+  init_pyspiel_utils(m);         // Utilities.
 
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
@@ -622,6 +632,9 @@ PYBIND11_MODULE(pyspiel, m) {
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
   init_pyspiel_xinxin(m);
+#endif
+#if OPEN_SPIEL_BUILD_WITH_HIGC
+  init_pyspiel_referee(m);
 #endif
 }
 

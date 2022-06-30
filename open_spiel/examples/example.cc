@@ -1,18 +1,16 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#include <unistd.h>
 
 #include <memory>
 #include <random>
@@ -91,6 +89,14 @@ int main(int argc, char** argv) {
                 << state->ActionToString(open_spiel::kChancePlayerId, action)
                 << std::endl;
       state->ApplyAction(action);
+    } else if (state->IsMeanFieldNode()) {
+      int num_states_distribution = state->DistributionSupport().size();
+      state->UpdateDistribution(std::vector<double>(
+          num_states_distribution,
+          num_states_distribution > 0 ? 1.0 / num_states_distribution : 1.0));
+      std::cerr << "Call update distribution on a uniform distribution of "
+                << num_states_distribution << " states (length of "
+                << "DistributionSupport" << std::endl;
     } else if (state->IsSimultaneousNode()) {
       // open_spiel::Players choose simultaneously?
       std::vector<open_spiel::Action> joint_action;
@@ -117,7 +123,7 @@ int main(int argc, char** argv) {
         }
 
         open_spiel::Action action = 0;
-        if (!actions.empty()){
+        if (!actions.empty()) {
           absl::uniform_int_distribution<> dis(0, actions.size() - 1);
           action = actions[dis(rng)];
         }

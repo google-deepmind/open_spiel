@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace pig {
@@ -37,6 +38,7 @@ constexpr int kDefaultDiceOutcomes = 6;
 constexpr int kDefaultHorizon = 1000;
 constexpr int kDefaultPlayers = 2;
 constexpr int kDefaultWinScore = 100;
+constexpr bool kDefaultPiglet = false;
 
 // Facts about the game
 const GameType kGameType{
@@ -59,6 +61,7 @@ const GameType kGameType{
         {"horizon", GameParameter(kDefaultHorizon)},
         {"winscore", GameParameter(kDefaultWinScore)},
         {"diceoutcomes", GameParameter(kDefaultDiceOutcomes)},
+        {"piglet", GameParameter(kDefaultPiglet)},
     }};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -70,7 +73,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 std::string PigState::ActionToString(Player player, Action move_id) const {
   if (player == kChancePlayerId) {
-    return absl::StrCat("Roll ", 1 + move_id);
+    return absl::StrCat("Roll ", piglet_ ? move_id : 1 + move_id);
   } else if (move_id == kRoll) {
     return "roll";
   } else {
@@ -131,9 +134,8 @@ void PigState::ObservationTensor(Player player,
   int num_bins = (win_score_ / kBinSize) + 1;
 
   // One-hot encoding: turn total (#bin) followed by p1, p2, ...
-  SPIEL_CHECK_EQ(values.size(), num_bins + num_players_ * num_bins);
-  std::fill(values.begin(), values.end(), 0.);
-  int pos = 0;
+  // Treat `values` as a 2-d tensor.
+  TensorView<2> view(values, {1 + num_players_, num_bins}, true);
 
   // One-hot encoding:
   //  - turn total (#bins)
@@ -143,36 +145,22 @@ void PigState::ObservationTensor(Player player,
   //      .
   //      .
 
-  int bin = turn_total_ / kBinSize;
-  if (bin >= num_bins) {
-    // When the value is too large, use last bin.
-    values[pos + (num_bins - 1)] = 1;
-  } else {
-    values[pos + bin] = 1;
-  }
+  // turn total
+  view[{0, std::min(turn_total_ / kBinSize, num_bins - 1)}] = 1;
 
-  pos += num_bins;
-
-  // Find the right bin for each player.
   for (auto p = Player{0}; p < num_players_; p++) {
-    bin = scores_[p] / kBinSize;
-    if (bin >= num_bins) {
-      // When the value is too large, use last bin.
-      values[pos + (num_bins - 1)] = 1;
-    } else {
-      values[pos + bin] = 1;
-    }
-
-    pos += num_bins;
+    // score of each player
+    view[{1 + p, std::min(scores_[p] / kBinSize, num_bins - 1)}] = 1;
   }
 }
 
 PigState::PigState(std::shared_ptr<const Game> game, int dice_outcomes,
-                   int horizon, int win_score)
+                   int horizon, int win_score, bool piglet)
     : State(game),
       dice_outcomes_(dice_outcomes),
       horizon_(horizon),
-      win_score_(win_score) {
+      win_score_(win_score),
+      piglet_(piglet) {
   total_moves_ = 0;
   cur_player_ = 0;
   turn_player_ = 0;
@@ -186,7 +174,7 @@ int PigState::CurrentPlayer() const {
 
 void PigState::DoApplyAction(Action move) {
   // For decision node: 0 means roll, 1 means stop.
-  // For chance node: outcome of the dice (x-1).
+  // For chance node: outcome of the dice (x-1, piglet: [x != 1]).
   if (cur_player_ >= 0 && move == kRoll) {
     // Player roll -> chance node.
     cur_player_ = kChancePlayerId;
@@ -208,7 +196,7 @@ void PigState::DoApplyAction(Action move) {
       cur_player_ = turn_player_;
     } else {
       // Add to the turn total.
-      turn_total_ += (move + 1);
+      turn_total_ += (piglet_ ? 1 : move + 1);
       cur_player_ = turn_player_;
     }
   } else {
@@ -234,10 +222,18 @@ std::vector<std::pair<Action, double>> PigState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes;
 
-  // Chance outcomes are labelled 0+, corresponding to rolling 1+x.
-  outcomes.reserve(dice_outcomes_);
-  for (int i = 0; i < dice_outcomes_; i++) {
-    outcomes.push_back(std::make_pair(i, 1.0 / dice_outcomes_));
+  if (piglet_) {
+    // Chance outcomes are labelled 0 or 1, corresponding to rolling 1 or not 1
+    // respectively
+    outcomes.reserve(2);
+    outcomes.push_back(std::make_pair(0, 1.0 / dice_outcomes_));
+    outcomes.push_back(std::make_pair(1, 1.0 - (1.0 / dice_outcomes_)));
+  } else {
+    // Chance outcomes are labelled 0+, corresponding to rolling 1+x.
+    outcomes.reserve(dice_outcomes_);
+    for (int i = 0; i < dice_outcomes_; i++) {
+      outcomes.push_back(std::make_pair(i, 1.0 / dice_outcomes_));
+    }
   }
 
   return outcomes;
@@ -259,7 +255,8 @@ PigGame::PigGame(const GameParameters& params)
       dice_outcomes_(ParameterValue<int>("diceoutcomes")),
       horizon_(ParameterValue<int>("horizon")),
       num_players_(ParameterValue<int>("players")),
-      win_score_(ParameterValue<int>("winscore")) {}
+      win_score_(ParameterValue<int>("winscore")),
+      piglet_(ParameterValue<bool>("piglet")) {}
 
 }  // namespace pig
 }  // namespace open_spiel

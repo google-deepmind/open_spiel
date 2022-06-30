@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,8 +28,8 @@
 //
 // Parameters:
 //       "board_size"    int     size of the board   (default = 11)
-//       "row_size"      int     number of rows (optional)
-//       "col_size"      int     number of columns (optional)
+//       "num_cols"      int     number of columns (optional)
+//       "num_rows"      int     number of rows (optional)
 
 namespace open_spiel {
 namespace hex {
@@ -65,7 +65,7 @@ enum class CellState {
 // State of an in-play game.
 class HexState : public State {
  public:
-  HexState(std::shared_ptr<const Game> game, int row_size, int col_size);
+  HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows);
 
   HexState(const HexState&) = default;
 
@@ -95,33 +95,32 @@ class HexState : public State {
   Player current_player_ = 0;                      // Player zero goes first
   double result_black_perspective_ = 0;            // 1 if Black (player 0) wins
   std::vector<int> AdjacentCells(int cell) const;  // Cells adjacent to cell
-  // Same function as above when board size is 2.
-  std::vector<int> AdjacentCellsBoardSize2(int cell) const;
-  const int row_size_;  // x
-  const int col_size_;  // y
+
+  const int num_cols_;  // x
+  const int num_rows_;  // y
 };
 
 // Game object.
 class HexGame : public Game {
  public:
   explicit HexGame(const GameParameters& params);
-  int NumDistinctActions() const override { return row_size_ * col_size_; }
+  int NumDistinctActions() const override { return num_cols_ * num_rows_; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new HexState(shared_from_this(), row_size_, col_size_));
+        new HexState(shared_from_this(), num_cols_, num_rows_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, row_size_, col_size_};
+    return {kCellStates, num_cols_, num_rows_};
   }
-  int MaxGameLength() const override { return row_size_ * col_size_; }
+  int MaxGameLength() const override { return num_cols_ * num_rows_; }
 
  private:
-  const int row_size_;
-  const int col_size_;
+  const int num_cols_;
+  const int num_rows_;
 };
 
 CellState PlayerToState(Player player);

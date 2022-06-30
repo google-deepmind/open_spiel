@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,6 +37,7 @@ enum ElementProperties {
   kConsumable = 1 << 0,
   kCanExplode = 1 << 1,
   kRounded = 1 << 2,
+  kTraversable = 1 << 3,
 };
 
 // All possible elements
@@ -48,23 +49,27 @@ const Element kElAgentInExit = {HiddenCellType::kAgentInExit,
                                 ElementProperties::kNone, '!'};
 const Element kElExitOpen = {HiddenCellType::kExitOpen,
                              VisibleCellType::kExitOpen,
-                             ElementProperties::kNone, '#'};
+                             ElementProperties::kTraversable, '#'};
 const Element kElExitClosed = {HiddenCellType::kExitClosed,
                                VisibleCellType::kExitClosed,
                                ElementProperties::kNone, 'C'};
-const Element kElEmpty = {HiddenCellType::kEmpty, VisibleCellType::kEmpty,
-                          ElementProperties::kConsumable, ' '};
-const Element kElDirt = {HiddenCellType::kDirt, VisibleCellType::kDirt,
-                         ElementProperties::kConsumable, '.'};
+const Element kElEmpty = {
+    HiddenCellType::kEmpty, VisibleCellType::kEmpty,
+    ElementProperties::kConsumable | ElementProperties::kTraversable, ' '};
+const Element kElDirt = {
+    HiddenCellType::kDirt, VisibleCellType::kDirt,
+    ElementProperties::kConsumable | ElementProperties::kTraversable, '.'};
 const Element kElStone = {
     HiddenCellType::kStone, VisibleCellType::kStone,
     ElementProperties::kConsumable | ElementProperties::kRounded, 'o'};
 const Element kElStoneFalling = {HiddenCellType::kStoneFalling,
                                  VisibleCellType::kStone,
                                  ElementProperties::kConsumable, 'o'};
-const Element kElDiamond = {
-    HiddenCellType::kDiamond, VisibleCellType::kDiamond,
-    ElementProperties::kConsumable | ElementProperties::kRounded, '*'};
+const Element kElDiamond = {HiddenCellType::kDiamond, VisibleCellType::kDiamond,
+                            ElementProperties::kConsumable |
+                                ElementProperties::kRounded |
+                                ElementProperties::kTraversable,
+                            '*'};
 const Element kElDiamondFalling = {HiddenCellType::kDiamondFalling,
                                    VisibleCellType::kDiamond,
                                    ElementProperties::kConsumable, '*'};
@@ -125,7 +130,7 @@ const Element kElGateRedOpen = {HiddenCellType::kGateRedOpen,
                                 VisibleCellType::kGateRedOpen,
                                 ElementProperties::kNone, 'R'};
 const Element kElKeyRed = {HiddenCellType::kKeyRed, VisibleCellType::kKeyRed,
-                           ElementProperties::kNone, '1'};
+                           ElementProperties::kTraversable, '1'};
 const Element kElGateBlueClosed = {HiddenCellType::kGateBlueClosed,
                                    VisibleCellType::kGateBlueClosed,
                                    ElementProperties::kNone, 'b'};
@@ -133,7 +138,7 @@ const Element kElGateBlueOpen = {HiddenCellType::kGateBlueOpen,
                                  VisibleCellType::kGateBlueOpen,
                                  ElementProperties::kNone, 'B'};
 const Element kElKeyBlue = {HiddenCellType::kKeyBlue, VisibleCellType::kKeyBlue,
-                            ElementProperties::kNone, '2'};
+                            ElementProperties::kTraversable, '2'};
 const Element kElGateGreenClosed = {HiddenCellType::kGateGreenClosed,
                                     VisibleCellType::kGateGreenClosed,
                                     ElementProperties::kNone, 'g'};
@@ -142,7 +147,7 @@ const Element kElGateGreenOpen = {HiddenCellType::kGateGreenOpen,
                                   ElementProperties::kNone, 'G'};
 const Element kElKeyGreen = {HiddenCellType::kKeyGreen,
                              VisibleCellType::kKeyGreen,
-                             ElementProperties::kNone, '3'};
+                             ElementProperties::kTraversable, '3'};
 const Element kElGateYellowClosed = {HiddenCellType::kGateYellowClosed,
                                      VisibleCellType::kGateYellowClosed,
                                      ElementProperties::kNone, 'y'};
@@ -151,7 +156,7 @@ const Element kElGateYellowOpen = {HiddenCellType::kGateYellowOpen,
                                    ElementProperties::kNone, 'Y'};
 const Element kElKeyYellow = {HiddenCellType::kKeyYellow,
                               VisibleCellType::kKeyYellow,
-                              ElementProperties::kNone, '4'};
+                              ElementProperties::kTraversable, '4'};
 const Element kElNut = {
     HiddenCellType::kNut, VisibleCellType::kNut,
     ElementProperties::kRounded | ElementProperties::kConsumable, '+'};
@@ -861,9 +866,17 @@ void StonesNGemsState::UpdateAgent(int index, int action) {
     OpenGate(kKeyToGate.at(GetItem(index, action)));
     MoveItem(index, action);
   } else if (IsOpenGate(GetItem(index, action))) {
-    // Walking through an open gate
+    // Walking through an open gate, with traversable element on other side
     int index_gate = IndexFromAction(index, action);
-    if (IsType(index_gate, kElEmpty, action)) {
+    if (HasProperty(index_gate, ElementProperties::kTraversable, action)) {
+      // Correct for landing on traversable elements
+      if (IsType(index_gate, kElDiamond, action)) {
+        ++gems_collected_;
+        current_reward_ += kGemPoints.at(GetItem(index_gate, action));
+        sum_reward_ += kGemPoints.at(GetItem(index_gate, action));
+      } else if (IsKey(GetItem(index_gate, action))) {
+        OpenGate(kKeyToGate.at(GetItem(index_gate, action)));
+      }
       SetItem(index_gate, kElAgent, grid_.ids[index], action);
       SetItem(index, kElEmpty, ++id_counter_);
     }
@@ -1126,9 +1139,11 @@ std::string StonesNGemsState::Serialize() const {
   absl::StrAppend(&out_str, cur_player_, "\n");
   // grid contents
   int col_counter = 0;
-  for (const auto el : grid_.elements) {
+  for (std::size_t i = 0; i < grid_.elements.size(); ++i) {
     ++col_counter;
-    absl::StrAppend(&out_str, static_cast<int>(el.cell_type), ",");
+    absl::StrAppend(&out_str, static_cast<int>(grid_.elements[i].cell_type),
+                    ",");
+    absl::StrAppend(&out_str, grid_.ids[i], ",");
     if (col_counter == grid_.num_cols) {
       out_str.pop_back();
       absl::StrAppend(&out_str, "\n");
@@ -1166,13 +1181,7 @@ StonesNGemsState::StonesNGemsState(
       grid_(grid),
       obs_show_ids_(obs_show_ids),
       id_counter_(id_counter),
-      cur_player_(player) {
-  // Initialize the grid element IDs
-  grid_.ids.clear();
-  for (std::size_t i = 0; i < grid.elements.size(); ++i) {
-    grid_.ids.push_back(++id_counter_);
-  }
-}
+      cur_player_(player) {}
 
 // ------ Game -------
 
@@ -1213,18 +1222,22 @@ std::unique_ptr<State> StonesNGemsGame::DeserializeState(
   for (std::size_t i = 1; i < lines.size(); ++i) {
     std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
     // Check for proper number of columns
-    if (grid_line.size() != grid.num_cols) {
+    if (grid_line.size() != grid.num_cols * 2) {
       SpielFatalError(absl::StrCat("Grid line ", i - 1,
                                    "doesn't have correct number of elements."));
     }
     // Check each element in row
-    for (const auto &type : grid_line) {
-      auto it = kCellTypeToElement.find(std::stoi(type));
+    // for (const auto &type : grid_line) {
+    for (std::size_t i = 0; i < grid_line.size() / 2; ++i) {
+      // Element
+      auto it = kCellTypeToElement.find(std::stoi(grid_line[2 * i]));
       if (it != kCellTypeToElement.end()) {
         grid.elements.push_back(it->second);
       } else {
-        SpielFatalError(absl::StrCat("Unknown element id: ", type));
+        SpielFatalError(absl::StrCat("Unknown element id: ", grid_line[2 * i]));
       }
+      // ID
+      grid.ids.push_back(std::stoi(grid_line[2 * i + 1]));
     }
   }
   // Ensure we read proper number of rows
@@ -1312,7 +1325,7 @@ Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
     SpielFatalError("Empty map string passed.");
   }
   // Parse first line which contains level properties
-  std::vector<std::string> property_line = absl::StrSplit(lines[0], ',');
+  std::vector<std::string> property_line = absl::StrSplit(lines[0], '|');
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[0], &grid.num_cols));
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[1], &grid.num_rows));
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(property_line[2], &max_steps_));
@@ -1321,7 +1334,7 @@ Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
   // Parse grid contents
   for (std::size_t i = 1; i < lines.size(); ++i) {
     // Check for proper number of columns
-    std::vector<std::string> grid_line = absl::StrSplit(lines[i], ',');
+    std::vector<std::string> grid_line = absl::StrSplit(lines[i], '|');
     if (grid_line.size() != grid.num_cols) {
       SpielFatalError(absl::StrCat(
           "Grid line ", i - 1, " doesn't have correct number of elements.",
@@ -1349,6 +1362,12 @@ Grid StonesNGemsGame::ParseGrid(const std::string &grid_string,
     SpielFatalError("Grid string doesn't contain the agent.");
   }
   blob_max_size_ = (int)(grid_.num_cols * grid_.num_rows * blob_max_percentage);
+
+  // Initialize the grid element IDs
+  grid_.ids.clear();
+  for (std::size_t i = 0; i < grid.elements.size(); ++i) {
+    grid_.ids.push_back(i + 1);
+  }
 
   return grid;
 }

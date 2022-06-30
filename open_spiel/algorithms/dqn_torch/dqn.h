@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,8 +29,7 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/circular_buffer.h"
 
-// Note: This code is still experimental. Currently it does not appear to be
-// learning catch (see dqn_torch_example.cc).
+// Note: This implementation has only been lightly tested on a few small games.
 
 namespace open_spiel {
 namespace algorithms {
@@ -103,13 +102,21 @@ class DQN : public Agent {
   double GetEpsilon(bool is_evaluation, int power = 1.0);
   int seed() const { return seed_; }
 
+  // Load checkpoint/trained model and optimizer
+  void Load(const std::string& data_path,
+            const std::string& optimizer_data_path = "");
+  // Save checkpoint/trained model and optimizer
+  void Save(const std::string& data_path,
+            const std::string& optimizer_data_path = "");
+
  private:
   std::vector<float> GetInfoState(const State& state, Player player_id,
                                   bool use_observation);
   void AddTransition(const State& prev_state, Action prev_action,
                      const State& state);
   Action EpsilonGreedy(std::vector<float> info_state,
-                       std::vector<Action> legal_actions, double epsilon);
+                       std::vector<Action> legal_actions,
+                       double epsilon);
   void Learn();
 
   int seed_;

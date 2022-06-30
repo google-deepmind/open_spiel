@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2019 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -73,8 +73,8 @@
 //                                          kDefaultGrid below)
 //
 // Grid parameter specification
-//     - The grid string parameter is a comma-separated string representing the
-//     map
+//     - The grid string parameter is a pipe-separated (|) string representing
+//     the map
 //     - The first line should contain the # of cols, # of rows, max_steps, and
 //     gems required
 //     - The following lines represent the rows, with elements column separated
@@ -236,19 +236,19 @@ struct Grid {
 
 // Default map, simple level of gems/stones/exit
 inline constexpr char kDefaultGrid[] =
-    "20,12,600,4\n"
-    "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19\n"
-    "19,03,02,02,03,02,02,02,02,03,02,02,02,02,02,03,02,02,02,19\n"
-    "19,02,00,02,02,02,02,02,02,01,02,02,02,02,02,02,02,02,02,19\n"
-    "19,02,02,02,05,02,02,02,02,02,02,03,02,02,02,02,02,02,02,19\n"
-    "19,18,18,18,18,18,18,18,18,18,18,18,18,18,02,02,02,03,02,19\n"
-    "19,02,02,02,02,02,05,02,02,02,02,02,02,02,02,02,02,02,02,19\n"
-    "19,02,02,03,02,02,02,02,02,02,02,05,02,02,03,02,02,01,01,19\n"
-    "19,02,02,03,02,02,02,03,02,02,02,02,02,02,02,02,02,01,11,19\n"
-    "19,02,02,02,02,02,18,18,18,18,18,18,18,18,18,18,18,18,18,19\n"
-    "19,02,02,05,02,02,02,02,02,02,05,03,02,02,03,02,02,03,02,19\n"
-    "19,02,02,02,02,02,02,02,02,02,02,02,02,02,03,02,02,02,02,07\n"
-    "19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19";
+    "20|12|600|4\n"
+    "19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19\n"
+    "19|03|02|02|03|02|02|02|02|03|02|02|02|02|02|03|02|02|02|19\n"
+    "19|02|00|02|02|02|02|02|02|01|02|02|02|02|02|02|02|02|02|19\n"
+    "19|02|02|02|05|02|02|02|02|02|02|03|02|02|02|02|02|02|02|19\n"
+    "19|18|18|18|18|18|18|18|18|18|18|18|18|18|02|02|02|03|02|19\n"
+    "19|02|02|02|02|02|05|02|02|02|02|02|02|02|02|02|02|02|02|19\n"
+    "19|02|02|03|02|02|02|02|02|02|02|05|02|02|03|02|02|01|01|19\n"
+    "19|02|02|03|02|02|02|03|02|02|02|02|02|02|02|02|02|01|11|19\n"
+    "19|02|02|02|02|02|18|18|18|18|18|18|18|18|18|18|18|18|18|19\n"
+    "19|02|02|05|02|02|02|02|02|02|05|03|02|02|03|02|02|03|02|19\n"
+    "19|02|02|02|02|02|02|02|02|02|02|02|02|02|03|02|02|02|02|07\n"
+    "19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19|19";
 
 class StonesNGemsState : public State {
  public:
@@ -350,7 +350,7 @@ class StonesNGemsGame : public Game {
     return std::unique_ptr<State>(new StonesNGemsState(
         shared_from_this(), max_steps_, magic_wall_steps_, false,
         blob_max_size_, 0, blob_chance_, kNullElement, true, gems_required_, 0,
-        0, 0, grid_, obs_show_ids_, 0, 0));
+        0, 0, grid_, obs_show_ids_, (int)grid_.ids.size(), 0));
   }
   int MaxGameLength() const override;
   int NumPlayers() const override;

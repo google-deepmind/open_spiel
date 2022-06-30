@@ -1,10 +1,10 @@
-// Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,10 +79,26 @@ class Bot {
   virtual Action Step(const State& state) = 0;
 
   // Let the bot know that a different player made an action at a given state.
+  //
+  // The state is the state at which the `player_id` player decided to take
+  // the given `action` (but before it is applied to the state). Some usage
+  // example looks like:
+  //
+  //   Player current_player = state->CurrentPlayer();
+  //   Action action = bots[current_player]->Step(*state);
+  //   for (Player p = 0; p < num_players; ++p) {
+  //     if (p != current_player) {
+  //       bots[p]->InformAction(*state, current_player, action);
+  //     }
+  //   }
+  //   state->ApplyAction(action);  # We apply the action after informing bots.
+  //
   // This is useful for stateful bots so they know that the state of the game
   // has advanced. This should not be called for the bot that generated the
   // action as it already knows the action it took. As most bots are not
   // stateful, the default implementation is a no-op.
+  // This is more explicit and less error prone than having bots inspect and
+  // potentially replay the history of actions.
   virtual void InformAction(const State& state, Player player_id,
                             Action action) {}
   // In simultaneous move games the bot receives a vector containing the

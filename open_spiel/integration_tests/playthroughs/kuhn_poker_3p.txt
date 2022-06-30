@@ -194,8 +194,8 @@ ObservationTensor(1).pot_contribution: ◉◉◉
 ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◉◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -250,8 +250,8 @@ ObservationTensor(1).pot_contribution: ◉◉◉
 ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◉◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -306,8 +306,8 @@ ObservationTensor(1).pot_contribution: ◉◉◉
 ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◉◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -362,8 +362,8 @@ ObservationTensor(1).pot_contribution = [1.0, 1.0, 2.0]
 ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◉◯
 ObservationTensor(2).pot_contribution = [1.0, 1.0, 2.0]
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -418,8 +418,8 @@ ObservationTensor(1).pot_contribution = [2.0, 1.0, 2.0]
 ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◉◯
 ObservationTensor(2).pot_contribution = [2.0, 1.0, 2.0]
-Rewards() = [0.0, 0.0, 0.0]
-Returns() = [0.0, 0.0, 0.0]
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
 LegalActions() = [0, 1]
 StringLegalActions() = ["Pass", "Bet"]
 
@@ -474,5 +474,5 @@ ObservationTensor(1).pot_contribution = [2.0, 1.0, 2.0]
 ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◉◯
 ObservationTensor(2).pot_contribution = [2.0, 1.0, 2.0]
-Rewards() = [-2.0, -1.0, 3.0]
-Returns() = [-2.0, -1.0, 3.0]
+Rewards() = [-2, -1, 3]
+Returns() = [-2, -1, 3]

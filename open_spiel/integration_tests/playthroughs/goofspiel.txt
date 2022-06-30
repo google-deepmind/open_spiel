@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Goofspiel"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["imp_info", "num_cards", "num_turns", "players", "points_order", "returns_type"]
+GameType.parameter_specification = ["egocentric", "imp_info", "num_cards", "num_turns", "players", "points_order", "returns_type"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 4
 PolicyTensorShape() = [4]
 MaxChanceOutcomes() = 0
-GetParameters() = {imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss}
+GetParameters() = {egocentric=False,imp_info=True,num_cards=4,num_turns=-1,players=2,points_order=descending,returns_type=win_loss}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -101,8 +101,8 @@ ObservationTensor(1).win_sequence: ◯◯
                                    ◯◯
                                    ◯◯
                                    ◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 2, 3]
 LegalActions(1) = [0, 1, 2, 3]
 StringLegalActions(0) = ["[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 3", "[P0]Bid: 4"]
@@ -179,8 +179,8 @@ ObservationTensor(1).win_sequence: ◯◉
                                    ◯◯
                                    ◯◯
                                    ◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 1, 3]
 LegalActions(1) = [0, 1, 2]
 StringLegalActions(0) = ["[P0]Bid: 1", "[P0]Bid: 2", "[P0]Bid: 4"]
@@ -257,8 +257,8 @@ ObservationTensor(1).win_sequence: ◯◉
                                    ◉◯
                                    ◯◯
                                    ◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions(0) = [0, 3]
 LegalActions(1) = [1, 2]
 StringLegalActions(0) = ["[P0]Bid: 1", "[P0]Bid: 4"]
@@ -335,5 +335,5 @@ ObservationTensor(1).win_sequence: ◯◉
                                    ◉◯
                                    ◉◯
                                    ◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]

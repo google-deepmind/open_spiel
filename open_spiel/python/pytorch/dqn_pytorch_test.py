@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,10 @@
 
 """Tests for open_spiel.python.algorithms.dqn."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-from torch.testing._internal.common_utils import run_tests
-from torch.testing._internal.common_utils import TestCase
+import random
+from absl.testing import absltest
+import numpy as np
+import torch
 
 from open_spiel.python import rl_environment
 import pyspiel
@@ -33,32 +31,42 @@ SIMPLE_EFG_DATA = """
     t "L" 1 "Outcome L" { -1.0 }
     t "R" 2 "Outcome R" { 1.0 }
 """
+SEED = 24261711
 
 
-class DQNTest(TestCase):
+class DQNTest(absltest.TestCase):
 
   def test_simple_game(self):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
     env = rl_environment.Environment(game=game)
-    agent = dqn.DQN(0,
-                    state_representation_size=
-                    game.information_state_tensor_shape()[0],
-                    num_actions=game.num_distinct_actions(),
-                    hidden_layers_sizes=[16],
-                    replay_buffer_capacity=100,
-                    batch_size=5,
-                    epsilon_start=0.02,
-                    epsilon_end=0.01)
-    total_reward = 0
-
-    for _ in range(100):
+    agent = dqn.DQN(
+        0,
+        state_representation_size=game.information_state_tensor_shape()[0],
+        num_actions=game.num_distinct_actions(),
+        min_buffer_size_to_learn=10,
+        hidden_layers_sizes=[16],
+        replay_buffer_capacity=1000,
+        update_target_network_every=100,
+        learn_every=10,
+        discount_factor=0.99,
+        epsilon_decay_duration=1000,
+        batch_size=32,
+        epsilon_start=0.5,
+        epsilon_end=0.01)
+    total_eval_reward = 0
+    for _ in range(1000):
       time_step = env.reset()
       while not time_step.last():
         agent_output = agent.step(time_step)
         time_step = env.step([agent_output.action])
-        total_reward += time_step.rewards[0]
       agent.step(time_step)
-    self.assertGreaterEqual(total_reward, 75)
+    for _ in range(1000):
+      time_step = env.reset()
+      while not time_step.last():
+        agent_output = agent.step(time_step, is_evaluation=True)
+        time_step = env.step([agent_output.action])
+        total_eval_reward += time_step.rewards[0]
+    self.assertGreaterEqual(total_eval_reward, 250)
 
   def test_run_tic_tac_toe(self):
     env = rl_environment.Environment("tic_tac_toe")
@@ -123,41 +131,8 @@ class DQNTest(TestCase):
       agent.step(time_step)
 
 
-class ReplayBufferTest(TestCase):
-
-  def test_replay_buffer_add(self):
-    replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=10)
-    self.assertEqual(len(replay_buffer), 0)
-    replay_buffer.add("entry1")
-    self.assertEqual(len(replay_buffer), 1)
-    replay_buffer.add("entry2")
-    self.assertEqual(len(replay_buffer), 2)
-
-    self.assertIn("entry1", replay_buffer)
-    self.assertIn("entry2", replay_buffer)
-
-  def test_replay_buffer_max_capacity(self):
-    replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=2)
-    replay_buffer.add("entry1")
-    replay_buffer.add("entry2")
-    replay_buffer.add("entry3")
-    self.assertEqual(len(replay_buffer), 2)
-
-    self.assertIn("entry2", replay_buffer)
-    self.assertIn("entry3", replay_buffer)
-
-  def test_replay_buffer_sample(self):
-    replay_buffer = dqn.ReplayBuffer(replay_buffer_capacity=3)
-    replay_buffer.add("entry1")
-    replay_buffer.add("entry2")
-    replay_buffer.add("entry3")
-
-    samples = replay_buffer.sample(3)
-
-    self.assertIn("entry1", samples)
-    self.assertIn("entry2", samples)
-    self.assertIn("entry3", samples)
-
-
 if __name__ == "__main__":
-  run_tests()
+  random.seed(SEED)
+  torch.manual_seed(SEED)
+  np.random.seed(SEED)
+  absltest.main()

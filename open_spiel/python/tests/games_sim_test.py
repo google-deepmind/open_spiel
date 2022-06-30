@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +14,6 @@
 
 """Python spiel example."""
 
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import pickle
 
@@ -311,6 +307,21 @@ class GamesSimTest(parameterized.TestCase):
                             not checker_moves[1].hit)
         action = np.random.choice(legal_actions)
         state.apply_action(action)
+
+  def test_leduc_get_and_set_private_cards(self):
+    game = pyspiel.load_game("leduc_poker")
+    state = game.new_initial_state()
+    state.apply_action(0)   # give player 0 jack of first suit
+    state.apply_action(1)   # give player 1 jack of second suit
+    # check that we can retrieve those cards
+    print(state)
+    private_cards = state.get_private_cards()
+    self.assertEqual(private_cards, [0, 1])
+    # now give them queens instead, get them again, and check that it worked
+    state.set_private_cards([2, 3])
+    print(state)
+    private_cards = state.get_private_cards()
+    self.assertEqual(private_cards, [2, 3])
 
   @parameterized.parameters(
       {"game_name": "blotto"},

@@ -95,8 +95,8 @@ ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ"
 ObservationString(1) = "SQSJ"
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6]
 StringLegalActions() = ["Pass", "1H", "1S", "1NT", "2H", "2S", "2NT"]
 
@@ -119,8 +119,8 @@ ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2S:Us"
 ObservationString(1) = "SQSJ 2S:Pd"
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0, 6]
 StringLegalActions() = ["Pass", "2NT"]
 
@@ -143,8 +143,8 @@ ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2NT:Pd"
 ObservationString(1) = "SQSJ 2NT:Us"
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉
-Rewards() = [0.0, 0.0]
-Returns() = [0.0, 0.0]
+Rewards() = [0, 0]
+Returns() = [0, 0]
 LegalActions() = [0]
 StringLegalActions() = ["Pass"]
 
@@ -167,5 +167,5 @@ ObservationString(0) = "SJHJ SJHK SJHQ SKHJ SKHK SKHQ SQHJ SQHK SQHQ 2NT:Pd"
 ObservationString(1) = "SQSJ 2NT:Us"
 ObservationTensor(0): ◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯
-Rewards() = [-39.99999999999999, -39.99999999999999]
-Returns() = [-39.99999999999999, -39.99999999999999]
+Rewards() = [-40, -40]
+Returns() = [-40, -40]

@@ -1,10 +1,10 @@
-# Copyright 2019 DeepMind Technologies Ltd. All rights reserved.
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,10 +30,6 @@ player_id`), to obtain a dict of {action: probability}. `TabularPolicy`
 objects expose a lower-level interface, which may be more efficient for
 some use cases.
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import itertools
 from typing import Iterable
@@ -327,6 +323,20 @@ class TabularPolicy(Policy):
       ```
     """
     return self.action_probability_array[self.state_lookup[key]]
+
+  def to_dict(self):
+    """Returns a single dictionary representing the tabular policy.
+
+    Returns:
+      A dictionary of string keys to lists of (action, prob) pairs.
+    """
+    policy_dict = {}
+    num_actions = self.action_probability_array.shape[1]
+    for infostate_key, index in self.state_lookup.items():
+      probs = self.action_probability_array[index]
+      actions_and_probs = [(a, probs[a]) for a in range(num_actions)]
+      policy_dict[infostate_key] = actions_and_probs
+    return policy_dict
 
   def __copy__(self, copy_action_probability_array=True):
     """Returns a shallow copy of self.
