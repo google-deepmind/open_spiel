@@ -53,6 +53,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
 <font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
+<font color="orange"><b>~</b></font>         | [Nim](#nim)
 <font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
@@ -520,6 +521,16 @@ Status                                       | Game
 *   2 players.
 *   [Lewis et al. '17](https://arxiv.org/abs/1706.05125),
     [Cao et al. '18](https://arxiv.org/abs/1804.03980)
+
+### Nim
+
+*   Two agents take objects from distinct piles trying to either avoid taking the last one or take it. 
+    Any positive number of objects can be taken on each turn given they all come from the same pile.
+*   Traditional mathematical game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Nim)
 
 ### Oh Hell
 

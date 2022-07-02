@@ -23,10 +23,19 @@
 
 #include "open_spiel/spiel.h"
 
+// Nim:
+// * Two players take turns removing objects from distinct piles;
+// * On each turn, a player must remove at least one object,
+//      and may remove any number of objects provided they all come from the same heap or pile;
+// * Depending on the version, the goal of the game is either to avoid taking the last object or to take it.
+// Please see https://en.wikipedia.org/wiki/Nim for more
+
 namespace open_spiel {
 namespace nim {
 
 // Constants.
+// bits in a number that corresponds to an amount of objects in a single pile;
+//    used to encode an observation tensor in binary
 inline constexpr int kBits = 16;
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultNumPiles = 3;

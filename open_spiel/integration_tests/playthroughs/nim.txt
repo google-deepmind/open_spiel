@@ -40,8 +40,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = ""
 InformationStateString(1) = ""
-ObservationString(0) = "1 3 5 7 "
-ObservationString(1) = "1 3 5 7 "
+ObservationString(0) = "1 3 5 7"
+ObservationString(1) = "1 3 5 7"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 Rewards() = [0, 0]
@@ -62,8 +62,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "11"
 InformationStateString(1) = "11"
-ObservationString(0) = "1 3 5 4 "
-ObservationString(1) = "1 3 5 4 "
+ObservationString(0) = "1 3 5 4"
+ObservationString(1) = "1 3 5 4"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 Rewards() = [0, 0]
@@ -84,8 +84,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "11, 2"
 InformationStateString(1) = "11, 2"
-ObservationString(0) = "1 3 4 4 "
-ObservationString(1) = "1 3 4 4 "
+ObservationString(0) = "1 3 4 4"
+ObservationString(1) = "1 3 4 4"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 Rewards() = [0, 0]
@@ -106,8 +106,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "11, 2, 1"
 InformationStateString(1) = "11, 2, 1"
-ObservationString(0) = "1 2 4 4 "
-ObservationString(1) = "1 2 4 4 "
+ObservationString(0) = "1 2 4 4"
+ObservationString(1) = "1 2 4 4"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯
 Rewards() = [0, 0]
@@ -128,8 +128,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "11, 2, 1, 7"
 InformationStateString(1) = "11, 2, 1, 7"
-ObservationString(0) = "1 2 4 2 "
-ObservationString(1) = "1 2 4 2 "
+ObservationString(0) = "1 2 4 2"
+ObservationString(1) = "1 2 4 2"
 ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 Rewards() = [0, 0]
@@ -150,8 +150,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "11, 2, 1, 7, 1"
 InformationStateString(1) = "11, 2, 1, 7, 1"
-ObservationString(0) = "1 1 4 2 "
-ObservationString(1) = "1 1 4 2 "
+ObservationString(0) = "1 1 4 2"
+ObservationString(1) = "1 1 4 2"
 ObservationTensor(0): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
 Rewards() = [0, 0]
@@ -192,8 +192,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "11, 2, 1, 7, 1, 0, 10, 2, 3, 3, 1"
 InformationStateString(1) = "11, 2, 1, 7, 1, 0, 10, 2, 3, 3, 1"
-ObservationString(0) = "0 0 0 0 "
-ObservationString(1) = "0 0 0 0 "
+ObservationString(0) = "0 0 0 0"
+ObservationString(1) = "0 0 0 0"
 ObservationTensor(0): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [-1, 1]

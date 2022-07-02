@@ -110,6 +110,8 @@ void NimState::DoApplyAction(Action move) {
   std::pair<int, int> action = UnpackAction(move);
   int pile_idx = action.first, take = action.second;
 
+  SPIEL_CHECK_LT(pile_idx, piles_.size());
+  SPIEL_CHECK_GT(take, 0);
   SPIEL_CHECK_LE(take, piles_[pile_idx]);
 
   piles_[pile_idx] -= take;
@@ -146,7 +148,10 @@ NimState::NimState(std::shared_ptr<const Game> game, int num_piles, std::vector<
 std::string NimState::ToString() const {
   std::string str;
   for (std::size_t pile_idx = 0; pile_idx < piles_.size(); pile_idx++) {
-    absl::StrAppend(&str, piles_[pile_idx], " ");
+    absl::StrAppend(&str, piles_[pile_idx]);
+    if (pile_idx != piles_.size() - 1) {
+      absl::StrAppend(&str, " ");
+    }
   }
   return str;
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/algorithms/value_iteration.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -20,6 +21,7 @@ namespace nim {
 namespace {
 
 namespace testing = open_spiel::testing;
+namespace algorithms = open_spiel::algorithms;
 
 void BasicNimTests() {
   testing::LoadGameTest("nim");
@@ -45,10 +47,99 @@ void BasicNimTests() {
       10);
 }
 
+void SinglePileNormalTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("100")},
+          {"is_misere", GameParameter(false)},
+      });
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::vector<Action> actions = state->LegalActions();
+  SPIEL_CHECK_EQ(actions.size(), 100);
+
+  state->ApplyAction(actions.back());
+  SPIEL_CHECK_EQ(state->IsTerminal(), 1);
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), 1);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), -1);
+}
+
+void SinglePileMisereTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("100")},
+      });
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::vector<Action> actions = state->LegalActions();
+  SPIEL_CHECK_EQ(actions.size(), 100);
+
+  state->ApplyAction(actions.back());
+  SPIEL_CHECK_EQ(state->IsTerminal(), 1);
+  SPIEL_CHECK_EQ(state->PlayerReturn(0), -1);
+  SPIEL_CHECK_EQ(state->PlayerReturn(1), 1);
+}
+
+void VISinglePileMisereTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("100")},
+      });
+  auto values = algorithms::ValueIteration(*game, -1, 0.01);
+  SPIEL_CHECK_EQ(values["100"], 1);
+}
+
+// See "Winning positions" here
+// https://en.wikipedia.org/wiki/Nim
+// to understand the "pile_sizes" parameter from the tests below
+void VIThreeOnesNormalTest() {
+  std::shared_ptr<const Game> normal_game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("1;1;1")},
+          {"is_misere", GameParameter(false)},
+      });
+  auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
+  SPIEL_CHECK_EQ(values["1 1 1"], 1);
+}
+
+void VIThreeOnesMisereTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("1;1;1")},
+      });
+  auto values = algorithms::ValueIteration(*game, -1, 0.01);
+  SPIEL_CHECK_EQ(values["1 1 1"], -1);
+}
+
+void VIThreePilesTest() {
+  std::shared_ptr<const Game> normal_game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("5;8;13")},
+          {"is_misere", GameParameter(false)},
+      });
+  auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
+  SPIEL_CHECK_EQ(values["5 8 13"], -1);
+}
+
+void VIFourPilesTest() {
+  std::shared_ptr<const Game> normal_game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("2;3;8;10")},
+          {"is_misere", GameParameter(false)},
+      });
+  auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
+  SPIEL_CHECK_EQ(values["2 3 8 10"], 1);
+}
+
 }  // namespace
 }  // namespace nim
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
   open_spiel::nim::BasicNimTests();
+  open_spiel::nim::SinglePileNormalTest();
+  open_spiel::nim::SinglePileMisereTest();
+  open_spiel::nim::VISinglePileMisereTest();
+  open_spiel::nim::VIThreeOnesNormalTest();
+  open_spiel::nim::VIThreeOnesMisereTest();
+  open_spiel::nim::VIThreePilesTest();
+  open_spiel::nim::VIFourPilesTest();
 }
