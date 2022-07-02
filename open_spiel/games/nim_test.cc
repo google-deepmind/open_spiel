@@ -78,13 +78,23 @@ void SinglePileMisereTest() {
   SPIEL_CHECK_EQ(state->PlayerReturn(1), 1);
 }
 
+void VISinglePileNormalTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "nim", {
+          {"pile_sizes", GameParameter("100")},
+          {"is_misere", GameParameter(false)},
+      });
+  auto values = algorithms::ValueIteration(*game, -1, 0.01);
+  SPIEL_CHECK_EQ(values["(0): 100"], 1);
+}
+
 void VISinglePileMisereTest() {
   std::shared_ptr<const Game> game = LoadGame(
       "nim", {
           {"pile_sizes", GameParameter("100")},
       });
   auto values = algorithms::ValueIteration(*game, -1, 0.01);
-  SPIEL_CHECK_EQ(values["100"], 1);
+  SPIEL_CHECK_EQ(values["(0): 100"], 1);
 }
 
 // See "Winning positions" here
@@ -97,7 +107,7 @@ void VIThreeOnesNormalTest() {
           {"is_misere", GameParameter(false)},
       });
   auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
-  SPIEL_CHECK_EQ(values["1 1 1"], 1);
+  SPIEL_CHECK_EQ(values["(0): 1 1 1"], 1);
 }
 
 void VIThreeOnesMisereTest() {
@@ -106,7 +116,7 @@ void VIThreeOnesMisereTest() {
           {"pile_sizes", GameParameter("1;1;1")},
       });
   auto values = algorithms::ValueIteration(*game, -1, 0.01);
-  SPIEL_CHECK_EQ(values["1 1 1"], -1);
+  SPIEL_CHECK_EQ(values["(0): 1 1 1"], -1);
 }
 
 void VIThreePilesTest() {
@@ -116,7 +126,7 @@ void VIThreePilesTest() {
           {"is_misere", GameParameter(false)},
       });
   auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
-  SPIEL_CHECK_EQ(values["5 8 13"], -1);
+  SPIEL_CHECK_EQ(values["(0): 5 8 13"], -1);
 }
 
 void VIFourPilesTest() {
@@ -126,7 +136,7 @@ void VIFourPilesTest() {
           {"is_misere", GameParameter(false)},
       });
   auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
-  SPIEL_CHECK_EQ(values["2 3 8 10"], 1);
+  SPIEL_CHECK_EQ(values["(0): 2 3 8 10"], 1);
 }
 
 }  // namespace
@@ -137,6 +147,7 @@ int main(int argc, char **argv) {
   open_spiel::nim::BasicNimTests();
   open_spiel::nim::SinglePileNormalTest();
   open_spiel::nim::SinglePileMisereTest();
+  open_spiel::nim::VISinglePileNormalTest();
   open_spiel::nim::VISinglePileMisereTest();
   open_spiel::nim::VIThreeOnesNormalTest();
   open_spiel::nim::VIThreeOnesMisereTest();

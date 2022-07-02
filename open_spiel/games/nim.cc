@@ -147,6 +147,7 @@ NimState::NimState(std::shared_ptr<const Game> game, int num_piles, std::vector<
 
 std::string NimState::ToString() const {
   std::string str;
+  absl::StrAppend(&str, "(", current_player_, "): ");
   for (std::size_t pile_idx = 0; pile_idx < piles_.size(); pile_idx++) {
     absl::StrAppend(&str, piles_[pile_idx]);
     if (pile_idx != piles_.size() - 1) {
