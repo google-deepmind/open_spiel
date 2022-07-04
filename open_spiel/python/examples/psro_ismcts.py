@@ -16,45 +16,51 @@
 """Example use of ISMCTS as a best response oracle in PSRO.
 
 PSRO-ISMCTS demonstrates that online planning algorithms are compatiable with the population-based PSRO paradigm.
-It potentially fits for large-scale perfect-information games.
-On kuhn poker nashconv decreases from 1.0 to ~0.15 in 50 PSRO iterations.
+It potentially fits for any imperfect-information games with moderate size.
+For games with large state space, the tabular method may not scale.
+On kuhn poker nashconv decreases from 1.0 to ~0.02 in 100 PSRO iterations.
 """
-
-import time
 
 from absl import app
 from absl import flags
 
-import pyspiel
-
-from open_spiel.python.algorithms import policy_aggregator
+from open_spiel.python.algorithms.mcts import Evaluator 
 from open_spiel.python.algorithms.mcts import RandomRolloutEvaluator
 from open_spiel.python.algorithms.psro_v2 import optimization_oracle
-from open_spiel.python.algorithms.psro_v2 import utils
+from open_spiel.python.algorithms.psro_v2.utils import marginal_to_joint
 from open_spiel.python.algorithms.psro_v2 import psro_v2
+from open_spiel.python.algorithms import policy_aggregator
 from open_spiel.python.algorithms import best_response as pyspiel_best_response
 from open_spiel.python.policy import Policy
+from open_spiel.python import rl_tools
 
-
+import pyspiel
 import copy
+import time
 from enum import Enum
-
 import numpy as np
 
 
 FLAGS = flags.FLAGS
 
-# ISMCTS related
-flags.DEFINE_float("uct_c", 2, "uct_c for ISMCTS")
-flags.DEFINE_integer("rollout_count", 1, "rollout count for ISMCTS")
+# MCTS related
+flags.DEFINE_float("uct_c", 2, "uct_c for MCTS")
 flags.DEFINE_integer("max_simulations", 100,
-                     "max iterations for ISMCTS simulations phase")
-flags.DEFINE_integer("seed", 17, "random seed")
+                     "max iterations for MCTS simulations phase")
 
 # PSRO related
-flags.DEFINE_integer("psro_sims_per_entry", 1,
+flags.DEFINE_integer("psro_sims_per_entry", 100,
                      "simulation numbers for meta-game entry")
 flags.DEFINE_integer("psro_iterations", 100, "number of PSRO iterations")
+
+# AZ related
+flags.DEFINE_integer("az_episodes", 1000,
+                     "episodes for AZ training")
+flags.DEFINE_float("v_lr", 0.1, "AZ value learning rate")
+flags.DEFINE_float("p_lr", 0.1, "AZ prior learning rate")
+flags.DEFINE_integer("az_delay", 10, "AZ delay")
+flags.DEFINE_bool(
+    "use_obs", False, "use obs string or infoset for storing values")
 
 
 # ------------------adapted from C++ IS-MCTS implementations-------------
@@ -65,17 +71,20 @@ TIE_TOLERANCE = 1e-5
 
 
 class ISMCTSFinalPolicyType(Enum):
+  """A enumeration class for final ISMCTS policy type."""
   NORMALIZED_VISITED_COUNT = 1
   MAX_VISIT_COUNT = 2
   MAX_VALUE = 3
 
 
 class ChildSelectionPolicy(Enum):
+  """A enumeration class for children selection in ISMCTS."""
   UCT = 1
   PUCT = 2
 
 
 class ChildInfo(object):
+  """Child node information for the search tree."""
   def __init__(self, visits, return_sum, prior):
     self.visits = visits
     self.return_sum = return_sum
@@ -86,6 +95,7 @@ class ChildInfo(object):
 
 
 class ISMCTSNode(object):
+  """Node data structure for the search tree."""
   def __init__(self):
     self.child_info = {}
     self.total_visits = 0
@@ -93,10 +103,15 @@ class ISMCTSNode(object):
 
 
 class ISMCTSBot(pyspiel.Bot):
-  def __init__(self, game, evaluator, uct_c, max_simulations,
+  """Adapted from the C++ implementation."""
+  def __init__(self,
+               game,
+               evaluator,
+               uct_c,
+               max_simulations,
                max_world_samples=UNLIMITED_NUM_WORLD_SAMPLES,
                random_state=None,
-               final_policy_type=ISMCTSFinalPolicyType.NORMALIZED_VISITED_COUNT,
+               final_policy_type=ISMCTSFinalPolicyType.MAX_VISIT_COUNT,
                use_observation_string=False,
                allow_inconsistent_action_sets=False,
                child_selection_policy=ChildSelectionPolicy.PUCT):
@@ -192,7 +207,8 @@ class ISMCTSBot(pyspiel.Bot):
         elif child.visits > max_visits:
           max_visits = child.visits
           count = 1
-      policy = [(action, 1./count if child.visits == max_visits else 0.0)]
+      policy = [(action, 1./count if child.visits == max_visits else 0.0)
+                for action, child in node.child_info.items()]
     elif self._final_policy_type == ISMCTSFinalPolicyType.MAX_VALUE:
       assert node.total_visits > 0
       max_value = -float('inf')
@@ -203,7 +219,8 @@ class ISMCTSBot(pyspiel.Bot):
         elif child.value() > max_value:
           max_value = child.value()
           count = 1
-      policy = [(action, 1./count if child.value() == max_value else 0.0)]
+      policy = [(action, 1./count if child.value() == max_value else 0.0)
+                for action, child in node.child_info.items()]
 
     policy_size = len(policy)
     legal_actions = state.legal_actions()
@@ -355,17 +372,17 @@ class ISMCTSBot(pyspiel.Bot):
 # ------------------end of python adaption----------------------------
 
 class AgainstMixtureISMCTSBot(ISMCTSBot):
-  """An ISMCTS bot that conducts planning against a fixed mixture of opponents.
+  """An ISMCTS Bot searching against a mixture of opponent.
 
-  Args:
-    player_id: the player id that this bot corresponds to in a game
-    player_policies: if is_joint, then a list of lists each containing num_players policies, 
-    representing joint-policy profiles. Otherwise a list of lists each containing individual policies for each num_players
-    weights: lists of arrays. it corresponds to the mixture of player_policies
-    is_joint: a boolean indicating whether player_policies are represented as joint profile or not
-    epsilon: a trembling-hand parameters dealing with zero-reaching cases
-  """
-
+    Args:
+      player_id: the id of the searching player
+      player_policies: if is_joint, then a list of joint policy each of size num_of_player;
+      otherwise a list of num_of_player per-individual policy set
+      weights: the corresponding un-normalized probablistic weights for player_policies
+      is_joint: whether player_policies is represented as joint-policies or not
+      epsilon: a trembling-hand parameter
+      **ismcts_base_params: mcts-related parameters
+  """  
   def __init__(self,
                player_id,
                player_policies,
@@ -382,18 +399,7 @@ class AgainstMixtureISMCTSBot(ISMCTSBot):
     self._epsilon = epsilon
 
   def get_root_state_distributions(self, state):
-    """Computes correct posterior (state, opponent-sampling weights) distribution.
-
-      Using BFS search to compute the probabilities.
-      Args:
-        state: a game state
-      Returns:
-        a list of (state_p, weights, player_weights)
-        all state_p have the same infostate of the input state
-        weights are the corresponding un-normalized sampling weights
-        player_weights are the corresponding posterior sampling weights for this state_p 
-    """
-
+    """Computing posterior (history, joint opponent policies) using BFS."""
     player = state.current_player()
     infostate_action_map = {}
     working_state = self._game.new_initial_state()
@@ -450,13 +456,14 @@ class AgainstMixtureISMCTSBot(ISMCTSBot):
         i += 1
     return final_distribution
 
+  def set_evaluator(self, evaluator):
+    self._evaluator = evaluator
+
   def sample_root_state_and_policies(self, state):
-    """Sample a (state, opponent-mixture) from the current infostate"""
     final_distribution = self.get_root_state_distributions(state)
     state_probs = np.array([elem[1]
                            for elem in final_distribution]) + self._epsilon
     state_probs = state_probs/np.sum(state_probs)
-    #print(final_distribution, state_probs)
     chosen_idx = self._random_state.choice(
         range(len(final_distribution)), p=state_probs)
     root_elem = final_distribution[chosen_idx]
@@ -494,13 +501,13 @@ class AgainstMixtureISMCTSBot(ISMCTSBot):
 
     for sim in range(self._max_simulations):
       sampled_root_state, sampled_player_policies = self.sample_root_state_and_policies(
-          state)  # how to sample a pyspiel.state from another pyspiel.state?
+          state) 
 
       assert root_infostate_key == self.get_state_key(sampled_root_state)
       assert sampled_root_state
       self.run_simulation(sampled_root_state, sampled_player_policies)
 
-    if self._allow_inconsistent_action_sets:  # when this happens?
+    if self._allow_inconsistent_action_sets:
       legal_actions = state.legal_actions()
       temp_node = self.filter_illegals(self._root_node, legal_actions)
       assert temp_node.total_visits > 0
@@ -527,6 +534,7 @@ class AgainstMixtureISMCTSBot(ISMCTSBot):
     node = self.lookup_or_create_node(state)
 
     assert node
+    assert cur_player == self._player_id
 
     if node.total_visits == UNEXPANDED_VISIT_COUNT:
       node.total_visits = 0
@@ -535,9 +543,8 @@ class AgainstMixtureISMCTSBot(ISMCTSBot):
       return self._evaluator.evaluate(state)
     else:
       chosen_action = self.check_expand(
-          node, legal_actions)  # add one children at a time?
+          node, legal_actions)
       if chosen_action != pyspiel.INVALID_ACTION:
-        # check if all actions have been expanded, if not, select one?, if yes, ucb?
         self.expand_if_necessary(node, chosen_action)
       else:
         chosen_action = self.select_action_tree_policy(node, legal_actions)
@@ -552,29 +559,158 @@ class AgainstMixtureISMCTSBot(ISMCTSBot):
       return returns
 
 
-class WrappedISMCTSTabularPolicy(Policy):
-  """A policy class wrapping and caching ISMCTS search results."""
+class LearnedTabularEvaluator(Evaluator):
+  """A Tabular AlphaZero styled evaluator.
 
-  def __init__(self, game, ismcts_agent):
+    Args:
+      player_id: the player_id of the considered agent
+      initial_evaluator: the default evaluator for the initial values
+      use_obs: using observation_string() or information_state_string() for storing values
+  """  
+  def __init__(self, player_id, initial_evaluator=None, use_obs=True):
+    self._initial_evaluator = initial_evaluator or RandomRolloutEvaluator(1)
+    self._state_values = {}
+    self._priors = {}
+    self._player_id = player_id
+    self._use_obs=use_obs
+  
+  def get_state_key(self, state):
+    if self._use_obs:
+      return state.observation_string(self._player_id)
+    else:
+      return state.information_state_string(self._player_id)
+  
+  def evaluate(self, state):
+    state_key = self.get_state_key(state)
+    if state_key not in self._state_values:
+      self._state_values[state_key] = np.array(self._initial_evaluator.evaluate(state))
+    return self._state_values[state_key]
+  
+  def prior(self, state):
+    state_key = self.get_state_key(state)
+    if state_key not in self._priors:
+      self._priors[state_key] = dict(self._initial_evaluator.prior(state))
+    return list(self._priors[state_key].items())
+  
+  def learn_value_step(self, state, value_target, lr=0.001):
+    state_key = self.get_state_key(state)
+    state_value = self.evaluate(state) 
+    self._state_values[state_key] = (1-lr)*np.array(state_value) + lr*np.array(value_target)
+
+  def learn_prior_step(self, state, prior_target, lr=0.001):
+    state_key = self.get_state_key(state)
+    state_prior = dict(self.prior(state))
+    policy_map = {}
+    for action, prob in state_prior.items():
+      policy_map[action] = prob*(1-lr)
+    for action, prob in prior_target.items():
+      if action not in policy_map:
+        policy_map[action] = prob*lr
+      else:
+        policy_map[action] += prob*lr
+    self._priors[state_key] = policy_map
+
+
+class AZISMCTSTabularPolicy(Policy):
+  """A Wrapper policy class for tabular-based AlphaZero policy.
+
+    The wrapper class wraps an ISMCTS agent and provides a AlphaZero-like training method.
+  """
+  def __init__(self,
+               game,
+               player_id,
+               player_policies,
+               weights,
+               is_joint=False,
+               use_obs=True,
+               epsilon_schedule=rl_tools.ConstantSchedule(0.1),
+               random_state=None,
+               **ismcts_base_params):
     self._game = game
-    self._ismcts_agent = ismcts_agent
-    self._cache = {}
+    self._player_id = player_id
+    self._player_policies = player_policies
+    self._weights = weights
+    self._is_joint = is_joint
+    self._evaluator = LearnedTabularEvaluator(
+        player_id=player_id, use_obs=use_obs)
+    self._ismcts_bot = AgainstMixtureISMCTSBot(game=game,
+                                               player_id=player_id,
+                                               player_policies=player_policies,
+                                               weights=weights,
+                                               is_joint=is_joint,
+                                               evaluator=copy.deepcopy(
+                                                   self._evaluator),
+                                               child_selection_policy=ChildSelectionPolicy.PUCT,
+                                               **ismcts_base_params)
+    self._random_state = random_state or np.random.RandomState()
+    self._epsilon_schedule = epsilon_schedule
+
+  def az_train(self, num_episodes=1000, v_lr=0.01, p_lr=0.01, delay_interval=10):
+    for epi in range(num_episodes):
+      if self._is_joint:
+        norm_prob = np.array(self._weights)
+        norm_prob = norm_prob/np.sum(norm_prob)
+        policy_idx = self._random_state.choice(len(self._player_policies), p=norm_prob)
+        cur_policies = self._player_policies[policy_idx]
+      else:
+        norm_probs = [np.array(weights) for weights in self._weights]
+        norm_probs = [weights/np.sum(weights) for weights in norm_probs]
+        cur_policies = [self._random_state.choice(self._player_policies[n], p=norm_probs[n]) for n in range(len(norm_probs))]
+        
+      state = self._game.new_initial_state()
+      states = []
+      prior_targets = []
+      
+      while not state.is_terminal():
+        if state.current_player() != self._player_id:
+          if state.is_chance_node(): 
+            outcomes = state.chance_outcomes()
+            action_list, prob_list = zip(*outcomes)
+          else:
+            cur_player = state.current_player()
+            action_list, prob_list = zip(*(cur_policies[cur_player].action_probabilities(state)).items())
+          action = self._random_state.choice(action_list, p=prob_list)    
+        else:
+          policy, _ = self._ismcts_bot.step_with_policy(state)
+          prior_targets.append((state.clone(), dict(policy)))
+          epsilon = self._epsilon_schedule.step()
+          policy = [(action, (1-epsilon)*prob + epsilon/len(policy)) for (action, prob) in policy]
+          action_list, prob_list = zip(*policy)
+          action = self._random_state.choice(action_list, p=prob_list)
+        state.apply_action(action)
+        states.append(state.clone())
+      for i in range(len(states)):
+        self._evaluator.learn_value_step(states[i], state.returns(), v_lr)
+      for i in range(len(prior_targets)):
+        self._evaluator.learn_prior_step(prior_targets[i][0], prior_targets[i][1], p_lr)
+      if epi and epi % delay_interval == 0:
+        self._ismcts_bot.set_evaluator(copy.deepcopy(self._evaluator))
 
   def action_probabilities(self, state, player_id=None):
-    if state.information_state_string() in self._cache:
-      return self._cache[state.information_state_string()]
-    action_and_probs = self._ismcts_agent.step_with_policy(state)[0]
-    self._cache[state.information_state_string()] = {
-        action: prob for action, prob in action_and_probs}
-    return self._cache[state.information_state_string()]
+    """Return a greedy policy of the learned value estimation."""
+    assert state.current_player() == self._player_id
+    child_values = [(action, self._evaluator.evaluate(state.child(action)))
+                    for action in state.legal_actions()]
+    max_value = max(child_values, key=lambda x: x[1][self._player_id])[
+        1][self._player_id]
+    max_actions = [action for action,
+                   value in child_values if value[self._player_id] == max_value]
+    policy = [(action, 1./len(max_actions)) if value[self._player_id]
+              == max_value else (action, 0.) for action, value in child_values]
+    return dict(policy)
 
 
-class ISMCTSBROracle(optimization_oracle.AbstractOracle):
-  """A BR oracle class that generates ISMCTS-based BR policies"""
 
-  def __init__(self, **oracle_specific_execution_kwargs):
-    self._oracle_specific_execution_kwargs = oracle_specific_execution_kwargs
 
+class AZISMCTSBROracle(optimization_oracle.AbstractOracle):
+  """Wrapping AZISMCTSTabularPolicy as a BR oracle in PSRO."""
+  def __init__(self, az_episodes=1000, v_lr=0.001, p_lr=0.001, az_delay=10, **ismcts_base_params):
+    self._az_episodes = az_episodes
+    self._v_lr = v_lr
+    self._p_lr = p_lr
+    self._az_delay = az_delay
+    self._ismcts_base_params = ismcts_base_params
+  
   def __call__(self, game, training_parameters, strategy_sampler, using_joint_strategies, **oracle_specific_execution_kwargs):
     new_policies = []
     for player_parameters in training_parameters:
@@ -583,21 +719,26 @@ class ISMCTSBROracle(optimization_oracle.AbstractOracle):
         current_player = params['current_player']
         total_policies = params['total_policies']
         probabilities_of_playing_policies = params['probabilities_of_playing_policies']
+        
         if using_joint_strategies:
-          ismcts_agent = AgainstMixtureISMCTSBot(game=game, player_id=current_player,
-                                                 player_policies=utils.marginal_to_joint(
-                                                     utils.marginal_to_joint(total_policies)),
-                                                 weights=probabilities_of_playing_policies.reshape(
-                                                     -1),
-                                                 is_joint=True, **self._oracle_specific_execution_kwargs)
+          az_policy = AZISMCTSTabularPolicy(game=game, 
+                                          player_id=current_player,
+                                          player_policies=marginal_to_joint(total_policies),
+                                          weights=probabilities_of_playing_policies.reshape(-1),
+                                          is_joint=True,
+                                          **self._ismcts_base_params)
         else:
-          ismcts_agent = AgainstMixtureISMCTSBot(game=game, player_id=current_player,
-                                                 player_policies=total_policies,
-                                                 weights=probabilities_of_playing_policies,
-                                                 is_joint=False, **self._oracle_specific_execution_kwargs)
-        player_policies.append(WrappedISMCTSTabularPolicy(game, ismcts_agent))
+          az_policy = AZISMCTSTabularPolicy(game=game, 
+                                          player_id=current_player,
+                                          player_policies=total_policies,
+                                          weights=probabilities_of_playing_policies,
+                                          is_joint=False,
+                                          **self._ismcts_base_params)  
+                                        
+        az_policy.az_train(num_episodes=self._az_episodes, v_lr=self._v_lr, p_lr=self._p_lr, delay_interval=self._az_delay)
+        player_policies.append(az_policy)
       new_policies.append(player_policies)
-    return new_policies
+    return new_policies 
 
 
 def _state_values(state, num_players, policy):
@@ -633,23 +774,24 @@ def nash_conv(game, policy, use_cpp_br=False):
 
 
 def main(_):
-  rng = np.random.RandomState(FLAGS.seed)
-  evaluator = RandomRolloutEvaluator(FLAGS.rollout_count, rng)
-  psro_sims_per_entry = 1
 
   game = pyspiel.load_game("kuhn_poker")
 
-  ismcts_br = ISMCTSBROracle(
-      uct_c=FLAGS.uct_c, max_simulations=FLAGS.max_simulations, evaluator=evaluator)
+  ismcts_br = AZISMCTSBROracle(az_episodes=FLAGS.az_episodes,
+                               v_lr=FLAGS.v_lr,
+                               p_lr=FLAGS.p_lr,
+                               az_delay=FLAGS.az_delay,
+                               uct_c=FLAGS.uct_c,
+                               use_obs=FLAGS.use_obs,
+                               max_simulations=FLAGS.max_simulations)
 
   psro_solver = psro_v2.PSROSolver(game, ismcts_br, sims_per_entry=FLAGS.psro_sims_per_entry,
                                    training_strategy_selector='probabilistic',
                                    meta_strategy_method='nash',
                                    sample_from_marginals=True)
 
-
+  start_time = time.time()
   for it in range(FLAGS.psro_iterations):
-    start_time = time.time()
     meta_game = psro_solver.get_meta_game()
     meta_probabilities = psro_solver.get_meta_strategies()
     print("------------------iter {}--------------------------------".format(it))
@@ -673,6 +815,7 @@ def main(_):
     print(br_values)
     tt = (time.time()-start_time)/60
     print("spent {} mins".format(tt))
+    start_time = time.time()
     psro_solver.iteration()
 
 
