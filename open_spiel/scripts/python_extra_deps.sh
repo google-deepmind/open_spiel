@@ -26,5 +26,5 @@
 # scripts/global_variables.sh
 export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.3.7 jaxlib==0.3.7 dm-haiku==0.0.6 optax==0.1.2 chex==0.1.3 rlax==0.1.2"
 export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==1.11.0"
-export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.21.5 tensorflow==2.8.0 tensorflow-probability==0.16.0 tensorflow_datasets==4.5.2 keras==2.8.0"
-export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 cvxopt==1.3.0 networkx==2.4 matplotlib==3.3.2 mock==4.0.2 nashpy==0.0.19 scipy==1.7.3 testresources==2.0.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6"
+export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.21.6 tensorflow==2.9.0 tensorflow-probability==0.16.0 tensorflow_datasets==4.5.2 keras==2.9.0"
+export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 cvxopt==1.3.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.7.3 testresources==2.0.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6"
