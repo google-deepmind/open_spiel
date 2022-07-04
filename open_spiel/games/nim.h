@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2022 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,9 +25,10 @@
 
 // Nim:
 // * Two players take turns removing objects from distinct piles;
-// * On each turn, a player must remove at least one object,
-//      and may remove any number of objects provided they all come from the same heap or pile;
-// * Depending on the version, the goal of the game is either to avoid taking the last object or to take it.
+// * On each turn, a player must remove at least one object, and may remove
+//      any number of objects provided they all come from the same heap or pile;
+// * Depending on the version, the goal of the game is either to
+//      avoid taking the last object or to take it.
 // Please see https://en.wikipedia.org/wiki/Nim for more
 
 namespace open_spiel {
@@ -44,7 +45,10 @@ inline constexpr bool kDefaultIsMisere = true;
 // State of an in-play game.
 class NimState : public State {
  public:
-  explicit NimState(std::shared_ptr<const Game> game, int num_piles, std::vector<int> piles, bool is_misere);
+  explicit NimState(std::shared_ptr<const Game> game,
+                    int num_piles,
+                    std::vector<int> piles,
+                    bool is_misere);
 
   NimState(const NimState &) = default;
   NimState &operator=(const NimState &) = default;
@@ -73,7 +77,9 @@ class NimState : public State {
  private:
   bool IsEmpty() const;
   std::pair<int, int> UnpackAction(Action action_id) const;
-  void WriteIntToObservation(absl::Span<float> &values, int &offset, int num) const;
+  void WriteIntToObservation(absl::Span<float> &values,
+                             int &offset,
+                             int num) const;
   Player current_player_ = 0;         // Player zero goes first
   Player outcome_ = kInvalidPlayer;
   int num_moves_ = 0;
@@ -86,7 +92,10 @@ class NimGame : public Game {
   explicit NimGame(const GameParameters &params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new NimState(shared_from_this(), num_piles_, piles_, is_misere_));
+    return std::unique_ptr<State>(new NimState(shared_from_this(),
+                                               num_piles_,
+                                               piles_,
+                                               is_misere_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -97,7 +106,8 @@ class NimGame : public Game {
         2 +  // Turn
         1 +  // Is terminal?
         kBits +  // Single number `num_piles_`
-        num_piles_ * kBits  // Amount of objects in every of `num_piles_` pile, `kBits` bits each
+        // Amount of objects in every `num_piles_` piles, `kBits` bits each
+        num_piles_ * kBits
     };
   };
   int MaxGameLength() const override;

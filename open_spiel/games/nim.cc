@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2022 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -84,7 +84,8 @@ int NimGame::NumDistinctActions() const {
   if (piles_.empty()) {
     return 0;
   }
-  // action_id = (take - 1) * num_piles_ + pile_idx < (max_take - 1) * num_piles_ + num_piles = max_take * num_piles_
+  // action_id = (take - 1) * num_piles_ + pile_idx <
+  //    < (max_take - 1) * num_piles_ + num_piles = max_take * num_piles_
   int max_take = *std::max_element(piles_.begin(), piles_.end());
   return num_piles_ * max_take + 1;
 }
@@ -142,8 +143,10 @@ std::string NimState::ActionToString(Player player,
   return absl::StrCat("pile:", pile_idx + 1, ", take:", take, ";");
 }
 
-NimState::NimState(std::shared_ptr<const Game> game, int num_piles, std::vector<int> piles, bool is_misere)
-    : State(game), num_piles_(num_piles), piles_(piles), is_misere_(is_misere) {}
+NimState::NimState(std::shared_ptr<const Game> game, int num_piles,
+                   std::vector<int> piles, bool is_misere)
+    : State(game), num_piles_(num_piles),
+      piles_(piles), is_misere_(is_misere) {}
 
 std::string NimState::ToString() const {
   std::string str;
@@ -183,7 +186,9 @@ std::string NimState::ObservationString(Player player) const {
   return ToString();
 }
 
-void NimState::WriteIntToObservation(absl::Span<float> &values, int &offset, int num) const {
+void NimState::WriteIntToObservation(absl::Span<float> &values,
+                                     int &offset,
+                                     int num) const {
   for (int i = kBits - 1; i >= 0; i--) {
     values[offset + (kBits - i - 1)] = (num >> i) & 1U;
   }
@@ -192,7 +197,8 @@ void NimState::WriteIntToObservation(absl::Span<float> &values, int &offset, int
 
 void NimState::ObservationTensor(Player player,
                                  absl::Span<float> values) const {
-  // [one-hot player] + [IsTerminal()] + [binary representation of num_piles] + [binary representation of every pile]
+  // [one-hot player] + [IsTerminal()] + [binary representation of num_piles] +
+  // + [binary representation of every pile]
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   std::fill(values.begin(), values.end(), 0);

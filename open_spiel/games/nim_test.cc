@@ -1,4 +1,4 @@
-// Copyright 2019 DeepMind Technologies Limited
+// Copyright 2022 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ void BasicNimTests() {
   testing::RandomSimTest(
       *LoadGame("nim",
                 {
-                    {"pile_sizes", GameParameter("10000;2000;3000;12414;1515;53252;1;35126")},
+                    {"pile_sizes", GameParameter("10000;2000;3000;12414;1515")},
                 }),
       10);
   testing::RandomSimTest(
