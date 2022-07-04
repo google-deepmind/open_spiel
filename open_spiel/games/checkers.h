@@ -21,6 +21,11 @@
 // Some notes about this implementation:
 // - Drawing: 
 //     Game is drawn if no pieces have been removed in 40 moves
+//     (http://www.flyordie.com/games/help/checkers/en/games_rules_checkers.html)
+// - Custom board dimensions:
+//     Dimensions of the board can be customised by calling the
+//     CheckersState(rows, columns) constructer with the desired
+//     number of rows and columns
 
 #include <memory>
 #include <string>
