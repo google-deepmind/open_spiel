@@ -45,6 +45,8 @@ class BlackjackState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
 
   std::unique_ptr<State> Clone() const override;
@@ -64,6 +66,9 @@ class BlackjackState : public State {
 
  private:
   void MaybeApplyDealerAction();
+  void WriteAcesToObservation(absl::Span<float> &values,
+                              int &offset,
+                              int num) const;
 
   // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
 
@@ -94,6 +99,16 @@ class BlackjackGame : public Game {
   int NumPlayers() const override { return 1; }
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return +1; }
+  std::vector<int> ObservationTensorShape() const override {
+    // bits to represent an amount of aces
+    int kNumBitsForAces = __builtin_clz(1) - __builtin_clz(kNumSuits) + 1;
+    return {
+        NumPlayers() + 1 +  // turn
+        1 + // is terminal?
+        kNumBitsForAces * (NumPlayers() + 1) + // num_aces_ for every player
+        kDeckSize * (NumPlayers() + 1) // one-hot of the deck for every player
+    };
+  };
 };
 
 }  // namespace blackjack
