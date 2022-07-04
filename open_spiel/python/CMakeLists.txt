@@ -294,6 +294,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/nash_averaging_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
+      algorithms/stackelberg_lp_test.py
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
       egt/alpharank_test.py
