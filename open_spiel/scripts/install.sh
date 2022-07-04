@@ -107,7 +107,15 @@ fi
 
 DIR="open_spiel/abseil-cpp"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
+fi
+
+DIR="open_spiel/pybind11_abseil"
+if [[ ! -d ${DIR} ]]; then
+  cached_clone -b 'master' --single-branch --depth 1 https://github.com/pybind/pybind11_abseil.git ${DIR}
+  pushd ${DIR}
+  git checkout '73992b5'
+  popd
 fi
 
 # Optional dependencies.

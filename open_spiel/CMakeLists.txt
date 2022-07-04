@@ -197,6 +197,7 @@ set (OPEN_SPIEL_CORE_FILES
 # We add the subdirectory here so open_spiel_core can #include absl.
 set(ABSL_PROPAGATE_CXX_STD ON)
 add_subdirectory (abseil-cpp)
+include_directories (abseil-cpp)
 
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
