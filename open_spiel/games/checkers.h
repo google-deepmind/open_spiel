@@ -86,6 +86,7 @@ class CheckersState : public State {
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
   void SetCustomBoard(const std::string board_string);
+  CellState CrownStateIfLastRowReached(int row, CellState state);
   void SetBoard(int row, int column, CellState state) {    
     board_[row * columns_ + column] = state;
   }

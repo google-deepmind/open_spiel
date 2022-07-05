@@ -91,16 +91,6 @@ CellState CrownState(CellState state) {
   }
 }
 
-CellState CrownStateIfLastRowReached(int row, CellState state) {
-  if (row == 0 && state == CellState::kWhite) {
-    state = CellState::kWhiteCrowned;
-  }
-  if (row == kDefaultRows - 1 && state == CellState::kBlack) {
-    state = CellState::kBlackCrowned;
-  }
-  return state;
-}
-
 PieceType StateToPiece(CellState state) {
   switch (state) {
     case CellState::kWhite:
@@ -208,13 +198,24 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
       if ((row + column) % 2 == 1) {
         if (row >= 0 && row < kNumRowsWithPieces) {
           SetBoard(row, column, CellState::kBlack);
-        } else if (row >= (kDefaultRows - kNumRowsWithPieces)) {
+        } else if (row >= (rows_ - kNumRowsWithPieces)) {
           SetBoard(row, column, CellState::kWhite);
         }
       }
     }
   }
 }
+
+CellState CheckersState::CrownStateIfLastRowReached(int row, CellState state) {
+  if (row == 0 && state == CellState::kWhite) {
+    state = CellState::kWhiteCrowned;
+  }
+  if (row == rows_ - 1 && state == CellState::kBlack) {
+    state = CellState::kBlackCrowned;
+  }
+  return state;
+}
+
 
 void CheckersState::SetCustomBoard(const std::string board_string) {
   SPIEL_CHECK_EQ(rows_ * columns_, board_string.length() - 1);
