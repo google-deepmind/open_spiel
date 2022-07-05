@@ -30,13 +30,13 @@ namespace checkers {
 namespace {
 
 // Number of rows with pieces for each player
-inline constexpr int kNumRowsWithPieces = 3;
+constexpr int kNumRowsWithPieces = 3;
 // Types of moves: normal & capture 
-inline constexpr int kNumMoveType = 2;
+constexpr int kNumMoveType = 2;
 // Types of pieces: normal & crowned 
-inline constexpr int kNumPieceType = 2;
+constexpr int kNumPieceType = 2;
 // Number of unique directions each piece can take.
-inline constexpr int kNumDirections = 4;
+constexpr int kNumDirections = 4;
 
 // Index 0: Direction is diagonally up-left.
 // Index 1: Direction is diagonally up-right.

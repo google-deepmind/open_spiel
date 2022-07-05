@@ -36,12 +36,12 @@
 namespace open_spiel {
 namespace checkers {
 
-inline constexpr int kNumPlayers = 2;
-inline constexpr int kDefaultRows = 8;
-inline constexpr int kDefaultColumns = 8;
-inline constexpr int kMaxMovesWithoutCapture = 40;
+constexpr int kNumPlayers = 2;
+constexpr int kDefaultRows = 8;
+constexpr int kDefaultColumns = 8;
+constexpr int kMaxMovesWithoutCapture = 40;
 // Empty, White, WhiteCrowned, Black and BlackCrowned.
-inline constexpr int kCellStates = 5;  
+constexpr int kCellStates = 5;  
 
 // State of a cell.
 enum class CellState {
