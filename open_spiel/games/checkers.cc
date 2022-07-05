@@ -87,7 +87,7 @@ CellState CrownState(CellState state) {
     case CellState::kBlack:
       return CellState::kBlackCrowned;
     default:
-      SpielFatalError(absl::StrCat("Invalid state"));
+      SpielFatalError("Invalid state");
   }
 }
 
@@ -110,7 +110,7 @@ PieceType StateToPiece(CellState state) {
     case CellState::kBlackCrowned:
       return PieceType::kKing;
     default:
-      SpielFatalError(absl::StrCat("Invalid state"));
+      SpielFatalError("Invalid state");
   }
 }
 
