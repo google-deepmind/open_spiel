@@ -84,6 +84,27 @@ void CrownedPieceCanMoveBackwardsTest() {
   SPIEL_CHECK_EQ(cstate->BoardAt(1, 4), CellState::kWhiteCrowned);  
 }
 
+// Board:
+// 8........
+// 7....+.+.
+// 6........
+// 5....+.o.
+// 4.....o..
+// 3+.......
+// 2........
+// 1o.o.....
+//  abcdefgh
+// Player 0 move should end after piece crowned 
+void MoveShouldEndAfterPieceCrownedTest() {
+  std::shared_ptr<const Game> game = LoadGame("checkers");
+  std::unique_ptr<State> state = game->NewInitialState();
+  CheckersState* cstate = static_cast<CheckersState*>(state.get());
+  cstate->SetCustomBoard("0............+.+.............+.o......o..+...............o.o.....");
+  cstate->ApplyAction(cstate->LegalActions()[0]);
+  cstate->ApplyAction(cstate->LegalActions()[0]);
+  SPIEL_CHECK_EQ(cstate->CurrentPlayer(), 1);  
+}
+
 }  // namespace
 }  // namespace checkers
 }  // namespace open_spiel
@@ -93,4 +114,5 @@ int main(int argc, char** argv) {
   open_spiel::checkers::BasicCheckersTests();
   open_spiel::checkers::MultipleJumpTest();
   open_spiel::checkers::CrownedPieceCanMoveBackwardsTest();
+  open_spiel::checkers::MoveShouldEndAfterPieceCrownedTest();
 }

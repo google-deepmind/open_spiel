@@ -262,22 +262,26 @@ void CheckersState::DoApplyAction(Action action) {
       SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
       SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
       SetBoard((start_row + end_row) / 2, (start_column + end_column) / 2, CellState::kEmpty);
-      SetBoard(end_row, end_column, CrownStateIfLastRowReached(end_row, BoardAt(start_row, start_column)));
+      CellState end_state = CrownStateIfLastRowReached(end_row, BoardAt(start_row, start_column));
+      SetBoard(end_row, end_column, end_state);
+      bool piece_crowned = BoardAt(start_row, start_column) != end_state;
       SetBoard(start_row, start_column, CellState::kEmpty);
       moves_without_capture_ = 0;
 
       // Check if multiple jump is possible
-      std::vector<Action> moves = LegalActions();
-      std::vector<Action> moves_for_last_moved_piece;
-      for (Action action: moves) {
-        std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
-        if (move[0] == end_row && move[1] == end_column && move[3] == MoveType::kCapture) {
-          moves_for_last_moved_piece.push_back(action);
+      if (!piece_crowned) {
+        std::vector<Action> moves = LegalActions();
+        std::vector<Action> moves_for_last_moved_piece;
+        for (Action action: moves) {
+          std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_, kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
+          if (move[0] == end_row && move[1] == end_column && move[3] == MoveType::kCapture) {
+            moves_for_last_moved_piece.push_back(action);
+          }
         }
-      }    
-      if (moves_for_last_moved_piece.size() > 0) {
-        multiple_jump = true;
-        multiple_jump_piece_ = end_row * rows_ + end_column;
+        if (moves_for_last_moved_piece.size() > 0) {
+          multiple_jump = true;
+          multiple_jump_piece_ = end_row * rows_ + end_column;
+        }
       }
       break;
   }
