@@ -40,7 +40,8 @@ inline constexpr int kNumPlayers = 2;
 inline constexpr int kDefaultRows = 8;
 inline constexpr int kDefaultColumns = 8;
 inline constexpr int kMaxMovesWithoutCapture = 40;
-inline constexpr int kCellStates = 5;  // Empty, White, WhiteCrowned, Black and BlackCrowned.
+// Empty, White, WhiteCrowned, Black and BlackCrowned.
+inline constexpr int kCellStates = 5;  
 
 // State of a cell.
 enum class CellState {
@@ -101,7 +102,9 @@ class CheckersState : public State {
 
   Player current_player_ = 0;  // Player zero (White, 'o') goes first.
   Player outcome_ = kInvalidPlayer;
-  int multiple_jump_piece_ = 0; // Piece in the board who can do multiple jump. Represented by row * rows_ + column
+  // Piece in the board who can do multiple jump.
+  // Represented by row * rows_ + column
+  int multiple_jump_piece_ = 0; 
   int rows_;
   int columns_;
   int moves_without_capture_;

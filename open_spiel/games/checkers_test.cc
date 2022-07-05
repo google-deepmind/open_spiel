@@ -54,8 +54,9 @@ void MultipleJumpTest() {
   CheckersState* cstate = static_cast<CheckersState*>(state.get());
   cstate->SetCustomBoard("0..........*.................+.o......o..+..........+....o.o.....");
   cstate->ApplyAction(cstate->LegalActions()[0]);
-  // Confirm that player 0 is given only one action (f4 token is in the middle of a multiple jump) 
-  // and there's a capture opportunity for c1 piece as well (which cannot be moved in this extra move)
+  // Confirm that player 0 is given only one action (f4 token is in the middle 
+  // of a multiple jump) and there's a capture opportunity for c1 piece as well
+  // (which cannot be moved in this extra move)
   SPIEL_CHECK_EQ(cstate->LegalActions().size(), 1);
   cstate->ApplyAction(cstate->LegalActions()[0]);
   SPIEL_CHECK_EQ(cstate->BoardAt(0, 1), CellState::kWhiteCrowned);
