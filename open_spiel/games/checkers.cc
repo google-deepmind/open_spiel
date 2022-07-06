@@ -153,7 +153,7 @@ CellState OpponentState(CellState state) {
 }
 
 std::string RowLabel(int rows, int row) {
-  int row_number = 1 + (rows - 1 - row);
+  int row_number = rows - row;
   std::string label = std::to_string(row_number);
   return label;
 }
