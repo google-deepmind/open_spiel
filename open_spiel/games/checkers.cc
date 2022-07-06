@@ -139,7 +139,7 @@ CellState StringToState(std::string str) {
     return CellState::kWhite;
   } else if (str == "+") {
     return CellState::kBlack;
-    } else if (str == "8") {
+  } else if (str == "8") {
     return CellState::kWhiteCrowned;
   } else if (str == "*") {
     return CellState::kBlackCrowned;
