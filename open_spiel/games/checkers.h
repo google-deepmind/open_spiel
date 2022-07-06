@@ -48,8 +48,8 @@ enum class CellState {
   kEmpty,         // Represented by ' '.
   kWhite,         // Represented by 'o'.
   kBlack,         // Represented by '+'.
-  kWhiteCrowned,  // Represented by '8'.
-  kBlackCrowned,  // Represented by '*'.
+  kWhiteKing,  // Represented by '8'.
+  kBlackKing,  // Represented by '*'.
 };
 
 // Types of moves.

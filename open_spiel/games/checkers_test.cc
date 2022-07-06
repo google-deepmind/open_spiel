@@ -59,7 +59,7 @@ void MultipleJumpTest() {
   // (which cannot be moved in this extra move)
   SPIEL_CHECK_EQ(cstate->LegalActions().size(), 1);
   cstate->ApplyAction(cstate->LegalActions()[0]);
-  SPIEL_CHECK_EQ(cstate->BoardAt(0, 1), CellState::kWhiteCrowned);
+  SPIEL_CHECK_EQ(cstate->BoardAt(0, 1), CellState::kWhiteKing);
   SPIEL_CHECK_EQ(cstate->BoardAt(1, 2), CellState::kEmpty);
   SPIEL_CHECK_EQ(cstate->BoardAt(3, 4), CellState::kEmpty);  
 }
@@ -82,7 +82,7 @@ void CrownedPieceCanMoveBackwardsTest() {
   cstate->SetCustomBoard("0...8........................+...........+.......................");
   std::vector<Action> legal_actions = cstate->LegalActions();
   cstate->ApplyAction(legal_actions[0]);
-  SPIEL_CHECK_EQ(cstate->BoardAt(1, 4), CellState::kWhiteCrowned);  
+  SPIEL_CHECK_EQ(cstate->BoardAt(1, 4), CellState::kWhiteKing);  
 }
 
 // Board:

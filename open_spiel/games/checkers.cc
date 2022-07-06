@@ -83,9 +83,9 @@ int StateToPlayer(CellState state) {
 CellState CrownState(CellState state) {
   switch (state) {
     case CellState::kWhite:
-      return CellState::kWhiteCrowned;
+      return CellState::kWhiteKing;
     case CellState::kBlack:
-      return CellState::kBlackCrowned;
+      return CellState::kBlackKing;
     default:
       SpielFatalError("Invalid state");
   }
@@ -96,8 +96,8 @@ PieceType StateToPiece(CellState state) {
     case CellState::kWhite:
     case CellState::kBlack:
       return PieceType::kMan;
-    case CellState::kWhiteCrowned:
-    case CellState::kBlackCrowned:
+    case CellState::kWhiteKing:
+    case CellState::kBlackKing:
       return PieceType::kKing;
     default:
       SpielFatalError("Invalid state");
@@ -123,9 +123,9 @@ std::string StateToString(CellState state) {
       return "o";
     case CellState::kBlack:
       return "+";
-    case CellState::kWhiteCrowned:
+    case CellState::kWhiteKing:
       return "8";
-    case CellState::kBlackCrowned:
+    case CellState::kBlackKing:
       return "*";
     default:
       SpielFatalError("Unknown state.");
@@ -140,9 +140,9 @@ CellState StringToState(std::string str) {
   } else if (str == "+") {
     return CellState::kBlack;
   } else if (str == "8") {
-    return CellState::kWhiteCrowned;
+    return CellState::kWhiteKing;
   } else if (str == "*") {
-    return CellState::kBlackCrowned;
+    return CellState::kBlackKing;
   } else {
     SpielFatalError(absl::StrCat("Unknown state ", str));
   }
@@ -171,9 +171,9 @@ std::ostream& operator<<(std::ostream& stream, const CellState& state) {
       return stream << "White";
     case CellState::kBlack:
       return stream << "Black";
-    case CellState::kWhiteCrowned:
+    case CellState::kWhiteKing:
       return stream << "WhiteCrowned";
-    case CellState::kBlackCrowned:
+    case CellState::kBlackKing:
       return stream << "BlackCrowned";
     case CellState::kEmpty:
       return stream << "Empty";
@@ -208,10 +208,10 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
 
 CellState CheckersState::CrownStateIfLastRowReached(int row, CellState state) {
   if (row == 0 && state == CellState::kWhite) {
-    state = CellState::kWhiteCrowned;
+    state = CellState::kWhiteKing;
   }
   if (row == rows_ - 1 && state == CellState::kBlack) {
-    state = CellState::kBlackCrowned;
+    state = CellState::kBlackKing;
   }
   return state;
 }
@@ -453,10 +453,10 @@ int CheckersState::ObservationPlane(CellState state, Player player) const {
     case CellState::kWhite:
       state_value = 0;
       break;
-    case CellState::kWhiteCrowned:
+    case CellState::kWhiteKing:
       state_value = 1;
       break;
-    case CellState::kBlackCrowned:
+    case CellState::kBlackKing:
       state_value = 2;
       break;
     case CellState::kBlack:
