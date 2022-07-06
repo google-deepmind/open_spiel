@@ -132,19 +132,20 @@ std::string StateToString(CellState state) {
   }
 }
 
-CellState StringToState(std::string str) {
-  if (str == ".") {
-    return CellState::kEmpty;
-  } else if (str == "o") {
-    return CellState::kWhite;
-  } else if (str == "+") {
-    return CellState::kBlack;
-  } else if (str == "8") {
-    return CellState::kWhiteKing;
-  } else if (str == "*") {
-    return CellState::kBlackKing;
-  } else {
-    SpielFatalError(absl::StrCat("Unknown state ", str));
+CellState StringToState(char ch) {
+  switch (ch) {
+    case '.':
+      return CellState::kEmpty;
+    case 'o':
+      return CellState::kWhite;
+    case '+':
+      return CellState::kBlack;
+    case '8':
+      return CellState::kWhiteKing;
+    case '*':
+      return CellState::kBlackKing;
+    default:
+      SpielFatalError("Unknown state " + ch);
   }
 }
 
@@ -226,7 +227,7 @@ void CheckersState::SetCustomBoard(const std::string board_string) {
   for (int row = 0; row < rows_; row++) {
     for (int column = 0; column < columns_; column++) {
       char state_character = board_string[1 + row * columns_ + column];
-      CellState state = StringToState(std::string(1, state_character));
+      CellState state = StringToState(state_character);
       SetBoard(row, column, state);
     }
   }
