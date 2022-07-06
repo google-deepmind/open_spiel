@@ -221,6 +221,8 @@ CellState CheckersState::CrownStateIfLastRowReached(int row, CellState state) {
 void CheckersState::SetCustomBoard(const std::string board_string) {
   SPIEL_CHECK_EQ(rows_ * columns_, board_string.length() - 1);
   current_player_ = board_string[0] - '0';
+  SPIEL_CHECK_GE(current_player_, 0);
+  SPIEL_CHECK_LE(current_player_, 1);
   // Create the board from the board string. The characters 'o', '8' are White
   // (first player) & '+', '*' are Black (second player), and the character '.'
   // is an Empty cell. Population goes from top left to bottom right.
