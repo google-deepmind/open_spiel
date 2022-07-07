@@ -209,10 +209,10 @@ CheckersState::CheckersState(std::shared_ptr<const Game> game, int rows,
 
 CellState CheckersState::CrownStateIfLastRowReached(int row, CellState state) {
   if (row == 0 && state == CellState::kWhite) {
-    state = CellState::kWhiteKing;
+    return CellState::kWhiteKing;
   }
   if (row == rows_ - 1 && state == CellState::kBlack) {
-    state = CellState::kBlackKing;
+    return CellState::kBlackKing;
   }
   return state;
 }
