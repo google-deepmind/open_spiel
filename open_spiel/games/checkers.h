@@ -58,13 +58,24 @@ struct CheckersAction {
   int column;
   int direction;
   int move_type;
-  int captured_piece_type;
-  int piece_type;
-  CheckersAction(int _row, int _column, int _direction, int _move_type,
-      int _captured_piece_type, int _piece_type)
+  CheckersAction(int _row, int _column, int _direction, int _move_type)
       : row(_row), column(_column), direction(_direction),
-        move_type(_move_type), captured_piece_type(_captured_piece_type),
-        piece_type(_piece_type){}  
+        move_type(_move_type) {}
+};
+
+// This is a small helper to track historical turn info not stored in the moves.
+// It is only needed for proper implementation of Undo.
+struct TurnHistoryInfo {
+  Action action;
+  Player player;
+  // set to kMan if not a capture move
+  int captured_piece_type;
+  int player_piece_type;
+  TurnHistoryInfo(Action _action, Player _player, int _captured_piece_type
+      , int _player_piece_type)
+      : action(_action), player(_player),
+        captured_piece_type(_captured_piece_type),
+        player_piece_type(_player_piece_type) {}
 };
 
 // Types of moves.
@@ -110,7 +121,7 @@ class CheckersState : public State {
   CellState BoardAt(int row, int column) const {
     return board_[row * columns_ + column];
   }
-  std::vector<Action> LegalActions() const override;
+  std::vector<Action> LegalActions() const override;  
 
  protected:
   void DoApplyAction(Action action) override;
@@ -127,6 +138,7 @@ class CheckersState : public State {
   int columns_;
   int moves_without_capture_;
   std::vector<CellState> board_;
+  std::vector<TurnHistoryInfo> turn_history_info_;  // Info needed for Undo.
 };
 
 // Game object.
