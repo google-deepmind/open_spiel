@@ -256,8 +256,7 @@ void CheckersState::DoApplyAction(Action action) {
   SPIEL_CHECK_TRUE(InBounds(checkers_action.row, checkers_action.column));  
   
   int end_row, end_column;
-  bool multiple_jump = false;
-  multiple_jump_piece_ = 0;
+  multiple_jump_piece_ = kNoMultipleJumpsPossible;
   moves_without_capture_++;
 
   switch (checkers_action.move_type) {
@@ -300,7 +299,6 @@ void CheckersState::DoApplyAction(Action action) {
           CheckersAction move = SpielActionToCheckersAction(action);
           if (move.row == end_row && move.column == end_column
                 && move.move_type == MoveType::kCapture) {
-            multiple_jump = true;
             multiple_jump_piece_ = end_row * rows_ + end_column;
             break;
           }
@@ -309,7 +307,7 @@ void CheckersState::DoApplyAction(Action action) {
       break;
   }
 
-  if (!multiple_jump) {
+  if (multiple_jump_piece_ == kNoMultipleJumpsPossible) {
     current_player_ = 1 - current_player_; 
   }
 
@@ -391,7 +389,7 @@ std::vector<Action> CheckersState::LegalActions() const {
 
   // If capture moves are possible, it's mandatory to play them.
   if (!capture_move_list.empty()) {
-    if (multiple_jump_piece_ > 0) {
+    if (multiple_jump_piece_ != kNoMultipleJumpsPossible) {
       int multiple_jump_piece_row = multiple_jump_piece_ / rows_;
       int multiple_jump_piece_column = multiple_jump_piece_ % rows_;
       std::vector<Action> multiple_move_list;

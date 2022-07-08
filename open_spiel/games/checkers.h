@@ -41,7 +41,8 @@ constexpr int kDefaultRows = 8;
 constexpr int kDefaultColumns = 8;
 constexpr int kMaxMovesWithoutCapture = 40;
 // Empty, White, WhiteCrowned, Black and BlackCrowned.
-constexpr int kCellStates = 5;  
+constexpr int kCellStates = 5;
+constexpr int kNoMultipleJumpsPossible = -1;
 
 // State of a cell.
 enum class CellState {
@@ -121,7 +122,7 @@ class CheckersState : public State {
   Player outcome_ = kInvalidPlayer;
   // Piece in the board who can do multiple jump.
   // Represented by row * rows_ + column
-  int multiple_jump_piece_ = 0; 
+  int multiple_jump_piece_ = kNoMultipleJumpsPossible; 
   int rows_;
   int columns_;
   int moves_without_capture_;
