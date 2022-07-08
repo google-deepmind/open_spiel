@@ -30,6 +30,16 @@ void BasicSerializationTest() {
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
+void RandomSerializationTest() {
+  std::shared_ptr<const Game> game = LoadGame("checkers");
+  std::unique_ptr<State> state = game->NewInitialState();
+  for(int i = 0; i < 20; ++i) {
+    state->ApplyAction(state->LegalActions()[0]);
+  }
+  std::unique_ptr<State> state2 = game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
+}
+
 void BasicCheckersTests() {
   testing::LoadGameTest("checkers");
   testing::NoChanceOutcomesTest(*LoadGame("checkers"));
@@ -112,6 +122,7 @@ void MoveShouldEndAfterPieceCrownedTest() {
 
 int main(int argc, char** argv) {
   open_spiel::checkers::BasicSerializationTest();
+  open_spiel::checkers::RandomSerializationTest();
   open_spiel::checkers::BasicCheckersTests();
   open_spiel::checkers::MultipleJumpTest();
   open_spiel::checkers::CrownedPieceCanMoveBackwardsTest();
