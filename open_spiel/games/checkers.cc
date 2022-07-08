@@ -289,7 +289,10 @@ void CheckersState::DoApplyAction(Action action) {
       SetBoard(checkers_action.row, checkers_action.column, CellState::kEmpty);
       moves_without_capture_ = 0;
 
-      // Check if multiple jump is possible
+      // Check if multiple jump is possible for the piece that made the
+      // last capture. If that is the case, then the current player gets
+      // to move again with LegalActions restricted to multiple jump moves
+      // for this piece.
       if (!piece_crowned) {
         std::vector<Action> moves = LegalActions();
         std::vector<Action> moves_for_last_moved_piece;
