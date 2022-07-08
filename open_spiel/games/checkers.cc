@@ -235,44 +235,58 @@ void CheckersState::SetCustomBoard(const std::string board_string) {
   }
 }
 
-void CheckersState::DoApplyAction(Action action) {
+CheckersAction CheckersState::SpielActionToCheckersAction(Action action) const {
   std::vector<int> values = UnrankActionMixedBase(action, {rows_, columns_, 
       kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
+  return CheckersAction(values[0], values[1], values[2], values[3], values[4],
+      values[5]);
+}
 
-  const int start_row = values[0];
-  const int start_column = values[1];
-  const int direction = values[2];
-  const int move_type = values[3];
+Action CheckersState::CheckersActionToSpielAction(CheckersAction move) const {
+  std::vector<int> action_bases = {rows_, columns_, kNumDirections,
+      kNumMoveType, kNumPieceType, kNumPieceType};
+  return RankActionMixedBase(action_bases, {move.row, move.column,
+      move.direction, move.move_type, move.captured_piece_type,
+      move.piece_type});
+}
 
-  SPIEL_CHECK_TRUE(InBounds(start_row, start_column));  
+void CheckersState::DoApplyAction(Action action) {
+  CheckersAction checkers_action
+      = SpielActionToCheckersAction(action);  
+  SPIEL_CHECK_TRUE(InBounds(checkers_action.row, checkers_action.column));  
   
   int end_row, end_column;
   bool multiple_jump = false;
   multiple_jump_piece_ = 0;
   moves_without_capture_++;
 
-  switch (move_type) {
+  switch (checkers_action.move_type) {
     case MoveType::kNormal:
-      end_row = start_row + kDirRowOffsets[direction];
-      end_column = start_column + kDirColumnOffsets[direction];
+      end_row = checkers_action.row + kDirRowOffsets[checkers_action.direction];
+      end_column = checkers_action.column
+          + kDirColumnOffsets[checkers_action.direction];
       SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
       SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
       SetBoard(end_row, end_column, CrownStateIfLastRowReached(end_row,
-          BoardAt(start_row, start_column)));
-      SetBoard(start_row, start_column, CellState::kEmpty);
+          BoardAt(checkers_action.row, checkers_action.column)));
+      SetBoard(checkers_action.row, checkers_action.column, CellState::kEmpty);
       break;
     case MoveType::kCapture:
-      end_row = start_row + kDirRowOffsets[direction] * 2;
-      end_column = start_column + kDirColumnOffsets[direction] * 2;
+      end_row = checkers_action.row
+          + kDirRowOffsets[checkers_action.direction] * 2;
+      end_column = checkers_action.column
+          + kDirColumnOffsets[checkers_action.direction] * 2;
       SPIEL_CHECK_TRUE(InBounds(end_row, end_column));
       SPIEL_CHECK_EQ(BoardAt(end_row, end_column), CellState::kEmpty);
-      SetBoard((start_row + end_row) / 2, (start_column + end_column) / 2,
+      SetBoard((checkers_action.row + end_row) / 2,
+          (checkers_action.column + end_column) / 2,
           CellState::kEmpty);
       CellState end_state = CrownStateIfLastRowReached(end_row,
-          BoardAt(start_row, start_column));
+          BoardAt(checkers_action.row, checkers_action.column));
       SetBoard(end_row, end_column, end_state);
-      bool piece_crowned = BoardAt(start_row, start_column) != end_state;
-      SetBoard(start_row, start_column, CellState::kEmpty);
+      bool piece_crowned
+          = BoardAt(checkers_action.row, checkers_action.column) != end_state;
+      SetBoard(checkers_action.row, checkers_action.column, CellState::kEmpty);
       moves_without_capture_ = 0;
 
       // Check if multiple jump is possible
@@ -280,11 +294,9 @@ void CheckersState::DoApplyAction(Action action) {
         std::vector<Action> moves = LegalActions();
         std::vector<Action> moves_for_last_moved_piece;
         for (Action action: moves) {
-          std::vector<int> move = UnrankActionMixedBase(action, {rows_,
-              columns_, kNumDirections, kNumMoveType, kNumPieceType,
-                  kNumPieceType});
-          if (move[0] == end_row && move[1] == end_column
-                && move[3] == MoveType::kCapture) {
+          CheckersAction move = SpielActionToCheckersAction(action);
+          if (move.row == end_row && move.column == end_column
+                && move.move_type == MoveType::kCapture) {
             moves_for_last_moved_piece.push_back(action);
           }
         }
@@ -307,20 +319,18 @@ void CheckersState::DoApplyAction(Action action) {
 
 std::string CheckersState::ActionToString(Player player,
                                          Action action_id) const {
-  std::vector<int> values = UnrankActionMixedBase(action_id, {rows_, columns_,
-      kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
-
-  const int start_row = values[0];
-  const int start_column = values[1];
-  const int direction = values[2];
-  const int move_type = values[3];
-  const int end_row = start_row + kDirRowOffsets[direction] * (move_type + 1);
+  CheckersAction checkers_action = SpielActionToCheckersAction(action_id);
+  const int end_row = checkers_action.row
+      + kDirRowOffsets[checkers_action.direction]
+      * (checkers_action.move_type + 1);
   const int end_column
-      = start_column + kDirColumnOffsets[direction] * (move_type + 1);
+      = checkers_action.column
+      + kDirColumnOffsets[checkers_action.direction]
+      * (checkers_action.move_type + 1);
 
-  std::string action_string =
-      absl::StrCat(ColumnLabel(start_column), RowLabel(rows_, start_row),
-                   ColumnLabel(end_column), RowLabel(rows_, end_row));
+  std::string action_string = absl::StrCat(ColumnLabel(checkers_action.column),
+      RowLabel(rows_, checkers_action.row), ColumnLabel(end_column),
+      RowLabel(rows_, end_row));
 
   return action_string;
 }
@@ -334,7 +344,6 @@ std::vector<Action> CheckersState::LegalActions() const {
   CellState current_player_crowned = CrownState(current_player_state);
   std::vector<int> action_bases = {rows_, columns_, kNumDirections,
       kNumMoveType, kNumPieceType, kNumPieceType};
-  std::vector<int> action_values = {0, 0, 0, 0, 0, 0};
 
   for (int row = 0; row < rows_; row++) {
     for (int column = 0; column < columns_; column++) {
@@ -356,20 +365,10 @@ std::vector<Action> CheckersState::LegalActions() const {
             CellState opponent_state_crowned = CrownState(opponent_state);
 
             if (adjacent_state == CellState::kEmpty) {
-              // Initial row value of player piece
-              action_values[0] = row;
-              // Initial column value of player piece
-              action_values[1] = column;
-              // Direction of move for player piece
-              action_values[2] = direction;
-              // Type of move
-              action_values[3] = MoveType::kNormal;
-              // Type of captured piece if any. kMan by default
-              action_values[4] = PieceType::kMan;
-              // Type of player piece
-              action_values[5] = StateToPiece(BoardAt(row, column));
-              move_list.push_back(
-                  RankActionMixedBase(action_bases, action_values));
+              CheckersAction move = CheckersAction(row, column, direction,
+                  MoveType::kNormal, PieceType::kMan,
+                  StateToPiece(BoardAt(row, column)));              
+              move_list.push_back(CheckersActionToSpielAction(move));
             } else if (adjacent_state == opponent_state
                 || adjacent_state == opponent_state_crowned) {
               int jumping_row = adjacent_row + kDirRowOffsets[direction];
@@ -377,14 +376,10 @@ std::vector<Action> CheckersState::LegalActions() const {
                 adjacent_column + kDirColumnOffsets[direction];
               if (InBounds(jumping_row, jumping_column)
                 && BoardAt(jumping_row, jumping_column) == CellState::kEmpty) {
-                action_values[0] = row;
-                action_values[1] = column;
-                action_values[2] = direction;
-                action_values[3] = MoveType::kCapture;
-                action_values[4] = StateToPiece(adjacent_state);
-                action_values[5] = StateToPiece(BoardAt(row, column));
-                capture_move_list.push_back(
-                    RankActionMixedBase(action_bases, action_values));
+                CheckersAction move = CheckersAction(row, column, direction,
+                    MoveType::kCapture, StateToPiece(adjacent_state),
+                    StateToPiece(BoardAt(row, column)));
+                capture_move_list.push_back(CheckersActionToSpielAction(move));
               }
             }
           }
@@ -400,10 +395,9 @@ std::vector<Action> CheckersState::LegalActions() const {
       int multiple_jump_piece_column = multiple_jump_piece_ % rows_;
       std::vector<Action> multiple_move_list;
       for (Action action: capture_move_list) {
-        std::vector<int> move = UnrankActionMixedBase(action, {rows_, columns_,
-            kNumDirections, kNumMoveType, kNumPieceType, kNumPieceType});
-        if (move[0] == multiple_jump_piece_row
-            && move[1] == multiple_jump_piece_column) {
+        CheckersAction move = SpielActionToCheckersAction(action);
+        if (move.row == multiple_jump_piece_row
+            && move.column == multiple_jump_piece_column) {
           multiple_move_list.push_back(action);
         }
       }
@@ -527,39 +521,31 @@ void CheckersState::ObservationTensor(Player player,
 }
 
 void CheckersState::UndoAction(Player player, Action action) {
-  std::vector<int> values = UnrankActionMixedBase(action, {rows_, columns_,
-      kNumDirections,kNumMoveType, kNumPieceType, kNumPieceType});
+  CheckersAction move = SpielActionToCheckersAction(action);
 
-  const int start_row = values[0];
-  const int start_column = values[1];
-  const int direction = values[2];
-  const int move_type = values[3];
-  const int captured_piece_type = values[4];
-  const int player_piece_type = values[5];
-  
   current_player_ = player;
   outcome_ = kInvalidPlayer;
   move_number_--;
 
   int end_row, end_column;
-  CellState player_piece = player_piece_type == PieceType::kMan ?
+  CellState player_piece = move.piece_type == PieceType::kMan ?
       PlayerToState(player) : CrownState(PlayerToState(player));
 
-  switch (move_type) {
+  switch (move.move_type) {
     case MoveType::kNormal:
-      end_row = start_row + kDirRowOffsets[direction];
-      end_column = start_column + kDirColumnOffsets[direction];
-      SetBoard(start_row, start_column, player_piece);
+      end_row = move.row + kDirRowOffsets[move.direction];
+      end_column = move.column + kDirColumnOffsets[move.direction];
+      SetBoard(move.row, move.column, player_piece);
       SetBoard(end_row, end_column, CellState::kEmpty);
       break;
     case MoveType::kCapture:
-      end_row = start_row + kDirRowOffsets[direction] * 2;
-      end_column = start_column + kDirColumnOffsets[direction] * 2;
-      SetBoard(start_row, start_column, player_piece);
+      end_row = move.row + kDirRowOffsets[move.direction] * 2;
+      end_column = move.column + kDirColumnOffsets[move.direction] * 2;
+      SetBoard(move.row, move.column, player_piece);
       SetBoard(end_row, end_column, CellState::kEmpty);
       CellState captured_piece = OpponentState(PlayerToState(player));
-      SetBoard((start_row + end_row) / 2, (start_column + end_column) / 2, 
-        captured_piece_type == PieceType::kMan ?
+      SetBoard((move.row + end_row) / 2, (move.column + end_column) / 2, 
+        move.captured_piece_type == PieceType::kMan ?
             captured_piece : CrownState(captured_piece));
       break;
   }

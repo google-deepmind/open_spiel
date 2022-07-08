@@ -52,6 +52,20 @@ enum class CellState {
   kBlackKing,  // Represented by '*'.
 };
 
+struct CheckersAction {
+  int row;
+  int column;
+  int direction;
+  int move_type;
+  int captured_piece_type;
+  int piece_type;
+  CheckersAction(int _row, int _column, int _direction, int _move_type,
+      int _captured_piece_type, int _piece_type)
+      : row(_row), column(_column), direction(_direction),
+        move_type(_move_type), captured_piece_type(_captured_piece_type),
+        piece_type(_piece_type){}  
+};
+
 // Types of moves.
 enum MoveType {
   kNormal = 0,
@@ -87,6 +101,8 @@ class CheckersState : public State {
   bool InBounds(int row, int column) const;
   void SetCustomBoard(const std::string board_string);
   CellState CrownStateIfLastRowReached(int row, CellState state);
+  CheckersAction SpielActionToCheckersAction(Action action) const;
+  Action CheckersActionToSpielAction(CheckersAction move) const;
   void SetBoard(int row, int column, CellState state) {    
     board_[row * columns_ + column] = state;
   }
