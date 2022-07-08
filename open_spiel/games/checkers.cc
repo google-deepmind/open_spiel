@@ -295,18 +295,16 @@ void CheckersState::DoApplyAction(Action action) {
       // for this piece.
       if (!piece_crowned) {
         std::vector<Action> moves = LegalActions();
-        std::vector<Action> moves_for_last_moved_piece;
+        bool moves_for_last_moved_piece = false;
         for (Action action: moves) {
           CheckersAction move = SpielActionToCheckersAction(action);
           if (move.row == end_row && move.column == end_column
                 && move.move_type == MoveType::kCapture) {
-            moves_for_last_moved_piece.push_back(action);
+            multiple_jump = true;
+            multiple_jump_piece_ = end_row * rows_ + end_column;
+            break;
           }
-        }
-        if (moves_for_last_moved_piece.size() > 0) {
-          multiple_jump = true;
-          multiple_jump_piece_ = end_row * rows_ + end_column;
-        }
+        }        
       }
       break;
   }
