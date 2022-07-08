@@ -45,6 +45,18 @@ void BasicCheckersTests() {
   testing::NoChanceOutcomesTest(*LoadGame("checkers"));
   testing::RandomSimTest(*LoadGame("checkers"), 100);
   testing::RandomSimTestWithUndo(*LoadGame("checkers"), 10);
+
+  //10x10 Board
+  testing::RandomSimTest(*LoadGame("checkers", {{"rows", GameParameter(10)},
+      {"columns", GameParameter(10)}}), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("checkers",
+      {{"rows", GameParameter(10)}, {"columns", GameParameter(10)}}), 10);
+
+  //12x12 Board
+  testing::RandomSimTest(*LoadGame("checkers", {{"rows", GameParameter(12)},
+      {"columns", GameParameter(12)}}), 100);
+  testing::RandomSimTestWithUndo(*LoadGame("checkers",
+      {{"rows", GameParameter(12)}, {"columns", GameParameter(12)}}), 10);
 }
 
 // Board:
