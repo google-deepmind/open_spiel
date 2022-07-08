@@ -146,22 +146,30 @@ class EuchreState : public State {
   absl::optional<bool> DeclarerGoAlone() const { return declarer_go_alone_; }
   Player LoneDefender() const { return lone_defender_; }
   std::vector<bool> ActivePlayers() const { return active_players_; }
+  std::vector<double> Points() const { return points_; }
   Player Dealer() const { return dealer_; }
-  int CurrentPhase() const { return static_cast<int>(phase_); }
+
+  enum class Phase {
+    kDealerSelection, kDeal, kBidding, kDiscard, kGoAlone, kPlay, kGameOver };
+  Phase CurrentPhase() const { return phase_; }
+
+  int CurrentTrickIndex() const {
+    return std::min(num_cards_played_ / num_active_players_,
+                    static_cast<int>(tricks_.size()));
+  }
+
   std::array<absl::optional<Player>, kNumCards> CardHolder() const {
     return holder_;
   }
   int CardRank(int card) const { return euchre::CardRank(card); }
+  Suit CardSuit(int card) const { return euchre::CardSuit(card); }
   std::string CardString(int card) const { return euchre::CardString(card); }
-
+  std::vector<Trick> Tricks() const;
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
-  enum class Phase {
-    kDealerSelection, kDeal, kBidding, kDiscard, kGoAlone, kPlay, kGameOver };
-
   std::vector<Action> DealerSelectionLegalActions() const;
   std::vector<Action> DealLegalActions() const;
   std::vector<Action> BiddingLegalActions() const;
@@ -176,10 +184,7 @@ class EuchreState : public State {
   void ApplyPlayAction(int card);
 
   void ComputeScore();
-  int CurrentTrickIndex() const {
-    return std::min(num_cards_played_ / num_active_players_,
-                    static_cast<int>(tricks_.size()));
-  }
+
   Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
   const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
   std::array<std::string, kNumSuits> FormatHand(int player,

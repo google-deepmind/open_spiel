@@ -677,6 +677,10 @@ std::vector<double> EuchreState::Returns() const {
   return points_;
 }
 
+std::vector<Trick> EuchreState::Tricks() const {
+  return std::vector<Trick>(tricks_.begin(), tricks_.end());
+}
+
 Trick::Trick(Player leader, Suit trump_suit, int card)
     : winning_card_(card),
       led_suit_(CardSuit(card, trump_suit)),

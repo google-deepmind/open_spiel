@@ -34,8 +34,8 @@ using euchre::EuchreGame;
 using euchre::EuchreState;
 
 void init_pyspiel_games_euchre(py::module& m) {
-  py::classh<EuchreState, State>(m, "EuchreState")
-      .def("num_cards_dealt", &EuchreState::NumCardsDealt)
+  py::classh<EuchreState, State> state_class(m, "EuchreState");
+  state_class.def("num_cards_dealt", &EuchreState::NumCardsDealt)
       .def("num_cards_played", &EuchreState::NumCardsPlayed)
       .def("num_passes", &EuchreState::NumPasses)
       .def("upcard", &EuchreState::Upcard)
@@ -53,7 +53,11 @@ void init_pyspiel_games_euchre(py::module& m) {
       .def("current_phase", &EuchreState::CurrentPhase)
       .def("card_holder", &EuchreState::CardHolder)
       .def("card_rank", &EuchreState::CardRank)
+      .def("card_suit", &EuchreState::CardSuit)
       .def("card_string", &EuchreState::CardString)
+      .def("points", &EuchreState::Points)
+      .def("tricks", &EuchreState::Tricks)
+      .def("current_trick", &EuchreState::CurrentTrickIndex)
       // Pickle support
       .def(py::pickle(
           [](const EuchreState& state) {  // __getstate__
@@ -64,6 +68,30 @@ void init_pyspiel_games_euchre(py::module& m) {
                 game_and_state = DeserializeGameAndState(data);
             return dynamic_cast<EuchreState*>(game_and_state.second.release());
           }));
+
+  py::enum_<euchre::Suit>(state_class, "Suit")
+    .value("INVALID_SUIT", euchre::Suit::kInvalidSuit)
+    .value("CLUBS", euchre::Suit::kClubs)
+    .value("DIAMONDS", euchre::Suit::kDiamonds)
+    .value("HEARTS", euchre::Suit::kHearts)
+    .value("SPADES", euchre::Suit::kSpades)
+    .export_values();
+
+  py::class_<euchre::Trick>(state_class, "Trick")
+      .def("led_suit", &euchre::Trick::LedSuit)
+      .def("winner", &euchre::Trick::Winner)
+      .def("cards", &euchre::Trick::Cards)
+      .def("leader", &euchre::Trick::Leader);
+
+  py::enum_<euchre::EuchreState::Phase>(state_class, "Phase")
+      .value("DEALER_SELECTION", euchre::EuchreState::Phase::kDealerSelection)
+      .value("DEAL", euchre::EuchreState::Phase::kDeal)
+      .value("BIDDING", euchre::EuchreState::Phase::kBidding)
+      .value("DISCARD", euchre::EuchreState::Phase::kDiscard)
+      .value("GO_ALONE", euchre::EuchreState::Phase::kGoAlone)
+      .value("PLAY", euchre::EuchreState::Phase::kPlay)
+      .value("GAME_OVER", euchre::EuchreState::Phase::kGameOver)
+      .export_values();
 
   py::classh<EuchreGame, Game>(m, "EuchreGame")
       .def("max_bids", &EuchreGame::MaxBids)

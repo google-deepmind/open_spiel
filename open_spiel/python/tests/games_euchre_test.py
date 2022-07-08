@@ -38,16 +38,25 @@ class GamesEuchreTest(absltest.TestCase):
     self.assertEqual(state.first_defender(), pyspiel.PlayerId.INVALID)
     self.assertEqual(state.declarer_partner(), pyspiel.PlayerId.INVALID)
     self.assertEqual(state.second_defender(), pyspiel.PlayerId.INVALID)
-    self.assertIsNone(state.declarer_go_alone(), None)
+    self.assertIsNone(state.declarer_go_alone())
     self.assertEqual(state.lone_defender(), pyspiel.PlayerId.INVALID)
     self.assertEqual(state.active_players(), [True, True, True, True])
     self.assertEqual(state.dealer(), pyspiel.INVALID_ACTION)
-    self.assertEqual(state.current_phase(), 0)
+    self.assertEqual(state.current_phase(), state.Phase.DEALER_SELECTION)
     self.assertEqual(state.card_holder(), [None] * 24)
     self.assertEqual(state.card_rank(3), 0)
     self.assertEqual(state.card_rank(4), 1)
     self.assertEqual(state.card_string(0), 'C9')
     self.assertEqual(state.card_string(23), 'SA')
+    self.assertEqual(state.card_suit(0), state.Suit.CLUBS)
+    self.assertEqual(state.card_suit(23), state.Suit.SPADES)
+    self.assertEqual(state.current_trick(), 0)
+
+    trick = state.tricks()[0]
+    self.assertEqual(trick.leader(), pyspiel.PlayerId.INVALID)
+    self.assertEqual(trick.winner(), pyspiel.PlayerId.INVALID)
+    self.assertEqual(trick.led_suit(), state.Suit.INVALID_SUIT)
+    self.assertEqual(trick.cards(), [-1])
 
 
 if __name__ == '__main__':
