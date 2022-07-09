@@ -19,6 +19,9 @@
 // https://en.wikipedia.org/wiki/Checkers
 //
 // Some notes about this implementation:
+// - Capturing:
+//      When capturing an opponent's piece is possible, capturing is mandatory 
+//      in this implementation.
 // - Drawing: 
 //     Game is drawn if no pieces have been removed in 40 moves
 //     (http://www.flyordie.com/games/help/checkers/en/games_rules_checkers.html)
