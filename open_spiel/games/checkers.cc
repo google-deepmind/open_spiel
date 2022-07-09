@@ -525,6 +525,11 @@ void CheckersState::ObservationTensor(Player player,
   }
 }
 
+CellState GetPieceStateFromTurnHistory(Player player, int piece_type) {
+  return piece_type == PieceType::kMan ?
+      PlayerToState(player) : CrownState(PlayerToState(player));
+}
+
 void CheckersState::UndoAction(Player player, Action action) {
   CheckersAction move = SpielActionToCheckersAction(action);
   const TurnHistoryInfo& thi = turn_history_info_.back();
@@ -535,8 +540,8 @@ void CheckersState::UndoAction(Player player, Action action) {
   move_number_--;
 
   int end_row, end_column;
-  CellState player_piece = thi.player_piece_type == PieceType::kMan ?
-      PlayerToState(player) : CrownState(PlayerToState(player));
+  CellState player_piece = GetPieceStateFromTurnHistory(player,
+      thi.player_piece_type);
 
   switch (move.move_type) {
     case MoveType::kNormal:
@@ -550,10 +555,10 @@ void CheckersState::UndoAction(Player player, Action action) {
       end_column = move.column + kDirColumnOffsets[move.direction] * 2;
       SetBoard(move.row, move.column, player_piece);
       SetBoard(end_row, end_column, CellState::kEmpty);
-      CellState captured_piece = OpponentState(PlayerToState(player));
+      CellState captured_piece = GetPieceStateFromTurnHistory(1 - player,
+          thi.captured_piece_type);
       SetBoard((move.row + end_row) / 2, (move.column + end_column) / 2, 
-        thi.captured_piece_type == PieceType::kMan ?
-            captured_piece : CrownState(captured_piece));
+          captured_piece);
       break;
   }
   turn_history_info_.pop_back();
