@@ -16,10 +16,8 @@ from absl.testing import absltest
 import torch
 import torch.nn.functional as F
 
-# from open_spiel.python.pytorch import neurd
-import neurd
+from open_spiel.python.pytorch import neurd
 import pyspiel
-from open_spiel.python.pytorch.rcfr import num_features
 
 _GAME = pyspiel.load_game('kuhn_poker')
 
@@ -27,7 +25,6 @@ _GAME = pyspiel.load_game('kuhn_poker')
 def _new_model():
   return neurd.DeepNeurdModel(
       _GAME,
-      num_features(_GAME),
       num_hidden_layers=1,
       num_hidden_units=13,
       num_hidden_factors=1,

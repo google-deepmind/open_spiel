@@ -81,7 +81,6 @@ class DeepNeurdModel(nn.Module):
 
   def __init__(self,
                game,
-               input_size,
                num_hidden_units,
                num_hidden_layers=1,
                num_hidden_factors=0,
@@ -117,7 +116,7 @@ class DeepNeurdModel(nn.Module):
     self._hidden_are_factored = num_hidden_factors > 0
 
     self.layers = nn.ModuleList()
-    self.input_size = input_size
+    self.input_size = rcfr.num_features(game)
     for _ in range(num_hidden_layers):
       if self._hidden_are_factored:
         self.layers.append(
