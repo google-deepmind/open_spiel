@@ -28,15 +28,14 @@ Shayegan Omidshafiei, Daniel Hennes, Dustin Morrill, Remi Munos,
 import numpy as np
 import torch
 from torch import nn
-import torch.nn.functional as F
 
 from open_spiel.python.pytorch import rcfr
 
 
 def thresholded(logits, regrets, threshold=2.0):
   """Zeros out `regrets` where `logits` are too negative or too large."""
-  can_decrease = torch.gt(logits, -threshold)
-  can_increase = torch.lt(logits, threshold)
+  can_decrease = torch.gt(logits, -threshold).float()
+  can_increase = torch.lt(logits, threshold).float()
   regrets_negative = torch.minimum(regrets, torch.Tensor([0.0]))
   regrets_positive = torch.maximum(regrets, torch.Tensor([0.0]))
   return can_decrease * regrets_negative + can_increase * regrets_positive
@@ -77,7 +76,7 @@ class DeepNeurdModel(nn.Module):
   """A flexible deep feedforward NeuRD model class.
 
   Properties:
-    layers: The `tf.keras.Layer` layers describing this  model.
+    layers: The `torch.nn.Linear` layers describing this model.
   """
 
   def __init__(self,
@@ -104,7 +103,7 @@ class DeepNeurdModel(nn.Module):
         matrix. When `num_hidden_units < num_hidden_units`, this is effectively
         implements weight sharing. Defaults to 0.
       hidden_activation: The activation function to apply over hidden layers.
-        Defaults to `tf.nn.relu`.
+        Defaults to `torch.nn.Relu`.
       use_skip_connections: Whether or not to apply skip connections (layer
         output = layer(x) + x) on hidden layers. Zero padding or truncation is
         used to match the number of columns on layer inputs and outputs.
@@ -155,7 +154,7 @@ class DeepNeurdModel(nn.Module):
         Defaults to `False`.
 
     Returns:
-      The `tf.Tensor` resulting from evaluating this model on `x`. If
+      The `torch.Tensor` resulting from evaluating this model on `x`. If
         `training` and the constructor argument `autoencode` was `True`, then
         it will contain the estimated regrets concatenated with a
         reconstruction of the input, otherwise only regrets will be returned.
@@ -182,11 +181,8 @@ class CounterfactualNeurdSolver(object):
 
     Args:
       game: An OpenSpiel `Game`.
-      models: Current policy models (optimizable array-like -> `tf.Tensor`
+      models: Current policy models (optimizable array-like -> `torch.Tensor`
         callables) for both players.
-      session: A TensorFlow `Session` to convert sequence weights from
-        `tf.Tensor`s produced by `models` to `np.array`s. If `None`, it is
-        assumed that eager mode is enabled. Defaults to `None`.
     """
     self._game = game
     self._models = models
@@ -245,9 +241,9 @@ class CounterfactualNeurdSolver(object):
     """Performs a single step of policy evaluation and policy improvement.
 
     Args:
-      train_fn: A (model, `tf.data.Dataset`) function that trains the given
-        regression model to accurately reproduce the x to y mapping given x-y
-        data.
+      train_fn: A (model, `torch.utils.data.TensorDataset`) function that
+        trains the given regression model to accurately reproduce the x to y
+        mapping given x-y data.
     """
     sequence_weights = self._sequence_weights()
     player_seq_features = self._root_wrapper.sequence_features
