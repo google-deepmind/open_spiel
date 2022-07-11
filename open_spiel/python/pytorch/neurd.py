@@ -46,11 +46,8 @@ def train(model,
           batch_size,
           step_size=1.0,
           threshold=2.0,
-          random_shuffle_size=None,
           autoencoder_loss=None):
   """Train NeuRD `model` on `data`."""
-  if random_shuffle_size is None:
-    random_shuffle_size = 10 * batch_size
   data = torch.utils.data.DataLoader(
       data, batch_size=batch_size, shuffle=True)
 
@@ -106,7 +103,6 @@ class DeepNeurdModel(nn.Module):
       use_skip_connections: Whether or not to apply skip connections (layer
         output = layer(x) + x) on hidden layers. Zero padding or truncation is
         used to match the number of columns on layer inputs and outputs.
-      regularizer: A regularizer to apply to each layer. Defaults to `None`.
       autoencode: Whether or not to output a reconstruction of the inputs upon
         being called. Defaults to `False`.
     """
