@@ -83,6 +83,7 @@ EXPECTED_GAMES = frozenset([
     "morpion_solitaire",
     "negotiation",
     "nfg_game",
+    "nim",
     "normal_form_extensive_game",
     "oh_hell",
     "oshi_zumo",

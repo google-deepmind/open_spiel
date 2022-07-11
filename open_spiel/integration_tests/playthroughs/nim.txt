@@ -1,0 +1,180 @@
+game: nim
+
+GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.PERFECT_INFORMATION
+GameType.long_name = "Nim"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = ["is_misere", "pile_sizes"]
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "nim"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 29
+PolicyTensorShape() = [29]
+MaxChanceOutcomes() = 0
+GetParameters() = {is_misere=True,pile_sizes=1;3;5;7}
+NumPlayers() = 2
+MinUtility() = -1.0
+MaxUtility() = 1.0
+UtilitySum() = 0.0
+ObservationTensorShape() = [39]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 39
+MaxGameLength() = 16
+ToString() = "nim()"
+
+# State 0
+# (0): 1 3 5 7
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = ""
+InformationStateString(1) = ""
+ObservationString(0) = "(0): 1 3 5 7"
+ObservationString(1) = "(0): 1 3 5 7"
+ObservationTensor(0): ◉◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 14, 15, 18, 19, 23, 27]
+StringLegalActions() = ["pile:1, take:1;", "pile:2, take:1;", "pile:3, take:1;", "pile:4, take:1;", "pile:2, take:2;", "pile:3, take:2;", "pile:4, take:2;", "pile:2, take:3;", "pile:3, take:3;", "pile:4, take:3;", "pile:3, take:4;", "pile:4, take:4;", "pile:3, take:5;", "pile:4, take:5;", "pile:4, take:6;", "pile:4, take:7;"]
+
+# Apply action "pile:4, take:5;"
+action: 19
+
+# State 1
+# (1): 1 3 5 2
+IsTerminal() = False
+History() = [19]
+HistoryString() = "19"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "19"
+InformationStateString(1) = "19"
+ObservationString(0) = "(1): 1 3 5 2"
+ObservationString(1) = "(1): 1 3 5 2"
+ObservationTensor(0): ◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 2, 3, 5, 6, 7, 9, 10, 14, 18]
+StringLegalActions() = ["pile:1, take:1;", "pile:2, take:1;", "pile:3, take:1;", "pile:4, take:1;", "pile:2, take:2;", "pile:3, take:2;", "pile:4, take:2;", "pile:2, take:3;", "pile:3, take:3;", "pile:3, take:4;", "pile:3, take:5;"]
+
+# Apply action "pile:3, take:5;"
+action: 18
+
+# State 2
+# (0): 1 3 0 2
+IsTerminal() = False
+History() = [19, 18]
+HistoryString() = "19, 18"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "19, 18"
+InformationStateString(1) = "19, 18"
+ObservationString(0) = "(0): 1 3 0 2"
+ObservationString(1) = "(0): 1 3 0 2"
+ObservationTensor(0): ◉◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 3, 5, 7, 9]
+StringLegalActions() = ["pile:1, take:1;", "pile:2, take:1;", "pile:4, take:1;", "pile:2, take:2;", "pile:4, take:2;", "pile:2, take:3;"]
+
+# Apply action "pile:1, take:1;"
+action: 0
+
+# State 3
+# (1): 0 3 0 2
+IsTerminal() = False
+History() = [19, 18, 0]
+HistoryString() = "19, 18, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "19, 18, 0"
+InformationStateString(1) = "19, 18, 0"
+ObservationString(0) = "(1): 0 3 0 2"
+ObservationString(1) = "(1): 0 3 0 2"
+ObservationTensor(0): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 5, 7, 9]
+StringLegalActions() = ["pile:2, take:1;", "pile:4, take:1;", "pile:2, take:2;", "pile:4, take:2;", "pile:2, take:3;"]
+
+# Apply action "pile:2, take:1;"
+action: 1
+
+# State 4
+# (0): 0 2 0 2
+IsTerminal() = False
+History() = [19, 18, 0, 1]
+HistoryString() = "19, 18, 0, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "19, 18, 0, 1"
+InformationStateString(1) = "19, 18, 0, 1"
+ObservationString(0) = "(0): 0 2 0 2"
+ObservationString(1) = "(0): 0 2 0 2"
+ObservationTensor(0): ◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 5, 7]
+StringLegalActions() = ["pile:2, take:1;", "pile:4, take:1;", "pile:2, take:2;", "pile:4, take:2;"]
+
+# Apply action "pile:4, take:2;"
+action: 7
+
+# State 5
+# (1): 0 2 0 0
+IsTerminal() = False
+History() = [19, 18, 0, 1, 7]
+HistoryString() = "19, 18, 0, 1, 7"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "19, 18, 0, 1, 7"
+InformationStateString(1) = "19, 18, 0, 1, 7"
+ObservationString(0) = "(1): 0 2 0 0"
+ObservationString(1) = "(1): 0 2 0 0"
+ObservationTensor(0): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 5]
+StringLegalActions() = ["pile:2, take:1;", "pile:2, take:2;"]
+
+# Apply action "pile:2, take:2;"
+action: 5
+
+# State 6
+# (0): 0 0 0 0
+IsTerminal() = True
+History() = [19, 18, 0, 1, 7, 5]
+HistoryString() = "19, 18, 0, 1, 7, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "19, 18, 0, 1, 7, 5"
+InformationStateString(1) = "19, 18, 0, 1, 7, 5"
+ObservationString(0) = "(0): 0 0 0 0"
+ObservationString(1) = "(0): 0 0 0 0"
+ObservationTensor(0): ◉◯◉◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◉◯◯◯◉◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯
+Rewards() = [1, -1]
+Returns() = [1, -1]
