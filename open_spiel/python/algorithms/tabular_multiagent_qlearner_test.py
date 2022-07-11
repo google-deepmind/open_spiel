@@ -19,6 +19,7 @@ import numpy as np
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms.tabular_multiagent_qlearner import CorrelatedEqSolver
 from open_spiel.python.algorithms.tabular_multiagent_qlearner import MultiagentQLearner
+from open_spiel.python.algorithms.tabular_multiagent_qlearner import StackelbergEqSolver
 from open_spiel.python.algorithms.tabular_multiagent_qlearner import TwoPlayerNashSolver
 from open_spiel.python.algorithms.tabular_qlearner import QLearner
 from open_spiel.python.egt.utils import game_payoffs_array
@@ -50,7 +51,6 @@ class MultiagentQTest(absltest.TestCase):
         ]
         time_step = env.step(actions)
         step_cnt += 1
-
       self.assertLess(step_cnt, 500)
 
     with self.subTest("ce_q"):
@@ -93,6 +93,26 @@ class MultiagentQTest(absltest.TestCase):
 
       self.assertLess(step_cnt, 500)
 
+    with self.subTest("asym_q"):
+      qlearner = QLearner(0, env.game.num_distinct_actions())
+      asymqlearner = MultiagentQLearner(1, 2,
+                                        [env.game.num_distinct_actions()] * 2,
+                                        StackelbergEqSolver())
+
+      time_step = env.reset()
+      actions = [None, None]
+      step_cnt = 0
+
+      while not time_step.last():
+        actions = [
+            qlearner.step(time_step).action,
+            asymqlearner.step(time_step, actions).action
+        ]
+        time_step = env.step(actions)
+        step_cnt += 1
+
+      self.assertLess(step_cnt, 500)
+
   def test_rps_run(self):
     env = rl_environment.Environment("matrix_rps")
     nashqlearner0 = MultiagentQLearner(0, 2,
@@ -105,8 +125,6 @@ class MultiagentQTest(absltest.TestCase):
 
     for _ in range(1000):
       time_step = env.reset()
-      nashqlearner0.restart_episode()
-      nashqlearner1.restart_episode()
       actions = [None, None]
       actions = [
           nashqlearner0.step(time_step, actions).action,
@@ -118,8 +136,6 @@ class MultiagentQTest(absltest.TestCase):
 
     with self.subTest("correct_rps_strategy"):
       time_step = env.reset()
-      nashqlearner0.restart_episode()
-      nashqlearner1.restart_episode()
       actions = [None, None]
       learner0_strategy, learner1_strategy = nashqlearner0.step(
           time_step, actions).probs, nashqlearner1.step(time_step,
