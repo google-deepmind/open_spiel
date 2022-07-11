@@ -50,7 +50,7 @@ const GameType kGameType{/*short_name=*/"blackjack",
                          /*provides_information_state_string=*/false,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/false,
+                         /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/{}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -105,6 +105,38 @@ std::string BlackjackState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, game_->NumPlayers());
   return ToString();
+}
+
+void BlackjackState::ObservationTensor(Player player,
+                                       absl::Span<float> values) const {
+  std::fill(values.begin(), values.end(), 0);
+  int offset = 0;
+
+  // Whose turn is it?
+  if (cur_player_ + 1 >= 0) {     // do not support kTerminalPlayerId
+    values[cur_player_ + 1] = 1;  // to support kChancePlayerId (equals to -1)
+  }
+  offset += game_->NumPlayers() + 1;
+
+  // Terminal?
+  values[offset] = IsTerminal();
+  offset += 1;
+
+  // Number of aces for each player (incl. dealer)
+  for (std::size_t player_id = 0; player_id < cards_.size(); player_id++) {
+    values[offset + num_aces_[player_id]] = 1.0;
+    offset += (kNumSuits + 1);
+  }
+
+  // Cards used by each player (incl. dealer)
+  for (std::size_t player_id = 0; player_id < cards_.size(); player_id++) {
+    for (const int& card : cards_[player_id]) {
+      values[offset + card] = 1;
+    }
+    offset += kDeckSize;
+  }
+
+  SPIEL_CHECK_EQ(offset, values.size());
 }
 
 bool BlackjackState::InitialCardsDealt(int player) const {
