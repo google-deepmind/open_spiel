@@ -112,7 +112,7 @@ fi
 
 DIR="open_spiel/pybind11_abseil"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b 'master' --single-branch --depth 1 https://github.com/pybind/pybind11_abseil.git ${DIR}
+  cached_clone -b 'master' https://github.com/pybind/pybind11_abseil.git ${DIR}
   pushd ${DIR}
   git checkout '73992b5'
   popd
