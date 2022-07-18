@@ -19,7 +19,7 @@ This files enables to compute mixtures of such joint-policies to get a new
 policy.
 """
 
-import numpy as np
+import copy
 from open_spiel.python import policy
 import pyspiel
 
@@ -159,7 +159,7 @@ class JointPolicyAggregator(object):
     self._policy = {}
 
     state = self._game.new_initial_state()
-    self._rec_aggregate(pid, state, weights.copy())
+    self._rec_aggregate(pid, state, copy.deepcopy(weights))
 
     # Now normalize
     for key in self._policy:
@@ -215,7 +215,7 @@ class JointPolicyAggregator(object):
         self._policy[state_key] = {}
 
     for action in state.legal_actions():
-      new_reaches = np.copy(my_reaches)
+      new_reaches = copy.deepcopy(my_reaches)
       if pid == current_player:
         for idx, state_action_probs in enumerate(action_probabilities_list):
           # compute the new reach for each policy for this action
