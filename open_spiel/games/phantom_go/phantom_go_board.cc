@@ -640,7 +640,7 @@ VirtualPoint PhantomGoBoard::Chain::single_liberty() const {
     return static_cast<VirtualPoint>(liberty_vertex_sum / num_pseudo_liberties);
 }
 
-std::string PhantomGoBoard::ToString() {
+std::string PhantomGoBoard::ToString() const {
     std::ostringstream stream;
     stream << *this;
     return stream.str();
@@ -785,7 +785,6 @@ float TrompTaylorScore(const PhantomGoBoard &board, float komi, int handicap) {
 }
 
 PhantomGoBoard CreateBoard(const std::string &initial_stones) {
-    //if fails
     PhantomGoBoard board(9);
 
     int row = 0;

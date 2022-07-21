@@ -112,6 +112,7 @@ class PhantomGoBoard {
   std::string ObservationToString(int player) const;
   std::string LastMoveInformationToString() const;
   bool LastMoveObservational() const { return !last_move_valid;}
+  bool LastMoveCapture() const { return last_move_captured > 0;}
   std::array<GoColor, kMaxBoardSize * kMaxBoardSize> GetObservationByID(int player_id) const;
 
 
@@ -179,7 +180,7 @@ class PhantomGoBoard {
   // Number of stones in a chain.
   inline int ChainSize(VirtualPoint p) const { return chain(p).num_stones; }
 
-  std::string ToString();
+  std::string ToString() const;
 
   class GroupIter {
    public:

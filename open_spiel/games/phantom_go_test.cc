@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <asm-generic/ioctls.h>
+#include <sys/ioctl.h>
 #include "open_spiel/games/phantom_go.h"
 
 #include "open_spiel/games/phantom_go/phantom_go_board.h"

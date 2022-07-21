@@ -69,11 +69,7 @@ std::vector<VirtualPoint> HandicapStones(int num_handicap) {
          MakePoint("k10")}};
     static VirtualPoint center = MakePoint("k10");
 
-    std::vector<VirtualPoint> points;
-    points.reserve(num_handicap);
-    for (int i = 0; i < num_handicap; ++i) {
-        points.push_back(placement[i]);
-    }
+    std::vector points(placement.begin(), placement.begin() + num_handicap);
 
     if (num_handicap >= 5 && num_handicap % 2 == 1) {
         points[num_handicap - 1] = center;
@@ -173,10 +169,7 @@ PhantomGoState::PhantomGoState(std::shared_ptr<const Game> game, int board_size,
 std::string PhantomGoState::ObservationString(int player) const {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
-    std::stringstream stream;
-    stream << board_.ObservationToString(player);
-    stream << board_.LastMoveInformationToString();
-    return stream.str();
+    return absl::StrCat(board_.ObservationToString(player), board_.LastMoveInformationToString());
 }
 
 void PhantomGoState::ObservationTensor(Player player,
@@ -217,17 +210,12 @@ char GoColorToChar(GoColor c) {
 }
 
 std::string PhantomGoState::ToString() const {
-    std::stringstream ss;
     std::array<int, 2> stoneCount = board_.GetStoneCount();
-    ss << "GoState(komi=" << komi_ << ", to_play=" << GoColorToString(to_play_)
-       << ", history.size()=" << history_.size() << ", "
-       << "stones_count: w" << stoneCount[1] << " b" << stoneCount[0] << ")\n";
 
-    ss << board_;
-
-    ss << board_.ObservationsToString();
-
-    return ss.str();
+    return absl::StrCat("GoState(komi=", komi_, ", to_play=", GoColorToString(to_play_),
+                        ", history.size()=", history_.size(), ", ", "stones_count: w",
+                        stoneCount[1] , " b" , stoneCount[0] , ")\n", board_.ToString(),
+                        board_.ObservationsToString());
 }
 
 bool PhantomGoState::IsTerminal() const {

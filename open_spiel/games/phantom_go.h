@@ -62,6 +62,10 @@ inline int DefaultMaxGameLength(int board_size) {
     return board_size * board_size * 4;
 }
 
+inline int MaxGameLength(int board_size) {
+    return board_size * board_size * 4;
+}
+
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
 inline GoColor PlayerToColor(Player p) { return static_cast<GoColor>(p); }
 
