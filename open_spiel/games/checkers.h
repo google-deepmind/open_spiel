@@ -150,7 +150,8 @@ class CheckersGame : public Game {
   explicit CheckersGame(const GameParameters& params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<CheckersState>(shared_from_this(), rows_, columns_);
+    return 
+        absl::make_unique<CheckersState>(shared_from_this(), rows_, columns_);
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
