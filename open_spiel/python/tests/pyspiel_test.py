@@ -33,6 +33,7 @@ EXPECTED_GAMES = frozenset([
     "bridge",
     "bridge_uncontested_bidding",
     "catch",
+    "checkers",
     "chess",
     "cliff_walking",
     "clobber",
