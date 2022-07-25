@@ -1,3 +1,4 @@
 # These are the dependencies to generate the documentation.
+markdown==3.3.7
 sphinx_markdown_tables
 sphinx==4.2
