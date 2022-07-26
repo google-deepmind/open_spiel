@@ -11,7 +11,6 @@ from torch.distributions.categorical import Categorical
 from open_spiel.python.rl_agent import StepOutput
 
 INVALID_ACTION_PENALTY = -1e6
-
 def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
     torch.nn.init.orthogonal_(layer.weight, std)
     torch.nn.init.constant_(layer.bias, bias_const)
