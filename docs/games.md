@@ -18,6 +18,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
 <font color="orange"><b>~</b></font>         | [Catch](#catch)
+<font color="orange"><b>~</b></font>         | [Checkers](#checkers)
 <font color="orange"><b>~</b></font>         | [Cliff Walking](#cliff-walking)
 <font color="orange"><b>~</b></font>         | [Clobber](#clobber)
 <font color="orange"><b>~</b></font>         | [Coin Game](#coin-game)
@@ -172,6 +173,17 @@ Status                                       | Game
 *   Perfect information.
 *   1 players.
 *   [Mnih et al. 2014, Recurrent Models of Visual Attention](https://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf),<br>[Osband et al '19, Behaviour Suite for Reinforcement Learning, Appendix A](https://arxiv.org/abs/1908.03568)
+
+### Checkers
+
+*   Players move pieces around the board with the goal of eliminating the
+    opposing pieces.
+*   Pieces on a grid.
+*   Traditional game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Checkers)
 
 ### Cliff Walking
 
@@ -441,7 +453,8 @@ Status                                       | Game
 
 ### Mancala
 
-*   Players take turns sowing beans on the board and try to capture more beans than the opponent
+*   Players take turns sowing beans on the board and try to capture more beans
+    than the opponent.
 *   Idiosyncratic format.
 *   Traditional game.
 *   Deterministic.
