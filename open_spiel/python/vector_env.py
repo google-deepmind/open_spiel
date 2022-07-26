@@ -3,6 +3,8 @@ class SyncVectorEnv(object):
     A vectorized RL Environment. This environment is synchronized - games do not execute in parallel. Speedups are realized by calling models on many game states simultaneously.
     """
     def __init__(self, envs):
+        if not isinstance(envs, list):
+            raise ValueError("Need to call this with a list of rl_environment.Environment objects")
         self.envs = envs
         
     def __len__(self):

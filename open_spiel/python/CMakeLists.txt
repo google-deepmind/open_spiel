@@ -256,6 +256,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
       pytorch/policy_gradient_pytorch_test.py
+      pytorch/ppo_pytorch_test.py
   )
 endif()
 

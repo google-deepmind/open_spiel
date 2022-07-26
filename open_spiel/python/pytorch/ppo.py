@@ -10,10 +10,17 @@ from torch.distributions.categorical import Categorical
 
 from open_spiel.python.rl_agent import StepOutput
 
+INVALID_ACTION_PENALTY = -1e6
+
 def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
     torch.nn.init.orthogonal_(layer.weight, std)
     torch.nn.init.constant_(layer.bias, bias_const)
     return layer
+
+class CategoricalMasked(Categorical):
+    def __init__(self, probs=None, logits=None, validate_args=None, masks=[], mask_value=None):
+        logits = torch.where(masks.bool(), logits, mask_value)
+        super(CategoricalMasked, self).__init__(probs, logits, validate_args)
 
 class PPOAgent(nn.Module):
     def __init__(self, num_actions, observation_shape, device):
@@ -34,20 +41,17 @@ class PPOAgent(nn.Module):
         )
         self.device = device
         self.num_actions = num_actions
+        self.register_buffer("mask_value", torch.tensor(INVALID_ACTION_PENALTY))
 
     def get_value(self, x):
         return self.critic(x)
 
     def get_action_and_value(self, x, legal_actions_mask=None, action=None):
         if legal_actions_mask is None:
-            # All valid
             legal_actions_mask = torch.ones((len(x), self.num_actions)).bool()
 
-        # Fill with invalids
-        INVALID_ACTION_PENALTY = -1e6
-        logits = torch.full((len(x), self.num_actions), INVALID_ACTION_PENALTY).to(self.device)
-        logits[legal_actions_mask] = self.actor(x)[legal_actions_mask]
-        probs = Categorical(logits=logits)
+        logits = self.actor(x)
+        probs = CategoricalMasked(logits=logits, masks=legal_actions_mask, mask_value=self.mask_value)
         if action is None:
             action = probs.sample()
         return action, probs.log_prob(action), probs.entropy(), self.critic(x), probs.probs
@@ -57,7 +61,6 @@ class PPOAtariAgent(nn.Module):
     def __init__(self, num_actions, observation_shape, device):
         super(PPOAtariAgent, self).__init__()
         # Note: this network is intended for atari games, taken from https://github.com/vwxyzjn/ppo-implementation-details/blob/main/ppo_atari.py
-        # You may want a more generic network; see the Agent module in https://github.com/vwxyzjn/ppo-implementation-details/blob/main/ppo.py#L101
         self.network = nn.Sequential(
             layer_init(nn.Conv2d(4, 32, 8, stride=4)),
             nn.ReLU(),
@@ -73,21 +76,18 @@ class PPOAtariAgent(nn.Module):
         self.critic = layer_init(nn.Linear(512, 1), std=1)
         self.num_actions = num_actions
         self.device = device
+        self.register_buffer("mask_value", torch.tensor(INVALID_ACTION_PENALTY))
 
     def get_value(self, x):
         return self.critic(self.network(x / 255.0))
 
     def get_action_and_value(self, x, legal_actions_mask=None, action=None):
         if legal_actions_mask is None:
-            # All valid
             legal_actions_mask = torch.ones((len(x), self.num_actions)).bool()
         
-        # Fill with invalids
-        INVALID_ACTION_PENALTY = -1e6
-        logits = torch.full((len(x), self.num_actions), INVALID_ACTION_PENALTY).to(self.device)
         hidden = self.network(x / 255.0)
-        logits[legal_actions_mask] = self.actor(hidden)[legal_actions_mask]
-        probs = Categorical(logits=logits)
+        logits = self.actor(hidden)
+        probs = CategoricalMasked(logits=logits, masks=legal_actions_mask, mask_value=self.mask_value)
             
         if action is None:
             action = probs.sample()
@@ -261,7 +261,7 @@ class PPO(nn.Module):
                 advantages = returns - self.values
 
         # flatten the batch
-        b_legal_actions = self.legal_actions_mask.reshape((-1, self.num_actions))
+        b_legal_actions_mask = self.legal_actions_mask.reshape((-1, self.num_actions))
         b_obs = self.obs.reshape((-1,) + self.input_shape)
         b_logprobs = self.logprobs.reshape(-1)
         b_actions = self.actions.reshape(-1)
@@ -278,7 +278,7 @@ class PPO(nn.Module):
                 end = start + self.minibatch_size
                 mb_inds = b_inds[start:end]
 
-                _, newlogprob, entropy, newvalue, _ = self.get_action_and_value(b_obs[mb_inds], legal_actions_mask=b_legal_actions[mb_inds], action=b_actions.long()[mb_inds])
+                _, newlogprob, entropy, newvalue, _ = self.get_action_and_value(b_obs[mb_inds], legal_actions_mask=b_legal_actions_mask[mb_inds], action=b_actions.long()[mb_inds])
                 logratio = newlogprob - b_logprobs[mb_inds]
                 ratio = logratio.exp()
 
