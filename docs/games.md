@@ -9,6 +9,7 @@ we verified against known values and/or reproduced results from papers.
 
 Status                                       | Game
 -------------------------------------------- | ----
+<font color="orange"><b>~</b></font>         | [Atari](#atari)
 <font color="orange"><b>~</b></font>         | [Amazons](#amazons)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
@@ -77,6 +78,13 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Y](#y)
 
 ## Details
+
+### Atari
+
+*   Agent plays classic games from [Gym's Atari Environments](https://www.gymlibrary.ml/environments/atari/), such as Breakout.
+*   Single player.
+*   Most games are non-deterministic.
+*   Perfect information.
 
 ### Amazons
 
