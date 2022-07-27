@@ -23,6 +23,8 @@ set(GAME_SOURCES
   bridge_uncontested_bidding.h
   catch.cc
   catch.h
+  checkers.cc
+  checkers.h
   chess.cc
   chess.h
   chess/chess_board.cc
@@ -289,6 +291,10 @@ add_test(bridge_test bridge_test)
 add_executable(catch_test catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(catch_test catch_test)
+
+add_executable(checkers_test checkers_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(checkers_test checkers_test)
 
 add_executable(chess_test chess_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
