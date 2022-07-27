@@ -36,6 +36,10 @@ constexpr int kNumMoveType = 2;
 // Number of unique directions each piece can take.
 constexpr int kNumDirections = 4;
 
+constexpr int kMoveUp = 0;
+constexpr int kMoveRight = 1;
+constexpr int kMoveDown = 2;
+constexpr int kMoveLeft = 3;
 // Index 0: Direction is diagonally up-left.
 // Index 1: Direction is diagonally up-right.
 // Index 2: Direction is diagonally down-right.
@@ -235,29 +239,41 @@ Action TwoZeroFourEightState::CheckersActionToSpielAction(CheckersAction move) c
 }
 
 void TwoZeroFourEightState::DoApplyAction(Action action) {
-  if(IsChanceNode()){
+  if (IsChanceNode()) {
     ChanceAction chance_action = SpielActionToChanceAction(action);
     SetBoard(chance_action.row, chance_action.column, 
         chance_action.is_four ? 4 : 2);
+    current_player_ = 0;
     return;
   }
+  current_player_ = kChancePlayerId;
 }
 
 std::string TwoZeroFourEightState::ActionToString(Player player,
                                           Action action_id) const {
-  CheckersAction checkers_action = SpielActionToCheckersAction(action_id);
-  const int end_row =
-      checkers_action.row + kDirRowOffsets[checkers_action.direction] *
-                                (checkers_action.move_type + 1);
-  const int end_column =
-      checkers_action.column + kDirColumnOffsets[checkers_action.direction] *
-                                   (checkers_action.move_type + 1);
-
-  std::string action_string = absl::StrCat(
-      ColumnLabel(checkers_action.column), RowLabel(rows_, checkers_action.row),
-      ColumnLabel(end_column), RowLabel(rows_, end_row));
-
-  return action_string;
+  if (IsChanceNode()) {
+    ChanceAction chance_action = SpielActionToChanceAction(action_id);
+    return absl::StrCat(std::to_string(chance_action.is_four ? 4 : 2), 
+        " added to row ", std::to_string(chance_action.row + 1),
+        ", column ", std::to_string(chance_action.column + 1));
+  }
+  switch (action_id) {
+    case kMoveUp:
+      return "Up";
+      break;
+    case kMoveRight:
+      return "Right";
+      break;
+    case kMoveDown:
+      return "Down";
+      break;
+    case kMoveLeft:
+      return "Left";
+      break;
+    default:
+      return "Invalid action";
+      break;
+  }  
 }
 
 int TwoZeroFourEightState::AvailableCellCount() const {
@@ -291,7 +307,7 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
 
 std::vector<Action> TwoZeroFourEightState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
-  return {0};
+  return {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
 }
 
 bool TwoZeroFourEightState::InBounds(int row, int column) const {
