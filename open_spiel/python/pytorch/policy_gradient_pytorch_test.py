@@ -32,7 +32,7 @@ SEED = 24984617
 class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
-      itertools.product(("rpg", "qpg", "rm", "a2c"),
+      itertools.product(("rpg", "qpg", "rm", "a2c", "neurd"),
                         ("kuhn_poker", "leduc_poker")))
   def test_run_game(self, loss_str, game_name):
     env = rl_environment.Environment(game_name)
@@ -114,6 +114,7 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
         "rpg": rl_losses.BatchRPGLoss,
         "rm": rl_losses.BatchRMLoss,
         "a2c": rl_losses.BatchA2CLoss,
+        "neurd": rl_losses.BatchNeuRDLoss,
     }
 
     for loss_str, loss_class in loss_dict.items():
