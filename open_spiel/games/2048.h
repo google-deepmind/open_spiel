@@ -47,6 +47,7 @@ constexpr int kMaxMovesWithoutCapture = 40;
 // Empty, White, WhiteKing, Black and BlackKing.
 constexpr int kCellStates = 5;
 constexpr int kNoMultipleJumpsPossible = -1;
+constexpr int kNoCellAvailableAction = -2;
 
 // State of a cell.
 enum class CellState {
@@ -55,6 +56,12 @@ enum class CellState {
   kBlack,      // Represented by '+'.
   kWhiteKing,  // Represented by '8'.
   kBlackKing,  // Represented by '*'.
+};
+
+struct Coordinate {
+  int x, y;
+  Coordinate(int _x, int _y)
+      : x(_x), y(_y) {}
 };
 
 struct ChanceAction {
@@ -143,6 +150,11 @@ class TwoZeroFourEightState : public State {
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;  
   int AvailableCellCount() const;
+  std::vector<std::vector<int>> BuildTraversals (int direction) const;
+  bool WithinBounds(int x, int y) const;
+  bool CellAvailable(int x, int y) const;
+  std::vector<int> FindFarthestPosition(int x, int y, int direction) const;
+  bool TileMatchesAvailable() const;
 
  protected:
   void DoApplyAction(Action action) override;
