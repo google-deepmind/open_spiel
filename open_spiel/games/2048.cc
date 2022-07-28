@@ -29,23 +29,10 @@ namespace open_spiel {
 namespace two_zero_four_eight {
 namespace {
 
-// Number of rows with pieces for each player
-constexpr int kNumRowsWithPieces = 3;
-// Types of moves: normal & capture
-constexpr int kNumMoveType = 2;
-// Number of unique directions each piece can take.
-constexpr int kNumDirections = 4;
-
 constexpr int kMoveUp = 0;
 constexpr int kMoveRight = 1;
 constexpr int kMoveDown = 2;
 constexpr int kMoveLeft = 3;
-// Index 0: Direction is diagonally up-left.
-// Index 1: Direction is diagonally up-right.
-// Index 2: Direction is diagonally down-right.
-// Index 3: Direction is diagonally down-left.
-constexpr std::array<int, kNumDirections> kDirRowOffsets = {{-1, -1, 1, 1}};
-constexpr std::array<int, kNumDirections> kDirColumnOffsets = {{-1, 1, 1, -1}};
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"2048",
@@ -70,143 +57,13 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-
-int StateToPlayer(CellState state) {
-  switch (state) {
-    case CellState::kWhite:
-      return 0;
-    case CellState::kBlack:
-      return 1;
-    default:
-      SpielFatalError("No player id for this cell state");
-  }
-}
-
-CellState CrownState(CellState state) {
-  switch (state) {
-    case CellState::kWhite:
-      return CellState::kWhiteKing;
-    case CellState::kBlack:
-      return CellState::kBlackKing;
-    default:
-      SpielFatalError("Invalid state");
-  }
-}
-
-PieceType StateToPiece(CellState state) {
-  switch (state) {
-    case CellState::kWhite:
-    case CellState::kBlack:
-      return PieceType::kMan;
-    case CellState::kWhiteKing:
-    case CellState::kBlackKing:
-      return PieceType::kKing;
-    default:
-      SpielFatalError("Invalid state");
-  }
-}
-
-CellState PlayerToState(Player player) {
-  switch (player) {
-    case 0:
-      return CellState::kWhite;
-    case 1:
-      return CellState::kBlack;
-    default:
-      SpielFatalError(absl::StrCat("Invalid player id ", player));
-  }
-}
-
-std::string StateToString(CellState state) {
-  switch (state) {
-    case CellState::kEmpty:
-      return ".";
-    case CellState::kWhite:
-      return "o";
-    case CellState::kBlack:
-      return "+";
-    case CellState::kWhiteKing:
-      return "8";
-    case CellState::kBlackKing:
-      return "*";
-    default:
-      SpielFatalError("Unknown state.");
-  }
-}
-
-CellState StringToState(char ch) {
-  switch (ch) {
-    case '.':
-      return CellState::kEmpty;
-    case 'o':
-      return CellState::kWhite;
-    case '+':
-      return CellState::kBlack;
-    case '8':
-      return CellState::kWhiteKing;
-    case '*':
-      return CellState::kBlackKing;
-    default:
-      std::string error_string = "Unknown state: ";
-      error_string.push_back(ch);
-      SpielFatalError(error_string);
-  }
-}
-
-CellState OpponentState(CellState state) {
-  return PlayerToState(1 - StateToPlayer(state));
-}
-
-std::string RowLabel(int rows, int row) {
-  int row_number = rows - row;
-  std::string label = std::to_string(row_number);
-  return label;
-}
-
-std::string ColumnLabel(int column) {
-  std::string label = "";
-  label += static_cast<char>('a' + column);
-  return label;
-}
 }  // namespace
-
-std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  switch (state) {
-    case CellState::kWhite:
-      return stream << "White";
-    case CellState::kBlack:
-      return stream << "Black";
-    case CellState::kWhiteKing:
-      return stream << "WhiteKing";
-    case CellState::kBlackKing:
-      return stream << "BlackKing";
-    case CellState::kEmpty:
-      return stream << "Empty";
-    default:
-      SpielFatalError("Unknown cell state");
-  }
-}
 
 TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game, int rows,
                              int columns)
     : State(game), rows_(rows), columns_(columns) {
-  SPIEL_CHECK_GE(rows_, 1);
-  SPIEL_CHECK_GE(columns_, 1);
-  SPIEL_CHECK_LE(rows_, 99);     // Only supports 1 and 2 digit row numbers.
-  SPIEL_CHECK_LE(columns_, 26);  // Only 26 letters to represent columns.
-
   board_ = std::vector<int>(rows_ * columns_, 0);
   turn_history_info_ = {};
-}
-
-CellState TwoZeroFourEightState::CrownStateIfLastRowReached(int row, CellState state) {
-  if (row == 0 && state == CellState::kWhite) {
-    return CellState::kWhiteKing;
-  }
-  if (row == rows_ - 1 && state == CellState::kBlack) {
-    return CellState::kBlackKing;
-  }
-  return state;
 }
 
 void TwoZeroFourEightState::SetCustomBoard(const std::string board_string) {
@@ -223,19 +80,6 @@ Action TwoZeroFourEightState::ChanceActionToSpielAction(ChanceAction move) const
   std::vector<int> action_bases = {rows_, columns_, kNumChanceTiles};
   return RankActionMixedBase(
       action_bases, {move.row, move.column, move.is_four});
-}
-
-CheckersAction TwoZeroFourEightState::SpielActionToCheckersAction(Action action) const {
-  std::vector<int> values = UnrankActionMixedBase(
-      action, {rows_, columns_, kNumDirections, kNumMoveType});
-  return CheckersAction(values[0], values[1], values[2], values[3]);
-}
-
-Action TwoZeroFourEightState::CheckersActionToSpielAction(CheckersAction move) const {
-  std::vector<int> action_bases = {rows_, columns_, kNumDirections,
-                                   kNumMoveType};
-  return RankActionMixedBase(
-      action_bases, {move.row, move.column, move.direction, move.move_type});
 }
 
 std::vector<std::vector<int>> TwoZeroFourEightState::BuildTraversals(int direction) const {
@@ -311,7 +155,6 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
       }
     }
   }
-
   return false;
 };
 
@@ -438,46 +281,29 @@ std::string TwoZeroFourEightState::ToString() const {
   return str;  
 }
 
-int TwoZeroFourEightState::ObservationPlane(CellState state, Player player) const {
-  int state_value;
-  switch (state) {
-    case CellState::kWhite:
-      state_value = 0;
-      break;
-    case CellState::kWhiteKing:
-      state_value = 1;
-      break;
-    case CellState::kBlackKing:
-      state_value = 2;
-      break;
-    case CellState::kBlack:
-      state_value = 3;
-      break;
-    case CellState::kEmpty:
-    default:
-      return 4;
-  }
-  if (player == Player{0}) {
-    return state_value;
-  } else {
-    return 3 - state_value;
-  }
+bool TwoZeroFourEightState::IsTerminal() const {
+  return Reached2048() || (AvailableCellCount() == 0 && !TileMatchesAvailable());
 }
 
-bool TwoZeroFourEightState::IsTerminal() const {
-  return AvailableCellCount() == 0 && !TileMatchesAvailable();
+bool TwoZeroFourEightState::Reached2048() const {
+  for (int r = 0; r < rows_; r++) {
+    for (int c = 0; c < columns_; c++) {
+      if (BoardAt(r, c) == 2048) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 std::vector<double> TwoZeroFourEightState::Returns() const {
-  if (outcome_ == kInvalidPlayer ||
-      moves_without_capture_ >= kMaxMovesWithoutCapture) {
-    return {0., 0.};
-  } else if (outcome_ == Player{0}) {
-    return {1.0, -1.0};
-  } else if (outcome_ == Player{1}) {
-    return {-1.0, 1.0};
+  if (IsTerminal()) {
+    if (Reached2048()) {
+      return {1.0};
+    }
+    return {-1.0};
   }
-  return {0., 0.};
+  return {0.};  
 }
 
 std::string TwoZeroFourEightState::InformationStateString(Player player) const {
@@ -498,11 +324,6 @@ void TwoZeroFourEightState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);  
 }
 
-CellState GetPieceStateFromTurnHistory(Player player, int piece_type) {
-  return piece_type == PieceType::kMan ? PlayerToState(player)
-                                       : CrownState(PlayerToState(player));
-}
-
 void TwoZeroFourEightState::UndoAction(Player player, Action action) {  
   turn_history_info_.pop_back();
   history_.pop_back();
@@ -514,7 +335,7 @@ TwoZeroFourEightGame::TwoZeroFourEightGame(const GameParameters& params)
       columns_(ParameterValue<int>("columns")) {}
 
 int TwoZeroFourEightGame::NumDistinctActions() const {
-  return rows_ * columns_ * kNumDirections * kNumMoveType;
+  return rows_ * columns_ * 2;
 }
 
 }  // namespace two_zero_four_eight

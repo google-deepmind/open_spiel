@@ -39,24 +39,12 @@
 namespace open_spiel {
 namespace two_zero_four_eight {
 
-constexpr int kNumPlayers = 2;
+constexpr int kNumPlayers = 1;
 constexpr int kDefaultRows = 4;
 constexpr int kDefaultColumns = 4;
+// 2 & 4
 constexpr int kNumChanceTiles = 2;
-constexpr int kMaxMovesWithoutCapture = 40;
-// Empty, White, WhiteKing, Black and BlackKing.
-constexpr int kCellStates = 5;
-constexpr int kNoMultipleJumpsPossible = -1;
 constexpr int kNoCellAvailableAction = -2;
-
-// State of a cell.
-enum class CellState {
-  kEmpty,      // Represented by ' '.
-  kWhite,      // Represented by 'o'.
-  kBlack,      // Represented by '+'.
-  kWhiteKing,  // Represented by '8'.
-  kBlackKing,  // Represented by '*'.
-};
 
 struct Coordinate {
   int x, y;
@@ -74,44 +62,14 @@ struct ChanceAction {
         is_four(_is_four) {}
 };
 
-struct CheckersAction {
-  int row;
-  int column;
-  int direction;
-  int move_type;
-  CheckersAction(int _row, int _column, int _direction, int _move_type)
-      : row(_row),
-        column(_column),
-        direction(_direction),
-        move_type(_move_type) {}
-};
-
-// Types of moves.
-enum MoveType {
-  kNormal = 0,
-  kCapture = 1,
-};
-
-// Types of pieces.
-enum PieceType {
-  kMan = 0,
-  kKing = 1,
-};
-
 // This is a small helper to track historical turn info not stored in the moves.
 // It is only needed for proper implementation of Undo.
 struct TurnHistoryInfo {
   Action action;
   Player player;
-  // set to kMan if not a capture move
-  PieceType captured_piece_type;
-  PieceType player_piece_type;
-  TurnHistoryInfo(Action _action, Player _player,
-                  PieceType _captured_piece_type, PieceType _player_piece_type)
+  TurnHistoryInfo(Action _action, Player _player)
       : action(_action),
-        player(_player),
-        captured_piece_type(_captured_piece_type),
-        player_piece_type(_player_piece_type) {}
+        player(_player){}
 };
 
 // State of an in-play game.
@@ -136,11 +94,8 @@ class TwoZeroFourEightState : public State {
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
   void SetCustomBoard(const std::string board_string);
-  CellState CrownStateIfLastRowReached(int row, CellState state);
   ChanceAction SpielActionToChanceAction(Action action) const;
   Action ChanceActionToSpielAction(ChanceAction move) const;
-  CheckersAction SpielActionToCheckersAction(Action action) const;
-  Action CheckersActionToSpielAction(CheckersAction move) const;
   void SetBoard(int row, int column, int num) {
     board_[row * columns_ + column] = num;
   }
@@ -155,21 +110,15 @@ class TwoZeroFourEightState : public State {
   bool CellAvailable(int x, int y) const;
   std::vector<int> FindFarthestPosition(int x, int y, int direction) const;
   bool TileMatchesAvailable() const;
+  bool Reached2048() const;
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
-  int ObservationPlane(CellState state, Player player) const;
-
   Player current_player_ = kChancePlayerId;  // Player zero (White, 'o') goes first.
-  Player outcome_ = kInvalidPlayer;
-  // Piece in the board who can do multiple jump.
-  // Represented by row * rows_ + column
-  int multiple_jump_piece_ = kNoMultipleJumpsPossible;
   int rows_;
   int columns_;
-  int moves_without_capture_;
   std::vector<int> board_;
   std::vector<TurnHistoryInfo> turn_history_info_;  // Info needed for Undo.
 };
@@ -185,10 +134,9 @@ class TwoZeroFourEightGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
-  double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, rows_, columns_};
+    return {};
   }
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
@@ -198,8 +146,6 @@ class TwoZeroFourEightGame : public Game {
   int rows_;
   int columns_;
 };
-
-std::ostream& operator<<(std::ostream& stream, const CellState& state);
 
 }  // namespace two_zero_four_eight
 }  // namespace open_spiel
