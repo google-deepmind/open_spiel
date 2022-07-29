@@ -62,12 +62,21 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game, int rows,
                              int columns)
     : State(game), rows_(rows), columns_(columns) {
-  board_ = std::vector<int>(rows_ * columns_, 0);
+  board_ = std::vector<Tile>(rows_ * columns_, Tile(0, false));
   turn_history_info_ = {};
+  // SetCustomBoard({0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0});
+  // SetCustomBoard({2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+  // SetCustomBoard({2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0});
+  // SetCustomBoard({0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+  // SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0});
 }
 
-void TwoZeroFourEightState::SetCustomBoard(const std::string board_string) {
-  
+void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
+  for (int x = 0; x < rows_; x++) {
+    for (int y = 0; y < columns_; y++) {
+      SetBoard(x, y, Tile(board_seq[x * rows_ + y], false));
+    }
+  }
 }
 
 ChanceAction TwoZeroFourEightState::SpielActionToChanceAction(Action action) const {
@@ -91,14 +100,12 @@ std::vector<std::vector<int>> TwoZeroFourEightState::BuildTraversals(int directi
     y.push_back(pos);    
   }
   switch (direction) {
-    case kMoveDown:
-      reverse(y.begin(), y.end());
-      break;
     case kMoveRight:
       reverse(x.begin(), x.end());
       reverse(y.begin(), y.end());
       break;
     case kMoveLeft:
+    case kMoveDown:
       reverse(x.begin(), x.end());
       break;
   }
@@ -110,7 +117,7 @@ bool TwoZeroFourEightState::WithinBounds(int x, int y) const {
 };
 
 bool TwoZeroFourEightState::CellAvailable(int x, int y) const {
-  return BoardAt(x, y) == 0;
+  return BoardAt(x, y).value == 0;
 }
 
 Coordinate GetVector(int direction) {
@@ -143,11 +150,11 @@ std::vector<int> TwoZeroFourEightState::FindFarthestPosition(int x, int y, int d
 bool TwoZeroFourEightState::TileMatchesAvailable() const {
   for (int x = 0; x < rows_; x++) {
     for (int y = 0; y < columns_; y++) {
-      int tile = BoardAt(x, y);
+      int tile = BoardAt(x, y).value;
       if (tile > 0) {
         for (int direction = 0; direction < 4; direction++) {
           Coordinate vector = GetVector(direction);
-          int other = BoardAt(x + vector.x, y + vector.y);
+          int other = BoardAt(x + vector.x, y + vector.y).value;
           if (other > 0 && other == tile) {
             return true; // These two tiles can be merged
           }
@@ -158,6 +165,23 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
   return false;
 };
 
+void TwoZeroFourEightState::PrepareTiles() {
+  for (int x = 0; x < rows_; x++) {
+    for (int y = 0; y < columns_; y++) {
+      Tile tile = BoardAt(x, y);
+      if (tile.is_merged) {
+        SetBoard(x, y, Tile(tile.value, false));
+      }
+    }
+  }  
+};
+
+int TwoZeroFourEightState::GetCellContent(int x, int y) const {
+  if (!WithinBounds(x, y))
+    return 0;
+  return BoardAt(x, y).value;
+}
+
 void TwoZeroFourEightState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
     current_player_ = 0;
@@ -165,30 +189,31 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
       return;
     }
     ChanceAction chance_action = SpielActionToChanceAction(action);
-    SetBoard(chance_action.row, chance_action.column, 
-        chance_action.is_four ? 4 : 2);    
+    SetBoard(chance_action.row, chance_action.column,
+        Tile(chance_action.is_four ? 4 : 2, false));
     return;
   }
   std::vector<std::vector<int>> traversals = BuildTraversals(action);
+  PrepareTiles();
   for (int x : traversals[0]) {
     for (int y : traversals[1]) {
-      int tile = BoardAt(x, y);
+      int tile = GetCellContent(x, y);
       if (tile > 0) {
         bool moved = false;
         std::vector<int> positions = FindFarthestPosition(x, y, action);
         int next_x = positions[2];
         int next_y = positions[3];
-        int next = BoardAt(next_x, next_y);
+        int next = GetCellContent(next_x, next_y);
         if (next > 0 && next == tile) {
           int merged = tile * 2;
-          SetBoard(next_x, next_y, merged);
+          SetBoard(next_x, next_y, Tile(merged, true));
           moved = true;
         } else if (positions[0] != x || positions[1] != y){
-          SetBoard(positions[0], positions[1], tile);
+          SetBoard(positions[0], positions[1], Tile(tile, false));
           moved = true;
         }
         if (moved) {
-          SetBoard(x, y, 0);
+          SetBoard(x, y, Tile(0, false));
         }        
       }
     }
@@ -227,7 +252,7 @@ int TwoZeroFourEightState::AvailableCellCount() const {
   int count = 0;
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < columns_; c++) {
-      if (BoardAt(r, c) == 0) {
+      if (BoardAt(r, c).value == 0) {
         count++;
       }
     }
@@ -246,7 +271,7 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
   action_and_probs.reserve(count * 2);
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < columns_; c++) {
-      if (BoardAt(r, c) == 0) {
+      if (BoardAt(r, c).value == 0) {
         action_and_probs.emplace_back(ChanceActionToSpielAction(
             ChanceAction(r, c, false)), .9 / count);
         action_and_probs.emplace_back(ChanceActionToSpielAction(
@@ -275,7 +300,7 @@ std::string TwoZeroFourEightState::ToString() const {
   std::string str;
   for (int r = 0; r < rows_; ++r) {
     for (int c = 0; c < columns_; ++c) {
-      std::string tile = std::to_string(BoardAt(r, c));
+      std::string tile = std::to_string(BoardAt(r, c).value);
       absl::StrAppend(&str, std::string(5 - tile.length(), ' '));
       absl::StrAppend(&str, tile);
     }
@@ -291,7 +316,7 @@ bool TwoZeroFourEightState::IsTerminal() const {
 bool TwoZeroFourEightState::Reached2048() const {
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < columns_; c++) {
-      if (BoardAt(r, c) == 2048) {
+      if (BoardAt(r, c).value == 2048) {
         return true;
       }
     }

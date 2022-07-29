@@ -62,6 +62,14 @@ struct ChanceAction {
         is_four(_is_four) {}
 };
 
+struct Tile {
+  int value;
+  bool is_merged;
+  Tile(int _value, bool _is_merged)
+      : value(_value),
+        is_merged(_is_merged) {}
+};
+
 // This is a small helper to track historical turn info not stored in the moves.
 // It is only needed for proper implementation of Undo.
 struct TurnHistoryInfo {
@@ -93,13 +101,13 @@ class TwoZeroFourEightState : public State {
   }
   void UndoAction(Player player, Action action) override;
   bool InBounds(int row, int column) const;
-  void SetCustomBoard(const std::string board_string);
+  void SetCustomBoard(const std::vector<int> board_seq);
   ChanceAction SpielActionToChanceAction(Action action) const;
   Action ChanceActionToSpielAction(ChanceAction move) const;
-  void SetBoard(int row, int column, int num) {
-    board_[row * columns_ + column] = num;
+  void SetBoard(int row, int column, Tile tile) {
+    board_[row * columns_ + column] = tile;
   }
-  int BoardAt(int row, int column) const {
+  Tile BoardAt(int row, int column) const {
     return board_[row * columns_ + column];
   }
   std::vector<Action> LegalActions() const override;
@@ -111,6 +119,8 @@ class TwoZeroFourEightState : public State {
   std::vector<int> FindFarthestPosition(int x, int y, int direction) const;
   bool TileMatchesAvailable() const;
   bool Reached2048() const;
+  void PrepareTiles();
+  int GetCellContent(int x, int y) const;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -119,7 +129,7 @@ class TwoZeroFourEightState : public State {
   Player current_player_ = kChancePlayerId;  // Player zero (White, 'o') goes first.
   int rows_;
   int columns_;
-  std::vector<int> board_;
+  std::vector<Tile> board_;
   std::vector<TurnHistoryInfo> turn_history_info_;  // Info needed for Undo.
 };
 
