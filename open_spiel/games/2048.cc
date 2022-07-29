@@ -47,10 +47,7 @@ const GameType kGameType{/*short_name=*/"2048",
                          /*provides_information_state_string=*/false,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {{"rows", GameParameter(kDefaultRows)},
-                          {"columns", GameParameter(kDefaultColumns)}}};
+                         /*provides_observation_tensor=*/true};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TwoZeroFourEightGame(params));
@@ -59,10 +56,9 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game, int rows,
-                             int columns)
-    : State(game), rows_(rows), columns_(columns) {
-  board_ = std::vector<Tile>(rows_ * columns_, Tile(0, false));
+TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
+    : State(game) {
+  board_ = std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false));
   turn_history_info_ = {};
   // SetCustomBoard({0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0});
   // SetCustomBoard({2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
@@ -73,31 +69,31 @@ TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game, i
 }
 
 void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
-  for (int x = 0; x < rows_; x++) {
-    for (int y = 0; y < columns_; y++) {
-      SetBoard(x, y, Tile(board_seq[x * rows_ + y], false));
+  for (int x = 0; x < kDefaultRows; x++) {
+    for (int y = 0; y < kDefaultColumns; y++) {
+      SetBoard(x, y, Tile(board_seq[x * kDefaultRows + y], false));
     }
   }
 }
 
 ChanceAction TwoZeroFourEightState::SpielActionToChanceAction(Action action) const {
   std::vector<int> values = UnrankActionMixedBase(
-      action, {rows_, columns_, kNumChanceTiles});
+      action, {kDefaultRows, kDefaultColumns, kNumChanceTiles});
   return ChanceAction(values[0], values[1], values[2]);
 }
 
 Action TwoZeroFourEightState::ChanceActionToSpielAction(ChanceAction move) const {
-  std::vector<int> action_bases = {rows_, columns_, kNumChanceTiles};
+  std::vector<int> action_bases = {kDefaultRows, kDefaultColumns, kNumChanceTiles};
   return RankActionMixedBase(
       action_bases, {move.row, move.column, move.is_four});
 }
 
 std::vector<std::vector<int>> TwoZeroFourEightState::BuildTraversals(int direction) const {
   std::vector<int> x, y;
-  for (int pos = 0; pos < rows_; pos++) {
+  for (int pos = 0; pos < kDefaultRows; pos++) {
     x.push_back(pos);    
   }
-  for (int pos = 0; pos < columns_; pos++) {
+  for (int pos = 0; pos < kDefaultColumns; pos++) {
     y.push_back(pos);    
   }
   switch (direction) {
@@ -114,7 +110,7 @@ std::vector<std::vector<int>> TwoZeroFourEightState::BuildTraversals(int directi
 };
 
 bool TwoZeroFourEightState::WithinBounds(int x, int y) const {
-  return x >= 0 && x < rows_ && y >= 0 && y < columns_;
+  return x >= 0 && x < kDefaultRows && y >= 0 && y < kDefaultColumns;
 };
 
 bool TwoZeroFourEightState::CellAvailable(int x, int y) const {
@@ -149,8 +145,8 @@ std::vector<int> TwoZeroFourEightState::FindFarthestPosition(int x, int y, int d
 
 // Check for available matches between tiles (more expensive check)
 bool TwoZeroFourEightState::TileMatchesAvailable() const {
-  for (int x = 0; x < rows_; x++) {
-    for (int y = 0; y < columns_; y++) {
+  for (int x = 0; x < kDefaultRows; x++) {
+    for (int y = 0; y < kDefaultColumns; y++) {
       int tile = BoardAt(x, y).value;
       if (tile > 0) {
         for (int direction = 0; direction < 4; direction++) {
@@ -167,8 +163,8 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
 };
 
 void TwoZeroFourEightState::PrepareTiles() {
-  for (int x = 0; x < rows_; x++) {
-    for (int y = 0; y < columns_; y++) {
+  for (int x = 0; x < kDefaultRows; x++) {
+    for (int y = 0; y < kDefaultColumns; y++) {
       Tile tile = BoardAt(x, y);
       if (tile.is_merged) {
         SetBoard(x, y, Tile(tile.value, false));
@@ -251,8 +247,8 @@ std::string TwoZeroFourEightState::ActionToString(Player player,
 
 int TwoZeroFourEightState::AvailableCellCount() const {
   int count = 0;
-  for (int r = 0; r < rows_; r++) {
-    for (int c = 0; c < columns_; c++) {
+  for (int r = 0; r < kDefaultRows; r++) {
+    for (int c = 0; c < kDefaultColumns; c++) {
       if (BoardAt(r, c).value == 0) {
         count++;
       }
@@ -270,8 +266,8 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
     return action_and_probs;  
   }
   action_and_probs.reserve(count * 2);
-  for (int r = 0; r < rows_; r++) {
-    for (int c = 0; c < columns_; c++) {
+  for (int r = 0; r < kDefaultRows; r++) {
+    for (int c = 0; c < kDefaultColumns; c++) {
       if (BoardAt(r, c).value == 0) {
         action_and_probs.emplace_back(ChanceActionToSpielAction(
             ChanceAction(r, c, false)), .9 / count);
@@ -294,13 +290,14 @@ std::vector<Action> TwoZeroFourEightState::LegalActions() const {
 }
 
 bool TwoZeroFourEightState::InBounds(int row, int column) const {
-  return (row >= 0 && row < rows_ && column >= 0 && column < columns_);
+  return (row >= 0 && row < kDefaultRows && column >= 0
+      && column < kDefaultColumns);
 }
 
 std::string TwoZeroFourEightState::ToString() const {  
   std::string str;
-  for (int r = 0; r < rows_; ++r) {
-    for (int c = 0; c < columns_; ++c) {
+  for (int r = 0; r < kDefaultRows; ++r) {
+    for (int c = 0; c < kDefaultColumns; ++c) {
       std::string tile = std::to_string(BoardAt(r, c).value);
       absl::StrAppend(&str, std::string(5 - tile.length(), ' '));
       absl::StrAppend(&str, tile);
@@ -315,8 +312,8 @@ bool TwoZeroFourEightState::IsTerminal() const {
 }
 
 bool TwoZeroFourEightState::Reached2048() const {
-  for (int r = 0; r < rows_; r++) {
-    for (int c = 0; c < columns_; c++) {
+  for (int r = 0; r < kDefaultRows; r++) {
+    for (int c = 0; c < kDefaultColumns; c++) {
       if (BoardAt(r, c).value == 2048) {
         return true;
       }
@@ -359,12 +356,10 @@ void TwoZeroFourEightState::UndoAction(Player player, Action action) {
 }
 
 TwoZeroFourEightGame::TwoZeroFourEightGame(const GameParameters& params)
-    : Game(kGameType, params),
-      rows_(ParameterValue<int>("rows")),
-      columns_(ParameterValue<int>("columns")) {}
+    : Game(kGameType, params) {}
 
 int TwoZeroFourEightGame::NumDistinctActions() const {
-  return rows_ * columns_ * 2;
+  return kDefaultRows * kDefaultColumns * 2;
 }
 
 }  // namespace two_zero_four_eight

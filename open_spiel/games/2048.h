@@ -83,8 +83,7 @@ struct TurnHistoryInfo {
 // State of an in-play game.
 class TwoZeroFourEightState : public State {
  public:
-  explicit TwoZeroFourEightState(std::shared_ptr<const Game> game, int rows,
-                         int columns);
+  explicit TwoZeroFourEightState(std::shared_ptr<const Game> game);
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
@@ -105,10 +104,10 @@ class TwoZeroFourEightState : public State {
   ChanceAction SpielActionToChanceAction(Action action) const;
   Action ChanceActionToSpielAction(ChanceAction move) const;
   void SetBoard(int row, int column, Tile tile) {
-    board_[row * columns_ + column] = tile;
+    board_[row * kDefaultColumns + column] = tile;
   }
   Tile BoardAt(int row, int column) const {
-    return board_[row * columns_ + column];
+    return board_[row * kDefaultColumns + column];
   }
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;  
@@ -127,8 +126,6 @@ class TwoZeroFourEightState : public State {
 
  private:
   Player current_player_ = kChancePlayerId;  // Player zero (White, 'o') goes first.
-  int rows_;
-  int columns_;
   std::vector<Tile> board_;
   std::vector<TurnHistoryInfo> turn_history_info_;  // Info needed for Undo.
 };
@@ -139,8 +136,7 @@ class TwoZeroFourEightGame : public Game {
   explicit TwoZeroFourEightGame(const GameParameters& params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<TwoZeroFourEightState>(shared_from_this(), rows_,
-                                            columns_);
+    return absl::make_unique<TwoZeroFourEightState>(shared_from_this());
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -150,11 +146,8 @@ class TwoZeroFourEightGame : public Game {
   }
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
-  int MaxChanceOutcomes() const override { return columns_; }
+  int MaxChanceOutcomes() const override { return kDefaultColumns; }
 
- private:
-  int rows_;
-  int columns_;
 };
 
 }  // namespace two_zero_four_eight
