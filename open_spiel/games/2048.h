@@ -39,7 +39,8 @@ constexpr int kDefaultColumns = 4;
 
 // The chance tiles that randomly appear on the board after each move
 const std::vector<int> kChanceTiles = {2, 4};
-const int kNoCellAvailableAction = kDefaultRows * kDefaultColumns * kChanceTiles.size();
+const int kNoCellAvailableAction = kDefaultRows * kDefaultColumns
+    * kChanceTiles.size();
 
 struct Coordinate {
   int x, y;

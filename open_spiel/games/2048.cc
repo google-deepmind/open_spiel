@@ -33,7 +33,8 @@ constexpr int kMoveUp = 0;
 constexpr int kMoveRight = 1;
 constexpr int kMoveDown = 2;
 constexpr int kMoveLeft = 3;
-const std::vector<Action> kPlayerActions = {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
+const std::vector<Action> kPlayerActions
+   = {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"2048",
@@ -71,19 +72,23 @@ void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
   }
 }
 
-ChanceAction TwoZeroFourEightState::SpielActionToChanceAction(Action action) const {
+ChanceAction TwoZeroFourEightState
+    ::SpielActionToChanceAction(Action action) const {
   std::vector<int> values = UnrankActionMixedBase(
       action, {kDefaultRows, kDefaultColumns, kChanceTiles.size()});
   return ChanceAction(values[0], values[1], values[2]);
 }
 
-Action TwoZeroFourEightState::ChanceActionToSpielAction(ChanceAction move) const {
-  std::vector<int> action_bases = {kDefaultRows, kDefaultColumns, kChanceTiles.size()};
+Action TwoZeroFourEightState
+    ::ChanceActionToSpielAction(ChanceAction move) const {
+  std::vector<int> action_bases = {kDefaultRows, kDefaultColumns, 
+      kChanceTiles.size()};
   return RankActionMixedBase(
       action_bases, {move.row, move.column, move.is_four});
 }
 
-std::vector<std::vector<int>> TwoZeroFourEightState::BuildTraversals(int direction) const {
+std::vector<std::vector<int>> TwoZeroFourEightState
+    ::BuildTraversals(int direction) const {
   std::vector<int> x, y;
   for (int pos = 0; pos < kDefaultRows; pos++) {
     x.push_back(pos);    
@@ -125,7 +130,8 @@ Coordinate GetVector(int direction) {
     }
 }
 
-std::vector<Coordinate> TwoZeroFourEightState::FindFarthestPosition(int x, int y, int direction) const {  
+std::vector<Coordinate> TwoZeroFourEightState
+    ::FindFarthestPosition(int x, int y, int direction) const {  
   // Progress towards the vector direction until an obstacle is found
   Coordinate prev = Coordinate(x, y);
   do {
@@ -308,7 +314,8 @@ std::string TwoZeroFourEightState::ToString() const {
 }
 
 bool TwoZeroFourEightState::IsTerminal() const {
-  return Reached2048() || (AvailableCellCount() == 0 && !TileMatchesAvailable());
+  return Reached2048() 
+      || (AvailableCellCount() == 0 && !TileMatchesAvailable());
 }
 
 bool TwoZeroFourEightState::Reached2048() const {
