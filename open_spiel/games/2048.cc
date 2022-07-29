@@ -258,6 +258,9 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
 }
 
 std::vector<Action> TwoZeroFourEightState::LegalActions() const {
+  if (IsTerminal()) {
+    return {};
+  }
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
   }
