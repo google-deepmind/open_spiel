@@ -59,7 +59,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
     : State(game) {
-  board_ = std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false));  
+  board_ = std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false));
 }
 
 void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
@@ -73,12 +73,12 @@ void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
 
 ChanceAction TwoZeroFourEightState::SpielActionToChanceAction(Action action) const {
   std::vector<int> values = UnrankActionMixedBase(
-      action, {kDefaultRows, kDefaultColumns, kNumChanceTiles});
+      action, {kDefaultRows, kDefaultColumns, kChanceTiles.size()});
   return ChanceAction(values[0], values[1], values[2]);
 }
 
 Action TwoZeroFourEightState::ChanceActionToSpielAction(ChanceAction move) const {
-  std::vector<int> action_bases = {kDefaultRows, kDefaultColumns, kNumChanceTiles};
+  std::vector<int> action_bases = {kDefaultRows, kDefaultColumns, kChanceTiles.size()};
   return RankActionMixedBase(
       action_bases, {move.row, move.column, move.is_four});
 }
@@ -125,17 +125,17 @@ Coordinate GetVector(int direction) {
     }
 }
 
-std::vector<int> TwoZeroFourEightState::FindFarthestPosition(int x, int y, int direction) const {
-  int prev_x, prev_y;
+std::vector<Coordinate> TwoZeroFourEightState::FindFarthestPosition(int x, int y, int direction) const {  
   // Progress towards the vector direction until an obstacle is found
+  Coordinate prev = Coordinate(x, y);
   do {
-    prev_x = x;
-    prev_y = y;
+    prev = Coordinate(x, y);
     Coordinate direction_diff = GetVector(direction);
     x += direction_diff.x;
     y += direction_diff.y;    
   } while (WithinBounds(x, y) && CellAvailable(x, y));
-  return std::vector<int> {prev_x, prev_y, x, y};  
+  return std::vector<Coordinate> {prev,
+      Coordinate(x, y)};
 };
 
 // Check for available matches between tiles (more expensive check)
@@ -182,7 +182,7 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
     }
     ChanceAction chance_action = SpielActionToChanceAction(action);
     SetBoard(chance_action.row, chance_action.column,
-        Tile(chance_action.is_four ? 4 : 2, false));
+        Tile(chance_action.is_four ? kChanceTiles[1] : kChanceTiles[0], false));
     return;
   }
   std::vector<std::vector<int>> traversals = BuildTraversals(action);
@@ -192,16 +192,17 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
       int tile = GetCellContent(x, y);
       if (tile > 0) {
         bool moved = false;
-        std::vector<int> positions = FindFarthestPosition(x, y, action);
-        int next_x = positions[2];
-        int next_y = positions[3];
-        int next = GetCellContent(next_x, next_y);
-        if (next > 0 && next == tile && !BoardAt(next_x, next_y).is_merged) {
+        std::vector<Coordinate> positions = FindFarthestPosition(x, y, action);
+        Coordinate farthest_pos = positions[0];
+        Coordinate next_pos = positions[1];
+        int next_cell = GetCellContent(next_pos.x, next_pos.y);
+        if (next_cell > 0 && next_cell == tile
+            && !BoardAt(next_pos.x, next_pos.y).is_merged) {
           int merged = tile * 2;
-          SetBoard(next_x, next_y, Tile(merged, true));
+          SetBoard(next_pos.x, next_pos.y, Tile(merged, true));
           moved = true;
-        } else if (positions[0] != x || positions[1] != y){
-          SetBoard(positions[0], positions[1], Tile(tile, false));
+        } else if (farthest_pos.x != x || farthest_pos.y != y){
+          SetBoard(farthest_pos.x, farthest_pos.y, Tile(tile, false));
           moved = true;
         }
         if (moved) {
@@ -267,6 +268,7 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
   for (int r = 0; r < kDefaultRows; r++) {
     for (int c = 0; c < kDefaultColumns; c++) {
       if (BoardAt(r, c).value == 0) {
+        // 2 appearing randomly on the board should be 9 times as likely as a 4
         action_and_probs.emplace_back(ChanceActionToSpielAction(
             ChanceAction(r, c, false)), .9 / count);
         action_and_probs.emplace_back(ChanceActionToSpielAction(

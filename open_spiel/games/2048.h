@@ -15,20 +15,14 @@
 #ifndef OPEN_SPIEL_GAMES_2048_H_
 #define OPEN_SPIEL_GAMES_2048_H_
 
-// Implementation of the board game Checkers.
-// https://en.wikipedia.org/wiki/Checkers
+// Implementation of the popular game 2048.
+// https://github.com/gabrielecirulli/2048
 //
 // Some notes about this implementation:
-// - Capturing:
-//     When capturing an opponent's piece is possible, capturing is mandatory
-//     in this implementation.
-// - Drawing:
-//     Game is drawn if no pieces have been removed in 40 moves
-//     http://www.flyordie.com/games/help/checkers/en/games_rules_checkers.html
-// - Custom board dimensions:
-//     Dimensions of the board can be customised by calling the
-//     TwoZeroFourEightState(rows, columns) constructer with the desired
-//     number of rows and columns
+// - Winning:
+//     The original game continues on even if you reach the coveted 2048 tile,
+//     but in this implementation the game will end so that there's a winning 
+//     end state.
 
 #include <memory>
 #include <string>
@@ -42,9 +36,10 @@ namespace two_zero_four_eight {
 constexpr int kNumPlayers = 1;
 constexpr int kDefaultRows = 4;
 constexpr int kDefaultColumns = 4;
-// 2 & 4
-constexpr int kNumChanceTiles = 2;
-constexpr int kNoCellAvailableAction = kDefaultRows * kDefaultColumns * 2;
+
+// The chance tiles that randomly appear on the board after each move
+const std::vector<int> kChanceTiles = {2, 4};
+const int kNoCellAvailableAction = kDefaultRows * kDefaultColumns * kChanceTiles.size();
 
 struct Coordinate {
   int x, y;
@@ -102,10 +97,11 @@ class TwoZeroFourEightState : public State {
   std::vector<Action> LegalActions() const override;
   ActionsAndProbs ChanceOutcomes() const override;  
   int AvailableCellCount() const;
-  std::vector<std::vector<int>> BuildTraversals (int direction) const;
+  std::vector<std::vector<int>> BuildTraversals(int direction) const;
   bool WithinBounds(int x, int y) const;
   bool CellAvailable(int x, int y) const;
-  std::vector<int> FindFarthestPosition(int x, int y, int direction) const;
+  std::vector<Coordinate> 
+      FindFarthestPosition(int x, int y, int direction) const;
   bool TileMatchesAvailable() const;
   bool Reached2048() const;
   void PrepareTiles();
@@ -115,7 +111,7 @@ class TwoZeroFourEightState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-  Player current_player_ = kChancePlayerId;  // Player zero (White, 'o') goes first.
+  Player current_player_ = kChancePlayerId;
   std::vector<Tile> board_;
 };
 
@@ -136,11 +132,11 @@ class TwoZeroFourEightGame : public Game {
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
   int MaxChanceOutcomes() const override { 
-    return kDefaultRows * kDefaultColumns * 2 + 1;
+    return kDefaultRows * kDefaultColumns * kChanceTiles.size() + 1;
   }
 };
 
 }  // namespace two_zero_four_eight
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_CHECKERS_H_
+#endif  // OPEN_SPIEL_GAMES_2048_H_
