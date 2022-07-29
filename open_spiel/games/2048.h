@@ -131,7 +131,7 @@ class TwoZeroFourEightGame : public Game {
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {};
+    return {kDefaultRows, kDefaultColumns};
   }
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }

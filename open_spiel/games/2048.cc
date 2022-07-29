@@ -59,13 +59,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
     : State(game) {
-  board_ = std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false));
-  // SetCustomBoard({0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0});
-  // SetCustomBoard({2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-  // SetCustomBoard({2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0});
-  // SetCustomBoard({0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-  // SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0});
-  // SetCustomBoard({4, 8, 2, 4, 2, 4, 8, 16, 16, 128, 64, 128, 2, 8, 2, 8});
+  board_ = std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false));  
 }
 
 void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
@@ -202,7 +196,7 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
         int next_x = positions[2];
         int next_y = positions[3];
         int next = GetCellContent(next_x, next_y);
-        if (next > 0 && next == tile) {
+        if (next > 0 && next == tile && !BoardAt(next_x, next_y).is_merged) {
           int merged = tile * 2;
           SetBoard(next_x, next_y, Tile(merged, true));
           moved = true;
@@ -351,7 +345,13 @@ std::string TwoZeroFourEightState::ObservationString(Player player) const {
 void TwoZeroFourEightState::ObservationTensor(Player player,
                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);  
+  SPIEL_CHECK_LT(player, num_players_);
+  TensorView<2> view(values, {kDefaultRows, kDefaultColumns}, true);
+  for (int row = 0; row < kDefaultRows; row++) {
+    for (int column = 0; column < kDefaultColumns; column++) {
+      view[{row, column}] = BoardAt(row, column).value;
+    }
+  }
 }
 
 void TwoZeroFourEightState::UndoAction(Player player, Action action) {  

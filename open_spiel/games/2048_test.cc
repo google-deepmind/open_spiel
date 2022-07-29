@@ -52,7 +52,7 @@ void Basic2048Tests() {
 //    2    0    0    0
 //    2    0    0    0
 // 4 should be formed in the bottom left corner and not on the cell above it
-void MultipleMergeTest() {
+void MultipleMergePossibleTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
   TwoZeroFourEightState* cstate = 
@@ -60,6 +60,23 @@ void MultipleMergeTest() {
   cstate->SetCustomBoard({0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0});
   cstate->ApplyAction(cstate->LegalActions()[2]);
   SPIEL_CHECK_EQ(cstate->BoardAt(3, 0).value, 4);  
+}
+
+// Board:
+//    2    4    0    4
+//    0    2    0    2
+//    0    0    0    0
+//    0    2    0    0
+// 4 should not be merged again with the newly formed 4 in 2nd column
+void OneMergePerTurnTest() {
+  std::shared_ptr<const Game> game = LoadGame("2048");
+  std::unique_ptr<State> state = game->NewInitialState();
+  TwoZeroFourEightState* cstate = 
+      static_cast<TwoZeroFourEightState*>(state.get());
+  cstate->SetCustomBoard({2, 4, 0, 4, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0});
+  cstate->ApplyAction(cstate->LegalActions()[2]);
+  SPIEL_CHECK_EQ(cstate->BoardAt(2, 1).value, 4);
+  SPIEL_CHECK_EQ(cstate->BoardAt(3, 1).value, 4);
 }
 
 // Board:
@@ -105,7 +122,8 @@ int main(int argc, char** argv) {
   open_spiel::two_zero_four_eight::BasicSerializationTest();
   open_spiel::two_zero_four_eight::RandomSerializationTest();
   open_spiel::two_zero_four_eight::Basic2048Tests();
-  open_spiel::two_zero_four_eight::MultipleMergeTest();
+  open_spiel::two_zero_four_eight::MultipleMergePossibleTest();
+  open_spiel::two_zero_four_eight::OneMergePerTurnTest();
   open_spiel::two_zero_four_eight::TerminalStateTest();
   open_spiel::two_zero_four_eight::GameWonTest();
 }
