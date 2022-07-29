@@ -30,11 +30,19 @@ void BasicSerializationTest() {
   SPIEL_CHECK_EQ(state->ToString(), state2->ToString());
 }
 
+void Basic2048Tests() {
+  testing::LoadGameTest("2048");
+  testing::ChanceOutcomesTest(*LoadGame("2048"));
+  testing::RandomSimTest(*LoadGame("2048"), 100);
+  // testing::RandomSimTestWithUndo(*LoadGame("2048"), 10);
+}
+
 }  // namespace
 }  // namespace two_zero_four_eigth
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::two_zero_four_eight::BasicSerializationTest();
+  open_spiel::two_zero_four_eight::Basic2048Tests();
  
 }

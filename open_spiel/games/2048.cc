@@ -33,6 +33,7 @@ constexpr int kMoveUp = 0;
 constexpr int kMoveRight = 1;
 constexpr int kMoveDown = 2;
 constexpr int kMoveLeft = 3;
+const std::vector<Action> kPlayerActions = {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"2048",
@@ -221,6 +222,9 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
 std::string TwoZeroFourEightState::ActionToString(Player player,
                                           Action action_id) const {
   if (IsChanceNode()) {
+    if (action_id == kNoCellAvailableAction) {
+      return "No Cell Available";
+    }
     ChanceAction chance_action = SpielActionToChanceAction(action_id);
     return absl::StrCat(std::to_string(chance_action.is_four ? 4 : 2), 
         " added to row ", std::to_string(chance_action.row + 1),
@@ -286,7 +290,7 @@ std::vector<Action> TwoZeroFourEightState::LegalActions() const {
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
   }
-  return {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
+  return kPlayerActions;
 }
 
 bool TwoZeroFourEightState::InBounds(int row, int column) const {
@@ -359,7 +363,7 @@ TwoZeroFourEightGame::TwoZeroFourEightGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
 int TwoZeroFourEightGame::NumDistinctActions() const {
-  return kDefaultRows * kDefaultColumns * 2;
+  return kPlayerActions.size();
 }
 
 }  // namespace two_zero_four_eight

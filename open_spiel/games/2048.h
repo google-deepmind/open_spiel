@@ -44,7 +44,7 @@ constexpr int kDefaultRows = 4;
 constexpr int kDefaultColumns = 4;
 // 2 & 4
 constexpr int kNumChanceTiles = 2;
-constexpr int kNoCellAvailableAction = -2;
+constexpr int kNoCellAvailableAction = kDefaultRows * kDefaultColumns * 2;
 
 struct Coordinate {
   int x, y;
@@ -146,8 +146,9 @@ class TwoZeroFourEightGame : public Game {
   }
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
-  int MaxChanceOutcomes() const override { return kDefaultColumns; }
-
+  int MaxChanceOutcomes() const override { 
+    return kDefaultRows * kDefaultColumns * 2 + 1;
+  }
 };
 
 }  // namespace two_zero_four_eight
