@@ -69,6 +69,7 @@ TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game, i
   // SetCustomBoard({2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0});
   // SetCustomBoard({0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
   // SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0});
+  // SetCustomBoard({4, 8, 2, 4, 2, 4, 8, 16, 16, 128, 64, 128, 2, 8, 2, 8});
 }
 
 void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
@@ -154,7 +155,7 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
       if (tile > 0) {
         for (int direction = 0; direction < 4; direction++) {
           Coordinate vector = GetVector(direction);
-          int other = BoardAt(x + vector.x, y + vector.y).value;
+          int other = GetCellContent(x + vector.x, y + vector.y);
           if (other > 0 && other == tile) {
             return true; // These two tiles can be merged
           }
