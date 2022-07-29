@@ -60,7 +60,6 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
     : State(game) {
   board_ = std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false));
-  turn_history_info_ = {};
   // SetCustomBoard({0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0});
   // SetCustomBoard({2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
   // SetCustomBoard({2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0});
@@ -355,7 +354,6 @@ void TwoZeroFourEightState::ObservationTensor(Player player,
 }
 
 void TwoZeroFourEightState::UndoAction(Player player, Action action) {  
-  turn_history_info_.pop_back();
   history_.pop_back();
 }
 

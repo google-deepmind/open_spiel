@@ -34,7 +34,6 @@ void Basic2048Tests() {
   testing::LoadGameTest("2048");
   testing::ChanceOutcomesTest(*LoadGame("2048"));
   testing::RandomSimTest(*LoadGame("2048"), 100);
-  // testing::RandomSimTestWithUndo(*LoadGame("2048"), 10);
 }
 
 }  // namespace

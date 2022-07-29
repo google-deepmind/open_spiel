@@ -70,16 +70,6 @@ struct Tile {
         is_merged(_is_merged) {}
 };
 
-// This is a small helper to track historical turn info not stored in the moves.
-// It is only needed for proper implementation of Undo.
-struct TurnHistoryInfo {
-  Action action;
-  Player player;
-  TurnHistoryInfo(Action _action, Player _player)
-      : action(_action),
-        player(_player){}
-};
-
 // State of an in-play game.
 class TwoZeroFourEightState : public State {
  public:
@@ -127,7 +117,6 @@ class TwoZeroFourEightState : public State {
  private:
   Player current_player_ = kChancePlayerId;  // Player zero (White, 'o') goes first.
   std::vector<Tile> board_;
-  std::vector<TurnHistoryInfo> turn_history_info_;  // Info needed for Undo.
 };
 
 // Game object.
