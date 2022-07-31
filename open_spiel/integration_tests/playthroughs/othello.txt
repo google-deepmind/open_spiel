@@ -27,7 +27,7 @@ UtilitySum() = 0.0
 ObservationTensorShape() = [3, 8, 8]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 192
-MaxGameLength() = 64
+MaxGameLength() = 128
 ToString() = "othello()"
 
 # State 0
