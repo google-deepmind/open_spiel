@@ -9,6 +9,7 @@ we verified against known values and/or reproduced results from papers.
 
 Status                                       | Game
 -------------------------------------------- | ----
+<font color="orange"><b>~</b></font>         | [2048](#2048)
 <font color="orange"><b>~</b></font>         | [Amazons](#amazons)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
@@ -78,6 +79,16 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Y](#y)
 
 ## Details
+
+### 2048
+
+*   A single player game where player aims to create a 2048 tile by merging other tiles.
+*   Numbers on a grid.
+*   Modern game.
+*   Non-deterministic.
+*   Perfect information.
+*   1 player.
+*   [Github](https://github.com/gabrielecirulli/2048)
 
 ### Amazons
 
