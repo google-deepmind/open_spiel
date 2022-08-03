@@ -114,6 +114,7 @@ class TwoZeroFourEightState : public State {
  private:
   Player current_player_ = kChancePlayerId;
   std::vector<Tile> board_;
+  bool extra_chance_turn_ = true;
 };
 
 // Game object.

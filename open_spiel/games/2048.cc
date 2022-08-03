@@ -182,7 +182,12 @@ int TwoZeroFourEightState::GetCellContent(int x, int y) const {
 
 void TwoZeroFourEightState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
-    current_player_ = 0;
+    // The original 2048 game starts with two random tiles
+    if (!extra_chance_turn_) {
+      current_player_ = 0;
+    }
+    extra_chance_turn_ = false;
+    
     if (action == kNoCellAvailableAction) {
       return;
     }
