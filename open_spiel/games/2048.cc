@@ -213,11 +213,11 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
         }
         if (moved) {
           SetBoard(x, y, Tile(0, false));
+          current_player_ = kChancePlayerId;
         }        
       }
     }
-  }
-  current_player_ = kChancePlayerId;
+  }  
 }
 
 std::string TwoZeroFourEightState::ActionToString(Player player,
