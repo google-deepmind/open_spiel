@@ -85,6 +85,7 @@ class TwoZeroFourEightState : public State {
     return std::unique_ptr<State>(new TwoZeroFourEightState(*this));
   }
   void UndoAction(Player player, Action action) override;
+  std::vector<double> Rewards() const override;
   bool InBounds(int row, int column) const;
   void SetCustomBoard(const std::vector<int> board_seq);
   ChanceAction SpielActionToChanceAction(Action action) const;
@@ -107,6 +108,7 @@ class TwoZeroFourEightState : public State {
   bool Reached2048() const;
   void PrepareTiles();
   int GetCellContent(int x, int y) const;
+  int GetMaxTile() const;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -115,6 +117,7 @@ class TwoZeroFourEightState : public State {
   Player current_player_ = kChancePlayerId;
   std::vector<Tile> board_;
   bool extra_chance_turn_ = true;
+  bool new_tile_reached_ = false;
 };
 
 // Game object.
@@ -126,8 +129,8 @@ class TwoZeroFourEightGame : public Game {
     return absl::make_unique<TwoZeroFourEightState>(shared_from_this());
   }
   int NumPlayers() const override { return kNumPlayers; }
-  double MinUtility() const override { return -1; }
-  double MaxUtility() const override { return 1; }
+  double MinUtility() const override { return 0; }
+  double MaxUtility() const override { return 9; }
   std::vector<int> ObservationTensorShape() const override {
     return {kDefaultRows, kDefaultColumns};
   }
