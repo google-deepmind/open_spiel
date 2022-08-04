@@ -282,9 +282,9 @@ def _cce_constraints(payoff, epsilons, remove_null=True, zero_tolerance=1e-8):
   con = 0
   for p in range(num_players):
     for a1 in range(num_actions[p]):
-      a1_inds = _indices(p, a1, num_players)
+      a1_inds = tuple(_indices(p, a1, num_players))
       for a0 in range(num_actions[p]):
-        a0_inds = _indices(p, a0, num_players)
+        a0_inds = tuple(_indices(p, a0, num_players))
         a_mat[con][a0_inds] += payoff[p][a1_inds]
       a_mat[con] -= payoff[p]
       a_mat[con] -= epsilons[p]
