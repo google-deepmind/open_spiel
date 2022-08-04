@@ -90,7 +90,7 @@ class WoLFPHC(rl_agent.AbstractAgent):
       info_state: hashable representation of the information state.
       legal_actions: list of actions at `info_state`.
     """
-    
+
     greedy_q = max([self._q_values[info_state][action]
                    for action in legal_actions])
     greedy_actions = [
@@ -170,24 +170,23 @@ class WoLFPHC(rl_agent.AbstractAgent):
       self._q_values[self._prev_info_state][self._prev_action] += (
           self._step_size.value * self._last_loss_value)
 
-
-
       self._state_counters[info_state] += 1
       for action_ in legal_actions:
         self._avg_policy[info_state][action_] = self._avg_policy[info_state][action_] + 1 / \
             self._state_counters[info_state] * (
             self._cur_policy[info_state][action_] - self._avg_policy[info_state][action_])
-      
 
       assert self._delta_l.value > self._delta_w.value
-      cur_policy_value = sum([self._cur_policy[info_state][action] * self._q_values[info_state][action] for action in legal_actions])
-      avg_policy_value = sum([self._avg_policy[info_state][action] * self._q_values[info_state][action] for action in legal_actions])
+      cur_policy_value = sum([self._cur_policy[info_state][action] *
+                             self._q_values[info_state][action] for action in legal_actions])
+      avg_policy_value = sum([self._avg_policy[info_state][action] *
+                             self._q_values[info_state][action] for action in legal_actions])
       if cur_policy_value > avg_policy_value:
         self._cur_delta_value = self._delta_w.value
       else:
         self._cur_delta_value = self._delta_l.value
-              
-      if not time_step.last():       
+
+      if not time_step.last():
         self._hill_climbing(info_state, legal_actions)
 
         # Decay epsilon, if necessary.
@@ -208,4 +207,3 @@ class WoLFPHC(rl_agent.AbstractAgent):
   @property
   def loss(self):
     return self._last_loss_value
-
