@@ -21,7 +21,8 @@ import torch
 
 from open_spiel.python import rl_environment
 import pyspiel
-from open_spiel.python.pytorch.ppo import PPO, PPOAgent
+from open_spiel.python.pytorch.ppo import PPO
+from open_spiel.python.pytorch.ppo import PPOAgent
 from open_spiel.python.vector_env import SyncVectorEnv
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
@@ -60,11 +61,11 @@ class PPOTest(absltest.TestCase):
 
     time_step = envs.reset()
     for update in range(1, num_updates + 1):
-        for step in range(0, steps_per_batch):
-            agent_output = agent.step(time_step)
-            time_step, reward, done, unreset_time_steps = envs.step(agent_output, reset_if_done=True)
-            agent.post_step(reward, done)
-        agent.learn(time_step)
+      for step in range(0, steps_per_batch):
+          agent_output = agent.step(time_step)
+          time_step, reward, done, unreset_time_steps = envs.step(agent_output, reset_if_done=True)
+          agent.post_step(reward, done)
+      agent.learn(time_step)
 
     total_eval_reward = 0
     for _ in range(1000):

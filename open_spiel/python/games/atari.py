@@ -3,69 +3,69 @@ import numpy as np
 import pyspiel
 
 from stable_baselines3.common.atari_wrappers import (
-    ClipRewardEnv,
-    EpisodicLifeEnv,
-    FireResetEnv,
-    MaxAndSkipEnv,
-    NoopResetEnv
+  ClipRewardEnv,
+  EpisodicLifeEnv,
+  FireResetEnv,
+  MaxAndSkipEnv,
+  NoopResetEnv
 )
 
 ### NOTE: We include this wrapper by hand because the default wrapper threw errors (see modified lines).
 class NoopResetEnv(gym.Wrapper):
-    """
-    Sample initial states by taking random number of no-ops on reset.
-    No-op is assumed to be action 0.
-    :param env: the environment to wrap
-    :param noop_max: the maximum value of no-ops to run
-    """
+  """
+  Sample initial states by taking random number of no-ops on reset.
+  No-op is assumed to be action 0.
+  :param env: the environment to wrap
+  :param noop_max: the maximum value of no-ops to run
+  """
 
-    def __init__(self, env: gym.Env, noop_max: int = 30):
-        gym.Wrapper.__init__(self, env)
-        self.noop_max = noop_max
-        self.override_num_noops = None
-        self.noop_action = 0
-        assert env.unwrapped.get_action_meanings()[0] == "NOOP"
+  def __init__(self, env: gym.Env, noop_max: int = 30):
+    gym.Wrapper.__init__(self, env)
+    self.noop_max = noop_max
+    self.override_num_noops = None
+    self.noop_action = 0
+    assert env.unwrapped.get_action_meanings()[0] == "NOOP"
 
-    def reset(self, **kwargs) -> np.ndarray:
-        self.env.reset(**kwargs)
-        if self.override_num_noops is not None:
-            noops = self.override_num_noops
-        else:
-          #### MODIFIED LINES ###
-          noops = self.unwrapped.np_random.integers(1, self.noop_max + 1)
-          ### END MODIFIED LIENS ###
-        assert noops > 0
-        obs = np.zeros(0)
-        for _ in range(noops):
-            obs, _, done, _ = self.env.step(self.noop_action)
-            if done:
-                obs = self.env.reset(**kwargs)
-        return obs
+  def reset(self, **kwargs) -> np.ndarray:
+    self.env.reset(**kwargs)
+    if self.override_num_noops is not None:
+      noops = self.override_num_noops
+    else:
+      #### MODIFIED LINES ###
+      noops = self.unwrapped.np_random.integers(1, self.noop_max + 1)
+      ### END MODIFIED LIENS ###
+    assert noops > 0
+    obs = np.zeros(0)
+    for _ in range(noops):
+      obs, _, done, _ = self.env.step(self.noop_action)
+      if done:
+        obs = self.env.reset(**kwargs)
+    return obs
 
 _NUM_PLAYERS = 1
 _GAME_TYPE = pyspiel.GameType(
-    short_name="atari",
-    long_name="atari",
-    dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
-    chance_mode=pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC,
-    information=pyspiel.GameType.Information.PERFECT_INFORMATION,
-    utility=pyspiel.GameType.Utility.ZERO_SUM,
-    reward_model=pyspiel.GameType.RewardModel.REWARDS,
-    max_num_players=_NUM_PLAYERS,
-    min_num_players=_NUM_PLAYERS,
-    provides_information_state_string=False,
-    provides_information_state_tensor=True,
-    provides_observation_string=False,
-    provides_observation_tensor=False,
-    parameter_specification={"gym_id": 'ALE/Breakout-v5', "seed": 1, "idx": 0, "capture_video": False, 'run_name': 'default', 'use_episodic_life_env': True})
+  short_name="atari",
+  long_name="atari",
+  dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
+  chance_mode=pyspiel.GameType.ChanceMode.SAMPLED_STOCHASTIC,
+  information=pyspiel.GameType.Information.PERFECT_INFORMATION,
+  utility=pyspiel.GameType.Utility.ZERO_SUM,
+  reward_model=pyspiel.GameType.RewardModel.REWARDS,
+  max_num_players=_NUM_PLAYERS,
+  min_num_players=_NUM_PLAYERS,
+  provides_information_state_string=False,
+  provides_information_state_tensor=True,
+  provides_observation_string=False,
+  provides_observation_tensor=False,
+  parameter_specification={"gym_id": 'ALE/Breakout-v5', "seed": 1, "idx": 0, "capture_video": False, 'run_name': 'default', 'use_episodic_life_env': True})
 _GAME_INFO = pyspiel.GameInfo(
-    num_distinct_actions=4,
-    max_chance_outcomes=0,
-    num_players=_NUM_PLAYERS,
-    min_utility=-1.0,
-    max_utility=1.0,
-    utility_sum=0.0,
-    max_game_length=2000)
+  num_distinct_actions=4,
+  max_chance_outcomes=0,
+  num_players=_NUM_PLAYERS,
+  min_utility=-1.0,
+  max_utility=1.0,
+  utility_sum=0.0,
+  max_game_length=2000)
 
 class AtariGame(pyspiel.Game):
 
@@ -81,15 +81,15 @@ class AtariGame(pyspiel.Game):
     env = gym.make(self.gym_id) 
     env = gym.wrappers.RecordEpisodeStatistics(env)
     if self.capture_video and self.idx == 0:
-        env = gym.wrappers.RecordVideo(env, f"videos/{self.run_name}")
+      env = gym.wrappers.RecordVideo(env, f"videos/{self.run_name}")
     
     # Wrappers are a bit specialized right nwo to Breakout - different games may want different wrappers.
     env = NoopResetEnv(env, noop_max=30)
     env = MaxAndSkipEnv(env, skip=4)
     if self.use_episodic_life_env:
-        env = EpisodicLifeEnv(env)
+      env = EpisodicLifeEnv(env)
     if "FIRE" in env.unwrapped.get_action_meanings():
-        env = FireResetEnv(env)
+      env = FireResetEnv(env)
     env = ClipRewardEnv(env)
     env = gym.wrappers.ResizeObservation(env, (84, 84))
     env = gym.wrappers.GrayScaleObservation(env)
