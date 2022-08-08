@@ -42,6 +42,15 @@ def _assert_rank_and_shape_compatibility(tensors, rank):
                        (tensor.shape, tmp_shape))
 
 
+def thresholded(logits, regrets, threshold=2.0):
+  """Zeros out `regrets` where `logits` are too negative or too large."""
+  can_decrease = logits.gt(-threshold).float()
+  can_increase = logits.lt(threshold).float()
+  regrets_negative = regrets.clamp(max=0.0)
+  regrets_positive = regrets.clamp(min=0.0)
+  return can_decrease * regrets_negative + can_increase * regrets_positive
+
+
 def compute_baseline(policy, action_values):
   # V = pi * Q, backprop through pi but not Q.
   return torch.sum(torch.mul(policy, action_values.detach()), dim=1)
@@ -62,7 +71,10 @@ def compute_regrets(policy_logits, action_values):
   return regrets
 
 
-def compute_advantages(policy_logits, action_values, use_relu=False):
+def compute_advantages(policy_logits,
+                       action_values,
+                       use_relu=False,
+                       threshold_fn=None):
   """Compute advantages using pi and Q."""
   # Compute advantage.
   policy = F.softmax(policy_logits, dim=1)
@@ -75,8 +87,14 @@ def compute_advantages(policy_logits, action_values, use_relu=False):
   if use_relu:
     advantages = F.relu(advantages)
 
-  # Compute advantage weighted by policy.
-  policy_advantages = -torch.mul(policy, advantages.detach())
+  if threshold_fn:
+    # Compute thresholded advanteges weighted by policy logits for NeuRD.
+    policy_logits = policy_logits - policy_logits.mean(-1, keepdim=True)
+    advantages = threshold_fn(policy_logits, advantages)
+    policy_advantages = -torch.mul(policy_logits, advantages.detach())
+  else:
+    # Compute advantage weighted by policy.
+    policy_advantages = -torch.mul(policy, advantages.detach())
   return torch.sum(policy_advantages, dim=1)
 
 
@@ -116,6 +134,38 @@ class BatchQPGLoss(object):
     advantages = compute_advantages(policy_logits, action_values)
     _assert_rank_and_shape_compatibility([advantages], 1)
     total_adv = torch.mean(advantages, dim=0)
+
+    total_loss = total_adv
+    if self._entropy_cost:
+      policy_entropy = torch.mean(compute_entropy(policy_logits))
+      entropy_loss = torch.mul(float(self._entropy_cost), policy_entropy)
+      total_loss = torch.add(total_loss, entropy_loss)
+
+    return total_loss
+
+
+class BatchNeuRDLoss(object):
+  """Defines the batch NeuRD loss op."""
+
+  def __init__(self, entropy_cost=None, name="batch_neurd_loss"):
+    self._entropy_cost = entropy_cost
+    self._name = name
+
+  def loss(self, policy_logits, action_values):
+    """Constructs a PyTorch Crierion that computes the NeuRD loss for batches.
+
+    Args:
+      policy_logits: `B x A` tensor corresponding to policy logits.
+      action_values: `B x A` tensor corresponding to Q-values.
+
+    Returns:
+      loss: A 0-D `float` tensor corresponding the loss.
+    """
+    _assert_rank_and_shape_compatibility([policy_logits, action_values], 2)
+    advantages = compute_advantages(
+        policy_logits, action_values, threshold_fn=thresholded)
+    _assert_rank_and_shape_compatibility([advantages], 1)
+    total_adv = torch.mean(advantages, axis=0)
 
     total_loss = total_adv
     if self._entropy_cost:

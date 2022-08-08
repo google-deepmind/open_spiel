@@ -197,6 +197,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/random_agent_test.py
   algorithms/tabular_qlearner_test.py
   algorithms/sequence_form_utils_test.py
+  algorithms/wolf_phc_test.py
   algorithms/mmd_dilated_test.py
   bots/bluechip_bridge_test.py
   bots/bluechip_bridge_uncontested_bidding_test.py
@@ -242,6 +243,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    jax/policy_gradient_jax_test.py
     mfg/algorithms/fictitious_play_test.py
   )
 endif()

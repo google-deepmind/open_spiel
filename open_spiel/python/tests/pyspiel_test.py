@@ -92,6 +92,7 @@ EXPECTED_GAMES = frozenset([
     "oware",
     "pentago",
     "pathfinding",
+    "phantom_go",
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",

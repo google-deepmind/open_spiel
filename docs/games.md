@@ -61,6 +61,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 <font color="orange"><b>~</b></font>         | [Pathfinding](#pathfinding)
 ![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
+<font color="orange"><b>~</b></font>         | [Phantom Go](#phantom-go)
 <font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
@@ -609,6 +610,16 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Pentago)
+
+### Phantom Go
+
+*   Go, except the opponent's stones are hidden. The analogue of Kriegspiel for
+    Go.
+*   Research game.
+*   Deterministic.
+*   Imperfect information.
+*   2 players.
+*   [Cazenave '05, A Phantom Go Program](https://link.springer.com/chapter/10.1007/11922155_9)
 
 ### Phantom Tic-Tac-Toe
 

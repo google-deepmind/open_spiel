@@ -131,6 +131,10 @@ set(GAME_SOURCES
   pathfinding.h
   pentago.cc
   pentago.h
+  phantom_go.h
+  phantom_go.cc
+  phantom_go/phantom_go_board.h
+  phantom_go/phantom_go_board.cc
   phantom_ttt.cc
   phantom_ttt.h
   pig.cc
@@ -397,6 +401,10 @@ add_test(gin_rummy_test gin_rummy_test)
 add_executable(go_test go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(go_test go_test)
+
+add_executable(phantom_go_test phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(phantom_go_test phantom_go_test)
 
 add_executable(goofspiel_test goofspiel_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

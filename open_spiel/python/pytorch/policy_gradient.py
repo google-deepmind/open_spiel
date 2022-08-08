@@ -143,8 +143,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
       info_state_size: int, info_state vector size.
       num_actions: int, number of actions per info state.
       loss_str: string or None. If string, must be one of ["rpg", "qpg", "rm",
-        "a2c"] and defined in `_get_loss_class`. If None, a loss class must be
-        passed through `loss_class`. Defaults to "a2c".
+        "a2c", "neurd"] and defined in `_get_loss_class`. If None, a loss class
+        must be passed through `loss_class`. Defaults to "a2c".
       loss_class: Class or None. If Class, it must define the policy gradient
         loss. If None a loss class in a string format must be passed through
         `loss_str`. Defaults to None.
@@ -206,7 +206,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     self._savers = []
 
-    # Add baseline (V) head for A2C (or Q-head for QPG / RPG / RMPG)
+    # Add baseline (V) head for A2C (or Q-head for QPG / RPG / RMPG / NeuRD)
     if optimizer_str == "adam":
       self._critic_optimizer = optim.Adam
     elif optimizer_str == "sgd":
@@ -249,6 +249,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
       return rl_losses.BatchRMLoss
     elif loss_str == "a2c":
       return rl_losses.BatchA2CLoss
+    elif loss_str == "neurd":
+      return rl_losses.BatchNeuRDLoss
 
   def minimize_with_clipping(self, model, optimizer, loss):
     optimizer.zero_grad()
