@@ -163,7 +163,7 @@ def create_braess_network(capacity):
   free_flow_travel_time = {}
   for o_node, value_dict in graph_dict.items():
     for d_node, section_dict in value_dict["connection"].items():
-      road_section = dynamic_routing_utils._nodes_to_road_section(
+      road_section = dynamic_routing_utils._road_section_from_nodes(
           origin=o_node, destination=d_node)
       bpr_a_coefficient[road_section] = section_dict["a"]
       bpr_b_coefficient[road_section] = section_dict["b"]
@@ -274,7 +274,7 @@ def create_augmented_braess_network(capacity):
   free_flow_travel_time = {}
   for o_node, value_dict in graph_dict.items():
     for d_node, section_dict in value_dict["connection"].items():
-      road_section = dynamic_routing_utils._nodes_to_road_section(
+      road_section = dynamic_routing_utils._road_section_from_nodes(
           origin=o_node, destination=d_node)
       bpr_a_coefficient[road_section] = section_dict["a"]
       bpr_b_coefficient[road_section] = section_dict["b"]
@@ -377,7 +377,7 @@ def create_series_parallel_network(num_network_in_series,
   free_flow_travel_time = {}
   for o_node, value_dict in graph_dict.items():
     for d_node, section_dict in value_dict["connection"].items():
-      road_section = dynamic_routing_utils._nodes_to_road_section(
+      road_section = dynamic_routing_utils._road_section_from_nodes(
           origin=o_node, destination=d_node)
       bpr_a_coefficient[road_section] = section_dict["a"]
       bpr_b_coefficient[road_section] = section_dict["b"]
