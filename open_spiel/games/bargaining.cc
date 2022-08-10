@@ -287,6 +287,20 @@ void BargainingState::InformationStateTensor(Player player,
   SPIEL_CHECK_EQ(offset, values.size());
 }
 
+void BargainingState::SetInstance(Instance instance) {
+  instance_ = instance;
+  // TODO(author5): we could (should?) add the ability to check if the instance
+  // abides by the rules of the game here (refactoring that logic out of the
+  // instance generator into a general helper function).
+
+  // Check if this is at the start of the game. If so, make it no longer the
+  // chance player.
+  if (IsChanceNode()) {
+    SPIEL_CHECK_TRUE(offers_.empty());
+    cur_player_ = 0;
+  }
+}
+
 BargainingState::BargainingState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
