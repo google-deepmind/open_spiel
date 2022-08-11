@@ -431,7 +431,8 @@ class DeepCFRSolver(policy.Policy):
       return state.returns()[player]
     elif state.is_chance_node():
       # If this is a chance node, sample an action
-      action = np.random.choice([i[0] for i in state.chance_outcomes()])
+      chance_outcome, chance_proba = zip(*state.chance_outcomes())
+      action = np.random.choice(chance_outcome, p=chance_proba)
       return self._traverse_game_tree(state.child(action), player)
     elif state.current_player() == player:
       # Update the policy over the info set & actions via regret matching.
