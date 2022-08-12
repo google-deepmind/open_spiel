@@ -68,9 +68,9 @@ TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
 
 void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
   current_player_ = 0;
-  for (int x = 0; x < kDefaultRows; x++) {
-    for (int y = 0; y < kDefaultColumns; y++) {
-      SetBoard(x, y, Tile(board_seq[x * kDefaultRows + y], false));
+  for (int r = 0; r < kDefaultRows; r++) {
+    for (int c = 0; c < kDefaultColumns; c++) {
+      SetBoard(r, c, Tile(board_seq[r * kDefaultRows + c], false));
     }
   }
 }
@@ -112,12 +112,12 @@ std::vector<std::vector<int>> TwoZeroFourEightState
   return {x, y};
 };
 
-bool TwoZeroFourEightState::WithinBounds(int x, int y) const {
-  return x >= 0 && x < kDefaultRows && y >= 0 && y < kDefaultColumns;
+bool TwoZeroFourEightState::WithinBounds(int r, int c) const {
+  return r >= 0 && r < kDefaultRows && c >= 0 && c < kDefaultColumns;
 };
 
-bool TwoZeroFourEightState::CellAvailable(int x, int y) const {
-  return BoardAt(x, y).value == 0;
+bool TwoZeroFourEightState::CellAvailable(int r, int c) const {
+  return BoardAt(r, c).value == 0;
 }
 
 Coordinate GetVector(int direction) {
@@ -134,28 +134,28 @@ Coordinate GetVector(int direction) {
 }
 
 std::vector<Coordinate> TwoZeroFourEightState
-    ::FindFarthestPosition(int x, int y, int direction) const {  
+    ::FindFarthestPosition(int r, int c, int direction) const {  
   // Progress towards the vector direction until an obstacle is found
-  Coordinate prev = Coordinate(x, y);
+  Coordinate prev = Coordinate(r, c);
   do {
-    prev = Coordinate(x, y);
+    prev = Coordinate(r, c);
     Coordinate direction_diff = GetVector(direction);
-    x += direction_diff.x;
-    y += direction_diff.y;    
-  } while (WithinBounds(x, y) && CellAvailable(x, y));
+    r += direction_diff.row;
+    c += direction_diff.column;
+  } while (WithinBounds(r, c) && CellAvailable(r, c));
   return std::vector<Coordinate> {prev,
-      Coordinate(x, y)};
+      Coordinate(r, c)};
 };
 
 // Check for available matches between tiles (more expensive check)
 bool TwoZeroFourEightState::TileMatchesAvailable() const {
-  for (int x = 0; x < kDefaultRows; x++) {
-    for (int y = 0; y < kDefaultColumns; y++) {
-      int tile = BoardAt(x, y).value;
+  for (int r = 0; r < kDefaultRows; r++) {
+    for (int c = 0; c < kDefaultColumns; c++) {
+      int tile = BoardAt(r, c).value;
       if (tile > 0) {
         for (int direction = 0; direction < 4; direction++) {
           Coordinate vector = GetVector(direction);
-          int other = GetCellContent(x + vector.x, y + vector.y);
+          int other = GetCellContent(r + vector.row, c + vector.column);
           if (other > 0 && other == tile) {
             return true; // These two tiles can be merged
           }
@@ -167,20 +167,20 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
 };
 
 void TwoZeroFourEightState::PrepareTiles() {
-  for (int x = 0; x < kDefaultRows; x++) {
-    for (int y = 0; y < kDefaultColumns; y++) {
-      Tile tile = BoardAt(x, y);
+  for (int r = 0; r < kDefaultRows; r++) {
+    for (int c = 0; c < kDefaultColumns; c++) {
+      Tile tile = BoardAt(r, c);
       if (tile.is_merged) {
-        SetBoard(x, y, Tile(tile.value, false));
+        SetBoard(r, c, Tile(tile.value, false));
       }
     }
   }  
 };
 
-int TwoZeroFourEightState::GetCellContent(int x, int y) const {
-  if (!WithinBounds(x, y))
+int TwoZeroFourEightState::GetCellContent(int r, int c) const {
+  if (!WithinBounds(r, c))
     return 0;
-  return BoardAt(x, y).value;
+  return BoardAt(r, c).value;
 }
 
 void TwoZeroFourEightState::DoApplyAction(Action action) {
@@ -202,27 +202,27 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
   action_score_ = 0;
   std::vector<std::vector<int>> traversals = BuildTraversals(action);
   PrepareTiles();
-  for (int x : traversals[0]) {
-    for (int y : traversals[1]) {
-      int tile = GetCellContent(x, y);
+  for (int r : traversals[0]) {
+    for (int c : traversals[1]) {
+      int tile = GetCellContent(r, c);
       if (tile > 0) {
         bool moved = false;
-        std::vector<Coordinate> positions = FindFarthestPosition(x, y, action);
+        std::vector<Coordinate> positions = FindFarthestPosition(r, c, action);
         Coordinate farthest_pos = positions[0];
         Coordinate next_pos = positions[1];
-        int next_cell = GetCellContent(next_pos.x, next_pos.y);
+        int next_cell = GetCellContent(next_pos.row, next_pos.column);
         if (next_cell > 0 && next_cell == tile
-            && !BoardAt(next_pos.x, next_pos.y).is_merged) {
+            && !BoardAt(next_pos.row, next_pos.column).is_merged) {
           int merged = tile * 2;
           action_score_ += merged;
-          SetBoard(next_pos.x, next_pos.y, Tile(merged, true));
+          SetBoard(next_pos.row, next_pos.column, Tile(merged, true));
           moved = true;
-        } else if (farthest_pos.x != x || farthest_pos.y != y){
-          SetBoard(farthest_pos.x, farthest_pos.y, Tile(tile, false));
+        } else if (farthest_pos.row != r || farthest_pos.column != c){
+          SetBoard(farthest_pos.row, farthest_pos.column, Tile(tile, false));
           moved = true;
         }
         if (moved) {
-          SetBoard(x, y, Tile(0, false));
+          SetBoard(r, c, Tile(0, false));
           current_player_ = kChancePlayerId;
         }        
       }

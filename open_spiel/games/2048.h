@@ -50,9 +50,9 @@ const int kNoCellAvailableAction = kDefaultRows * kDefaultColumns
     * kChanceTiles.size();
 
 struct Coordinate {
-  int x, y;
-  Coordinate(int _x, int _y)
-      : x(_x), y(_y) {}
+  int row, column;
+  Coordinate(int _row, int _column)
+      : row(_row), column(_column) {}
 };
 
 struct ChanceAction {
