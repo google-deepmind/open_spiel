@@ -16,13 +16,17 @@
 #define OPEN_SPIEL_GAMES_2048_H_
 
 // Implementation of the popular game 2048.
+// https://en.wikipedia.org/wiki/2048_(video_game)
 // https://github.com/gabrielecirulli/2048
 //
+// The objective of the game is to slide numbered tiles on a grid to combine
+// them to create bigger tiles.
+//
 // Some notes about this implementation:
-// - Winning:
-//     The original game continues on even if you reach the coveted 2048 tile,
-//     but in this implementation the game will end so that there's a winning 
-//     end state.
+// - End condition:
+//     The original game gives an option for the player to end the game once the
+//     2048 tile is created. But this implementation goes on till no more moves
+//     are available for the player or kMaxGameLength number of moves is reached
 
 #include <memory>
 #include <string>
