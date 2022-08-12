@@ -49,7 +49,9 @@ const GameType kGameType{/*short_name=*/"2048",
                          /*provides_information_state_string=*/false,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true};
+                         /*provides_observation_tensor=*/true,
+                         {{"max_game_length", GameParameter(kMaxGameLength)},
+                          {"max_score", GameParameter(kMaxScore)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TwoZeroFourEightGame(params));
@@ -386,7 +388,9 @@ void TwoZeroFourEightState::UndoAction(Player player, Action action) {
 }
 
 TwoZeroFourEightGame::TwoZeroFourEightGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      max_game_length_(ParameterValue<int>("max_game_length")),
+      max_score_(ParameterValue<int>("max_score")) {}
 
 int TwoZeroFourEightGame::NumDistinctActions() const {
   return kPlayerActions.size();

@@ -37,6 +37,9 @@ constexpr int kNumPlayers = 1;
 constexpr int kDefaultRows = 4;
 constexpr int kDefaultColumns = 4;
 
+constexpr int kMaxGameLength = INT_MAX;
+constexpr int kMaxScore = INT_MAX;
+
 // The chance tiles that randomly appear on the board after each move
 const std::vector<int> kChanceTiles = {2, 4};
 const int kNoCellAvailableAction = kDefaultRows * kDefaultColumns
@@ -131,15 +134,18 @@ class TwoZeroFourEightGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return 0; }
-  double MaxUtility() const override { return 100000; }
+  double MaxUtility() const override { return max_score_; }
   std::vector<int> ObservationTensorShape() const override {
     return {kDefaultRows, kDefaultColumns};
   }
   // There is arbitrarily chosen number to ensure the game is finite.
-  int MaxGameLength() const override { return 1000; }
+  int MaxGameLength() const override { return max_game_length_; }
   int MaxChanceOutcomes() const override { 
     return kDefaultRows * kDefaultColumns * kChanceTiles.size() + 1;
   }
+ private:
+  int max_game_length_;
+  long max_score_;
 };
 
 }  // namespace two_zero_four_eight
