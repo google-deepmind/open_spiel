@@ -245,19 +245,14 @@ std::string TwoZeroFourEightState::ActionToString(Player player,
   switch (action_id) {
     case kMoveUp:
       return "Up";
-      break;
     case kMoveRight:
       return "Right";
-      break;
     case kMoveDown:
       return "Down";
-      break;
     case kMoveLeft:
       return "Left";
-      break;
     default:
       return "Invalid action";
-      break;
   }  
 }
 
