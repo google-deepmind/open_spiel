@@ -340,18 +340,6 @@ bool TwoZeroFourEightState::Reached2048() const {
   return false;
 }
 
-int TwoZeroFourEightState::GetMaxTile() const {
-  int max_tile = 0;
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
-      if (BoardAt(r, c).value > max_tile) {
-        max_tile = BoardAt(r, c).value;
-      }
-    }
-  }
-  return max_tile;
-}
-
 std::vector<double> TwoZeroFourEightState::Rewards() const {
   return {action_score_};
 }

@@ -94,6 +94,10 @@ class TwoZeroFourEightState : public State {
   void UndoAction(Player player, Action action) override;
   std::vector<double> Rewards() const override;
   bool InBounds(int row, int column) const;
+  std::vector<Action> LegalActions() const override;
+  ActionsAndProbs ChanceOutcomes() const override;  
+  
+  // Methods below are outside core API
   void SetCustomBoard(const std::vector<int> board_seq);
   ChanceAction SpielActionToChanceAction(Action action) const;
   Action ChanceActionToSpielAction(ChanceAction move) const;
@@ -103,8 +107,6 @@ class TwoZeroFourEightState : public State {
   Tile BoardAt(int row, int column) const {
     return board_[row * kDefaultColumns + column];
   }
-  std::vector<Action> LegalActions() const override;
-  ActionsAndProbs ChanceOutcomes() const override;  
   int AvailableCellCount() const;
   std::vector<std::vector<int>> BuildTraversals(int direction) const;
   bool WithinBounds(int x, int y) const;
@@ -115,7 +117,6 @@ class TwoZeroFourEightState : public State {
   bool Reached2048() const;
   void PrepareTiles();
   int GetCellContent(int x, int y) const;
-  int GetMaxTile() const;
 
  protected:
   void DoApplyAction(Action action) override;
