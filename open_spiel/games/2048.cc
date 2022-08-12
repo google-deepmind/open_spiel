@@ -196,8 +196,7 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
         Tile(chance_action.is_four ? kChanceTiles[1] : kChanceTiles[0], false));
     return;
   }
-  new_tile_reached_ = false;
-  int highest_tile_before_action = GetMaxTile();
+  action_score_ = 0;
   std::vector<std::vector<int>> traversals = BuildTraversals(action);
   PrepareTiles();
   for (int x : traversals[0]) {
@@ -212,6 +211,7 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
         if (next_cell > 0 && next_cell == tile
             && !BoardAt(next_pos.x, next_pos.y).is_merged) {
           int merged = tile * 2;
+          action_score_ += merged;
           SetBoard(next_pos.x, next_pos.y, Tile(merged, true));
           moved = true;
         } else if (farthest_pos.x != x || farthest_pos.y != y){
@@ -225,11 +225,7 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
       }
     }
   }  
-  int highest_tile_after_action = GetMaxTile();
-  if (highest_tile_after_action > kChanceTiles.back()
-      && highest_tile_after_action > highest_tile_before_action) {
-    new_tile_reached_ = true;
-  }
+  total_score_ += action_score_;
 }
 
 std::string TwoZeroFourEightState::ActionToString(Player player,
@@ -354,21 +350,11 @@ int TwoZeroFourEightState::GetMaxTile() const {
 }
 
 std::vector<double> TwoZeroFourEightState::Rewards() const {
-  if (new_tile_reached_) {
-    return {1.0};
-  }
-  return {0.0};
+  return {action_score_};
 }
 
 std::vector<double> TwoZeroFourEightState::Returns() const {
-  double cumulative_rewards = log2(GetMaxTile()) - 2.0;
-
-  // Lowest Returns should be zero
-  if (cumulative_rewards < 0) {
-    cumulative_rewards = 0;
-  }
-
-  return {cumulative_rewards};
+  return {total_score_};
 }
 
 std::string TwoZeroFourEightState::InformationStateString(Player player) const {

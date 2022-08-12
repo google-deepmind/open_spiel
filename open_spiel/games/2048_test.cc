@@ -84,7 +84,7 @@ void OneMergePerTurnTest() {
 //    2    4    8   16
 //   16  128   64  128
 //    2    8    2    8
-// This should be a losing terminal state
+// This should be a terminal state
 void TerminalStateTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
@@ -93,7 +93,6 @@ void TerminalStateTest() {
   cstate->SetCustomBoard(
       {4, 8, 2, 4, 2, 4, 8, 16, 16, 128, 64, 128, 2, 8, 2, 8});
   SPIEL_CHECK_EQ(cstate->IsTerminal(), true);
-  SPIEL_CHECK_EQ(cstate->Returns()[0], 5.0);
 }
 
 // Board:
@@ -111,7 +110,7 @@ void GameWonTest() {
       {4, 8, 2, 4, 2, 4, 8, 16, 1024, 128, 64, 128, 1024, 8, 2, 8});
   cstate->ApplyAction(cstate->LegalActions()[2]);
   SPIEL_CHECK_EQ(cstate->IsTerminal(), true);
-  SPIEL_CHECK_EQ(cstate->Returns()[0], 9.0);
+  SPIEL_CHECK_EQ(cstate->Returns()[0], 2048);
 }
 
 // Board:

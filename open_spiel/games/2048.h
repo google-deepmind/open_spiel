@@ -117,7 +117,8 @@ class TwoZeroFourEightState : public State {
   Player current_player_ = kChancePlayerId;
   std::vector<Tile> board_;
   bool extra_chance_turn_ = true;
-  bool new_tile_reached_ = false;
+  int total_score_ = 0;
+  int action_score_ = 0;
 };
 
 // Game object.
@@ -130,7 +131,7 @@ class TwoZeroFourEightGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return 0; }
-  double MaxUtility() const override { return 9; }
+  double MaxUtility() const override { return 100000; }
   std::vector<int> ObservationTensorShape() const override {
     return {kDefaultRows, kDefaultColumns};
   }
