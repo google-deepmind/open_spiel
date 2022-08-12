@@ -33,8 +33,9 @@ constexpr int kMoveUp = 0;
 constexpr int kMoveRight = 1;
 constexpr int kMoveDown = 2;
 constexpr int kMoveLeft = 3;
-const std::vector<Action> kPlayerActions
-   = {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
+inline const std::vector<Action> kPlayerActions() {
+  return {kMoveUp, kMoveRight, kMoveDown, kMoveLeft};
+}
 
 // Facts about the game.
 const GameType kGameType{/*short_name=*/"2048",
@@ -302,7 +303,7 @@ std::vector<Action> TwoZeroFourEightState::LegalActions() const {
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
   }
-  return kPlayerActions;
+  return kPlayerActions();
 }
 
 bool TwoZeroFourEightState::InBounds(int row, int column) const {
@@ -393,7 +394,7 @@ TwoZeroFourEightGame::TwoZeroFourEightGame(const GameParameters& params)
       max_score_(ParameterValue<int>("max_score")) {}
 
 int TwoZeroFourEightGame::NumDistinctActions() const {
-  return kPlayerActions.size();
+  return kPlayerActions().size();
 }
 
 }  // namespace two_zero_four_eight
