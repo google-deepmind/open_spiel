@@ -268,14 +268,12 @@ int TwoZeroFourEightState::AvailableCellCount() const {
   return count;
 }
 
-ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
-  ActionsAndProbs action_and_probs;
+ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {  
   int count = AvailableCellCount();
   if (count == 0) {
-    action_and_probs.reserve(1);
-    action_and_probs.emplace_back(kNoCellAvailableAction, 1);
-    return action_and_probs;  
+    return {{kNoCellAvailableAction, 1.0}};    
   }
+  ActionsAndProbs action_and_probs;
   action_and_probs.reserve(count * 2);
   for (int r = 0; r < kDefaultRows; r++) {
     for (int c = 0; c < kDefaultColumns; c++) {
