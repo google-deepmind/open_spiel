@@ -66,7 +66,7 @@ TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
       board_(std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false)))
       {}
 
-void TwoZeroFourEightState::SetCustomBoard(const std::vector<int> board_seq) {
+void TwoZeroFourEightState::SetCustomBoard(const std::vector<int>& board_seq) {
   current_player_ = 0;
   for (int r = 0; r < kDefaultRows; r++) {
     for (int c = 0; c < kDefaultColumns; c++) {

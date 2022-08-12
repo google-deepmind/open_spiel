@@ -98,7 +98,7 @@ class TwoZeroFourEightState : public State {
   ActionsAndProbs ChanceOutcomes() const override;  
   
   // Methods below are outside core API
-  void SetCustomBoard(const std::vector<int> board_seq);
+  void SetCustomBoard(const std::vector<int>& board_seq);
   ChanceAction SpielActionToChanceAction(Action action) const;
   Action ChanceActionToSpielAction(ChanceAction move) const;
   void SetBoard(int row, int column, Tile tile) {
