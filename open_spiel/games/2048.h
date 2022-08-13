@@ -45,7 +45,7 @@ constexpr int kMaxGameLength = INT_MAX;
 constexpr int kMaxScore = INT_MAX;
 
 // The chance tiles that randomly appear on the board after each move
-const std::vector<int> kChanceTiles = {2, 4};
+constexpr std::array<int, 2> kChanceTiles = {2, 4};
 const int kNoCellAvailableAction = kRows * kColumns
     * kChanceTiles.size();
 
