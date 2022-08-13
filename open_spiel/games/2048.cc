@@ -208,7 +208,7 @@ void TwentyFortyEightState::DoApplyAction(Action action) {
         Coordinate next_pos = positions[1];
         int next_cell = GetCellContent(next_pos.row, next_pos.column);
         if (next_cell > 0 && next_cell == tile
-            && !BoardAt(next_pos.row, next_pos.column).is_merged) {
+            && !BoardAt(next_pos).is_merged) {
           int merged = tile * 2;
           action_score_ += merged;
           SetBoard(next_pos.row, next_pos.column, Tile(merged, true));

@@ -110,6 +110,9 @@ class TwentyFortyEightState : public State {
   Tile BoardAt(int row, int column) const {
     return board_[row * kColumns + column];
   }
+  Tile BoardAt(Coordinate coordinate) const {
+    return board_[coordinate.row * kColumns + coordinate.column];
+  }
   int AvailableCellCount() const;
   std::array<std::vector<int>, 2> BuildTraversals(int direction) const;
   bool WithinBounds(int x, int y) const;
