@@ -104,6 +104,9 @@ class TwentyFortyEightState : public State {
   void SetBoard(int row, int column, Tile tile) {
     board_[row * kColumns + column] = tile;
   }
+  void SetTileIsMerged(int row, int column, bool is_merged) {
+    board_[row * kColumns + column].is_merged = is_merged;
+  }
   Tile BoardAt(int row, int column) const {
     return board_[row * kColumns + column];
   }

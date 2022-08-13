@@ -168,10 +168,7 @@ bool TwentyFortyEightState::TileMatchesAvailable() const {
 void TwentyFortyEightState::PrepareTiles() {
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
-      Tile tile = BoardAt(r, c);
-      if (tile.is_merged) {
-        SetBoard(r, c, Tile(tile.value, false));
-      }
+      SetTileIsMerged(r, c, false);
     }
   }  
 };
