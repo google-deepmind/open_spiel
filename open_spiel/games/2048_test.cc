@@ -127,8 +127,8 @@ void BoardNotChangedTest() {
   cstate->SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2});
   cstate->ApplyAction(cstate->LegalActions()[2]);
   // Check the board remained the same after player move
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
       if (!(r == 3 && c == 0) && !(r == 3 || c == 3)) {
         SPIEL_CHECK_EQ(cstate->BoardAt(r, c).value, 0);
       }

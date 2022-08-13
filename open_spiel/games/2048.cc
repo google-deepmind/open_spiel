@@ -63,14 +63,14 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
     : State(game),
-      board_(std::vector<Tile>(kDefaultRows * kDefaultColumns, Tile(0, false)))
+      board_(std::vector<Tile>(kRows * kColumns, Tile(0, false)))
       {}
 
 void TwoZeroFourEightState::SetCustomBoard(const std::vector<int>& board_seq) {
   current_player_ = 0;
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
-      SetBoard(r, c, Tile(board_seq[r * kDefaultRows + c], false));
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
+      SetBoard(r, c, Tile(board_seq[r * kRows + c], false));
     }
   }
 }
@@ -78,13 +78,13 @@ void TwoZeroFourEightState::SetCustomBoard(const std::vector<int>& board_seq) {
 ChanceAction TwoZeroFourEightState
     ::SpielActionToChanceAction(Action action) const {
   std::vector<int> values = UnrankActionMixedBase(
-      action, {kDefaultRows, kDefaultColumns, kChanceTiles.size()});
+      action, {kRows, kColumns, kChanceTiles.size()});
   return ChanceAction(values[0], values[1], values[2]);
 }
 
 Action TwoZeroFourEightState
     ::ChanceActionToSpielAction(ChanceAction move) const {
-  std::vector<int> action_bases = {kDefaultRows, kDefaultColumns, 
+  std::vector<int> action_bases = {kRows, kColumns, 
       kChanceTiles.size()};
   return RankActionMixedBase(
       action_bases, {move.row, move.column, move.is_four});
@@ -93,10 +93,10 @@ Action TwoZeroFourEightState
 std::vector<std::vector<int>> TwoZeroFourEightState
     ::BuildTraversals(int direction) const {
   std::vector<int> x, y;
-  for (int pos = 0; pos < kDefaultRows; pos++) {
+  for (int pos = 0; pos < kRows; pos++) {
     x.push_back(pos);    
   }
-  for (int pos = 0; pos < kDefaultColumns; pos++) {
+  for (int pos = 0; pos < kColumns; pos++) {
     y.push_back(pos);    
   }
   switch (direction) {
@@ -113,7 +113,7 @@ std::vector<std::vector<int>> TwoZeroFourEightState
 };
 
 bool TwoZeroFourEightState::WithinBounds(int r, int c) const {
-  return r >= 0 && r < kDefaultRows && c >= 0 && c < kDefaultColumns;
+  return r >= 0 && r < kRows && c >= 0 && c < kColumns;
 };
 
 bool TwoZeroFourEightState::CellAvailable(int r, int c) const {
@@ -149,8 +149,8 @@ std::vector<Coordinate> TwoZeroFourEightState
 
 // Check for available matches between tiles (more expensive check)
 bool TwoZeroFourEightState::TileMatchesAvailable() const {
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
       int tile = BoardAt(r, c).value;
       if (tile > 0) {
         for (int direction = 0; direction < 4; direction++) {
@@ -167,8 +167,8 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
 };
 
 void TwoZeroFourEightState::PrepareTiles() {
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
       Tile tile = BoardAt(r, c);
       if (tile.is_merged) {
         SetBoard(r, c, Tile(tile.value, false));
@@ -258,8 +258,8 @@ std::string TwoZeroFourEightState::ActionToString(Player player,
 
 int TwoZeroFourEightState::AvailableCellCount() const {
   int count = 0;
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
       if (BoardAt(r, c).value == 0) {
         count++;
       }
@@ -275,8 +275,8 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
   }
   ActionsAndProbs action_and_probs;
   action_and_probs.reserve(count * 2);
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
       if (BoardAt(r, c).value == 0) {
         // 2 appearing randomly on the board should be 9 times as likely as a 4
         action_and_probs.emplace_back(ChanceActionToSpielAction(
@@ -300,14 +300,14 @@ std::vector<Action> TwoZeroFourEightState::LegalActions() const {
 }
 
 bool TwoZeroFourEightState::InBounds(int row, int column) const {
-  return (row >= 0 && row < kDefaultRows && column >= 0
-      && column < kDefaultColumns);
+  return (row >= 0 && row < kRows && column >= 0
+      && column < kColumns);
 }
 
 std::string TwoZeroFourEightState::ToString() const {  
   std::string str;
-  for (int r = 0; r < kDefaultRows; ++r) {
-    for (int c = 0; c < kDefaultColumns; ++c) {
+  for (int r = 0; r < kRows; ++r) {
+    for (int c = 0; c < kColumns; ++c) {
       std::string tile = std::to_string(BoardAt(r, c).value);
       absl::StrAppend(&str, std::string(5 - tile.length(), ' '));
       absl::StrAppend(&str, tile);
@@ -323,8 +323,8 @@ bool TwoZeroFourEightState::IsTerminal() const {
 }
 
 bool TwoZeroFourEightState::Reached2048() const {
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
+  for (int r = 0; r < kRows; r++) {
+    for (int c = 0; c < kColumns; c++) {
       if (BoardAt(r, c).value == 2048) {
         return true;
       }
@@ -357,9 +357,9 @@ void TwoZeroFourEightState::ObservationTensor(Player player,
                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
-  TensorView<2> view(values, {kDefaultRows, kDefaultColumns}, true);
-  for (int row = 0; row < kDefaultRows; row++) {
-    for (int column = 0; column < kDefaultColumns; column++) {
+  TensorView<2> view(values, {kRows, kColumns}, true);
+  for (int row = 0; row < kRows; row++) {
+    for (int column = 0; column < kColumns; column++) {
       view[{row, column}] = BoardAt(row, column).value;
     }
   }

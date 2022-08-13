@@ -38,15 +38,15 @@ namespace open_spiel {
 namespace two_zero_four_eight {
 
 constexpr int kNumPlayers = 1;
-constexpr int kDefaultRows = 4;
-constexpr int kDefaultColumns = 4;
+constexpr int kRows = 4;
+constexpr int kColumns = 4;
 
 constexpr int kMaxGameLength = INT_MAX;
 constexpr int kMaxScore = INT_MAX;
 
 // The chance tiles that randomly appear on the board after each move
 const std::vector<int> kChanceTiles = {2, 4};
-const int kNoCellAvailableAction = kDefaultRows * kDefaultColumns
+const int kNoCellAvailableAction = kRows * kColumns
     * kChanceTiles.size();
 
 struct Coordinate {
@@ -102,10 +102,10 @@ class TwoZeroFourEightState : public State {
   ChanceAction SpielActionToChanceAction(Action action) const;
   Action ChanceActionToSpielAction(ChanceAction move) const;
   void SetBoard(int row, int column, Tile tile) {
-    board_[row * kDefaultColumns + column] = tile;
+    board_[row * kColumns + column] = tile;
   }
   Tile BoardAt(int row, int column) const {
-    return board_[row * kDefaultColumns + column];
+    return board_[row * kColumns + column];
   }
   int AvailableCellCount() const;
   std::vector<std::vector<int>> BuildTraversals(int direction) const;
@@ -141,12 +141,12 @@ class TwoZeroFourEightGame : public Game {
   double MinUtility() const override { return 0; }
   double MaxUtility() const override { return max_score_; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kDefaultRows, kDefaultColumns};
+    return {kRows, kColumns};
   }
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return max_game_length_; }
   int MaxChanceOutcomes() const override { 
-    return kDefaultRows * kDefaultColumns * kChanceTiles.size() + 1;
+    return kRows * kColumns * kChanceTiles.size() + 1;
   }
  private:
   int max_game_length_;
