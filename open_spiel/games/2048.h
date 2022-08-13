@@ -35,7 +35,7 @@
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
-namespace two_zero_four_eight {
+namespace twenty_forty_eight {
 
 constexpr int kNumPlayers = 1;
 constexpr int kRows = 4;
@@ -74,9 +74,9 @@ struct Tile {
 };
 
 // State of an in-play game.
-class TwoZeroFourEightState : public State {
+class TwentyFortyEightState : public State {
  public:
-  explicit TwoZeroFourEightState(std::shared_ptr<const Game> game);
+  explicit TwentyFortyEightState(std::shared_ptr<const Game> game);
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
@@ -89,7 +89,7 @@ class TwoZeroFourEightState : public State {
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
-    return std::unique_ptr<State>(new TwoZeroFourEightState(*this));
+    return std::unique_ptr<State>(new TwentyFortyEightState(*this));
   }
   void UndoAction(Player player, Action action) override;
   std::vector<double> Rewards() const override;
@@ -130,12 +130,12 @@ class TwoZeroFourEightState : public State {
 };
 
 // Game object.
-class TwoZeroFourEightGame : public Game {
+class TwentyFortyEightGame : public Game {
  public:
-  explicit TwoZeroFourEightGame(const GameParameters& params);
+  explicit TwentyFortyEightGame(const GameParameters& params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
-    return absl::make_unique<TwoZeroFourEightState>(shared_from_this());
+    return absl::make_unique<TwentyFortyEightState>(shared_from_this());
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return 0; }
@@ -153,7 +153,7 @@ class TwoZeroFourEightGame : public Game {
   long max_score_;
 };
 
-}  // namespace two_zero_four_eight
+}  // namespace twenty_forty_eight
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_GAMES_2048_H_

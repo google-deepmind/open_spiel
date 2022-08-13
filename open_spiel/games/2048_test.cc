@@ -18,7 +18,7 @@
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
-namespace two_zero_four_eight {
+namespace twenty_forty_eight {
 namespace {
 
 namespace testing = open_spiel::testing;
@@ -55,8 +55,8 @@ void Basic2048Tests() {
 void MultipleMergePossibleTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
-  TwoZeroFourEightState* cstate = 
-      static_cast<TwoZeroFourEightState*>(state.get());
+  TwentyFortyEightState* cstate = 
+      static_cast<TwentyFortyEightState*>(state.get());
   cstate->SetCustomBoard({0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0});
   cstate->ApplyAction(cstate->LegalActions()[2]);
   SPIEL_CHECK_EQ(cstate->BoardAt(3, 0).value, 4);  
@@ -71,8 +71,8 @@ void MultipleMergePossibleTest() {
 void OneMergePerTurnTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
-  TwoZeroFourEightState* cstate = 
-      static_cast<TwoZeroFourEightState*>(state.get());
+  TwentyFortyEightState* cstate = 
+      static_cast<TwentyFortyEightState*>(state.get());
   cstate->SetCustomBoard({2, 4, 0, 4, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0});
   cstate->ApplyAction(cstate->LegalActions()[2]);
   SPIEL_CHECK_EQ(cstate->BoardAt(2, 1).value, 4);
@@ -88,8 +88,8 @@ void OneMergePerTurnTest() {
 void TerminalStateTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
-  TwoZeroFourEightState* cstate = 
-      static_cast<TwoZeroFourEightState*>(state.get());
+  TwentyFortyEightState* cstate = 
+      static_cast<TwentyFortyEightState*>(state.get());
   cstate->SetCustomBoard(
       {4, 8, 2, 4, 2, 4, 8, 16, 16, 128, 64, 128, 2, 8, 2, 8});
   SPIEL_CHECK_EQ(cstate->IsTerminal(), true);
@@ -104,8 +104,8 @@ void TerminalStateTest() {
 void GameWonTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
-  TwoZeroFourEightState* cstate = 
-      static_cast<TwoZeroFourEightState*>(state.get());
+  TwentyFortyEightState* cstate = 
+      static_cast<TwentyFortyEightState*>(state.get());
   cstate->SetCustomBoard(
       {4, 8, 2, 4, 2, 4, 8, 16, 1024, 128, 64, 128, 1024, 8, 2, 8});
   cstate->ApplyAction(cstate->LegalActions()[2]);
@@ -122,8 +122,8 @@ void GameWonTest() {
 void BoardNotChangedTest() {
   std::shared_ptr<const Game> game = LoadGame("2048");
   std::unique_ptr<State> state = game->NewInitialState();
-  TwoZeroFourEightState* cstate = 
-      static_cast<TwoZeroFourEightState*>(state.get());
+  TwentyFortyEightState* cstate = 
+      static_cast<TwentyFortyEightState*>(state.get());
   cstate->SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2});
   cstate->ApplyAction(cstate->LegalActions()[2]);
   // Check the board remained the same after player move
@@ -141,16 +141,16 @@ void BoardNotChangedTest() {
 }
 
 }  // namespace
-}  // namespace two_zero_four_eigth
+}  // namespace twenty_forty_eight
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::two_zero_four_eight::BasicSerializationTest();
-  open_spiel::two_zero_four_eight::RandomSerializationTest();
-  open_spiel::two_zero_four_eight::Basic2048Tests();
-  open_spiel::two_zero_four_eight::MultipleMergePossibleTest();
-  open_spiel::two_zero_four_eight::OneMergePerTurnTest();
-  open_spiel::two_zero_four_eight::TerminalStateTest();
-  open_spiel::two_zero_four_eight::GameWonTest();
-  open_spiel::two_zero_four_eight::BoardNotChangedTest();
+  open_spiel::twenty_forty_eight::BasicSerializationTest();
+  open_spiel::twenty_forty_eight::RandomSerializationTest();
+  open_spiel::twenty_forty_eight::Basic2048Tests();
+  open_spiel::twenty_forty_eight::MultipleMergePossibleTest();
+  open_spiel::twenty_forty_eight::OneMergePerTurnTest();
+  open_spiel::twenty_forty_eight::TerminalStateTest();
+  open_spiel::twenty_forty_eight::GameWonTest();
+  open_spiel::twenty_forty_eight::BoardNotChangedTest();
 }

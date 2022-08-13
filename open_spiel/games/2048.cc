@@ -26,7 +26,7 @@
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
-namespace two_zero_four_eight {
+namespace twenty_forty_eight {
 namespace {
 
 constexpr int kMoveUp = 0;
@@ -55,18 +55,18 @@ const GameType kGameType{/*short_name=*/"2048",
                           {"max_score", GameParameter(kMaxScore)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return std::shared_ptr<const Game>(new TwoZeroFourEightGame(params));
+  return std::shared_ptr<const Game>(new TwentyFortyEightGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace
 
-TwoZeroFourEightState::TwoZeroFourEightState(std::shared_ptr<const Game> game)
+TwentyFortyEightState::TwentyFortyEightState(std::shared_ptr<const Game> game)
     : State(game),
       board_(std::vector<Tile>(kRows * kColumns, Tile(0, false)))
       {}
 
-void TwoZeroFourEightState::SetCustomBoard(const std::vector<int>& board_seq) {
+void TwentyFortyEightState::SetCustomBoard(const std::vector<int>& board_seq) {
   current_player_ = 0;
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
@@ -75,14 +75,14 @@ void TwoZeroFourEightState::SetCustomBoard(const std::vector<int>& board_seq) {
   }
 }
 
-ChanceAction TwoZeroFourEightState
+ChanceAction TwentyFortyEightState
     ::SpielActionToChanceAction(Action action) const {
   std::vector<int> values = UnrankActionMixedBase(
       action, {kRows, kColumns, kChanceTiles.size()});
   return ChanceAction(values[0], values[1], values[2]);
 }
 
-Action TwoZeroFourEightState
+Action TwentyFortyEightState
     ::ChanceActionToSpielAction(ChanceAction move) const {
   std::vector<int> action_bases = {kRows, kColumns, 
       kChanceTiles.size()};
@@ -90,7 +90,7 @@ Action TwoZeroFourEightState
       action_bases, {move.row, move.column, move.is_four});
 }
 
-std::vector<std::vector<int>> TwoZeroFourEightState
+std::vector<std::vector<int>> TwentyFortyEightState
     ::BuildTraversals(int direction) const {
   std::vector<int> x, y;
   for (int pos = 0; pos < kRows; pos++) {
@@ -112,11 +112,11 @@ std::vector<std::vector<int>> TwoZeroFourEightState
   return {x, y};
 };
 
-bool TwoZeroFourEightState::WithinBounds(int r, int c) const {
+bool TwentyFortyEightState::WithinBounds(int r, int c) const {
   return r >= 0 && r < kRows && c >= 0 && c < kColumns;
 };
 
-bool TwoZeroFourEightState::CellAvailable(int r, int c) const {
+bool TwentyFortyEightState::CellAvailable(int r, int c) const {
   return BoardAt(r, c).value == 0;
 }
 
@@ -133,7 +133,7 @@ Coordinate GetVector(int direction) {
     }
 }
 
-std::vector<Coordinate> TwoZeroFourEightState
+std::vector<Coordinate> TwentyFortyEightState
     ::FindFarthestPosition(int r, int c, int direction) const {  
   // Progress towards the vector direction until an obstacle is found
   Coordinate prev = Coordinate(r, c);
@@ -148,7 +148,7 @@ std::vector<Coordinate> TwoZeroFourEightState
 };
 
 // Check for available matches between tiles (more expensive check)
-bool TwoZeroFourEightState::TileMatchesAvailable() const {
+bool TwentyFortyEightState::TileMatchesAvailable() const {
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
       int tile = BoardAt(r, c).value;
@@ -166,7 +166,7 @@ bool TwoZeroFourEightState::TileMatchesAvailable() const {
   return false;
 };
 
-void TwoZeroFourEightState::PrepareTiles() {
+void TwentyFortyEightState::PrepareTiles() {
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
       Tile tile = BoardAt(r, c);
@@ -177,13 +177,13 @@ void TwoZeroFourEightState::PrepareTiles() {
   }  
 };
 
-int TwoZeroFourEightState::GetCellContent(int r, int c) const {
+int TwentyFortyEightState::GetCellContent(int r, int c) const {
   if (!WithinBounds(r, c))
     return 0;
   return BoardAt(r, c).value;
 }
 
-void TwoZeroFourEightState::DoApplyAction(Action action) {
+void TwentyFortyEightState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
     // The original 2048 game starts with two random tiles
     if (!extra_chance_turn_) {
@@ -231,7 +231,7 @@ void TwoZeroFourEightState::DoApplyAction(Action action) {
   total_score_ += action_score_;
 }
 
-std::string TwoZeroFourEightState::ActionToString(Player player,
+std::string TwentyFortyEightState::ActionToString(Player player,
                                           Action action_id) const {
   if (IsChanceNode()) {
     if (action_id == kNoCellAvailableAction) {
@@ -256,7 +256,7 @@ std::string TwoZeroFourEightState::ActionToString(Player player,
   }  
 }
 
-int TwoZeroFourEightState::AvailableCellCount() const {
+int TwentyFortyEightState::AvailableCellCount() const {
   int count = 0;
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
@@ -268,7 +268,7 @@ int TwoZeroFourEightState::AvailableCellCount() const {
   return count;
 }
 
-ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {  
+ActionsAndProbs TwentyFortyEightState::ChanceOutcomes() const {  
   int count = AvailableCellCount();
   if (count == 0) {
     return {{kNoCellAvailableAction, 1.0}};    
@@ -289,7 +289,7 @@ ActionsAndProbs TwoZeroFourEightState::ChanceOutcomes() const {
   return action_and_probs;
 }
 
-std::vector<Action> TwoZeroFourEightState::LegalActions() const {
+std::vector<Action> TwentyFortyEightState::LegalActions() const {
   if (IsTerminal()) {
     return {};
   }
@@ -299,12 +299,12 @@ std::vector<Action> TwoZeroFourEightState::LegalActions() const {
   return kPlayerActions();
 }
 
-bool TwoZeroFourEightState::InBounds(int row, int column) const {
+bool TwentyFortyEightState::InBounds(int row, int column) const {
   return (row >= 0 && row < kRows && column >= 0
       && column < kColumns);
 }
 
-std::string TwoZeroFourEightState::ToString() const {  
+std::string TwentyFortyEightState::ToString() const {  
   std::string str;
   for (int r = 0; r < kRows; ++r) {
     for (int c = 0; c < kColumns; ++c) {
@@ -317,12 +317,12 @@ std::string TwoZeroFourEightState::ToString() const {
   return str;  
 }
 
-bool TwoZeroFourEightState::IsTerminal() const {
+bool TwentyFortyEightState::IsTerminal() const {
   return Reached2048() 
       || (AvailableCellCount() == 0 && !TileMatchesAvailable());
 }
 
-bool TwoZeroFourEightState::Reached2048() const {
+bool TwentyFortyEightState::Reached2048() const {
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
       if (BoardAt(r, c).value == 2048) {
@@ -333,27 +333,27 @@ bool TwoZeroFourEightState::Reached2048() const {
   return false;
 }
 
-std::vector<double> TwoZeroFourEightState::Rewards() const {
+std::vector<double> TwentyFortyEightState::Rewards() const {
   return {action_score_};
 }
 
-std::vector<double> TwoZeroFourEightState::Returns() const {
+std::vector<double> TwentyFortyEightState::Returns() const {
   return {total_score_};
 }
 
-std::string TwoZeroFourEightState::InformationStateString(Player player) const {
+std::string TwentyFortyEightState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return HistoryString();
 }
 
-std::string TwoZeroFourEightState::ObservationString(Player player) const {
+std::string TwentyFortyEightState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   return ToString();
 }
 
-void TwoZeroFourEightState::ObservationTensor(Player player,
+void TwentyFortyEightState::ObservationTensor(Player player,
                                       absl::Span<float> values) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
@@ -365,18 +365,18 @@ void TwoZeroFourEightState::ObservationTensor(Player player,
   }
 }
 
-void TwoZeroFourEightState::UndoAction(Player player, Action action) {  
+void TwentyFortyEightState::UndoAction(Player player, Action action) {  
   history_.pop_back();
 }
 
-TwoZeroFourEightGame::TwoZeroFourEightGame(const GameParameters& params)
+TwentyFortyEightGame::TwentyFortyEightGame(const GameParameters& params)
     : Game(kGameType, params),
       max_game_length_(ParameterValue<int>("max_game_length")),
       max_score_(ParameterValue<int>("max_score")) {}
 
-int TwoZeroFourEightGame::NumDistinctActions() const {
+int TwentyFortyEightGame::NumDistinctActions() const {
   return kPlayerActions().size();
 }
 
-}  // namespace two_zero_four_eight
+}  // namespace twenty_forty_eight
 }  // namespace open_spiel
