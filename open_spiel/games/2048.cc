@@ -143,8 +143,7 @@ std::vector<Coordinate> TwentyFortyEightState
     r += direction_diff.row;
     c += direction_diff.column;
   } while (WithinBounds(r, c) && CellAvailable(r, c));
-  return std::vector<Coordinate> {prev,
-      Coordinate(r, c)};
+  return std::vector<Coordinate> {prev, Coordinate(r, c)};
 };
 
 // Check for available matches between tiles (more expensive check)
