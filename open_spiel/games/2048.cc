@@ -237,9 +237,9 @@ std::string TwentyFortyEightState::ActionToString(Player player,
       return "No Cell Available";
     }
     ChanceAction chance_action = SpielActionToChanceAction(action_id);
-    return absl::StrCat(std::to_string(chance_action.is_four ? 4 : 2), 
-        " added to row ", std::to_string(chance_action.row + 1),
-        ", column ", std::to_string(chance_action.column + 1));
+    return absl::StrCat(chance_action.is_four ? 4 : 2, 
+        " added to row ", chance_action.row + 1,
+        ", column ", chance_action.column + 1);
   }
   switch (action_id) {
     case kMoveUp:
