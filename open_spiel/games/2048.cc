@@ -137,9 +137,9 @@ std::array<Coordinate, 2> TwentyFortyEightState
     ::FindFarthestPosition(int r, int c, int direction) const {  
   // Progress towards the vector direction until an obstacle is found
   Coordinate prev = Coordinate(r, c);
+  Coordinate direction_diff = GetVector(direction);
   do {
-    prev = Coordinate(r, c);
-    Coordinate direction_diff = GetVector(direction);
+    prev = Coordinate(r, c);    
     r += direction_diff.row;
     c += direction_diff.column;
   } while (WithinBounds(r, c) && CellAvailable(r, c));
