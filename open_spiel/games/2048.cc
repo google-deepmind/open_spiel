@@ -90,7 +90,7 @@ Action TwentyFortyEightState
       action_bases, {move.row, move.column, move.is_four});
 }
 
-std::vector<std::vector<int>> TwentyFortyEightState
+std::array<std::vector<int>, 2> TwentyFortyEightState
     ::BuildTraversals(int direction) const {
   std::vector<int> x, y;
   for (int pos = 0; pos < kRows; pos++) {
@@ -133,7 +133,7 @@ Coordinate GetVector(int direction) {
     }
 }
 
-std::vector<Coordinate> TwentyFortyEightState
+std::array<Coordinate, 2> TwentyFortyEightState
     ::FindFarthestPosition(int r, int c, int direction) const {  
   // Progress towards the vector direction until an obstacle is found
   Coordinate prev = Coordinate(r, c);
@@ -143,7 +143,7 @@ std::vector<Coordinate> TwentyFortyEightState
     r += direction_diff.row;
     c += direction_diff.column;
   } while (WithinBounds(r, c) && CellAvailable(r, c));
-  return std::vector<Coordinate> {prev, Coordinate(r, c)};
+  return std::array<Coordinate, 2> {prev, Coordinate(r, c)};
 };
 
 // Check for available matches between tiles (more expensive check)
@@ -152,7 +152,7 @@ bool TwentyFortyEightState::TileMatchesAvailable() const {
     for (int c = 0; c < kColumns; c++) {
       int tile = BoardAt(r, c).value;
       if (tile > 0) {
-        for (int direction = 0; direction < 4; direction++) {
+        for (int direction : kPlayerActions()) {
           Coordinate vector = GetVector(direction);
           int other = GetCellContent(r + vector.row, c + vector.column);
           if (other > 0 && other == tile) {
@@ -196,14 +196,14 @@ void TwentyFortyEightState::DoApplyAction(Action action) {
     return;
   }
   action_score_ = 0;
-  std::vector<std::vector<int>> traversals = BuildTraversals(action);
+  std::array<std::vector<int>, 2> traversals = BuildTraversals(action);
   PrepareTiles();
   for (int r : traversals[0]) {
     for (int c : traversals[1]) {
       int tile = GetCellContent(r, c);
       if (tile > 0) {
         bool moved = false;
-        std::vector<Coordinate> positions = FindFarthestPosition(r, c, action);
+        std::array<Coordinate, 2> positions = FindFarthestPosition(r, c, action);
         Coordinate farthest_pos = positions[0];
         Coordinate next_pos = positions[1];
         int next_cell = GetCellContent(next_pos.row, next_pos.column);

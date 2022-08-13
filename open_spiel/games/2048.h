@@ -111,10 +111,10 @@ class TwentyFortyEightState : public State {
     return board_[row * kColumns + column];
   }
   int AvailableCellCount() const;
-  std::vector<std::vector<int>> BuildTraversals(int direction) const;
+  std::array<std::vector<int>, 2> BuildTraversals(int direction) const;
   bool WithinBounds(int x, int y) const;
   bool CellAvailable(int x, int y) const;
-  std::vector<Coordinate> 
+  std::array<Coordinate, 2> 
       FindFarthestPosition(int x, int y, int direction) const;
   bool TileMatchesAvailable() const;
   bool Reached2048() const;
