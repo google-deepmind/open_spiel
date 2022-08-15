@@ -120,7 +120,7 @@ bool TwentyFortyEightState::CellAvailable(int r, int c) const {
   return BoardAt(r, c).value == 0;
 }
 
-Coordinate GetVector(int direction) {
+constexpr Coordinate GetVector(int direction) {
   switch (direction) {
       case kMoveUp:
         return Coordinate(-1, 0);        

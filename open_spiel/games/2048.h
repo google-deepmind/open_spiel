@@ -51,7 +51,7 @@ const int kNoCellAvailableAction = kRows * kColumns
 
 struct Coordinate {
   int row, column;
-  Coordinate(int _row, int _column)
+  constexpr Coordinate(int _row, int _column)
       : row(_row), column(_column) {}
 };
 
