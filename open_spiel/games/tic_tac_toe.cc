@@ -114,8 +114,7 @@ std::vector<Action> TicTacToeState::LegalActions() const {
 
 std::string TicTacToeState::ActionToString(Player player,
                                            Action action_id) const {
-  return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id / kNumCols, ",", action_id % kNumCols, ")");
+  return game_->ActionToString(player, action_id);
 }
 
 bool TicTacToeState::HasLine(Player player) const {
@@ -190,6 +189,12 @@ void TicTacToeState::UndoAction(Player player, Action move) {
 
 std::unique_ptr<State> TicTacToeState::Clone() const {
   return std::unique_ptr<State>(new TicTacToeState(*this));
+}
+
+std::string TicTacToeGame::ActionToString(Player player,
+                                          Action action_id) const {
+  return absl::StrCat(StateToString(PlayerToState(player)), "(",
+                      action_id / kNumCols, ",", action_id % kNumCols, ")");
 }
 
 TicTacToeGame::TicTacToeGame(const GameParameters& params)

@@ -107,6 +107,7 @@ class TicTacToeGame : public Game {
     return {kCellStates, kNumRows, kNumCols};
   }
   int MaxGameLength() const override { return kNumCells; }
+  std::string ActionToString(Player player, Action action_id) const override;
 };
 
 CellState PlayerToState(Player player);
