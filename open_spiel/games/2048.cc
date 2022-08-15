@@ -70,7 +70,7 @@ void TwentyFortyEightState::SetCustomBoard(const std::vector<int>& board_seq) {
   current_player_ = 0;
   for (int r = 0; r < kRows; r++) {
     for (int c = 0; c < kColumns; c++) {
-      SetBoard(r, c, Tile(board_seq[r * kRows + c], false));
+      SetBoard(r, c, Tile(board_seq[r * kColumns + c], false));
     }
   }
 }
