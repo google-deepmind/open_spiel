@@ -50,4 +50,16 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
             return dynamic_cast<BargainingState*>(
                 game_and_state.second.release());
           }));
+
+  py::classh<BargainingGame, Game>(m, "BargainingGame")
+    .def("all_instances", &BargainingGame::AllInstances)
+    // Pickle support
+    .def(py::pickle(
+        [](std::shared_ptr<const BargainingGame> game) {  // __getstate__
+          return game->ToString();
+        },
+        [](const std::string& data) {  // __setstate__
+          return std::dynamic_pointer_cast<BargainingGame>(
+              std::const_pointer_cast<Game>(LoadGame(data)));
+        }));
 }
