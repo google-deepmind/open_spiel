@@ -85,6 +85,25 @@ class MatrixGame : public NormalFormGame {
         *std::max_element(begin(col_utilities_), end(col_utilities_)));
   }
 
+  std::string ActionToString(Player player, Action action) const override {
+    switch (player) {
+      case 0: {
+        SPIEL_CHECK_GE(action, 0);
+        SPIEL_CHECK_LT(action, row_action_names_.size());
+        return row_action_names_[action];
+      }
+
+      case 1: {
+        SPIEL_CHECK_GE(action, 0);
+        SPIEL_CHECK_LT(action, col_action_names_.size());
+        return col_action_names_[action];
+      }
+
+      default:
+        SpielFatalError("Unknown player");
+    }
+  }
+
   // Methods for MatrixState to call.
   int NumRows() const { return row_action_names_.size(); }
   int NumCols() const { return col_action_names_.size(); }
