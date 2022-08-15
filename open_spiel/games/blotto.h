@@ -82,6 +82,7 @@ class BlottoGame : public NormalFormGame {
   double MinUtility() const override { return -1; }
   double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
+  std::string ActionToString(Player player, Action action) const override;
 
  private:
   void CreateActionMapRec(int* count, int coins_left,
