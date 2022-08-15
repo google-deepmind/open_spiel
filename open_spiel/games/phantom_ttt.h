@@ -109,6 +109,10 @@ class PhantomTTTGame : public Game {
   double MinUtility() const override { return game_->MinUtility(); }
   double UtilitySum() const override { return game_->UtilitySum(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
+  std::string ActionToString(Player player, Action action_id) const override {
+    return game_->ActionToString(player, action_id);
+  }
+
 
   // These will depend on the obstype parameter.
   std::vector<int> InformationStateTensorShape() const override;

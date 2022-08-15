@@ -163,7 +163,7 @@ def create_braess_network(capacity):
   free_flow_travel_time = {}
   for o_node, value_dict in graph_dict.items():
     for d_node, section_dict in value_dict["connection"].items():
-      road_section = dynamic_routing_utils._nodes_to_road_section(
+      road_section = dynamic_routing_utils._road_section_from_nodes(
           origin=o_node, destination=d_node)
       bpr_a_coefficient[road_section] = section_dict["a"]
       bpr_b_coefficient[road_section] = section_dict["b"]
@@ -274,7 +274,7 @@ def create_augmented_braess_network(capacity):
   free_flow_travel_time = {}
   for o_node, value_dict in graph_dict.items():
     for d_node, section_dict in value_dict["connection"].items():
-      road_section = dynamic_routing_utils._nodes_to_road_section(
+      road_section = dynamic_routing_utils._road_section_from_nodes(
           origin=o_node, destination=d_node)
       bpr_a_coefficient[road_section] = section_dict["a"]
       bpr_b_coefficient[road_section] = section_dict["b"]
@@ -377,7 +377,7 @@ def create_series_parallel_network(num_network_in_series,
   free_flow_travel_time = {}
   for o_node, value_dict in graph_dict.items():
     for d_node, section_dict in value_dict["connection"].items():
-      road_section = dynamic_routing_utils._nodes_to_road_section(
+      road_section = dynamic_routing_utils._road_section_from_nodes(
           origin=o_node, destination=d_node)
       bpr_a_coefficient[road_section] = section_dict["a"]
       bpr_b_coefficient[road_section] = section_dict["b"]
@@ -393,67 +393,6 @@ def create_series_parallel_network(num_network_in_series,
       capacity=capacity,
       free_flow_travel_time=free_flow_travel_time
   ), origin, destination, time_horizon
-
-
-def create_sioux_falls_network():
-  sioux_falls_adjacency_list = {}
-  sioux_falls_node_position = {}
-  bpr_a_coefficient = {}
-  bpr_b_coefficient = {}
-  capacity = {}
-  free_flow_travel_time = {}
-
-  content = open("./SiouxFalls_node.csv", "r").read()
-  for line in content.split("\n")[1:]:
-    row = line.split(",")
-    sioux_falls_node_position[row[0]] = [int(row[1]) / 1e5, int(row[2]) / 1e5]
-    sioux_falls_node_position[f"bef_{row[0]}"] = [
-        int(row[1]) / 1e5, int(row[2]) / 1e5
-    ]
-    sioux_falls_node_position[f"aft_{row[0]}"] = [
-        int(row[1]) / 1e5, int(row[2]) / 1e5
-    ]
-    sioux_falls_adjacency_list[f"bef_{row[0]}"] = [row[0]]
-    sioux_falls_adjacency_list[row[0]] = [f"aft_{row[0]}"]
-    sioux_falls_adjacency_list[f"aft_{row[0]}"] = []
-
-    bpr_a_coefficient[f"{row[0]}->aft_{row[0]}"] = 0.0
-    bpr_b_coefficient[f"{row[0]}->aft_{row[0]}"] = 1.0
-    capacity[f"{row[0]}->aft_{row[0]}"] = 0.0
-    free_flow_travel_time[f"{row[0]}->aft_{row[0]}"] = 0.0
-
-    bpr_a_coefficient[f"bef_{row[0]}->{row[0]}"] = 0.0
-    bpr_b_coefficient[f"bef_{row[0]}->{row[0]}"] = 1.0
-    capacity[f"bef_{row[0]}->{row[0]}"] = 0.0
-    free_flow_travel_time[f"bef_{row[0]}->{row[0]}"] = 0.0
-
-  content = open("./SiouxFalls_net.csv", "r").read()
-  for l in content.split("\n")[1:-1]:
-    _, origin, destination, a0, a1, a2, a3, a4 = l.split(",")
-    assert all(int(x) == 0 for x in [a1, a2, a3])
-    sioux_falls_adjacency_list[origin].append(destination)
-    road_section = f"{origin}->{destination}"
-    bpr_a_coefficient[road_section] = float(a4)
-    bpr_b_coefficient[road_section] = 4.0
-    capacity[road_section] = 1.0
-    free_flow_travel_time[road_section] = float(a0)
-
-  sioux_falls_od_demand = []
-  content = open("./SiouxFalls_od.csv", "r").read()
-  for line in content.split("\n")[1:-1]:
-    row = line.split(",")
-    sioux_falls_od_demand.append(
-        dynamic_routing_utils.OriginDestinationDemand(
-            f"bef_{row[0]}->{row[0]}", f"{row[1]}->aft_{row[1]}", 0,
-            float(row[2])))
-
-  return dynamic_routing_utils.Network(
-      sioux_falls_adjacency_list,
-      node_position=sioux_falls_node_position,
-      bpr_a_coefficient=bpr_a_coefficient,
-      bpr_b_coefficient=bpr_b_coefficient,
-      capacity=capacity,
-      free_flow_travel_time=free_flow_travel_time), sioux_falls_od_demand
 
 
 def plot_network_n_player_game(g: dynamic_routing_utils.Network,

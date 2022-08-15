@@ -116,6 +116,7 @@ class BargainingState : public State {
 
   // Extra methods not part of the general API.
   Instance instance() const { return instance_; }
+  void SetInstance(Instance instance);
 
   Action AgreeAction() const;
 

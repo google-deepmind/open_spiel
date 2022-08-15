@@ -21,19 +21,24 @@
 namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
+using open_spiel::bargaining::BargainingGame;
 using open_spiel::bargaining::BargainingState;
 using open_spiel::bargaining::Instance;
 
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(BargainingGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(BargainingState);
 
 void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
   py::class_<Instance>(m, "Instance")
+      .def(py::init<>())
       .def_readwrite("pool", &Instance::pool)
       .def_readwrite("values", &Instance::values);
 
   py::classh<BargainingState, State>(m, "BargainingState")
       .def("instance", &BargainingState::instance)
       .def("agree_action", &BargainingState::AgreeAction)
+      // set_instance(instance)
+      .def("set_instance", &BargainingState::SetInstance)
       // Pickle support
       .def(py::pickle(
           [](const BargainingState& state) {  // __getstate__

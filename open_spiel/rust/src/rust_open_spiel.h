@@ -28,6 +28,8 @@ void GameParametersSetInt(void* params_ptr, const char* key, int value);
 void GameParametersSetDouble(void* params_ptr, const char* key, double value);
 void GameParametersSetString(void* params_ptr, const char* key,
                              const char* value);
+char* GameParametersSerialize(const void* params_ptr,
+                              unsigned long* length); /* NOLINT */
 
 /* Game functions. */
 void* LoadGame(const char* name);

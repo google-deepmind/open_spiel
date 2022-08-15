@@ -28,6 +28,12 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn GameParametersSerialize(
+        params_ptr: *mut ::std::os::raw::c_void,
+        length: *mut ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_char;
+}
+extern "C" {
     pub fn LoadGame(name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
