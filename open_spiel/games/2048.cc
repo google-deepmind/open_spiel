@@ -101,10 +101,8 @@ std::array<std::vector<int>, 2> TwentyFortyEightState
   }
   switch (direction) {
     case kMoveRight:
-      reverse(x.begin(), x.end());
       reverse(y.begin(), y.end());
       break;
-    case kMoveLeft:
     case kMoveDown:
       reverse(x.begin(), x.end());
       break;
