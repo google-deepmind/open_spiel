@@ -22,7 +22,7 @@ MaxChanceOutcomes() = 10
 GetParameters() = {board_size=4,boards_file=,num_colors=5,players=3}
 NumPlayers() = 3
 MinUtility() = -400.0
-MaxUtility() = 80.0
+MaxUtility() = 150.0
 UtilitySum() = None
 InformationStateTensorShape() = [463]
 InformationStateTensorLayout() = TensorLayout.CHW

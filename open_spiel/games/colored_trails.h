@@ -63,7 +63,7 @@ constexpr int kFlagPenaltyPerCell = -25;
 
 // Default 10-board database used for tests, etc. See
 // colored_trails/boards100.txt and create your own using
-// colored_trails/colored_trails_board_generator to make your own.
+// colored_trails/colored_trails_board_generator.
 constexpr const char* kDefaultBoardsString =
     "4 5 3 DEADCACCADBDBECC BCD BDDDD AAABCC 4 5 15 12\n"
     "4 5 3 CCADBEEAEDDDDACD ACCD AABC ABBCDDE 14 7 8 11\n"
@@ -181,9 +181,12 @@ class ColoredTrailsGame : public Game {
 
   int NumPlayers() const override { return num_players_; }
   double MaxUtility() const override {
-    return kLeftoverChipScore * kNumChipsUpperBound;
+    // Get max chips, then do a 1-for-8 trade, and only use 1 chip.
+    // = 0 (for reaching goal) + (8 - 1 + 8) * leftover_chip_value
+    return kLeftoverChipScore * (kNumChipsUpperBound - 1 + kNumChipsUpperBound);
   }
   double MinUtility() const override {
+    // No chips left and as far away from the goal as possible.
     return board_size_ * board_size_ * kFlagPenaltyPerCell;
   }
   std::vector<int> ObservationTensorShape() const override;
@@ -217,7 +220,10 @@ std::vector<int> ComboStringToCombo(const std::string& combo_str,
 void InitTradeInfo(TradeInfo* trade_info, int num_colors);
 
 // This is the G function described in [2]: the score if the player were to
-// advance as close to the goal as possible given their current chips.
+// advance as close to the goal as possible given their current chips:
+//   - Subtract 25 points for every step away from the goal in Manhattan
+//   distance
+//   - Add 10 points for every chip leftover after the exchange.
 std::pair<int, bool> Score(Player player, const Board& board);
 
 void ParseBoardsFile(std::vector<Board>* boards, const std::string& filename,
