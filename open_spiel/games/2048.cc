@@ -181,7 +181,9 @@ int TwentyFortyEightState::GetCellContent(int r, int c) const {
 
 void TwentyFortyEightState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
-    // The original 2048 game starts with two random tiles
+    // The original 2048 game starts with two random tiles. To achieve this,
+    // an extra move is given to the chance player during the beginning of the
+    // game.
     if (!extra_chance_turn_) {
       current_player_ = 0;
     }
