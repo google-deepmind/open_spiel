@@ -60,6 +60,12 @@ impl GameParameters {
             GameParametersSetString(self.params, key.as_ptr(), value.as_ptr());
         }
     }
+
+    pub fn serialize(&self) -> String {
+        let mut length = 0;
+        let c_buf: *mut c_char = unsafe { GameParametersSerialize(self.params, &mut length) };
+        convert_and_free_cstring(c_buf, length)
+    }
 }
 
 impl Drop for GameParameters {

@@ -81,6 +81,10 @@ fn new_game_with_parameters_test() {
     params.set_int("board_size", 9);
     params.set_f64("komi", 7.5);
     let game = Game::new_with_parameters(&params);
+    assert_eq!(
+        params.serialize(),
+        "board_size=kInt***9***false|||komi=kDouble***7.5***false|||name=kString***go***false"
+    );
     assert_eq!(game.short_name(), "go");
     assert_eq!(game.observation_shape(), vec![4, 9, 9]);
 }

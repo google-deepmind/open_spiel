@@ -31,16 +31,16 @@ using ::open_spiel::BotRegisterer;
 using ::open_spiel::Game;
 using ::open_spiel::GameParameter;
 using ::open_spiel::GameParameters;
+using ::open_spiel::SerializeGameParameters;
 using ::open_spiel::State;
 
-// A number of functions in this file returns pointers to dynamically-allocated
-// memory. These are temporary memory buffers used to store data that must be
-// freed on the Rust API (rust_open_spiel.rs).
+// A number of functions in this file returns pointers to
+// dynamically-allocated memory. These are temporary memory buffers used to
+// store data that must be freed on the Rust API (rust_open_spiel.rs).
 
 /* We need this because games are shared pointers and we need to return
  raw pointers to objects that contain them.*/
 namespace {
-
 struct GamePointerHolder {
   std::shared_ptr<const Game> ptr;
 };
@@ -88,6 +88,15 @@ void GameParametersSetString(void* params_ptr, const char* key,
                              const char* value) {
   GameParameters* params = reinterpret_cast<GameParameters*>(params_ptr);
   params->insert_or_assign(std::string(key), GameParameter(std::string(value)));
+}
+
+char* GameParametersSerialize(const void* params_ptr,
+                              unsigned long* length) {  // NOLINT
+  const GameParameters* params =
+      reinterpret_cast<const GameParameters*>(params_ptr);
+  std::string serialized = SerializeGameParameters(*params);
+  *length = serialized.length();
+  return AllocAndCopyString(serialized);
 }
 
 /* Game functions. */
