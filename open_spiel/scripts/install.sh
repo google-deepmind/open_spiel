@@ -274,7 +274,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   if [[ "$CI" && "${OS_PYTHON_VERSION}" != "3.9" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
     # Uninstall Python 3.9 if we need to.
-    brew list python@3.9 ]] && brew unlink python@3.9
+    brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
