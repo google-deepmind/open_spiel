@@ -361,10 +361,6 @@ void TwentyFortyEightState::ObservationTensor(Player player,
   }
 }
 
-void TwentyFortyEightState::UndoAction(Player player, Action action) {  
-  history_.pop_back();
-}
-
 TwentyFortyEightGame::TwentyFortyEightGame(const GameParameters& params)
     : Game(kGameType, params),
       max_game_length_(ParameterValue<int>("max_game_length")),

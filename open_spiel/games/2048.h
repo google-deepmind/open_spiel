@@ -91,7 +91,6 @@ class TwentyFortyEightState : public State {
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new TwentyFortyEightState(*this));
   }
-  void UndoAction(Player player, Action action) override;
   std::vector<double> Rewards() const override;
   bool InBounds(int row, int column) const;
   std::vector<Action> LegalActions() const override;
