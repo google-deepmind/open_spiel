@@ -44,6 +44,10 @@ git clone https://github.com/deepmind/open_spiel.git
 cd open_spiel
 git clone -b smart_holder --single-branch --depth 1 https://github.com/pybind/pybind11.git pybind11
 git clone -b 20211102.0 --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel\abseil-cpp
+git clone -b 'master' https://github.com/pybind/pybind11_abseil.git open_spiel\pybind11_abseil
+cd open_spiel\pybind11_abseil
+git checkout '73992b5'
+cd ..\..
 git clone -b develop --single-branch --depth 1 https://github.com/jblespiau/dds.git open_spiel\games\bridge\double_dummy_solver
 ```
 
