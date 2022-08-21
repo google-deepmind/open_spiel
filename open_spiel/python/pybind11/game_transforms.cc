@@ -28,32 +28,35 @@ namespace py = ::pybind11;
 
 void init_pyspiel_game_transforms(py::module& m) {
   m.def("load_game_as_turn_based",
-        py::overload_cast<const std::string&>(&open_spiel::LoadGameAsTurnBased),
+        py::overload_cast<const std::string&>(&LoadGameAsTurnBased),
         "Converts a simultaneous game into an turn-based game with infosets.");
 
   m.def("load_game_as_turn_based",
         py::overload_cast<const std::string&, const GameParameters&>(
-            &open_spiel::LoadGameAsTurnBased),
+            &LoadGameAsTurnBased),
         "Converts a simultaneous game into an turn-based game with infosets.");
 
-  m.def("extensive_to_tensor_game", open_spiel::ExtensiveToTensorGame,
+  m.def("extensive_to_tensor_game", ExtensiveToTensorGame,
         "Converts an extensive-game to its equivalent tensor game, "
         "which is exponentially larger. Use only with small games.");
 
-  m.def("convert_to_turn_based",
-        [](const std::shared_ptr<open_spiel::Game>& game) {
-          return open_spiel::ConvertToTurnBased(*game);
-        },
-        "Returns a turn-based version of the given game.");
+  m.def(
+      "convert_to_turn_based",
+      [](std::shared_ptr<const Game> game) {
+        return ConvertToTurnBased(*game);
+      },
+      "Returns a turn-based version of the given game.");
 
-  m.def("create_repeated_game",
-        py::overload_cast<const Game&, const GameParameters&>(
-            &open_spiel::CreateRepeatedGame),
-        "Creates a repeated game from a stage game.");
+  m.def(
+      "create_repeated_game",
+      [](std::shared_ptr<const Game> game, const GameParameters& params) {
+        return CreateRepeatedGame(*game, params);
+      },
+      "Creates a repeated game from a stage game.");
 
   m.def("create_repeated_game",
         py::overload_cast<const std::string&, const GameParameters&>(
-            &open_spiel::CreateRepeatedGame),
+            &CreateRepeatedGame),
         "Creates a repeated game from a stage game.");
 }
 }  // namespace open_spiel
