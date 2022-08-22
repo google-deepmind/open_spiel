@@ -14,14 +14,13 @@ formats: all
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: 3.7
   install:
     - requirements: docs/requirements.readthedocs.txt
 
 build:
   os: ubuntu-22.04
   tools:
-    python: "3.7"
+    python: "3.9"
   jobs:
     post_build:
       - echo "Running post-build commands."
