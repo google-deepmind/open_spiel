@@ -26,6 +26,8 @@ build:
       - echo "Running post-build commands."
       - echo `date`
       - echo `pwd`
-      - echo `ls -lR`
+      - echo `ls docs/_build/html/api_reference.html`
       - echo "Fixing the table links"
-      - sed -i -E 's/a href="(.*)\.md"/a href="\1\.html"/g' docs/_build/html/api_reference.html
+      - cd docs
+      - bash ./fix_table_links.sh
+      - cd ..
