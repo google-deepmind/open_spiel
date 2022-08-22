@@ -25,5 +25,6 @@ build:
     post_build:
       - echo "Running post-build commands."
       - echo `date`
+      - echo `pwd`
       - echo "Fixing the table links"
-      - sed -i -E 's/a href="(.*)\.md"/a href="\1\.html"/g' _readthedocs/html/api_reference.html
+      - sed -i -E 's/a href="(.*)\.md"/a href="\1\.html"/g' _build/html/api_reference.html
