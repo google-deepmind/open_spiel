@@ -19,6 +19,9 @@ python:
     - requirements: docs/requirements.readthedocs.txt
 
 build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.7"
   jobs:
     post_build:
       - echo "Running post-build commands."
