@@ -17,3 +17,11 @@ python:
   version: 3.7
   install:
     - requirements: docs/requirements.readthedocs.txt
+
+build:
+  jobs:
+    post_build:
+      - echo "Running post-build commands."
+      - echo `date`
+      - echo "Fixing the table links"
+      - sed -i -E 's/a href="(.*)\.md"/a href="\1\.html"/g' _readthedocs/html/api_reference.html
