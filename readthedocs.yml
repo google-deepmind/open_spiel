@@ -29,4 +29,4 @@ build:
       - echo `ls docs`
       - echo `ls docs/_build/html/api_reference.html`
       - echo "Fixing the table links"
-      - cd docs && bash fix_table_links.sh
+      - bash docs/fix_table_links.sh _readthedocs/html/api_reference.html

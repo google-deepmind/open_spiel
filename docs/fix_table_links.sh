@@ -22,4 +22,9 @@
 # https://github.com/ryanfox/sphinx-markdown-tables/issues/18
 
 # Currently the only file affected is the api_reference:
-sed -i -E 's/a href="(.*)\.md"/a href="\1\.html"/g' _build/html/api_reference.html
+FILE="_build/html/api_reference.html"
+if [[ "$1" != "" ]]; then
+  FILE="$1"
+fi
+
+sed -E 's/a href="(.*)\.md"/a href="\1\.html"/g' -i ${FILE}
