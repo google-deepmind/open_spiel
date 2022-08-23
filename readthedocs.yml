@@ -22,11 +22,11 @@ build:
   tools:
     python: "3.8"
   jobs:
-    post_build:
-      - echo "Running post-build commands."
+    pre_build:
+      - echo "Running pre-build commands."
       - echo `date`
       - echo `pwd`
+      - echo `ls`
       - echo `ls docs`
-      - echo `ls docs/_build/html/api_reference.html`
       - echo "Fixing the table links"
-      - bash docs/fix_table_links.sh _readthedocs/html/api_reference.html
+      - bash docs/fix_table_links.sh

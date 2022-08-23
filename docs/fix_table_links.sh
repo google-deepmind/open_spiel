@@ -21,10 +21,21 @@
 # This is an open issue with sphinx-markdown-tables, see
 # https://github.com/ryanfox/sphinx-markdown-tables/issues/18
 
-# Currently the only file affected is the api_reference:
-FILE="_build/html/api_reference.html"
-if [[ "$1" != "" ]]; then
-  FILE="$1"
+if [[ "$READTHEDOCS" = "True" ]]; then
+  # Fix the links pre-build. In this case, edit the markdown file rather than
+  # the resulting HTML
+  FILE="docs/api_reference.md"
+  if [[ "$1" != "" ]]; then
+    FILE="$1"
+  fi
+  sed -E 's/\[Python\]\((.*).md\)/\[Python\]\(\1.html\)/g' -i ${FILE}
+else
+  # Fix the links post-build: rewrite the HTML after it's been generated. Was
+  # not able to get this to work on Read the Docs.
+  FILE="_build/html/api_reference.html"
+  if [[ "$1" != "" ]]; then
+    FILE="$1"
+  fi
+  sed -E 's/a href="(.*)\.md"/a href="\1\.html"/g' -i ${FILE}
 fi
 
-sed -E 's/a href="(.*)\.md"/a href="\1\.html"/g' -i ${FILE}
