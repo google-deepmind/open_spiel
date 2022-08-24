@@ -157,6 +157,8 @@ void init_pyspiel_policy(py::module& m) {
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
       .def("average_policy",
            &open_spiel::algorithms::CFRPlusSolver::AveragePolicy)
+      .def("tabular_average_policy",
+           &open_spiel::algorithms::CFRPlusSolver::TabularAveragePolicy)
       .def(py::pickle(
           [](const open_spiel::algorithms::CFRPlusSolver&
                  solver) {  // __getstate__
