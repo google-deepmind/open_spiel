@@ -17,21 +17,21 @@ Based on https://arxiv.org/abs/1806.02643. An axiomatic strategy evaluation
 metric for Agent-vs-Agent or Agent-vs-Task two-player zero-sum games.
 """
 
-import cvxopt
+import cvxpy as cp
 import numpy as np
 
 from open_spiel.python.egt.utils import game_payoffs_array
 
 
-def _max_entropy_symmetric_nash(p_mat, eps=0.0):
-  """Solving for the maxent symmetric nash for symmetric 2P zero-sum games.
+def _max_entropy_symmetric_nash(p_mat, eps=1e-9):
+  """Solves for the maxent symmetric nash for symmetric 2P zero-sum games.
 
-  convex programming:
-    min p^Tlog(p)
-    s.t.
-    p_mat.dot(p) <= p^T*p_mat*p
-    p >= 0
-    1^T * p = 1
+    Using convex programming:
+      min p^Tlog(p)
+      s.t.
+      p_mat.dot(p) <= 0, since game value must be 0
+      p >= 0
+      1^T * p = 1
 
   Args:
     p_mat: an N*N anti-symmetric payoff matrix for the row player
@@ -42,31 +42,13 @@ def _max_entropy_symmetric_nash(p_mat, eps=0.0):
   """
   assert np.array_equal(p_mat, -p_mat.T) and eps >= 0 and eps <= 0.5
   n = len(p_mat)
-  p_mat = cvxopt.matrix(p_mat)
-  cvxopt.solvers.options["show_progress"] = False
-
-  def func(x=None, z=None):
-    if x is None:
-      return 2 * n, cvxopt.matrix(1 / n, (n, 1))
-    if min(x) <= eps or max(x) >= 1 - eps:
-      return None
-    ev = x.T * p_mat * x
-    f = cvxopt.matrix(0.0, (2 * n + 1, 1))
-    df = cvxopt.matrix(0.0, (2 * n + 1, n))
-    f[0] = x.T * cvxopt.log(x)
-    df[0, :] = (cvxopt.log(x) + 1).T
-    f[1:n + 1] = p_mat * x - ev
-    df[1:n + 1, :] = p_mat
-    f[n+1:] = -x + eps  # pylint: disable=invalid-unary-operand-type
-    df[n + 1:, :] = -cvxopt.spmatrix(1.0, range(n), range(n))
-    if z is None:
-      return f, df
-    h = cvxopt.spdiag(z[0] * x**(-1))
-    return f, df, h
-
-  a_mat = cvxopt.matrix(1.0, (1, n))
-  b = cvxopt.matrix(1.0, (1, 1))
-  return cvxopt.solvers.cp(func, A=a_mat, b=b)["x"]
+  x = cp.Variable(shape=n)
+  obj = cp.Maximize(cp.sum(cp.entr(x)))
+  a_mat = np.ones(n).reshape((1, n))
+  constraints = [p_mat @ x <= 0, a_mat @ x == 1, x >= eps * np.ones(n)]
+  prob = cp.Problem(obj, constraints)
+  prob.solve()
+  return x.value.reshape((-1, 1))
 
 
 def nash_averaging(game, eps=0.0, a_v_a=True):

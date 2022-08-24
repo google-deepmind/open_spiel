@@ -7,28 +7,54 @@ extern "C" {
     pub fn DeleteGameParameters(params_ptr: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn GameParametersSetInt(params_ptr: *mut ::std::os::raw::c_void, key: *const ::std::os::raw::c_char, value: ::std::os::raw::c_int);
+    pub fn GameParametersSetInt(
+        params_ptr: *mut ::std::os::raw::c_void,
+        key: *const ::std::os::raw::c_char,
+        value: ::std::os::raw::c_int,
+    );
 }
 extern "C" {
-    pub fn GameParametersSetDouble(params_ptr: *mut ::std::os::raw::c_void, key: *const ::std::os::raw::c_char, value: ::std::os::raw::c_double);
+    pub fn GameParametersSetDouble(
+        params_ptr: *mut ::std::os::raw::c_void,
+        key: *const ::std::os::raw::c_char,
+        value: ::std::os::raw::c_double,
+    );
 }
 extern "C" {
-    pub fn GameParametersSetString(params_ptr: *mut ::std::os::raw::c_void, key: *const ::std::os::raw::c_char, value: *const ::std::os::raw::c_char);
+    pub fn GameParametersSetString(
+        params_ptr: *mut ::std::os::raw::c_void,
+        key: *const ::std::os::raw::c_char,
+        value: *const ::std::os::raw::c_char,
+    );
+}
+extern "C" {
+    pub fn GameParametersSerialize(
+        params_ptr: *mut ::std::os::raw::c_void,
+        length: *mut ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn LoadGame(name: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn LoadGameFromParameters(params_ptr: *const ::std::os::raw::c_void) -> *mut ::std::os::raw::c_void;
+    pub fn LoadGameFromParameters(
+        params_ptr: *const ::std::os::raw::c_void,
+    ) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
     pub fn DeleteGame(game_ptr: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    pub fn GameShortName(game_ptr: *const ::std::os::raw::c_void, length: *mut ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_char;
+    pub fn GameShortName(
+        game_ptr: *const ::std::os::raw::c_void,
+        length: *mut ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn GameLongName(game_ptr: *const ::std::os::raw::c_void, length: *mut ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_char;
+    pub fn GameLongName(
+        game_ptr: *const ::std::os::raw::c_void,
+        length: *mut ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn GameNewInitialState(
@@ -43,7 +69,7 @@ extern "C" {
 }
 extern "C" {
     pub fn GameNumDistinctActions(game_ptr: *const ::std::os::raw::c_void)
-        -> ::std::os::raw::c_int;
+    -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn GameObservationTensorShape(
@@ -64,7 +90,10 @@ extern "C" {
     pub fn StateClone(state_ptr: *const ::std::os::raw::c_void) -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn StateToString(state_ptr: *const ::std::os::raw::c_void, length: *mut ::std::os::raw::c_ulong) -> *mut ::std::os::raw::c_char;
+    pub fn StateToString(
+        state_ptr: *const ::std::os::raw::c_void,
+        length: *mut ::std::os::raw::c_ulong,
+    ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
     pub fn StateLegalActions(
@@ -96,7 +125,10 @@ extern "C" {
     pub fn StateApplyAction(state_ptr: *mut ::std::os::raw::c_void, action: ::std::os::raw::c_long);
 }
 extern "C" {
-    pub fn StateReturns(state_ptr: *const ::std::os::raw::c_void, returns_buf: *mut ::std::os::raw::c_double);
+    pub fn StateReturns(
+        state_ptr: *const ::std::os::raw::c_void,
+        returns_buf: *mut ::std::os::raw::c_double,
+    );
 }
 extern "C" {
     pub fn StatePlayerReturn(
@@ -135,6 +167,7 @@ extern "C" {
 extern "C" {
     pub fn StateObservationTensor(
         state_ptr: *const ::std::os::raw::c_void,
+        player: ::std::os::raw::c_int,
         obs_buf: *mut ::std::os::raw::c_float,
         length: ::std::os::raw::c_int,
     );
@@ -142,7 +175,36 @@ extern "C" {
 extern "C" {
     pub fn StateInformationStateTensor(
         state_ptr: *const ::std::os::raw::c_void,
+        player: ::std::os::raw::c_int,
         infostate_buf: *mut ::std::os::raw::c_float,
         length: ::std::os::raw::c_int,
     );
+}
+extern "C" {
+    pub fn DeleteBot(bot_ptr: *mut ::std::os::raw::c_void);
+}
+extern "C" {
+    pub fn BotStep(
+        bot_ptr: *mut ::std::os::raw::c_void,
+        state_ptr: *const ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_long;
+}
+extern "C" {
+    pub fn BotInformAction(
+        bot_ptr: *mut ::std::os::raw::c_void,
+        state_ptr: *const ::std::os::raw::c_void,
+        player_id: ::std::os::raw::c_int,
+        action: ::std::os::raw::c_long,
+    ) -> ::std::os::raw::c_long;
+}
+extern "C" {
+    pub fn BotRestart(bot_ptr: *mut ::std::os::raw::c_void);
+}
+extern "C" {
+    pub fn BotRegistererCreateByName(
+        bot_name_ptr: *const ::std::os::raw::c_char,
+        game_ptr: *const ::std::os::raw::c_void,
+        player_id: i32,
+        params_ptr: *const ::std::os::raw::c_void,
+    ) -> *mut ::std::os::raw::c_void;
 }

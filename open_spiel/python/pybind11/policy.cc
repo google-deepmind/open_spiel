@@ -131,7 +131,9 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::PreferredActionPolicy::GetStatePolicy);
 
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
-      .def(py::init<const Game&>())
+      .def(py::init([](std::shared_ptr<const Game> game) {
+        return new algorithms::CFRSolver(*game);
+      }))
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
@@ -147,7 +149,9 @@ void init_pyspiel_policy(py::module& m) {
           }));
 
   py::class_<open_spiel::algorithms::CFRPlusSolver>(m, "CFRPlusSolver")
-      .def(py::init<const Game&>())
+      .def(py::init([](std::shared_ptr<const Game> game) {
+        return new algorithms::CFRPlusSolver(*game);
+      }))
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
@@ -163,7 +167,9 @@ void init_pyspiel_policy(py::module& m) {
           }));
 
   py::class_<open_spiel::algorithms::CFRBRSolver>(m, "CFRBRSolver")
-      .def(py::init<const Game&>())
+      .def(py::init([](std::shared_ptr<const Game> game) {
+        return new algorithms::CFRBRSolver(*game);
+      }))
       .def("evaluate_and_update_policy",
            &open_spiel::algorithms::CFRPlusSolver::EvaluateAndUpdatePolicy)
       .def("current_policy", &open_spiel::algorithms::CFRSolver::CurrentPolicy)
@@ -184,7 +190,11 @@ void init_pyspiel_policy(py::module& m) {
 
   py::class_<open_spiel::algorithms::ExternalSamplingMCCFRSolver>(
       m, "ExternalSamplingMCCFRSolver")
-      .def(py::init<const Game&, int, open_spiel::algorithms::AverageType>(),
+      .def(py::init([](std::shared_ptr<const Game> game, int seed,
+                       algorithms::AverageType average_type) {
+             return new algorithms::ExternalSamplingMCCFRSolver(*game, seed,
+                                                                average_type);
+           }),
            py::arg("game"), py::arg("seed") = 0,
            py::arg("avg_type") = open_spiel::algorithms::AverageType::kSimple)
       .def("run_iteration",
@@ -204,7 +214,12 @@ void init_pyspiel_policy(py::module& m) {
 
   py::class_<open_spiel::algorithms::OutcomeSamplingMCCFRSolver>(
       m, "OutcomeSamplingMCCFRSolver")
-      .def(py::init<const Game&, double, int>(), py::arg("game"),
+      .def(py::init(
+               [](std::shared_ptr<const Game> game, double epsilon, int seed) {
+                 return new algorithms::OutcomeSamplingMCCFRSolver(
+                     *game, epsilon, seed);
+               }),
+           py::arg("game"),
            py::arg("epsilon") = open_spiel::algorithms::
                OutcomeSamplingMCCFRSolver::kDefaultEpsilon,
            py::arg("seed") = -1)
@@ -267,20 +282,11 @@ void init_pyspiel_policy(py::module& m) {
         py::arg("use_infostate_get_policy"),
         py::arg("prob_cut_threshold") = 0.0);
 
-  m.def("exploitability",
-        py::overload_cast<const Game&, const Policy&>(&Exploitability),
-        "Returns the sum of the utility that a best responder wins when when "
-        "playing against 1) the player 0 policy contained in `policy` and 2) "
-        "the player 1 policy contained in `policy`."
-        "This only works for two player, zero- or constant-sum sequential "
-        "games, and raises a SpielFatalError if an incompatible game is passed "
-        "to it.");
-
   m.def(
       "exploitability",
-      py::overload_cast<
-          const Game&, const std::unordered_map<std::string, ActionsAndProbs>&>(
-          &Exploitability),
+      [](std::shared_ptr<const Game> game, const Policy& policy) {
+        return Exploitability(*game, policy);
+      },
       "Returns the sum of the utility that a best responder wins when when "
       "playing against 1) the player 0 policy contained in `policy` and 2) "
       "the player 1 policy contained in `policy`."
@@ -288,24 +294,42 @@ void init_pyspiel_policy(py::module& m) {
       "games, and raises a SpielFatalError if an incompatible game is passed "
       "to it.");
 
-  m.def("nash_conv",
-        py::overload_cast<const Game&, const Policy&, bool>(&NashConv),
-        "Calculates a measure of how far the given policy is from a Nash "
-        "equilibrium by returning the sum of the improvements in the value "
-        "that each player could obtain by unilaterally changing their strategy "
-        "while the opposing player maintains their current strategy (which "
-        "for a Nash equilibrium, this value is 0). The third parameter is to "
-        "indicate whether to use the Policy::GetStatePolicy(const State&) "
-        "instead of Policy::GetStatePolicy(const std::string& info_state) for "
-        "computation of the on-policy expected values.",
-        py::arg("game"), py::arg("policy"),
-        py::arg("use_state_get_policy") = false);
+  m.def(
+      "exploitability",
+      [](std::shared_ptr<const Game> game,
+         const std::unordered_map<std::string, ActionsAndProbs>& policy) {
+        return Exploitability(*game, policy);
+      },
+      "Returns the sum of the utility that a best responder wins when when "
+      "playing against 1) the player 0 policy contained in `policy` and 2) "
+      "the player 1 policy contained in `policy`."
+      "This only works for two player, zero- or constant-sum sequential "
+      "games, and raises a SpielFatalError if an incompatible game is passed "
+      "to it.");
 
   m.def(
       "nash_conv",
-      py::overload_cast<
-          const Game&, const std::unordered_map<std::string, ActionsAndProbs>&>(
-          &NashConv),
+      [](std::shared_ptr<const Game> game, const Policy& policy,
+         bool use_state_get_policy) {
+        return NashConv(*game, policy, use_state_get_policy);
+      },
+      "Calculates a measure of how far the given policy is from a Nash "
+      "equilibrium by returning the sum of the improvements in the value "
+      "that each player could obtain by unilaterally changing their strategy "
+      "while the opposing player maintains their current strategy (which "
+      "for a Nash equilibrium, this value is 0). The third parameter is to "
+      "indicate whether to use the Policy::GetStatePolicy(const State&) "
+      "instead of Policy::GetStatePolicy(const std::string& info_state) for "
+      "computation of the on-policy expected values.",
+      py::arg("game"), py::arg("policy"),
+      py::arg("use_state_get_policy") = false);
+
+  m.def(
+      "nash_conv",
+      [](std::shared_ptr<const Game> game,
+         const std::unordered_map<std::string, ActionsAndProbs>& policy) {
+        return NashConv(*game, policy);
+      },
       "Calculates a measure of how far the given policy is from a Nash "
       "equilibrium by returning the sum of the improvements in the value "
       "that each player could obtain by unilaterally changing their strategy "

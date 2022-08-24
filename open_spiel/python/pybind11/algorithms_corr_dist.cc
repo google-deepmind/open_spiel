@@ -50,27 +50,37 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
       .def_readonly("conditional_best_response_policies",
                     &CorrDistInfo::conditional_best_response_policies);
 
-  m.def("cce_dist",
-        py::overload_cast<const Game&, const CorrelationDevice&, int, float>(
-            &open_spiel::algorithms::CCEDist),
-        "Returns a player's distance to a coarse-correlated equilibrium.",
-        py::arg("game"),
-        py::arg("correlation_device"),
-        py::arg("player"),
-        py::arg("prob_cut_threshold") = -1.0);
+  m.def(
+      "cce_dist",
+      [](std::shared_ptr<const Game> game,
+         const CorrelationDevice& correlation_device, int player,
+         float prob_cut_threshold) {
+        return algorithms::CCEDist(*game, correlation_device, player,
+                                   prob_cut_threshold);
+      },
+      "Returns a player's distance to a coarse-correlated equilibrium.",
+      py::arg("game"), py::arg("correlation_device"), py::arg("player"),
+      py::arg("prob_cut_threshold") = -1.0);
 
-  m.def("cce_dist",
-        py::overload_cast<const Game&, const CorrelationDevice&, float>(
-            &open_spiel::algorithms::CCEDist),
-        "Returns the distance to a coarse-correlated equilibrium.",
-        py::arg("game"),
-        py::arg("correlation_device"),
-        py::arg("prob_cut_threshold") = -1.0);
+  m.def(
+      "cce_dist",
+      [](std::shared_ptr<const Game> game,
+         const CorrelationDevice& correlation_device,
+         float prob_cut_threshold) {
+        return algorithms::CCEDist(*game, correlation_device,
+                                   prob_cut_threshold);
+      },
+      "Returns the distance to a coarse-correlated equilibrium.",
+      py::arg("game"), py::arg("correlation_device"),
+      py::arg("prob_cut_threshold") = -1.0);
 
-  m.def("ce_dist",
-        py::overload_cast<const Game&, const CorrelationDevice&>(
-            &open_spiel::algorithms::CEDist),
-        "Returns the distance to a correlated equilibrium.");
+  m.def(
+      "ce_dist",
+      [](std::shared_ptr<const Game> game,
+         const CorrelationDevice& correlation_device) {
+        return algorithms::CEDist(*game, correlation_device);
+      },
+      "Returns the distance to a correlated equilibrium.");
 
   // TODO(author5): expose the rest of the functions.
 }

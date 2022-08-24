@@ -152,7 +152,9 @@ class OthelloGame : public Game {
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, kNumRows, kNumCols};
   }
-  int MaxGameLength() const override { return kNumCells; }
+
+  // Conservative upper bound due to pass moves.
+  int MaxGameLength() const override { return 2*kNumCells; }
 };
 
 }  // namespace othello

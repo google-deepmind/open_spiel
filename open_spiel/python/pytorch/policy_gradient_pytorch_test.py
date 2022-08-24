@@ -22,6 +22,8 @@ import numpy as np
 import torch
 
 from open_spiel.python import rl_environment
+from open_spiel.python.algorithms import exploitability
+from open_spiel.python.examples import kuhn_policy_gradient
 import pyspiel
 from open_spiel.python.pytorch import policy_gradient
 from open_spiel.python.pytorch.losses import rl_losses
@@ -32,7 +34,7 @@ SEED = 24984617
 class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
-      itertools.product(("rpg", "qpg", "rm", "a2c"),
+      itertools.product(("rpg", "qpg", "rm", "a2c", "neurd"),
                         ("kuhn_poker", "leduc_poker")))
   def test_run_game(self, loss_str, game_name):
     env = rl_environment.Environment(game_name)
@@ -64,6 +66,42 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
       for agent in agents:
         agent.step(time_step)
+
+  def test_neurd_kuhn(self):
+    env = rl_environment.Environment("kuhn_poker")
+    env.seed(SEED)
+    info_state_size = env.observation_spec()["info_state"][0]
+    num_actions = env.action_spec()["num_actions"]
+
+    agents = [
+        policy_gradient.PolicyGradient(  # pylint: disable=g-complex-comprehension
+            player_id=player_id,
+            info_state_size=info_state_size,
+            num_actions=num_actions,
+            loss_str="neurd",
+            hidden_layers_sizes=[32],
+            batch_size=16,
+            entropy_cost=0.001,
+            critic_learning_rate=0.01,
+            pi_learning_rate=0.01,
+            num_critic_before_pi=4) for player_id in [0, 1]
+    ]
+    expl_policies_avg = kuhn_policy_gradient.PolicyGradientPolicies(env, agents)
+
+    for _ in range(100):
+      time_step = env.reset()
+      while not time_step.last():
+        current_player = time_step.observations["current_player"]
+        current_agent = agents[current_player]
+        agent_output = current_agent.step(time_step)
+        time_step = env.step([agent_output.action])
+
+      for agent in agents:
+        agent.step(time_step)
+
+    expl = exploitability.exploitability(env.game, expl_policies_avg)
+    # Check the exploitability is less than the target upper bound.
+    self.assertLess(expl, 0.7)
 
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
@@ -114,6 +152,7 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
         "rpg": rl_losses.BatchRPGLoss,
         "rm": rl_losses.BatchRMLoss,
         "a2c": rl_losses.BatchA2CLoss,
+        "neurd": rl_losses.BatchNeuRDLoss,
     }
 
     for loss_str, loss_class in loss_dict.items():

@@ -16,6 +16,7 @@
 """Tests for Python mean field routing game."""
 
 from absl.testing import absltest
+from absl.testing import parameterized
 import numpy as np
 import numpy.testing as npt
 
@@ -33,6 +34,38 @@ from open_spiel.python.observation import make_observation
 import pyspiel
 
 _NUMBER_OF_ITERATIONS_TESTS = 1
+
+
+class SocialOptimumBraess(policy.Policy):
+
+  def action_probabilities(self, state, player_id=None):
+    legal_actions = state.legal_actions()
+    if not legal_actions:
+      return {dynamic_routing_utils.NO_POSSIBLE_ACTION: 1.0}
+    elif len(legal_actions) == 1:
+      return {legal_actions[0]: 1.0}
+    else:
+      if legal_actions[0] == 1:
+        return {1: 0.5, 2: 0.5}
+      elif legal_actions[0] == 3:
+        return {4: 1.0}
+    raise ValueError(f"{legal_actions} is not correct.")
+
+
+class NashEquilibriumBraess(policy.Policy):
+
+  def action_probabilities(self, state, player_id=None):
+    legal_actions = state.legal_actions()
+    if not legal_actions:
+      return {dynamic_routing_utils.NO_POSSIBLE_ACTION: 1.0}
+    elif len(legal_actions) == 1:
+      return {legal_actions[0]: 1.0}
+    else:
+      if legal_actions[0] == 1:
+        return {1: 0.75, 2: 0.25}
+      elif legal_actions[0] == 3:
+        return {3: 2 / 3, 4: 1 / 3}
+    raise ValueError(f"{legal_actions} is not correct. {state}.")
 
 
 class MeanFieldRoutingGameTest(absltest.TestCase):
@@ -72,7 +105,7 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
                              {"max_num_time_step": 5})
     self.assertEqual(game.max_game_length(), 5)
 
-  # TODO(open_spiel): enable ficticious_play with game where the dynamics depend
+  # TODO(cabannes): enable ficticious_play with game where the dynamics depend
   # on the distribution.
   # def test_ficticious_play(self):
   #   """Test that ficticious play can be used on this game."""
@@ -101,57 +134,6 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
       omd.iteration()
     self.assertAlmostEqual(
         nash_conv.NashConv(mfg_game, omd.get_policy()).nash_conv(), 0)
-
-  def test_braess_paradox(self):
-    """Test that Braess paradox can be reproduced with the mean field game."""
-    mfg_game = pyspiel.load_game("python_mfg_dynamic_routing", {
-        "time_step_length": 0.05,
-        "max_num_time_step": 100
-    })
-
-    class NashEquilibriumBraess(policy.Policy):
-
-      def action_probabilities(self, state, player_id=None):
-        legal_actions = state.legal_actions()
-        if not legal_actions:
-          return {dynamic_routing_utils.NO_POSSIBLE_ACTION: 1.0}
-        elif len(legal_actions) == 1:
-          return {legal_actions[0]: 1.0}
-        else:
-          if legal_actions[0] == 2:
-            return {2: 0.75, 3: 0.25}
-          elif legal_actions[0] == 4:
-            return {4: 2 / 3, 5: 1 / 3}
-        raise ValueError(f"{legal_actions} is not correct.")
-
-    ne_policy = NashEquilibriumBraess(mfg_game, 1)
-    self.assertEqual(
-        -policy_value.PolicyValue(
-            mfg_game, distribution.DistributionPolicy(mfg_game, ne_policy),
-            ne_policy).value(mfg_game.new_initial_state()), 3.75)
-    self.assertEqual(nash_conv.NashConv(mfg_game, ne_policy).nash_conv(), 0.0)
-
-    class SocialOptimumBraess(policy.Policy):
-
-      def action_probabilities(self, state, player_id=None):
-        legal_actions = state.legal_actions()
-        if not legal_actions:
-          return {dynamic_routing_utils.NO_POSSIBLE_ACTION: 1.0}
-        elif len(legal_actions) == 1:
-          return {legal_actions[0]: 1.0}
-        else:
-          if legal_actions[0] == 2:
-            return {2: 0.5, 3: 0.5}
-          elif legal_actions[0] == 4:
-            return {5: 1.0}
-        raise ValueError(f"{legal_actions} is not correct.")
-
-    so_policy = SocialOptimumBraess(mfg_game, 1)
-    self.assertEqual(
-        -policy_value.PolicyValue(
-            mfg_game, distribution.DistributionPolicy(mfg_game, so_policy),
-            so_policy).value(mfg_game.new_initial_state()), 3.5)
-    self.assertEqual(nash_conv.NashConv(mfg_game, so_policy).nash_conv(), 0.75)
 
   def test_vehicle_origin_outside_network(self):
     """Check raise assertion if vehicle's origin is outside the Network."""
@@ -217,18 +199,18 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     state.apply_action(0)
     self.assertEqual(state.current_player(), 0)
 
-    location, destination = 1, 7
+    location, destination = 7, 6
     self.assertEqual(state.get_location_as_int(), location)
     self.assertEqual(state.get_destination_as_int(), destination)
 
     py_obs.set_from(state, state.current_player())
     obs_size = num_locations * 2 + steps + 2
     expected_tensor = np.zeros(obs_size)
-    # location = 1
-    # destination + num_locations = 15
+    # location = 7
+    # destination + num_locations = 14
     # time + 2 * num_locations = 16
     # waiting bit at last index.
-    expected_tensor[[1, 15, 16]] = 1
+    expected_tensor[[7, 14, 16]] = 1
     npt.assert_array_equal(py_obs.tensor, expected_tensor)
 
   def test_apply_actions_error_no_movement_with_negative_waiting_time(self):
@@ -254,6 +236,32 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
     for _ in range(_NUMBER_OF_ITERATIONS_TESTS):
       omd.iteration()
     nash_conv.NashConv(mfg_game, omd.get_policy())
+
+
+class CppVsPythonMeanFieldRoutingGameTest(parameterized.TestCase):
+
+  @parameterized.named_parameters(
+      ("python", ("python_mfg_dynamic_routing(max_num_time_step=100,"
+                  "time_step_length=0.05)")),
+      ("cpp", ("mfg_dynamic_routing(max_num_time_step=100,"
+               "time_step_length=0.05,network_name=braess)")))
+  def test_braess_paradox_game(self, game_name):
+    """Test that Braess paradox can be reproduced with the mean field game."""
+    mfg_game = pyspiel.load_game(game_name)
+
+    ne_policy = NashEquilibriumBraess(mfg_game, 1)
+    self.assertEqual(
+        -policy_value.PolicyValue(
+            mfg_game, distribution.DistributionPolicy(mfg_game, ne_policy),
+            ne_policy).value(mfg_game.new_initial_state()), 3.75)
+    self.assertEqual(nash_conv.NashConv(mfg_game, ne_policy).nash_conv(), 0.0)
+
+    so_policy = SocialOptimumBraess(mfg_game, 1)
+    self.assertEqual(
+        -policy_value.PolicyValue(
+            mfg_game, distribution.DistributionPolicy(mfg_game, so_policy),
+            so_policy).value(mfg_game.new_initial_state()), 3.5)
+    self.assertEqual(nash_conv.NashConv(mfg_game, so_policy).nash_conv(), 0.75)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
 set(GAME_SOURCES
+  2048.cc
+  2048.h
   amazons.cc
   amazons.h
   backgammon.cc
@@ -23,6 +25,8 @@ set(GAME_SOURCES
   bridge_uncontested_bidding.h
   catch.cc
   catch.h
+  checkers.cc
+  checkers.h
   chess.cc
   chess.h
   chess/chess_board.cc
@@ -52,10 +56,16 @@ set(GAME_SOURCES
   dark_hex.h
   deep_sea.cc
   deep_sea.h
+  dynamic_routing/dynamic_routing_data.cc
+  dynamic_routing/dynamic_routing_data.h
+  dynamic_routing/dynamic_routing_utils.cc
+  dynamic_routing/dynamic_routing_utils.h
   efg_game.cc
   efg_game.h
   efg_game_data.cc
   efg_game_data.h
+  euchre.cc
+  euchre.h
   first_sealed_auction.cc
   first_sealed_auction.h
   gin_rummy.cc
@@ -88,6 +98,8 @@ set(GAME_SOURCES
   liars_dice.h
   maedn.cc
   maedn.h
+  mancala.cc
+  mancala.h
   markov_soccer.cc
   markov_soccer.h
   matching_pennies_3p.cc
@@ -97,6 +109,8 @@ set(GAME_SOURCES
   mfg/crowd_modelling.h
   mfg/crowd_modelling_2d.cc
   mfg/crowd_modelling_2d.h
+  mfg/dynamic_routing.cc
+  mfg/dynamic_routing.h
   mfg/garnet.cc
   mfg/garnet.h
   morpion_solitaire.cc
@@ -105,6 +119,8 @@ set(GAME_SOURCES
   negotiation.h
   nfg_game.cc
   nfg_game.h
+  nim.cc
+  nim.h
   oh_hell.cc
   oh_hell.h
   oshi_zumo.cc
@@ -119,6 +135,10 @@ set(GAME_SOURCES
   pathfinding.h
   pentago.cc
   pentago.h
+  phantom_go.h
+  phantom_go.cc
+  phantom_go/phantom_go_board.h
+  phantom_go/phantom_go_board.cc
   phantom_ttt.cc
   phantom_ttt.h
   pig.cc
@@ -242,6 +262,10 @@ add_library(bridge_double_dummy_solver OBJECT
 target_include_directories (bridge_double_dummy_solver PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(bridge_double_dummy_solver PUBLIC DDS_NO_STATIC_INIT)
 
+add_executable(2048_test 2048_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(2048_test 2048_test)
+
 add_executable(amazons_test amazons_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(amazons_test amazons_test)
@@ -283,6 +307,10 @@ add_test(bridge_test bridge_test)
 add_executable(catch_test catch_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(catch_test catch_test)
+
+add_executable(checkers_test checkers_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(checkers_test checkers_test)
 
 add_executable(chess_test chess_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -349,9 +377,25 @@ add_executable(deep_sea_test deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(deep_sea_test deep_sea_test)
 
+add_executable(dynamic_routing_data_test dynamic_routing/dynamic_routing_data_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dynamic_routing_data_test dynamic_routing_data_test)
+
+add_executable(dynamic_routing_test mfg/dynamic_routing_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dynamic_routing_test dynamic_routing_test)
+
+add_executable(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dynamic_routing_utils_test dynamic_routing_utils_test)
+
 add_executable(efg_game_test efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(efg_game_test efg_game_test)
+
+add_executable(euchre_test euchre_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(euchre_test euchre_test)
 
 add_executable(first_sealed_auction_test first_sealed_auction_test.cc
                ${OPEN_SPIEL_OBJECTS}
@@ -369,6 +413,10 @@ add_test(gin_rummy_test gin_rummy_test)
 add_executable(go_test go_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(go_test go_test)
+
+add_executable(phantom_go_test phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(phantom_go_test phantom_go_test)
 
 add_executable(goofspiel_test goofspiel_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
@@ -409,6 +457,10 @@ add_executable(liars_dice_test liars_dice_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:algorithms>)
 add_test(liars_dice_test liars_dice_test)
 
+add_executable(mancala_test mancala_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(mancala_test mancala_test)
+
 add_executable(markov_soccer_test markov_soccer_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
@@ -437,6 +489,10 @@ add_executable(nfg_game_test nfg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(nfg_game_test nfg_game_test)
+
+add_executable(nim_test nim_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(nim_test nim_test)
 
 add_executable(oh_hell_test oh_hell_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

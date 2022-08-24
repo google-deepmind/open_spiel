@@ -277,6 +277,16 @@ bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \
       __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, ")"))
 
+// A verbose checker that will print state info:
+// Use as SPIEL_CHECK_TRUE_WSI(bool cond, const std::string& error_message,
+//                             const Game& game_ref, const State& state_ref)
+#define SPIEL_CHECK_TRUE_WSI(x, e, g, s)                         \
+  while (!(x))                                                   \
+  open_spiel::SpielFatalErrorWithStateInfo(                      \
+      open_spiel::internal::SpielStrCat(                         \
+      __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, "): ", e),    \
+      (g), (s))
+
 #define SPIEL_CHECK_FALSE(x)                                     \
   while (x)                                                      \
   open_spiel::SpielFatalError(open_spiel::internal::SpielStrCat( \

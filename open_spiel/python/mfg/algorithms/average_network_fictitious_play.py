@@ -101,7 +101,7 @@ class AveragePolicy(rl_agent.AbstractAgent):
     if params_avg_network is None:
       self._params_avg_network = self.avg_network.init(rng, x)
     else:
-      self._params_avg_network = jax.tree_multimap(lambda x: x.copy(),
+      self._params_avg_network = jax.tree_map(lambda x: x.copy(),
                                                    params_avg_network)
     self._params_avg_network = jax.device_put(self._params_avg_network)
 

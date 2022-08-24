@@ -140,19 +140,6 @@ release!). Contributions are certainly not limited to these suggestions!
     It is very basic, only exposing the games. It would be nice to have a few
     example algorithms and/or utilities written in go.
 
--   **Minimax-Q and other classic MARL algorithms**. Minimax-Q is a classic
-    multiagent reinforcement learning algorithm
-    ([Markov games as a framework for multi-agent reinforcement learning](https://www2.cs.duke.edu/courses/spring07/cps296.3/littman94markov.pdf).
-    Other classic algorithms, such as
-    [Correlated Q-learning](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf),
-    [NashQ](http://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf), and
-    Friend-or-Foe Q-learning
-    ([Friend-or-foe q-learning in general-sum games](http://jmvidal.cse.sc.edu/library/littman01a.pdf)
-    would be welcome as well.
-
--   **Nash Averaging**. An evaluation tool first described in
-    [Re-evaluating Evaluation](https://arxiv.org/abs/1806.02643).
-
 -   **Opponent Modeling / Shaping Algorithms**. For example,
     [DRON](https://arxiv.org/abs/1609.05559),
     [LOLA](https://arxiv.org/abs/1709.04326), and

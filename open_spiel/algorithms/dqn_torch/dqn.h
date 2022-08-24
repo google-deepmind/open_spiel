@@ -102,13 +102,21 @@ class DQN : public Agent {
   double GetEpsilon(bool is_evaluation, int power = 1.0);
   int seed() const { return seed_; }
 
+  // Load checkpoint/trained model and optimizer
+  void Load(const std::string& data_path,
+            const std::string& optimizer_data_path = "");
+  // Save checkpoint/trained model and optimizer
+  void Save(const std::string& data_path,
+            const std::string& optimizer_data_path = "");
+
  private:
   std::vector<float> GetInfoState(const State& state, Player player_id,
                                   bool use_observation);
   void AddTransition(const State& prev_state, Action prev_action,
                      const State& state);
   Action EpsilonGreedy(std::vector<float> info_state,
-                       std::vector<Action> legal_actions, double epsilon);
+                       std::vector<Action> legal_actions,
+                       double epsilon);
   void Learn();
 
   int seed_;

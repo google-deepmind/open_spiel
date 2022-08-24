@@ -28,6 +28,7 @@
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -348,10 +349,10 @@ std::unique_ptr<State> MCTSBot::ApplyTreePolicy(
 }
 
 std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
-  Player player_id = state.CurrentPlayer();
   nodes_ = 1;
   gc_limit_ = MIN_GC_LIMIT;
-  auto root = std::make_unique<SearchNode>(kInvalidAction, player_id, 1);
+  auto root = std::make_unique<SearchNode>(kInvalidAction,
+                                           state.CurrentPlayer(), 1);
   std::vector<SearchNode*> visit_path;
   std::vector<double> returns;
   visit_path.reserve(64);
@@ -373,12 +374,18 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     }
 
     // Propagate values back.
-    for (auto it = visit_path.rbegin(); it != visit_path.rend(); ++it) {
-      SearchNode* node = *it;
+    while (!visit_path.empty()) {
+      int decision_node_idx = visit_path.size() - 1;
+      SearchNode* node = visit_path[decision_node_idx];
 
-      node->total_reward +=
-          returns[node->player == kChancePlayerId ? player_id : node->player];
+      // If it's a chance node, find the parent player id.
+      while (visit_path[decision_node_idx]->player == kChancePlayerId) {
+        decision_node_idx--;
+      }
+
+      node->total_reward += returns[visit_path[decision_node_idx]->player];
       node->explore_count += 1;
+      visit_path.pop_back();
 
       // Back up solved results as well.
       if (solved && !node->children.empty()) {

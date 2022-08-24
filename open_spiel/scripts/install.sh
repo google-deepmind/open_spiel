@@ -107,13 +107,21 @@ fi
 
 DIR="open_spiel/abseil-cpp"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git open_spiel/abseil-cpp
+  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
+fi
+
+DIR="open_spiel/pybind11_abseil"
+if [[ ! -d ${DIR} ]]; then
+  cached_clone -b 'master' https://github.com/pybind/pybind11_abseil.git ${DIR}
+  pushd ${DIR}
+  git checkout '73992b5'
+  popd
 fi
 
 # Optional dependencies.
 DIR="open_spiel/games/hanabi/hanabi-learning-environment"
 if [[ ${OPEN_SPIEL_BUILD_WITH_HANABI:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  cached_clone -b 'master' --single-branch --depth 15 https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
+  cached_clone -b 'master' https://github.com/deepmind/hanabi-learning-environment.git ${DIR}
   # We checkout a specific CL to prevent future breakage due to changes upstream
   # The repository is very infrequently updated, thus the last 15 commits should
   # be ok for a long time.
@@ -261,11 +269,12 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
-  # On Github Actions, macOS 10.15 comes with Python 3.9.
+  # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" && "${OS_PYTHON_VERSION}" != "3.9" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
-    brew unlink python@3.9
+    # Uninstall Python 3.9 if we need to.
+    brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"

@@ -46,7 +46,7 @@ MIN_ACTION_PROB = 1e-6
 
 def _copy_params(params):
   """Returns a copy of the params."""
-  return jax.tree_multimap(lambda x: x.copy(), params)
+  return jax.tree_map(lambda x: x.copy(), params)
 
 
 class MunchausenDQN(rl_agent.AbstractAgent):

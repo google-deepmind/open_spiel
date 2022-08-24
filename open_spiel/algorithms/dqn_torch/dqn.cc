@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -31,7 +32,8 @@ namespace open_spiel {
 namespace algorithms {
 namespace torch_dqn {
 
-constexpr const int kIllegalActionLogitsPenalty = -1e9;
+constexpr const float kIllegalActionLogitsPenalty =
+    std::numeric_limits<float>::lowest();
 
 Action RandomAgent::Step(const State& state, bool is_evaluation) {
   if (state.IsTerminal()) {
@@ -65,6 +67,7 @@ DQN::DQN(const DQNSettings& settings)
       loss_str_(settings.loss_str),
       exists_prev_(false),
       prev_state_(nullptr),
+      prev_action_(0),
       step_counter_(0),
       rng_(settings.seed) {}
 
@@ -102,8 +105,9 @@ Action DQN::Step(const State& state, bool is_evaluation) {
       Learn();
     }
     if (step_counter_ % update_target_network_every_ == 0) {
-      torch::save(q_network_, "q_network.pt");
-      torch::load(target_q_network_, "q_network.pt");
+      std::stringstream stream;
+      torch::save(q_network_, stream);
+      torch::load(target_q_network_, stream);
     }
     if (exists_prev_) {
       AddTransition(*prev_state_, prev_action_, state);
@@ -127,9 +131,6 @@ Action DQN::Step(const State& state, bool is_evaluation) {
 void DQN::AddTransition(const State& prev_state,
                         Action prev_action,
                         const State& state) {
-  // std::cout << "Adding transition: prev_action = " << prev_action
-  //           << ", player id = " << player_id_
-  //           << ", reward = " << state.PlayerReward(player_id_) << std::endl;
   Transition transition = {
     /*info_state=*/GetInfoState(prev_state, player_id_, use_observation_),
     /*action=*/prev_action_,
@@ -153,25 +154,26 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
 
   if (absl::Uniform(rng_, 0.0, 1.0) < epsilon) {
     ActionsAndProbs actions_probs;
-    std::vector<double> probs(legal_actions.size(), 1.0/legal_actions.size());
+    std::vector<double> probs(legal_actions.size(), 1.0 / legal_actions.size());
     for (int i = 0; i < legal_actions.size(); i++) {
       actions_probs.push_back({legal_actions[i], probs[i]});
     }
     action = SampleAction(actions_probs, rng_).first;
   } else {
-    torch::Tensor info_state_tensor = torch::from_blob(
-        info_state.data(),
-        {info_state.size()},
-        torch::TensorOptions().dtype(torch::kFloat32)).view({1, -1});
+    torch::Tensor info_state_tensor =
+        torch::from_blob(info_state.data(), {info_state.size()},
+                         torch::dtype(torch::kFloat32))
+            .view({1, -1});
     q_network_->eval();
-    torch::Tensor q_value = q_network_->forward(info_state_tensor);
-    torch::Tensor legal_actions_mask =
-        torch::full({num_actions_}, kIllegalActionLogitsPenalty,
-                    torch::TensorOptions().dtype(torch::kFloat32));
-    for (Action a : legal_actions) {
-      legal_actions_mask[a] = 0;
+    torch::Tensor q_values = q_network_->forward(info_state_tensor).detach();
+    torch::Tensor illegal_actions_mask =
+        torch::full({num_actions_}, true, torch::dtype(torch::kBool));
+    for (const auto& action : legal_actions) {
+      illegal_actions_mask[action] = false;
     }
-    action = (q_value.detach() + legal_actions_mask).argmax(1).item().toInt();
+    torch::Tensor legal_q_values = torch::masked_fill(
+        q_values, illegal_actions_mask, kIllegalActionLogitsPenalty);
+    action = legal_q_values.argmax(1).item().toInt();
   }
   return action;
 }
@@ -215,7 +217,6 @@ void DQN::Learn() {
         torch::from_blob(t.legal_actions_mask.data(),
                          {1, t.legal_actions_mask.size()},
                          torch::TensorOptions().dtype(torch::kInt32))
-            .to(torch::kInt64)
             .clone());
     actions.push_back(t.action);
     rewards.push_back(t.reward);
@@ -229,12 +230,14 @@ void DQN::Learn() {
   torch::Tensor target_q_values = target_q_network_->forward(
       next_info_states_tensor).detach();
 
-  torch::Tensor legal_action_masks_tensor = torch::stack(legal_actions_mask, 0);
-  torch::Tensor illegal_actions = 1.0 - legal_action_masks_tensor;
-  torch::Tensor illegal_logits = illegal_actions * kIllegalActionLogitsPenalty;
+  torch::Tensor illegal_action_masks_tensor =
+      1.0 - torch::stack(legal_actions_mask, 0);
+  torch::Tensor legal_q_values =
+      torch::masked_fill(target_q_values, illegal_action_masks_tensor,
+                         kIllegalActionLogitsPenalty);
 
-  torch::Tensor max_next_q = std::get<0>(
-      torch::max(target_q_values + illegal_logits, 2));
+  torch::Tensor max_next_q = std::get<0>(legal_q_values.max(2));
+
   torch::Tensor are_final_steps_tensor = torch::from_blob(
       are_final_steps.data(),
       {batch_size_},
@@ -267,6 +270,23 @@ void DQN::Learn() {
   }
   value_loss.backward();
   optimizer_.step();
+}
+
+void DQN::Load(const std::string& data_path,
+               const std::string& optimizer_data_path) {
+  torch::load(q_network_, data_path);
+  torch::load(target_q_network_, data_path);
+  if (!optimizer_data_path.empty()) {
+    torch::load(optimizer_, optimizer_data_path);
+  }
+}
+
+void DQN::Save(const std::string& data_path,
+               const std::string& optimizer_data_path) {
+  torch::save(q_network_, data_path);
+  if (!optimizer_data_path.empty()) {
+    torch::save(optimizer_, optimizer_data_path);
+  }
 }
 
 std::vector<double> RunEpisodes(std::mt19937* rng, const Game& game,

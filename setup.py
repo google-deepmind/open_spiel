@@ -80,12 +80,6 @@ class BuildExt(build_ext):
     if os.environ.get("CXX") is not None:
       cxx = os.environ.get("CXX")
     env = os.environ.copy()
-    # If not specified, assume ACPC and Hanabi are built in.
-    # Disable this by passing e.g. OPEN_SPIEL_BUILD_WITH_ACPC=OFF when building
-    if env.get("OPEN_SPIEL_BUILD_WITH_ACPC") is None:
-      env["OPEN_SPIEL_BUILD_WITH_ACPC"] = "ON"
-    if env.get("OPEN_SPIEL_BUILD_WITH_HANABI") is None:
-      env["OPEN_SPIEL_BUILD_WITH_HANABI"] = "ON"
     cmake_args = [
         f"-DPython3_EXECUTABLE={sys.executable}",
         f"-DCMAKE_CXX_COMPILER={cxx}",
@@ -135,7 +129,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="1.1.0",
+    version="1.2",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",

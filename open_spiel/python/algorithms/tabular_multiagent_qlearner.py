@@ -17,18 +17,21 @@ Currently implementations include:
 Nash-Q: https://www.jmlr.org/papers/volume4/hu03a/hu03a.pdf
 Correlated-Q: https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf, where both
 CE-Q and CCE-Q are supported.
+Asymmetric-Q: https://ieeexplore.ieee.org/document/1241094
 """
 
 import abc
 import collections
 import itertools
+import nashpy as nash
 import numpy as np
 
 from open_spiel.python import rl_agent
 from open_spiel.python import rl_tools
 from open_spiel.python.algorithms.jpsro import _mgcce
 from open_spiel.python.algorithms.jpsro import _mgce
-from open_spiel.python.algorithms.matrix_nash import lemke_howson_solve
+from open_spiel.python.algorithms.stackelberg_lp import solve_stackelberg
+import pyspiel
 
 
 def valuedict():
@@ -62,11 +65,12 @@ class TwoPlayerNashSolver(JointActionSolver):
     row_payoffs, col_payoffs = payoffs_array[0], payoffs_array[1]
     a0, a1 = payoffs_array.shape[1:]
 
+    nashpy_game = nash.Game(row_payoffs, col_payoffs)
+
     best_value = float("-inf")
     res_mixtures, res_values = None, None
 
-    for (row_mixture,
-         col_mixture) in lemke_howson_solve(row_payoffs, col_payoffs):
+    for (row_mixture, col_mixture) in nashpy_game.support_enumeration():
       # TO-DO: handle the case where the LH solver gave ineligible answer
       if np.sum(np.isnan(row_mixture)) or np.sum(np.isnan(col_mixture)):
         continue
@@ -116,6 +120,38 @@ class CorrelatedEqSolver(JointActionSolver):
     return mixtures, values
 
 
+class StackelbergEqSolver(JointActionSolver):
+  """A joint action solver solving for Stackelverg equilibrium.
+
+  Uses python.algorithms.stackelberg_lp.py.
+  """
+
+  def __init__(self, is_first_leader=True):
+    self._is_first_leader = is_first_leader
+
+  def __call__(self, payoffs_array):
+    assert len(payoffs_array) == 2
+    game = pyspiel.create_matrix_game(payoffs_array[0], payoffs_array[1])
+    try:
+      player0_strategy, player1_strategy, player0_value, player1_value = solve_stackelberg(
+          game, self._is_first_leader)
+      return [player0_strategy,
+              player1_strategy], [player0_value, player1_value]
+    except:  # pylint: disable=bare-except
+      # if the game matrix is degenerated and cannot solve for an SSE,
+      # return uniform strategy
+      num_player0_strategies, num_player1_strategies = payoffs_array[0].shape
+      player0_strategy, player1_strategy = np.ones(
+          num_player0_strategies) / num_player0_strategies, np.ones(
+              num_player1_strategies) / num_player1_strategies
+      player0_value, player1_value = player0_strategy.reshape(1, -1).dot(
+          payoffs_array[0]).dot(player1_strategy.reshape(
+              -1, 1)), player0_strategy.reshape(1, -1).dot(
+                  payoffs_array[1]).dot(player1_strategy.reshape(-1, 1))
+      return [player0_strategy,
+              player1_strategy], [player0_value, player1_value]
+
+
 class MultiagentQLearner(rl_agent.AbstractAgent):
   """A multiagent joint action learner."""
 
@@ -152,9 +188,6 @@ class MultiagentQLearner(rl_agent.AbstractAgent):
     self._q_values = [
         collections.defaultdict(valuedict) for _ in range(num_players)
     ]
-    self._prev_info_state = None
-
-  def restart_episode(self):
     self._prev_info_state = None
 
   def _get_payoffs_array(self, info_state):

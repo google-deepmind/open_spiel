@@ -395,7 +395,6 @@ class MCTSBot(pyspiel.Bot):
     Returns:
       The most visited move from the root node.
     """
-    root_player = state.current_player()
     root = SearchNode(None, state.current_player(), 1)
     for _ in range(self.max_simulations):
       visit_path, working_state = self._apply_tree_policy(root, state)
@@ -407,9 +406,15 @@ class MCTSBot(pyspiel.Bot):
         returns = self.evaluator.evaluate(working_state)
         solved = False
 
-      for node in reversed(visit_path):
-        node.total_reward += returns[root_player if node.player ==
-                                     pyspiel.PlayerId.CHANCE else node.player]
+      while visit_path:
+        # For chance nodes, walk up the tree to find the decision-maker.
+        decision_node_idx = -1
+        while visit_path[decision_node_idx].player == pyspiel.PlayerId.CHANCE:
+          decision_node_idx -= 1
+        # Chance node targets are for the respective decision-maker.
+        target_return = returns[visit_path[decision_node_idx].player]
+        node = visit_path.pop()
+        node.total_reward += target_return
         node.explore_count += 1
 
         if solved and node.children:

@@ -233,7 +233,10 @@ class DynamicRoutingGameTest(absltest.TestCase):
         dynamic_routing_utils.Vehicle("O->A", "D->E") for _ in range(num_player)
     ]
     game = dynamic_routing.DynamicRoutingGame(
-        {"time_step_length": 0.125, "max_num_time_step": 40},
+        {
+            "time_step_length": 0.125,
+            "max_num_time_step": 40
+        },
         network=braess_network,
         vehicles=demand)
 
@@ -251,18 +254,18 @@ class DynamicRoutingGameTest(absltest.TestCase):
         elif len(legal_actions) == 1:
           return {legal_actions[0]: 1.0}
         else:
-          if legal_actions[0] == 2:
+          if legal_actions[0] == 1:
             if self._path[player_id] in ["top", "middle"]:
-              return {2: 1.0}
+              return {1: 1.0}
             elif self._path[player_id] == "bottom":
-              return {3: 1.0}
+              return {2: 1.0}
             else:
               raise ValueError()
-          elif legal_actions[0] == 4:
+          elif legal_actions[0] == 3:
             if self._path[player_id] == "top":
-              return {5: 1.0}
-            elif self._path[player_id] == "middle":
               return {4: 1.0}
+            elif self._path[player_id] == "middle":
+              return {3: 1.0}
             else:
               raise ValueError()
         raise ValueError(f"{legal_actions} is not correct.")

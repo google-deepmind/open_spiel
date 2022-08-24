@@ -45,6 +45,8 @@ class BlackjackState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
+  void ObservationTensor(Player player,
+                         absl::Span<float> values) const override;
   ActionsAndProbs ChanceOutcomes() const override;
 
   std::unique_ptr<State> Clone() const override;
@@ -94,6 +96,14 @@ class BlackjackGame : public Game {
   int NumPlayers() const override { return 1; }
   double MinUtility() const override { return -1; }
   double MaxUtility() const override { return +1; }
+  std::vector<int> ObservationTensorShape() const override {
+    return {
+        NumPlayers() + 1 +                      // turn  (incl. chance)
+        1 +                                     // is terminal?
+        (kNumSuits + 1) * (NumPlayers() + 1) +  // num_aces_ for every player
+        kDeckSize * (NumPlayers() + 1)  // many-hot of the cards for each player
+    };
+  };
 };
 
 }  // namespace blackjack

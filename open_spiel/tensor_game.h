@@ -69,6 +69,10 @@ class TensorGame : public NormalFormGame {
 
   double MaxUtility() const override { return max_utility_; }
 
+  std::string ActionToString(Player player, Action action) const override {
+    return ActionName(player, action);
+  }
+
   const std::vector<int>& Shape() const { return shape_; }
   const double PlayerUtility(const Player player,
                              const std::vector<Action>& actions) const {

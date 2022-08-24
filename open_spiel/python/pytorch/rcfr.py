@@ -592,17 +592,16 @@ class DeepRcfrModel(nn.Module):
     self._use_skip_connections = use_skip_connections
     self._hidden_are_factored = num_hidden_factors > 0
     self._hidden_activation = hidden_activation
-    input_rank = game.information_state_tensor_shape(
-    )[0] + game.new_initial_state().num_distinct_actions()
+    input_size = num_features(game)
 
     self.layers = []
     for _ in range(num_hidden_layers):
       if self._hidden_are_factored:
-        self.layers.append(nn.Linear(input_rank, num_hidden_factors, bias=True))
+        self.layers.append(nn.Linear(input_size, num_hidden_factors, bias=True))
 
       self.layers.append(
           nn.Linear(
-              num_hidden_factors if self._hidden_are_factored else input_rank,
+              num_hidden_factors if self._hidden_are_factored else input_size,
               num_hidden_units,
               bias=True))
       if hidden_activation:

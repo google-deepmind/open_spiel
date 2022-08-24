@@ -18,6 +18,7 @@ Turns a weighted sum of N policies into a realization-equivalent single
 policy by sweeping over the state space.
 """
 
+import copy
 import numpy as np
 from open_spiel.python import policy
 import pyspiel
@@ -236,7 +237,7 @@ class PolicyAggregator(object):
       used_moves = np.unique(used_moves)
 
       for uid in used_moves:
-        new_reaches = np.copy(my_reaches)
+        new_reaches = copy.deepcopy(my_reaches)
         if pid == turn_player:
           for i in range(len(legal_policies)):
             # compute the new reach for each policy for this action

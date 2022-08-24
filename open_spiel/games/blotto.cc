@@ -132,7 +132,7 @@ std::vector<Action> BlottoState::LegalActions(Player player) const {
 }
 
 std::string BlottoState::ActionToString(Player player, Action move_id) const {
-  return "[" + absl::StrJoin(action_map_->at(move_id), ",") + "]";
+  return game_->ActionToString(player, move_id);
 }
 
 std::string BlottoState::ToString() const {
@@ -153,6 +153,10 @@ std::vector<double> BlottoState::Returns() const {
 
 std::unique_ptr<State> BlottoState::Clone() const {
   return std::unique_ptr<State>(new BlottoState(*this));
+}
+
+std::string BlottoGame::ActionToString(Player player, Action action) const {
+  return "[" + absl::StrJoin(action_map_->at(action), ",") + "]";
 }
 
 int BlottoGame::NumDistinctActions() const { return num_distinct_actions_; }

@@ -25,7 +25,7 @@ E.g. on Ubuntu or Debian:
 
 ```bash
 # Check to see if you have the necessary tools for building OpenSpiel:
-cmake --version        # Must be >= 3.12
+cmake --version        # Must be >= 3.17
 clang++ --version      # Must be >= 7.0.0
 python3-config --help
 
@@ -66,22 +66,16 @@ developer tools.
 
 The instructions here are for Linux and MacOS. For installation on Windows, see
 [these separate installation instructions](windows.md). On Linux, we recommend
-Ubuntu 20.04 (or 19.10), Debian 10, or later versions. There are
-[known issues](https://github.com/deepmind/open_spiel/issues/407) with default
-compilers on Ubuntu on 18.04, and `clang-10` must be installed separately. On
-MacOS, we recommend XCode 11 or newer.
+Ubuntu 22.04, Debian 10, or later versions. On MacOS, we recommend XCode 11 or
+newer. For the Python API: our tests run using Python versions 3.7 - 3.10. If
+you encounter any problems on other setups, please let us know by opening an
+issue.
 
-For the Python API: our tests run using Python 3.8 and 3.9 on Ubuntu 20.04 and
-MacOS 10.15. We also test using Ubuntu 18.04 LTS with Python 3.6. So, we
-recommend one of these setups. If you encounter any problems on other setups,
-please let us know by opening an issue.
-
-Currently there are two installation methods:
+Currently there are three installation methods:
 
 1.  building from the source code and editing `PYTHONPATH`.
 2.  using `pip install` to build and testing using
-    [nox](https://nox.thea.codes/en/stable/). A pip package to install directly
-    does not exist yet.
+    [nox](https://nox.thea.codes/en/stable/).
 3.  installing via [Docker](https://www.docker.com).
 
 ## Summary
@@ -102,7 +96,8 @@ In a nutshell:
     ./install.sh
     ```
 
-3.  Install your [Python dependencies](#installing-python-dependencies), e.g. in Python 3 using
+3.  Install your [Python dependencies](#installing-python-dependencies), e.g. in
+    Python 3 using
     [`virtualenv`](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/):
 
     ```bash
@@ -122,18 +117,18 @@ In a nutshell:
     pip3 install --upgrade setuptools testresources
     ```
 
-    Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them, e.g.:
-    ```bash
-    pip install --upgrade torch==x.xx.x jax==x.x.x
-    ```
-    where `x.xx.x` should be the desired version numbers (which can be found at the link above).
+    Additionally, if you intend to use one of the
+    [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you
+    must manually install and/or upgrade them, e.g.: `bash pip install --upgrade
+    torch==x.xx.x jax==x.x.x` where `x.xx.x` should be the desired version
+    numbers (which can be found at the link above).
 
 4.  This sections differs depending on the installation procedure:
 
     **Building and testing from source**
 
     ```bash
-    pip3 install -r requirements.txt
+    python3 -m pip install -r requirements.txt
     ./open_spiel/scripts/build_and_run_tests.sh
     ```
 
@@ -141,7 +136,7 @@ In a nutshell:
 
     ```bash
     python3 -m pip install .
-    pip install nox
+    pythin3 -m pip install nox
     nox -s tests
     ```
 
@@ -170,9 +165,8 @@ Linux versions).
 ## Installing via Docker
 
 Please note that we don't regularly test the Docker installation. As such, it
-may not work at any given time. We are investigating enabling tests and proper
-longer-term support, but it may take some time. Until then, if you encounter a
-problem, please [open an issue](https://github.com/deepmind/open_spiel/issues).
+may not work at any given time. If you encounter a problem, please
+[open an issue](https://github.com/deepmind/open_spiel/issues).
 
 Option 1 (Basic, 3.13GB):
 
@@ -267,16 +261,21 @@ more information see:
 Install required dependencies (Python 3):
 
 ```bash
+# Ubuntu 22.04 and newer:
+python3 -m venv ./venv
+source venv/bin/activate
+python3 -m pip install -r requirements.txt
+# Older than Ubuntu 22.04:
 virtualenv -p python3 venv
 source venv/bin/activate
-pip3 install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 Alternatively, although not recommended, you can install the Python dependencies
 system-wide with:
 
 ```bash
-pip3 install --upgrade -r requirements.txt
+python3 -m pip install --upgrade -r requirements.txt
 ```
 
 ##### Optional dependencies
@@ -284,9 +283,11 @@ pip3 install --upgrade -r requirements.txt
 Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them. The installation scripts will not install or upgrade these dependencies. e.g.:
 
 ```bash
-pip install --upgrade torch==x.xx.x jax==x.x.x
+python3 -m pip install --upgrade torch==x.xx.x jax==x.x.x
 ```
-where `x.xx.x` should be the desired version numbers (which can be found at the link above).
+
+where `x.xx.x` should be the desired version numbers (which can be found at the
+link above).
 
 ### Building and running tests
 
@@ -307,7 +308,7 @@ ctest -j$(nproc)
 
 The CMake variable `Python3_EXECUTABLE` is used to specify the Python
 interpreter. If the variable is not set, CMake's FindPython3 module will prefer
-the latest version installed. Note, Python >= 3.6.0 is required.
+the latest version installed. Note, Python >= 3.7 is required.
 
 One can run an example of a game running (in the `build/` folder):
 
