@@ -86,6 +86,8 @@ set(GAME_SOURCES
   lewis_signaling.h
   liars_dice.cc
   liars_dice.h
+  maedn.cc
+  maedn.h
   markov_soccer.cc
   markov_soccer.h
   matching_pennies_3p.cc
@@ -247,6 +249,10 @@ add_test(amazons_test amazons_test)
 add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
+
+add_executable(maedn_test maedn_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(maedn_test maedn_test)
 
 add_executable(bargaining_instance_generator bargaining_instance_generator.cc
                ${OPEN_SPIEL_OBJECTS})
