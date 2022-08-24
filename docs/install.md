@@ -136,7 +136,7 @@ In a nutshell:
 
     ```bash
     python3 -m pip install .
-    pythin3 -m pip install nox
+    python3 -m pip install nox
     nox -s tests
     ```
 
