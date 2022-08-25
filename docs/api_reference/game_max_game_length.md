@@ -5,6 +5,9 @@
 
 `max_game_length()`
 
+The maximum length of any one game (in terms of number of decision nodes 
+visited in the game tree).
+
 For a simultaneous action game, this is the maximum number of joint decisions.
 In a turn-based game, this is the maximum number of individual decisions summed
 over all players. Outcomes of chance nodes are not included in this length.
