@@ -5,9 +5,6 @@
 
 `max_game_length()`
 
-Returns the maximum and minimum achievable utility (return in any given episode)
-in the game.
-
 For a simultaneous action game, this is the maximum number of joint decisions.
 In a turn-based game, this is the maximum number of individual decisions summed
 over all players. Outcomes of chance nodes are not included in this length.
