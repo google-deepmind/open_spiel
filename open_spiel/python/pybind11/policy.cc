@@ -51,6 +51,12 @@ void init_pyspiel_policy(py::module& m) {
                     const std::unordered_map<std::string,
                                              open_spiel::ActionsAndProbs>&>())
       .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*>())
+      .def(py::init<
+           const open_spiel::Game&, int,
+           const std::unordered_map<std::string, open_spiel::ActionsAndProbs>&,
+           const float, const float>())
+      .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*,
+                    const float, const float>())
       .def("value",
            py::overload_cast<const std::string&>(&TabularBestResponse::Value))
       .def("value_from_state", py::overload_cast<const open_spiel::State&>(
@@ -95,21 +101,21 @@ void init_pyspiel_policy(py::module& m) {
 
   py::class_<open_spiel::PartialTabularPolicy,
              std::shared_ptr<open_spiel::PartialTabularPolicy>,
-             open_spiel::TabularPolicy>(
-      m, "PartialTabularPolicy")
+             open_spiel::TabularPolicy>(m, "PartialTabularPolicy")
       .def(py::init<>())
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&,
                     std::shared_ptr<Policy>>())
       .def("get_state_policy",
-          (ActionsAndProbs(open_spiel::Policy::*)(const State&) const)
-          &open_spiel::PartialTabularPolicy::GetStatePolicy)
+           (ActionsAndProbs(open_spiel::Policy::*)(const State&) const) &
+               open_spiel::PartialTabularPolicy::GetStatePolicy)
+      .def(
+          "get_state_policy",
+          (ActionsAndProbs(open_spiel::Policy::*)(const State&, Player) const) &
+              open_spiel::PartialTabularPolicy::GetStatePolicy)
       .def("get_state_policy",
-          (ActionsAndProbs(open_spiel::Policy::*)(const State&, Player) const)
-          &open_spiel::PartialTabularPolicy::GetStatePolicy)
-      .def("get_state_policy",
-           (ActionsAndProbs(open_spiel::Policy::*)(const std::string&) const)
-          &open_spiel::PartialTabularPolicy::GetStatePolicy)
+           (ActionsAndProbs(open_spiel::Policy::*)(const std::string&) const) &
+               open_spiel::PartialTabularPolicy::GetStatePolicy)
       .def("set_prob", &open_spiel::PartialTabularPolicy::SetProb)
       .def("set_state_policy",
            &open_spiel::PartialTabularPolicy::SetStatePolicy)
@@ -253,32 +259,26 @@ void init_pyspiel_policy(py::module& m) {
       .def(py::init<const open_spiel::Game&, const open_spiel::Policy&>())
       .def("compute_best_responses",  // Takes no arguments.
            &TabularBestResponseMDP::ComputeBestResponses)
-      .def("compute_best_response",   // Takes one argument: Player max_player.
+      .def("compute_best_response",  // Takes one argument: Player max_player.
            &TabularBestResponseMDP::ComputeBestResponse, py::arg("max_player"))
       .def("nash_conv", &TabularBestResponseMDP::NashConv)
       .def("exploitability", &TabularBestResponseMDP::Exploitability);
 
-  m.def("expected_returns",
-        py::overload_cast<const State&, const std::vector<const Policy*>&, int,
-                          bool, float>(
-                              &open_spiel::algorithms::ExpectedReturns),
-        "Computes the undiscounted expected returns from a depth-limited "
-        "search.",
-        py::arg("state"),
-        py::arg("policies"),
-        py::arg("depth_limit"),
-        py::arg("use_infostate_get_policy"),
-        py::arg("prob_cut_threshold") = 0.0);
+  m.def(
+      "expected_returns",
+      py::overload_cast<const State&, const std::vector<const Policy*>&, int,
+                        bool, float>(&open_spiel::algorithms::ExpectedReturns),
+      "Computes the undiscounted expected returns from a depth-limited "
+      "search.",
+      py::arg("state"), py::arg("policies"), py::arg("depth_limit"),
+      py::arg("use_infostate_get_policy"), py::arg("prob_cut_threshold") = 0.0);
 
   m.def("expected_returns",
-        py::overload_cast<const State&, const Policy&, int,
-                          bool, float>(
-                              &open_spiel::algorithms::ExpectedReturns),
+        py::overload_cast<const State&, const Policy&, int, bool, float>(
+            &open_spiel::algorithms::ExpectedReturns),
         "Computes the undiscounted expected returns from a depth-limited "
         "search.",
-        py::arg("state"),
-        py::arg("joint_policy"),
-        py::arg("depth_limit"),
+        py::arg("state"), py::arg("joint_policy"), py::arg("depth_limit"),
         py::arg("use_infostate_get_policy"),
         py::arg("prob_cut_threshold") = 0.0);
 

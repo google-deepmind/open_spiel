@@ -54,33 +54,38 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
       "cce_dist",
       [](std::shared_ptr<const Game> game,
          const CorrelationDevice& correlation_device, int player,
-         float prob_cut_threshold) {
+         float prob_cut_threshold, const float action_value_tolerance) {
         return algorithms::CCEDist(*game, correlation_device, player,
-                                   prob_cut_threshold);
+                                   prob_cut_threshold, action_value_tolerance);
       },
       "Returns a player's distance to a coarse-correlated equilibrium.",
       py::arg("game"), py::arg("correlation_device"), py::arg("player"),
-      py::arg("prob_cut_threshold") = -1.0);
+      py::arg("prob_cut_threshold") = -1.0,
+      py::arg("action_value_tolerance") = -1.0);
 
   m.def(
       "cce_dist",
       [](std::shared_ptr<const Game> game,
-         const CorrelationDevice& correlation_device,
-         float prob_cut_threshold) {
+         const CorrelationDevice& correlation_device, float prob_cut_threshold,
+         const float action_value_tolerance) {
         return algorithms::CCEDist(*game, correlation_device,
-                                   prob_cut_threshold);
+                                   prob_cut_threshold, action_value_tolerance);
       },
       "Returns the distance to a coarse-correlated equilibrium.",
       py::arg("game"), py::arg("correlation_device"),
-      py::arg("prob_cut_threshold") = -1.0);
+      py::arg("prob_cut_threshold") = -1.0,
+      py::arg("action_value_tolerance") = false);
 
   m.def(
       "ce_dist",
       [](std::shared_ptr<const Game> game,
-         const CorrelationDevice& correlation_device) {
-        return algorithms::CEDist(*game, correlation_device);
+         const CorrelationDevice& correlation_device,
+         const float action_value_tolerance) {
+        return algorithms::CEDist(*game, correlation_device,
+                                  action_value_tolerance);
       },
-      "Returns the distance to a correlated equilibrium.");
+      "Returns the distance to a correlated equilibrium.", py::arg("game"),
+      py::arg("correlation_device"), py::arg("action_value_tolerance") = -1.0);
 
   // TODO(author5): expose the rest of the functions.
 }
