@@ -275,7 +275,7 @@ class MaednGame : public Game {
   int num_players_;
 };
 
-}  // namespace Maedn
+}  // namespace maedn
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_GAMES_MAEDN_H_

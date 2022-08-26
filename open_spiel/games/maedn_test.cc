@@ -295,25 +295,25 @@ void MinimalGameToWin() {
   // Scenarios: 2p side-by-side, 2p opposite sides, 3p, 4p,
   // for each participating player.
 
-  int terminalStateScenarioNumber = 0;
+  int terminal_state_scenario_number = 0;
   for (int scenario = 0; scenario < 4; scenario++) {
     int players;
-    bool twoPlayersOpposite;
+    bool two_players_opposite;
     if (scenario == 0) {
       players = 2;
-      twoPlayersOpposite = false;
+      two_players_opposite = false;
     } else if (scenario == 1) {
       players = 2;
-      twoPlayersOpposite = true;
+      two_players_opposite = true;
     } else {
       players = scenario + 1;
     }
 
     for (int ply = 0; ply < players; ply++) {
       PlayMinimalGameToWin(players, 
-                           twoPlayersOpposite, 
+                           two_players_opposite, 
                            ply, 
-                           terminalStateScenarioNumber++);
+                           terminal_state_scenario_number++);
     }
   }
 }
@@ -365,7 +365,7 @@ void BasicSerializationTest() {
 }
 
 }  // namespace
-}  // namespace connect_four
+}  // namespace maedn
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
