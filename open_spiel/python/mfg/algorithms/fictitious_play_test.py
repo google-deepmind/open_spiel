@@ -43,6 +43,17 @@ class FictitiousPlayTest(absltest.TestCase):
 
     self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
 
+  def test_fixedpoint_python_game(self):
+    """Checks if fixed point works."""
+    game = crowd_modelling.MFGCrowdModellingGame()
+    fp = fictitious_play.FictitiousPlay(game)
+    for _ in range(10):
+      fp.iteration(learning_rate=1.0)
+    fp_policy = fp.get_policy()
+    nash_conv_fp = nash_conv.NashConv(game, fp_policy)
+
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 55.745101814752616)
+
   def test_dqn_fp_python_game(self):
     """Checks if fictitious play with DQN-based value function works."""
     game = crowd_modelling.MFGCrowdModellingGame()

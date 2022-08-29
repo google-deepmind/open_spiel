@@ -13,6 +13,8 @@ Welcome to OpenSpiel's documentation!
    :maxdepth: 2
 
    concepts
+   api_reference
+   algorithms
    games
 
 .. toctree:: :caption: Evaluation
@@ -25,11 +27,21 @@ Welcome to OpenSpiel's documentation!
 
    OpenSpiel on Julia<julia>
 
+.. toctree:: :caption: AlphaZero
+   :maxdepth: 2
+
+   alpha_zero
+
 .. toctree:: :caption: Developer guide
    :maxdepth: 2
 
    developer_guide
    contributing
+
+.. toctree:: :caption: Using OpenSpiel as a C++ Library
+   :maxdepth: 2
+
+   library
 
 .. toctree:: :caption: Extra information
    :maxdepth: 2

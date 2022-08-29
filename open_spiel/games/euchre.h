@@ -23,7 +23,9 @@
 // This implementation uses standard North American rules with "super-Euchres",
 // i.e. the makers lose 4 points if they fail to win a single trick. By default,
 // only the declarer has the option of playing alone, but optionally the
-// defenders can go alone as well.
+// defenders can go alone as well. The popular variation "stick the dealer" is
+// enabled by default as it has interesting strategic implications and increases
+// playability by avoiding drawn hands.
 
 #include <map>
 #include <memory>
@@ -118,7 +120,8 @@ class Trick {
 
 class EuchreState : public State {
  public:
-  EuchreState(std::shared_ptr<const Game> game, bool allow_lone_defender);
+  EuchreState(std::shared_ptr<const Game> game, bool allow_lone_defender,
+              bool stick_the_dealer);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -195,6 +198,7 @@ class EuchreState : public State {
   std::string FormatPoints() const;
 
   const bool allow_lone_defender_;
+  const bool stick_the_dealer_;
 
   int num_cards_dealt_ = 0;
   int num_cards_played_ = 0;
@@ -226,8 +230,9 @@ class EuchreGame : public Game {
   int NumDistinctActions() const override { return kNumDistinctActions; }
   int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new EuchreState(
-        shared_from_this(), /*allow_lone_defender=*/allow_lone_defender_));
+    return std::unique_ptr<State>(new EuchreState(shared_from_this(),
+        /*allow_lone_defender=*/allow_lone_defender_,
+        /*stick_the_dealer=*/stick_the_dealer_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinScore; }
@@ -252,6 +257,7 @@ class EuchreGame : public Game {
 
  private:
   const bool allow_lone_defender_;
+  const bool stick_the_dealer_;
 };
 
 }  // namespace euchre

@@ -81,6 +81,11 @@ class KuhnPokerTest(absltest.TestCase):
     self.assertAlmostEqual(
         pyspiel.exploitability(game, test_policy), expected_nash_conv / 2)
 
+  def test_cfr_cc(self):
+    """Runs a C++ CFR algorithm on the game."""
+    game = pyspiel.load_game("python_kuhn_poker")
+    unused_results = pyspiel.CFRSolver(game)
+
 
 if __name__ == "__main__":
   absltest.main()

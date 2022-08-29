@@ -52,17 +52,28 @@ void init_pyspiel_algorithms_trajectories(py::module& m) {
       .def("resize_fields",
            &open_spiel::algorithms::BatchedTrajectory::ResizeFields);
 
-  m.def("record_batched_trajectories",
-        py::overload_cast<
-            const Game&, const std::vector<open_spiel::TabularPolicy>&,
-            const std::unordered_map<std::string, int>&, int, bool, int, int>(
-            &open_spiel::algorithms::RecordBatchedTrajectory),
-        "Records a batch of trajectories.");
+  m.def(
+      "record_batched_trajectories",
+      [](std::shared_ptr<const Game> game,
+         const std::vector<TabularPolicy>& policies,
+         const std::unordered_map<std::string, int>& state_to_index,
+         int batch_size, bool include_full_observations, int seed,
+         int max_unroll_length) {
+        return open_spiel::algorithms::RecordBatchedTrajectory(
+            *game, policies, state_to_index, batch_size,
+            include_full_observations, seed, max_unroll_length);
+      },
+      "Records a batch of trajectories.");
 
   py::class_<open_spiel::algorithms::TrajectoryRecorder>(m,
                                                          "TrajectoryRecorder")
-      .def(py::init<const Game&, const std::unordered_map<std::string, int>&,
-                    int>())
+      .def(py::init(
+          [](std::shared_ptr<const Game> game,
+             const std::unordered_map<std::string, int>& state_to_index,
+             int seed) {
+            return new algorithms::TrajectoryRecorder(*game, state_to_index,
+                                                      seed);
+          }))
       .def("record_batch",
            &open_spiel::algorithms::TrajectoryRecorder::RecordBatch);
 }

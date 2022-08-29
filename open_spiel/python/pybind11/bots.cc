@@ -187,15 +187,20 @@ void init_pyspiel_bots(py::module& m) {
         "Returns a list of registered bot names.");
   m.def(
       "bots_that_can_play_game",
-      py::overload_cast<const Game&, Player>(&open_spiel::BotsThatCanPlayGame),
+      [](std::shared_ptr<const Game> game, int player) {
+        return BotsThatCanPlayGame(*game, player);
+      },
       py::arg("game"), py::arg("player"),
       "Returns a list of bot names that can play specified game for the "
       "given player.");
-  m.def("bots_that_can_play_game",
-        py::overload_cast<const Game&>(&open_spiel::BotsThatCanPlayGame),
-        py::arg("game"),
-        "Returns a list of bot names that can play specified game for any "
-        "player.");
+  m.def(
+      "bots_that_can_play_game",
+      [](std::shared_ptr<const Game> game) {
+        return BotsThatCanPlayGame(*game);
+      },
+      py::arg("game"),
+      "Returns a list of bot names that can play specified game for any "
+      "player.");
 
   py::class_<algorithms::Evaluator,
              std::shared_ptr<algorithms::Evaluator>> mcts_evaluator(
@@ -223,14 +228,21 @@ void init_pyspiel_bots(py::module& m) {
       .def("children_str", &SearchNode::ChildrenStr);
 
   py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
-      .def(py::init<const Game&, std::shared_ptr<Evaluator>, double, int,
-                    int64_t, bool, int, bool,
-                    ::open_spiel::algorithms::ChildSelectionPolicy>(),
-           py::arg("game"), py::arg("evaluator"), py::arg("uct_c"),
-           py::arg("max_simulations"), py::arg("max_memory_mb"),
-           py::arg("solve"), py::arg("seed"), py::arg("verbose"),
-           py::arg("child_selection_policy") =
-               algorithms::ChildSelectionPolicy::UCT)
+      .def(
+          py::init([](std::shared_ptr<const Game> game,
+                      std::shared_ptr<Evaluator> evaluator, double uct_c,
+                      int max_simulations, int64_t max_memory_mb, bool solve,
+                      int seed, bool verbose,
+                      algorithms::ChildSelectionPolicy child_selection_policy) {
+            return new algorithms::MCTSBot(
+                *game, evaluator, uct_c, max_simulations, max_memory_mb, solve,
+                seed, verbose, child_selection_policy);
+          }),
+          py::arg("game"), py::arg("evaluator"), py::arg("uct_c"),
+          py::arg("max_simulations"), py::arg("max_memory_mb"),
+          py::arg("solve"), py::arg("seed"), py::arg("verbose"),
+          py::arg("child_selection_policy") =
+              algorithms::ChildSelectionPolicy::UCT)
       .def("step", &algorithms::MCTSBot::Step)
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
 
@@ -270,10 +282,13 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def("make_stateful_random_bot", open_spiel::MakeStatefulRandomBot,
         "A stateful random bot, for test purposes.");
-  m.def("make_policy_bot",
-        py::overload_cast<const Game&, Player, int, std::shared_ptr<Policy>>(
-            open_spiel::MakePolicyBot),
-        "A bot that samples from a policy.");
+  m.def(
+      "make_policy_bot",
+      [](std::shared_ptr<const Game> game, Player player_id, int seed,
+         std::shared_ptr<Policy> policy) {
+        return MakePolicyBot(*game, player_id, seed, policy);
+      },
+      "A bot that samples from a policy.");
 
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
   m.attr("ROSHAMBO_NUM_THROWS") = py::int_(open_spiel::roshambo::kNumThrows);

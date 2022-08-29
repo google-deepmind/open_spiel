@@ -130,12 +130,16 @@ class FictitiousPlay(object):
           self._game, distrib, value.TabularValueFunction(self._game))
 
     greedy_pi = greedy_policy.GreedyPolicy(self._game, None, br_value)
-    greedy_pi = greedy_pi.to_tabular(states=self._states)
-    distrib_greedy = distribution.DistributionPolicy(self._game, greedy_pi)
+    greedy_pi_tabular = greedy_pi.to_tabular(states=self._states)
+    distrib_greedy = distribution.DistributionPolicy(self._game,
+                                                     greedy_pi_tabular)
 
     weight = learning_rate if learning_rate else 1.0 / (self._fp_step + 1)
 
-    self._policy = MergedPolicy(
-        self._game, list(range(self._game.num_players())),
-        [self._policy, greedy_pi], [distrib, distrib_greedy],
-        [1.0 - weight, weight]).to_tabular(states=self._states)
+    if math.isclose(weight, 1.0):
+      self._policy = greedy_pi
+    else:
+      self._policy = MergedPolicy(
+          self._game, list(range(self._game.num_players())),
+          [self._policy, greedy_pi_tabular], [distrib, distrib_greedy],
+          [1.0 - weight, weight]).to_tabular(states=self._states)

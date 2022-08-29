@@ -365,19 +365,19 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
       .def("make_observer",
-           [](const Game& game, IIGObservationType iig_obs_type,
+           [](std::shared_ptr<const Game> game, IIGObservationType iig_obs_type,
               const GameParameters& params) {
-             return game.MakeObserver(iig_obs_type, params);
+             return game->MakeObserver(iig_obs_type, params);
            })
       .def("make_observer",
-           [](const Game& game, const GameParameters& params) {
-             return game.MakeObserver(absl::nullopt, params);
+           [](std::shared_ptr<const Game> game, const GameParameters& params) {
+             return game->MakeObserver(absl::nullopt, params);
            })
       .def("__str__", &Game::ToString)
       .def("__repr__", &Game::ToString)
       .def("__eq__",
-           [](const Game& value, Game* value2) {
-             return value2 && value.ToString() == value2->ToString();
+           [](std::shared_ptr<const Game> a, std::shared_ptr<const Game> b) {
+             return b && a->ToString() == b->ToString();
            })
       .def(py::pickle(                            // Pickle support
           [](std::shared_ptr<const Game> game) {  // __getstate__
