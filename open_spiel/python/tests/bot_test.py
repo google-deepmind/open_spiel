@@ -99,8 +99,9 @@ class BotTest(absltest.TestCase):
                                f"{pyspiel.ROSHAMBO_NUM_THROWS})")
       num_players = 2
       bots = [
-          pyspiel.make_roshambo_bot(0, "rotatebot"),
-          pyspiel.make_roshambo_bot(1, "copybot")
+          pyspiel.make_roshambo_bot(0, "rotatebot",
+                                    pyspiel.ROSHAMBO_NUM_THROWS),
+          pyspiel.make_roshambo_bot(1, "copybot", pyspiel.ROSHAMBO_NUM_THROWS)
       ]
       state = game.new_initial_state()
       for i in range(pyspiel.ROSHAMBO_NUM_THROWS):
