@@ -107,16 +107,17 @@ class CorrelatedEqSolver(JointActionSolver):
     self._is_cce = is_cce
 
   def __call__(self, payoffs_array):
-    size = len(payoffs_array)
-    assert size > 0
-    mixture, _ = (_mgcce(payoffs_array, [1] * size, ignore_repeats=True) if
-                  self._is_cce else _mgce(payoffs_array, [1] * size,
-                                          ignore_repeats=True))
+    num_players = len(payoffs_array)
+    assert num_players > 0
+    num_strategies_per_player = payoffs_array.shape[1:]
+    mixture, _ = (_mgcce(payoffs_array, [np.ones([ns], dtype=np.int32) for ns in num_strategies_per_player], ignore_repeats=True) if
+                  self._is_cce else _mgcce(payoffs_array, [np.ones([ns], dtype=np.int32) for ns in num_strategies_per_player],
+                                           ignore_repeats=True))
     mixtures, values = [], []
-    for n in range(size):
+    for n in range(num_players):
       values.append(np.sum(payoffs_array[n] * mixture))
       mixtures.append(
-          np.sum(mixture, axis=tuple([n_ for n_ in range(size) if n_ != n])))
+          np.sum(mixture, axis=tuple([n_ for n_ in range(num_players) if n_ != n])))
     return mixtures, values
 
 
@@ -193,7 +194,7 @@ class MultiagentQLearner(rl_agent.AbstractAgent):
   def _get_payoffs_array(self, info_state):
     payoffs_array = np.zeros((self._num_players,) + tuple(self._num_actions))
     for joint_action in itertools.product(
-        *[range(dim) for dim in self._num_actions]):
+            *[range(dim) for dim in self._num_actions]):
       for n in range(self._num_players):
         payoffs_array[
             (n,) + joint_action] = self._q_values[n][info_state][joint_action]
