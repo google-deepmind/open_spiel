@@ -254,7 +254,7 @@ class Solver(object):
 
     _, lr_y = self.lrs
     if (reg_exp_mean < self.exp_thresh) and (anneal_steps >= 1 / lr_y):
-      self.temperature = np.clip(temperature / 2., 0., 1.)
+      self.temperature = np.clip(temperature / 2., 0., np.inf)
       grad_anneal_steps = -anneal_steps
     else:
       grad_anneal_steps = 1
@@ -360,7 +360,7 @@ class Solver(object):
 
     _, lr_y = self.lrs
     if (reg_exp_mean < self.exp_thresh) and (anneal_steps >= 1 / lr_y):
-      self.temperature = np.clip(temperature / 2., 0., 1.)
+      self.temperature = np.clip(temperature / 2., 0., np.inf)
       grad_anneal_steps = -anneal_steps
     else:
       grad_anneal_steps = 1
