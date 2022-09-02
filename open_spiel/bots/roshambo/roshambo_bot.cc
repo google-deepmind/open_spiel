@@ -19,38 +19,33 @@ namespace roshambo {
 
 using ::roshambo_tournament::bot_map;
 
-RoshamboBot::RoshamboBot(Player player_id, std::string bot_name)
-    : player_id_(player_id),
-      opponent_id_(1 - player_id),
-      bot_name_(bot_name) {
-  if (bot_map.find(bot_name) == bot_map.end())
+RoshamboBot::RoshamboBot(Player player_id, std::string bot_name, int num_throws)
+    : player_id_(player_id), opponent_id_(1 - player_id), bot_name_(bot_name) {
+  if (auto bot_it = bot_map.find(bot_name); bot_it == bot_map.end()) {
     SpielFatalError("Invalid bot name!");
+  } else {
+    bot_ = bot_it->second(num_throws);
+  }
 }
 
 Action RoshamboBot::Step(const State& state) {
   // Every step must synchronize histories between the OpenSpiel wrapper
-  // bot and original C bot.
+  // bot and the RoShamBo bot.
   std::vector<Action> history = state.History();
-  SPIEL_CHECK_EQ(history.size() % 2, 0);
-  int throw_num = history.size() / 2;
-  ROSHAMBO_BOT_my_history[0] = throw_num;
-  ROSHAMBO_BOT_opp_history[0] = throw_num;
-
-  for (int i = 0; i < kNumThrows; ++i) {
-    if (i < throw_num) {
-      ROSHAMBO_BOT_my_history[i + 1] = history[(i * 2) + player_id_];
-      ROSHAMBO_BOT_opp_history[i + 1] = history[(i * 2) + opponent_id_];
-    } else {
-      ROSHAMBO_BOT_my_history[i + 1] = 0;
-      ROSHAMBO_BOT_opp_history[i + 1] = 0;
-    }
+  if (history.empty()) {
+    SPIEL_CHECK_EQ(bot_->CurrentMatchLength(), 0);
+  } else {
+    const int throw_num = history.size() / 2;
+    SPIEL_CHECK_EQ(bot_->CurrentMatchLength() + 1, throw_num);
+    bot_->RecordTrial(history[((throw_num - 1) * 2) + player_id_],
+                      history[((throw_num - 1) * 2) + opponent_id_]);
   }
-
-  return bot_map[bot_name_]();
+  return bot_->GetAction();
 }
 
-std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name) {
-  return std::make_unique<RoshamboBot>(player_id, bot_name);
+std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name,
+                                     int num_throws) {
+  return std::make_unique<RoshamboBot>(player_id, bot_name, num_throws);
 }
 
 std::vector<std::string> RoshamboBotNames() {
