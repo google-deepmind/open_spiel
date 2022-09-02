@@ -41,7 +41,6 @@ inline constexpr double LossUtility() { return -1; }
 inline constexpr double DrawUtility() { return 0; }
 inline constexpr double WinUtility() { return 1; }
 
-// See action encoding below.
 inline constexpr int NumDistinctActions() { return 4672; }
 
 // https://math.stackexchange.com/questions/194008/how-many-turns-can-a-chess-game-take-at-maximum
@@ -69,22 +68,6 @@ inline int ColorToPlayer(Color c) {
 }
 
 inline int OtherPlayer(Player player) { return player == Player{0} ? 1 : 0; }
-
-// Action encoding (must be changed to support larger boards):
-// bits 0-5: from square (0-64)
-// bits 6-11: to square (0-64)
-// bits 12-14: promotion type (0 if not promotion)
-// bits 15: is castling (we need to record this because just from and to squares
-//   can be ambiguous in chess960).
-//
-// Promotion type:
-enum class PromotionTypeEncoding {
-  kNotPromotion = 0,
-  kQueen = 1,
-  kRook = 2,
-  kBishop = 3,
-  kKnight = 4
-};
 
 inline constexpr std::array<PieceType, 3> kUnderPromotionIndexToType = {
     PieceType::kRook, PieceType::kBishop, PieceType::kKnight};
