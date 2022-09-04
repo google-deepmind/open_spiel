@@ -233,7 +233,7 @@ class ISMCTSBot(pyspiel.Bot):
       return node
     return self.create_new_node(state)
 
-  def filter_illeals(self, node, legal_actions):
+  def filter_illegals(self, node, legal_actions):
     new_node = copy.deepcopy(node)
     for action, child in node.child_info.items():
       if action not in legal_actions:
