@@ -29,7 +29,6 @@ import numpy as np
 from open_spiel.python import rl_agent
 from open_spiel.python import rl_tools
 from open_spiel.python.algorithms.jpsro import _mgcce
-from open_spiel.python.algorithms.jpsro import _mgce
 from open_spiel.python.algorithms.stackelberg_lp import solve_stackelberg
 import pyspiel
 
@@ -107,16 +106,25 @@ class CorrelatedEqSolver(JointActionSolver):
     self._is_cce = is_cce
 
   def __call__(self, payoffs_array):
-    size = len(payoffs_array)
-    assert size > 0
-    mixture, _ = (_mgcce(payoffs_array, [1] * size, ignore_repeats=True) if
-                  self._is_cce else _mgce(payoffs_array, [1] * size,
-                                          ignore_repeats=True))
+    num_players = len(payoffs_array)
+    assert num_players > 0
+    num_strategies_per_player = payoffs_array.shape[1:]
+    mixture, _ = (
+        _mgcce(  # pylint: disable=g-long-ternary
+            payoffs_array,
+            [np.ones([ns], dtype=np.int32) for ns in num_strategies_per_player],
+            ignore_repeats=True)
+        if self._is_cce else _mgcce(
+            payoffs_array,
+            [np.ones([ns], dtype=np.int32) for ns in num_strategies_per_player],
+            ignore_repeats=True))
     mixtures, values = [], []
-    for n in range(size):
+    for n in range(num_players):
       values.append(np.sum(payoffs_array[n] * mixture))
       mixtures.append(
-          np.sum(mixture, axis=tuple([n_ for n_ in range(size) if n_ != n])))
+          np.sum(
+              mixture,
+              axis=tuple([n_ for n_ in range(num_players) if n_ != n])))
     return mixtures, values
 
 
