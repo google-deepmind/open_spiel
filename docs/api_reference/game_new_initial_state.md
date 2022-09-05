@@ -14,12 +14,11 @@ games with chance events.
 ```python
 import pyspiel
 
-game = pyspiel.load_game("breakthrough")
+game = pyspiel.load_game("hex")
 state = game.new_initial_state()
 print(state)
 
-# Output
-# . . . . . . . . . . .
+# Output:
 # . . . . . . . . . . .
 #  . . . . . . . . . . .
 #   . . . . . . . . . . .
@@ -30,4 +29,5 @@ print(state)
 #        . . . . . . . . . . .
 #         . . . . . . . . . . .
 #          . . . . . . . . . . .
+#           . . . . . . . . . . .
 ```
