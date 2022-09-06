@@ -30,6 +30,7 @@ inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumSuits = 4;
 inline constexpr int kNumCardsPerSuit = 13;
 inline constexpr int kNumCards = 52;
+inline constexpr int kNumInitCardsPerPlayer = 7;
 inline constexpr int kFirstPlayer = 0;
 inline constexpr int kSecondPlayer = 1;
 // inline constexpr int kNumCardsInPass = 3;
@@ -41,9 +42,9 @@ inline constexpr int kMaxScore = 1;
 inline constexpr int kActionSize = kNumCards * kNumCards + 1; // +1 for pass
 inline constexpr int kMaxNumberOfTurns = kNumCards; // ! Check here
 inline constexpr int kInformationStateTensorSize =
-    kNumCards                           // Cards claimed
+    kNumCards                           // Current hand
+    + kNumCards                         // Cards claimed
     + kNumCards                         // Cards seen
-    + kNumCards                         // Current hand
     + kMaxNumberOfTurns * kActionSize;  // History of Actions
 
 enum class Suit { kClubs = 0, kDiamonds = 1, kHearts = 2, kSpades = 3 };
@@ -59,28 +60,6 @@ inline std::string CardString(int card) {
   return {kRankChar[CardRank(card)],
           kSuitChar[static_cast<int>(CardSuit(card))]};
 }
-
-// State of a single trick.
-class Trick {
- public:
-  Trick() : Trick{kInvalidPlayer, 0, false} {}
-  Trick(Player leader, int card, bool jd_bonus);
-  void Play(Player player, int card);
-  Suit LedSuit() const { return led_suit_; }
-  Player Winner() const { return winning_player_; }
-  Player Leader() const { return leader_; }
-  int Points() const { return points_; }
-  std::vector<int> Cards() const { return cards_; }
-
- private:
-  bool jd_bonus_;
-  int winning_rank_;
-  int points_;
-  Suit led_suit_;
-  Player leader_;
-  Player winning_player_;
-  std::vector<int> cards_;
-};
 
 class CheatState : public State {
  public:
@@ -105,8 +84,6 @@ class CheatState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-  enum class Phase { kDeal, kPass, kPlay, kGameOver };
-
   std::vector<Action> DealLegalActions() const;
   std::vector<Action> PassLegalActions() const;
   std::vector<Action> PlayLegalActions() const;
@@ -134,14 +111,8 @@ class CheatState : public State {
 
   int num_cards_dealt_ = 0;
   int num_cards_played_ = 0;
-  // bool hearts_broken_ = false;
   Player current_player_ = kChancePlayerId;
-  Phase phase_ = Phase::kDeal;
-  // std::array<Trick, kNumTricks> tricks_{};
-  std::array<absl::optional<Player>, kNumCards> holder_{};
-  std::array<absl::optional<Player>, kNumCards> initial_deal_{};
-  std::vector<std::vector<int>> passed_cards_{kNumPlayers};
-  std::vector<double> points_ = std::vector<double>(kNumPlayers, 0);
+  std::array<absl::optional<Player>, kNumCards> player_hand_{};
 };
 
 class CheatGame : public Game {
