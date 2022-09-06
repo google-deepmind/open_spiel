@@ -258,4 +258,34 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace chicken_dare
 
+// Bach or Stravinksy game.
+// https://en.wikipedia.org/wiki/Battle_of_the_sexes_(game_theory)
+namespace bach_or_stravinsky {
+const GameType kGameType{
+    /*short_name=*/"matrix_bos",
+    /*long_name=*/"Bach or Stravinsky",
+    GameType::Dynamics::kSimultaneous,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kOneShot,
+    GameType::Utility::kGeneralSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/{}  // no parameters
+};
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
+      new MatrixGame(kGameType, params, {"Bach", "Stravinsky"},
+                     {"Bach", "Stravinsky"}, {3, 0, 0, 2}, {2, 0, 0, 3}));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
+}  // namespace bach_or_stravinsky
+
+
 }  // namespace open_spiel

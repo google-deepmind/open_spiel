@@ -68,6 +68,7 @@ EXPECTED_GAMES = frozenset([
     "mancala",
     "markov_soccer",
     "matching_pennies_3p",
+    "matrix_bos",
     "matrix_cd",
     "matrix_coordination",
     "matrix_mp",
