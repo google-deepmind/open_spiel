@@ -197,7 +197,7 @@ def write_instances_file(negotiations, filename):
 
 def compute_nbs_from_simulations(game, num_games, bots):
   """Compute empirical NBS from simulations."""
-  sum_nbs = 0
+  avg_returns = np.zeros(game.num_players())
   for _ in range(num_games):
     state = game.new_initial_state()
     while not state.is_terminal():
@@ -211,9 +211,10 @@ def compute_nbs_from_simulations(game, num_games, bots):
         player = state.current_player()
         action = bots[player].step(state)
         state.apply_action(action)
-    returns = state.returns()
-    sum_nbs += np.prod(returns)
-  return sum_nbs / num_games
+    returns = np.asarray(state.returns())
+    avg_returns += returns
+  avg_returns /= num_games
+  return np.prod(avg_returns)
 
 
 class MaxBot(object):
