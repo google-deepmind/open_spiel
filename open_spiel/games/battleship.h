@@ -119,9 +119,9 @@
 //     "board_height"          int     Number of rows of the game board for
 //                                     each player            (default = 10)
 //     "ship_sizes"          [int]     Length of the ships each player has
-//                                                      (default = [2,3,3,4,5])
+//                                                      (default = [2;3;3;4;5])
 //     "ship_values"      [double]     Value of the ships each player has
-//                                                      (default = [1,1,1,1,1])
+//                                                      (default = [1;1;1;1;1])
 //     "num_shots"             int     Number of shots available to each
 //                                     player                 (default = 50)
 //     "allow_repeated_shots" bool     If false, the players will be prevented
@@ -190,6 +190,7 @@ class BattleshipGame final : public Game {
   double UtilitySum() const override;
   int MaxGameLength() const override;
   std::string ActionToString(Player player, Action action_id) const override;
+  std::vector<int> InformationStateTensorShape() const override;
 
   // Action (de)serialization routines
   // =================================
@@ -254,6 +255,8 @@ class BattleshipState final : public State {
   std::vector<double> Returns() const override;
   std::unique_ptr<State> Clone() const override;
   std::string InformationStateString(Player player) const override;
+  void InformationStateTensor(Player player,
+                              absl::Span<float> values) const override;
   std::string ObservationString(Player player) const override;
   void UndoAction(Player player, Action action_id) override;
 
