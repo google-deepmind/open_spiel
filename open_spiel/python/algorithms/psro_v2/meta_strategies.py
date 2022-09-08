@@ -18,6 +18,7 @@ import numpy as np
 
 from open_spiel.python.algorithms import lp_solver
 from open_spiel.python.algorithms import projected_replicator_dynamics
+from open_spiel.python.algorithms import regret_matching
 import pyspiel
 
 
@@ -171,9 +172,33 @@ def prd_strategy(solver, return_joint=False):
     return result, joint_strategies
 
 
+def rm_strategy(solver, return_joint=False):
+  """Computes regret-matching strategies.
+
+  Args:
+    solver: GenPSROSolver instance.
+    return_joint: If true, only returns marginals. Otherwise marginals as well
+      as joint probabilities.
+
+  Returns:
+    PRD-computed strategies.
+  """
+  meta_games = solver.get_meta_game()
+  if not isinstance(meta_games, list):
+    meta_games = [meta_games, -meta_games]
+  kwargs = solver.get_kwargs()
+  result = regret_matching.regret_matching(meta_games, **kwargs)
+  if not return_joint:
+    return result
+  else:
+    joint_strategies = get_joint_strategy_from_marginals(result)
+    return result, joint_strategies
+
+
 META_STRATEGY_METHODS = {
     "uniform_biased": uniform_biased_strategy,
     "uniform": uniform_strategy,
     "nash": nash_strategy,
     "prd": prd_strategy,
+    "rm": rm_strategy,
 }

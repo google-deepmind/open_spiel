@@ -69,6 +69,7 @@ EXPECTED_GAMES = frozenset([
     "markov_soccer",
     "matching_pennies_3p",
     "matrix_bos",
+    "matrix_brps",
     "matrix_cd",
     "matrix_coordination",
     "matrix_mp",
