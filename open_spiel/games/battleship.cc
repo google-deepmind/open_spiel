@@ -344,7 +344,9 @@ void BattleshipState::InformationStateTensor(
   values[offset + player] = 1;
   offset += 2;
 
-  values[offset + CurrentPlayer()] = 1;
+  if (!IsTerminal()) {
+    values[offset + CurrentPlayer()] = 1;
+  }
   offset += 2;
 
   for (const auto& move : moves_) {
