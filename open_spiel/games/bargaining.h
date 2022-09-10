@@ -157,6 +157,8 @@ class BargainingGame : public Game {
   const std::vector<Offer>& AllOffers() const { return all_offers_; }
   const Instance& GetInstance(int num) const { return all_instances_[num]; }
   const Offer& GetOffer(int num) const { return all_offers_[num]; }
+  std::pair<Offer, Action> GetOfferByQuantities(
+      const std::vector<int>& quantities) const;
 
  private:
   void ParseInstancesFile(const std::string& filename);

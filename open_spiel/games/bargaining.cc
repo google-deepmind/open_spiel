@@ -482,6 +482,17 @@ int BargainingGame::NumDistinctActions() const {
   return all_offers_.size() + 1;
 }
 
+std::pair<Offer, Action> BargainingGame::GetOfferByQuantities(
+    const std::vector<int>& quantities) const {
+  for (int i = 0; i < all_offers_.size(); ++i) {
+    if (quantities == all_offers_[i].quantities) {
+      return {all_offers_[i], i};
+    }
+  }
+  return {Offer(), kInvalidAction};
+}
+
+
 std::vector<int> BargainingGame::ObservationTensorShape() const {
   return {
       1 +                                       // Agreement reached?
