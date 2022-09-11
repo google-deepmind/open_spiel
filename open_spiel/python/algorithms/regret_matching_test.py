@@ -65,6 +65,7 @@ class RegretMatchingTest(absltest.TestCase):
         iterations=50000,
         gamma=1e-6)
     self.assertLen(strategies, 2, "Wrong strategy length.")
+    # places=1 corresponds to an absolute difference of < 0.001
     self.assertAlmostEqual(strategies[0][0], 1 / 3., places=2)
     self.assertAlmostEqual(strategies[0][1], 1 / 3., places=2)
     self.assertAlmostEqual(strategies[0][2], 1 / 3., places=2)
@@ -75,9 +76,10 @@ class RegretMatchingTest(absltest.TestCase):
     strategies = regret_matching.regret_matching(
         [payoffs_array[0], payoffs_array[1]], iterations=50000, gamma=1e-8)
     self.assertLen(strategies, 2, "Wrong strategy length.")
-    self.assertAlmostEqual(strategies[0][0], 1 / 16., places=2)
-    self.assertAlmostEqual(strategies[0][1], 10 / 16., places=2)
-    self.assertAlmostEqual(strategies[0][2], 5 / 16., places=2)
+    # places=1 corresponds to an absolute difference of < 0.01
+    self.assertAlmostEqual(strategies[0][0], 1 / 16., places=1)
+    self.assertAlmostEqual(strategies[0][1], 10 / 16., places=1)
+    self.assertAlmostEqual(strategies[0][2], 5 / 16., places=1)
 
 
 if __name__ == "__main__":
