@@ -59,6 +59,9 @@ GAMES = (
     "goofspiel_2p_3c_total",
     "goofspiel_2p_4c_total",
     "goofspiel_2p_5c_total",
+    "goofspiel_2p_5c_total",
+    "goofspiel_2p_5c_dsc_total",
+    "goofspiel_2p_5c_dsc_pt_diff",
 )
 
 FLAGS = flags.FLAGS
@@ -105,6 +108,12 @@ flags.DEFINE_bool(
     "spread weight over repeats. This may or may not be a desireable property "
     "depending on how one wishes to search the game space. A uniform "
     "meta-solver requires this to be False.")
+flags.DEFINE_float(
+    "action_value_tolerance", -1.0,
+    "If non-negative, use max-entropy best-responses with specified tolerance "
+    "on action-value. If negative, the best-response operator will return a "
+    "best-response policy that deterministically chooses the first action with "
+    "maximum action-value in each state.")
 
 
 def get_game(game_name):
@@ -185,9 +194,32 @@ def get_game(game_name):
   elif game_name == "goofspiel_2p_5c_total":
     game_name = "goofspiel"
     game_kwargs = {
+        "imp_info": True,
+        "egocentric": True,
         "players": int(2),
         "returns_type": "total_points",
-        "num_cards": int(5)}
+        "num_cards": int(5)
+    }
+  elif game_name == "goofspiel_2p_5c_dsc_total":
+    game_name = "goofspiel"
+    game_kwargs = {
+        "imp_info": True,
+        "egocentric": True,
+        "points_order": "descending",
+        "players": int(2),
+        "returns_type": "total_points",
+        "num_cards": int(5)
+    }
+  elif game_name == "goofspiel_2p_5c_dsc_pt_diff":
+    game_name = "goofspiel"
+    game_kwargs = {
+        "imp_info": True,
+        "egocentric": True,
+        "points_order": "descending",
+        "players": int(2),
+        "returns_type": "point_difference",
+        "num_cards": int(5)
+    }
 
   else:
     raise ValueError("Unrecognised game: %s" % game_name)
@@ -210,6 +242,7 @@ def main(argv):
       br_selection=FLAGS.br_selection,
       train_meta_solver=FLAGS.train_meta_solver,
       eval_meta_solver=FLAGS.eval_meta_solver,
+      action_value_tolerance=FLAGS.action_value_tolerance,
       ignore_repeats=FLAGS.ignore_repeats)
 
 

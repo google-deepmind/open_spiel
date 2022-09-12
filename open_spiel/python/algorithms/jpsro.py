@@ -1181,8 +1181,15 @@ def add_meta_dist(
 
 
 def find_best_response(
-    game, meta_dist, meta_game, iteration, joint_policies,
-    target_equilibrium, update_players_strategy):
+    game,
+    meta_dist,
+    meta_game,
+    iteration,
+    joint_policies,
+    target_equilibrium,
+    update_players_strategy,
+    action_value_tolerance,
+):
   """Returns new best response policies."""
   num_players = meta_game.shape[0]
   per_player_num_policies = meta_dist.shape[:]
@@ -1219,7 +1226,12 @@ def find_best_response(
 
         mu = [(p, mp) for mp, p in zip(joint_policies_slice, meta_dist_slice)
               if p > 0]
-        info = pyspiel.cce_dist(game, mu, player, prob_cut_threshold=0.0)
+        info = pyspiel.cce_dist(
+            game,
+            mu,
+            player,
+            prob_cut_threshold=0.0,
+            action_value_tolerance=action_value_tolerance)
 
         new_policy = policy.pyspiel_policy_to_python_policy(
             game, info.best_response_policies[0], players=(player,))
@@ -1259,7 +1271,12 @@ def find_best_response(
             mu = [(p, mp) for mp, p in
                   zip(joint_policies_slice, meta_dist_slice)
                   if p > 0]
-            info = pyspiel.cce_dist(game, mu, player, prob_cut_threshold=0.0)
+            info = pyspiel.cce_dist(
+                game,
+                mu,
+                player,
+                prob_cut_threshold=0.0,
+                action_value_tolerance=action_value_tolerance)
 
             new_policy = policy.pyspiel_policy_to_python_policy(
                 game, info.best_response_policies[0], players=(player,))
@@ -1399,20 +1416,20 @@ def callback_(
   return checkpoint
 
 
-def run_loop(
-    game,
-    game_name,
-    seed=0,
-    iterations=40,
-    policy_init="uniform",
-    update_players_strategy="all",
-    target_equilibrium="cce",
-    br_selection="largest_gap",
-    train_meta_solver="mgcce",
-    eval_meta_solver="mwcce",
-    ignore_repeats=False,
-    initialize_callback=None,
-    callback=None):
+def run_loop(game,
+             game_name,
+             seed=0,
+             iterations=40,
+             policy_init="uniform",
+             update_players_strategy="all",
+             target_equilibrium="cce",
+             br_selection="largest_gap",
+             train_meta_solver="mgcce",
+             eval_meta_solver="mwcce",
+             ignore_repeats=False,
+             initialize_callback=None,
+             action_value_tolerance=-1.0,
+             callback=None):
   """Runs JPSRO."""
   if initialize_callback is None:
     initialize_callback = initialize_callback_
@@ -1461,12 +1478,26 @@ def run_loop(
   while iteration <= iterations:
     logging.debug("Beginning JPSRO iteration %03d", iteration)
     per_player_new_policies, per_player_gaps_train = find_best_response(
-        game, train_meta_dists[-1], meta_games[-1], iteration, joint_policies,
-        target_equilibrium, update_players_strategy)
+        game,
+        train_meta_dists[-1],
+        meta_games[-1],
+        iteration,
+        joint_policies,
+        target_equilibrium,
+        update_players_strategy,
+        action_value_tolerance,
+    )
     train_meta_gaps.append([sum(gaps) for gaps in per_player_gaps_train])
     _, per_player_gaps_eval = find_best_response(
-        game, eval_meta_dists[-1], meta_games[-1], iteration, joint_policies,
-        target_equilibrium, update_players_strategy)
+        game,
+        eval_meta_dists[-1],
+        meta_games[-1],
+        iteration,
+        joint_policies,
+        target_equilibrium,
+        update_players_strategy,
+        action_value_tolerance,
+    )
     eval_meta_gaps.append([sum(gaps) for gaps in per_player_gaps_eval])
     per_player_num_novel_policies = add_new_policies(
         per_player_new_policies, per_player_gaps_train, per_player_repeats,
