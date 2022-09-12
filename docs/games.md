@@ -56,7 +56,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>~</b></font>         | [Nim](#nim)
-<font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
+<font color="orange"><b>~</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 <font color="orange"><b>~</b></font>         | [Pathfinding](#pathfinding)
