@@ -152,6 +152,9 @@ class ColoredTrailsState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
+  const Board& board() { return board_; }
+  const std::vector<Trade>& proposals() { return proposals_; }
+
  protected:
   void DoApplyAction(Action action) override;
 
