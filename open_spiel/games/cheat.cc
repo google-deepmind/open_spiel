@@ -66,6 +66,7 @@ std::string CheatState::ActionToString(Player player, Action action) const {
 }
 
 std::string CheatState::ToString() const {
+  // Todo: Re-implement this. Supposed to be returning a string representation of the state.
   absl::StrAppend(&rv, FormatDeal());
   if (!passed_cards_[0].empty()) absl::StrAppend(&rv, FormatPass());
   if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay(), FormatPoints());
@@ -73,6 +74,7 @@ std::string CheatState::ToString() const {
 }
 
 std::string CheatState::InformationStateString(Player player) const {
+  // Todo: Returns the information state string for the given player.
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (IsTerminal()) return ToString();
@@ -87,6 +89,8 @@ std::string CheatState::InformationStateString(Player player) const {
 
 void CheatState::InformationStateTensor(Player player,
                                          absl::Span<float> values) const {
+  // Todo: Check the viablitity of this function. Define card_claimed_ and
+  // card_seen_ in cheat.h.
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
@@ -116,37 +120,17 @@ void CheatState::InformationStateTensor(Player player,
 }
 
 std::vector<Action> CheatState::LegalActions() const {
+  // Todo: Find and add all the legal actions for the given or current player.
+  // Make sure to include the bluff system as well as the pass system.
+ 
   std::vector<Action> legal_actions;
-  // If initial move, deal cards - chance node
-  if (num_cards_dealt_ == 0) {
-    // Deal 7 random cards to each player
-    for (int i = 0; i < kNumPlayers; ++i) {
-      for (int j = 0; j < kNumInitCardsPerPlayer; ++j) {
-        legal_actions.push_back(kDealAction);
-      }
-    }
-    legal_actions.reserve(kNumCards - num_cards_dealt_);
-    for (int i = 0; i < kNumCards; ++i) {
-      if (!player_hand_[i].has_value()) legal_actions.push_back(i);
-    }
-    SPIEL_CHECK_GT(legal_actions.size(), 0);
-    return legal_actions;
-  }
   legal_actions.reserve(kNumTricks - num_cards_played_ / kNumPlayers);
 
-  // Check if we can follow suit.
-  if (num_cards_played_ % kNumPlayers != 0) {
-    auto suit = CurrentTrick().LedSuit();
-    for (int rank = 0; rank < kNumCardsPerSuit; ++rank) {
-      if (player_hand_[Card(suit, rank)] == current_player_) {
-        legal_actions.push_back(Card(suit, rank));
-      }
-    }
-  }
-  if (!legal_actions.empty()) return legal_actions;
-
-
-  // Otherwise, we can play any of our cards. 
+  // Each action in cheat will be a tuple of (card actually played, card claimed)
+  // At each point in the game, the player can:
+  // 1. Card actually played: One of the cards in player's hand.
+  // 2. Card claimed: Any card in the deck initially (even if it was played).
+  // 3. Pass: Pass the turn to the next player.
   for (int card = 0; card < kNumCards; ++card) {
     if (player_hand_[card] == current_player_) legal_actions.push_back(card);
   }
@@ -154,6 +138,8 @@ std::vector<Action> CheatState::LegalActions() const {
 }
 
 std::vector<std::pair<Action, double>> CheatState::ChanceOutcomes() const {
+  // Todo: Create the chance outcomes for the game.
+  // Just observe one of the poker games for the reference.
   std::vector<std::pair<Action, double>> outcomes;
   if (history_.empty()) {
     outcomes.reserve(kNumPlayers);
@@ -173,50 +159,34 @@ std::vector<std::pair<Action, double>> CheatState::ChanceOutcomes() const {
 }
 
 void CheatState::DoApplyAction(Action action) {
-  switch (phase_) {
-    case Phase::kDeal:
-      return ApplyDealAction(action);
-    case Phase::kPass:
-      return ApplyPassAction(action);
-    case Phase::kPlay:
-      return ApplyPlayAction(action);
-    case Phase::kGameOver:
-      SpielFatalError("Cannot act in terminal states");
-  }
-}
+  // Todo: Taking the action given. There should be no "phase". Combine the dealing
+  // and the playing in this function. Do not have seperate functions as ApplyDealAction
+  // and ApplyPlayAction.
 
-void CheatState::ApplyDealAction(int card) {
-  player_hand_[card] = num_cards_dealt_ % kNumPlayers;
-  ++num_cards_dealt_;
-  if (num_cards_dealt_ == kNumCards) {
-    // Preserve the initial deal for easy retrieval
-    initial_deal_ = player_hand_;
-    if (pass_dir_ == PassDir::kNoPass) {
-      phase_ = Phase::kPlay;
-      // Play starts with the holder of the 2C
-      current_player_ = player_hand_[Card(Suit::kClubs, 0)].value();
-    } else {
-      phase_ = Phase::kPass;
-      current_player_ = 0;
-    }
-  }
-}
+  // We do have dealing only at the beginning of the game (giving 7 cards to each player).
+  // After that, we only have player moves. Including drawing a card from the "Already" 
+  // shuffled deck.
 
-void CheatState::ApplyPassAction(int card) {
-  passed_cards_[current_player_].push_back(card);
-  player_hand_[card] = absl::nullopt;
-  if (passed_cards_[current_player_].size() % kNumCardsInPass == 0)
-    ++current_player_;
-  if (current_player_ == kNumPlayers) {
-    // Players have completed passing. Now let's distribute the passed cards.
-    for (int player = 0; player < kNumPlayers; ++player) {
-      for (int card : passed_cards_[player]) {
-        player_hand_[card] = (player + static_cast<int>(pass_dir_)) % kNumPlayers;
+  // Add checks to make sure the game is not over / not a terminal state.
+  if(IsTerminal()) return;
+  if(history_.size() == 0){
+    // Shuffle the deck and deal the cards.
+    // Fill the deck
+    for(int i = 0; i < kNumCards; ++i){
+      deck_.push_back(i);
+    } 
+    // Shuffle the deck
+    std::random_shuffle(deck_.begin(), deck_.end());
+    // Deal the cards - 7 cards to each player
+    for(int i = 0; i < kNumPlayers; ++i){
+      for(int j = 0; j < kNumInitCardsPerPlayer; ++j){
+        player_hand_[deck_[num_cards_dealt_]] = i;
+        num_cards_dealt_++;
       }
     }
-    phase_ = Phase::kPlay;
-    // Play starts with the holder of the 2C
-    current_player_ = player_hand_[Card(Suit::kClubs, 0)].value();
+  } else {
+    // Players play their cards.
+    
   }
 }
 
@@ -249,52 +219,12 @@ void CheatState::ApplyPlayAction(int card) {
 }
 
 Player CheatState::CurrentPlayer() const {
+  // Todo: This function returns the player who is about to act
+  // Modify so that it doesn't use Phase. Return if it's a chance node
+  // or whoever is about to act.
   if (phase_ == Phase::kDeal) return kChancePlayerId;
   return current_player_;
 }
 
-// Does not account for void suit information exposed by other players during
-// the play phase
-std::unique_ptr<State> CheatState::ResampleFromInfostate(
-    int player_id, std::function<double()> rng) const {
-  std::unique_ptr<State> clone = game_->NewInitialState();
-  Action pass_dir = static_cast<int>(pass_dir_);
-  clone->ApplyAction(pass_dir);
-
-  // start by gathering all public and private info known to player_id to
-  // simplify the logic for applying deal / pass actions
-  // first thing we know is the player's entire hand
-  std::vector<int> initial_hand;
-  for (int card = 0; card < kNumCards; card++) {
-    if (initial_deal_[card] == player_id) initial_hand.push_back(card);
-  }
-
-  // collect cards that have been revealed through the play phase
-  std::vector<std::vector<int>> play_known(kNumPlayers);
-  if (phase_ == Phase::kPlay) {
-    for (int card = 0; card < kNumCards; card++) {
-      absl::optional<Player> p = Played(card);
-      if (p && *p != player_id) {
-        play_known[*p].push_back(card);
-      }
-    }
-  }
-
-  // given that we should now have a state consistent with the public actions
-  // and player_id's private cards, we can just copy the action sequence in
-  // the play phase
-  int play_start_index = kNumCards + 1;
-  if (pass_dir_ != PassDir::kNoPass)
-    play_start_index += kNumPlayers * kNumCardsInPass;
-  for (size_t i = play_start_index; i < history_.size(); i++) {
-    clone->ApplyAction(history_.at(i).action);
-  }
-
-  SPIEL_CHECK_EQ(FullHistory().size(), clone->FullHistory().size());
-  SPIEL_CHECK_EQ(InformationStateString(player_id),
-                 clone->InformationStateString(player_id));
-  return clone;
-}
-
-}  // namespace hearts
+}  // namespace cheat
 }  // namespace open_spiel

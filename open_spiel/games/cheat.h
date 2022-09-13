@@ -33,9 +33,6 @@ inline constexpr int kNumCards = 52;
 inline constexpr int kNumInitCardsPerPlayer = 7;
 inline constexpr int kFirstPlayer = 0;
 inline constexpr int kSecondPlayer = 1;
-// inline constexpr int kNumCardsInPass = 3;
-// inline constexpr int kNumTricks = kNumCards / kNumPlayers;
-// inline constexpr int kPointsForQS = 13;
 inline constexpr int kMinScore = -1;
 inline constexpr int kMaxScore = 1;
 // inline constexpr int kTrickTensorSize = kNumCards * 7;  // N E S W N E S
@@ -67,7 +64,9 @@ class CheatState : public State {
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
-  bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
+  bool IsTerminal() const override { // Change this implementation to ignore phase. 
+  //  return phase_ == Phase::kGameOver; 
+  }
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   void InformationStateTensor(Player player,
@@ -77,42 +76,18 @@ class CheatState : public State {
   }
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
-  std::unique_ptr<State> ResampleFromInfostate(
-      int player_id, std::function<double()> rng) const override; // ! Check here
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
-  std::vector<Action> DealLegalActions() const;
-  std::vector<Action> PassLegalActions() const;
-  std::vector<Action> PlayLegalActions() const;
-  void ApplyDealAction(int card);
-  void ApplyPassAction(int card);
-  void ApplyPlayAction(int card);
-
-  void ComputeScore();
-  // int CurrentTrickIndex() const {
-  //   return std::min(num_cards_played_ / kNumPlayers,
-  //                   static_cast<int>(tricks_.size()));
-  // }
-  // Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
-  // const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
-  std::array<std::string, kNumSuits> FormatHand(int player,
-                                                bool mark_voids) const;
-  std::string FormatPlay() const;
-  std::string FormatPass() const;
-  std::string FormatPass(Player player) const;
-  std::string FormatDeal() const;
-  std::string FormatPoints() const;
-
   absl::optional<Player> Played(int card) const;
-  bool KnowsLocation(Player player, int card) const;
 
   int num_cards_dealt_ = 0;
   int num_cards_played_ = 0;
   Player current_player_ = kChancePlayerId;
   std::array<absl::optional<Player>, kNumCards> player_hand_{};
+  std::vector<int> deck_;
 };
 
 class CheatGame : public Game {
