@@ -35,8 +35,9 @@ inline constexpr int kFirstPlayer = 0;
 inline constexpr int kSecondPlayer = 1;
 inline constexpr int kMinScore = -1;
 inline constexpr int kMaxScore = 1;
-// inline constexpr int kTrickTensorSize = kNumCards * 7;  // N E S W N E S
-inline constexpr int kActionSize = kNumCards * kNumCards + 1; // +1 for pass
+inline constexpr int kActionSize = kNumCards * kNumCards + 2; // +1 for pass
+inline constexpr int kActionPass = kNumCards * kNumCards; 
+inline constexpr int kActionCallBluff = kActionPass + 1;
 inline constexpr int kMaxNumberOfTurns = kNumCards; // ! Check here
 inline constexpr int kInformationStateTensorSize =
     kNumCards                           // Current hand
@@ -85,9 +86,13 @@ class CheatState : public State {
 
   int num_cards_dealt_ = 0;
   int num_cards_played_ = 0;
+  std::vector<int> current_hand_size = {0, 0};
+  std::vector<bool> is_last_action_card = {false, false}; // If last action was a card
   Player current_player_ = kChancePlayerId;
   std::array<absl::optional<Player>, kNumCards> player_hand_{};
   std::vector<int> deck_;
+  std::vector<std::vector<int>> cards_seen_ = {{}, {}};
+  std::vector<int> cards_claimed_;
 };
 
 class CheatGame : public Game {

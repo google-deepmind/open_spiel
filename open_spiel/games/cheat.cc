@@ -120,11 +120,9 @@ void CheatState::InformationStateTensor(Player player,
 }
 
 std::vector<Action> CheatState::LegalActions() const {
-  // Todo: Find and add all the legal actions for the given or current player.
-  // Make sure to include the bluff system as well as the pass system.
- 
   std::vector<Action> legal_actions;
-  legal_actions.reserve(kNumTricks - num_cards_played_ / kNumPlayers);
+  SPIEL_CHECK_TRUE(current_player_ == 0 || current_player_ == 1);
+  legal_actions.reserve(current_hand_size[current_player_]);
 
   // Each action in cheat will be a tuple of (card actually played, card claimed)
   // At each point in the game, the player can:
@@ -132,44 +130,33 @@ std::vector<Action> CheatState::LegalActions() const {
   // 2. Card claimed: Any card in the deck initially (even if it was played).
   // 3. Pass: Pass the turn to the next player.
   for (int card = 0; card < kNumCards; ++card) {
-    if (player_hand_[card] == current_player_) legal_actions.push_back(card);
+    for (int claim = 0; claim < kNumCards; ++claim) {
+      if (player_hand_[card] == current_player_) {
+        legal_actions.push_back(card * kNumCards + claim); 
+      }
+    }
+  }
+  legal_actions.push_back(kActionPass);
+  // Add bluff only if the opponent played a card.
+  if (is_last_action_card[1 - current_player_]) {
+    legal_actions.push_back(kActionCallBluff);
   }
   return legal_actions;
 }
 
-std::vector<std::pair<Action, double>> CheatState::ChanceOutcomes() const {
-  // Todo: Create the chance outcomes for the game.
-  // Just observe one of the poker games for the reference.
-  std::vector<std::pair<Action, double>> outcomes;
-  if (history_.empty()) {
-    outcomes.reserve(kNumPlayers);
-    const double p = 1.0 / kNumPlayers;
-    for (int dir = 0; dir < kNumPlayers; ++dir) {
-      outcomes.emplace_back(dir, p);
-    }
-    return outcomes;
-  }
-  int num_cards_remaining = kNumCards - num_cards_dealt_;
-  outcomes.reserve(num_cards_remaining);
-  const double p = 1.0 / num_cards_remaining;
-  for (int card = 0; card < kNumCards; ++card) {
-    if (!player_hand_[card].has_value()) outcomes.emplace_back(card, p);
+ActionsAndProbs CheatState::ChanceOutcomes() const {
+  SPIEL_CHECK_TRUE(IsChanceNode());
+  ActionsAndProbs outcomes;
+  outcomes.reserve(deck_.size());
+  for (int card : deck_) {
+    outcomes.emplace_back(card, 1.0 / deck_.size());
   }
   return outcomes;
 }
 
 void CheatState::DoApplyAction(Action action) {
-  // Todo: Taking the action given. There should be no "phase". Combine the dealing
-  // and the playing in this function. Do not have seperate functions as ApplyDealAction
-  // and ApplyPlayAction.
-
-  // We do have dealing only at the beginning of the game (giving 7 cards to each player).
-  // After that, we only have player moves. Including drawing a card from the "Already" 
-  // shuffled deck.
-
-  // Add checks to make sure the game is not over / not a terminal state.
-  if(IsTerminal()) return;
-  if(history_.size() == 0){
+  SPIEL_CHECK_NE(current_player_, kTerminalPlayerId);
+  if(history_.empty()){
     // Shuffle the deck and deal the cards.
     // Fill the deck
     for(int i = 0; i < kNumCards; ++i){
@@ -181,48 +168,45 @@ void CheatState::DoApplyAction(Action action) {
     for(int i = 0; i < kNumPlayers; ++i){
       for(int j = 0; j < kNumInitCardsPerPlayer; ++j){
         player_hand_[deck_[num_cards_dealt_]] = i;
+        current_hand_size[i]++;
         num_cards_dealt_++;
       }
     }
   } else {
-    // Players play their cards.
-    
+    SPIEL_CHECK_LE(action, kActionSize);
+    SPIEL_CHECK_GE(action, 0);
+    if (action == kActionPass) {
+      // Update the pass action
+      is_last_action_card[current_player_] = false;
+      // Pass the turn to the next player.
+      current_player_ = 1 - current_player_;
+      return;
+    } else if (action == kActionCallBluff) {
+      // Todo: Call the bluff. (Check if the last action was a bluff)
+    } else {
+      // Play the card.
+      int card_played = action / kNumCards;
+      int card_claimed = action % kNumCards;
+      // Update the player's hand.
+      player_hand_[card_played] = absl::nullopt;
+      current_hand_size[current_player_]--;
+      // Update the card claimed.
+      cards_claimed_.push_back(card_claimed);
+      // Update the card seen.
+      cards_seen_[current_player_].push_back(card_played);
+      // Update the last action.
+      is_last_action_card[current_player_] = true;
+      // Update the current player.
+      current_player_ = 1 - current_player_;
+    }
   }
-}
-
-void CheatState::ApplyPlayAction(int card) {
-  SPIEL_CHECK_TRUE(player_hand_[card] == current_player_);
-  player_hand_[card] = absl::nullopt;
-  if (num_cards_played_ % kNumPlayers == 0) {
-    CurrentTrick() = Trick(current_player_, card, jd_bonus_);
-  } else {
-    CurrentTrick().Play(current_player_, card);
-  }
-  // Check if action breaks hearts.
-  if (CardSuit(card) == Suit::kCheat) hearts_broken_ = true;
-  if (qs_breaks_hearts_ && card == Card(Suit::kSpades, 10))
-    hearts_broken_ = true;
-  // Update player and point totals.
-  Trick current_trick = CurrentTrick();
-  ++num_cards_played_;
-  if (num_cards_played_ % kNumPlayers == 0) {
-    current_player_ = current_trick.Winner();
-    points_[current_player_] += current_trick.Points();
-  } else {
-    current_player_ = (current_player_ + 1) % kNumPlayers;
-  }
-  if (num_cards_played_ == kNumCards) {
-    phase_ = Phase::kGameOver;
+  if(IsTerminal()) {
     current_player_ = kTerminalPlayerId;
-    ComputeScore();
-  }
+  } 
 }
 
 Player CheatState::CurrentPlayer() const {
-  // Todo: This function returns the player who is about to act
-  // Modify so that it doesn't use Phase. Return if it's a chance node
-  // or whoever is about to act.
-  if (phase_ == Phase::kDeal) return kChancePlayerId;
+  if (history_.empty()) return kChancePlayerId;
   return current_player_;
 }
 
