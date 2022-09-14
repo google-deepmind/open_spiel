@@ -141,7 +141,7 @@ double TabularBestResponse::HandleDecisionCase(HistoryNode* node) {
     HistoryNode* child = node->GetChild(action).second;
     if (child == nullptr) SpielFatalError("HandleDecisionCase: node is null.");
     // Finally, we update value by the policy weighted value of the child.
-    SPIEL_CHECK_GE(prob, 0);
+    SPIEL_CHECK_PROB_TOLERANCE(prob, ProbabilityDefaultTolerance());
     value += prob * Value(child->GetHistory());
   }
   return value;
@@ -157,8 +157,7 @@ double TabularBestResponse::HandleChanceCase(HistoryNode* node) {
     HistoryNode* child = prob_and_child.second;
     if (child == nullptr) SpielFatalError("Child is null.");
     // Verify that the probability is valid. This should always be true.
-    SPIEL_CHECK_GE(prob, 0.);
-    SPIEL_CHECK_LE(prob, 1.);
+    SPIEL_CHECK_PROB_TOLERANCE(prob, ProbabilityDefaultTolerance());
     value += prob * Value(child->GetHistory());
   }
   // Verify that the sum of the probabilities is 1, within tolerance.

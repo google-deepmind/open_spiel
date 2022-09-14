@@ -141,6 +141,10 @@ using Action = int64_t;
 // numbers as the threshold.
 inline constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
 
+// Default tolerance applied when validating variables are valid probability.
+inline constexpr float ProbabilityDefaultTolerance() { return 1e-9; }
+
+
 // Helpers used to convert actions represented as integers in mixed bases.
 // E.g. RankActionMixedBase({2, 3, 6}, {1, 1, 1}) = 1*18 + 1*6 + 1 = 25,
 // and UnrankActioMixedBase(25, {2, 3, 6}, &digits) sets digits to {1, 1, 1}.
@@ -260,6 +264,11 @@ bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
   SPIEL_CHECK_GE(x, 0);     \
   SPIEL_CHECK_LE(x, 1);     \
   SPIEL_CHECK_FALSE(std::isnan(x) || std::isinf(x))
+#define SPIEL_CHECK_PROB_TOLERANCE(x, tol)      \
+  SPIEL_CHECK_GE(x, -(tol));      \
+  SPIEL_CHECK_LE(x, 1.0 + (tol)); \
+  SPIEL_CHECK_FALSE(std::isnan(x) || std::isinf(x))
+
 
 // Checks that x and y are equal to the default dynamic threshold proportional
 // to max(|x|, |y|).
