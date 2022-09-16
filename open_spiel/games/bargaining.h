@@ -115,8 +115,10 @@ class BargainingState : public State {
       int player_id, std::function<double()> rng) const override;
 
   // Extra methods not part of the general API.
-  Instance instance() const { return instance_; }
+  Instance GetInstance() const { return instance_; }
   void SetInstance(Instance instance);
+
+  std::vector<Offer> Offers() const { return offers_; }
 
   Action AgreeAction() const;
 

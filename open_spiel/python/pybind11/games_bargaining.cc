@@ -40,7 +40,8 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
       .def_readwrite("quantities", &Offer::quantities);
 
   py::classh<BargainingState, State>(m, "BargainingState")
-      .def("instance", &BargainingState::instance)
+      .def("instance", &BargainingState::GetInstance)
+      .def("offers", &BargainingState::Offers)
       .def("agree_action", &BargainingState::AgreeAction)
       // set_instance(instance)
       .def("set_instance", &BargainingState::SetInstance)
