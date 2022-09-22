@@ -76,7 +76,7 @@ GAME_SETTINGS.update({
     "python_mfg_predator_prey": GAME_SETTINGS["predator_prey_5x5x3"],
 })
 
-_DYNAMIC_ROUTING_NETWORK = {
+DYNAMIC_ROUTING_NETWORK = {
     "line": (dynamic_routing_data.LINE_NETWORK,
              dynamic_routing_data.LINE_NETWORK_OD_DEMAND),
     "braess": (dynamic_routing_data.BRAESS_NETWORK,
@@ -113,7 +113,7 @@ def create_game_with_setting(game_name: str,
     # Create a copy since we modify it below removing the network key.
     params = params.copy()
     network = params.pop("network")
-    network, od_demand = _DYNAMIC_ROUTING_NETWORK[network]
+    network, od_demand = DYNAMIC_ROUTING_NETWORK[network]
     return dynamic_routing.MeanFieldRoutingGame(
         params, network=network, od_demand=od_demand)
 
