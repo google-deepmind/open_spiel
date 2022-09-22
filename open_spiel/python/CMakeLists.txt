@@ -103,6 +103,10 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_negotiation.h
   pybind11/games_tarok.cc
   pybind11/games_tarok.h
+  pybind11/games_tiny_bridge.cc
+  pybind11/games_tiny_bridge.h
+  pybind11/games_trade_comm.cc
+  pybind11/games_trade_comm.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
   pybind11/observer.cc
