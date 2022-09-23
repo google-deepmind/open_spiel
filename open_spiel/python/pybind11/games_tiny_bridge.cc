@@ -21,9 +21,12 @@
 namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
+using open_spiel::tiny_bridge::TinyBridgeAuctionState;
 using open_spiel::tiny_bridge::TinyBridgePlayState;
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(TinyBridgePlayState);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(TinyBridgeAuctionState);
+
 void open_spiel::init_pyspiel_games_tiny_bridge(py::module& m) {
   py::classh<TinyBridgePlayState, State>(m, "TinyBridgePlayState")
       .def("to_string", &TinyBridgePlayState::ToString)
@@ -36,6 +39,20 @@ void open_spiel::init_pyspiel_games_tiny_bridge(py::module& m) {
             std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
                 game_and_state = DeserializeGameAndState(data);
             return dynamic_cast<TinyBridgePlayState*>(
+                game_and_state.second.release());
+          }));
+
+  py::classh<TinyBridgeAuctionState, State>(m, "TinyBridgeAuctionState")
+      .def("to_string", &TinyBridgeAuctionState::ToString)
+      // Pickle support
+      .def(py::pickle(
+          [](const TinyBridgeAuctionState& state) {  // __getstate__
+            return SerializeGameAndState(*state.GetGame(), state);
+          },
+          [](const std::string& data) {  // __setstate__
+            std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
+                game_and_state = DeserializeGameAndState(data);
+            return dynamic_cast<TinyBridgeAuctionState*>(
                 game_and_state.second.release());
           }));
 }
