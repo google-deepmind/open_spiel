@@ -31,7 +31,6 @@ void open_spiel::init_pyspiel_games_leduc_poker(py::module& m) {
       .def("get_private_cards", &LeducState::GetPrivateCards)
       // Sets the private cards; takes a vector of ints, no returns.
       .def("set_private_cards", &LeducState::SetPrivateCards)
-      .def("to_string", &LeducState::ToString)
       // Pickle support
       .def(py::pickle(
           [](const LeducState& state) {  // __getstate__
