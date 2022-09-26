@@ -204,8 +204,20 @@ std::vector<torch::Tensor> ResOutputBlockImpl::forward(torch::Tensor x,
   policy_logits = policy_linear_(policy_logits);
   policy_logits = torch::where(mask, policy_logits,
                                -(1 << 16) * torch::ones_like(policy_logits));
-
   return {value_output, policy_logits};
+}
+
+MLPTorsoBlockImpl::MLPTorsoBlockImpl(const int in_features,
+                                     const int out_features)
+    : linear_(torch::nn::LinearOptions(
+                         /*in_features=*/in_features,
+                         /*out_features=*/out_features)
+                         .bias(true)) {
+  register_module("linear", linear_);
+}
+
+torch::Tensor MLPTorsoBlockImpl::forward(torch::Tensor x) {
+  return torch::relu(linear_(x));
 }
 
 MLPOutputBlockImpl::MLPOutputBlockImpl(const int nn_width,
@@ -241,7 +253,6 @@ std::vector<torch::Tensor> MLPOutputBlockImpl::forward(torch::Tensor x,
   policy_logits = policy_linear2_(policy_logits);
   policy_logits = torch::where(mask, policy_logits,
                                -(1 << 16) * torch::ones_like(policy_logits));
-
   return {value_output, policy_logits};
 }
 
@@ -258,9 +269,9 @@ ModelImpl::ModelImpl(const ModelConfig& config, const std::string& device)
       input_size *= num;
     }
   }
-  int channels = config.observation_tensor_shape[0];
   // Decide if resnet or MLP
   if (config.nn_model == "resnet") {
+    int channels = config.observation_tensor_shape[0];
     int height = config.observation_tensor_shape[1];
     int width = config.observation_tensor_shape[2];
 
@@ -298,9 +309,9 @@ ModelImpl::ModelImpl(const ModelConfig& config, const std::string& device)
     register_module("layers", layers_);
 
   } else if (config.nn_model == "mlp") {
-    layers_->push_back(torch::nn::Linear(input_size, config.nn_width));
     for (int i = 0; i < num_torso_blocks_; i++) {
-      layers_->push_back(torch::nn::Linear(config.nn_width, config.nn_width));
+      layers_->push_back(
+          MLPTorsoBlock((i == 0 ? input_size : config.nn_width), config.nn_width));
     }
     layers_->push_back(
         MLPOutputBlock(config.nn_width, config.number_of_actions));
@@ -371,15 +382,10 @@ std::vector<torch::Tensor> ModelImpl::forward_(torch::Tensor x,
       }
     }
   } else if (this->nn_model_ == "mlp") {
-    for (int i = 0; i < num_torso_blocks_ + 2; i++) {
-      if (i == 0) {
-        x = layers_[i]->as<torch::nn::Linear>()->forward(x);
-      } else if (i >= num_torso_blocks_ + 1) {
-        output = layers_[i]->as<MLPOutputBlockImpl>()->forward(x, mask);
-      } else {
-        x = layers_[i]->as<torch::nn::Linear>()->forward(x);
-      }
+    for (int i = 0; i < num_torso_blocks_; i++) {
+        x = layers_[i]->as<MLPTorsoBlock>()->forward(x);
     }
+    output = layers_[num_torso_blocks_]->as<MLPOutputBlockImpl>()->forward(x, mask);
   } else {
     throw std::runtime_error("Unknown nn_model: " + this->nn_model_);
   }
