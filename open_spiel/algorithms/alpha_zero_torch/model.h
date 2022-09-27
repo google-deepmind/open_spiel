@@ -155,6 +155,17 @@ class ResOutputBlockImpl : public torch::nn::Module {
 };
 TORCH_MODULE(ResOutputBlock);
 
+// A dense block with ReLU activation.
+class MLPTorsoBlockImpl : public torch::nn::Module {
+ public:
+  MLPTorsoBlockImpl(const int in_features, const int out_features);
+  torch::Tensor forward(torch::Tensor x);
+
+ private:
+  torch::nn::Linear linear_;
+};
+TORCH_MODULE(MLPTorsoBlock);
+
 class MLPOutputBlockImpl : public torch::nn::Module {
  public:
   MLPOutputBlockImpl(const int nn_width, const int policy_linear_out_features);
