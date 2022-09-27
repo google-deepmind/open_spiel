@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Mirror Descent (https://arxiv.org/pdf/2103.00623.pdf)."""
-from typing import Optional
+
+from typing import Dict, List, Optional
 
 import numpy as np
 
-from open_spiel.python import policy as policy_std
+from open_spiel.python import policy as policy_lib
 from open_spiel.python.mfg import value
 from open_spiel.python.mfg.algorithms import distribution
 import pyspiel
@@ -29,48 +30,54 @@ def softmax_projection(logits):
   return [l / norm_exp for l in exp_l]
 
 
-class ProjectedPolicy(policy_std.Policy):
+class ProjectedPolicy(policy_lib.Policy):
   """Project values on the policy simplex."""
 
-  def __init__(self, game, player_ids,
-               cumulative_state_value: value.ValueFunction):
+  def __init__(
+      self,
+      game: pyspiel.Game,
+      player_ids: List[int],
+      state_value: value.ValueFunction,
+  ):
     """Initializes the projected policy.
 
     Args:
       game: The game to analyze.
       player_ids: list of player ids for which this policy applies; each should
         be in the range 0..game.num_players()-1.
-      cumulative_state_value: The cumulative state value to project.
+      state_value: The (cumulative) state value to project.
     """
     super(ProjectedPolicy, self).__init__(game, player_ids)
-    self._cumulative_state_value = cumulative_state_value
+    self._state_value = state_value
 
-  def cumulative_value(self, state, action=None):
+  def value(self, state: pyspiel.State, action: Optional[int] = None) -> float:
     if action is None:
-      return self._cumulative_state_value(
+      return self._state_value(
           state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
     else:
       new_state = state.child(action)
-      return state.rewards()[0] + self._cumulative_state_value(
+      return state.rewards()[0] + self._state_value(
           new_state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
 
-  def action_probabilities(self, state, player_id=None):
-    action_logit = [(a, self.cumulative_value(state, action=a))
-                    for a in state.legal_actions()]
+  def action_probabilities(self,
+                           state: pyspiel.State,
+                           player_id: Optional[int] = None) -> Dict[int, float]:
+    del player_id
+    action_logit = [
+        (a, self.value(state, action=a)) for a in state.legal_actions()
+    ]
     action, logit = zip(*action_logit)
-    prob = softmax_projection(logit)
-    action_prob = zip(action, prob)
-    return dict(action_prob)
+    return dict(zip(action, softmax_projection(logit)))
 
 
 class MirrorDescent(object):
   """The mirror descent algorithm."""
 
   def __init__(self,
-               game,
+               game: pyspiel.Game,
                state_value: Optional[value.ValueFunction] = None,
-               lr=0.01,
-               root_state=None):
+               lr: float = 0.01,
+               root_state: Optional[pyspiel.State] = None):
     """Initializes mirror descent.
 
     Args:
@@ -85,7 +92,7 @@ class MirrorDescent(object):
       self._root_states = game.new_initial_states()
     else:
       self._root_states = [root_state]
-    self._policy = policy_std.UniformRandomPolicy(game)
+    self._policy = policy_lib.UniformRandomPolicy(game)
     self._distribution = distribution.DistributionPolicy(game, self._policy)
     self._md_step = 0
     self._lr = lr
@@ -94,28 +101,20 @@ class MirrorDescent(object):
         state_value if state_value else value.TabularValueFunction(game))
     self._cumulative_state_value = value.TabularValueFunction(game)
 
-  def eval_state(self, state, learning_rate):
-    """Evaluate the value of a state and update the cumulative sum."""
-    state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
-    if self._state_value.has(state_str):
-      return self._state_value(state_str)
-    elif state.is_terminal():
-      self._state_value.set_value(
-          state_str,
-          state.rewards()[state.mean_field_population()])
-      self._cumulative_state_value.add_value(
-          state_str, learning_rate * self._state_value(state_str))
-      return self._state_value(state_str)
-    elif state.current_player() == pyspiel.PlayerId.CHANCE:
-      self._state_value.set_value(state_str, 0.0)
+  def get_state_value(self, state: pyspiel.State,
+                      learning_rate: float) -> float:
+    """Returns the value of the state."""
+    if state.is_terminal():
+      return state.rewards()[state.mean_field_population()]
+
+    if state.current_player() == pyspiel.PlayerId.CHANCE:
+      v = 0.0
       for action, prob in state.chance_outcomes():
         new_state = state.child(action)
-        self._state_value.add_value(
-            state_str, prob * self.eval_state(new_state, learning_rate))
-      self._cumulative_state_value.add_value(
-          state_str, learning_rate * self._state_value(state_str))
-      return self._state_value(state_str)
-    elif state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
+        v += prob * self.eval_state(new_state, learning_rate)
+      return v
+
+    if state.current_player() == pyspiel.PlayerId.MEAN_FIELD:
       dist_to_register = state.distribution_support()
       dist = [
           self._distribution.value_str(str_state, 0.0)
@@ -123,40 +122,46 @@ class MirrorDescent(object):
       ]
       new_state = state.clone()
       new_state.update_distribution(dist)
-      self._state_value.set_value(
-          state_str,
-          state.rewards()[state.mean_field_population()] +
-          self.eval_state(new_state, learning_rate))
-      self._cumulative_state_value.add_value(
-          state_str, learning_rate * self._state_value(state_str))
-      return self._state_value(state_str)
-    else:
-      assert int(state.current_player()) >= 0, "The player id should be >= 0"
-      v = 0.0
-      for action, prob in self._policy.action_probabilities(state).items():
-        new_state = state.child(action)
-        v += prob * self.eval_state(new_state, learning_rate)
-      self._state_value.set_value(
-          state_str,
-          state.rewards()[state.mean_field_population()] + v)
-      self._cumulative_state_value.add_value(
-          state_str, learning_rate * self._state_value(state_str))
-      return self._state_value(state_str)
+      return (state.rewards()[state.mean_field_population()] +
+              self.eval_state(new_state, learning_rate))
 
-  def iteration(self, learning_rate=None):
-    """an iteration of Mirror Descent."""
+    assert int(state.current_player()) >= 0, "The player id should be >= 0"
+    v = 0.0
+    for action, prob in self._policy.action_probabilities(state).items():
+      new_state = state.child(action)
+      v += prob * self.eval_state(new_state, learning_rate)
+    return state.rewards()[state.mean_field_population()] + v
+
+  def eval_state(self, state: pyspiel.State, learning_rate: float) -> float:
+    """Evaluate the value of a state and update the cumulative sum."""
+    state_str = state.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
+    # Return the already calculated value if present.
+    if self._state_value.has(state_str):
+      return self._state_value(state_str)
+    # Otherwise, calculate the value of the state.
+    v = self.get_state_value(state, learning_rate)
+    self._state_value.set_value(state_str, v)
+    # Update the cumulative value of the state.
+    self._cumulative_state_value.add_value(state_str, learning_rate * v)
+    return v
+
+  def get_projected_policy(self) -> policy_lib.Policy:
+    """Returns the projected policy."""
+    return ProjectedPolicy(self._game, list(range(self._game.num_players())),
+                           self._cumulative_state_value)
+
+  def iteration(self, learning_rate: Optional[float] = None):
+    """An iteration of Mirror Descent."""
     self._md_step += 1
     # TODO(sertan): Fix me.
     self._state_value = value.TabularValueFunction(self._game)
     for state in self._root_states:
       self.eval_state(state, learning_rate if learning_rate else self._lr)
-    self._policy = ProjectedPolicy(self._game,
-                                   list(range(self._game.num_players())),
-                                   self._cumulative_state_value)
+    self._policy = self.get_projected_policy()
     self._distribution = distribution.DistributionPolicy(
         self._game, self._policy)
 
-  def get_policy(self):
+  def get_policy(self) -> policy_lib.Policy:
     return self._policy
 
   @property
