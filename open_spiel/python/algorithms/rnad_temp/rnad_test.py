@@ -14,10 +14,11 @@
 
 """Tests for google3.third_party.open_spiel.python.algorithms.rnad_temp.rnad."""
 
+import pickle
+
 from absl.testing import absltest
 
 from open_spiel.python.algorithms.rnad_temp import rnad
-import pyspiel
 
 # TODO(perolat): test the losses and jax ops
 
@@ -25,16 +26,17 @@ import pyspiel
 class RNADTest(absltest.TestCase):
 
   def test_run_kuhn(self):
-    game = pyspiel.load_game("kuhn_poker")
-    rnad_solver = rnad.RNaDSolver(game=game)
+    solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="kuhn_poker"))
     for _ in range(10):
-      rnad_solver.step()
-    rnad_state = rnad_solver.__getstate__()
-    rnad_solver = rnad.RNaDSolver(game=game)
-    rnad_solver.__setstate__(rnad_state)
-    for _ in range(10):
-      rnad_solver.step()
+      solver.step()
 
+  def test_serialization(self):
+    solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="kuhn_poker"))
+    solver.step()
+    state_bytes = pickle.dumps(solver)
+
+    solver2 = pickle.loads(state_bytes)
+    self.assertEqual(solver.config, solver2.config)
 
 if __name__ == "__main__":
   absltest.main()
