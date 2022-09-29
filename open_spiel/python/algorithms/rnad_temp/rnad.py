@@ -223,11 +223,11 @@ class PolicyPostProcessing:
     return result_next / self.discretization
 
 
-def play_chance(state: pyspiel.State):
+def play_chance(state: pyspiel.State, rng: np.random.RandomState):
   """Plays the chance nodes until we end up at another type of node."""
   while state.is_chance_node():
     chance_outcome, chance_proba = zip(*state.chance_outcomes())
-    action = np.random.choice(chance_outcome, p=chance_proba)
+    action = rng.choice(chance_outcome, p=chance_proba)
     state.apply_action(action)
   return state
 
@@ -645,7 +645,11 @@ class RNaDSolver(policy_lib.Policy):
     self._entropy_schedule = EntropySchedule(
         sizes=self.config.entropy_schedule_size,
         repeats=self.config.entropy_schedule_repeats)
+
+    # Initialize the random facilities for jax and numpy.
     self._rngkey = jax.random.PRNGKey(self.config.seed)
+    self._np_rng = np.random.RandomState(self.config.seed)
+    # TODO(etar): serialize both above to get fully deterministic behaviour.
 
     self._num_actions = self._game.num_distinct_actions()
 
@@ -662,7 +666,7 @@ class RNaDSolver(policy_lib.Policy):
     self.network = hk.without_apply_rng(hk.transform(network))
     self.network_jit = tree.tree_map(jax.jit, self.network)
 
-    s = play_chance(self._game.new_initial_state())
+    s = play_chance(self._game.new_initial_state(), self._np_rng)
     x = self._get_state_representation(s)
     self._state_representation_shape = x.shape
     x = np.expand_dims(x, axis=0)
@@ -842,8 +846,8 @@ class RNaDSolver(policy_lib.Policy):
     (observation, legal, action, policy, player_id, valid,
      rewards) = self.collect_batch_trajectory()
     alpha, update_target_net = self._entropy_schedule(self._t)
-    finetune = (self._t > self.config.finetune_from) if (
-        self.config.finetune_from >= 0) else False
+    finetune = (self.config.finetune_from >= 0) and (self._t >
+                                                     self.config.finetune_from)
     (_, self._params, self._params_target, self._params_prev,
      self._params_prev_, self._opt_state, self._opt_state_target
      ) = self._update(self._params, self._params_target, self._params_prev,
@@ -894,7 +898,7 @@ class RNaDSolver(policy_lib.Policy):
     pi = np.asarray(pi).astype("float64")
     pi = pi / np.sum(pi, axis=-1, keepdims=True)
     a = np.apply_along_axis(
-        lambda x: np.random.choice(range(pi.shape[1]), p=x), axis=-1, arr=pi)
+        lambda x: self._np_rng.choice(range(pi.shape[1]), p=x), axis=-1, arr=pi)
     action_vec = np.zeros(pi.shape, dtype="float64")
     action_vec[range(pi.shape[0]), a] = 1.0
     return pi, action_vec, a
@@ -931,7 +935,7 @@ class RNaDSolver(policy_lib.Policy):
     ]
 
     states = [
-        play_chance(self._game.new_initial_state())
+        play_chance(self._game.new_initial_state(), self._np_rng)
         for _ in range(self.config.batch_size)
     ]
 
@@ -948,7 +952,7 @@ class RNaDSolver(policy_lib.Policy):
         if not state.is_terminal():
           state.apply_action(a[i])
           self._step_counter += 1
-          state = play_chance(state)
+          state = play_chance(state, self._np_rng)
           returns = state.returns()
           for p in range(self._game.num_players()):
             rewards[p][t, i] = returns[p]
