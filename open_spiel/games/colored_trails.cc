@@ -80,6 +80,16 @@ Board::Board(int _size, int _num_colors, int _num_players)
   init();
 }
 
+Board Board::Clone() const {
+  Board clone(size, num_colors, num_players);
+  clone.board = board;
+  clone.num_chips = num_chips;
+  clone.chips = chips;
+  clone.positions = positions;
+  return clone;
+}
+
+
 void Board::init() {
   chips.reserve(num_players);
   for (int p = 0; p < num_players; ++p) {
@@ -355,12 +365,11 @@ void ColoredTrailsState::DoApplyAction(Action action) {
       returns_[p] = Score(p, board_).first;
     }
 
-    const int num_distinct_actions = parent_game_->NumDistinctActions();
-    if (action == num_distinct_actions - 3) {
+    if (action == parent_game_->ResponderTradeWithPlayerAction(0)) {
       board_.ApplyTrade({0, kResponderId}, proposals_[0]);
-    } else if (action == num_distinct_actions - 2) {
+    } else if (action == parent_game_->ResponderTradeWithPlayerAction(1)) {
       board_.ApplyTrade({1, kResponderId}, proposals_[1]);
-    } else if (action == num_distinct_actions - 1) {
+    } else if (action == parent_game_->ResponderPassAction()) {
       // No trade.
     } else {
       SpielFatalError("Invalid action");
