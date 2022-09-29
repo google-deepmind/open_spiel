@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Python implementation of R-NaD."""
+"""Python implementation of R-NaD (https://arxiv.org/pdf/2206.15378.pdf)."""
 
 import functools
 from typing import Any, Dict, Optional, Sequence, Tuple
@@ -882,8 +882,11 @@ class RNaDSolver(policy_lib.Policy):
           f"Invalid state_representation: {self.config.state_representation}. "
           "Must be either 'info_set' or 'observation'.")
 
-  def action_probabilities(self, state: pyspiel.State) -> Dict[int, float]:
+  def action_probabilities(self,
+                           state: pyspiel.State,
+                           player_id: Any = None) -> Dict[int, float]:
     """Returns action probabilities dict for a single batch."""
+    del player_id
     cur_player = state.current_player()
     legal_actions = state.legal_actions(cur_player)
     x = self._get_state_representation(state)

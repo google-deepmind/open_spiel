@@ -8,10 +8,6 @@ architecture (an MLP) and is only able to run on smaller games.
 - `rnad_nashconv_leduc.png` shows the evolution of the NashConv metric (a
 distance to the Nash equilibrium) as the learning progress.
 
-<p align="center">
-  <img src="rnad_nashconv_leduc.png" alt="NashConv of R-NaD on Leduc">
-</p>
-
 To generate these plots we used the following parameters:
 
 | Hyper-parameter | Value |

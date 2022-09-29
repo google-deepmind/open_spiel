@@ -19,7 +19,7 @@ import pickle
 from absl.testing import absltest
 
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.algorithms.rnad_temp import rnad
+from open_spiel.python.algorithms.rnad import rnad
 import pyspiel
 
 # TODO(perolat): test the losses and jax ops
