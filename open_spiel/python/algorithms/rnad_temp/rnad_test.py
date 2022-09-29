@@ -18,7 +18,9 @@ import pickle
 
 from absl.testing import absltest
 
+from open_spiel.python.algorithms import exploitability
 from open_spiel.python.algorithms.rnad_temp import rnad
+import pyspiel
 
 # TODO(perolat): test the losses and jax ops
 
@@ -30,6 +32,10 @@ class RNADTest(absltest.TestCase):
     for _ in range(10):
       solver.step()
 
+    # Compute the nash_conv.
+    game = pyspiel.load_game(solver.config.game_name)
+    exploitability.nash_conv(game, solver)
+
   def test_serialization(self):
     solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="kuhn_poker"))
     solver.step()
@@ -37,6 +43,7 @@ class RNADTest(absltest.TestCase):
 
     solver2 = pickle.loads(state_bytes)
     self.assertEqual(solver.config, solver2.config)
+
 
 if __name__ == "__main__":
   absltest.main()

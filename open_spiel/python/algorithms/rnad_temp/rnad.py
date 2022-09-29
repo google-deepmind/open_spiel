@@ -889,12 +889,11 @@ class RNaDSolver(policy_lib.Policy):
     x = self._get_state_representation(state)
     legal_actions_mask = np.array(
         state.legal_actions_mask(cur_player), dtype=jnp.float32)
-    probs = self._network_jit_apply(self._params_target, x, legal_actions_mask,
-                                    self.config.policy_post_processing)
+    probs = self._network_jit_apply(self._params_target, x, legal_actions_mask)
     return {action: probs[action] for action in legal_actions}
 
   def sample_batch_action(self, x, legal):
-    pi = self._network_jit_apply(self._params, x, legal)
+    pi, _, _, _ = self.network.apply(self._params, x, legal)
     pi = np.asarray(pi).astype("float64")
     pi = pi / np.sum(pi, axis=-1, keepdims=True)
     a = np.apply_along_axis(
@@ -908,11 +907,9 @@ class RNaDSolver(policy_lib.Policy):
       self,
       params,
       x: chex.Array,
-      legal: chex.Array,
-      policy_post_processing: Optional[PolicyPostProcessing] = None):
+      legal: chex.Array):
     pi, _, _, _ = self.network.apply(params, x, legal)
-    if policy_post_processing is not None:
-      pi = policy_post_processing(pi, legal)
+    pi = self.config.policy_post_processing(pi, legal)
     return pi
 
   def collect_batch_trajectory(self):
