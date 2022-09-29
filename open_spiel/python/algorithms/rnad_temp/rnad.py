@@ -27,10 +27,6 @@ import optax
 from open_spiel.python import policy as policy_lib
 import pyspiel
 
-# TODO(perolat): improve the documentation of the code (including shapes
-# of input and output).
-# TODO(perolat): add README and nashconv plots on leduc.
-
 
 def get_entropy_schedule(
     sizes: Sequence[int],
@@ -603,8 +599,8 @@ class RNaDSolver(policy_lib.Policy):
       batch_size: int = 256,
       beta_neurd: float = 2.0,
       c_vtrace: float = 1.0,
-      clip_gradient: float = 10000,
-      clip_neurd: float = 10000,
+      clip_gradient: float = 10e4,
+      clip_neurd: float = 10e4,
       entropy_schedule_repeats: Sequence[int] = (1,),
       entropy_schedule_size: Sequence[int] = (20000,),
       epsilon_adam: float = 10e-8,
@@ -691,7 +687,6 @@ class RNaDSolver(policy_lib.Policy):
       pi, v, log_pi, logit = jax.vmap(
           self.hk_network_apply, (None, 0, 0), 0)(params, observation, legal)
 
-      # TODO(perolat): change for post processed policy
       pi_pprocessed = _threshold_jax(
           pi, legal, self._policy_option.threshold)
       pi_pprocessed = _discretize_jax(
