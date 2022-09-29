@@ -38,6 +38,7 @@ class ProjectedPolicy(policy_lib.Policy):
       game: pyspiel.Game,
       player_ids: List[int],
       state_value: value.ValueFunction,
+      coeff: float = 1.0,
   ):
     """Initializes the projected policy.
 
@@ -46,9 +47,11 @@ class ProjectedPolicy(policy_lib.Policy):
       player_ids: list of player ids for which this policy applies; each should
         be in the range 0..game.num_players()-1.
       state_value: The (cumulative) state value to project.
+      coeff: Coefficient for the values of the states.
     """
     super(ProjectedPolicy, self).__init__(game, player_ids)
     self._state_value = state_value
+    self._coeff = coeff
 
   def value(self, state: pyspiel.State, action: Optional[int] = None) -> float:
     if action is None:
@@ -63,9 +66,8 @@ class ProjectedPolicy(policy_lib.Policy):
                            state: pyspiel.State,
                            player_id: Optional[int] = None) -> Dict[int, float]:
     del player_id
-    action_logit = [
-        (a, self.value(state, action=a)) for a in state.legal_actions()
-    ]
+    action_logit = [(a, self._coeff * self.value(state, action=a))
+                    for a in state.legal_actions()]
     action, logit = zip(*action_logit)
     return dict(zip(action, softmax_projection(logit)))
 
