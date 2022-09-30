@@ -39,6 +39,21 @@ class FixedPointTest(parameterized.TestCase):
 
     self.assertAlmostEqual(nash_conv_fixed_p.nash_conv(), 55.745, places=3)
 
+  @parameterized.named_parameters(('python', 'python_mfg_crowd_modelling'),
+                                  ('cpp', 'mfg_crowd_modelling'))
+  def test_softmax(self, name):
+    """Checks the softmax policy."""
+    game = pyspiel.load_game(name)
+    fixed_p = fixed_point.FixedPoint(game, temperature=10.0)
+
+    for _ in range(10):
+      fixed_p.iteration()
+
+    fixed_p_policy = fixed_p.get_policy()
+    nash_conv_fixed_p = nash_conv.NashConv(game, fixed_p_policy)
+
+    self.assertAlmostEqual(nash_conv_fixed_p.nash_conv(), 2.421, places=3)
+
 
 if __name__ == '__main__':
   absltest.main()
