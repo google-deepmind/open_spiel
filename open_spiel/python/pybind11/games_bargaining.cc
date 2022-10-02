@@ -45,7 +45,6 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
       .def("agree_action", &BargainingState::AgreeAction)
       // set_instance(instance)
       .def("set_instance", &BargainingState::SetInstance)
-      .def("to_string", &BargainingState::ToString)
       // Pickle support
       .def(py::pickle(
           [](const BargainingState& state) {  // __getstate__

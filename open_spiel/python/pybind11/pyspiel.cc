@@ -277,6 +277,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
+      .def("to_string", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
       .def("is_initial_state", &State::IsInitialState)
       .def("move_number", &State::MoveNumber)
