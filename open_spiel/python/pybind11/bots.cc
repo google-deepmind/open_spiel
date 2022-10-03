@@ -296,7 +296,9 @@ void init_pyspiel_bots(py::module& m) {
   // no arguments; returns vector of strings
   m.def("roshambo_bot_names", open_spiel::roshambo::RoshamboBotNames);
   // args: player_int (int), bot name (string), num throws (int), returns bot
-  m.def("make_roshambo_bot", open_spiel::roshambo::MakeRoshamboBot);
+  m.def("make_roshambo_bot", open_spiel::roshambo::MakeRoshamboBot,
+        py::arg("player_id"), py::arg("bot_name"),
+        py::arg("num_throws") = open_spiel::roshambo::kNumThrows);
 #endif
 }
 }  // namespace open_spiel
