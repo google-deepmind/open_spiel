@@ -234,7 +234,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    EXT_DEPS="${EXT_DEPS} rust-all cargo"
+    EXT_DEPS="${EXT_DEPS} rustc cargo"
   fi
 
   APT_GET=`which apt-get`
