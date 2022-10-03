@@ -12,6 +12,7 @@ import numpy as np
 import optax
 import rlax
 from jax import grad, vmap
+from tensorflow_probability.substrates.jax.monte_carlo import expectation
 
 from open_spiel.python import rl_agent
 from open_spiel.python.rl_environment import TimeStep
@@ -75,8 +76,57 @@ def get_critic_update_fn(agent_id: int, critic_network: hk.Transformed, optimize
 
 
 def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_network: hk.Transformed,
-                         optimizer: optax.TransformUpdateFn, pi_lr: float, lola_weight: float) -> UpdateFn:
-    def compute_lola_correction(train_state: TrainState, batch: TransitionBatch):
+                         optimizer: optax.TransformUpdateFn, pi_lr: float, correction_weight: float, correction_method: str = 'dice') -> UpdateFn:
+
+    def dice_correction(train_state: TrainState, batch: TransitionBatch):
+
+        def magic_box(x):
+            return jnp.exp(x - jax.lax.stop_gradient(x))
+
+        params, unravel_policy_params = jax.flatten_util.ravel_pytree(train_state.policy_params[agent_id])
+        opp_params, unravel_opp_policy_params = jax.flatten_util.ravel_pytree(train_state.policy_params[1 - agent_id])
+        a_t, opp_a_t = batch.action[agent_id], batch.action[1 - agent_id]
+        o_t, opp_o_t = batch.info_state[agent_id], batch.info_state[1 - agent_id]
+        r_t, opp_r_t = batch.reward[agent_id], batch.reward[1 - agent_id] # r_1, ..., r_T
+        v_t = critic_network.apply(train_state.critic_params[agent_id], o_t).squeeze() # v_0, ..., v_T
+        opp_v_t = critic_network.apply(train_state.critic_params[1 - agent_id], opp_o_t).squeeze()
+
+        # Compute discounted sum of rewards
+        compute_return = vmap(rlax.discounted_returns)
+        G_t = compute_return(r_t=r_t, discount_t=batch.discount, v_t=jnp.zeros_like(r_t)) - v_t
+        opp_G_t = compute_return(r_t=opp_r_t, discount_t=batch.discount, v_t=jnp.zeros_like(opp_r_t)) - opp_v_t
+
+        # Standardize returns
+        G_t = (G_t - G_t.mean()) / (G_t.std() + 1e-8)
+        opp_G_t = (opp_G_t - opp_G_t.mean()) / (opp_G_t.std() + 1e-8)
+
+        def objective(params, opp_params, G_t):
+            logp = policy_network.apply(unravel_policy_params(params), o_t).log_prob(a_t)
+            opp_logp = policy_network.apply(unravel_opp_policy_params(opp_params), opp_o_t).log_prob(opp_a_t)
+            cumlogp_t = logp.cumsum(-1)
+            oppcumlogp_t = opp_logp.cumsum(-1)
+            joint_cumlogp_t = cumlogp_t + oppcumlogp_t
+            joint_cumlogp_t = magic_box(joint_cumlogp_t)
+            return (G_t * joint_cumlogp_t).sum(-1).mean()
+
+        # Define agent losses
+        L0 = partial(objective, G_t=G_t)
+        L1 = partial(objective, G_t=opp_G_t)
+
+
+        # Compute gradient of agent loss w.r.t opponent parameters
+        L0_grad_opp_params = grad(L0, argnums=1)(params, opp_params)
+
+        # Compute jacobian of the opponent update step
+        opp_update_fn = lambda params, opp_params: pi_lr * grad(L1, argnums=1)(params, opp_params)
+        L1_grad_opp_params_grad_params = jax.jacobian(opp_update_fn, argnums=0)(params, opp_params)
+
+        # compute correction
+        correction = L0_grad_opp_params @ L1_grad_opp_params_grad_params
+        return unravel_policy_params(correction)
+
+
+    def lola_correction(train_state: TrainState, batch: TransitionBatch):
         """
         Computes the correction term according to Foerster et al. (2018).
         Args:
@@ -107,7 +157,7 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             return policy_network.apply(unravel_policy_params(params), o_t).log_prob(a_t)
 
         # Compute gradient of agent loss w.r.t opponent parameters
-        G_grad_opp_params = grad(lambda param: (G_t * log_pi(param, obs2, opp_a_t)).mean())(opp_params)
+        G_grad_opp_params = grad(lambda param: (G_t * log_pi(param, obs2, opp_a_t).cumsum(-1)).mean())(opp_params)
 
         # Compute second order correction term according to (A.1) in https://arxiv.org/abs/1709.04326
         traj_log_prob = lambda params, o_t, a_t: log_pi(params, o_t, a_t).sum(-1)
@@ -156,9 +206,14 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             A tuple (new_train_state, metrics)
         """
         loss, policy_grads = policy_update(train_state, batch)
-        if lola_weight > 0:
-            gradient_correction = compute_lola_correction(train_state, batch)
-            policy_grads = jax.tree_util.tree_map(lambda g, c: g - lola_weight * c, policy_grads, gradient_correction)
+        if correction_weight > 0:
+            if correction_method == 'lola':
+                correction_fn = lola_correction
+            else:
+                correction_fn = dice_correction
+
+            gradient_correction = correction_fn(train_state, batch)
+            policy_grads = jax.tree_util.tree_map(lambda g, c: g - correction_weight * c, policy_grads, gradient_correction)
 
         updates, opt_state = optimizer(policy_grads, train_state.policy_opt_state)
         policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
@@ -182,11 +237,12 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  batch_size: int = 16,
                  critic_learning_rate: typing.Union[float, optax.Schedule] = 0.01,
                  pi_learning_rate: typing.Union[float, optax.Schedule] = 0.001,
-                 lola_weight: float = 1.0,
+                 correction_weight: float = 1.0,
                  clip_grad_norm: float = 0.5,
                  policy_update_interval: int = 8,
                  discount: float = 0.99,
                  seed: jax.random.PRNGKey = 42,
+                 correction_method: str = 'dice',
                  use_jit: bool = False):
 
         self.player_id = player_id
@@ -221,8 +277,9 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             policy_network=policy,
             critic_network=critic,
             pi_lr=pi_learning_rate,
-            lola_weight=lola_weight,
-            optimizer=self._policy_opt.update
+            correction_weight=correction_weight,
+            optimizer=self._policy_opt.update,
+            correction_method=correction_method
         )
         critic_update_fn = get_critic_update_fn(
             agent_id=player_id,

@@ -26,16 +26,16 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 128, "Number of episodes in a batch.")
+flags.DEFINE_integer("batch_size", 64, "Number of episodes in a batch.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.005, "Policy learning rate.")
+flags.DEFINE_float("policy_lr", 0.0005, "Policy learning rate.")
 flags.DEFINE_float("critic_lr", 1.0, "Critic learning rate.")
 flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 2, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
-flags.DEFINE_bool("use_jit", True, "If true, JAX jit compilation will be enabled.")
+flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
 
 
 def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
@@ -108,7 +108,7 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         critic_learning_rate=FLAGS.critic_lr,
         policy_update_interval=FLAGS.policy_update_interval,
         discount=FLAGS.discount,
-        lola_weight=FLAGS.lola_weight,
+        correction_weight=FLAGS.lola_weight,
         clip_grad_norm=FLAGS.correction_max_grad_norm,
         use_jit=FLAGS.use_jit
     )
@@ -116,11 +116,11 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
 
 def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transformed]:
     def policy(obs):
-        logits = hk.nets.MLP(output_sizes=[8, 8, num_actions], with_bias=True)(obs)
+        logits = hk.nets.MLP(output_sizes=[num_actions], with_bias=True)(obs)
         return distrax.Categorical(logits=logits)
 
     def value_fn(obs):
-        values = hk.nets.MLP(output_sizes=[8, 8, 1], with_bias=True)(obs)
+        values = hk.nets.MLP(output_sizes=[1], with_bias=True)(obs)
         return values
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))

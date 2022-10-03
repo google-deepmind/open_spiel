@@ -75,7 +75,7 @@ class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
                 critic_learning_rate=1.0,
                 policy_update_interval=2,
                 discount=0.96,
-                lola_weight=1.0,
+                correction_weight=1.0,
                 use_jit=True
             )
             for i in range(2)
