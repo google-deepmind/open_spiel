@@ -54,6 +54,10 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
       .def_readonly("chips", &Board::chips)
       // list if positions of the players and the flag (the last element)
       .def_readonly("positions", &Board::positions)
+      // arguments: (player: List[int], trade: trade)
+      .def("apply_trade", &Board::ApplyTrade)
+      // no arguments; returns a clone of this board
+      .def("clone", &Board::Clone)
       // in_bounds(row, col); returns true/false
       .def("in_bounds", &Board::InBounds)
       // return a string description of the board, as in the instances file
@@ -77,6 +81,13 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
           }));
 
   py::classh<ColoredTrailsGame, Game>(m, "ColoredTrailsGame")
+    // arguments(trade_action: int); returns Trade
+    .def("lookup_trade", &ColoredTrailsGame::LookupTrade)
+    // arguments (player: int); returns responder action to trade with player
+    .def("responder_trade_with_player_action",
+         &ColoredTrailsGame::ResponderTradeWithPlayerAction)
+    // no arguments; returns the responder's pass action
+    .def("responder_pass_action", &ColoredTrailsGame::ResponderPassAction)
     // Pickle support
     .def(py::pickle(
         [](std::shared_ptr<const ColoredTrailsGame> game) {  // __getstate__
@@ -86,4 +97,7 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
           return std::dynamic_pointer_cast<ColoredTrailsGame>(
               std::const_pointer_cast<Game>(LoadGame(data)));
         }));
+
+  // arguments: (player: int, board: board). Returns the gain of the player.
+  m.def("score", &colored_trails::Score);
 }

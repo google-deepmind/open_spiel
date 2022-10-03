@@ -111,6 +111,7 @@ struct Board {
   Board();
   Board(int _size, int _num_colors, int _num_players);
 
+  Board Clone() const;
   void ParseFromLine(const std::string& line);
   bool InBounds(int row, int col) const;
   void init();
@@ -199,6 +200,16 @@ class ColoredTrailsGame : public Game {
 
   Trade LookupTrade(int trade_id) const {
     return *(trade_info_.possible_trades.at(trade_id));
+  }
+
+  Action ResponderTradeWithPlayerAction(Player player) const {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LE(player, 1);
+    return NumDistinctActions() - 3 + player;
+  }
+
+  Action ResponderPassAction() const {
+    return NumDistinctActions() - 1;
   }
 
   int LookupTradeId(const std::string& trade_str) const {
