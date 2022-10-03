@@ -58,7 +58,7 @@ const GameType kGameType{
     {{"max_num_time_step", GameParameter(10)},
      {"time_step_length", GameParameter(kDefaultTimeStepLength)},
      {"players", GameParameter(-1)},
-     {"network_name", GameParameter(kDefaultNetworkName)},
+     {"network", GameParameter(kDefaultNetworkName)},
      {"perform_sanity_checks", GameParameter(true)}},
     /*default_loadable*/ true,
     /*provides_factored_observation_string*/ true};
@@ -84,7 +84,7 @@ MeanFieldRoutingGame::MeanFieldRoutingGame(const GameParameters& params)
   time_step_length_ =
       ParameterValue<double>("time_step_length", kDefaultTimeStepLength);
   network_name_ =
-      ParameterValue<std::string>("network_name", kDefaultNetworkName);
+      ParameterValue<std::string>("network", kDefaultNetworkName);
   SPIEL_CHECK_NE(network_name_, "");
   perform_sanity_checks_ = ParameterValue<bool>("perform_sanity_checks", true);
   std::unique_ptr<DynamicRoutingData> data =

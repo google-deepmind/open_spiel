@@ -256,7 +256,7 @@ class MeanFieldRoutingGame : public Game {
   // Constructor of the game.
   // Args:
   //   `params`: game parameters. It should define max_num_time_step,
-  //     time_step_length, network_name and perform_sanity_checks.
+  //     time_step_length, network and perform_sanity_checks.
   explicit MeanFieldRoutingGame(const GameParameters& params);
 
   // There is only 1 chance node (the initial node).

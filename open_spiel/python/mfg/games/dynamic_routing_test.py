@@ -244,7 +244,7 @@ class CppVsPythonMeanFieldRoutingGameTest(parameterized.TestCase):
       ("python", ("python_mfg_dynamic_routing(max_num_time_step=100,"
                   "time_step_length=0.05)")),
       ("cpp", ("mfg_dynamic_routing(max_num_time_step=100,"
-               "time_step_length=0.05,network_name=braess)")))
+               "time_step_length=0.05,network=braess)")))
   def test_braess_paradox_game(self, game_name):
     """Test that Braess paradox can be reproduced with the mean field game."""
     mfg_game = pyspiel.load_game(game_name)

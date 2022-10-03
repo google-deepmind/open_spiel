@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Cpp Mean Field Dynamic Routing"
 GameType.max_num_players = 1
 GameType.min_num_players = 1
-GameType.parameter_specification = ["max_num_time_step", "network_name", "perform_sanity_checks", "players", "time_step_length"]
+GameType.parameter_specification = ["max_num_time_step", "network", "perform_sanity_checks", "players", "time_step_length"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 8
 PolicyTensorShape() = [8]
 MaxChanceOutcomes() = 1
-GetParameters() = {max_num_time_step=10,network_name=braess,perform_sanity_checks=True,time_step_length=1.0}
+GetParameters() = {max_num_time_step=10,network=braess,perform_sanity_checks=True,time_step_length=1.0}
 NumPlayers() = 1
 MinUtility() = -11.0
 MaxUtility() = 0.0

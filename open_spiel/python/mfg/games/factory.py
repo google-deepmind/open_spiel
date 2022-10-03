@@ -56,7 +56,6 @@ GAME_SETTINGS = {
         "time_step_length": 0.5,
     },
     "dynamic_routing_sioux_falls": {
-        # TODO(cabannes): change these values based on experiment output.
         "max_num_time_step": 81,
         "network": "sioux_falls",
         "time_step_length": 0.5,
@@ -109,7 +108,7 @@ def create_game_with_setting(game_name: str,
   logging.info("Creating %s game with parameters: %r", game_name, params)
 
   # Dynamic routing game requires setting the network and demand explicitly.
-  if game_name in ["mfg_dynamic_routing", "python_mfg_dynamic_routing"]:
+  if game_name == "python_mfg_dynamic_routing":
     # Create a copy since we modify it below removing the network key.
     params = params.copy()
     network = params.pop("network")

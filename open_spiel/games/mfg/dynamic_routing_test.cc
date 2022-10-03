@@ -28,10 +28,10 @@ namespace testing = open_spiel::testing;
 void TestLoad() {
   testing::LoadGameTest(
       "mfg_dynamic_routing(max_num_time_step=10,time_step_length=20.0"
-      ",network_name=line)");
+      ",network=line)");
   auto game = LoadGame(
       "mfg_dynamic_routing(max_num_time_step=10,time_step_length=20.0"
-      ",network_name=line)");
+      ",network=line)");
   auto state = game->NewInitialState();
   auto cloned = state->Clone();
   SPIEL_CHECK_EQ(state->ToString(), cloned->ToString());
@@ -42,10 +42,10 @@ void TestLoad() {
 void TestLoadWithParams() {
   testing::LoadGameTest(
       "mfg_dynamic_routing(max_num_time_step=10,time_step_length=20.0"
-      ",network_name=line)");
+      ",network=line)");
   auto game = LoadGame(
       "mfg_dynamic_routing(max_num_time_step=10,time_step_length=20.0"
-      ",network_name=line)");
+      ",network=line)");
   auto state = game->NewInitialState();
   SPIEL_CHECK_EQ(game->ObservationTensorShape().size(), 1);
   SPIEL_CHECK_EQ(game->ObservationTensorShape()[0],
@@ -56,7 +56,7 @@ void TestWholeGameWithLineNetwork() {
   std::vector<double> distribution{1};
   auto game = LoadGame(
       "mfg_dynamic_routing(max_num_time_step=5,time_step_length=0.5,"
-      "network_name=line)");
+      "network=line)");
   auto state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
@@ -139,7 +139,7 @@ void TestWholeGameWithBraessNetwork() {
   std::vector<double> distribution{1};
   auto game = LoadGame(
       "mfg_dynamic_routing(max_num_time_step=12,time_step_length=0.5,"
-      "network_name=braess)");
+      "network=braess)");
   auto state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
@@ -301,7 +301,7 @@ void TestPreEndedGameWithLineNetwork() {
   std::vector<double> distribution{1};
   auto game = LoadGame(
       "mfg_dynamic_routing(max_num_time_step=2,time_step_length=0.5,"
-      "network_name=line)");
+      "network=line)");
   auto state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
@@ -337,14 +337,14 @@ void TestPreEndedGameWithLineNetwork() {
 void TestRandomPlayWithLineNetwork() {
   testing::RandomSimTest(
       *LoadGame("mfg_dynamic_routing(max_num_time_step=10,time_step_length=0.5,"
-                "network_name=line,perform_sanity_checks=true)"),
+                "network=line,perform_sanity_checks=true)"),
       3);
 }
 
 void TestRandomPlayWithBraessNetwork() {
   testing::RandomSimTest(
       *LoadGame("mfg_dynamic_routing(max_num_time_step=10,time_step_length=0.5,"
-                "network_name=braess,perform_sanity_checks=true)"),
+                "network=braess,perform_sanity_checks=true)"),
       3);
 }
 
@@ -352,7 +352,7 @@ void TestRandomPlayWithBraessNetwork() {
 void TestCorrectTravelTimeUpdate() {
   auto game = LoadGame(
       "mfg_dynamic_routing(max_num_time_step=100,time_step_length=0.05,"
-      "network_name=braess)");
+      "network=braess)");
   auto state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->ToString(), "Before initial chance node.");
