@@ -1,5 +1,6 @@
 import logging
 import random
+import typing
 import warnings
 from typing import List, Tuple
 
@@ -26,8 +27,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 64, "Number of episodes in a batch.")
-flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
+flags.DEFINE_integer("batch_size", 8, "Number of episodes in a batch.")
+flags.DEFINE_integer("game_iterations", 15, "Number of iterated plays.")
 flags.DEFINE_float("policy_lr", 0.0005, "Policy learning rate.")
 flags.DEFINE_float("critic_lr", 1.0, "Critic learning rate.")
 flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
@@ -58,22 +59,32 @@ def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment,
     print(f'[epoch {epoch}] Agent {agent.player_id}: {episode_stats} | {probs}')
 
 
-def append_action(env: rl_environment.Environment, timestep: rl_environment.TimeStep) -> rl_environment.TimeStep:
-    observations = timestep.observations.copy()
-    info_states = timestep.observations["info_state"]
-    if timestep.first():
-        observations["current_player"] = pyspiel.PlayerId.SIMULTANEOUS
-    observations["actions"] = []
-    for i, info_state in enumerate(info_states):
-        observations["actions"].append(np.argmax(info_state[i * env.num_players:(i + 1) * env.num_players]))
-    observations["legal_actions"] = [np.arange(env.num_actions_per_step) for _ in range(env.num_players)]
-    return timestep._replace(observations=observations)
 
 
-def collect_batch(env: Environment, agents: List[AbstractAgent], n_episodes: int, eval: bool):
+
+def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_episodes: int, eval: bool):
+
+    def postprocess(timestep: rl_environment.TimeStep, actions: typing.List) -> rl_environment.TimeStep:
+        observations = timestep.observations.copy()
+
+        if timestep.first():
+            observations["current_player"] = pyspiel.PlayerId.SIMULTANEOUS
+        observations["actions"] = []
+
+        values = np.zeros(len(agents))
+
+        for agent in agents:
+            v_fn = agent.get_value_fn()
+            values[agent.player_id] = v_fn(observations["info_state"][agent.player_id])
+
+        observations["values"] = jnp.stack(values, axis=0)
+        observations["actions"] = actions
+        return timestep._replace(observations=observations)
+
     episodes = []
     for _ in range(n_episodes):
         time_step = env.reset()
+        time_step = postprocess(time_step, actions=None)
         episode = []
         while not time_step.last():
             agents_output, action_list = [], []
@@ -82,7 +93,7 @@ def collect_batch(env: Environment, agents: List[AbstractAgent], n_episodes: int
                 agents_output.append(output)
                 action_list.append(output.action)
             time_step = env.step(action_list)
-            time_step = append_action(env=env, timestep=time_step)
+            time_step = postprocess(timestep=time_step, actions=action_list)
             episode.append(time_step)
 
         for agent in agents:

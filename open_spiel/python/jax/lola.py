@@ -26,6 +26,7 @@ class TransitionBatch:
     discount: np.ndarray
     terminal: np.ndarray
     legal_actions_mask: np.ndarray
+    values: np.ndarray = None
 
 
 class TrainState(typing.NamedTuple):
@@ -83,26 +84,21 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         def magic_box(x):
             return jnp.exp(x - jax.lax.stop_gradient(x))
 
-        params, unravel_policy_params = jax.flatten_util.ravel_pytree(train_state.policy_params[agent_id])
-        opp_params, unravel_opp_policy_params = jax.flatten_util.ravel_pytree(train_state.policy_params[1 - agent_id])
-        a_t, opp_a_t = batch.action[agent_id], batch.action[1 - agent_id]
-        o_t, opp_o_t = batch.info_state[agent_id], batch.info_state[1 - agent_id]
-        r_t, opp_r_t = batch.reward[agent_id], batch.reward[1 - agent_id] # r_1, ..., r_T
-        v_t = critic_network.apply(train_state.critic_params[agent_id], o_t).squeeze() # v_0, ..., v_T
-        opp_v_t = critic_network.apply(train_state.critic_params[1 - agent_id], opp_o_t).squeeze()
-
+        agent, opp = agent_id, 1-agent_id
+        params, unravel = zip(*[jax.flatten_util.ravel_pytree(params) for params in train_state.policy_params])
+        batch = jax.tree_util.tree_map(jnp.array, batch)
+        a_t, o_t, r_t, v_t = batch.action, batch.info_state, batch.reward, batch.values
+        discounts = jnp.stack([batch.discount] * len(a_t), axis=0) # assume same discounts for all agents
         # Compute discounted sum of rewards
-        compute_return = vmap(rlax.discounted_returns)
-        G_t = compute_return(r_t=r_t, discount_t=batch.discount, v_t=jnp.zeros_like(r_t)) - v_t
-        opp_G_t = compute_return(r_t=opp_r_t, discount_t=batch.discount, v_t=jnp.zeros_like(opp_r_t)) - opp_v_t
+        compute_return = vmap(vmap(rlax.discounted_returns)) # map over agents and batch
+        G_t = compute_return(r_t=r_t, discount_t=discounts, v_t=jnp.zeros_like(r_t)) - v_t
 
         # Standardize returns
-        G_t = (G_t - G_t.mean()) / (G_t.std() + 1e-8)
-        opp_G_t = (opp_G_t - opp_G_t.mean()) / (opp_G_t.std() + 1e-8)
+        G_t = vmap(lambda x: (x - x.mean()) / (x.std() + 1e-8))(G_t)
 
         def objective(params, opp_params, G_t):
-            logp = policy_network.apply(unravel_policy_params(params), o_t).log_prob(a_t)
-            opp_logp = policy_network.apply(unravel_opp_policy_params(opp_params), opp_o_t).log_prob(opp_a_t)
+            logp = policy_network.apply(unravel[agent](params), o_t[agent]).log_prob(a_t[agent])
+            opp_logp = policy_network.apply(unravel[opp](opp_params), o_t[opp]).log_prob(a_t[opp])
             cumlogp_t = logp.cumsum(-1)
             oppcumlogp_t = opp_logp.cumsum(-1)
             joint_cumlogp_t = cumlogp_t + oppcumlogp_t
@@ -110,20 +106,20 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             return (G_t * joint_cumlogp_t).sum(-1).mean()
 
         # Define agent losses
-        L0 = partial(objective, G_t=G_t)
-        L1 = partial(objective, G_t=opp_G_t)
+        L0 = partial(objective, G_t=G_t[agent])
+        L1 = partial(objective, G_t=G_t[opp])
 
 
         # Compute gradient of agent loss w.r.t opponent parameters
-        L0_grad_opp_params = grad(L0, argnums=1)(params, opp_params)
+        L0_grad_opp_params = grad(L0, argnums=1)(params[agent], params[opp])
 
         # Compute jacobian of the opponent update step
         opp_update_fn = lambda params, opp_params: pi_lr * grad(L1, argnums=1)(params, opp_params)
-        L1_grad_opp_params_grad_params = jax.jacobian(opp_update_fn, argnums=0)(params, opp_params)
+        L1_grad_opp_params_grad_params = jax.jacobian(opp_update_fn, argnums=0)(params[agent], params[opp])
 
         # compute correction
         correction = L0_grad_opp_params @ L1_grad_opp_params_grad_params
-        return unravel_policy_params(correction)
+        return unravel[agent](correction)
 
 
     def lola_correction(train_state: TrainState, batch: TransitionBatch):
@@ -281,6 +277,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             optimizer=self._policy_opt.update,
             correction_method=correction_method
         )
+
         critic_update_fn = get_critic_update_fn(
             agent_id=player_id,
             critic_network=critic,
@@ -316,6 +313,12 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         """
         self._train_state.policy_params[player_id] = state.policy_params[player_id]
         self._train_state.critic_params[player_id] = state.critic_params[player_id]
+
+    def get_value_fn(self) -> typing.Callable:
+        def value_fn(obs: jnp.ndarray):
+            obs = jnp.array(obs)
+            return self._critic_network.apply(self.train_state.critic_params[self.player_id], obs).squeeze(-1)
+        return jax.jit(value_fn)
 
     def get_policy(self, return_probs=True) -> typing.Callable:
         """
@@ -511,6 +514,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             reward=rewards,
             discount=self._discount * (1 - time_step.last()),
             terminal=time_step.last(),
-            legal_actions_mask=legal_actions_mask
+            legal_actions_mask=legal_actions_mask,
+            values=self._prev_time_step.observations["values"]
         )
         return transition
