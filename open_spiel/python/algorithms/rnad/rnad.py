@@ -14,7 +14,7 @@
 """Python implementation of R-NaD (https://arxiv.org/pdf/2206.15378.pdf)."""
 
 import functools
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, Sequence, Tuple
 
 import chex
 import haiku as hk
@@ -72,6 +72,7 @@ class EntropySchedule:
 
     Args:
       t: The current learning step.
+
     Returns:
       alpha_t: The mixing weight (from [0, 1]) of the previous policy with
         the one before for computing the intrinsic reward.
@@ -215,40 +216,48 @@ class PolicyPostProcessing:
         xs=None,
         length=n_actions)
 
-    result_next = jnp.where(
-        weight_left_next > 0, result_next.at[order[0]].add(weight_left_next),
-        result_next)
+    result_next = jnp.where(weight_left_next > 0,
+                            result_next.at[order[0]].add(weight_left_next),
+                            result_next)
     if len(mu.shape) == 2:
       result_next = jnp.expand_dims(result_next, axis=0)
     return result_next / self.discretization
 
 
-def play_chance(state: pyspiel.State, rng: np.random.RandomState):
-  """Plays the chance nodes until we end up at another type of node."""
-  while state.is_chance_node():
-    chance_outcome, chance_proba = zip(*state.chance_outcomes())
-    action = rng.choice(chance_outcome, p=chance_proba)
-    state.apply_action(action)
-  return state
-
-
-def legal_policy(logits: chex.Array,
-                 legal_actions: chex.Array,
-                 temperature: float = 1.0) -> chex.Array:
-  """A soft-max policy that respects legal_actions and temperature."""
+def _legal_policy(logits: chex.Array, legal_actions: chex.Array) -> chex.Array:
+  """A soft-max policy that respects legal_actions."""
   # Fiddle a bit to make sure we don't generate NaNs or Inf in the middle.
   l_min = logits.min(axis=-1, keepdims=True)
   logits = jnp.where(legal_actions, logits, l_min)
   logits -= logits.max(axis=-1, keepdims=True)
   logits *= legal_actions
-  exp_logits = jnp.where(legal_actions,
-                         jnp.exp(temperature * logits),
+  exp_logits = jnp.where(legal_actions, jnp.exp(logits),
                          0)  # Illegal actions become 0.
   exp_logits_sum = jnp.sum(exp_logits, axis=-1, keepdims=True)
   return exp_logits / exp_logits_sum
 
 
-def player_others(player_ids, valid, player):
+def legal_log_policy(logits, legal_actions):
+  """Return the log of the policy on legal action, 0 on illegal action."""
+  # logits_masked has illegal actions set to -inf.
+  logits_masked = logits + jnp.log(legal_actions)
+  max_legal_logit = logits_masked.max(axis=-1, keepdims=True)
+  logits_masked = logits_masked - max_legal_logit
+  # exp_logits_masked is 0 for illegal actions.
+  exp_logits_masked = jnp.exp(logits_masked)
+
+  baseline = jnp.log(jnp.sum(exp_logits_masked, axis=-1, keepdims=True))
+  # Subtract baseline from logits. We do not simply return
+  #     logits_masked - baseline
+  # because that has -inf for illegal actions, or
+  #     legal_actions * (logits_masked - baseline)
+  # because that leads to 0 * -inf == nan for illegal actions.
+  log_policy = jnp.multiply(legal_actions,
+                            (logits - max_legal_logit - baseline))
+  return log_policy
+
+
+def _player_others(player_ids, valid, player):
   """A vector of 1 for the current player and -1 for others.
 
   Args:
@@ -266,30 +275,32 @@ def player_others(player_ids, valid, player):
   return jnp.expand_dims(res, axis=-1)
 
 
-def _select_action(actions, pi, valid):
-  return jnp.sum(actions * pi, axis=-1, keepdims=False) * valid + (1 - valid)
-
-
-def _policy_ratio(pi, mu, actions, valid):
+def _policy_ratio(pi, mu, actions_oh, valid):
   """Returns a ratio of policy pi/mu when selecting action a.
 
   By convention, this ratio is 1 on non valid states
   Args:
     pi: the policy of shape [..., A].
     mu: the sampling policy of shape [..., A].
-    actions: an array of the current actions of shape [..., A].
+    actions_oh: a one-hot encoding of the current actions of shape [..., A].
     valid: 0 if the state is not valid and else 1 of shape [...].
 
   Returns:
-    policy_ratio: pi/mu and 1 on non valid states (the shape is [..., 1]).
+    pi/mu on valid states and 1 otherwise. The shape is the same
+    as pi, mu or actions_oh but without the last dimension A.
   """
-  pi_actions = _select_action(actions, pi, valid)
-  mu_actions = _select_action(actions, mu, valid)
-  return pi_actions / mu_actions
+
+  def _select_action_prob(pi):
+    return (jnp.sum(actions_oh * pi, axis=-1, keepdims=False) * valid +
+            (1 - valid))
+
+  pi_actions_prob = _select_action_prob(pi)
+  mu_actions_prob = _select_action_prob(mu)
+  return pi_actions_prob / mu_actions_prob
 
 
 def _where(pred, true_data, false_data):
-  """Similar to jax.where that treats `pred` as a broadcastable prefix."""
+  """Similar to jax.where but treats `pred` as a broadcastable prefix."""
 
   def _where_one(t, f):
     chex.assert_equal_rank((t, f))
@@ -300,12 +311,9 @@ def _where(pred, true_data, false_data):
   return tree.tree_map(_where_one, true_data, false_data)
 
 
-def has_played_with_state(state: chex.Array, valid: chex.Array,
-                          player_id: chex.Array,
-                          player: int) -> Tuple[chex.Array, chex.Array]:
+def _has_played(valid: chex.Array, player_id: chex.Array,
+                player: int) -> chex.Array:
   """Compute a mask of states which have a next state in the sequence."""
-  if state is None:
-    state = jnp.zeros_like(player_id[-1])
 
   def _loop_has_played(carry, x):
     valid, player_id = x
@@ -326,11 +334,12 @@ def has_played_with_state(state: chex.Array, valid: chex.Array,
                   (reset_carry, reset_res))
     # pyformat: enable
 
-  return lax.scan(
+  _, result = lax.scan(
       f=_loop_has_played,
-      init=state,
+      init=jnp.zeros_like(player_id[-1]),
       xs=(valid, player_id),
       reverse=True)
+  return result
 
 
 # V-Trace
@@ -352,23 +361,15 @@ class LoopVTraceCarry:
   importance_sampling: chex.Array
 
 
-@chex.dataclass(frozen=True)
-class VTraceState:
-  """An internal carry-over between chunks related to v-trace computations."""
-  has_played: Any = None
-  v_trace: Optional[LoopVTraceCarry] = None
-
-
 def v_trace(
-    state: Optional[VTraceState],
     v,
     valid,
     player_id,
     acting_policy,
     merged_policy,
     merged_log_policy,
-    player_others_,
-    actions,
+    player_others,
+    actions_oh,
     reward,
     player,
     # Scalars below.
@@ -378,28 +379,23 @@ def v_trace(
     rho,
     gamma=1.0,
     estimate_all=False,
-) -> Tuple[VTraceState, Tuple[Any, Any, Any]]:
+) -> Tuple[Any, Any, Any]:
   """Custom VTrace for trajectories with a mix of different player steps."""
-  if not state:
-    state = VTraceState()
-
-  # pylint: disable=g-long-lambda
   if estimate_all:
     player_id_step = player * jnp.ones_like(player_id)
   else:
     player_id_step = player_id
 
-  new_state_has_played, has_played_ = has_played_with_state(
-      state.has_played, valid, player_id_step, player)
+  has_played = _has_played(valid, player_id_step, player)
 
-  policy_ratio = _policy_ratio(merged_policy, acting_policy, actions, valid)
+  policy_ratio = _policy_ratio(merged_policy, acting_policy, actions_oh, valid)
   inv_mu = _policy_ratio(
-      jnp.ones_like(merged_policy), acting_policy, actions, valid)
+      jnp.ones_like(merged_policy), acting_policy, actions_oh, valid)
 
   eta_reg_entropy = (-eta *
                      jnp.sum(merged_policy * merged_log_policy, axis=-1) *
-                     jnp.squeeze(player_others_, axis=-1))
-  eta_log_policy = -eta * merged_log_policy * player_others_
+                     jnp.squeeze(player_others, axis=-1))
+  eta_log_policy = -eta * merged_log_policy * player_others
 
   init_state_v_trace = LoopVTraceCarry(
       reward=jnp.zeros_like(reward[-1]),
@@ -409,7 +405,7 @@ def v_trace(
       importance_sampling=jnp.ones_like(policy_ratio[-1]))
 
   def _loop_v_trace(carry: LoopVTraceCarry, x) -> Tuple[LoopVTraceCarry, Any]:
-    (cs, player_id, v, reward, eta_reg_entropy, valid, inv_mu, actions,
+    (cs, player_id, v, reward, eta_reg_entropy, valid, inv_mu, actions_oh,
      eta_log_policy) = x
 
     reward_uncorrected = (
@@ -432,7 +428,7 @@ def v_trace(
     our_learning_output = (
         v +  # value
         eta_log_policy +  # regularisation
-        actions * jnp.expand_dims(inv_mu, axis=-1) *
+        actions_oh * jnp.expand_dims(inv_mu, axis=-1) *
         (jnp.expand_dims(discounted_reward, axis=-1) + gamma * jnp.expand_dims(
             carry.importance_sampling, axis=-1) * carry.next_v_target - v))
 
@@ -463,64 +459,35 @@ def v_trace(
                   (reset_carry, (reset_v_target, reset_learning_output)))
     # pyformat: enable
 
-  state_v_trace = state.v_trace or init_state_v_trace
-  new_state_v_trace, (v_target_, learning_output) = lax.scan(
+  _, (v_target, learning_output) = lax.scan(
       f=_loop_v_trace,
-      init=state_v_trace,
+      init=init_state_v_trace,
       xs=(policy_ratio, player_id_step, v, reward, eta_reg_entropy, valid,
-          inv_mu, actions, eta_log_policy),
+          inv_mu, actions_oh, eta_log_policy),
       reverse=True)
 
-  new_state = VTraceState(
-      has_played=new_state_has_played,
-      v_trace=new_state_v_trace)
-  return new_state, (v_target_, has_played_, learning_output)
+  return v_target, has_played, learning_output
 
 
-def legal_log_policy(logits, legal_actions):
-  """Return the log of the policy on legal action, 0 on illegal action."""
-  # logits_masked has illegal actions set to -inf.
-  logits_masked = logits + jnp.log(legal_actions)
-  max_legal_logit = logits_masked.max(axis=-1, keepdims=True)
-  logits_masked = logits_masked - max_legal_logit
-  # exp_logits_masked is 0 for illegal actions.
-  exp_logits_masked = jnp.exp(logits_masked)
-
-  baseline = jnp.log(jnp.sum(exp_logits_masked, axis=-1, keepdims=True))
-  # Subtract baseline from logits. We do not simply return
-  #     logits_masked - baseline
-  # because that has -inf for illegal actions, or
-  #     legal_actions * (logits_masked - baseline)
-  # because that leads to 0 * -inf == nan for illegal actions.
-  log_policy = jnp.multiply(
-      legal_actions,
-      (logits - max_legal_logit - baseline))
-  return log_policy
-
-
-def get_loss_v(v_list,
-               v_target_list,
-               mask_list,
-               normalization_list=None):
+def get_loss_v(v_list, v_target_list, mask_list, normalization_list=None):
   """Define the loss function for the critic."""
   if normalization_list is None:
     normalization_list = [jnp.sum(mask) for mask in mask_list]
   loss_v_list = []
-  for (v_n, v_target, mask, normalization) in zip(
-      v_list, v_target_list, mask_list, normalization_list):
+  for (v_n, v_target, mask, normalization) in zip(v_list, v_target_list,
+                                                  mask_list,
+                                                  normalization_list):
     assert v_n.shape[0] == v_target.shape[0]
 
-    loss_v = jnp.expand_dims(mask, axis=-1) * (
-        v_n - lax.stop_gradient(v_target))**2
+    loss_v = jnp.expand_dims(
+        mask, axis=-1) * (v_n - lax.stop_gradient(v_target))**2
     loss_v = jnp.sum(loss_v) / (normalization + (normalization == 0.0))
 
     loss_v_list.append(loss_v)
   return sum(loss_v_list)
 
 
-def apply_force_with_threshold(decision_outputs,
-                               force,
-                               threshold,
+def apply_force_with_threshold(decision_outputs, force, threshold,
                                threshold_center):
   """Apply the force with below a given threshold."""
   can_decrease = decision_outputs - threshold_center > -threshold
@@ -575,12 +542,12 @@ def get_loss_nerd(logit_list,
       threshold_center = threshold_center - jnp.mean(
           threshold_center * legal_actions, axis=-1, keepdims=True)
 
-    nerd_loss = jnp.sum(legal_actions *
-                        apply_force_with_threshold(
-                            logits, adv_pi, threshold, threshold_center),
-                        axis=-1)
-    nerd_loss = -renormalize(nerd_loss,
-                             valid * (player_ids == k), normalization)
+    nerd_loss = jnp.sum(
+        legal_actions *
+        apply_force_with_threshold(logits, adv_pi, threshold, threshold_center),
+        axis=-1)
+    nerd_loss = -renormalize(nerd_loss, valid *
+                             (player_ids == k), normalization)
     loss_pi_list.append(nerd_loss)
   return sum(loss_pi_list)
 
@@ -621,6 +588,49 @@ class RNaDConfig:
   trajectory_max: int = 10
 
 
+@chex.dataclass(frozen=True)
+class EnvStep:
+  """Holds the tensor data representing the current game state."""
+  obs: chex.Array = ()
+  legal: chex.Array = ()
+  player_id: chex.Array = ()
+  valid: chex.Array = ()
+  rewards: chex.Array = ()
+
+
+@chex.dataclass(frozen=True)
+class ActorStep:
+  """Holds the tensor data representing the current game state."""
+  # The action (as one-hot) of the current player. Shape: [..., A]
+  action_oh: chex.Array = ()
+  policy: chex.Array = ()
+  rewards: chex.Array = ()
+
+
+@chex.dataclass(frozen=True)
+class TimeStep:
+  """Holds the tensor data representing the current game state."""
+  env: EnvStep = EnvStep()
+  actor: ActorStep = ActorStep()
+
+
+def create_optimizer(params: chex.ArrayTree,
+                     init_and_update: optax.GradientTransformation) -> Any:
+  """Creates a parameterized function that represents an optimizer."""
+  init_fn, update_fn = init_and_update
+
+  @chex.dataclass
+  class Optimizer:
+    """A jax-friendly representation of an optimizer state with the update."""
+    state: chex.Array
+
+    def __call__(self, params: chex.ArrayTree, grads: chex.ArrayTree):
+      updates, self.state = update_fn(grads, self.state)
+      return optax.apply_updates(params, updates)
+
+  return Optimizer(state=init_fn(params))
+
+
 class RNaDSolver(policy_lib.Policy):
   """Implements a solver for the R-NaD Algorithm.
 
@@ -634,172 +644,162 @@ class RNaDSolver(policy_lib.Policy):
     self.config = config
 
     # Learner and actor step counters.
-    self._t = 0
-    self._step_counter = 0
+    self.learner_steps = 0
+    self.actor_steps = 0
 
     self.init()
 
   def init(self):
     """Initialize the network and losses."""
-    self._game = pyspiel.load_game(self.config.game_name)
-    self._entropy_schedule = EntropySchedule(
-        sizes=self.config.entropy_schedule_size,
-        repeats=self.config.entropy_schedule_repeats)
-
-    # Initialize the random facilities for jax and numpy.
+    # The random facilities for jax and numpy.
     self._rngkey = jax.random.PRNGKey(self.config.seed)
     self._np_rng = np.random.RandomState(self.config.seed)
-    # TODO(etar): serialize both above to get fully deterministic behaviour.
+    # TODO(etar): serialize both above to get the fully deterministic behaviour.
 
-    self._num_actions = self._game.num_distinct_actions()
+    # Create a game and an example of a state.
+    self._game = pyspiel.load_game(self.config.game_name)
+    self._ex_state = self._play_chance(self._game.new_initial_state())
 
-    def network(x, legal):
+    # The network.
+    def network(
+        env_step: EnvStep
+    ) -> Tuple[chex.Array, chex.Array, chex.Array, chex.Array]:
       mlp_torso = hk.nets.MLP(self.config.policy_network_layers)
-      mlp_policy_head = hk.nets.MLP([self._num_actions])
+      torso = mlp_torso(env_step.obs)
+
+      mlp_policy_head = hk.nets.MLP([self._game.num_distinct_actions()])
+      logit = mlp_policy_head(torso)
+
       mlp_policy_value = hk.nets.MLP([1])
-      torso = mlp_torso(x)
-      logit, v = mlp_policy_head(torso), mlp_policy_value(torso)
-      pi = legal_policy(logit, legal)
-      log_pi = legal_log_policy(logit, legal)
+      v = mlp_policy_value(torso)
+
+      pi = _legal_policy(logit, env_step.legal)
+      log_pi = legal_log_policy(logit, env_step.legal)
       return pi, v, log_pi, logit
 
     self.network = hk.without_apply_rng(hk.transform(network))
-    self.network_jit = tree.tree_map(jax.jit, self.network)
 
-    s = play_chance(self._game.new_initial_state(), self._np_rng)
-    x = self._get_state_representation(s)
-    self._state_representation_shape = x.shape
-    x = np.expand_dims(x, axis=0)
-    legal = np.expand_dims(s.legal_actions_mask(), axis=0)
-    key = self._next_rng_key()
-    self._params = self.network.init(key, x, legal)
-    self._params_target = self.network.init(key, x, legal)
-    self._params_prev = self.network.init(key, x, legal)
-    self._params_prev_ = self.network.init(key, x, legal)
+    # The machinery related to updating parameters/learner.
+    self._entropy_schedule = EntropySchedule(
+        sizes=self.config.entropy_schedule_size,
+        repeats=self.config.entropy_schedule_repeats)
+    self._loss_and_grad = jax.value_and_grad(self.loss, has_aux=False)
 
-    def loss(params, params_target, params_prev, params_prev_, observation,
-             legal, action, policy_actor, player_id, valid, rewards, alpha,
-             finetune):
-      pi, v, log_pi, logit = jax.vmap(self.network.apply, (None, 0, 0),
-                                      0)(params, observation, legal)
+    # Create initial parameters.
+    env_step = self._state_as_env_step(self._ex_state)
+    self.params = self.network.init(self._next_rng_key(), env_step)
+    self.params_target = self.network.init(self._next_rng_key(), env_step)
+    self.params_prev = self.network.init(self._next_rng_key(), env_step)
+    self.params_prev_ = self.network.init(self._next_rng_key(), env_step)
 
-      pi_pprocessed = self.config.policy_post_processing(pi, legal)
-      merged_policy_pprocessed = jnp.where(finetune, pi_pprocessed, pi)
+    # Parameter optimizers.
+    self.optimizer = create_optimizer(
+        self.params,
+        optax.chain(
+            optax.scale_by_adam(
+                eps_root=0.0,
+                **self.config.adam,
+            ), optax.scale(-self.config.learning_rate),
+            optax.clip(self.config.clip_gradient)))
+    self.optimizer_target = create_optimizer(
+        self.params_target, optax.sgd(self.config.target_network_avg))
 
-      _, v_target, _, _ = jax.vmap(self.network.apply, (None, 0, 0),
-                                   0)(params_target, observation, legal)
-      _, _, log_pi_prev, _ = jax.vmap(self.network.apply, (None, 0, 0),
-                                      0)(params_prev, observation, legal)
-      _, _, log_pi_prev_, _ = jax.vmap(self.network.apply, (None, 0, 0),
-                                       0)(params_prev_, observation, legal)
-      player_others_list = [
-          player_others(player_id, valid, player)
-          for player in range(self._game.num_players())
-      ]
-      # This line creates the reward transform log(pi(a|x)/pi_reg(a|x)).
-      # For the stability reasons, reward changes smoothly between iterations.
-      # The mixing between old and new reward transform is a convex combination
-      # parametrised by alpha.
-      log_policy_reg = log_pi - (
-          alpha * log_pi_prev + (1 - alpha) * log_pi_prev_)
+  def loss(self, params, params_target, params_prev, params_prev_, ts: TimeStep,
+           alpha, finetune) -> float:
+    rollout = jax.vmap(self.network.apply, (None, 0), 0)
+    pi, v, log_pi, logit = rollout(params, ts.env)
 
-      new_v_trace_states = []
-      v_target_list, has_played_list, v_trace_policy_target_list = [], [], []
-      for i, (player_others_, reward) in enumerate(
-          zip(player_others_list, rewards)):
-        new_state, (v_target_, has_played_, policy_target_) = v_trace(
-            None,
-            v_target,
-            valid,
-            player_id,
-            policy_actor,
-            merged_policy_pprocessed,
-            log_policy_reg,
-            player_others_,
-            action,
-            reward,
-            i,
-            lambda_=1.0,
-            c=self.config.c_vtrace,
-            rho=np.inf,
-            estimate_all=False,
-            eta=self.config.eta_reward_transform,
-            gamma=1.0)
-        new_v_trace_states.append(new_state)
-        v_target_list.append(v_target_)
-        has_played_list.append(has_played_)
-        v_trace_policy_target_list.append(policy_target_)
-      loss_v = get_loss_v(
-          [v] * self._game.num_players(),
-          v_target_list,
-          has_played_list,
-          normalization_list=None)
+    pi_pprocessed = self.config.policy_post_processing(pi, ts.env.legal)
+    merged_policy_pprocessed = jnp.where(finetune, pi_pprocessed, pi)
 
-      is_vector = jnp.expand_dims(jnp.ones_like(valid), axis=-1)
-      importance_sampling_correction = [is_vector] * self._game.num_players()
-      # Uses v-trace to define q-values for Nerd
-      loss_nerd = get_loss_nerd(
-          [logit] * self._game.num_players(), [pi] * self._game.num_players(),
-          v_trace_policy_target_list,
-          valid,
-          player_id,
-          legal,
-          importance_sampling_correction,
-          clip=self.config.nerd.clip,
-          threshold=self.config.nerd.beta,
-          threshold_center=None,
-          normalization_list=None)
-      return loss_v + loss_nerd
+    _, v_target, _, _ = rollout(params_target, ts.env)
+    _, _, log_pi_prev, _ = rollout(params_prev, ts.env)
+    _, _, log_pi_prev_, _ = rollout(params_prev_, ts.env)
+    # This line creates the reward transform log(pi(a|x)/pi_reg(a|x)).
+    # For the stability reasons, reward changes smoothly between iterations.
+    # The mixing between old and new reward transform is a convex combination
+    # parametrised by alpha.
+    log_policy_reg = log_pi - (alpha * log_pi_prev + (1 - alpha) * log_pi_prev_)
 
-    self._loss_and_grad = jax.value_and_grad(loss, has_aux=False)
+    v_target_list, has_played_list, v_trace_policy_target_list = [], [], []
+    for player in range(self._game.num_players()):
+      reward = ts.actor.rewards[:, :, player]  # [T, B, Player]
+      v_target, has_played, policy_target_ = v_trace(
+          v_target,
+          ts.env.valid,
+          ts.env.player_id,
+          ts.actor.policy,
+          merged_policy_pprocessed,
+          log_policy_reg,
+          _player_others(ts.env.player_id, ts.env.valid, player),
+          ts.actor.action_oh,
+          reward,
+          player,
+          lambda_=1.0,
+          c=self.config.c_vtrace,
+          rho=np.inf,
+          estimate_all=False,
+          eta=self.config.eta_reward_transform,
+          gamma=1.0)
+      v_target_list.append(v_target)
+      has_played_list.append(has_played)
+      v_trace_policy_target_list.append(policy_target_)
+    loss_v = get_loss_v([v] * self._game.num_players(), v_target_list,
+                        has_played_list)
 
-    ## Optimizer state
-    opt_init, opt_update = optax.chain(
-        optax.scale_by_adam(
-            eps_root=0.0,
-            **self.config.adam,
-        ), optax.scale(-self.config.learning_rate),
-        optax.clip(self.config.clip_gradient))
-    self._opt_update_fn = self._get_update_func(opt_update)
-    self._opt_state = opt_init(self._params)
+    is_vector = jnp.expand_dims(jnp.ones_like(ts.env.valid), axis=-1)
+    importance_sampling_correction = [is_vector] * self._game.num_players()
+    # Uses v-trace to define q-values for Nerd
+    loss_nerd = get_loss_nerd(
+        [logit] * self._game.num_players(), [pi] * self._game.num_players(),
+        v_trace_policy_target_list,
+        ts.env.valid,
+        ts.env.player_id,
+        ts.env.legal,
+        importance_sampling_correction,
+        clip=self.config.nerd.clip,
+        threshold=self.config.nerd.beta,
+        threshold_center=None,
+        normalization_list=None)
+    return loss_v + loss_nerd
 
-    ## Target network update SGD
-    opt_init_target, opt_update_target = optax.sgd(
-        self.config.target_network_avg)
-    self._opt_update_target_fn = self._get_update_func(opt_update_target)
-    self._opt_state_target = opt_init_target(self._params_target)
+  @functools.partial(jax.jit, static_argnums=(0,))
+  def update(
+      self,
+      params,
+      params_target,
+      params_prev,
+      params_prev_,
+      optimizer,
+      optimizer_target,
+      timestep: TimeStep,
+      alpha,
+      finetune,
+      update_target_net,
+  ) -> Tuple[Tuple[Any, Any, Any, Any, Any, Any], dict[str, float]]:
+    """A jitted pure-functional part of the `step`."""
+    loss_val, grad = self._loss_and_grad(params, params_target, params_prev,
+                                         params_prev_, timestep, alpha,
+                                         finetune)
+    # Update `params`` using the computed gradient.
+    params = optimizer(params, grad)
+    # Update `params_target` towards `params`.
+    params_target = optimizer_target(
+        params_target, tree.tree_map(lambda a, b: a - b, params_target, params))
 
-    def update(params, params_target, params_prev, params_prev_, opt_state,
-               opt_state_target, observation, legal, action, policy_actor,
-               player_id, valid, rewards, alpha, finetune, update_target_net):
-      loss_val, grad = self._loss_and_grad(params, params_target, params_prev,
-                                           params_prev_, observation, legal,
-                                           action, policy_actor, player_id,
-                                           valid, rewards, alpha, finetune)
-      # Update params using the computed gradient.
-      (next_params, next_opt_state) = self._opt_update_fn(
-          params, opt_state, grad)
+    # Rolls forward the prev and prev_ params if update_target_net is 1.
+    # pyformat: disable
+    params_prev, params_prev_ = jax.lax.cond(
+        update_target_net,
+        lambda: (params_target, params_prev),
+        lambda: (params_prev, params_prev_))
+    # pyformat: enable
 
-      # Also update the `params_target` a tiny bit towards `params`.
-      diff = tree.tree_map(lambda a, b: a - b, params_target, next_params)
-      (next_params_target, next_opt_state_target) = self._opt_update_target_fn(
-          params_target, opt_state_target, diff)
-
-      # Rolls forward the prev and prev_ params if update_target_net is 1.
-      # I.e. if update_target_net then
-      # params_prev <= params_target
-      # params_prev_ <= params_prev
-      next_params_prev = tree.tree_map(
-          lambda x, y: jnp.where(update_target_net, x, y),
-          next_params_target, params_prev)
-      next_params_prev_ = tree.tree_map(
-          lambda x, y: jnp.where(update_target_net, x, y),
-          params_prev, params_prev_)
-
-      return (loss_val, next_params, next_params_target, next_params_prev,
-              next_params_prev_, next_opt_state, next_opt_state_target)
-
-    self._update = jax.jit(update)
+    logs = {
+        "loss": loss_val,
+    }
+    return (params, params_target, params_prev, params_prev_, optimizer,
+            optimizer_target), logs
 
   def __getstate__(self) -> Dict[str, Any]:
     """To serialize the agent."""
@@ -808,18 +808,21 @@ class RNaDSolver(policy_lib.Policy):
         config=self.config,
 
         # Learner and actor step counters.
-        t=self._t,
-        step_counter=self._step_counter,
+        learner_steps=self.learner_steps,
+        actor_steps=self.actor_steps,
+
+        # The randomness keys.
+        np_rng=self._np_rng.get_state(),
+        rngkey=self._rngkey,
 
         # Network params.
-        params=self._params,
-        params_target=self._params_target,
-        params_prev=self._params_prev,
-        params_prev_=self._params_prev_,
-
+        params=self.params,
+        params_target=self.params_target,
+        params_prev=self.params_prev,
+        params_prev_=self.params_prev_,
         # Optimizer state.
-        opt_state=self._opt_state,
-        opt_state_target=self._opt_state_target,
+        optimizer=self.optimizer.state,
+        optimizer_target=self.optimizer_target.state,
     )
 
   def __setstate__(self, state: Dict[str, Any]):
@@ -827,139 +830,157 @@ class RNaDSolver(policy_lib.Policy):
     # RNaD config.
     self.config = state["config"]
 
-    # Learner and actor step counters.
-    self._t = state["t"]
-    self._step_counter = state["step_counter"]
-
     self.init()
 
+    # Learner and actor step counters.
+    self.learner_steps = state["learner_steps"]
+    self.actor_steps = state["actor_steps"]
+
+    # The randomness keys.
+    self._np_rng.set_state(state["np_rng"])
+    self._rngkey = state["rngkey"]
+
     # Network params.
-    self._params = state["params"]
-    self._params_target = state["params_target"]
-    self._params_prev = state["params_prev"]
-    self._params_prev_ = state["params_prev_"]
+    self.params = state["params"]
+    self.params_target = state["params_target"]
+    self.params_prev = state["params_prev"]
+    self.params_prev_ = state["params_prev_"]
     # Optimizer state.
-    self._opt_state = state["opt_state"]
-    self._opt_state_target = state["opt_state_target"]
+    self.optimizer.state = state["optimizer"]
+    self.optimizer_target.state = state["optimizer_target"]
 
-  def step(self):
-    (observation, legal, action, policy, player_id, valid,
-     rewards) = self.collect_batch_trajectory()
-    alpha, update_target_net = self._entropy_schedule(self._t)
-    finetune = (self.config.finetune_from >= 0) and (self._t >
+  def step(self) -> dict[str, float]:
+    """One step of algorithm, that plays the game and improves params."""
+    timestep = self.collect_batch_trajectory()
+    alpha, update_target_net = self._entropy_schedule(self.learner_steps)
+    finetune = (self.config.finetune_from >= 0) and (self.learner_steps >
                                                      self.config.finetune_from)
-    (_, self._params, self._params_target, self._params_prev,
-     self._params_prev_, self._opt_state, self._opt_state_target
-     ) = self._update(self._params, self._params_target, self._params_prev,
-                      self._params_prev_, self._opt_state,
-                      self._opt_state_target, observation, legal, action,
-                      policy, player_id, valid, rewards, alpha, finetune,
-                      update_target_net)
-    self._t += 1
-
-  def _get_update_func(self, opt_update):
-
-    def update_param_state(params, opt_state, gradient):
-      """Learning rule (stochastic gradient descent)."""
-      updates, opt_state = opt_update(gradient, opt_state)
-      new_params = optax.apply_updates(params, updates)
-      return new_params, opt_state
-
-    return update_param_state
+    (self.params, self.params_target, self.params_prev, self.params_prev_,
+     self.optimizer, self.optimizer_target), logs = self.update(
+         self.params, self.params_target, self.params_prev, self.params_prev_,
+         self.optimizer, self.optimizer_target, timestep, alpha, finetune,
+         update_target_net)
+    self.learner_steps += 1
+    logs.update(
+        dict(
+            actor_steps=self.actor_steps,
+            learner_steps=self.learner_steps,
+        ))
+    return logs
 
   def _next_rng_key(self):
     """Get the next rng subkey from class rngkey."""
     self._rngkey, subkey = jax.random.split(self._rngkey)
     return subkey
 
-  def _get_state_representation(self, state):
+  def _state_as_env_step(self, state: pyspiel.State) -> EnvStep:
+    valid = not state.is_terminal()
+    if state.is_terminal():
+      state = self._ex_state
+
     if self.config.state_representation == "observation":
-      return np.asarray(state.observation_tensor())
+      obs = state.observation_tensor()
     elif self.config.state_representation == "info_set":
-      return np.asarray(state.information_state_tensor())
+      obs = state.information_state_tensor()
     else:
       raise ValueError(
           f"Invalid state_representation: {self.config.state_representation}. "
           "Must be either 'info_set' or 'observation'.")
 
+    return EnvStep(
+        obs=np.array(obs, dtype=np.float64),
+        legal=np.array(state.legal_actions_mask(), dtype=np.float64),
+        player_id=np.array(state.current_player(), dtype=np.float64),
+        valid=np.array(valid, dtype=np.float64),
+        rewards=np.array(state.returns(), dtype=np.float64))
+
   def action_probabilities(self,
                            state: pyspiel.State,
                            player_id: Any = None) -> Dict[int, float]:
     """Returns action probabilities dict for a single batch."""
-    del player_id
-    cur_player = state.current_player()
-    legal_actions = state.legal_actions(cur_player)
-    x = self._get_state_representation(state)
-    legal_actions_mask = np.array(
-        state.legal_actions_mask(cur_player), dtype=jnp.float32)
-    probs = self._network_jit_apply(self._params_target, x, legal_actions_mask)
-    return {action: probs[action] for action in legal_actions}
-
-  def sample_batch_action(self, x, legal):
-    pi, _, _, _ = self.network.apply(self._params, x, legal)
-    pi = np.asarray(pi).astype("float64")
-    pi = pi / np.sum(pi, axis=-1, keepdims=True)
-    a = np.apply_along_axis(
-        lambda x: self._np_rng.choice(range(pi.shape[1]), p=x), axis=-1, arr=pi)
-    action_vec = np.zeros(pi.shape, dtype="float64")
-    action_vec[range(pi.shape[0]), a] = 1.0
-    return pi, action_vec, a
+    env_step = self._batch_of_states_as_env_step([state])
+    probs = self._network_jit_apply_and_post_process(
+        self.params_target, env_step, self.config.policy_post_processing)
+    probs = probs[0]  # Extract the only entry out of this 1-element batch.
+    return {action: probs[action] for action in env_step.legal[0]}
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def _network_jit_apply(
-      self,
-      params,
-      x: chex.Array,
-      legal: chex.Array):
-    pi, _, _, _ = self.network.apply(params, x, legal)
-    pi = self.config.policy_post_processing(pi, legal)
+  def _network_jit_apply_and_post_process(
+      self, params, env_step: EnvStep,
+      policy_post_processing: PolicyPostProcessing):
+    pi, _, _, _ = self.network.apply(params, env_step)
+    pi = policy_post_processing(pi, env_step.legal)
     return pi
 
-  def collect_batch_trajectory(self):
-    observation = np.zeros(
-        (self.config.trajectory_max, self.config.batch_size) +
-        self._state_representation_shape,
-        dtype="float64")
-    legal = np.ones((self.config.trajectory_max, self.config.batch_size,
-                     self._num_actions),
-                    dtype="float64")
-    action = np.zeros_like(legal)
-    policy = np.ones_like(action) / (1.0 * self._num_actions)
-    player_id = np.zeros((self.config.trajectory_max, self.config.batch_size),
-                         dtype="float64")
-    valid = np.zeros((self.config.trajectory_max, self.config.batch_size),
-                     dtype="float64")
-    rewards = [
-        np.zeros((self.config.trajectory_max, self.config.batch_size),
-                 dtype="float64") for p in range(self._game.num_players())
-    ]
+  @functools.partial(jax.jit, static_argnums=(0,))
+  def actor_step(self, env_step: EnvStep,
+                 rng_key: chex.PRNGKey) -> Tuple[chex.Array, ActorStep]:
+    pi, _, _, _ = self.network.apply(self.params, env_step)
+    # TODO(perolat): is this policy normalization really needed?
+    pi = pi / jnp.sum(pi, axis=-1, keepdims=True)
 
+    # Sample from the policy pi respecting legal actions.
+    cumsum = jnp.cumsum(pi, axis=-1)
+    eps = jnp.finfo(pi.dtype).eps
+    unirnd = jax.random.uniform(
+        key=rng_key, shape=pi.shape[:-1] + (1,), dtype=pi.dtype, minval=eps)
+    action = jnp.argmin(
+        jnp.logical_or(
+            jnp.logical_or(unirnd > cumsum, pi < eps), env_step.legal == 0),
+        axis=-1)
+    # Make sure to cast to int32 as expected by open-spiel.
+    action = action.astype(jnp.int32)
+    action_oh = jax.nn.one_hot(action, pi.shape[-1])
+    actor_step = ActorStep(policy=pi, action_oh=action_oh, rewards=())
+
+    return action, actor_step
+
+  def collect_batch_trajectory(self) -> TimeStep:
     states = [
-        play_chance(self._game.new_initial_state(), self._np_rng)
+        self._play_chance(self._game.new_initial_state())
         for _ in range(self.config.batch_size)
     ]
+    timesteps = []
 
-    for t in range(self.config.trajectory_max):
-      for i, state in enumerate(states):
-        if not state.is_terminal():
-          observation[t, i, :] = self._get_state_representation(state)
-          legal[t, i, :] = state.legal_actions_mask()
-          player_id[t, i] = state.current_player()
-          valid[t, i] = 1.0
-      (policy[t, :, :], action[t, :, :], a
-       ) = self.sample_batch_action(observation[t, :, :], legal[t, :, :])
-      for i, state in enumerate(states):
-        if not state.is_terminal():
-          state.apply_action(a[i])
-          self._step_counter += 1
-          state = play_chance(state, self._np_rng)
-          returns = state.returns()
-          for p in range(self._game.num_players()):
-            rewards[p][t, i] = returns[p]
-    return observation, legal, action, policy, player_id, valid, rewards
+    env_step = self._batch_of_states_as_env_step(states)
+    for _ in range(self.config.trajectory_max):
+      # for _ in range(4):
+      prev_env_step = env_step
+      a, actor_step = self.actor_step(env_step, self._next_rng_key())
 
-  def get_actor_step_counter(self) -> int:
-    return self._step_counter
+      self._batch_of_states_apply_action(states, a)
+      env_step = self._batch_of_states_as_env_step(states)
+      timesteps.append(
+          TimeStep(
+              env=prev_env_step,
+              actor=ActorStep(
+                  action_oh=actor_step.action_oh,
+                  policy=actor_step.policy,
+                  rewards=env_step.rewards),
+          ))
+    # Concatenate all the timesteps together to form a single rollout [T, B, ..]
+    return jax.tree_util.tree_map(lambda *xs: jnp.stack(xs, axis=0), *timesteps)
 
-  def get_learner_step_counter(self) -> int:
-    return self._t
+  def _batch_of_states_as_env_step(self,
+                                   states: Sequence[pyspiel.State]) -> EnvStep:
+    envs = [self._state_as_env_step(state) for state in states]
+    return jax.tree_util.tree_map(lambda *e: jnp.stack(e, axis=0), *envs)
+
+  def _batch_of_states_apply_action(
+      self, states: Sequence[pyspiel.State],
+      actions: chex.Array) -> Sequence[pyspiel.State]:
+    next_states = []
+    for i, state in enumerate(states):
+      if not state.is_terminal():
+        self.actor_steps += 1
+        state.apply_action(actions[i])
+        next_states.append(self._play_chance(state))
+    return next_states
+
+  def _play_chance(self, state: pyspiel.State):
+    """Plays the chance nodes until we end up at another type of node."""
+    while state.is_chance_node():
+      chance_outcome, chance_proba = zip(*state.chance_outcomes())
+      action = self._np_rng.choice(chance_outcome, p=chance_proba)
+      state.apply_action(action)
+    return state
