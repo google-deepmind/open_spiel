@@ -14,7 +14,7 @@
 """Python implementation of R-NaD (https://arxiv.org/pdf/2206.15378.pdf)."""
 
 import functools
-from typing import Any, Dict, Sequence, Tuple
+from typing import Any, Sequence, Tuple
 
 import chex
 import haiku as hk
@@ -24,9 +24,17 @@ from jax import numpy as jnp
 from jax import tree_util as tree
 import numpy as np
 import optax
+import typing_extensions
 
 from open_spiel.python import policy as policy_lib
 import pyspiel
+
+
+# Some handy aliases.
+# Since most of these are just aliases for a "bag of tensors", the goal
+# is to improve the documentation, and not to actually enforce correctness
+# through pytype.
+Params = chex.ArrayTree
 
 
 class EntropySchedule:
@@ -67,14 +75,14 @@ class EntropySchedule:
 
     self.schedule = np.array(schedule, dtype=np.int32)
 
-  def __call__(self, t: int) -> Tuple[float, bool]:
-    """Entropy scheduling parameters for a given step `t`.
+  def __call__(self, learner_step: int) -> Tuple[float, bool]:
+    """Entropy scheduling parameters for a given `learner_step`.
 
     Args:
-      t: The current learning step.
+      learner_step: The current learning step.
 
     Returns:
-      alpha_t: The mixing weight (from [0, 1]) of the previous policy with
+      alpha: The mixing weight (from [0, 1]) of the previous policy with
         the one before for computing the intrinsic reward.
       update_target_net: A boolean indicator for updating the target network
         with the current network.
@@ -82,40 +90,44 @@ class EntropySchedule:
 
     # The complexity below is because at some point we might go past
     # the explicit schedule, and then we'd need to just use the last step
-    # in the schedule and apply ((t - last_step) % last_iteration) == 0) logic.
+    # in the schedule and apply the logic of
+    # ((learner_step - last_step) % last_iteration) == 0)
 
     # The schedule might look like this:
-    # X----X-----X--X--X--X--------X
-    # `t` might  |  be here  ^         |
-    # or there   ^                     |
-    # or even past the schedule        ^
+    # X----X-------X--X--X--X--------X
+    # learner_step | might be here ^    |
+    # or there     ^                    |
+    # or even past the schedule         ^
 
     # We need to deal with two cases below.
     # Instead of going for the complicated conditional, let's just
     # compute both and then do the A * s + B * (1 - s) with s being a bool
     # selector between A and B.
 
-    # 1. assume t is past the schedule, ie schedule[-1] <= t.
+    # 1. assume learner_step is past the schedule,
+    #    ie schedule[-1] <= learner_step.
     last_size = self.schedule[-1] - self.schedule[-2]
     last_start = self.schedule[-1] + (
-        t - self.schedule[-1]) // last_size * last_size
-    # 2. assume t is within the schedule.
-    start = jnp.amax(self.schedule * (self.schedule <= t))
+        learner_step - self.schedule[-1]) // last_size * last_size
+    # 2. assume learner_step is within the schedule.
+    start = jnp.amax(self.schedule * (self.schedule <= learner_step))
     finish = jnp.amin(
-        self.schedule * (t < self.schedule),
+        self.schedule * (learner_step < self.schedule),
         initial=self.schedule[-1],
-        where=(t < self.schedule))
+        where=(learner_step < self.schedule))
     size = finish - start
 
     # Now select between the two.
-    beyond = (self.schedule[-1] <= t)  # Are we past the schedule?
+    beyond = (self.schedule[-1] <= learner_step)  # Are we past the schedule?
     iteration_start = (last_start * beyond + start * (1 - beyond))
     iteration_size = (last_size * beyond + size * (1 - beyond))
 
-    update_target_net = jnp.logical_and(t > 0, jnp.sum(t == iteration_start))
-    alpha_t = jnp.minimum((2.0 * (t - iteration_start)) / iteration_size, 1.0)
+    update_target_net = jnp.logical_and(
+        learner_step > 0, jnp.sum(learner_step == iteration_start))
+    alpha = jnp.minimum(
+        (2.0 * (learner_step - iteration_start)) / iteration_size, 1.0)
 
-    return alpha_t, update_target_net
+    return alpha, update_target_net
 
 
 @chex.dataclass(frozen=True)
@@ -254,7 +266,8 @@ def _legal_policy(logits: chex.Array, legal_actions: chex.Array) -> chex.Array:
   return exp_logits / exp_logits_sum
 
 
-def legal_log_policy(logits, legal_actions):
+def legal_log_policy(logits: chex.Array,
+                     legal_actions: chex.Array) -> chex.Array:
   """Return the log of the policy on legal action, 0 on illegal action."""
   # logits_masked has illegal actions set to -inf.
   logits_masked = logits + jnp.log(legal_actions)
@@ -274,7 +287,8 @@ def legal_log_policy(logits, legal_actions):
   return log_policy
 
 
-def _player_others(player_ids, valid, player):
+def _player_others(player_ids: chex.Array, valid: chex.Array,
+                   player: int) -> chex.Array:
   """A vector of 1 for the current player and -1 for others.
 
   Args:
@@ -292,7 +306,8 @@ def _player_others(player_ids, valid, player):
   return jnp.expand_dims(res, axis=-1)
 
 
-def _policy_ratio(pi, mu, actions_oh, valid):
+def _policy_ratio(pi: chex.Array, mu: chex.Array, actions_oh: chex.Array,
+                  valid: chex.Array) -> chex.Array:
   """Returns a ratio of policy pi/mu when selecting action a.
 
   By convention, this ratio is 1 on non valid states
@@ -316,7 +331,8 @@ def _policy_ratio(pi, mu, actions_oh, valid):
   return pi_actions_prob / mu_actions_prob
 
 
-def _where(pred, true_data, false_data):
+def _where(pred: chex.Array, true_data: chex.ArrayTree,
+           false_data: chex.ArrayTree) -> chex.ArrayTree:
   """Similar to jax.where but treats `pred` as a broadcastable prefix."""
 
   def _where_one(t, f):
@@ -366,18 +382,6 @@ def _has_played(valid: chex.Array, player_id: chex.Array,
 # out of the box because a trajectory could look like '121211221122'.
 
 
-@chex.dataclass(frozen=True)
-class LoopVTraceCarry:
-  """An internal carry-over between chunks related to v-trace computations."""
-  reward: chex.Array
-  # The cumulated reward until the end of the episode. Uncorrected (v-trace).
-  # Gamma discounted and includes eta_reg_entropy.
-  reward_uncorrected: chex.Array
-  next_value: chex.Array
-  next_v_target: chex.Array
-  importance_sampling: chex.Array
-
-
 def v_trace(
     v,
     valid,
@@ -413,6 +417,17 @@ def v_trace(
                      jnp.sum(merged_policy * merged_log_policy, axis=-1) *
                      jnp.squeeze(player_others, axis=-1))
   eta_log_policy = -eta * merged_log_policy * player_others
+
+  @chex.dataclass(frozen=True)
+  class LoopVTraceCarry:
+    """The carry of the v-trace scan loop."""
+    reward: chex.Array
+    # The cumulated reward until the end of the episode. Uncorrected (v-trace).
+    # Gamma discounted and includes eta_reg_entropy.
+    reward_uncorrected: chex.Array
+    next_value: chex.Array
+    next_v_target: chex.Array
+    importance_sampling: chex.Array
 
   init_state_v_trace = LoopVTraceCarry(
       reward=jnp.zeros_like(reward[-1]),
@@ -486,26 +501,26 @@ def v_trace(
   return v_target, has_played, learning_output
 
 
-def get_loss_v(v_list, v_target_list, mask_list, normalization_list=None):
+def get_loss_v(v_list: Sequence[chex.Array],
+               v_target_list: Sequence[chex.Array],
+               mask_list: Sequence[chex.Array]) -> chex.Array:
   """Define the loss function for the critic."""
-  if normalization_list is None:
-    normalization_list = [jnp.sum(mask) for mask in mask_list]
   loss_v_list = []
-  for (v_n, v_target, mask, normalization) in zip(v_list, v_target_list,
-                                                  mask_list,
-                                                  normalization_list):
+  for (v_n, v_target, mask) in zip(v_list, v_target_list, mask_list):
     assert v_n.shape[0] == v_target.shape[0]
 
     loss_v = jnp.expand_dims(
         mask, axis=-1) * (v_n - lax.stop_gradient(v_target))**2
+    normalization = jnp.sum(mask)
     loss_v = jnp.sum(loss_v) / (normalization + (normalization == 0.0))
 
     loss_v_list.append(loss_v)
   return sum(loss_v_list)
 
 
-def apply_force_with_threshold(decision_outputs, force, threshold,
-                               threshold_center):
+def apply_force_with_threshold(decision_outputs: chex.Array, force: chex.Array,
+                               threshold: float,
+                               threshold_center: chex.Array) -> chex.Array:
   """Apply the force with below a given threshold."""
   can_decrease = decision_outputs - threshold_center > -threshold
   can_increase = decision_outputs - threshold_center < threshold
@@ -515,34 +530,27 @@ def apply_force_with_threshold(decision_outputs, force, threshold,
   return decision_outputs * lax.stop_gradient(clipped_force)
 
 
-def renormalize(loss, mask, normalization=None):
+def renormalize(loss: chex.Array, mask: chex.Array) -> chex.Array:
   """The `normalization` is the number of steps over which loss is computed."""
-  loss_ = jnp.sum(loss * mask)
-  if normalization is None:
-    normalization = jnp.sum(mask)
-  loss_ = loss_ / (normalization + (normalization == 0.0))
-  return loss_
+  loss = jnp.sum(loss * mask)
+  normalization = jnp.sum(mask)
+  return loss / (normalization + (normalization == 0.0))
 
 
-def get_loss_nerd(logit_list,
-                  policy_list,
-                  q_vr_list,
-                  valid,
-                  player_ids,
-                  legal_actions,
-                  importance_sampling_correction,
-                  clip=100,
-                  threshold=2,
-                  threshold_center=None,
-                  normalization_list=None):
+def get_loss_nerd(logit_list: Sequence[chex.Array],
+                  policy_list: Sequence[chex.Array],
+                  q_vr_list: Sequence[chex.Array],
+                  valid: chex.Array,
+                  player_ids: Sequence[chex.Array],
+                  legal_actions: chex.Array,
+                  importance_sampling_correction: Sequence[chex.Array],
+                  clip: float = 100,
+                  threshold: float = 2) -> chex.Array:
   """Define the nerd loss."""
   assert isinstance(importance_sampling_correction, list)
-  if normalization_list is None:
-    normalization_list = [None] * len(logit_list)
   loss_pi_list = []
-  for k, (logit_pi, pi, q_vr, is_c, normalization) in enumerate(
-      zip(logit_list, policy_list, q_vr_list, importance_sampling_correction,
-          normalization_list)):
+  for k, (logit_pi, pi, q_vr, is_c) in enumerate(
+      zip(logit_list, policy_list, q_vr_list, importance_sampling_correction)):
     assert logit_pi.shape[0] == q_vr.shape[0]
     # loss policy
     adv_pi = q_vr - jnp.sum(pi * q_vr, axis=-1, keepdims=True)
@@ -553,18 +561,13 @@ def get_loss_nerd(logit_list,
     logits = logit_pi - jnp.mean(
         logit_pi * legal_actions, axis=-1, keepdims=True)
 
-    if threshold_center is None:
-      threshold_center = jnp.zeros_like(logits)
-    else:
-      threshold_center = threshold_center - jnp.mean(
-          threshold_center * legal_actions, axis=-1, keepdims=True)
+    threshold_center = jnp.zeros_like(logits)
 
     nerd_loss = jnp.sum(
         legal_actions *
         apply_force_with_threshold(logits, adv_pi, threshold, threshold_center),
         axis=-1)
-    nerd_loss = -renormalize(nerd_loss, valid *
-                             (player_ids == k), normalization)
+    nerd_loss = -renormalize(nerd_loss, valid * (player_ids == k))
     loss_pi_list.append(nerd_loss)
   return sum(loss_pi_list)
 
@@ -579,6 +582,7 @@ class AdamConfig:
 
 @chex.dataclass(frozen=True)
 class NerdConfig:
+  """Nerd related params."""
   beta: float = 2.0
   clip: float = 10_000
 
@@ -654,26 +658,34 @@ class ActorStep:
 
 @chex.dataclass(frozen=True)
 class TimeStep:
-  """Holds the tensor data representing the current game state."""
+  """The tensor data for one game transition (env_step, actor_step)."""
   env: EnvStep = EnvStep()
   actor: ActorStep = ActorStep()
 
 
-def create_optimizer(params: chex.ArrayTree,
-                     init_and_update: optax.GradientTransformation) -> Any:
+class Optimizer(typing_extensions.Protocol):
+  """An optimizer."""
+
+  def __call__(self, params: Params, grads: Params) -> Params:
+    ...
+
+
+def optax_optimizer(
+    params: chex.ArrayTree,
+    init_and_update: optax.GradientTransformation) -> Optimizer:
   """Creates a parameterized function that represents an optimizer."""
   init_fn, update_fn = init_and_update
 
   @chex.dataclass
-  class Optimizer:
+  class OptaxOptimizer:
     """A jax-friendly representation of an optimizer state with the update."""
     state: chex.Array
 
-    def __call__(self, params: chex.ArrayTree, grads: chex.ArrayTree):
+    def __call__(self, params: Params, grads: Params) -> Params:
       updates, self.state = update_fn(grads, self.state)
       return optax.apply_updates(params, updates)
 
-  return Optimizer(state=init_fn(params))
+  return OptaxOptimizer(state=init_fn(params))
 
 
 class RNaDSolver(policy_lib.Policy):
@@ -738,7 +750,7 @@ class RNaDSolver(policy_lib.Policy):
     self.params_prev_ = self.network.init(self._next_rng_key(), env_step)
 
     # Parameter optimizers.
-    self.optimizer = create_optimizer(
+    self.optimizer = optax_optimizer(
         self.params,
         optax.chain(
             optax.scale_by_adam(
@@ -746,11 +758,12 @@ class RNaDSolver(policy_lib.Policy):
                 **self.config.adam,
             ), optax.scale(-self.config.learning_rate),
             optax.clip(self.config.clip_gradient)))
-    self.optimizer_target = create_optimizer(
+    self.optimizer_target = optax_optimizer(
         self.params_target, optax.sgd(self.config.target_network_avg))
 
-  def loss(self, params, params_target, params_prev, params_prev_, ts: TimeStep,
-           alpha, learner_steps) -> float:
+  def loss(self, params: Params, params_target: Params, params_prev: Params,
+           params_prev_: Params, ts: TimeStep, alpha: float,
+           learner_steps: int) -> float:
     rollout = jax.vmap(self.network.apply, (None, 0), 0)
     pi, v, log_pi, logit = rollout(params, ts.env)
 
@@ -802,24 +815,22 @@ class RNaDSolver(policy_lib.Policy):
         ts.env.legal,
         importance_sampling_correction,
         clip=self.config.nerd.clip,
-        threshold=self.config.nerd.beta,
-        threshold_center=None,
-        normalization_list=None)
+        threshold=self.config.nerd.beta)
     return loss_v + loss_nerd
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def update(
       self,
-      params,
-      params_target,
-      params_prev,
-      params_prev_,
-      optimizer,
-      optimizer_target,
+      params: Params,
+      params_target: Params,
+      params_prev: Params,
+      params_prev_: Params,
+      optimizer: Optimizer,
+      optimizer_target: Optimizer,
       timestep: TimeStep,
-      alpha,
-      learner_steps,
-      update_target_net,
+      alpha: float,
+      learner_steps: int,
+      update_target_net: bool,
   ) -> Tuple[Tuple[Any, Any, Any, Any, Any, Any], dict[str, float]]:
     """A jitted pure-functional part of the `step`."""
     loss_val, grad = self._loss_and_grad(params, params_target, params_prev,
@@ -845,7 +856,7 @@ class RNaDSolver(policy_lib.Policy):
     return (params, params_target, params_prev, params_prev_, optimizer,
             optimizer_target), logs
 
-  def __getstate__(self) -> Dict[str, Any]:
+  def __getstate__(self) -> dict[str, Any]:
     """To serialize the agent."""
     return dict(
         # RNaD config.
@@ -869,7 +880,7 @@ class RNaDSolver(policy_lib.Policy):
         optimizer_target=self.optimizer_target.state,
     )
 
-  def __setstate__(self, state: Dict[str, Any]):
+  def __setstate__(self, state: dict[str, Any]):
     """To deserialize the agent."""
     # RNaD config.
     self.config = state["config"]
@@ -910,7 +921,7 @@ class RNaDSolver(policy_lib.Policy):
         ))
     return logs
 
-  def _next_rng_key(self):
+  def _next_rng_key(self) -> chex.PRNGKey:
     """Get the next rng subkey from class rngkey."""
     self._rngkey, subkey = jax.random.split(self._rngkey)
     return subkey
@@ -938,7 +949,7 @@ class RNaDSolver(policy_lib.Policy):
 
   def action_probabilities(self,
                            state: pyspiel.State,
-                           player_id: Any = None) -> Dict[int, float]:
+                           player_id: Any = None) -> dict[int, float]:
     """Returns action probabilities dict for a single batch."""
     env_step = self._batch_of_states_as_env_step([state])
     probs = self._network_jit_apply_and_post_process(
@@ -947,7 +958,8 @@ class RNaDSolver(policy_lib.Policy):
     return {action: probs[action] for action in env_step.legal[0]}
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def _network_jit_apply_and_post_process(self, params, env_step: EnvStep):
+  def _network_jit_apply_and_post_process(
+      self, params: Params, env_step: EnvStep) -> chex.Array:
     pi, _, _, _ = self.network.apply(params, env_step)
     pi = self.config.finetune.post_process_policy(pi, env_step.legal)
     return pi
@@ -1017,7 +1029,7 @@ class RNaDSolver(policy_lib.Policy):
         next_states.append(self._play_chance(state))
     return next_states
 
-  def _play_chance(self, state: pyspiel.State):
+  def _play_chance(self, state: pyspiel.State) -> pyspiel.State:
     """Plays the chance nodes until we end up at another type of node."""
     while state.is_chance_node():
       chance_outcome, chance_proba = zip(*state.chance_outcomes())
