@@ -119,8 +119,8 @@ class EntropySchedule:
 
 
 @chex.dataclass(frozen=True)
-class PolicyPostProcessing:
-  """Policy post-processing options.
+class FineTuning:
+  """Fine tuning options, aka policy post-processing.
 
   Even when fully trained, the resulting softmax-based policy may put
   a small probability mass on bad actions. This results in an agent
@@ -134,36 +134,53 @@ class PolicyPostProcessing:
 
   The post-processing is used on the learner, and thus must be jit-friendly.
   """
+  # The learner step after which the policy post processing (aka finetuning)
+  # will be enabled when learning. A strictly negative value is equivalent
+  # to infinity, ie disables finetuning completely.
+  from_learner_steps: int = -1
   # All policy probabilities below `threshold` are zeroed out. Thresholding
   # is disabled if this value is non-positive.
-  threshold: float = 0.03
+  policy_threshold: float = 0.03
   # Rounds the policy probabilities to the "closest"
   # multiple of 1/`self.discretization`.
   # Discretization is disabled for non-positive values.
-  discretization: int = 32
+  policy_discretization: int = 32
 
-  def __call__(self, policy: chex.Array, mask: chex.Array) -> chex.Array:
-    """A jax friendly post-processing of a policy."""
+  def __call__(self, policy: chex.Array, mask: chex.Array,
+               learner_steps: int) -> chex.Array:
+    """A configurable fine tuning of a policy."""
+    do_finetune = jnp.logical_and(self.from_learner_steps >= 0,
+                                  learner_steps > self.from_learner_steps)
+
+    return jnp.where(do_finetune, self.post_process_policy(policy, mask),
+                     policy)
+
+  def post_process_policy(
+      self,
+      policy: chex.Array,
+      mask: chex.Array,
+  ) -> chex.Array:
+    """Unconditionally post process a given masked policy."""
     policy = self._threshold(policy, mask)
     policy = self._discretize(policy)
     return policy
 
   def _threshold(self, policy: chex.Array, mask: chex.Array) -> chex.Array:
     """Remove from the support the actions 'a' where policy(a) < threshold."""
-    if self.threshold <= 0:
+    if self.policy_threshold <= 0:
       return policy
 
     mask = mask * (
         # Values over the threshold.
-        (policy >= self.threshold) +
+        (policy >= self.policy_threshold) +
         # Degenerate case is when policy is less than threshold *everywhere*.
         # In that case we just keep the policy as-is.
-        (jnp.max(policy, axis=-1, keepdims=True) < self.threshold))
+        (jnp.max(policy, axis=-1, keepdims=True) < self.policy_threshold))
     return mask * policy / jnp.sum(mask * policy, axis=-1, keepdims=True)
 
   def _discretize(self, policy: chex.Array) -> chex.Array:
     """Round all action probabilities to a multiple of 1/self.discretize."""
-    if self.discretization <= 0:
+    if self.policy_discretization <= 0:
       return policy
 
     # The unbatched/single policy case:
@@ -190,10 +207,10 @@ class PolicyPostProcessing:
     else:
       mu_ = mu
     n_actions = mu_.shape[-1]
-    roundup = jnp.ceil(mu_ * self.discretization).astype(jnp.int32)
+    roundup = jnp.ceil(mu_ * self.policy_discretization).astype(jnp.int32)
     result = jnp.zeros_like(mu_)
     order = jnp.argsort(-mu_)  # Indices of descending order.
-    weight_left = self.discretization
+    weight_left = self.policy_discretization
 
     def f_disc(i, order, roundup, weight_left, result):
       x = jnp.minimum(roundup[order[i]], weight_left)
@@ -221,7 +238,7 @@ class PolicyPostProcessing:
                             result_next)
     if len(mu.shape) == 2:
       result_next = jnp.expand_dims(result_next, axis=0)
-    return result_next / self.discretization
+    return result_next / self.policy_discretization
 
 
 def _legal_policy(logits: chex.Array, legal_actions: chex.Array) -> chex.Array:
@@ -569,41 +586,69 @@ class NerdConfig:
 @chex.dataclass(frozen=True)
 class RNaDConfig:
   """Configuration parameters for the RNaDSolver."""
+  # The game parameter string including its name and parameters.
   game_name: str
+  # The games longer than this value are truncated. Must be strictly positive.
+  trajectory_max: int = 10
+
+  # The content of the EnvStep.obs tensor.
+  state_representation: str = "info_set"  # or "observation"
+
+  # Network configuration.
+  policy_network_layers: Sequence[int] = (256, 256)
+
+  # The batch size to use when learning/improving parameters.
   batch_size: int = 256
+  # The learning rate for `params`.
+  learning_rate: float = 0.00005
+  # The config related to the ADAM optimizer used for updating `params`.
   adam: AdamConfig = AdamConfig()
-  nerd: NerdConfig = NerdConfig()
-  c_vtrace: float = 1.0
+  # All gradients values are clipped to [-clip_gradient, clip_gradient].
   clip_gradient: float = 10_000
+  # The "speed" at which `params_target` is following `params`.
+  target_network_avg: float = 0.001
+
+  # RNaD algorithm configuration.
+  # Entropy schedule configuration. See EntropySchedule class documentation.
   entropy_schedule_repeats: Sequence[int] = (1,)
   entropy_schedule_size: Sequence[int] = (20_000,)
+  # The weight of the reward regularisation term in RNaD.
   eta_reward_transform: float = 0.2
-  finetune_from: int = -1
-  learning_rate: float = 0.00005
-  policy_network_layers: Sequence[int] = (256, 256)
-  policy_post_processing: PolicyPostProcessing = PolicyPostProcessing()
+  nerd: NerdConfig = NerdConfig()
+  c_vtrace: float = 1.0
+
+  # Options related to fine tuning of the agent.
+  finetune: FineTuning = FineTuning()
+
+  # The seed that fully controls the randomness.
   seed: int = 42
-  state_representation: str = "info_set"  # or "observation"
-  target_network_avg: float = 0.001
-  trajectory_max: int = 10
 
 
 @chex.dataclass(frozen=True)
 class EnvStep:
   """Holds the tensor data representing the current game state."""
+  # The single tensor representing the state observation. Shape: [..., ??]
   obs: chex.Array = ()
+  # The legal actions mask for the current player. Shape: [..., A]
   legal: chex.Array = ()
+  # The current player id as an int. Shape: [...]
   player_id: chex.Array = ()
+  # Indicates whether the state is a valid one or just a padding. Shape: [...]
   valid: chex.Array = ()
+  # The rewards of all the players. Shape: [..., P]
   rewards: chex.Array = ()
 
 
 @chex.dataclass(frozen=True)
 class ActorStep:
-  """Holds the tensor data representing the current game state."""
+  """The actor step tensor summary."""
   # The action (as one-hot) of the current player. Shape: [..., A]
   action_oh: chex.Array = ()
+  # The policy of the current player. Shape: [..., A]
   policy: chex.Array = ()
+  # The rewards of all the players. Shape: [..., P]
+  # Note - these are rewards obtained *after* the actor step, and thus
+  # these are the same as EnvStep.rewards visible before the *next* step.
   rewards: chex.Array = ()
 
 
@@ -705,12 +750,11 @@ class RNaDSolver(policy_lib.Policy):
         self.params_target, optax.sgd(self.config.target_network_avg))
 
   def loss(self, params, params_target, params_prev, params_prev_, ts: TimeStep,
-           alpha, finetune) -> float:
+           alpha, learner_steps) -> float:
     rollout = jax.vmap(self.network.apply, (None, 0), 0)
     pi, v, log_pi, logit = rollout(params, ts.env)
 
-    pi_pprocessed = self.config.policy_post_processing(pi, ts.env.legal)
-    merged_policy_pprocessed = jnp.where(finetune, pi_pprocessed, pi)
+    policy_pprocessed = self.config.finetune(pi, ts.env.legal, learner_steps)
 
     _, v_target, _, _ = rollout(params_target, ts.env)
     _, _, log_pi_prev, _ = rollout(params_prev, ts.env)
@@ -729,7 +773,7 @@ class RNaDSolver(policy_lib.Policy):
           ts.env.valid,
           ts.env.player_id,
           ts.actor.policy,
-          merged_policy_pprocessed,
+          policy_pprocessed,
           log_policy_reg,
           _player_others(ts.env.player_id, ts.env.valid, player),
           ts.actor.action_oh,
@@ -774,13 +818,13 @@ class RNaDSolver(policy_lib.Policy):
       optimizer_target,
       timestep: TimeStep,
       alpha,
-      finetune,
+      learner_steps,
       update_target_net,
   ) -> Tuple[Tuple[Any, Any, Any, Any, Any, Any], dict[str, float]]:
     """A jitted pure-functional part of the `step`."""
     loss_val, grad = self._loss_and_grad(params, params_target, params_prev,
                                          params_prev_, timestep, alpha,
-                                         finetune)
+                                         learner_steps)
     # Update `params`` using the computed gradient.
     params = optimizer(params, grad)
     # Update `params_target` towards `params`.
@@ -853,13 +897,11 @@ class RNaDSolver(policy_lib.Policy):
     """One step of algorithm, that plays the game and improves params."""
     timestep = self.collect_batch_trajectory()
     alpha, update_target_net = self._entropy_schedule(self.learner_steps)
-    finetune = (self.config.finetune_from >= 0) and (self.learner_steps >
-                                                     self.config.finetune_from)
     (self.params, self.params_target, self.params_prev, self.params_prev_,
      self.optimizer, self.optimizer_target), logs = self.update(
          self.params, self.params_target, self.params_prev, self.params_prev_,
-         self.optimizer, self.optimizer_target, timestep, alpha, finetune,
-         update_target_net)
+         self.optimizer, self.optimizer_target, timestep, alpha,
+         self.learner_steps, update_target_net)
     self.learner_steps += 1
     logs.update(
         dict(
@@ -900,16 +942,14 @@ class RNaDSolver(policy_lib.Policy):
     """Returns action probabilities dict for a single batch."""
     env_step = self._batch_of_states_as_env_step([state])
     probs = self._network_jit_apply_and_post_process(
-        self.params_target, env_step, self.config.policy_post_processing)
+        self.params_target, env_step)
     probs = probs[0]  # Extract the only entry out of this 1-element batch.
     return {action: probs[action] for action in env_step.legal[0]}
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def _network_jit_apply_and_post_process(
-      self, params, env_step: EnvStep,
-      policy_post_processing: PolicyPostProcessing):
+  def _network_jit_apply_and_post_process(self, params, env_step: EnvStep):
     pi, _, _, _ = self.network.apply(params, env_step)
-    pi = policy_post_processing(pi, env_step.legal)
+    pi = self.config.finetune.post_process_policy(pi, env_step.legal)
     return pi
 
   @functools.partial(jax.jit, static_argnums=(0,))
