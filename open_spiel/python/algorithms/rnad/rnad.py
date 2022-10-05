@@ -14,7 +14,7 @@
 """Python implementation of R-NaD (https://arxiv.org/pdf/2206.15378.pdf)."""
 
 import functools
-from typing import Any, Sequence, Tuple
+from typing import Any, Callable, Sequence, Tuple
 
 import chex
 import haiku as hk
@@ -24,7 +24,6 @@ from jax import numpy as jnp
 from jax import tree_util as tree
 import numpy as np
 import optax
-import typing_extensions
 
 from open_spiel.python import policy as policy_lib
 import pyspiel
@@ -161,6 +160,7 @@ class FineTuning:
   def __call__(self, policy: chex.Array, mask: chex.Array,
                learner_steps: int) -> chex.Array:
     """A configurable fine tuning of a policy."""
+    chex.assert_equal_shape((policy, mask))
     do_finetune = jnp.logical_and(self.from_learner_steps >= 0,
                                   learner_steps > self.from_learner_steps)
 
@@ -173,12 +173,14 @@ class FineTuning:
       mask: chex.Array,
   ) -> chex.Array:
     """Unconditionally post process a given masked policy."""
+    chex.assert_equal_shape((policy, mask))
     policy = self._threshold(policy, mask)
     policy = self._discretize(policy)
     return policy
 
   def _threshold(self, policy: chex.Array, mask: chex.Array) -> chex.Array:
     """Remove from the support the actions 'a' where policy(a) < threshold."""
+    chex.assert_equal_shape((policy, mask))
     if self.policy_threshold <= 0:
       return policy
 
@@ -255,6 +257,7 @@ class FineTuning:
 
 def _legal_policy(logits: chex.Array, legal_actions: chex.Array) -> chex.Array:
   """A soft-max policy that respects legal_actions."""
+  chex.assert_equal_shape((logits, legal_actions))
   # Fiddle a bit to make sure we don't generate NaNs or Inf in the middle.
   l_min = logits.min(axis=-1, keepdims=True)
   logits = jnp.where(legal_actions, logits, l_min)
@@ -269,6 +272,7 @@ def _legal_policy(logits: chex.Array, legal_actions: chex.Array) -> chex.Array:
 def legal_log_policy(logits: chex.Array,
                      legal_actions: chex.Array) -> chex.Array:
   """Return the log of the policy on legal action, 0 on illegal action."""
+  chex.assert_equal_shape((logits, legal_actions))
   # logits_masked has illegal actions set to -inf.
   logits_masked = logits + jnp.log(legal_actions)
   max_legal_logit = logits_masked.max(axis=-1, keepdims=True)
@@ -294,11 +298,12 @@ def _player_others(player_ids: chex.Array, valid: chex.Array,
   Args:
     player_ids: Tensor [...] containing player ids (0 <= player_id < N).
     valid: Tensor [...] containing whether these states are valid.
-    player: The player id.
+    player: The player id as int.
 
   Returns:
     player_other: is 1 for the current player and -1 for others [..., 1].
   """
+  chex.assert_equal_shape((player_ids, valid))
   current_player_tensor = (player_ids == player).astype(jnp.int32)
 
   res = 2 * current_player_tensor - 1
@@ -321,6 +326,8 @@ def _policy_ratio(pi: chex.Array, mu: chex.Array, actions_oh: chex.Array,
     pi/mu on valid states and 1 otherwise. The shape is the same
     as pi, mu or actions_oh but without the last dimension A.
   """
+  chex.assert_equal_shape((pi, mu, actions_oh))
+  chex.assert_shape((valid,), actions_oh.shape[:-1])
 
   def _select_action_prob(pi):
     return (jnp.sum(actions_oh * pi, axis=-1, keepdims=False) * valid +
@@ -347,6 +354,7 @@ def _where(pred: chex.Array, true_data: chex.ArrayTree,
 def _has_played(valid: chex.Array, player_id: chex.Array,
                 player: int) -> chex.Array:
   """Compute a mask of states which have a next state in the sequence."""
+  chex.assert_equal_shape((valid, player_id))
 
   def _loop_has_played(carry, x):
     valid, player_id = x
@@ -383,31 +391,26 @@ def _has_played(valid: chex.Array, player_id: chex.Array,
 
 
 def v_trace(
-    v,
-    valid,
-    player_id,
-    acting_policy,
-    merged_policy,
-    merged_log_policy,
-    player_others,
-    actions_oh,
-    reward,
-    player,
+    v: chex.Array,
+    valid: chex.Array,
+    player_id: chex.Array,
+    acting_policy: chex.Array,
+    merged_policy: chex.Array,
+    merged_log_policy: chex.Array,
+    player_others: chex.Array,
+    actions_oh: chex.Array,
+    reward: chex.Array,
+    player: int,
     # Scalars below.
-    eta,
-    lambda_,
-    c,
-    rho,
-    gamma=1.0,
-    estimate_all=False,
+    eta: float,
+    lambda_: float,
+    c: float,
+    rho: float,
 ) -> Tuple[Any, Any, Any]:
   """Custom VTrace for trajectories with a mix of different player steps."""
-  if estimate_all:
-    player_id_step = player * jnp.ones_like(player_id)
-  else:
-    player_id_step = player_id
+  gamma = 1.0
 
-  has_played = _has_played(valid, player_id_step, player)
+  has_played = _has_played(valid, player_id, player)
 
   policy_ratio = _policy_ratio(merged_policy, acting_policy, actions_oh, valid)
   inv_mu = _policy_ratio(
@@ -494,8 +497,8 @@ def v_trace(
   _, (v_target, learning_output) = lax.scan(
       f=_loop_v_trace,
       init=init_state_v_trace,
-      xs=(policy_ratio, player_id_step, v, reward, eta_reg_entropy, valid,
-          inv_mu, actions_oh, eta_log_policy),
+      xs=(policy_ratio, player_id, v, reward, eta_reg_entropy, valid, inv_mu,
+          actions_oh, eta_log_policy),
       reverse=True)
 
   return v_target, has_played, learning_output
@@ -505,6 +508,10 @@ def get_loss_v(v_list: Sequence[chex.Array],
                v_target_list: Sequence[chex.Array],
                mask_list: Sequence[chex.Array]) -> chex.Array:
   """Define the loss function for the critic."""
+  chex.assert_trees_all_equal_shapes(v_list, v_target_list)
+  # v_list and v_target_list come with a degenerate trailing dimension,
+  # which mask_list tensors do not have.
+  chex.assert_shape(mask_list, v_list[0].shape[:-1])
   loss_v_list = []
   for (v_n, v_target, mask) in zip(v_list, v_target_list, mask_list):
     assert v_n.shape[0] == v_target.shape[0]
@@ -522,6 +529,7 @@ def apply_force_with_threshold(decision_outputs: chex.Array, force: chex.Array,
                                threshold: float,
                                threshold_center: chex.Array) -> chex.Array:
   """Apply the force with below a given threshold."""
+  chex.assert_equal_shape((decision_outputs, force, threshold_center))
   can_decrease = decision_outputs - threshold_center > -threshold
   can_increase = decision_outputs - threshold_center < threshold
   force_negative = jnp.minimum(force, 0.0)
@@ -532,6 +540,7 @@ def apply_force_with_threshold(decision_outputs: chex.Array, force: chex.Array,
 
 def renormalize(loss: chex.Array, mask: chex.Array) -> chex.Array:
   """The `normalization` is the number of steps over which loss is computed."""
+  chex.assert_equal_shape((loss, mask))
   loss = jnp.sum(loss * mask)
   normalization = jnp.sum(mask)
   return loss / (normalization + (normalization == 0.0))
@@ -663,11 +672,7 @@ class TimeStep:
   actor: ActorStep = ActorStep()
 
 
-class Optimizer(typing_extensions.Protocol):
-  """An optimizer."""
-
-  def __call__(self, params: Params, grads: Params) -> Params:
-    ...
+Optimizer = Callable[[Params, Params], Params]  # (params, grads) -> params
 
 
 def optax_optimizer(
@@ -795,9 +800,7 @@ class RNaDSolver(policy_lib.Policy):
           lambda_=1.0,
           c=self.config.c_vtrace,
           rho=np.inf,
-          estimate_all=False,
-          eta=self.config.eta_reward_transform,
-          gamma=1.0)
+          eta=self.config.eta_reward_transform)
       v_target_list.append(v_target)
       has_played_list.append(has_played)
       v_trace_policy_target_list.append(policy_target_)
@@ -819,7 +822,7 @@ class RNaDSolver(policy_lib.Policy):
     return loss_v + loss_nerd
 
   @functools.partial(jax.jit, static_argnums=(0,))
-  def update(
+  def update_parameters(
       self,
       params: Params,
       params_target: Params,
@@ -905,24 +908,29 @@ class RNaDSolver(policy_lib.Policy):
     self.optimizer_target.state = state["optimizer_target"]
 
   def step(self) -> dict[str, float]:
-    """One step of algorithm, that plays the game and improves params."""
+    """One step of the algorithm, that plays the game and improves params."""
     timestep = self.collect_batch_trajectory()
     alpha, update_target_net = self._entropy_schedule(self.learner_steps)
     (self.params, self.params_target, self.params_prev, self.params_prev_,
-     self.optimizer, self.optimizer_target), logs = self.update(
+     self.optimizer, self.optimizer_target), logs = self.update_parameters(
          self.params, self.params_target, self.params_prev, self.params_prev_,
          self.optimizer, self.optimizer_target, timestep, alpha,
          self.learner_steps, update_target_net)
     self.learner_steps += 1
-    logs.update(
-        dict(
-            actor_steps=self.actor_steps,
-            learner_steps=self.learner_steps,
-        ))
+    logs.update({
+        "actor_steps": self.actor_steps,
+        "learner_steps": self.learner_steps,
+    })
     return logs
 
   def _next_rng_key(self) -> chex.PRNGKey:
-    """Get the next rng subkey from class rngkey."""
+    """Get the next rng subkey from class rngkey.
+
+    Must *not* be called from under a jitted function!
+
+    Returns:
+      A fresh rng_key.
+    """
     self._rngkey, subkey = jax.random.split(self._rngkey)
     return subkey
 
@@ -942,7 +950,7 @@ class RNaDSolver(policy_lib.Policy):
 
     return EnvStep(
         obs=np.array(obs, dtype=np.float64),
-        legal=np.array(state.legal_actions_mask(), dtype=np.float64),
+        legal=np.array(state.legal_actions_mask(), dtype=np.int8),
         player_id=np.array(state.current_player(), dtype=np.float64),
         valid=np.array(valid, dtype=np.float64),
         rewards=np.array(state.returns(), dtype=np.float64))
@@ -954,8 +962,9 @@ class RNaDSolver(policy_lib.Policy):
     env_step = self._batch_of_states_as_env_step([state])
     probs = self._network_jit_apply_and_post_process(
         self.params_target, env_step)
-    probs = probs[0]  # Extract the only entry out of this 1-element batch.
-    return {action: probs[action] for action in env_step.legal[0]}
+    probs = jax.device_get(probs[0])  # Squeeze out the 1-element batch.
+    return {action: probs[action]
+            for action in jax.device_get(env_step.legal[0])}
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def _network_jit_apply_and_post_process(
@@ -996,11 +1005,10 @@ class RNaDSolver(policy_lib.Policy):
 
     env_step = self._batch_of_states_as_env_step(states)
     for _ in range(self.config.trajectory_max):
-      # for _ in range(4):
       prev_env_step = env_step
       a, actor_step = self.actor_step(env_step, self._next_rng_key())
 
-      self._batch_of_states_apply_action(states, a)
+      states = self._batch_of_states_apply_action(states, a)
       env_step = self._batch_of_states_as_env_step(states)
       timesteps.append(
           TimeStep(
@@ -1021,16 +1029,24 @@ class RNaDSolver(policy_lib.Policy):
   def _batch_of_states_apply_action(
       self, states: Sequence[pyspiel.State],
       actions: chex.Array) -> Sequence[pyspiel.State]:
-    next_states = []
-    for i, state in enumerate(states):
-      if not state.is_terminal():
-        self.actor_steps += 1
-        state.apply_action(actions[i])
-        next_states.append(self._play_chance(state))
-    return next_states
+    """Apply a batch of `actions` to a parallel list of `states`."""
+    def _play_action(state, action):
+      if state.is_terminal():
+        return state
+      self.actor_steps += 1
+      state.apply_action(action)
+      return self._play_chance(state)
+    return [_play_action(state, actions[i]) for i, state in enumerate(states)]
 
   def _play_chance(self, state: pyspiel.State) -> pyspiel.State:
-    """Plays the chance nodes until we end up at another type of node."""
+    """Plays the chance nodes until we end up at another type of node.
+
+    Args:
+      state: to be updated until it does not correspond to a chance node.
+    Returns:
+      The same input state object, but updated. The state is returned
+      only for convenience, to allow chaining function calls.
+    """
     while state.is_chance_node():
       chance_outcome, chance_proba = zip(*state.chance_outcomes())
       action = self._np_rng.choice(chance_outcome, p=chance_proba)
