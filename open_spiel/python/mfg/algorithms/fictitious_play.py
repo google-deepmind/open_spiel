@@ -37,7 +37,7 @@ policy = fp.get_policy()
 
 import math
 
-from typing import List
+from typing import List, Optional
 
 from open_spiel.python import policy as policy_std
 from open_spiel.python.mfg import distribution as distribution_std
@@ -46,14 +46,21 @@ from open_spiel.python.mfg.algorithms import best_response_value
 from open_spiel.python.mfg.algorithms import distribution
 from open_spiel.python.mfg.algorithms import greedy_policy
 from open_spiel.python.mfg.algorithms import policy_value
+from open_spiel.python.mfg.algorithms import softmax_policy
+import pyspiel
 
 
 class MergedPolicy(policy_std.Policy):
   """Merge several policies."""
 
-  def __init__(self, game, player_ids, policies: List[policy_std.Policy],
-               distributions: List[distribution_std.Distribution],
-               weights: List[float]):
+  def __init__(
+      self,
+      game,
+      player_ids: List[int],
+      policies: List[policy_std.Policy],
+      distributions: List[distribution_std.Distribution],
+      weights: List[float],
+  ):
     """Initializes the merged policy.
 
     Args:
@@ -96,13 +103,23 @@ class MergedPolicy(policy_std.Policy):
 class FictitiousPlay(object):
   """Computes the value of a specified strategy."""
 
-  def __init__(self, game):
+  def __init__(self,
+               game: pyspiel.Game,
+               lr: Optional[float] = None,
+               temperature: Optional[float] = None):
     """Initializes the greedy policy.
 
     Args:
       game: The game to analyze.
+      lr: The learning rate of mirror descent. If None, at iteration i it will
+        be set to 1/i.
+      temperature: If set, then instead of the greedy policy a softmax policy
+        with the specified temperature will be used to update the policy at each
+        iteration.
     """
     self._game = game
+    self._lr = lr
+    self._temperature = temperature
     self._states = None  # Required to avoid attribute-error.
     self._policy = policy_std.UniformRandomPolicy(self._game)
     self._fp_step = 0
@@ -129,17 +146,26 @@ class FictitiousPlay(object):
       br_value = best_response_value.BestResponse(
           self._game, distrib, value.TabularValueFunction(self._game))
 
-    greedy_pi = greedy_policy.GreedyPolicy(self._game, None, br_value)
-    greedy_pi_tabular = greedy_pi.to_tabular(states=self._states)
-    distrib_greedy = distribution.DistributionPolicy(self._game,
-                                                     greedy_pi_tabular)
+    # Policy is either greedy or softmax with respect to the best response if
+    # temperature is specified.
+    player_ids = list(range(self._game.num_players()))
+    if self._temperature is None:
+      pi = greedy_policy.GreedyPolicy(self._game, player_ids, br_value)
+    else:
+      pi = softmax_policy.SoftmaxPolicy(self._game, player_ids,
+                                        self._temperature, br_value)
+    pi = pi.to_tabular(states=self._states)
 
-    weight = learning_rate if learning_rate else 1.0 / (self._fp_step + 1)
+    distrib_pi = distribution.DistributionPolicy(self._game, pi)
+
+    if learning_rate:
+      weight = learning_rate
+    else:
+      weight = self._lr if self._lr else 1.0 / (self._fp_step + 1)
 
     if math.isclose(weight, 1.0):
-      self._policy = greedy_pi
+      self._policy = pi
     else:
       self._policy = MergedPolicy(
-          self._game, list(range(self._game.num_players())),
-          [self._policy, greedy_pi_tabular], [distrib, distrib_greedy],
+          self._game, player_ids, [self._policy, pi], [distrib, distrib_pi],
           [1.0 - weight, weight]).to_tabular(states=self._states)
