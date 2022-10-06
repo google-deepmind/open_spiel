@@ -361,6 +361,7 @@ void ColoredTrailsState::DoApplyAction(Action action) {
     cur_player_++;
   } else {
     // Base scores.
+    SPIEL_CHECK_EQ(cur_player_, kResponderId);
     for (Player p = 0; p < board_.num_players; ++p) {
       returns_[p] = Score(p, board_).first;
     }
@@ -372,7 +373,10 @@ void ColoredTrailsState::DoApplyAction(Action action) {
     } else if (action == parent_game_->ResponderPassAction()) {
       // No trade.
     } else {
-      SpielFatalError("Invalid action");
+      std::string error = absl::StrCat("Invalid action: ", action,
+          parent_game_->ActionToString(kResponderId, action), "\n",
+                                       ToString());
+      SpielFatalErrorWithStateInfo(error, *parent_game_, *this);
     }
 
     // Gain is final score minus base score.
@@ -432,9 +436,11 @@ std::vector<Action> ColoredTrailsState::LegalActions() const {
     SPIEL_CHECK_EQ(cur_player_, kResponderId);
     // Last three actions correspond to "trade with 0", "trade with 1", and
     // "no trade".
-    const int num_distinct_actions = parent_game_->NumDistinctActions();
-    return {num_distinct_actions - 3, num_distinct_actions - 2,
-            num_distinct_actions - 1};
+    return {
+      parent_game_->ResponderTradeWithPlayerAction(0),
+      parent_game_->ResponderTradeWithPlayerAction(1),
+      parent_game_->ResponderPassAction()
+    };
   }
 }
 
