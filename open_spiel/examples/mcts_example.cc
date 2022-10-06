@@ -34,7 +34,8 @@ ABSL_FLAG(std::string, player1, "mcts", "Who controls player1.");
 ABSL_FLAG(std::string, player2, "random", "Who controls player2.");
 ABSL_FLAG(double, uct_c, 2, "UCT exploration constant.");
 ABSL_FLAG(int, rollout_count, 10, "How many rollouts per evaluation.");
-ABSL_FLAG(int, max_simulations, 10000, "How many simulations to run.");
+ABSL_FLAG(int, min_simulations, 0, "How many simulations to run (min).");
+ABSL_FLAG(int, max_simulations, 10000, "How many simulations to run (max).");
 ABSL_FLAG(int, num_games, 1, "How many games to play.");
 ABSL_FLAG(int, max_memory_mb, 1000,
           "The maximum memory used before cutting the search short.");
@@ -58,6 +59,7 @@ std::unique_ptr<open_spiel::Bot> InitBot(
   if (type == "mcts") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
         game, std::move(evaluator), absl::GetFlag(FLAGS_uct_c),
+        absl::GetFlag(FLAGS_min_simulations),
         absl::GetFlag(FLAGS_max_simulations),
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));

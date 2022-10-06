@@ -35,7 +35,7 @@ std::unique_ptr<open_spiel::Bot> InitBot(const open_spiel::Game& game,
                                          int max_simulations,
                                          std::shared_ptr<Evaluator> evaluator) {
   return std::make_unique<open_spiel::algorithms::MCTSBot>(
-      game, std::move(evaluator), UCT_C, max_simulations,
+      game, std::move(evaluator), UCT_C, /*min_simulations=*/0, max_simulations,
       /*max_memory_mb=*/5, /*solve=*/true, /*seed=*/42, /*verbose=*/false);
 }
 

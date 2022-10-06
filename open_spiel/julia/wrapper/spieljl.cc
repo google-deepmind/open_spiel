@@ -613,7 +613,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
          "MCTSBot", jlcxx::julia_base_type<open_spiel::Bot>())
       .constructor<const open_spiel::Game&,
                    std::shared_ptr<open_spiel::algorithms::Evaluator>,
-                   double, int, int64_t, bool, int, bool,
+                   double, int, int, int64_t, bool, int, bool,
                    open_spiel::algorithms::ChildSelectionPolicy, double,
                    double>()
       .method("restart", &open_spiel::algorithms::MCTSBot::Restart)

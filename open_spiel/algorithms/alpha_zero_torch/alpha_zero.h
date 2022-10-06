@@ -49,6 +49,7 @@ struct AlphaZeroConfig {
   int evaluation_window;
 
   double uct_c;
+  int min_simulations;
   int max_simulations;
   double policy_alpha;
   double policy_epsilon;
@@ -56,6 +57,8 @@ struct AlphaZeroConfig {
   double temperature_drop;
   double cutoff_probability;
   double cutoff_value;
+  double td_lambda;
+  int td_n_steps;
 
   int actors;
   int evaluators;
@@ -83,6 +86,7 @@ struct AlphaZeroConfig {
         {"checkpoint_freq", checkpoint_freq},
         {"evaluation_window", evaluation_window},
         {"uct_c", uct_c},
+        {"min_simulations", min_simulations},
         {"max_simulations", max_simulations},
         {"policy_alpha", policy_alpha},
         {"policy_epsilon", policy_epsilon},
@@ -90,6 +94,8 @@ struct AlphaZeroConfig {
         {"temperature_drop", temperature_drop},
         {"cutoff_probability", cutoff_probability},
         {"cutoff_value", cutoff_value},
+        {"td_lambda", td_lambda},
+        {"td_n_steps", td_n_steps},
         {"actors", actors},
         {"evaluators", evaluators},
         {"eval_levels", eval_levels},
@@ -97,37 +103,44 @@ struct AlphaZeroConfig {
     });
   }
 
-  void FromJson(const json::Object& config_json) {
-    game = config_json.at("game").GetString();
-    path = config_json.at("path").GetString();
-    graph_def = config_json.at("graph_def").GetString();
-    nn_model = config_json.at("nn_model").GetString();
-    nn_width = config_json.at("nn_width").GetInt();
-    nn_depth = config_json.at("nn_depth").GetInt();
-    devices = config_json.at("devices").GetString();
-    explicit_learning = config_json.at("explicit_learning").GetBool();
-    learning_rate = config_json.at("learning_rate").GetDouble();
-    weight_decay = config_json.at("weight_decay").GetDouble();
-    train_batch_size = config_json.at("train_batch_size").GetInt();
-    inference_batch_size = config_json.at("inference_batch_size").GetInt();
-    inference_threads = config_json.at("inference_threads").GetInt();
-    inference_cache = config_json.at("inference_cache").GetInt();
-    replay_buffer_size = config_json.at("replay_buffer_size").GetInt();
-    replay_buffer_reuse = config_json.at("replay_buffer_reuse").GetInt();
-    checkpoint_freq = config_json.at("checkpoint_freq").GetInt();
-    evaluation_window = config_json.at("evaluation_window").GetInt();
-    uct_c = config_json.at("uct_c").GetDouble();
-    max_simulations = config_json.at("max_simulations").GetInt();
-    policy_alpha = config_json.at("policy_alpha").GetDouble();
-    policy_epsilon = config_json.at("policy_epsilon").GetDouble();
-    temperature = config_json.at("temperature").GetDouble();
-    temperature_drop = config_json.at("temperature_drop").GetDouble();
-    cutoff_probability = config_json.at("cutoff_probability").GetDouble();
-    cutoff_value = config_json.at("cutoff_value").GetDouble();
-    actors = config_json.at("actors").GetInt();
-    evaluators = config_json.at("evaluators").GetInt();
-    eval_levels = config_json.at("eval_levels").GetInt();
-    max_steps = config_json.at("max_steps").GetInt();
+  void FromJsonWithDefaults(const json::Object& config_json,
+                            const json::Object& defaults_json) {
+    json::Object merged;
+    merged.insert(config_json.begin(), config_json.end());
+    merged.insert(defaults_json.begin(), defaults_json.end());
+    game = merged.at("game").GetString();
+    path = merged.at("path").GetString();
+    graph_def = merged.at("graph_def").GetString();
+    nn_model = merged.at("nn_model").GetString();
+    nn_width = merged.at("nn_width").GetInt();
+    nn_depth = merged.at("nn_depth").GetInt();
+    devices = merged.at("devices").GetString();
+    explicit_learning = merged.at("explicit_learning").GetBool();
+    learning_rate = merged.at("learning_rate").GetDouble();
+    weight_decay = merged.at("weight_decay").GetDouble();
+    train_batch_size = merged.at("train_batch_size").GetInt();
+    inference_batch_size = merged.at("inference_batch_size").GetInt();
+    inference_threads = merged.at("inference_threads").GetInt();
+    inference_cache = merged.at("inference_cache").GetInt();
+    replay_buffer_size = merged.at("replay_buffer_size").GetInt();
+    replay_buffer_reuse = merged.at("replay_buffer_reuse").GetInt();
+    checkpoint_freq = merged.at("checkpoint_freq").GetInt();
+    evaluation_window = merged.at("evaluation_window").GetInt();
+    uct_c = merged.at("uct_c").GetDouble();
+    min_simulations = merged.at("min_simulations").GetInt();
+    max_simulations = merged.at("max_simulations").GetInt();
+    policy_alpha = merged.at("policy_alpha").GetDouble();
+    policy_epsilon = merged.at("policy_epsilon").GetDouble();
+    temperature = merged.at("temperature").GetDouble();
+    temperature_drop = merged.at("temperature_drop").GetDouble();
+    cutoff_probability = merged.at("cutoff_probability").GetDouble();
+    cutoff_value = merged.at("cutoff_value").GetDouble();
+    td_lambda = merged.at("td_lambda").GetDouble();
+    td_n_steps = merged.at("td_n_steps").GetInt();
+    actors = merged.at("actors").GetInt();
+    evaluators = merged.at("evaluators").GetInt();
+    eval_levels = merged.at("eval_levels").GetInt();
+    max_steps = merged.at("max_steps").GetInt();
   }
 };
 

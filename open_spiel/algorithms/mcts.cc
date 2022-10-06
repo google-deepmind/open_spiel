@@ -202,12 +202,13 @@ std::vector<double> dirichlet_noise(int count, double alpha,
 }
 
 MCTSBot::MCTSBot(const Game& game, std::shared_ptr<Evaluator> evaluator,
-                 double uct_c, int max_simulations, int64_t max_memory_mb,
-                 bool solve, int seed, bool verbose,
+                 double uct_c, int min_simulations, int max_simulations,
+                 int64_t max_memory_mb, bool solve, int seed, bool verbose,
                  ChildSelectionPolicy child_selection_policy,
                  double dirichlet_alpha, double dirichlet_epsilon,
                  bool dont_return_chance_node)
     : uct_c_{uct_c},
+      min_simulations_{min_simulations},
       max_simulations_{max_simulations},
       max_nodes_((max_memory_mb << 20) / sizeof(SearchNode) + 1),
       nodes_(0),
@@ -428,7 +429,7 @@ std::unique_ptr<SearchNode> MCTSBot::MCTSearch(const State& state) {
     }
 
     if (!root->outcome.empty() ||  // Full game tree is solved.
-        root->children.size() == 1) {
+        (root->children.size() == 1 && i >= min_simulations_)) {
       break;
     }
     if (max_nodes_ > 1 && nodes_ >= max_nodes_) {

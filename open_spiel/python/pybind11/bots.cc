@@ -231,17 +231,18 @@ void init_pyspiel_bots(py::module& m) {
       .def(
           py::init([](std::shared_ptr<const Game> game,
                       std::shared_ptr<Evaluator> evaluator, double uct_c,
-                      int max_simulations, int64_t max_memory_mb, bool solve,
+                      int min_simulations, int max_simulations,
+                      int64_t max_memory_mb, bool solve,
                       int seed, bool verbose,
                       algorithms::ChildSelectionPolicy child_selection_policy) {
             return new algorithms::MCTSBot(
-                *game, evaluator, uct_c, max_simulations, max_memory_mb, solve,
-                seed, verbose, child_selection_policy);
+                *game, evaluator, uct_c, min_simulations, max_simulations,
+                max_memory_mb, solve, seed, verbose, child_selection_policy);
           }),
           py::arg("game"), py::arg("evaluator"), py::arg("uct_c"),
-          py::arg("max_simulations"), py::arg("max_memory_mb"),
-          py::arg("solve"), py::arg("seed"), py::arg("verbose"),
-          py::arg("child_selection_policy") =
+          py::arg("min_simulations"), py::arg("max_simulations"),
+          py::arg("max_memory_mb"), py::arg("solve"), py::arg("seed"),
+          py::arg("verbose"), py::arg("child_selection_policy") =
               algorithms::ChildSelectionPolicy::UCT)
       .def("step", &algorithms::MCTSBot::Step)
       .def("mcts_search", &algorithms::MCTSBot::MCTSearch);
