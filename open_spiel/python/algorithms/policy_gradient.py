@@ -128,10 +128,10 @@ class PolicyGradient(rl_agent.AbstractAgent):
           to (128,), which produces a NN: [INPUT] -> [128] -> ReLU -> [OUTPUT].
       batch_size: int, batch size to use for Q and Pi learning. Defaults to 128.
       critic_learning_rate: float, learning rate used for Critic (Q or V).
-        Defaults to 0.001.
+        Defaults to 0.01.
       pi_learning_rate: float, learning rate used for Pi. Defaults to 0.001.
       entropy_cost: float, entropy cost used to multiply the entropy loss. Can
-        be set to None to skip entropy computation. Defaults to 0.001.
+        be set to None to skip entropy computation. Defaults to 0.01.
       num_critic_before_pi: int, number of Critic (Q or V) updates before each
         Pi update. Defaults to 8 (every 8th critic learning step, Pi also
         learns).
@@ -139,9 +139,9 @@ class PolicyGradient(rl_agent.AbstractAgent):
         Defaults to 1.0, in which case, no extra discount is applied.  None that
         users must provide *only one of* `loss_str` or `loss_class`.
       max_global_gradient_norm: float or None, maximum global norm of a gradient
-        to which the gradient is shrunk if its value is larger.
+        to which the gradient is shrunk if its value is larger. Defaults to None.
       optimizer_str: String defining which optimizer to use. Supported values
-        are {sgd, adam}
+        are {sgd, adam}. Defaults to sgd
     """
     assert bool(loss_str) ^ bool(loss_class), "Please provide only one option."
     self._kwargs = locals()
@@ -298,7 +298,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     Args:
       time_step: an instance of rl_environment.TimeStep.
-      is_evaluation: bool, whether this is a training or evaluation call.
+      is_evaluation: bool, whether this is a training or evaluation call. Defaults to False.
 
     Returns:
       A `rl_agent.StepOutput` containing the action probs and chosen action.
