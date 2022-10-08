@@ -12,8 +12,6 @@ import numpy as np
 import optax
 import rlax
 from jax import grad, vmap
-from tensorflow_probability.substrates.jax.monte_carlo import expectation
-
 from open_spiel.python import rl_agent
 from open_spiel.python.rl_environment import TimeStep
 
@@ -53,13 +51,16 @@ def get_critic_update_fn(agent_id: int, critic_network: hk.Transformed, optimize
     """
 
     def loss_fn(params, batch: TransitionBatch):
-        discounted_returns = vmap(partial(rlax.discounted_returns, stop_target_gradients=True))
+        td_learning = vmap(partial(rlax.td_learning, stop_target_gradients=True))
         info_states, rewards = batch.info_state[agent_id], batch.reward[agent_id]
         discounts = batch.discount
-        values = jnp.squeeze(critic_network.apply(params, info_states))
-        target = discounted_returns(r_t=rewards, discount_t=discounts, v_t=jax.lax.stop_gradient(values))
-        td_error = values - target
-        return 0.5 * jnp.mean(td_error ** 2)
+        values = critic_network.apply(params, info_states)
+        v_tm1 = values[:, :-1].reshape(-1)
+        v_t = values[:, 1:].reshape(-1)
+        r_t = rewards[:, 1:].reshape(-1)
+        d_t = discounts[:, 1:].reshape(-1)
+        td_error = td_learning(v_tm1=v_tm1, r_t=r_t, discount_t=d_t, v_t=v_t)
+        return td_error.mean()
 
     def update(train_state: TrainState, batch: TransitionBatch):
         params = train_state.critic_params[agent_id]
@@ -77,7 +78,7 @@ def get_critic_update_fn(agent_id: int, critic_network: hk.Transformed, optimize
 
 
 def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_network: hk.Transformed,
-                         optimizer: optax.TransformUpdateFn, pi_lr: float, correction_weight: float, correction_method: str = 'dice') -> UpdateFn:
+                         optimizer: optax.TransformUpdateFn, pi_lr: float, correction_weight: float) -> UpdateFn:
 
     def dice_correction(train_state: TrainState, batch: TransitionBatch):
 
@@ -87,30 +88,35 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         agent, opp = agent_id, 1-agent_id
         params, unravel = zip(*[jax.flatten_util.ravel_pytree(params) for params in train_state.policy_params])
         batch = jax.tree_util.tree_map(jnp.array, batch)
-        a_t, o_t, r_t, v_t = batch.action, batch.info_state, batch.reward, batch.values
-        discounts = jnp.stack([batch.discount] * len(a_t), axis=0) # assume same discounts for all agents
-        # Compute discounted sum of rewards
-        compute_return = vmap(vmap(rlax.discounted_returns)) # map over agents and batch
-        G_t = compute_return(r_t=r_t, discount_t=discounts, v_t=jnp.zeros_like(r_t)) - v_t
+        a_t, o_t, r_t, values = batch.action, batch.info_state, batch.reward, batch.values
+
+        # Compute advantages
+        v_tp1, v_t = values[:, :, 1:], values[:, :, :-1]
+        o_t, a_t = o_t[:, :, :-1], a_t[:, :, :-1]
+        r_t = r_t[:, :, :-1]
+        discounts = jnp.stack([batch.discount] * len(a_t), axis=0)[:, :, 1:]  # assume same discounts for all agents
+        compute_return = vmap(vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0)))
+        G_t = compute_return(r_t=r_t, discount_t=discounts, v_t=v_tp1)
+        adv_t = G_t - v_t
 
         # Standardize returns
-        G_t = vmap(lambda x: (x - x.mean()) / (x.std() + 1e-8))(G_t)
+        #adv_t = vmap(lambda x: (x - x.mean()) / (x.std() + 1e-8))(adv_t)
 
-        def objective(params, opp_params, G_t):
+        def objective(params, opp_params, adv_t):
             logp = policy_network.apply(unravel[agent](params), o_t[agent]).log_prob(a_t[agent])
             opp_logp = policy_network.apply(unravel[opp](opp_params), o_t[opp]).log_prob(a_t[opp])
             cumlogp_t = logp.cumsum(-1)
             oppcumlogp_t = opp_logp.cumsum(-1)
-            joint_cumlogp_t = cumlogp_t + oppcumlogp_t
-            joint_cumlogp_t = magic_box(joint_cumlogp_t)
-            return (G_t * joint_cumlogp_t).sum(-1).mean()
+            joint_cumlogp_t = magic_box(cumlogp_t + oppcumlogp_t)
+            return (adv_t * joint_cumlogp_t).sum(-1).mean()
 
         # Define agent losses
-        L0 = partial(objective, G_t=G_t[agent])
-        L1 = partial(objective, G_t=G_t[opp])
+        L0 = partial(objective, adv_t=adv_t[agent])
+        L1 = partial(objective, adv_t=adv_t[opp])
 
 
         # Compute gradient of agent loss w.r.t opponent parameters
+        pg_update = grad(L0, argnums=0)(params[agent], params[opp])
         L0_grad_opp_params = grad(L0, argnums=1)(params[agent], params[opp])
 
         # Compute jacobian of the opponent update step
@@ -118,53 +124,8 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         L1_grad_opp_params_grad_params = jax.jacobian(opp_update_fn, argnums=0)(params[agent], params[opp])
 
         # compute correction
-        correction = L0_grad_opp_params @ L1_grad_opp_params_grad_params
+        correction = pg_update + L0_grad_opp_params @ L1_grad_opp_params_grad_params
         return unravel[agent](correction)
-
-
-    def lola_correction(train_state: TrainState, batch: TransitionBatch):
-        """
-        Computes the correction term according to Foerster et al. (2018).
-        Args:
-            train_state: the agent's train state.
-            batch: a transition batch
-
-        Returns:
-            The correction term in the same format as the policy parameters.
-        """
-        # Read and store data
-        params, unravel_policy_params = jax.flatten_util.ravel_pytree(train_state.policy_params[agent_id])
-        opp_params, unravel_opp_policy_params = jax.flatten_util.ravel_pytree(train_state.policy_params[1 - agent_id])
-        a_t, opp_a_t = batch.action[agent_id], batch.action[1 - agent_id]
-        obs1, obs2 = batch.info_state[agent_id], batch.info_state[1 - agent_id]
-        r_t, opp_r_t = batch.reward[agent_id], batch.reward[1 - agent_id]
-        v_t = critic_network.apply(train_state.critic_params[agent_id], obs1).squeeze()
-        opp_v_t = critic_network.apply(train_state.critic_params[1 - agent_id], obs2).squeeze()
-        # Compute discounted sum of rewards
-        compute_return = vmap(rlax.discounted_returns)
-        G_t = compute_return(r_t=r_t, discount_t=batch.discount, v_t=jnp.zeros_like(r_t)) - v_t
-        opp_G_t = compute_return(r_t=opp_r_t, discount_t=batch.discount, v_t=jnp.zeros_like(opp_r_t)) - opp_v_t
-
-        # Standardize returns
-        G_t = (G_t - G_t.mean()) / (G_t.std() + 1e-8)
-        opp_G_t = (opp_G_t - opp_G_t.mean()) / (opp_G_t.std() + 1e-8)
-
-        def log_pi(params, o_t, a_t):
-            return policy_network.apply(unravel_policy_params(params), o_t).log_prob(a_t)
-
-        # Compute gradient of agent loss w.r.t opponent parameters
-        G_grad_opp_params = grad(lambda param: (G_t * log_pi(param, obs2, opp_a_t).cumsum(-1)).mean())(opp_params)
-
-        # Compute second order correction term according to (A.1) in https://arxiv.org/abs/1709.04326
-        traj_log_prob = lambda params, o_t, a_t: log_pi(params, o_t, a_t).sum(-1)
-        grad_log_pi = vmap(grad(traj_log_prob), in_axes=(None, 0, 0))(params, obs1, a_t)
-        opp_grad_log_pi = vmap(grad(traj_log_prob), in_axes=(None, 0, 0))(opp_params, obs2, opp_a_t)
-        jacobian = vmap(lambda R, a, b: R[0] * jnp.outer(a, b))(opp_G_t, grad_log_pi, opp_grad_log_pi)
-        second_order_term = jacobian.mean(0)
-
-        # scale by learning rate
-        update = pi_lr * (G_grad_opp_params @ second_order_term)
-        return unravel_policy_params(update)
 
     def policy_update(train_state: TrainState, batch: TransitionBatch):
         """
@@ -180,11 +141,13 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             r_t = batch.reward[agent_id]
             a_t = batch.action[agent_id]
             o_t = batch.info_state[agent_id]
-            v_t = jnp.squeeze(critic_network.apply(train_state.critic_params[agent_id], o_t))
+            values = jnp.squeeze(critic_network.apply(train_state.critic_params[agent_id], o_t))
+            v_t, v_tp1 = values[:, :-1], values[:, 1:]
             logits = policy_network.apply(params, o_t).logits
-            returns = vmap(partial(rlax.discounted_returns))
-            R_t = returns(r_t=r_t, discount_t=batch.discount, v_t=v_t)
-            loss = vmap(rlax.policy_gradient_loss)(logits, a_t, R_t, v_t)
+            compute_return = vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0))
+            G_t = compute_return(r_t=r_t[:, :-1], discount_t=batch.discount[:, :-1], v_t=v_tp1)
+            adv_t = G_t - v_t
+            loss = vmap(rlax.policy_gradient_loss)(logits[:, :-1], a_t[:, :-1], adv_t, jnp.ones_like(adv_t))
             return loss.mean()
 
         value, grads = jax.value_and_grad(loss)(train_state.policy_params[agent_id])
@@ -203,13 +166,8 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         """
         loss, policy_grads = policy_update(train_state, batch)
         if correction_weight > 0:
-            if correction_method == 'lola':
-                correction_fn = lola_correction
-            else:
-                correction_fn = dice_correction
-
-            gradient_correction = correction_fn(train_state, batch)
-            policy_grads = jax.tree_util.tree_map(lambda g, c: g - correction_weight * c, policy_grads, gradient_correction)
+            gradient_correction = dice_correction(train_state, batch)
+            policy_grads = jax.tree_util.tree_map(lambda g, c: -correction_weight * c, policy_grads, gradient_correction)
 
         updates, opt_state = optimizer(policy_grads, train_state.policy_opt_state)
         policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
@@ -238,7 +196,6 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  policy_update_interval: int = 8,
                  discount: float = 0.99,
                  seed: jax.random.PRNGKey = 42,
-                 correction_method: str = 'dice',
                  use_jit: bool = False):
 
         self.player_id = player_id
@@ -274,8 +231,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             critic_network=critic,
             pi_lr=pi_learning_rate,
             correction_weight=correction_weight,
-            optimizer=self._policy_opt.update,
-            correction_method=correction_method
+            optimizer=self._policy_opt.update
         )
 
         critic_update_fn = get_critic_update_fn(

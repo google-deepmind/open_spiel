@@ -27,21 +27,21 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 8, "Number of episodes in a batch.")
-flags.DEFINE_integer("game_iterations", 15, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.0005, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 1.0, "Critic learning rate.")
+flags.DEFINE_integer("batch_size", 64, "Number of episodes in a batch.")
+flags.DEFINE_integer("game_iterations", 50, "Number of iterated plays.")
+flags.DEFINE_float("policy_lr", 0.005, "Policy learning rate.")
+flags.DEFINE_float("critic_lr", 0.3, "Critic learning rate.")
 flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
-flags.DEFINE_integer("policy_update_interval", 2, "Number of critic updates per before policy is updated.")
+flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
 
 
 def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
     def get_action_probs(policy_params: hk.Params, num_actions: int) -> List[str]:
-        states = jnp.concatenate([jnp.zeros((1, num_actions * 2)), jnp.eye(num_actions * 2)], axis=0)
+        states = jnp.append(jnp.concatenate([jnp.zeros((1, num_actions * 2)), jnp.eye(num_actions * 2)], axis=0), jnp.zeros((5,1)), axis=-1)
         logits = policy_network.apply(policy_params, states).logits
         probs = jax.nn.softmax(logits, axis=1)
         prob_strings = []
@@ -64,7 +64,7 @@ def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment,
 
 def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_episodes: int, eval: bool):
 
-    def postprocess(timestep: rl_environment.TimeStep, actions: typing.List) -> rl_environment.TimeStep:
+    def postprocess(timestep: rl_environment.TimeStep, t: int, actions: typing.List) -> rl_environment.TimeStep:
         observations = timestep.observations.copy()
 
         if timestep.first():
@@ -72,19 +72,21 @@ def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_epi
         observations["actions"] = []
 
         values = np.zeros(len(agents))
-
+        observations["info_state"] = np.append(observations["info_state"], np.array([[t], [t]]), axis=-1)
         for agent in agents:
             v_fn = agent.get_value_fn()
             values[agent.player_id] = v_fn(observations["info_state"][agent.player_id])
 
         observations["values"] = jnp.stack(values, axis=0)
+
         observations["actions"] = actions
         return timestep._replace(observations=observations)
 
     episodes = []
     for _ in range(n_episodes):
         time_step = env.reset()
-        time_step = postprocess(time_step, actions=None)
+        t = 0
+        time_step = postprocess(time_step, t=1-(t/FLAGS.game_iterations), actions=None)
         episode = []
         while not time_step.last():
             agents_output, action_list = [], []
@@ -93,8 +95,10 @@ def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_epi
                 agents_output.append(output)
                 action_list.append(output.action)
             time_step = env.step(action_list)
-            time_step = postprocess(timestep=time_step, actions=action_list)
+            t += 1
+            time_step = postprocess(timestep=time_step, t=1-(t/FLAGS.game_iterations), actions=action_list)
             episode.append(time_step)
+
 
         for agent in agents:
             agent.step(time_step, is_evaluation=eval)
@@ -110,7 +114,7 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         player_id=player_id,
         opponent_ids=[1 - player_id],
         seed=key,
-        info_state_size=env.observation_spec()["info_state"],
+        info_state_size=(env.observation_spec()["info_state"][0]+1,),
         num_actions=env.action_spec()["num_actions"],
         policy=policy_network,
         critic=critic_network,
