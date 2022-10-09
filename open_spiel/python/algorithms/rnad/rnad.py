@@ -833,8 +833,7 @@ class RNaDSolver(policy_lib.Policy):
       timestep: TimeStep,
       alpha: float,
       learner_steps: int,
-      update_target_net: bool,
-  ) -> Tuple[Tuple[Any, Any, Any, Any, Any, Any], dict[str, float]]:
+      update_target_net: bool):
     """A jitted pure-functional part of the `step`."""
     loss_val, grad = self._loss_and_grad(params, params_target, params_prev,
                                          params_prev_, timestep, alpha,
