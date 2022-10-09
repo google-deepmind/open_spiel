@@ -858,7 +858,7 @@ class RNaDSolver(policy_lib.Policy):
     return (params, params_target, params_prev, params_prev_, optimizer,
             optimizer_target), logs
 
-  def __getstate__(self) -> dict[str, Any]:
+  def __getstate__(self):
     """To serialize the agent."""
     return dict(
         # RNaD config.
@@ -882,7 +882,7 @@ class RNaDSolver(policy_lib.Policy):
         optimizer_target=self.optimizer_target.state,
     )
 
-  def __setstate__(self, state: dict[str, Any]):
+  def __setstate__(self, state):
     """To deserialize the agent."""
     # RNaD config.
     self.config = state["config"]
@@ -906,7 +906,7 @@ class RNaDSolver(policy_lib.Policy):
     self.optimizer.state = state["optimizer"]
     self.optimizer_target.state = state["optimizer_target"]
 
-  def step(self) -> dict[str, float]:
+  def step(self):
     """One step of the algorithm, that plays the game and improves params."""
     timestep = self.collect_batch_trajectory()
     alpha, update_target_net = self._entropy_schedule(self.learner_steps)
@@ -956,7 +956,7 @@ class RNaDSolver(policy_lib.Policy):
 
   def action_probabilities(self,
                            state: pyspiel.State,
-                           player_id: Any = None) -> dict[int, float]:
+                           player_id: Any = None):
     """Returns action probabilities dict for a single batch."""
     env_step = self._batch_of_states_as_env_step([state])
     probs = self._network_jit_apply_and_post_process(
@@ -974,7 +974,7 @@ class RNaDSolver(policy_lib.Policy):
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def actor_step(self, env_step: EnvStep,
-                 rng_key: chex.PRNGKey) -> Tuple[chex.Array, ActorStep]:
+                 rng_key: chex.PRNGKey):
     pi, _, _, _ = self.network.apply(self.params, env_step)
     # TODO(perolat): is this policy normalization really needed?
     pi = pi / jnp.sum(pi, axis=-1, keepdims=True)
