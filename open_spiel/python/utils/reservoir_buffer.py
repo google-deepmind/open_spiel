@@ -21,7 +21,7 @@ import random
 import numpy as np
 
 
-# TODO(perolat): refactor the reservoir with the NFSP Pytorch implementation
+# TODO(author18): refactor the reservoir with the NFSP Pytorch implementation
 class ReservoirBuffer(object):
   """Allows uniform sampling over a stream of data.
 

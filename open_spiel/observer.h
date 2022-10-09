@@ -63,7 +63,7 @@ class State;
 using ObservationParams = GameParameters;
 
 // Information about a multi-dimensional tensor span, eg name, shape, etc.
-// TODO(etar) add types information. For now only floats are supported.
+// TODO(author16) add types information. For now only floats are supported.
 class SpanTensorInfo {
  public:
   using Shape = absl::InlinedVector<int, 4>;
@@ -382,7 +382,7 @@ class Observation {
   //       The compressed data is a raw memory representation of an array
   //       of floats. Passing it from, say, big-endian architecture
   //       to little-endian architecture may corrupt the original data.
-  // TODO(etar) address the note above and implement things in a platform
+  // TODO(author16) address the note above and implement things in a platform
   //             independent way.
   std::string Compress() const;
   void Decompress(absl::string_view compressed);

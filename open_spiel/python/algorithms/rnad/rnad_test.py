@@ -21,7 +21,7 @@ import numpy as np
 
 from open_spiel.python.algorithms.rnad import rnad
 
-# TODO(perolat): test the losses and jax ops
+# TODO(author18): test the losses and jax ops
 
 
 class RNADTest(absltest.TestCase):
@@ -42,7 +42,7 @@ class RNADTest(absltest.TestCase):
     np.testing.assert_equal(
         jax.device_get(solver.params), jax.device_get(solver2.params))
 
-    # TODO(etar): figure out the last bits of the non-determinism
+    # TODO(author16): figure out the last bits of the non-determinism
     #             and reenable the checks below.
     # Now run both solvers for the same number of steps and verify
     # they behave in exactly the same way.

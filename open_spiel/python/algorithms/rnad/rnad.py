@@ -204,7 +204,7 @@ class FineTuning:
     # policy may be [B, A] or [T, B, A], etc. Thus add hk.BatchApply.
     dims = len(policy.shape) - 1
 
-    # TODO(perolat): avoid mixing vmap and BatchApply since the two could
+    # TODO(author18): avoid mixing vmap and BatchApply since the two could
     # be folded into either a single BatchApply or a sequence of vmaps, but
     # not the mix.
     vmapped = jax.vmap(self._discretize_single)
@@ -214,7 +214,7 @@ class FineTuning:
 
   def _discretize_single(self, mu: chex.Array) -> chex.Array:
     """A version of self._discretize but for the unbatched data."""
-    # TODO(perolat): try to merge _discretize and _discretize_single
+    # TODO(author18): try to merge _discretize and _discretize_single
     # into one function that handles both batched and unbatched cases.
     if len(mu.shape) == 2:
       mu_ = jnp.squeeze(mu, axis=0)
@@ -716,7 +716,7 @@ class RNaDSolver(policy_lib.Policy):
     # The random facilities for jax and numpy.
     self._rngkey = jax.random.PRNGKey(self.config.seed)
     self._np_rng = np.random.RandomState(self.config.seed)
-    # TODO(etar): serialize both above to get the fully deterministic behaviour.
+    # TODO(author16): serialize both above to get the fully deterministic behaviour.
 
     # Create a game and an example of a state.
     self._game = pyspiel.load_game(self.config.game_name)
@@ -977,7 +977,7 @@ class RNaDSolver(policy_lib.Policy):
   def actor_step(self, env_step: EnvStep,
                  rng_key: chex.PRNGKey) -> Tuple[chex.Array, ActorStep]:
     pi, _, _, _ = self.network.apply(self.params, env_step)
-    # TODO(perolat): is this policy normalization really needed?
+    # TODO(author18): is this policy normalization really needed?
     pi = pi / jnp.sum(pi, axis=-1, keepdims=True)
 
     # Sample from the policy pi respecting legal actions.
