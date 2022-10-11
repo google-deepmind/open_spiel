@@ -61,6 +61,11 @@ constexpr int kNumChipsUpperBound = 8;
 constexpr int kLeftoverChipScore = 10;
 constexpr int kFlagPenaltyPerCell = -25;
 
+// How much distance can there be between trades?
+constexpr int kDefaultTradeDistanceUpperBound =
+    kDefaultNumColors * kNumChipsUpperBound;
+
+
 // Default 10-board database used for tests, etc. See
 // colored_trails/boards100.txt and create your own using
 // colored_trails/colored_trails_board_generator.
@@ -85,6 +90,7 @@ struct Trade {
   Trade(const std::vector<int> _giving, const std::vector<int> _receiving);
   Trade(const Trade& other);
   std::string ToString() const;
+  int DistanceTo(const Trade& other) const;
   bool operator==(const Trade& other) const {
     return (giving == other.giving && receiving == other.receiving);
   }
@@ -153,6 +159,20 @@ class ColoredTrailsState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
+
+  // Override the current chips and trade proposal for the specified player.
+  // If the chips is an illegal allotment, it is randomly matched to the
+  // neareast legal one. If the trade is illegal as a result, it is replaced
+  // by one of the closes legal trades in edit distance.
+  // If called on Player 1's turn to set Player 2's values, then the
+  // future_trade_ is set and applied automatically.
+  // Finally, rng_rolls is several random numbers in [0,1) used for random
+  // decisions.
+  void SetChipsAndTradeProposal(Player player, std::vector<int> chips,
+                                Trade trade, std::vector<double>& rng_rolls);
+
   const Board& board() { return board_; }
   const std::vector<Trade>& proposals() { return proposals_; }
 
@@ -160,13 +180,22 @@ class ColoredTrailsState : public State {
   void DoApplyAction(Action action) override;
 
  private:
+  bool IsPassTrade(const Trade& trade) const;
   bool IsLegalTrade(Player proposer, const Trade& trade) const;
+  bool IsLegalTrade(const Trade& trade, const std::vector<int>& proposer_chips,
+                    const std::vector<int>& responder_chips) const;
+  std::vector<Action> LegalActionsForChips(
+      const std::vector<int>& player_chips,
+      const std::vector<int>& responder_chips) const;
 
   Player cur_player_;
   const ColoredTrailsGame* parent_game_;
   Board board_;
   std::vector<double> returns_;
   std::vector<Trade> proposals_;
+
+  // This is only used by the SetChipsAndTradeProposals functions above.
+  Trade future_trade_;
 };
 
 class ColoredTrailsGame : public Game {
@@ -198,8 +227,12 @@ class ColoredTrailsGame : public Game {
 
   const std::vector<Board>& AllBoards() const { return all_boards_; }
 
-  Trade LookupTrade(int trade_id) const {
-    return *(trade_info_.possible_trades.at(trade_id));
+  const Trade& LookupTrade(int trade_id) const {
+    if (trade_id == PassAction()) {
+      return pass_trade_;
+    } else {
+      return *(trade_info_.possible_trades.at(trade_id));
+    }
   }
 
   Action ResponderTradeWithPlayerAction(Player player) const {
@@ -208,13 +241,15 @@ class ColoredTrailsGame : public Game {
     return NumDistinctActions() - 3 + player;
   }
 
-  Action ResponderPassAction() const {
-    return NumDistinctActions() - 1;
-  }
+  Action PassAction() const { return NumDistinctActions() - 1; }
 
   int LookupTradeId(const std::string& trade_str) const {
     return trade_info_.trade_str_to_id.at(trade_str);
   }
+
+  std::vector<Action> LookupTradesCache(const std::string& key) const;
+  void AddToTradesCache(const std::string& key,
+                        std::vector<Action>& actions) const;
 
  private:
   const int num_colors_;
@@ -222,6 +257,8 @@ class ColoredTrailsGame : public Game {
   const int num_players_;
   std::vector<Board> all_boards_;
   TradeInfo trade_info_;
+  Trade pass_trade_;
+  mutable absl::flat_hash_map<std::string, std::vector<Action>> trades_cache_;
 };
 
 // Helper functions used by the board generator and game implementation.

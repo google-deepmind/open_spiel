@@ -171,7 +171,23 @@ void Board::ParseFromLine(const std::string& line) {
 }
 
 std::string Trade::ToString() const {
+  if (giving.empty() || receiving.empty()) {
+    return "Pass trade.";
+  }
   return absl::StrCat(ComboToString(giving), " for ", ComboToString(receiving));
+}
+
+int Trade::DistanceTo(const Trade& other) const {
+  int sum = 0;
+  if (other.giving.empty() || other.receiving.empty()) {
+    // Pass trade is the furthest possible distance.
+    return kDefaultTradeDistanceUpperBound + 1;
+  }
+  for (int i = 0; i < giving.size(); ++i) {
+    sum += std::abs(other.giving[i] - giving[i]);
+    sum += std::abs(other.receiving[i] - receiving[i]);
+  }
+  return sum;
 }
 
 bool Trade::reduce() {
@@ -253,6 +269,65 @@ std::string ColoredTrailsState::InformationStateString(Player player) const {
 void ColoredTrailsState::ObservationTensor(Player player,
                                            absl::Span<float> values) const {
   InformationStateTensor(player, values);
+}
+
+std::unique_ptr<State> ColoredTrailsState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  std::vector<std::unique_ptr<State>> candidates;
+  const std::vector<Board>& all_boards = parent_game_->AllBoards();
+
+  for (int o = 0; o < all_boards.size(); ++o) {
+    if (board_.ToString() != all_boards[o].ToString()) {
+      continue;
+    }
+
+    std::unique_ptr<State> candidate_state = parent_game_->NewInitialState();
+    candidate_state->ApplyAction(o);
+
+    if (player_id == 0) {
+      if (candidate_state->InformationStateString(0) ==
+          InformationStateString(0)) {
+        candidates.push_back(std::move(candidate_state));
+      }
+    } else if (player_id == 1) {
+      // Enumerate legal moves.
+      for (Action action : candidate_state->LegalActions()) {
+        std::unique_ptr<State> candidate_child = candidate_state->Child(action);
+        if (candidate_child->InformationStateString(1) ==
+            InformationStateString(1)) {
+          candidates.push_back(std::move(candidate_child));
+        } else {
+          // Player 0's move is hidden. No need to keep trying actions if P1's
+          // infostate doesn't match.
+          break;
+        }
+      }
+    } else {
+      SPIEL_CHECK_EQ(player_id, 2);
+      SPIEL_CHECK_EQ(History().size(), 3);
+      Action p0_action = History()[1];
+      Action p1_action = History()[2];
+      // Receiver sees everything, so replay the moves.
+      std::vector<Action> legal_actions = candidate_state->LegalActions();
+      if (absl::c_find(legal_actions, p0_action) != legal_actions.end()) {
+        candidate_state->ApplyAction(p0_action);
+        legal_actions = candidate_state->LegalActions();
+        if (absl::c_find(legal_actions, p1_action) != legal_actions.end()) {
+          candidate_state->ApplyAction(p1_action);
+          candidates.push_back(std::move(candidate_state));
+        }
+      }
+    }
+  }
+
+  SPIEL_CHECK_GE(candidates.size(), 1);
+  if (candidates.size() == 1) {
+    return std::move(candidates[0]);
+  } else {
+    int idx = static_cast<int>(rng() * candidates.size());
+    SPIEL_CHECK_LE(idx, candidates.size());
+    return std::move(candidates[idx]);
+  }
 }
 
 void ColoredTrailsState::InformationStateTensor(
@@ -359,6 +434,15 @@ void ColoredTrailsState::DoApplyAction(Action action) {
   } else if (cur_player_ < kResponderId) {
     proposals_.push_back(parent_game_->LookupTrade(action));
     cur_player_++;
+
+    // Special case when using SetChipsAndProposals, check the future_trade_.
+    // If it's now the second player, and there's a future trade queued, apply
+    // it.
+    if (cur_player_ == 1 &&
+        (!future_trade_.giving.empty() || !future_trade_.receiving.empty())) {
+      proposals_.push_back(future_trade_);
+      cur_player_++;
+    }
   } else {
     // Base scores.
     SPIEL_CHECK_EQ(cur_player_, kResponderId);
@@ -367,10 +451,14 @@ void ColoredTrailsState::DoApplyAction(Action action) {
     }
 
     if (action == parent_game_->ResponderTradeWithPlayerAction(0)) {
-      board_.ApplyTrade({0, kResponderId}, proposals_[0]);
+      if (!IsPassTrade(proposals_[0])) {
+        board_.ApplyTrade({0, kResponderId}, proposals_[0]);
+      }
     } else if (action == parent_game_->ResponderTradeWithPlayerAction(1)) {
-      board_.ApplyTrade({1, kResponderId}, proposals_[1]);
-    } else if (action == parent_game_->ResponderPassAction()) {
+      if (!IsPassTrade(proposals_[1])) {
+        board_.ApplyTrade({1, kResponderId}, proposals_[1]);
+      }
+    } else if (action == parent_game_->PassAction()) {
       // No trade.
     } else {
       std::string error = absl::StrCat("Invalid action: ", action,
@@ -388,14 +476,19 @@ void ColoredTrailsState::DoApplyAction(Action action) {
   }
 }
 
-bool ColoredTrailsState::IsLegalTrade(Player proposer,
-                                      const Trade& trade) const {
+bool ColoredTrailsState::IsPassTrade(const Trade& trade) const {
+  return (trade.giving.empty() && trade.receiving.empty());
+}
+
+bool ColoredTrailsState::IsLegalTrade(
+    const Trade& trade, const std::vector<int>& proposer_chips,
+    const std::vector<int>& responder_chips) const {
   for (int i = 0; i < board_.num_colors; ++i) {
-    if (trade.giving[i] > board_.chips[proposer][i]) {
+    if (trade.giving[i] > proposer_chips[i]) {
       return false;
     }
 
-    if (trade.receiving[i] > board_.chips[kResponderId][i]) {
+    if (trade.receiving[i] > responder_chips[i]) {
       return false;
     }
   }
@@ -407,40 +500,64 @@ bool ColoredTrailsState::IsLegalTrade(Player proposer,
   return (valid && copy == trade);
 }
 
+bool ColoredTrailsState::IsLegalTrade(Player proposer,
+                                      const Trade& trade) const {
+  return IsLegalTrade(trade, board_.chips[proposer],
+                      board_.chips[kResponderId]);
+}
+
+std::vector<Action> ColoredTrailsState::LegalActionsForChips(
+    const std::vector<int>& player_chips,
+    const std::vector<int>& responder_chips) const {
+  // First, check the cache.
+  std::string key = absl::StrCat(ComboToString(player_chips), " ",
+                                 ComboToString(responder_chips));
+  std::vector<Action> actions = parent_game_->LookupTradesCache(key);
+  if (!actions.empty()) {
+    return actions;
+  }
+
+  ChipComboIterator proposer_iter(player_chips);
+  while (!proposer_iter.IsFinished()) {
+    std::vector<int> proposer_chips = proposer_iter.Next();
+    ChipComboIterator receiver_iter(responder_chips);
+    while (!receiver_iter.IsFinished()) {
+      std::vector<int> receiver_chips = receiver_iter.Next();
+      Trade trade(proposer_chips, receiver_chips);
+      if (IsLegalTrade(trade, proposer_chips, responder_chips)) {
+        int trade_id = parent_game_->LookupTradeId(trade.ToString());
+        actions.push_back(trade_id);
+      }
+    }
+  }
+  // Sort and remove duplicates.
+  absl::c_sort(actions);
+  auto last = std::unique(actions.begin(), actions.end());
+  actions.erase(last, actions.end());
+
+  // Add pass trade.
+  actions.push_back(parent_game_->PassAction());
+
+  // Add these to the cache.
+  parent_game_->AddToTradesCache(key, actions);
+  return actions;
+}
+
 std::vector<Action> ColoredTrailsState::LegalActions() const {
   if (IsChanceNode()) {
     return LegalChanceOutcomes();
   } else if (IsTerminal()) {
     return {};
   } else if (cur_player_ < kResponderId) {
-    std::vector<Action> actions;
-    ChipComboIterator proposer_iter(board_.chips[cur_player_]);
-    while (!proposer_iter.IsFinished()) {
-      std::vector<int> proposer_chips = proposer_iter.Next();
-      ChipComboIterator receiver_iter(board_.chips[kResponderId]);
-      while (!receiver_iter.IsFinished()) {
-        std::vector<int> receiver_chips = receiver_iter.Next();
-        Trade trade(proposer_chips, receiver_chips);
-        if (IsLegalTrade(cur_player_, trade)) {
-          int trade_id = parent_game_->LookupTradeId(trade.ToString());
-          actions.push_back(trade_id);
-        }
-      }
-    }
-    // Sort and remove duplicates.
-    absl::c_sort(actions);
-    auto last = std::unique(actions.begin(), actions.end());
-    actions.erase(last, actions.end());
-    return actions;
+    return LegalActionsForChips(board_.chips[cur_player_],
+                                board_.chips[kResponderId]);
   } else {
     SPIEL_CHECK_EQ(cur_player_, kResponderId);
     // Last three actions correspond to "trade with 0", "trade with 1", and
     // "no trade".
-    return {
-      parent_game_->ResponderTradeWithPlayerAction(0),
-      parent_game_->ResponderTradeWithPlayerAction(1),
-      parent_game_->ResponderPassAction()
-    };
+    return {parent_game_->ResponderTradeWithPlayerAction(0),
+            parent_game_->ResponderTradeWithPlayerAction(1),
+            parent_game_->PassAction()};
   }
 }
 
@@ -466,7 +583,12 @@ std::string ColoredTrailsState::ToString() const {
   if (MoveNumber() > 0) {
     absl::StrAppend(&str, "Move Number: ", MoveNumber(), "\n",
                     board_.PrettyBoardString(), "\n");
+    for (Player p = 0; p < num_players_; ++p) {
+      absl::StrAppend(&str, "P", p, " chips: ", ComboToString(board_.chips[p]),
+                      "\n");
+    }
   }
+
   absl::StrAppend(&str, "Pos: ", absl::StrJoin(board_.positions, " "), "\n");
   for (int i = 0; i < proposals_.size(); ++i) {
     absl::StrAppend(&str, "Proposal ", i, ": ", proposals_[i].ToString(), "\n");
@@ -476,6 +598,92 @@ std::string ColoredTrailsState::ToString() const {
 
 std::unique_ptr<State> ColoredTrailsState::Clone() const {
   return std::unique_ptr<State>(new ColoredTrailsState(*this));
+}
+
+void ColoredTrailsState::SetChipsAndTradeProposal(
+    Player player, std::vector<int> chips, Trade trade,
+    std::vector<double>& rng_rolls) {
+  // First, check the chips.
+  int rng_idx = 0;
+  int num_chips = std::accumulate(chips.begin(), chips.end(), 0);
+
+  while (num_chips < kNumChipsLowerBound) {
+    std::vector<int> indices;
+    for (int i = 0; i < chips.size(); i++) {
+      if (chips[i] == 0) {
+        indices.push_back(i);
+      }
+    }
+    SPIEL_CHECK_LT(rng_idx, rng_rolls.size());
+    int selected_idx =
+        indices[static_cast<int>(rng_rolls[rng_idx] * indices.size())];
+    chips[selected_idx]++;
+    rng_idx++;
+    num_chips = std::accumulate(chips.begin(), chips.end(), 0);
+  }
+
+  while (num_chips > kNumChipsUpperBound) {
+    std::vector<int> indices;
+    for (int i = 0; i < chips.size(); i++) {
+      if (chips[i] > 0) {
+        indices.push_back(i);
+      }
+    }
+    SPIEL_CHECK_LT(rng_idx, rng_rolls.size());
+    int selected_idx =
+        indices[static_cast<int>(rng_rolls[rng_idx] * indices.size())];
+    chips[selected_idx]--;
+    rng_idx++;
+    num_chips = std::accumulate(chips.begin(), chips.end(), 0);
+  }
+
+  board_.chips[player] = chips;
+  trade.reduce();
+
+  // Now check if the Trade is legal. If not, chose one of the closest legal
+  // ones in edit distance
+  if (!IsLegalTrade(player, trade)) {
+    std::vector<Trade> closest_trades;
+    int lowest_distance = kDefaultTradeDistanceUpperBound + 100;
+    std::vector<Action> legal_actions =
+        LegalActionsForChips(chips, board_.chips[kResponderId]);
+    for (Action action : legal_actions) {
+      const Trade& legal_trade = parent_game_->LookupTrade(action);
+      int dist = trade.DistanceTo(legal_trade);
+      if (dist == lowest_distance) {
+        closest_trades.push_back(legal_trade);
+      } else if (dist < lowest_distance) {
+        lowest_distance = dist;
+        closest_trades = {legal_trade};
+      }
+    }
+
+    if (closest_trades.empty()) {
+      std::cout << ToString() << std::endl;
+      std::cout << "Trade: " << trade.ToString() << std::endl;
+    }
+
+    SPIEL_CHECK_GT(closest_trades.size(), 0);
+    if (closest_trades.size() == 1) {
+      trade = closest_trades[0];
+    } else {
+      trade = closest_trades[static_cast<int>(rng_rolls[rng_idx] *
+                                              closest_trades.size())];
+      rng_idx++;
+    }
+  }
+
+  if (player == 0) {
+    SPIEL_CHECK_NE(cur_player_, 0);
+    proposals_[0] = trade;
+  } else if (player == 1) {
+    SPIEL_CHECK_NE(cur_player_, 1);
+    if (cur_player_ == 0) {
+      future_trade_ = trade;
+    } else {
+      proposals_[1] = trade;
+    }
+  }
 }
 
 ColoredTrailsGame::ColoredTrailsGame(const GameParameters& params)
@@ -517,6 +725,20 @@ std::vector<int> ColoredTrailsGame::InformationStateTensorShape() const {
     // 0 to upperboard of chip combos for each in X for Y, and max two proposals
     (kNumChipsUpperBound + 1) * num_colors_ * 2 * (num_players_ - 1)
   };
+}
+
+std::vector<Action> ColoredTrailsGame::LookupTradesCache(
+    const std::string& key) const {
+  const auto& iter = trades_cache_.find(key);
+  if (iter == trades_cache_.end()) {
+    return {};
+  }
+  return iter->second;
+}
+
+void ColoredTrailsGame::AddToTradesCache(const std::string& key,
+                                         std::vector<Action>& actions) const {
+  trades_cache_[key] = actions;
 }
 
 }  // namespace colored_trails
