@@ -147,7 +147,7 @@ class BargainingGame : public Game {
   std::string ActionToString(Player player, Action move_id) const override;
 
   int MaxGameLength() const override { return kMaxTurns; }
-  int MaxChanceNodesInHistory() const override { return MaxGameLength(); }
+  int MaxChanceNodesInHistory() const override { return 1; }
 
   int NumPlayers() const override { return kNumPlayers; }
   double MaxUtility() const override { return kTotalValueAllItems; }
