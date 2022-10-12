@@ -392,8 +392,14 @@ void ColoredTrailsState::InformationStateTensor(
   if (player == kResponderId && CurrentPlayer() == kResponderId) {
     SPIEL_CHECK_EQ(proposals_.size(), 2);
     for (int p : {0, 1}) {
-      chips_ptrs[0] = &(proposals_[p].giving);
-      chips_ptrs[1] = &(proposals_[p].receiving);
+      if (IsPassTrade(proposals_[p])) {
+        chips_ptrs[0] = &zeros;
+        chips_ptrs[1] = &zeros;
+      } else {
+        chips_ptrs[0] = &(proposals_[p].giving);
+        chips_ptrs[1] = &(proposals_[p].receiving);
+      }
+
       for (int c = 0; c < 2; ++c) {
         for (int i = 0; i < board_.num_colors; ++i) {
           for (int j = 0; j <= chips_ptrs[c]->at(i); ++j) {
