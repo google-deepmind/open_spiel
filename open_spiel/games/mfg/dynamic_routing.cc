@@ -83,8 +83,7 @@ MeanFieldRoutingGame::MeanFieldRoutingGame(const GameParameters& params)
   SPIEL_CHECK_NE(max_num_time_step, 0);
   time_step_length_ =
       ParameterValue<double>("time_step_length", kDefaultTimeStepLength);
-  network_name_ =
-      ParameterValue<std::string>("network", kDefaultNetworkName);
+  network_name_ = ParameterValue<std::string>("network", kDefaultNetworkName);
   SPIEL_CHECK_NE(network_name_, "");
   perform_sanity_checks_ = ParameterValue<bool>("perform_sanity_checks", true);
   std::unique_ptr<DynamicRoutingData> data =
@@ -217,26 +216,23 @@ std::string MeanFieldRoutingGameState::StateToString(
   if (is_chance_init_) {
     return "initial chance node";
   }
-  if (player_id == PlayerId::kDefaultPlayerId) {
-    time = absl::StrFormat("%d_default", time_step);
+  if (player_id == PlayerId::kDefaultPlayerId ||
+      player_id == PlayerId::kTerminalPlayerId) {
+    time = absl::StrCat(time_step);
   } else if (player_id == PlayerId::kMeanFieldPlayerId) {
     time = absl::StrFormat("%d_mean_field", time_step);
   } else if (player_id == PlayerId::kChancePlayerId) {
     time = absl::StrFormat("%d_chance", time_step);
-  } else if (player_id == PlayerId::kTerminalPlayerId) {
-    time = absl::StrFormat("%d_terminal", time_step);
   } else {
     SpielFatalError(
         "Player id should be DEFAULT_PLAYER_ID, MEAN_FIELD or CHANCE");
   }
   if (vehicle_final_travel_time_ != 0.0) {
-    return absl::StrFormat(
-        "Arrived at %s, with travel time %f, t=%s, return=%.2f", location,
-        vehicle_final_travel_time_, time, ret);
+    return absl::StrFormat("Arrived at %s, with arrival time %.2f, t=%s",
+                           location, vehicle_final_travel_time_, time);
   }
-  return absl::StrFormat(
-      "Location=%s, waiting time=%d, t=%s, destination=%s, return=%.2f",
-      location, waiting_time, time, destination, ret);
+  return absl::StrFormat("Location=%s, waiting time=%d, t=%s, destination=%s",
+                         location, waiting_time, time, destination);
 }
 
 std::vector<Action> MeanFieldRoutingGameState::LegalActions() const {

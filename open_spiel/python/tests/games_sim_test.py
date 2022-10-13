@@ -344,15 +344,15 @@ class GamesSimTest(parameterized.TestCase):
   @parameterized.parameters(
       {"game_name": "python_mfg_crowd_modelling"},
       {"game_name": "mfg_crowd_modelling"},
-      {"game_name": "mfg_crowd_modelling_2d"},
+      # {"game_name": "mfg_crowd_modelling_2d"},
       {"game_name": "kuhn_poker"},
       {"game_name": "leduc_poker"},
   )
   def test_has_at_least_an_action(self, game_name):
     """Check that all population's state have at least one action."""
     game = pyspiel.load_game(game_name)
-    to_string = lambda s: s.observation_string(pyspiel.PlayerId.
-                                               DEFAULT_PLAYER_ID)
+    to_string = (
+        lambda s: s.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
     states = get_all_states.get_all_states(
         game,
         depth_limit=-1,
