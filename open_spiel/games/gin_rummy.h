@@ -107,12 +107,6 @@ class GinRummyState : public State {
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
- protected:
-  void DoApplyAction(Action action) override;
-
- private:
-  friend class GinRummyObserver;
-
   enum class Phase {
     kDeal,
     kFirstUpcard,
@@ -123,6 +117,21 @@ class GinRummyState : public State {
     kWall,
     kGameOver
   };
+
+  // Used for Python bindings.
+  Phase CurrentPhase() const { return phase_; }
+  absl::optional<int> Upcard() const { return upcard_; }
+  int StockSize() const { return stock_size_; }
+  std::vector<std::vector<int>> Hands() const { return hands_; }
+  std::vector<int> DiscardPile() const { return discard_pile_; }
+  std::vector<int> Deadwood() const { return deadwood_; }
+  std::vector<bool> Knocked() const { return knocked_; }
+
+ protected:
+  void DoApplyAction(Action action) override;
+
+ private:
+  friend class GinRummyObserver;
 
   inline static constexpr std::array<absl::string_view, 8> kPhaseString = {
       "Deal",  "FirstUpcard", "Draw", "Discard",
@@ -242,6 +251,10 @@ class GinRummyGame : public Game {
 
   std::shared_ptr<GinRummyObserver> default_observer_;
   std::shared_ptr<GinRummyObserver> info_state_observer_;
+
+  // Used for Python bindings.
+  bool Oklahoma() const { return oklahoma_; }
+  int KnockCard() const { return knock_card_; }
 
  private:
   const bool oklahoma_;
