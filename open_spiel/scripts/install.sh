@@ -258,7 +258,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get -y install $EXT_DEPS
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    cargo install bindgen
+    cargo add bindgen
   fi
 
   if [[ "$TRAVIS" ]]; then
