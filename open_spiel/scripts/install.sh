@@ -258,7 +258,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get -y install $EXT_DEPS
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    cargo add bindgen
+    cargo install bindgen-cli
   fi
 
   if [[ "$TRAVIS" ]]; then
@@ -286,7 +286,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
     [[ -x `which rustc` ]] || brew install rust || echo "** Warning: failed 'brew install rust' -- continuing"
-    cargo install bindgen
+    cargo install bindgen-cli
   fi
 
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
