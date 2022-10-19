@@ -15,13 +15,16 @@
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 
 #include <memory>
+#include <vector>
 
 #include "open_spiel/games/gin_rummy.h"
+#include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 
 // Several function return absl::optional or lists of absl::optional, so must
 // use pybind11_abseil here.
+#include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::gin_rummy::GinRummyGame);
@@ -32,6 +35,7 @@ namespace open_spiel {
 namespace py = ::pybind11;
 using gin_rummy::GinRummyGame;
 using gin_rummy::GinRummyState;
+using gin_rummy::GinRummyUtils;
 
 void init_pyspiel_games_gin_rummy(py::module& m) {
   py::classh<GinRummyState, State> state_class(m, "GinRummyState");
@@ -78,6 +82,43 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
             return std::dynamic_pointer_cast<GinRummyGame>(
                 std::const_pointer_cast<Game>(LoadGame(data)));
           }));
+
+  py::class_<GinRummyUtils>(m, "GinRummyUtils")
+      .def(py::init<int, int, int>())
+      .def("card_string", &GinRummyUtils::CardString)
+      .def("hand_to_string", &GinRummyUtils::HandToString)
+      .def("card_int", &GinRummyUtils::CardInt)
+      .def("card_ints_to_card_strings", &GinRummyUtils::CardIntsToCardStrings)
+      .def("card_strings_to_card_ints", &GinRummyUtils::CardStringsToCardInts)
+      .def("card_value", &GinRummyUtils::CardValue)
+      .def("total_card_value",
+           py::overload_cast<const gin_rummy::VecInt &>(
+               &GinRummyUtils::TotalCardValue, py::const_))
+      .def("total_card_value",
+           py::overload_cast<const gin_rummy::VecVecInt &>(
+               &GinRummyUtils::TotalCardValue, py::const_))
+      .def("card_rank", &GinRummyUtils::CardRank)
+      .def("card_suit", &GinRummyUtils::CardSuit)
+      .def("is_consecutive", &GinRummyUtils::IsConsecutive)
+      .def("is_rank_meld", &GinRummyUtils::IsRankMeld)
+      .def("is_suit_meld", &GinRummyUtils::IsSuitMeld)
+      .def("rank_melds", &GinRummyUtils::RankMelds)
+      .def("suit_melds", &GinRummyUtils::SuitMelds)
+      .def("all_melds", &GinRummyUtils::AllMelds)
+      .def("all_meld_groups", &GinRummyUtils::AllMeldGroups)
+      .def("best_meld_group", &GinRummyUtils::BestMeldGroup)
+      .def("min_deadwood",
+           py::overload_cast<gin_rummy::VecInt, absl::optional<int>>(
+               &GinRummyUtils::MinDeadwood, py::const_))
+      .def("min_deadwood",
+           py::overload_cast<const gin_rummy::VecInt &>(
+               &GinRummyUtils::MinDeadwood, py::const_))
+      .def("rank_meld_layoff", &GinRummyUtils::RankMeldLayoff)
+      .def("suit_meld_layoffs", &GinRummyUtils::SuitMeldLayoffs)
+      .def("legal_melds", &GinRummyUtils::LegalMelds)
+      .def("legal_discards", &GinRummyUtils::LegalDiscards)
+      .def("all_layoffs", &GinRummyUtils::AllLayoffs)
+      .def("meld_to_int", &GinRummyUtils::MeldToInt);
 }
 }  // namespace open_spiel
 
