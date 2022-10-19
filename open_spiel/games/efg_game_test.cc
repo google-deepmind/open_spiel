@@ -30,6 +30,9 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
+// Sample game from Gambit
+const char* kCommasFilename = "open_spiel/games/efg/commas.efg";
+
 const char* kSampleFilename = "open_spiel/games/efg/sample.efg";
 const char* kKuhnFilename = "open_spiel/games/efg/kuhn_poker.efg";
 const char* kLeducFilename = "open_spiel/games/efg/leduc_poker.efg";
@@ -92,6 +95,24 @@ void EFGGameSimpleForkFromData() {
   // EFG games loaded directly via string cannot be properly deserialized
   // because there is no way to pass the data back vai the game string.
   testing::RandomSimTestNoSerialize(*game, 100);
+}
+
+void EFGGameCommasFromFile() {
+  absl::optional<std::string> file = FindFile(kCommasFilename, 2);
+  if (file != absl::nullopt) {
+    std::cout << "Found file: " << file.value() << "; running sim test.";
+    std::shared_ptr<const Game> game =
+        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+    SPIEL_CHECK_TRUE(game != nullptr);
+    GameType type = game->GetType();
+    SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
+    SPIEL_CHECK_EQ(type.information,
+                   GameType::Information::kImperfectInformation);
+    SPIEL_CHECK_EQ(type.utility, GameType::Utility::kGeneralSum);
+    SPIEL_CHECK_EQ(type.chance_mode, GameType::ChanceMode::kExplicitStochastic);
+    SPIEL_CHECK_EQ(game->NumDistinctActions(), 4);
+    SPIEL_CHECK_EQ(game->NumPlayers(), 2);
+  }
 }
 
 void EFGGameSimTestsSampleFromFile() {
@@ -191,6 +212,7 @@ int main(int argc, char** argv) {
   open_spiel::Init("", &argc, &argv, true);
   open_spiel::efg_game::EFGGameSimTestsSampleFromData();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromData();
+  open_spiel::efg_game::EFGGameCommasFromFile();
   open_spiel::efg_game::EFGGameSimTestsSampleFromFile();
   open_spiel::efg_game::EFGGameSimTestsKuhnFromFile();
   open_spiel::efg_game::EFGGameSimTestsLeducFromFile();

@@ -375,6 +375,39 @@ bool EFGGame::ParseDoubleValue(const std::string& str, double* value) const {
   }
 }
 
+
+std::string EFGGame::NextPayoffToken() {
+  std::string str = "";
+  bool seen_comma = false;
+
+  while (true) {
+    // Check stopping condition:
+    if (pos_ >= string_data_.length() ||
+        string_data_.at(pos_) == ',' ||
+        IsWhiteSpace(string_data_.at(pos_))) {
+      break;
+    }
+
+    str.push_back(string_data_.at(pos_));
+    AdvancePosition();
+  }
+
+  // Advance the position to the next token.
+  while (pos_ < string_data_.length()) {
+    if (!seen_comma && string_data_.at(pos_) == ',') {
+      seen_comma = true;
+      AdvancePosition();
+      continue;
+    }
+    if (!IsWhiteSpace(string_data_.at(pos_))) {
+      break;
+    }
+    AdvancePosition();
+  }
+
+  return str;
+}
+
 std::string EFGGame::NextToken() {
   std::string str = "";
   bool reading_quoted_string = false;
@@ -660,7 +693,7 @@ void EFGGame::ParseTerminalNode(Node* parent, Node* child, int depth) {
   bool identical = true;
   while (string_data_.at(pos_) != '}') {
     double utility = 0;
-    SPIEL_EFG_PARSE_CHECK_TRUE(ParseDoubleValue(NextToken(), &utility));
+    SPIEL_EFG_PARSE_CHECK_TRUE(ParseDoubleValue(NextPayoffToken(), &utility));
     child->payoffs.push_back(utility);
     util_sum += utility;
     if (!min_util_.has_value()) {
