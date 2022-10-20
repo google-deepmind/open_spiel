@@ -18,6 +18,10 @@ if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   )
   target_include_directories (alpha_zero_torch PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+  add_executable(torch_alpha_zero_test alpha_zero_test.cc ${OPEN_SPIEL_OBJECTS}
+                $<TARGET_OBJECTS:alpha_zero_torch> $<TARGET_OBJECTS:tests>)
+  add_test(torch_alpha_zero_test torch_alpha_zero_test)
+
   add_executable(torch_model_test model_test.cc ${OPEN_SPIEL_OBJECTS}
                 $<TARGET_OBJECTS:alpha_zero_torch> $<TARGET_OBJECTS:tests>)
   add_test(torch_model_test torch_model_test)
@@ -27,6 +31,7 @@ if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   add_test(torch_vpnet_test torch_vpnet_test)
 
   target_link_libraries (alpha_zero_torch ${TORCH_LIBRARIES})
+  target_link_libraries (torch_alpha_zero_test ${TORCH_LIBRARIES})
   target_link_libraries (torch_model_test ${TORCH_LIBRARIES})
   target_link_libraries (torch_vpnet_test ${TORCH_LIBRARIES})
 endif ()

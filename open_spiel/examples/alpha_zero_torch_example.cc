@@ -121,6 +121,9 @@ int main(int argc, char** argv) {
   config.learning_rate = absl::GetFlag(FLAGS_learning_rate);
   config.weight_decay = absl::GetFlag(FLAGS_weight_decay);
   config.train_batch_size = absl::GetFlag(FLAGS_train_batch_size);
+  config.inference_batch_size = absl::GetFlag(FLAGS_inference_batch_size);
+  config.inference_threads = absl::GetFlag(FLAGS_inference_threads);
+  config.inference_cache = absl::GetFlag(FLAGS_inference_cache);
   config.replay_buffer_size = absl::GetFlag(FLAGS_replay_buffer_size);
   config.replay_buffer_reuse = absl::GetFlag(FLAGS_replay_buffer_reuse);
   config.checkpoint_freq = absl::GetFlag(FLAGS_checkpoint_freq);
@@ -128,10 +131,6 @@ int main(int argc, char** argv) {
   config.uct_c = absl::GetFlag(FLAGS_uct_c);
   config.min_simulations = absl::GetFlag(FLAGS_min_simulations);
   config.max_simulations = absl::GetFlag(FLAGS_max_simulations);
-  config.train_batch_size = absl::GetFlag(FLAGS_train_batch_size);
-  config.inference_batch_size = absl::GetFlag(FLAGS_inference_batch_size);
-  config.inference_threads = absl::GetFlag(FLAGS_inference_threads);
-  config.inference_cache = absl::GetFlag(FLAGS_inference_cache);
   config.policy_alpha = absl::GetFlag(FLAGS_policy_alpha);
   config.policy_epsilon = absl::GetFlag(FLAGS_policy_epsilon);
   config.temperature = absl::GetFlag(FLAGS_temperature);

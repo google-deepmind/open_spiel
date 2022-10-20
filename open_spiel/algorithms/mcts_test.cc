@@ -23,20 +23,19 @@
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
 
-using open_spiel::algorithms::Evaluator;
-using open_spiel::algorithms::RandomRolloutEvaluator;
-
 namespace open_spiel {
+namespace algorithms {
 namespace {
 
 constexpr double UCT_C = 2;
+constexpr int MIN_SIMULATIONS = 10;
 
 std::unique_ptr<open_spiel::Bot> InitBot(const open_spiel::Game& game,
                                          int max_simulations,
                                          std::shared_ptr<Evaluator> evaluator) {
-  return std::make_unique<open_spiel::algorithms::MCTSBot>(
-      game, std::move(evaluator), UCT_C, /*min_simulations=*/0, max_simulations,
-      /*max_memory_mb=*/5, /*solve=*/true, /*seed=*/42, /*verbose=*/false);
+  return std::make_unique<MCTSBot>(
+      game, std::move(evaluator), UCT_C, MIN_SIMULATIONS, max_simulations,
+      /*max_memory_mb=*/10, /*solve=*/true, /*seed=*/42, /*verbose=*/false);
 }
 
 void MCTSTest_CanPlayTicTacToe() {
@@ -103,18 +102,19 @@ open_spiel::Action GetAction(const open_spiel::State& state,
   open_spiel::SpielFatalError(absl::StrCat("Illegal action: ", action_str));
 }
 
-std::pair<std::unique_ptr<algorithms::SearchNode>, std::unique_ptr<State>>
-SearchTicTacToeState(const absl::string_view initial_actions) {
+std::pair<std::unique_ptr<SearchNode>, std::unique_ptr<State>>
+SearchTicTacToeState(const absl::string_view initial_actions,
+                     bool solve = true) {
   auto game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
   for (const auto& action_str : absl::StrSplit(initial_actions, ' ')) {
     state->ApplyAction(GetAction(*state, action_str));
   }
   auto evaluator = std::make_shared<RandomRolloutEvaluator>(20, 42);
-  algorithms::MCTSBot bot(*game, evaluator, UCT_C,
+  algorithms::MCTSBot bot(*game, evaluator, UCT_C, MIN_SIMULATIONS,
                           /*max_simulations=*/ 10000,
                           /*max_memory_mb=*/ 10,
-                          /*solve=*/ true,
+                          /*solve=*/ solve,
                           /*seed=*/ 42,
                           /*verbose=*/ false);
   return {bot.MCTSearch(*state), std::move(state)};
@@ -124,9 +124,9 @@ void MCTSTest_SolveDraw() {
   auto [root, state] = SearchTicTacToeState("x(1,1) o(0,0) x(2,2)");
   SPIEL_CHECK_EQ(state->ToString(), "o..\n.x.\n..x");
   SPIEL_CHECK_EQ(root->outcome[root->player], 0);
-  for (const algorithms::SearchNode& c : root->children)
+  for (const SearchNode& c : root->children)
     SPIEL_CHECK_LE(c.outcome[c.player], 0);  // No winning moves.
-  const algorithms::SearchNode& best = root->BestChild();
+  const SearchNode& best = root->BestChild();
   SPIEL_CHECK_EQ(best.outcome[best.player], 0);
   std::string action_str = state->ActionToString(best.player, best.action);
   if (action_str != "o(2,0)" && action_str != "o(0,2)")  // All others lose.
@@ -138,7 +138,7 @@ void MCTSTest_SolveLoss() {
       SearchTicTacToeState("x(1,1) o(0,0) x(2,2) o(0,1) x(0,2)");
   SPIEL_CHECK_EQ(state->ToString(), "oox\n.x.\n..x");
   SPIEL_CHECK_EQ(root->outcome[root->player], -1);
-  for (const algorithms::SearchNode& c : root->children)
+  for (const SearchNode& c : root->children)
     SPIEL_CHECK_EQ(c.outcome[c.player], -1);  // All losses.
 }
 
@@ -146,7 +146,7 @@ void MCTSTest_SolveWin() {
   auto [root, state] = SearchTicTacToeState("x(0,1) o(2,2)");
   SPIEL_CHECK_EQ(state->ToString(), ".x.\n...\n..o");
   SPIEL_CHECK_EQ(root->outcome[root->player], 1);
-  const algorithms::SearchNode& best = root->BestChild();
+  const SearchNode& best = root->BestChild();
   SPIEL_CHECK_EQ(best.outcome[best.player], 1);
   SPIEL_CHECK_EQ(state->ActionToString(best.player, best.action), "x(0,2)");
 }
@@ -155,28 +155,51 @@ void MCTSTest_GarbageCollect() {
   auto game = LoadGame("tic_tac_toe");
   std::unique_ptr<State> state = game->NewInitialState();
   auto evaluator = std::make_shared<RandomRolloutEvaluator>(1, 42);
-  algorithms::MCTSBot bot(*game, evaluator, UCT_C,
-                          /*max_simulations=*/ 1000000,
-                          /*max_memory_mb=*/ 1,
-                          /*solve=*/ true,
-                          /*seed=*/ 42,
-                          /*verbose=*/ true);  // Verify the log output.
-  std::unique_ptr<algorithms::SearchNode> root = bot.MCTSearch(*state);
+  MCTSBot bot(*game, evaluator, UCT_C, MIN_SIMULATIONS,
+              /*max_simulations=*/ 1000000,
+              /*max_memory_mb=*/ 1,
+              /*solve=*/ true,
+              /*seed=*/ 42,
+              /*verbose=*/ true);  // Verify the log output.
+  std::unique_ptr<SearchNode> root = bot.MCTSearch(*state);
   SPIEL_CHECK_TRUE(root->outcome.size() == 2 ||
                    root->explore_count == 1000000);
 }
 
+void MCTSTest_MinSimulations() {
+  // A state with a single child action should run min_simulations.
+  auto [root, state] = SearchTicTacToeState(
+      "x(0,0) o(0,1) x(0,2) o(1,2) x(2,2) o(2,1) x(2,0) o(1,0)",
+      /*solve=*/false);
+  SPIEL_CHECK_EQ(state->ToString(), "xox\no.o\nxox");
+  SPIEL_CHECK_EQ(root->children.size(), 1);
+  SPIEL_CHECK_EQ(root->children[0].explore_count, MIN_SIMULATIONS);
+}
+
+void MCTSTest_MinSimulationsSolved() {
+  // Exception: A state with a single child action can return before
+  // min_simulations when the tree is solved.
+  auto [root, state] = SearchTicTacToeState(
+      "x(0,0) o(0,1) x(0,2) o(1,2) x(2,2) o(2,1) x(2,0) o(1,0)",
+      /*solve=*/true);
+  SPIEL_CHECK_EQ(state->ToString(), "xox\no.o\nxox");
+  SPIEL_CHECK_EQ(root->children.size(), 1);
+  SPIEL_CHECK_EQ(root->children[0].explore_count, 1);
+}
+
 }  // namespace
+}  // namespace algorithms
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::MCTSTest_CanPlayTicTacToe();
-  open_spiel::MCTSTest_CanPlayTicTacToe_LowSimulations();
-  open_spiel::MCTSTest_CanPlayBothSides();
-  open_spiel::MCTSTest_CanPlaySinglePlayer();
-  open_spiel::MCTSTest_CanPlayThreePlayerStochasticGames();
-  open_spiel::MCTSTest_SolveDraw();
-  open_spiel::MCTSTest_SolveLoss();
-  open_spiel::MCTSTest_SolveWin();
-  open_spiel::MCTSTest_GarbageCollect();
+  open_spiel::algorithms::MCTSTest_CanPlayTicTacToe();
+  open_spiel::algorithms::MCTSTest_CanPlayTicTacToe_LowSimulations();
+  open_spiel::algorithms::MCTSTest_CanPlayBothSides();
+  open_spiel::algorithms::MCTSTest_CanPlaySinglePlayer();
+  open_spiel::algorithms::MCTSTest_CanPlayThreePlayerStochasticGames();
+  open_spiel::algorithms::MCTSTest_SolveDraw();
+  open_spiel::algorithms::MCTSTest_SolveLoss();
+  open_spiel::algorithms::MCTSTest_SolveWin();
+  open_spiel::algorithms::MCTSTest_GarbageCollect();
+  open_spiel::algorithms::MCTSTest_MinSimulations();
 }
