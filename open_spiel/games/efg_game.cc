@@ -786,7 +786,7 @@ std::string EFGGame::GetInformationStateStringByNumber(Player player,
 
 void EFGGame::ParseGame() {
   // Skip any initial whitespace.
-  while (IsWhiteSpace(string_data_.at(pos_))) {
+  while (pos_ < string_data_.length() && IsWhiteSpace(string_data_.at(pos_))) {
     AdvancePosition();
   }
   SPIEL_EFG_PARSE_CHECK_LT(pos_, string_data_.length());
