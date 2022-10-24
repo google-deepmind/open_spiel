@@ -126,6 +126,9 @@ class GinRummyState : public State {
   std::vector<int> DiscardPile() const { return discard_pile_; }
   std::vector<int> Deadwood() const { return deadwood_; }
   std::vector<bool> Knocked() const { return knocked_; }
+  std::vector<bool> PassOnFirstUpcard() const { return pass_on_first_upcard_; }
+  std::vector<std::vector<int>> LayedMelds() const { return layed_melds_; }
+  std::vector<int> Layoffs() const { return layoffs_; }
 
  protected:
   void DoApplyAction(Action action) override;
@@ -255,6 +258,11 @@ class GinRummyGame : public Game {
   // Used for Python bindings.
   bool Oklahoma() const { return oklahoma_; }
   int KnockCard() const { return knock_card_; }
+  int DrawUpcardAction() const { return kDrawUpcardAction; }
+  int DrawStockAction() const { return kDrawStockAction; }
+  int PassAction() const { return kPassAction; }
+  int KnockAction() const { return kKnockAction; }
+  int MeldActionBase() const { return kMeldActionBase; }
 
  private:
   const bool oklahoma_;

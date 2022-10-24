@@ -47,6 +47,9 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .def("discard_pile", &GinRummyState::DiscardPile)
       .def("deadwood", &GinRummyState::Deadwood)
       .def("knocked", &GinRummyState::Knocked)
+      .def("pass_on_first_upcard", &GinRummyState::PassOnFirstUpcard)
+      .def("layed_melds", &GinRummyState::LayedMelds)
+      .def("layoffs", &GinRummyState::Layoffs)
       // Pickle support
       .def(py::pickle(
           [](const GinRummyState& state) {  // __getstate__
@@ -73,6 +76,11 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
   py::classh<GinRummyGame, Game>(m, "GinRummyGame")
       .def("oklahoma", &GinRummyGame::Oklahoma)
       .def("knock_card", &GinRummyGame::KnockCard)
+      .def("draw_upcard_action", &GinRummyGame::DrawUpcardAction)
+      .def("draw_stock_action", &GinRummyGame::DrawStockAction)
+      .def("pass_action", &GinRummyGame::PassAction)
+      .def("knock_action", &GinRummyGame::KnockAction)
+      .def("meld_action_base", &GinRummyGame::MeldActionBase)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const GinRummyGame> game) {  // __getstate__
@@ -118,6 +126,7 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .def("legal_melds", &GinRummyUtils::LegalMelds)
       .def("legal_discards", &GinRummyUtils::LegalDiscards)
       .def("all_layoffs", &GinRummyUtils::AllLayoffs)
+      .def_readonly("int_to_meld", &GinRummyUtils::int_to_meld)
       .def("meld_to_int", &GinRummyUtils::MeldToInt);
 }
 }  // namespace open_spiel
