@@ -65,6 +65,10 @@ constexpr int kFlagPenaltyPerCell = -25;
 constexpr int kDefaultTradeDistanceUpperBound =
     kDefaultNumColors * kNumChipsUpperBound;
 
+// Minimum gain required when generating boards.
+constexpr int kBaseScoreEpsilon = 20;
+
+
 
 // Default 10-board database used for tests, etc. See
 // colored_trails/boards100.txt and create your own using
@@ -182,8 +186,6 @@ class ColoredTrailsState : public State {
  private:
   bool IsPassTrade(const Trade& trade) const;
   bool IsLegalTrade(Player proposer, const Trade& trade) const;
-  bool IsLegalTrade(const Trade& trade, const std::vector<int>& proposer_chips,
-                    const std::vector<int>& responder_chips) const;
   std::vector<Action> LegalActionsForChips(
       const std::vector<int>& player_chips,
       const std::vector<int>& responder_chips) const;
@@ -251,6 +253,13 @@ class ColoredTrailsGame : public Game {
   void AddToTradesCache(const std::string& key,
                         std::vector<Action>& actions) const;
 
+  // Sample a random board according to the board generation rules, using a
+  // partial board which contains all the information for all the players except
+  // the specified player (override anything present for that player).
+  // Also returns a legal action for the same player.
+  std::pair<Board, Action> SampleRandomBoardCompletion(
+      int seed, const Board& board, Player player) const;
+
  private:
   const int num_colors_;
   const int board_size_;
@@ -282,6 +291,10 @@ void ParseBoardsFile(std::vector<Board>* boards, const std::string& filename,
 void ParseBoardsString(std::vector<Board>* boards,
                        const std::string& boards_string,
                        int num_colors, int board_size, int num_players);
+
+// Does the board match the creation criteria?
+bool CheckBoard(const Board& board);
+
 
 }  // namespace colored_trails
 }  // namespace open_spiel

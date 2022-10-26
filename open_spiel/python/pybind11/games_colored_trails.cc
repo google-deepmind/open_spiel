@@ -102,6 +102,10 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
            &ColoredTrailsGame::ResponderTradeWithPlayerAction)
       // no arguments; returns the pass action
       .def("pass_action", &ColoredTrailsGame::PassAction)
+      // arguments (seed: int, board: Board, player: int)
+      // returns: (board, action)
+      .def("sample_random_board_completion",
+           &ColoredTrailsGame::SampleRandomBoardCompletion)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const ColoredTrailsGame> game) {  // __getstate__
@@ -114,4 +118,7 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
 
   // arguments: (player: int, board: board). Returns the gain of the player.
   m.def("score", &colored_trails::Score);
+
+  // arguments: (combo: List[int])
+  m.def("combo_to_string", &colored_trails::ComboToString);
 }
