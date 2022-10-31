@@ -321,6 +321,110 @@ std::string BattleshipState::InformationStateString(Player player) const {
   return information_state;
 }
 
+void BattleshipState::InformationStateTensor(
+    Player player, absl::Span<float> values) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorSize());
+  std::fill(values.begin(), values.end(), 0);
+
+  int offset = 0;
+  const BattleshipConfiguration& conf = bs_game_->conf;
+  const Player opponent = (player == Player{0}) ? Player{1} : Player{0};
+  const int height = conf.board_height;
+  const int width = conf.board_width;
+  std::vector<int> ship_damage(conf.ships.size(), 0);
+  std::vector<bool> cell_hit(conf.board_width * conf.board_height, false);
+
+  if (IsTerminal()) {
+    values[offset] = 1;
+  }
+  offset += 1;
+
+  values[offset + player] = 1;
+  offset += 2;
+
+  if (!IsTerminal()) {
+    values[offset + CurrentPlayer()] = 1;
+  }
+  offset += 2;
+
+  for (const auto& move : moves_) {
+    if (absl::holds_alternative<ShipPlacement>(move.action)) {
+      // The player observed *their own* ship placements.
+      if (move.player == player) {
+        const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+        if (placement.direction == CellAndDirection::Horizontal) {
+          values[offset] = 1;
+        } else {
+          values[offset + 1] = 1;
+        }
+        offset += 2;
+
+        values[offset + placement.TopLeftCorner().row] = 1;
+        offset += height;
+        values[offset + placement.TopLeftCorner().col] = 1;
+        offset += width;
+      }
+    } else {
+      const Shot& shot = absl::get<Shot>(move.action);
+
+      values[offset + move.player] = 1;
+      offset += bs_game_->NumPlayers();
+
+      values[offset + shot.row] = 1;
+      offset += height;
+      values[offset + shot.col] = 1;
+      offset += width;
+
+      // Add info of hit, shot, or sunk only for my shots (same as in the
+      // info state string).
+      if (move.player == player) {
+        const int cell_index = bs_game_->SerializeShotAction(shot);
+
+        char shot_outcome = 'W';  // For 'water'.
+        for (int ship_index = 0; ship_index < conf.ships.size(); ++ship_index) {
+          const Ship& ship = conf.ships.at(ship_index);
+
+          // SAFETY: the call to FindShipPlacement_ is safe, because if we are
+          // here it means that all ships have been placed.
+          const ShipPlacement ship_placement =
+              FindShipPlacement(ship, opponent);
+
+          if (ship_placement.CoversCell(shot)) {
+            if (!cell_hit[cell_index]) {
+              // This is a new hit: we have to increas the ship damage and
+              // mark the cell as already hit.
+              ++ship_damage.at(ship_index);
+              cell_hit.at(cell_index) = true;
+            }
+            if (ship_damage.at(ship_index) == ship.length) {
+              shot_outcome = 'S';  // For 'sunk'.
+            } else {
+              shot_outcome = 'H';  // For 'hit' (but not sunk).
+            }
+          }
+        }
+
+        switch (shot_outcome) {
+            case 'W': values[offset] = 1; break;
+            case 'H': values[offset + 1] = 1; break;
+            case 'S': values[offset + 2] = 1; break;
+            default:
+              std::string error = "Bad shot outcome: ";
+              error.push_back(shot_outcome);
+              SpielFatalError(error);
+        }
+      }
+
+      // Bits for For W/H/S.
+      offset += 3;
+    }
+  }
+
+  SPIEL_CHECK_LE(offset, values.size());
+}
+
 std::string BattleshipState::ObservationString(Player player) const {
   std::string output = "State of player's ships:\n";
   absl::StrAppend(&output, OwnBoardString(player));
@@ -697,7 +801,7 @@ const GameType kGameType{
     /* max_num_players = */ 2,
     /* min_num_players = */ 2,
     /* provides_information_state_string = */ true,
-    /* provides_information_state_tensor = */ false,
+    /* provides_information_state_tensor = */ true,
     /* provides_observation_string = */ true,
     /* provides_observation_tensor = */ false,
     /* parameter_specification = */
@@ -865,6 +969,30 @@ int BattleshipGame::MaxGameLength() const {
   // Each player has to place their ships, plus potentially as many turns as
   // the number of shots
   return 2 * (conf.ships.size() + conf.num_shots);
+}
+
+std::vector<int> BattleshipGame::InformationStateTensorShape() const {
+  // The information set is a sequence of placements followed by a
+  // a sequence of shots.
+  //
+  // Each placement has:
+  //   - two bits for one-hot horizontal/vertical
+  //   - rows bits for one-hot row
+  //   - cols bits for one-hot col
+  const int bits_for_placement = conf.ships.size() *
+      (2 + conf.board_height + conf.board_width);
+
+  // Each shot has:
+  //   - two bits for the one-hot player
+  //   - three bits for one-hot W/H/S
+  //   - rows bits for the one-hot row
+  //   - cols bits for the one-hot col
+  const int bits_for_shots = conf.num_shots * NumPlayers() *
+      (2 + 3 + conf.board_height + conf.board_width);
+
+  // 1 bit for terminal?, 2 bits each for observing player and current player
+  return {1 + NumPlayers() + NumPlayers() +
+          bits_for_placement + bits_for_shots};
 }
 
 std::string BattleshipGame::ActionToString(Player player,

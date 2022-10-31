@@ -917,7 +917,11 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns true if these games are equal, false otherwise.
   virtual bool operator==(const Game& other) const {
-    return ToString() == other.ToString();
+    // GetParameters() includes default values. So comparing GetParameters
+    // instead of game_parameters_ makes sure that game equality is independent
+    // of the presence of explicitly passed game parameters with default values.
+    return game_type_.short_name == other.game_type_.short_name &&
+           GetParameters() == other.GetParameters();
   }
 
   // Get and set game's internal RNG state for de/serialization purposes. These

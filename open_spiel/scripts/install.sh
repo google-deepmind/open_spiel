@@ -234,7 +234,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    EXT_DEPS="${EXT_DEPS} rust-all cargo"
+    EXT_DEPS="${EXT_DEPS} rustc cargo"
   fi
 
   APT_GET=`which apt-get`
@@ -258,7 +258,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get -y install $EXT_DEPS
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    cargo install bindgen
+    if [[ ! -f $HOME/.cargo/bin/bindgen ]]; then
+      cargo install bindgen-cli
+    fi
   fi
 
   if [[ "$TRAVIS" ]]; then
@@ -269,11 +271,12 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which realpath` ]] || brew install coreutils || echo "** Warning: failed 'brew install coreutils' -- continuing"
   [[ -x `which cmake` ]] || brew install cmake || echo "** Warning: failed 'brew install cmake' -- continuing"
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
-  # On Github Actions, macOS 10.15 comes with Python 3.9.
+  # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" && "${OS_PYTHON_VERSION}" != "3.9" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
-    brew unlink python@3.9
+    # Uninstall Python 3.9 if we need to.
+    brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
@@ -285,7 +288,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
     [[ -x `which rustc` ]] || brew install rust || echo "** Warning: failed 'brew install rust' -- continuing"
-    cargo install bindgen
+    if [[ ! -f $HOME/.cargo/bin/bindgen ]]; then
+      cargo install bindgen-cli
+    fi
   fi
 
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py

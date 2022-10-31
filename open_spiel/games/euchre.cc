@@ -48,8 +48,8 @@ const GameType kGameType{
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
-        // Pass cards at the beginning of the hand.
         {"allow_lone_defender", GameParameter(false)},
+        {"stick_the_dealer", GameParameter(true)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -84,12 +84,14 @@ int CardRank(int card, Suit trump_suit) {
 
 EuchreGame::EuchreGame(const GameParameters& params)
     : Game(kGameType, params),
-      allow_lone_defender_(ParameterValue<bool>("allow_lone_defender")) {}
+      allow_lone_defender_(ParameterValue<bool>("allow_lone_defender")),
+      stick_the_dealer_(ParameterValue<bool>("stick_the_dealer")) {}
 
 EuchreState::EuchreState(std::shared_ptr<const Game> game,
-                         bool allow_lone_defender)
+                         bool allow_lone_defender, bool stick_the_dealer)
     : State(game),
-      allow_lone_defender_(allow_lone_defender) {}
+      allow_lone_defender_(allow_lone_defender),
+      stick_the_dealer_(stick_the_dealer) {}
 
 std::string EuchreState::ActionToString(Player player, Action action) const {
   if (history_.empty()) return DirString(action);
@@ -354,6 +356,8 @@ std::vector<Action> EuchreState::DealLegalActions() const {
 std::vector<Action> EuchreState::BiddingLegalActions() const {
   std::vector<Action> legal_actions;
   legal_actions.push_back(kPassAction);
+  if (stick_the_dealer_ && num_passes_ == 2 * kNumPlayers - 1)
+    legal_actions.pop_back();
   Suit suit = CardSuit(upcard_);
   if (num_passes_ < kNumPlayers) {
     switch (suit) {

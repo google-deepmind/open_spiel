@@ -36,8 +36,8 @@ available from Python.
 
 **Platforms**
 
-OpenSpiel has been tested on Linux (Debian 10 and Ubuntu 19.04), MacOS, and
-[Windows 10 (through Windows Subsystem for Linux)](windows.md).
+OpenSpiel has been tested on Linux (Ubuntu and Debian), MacOS. There is limited
+support for on [Windows 10](windows.md).
 
 **Visualization of games**
 

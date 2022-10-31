@@ -197,7 +197,7 @@ def write_instances_file(negotiations, filename):
 
 def compute_nbs_from_simulations(game, num_games, bots):
   """Compute empirical NBS from simulations."""
-  sum_nbs = 0
+  avg_returns = np.zeros(game.num_players())
   for _ in range(num_games):
     state = game.new_initial_state()
     while not state.is_terminal():
@@ -211,9 +211,10 @@ def compute_nbs_from_simulations(game, num_games, bots):
         player = state.current_player()
         action = bots[player].step(state)
         state.apply_action(action)
-    returns = state.returns()
-    sum_nbs += np.prod(returns)
-  return sum_nbs / num_games
+    returns = np.asarray(state.returns())
+    avg_returns += returns
+  avg_returns /= num_games
+  return np.prod(avg_returns)
 
 
 class MaxBot(object):
@@ -257,11 +258,14 @@ def main(_):
   print(f"Writing instances database: {FLAGS.instances_file}")
   write_instances_file(negotiations, FLAGS.instances_file)
 
-  # Human NBS
+  # Human averages + NBS
+  human_rewards = np.zeros(2, dtype=np.float64)
   avg_human_nbs = 0
   for neg in negotiations:
-    avg_human_nbs += np.prod(neg.rewards)
-  avg_human_nbs /= len(negotiations)
+    human_rewards += neg.rewards
+  human_rewards /= len(negotiations)
+  avg_human_nbs += np.prod(human_rewards)
+  print(f"Average human rewards: {human_rewards}")
   print(f"Average human NBS: {avg_human_nbs}")
 
   game = pyspiel.load_game("bargaining",

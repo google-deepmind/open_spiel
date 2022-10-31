@@ -34,11 +34,15 @@
 #include "open_spiel/python/pybind11/games_bargaining.h"
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_chess.h"
+#include "open_spiel/python/pybind11/games_colored_trails.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
+#include "open_spiel/python/pybind11/games_gin_rummy.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
+#include "open_spiel/python/pybind11/games_tiny_bridge.h"
+#include "open_spiel/python/pybind11/games_trade_comm.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -274,6 +278,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
+      .def("to_string", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
       .def("is_initial_state", &State::IsInitialState)
       .def("move_number", &State::MoveNumber)
@@ -365,19 +370,19 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
       .def("make_observer",
-           [](const Game& game, IIGObservationType iig_obs_type,
+           [](std::shared_ptr<const Game> game, IIGObservationType iig_obs_type,
               const GameParameters& params) {
-             return game.MakeObserver(iig_obs_type, params);
+             return game->MakeObserver(iig_obs_type, params);
            })
       .def("make_observer",
-           [](const Game& game, const GameParameters& params) {
-             return game.MakeObserver(absl::nullopt, params);
+           [](std::shared_ptr<const Game> game, const GameParameters& params) {
+             return game->MakeObserver(absl::nullopt, params);
            })
       .def("__str__", &Game::ToString)
       .def("__repr__", &Game::ToString)
       .def("__eq__",
-           [](const Game& value, Game* value2) {
-             return value2 && value.ToString() == value2->ToString();
+           [](std::shared_ptr<const Game> a, std::shared_ptr<const Game> b) {
+             return b && a->ToString() == b->ToString();
            })
       .def(py::pickle(                            // Pickle support
           [](std::shared_ptr<const Game> game) {  // __getstate__
@@ -618,11 +623,16 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_bargaining(m);         // Bargaining game.
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
   init_pyspiel_games_chess(m);   // Chess game.
+  init_pyspiel_games_colored_trails(m);   // Colored Trails game.
   init_pyspiel_games_euchre(m);  // Game-specific functions for euchre.
+  init_pyspiel_games_gin_rummy(m);  // Game-specific functions for gin_rummy.
   init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
   init_pyspiel_games_leduc_poker(m);  // Leduc poker game.
   init_pyspiel_games_negotiation(m);  // Negotiation game.
   init_pyspiel_games_tarok(m);   // Game-specific functions for tarok.
+  init_pyspiel_games_tiny_bridge(
+      m);                            // Game-specific functions for tiny_bridge.
+  init_pyspiel_games_trade_comm(m);  // Game-specific functions for trade_comm.
   init_pyspiel_observer(m);      // Observers and observations.
   init_pyspiel_utils(m);         // Utilities.
 

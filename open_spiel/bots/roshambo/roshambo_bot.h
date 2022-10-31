@@ -29,9 +29,13 @@
 #include <vector>
 
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/bots/roshambo/roshambo/BotClasses/rsb_bot.h"
+#include "open_spiel/bots/roshambo/roshambo/bot_map.h"
 
 namespace open_spiel {
 namespace roshambo {
+
+using roshambo_tournament::RSBBot;
 
 // The underlying C code requires that the number of throws in a game be
 // specified at compile time. Changing it requires modifying the file
@@ -44,33 +48,28 @@ namespace roshambo {
 // results were remarkably robust, and increasing the match length to 10000
 // turns or decreasing it to 400 turns had a negligible effect."
 // https://webdocs.cs.ualberta.ca/~darse/rsb-results1.html
-inline constexpr int kNumThrows = 1000;
+inline constexpr int kNumThrows = RSBBot::kCompetitionMatchLength;
 inline constexpr int kNumBots = 43;
 
 class RoshamboBot : public Bot {
  public:
-  explicit RoshamboBot(int player_id, std::string bot_name);
+  explicit RoshamboBot(int player_id, std::string bot_name,
+                       int num_throws = kNumThrows);
   Action Step(const State& state) override;
+  void Restart() override { bot_->Reset(); }
 
  private:
   Player player_id_;
   Player opponent_id_;
   std::string bot_name_;
+  std::unique_ptr<RSBBot> bot_;
 };
 
-std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name);
+std::unique_ptr<Bot> MakeRoshamboBot(int player_id, std::string bot_name,
+                                     int num_throws = kNumThrows);
 std::vector<std::string> RoshamboBotNames();
 
 }  // namespace roshambo
 }  // namespace open_spiel
-
-// Bots use these global arrays to inform their decisions.
-// Element 0 is the number of rounds so far in the match.
-// Element i is the action taken on turn i (1 <= i <= kNumThrows)
-extern "C" int ROSHAMBO_BOT_my_history[open_spiel::roshambo::kNumThrows + 1];
-extern "C" int ROSHAMBO_BOT_opp_history[open_spiel::roshambo::kNumThrows + 1];
-namespace roshambo_tournament {
-extern std::map<std::string, std::function<int()>> bot_map;
-}
 
 #endif  // OPEN_SPIEL_BOTS_ROSHAMBO_ROSHAMBO_BOT_H_

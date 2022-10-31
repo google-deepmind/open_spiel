@@ -453,7 +453,7 @@ class FirstActionPolicy(Policy):
 def get_tabular_policy_states(game):
   """Returns the states of the game for a tabular policy."""
   if game.get_type().dynamics == pyspiel.GameType.Dynamics.MEAN_FIELD:
-    # TODO(perolat): We use s.observation_string(DEFAULT_MFG_PLAYER) here as the
+    # TODO(author18): We use s.observation_string(DEFAULT_MFG_PLAYER) here as the
     # number of history is exponential on the depth of the MFG. What we really
     # need is a representation of the state. For many player Mean Field games,
     # the state will be (x0, x1, x2, ..., xn) and the observation_string(0) will

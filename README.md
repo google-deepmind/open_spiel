@@ -28,6 +28,7 @@ Please choose among the following options:
 *   [Installing OpenSpiel](docs/install.md)
 *   [Introduction to OpenSpiel](docs/intro.md)
 *   [API Overview and First Example](docs/concepts.md)
+*   [API Reference](docs/api_reference.md)
 *   [Overview of Implemented Games](docs/games.md)
 *   [Overview of Implemented Algorithms](docs/algorithms.md)
 *   [Developer Guide](docs/developer_guide.md)

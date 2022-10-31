@@ -162,9 +162,11 @@ struct CorrDistInfo {
 // the policies in this correlation device *can* be mixed. If values is
 // non-null, then it is filled with the deviation incentive of each player.
 CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu,
-                     const float prob_cut_threshold = -1.0);
+                     const float prob_cut_threshold = -1.0,
+                     const float action_value_tolerance = -1.0);
 CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu, int player,
-                     const float prob_cut_threshold = -1.0);
+                     const float prob_cut_threshold = -1.0,
+                     const float action_value_tolerance = -1.0);
 
 // Distance to a correlated equilibrium in an extensive-form game. Builds a
 // simpler auxiliary game similar to the *FCE ones where there is a chance node
@@ -174,7 +176,8 @@ CorrDistInfo CCEDist(const Game& game, const CorrelationDevice& mu, int player,
 // helper functions DeterminizeCorrDev or SampledDeterminizeCorrDev in
 // corr_dev_builder.h. If values is non-null, then it is filled with the
 // deviation incentive of each player.
-CorrDistInfo CEDist(const Game& game, const CorrelationDevice& mu);
+CorrDistInfo CEDist(const Game& game, const CorrelationDevice& mu,
+                    const float action_value_tolerance = -1.0);
 
 }  // namespace algorithms
 }  // namespace open_spiel

@@ -9,8 +9,9 @@ we verified against known values and/or reproduced results from papers.
 
 Status                                       | Game
 -------------------------------------------- | ----
-<font color="orange"><b>~</b></font>         | [Atari](#atari)
+<font color="orange"><b>~</b></font>         | [2048](#2048)
 <font color="orange"><b>~</b></font>         | [Amazons](#amazons)
+<font color="orange"><b>~</b></font>         | [Atari](#atari)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
@@ -56,7 +57,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>~</b></font>         | [Nim](#nim)
-<font color="orange"><b>X</b></font>         | [Oh Hell](#oh-hell)
+<font color="orange"><b>~</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
 <font color="orange"><b>~</b></font>         | [Pathfinding](#pathfinding)
@@ -81,12 +82,16 @@ Status                                       | Game
 
 ## Details
 
-### Atari
+### 2048
 
-*   Agent plays classic games from [Gym's Atari Environments](https://www.gymlibrary.ml/environments/atari/), such as Breakout.
-*   Single player.
-*   Most games are non-deterministic.
+*   A single player game where player aims to create a 2048 tile by merging
+    other tiles.
+*   Numbers on a grid.
+*   Modern game.
+*   Non-deterministic.
 *   Perfect information.
+*   1 player.
+*   [Github](https://github.com/gabrielecirulli/2048)
 
 ### Amazons
 
@@ -97,6 +102,13 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Game_of_the_Amazons)
+
+### Atari
+
+*   Agent plays classic games from [Gym's Atari Environments](https://www.gymlibrary.ml/environments/atari/), such as Breakout.
+*   Single player.
+*   Most games are non-deterministic.
+*   Perfect information.
 
 ### Backgammon
 

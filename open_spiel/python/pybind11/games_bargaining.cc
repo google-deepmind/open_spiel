@@ -24,6 +24,7 @@ using open_spiel::State;
 using open_spiel::bargaining::BargainingGame;
 using open_spiel::bargaining::BargainingState;
 using open_spiel::bargaining::Instance;
+using open_spiel::bargaining::Offer;
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(BargainingGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(BargainingState);
@@ -34,8 +35,13 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
       .def_readwrite("pool", &Instance::pool)
       .def_readwrite("values", &Instance::values);
 
+  py::class_<Offer>(m, "Offer")
+      .def(py::init<>())
+      .def_readwrite("quantities", &Offer::quantities);
+
   py::classh<BargainingState, State>(m, "BargainingState")
-      .def("instance", &BargainingState::instance)
+      .def("instance", &BargainingState::GetInstance)
+      .def("offers", &BargainingState::Offers)
       .def("agree_action", &BargainingState::AgreeAction)
       // set_instance(instance)
       .def("set_instance", &BargainingState::SetInstance)
@@ -50,4 +56,19 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
             return dynamic_cast<BargainingState*>(
                 game_and_state.second.release());
           }));
+
+  py::classh<BargainingGame, Game>(m, "BargainingGame")
+    .def("all_instances", &BargainingGame::AllInstances)
+    // get_offer_by_quantities(quantities: List[int]). Returns a tuple
+    // of (offer, OpenSpiel action)
+    .def("get_offer_by_quantities", &BargainingGame::GetOfferByQuantities)
+    // Pickle support
+    .def(py::pickle(
+        [](std::shared_ptr<const BargainingGame> game) {  // __getstate__
+          return game->ToString();
+        },
+        [](const std::string& data) {  // __setstate__
+          return std::dynamic_pointer_cast<BargainingGame>(
+              std::const_pointer_cast<Game>(LoadGame(data)));
+        }));
 }

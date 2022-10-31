@@ -23,6 +23,7 @@ import pyspiel
 
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = frozenset([
+    "2048",
     "amazons",
     "backgammon",
     "bargaining",
@@ -67,6 +68,8 @@ EXPECTED_GAMES = frozenset([
     "mancala",
     "markov_soccer",
     "matching_pennies_3p",
+    "matrix_bos",
+    "matrix_brps",
     "matrix_cd",
     "matrix_coordination",
     "matrix_mp",

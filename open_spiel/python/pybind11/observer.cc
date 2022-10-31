@@ -58,8 +58,11 @@ void init_pyspiel_observer(py::module& m) {
   // C++ Observation, intended only for the Python Observation class, not
   // for general Python code.
   py::class_<Observation>(m, "_Observation", py::buffer_protocol())
-      .def(py::init<const Game&, std::shared_ptr<Observer>>(), py::arg("game"),
-           py::arg("observer"))
+      .def(py::init([](std::shared_ptr<const Game> game,
+                       std::shared_ptr<Observer> observer) {
+             return new Observation(*game, observer);
+           }),
+           py::arg("game"), py::arg("observer"))
       .def("tensors", &Observation::tensors)
       .def("tensors_info", &Observation::tensors_info)
       .def("string_from", &Observation::StringFrom)

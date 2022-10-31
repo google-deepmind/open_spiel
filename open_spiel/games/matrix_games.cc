@@ -79,6 +79,39 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace rock_paper_scissors
 
+// Rock, Paper, Scissors.
+namespace biased_rock_paper_scissors {
+// Game from Figure 7 of Branislav Bošanský, Viliam Lisý, Marc Lanctot, Jirí
+// Cermák, and Mark H.M. Winands. Algorithms for computing strategies in
+// two-player simultaneous move games. Artificial Intelligence, 237:1-40, 2016.
+// Equilibrium is 1/16, 10/16, 5/16.
+const GameType kGameType{
+    /*short_name=*/"matrix_brps",
+    /*long_name=*/"Biased Rock, Paper, Scissors",
+    GameType::Dynamics::kSimultaneous,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kOneShot,
+    GameType::Utility::kZeroSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/{}  // no parameters
+};
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(new MatrixGame(
+      kGameType, params, {"Rock", "Paper", "Scissors"},
+      {"Rock", "Paper", "Scissors"}, {0, -25, 50, 25, 0, -5, -50, 5, 0},
+      {0, 25, -50, -25, 0, 5, 50, -5, 0}));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
+}  // namespace biased_rock_paper_scissors
+
 // Rock, Paper, Scissors, Water: a variant of RPS by Martin Schmid which adds
 // an action to both players that always gives, adding a pure equilibrium to the
 // game.
@@ -257,5 +290,35 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }  // namespace chicken_dare
+
+// Bach or Stravinksy game.
+// https://en.wikipedia.org/wiki/Battle_of_the_sexes_(game_theory)
+namespace bach_or_stravinsky {
+const GameType kGameType{
+    /*short_name=*/"matrix_bos",
+    /*long_name=*/"Bach or Stravinsky",
+    GameType::Dynamics::kSimultaneous,
+    GameType::ChanceMode::kDeterministic,
+    GameType::Information::kOneShot,
+    GameType::Utility::kGeneralSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/2,
+    /*min_num_players=*/2,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/{}  // no parameters
+};
+
+std::shared_ptr<const Game> Factory(const GameParameters& params) {
+  return std::shared_ptr<const Game>(
+      new MatrixGame(kGameType, params, {"Bach", "Stravinsky"},
+                     {"Bach", "Stravinsky"}, {3, 0, 0, 2}, {2, 0, 0, 3}));
+}
+
+REGISTER_SPIEL_GAME(kGameType, Factory);
+}  // namespace bach_or_stravinsky
+
 
 }  // namespace open_spiel

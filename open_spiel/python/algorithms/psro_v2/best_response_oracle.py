@@ -33,6 +33,8 @@ class BestResponseOracle(optimization_oracle.AbstractOracle):
                game=None,
                all_states=None,
                state_to_information_state=None,
+               prob_cut_threshold=-1.0,
+               action_value_tolerance=-1.0,
                **kwargs):
     """Init function for the RLOracle.
 
@@ -46,6 +48,10 @@ class BestResponseOracle(optimization_oracle.AbstractOracle):
       state_to_information_state: A dict mapping str(state) to
         state.information_state for every state in the game. Cached for improved
         performance.
+      prob_cut_threshold: For cpp backend, a partially computed best-response
+        can be computed when using a prob_cut_threshold >= 0.
+      action_value_tolerance: For cpp backend, the max-entropy best-response
+        policy is computed if a non-negative `action_value_tolerance` is used.
       **kwargs: kwargs
     """
     super(BestResponseOracle, self).__init__(**kwargs)
@@ -67,7 +73,9 @@ class BestResponseOracle(optimization_oracle.AbstractOracle):
       # TODO(b/140426861): Use a single best-responder once the code supports
       # multiple player ids.
       self.best_response_processors = [
-          pyspiel.TabularBestResponse(game, best_responder_id, policy_to_dict)
+          pyspiel.TabularBestResponse(game, best_responder_id, policy_to_dict,
+                                      prob_cut_threshold,
+                                      action_value_tolerance)
           for best_responder_id in range(game.num_players())
       ]
       self.best_responders = [

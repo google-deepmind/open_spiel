@@ -35,60 +35,6 @@ namespace open_spiel {
 namespace colored_trails {
 namespace {
 
-constexpr int kBaseScoreEpsilon = 20;
-
-bool CheckBoard(const Board& board) {
-  std::vector<int> base_scores(board.num_players);
-  int min_score = board.size * 100;
-  int max_score = board.size * -100;
-
-  for (Player player = 0; player < board.num_players; ++player) {
-    std::pair<int, bool> score_and_solved = Score(player, board);
-    if (score_and_solved.second) {
-      // Cannot be solvable without negotiation.
-      return false;
-    }
-    base_scores[player] = score_and_solved.first;
-    min_score = std::min(min_score, base_scores[player]);
-    max_score = std::max(max_score, base_scores[player]);
-  }
-
-  if (max_score - min_score > kBaseScoreEpsilon) {
-    return false;
-  }
-
-  // Now check that there exist two trades:
-  // - one between player 0 and 2, such that both can reach the goal
-  // - one between player 1 and 2, such that both can reach the goal
-  for (int proposer : {0, 1}) {
-    bool found_trade = false;
-    ChipComboIterator iter1(board.chips[proposer]);
-    while (!found_trade && !iter1.IsFinished()) {
-      std::vector<int> combo1 = iter1.Next();
-      ChipComboIterator iter2(board.chips[2]);
-      while (!found_trade && !iter2.IsFinished()) {
-        std::vector<int> combo2 = iter2.Next();
-        // Do the trade and check if both can reach the goal.
-        Board board_copy = board;
-        Trade trade(combo1, combo2);
-        board_copy.ApplyTrade({proposer, 2}, trade);
-        std::pair<int, bool> prop_score_and_goal = Score(proposer, board_copy);
-        if (prop_score_and_goal.second) {
-          std::pair<int, bool> rec_score_and_goal = Score(2, board_copy);
-          if (rec_score_and_goal.second) {
-            found_trade = true;
-          }
-        }
-      }
-    }
-    if (!found_trade) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 std::string GenerateBoard(std::mt19937* rng) {
   bool valid_board = false;
   std::string board_string;

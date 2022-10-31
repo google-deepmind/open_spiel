@@ -22,7 +22,6 @@
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/games/efg_game.h"
 #include "open_spiel/games/efg_game_data.h"
-#include "open_spiel/games/goofspiel.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"

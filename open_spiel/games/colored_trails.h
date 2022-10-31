@@ -61,6 +61,15 @@ constexpr int kNumChipsUpperBound = 8;
 constexpr int kLeftoverChipScore = 10;
 constexpr int kFlagPenaltyPerCell = -25;
 
+// How much distance can there be between trades?
+constexpr int kDefaultTradeDistanceUpperBound =
+    kDefaultNumColors * kNumChipsUpperBound;
+
+// Minimum gain required when generating boards.
+constexpr int kBaseScoreEpsilon = 20;
+
+
+
 // Default 10-board database used for tests, etc. See
 // colored_trails/boards100.txt and create your own using
 // colored_trails/colored_trails_board_generator.
@@ -85,6 +94,7 @@ struct Trade {
   Trade(const std::vector<int> _giving, const std::vector<int> _receiving);
   Trade(const Trade& other);
   std::string ToString() const;
+  int DistanceTo(const Trade& other) const;
   bool operator==(const Trade& other) const {
     return (giving == other.giving && receiving == other.receiving);
   }
@@ -111,6 +121,7 @@ struct Board {
   Board();
   Board(int _size, int _num_colors, int _num_players);
 
+  Board Clone() const;
   void ParseFromLine(const std::string& line);
   bool InBounds(int row, int col) const;
   void init();
@@ -152,17 +163,41 @@ class ColoredTrailsState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
+
+  // Override the current chips and trade proposal for the specified player.
+  // If the chips is an illegal allotment, it is randomly matched to the
+  // neareast legal one. If the trade is illegal as a result, it is replaced
+  // by one of the closes legal trades in edit distance.
+  // If called on Player 1's turn to set Player 2's values, then the
+  // future_trade_ is set and applied automatically.
+  // Finally, rng_rolls is several random numbers in [0,1) used for random
+  // decisions.
+  void SetChipsAndTradeProposal(Player player, std::vector<int> chips,
+                                Trade trade, std::vector<double>& rng_rolls);
+
+  const Board& board() { return board_; }
+  const std::vector<Trade>& proposals() { return proposals_; }
+
  protected:
   void DoApplyAction(Action action) override;
 
  private:
+  bool IsPassTrade(const Trade& trade) const;
   bool IsLegalTrade(Player proposer, const Trade& trade) const;
+  std::vector<Action> LegalActionsForChips(
+      const std::vector<int>& player_chips,
+      const std::vector<int>& responder_chips) const;
 
   Player cur_player_;
   const ColoredTrailsGame* parent_game_;
   Board board_;
   std::vector<double> returns_;
   std::vector<Trade> proposals_;
+
+  // This is only used by the SetChipsAndTradeProposals functions above.
+  Trade future_trade_;
 };
 
 class ColoredTrailsGame : public Game {
@@ -194,13 +229,36 @@ class ColoredTrailsGame : public Game {
 
   const std::vector<Board>& AllBoards() const { return all_boards_; }
 
-  Trade LookupTrade(int trade_id) const {
-    return *(trade_info_.possible_trades.at(trade_id));
+  const Trade& LookupTrade(int trade_id) const {
+    if (trade_id == PassAction()) {
+      return pass_trade_;
+    } else {
+      return *(trade_info_.possible_trades.at(trade_id));
+    }
   }
+
+  Action ResponderTradeWithPlayerAction(Player player) const {
+    SPIEL_CHECK_GE(player, 0);
+    SPIEL_CHECK_LE(player, 1);
+    return NumDistinctActions() - 3 + player;
+  }
+
+  Action PassAction() const { return NumDistinctActions() - 1; }
 
   int LookupTradeId(const std::string& trade_str) const {
     return trade_info_.trade_str_to_id.at(trade_str);
   }
+
+  std::vector<Action> LookupTradesCache(const std::string& key) const;
+  void AddToTradesCache(const std::string& key,
+                        std::vector<Action>& actions) const;
+
+  // Sample a random board according to the board generation rules, using a
+  // partial board which contains all the information for all the players except
+  // the specified player (override anything present for that player).
+  // Also returns a legal action for the same player.
+  std::pair<Board, Action> SampleRandomBoardCompletion(
+      int seed, const Board& board, Player player) const;
 
  private:
   const int num_colors_;
@@ -208,6 +266,8 @@ class ColoredTrailsGame : public Game {
   const int num_players_;
   std::vector<Board> all_boards_;
   TradeInfo trade_info_;
+  Trade pass_trade_;
+  mutable absl::flat_hash_map<std::string, std::vector<Action>> trades_cache_;
 };
 
 // Helper functions used by the board generator and game implementation.
@@ -231,6 +291,10 @@ void ParseBoardsFile(std::vector<Board>* boards, const std::string& filename,
 void ParseBoardsString(std::vector<Board>* boards,
                        const std::string& boards_string,
                        int num_colors, int board_size, int num_players);
+
+// Does the board match the creation criteria?
+bool CheckBoard(const Board& board);
+
 
 }  // namespace colored_trails
 }  // namespace open_spiel

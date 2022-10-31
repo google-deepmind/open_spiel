@@ -192,6 +192,8 @@ set (OPEN_SPIEL_CORE_FILES
   spiel_utils.h
   tensor_game.cc
   tensor_game.h
+  utils/usage_logging.h
+  utils/usage_logging.cc
 )
 
 # We add the subdirectory here so open_spiel_core can #include absl.

@@ -91,8 +91,12 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_bridge.h
   pybind11/games_chess.cc
   pybind11/games_chess.h
+  pybind11/games_colored_trails.cc
+  pybind11/games_colored_trails.h
   pybind11/games_euchre.cc
   pybind11/games_euchre.h
+  pybind11/games_gin_rummy.cc
+  pybind11/games_gin_rummy.h
   pybind11/games_kuhn_poker.cc
   pybind11/games_kuhn_poker.h
   pybind11/games_leduc_poker.cc
@@ -101,6 +105,10 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_negotiation.h
   pybind11/games_tarok.cc
   pybind11/games_tarok.h
+  pybind11/games_tiny_bridge.cc
+  pybind11/games_tiny_bridge.h
+  pybind11/games_trade_comm.cc
+  pybind11/games_trade_comm.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
   pybind11/observer.cc
@@ -186,6 +194,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/gambit_test.py
   algorithms/generate_playthrough_test.py
   algorithms/get_all_states_test.py
+  algorithms/ismcts_agent_test.py
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
@@ -195,6 +204,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/policy_aggregator_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
+  algorithms/regret_matching_test.py
   algorithms/tabular_qlearner_test.py
   algorithms/sequence_form_utils_test.py
   algorithms/wolf_phc_test.py
@@ -225,6 +235,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/game_transforms_test.py
   tests/games_bridge_test.py
   tests/games_euchre_test.py
+  tests/games_gin_rummy_test.py
   tests/games_sim_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
@@ -244,6 +255,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
     jax/policy_gradient_jax_test.py
+    algorithms/rnad/rnad_test.py
     mfg/algorithms/fictitious_play_test.py
   )
 endif()

@@ -1,3 +1,4 @@
+
 // Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,8 @@
 #include <cmath>
 #include <limits>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/history_tree.h"
@@ -30,13 +33,15 @@ namespace algorithms {
 TabularBestResponse::TabularBestResponse(const Game& game,
                                          Player best_responder,
                                          const Policy* policy,
-                                         const float prob_cut_threshold)
+                                         const float prob_cut_threshold,
+                                         const float action_value_tolerance)
     : best_responder_(best_responder),
       tabular_policy_container_(),
       policy_(policy),
       tree_(HistoryTree(game.NewInitialState(), best_responder_)),
       num_players_(game.NumPlayers()),
       prob_cut_threshold_(prob_cut_threshold),
+      action_value_tolerance_(action_value_tolerance),
       infosets_(GetAllInfoSets(game.NewInitialState(), best_responder, policy,
                                &tree_)),
       root_(game.NewInitialState()),
@@ -49,13 +54,14 @@ TabularBestResponse::TabularBestResponse(const Game& game,
 TabularBestResponse::TabularBestResponse(
     const Game& game, Player best_responder,
     const std::unordered_map<std::string, ActionsAndProbs>& policy_table,
-    const float prob_cut_threshold)
+    const float prob_cut_threshold, const float action_value_tolerance)
     : best_responder_(best_responder),
       tabular_policy_container_(policy_table),
       policy_(&tabular_policy_container_),
       tree_(HistoryTree(game.NewInitialState(), best_responder_)),
       num_players_(game.NumPlayers()),
       prob_cut_threshold_(prob_cut_threshold),
+      action_value_tolerance_(action_value_tolerance),
       infosets_(GetAllInfoSets(game.NewInitialState(), best_responder, policy_,
                                &tree_)),
       root_(game.NewInitialState()),
@@ -73,11 +79,24 @@ double TabularBestResponse::HandleDecisionCase(HistoryNode* node) {
   if (node == nullptr) SpielFatalError("HandleDecisionCase: node is null.");
   if (node->GetState()->CurrentPlayer() == best_responder_) {
     // If we're playing as the best responder, we look at every child node,
-    // and pick the one with the highest expected utility to play.
-    Action action = BestResponseAction(node->GetInfoState());
-    HistoryNode* child = node->GetChild(action).second;
-    if (child == nullptr) SpielFatalError("HandleDecisionCase: node is null.");
-    return Value(child->GetHistory());
+    if (action_value_tolerance_ < 0) {
+      // Pick the one with the highest expected utility to play.
+      BestResponseAction(node->GetInfoState());
+    } else {
+      // Or spread support over all best_actions.
+      BestResponseActions(node->GetInfoState(), action_value_tolerance_);
+    }
+
+    auto action_prob = best_response_policy_[node->GetInfoState()];
+    double value = 0.0;
+    for (const auto& [action, prob] : action_prob) {
+      HistoryNode* child = node->GetChild(action).second;
+      if (child == nullptr)
+        SpielFatalError("HandleDecisionCase: node is null.");
+      double child_value = Value(child->GetHistory());
+      value += child_value * prob;
+    }
+    return value;
   }
   // If the other player is playing, then we can recursively compute the
   // expected utility of that node by looking at their policy.
@@ -92,9 +111,10 @@ double TabularBestResponse::HandleDecisionCase(HistoryNode* node) {
     for (const auto& a_and_p : state_policy) {
       if (Near(a_and_p.second, 0.)) ++num_zeros;
     }
-    // We check here that the policy is valid, i.e. that it doesn't contain too
-    // many (invalid) actions. This can only happen when the policy is built
-    // incorrectly. If this is failing, you are building the policy wrong.
+    // We check here that the policy is valid, i.e. that it doesn't contain
+    // too many (invalid) actions. This can only happen when the policy is
+    // built incorrectly. If this is failing, you are building the policy
+    // wrong.
     if (state_policy.size() > node->NumChildren() + num_zeros) {
       std::vector<std::string> action_probs_str_vector;
       action_probs_str_vector.reserve(state_policy.size());
@@ -105,7 +125,6 @@ double TabularBestResponse::HandleDecisionCase(HistoryNode* node) {
       }
       std::string action_probs_str =
           absl::StrJoin(action_probs_str_vector, " ");
-
       SpielFatalError(absl::StrCat(
           "Policies don't match in size, in state ",
           node->GetState()->HistoryString(), ".\nThe tree has '",
@@ -117,19 +136,16 @@ double TabularBestResponse::HandleDecisionCase(HistoryNode* node) {
   for (const auto& action : node->GetState()->LegalActions()) {
     const double prob = GetProb(state_policy, action);
     if (prob <= prob_cut_threshold_) continue;
-
     // We discard the probability here that's returned by GetChild as we
     // immediately load the probability for the given child from the policy.
     HistoryNode* child = node->GetChild(action).second;
     if (child == nullptr) SpielFatalError("HandleDecisionCase: node is null.");
-
     // Finally, we update value by the policy weighted value of the child.
-    SPIEL_CHECK_GE(prob, 0);
+    SPIEL_CHECK_PROB_TOLERANCE(prob, ProbabilityDefaultTolerance());
     value += prob * Value(child->GetHistory());
   }
   return value;
 }
-
 double TabularBestResponse::HandleChanceCase(HistoryNode* node) {
   double value = 0;
   double prob_sum = 0;
@@ -140,18 +156,14 @@ double TabularBestResponse::HandleChanceCase(HistoryNode* node) {
     if (prob <= prob_cut_threshold_) continue;
     HistoryNode* child = prob_and_child.second;
     if (child == nullptr) SpielFatalError("Child is null.");
-
     // Verify that the probability is valid. This should always be true.
-    SPIEL_CHECK_GE(prob, 0.);
-    SPIEL_CHECK_LE(prob, 1.);
+    SPIEL_CHECK_PROB_TOLERANCE(prob, ProbabilityDefaultTolerance());
     value += prob * Value(child->GetHistory());
   }
-
   // Verify that the sum of the probabilities is 1, within tolerance.
   SPIEL_CHECK_FLOAT_EQ(prob_sum, 1.0);
   return value;
 }
-
 double TabularBestResponse::Value(const std::string& history) {
   auto it = value_cache_.find(history);
   if (it != value_cache_.end()) return it->second;
@@ -178,16 +190,14 @@ double TabularBestResponse::Value(const std::string& history) {
   value_cache_[history] = cache_value;
   return value_cache_[history];
 }
-
 Action TabularBestResponse::BestResponseAction(const std::string& infostate) {
-  auto it = best_response_actions_.find(infostate);
-  if (it != best_response_actions_.end()) return it->second;
+  auto it = best_response_policy_.find(infostate);
+  if (it != best_response_policy_.end()) return it->second.begin()->first;
   std::vector<std::pair<HistoryNode*, double>> infoset = infosets_[infostate];
-
   Action best_action = -1;
   double best_value = std::numeric_limits<double>::lowest();
-  // The legal actions are the same for all children, so we arbitrarily pick the
-  // first one to get the legal actions from.
+  // The legal actions are the same for all children, so we arbitrarily pick
+  // the first one to get the legal actions from.
   for (const auto& action : infoset[0].first->GetChildActions()) {
     double value = 0;
     // Prob here is the counterfactual reach-weighted probability.
@@ -204,51 +214,66 @@ Action TabularBestResponse::BestResponseAction(const std::string& infostate) {
     }
   }
   if (best_action == -1) SpielFatalError("No action was chosen.");
+
+  ActionsAndProbs actions_and_probs;
+  for (const auto& action : infoset[0].first->GetChildActions()) {
+    double prob = 0.0;
+    if (action == best_action) prob = 1.0;
+    actions_and_probs.push_back(std::make_pair(action, prob));
+  }
+  best_response_policy_[infostate] = actions_and_probs;
   best_response_actions_[infostate] = best_action;
   return best_action;
 }
-
 std::vector<Action> TabularBestResponse::BestResponseActions(
     const std::string& infostate, double tolerance) {
-  std::vector<Action> best_actions;
+  std::set<Action> best_actions;
+  std::vector<std::pair<Action, double>> action_values;
   std::vector<std::pair<HistoryNode*, double>> infoset =
       infosets_.at(infostate);
-
   double best_value = std::numeric_limits<double>::lowest();
-  // The legal actions are the same for all children, so we arbitrarily pick the
-  // first one to get the legal actions from.
+  // The legal actions are the same for all children, so we arbitrarily pick
+  // the first one to get the legal actions from.
   for (const Action& action : infoset[0].first->GetChildActions()) {
     double value = 0;
     // Prob here is the counterfactual reach-weighted probability.
-    for (const auto& [state_node, prob]  : infoset) {
+    for (const auto& [state_node, prob] : infoset) {
       if (prob <= prob_cut_threshold_) continue;
       HistoryNode* child_node = state_node->GetChild(action).second;
       SPIEL_CHECK_TRUE(child_node != nullptr);
       value += prob * Value(child_node->GetHistory());
     }
-    if (value > best_value + tolerance) {
+    action_values.push_back({action, value});
+    if (value > best_value) {
       best_value = value;
-      best_actions.clear();
-      best_actions.push_back(action);
-    } else if (value > best_value - tolerance) {
-      best_actions.push_back(action);
+    }
+  }
+  for (const auto& [action, value] : action_values) {
+    if (value >= best_value - tolerance) {
+      best_actions.insert(action);
     }
   }
   if (best_actions.empty()) SpielFatalError("No action was chosen.");
-  return best_actions;
+  ActionsAndProbs actions_and_probs;
+  for (const auto& action : infoset[0].first->GetChildActions()) {
+    double prob = 0.0;
+    if (best_actions.count(action)) {
+      prob = 1.0 / best_actions.size();
+    }
+    actions_and_probs.push_back(std::make_pair(action, prob));
+  }
+  best_response_policy_[infostate] = actions_and_probs;
+  return std::vector<Action>(best_actions.begin(), best_actions.end());
 }
-
 std::vector<std::pair<Action, double>>
 TabularBestResponse::BestResponseActionValues(const std::string& infostate) {
   std::vector<std::pair<Action, double>> action_values;
   std::vector<std::pair<HistoryNode*, double>> infoset =
       infosets_.at(infostate);
-
   action_values.reserve(infoset[0].first->GetChildActions().size());
   for (Action action : infoset[0].first->GetChildActions()) {
     double value = 0;
     double normalizer = 0;
-
     // Prob here is the counterfactual reach-weighted probability.
     for (const auto& [state_node, prob] : infoset) {
       if (prob <= prob_cut_threshold_) continue;
@@ -257,13 +282,10 @@ TabularBestResponse::BestResponseActionValues(const std::string& infostate) {
       value += prob * Value(child_node->GetHistory());
       normalizer += prob;
     }
-
     SPIEL_CHECK_GT(normalizer, 0);
     action_values.push_back({action, value / normalizer});
   }
-
   return action_values;
 }
-
 }  // namespace algorithms
 }  // namespace open_spiel
