@@ -258,10 +258,6 @@ class Environment(object):
       observations["serialized_state"] = pyspiel.serialize_game_and_state(
           self._game, self._state)
 
-    # For gym environments
-    if hasattr(self._state, 'last_info'):
-      observations['info'] = self._state.last_info
-
     return TimeStep(
         observations=observations,
         rewards=rewards,

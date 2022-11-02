@@ -1,3 +1,17 @@
+# Copyright 2022 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # Note: code adapted (with permission) from https://github.com/vwxyzjn/cleanrl/blob/master/cleanrl/ppo.py and https://github.com/vwxyzjn/ppo-implementation-details/blob/main/ppo_atari.py
 
 import time
@@ -186,22 +200,13 @@ class PPO(nn.Module):
 
   def step(self, time_step, is_evaluation=False):
     if is_evaluation:
-      singular_env = False
-      if not isinstance(time_step, list):
-        time_step = [time_step]
-        singular_env = True
-
       with torch.no_grad():
         legal_actions_mask = legal_actions_to_mask(
           [ts.observations['legal_actions'][self.player_id] for ts in time_step], self.num_actions
         ).to(self.device)
         obs = torch.Tensor(np.array([ts.observations['info_state'][self.player_id] for ts in time_step])).to(self.device)
         action, log_prob, entropy, value, probs = self.get_action_and_value(obs, legal_actions_mask=legal_actions_mask)
-
-        if singular_env:
-          return StepOutput(action=action[0].item(), probs=probs[0])
-        else:
-          return [StepOutput(action=a.item(), probs=p) for (a, p) in zip(action, probs)]
+        return [StepOutput(action=a.item(), probs=p) for (a, p) in zip(action, probs)]
     else:
       with torch.no_grad():
         # act
@@ -235,7 +240,9 @@ class PPO(nn.Module):
 
     # Annealing the rate if instructed to do so.
     if self.num_annealing_updates is not None:
-      frac = 1.0 - (self.updates_done) / self.num_annealing_updates
+      frac = 1.0 - (self.updates_done / self.num_annealing_updates)
+      if frac <= 0:
+        raise ValueError('Annealing learning rate to <= 0')
       lrnow = frac * self.learning_rate
       self.optimizer.param_groups[0]["lr"] = lrnow
 
