@@ -68,12 +68,14 @@ class PPOTest(absltest.TestCase):
       agent.learn(time_step)
 
     total_eval_reward = 0
-    for _ in range(1000):
-      time_step = env.reset()
-      while not time_step.last():
-        agent_output = agent.step(time_step, is_evaluation=True)
-        time_step = env.step([agent_output.action])
-        total_eval_reward += time_step.rewards[0]
+    n_total_evaluations = 1000
+    n_evaluations = 0
+    time_step = envs.reset()
+    while n_evaluations < n_total_evaluations:
+      agent_output = agent.step(time_step, is_evaluation=True)
+      time_step, reward, done, unreset_time_steps = envs.step(agent_output, reset_if_done=True)
+      total_eval_reward += reward[0][0]
+      n_evaluations += sum(done)
     self.assertGreaterEqual(total_eval_reward, 900)
 
 if __name__ == "__main__":

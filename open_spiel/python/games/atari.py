@@ -30,38 +30,6 @@ The original Atari suite paper can be found at https://arxiv.org/abs/1207.4708
 We use wrappers from Stable Baselines 3 (https://jmlr.org/papers/v22/20-1364.html) to facilitate traininng
 '''
 
-### NOTE: We include this wrapper by hand because the default wrapper threw errors (see modified lines).
-class NoopResetEnv(gym.Wrapper):
-  """
-  Sample initial states by taking random number of no-ops on reset.
-  No-op is assumed to be action 0.
-  :param env: the environment to wrap
-  :param noop_max: the maximum value of no-ops to run
-  """
-
-  def __init__(self, env: gym.Env, noop_max: int = 30):
-    gym.Wrapper.__init__(self, env)
-    self.noop_max = noop_max
-    self.override_num_noops = None
-    self.noop_action = 0
-    assert env.unwrapped.get_action_meanings()[0] == "NOOP"
-
-  def reset(self, **kwargs) -> np.ndarray:
-    self.env.reset(**kwargs)
-    if self.override_num_noops is not None:
-      noops = self.override_num_noops
-    else:
-      #### MODIFIED LINES ###
-      noops = self.unwrapped.np_random.integers(1, self.noop_max + 1)
-      ### END MODIFIED LINES ###
-    assert noops > 0
-    obs = np.zeros(0)
-    for _ in range(noops):
-      obs, _, done, _ = self.env.step(self.noop_action)
-      if done:
-        obs = self.env.reset(**kwargs)
-    return obs
-
 _NUM_PLAYERS = 1
 _GAME_TYPE = pyspiel.GameType(
   short_name="atari",
@@ -222,7 +190,6 @@ class AtariObserver:
     """Observation of `state` from the PoV of `player`, as a string."""
     pieces = []
     return " ".join(str(p) for p in pieces)
-
 
 
 # Register the game with the OpenSpiel library

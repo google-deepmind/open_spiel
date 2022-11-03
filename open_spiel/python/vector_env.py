@@ -35,9 +35,6 @@ class SyncVectorEnv(object):
         '''
         reset_if_done: if True, automatically reset the environment when the epsiode ends
         '''
-        if not isinstance(step_outputs, list):
-            step_outputs = [step_outputs]
-        
         time_steps = [self.envs[i].step([step_outputs[i].action]) for i in range(len(self.envs))]
         reward = [step.rewards for step in time_steps]
         done = [step.last() for step in time_steps]
