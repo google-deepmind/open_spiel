@@ -37,7 +37,7 @@ flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
-
+flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
 
 def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
     def get_action_probs(policy_params: hk.Params, num_actions: int) -> List[str]:

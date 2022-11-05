@@ -29,9 +29,9 @@ class TransitionBatch:
 
 class TrainState(typing.NamedTuple):
     policy_params: typing.Dict[typing.Any, hk.Params]
-    critic_params: typing.Dict[typing.Any, hk.Params]
     policy_opt_states: typing.Dict[typing.Any, optax.OptState]
     critic_opt_state: optax.OptState
+    critic_params: hk.Params
 
 
 UpdateFn = typing.Callable[[TrainState, TransitionBatch], typing.Tuple[TrainState, typing.Dict]]
@@ -63,14 +63,11 @@ def get_critic_update_fn(agent_id: int, critic_network: hk.Transformed, optimize
         return td_error.mean()
 
     def update(train_state: TrainState, batch: TransitionBatch):
-        params = train_state.critic_params[agent_id]
-        loss, grads = jax.value_and_grad(loss_fn)(params, batch)
+        loss, grads = jax.value_and_grad(loss_fn)(train_state.critic_params, batch)
         updates, opt_state = optimizer(grads, train_state.critic_opt_state)
-        critic_params = optax.apply_updates(params, updates)
-        new_params = deepcopy(train_state.critic_params)
-        new_params[agent_id] = critic_params
+        critic_params = optax.apply_updates(train_state.critic_params, updates)
         new_state = train_state \
-            ._replace(critic_params=new_params) \
+            ._replace(critic_params=critic_params) \
             ._replace(critic_opt_state=opt_state)
         return new_state, dict(loss=loss)
 
@@ -145,7 +142,7 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             r_t = batch.reward[agent_id]
             a_t = batch.action[agent_id]
             o_t = batch.info_state[agent_id]
-            values = jnp.squeeze(critic_network.apply(train_state.critic_params[agent_id], o_t))
+            values = jnp.squeeze(critic_network.apply(train_state.critic_params, o_t))
             v_t, v_tp1 = values[:, :-1], values[:, 1:]
             logits = policy_network.apply(params, o_t).logits
             compute_return = vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0))
@@ -310,12 +307,11 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
 
         """
         self._train_state.policy_params[player_id] = state.policy_params[player_id]
-        self._train_state.critic_params[player_id] = state.critic_params[player_id]
 
     def get_value_fn(self) -> typing.Callable:
         def value_fn(obs: jnp.ndarray):
             obs = jnp.array(obs)
-            return self._critic_network.apply(self.train_state.critic_params[self.player_id], obs).squeeze(-1)
+            return self._critic_network.apply(self.train_state.critic_params, obs).squeeze(-1)
         return jax.jit(value_fn)
 
     def get_policy(self, return_probs=True) -> typing.Callable:
@@ -393,17 +389,17 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
     def _init_train_state(self, info_state_size: chex.Shape):
         init_inputs = jnp.ones(info_state_size)
         agent_ids = self._opponent_ids + [self.player_id]
-        policy_params, critic_params, policy_opt_states = {}, {}, {}
-        for agent_id in sorted(agent_ids):
+        policy_params, policy_opt_states = {}, {}
+        for agent_id in agent_ids:
             policy_params[agent_id] = self._pi_network.init(next(self._rng), init_inputs)
-            critic_params[agent_id] = self._critic_network.init(next(self._rng), init_inputs)
             if agent_id == self.player_id:
                 policy_opt_state = self._policy_opt.init(policy_params[agent_id])
             else:
                 policy_opt_state = self._opponent_opt.init(policy_params[agent_id])
             policy_opt_states[agent_id] = policy_opt_state
 
-        critic_opt_state = self._critic_opt.init(critic_params[self.player_id])
+        critic_params = self._critic_network.init(next(self._rng), init_inputs)
+        critic_opt_state = self._critic_opt.init(critic_params)
         return TrainState(
             policy_params=policy_params,
             critic_params=critic_params,
