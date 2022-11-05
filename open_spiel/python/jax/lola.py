@@ -28,9 +28,9 @@ class TransitionBatch:
 
 
 class TrainState(typing.NamedTuple):
-    policy_params: typing.List[hk.Params]
-    critic_params: typing.List[hk.Params]
-    policy_opt_state: optax.OptState
+    policy_params: typing.Dict[typing.Any, hk.Params]
+    critic_params: typing.Dict[typing.Any, hk.Params]
+    policy_opt_states: typing.Dict[typing.Any, optax.OptState]
     critic_opt_state: optax.OptState
 
 
@@ -86,7 +86,9 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             return jnp.exp(x - jax.lax.stop_gradient(x))
 
         agent, opp = agent_id, 1-agent_id
-        params, unravel = zip(*[jax.flatten_util.ravel_pytree(params) for params in train_state.policy_params])
+        flat_param_dict = dict([(agent_id, jax.flatten_util.ravel_pytree(params)) for agent_id, params in train_state.policy_params.items()])
+        params = dict((k, flat_param_dict[k][0]) for k in flat_param_dict)
+        unravel_fns = dict((k, flat_param_dict[k][1]) for k in flat_param_dict)
         batch = jax.tree_util.tree_map(jnp.array, batch)
         a_t, o_t, r_t, values = batch.action, batch.info_state, batch.reward, batch.values
 
@@ -103,8 +105,10 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         #adv_t = vmap(lambda x: (x - x.mean()) / (x.std() + 1e-8))(adv_t)
 
         def objective(params, opp_params, adv_t):
-            logp = policy_network.apply(unravel[agent](params), o_t[agent]).log_prob(a_t[agent])
-            opp_logp = policy_network.apply(unravel[opp](opp_params), o_t[opp]).log_prob(a_t[opp])
+            agent_unravel = flat_param_dict[agent][1]
+            opp_unravel = flat_param_dict[opp][1]
+            logp = policy_network.apply(agent_unravel(params), o_t[agent]).log_prob(a_t[agent])
+            opp_logp = policy_network.apply(opp_unravel(opp_params), o_t[opp]).log_prob(a_t[opp])
             cumlogp_t = logp.cumsum(-1)
             oppcumlogp_t = opp_logp.cumsum(-1)
             joint_cumlogp_t = magic_box(cumlogp_t + oppcumlogp_t)
@@ -125,7 +129,7 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
 
         # compute correction
         correction = pg_update + L0_grad_opp_params @ L1_grad_opp_params_grad_params
-        return unravel[agent](correction)
+        return unravel_fns[agent](correction)
 
     def policy_update(train_state: TrainState, batch: TransitionBatch):
         """
@@ -169,15 +173,40 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             gradient_correction = dice_correction(train_state, batch)
             policy_grads = jax.tree_util.tree_map(lambda g, c: -correction_weight * c, policy_grads, gradient_correction)
 
-        updates, opt_state = optimizer(policy_grads, train_state.policy_opt_state)
+        updates, opt_state = optimizer(policy_grads, train_state.policy_opt_states[agent_id])
         policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
         new_policy_params = deepcopy(train_state.policy_params)
+        new_opt_states = deepcopy(train_state.policy_opt_states)
         new_policy_params[agent_id] = policy_params
-        train_state = train_state._replace(policy_params=new_policy_params)._replace(policy_opt_state=opt_state)
+        new_opt_states[agent_id] = opt_state
+        train_state = train_state.\
+            _replace(policy_params=new_policy_params).\
+            _replace(policy_opt_states=new_opt_states)
         return train_state, dict(loss=loss)
 
     return update
 
+def get_opponent_update_fn(agent_id: int, policy_network: hk.Transformed, optimizer: optax.TransformUpdateFn) -> UpdateFn:
+
+    def loss_fn(params, batch: TransitionBatch):
+        actions = batch.action[agent_id]
+        log_prob = policy_network.apply(params, batch.info_state[agent_id]).log_prob(actions)
+        return -log_prob.sum(axis=-1).mean()
+
+    def update(train_state: TrainState, batch: TransitionBatch) -> typing.Tuple[TrainState, typing.Dict]:
+        loss, policy_grads = jax.value_and_grad(loss_fn)(train_state.policy_params[agent_id], batch)
+        updates, opt_state = optimizer(policy_grads, train_state.policy_opt_states[agent_id])
+        policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
+        new_policy_params = deepcopy(train_state.policy_params)
+        new_opt_states = deepcopy(train_state.policy_opt_states)
+        new_policy_params[agent_id] = policy_params
+        new_opt_states[agent_id] = opt_state
+        train_state = train_state. \
+            _replace(policy_params=new_policy_params). \
+            _replace(policy_opt_states=new_opt_states)
+        return train_state, dict(loss=loss)
+
+    return update
 
 class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
 
@@ -191,11 +220,13 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  batch_size: int = 16,
                  critic_learning_rate: typing.Union[float, optax.Schedule] = 0.01,
                  pi_learning_rate: typing.Union[float, optax.Schedule] = 0.001,
+                 opponent_model_learning_rate: typing.Union[float, optax.Schedule] = 0.001,
                  correction_weight: float = 1.0,
                  clip_grad_norm: float = 0.5,
                  policy_update_interval: int = 8,
                  discount: float = 0.99,
                  seed: jax.random.PRNGKey = 42,
+                 fit_opponent_model = True,
                  use_jit: bool = False):
 
         self.player_id = player_id
@@ -207,6 +238,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         self._prev_action = None
         self._data = []
         self._metrics = []
+        self._fit_opponent_model = fit_opponent_model
         self._opponent_ids = opponent_ids
         self._rng = hk.PRNGSequence(seed)
 
@@ -218,6 +250,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         self._pi_network = policy
         self._critic_network = critic
         self._critic_opt = optax.sgd(learning_rate=critic_learning_rate)
+        self._opponent_opt = optax.adam(opponent_model_learning_rate)
         self._policy_opt = optax.chain(
             optax.clip_by_global_norm(clip_grad_norm) if clip_grad_norm else optax.identity(),
             optax.sgd(learning_rate=pi_learning_rate)
@@ -239,13 +272,22 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             critic_network=critic,
             optimizer=self._critic_opt.update
         )
+
+        self._policy_update_fns = {}
+
         if use_jit:
-            self._policy_update_fn = jax.jit(policy_update_fn)
+            self._policy_update_fns[player_id] = jax.jit(policy_update_fn)
             self._critic_update_fn = jax.jit(critic_update_fn)
         else:
-            self._policy_update_fn = policy_update_fn
+            self._policy_update_fns[player_id] = policy_update_fn
             self._critic_update_fn = critic_update_fn
 
+        for opponent in opponent_ids:
+            opp_update_fn = get_opponent_update_fn(agent_id=opponent, policy_network=policy, optimizer=self._opponent_opt.update)
+            if use_jit:
+                self._policy_update_fns[opponent] = jax.jit(opp_update_fn)
+            else:
+                self._policy_update_fns[opponent] = opp_update_fn
     @property
     def train_state(self):
         return deepcopy(self._train_state)
@@ -350,15 +392,22 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
 
     def _init_train_state(self, info_state_size: chex.Shape):
         init_inputs = jnp.ones(info_state_size)
-        number_of_agents = len(self._opponent_ids) + 1
-        policy_params = [self._pi_network.init(next(self._rng), init_inputs) for _ in range(number_of_agents)]
-        critic_params = [self._critic_network.init(next(self._rng), init_inputs) for _ in range(number_of_agents)]
-        policy_opt_state = self._policy_opt.init(policy_params[self.player_id])
+        agent_ids = self._opponent_ids + [self.player_id]
+        policy_params, critic_params, policy_opt_states = {}, {}, {}
+        for agent_id in sorted(agent_ids):
+            policy_params[agent_id] = self._pi_network.init(next(self._rng), init_inputs)
+            critic_params[agent_id] = self._critic_network.init(next(self._rng), init_inputs)
+            if agent_id == self.player_id:
+                policy_opt_state = self._policy_opt.init(policy_params[agent_id])
+            else:
+                policy_opt_state = self._opponent_opt.init(policy_params[agent_id])
+            policy_opt_states[agent_id] = policy_opt_state
+
         critic_opt_state = self._critic_opt.init(critic_params[self.player_id])
         return TrainState(
             policy_params=policy_params,
             critic_params=critic_params,
-            policy_opt_state=policy_opt_state,
+            policy_opt_states=policy_opt_states,
             critic_opt_state=critic_opt_state
         )
 
@@ -413,8 +462,10 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         """
         metrics = {}
         self._num_learn_steps += 1
+        opponent_update_metrics = self._update_opponents(batch)
         critic_update_metrics = self._update_critic(batch)
         metrics.update((f'critic/{k}', v) for k, v in critic_update_metrics.items())
+        metrics.update((f'opponents/{k}', v) for k, v in opponent_update_metrics.items())
         if self._num_learn_steps % self._policy_update_interval == 0:
             policy_update_metrics = self._update_policy(batch)
             metrics.update((f'policy/{k}', v) for k, v in policy_update_metrics.items())
@@ -448,13 +499,20 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         return batch
 
     def _update_policy(self, batch: TransitionBatch):
-        self._train_state, metrics = self._policy_update_fn(self._train_state, batch)
+        self._train_state, metrics = self._policy_update_fns[self.player_id](self._train_state, batch)
         self._current_policy = self.get_policy(return_probs=True)
         return metrics
 
     def _update_critic(self, batch: TransitionBatch):
         self._train_state, metrics = self._critic_update_fn(self._train_state, batch)
         return metrics
+
+    def _update_opponents(self, batch: TransitionBatch):
+        update_metrics = {}
+        for opponent in self._opponent_ids:
+            self._train_state, metrics = self._policy_update_fns[opponent](self._train_state, batch)
+            update_metrics.update({f'agent_{opponent}/{k}': v for k, v in metrics.items()})
+        return update_metrics
 
     def _make_transition(self, time_step: TimeStep):
         assert self._prev_time_step is not None
