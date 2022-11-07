@@ -29,9 +29,11 @@ jobs:
       matrix:
         include:
         - os: ubuntu-20.04
+          OS_TYPE: "Linux"
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
           CIBW_BUILD: cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64
         - os: macOS-12
+          OS_TYPE: "Darwin"
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
           CIBW_BUILD: cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64
     env:
@@ -54,20 +56,22 @@ jobs:
         run: |
           pwd
           uname -a
+          [[ "${OS_TYPE} = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
+          [[ "${OS_TYPE} = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
           which g++
           g++ --version
           chmod +x install.sh
           # This is needed to grab OpenSpiel dependencies.
           ./install.sh
           # These are necessary to install what is necessary for the build and for the full tests below.
-          python3 -m pip install --upgrade pip
-          python3 -m pip --version
-          python3 -m pip install --upgrade setuptools
-          python3 -m pip install --upgrade -r requirements.txt -q
+          python -m pip install --upgrade pip
+          python -m pip --version
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
-          python3 -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
-          python3 -m pip install twine
-          python3 -m pip install cibuildwheel==2.5.0
+          python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          python -m pip install twine
+          python -m pip install cibuildwheel==2.5.0
       - name: Build sdist
         run: |
           pipx run build --sdist
@@ -77,7 +81,7 @@ jobs:
       # Basic tests are run via the CIBW_TEST_COMMAND environment variable.
       - name: Build bdist_wheel and run tests
         run: |
-          python3 -m cibuildwheel --output-dir wheelhouse
+          python -m cibuildwheel --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
