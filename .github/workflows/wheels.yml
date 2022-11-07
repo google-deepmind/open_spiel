@@ -63,17 +63,17 @@ jobs:
           g++ --version
           chmod +x install.sh
           # This is needed to grab OpenSpiel dependencies.
-          [[ "${OS_TYPE} = "Darwin" ]] && ./install.sh `which python`
+          [[ "${OS_TYPE} = "Darwin" ]] && ./install.sh `which python${OS_PYTHON_VERSION}`
           [[ "${OS_TYPE} = "Linux" ]] && ./install.sh `which python3`
           # These are necessary to install what is necessary for the build and for the full tests below.
-          python -m pip install --upgrade pip
-          python -m pip --version
-          python -m pip install --upgrade setuptools
-          python -m pip install --upgrade -r requirements.txt -q
+          python3 -m pip install --upgrade pip
+          python3 -m pip --version
+          python3 -m pip install --upgrade setuptools
+          python3 -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
-          python -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
-          python -m pip install twine
-          python -m pip install cibuildwheel==2.5.0
+          python3 -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          python3 -m pip install twine
+          python3 -m pip install cibuildwheel==2.5.0
       - name: Build sdist
         run: |
           pipx run build --sdist
@@ -83,7 +83,7 @@ jobs:
       # Basic tests are run via the CIBW_TEST_COMMAND environment variable.
       - name: Build bdist_wheel and run tests
         run: |
-          python -m cibuildwheel --output-dir wheelhouse
+          python3 -m cibuildwheel --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
