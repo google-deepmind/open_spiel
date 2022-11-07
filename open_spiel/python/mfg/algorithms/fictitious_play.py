@@ -91,8 +91,13 @@ class MergedPolicy(policy_std.Policy):
       merged_pi = 0.0
       norm_merged_pi = 0.0
       for p, d, w in zip(self._policies, self._distributions, self._weights):
-        merged_pi += w * d(state) * p(state)[a]
-        norm_merged_pi += w * d(state)
+        try:
+          merged_pi += w * d(state) * p(state)[a]
+          norm_merged_pi += w * d(state)
+        except (KeyError, ValueError):
+          # This happens when the state was not observed in the merged
+          # distributions or policies.
+          pass
       if norm_merged_pi > 0.0:
         action_prob.append((a, merged_pi / norm_merged_pi))
       else:
@@ -120,10 +125,8 @@ class FictitiousPlay(object):
     self._game = game
     self._lr = lr
     self._temperature = temperature
-    self._states = None  # Required to avoid attribute-error.
     self._policy = policy_std.UniformRandomPolicy(self._game)
     self._fp_step = 0
-    self._states = policy_std.get_tabular_policy_states(self._game)
 
   def get_policy(self):
     return self._policy
@@ -154,7 +157,7 @@ class FictitiousPlay(object):
     else:
       pi = softmax_policy.SoftmaxPolicy(self._game, player_ids,
                                         self._temperature, br_value)
-    pi = pi.to_tabular(states=self._states)
+    pi = pi.to_tabular()
 
     distrib_pi = distribution.DistributionPolicy(self._game, pi)
 
@@ -166,6 +169,6 @@ class FictitiousPlay(object):
     if math.isclose(weight, 1.0):
       self._policy = pi
     else:
-      self._policy = MergedPolicy(
-          self._game, player_ids, [self._policy, pi], [distrib, distrib_pi],
-          [1.0 - weight, weight]).to_tabular(states=self._states)
+      self._policy = MergedPolicy(self._game, player_ids, [self._policy, pi],
+                                  [distrib, distrib_pi],
+                                  [1.0 - weight, weight]).to_tabular()
