@@ -1,9 +1,25 @@
+# Copyright 2022 DeepMind Technologies Limited
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Tests counterfactual regret minimization."""
+
+from absl.testing import absltest
+from absl.testing import parameterized
+
 from open_spiel.python.examples.meta_cfr.sequential_games import cfr
 from open_spiel.python.examples.meta_cfr.sequential_games import game_tree_utils as trees
 from open_spiel.python.examples.meta_cfr.sequential_games import openspiel_api
-from google3.testing.pybase import googletest
-from google3.testing.pybase import parameterized
 
 
 def _uniform_policy(size):
@@ -67,4 +83,4 @@ class CfrTest(parameterized.TestCase):
 
 
 if __name__ == '__main__':
-  googletest.main()
+  absltest.main()
