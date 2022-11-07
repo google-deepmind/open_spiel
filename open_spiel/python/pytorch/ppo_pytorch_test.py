@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for open_spiel.python.algorithms.ppo."""
 
 import random
@@ -35,15 +34,17 @@ SIMPLE_EFG_DATA = """
 """
 SEED = 24261711
 
+
 class PPOTest(absltest.TestCase):
 
   def test_simple_game(self):
     game = pyspiel.load_efg_game(SIMPLE_EFG_DATA)
     env = rl_environment.Environment(game=game)
     envs = SyncVectorEnv([env])
-    agent_fn = PPOAgent 
+    agent_fn = PPOAgent
 
-    info_state_shape = tuple(np.array(env.observation_spec()["info_state"]).flatten()) 
+    info_state_shape = tuple(
+        np.array(env.observation_spec()["info_state"]).flatten())
 
     total_timesteps = 1000
     steps_per_batch = 8
@@ -62,9 +63,10 @@ class PPOTest(absltest.TestCase):
     time_step = envs.reset()
     for update in range(1, num_updates + 1):
       for step in range(0, steps_per_batch):
-          agent_output = agent.step(time_step)
-          time_step, reward, done, unreset_time_steps = envs.step(agent_output, reset_if_done=True)
-          agent.post_step(reward, done)
+        agent_output = agent.step(time_step)
+        time_step, reward, done, unreset_time_steps = envs.step(
+            agent_output, reset_if_done=True)
+        agent.post_step(reward, done)
       agent.learn(time_step)
 
     total_eval_reward = 0
@@ -73,10 +75,12 @@ class PPOTest(absltest.TestCase):
     time_step = envs.reset()
     while n_evaluations < n_total_evaluations:
       agent_output = agent.step(time_step, is_evaluation=True)
-      time_step, reward, done, unreset_time_steps = envs.step(agent_output, reset_if_done=True)
+      time_step, reward, done, unreset_time_steps = envs.step(
+          agent_output, reset_if_done=True)
       total_eval_reward += reward[0][0]
       n_evaluations += sum(done)
     self.assertGreaterEqual(total_eval_reward, 900)
+
 
 if __name__ == "__main__":
   random.seed(SEED)
