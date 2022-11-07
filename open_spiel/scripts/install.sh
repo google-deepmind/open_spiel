@@ -25,10 +25,12 @@ die() {
 set -e  # exit when any command fails
 set -x  # show evaluation trace
 
-PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
-PYBIN=${PYBIN:-"python3"}
-PYBIN=`which $PYBIN`
-
+PYBIN="python3"
+if [[ "$1" != "" ]]; then
+  PYBIN=$1
+fi
+${PYBIN} --version
+ 
 MYDIR="$(dirname "$(realpath "$0")")"
 
 # Calling this file from the project root is not allowed,
@@ -283,8 +285,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
-  `${PYBIN} -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
-  ${PYBIN} --version
+  `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
+  python3 --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
   [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
