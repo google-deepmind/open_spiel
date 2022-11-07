@@ -28,6 +28,7 @@ elif [[ "$OS" = "Darwin" ]]; then
   # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
   # install the specific versions we've requested on MacOS.
   brew install python@${OS_PYTHON_VERSION}
+  brew link --force python@{OS_PYTHON_VERSION}
 fi
 
 PYBIN=${PYBIN:-"python3"}
