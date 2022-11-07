@@ -63,7 +63,8 @@ jobs:
           g++ --version
           chmod +x install.sh
           # This is needed to grab OpenSpiel dependencies.
-          ./install.sh
+          [[ "${OS_TYPE} = "Darwin" ]] && ./install.sh `which python`
+          [[ "${OS_TYPE} = "Linux" ]] && ./install.sh `which python3`
           # These are necessary to install what is necessary for the build and for the full tests below.
           python -m pip install --upgrade pip
           python -m pip --version
