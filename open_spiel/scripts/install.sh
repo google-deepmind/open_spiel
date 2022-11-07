@@ -26,7 +26,6 @@ set -e  # exit when any command fails
 set -x  # show evaluation trace
 
 PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
-PYBIN=${PYBIN:-"python"}
 PYBIN=${PYBIN:-"python3"}
 PYBIN=`which $PYBIN`
 
