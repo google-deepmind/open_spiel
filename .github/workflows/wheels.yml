@@ -60,14 +60,14 @@ jobs:
         run: |
           pwd
           uname -a
-          [[ "${OS_TYPE} = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
-          [[ "${OS_TYPE} = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
+          [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
+          [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
           which g++
           g++ --version
           chmod +x install.sh
           # This is needed to grab OpenSpiel dependencies.
-          [[ "${OS_TYPE} = "Darwin" ]] && ./install.sh `which python${OS_PYTHON_VERSION}`
-          [[ "${OS_TYPE} = "Linux" ]] && ./install.sh `which python3`
+          [[ "${OS_TYPE}" = "Darwin" ]] && ./install.sh `which python${OS_PYTHON_VERSION}`
+          [[ "${OS_TYPE}" = "Linux" ]] && ./install.sh `which python3`
           # These are necessary to install what is necessary for the build and for the full tests below.
           ${PYBIN} -m pip install --upgrade pip
           ${PYBIN} -m pip --version
