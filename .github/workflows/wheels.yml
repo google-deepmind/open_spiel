@@ -30,12 +30,12 @@ jobs:
         include:
         - os: ubuntu-20.04
           OS_TYPE: "Linux"
-          PYBIN: python3
+          CI_PYBIN: python3
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
           CIBW_BUILD: cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64
         - os: macOS-12
           OS_TYPE: "Darwin"
-          PYBIN: python3.9
+          CI_PYBIN: python3.9
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
           CIBW_BUILD: cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64
     env:
@@ -44,7 +44,7 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
       OS_TYPE: ${{ matrix.OS_TYPE }}
       OS_PYTHON_VERSION: "3.9"
-      PYBIN: ${{ matrix.PYBIN }}
+      CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: pp*
@@ -69,14 +69,14 @@ jobs:
           [[ "${OS_TYPE}" = "Darwin" ]] && ./install.sh `which python${OS_PYTHON_VERSION}`
           [[ "${OS_TYPE}" = "Linux" ]] && ./install.sh `which python3`
           # These are necessary to install what is necessary for the build and for the full tests below.
-          ${PYBIN} -m pip install --upgrade pip
-          ${PYBIN} -m pip --version
-          ${PYBIN} -m pip install --upgrade setuptools
-          ${PYBIN} -m pip install --upgrade -r requirements.txt -q
+          ${CI_PYBIN} -m pip install --upgrade pip
+          ${CI_PYBIN} -m pip --version
+          ${CI_PYBIN} -m pip install --upgrade setuptools
+          ${CI_PYBIN} -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
-          ${PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
-          ${PYBIN} -m pip install twine
-          ${PYBIN} -m pip install cibuildwheel==2.5.0
+          ${CI_PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          ${CI_PYBIN} -m pip install twine
+          ${CI_PYBIN} -m pip install cibuildwheel==2.5.0
       - name: Build sdist
         run: |
           pipx run build --sdist
@@ -86,7 +86,7 @@ jobs:
       # Basic tests are run via the CIBW_TEST_COMMAND environment variable.
       - name: Build bdist_wheel and run tests
         run: |
-          ${PYBIN} -m cibuildwheel --output-dir wheelhouse
+          ${CI_PYBIN} -m cibuildwheel --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
