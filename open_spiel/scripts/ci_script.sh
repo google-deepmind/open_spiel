@@ -27,8 +27,7 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
 elif [[ "$OS" = "Darwin" ]]; then
   # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
   # install the specific versions we've requested on MacOS.
-  python3 -m pip install python@${OS_PYTHON_VERSION}
-  python3 -m pip install virtualenv
+  brew install python@${OS_PYTHON_VERSION}
 fi
 
 PYBIN=${PYBIN:-"python3"}
@@ -44,6 +43,7 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
   ${PYBIN} -m venv ./venv
 else
   # Ubuntu 20.04 and earlier
+  ${PYBIN} -m pip install virtualenv
   virtualenv -p ${PYBIN} ./venv
 fi
 source ./venv/bin/activate
