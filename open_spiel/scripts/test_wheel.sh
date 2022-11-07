@@ -20,7 +20,7 @@ set -x
 
 if [ "$2" = "" ];
 then
-  echo "Usage: test_wheel <mode (full|basic)> <project main dir>"
+  echo "Usage: test_wheel <mode (full|basic)> <project main dir> [python binary]"
   echo ""
   echo "Basic mode tests only the python functionaly (no ML libraries)"
   echo "Full mode installs the extra ML libraries and the wheel. (requires Python >= 3.7 for JAX)."
@@ -31,18 +31,22 @@ MODE=$1
 PROJDIR=$2
 
 uname -a
-
 OS=`uname -a | awk '{print $1}'`
-if [[ "$MODE" = "full" && "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
-  echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
-  sudo apt-get install python3.9 python3.9-dev
-  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
-  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+
+# Setting of PYBIN is complicated because of all the different environments this is run from.
+if [[ "$3" != "" ]]; then
+  PYBIN=$3
+else
+  if [[ "$MODE" = "full" && "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
+    echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
+    sudo apt-get install python3.9 python3.9-dev
+    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
+    sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+  fi
+  PYBIN=${PYBIN:-"python3"}
 fi
 
-PYBIN=${PYBIN:-"python3"}
 PYBIN=`which $PYBIN`
-
 $PYBIN -m pip install --upgrade setuptools
 $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
 
