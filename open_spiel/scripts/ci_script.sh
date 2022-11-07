@@ -37,6 +37,9 @@ ${PYBIN} -m pip install --upgrade setuptools
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
+elif [[ "$OS" = "Darwin" ]]; then
+  # MacOS versions of python are newer on GitHub Actions
+  ${PYBIN} -m venv ./venv
 else
   # Ubuntu 20.04 and earlier
   virtualenv -p ${PYBIN} ./venv
