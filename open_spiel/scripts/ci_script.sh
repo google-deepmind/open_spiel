@@ -31,6 +31,8 @@ elif [[ "$OS" = "Darwin" ]]; then
   brew link --force python@${OS_PYTHON_VERSION}
 fi
 
+PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
+PYBIN=${PYBIN:-"python"}
 PYBIN=${PYBIN:-"python3"}
 PYBIN=`which $PYBIN`
 
@@ -49,13 +51,15 @@ else
 fi
 source ./venv/bin/activate
 
-python3 --version
-pip3 install --upgrade -r requirements.txt
+# Can use python and pip directly after here because we're in the virtual env
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+python --version
+pip install --upgrade -r requirements.txt
+
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 ./open_spiel/scripts/build_and_run_tests.sh
 
