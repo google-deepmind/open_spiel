@@ -20,7 +20,7 @@ set -x
 
 if [ "$2" = "" ];
 then
-  echo "Usage: test_wheel <mode (full|basic)> <project main dir>"
+  echo "Usage: test_wheel <mode (full|basic)> <project main dir> [python binary]"
   echo ""
   echo "Basic mode tests only the python functionaly (no ML libraries)"
   echo "Full mode installs the extra ML libraries and the wheel. (requires Python >= 3.7 for JAX)."
@@ -31,8 +31,9 @@ MODE=$1
 PROJDIR=$2
 
 uname -a
-
 OS=`uname -a | awk '{print $1}'`
+
+# If it's full mode on Linux, we have to install Python 3.9 and make it the default.
 if [[ "$MODE" = "full" && "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   echo "Linux detected and Python 3.9 requested. Installing Python 3.9 and setting as default."
   sudo apt-get install python3.9 python3.9-dev
@@ -40,9 +41,14 @@ if [[ "$MODE" = "full" && "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; th
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 fi
 
-PYBIN=${PYBIN:-"python3"}
-PYBIN=`which $PYBIN`
+# Setting of PYBIN is complicated because of all the different environments this is run from.
+if [[ "$3" != "" ]]; then
+  PYBIN=$3
+else
+  PYBIN=${PYBIN:-"python3"}
+fi
 
+PYBIN=`which $PYBIN`
 $PYBIN -m pip install --upgrade setuptools
 $PYBIN -m pip install --upgrade -r $PROJDIR/requirements.txt -q
 
@@ -56,7 +62,7 @@ if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
     ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
   else
-    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp310-cp310-macosx_10_9_x86_64.whl
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-macosx_10_9_x86_64.whl
   fi
 fi
 

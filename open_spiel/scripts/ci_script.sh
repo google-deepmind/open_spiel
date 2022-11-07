@@ -24,8 +24,15 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo apt-get install python3.9 python3.9-dev
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+elif [[ "$OS" = "Darwin" ]]; then
+  # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
+  # install the specific versions we've requested on MacOS.
+  brew install python@${OS_PYTHON_VERSION}
+  brew link --force python@${OS_PYTHON_VERSION}
 fi
 
+PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
+PYBIN=${PYBIN:-"python"}
 PYBIN=${PYBIN:-"python3"}
 PYBIN=`which $PYBIN`
 
@@ -39,17 +46,20 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
   ${PYBIN} -m venv ./venv
 else
   # Ubuntu 20.04 and earlier
+  ${PYBIN} -m pip install virtualenv
   virtualenv -p ${PYBIN} ./venv
 fi
 source ./venv/bin/activate
 
-python3 --version
-pip3 install --upgrade -r requirements.txt
+# Can use python and pip directly after here because we're in the virtual env
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip3 install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+python --version
+pip install --upgrade -r requirements.txt
+
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 ./open_spiel/scripts/build_and_run_tests.sh
 
