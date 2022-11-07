@@ -229,7 +229,7 @@ fi
 
 # Install other system-wide packages.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  EXT_DEPS="virtualenv clang cmake curl python3 python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
+  EXT_DEPS="virtualenv clang cmake curl python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi
@@ -279,8 +279,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
-  `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
-  python3 --version
+  `python -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
+  python --version
   [[ -x `which clang++` ]] || die "Clang not found. Please install or upgrade XCode and run the command-line developer tools"
   [[ -x `which curl` ]] || brew install curl || echo "** Warning: failed 'brew install curl' -- continuing"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
@@ -294,8 +294,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   fi
 
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-  python3 get-pip.py
-  python3 -m pip install virtualenv
+  python get-pip.py
+  python -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."
