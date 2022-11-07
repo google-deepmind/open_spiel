@@ -105,7 +105,7 @@ Status                                       | Game
 
 ### Atari
 
-*   Agent plays classic games from [Gym's Atari Environments](https://www.gymlibrary.ml/environments/atari/), such as Breakout.
+*   Agent plays classic games from [Gym's Atari Environments](https://www.gymlibrary.dev/environments/atari/), such as Breakout.
 *   Single player.
 *   Most games are non-deterministic.
 *   Perfect information.
