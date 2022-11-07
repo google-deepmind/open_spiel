@@ -24,6 +24,11 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo apt-get install python3.9 python3.9-dev
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+elif [[ "$OS" = "Darwin" ]]; then
+  # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
+  # install the specific versions we've requested on MacOS.
+  python3 -m pip install python@${OS_PYTHON_VERSION}
+  python3 -m pip install virtualenv
 fi
 
 PYBIN=${PYBIN:-"python3"}
@@ -36,9 +41,6 @@ ${PYBIN} -m pip install --upgrade setuptools
 
 if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
-  ${PYBIN} -m venv ./venv
-elif [[ "$OS" = "Darwin" ]]; then
-  # MacOS versions of python are newer on GitHub Actions
   ${PYBIN} -m venv ./venv
 else
   # Ubuntu 20.04 and earlier
