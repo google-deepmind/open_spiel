@@ -22,6 +22,7 @@
 
 // Several function return absl::optional or lists of absl::optional, so must
 // use pybind11_abseil here.
+#include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::euchre::EuchreGame);
@@ -35,29 +36,42 @@ using euchre::EuchreState;
 
 void init_pyspiel_games_euchre(py::module& m) {
   py::classh<EuchreState, State> state_class(m, "EuchreState");
-  state_class.def("num_cards_dealt", &EuchreState::NumCardsDealt)
+  state_class
+      .def("num_cards_dealt", &EuchreState::NumCardsDealt)
       .def("num_cards_played", &EuchreState::NumCardsPlayed)
       .def("num_passes", &EuchreState::NumPasses)
       .def("upcard", &EuchreState::Upcard)
       .def("discard", &EuchreState::Discard)
       .def("trump_suit", &EuchreState::TrumpSuit)
       .def("left_bower", &EuchreState::LeftBower)
+      .def("right_bower", &EuchreState::RightBower)
       .def("declarer", &EuchreState::Declarer)
-      .def("first_defender", &EuchreState::FirstDefender)
       .def("declarer_partner", &EuchreState::DeclarerPartner)
+      .def("first_defender", &EuchreState::FirstDefender)
       .def("second_defender", &EuchreState::SecondDefender)
       .def("declarer_go_alone", &EuchreState::DeclarerGoAlone)
       .def("lone_defender", &EuchreState::LoneDefender)
       .def("active_players", &EuchreState::ActivePlayers)
       .def("dealer", &EuchreState::Dealer)
       .def("current_phase", &EuchreState::CurrentPhase)
-      .def("card_holder", &EuchreState::CardHolder)
-      .def("card_rank", &EuchreState::CardRank)
-      .def("card_suit", &EuchreState::CardSuit)
-      .def("card_string", &EuchreState::CardString)
-      .def("points", &EuchreState::Points)
-      .def("tricks", &EuchreState::Tricks)
+      // TODO(jhtschultz) Change this to CurrentTrick and separately expose
+      // CurrentTrickIndex. Note that Loupe app depends on this.
       .def("current_trick", &EuchreState::CurrentTrickIndex)
+      .def("card_holder", &EuchreState::CardHolder)
+      .def("card_rank",
+           py::overload_cast<int>(
+               &EuchreState::CardRank, py::const_))
+      .def("card_rank",
+           py::overload_cast<int, euchre::Suit>(
+               &EuchreState::CardRank, py::const_))
+      .def("card_suit",
+           py::overload_cast<int>(
+               &EuchreState::CardSuit, py::const_))
+      .def("card_suit",
+           py::overload_cast<int, euchre::Suit>(
+               &EuchreState::CardSuit, py::const_))
+      .def("card_string", &EuchreState::CardString)
+      .def("tricks", &EuchreState::Tricks)
       // Pickle support
       .def(py::pickle(
           [](const EuchreState& state) {  // __getstate__
@@ -77,12 +91,6 @@ void init_pyspiel_games_euchre(py::module& m) {
     .value("SPADES", euchre::Suit::kSpades)
     .export_values();
 
-  py::class_<euchre::Trick>(state_class, "Trick")
-      .def("led_suit", &euchre::Trick::LedSuit)
-      .def("winner", &euchre::Trick::Winner)
-      .def("cards", &euchre::Trick::Cards)
-      .def("leader", &euchre::Trick::Leader);
-
   py::enum_<euchre::EuchreState::Phase>(state_class, "Phase")
       .value("DEALER_SELECTION", euchre::EuchreState::Phase::kDealerSelection)
       .value("DEAL", euchre::EuchreState::Phase::kDeal)
@@ -93,9 +101,29 @@ void init_pyspiel_games_euchre(py::module& m) {
       .value("GAME_OVER", euchre::EuchreState::Phase::kGameOver)
       .export_values();
 
+  py::class_<euchre::Trick>(state_class, "Trick")
+      .def("led_suit", &euchre::Trick::LedSuit)
+      .def("trump_suit", &euchre::Trick::TrumpSuit)
+      .def("trump_played", &euchre::Trick::TrumpPlayed)
+      .def("leader", &euchre::Trick::Leader)
+      .def("winner", &euchre::Trick::Winner)
+      .def("cards", &euchre::Trick::Cards);
+
   py::classh<EuchreGame, Game>(m, "EuchreGame")
-      .def("max_bids", &EuchreGame::MaxBids)
+      .def("jack_rank", &EuchreGame::JackRank)
+      .def("num_suits", &EuchreGame::NumSuits)
+      .def("num_cards_per_suit", &EuchreGame::NumCardsPerSuit)
       .def("num_cards", &EuchreGame::NumCards)
+      .def("pass_action", &EuchreGame::PassAction)
+      .def("clubs_trump_action", &EuchreGame::ClubsTrumpAction)
+      .def("diamonds_trump_action", &EuchreGame::DiamondsTrumpAction)
+      .def("hearts_trump_action", &EuchreGame::HeartsTrumpAction)
+      .def("spades_trump_action", &EuchreGame::SpadesTrumpAction)
+      .def("go_alone_action", &EuchreGame::GoAloneAction)
+      .def("play_with_partner_action", &EuchreGame::PlayWithPartnerAction)
+      .def("max_bids", &EuchreGame::MaxBids)
+      .def("num_tricks", &EuchreGame::NumTricks)
+      .def("full_hand_size", &EuchreGame::FullHandSize)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const EuchreGame> game) {  // __getstate__
