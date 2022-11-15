@@ -142,6 +142,7 @@ class PPO(nn.Module):
   performance. The number of parallel environments is controlled by the 
   num_envs argument. 
   """
+
   def __init__(
       self,
       input_shape,
@@ -153,7 +154,6 @@ class PPO(nn.Module):
       num_minibatches=4,
       update_epochs=4,
       learning_rate=2.5e-4,
-      num_annealing_updates=None,
       gae=True,
       gamma=0.99,
       gae_lambda=0.95,
@@ -184,7 +184,6 @@ class PPO(nn.Module):
     self.minibatch_size = self.batch_size // self.num_minibatches
     self.update_epochs = update_epochs
     self.learning_rate = learning_rate
-    self.num_annealing_updates = num_annealing_updates
 
     # Loss function
     self.gae = gae
@@ -290,14 +289,6 @@ class PPO(nn.Module):
             np.reshape(ts.observations['info_state'][self.player_id],
                        self.input_shape) for ts in time_step
         ])).to(self.device)
-
-    # Annealing the rate if instructed to do so.
-    if self.num_annealing_updates is not None:
-      frac = 1.0 - (self.updates_done / self.num_annealing_updates)
-      if frac <= 0:
-        raise ValueError('Annealing learning rate to <= 0')
-      lrnow = frac * self.learning_rate
-      self.optimizer.param_groups[0]["lr"] = lrnow
 
     # bootstrap value if not done
     with torch.no_grad():
@@ -428,3 +419,11 @@ class PPO(nn.Module):
     # Update counters
     self.updates_done += 1
     self.cur_batch_idx = 0
+
+  def anneal_learning_rate(self, update, num_total_updates):
+    # Annealing the rate
+    frac = 1.0 - (update / num_total_updates)
+    if frac <= 0:
+      raise ValueError('Annealing learning rate to <= 0')
+    lrnow = frac * self.learning_rate
+    self.optimizer.param_groups[0]["lr"] = lrnow

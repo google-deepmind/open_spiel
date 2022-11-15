@@ -194,7 +194,6 @@ def main(_):
       num_minibatches=FLAGS.num_minibatches,
       update_epochs=FLAGS.update_epochs,
       learning_rate=FLAGS.learning_rate,
-      num_annealing_updates=num_updates,
       gae=FLAGS.gae,
       gamma=FLAGS.gamma,
       gae_lambda=FLAGS.gae_lambda,
@@ -213,8 +212,8 @@ def main(_):
   N_REWARD_WINDOW = 50
   recent_rewards = collections.deque(maxlen=N_REWARD_WINDOW)
   time_step = envs.reset()
-  for update in range(1, num_updates + 1):
-    for step in range(0, FLAGS.num_steps):
+  for update in range(num_updates):
+    for step in range(FLAGS.num_steps):
       agent_output = agent.step(time_step)
       time_step, reward, done, unreset_time_steps = envs.step(
           agent_output, reset_if_done=True)
@@ -237,6 +236,9 @@ def main(_):
             recent_rewards.append(real_reward)
 
       agent.post_step(reward, done)
+
+    if FLAGS.anneal_lr:
+      agent.anneal_learning_rate(update, num_updates)
 
     agent.learn(time_step)
 

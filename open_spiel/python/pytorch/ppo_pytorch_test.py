@@ -42,6 +42,7 @@ class PPOTest(absltest.TestCase):
     env = rl_environment.Environment(game=game)
     envs = SyncVectorEnv([env])
     agent_fn = PPOAgent
+    anneal_lr = True
 
     info_state_shape = tuple(
         np.array(env.observation_spec()["info_state"]).flatten())
@@ -56,17 +57,20 @@ class PPOTest(absltest.TestCase):
         num_players=game.num_players(),
         player_id=0,
         num_envs=1,
-        num_annealing_updates=num_updates,
         agent_fn=agent_fn,
     )
 
     time_step = envs.reset()
-    for update in range(1, num_updates + 1):
-      for step in range(0, steps_per_batch):
+    for update in range(num_updates):
+      for step in range(steps_per_batch):
         agent_output = agent.step(time_step)
         time_step, reward, done, unreset_time_steps = envs.step(
             agent_output, reset_if_done=True)
         agent.post_step(reward, done)
+
+      if anneal_lr:
+        agent.anneal_learning_rate(update, num_updates)
+
       agent.learn(time_step)
 
     total_eval_reward = 0
