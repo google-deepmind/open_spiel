@@ -786,7 +786,7 @@ class RNaDSolver(policy_lib.Policy):
     v_target_list, has_played_list, v_trace_policy_target_list = [], [], []
     for player in range(self._game.num_players()):
       reward = ts.actor.rewards[:, :, player]  # [T, B, Player]
-      v_target, has_played, policy_target_ = v_trace(
+      v_target_, has_played, policy_target_ = v_trace(
           v_target,
           ts.env.valid,
           ts.env.player_id,
@@ -801,7 +801,7 @@ class RNaDSolver(policy_lib.Policy):
           c=self.config.c_vtrace,
           rho=np.inf,
           eta=self.config.eta_reward_transform)
-      v_target_list.append(v_target)
+      v_target_list.append(v_target_)
       has_played_list.append(has_played)
       v_trace_policy_target_list.append(policy_target_)
     loss_v = get_loss_v([v] * self._game.num_players(), v_target_list,
