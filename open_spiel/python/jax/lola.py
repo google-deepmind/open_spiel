@@ -451,7 +451,14 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         """
         Updates the critic and policy parameters of the agent.
         Args:
-            batch: A batch of training episodes.
+            batch: A batch of training episodes. Dimensions (N=player, B=batch_size, T=timesteps, S=state_dim):
+                   action: (N, B, T),
+                   discount: (B, T),
+                   info_state: (N, B, T, *S),
+                   legal_actions_mask: (N, B, T),
+                   reward: (N, B, T),
+                   terminal: (B, T),
+                   values: (N, B, T)
 
         Returns:
             A dictionary that contains relevant training metrics.

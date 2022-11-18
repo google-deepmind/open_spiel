@@ -27,17 +27,17 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 16, "Number of episodes in a batch.")
-flags.DEFINE_integer("game_iterations", 5, "Number of iterated plays.")
+flags.DEFINE_integer("batch_size", 128, "Number of episodes in a batch.")
+flags.DEFINE_integer("game_iterations", 15, "Number of iterated plays.")
 flags.DEFINE_float("policy_lr", 0.005, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 1.0, "Critic learning rate.")
+flags.DEFINE_float("critic_lr", 0.01, "Critic learning rate.")
 flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
-flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
+flags.DEFINE_bool("use_opponent_modelling", True, "If false, ground truth opponent weights are used.")
 
 def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
     def get_action_probs(policy_params: hk.Params, num_actions: int) -> List[str]:
