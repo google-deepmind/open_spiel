@@ -25,7 +25,8 @@ import rlax
 from open_spiel.python import rl_agent
 
 Transition = collections.namedtuple(
-    "Transition", "info_state action reward discount legal_actions_mask")
+    "Transition",
+    "info_state action reward discount legal_actions_mask next_info_state")
 
 
 class NetA2C(hk.Module):
@@ -62,42 +63,63 @@ class NetPG(hk.Module):
     return policy_logits, q_values
 
 
-def generate_a2c_pi_loss(net_apply, loss_class, entropy_cost):
+def generate_a2c_pi_loss(net_apply, loss_class, entropy_cost, l2_actor_weight,
+                         lambda_):
   """A function generator generates loss function."""
 
   def _a2c_pi_loss(net_params, batch):
-    info_states, actions, returns = batch["info_states"], batch[
-        "actions"], batch["returns"]
+    info_states, actions, rewards, discounts = batch["info_states"], batch[
+        "actions"], batch["rewards"], batch["discounts"]
     policy_logits, baselines = net_apply(net_params, info_states)
+    policy_logits = policy_logits[:-1]
+
     baselines = jnp.squeeze(baselines, axis=1)
-    advantages = returns - baselines
-    chex.assert_equal_shape([returns, baselines, actions, advantages])
+    baselines = jnp.concatenate([baselines[:-1], jnp.zeros(1)])
+    td_returns = rlax.lambda_returns(
+        rewards,
+        discounts,
+        baselines[1:],
+        lambda_=lambda_,
+        stop_target_gradients=True)
+    advantages = td_returns - baselines[:-1]
+    chex.assert_equal_shape([td_returns, actions, advantages])
     pi_loss = loss_class(
         logits_t=policy_logits,
         a_t=actions,
         adv_t=advantages,
-        w_t=jnp.ones(returns.shape))
+        w_t=jnp.ones(td_returns.shape))
     ent_loss = rlax.entropy_loss(
-        logits_t=policy_logits, w_t=jnp.ones(returns.shape))
-    return pi_loss + entropy_cost * ent_loss
+        logits_t=policy_logits, w_t=jnp.ones(td_returns.shape))
+    l2_loss = jnp.sum(jnp.square(jax.flatten_util.ravel_pytree(net_params)[0]))
+    return pi_loss + entropy_cost * ent_loss + l2_actor_weight * l2_loss
 
   return _a2c_pi_loss
 
 
-def generate_a2c_critic_loss(net_apply):
+def generate_a2c_critic_loss(net_apply, l2_critic_weight, lambda_):
   """A function generator generates loss function."""
 
   def _a2c_critic_loss(net_params, batch):
-    info_states, returns = batch["info_states"], batch["returns"]
+    info_states, rewards, discounts = batch["info_states"], batch[
+        "rewards"], batch["discounts"]
     _, baselines = net_apply(net_params, info_states)
     baselines = jnp.squeeze(baselines, axis=1)
-    chex.assert_equal_shape([returns, baselines])
-    return jnp.mean(jnp.square(baselines - returns))
+    baselines = jnp.concatenate([baselines[:-1], jnp.zeros(1)])
+
+    td_lambda = rlax.td_lambda(
+        v_tm1=baselines[:-1],
+        r_t=rewards,
+        discount_t=discounts,
+        v_t=baselines[1:],
+        lambda_=lambda_,
+        stop_target_gradients=True)
+    l2_loss = jnp.sum(jnp.square(jax.flatten_util.ravel_pytree(net_params)[0]))
+    return jnp.mean(jnp.square(td_lambda)) + l2_critic_weight * l2_loss
 
   return _a2c_critic_loss
 
 
-def generate_pg_pi_loss(net_apply, loss_class, entropy_cost):
+def generate_pg_pi_loss(net_apply, loss_class, entropy_cost, l2_actor_weight):
   """A function generator generates loss function."""
 
   def _pg_loss(net_params, batch):
@@ -107,22 +129,35 @@ def generate_pg_pi_loss(net_apply, loss_class, entropy_cost):
     pi_loss = loss_class(logits_t=policy_logits, q_t=q_values)
     ent_loss = rlax.entropy_loss(
         logits_t=policy_logits, w_t=jnp.ones(policy_logits.shape[:1]))
-    return pi_loss + entropy_cost * ent_loss
+    l2_loss = jnp.sum(jnp.square(jax.flatten_util.ravel_pytree(net_params)[0]))
+    return pi_loss + entropy_cost * ent_loss + l2_actor_weight * l2_loss
 
   return _pg_loss
 
 
-def generate_pg_critic_loss(net_apply):
+def generate_pg_critic_loss(net_apply, l2_critic_weight, lambda_):
   """A function generator generates loss function."""
 
   def _critic_loss(net_params, batch):
-    info_states, actions, returns = batch["info_states"], batch[
-        "actions"], batch["returns"]
+    info_states, actions, rewards, discounts = batch["info_states"], batch[
+        "actions"], batch["rewards"], batch["discounts"]
     _, q_values = net_apply(net_params, info_states)
-    action_indices = jnp.stack([jnp.arange(q_values.shape[0]), actions], axis=0)
-    value_predictions = q_values[tuple(action_indices)]
-    chex.assert_equal_shape([value_predictions, returns])
-    return jnp.mean(jnp.square(value_predictions - returns))
+    q_values = q_values[:-1]
+    q_values = jnp.concatenate(
+        [q_values, jnp.zeros(q_values[-1].reshape(1, -1).shape)])
+
+    actions = jnp.concatenate([actions, jnp.zeros(1, dtype=int)])
+    sarsa_lambda = rlax.sarsa_lambda(
+        q_tm1=q_values[:-1],
+        a_tm1=actions[:-1],
+        r_t=rewards,
+        discount_t=discounts,
+        q_t=q_values[1:],
+        a_t=actions[1:],
+        lambda_=lambda_,
+        stop_target_gradients=True)
+    l2_loss = jnp.sum(jnp.square(jax.flatten_util.ravel_pytree(net_params)[0]))
+    return jnp.mean(jnp.square(sarsa_lambda)) + l2_critic_weight * l2_loss
 
   return _critic_loss
 
@@ -155,10 +190,12 @@ class PolicyGradient(rl_agent.AbstractAgent):
                loss_str="a2c",
                loss_class=None,
                hidden_layers_sizes=(128,),
-               batch_size=16,
+               lambda_=1.0,
                critic_learning_rate=0.01,
                pi_learning_rate=0.001,
                entropy_cost=0.01,
+               l2_weight_actor=0.0,
+               l2_weight_critic=0.0,
                num_critic_before_pi=8,
                additional_discount_factor=1.0,
                max_global_gradient_norm=None,
@@ -178,12 +215,15 @@ class PolicyGradient(rl_agent.AbstractAgent):
         `loss_str`. Defaults to None.
       hidden_layers_sizes: iterable, defines the neural network layers. Defaults
         to (128,), which produces a NN: [INPUT] -> [128] -> ReLU -> [OUTPUT].
-      batch_size: int, batch size to use for Q and Pi learning. Defaults to 128.
+      lambda_: float, lambda in TD(lambda) or SARSA(lambda). Defaults to 1.0.
       critic_learning_rate: float, learning rate used for Critic (Q or V).
         Defaults to 0.001.
       pi_learning_rate: float, learning rate used for Pi. Defaults to 0.001.
       entropy_cost: float, entropy cost used to multiply the entropy loss. Can
         be set to None to skip entropy computation. Defaults to 0.001.
+      l2_weight_actor: l2 penaly weight for actor network. Defaults to 0.0.
+      l2_weight_critic: l2 penalty weight for critic network. Defaults to
+        0.0.
       num_critic_before_pi: int, number of Critic (Q or V) updates before each
         Pi update. Defaults to 8 (every 8th critic learning step, Pi also
         learns).
@@ -202,7 +242,6 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     self.player_id = player_id
     self._num_actions = num_actions
-    self._batch_size = batch_size
     self._extra_discount = additional_discount_factor
     self._num_critic_before_pi = num_critic_before_pi
 
@@ -262,15 +301,17 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     if loss_str == "a2c":
       pi_loss_and_grad = jax.value_and_grad(
-          generate_a2c_pi_loss(hk_net_apply, loss_class, entropy_cost))
+          generate_a2c_pi_loss(hk_net_apply, loss_class, entropy_cost,
+                               l2_weight_actor, lambda_))
       critic_loss_and_grad = jax.value_and_grad(
-          generate_a2c_critic_loss(hk_net_apply))
+          generate_a2c_critic_loss(hk_net_apply, l2_weight_critic, lambda_))
       self._critic_opt_state = critic_opt_init(self.hk_net_params)
     else:
       pi_loss_and_grad = jax.value_and_grad(
-          generate_pg_pi_loss(hk_net_apply, loss_class, entropy_cost))
+          generate_pg_pi_loss(hk_net_apply, loss_class, entropy_cost,
+                              l2_weight_actor))
       critic_loss_and_grad = jax.value_and_grad(
-          generate_pg_critic_loss(hk_net_apply))
+          generate_pg_critic_loss(hk_net_apply, l2_weight_critic, lambda_))
       self._critic_opt_state = critic_opt_init(self.hk_net_params)
 
     self._jit_pi_update = jax.jit(
@@ -331,16 +372,15 @@ class PolicyGradient(rl_agent.AbstractAgent):
         self._add_transition(time_step)
 
       # Episode done, add to dataset and maybe learn.
+
       if time_step.last():
-        self._add_episode_data_to_dataset()
         self._episode_counter += 1
 
-        if len(self._dataset["returns"]) >= self._batch_size:
-          self._critic_update()
-          self._num_learn_steps += 1
-          if self._num_learn_steps % self._num_critic_before_pi == 0:
-            self._pi_update()
-          self._dataset = collections.defaultdict(list)
+        self._critic_update()
+        self._num_learn_steps += 1
+        if self._num_learn_steps % self._num_critic_before_pi == 0:
+          self._pi_update()
+        self._episode_data = []
 
         self._prev_time_step = None
         self._prev_action = None
@@ -354,26 +394,6 @@ class PolicyGradient(rl_agent.AbstractAgent):
   @property
   def loss(self):
     return (self._last_critic_loss_value, self._last_pi_loss_value)
-
-  def _add_episode_data_to_dataset(self):
-    """Add episode data to the buffer."""
-    info_states = [data.info_state for data in self._episode_data]
-    rewards = [data.reward for data in self._episode_data]
-    discount = [data.discount for data in self._episode_data]
-    actions = [data.action for data in self._episode_data]
-
-    # Calculate returns
-    returns = np.array(rewards)
-    for idx in reversed(range(len(rewards[:-1]))):
-      returns[idx] = (
-          rewards[idx] +
-          discount[idx] * returns[idx + 1] * self._extra_discount)
-
-    # Add flattened data points to dataset
-    self._dataset["actions"].extend(actions)
-    self._dataset["returns"].extend(returns)
-    self._dataset["info_states"].extend(info_states)
-    self._episode_data = []
 
   def _add_transition(self, time_step):
     """Adds intra-episode transition to the `_episode_data` buffer.
@@ -393,7 +413,9 @@ class PolicyGradient(rl_agent.AbstractAgent):
         action=self._prev_action,
         reward=time_step.rewards[self.player_id],
         discount=time_step.discounts[self.player_id],
-        legal_actions_mask=legal_actions_mask)
+        legal_actions_mask=legal_actions_mask,
+        next_info_state=(
+            time_step.observations["info_state"][self.player_id][:]))
 
     self._episode_data.append(transition)
 
@@ -403,27 +425,20 @@ class PolicyGradient(rl_agent.AbstractAgent):
     Returns:
       The average Critic loss obtained on this batch.
     """
-    assert len(self._dataset["returns"]) >= self._batch_size
-    info_states = jnp.asarray(self._dataset["info_states"])
-    returns = jnp.asarray(self._dataset["returns"])
-    if self._loss_str != "a2c":
-      actions = jnp.asarray(self._dataset["actions"])
-
-    if len(self._dataset["returns"]) > self._batch_size:
-      info_states = info_states[-self._batch_size:]
-      returns = returns[-self._batch_size:]
-      if self._loss_str != "a2c":
-        actions = actions[-self._batch_size:]
-
     batch = {}
-    batch["info_states"] = info_states
-    batch["returns"] = returns
+    batch["info_states"] = jnp.asarray(
+        [transition.info_state for transition in self._episode_data] +
+        [self._episode_data[-1].next_info_state])
+    batch["rewards"] = jnp.asarray(
+        [transition.reward for transition in self._episode_data])
+    batch["discounts"] = jnp.asarray(
+        [transition.discount for transition in self._episode_data])
     if self._loss_str != "a2c":
-      batch["actions"] = actions
+      batch["actions"] = jnp.asarray(
+          [transition.action for transition in self._episode_data])
 
     self.hk_net_params, self._critic_opt_state, self._last_critic_loss_value = self._jit_critic_update(
         self.hk_net_params, self._critic_opt_state, batch)
-
     return self._last_critic_loss_value
 
   def _pi_update(self):
@@ -432,22 +447,18 @@ class PolicyGradient(rl_agent.AbstractAgent):
     Returns:
       The average Pi loss obtained on this batch.
     """
-    assert len(self._dataset["returns"]) >= self._batch_size
-    info_states = jnp.asarray(self._dataset["info_states"])
-    if self._loss_str == "a2c":
-      actions = jnp.asarray(self._dataset["actions"])
-      returns = jnp.asarray(self._dataset["returns"])
-
-    if len(self._dataset["returns"]) > self._batch_size:
-      info_states = info_states[-self._batch_size:]
-      if self._loss_str == "a2c":
-        actions = actions[-self._batch_size:]
-        returns = returns[-self._batch_size:]
     batch = {}
-    batch["info_states"] = info_states
+    batch["info_states"] = jnp.asarray(
+        [transition.info_state for transition in self._episode_data] +
+        [self._episode_data[-1].next_info_state])
+
     if self._loss_str == "a2c":
-      batch["actions"] = actions
-      batch["returns"] = returns
+      batch["discounts"] = jnp.asarray(
+          [transition.discount for transition in self._episode_data])
+      batch["actions"] = jnp.asarray(
+          [transition.action for transition in self._episode_data])
+      batch["rewards"] = jnp.asarray(
+          [transition.reward for transition in self._episode_data])
     self.hk_net_params, self._pi_opt_state, self._last_pi_loss_value = self._jit_pi_update(
         self.hk_net_params, self._pi_opt_state, batch)
     return self._last_pi_loss_value
