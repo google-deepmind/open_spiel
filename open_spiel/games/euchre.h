@@ -71,6 +71,8 @@ inline constexpr int kInformationStateTensorSize =
     + kNumCards                       // Current hand
     + kNumTricks * kTrickTensorSize;  // History of tricks
 
+enum class Phase { kDealerSelection, kDeal, kBidding, kDiscard, kGoAlone, kPlay,
+                   kGameOver };
 enum class Suit { kInvalidSuit = -1, kClubs = 0, kDiamonds = 1,
                   kHearts = 2, kSpades = 3 };
 enum Seat { kNorth, kEast, kSouth, kWest };
@@ -155,25 +157,18 @@ class EuchreState : public State {
   std::vector<bool> ActivePlayers() const { return active_players_; }
   Player Dealer() const { return dealer_; }
 
-  enum class Phase {
-    kDealerSelection, kDeal, kBidding, kDiscard, kGoAlone, kPlay, kGameOver };
   Phase CurrentPhase() const { return phase_; }
 
   int CurrentTrickIndex() const {
     return std::min(num_cards_played_ / num_active_players_,
                     static_cast<int>(tricks_.size()));
   }
+  Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
+  const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
 
   std::array<absl::optional<Player>, kNumCards> CardHolder() const {
     return holder_;
   }
-  int CardRank(int card) const { return euchre::CardRank(card); }
-  int CardRank(int card, Suit trump_suit) const {
-    return euchre::CardRank(card, trump_suit); }
-  Suit CardSuit(int card) const { return euchre::CardSuit(card); }
-  Suit CardSuit(int card, Suit trump_suit) const {
-    return euchre::CardSuit(card, trump_suit); }
-  std::string CardString(int card) const { return euchre::CardString(card); }
   std::vector<Trick> Tricks() const;
 
  protected:
@@ -195,10 +190,6 @@ class EuchreState : public State {
 
   void ComputeScore();
 
-  // TODO(jhtschultz) Remove duplicate function. Clarify which version works
-  // best with pybind first.
-  Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
-  const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
   std::array<std::string, kNumSuits> FormatHand(int player,
                                                 bool mark_voids) const;
   std::string FormatBidding() const;
@@ -261,21 +252,6 @@ class EuchreGame : public Game {
         (kNumPlayers * kNumTricks) +  // Deal hands
         1;                            // Upcard
   }
-
-  int JackRank() const { return kJackRank; }
-  int NumSuits() const { return kNumSuits; }
-  int NumCardsPerSuit() const { return kNumCardsPerSuit; }
-  int NumCards() const { return kNumCards; }
-  int PassAction() const { return kPassAction; }
-  int ClubsTrumpAction() const { return kClubsTrumpAction; }
-  int DiamondsTrumpAction() const { return kDiamondsTrumpAction; }
-  int HeartsTrumpAction() const { return kHeartsTrumpAction; }
-  int SpadesTrumpAction() const { return kSpadesTrumpAction; }
-  int GoAloneAction() const { return kGoAloneAction; }
-  int PlayWithPartnerAction() const { return kPlayWithPartnerAction; }
-  int MaxBids() const { return kMaxBids; }
-  int NumTricks() const { return kNumTricks; }
-  int FullHandSize() const { return kFullHandSize; }
 
  private:
   const bool allow_lone_defender_;

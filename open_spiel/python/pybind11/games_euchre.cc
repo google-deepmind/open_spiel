@@ -35,7 +35,51 @@ using euchre::EuchreGame;
 using euchre::EuchreState;
 
 void init_pyspiel_games_euchre(py::module& m) {
-  py::classh<EuchreState, State> state_class(m, "EuchreState");
+  py::module_ euchre = m.def_submodule("euchre");
+
+  euchre.attr("JACK_RANK") = py::int_(euchre::kJackRank);
+  euchre.attr("NUM_SUITS") = py::int_(euchre::kNumSuits);
+  euchre.attr("NUM_CARDS_PER_SUIT") = py::int_(euchre::kNumCardsPerSuit);
+  euchre.attr("NUM_CARDS") = py::int_(euchre::kNumCards);
+  euchre.attr("PASS_ACTION") = py::int_(euchre::kPassAction);
+  euchre.attr("CLUBS_TRUMP_ACTION") = py::int_(euchre::kClubsTrumpAction);
+  euchre.attr("DIAMONDS_TRUMP_ACTION") = py::int_(euchre::kDiamondsTrumpAction);
+  euchre.attr("HEARTS_TRUMP_ACTION") = py::int_(euchre::kHeartsTrumpAction);
+  euchre.attr("SPADES_TRUMP_ACTION") = py::int_(euchre::kSpadesTrumpAction);
+  euchre.attr("GO_ALONE_ACTION") = py::int_(euchre::kGoAloneAction);
+  euchre.attr("PLAY_WITH_PARTNER_ACTION") = py::int_(
+      euchre::kPlayWithPartnerAction);
+  euchre.attr("MAX_BIDS") = py::int_(euchre::kMaxBids);
+  euchre.attr("NUM_TRICKS") = py::int_(euchre::kNumTricks);
+  euchre.attr("FULL_HAND_SIZE") = py::int_(euchre::kFullHandSize);
+
+  euchre.def("card_string", euchre::CardString);
+  euchre.def("card_rank", py::overload_cast<int>(euchre::CardRank));
+  euchre.def("card_rank",
+             py::overload_cast<int, euchre::Suit>(euchre::CardRank));
+  euchre.def("card_suit", py::overload_cast<int>(euchre::CardSuit));
+  euchre.def("card_suit",
+             py::overload_cast<int, euchre::Suit>(euchre::CardSuit));
+
+  py::enum_<euchre::Suit>(euchre, "Suit")
+    .value("INVALID_SUIT", euchre::Suit::kInvalidSuit)
+    .value("CLUBS", euchre::Suit::kClubs)
+    .value("DIAMONDS", euchre::Suit::kDiamonds)
+    .value("HEARTS", euchre::Suit::kHearts)
+    .value("SPADES", euchre::Suit::kSpades)
+    .export_values();
+
+  py::enum_<euchre::Phase>(euchre, "Phase")
+      .value("DEALER_SELECTION", euchre::Phase::kDealerSelection)
+      .value("DEAL", euchre::Phase::kDeal)
+      .value("BIDDING", euchre::Phase::kBidding)
+      .value("DISCARD", euchre::Phase::kDiscard)
+      .value("GO_ALONE", euchre::Phase::kGoAlone)
+      .value("PLAY", euchre::Phase::kPlay)
+      .value("GAME_OVER", euchre::Phase::kGameOver)
+      .export_values();
+
+  py::classh<EuchreState, State> state_class(euchre, "EuchreState");
   state_class
       .def("num_cards_dealt", &EuchreState::NumCardsDealt)
       .def("num_cards_played", &EuchreState::NumCardsPlayed)
@@ -54,23 +98,10 @@ void init_pyspiel_games_euchre(py::module& m) {
       .def("active_players", &EuchreState::ActivePlayers)
       .def("dealer", &EuchreState::Dealer)
       .def("current_phase", &EuchreState::CurrentPhase)
-      // TODO(jhtschultz) Change this to CurrentTrick and separately expose
-      // CurrentTrickIndex. Note that Loupe app depends on this.
-      .def("current_trick", &EuchreState::CurrentTrickIndex)
+      .def("current_trick_index", &EuchreState::CurrentTrickIndex)
+      .def("current_trick",
+           py::overload_cast<>(&EuchreState::CurrentTrick, py::const_))
       .def("card_holder", &EuchreState::CardHolder)
-      .def("card_rank",
-           py::overload_cast<int>(
-               &EuchreState::CardRank, py::const_))
-      .def("card_rank",
-           py::overload_cast<int, euchre::Suit>(
-               &EuchreState::CardRank, py::const_))
-      .def("card_suit",
-           py::overload_cast<int>(
-               &EuchreState::CardSuit, py::const_))
-      .def("card_suit",
-           py::overload_cast<int, euchre::Suit>(
-               &EuchreState::CardSuit, py::const_))
-      .def("card_string", &EuchreState::CardString)
       .def("tricks", &EuchreState::Tricks)
       // Pickle support
       .def(py::pickle(
@@ -83,24 +114,6 @@ void init_pyspiel_games_euchre(py::module& m) {
             return dynamic_cast<EuchreState*>(game_and_state.second.release());
           }));
 
-  py::enum_<euchre::Suit>(state_class, "Suit")
-    .value("INVALID_SUIT", euchre::Suit::kInvalidSuit)
-    .value("CLUBS", euchre::Suit::kClubs)
-    .value("DIAMONDS", euchre::Suit::kDiamonds)
-    .value("HEARTS", euchre::Suit::kHearts)
-    .value("SPADES", euchre::Suit::kSpades)
-    .export_values();
-
-  py::enum_<euchre::EuchreState::Phase>(state_class, "Phase")
-      .value("DEALER_SELECTION", euchre::EuchreState::Phase::kDealerSelection)
-      .value("DEAL", euchre::EuchreState::Phase::kDeal)
-      .value("BIDDING", euchre::EuchreState::Phase::kBidding)
-      .value("DISCARD", euchre::EuchreState::Phase::kDiscard)
-      .value("GO_ALONE", euchre::EuchreState::Phase::kGoAlone)
-      .value("PLAY", euchre::EuchreState::Phase::kPlay)
-      .value("GAME_OVER", euchre::EuchreState::Phase::kGameOver)
-      .export_values();
-
   py::class_<euchre::Trick>(state_class, "Trick")
       .def("led_suit", &euchre::Trick::LedSuit)
       .def("trump_suit", &euchre::Trick::TrumpSuit)
@@ -110,20 +123,6 @@ void init_pyspiel_games_euchre(py::module& m) {
       .def("cards", &euchre::Trick::Cards);
 
   py::classh<EuchreGame, Game>(m, "EuchreGame")
-      .def("jack_rank", &EuchreGame::JackRank)
-      .def("num_suits", &EuchreGame::NumSuits)
-      .def("num_cards_per_suit", &EuchreGame::NumCardsPerSuit)
-      .def("num_cards", &EuchreGame::NumCards)
-      .def("pass_action", &EuchreGame::PassAction)
-      .def("clubs_trump_action", &EuchreGame::ClubsTrumpAction)
-      .def("diamonds_trump_action", &EuchreGame::DiamondsTrumpAction)
-      .def("hearts_trump_action", &EuchreGame::HeartsTrumpAction)
-      .def("spades_trump_action", &EuchreGame::SpadesTrumpAction)
-      .def("go_alone_action", &EuchreGame::GoAloneAction)
-      .def("play_with_partner_action", &EuchreGame::PlayWithPartnerAction)
-      .def("max_bids", &EuchreGame::MaxBids)
-      .def("num_tricks", &EuchreGame::NumTricks)
-      .def("full_hand_size", &EuchreGame::FullHandSize)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const EuchreGame> game) {  // __getstate__
