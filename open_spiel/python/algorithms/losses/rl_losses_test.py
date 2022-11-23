@@ -34,12 +34,12 @@ class RLLossesTest(parameterized.TestCase, tf.test.TestCase):
     policy_logits = tf.constant([[1., 1., 1.], [1., 1., 4.]], dtype=tf.float32)
     total_loss = batch_qpg_loss.loss(policy_logits, q_values)
     # Compute expected quantities.
-    expected_policy_entropy = (1.0986 + 0.3665) / 2
+    expected_policy_entropy_loss = -1 * (1.0986 + 0.3665) / 2
     # baseline = \sum_a pi_a * Q_a = 0.
     # -\sum_a pi_a * (Q_a - baseline)
     expected_policy_loss = (0.0 + 0.0) / 2
     expected_total_loss = (
-        expected_policy_loss + entropy_cost * expected_policy_entropy)
+        expected_policy_loss + entropy_cost * expected_policy_entropy_loss)
     with self.session() as sess:
       np.testing.assert_allclose(
           sess.run(total_loss), expected_total_loss, atol=1e-4)
@@ -52,16 +52,16 @@ class RLLossesTest(parameterized.TestCase, tf.test.TestCase):
     policy_logits = tf.constant([[1., 1., 1.], [1., 1., 4.]], dtype=tf.float32)
     total_loss = batch_rpg_loss.loss(policy_logits, q_values)
     # Compute expected quantities.
-    expected_policy_entropy = (1.0986 + 0.3665) / 2
+    expected_policy_entropy_loss = -(1.0986 + 0.3665) / 2
     # baseline = \sum_a pi_a * Q_a = 0.
     # -\sum_a pi_a * relu(Q_a - baseline)
     # negative sign as it's a loss term and loss needs to be minimized.
     expected_policy_loss = -(.3333 + .0452) / 2
     expected_total_loss = (
-        expected_policy_loss + entropy_cost * expected_policy_entropy)
+        expected_policy_loss + entropy_cost * expected_policy_entropy_loss)
     with self.session() as sess:
       np.testing.assert_allclose(
-          sess.run(total_loss), expected_total_loss, atol=1e-4)
+          sess.run(total_loss), expected_total_loss, atol=1e-3)
 
   @parameterized.named_parameters(('no_entropy_cost', 0.),
                                   ('with_entropy_cost', 1.))
@@ -71,12 +71,12 @@ class RLLossesTest(parameterized.TestCase, tf.test.TestCase):
     policy_logits = tf.constant([[1., 1., 1.], [1., 1., 4.]], dtype=tf.float32)
     total_loss = batch_rpg_loss.loss(policy_logits, q_values)
     # Compute expected quantities.
-    expected_policy_entropy = (1.0986 + 0.3665) / 2
+    expected_policy_entropy_loss = -1 * (1.0986 + 0.3665) / 2
     # baseline = \sum_a pi_a * Q_a = 0.
     # \sum_a relu(Q_a - baseline)
     expected_policy_loss = (1.0 + 1.0) / 2
     expected_total_loss = (
-        expected_policy_loss + entropy_cost * expected_policy_entropy)
+        expected_policy_loss + entropy_cost * expected_policy_entropy_loss)
     with self.session() as sess:
       np.testing.assert_allclose(
           sess.run(total_loss), expected_total_loss, atol=1e-4)
@@ -95,10 +95,10 @@ class RLLossesTest(parameterized.TestCase, tf.test.TestCase):
     # cross_entropy = [-log(e^1./3 * e^1), -log(e^4/(e^4+ e + e))]
     # = [1.0986, 0.09492]
     # policy_loss = cross_entropy * advantages = [-0.3662, 0.04746]
-    expected_policy_entropy = (1.0986 + 0.3665) / 2
+    expected_policy_entropy_loss = -1 * (1.0986 + 0.3665) / 2
     expected_policy_loss = (-0.3662 + 0.04746) / 2
     expected_total_loss = (
-        expected_policy_loss + entropy_cost * expected_policy_entropy)
+        expected_policy_loss + entropy_cost * expected_policy_entropy_loss)
     with self.session() as sess:
       np.testing.assert_allclose(
           sess.run(total_loss), expected_total_loss, atol=1e-4)

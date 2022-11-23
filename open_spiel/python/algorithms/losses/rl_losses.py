@@ -94,6 +94,27 @@ def compute_entropy(policy_logits):
       -tf.nn.softmax(policy_logits) * tf.nn.log_softmax(policy_logits), axis=-1)
 
 
+def compute_entropy_loss(policy_logits):
+  """Compute an entropy loss.
+
+  We want a value that we can minimize along with other losses, and where
+  minimizing means driving the policy towards a uniform distribution over
+  the actions. We thus scale it by negative one so that it can be simply
+  added to other losses (and so it can be considered a bonus for having
+  entropy).
+
+  Args:
+    policy_logits: the policy logits.
+
+  Returns:
+    entropy loss (negative entropy).
+  """
+  entropy = compute_entropy(policy_logits)
+  scale = tf.constant(-1.0, dtype=tf.float32)
+  entropy_loss = tf.multiply(scale, entropy, name="entropy_loss")
+  return entropy_loss
+
+
 class BatchQPGLoss(object):
   """Defines the batch QPG loss op."""
 
@@ -118,11 +139,11 @@ class BatchQPGLoss(object):
 
     total_loss = total_adv
     if self._entropy_cost:
-      policy_entropy = tf.reduce_mean(compute_entropy(policy_logits))
-      entropy_loss = tf.multiply(
-          float(self._entropy_cost), policy_entropy, name="entropy_loss")
+      entropy_loss = tf.reduce_mean(compute_entropy_loss(policy_logits))
+      scaled_entropy_loss = tf.multiply(
+          float(self._entropy_cost), entropy_loss, name="scaled_entropy_loss")
       total_loss = tf.add(
-          total_loss, entropy_loss, name="total_loss_with_entropy")
+          total_loss, scaled_entropy_loss, name="total_loss_with_entropy")
 
     return total_loss
 
@@ -151,11 +172,11 @@ class BatchRMLoss(object):
 
     total_loss = total_adv
     if self._entropy_cost:
-      policy_entropy = tf.reduce_mean(compute_entropy(policy_logits))
-      entropy_loss = tf.multiply(
-          float(self._entropy_cost), policy_entropy, name="entropy_loss")
+      entropy_loss = tf.reduce_mean(compute_entropy_loss(policy_logits))
+      scaled_entropy_loss = tf.multiply(
+          float(self._entropy_cost), entropy_loss, name="scaled_entropy_loss")
       total_loss = tf.add(
-          total_loss, entropy_loss, name="total_loss_with_entropy")
+          total_loss, scaled_entropy_loss, name="total_loss_with_entropy")
 
     return total_loss
 
@@ -184,11 +205,11 @@ class BatchRPGLoss(object):
 
     total_loss = total_regret
     if self._entropy_cost:
-      policy_entropy = tf.reduce_mean(compute_entropy(policy_logits))
-      entropy_loss = tf.multiply(
-          float(self._entropy_cost), policy_entropy, name="entropy_loss")
+      entropy_loss = tf.reduce_mean(compute_entropy_loss(policy_logits))
+      scaled_entropy_loss = tf.multiply(
+          float(self._entropy_cost), entropy_loss, name="scaled_entropy_loss")
       total_loss = tf.add(
-          total_loss, entropy_loss, name="total_loss_with_entropy")
+          total_loss, scaled_entropy_loss, name="total_loss_with_entropy")
 
     return total_loss
 
@@ -219,10 +240,10 @@ class BatchA2CLoss(object):
     policy_loss = compute_a2c_loss(policy_logits, actions, advantages)
     total_loss = tf.reduce_mean(policy_loss, axis=0)
     if self._entropy_cost:
-      policy_entropy = tf.reduce_mean(compute_entropy(policy_logits))
-      entropy_loss = tf.multiply(
-          float(self._entropy_cost), policy_entropy, name="entropy_loss")
+      entropy_loss = tf.reduce_mean(compute_entropy_loss(policy_logits))
+      scaled_entropy_loss = tf.multiply(
+          float(self._entropy_cost), entropy_loss, name="scaled_entropy_loss")
       total_loss = tf.add(
-          total_loss, entropy_loss, name="total_loss_with_entropy")
+          total_loss, scaled_entropy_loss, name="total_loss_with_entropy")
 
     return total_loss
