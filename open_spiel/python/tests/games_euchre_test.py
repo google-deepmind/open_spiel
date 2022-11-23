@@ -18,7 +18,7 @@
 from absl.testing import absltest
 
 import pyspiel
-from open_spiel.python.pybind11.pyspiel import euchre
+euchre = pyspiel.euchre
 
 
 class GamesEuchreTest(absltest.TestCase):
