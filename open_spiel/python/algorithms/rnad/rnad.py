@@ -980,8 +980,11 @@ class RNaDSolver(policy_lib.Policy):
     probs = self._network_jit_apply_and_post_process(
         self.params_target, env_step)
     probs = jax.device_get(probs[0])  # Squeeze out the 1-element batch.
-    return {action: probs[action]
-            for action in jax.device_get(env_step.legal[0])}
+    return {
+        action: probs[action]
+        for action, valid in enumerate(jax.device_get(env_step.legal[0]))
+        if valid
+    }
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def _network_jit_apply_and_post_process(
@@ -990,25 +993,19 @@ class RNaDSolver(policy_lib.Policy):
     pi = self.config.finetune.post_process_policy(pi, env_step.legal)
     return pi
 
-  @functools.partial(jax.jit, static_argnums=(0,))
-  def actor_step(self, env_step: EnvStep,
-                 rng_key: chex.PRNGKey):
+  # TODO(author16): jit actor_step.
+  def actor_step(self, env_step: EnvStep):
     pi, _, _, _ = self.network.apply(self.params, env_step)
+    pi = np.asarray(pi).astype("float64")
     # TODO(author18): is this policy normalization really needed?
-    pi = pi / jnp.sum(pi, axis=-1, keepdims=True)
+    pi = pi / np.sum(pi, axis=-1, keepdims=True)
 
-    # Sample from the policy pi respecting legal actions.
-    cumsum = jnp.cumsum(pi, axis=-1)
-    eps = jnp.finfo(pi.dtype).eps
-    unirnd = jax.random.uniform(
-        key=rng_key, shape=pi.shape[:-1] + (1,), dtype=pi.dtype, minval=eps)
-    action = jnp.argmin(
-        jnp.logical_or(
-            jnp.logical_or(unirnd > cumsum, pi < eps), env_step.legal == 0),
-        axis=-1)
-    # Make sure to cast to int32 as expected by open-spiel.
-    action = action.astype(jnp.int32)
-    action_oh = jax.nn.one_hot(action, pi.shape[-1])
+    action = np.apply_along_axis(
+        lambda x: self._np_rng.choice(range(pi.shape[1]), p=x), axis=-1, arr=pi)
+    # TODO(author16): reapply the legal actions mask to bullet-proof sampling.
+    action_oh = np.zeros(pi.shape, dtype="float64")
+    action_oh[range(pi.shape[0]), action] = 1.0
+
     actor_step = ActorStep(policy=pi, action_oh=action_oh, rewards=())
 
     return action, actor_step
@@ -1023,7 +1020,7 @@ class RNaDSolver(policy_lib.Policy):
     env_step = self._batch_of_states_as_env_step(states)
     for _ in range(self.config.trajectory_max):
       prev_env_step = env_step
-      a, actor_step = self.actor_step(env_step, self._next_rng_key())
+      a, actor_step = self.actor_step(env_step)
 
       states = self._batch_of_states_apply_action(states, a)
       env_step = self._batch_of_states_as_env_step(states)
@@ -1036,24 +1033,23 @@ class RNaDSolver(policy_lib.Policy):
                   rewards=env_step.rewards),
           ))
     # Concatenate all the timesteps together to form a single rollout [T, B, ..]
-    return jax.tree_util.tree_map(lambda *xs: jnp.stack(xs, axis=0), *timesteps)
+    return jax.tree_util.tree_map(lambda *xs: np.stack(xs, axis=0), *timesteps)
 
   def _batch_of_states_as_env_step(self,
                                    states: Sequence[pyspiel.State]) -> EnvStep:
     envs = [self._state_as_env_step(state) for state in states]
-    return jax.tree_util.tree_map(lambda *e: jnp.stack(e, axis=0), *envs)
+    return jax.tree_util.tree_map(lambda *e: np.stack(e, axis=0), *envs)
 
   def _batch_of_states_apply_action(
       self, states: Sequence[pyspiel.State],
       actions: chex.Array) -> Sequence[pyspiel.State]:
     """Apply a batch of `actions` to a parallel list of `states`."""
-    def _play_action(state, action):
-      if state.is_terminal():
-        return state
-      self.actor_steps += 1
-      state.apply_action(action)
-      return self._play_chance(state)
-    return [_play_action(state, actions[i]) for i, state in enumerate(states)]
+    for state, action in zip(states, list(actions)):
+      if not state.is_terminal():
+        self.actor_steps += 1
+        state.apply_action(action)
+        self._play_chance(state)
+    return states
 
   def _play_chance(self, state: pyspiel.State) -> pyspiel.State:
     """Plays the chance nodes until we end up at another type of node.
