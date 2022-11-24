@@ -43,7 +43,15 @@
 //     2015. Toward Natural Turn-taking in a Virtual Human Negotiation Agent
 //
 // Parameters:
-//     "instances_file"     string  The file containing the boards (default: "")
+//     "instances_file" string    The file containing the boards (default: "")
+//     "discount"       double    Discount factor multiplied each turn after
+//                                turn 2, applied to (multiplied to reduce) the
+//                                returns (default = 1.0).
+//     "max_turns"      integer   Maximum total turns before the game ends
+//                                (default = 10).
+//     "prob_end"       double    Probability of the game ending after each
+//                                action (only after each player has taken
+//                                one turn each)  (default = 0.0).
 
 namespace open_spiel {
 namespace bargaining {
@@ -53,7 +61,9 @@ constexpr int kPoolMinNumItems = 5;
 constexpr int kPoolMaxNumItems = 7;
 constexpr int kTotalValueAllItems = 10;
 constexpr int kNumPlayers = 2;
-constexpr int kMaxTurns = 10;
+constexpr double kDefaultDiscount = 1.0;
+constexpr int kDefaultMaxTurns = 10;
+constexpr double kDefaultProbEnd = 0.0;
 
 // Default 10-instance database used for tests. See
 // bargaining_instance_generator.cc to create your own.
@@ -133,6 +143,9 @@ class BargainingState : public State {
   const BargainingGame* parent_game_;
   Instance instance_;
   std::vector<Offer> offers_;
+  Player next_player_;
+  double discount_;
+  bool game_ended_;
 };
 
 class BargainingGame : public Game {
@@ -143,17 +156,24 @@ class BargainingGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new BargainingState(shared_from_this()));
   }
-  int MaxChanceOutcomes() const override { return all_instances_.size(); }
+  int MaxChanceOutcomes() const override { return all_instances_.size() + 2; }
   std::string ActionToString(Player player, Action move_id) const override;
 
-  int MaxGameLength() const override { return kMaxTurns; }
-  int MaxChanceNodesInHistory() const override { return 1; }
+  int MaxGameLength() const override { return max_turns_; }
+  int MaxChanceNodesInHistory() const override { return 1 + (max_turns_ - 2); }
 
   int NumPlayers() const override { return kNumPlayers; }
   double MaxUtility() const override { return kTotalValueAllItems; }
   double MinUtility() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override;
   std::vector<int> InformationStateTensorShape() const override;
+
+  int max_turns() const { return max_turns_; }
+  double discount() const { return discount_; }
+  double prob_end() const { return prob_end_; }
+
+  Action ContinueOutcome() const { return all_instances_.size(); }
+  Action EndOutcome() const { return all_instances_.size() + 1; }
 
   const std::vector<Instance>& AllInstances() const { return all_instances_; }
   const std::vector<Offer>& AllOffers() const { return all_offers_; }
@@ -169,6 +189,9 @@ class BargainingGame : public Game {
 
   std::vector<Instance> all_instances_;
   std::vector<Offer> all_offers_;
+  const int max_turns_;
+  const double discount_;
+  const double prob_end_;
 };
 
 }  // namespace bargaining

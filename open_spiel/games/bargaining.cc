@@ -21,8 +21,6 @@
 #include <random>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -51,7 +49,10 @@ const GameType kGameType{/*short_name=*/"bargaining",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"instances_file", GameParameter("")}}};
+                         {{"instances_file", GameParameter("")},
+                          {"max_turns", GameParameter(kDefaultMaxTurns)},
+                          {"discount", GameParameter(kDefaultDiscount)},
+                          {"prob_end", GameParameter(kDefaultProbEnd)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BargainingGame(params));
@@ -82,7 +83,8 @@ std::string BargainingState::ActionToString(Player player,
 }
 
 bool BargainingState::IsTerminal() const {
-  return agreement_reached_ || offers_.size() >= kMaxTurns;
+  return agreement_reached_ || game_ended_ ||
+         offers_.size() >= parent_game_->max_turns();
 }
 
 std::vector<double> BargainingState::Returns() const {
@@ -96,6 +98,12 @@ std::vector<double> BargainingState::Returns() const {
       returns[other_player] +=
           instance_.values[other_player][i] *
           (instance_.pool[i] - offers_.back().quantities[i]);
+    }
+    // Apply discount.
+    if (discount_ < 1.0) {
+      for (Player p = 0; p < num_players_; ++p) {
+        returns[p] *= discount_;
+      }
     }
     return returns;
   } else {
@@ -197,7 +205,7 @@ void BargainingState::ObservationTensor(Player player,
 
   // How many trade offers have happened?
   values[offers_.size()] = 1;
-  offset += kMaxTurns + 1;
+  offset += parent_game_->max_turns() + 1;
 
   // Pool
   for (int i = 0; i < kNumItemTypes; ++i) {
@@ -252,7 +260,7 @@ void BargainingState::InformationStateTensor(Player player,
 
   // How many trade offers have happened?
   values[offers_.size()] = 1;
-  offset += kMaxTurns + 1;
+  offset += parent_game_->max_turns() + 1;
 
   // Pool
   for (int i = 0; i < kNumItemTypes; ++i) {
@@ -271,7 +279,7 @@ void BargainingState::InformationStateTensor(Player player,
   }
 
   // Offers
-  for (int k = 0; k < kMaxTurns; ++k) {
+  for (int k = 0; k < parent_game_->max_turns(); ++k) {
     if (k < offers_.size()) {
       for (int i = 0; i < kNumItemTypes; ++i) {
         for (int j = 0; j <= offers_[k].quantities[i]; ++j) {
@@ -305,7 +313,10 @@ BargainingState::BargainingState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
       agreement_reached_(false),
-      parent_game_(down_cast<const BargainingGame*>(game.get())) {}
+      parent_game_(down_cast<const BargainingGame*>(game.get())),
+      next_player_(0),
+      discount_(1.0),
+      game_ended_(false) {}
 
 int BargainingState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : cur_player_;
@@ -317,15 +328,37 @@ Action BargainingState::AgreeAction() const {
 
 void BargainingState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
-    instance_ = parent_game_->GetInstance(action);
-    cur_player_ = 0;
+    if (move_number_ == 0) {
+      instance_ = parent_game_->GetInstance(action);
+      cur_player_ = 0;
+    } else {
+      if (action == parent_game_->ContinueOutcome()) {
+        cur_player_ = next_player_;
+      } else {
+        SPIEL_CHECK_EQ(action, parent_game_->EndOutcome());
+        game_ended_ = true;
+        cur_player_ = kTerminalPlayerId;
+      }
+    }
   } else {
+    // Check to apply discount.
+    if (move_number_ >= 3 && parent_game_->discount() < 1.0) {
+      discount_ *= parent_game_->discount();
+    }
+
     const std::vector<Offer>& all_offers = parent_game_->AllOffers();
-    if (action < all_offers.size()) {
+    if (action != AgreeAction()) {
       offers_.push_back(all_offers.at(action));
-      cur_player_ = 1 - cur_player_;
-    } else if (action == AgreeAction()) {
+
+      if (move_number_ >= 2 && parent_game_->prob_end() > 0.0) {
+        next_player_ = 1 - cur_player_;
+        cur_player_ = kChancePlayerId;
+      } else {
+        cur_player_ = 1 - cur_player_;
+      }
+    } else {
       // Agree action.
+      SPIEL_CHECK_EQ(action, AgreeAction());
       agreement_reached_ = true;
     }
   }
@@ -366,10 +399,19 @@ std::vector<std::pair<Action, double>> BargainingState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   std::vector<std::pair<Action, double>> outcomes;
   const int num_boards = parent_game_->AllInstances().size();
-  outcomes.reserve(num_boards);
-  double uniform_prob = 1.0 / num_boards;
-  for (int i = 0; i < num_boards; ++i) {
-    outcomes.push_back({i, uniform_prob});
+
+  if (move_number_ == 0) {
+    // First chance move of the game. This is for determining the instance.
+    outcomes.reserve(num_boards);
+    double uniform_prob = 1.0 / num_boards;
+    for (int i = 0; i < num_boards; ++i) {
+      outcomes.push_back({i, uniform_prob});
+    }
+  } else {
+    const double prob_end = parent_game_->prob_end();
+    SPIEL_CHECK_TRUE(move_number_ >= 3);
+    outcomes = {{parent_game_->ContinueOutcome(), 1.0 - prob_end},
+                {parent_game_->EndOutcome(), prob_end}};
   }
   return outcomes;
 }
@@ -455,7 +497,10 @@ void BargainingGame::CreateOffers() {
 }
 
 BargainingGame::BargainingGame(const GameParameters& params)
-    : Game(kGameType, params) {
+    : Game(kGameType, params),
+      max_turns_(ParameterValue<int>("max_turns", kDefaultMaxTurns)),
+      discount_(ParameterValue<double>("discount", kDefaultDiscount)),
+      prob_end_(ParameterValue<double>("prob_end", kDefaultProbEnd)) {
   std::string filename = ParameterValue<std::string>("instances_file", "");
   if (!filename.empty()) {
     ParseInstancesFile(filename);
@@ -496,7 +541,7 @@ std::pair<Offer, Action> BargainingGame::GetOfferByQuantities(
 std::vector<int> BargainingGame::ObservationTensorShape() const {
   return {
       1 +                                       // Agreement reached?
-      kMaxTurns + 1 +                           // How many offers have happened
+      max_turns_ + 1 +                          // How many offers have happened
       (kPoolMaxNumItems + 1) * kNumItemTypes +  // Pool
       (kTotalValueAllItems + 1) * kNumItemTypes +  // My values
       (kPoolMaxNumItems + 1) * kNumItemTypes       // Most recent offer
@@ -506,10 +551,10 @@ std::vector<int> BargainingGame::ObservationTensorShape() const {
 std::vector<int> BargainingGame::InformationStateTensorShape() const {
   return {
       1 +                                       // Agreement reached?
-      kMaxTurns + 1 +                           // How many offers have happened
+      max_turns_ + 1 +                          // How many offers have happened
       (kPoolMaxNumItems + 1) * kNumItemTypes +  // Pool
-      (kTotalValueAllItems + 1) * kNumItemTypes +         // My values
-      kMaxTurns * (kPoolMaxNumItems + 1) * kNumItemTypes  // Offers
+      (kTotalValueAllItems + 1) * kNumItemTypes +          // My values
+      max_turns_ * (kPoolMaxNumItems + 1) * kNumItemTypes  // Offers
   };
 }
 

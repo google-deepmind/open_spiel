@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Bargaining"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["instances_file"]
+GameType.parameter_specification = ["discount", "instances_file", "max_turns", "prob_end"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
@@ -18,8 +18,8 @@ GameType.utility = Utility.GENERAL_SUM
 
 NumDistinctActions() = 121
 PolicyTensorShape() = [121]
-MaxChanceOutcomes() = 10
-GetParameters() = {instances_file=}
+MaxChanceOutcomes() = 12
+GetParameters() = {discount=1.0,instances_file=,max_turns=10,prob_end=0.0}
 NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = 10.0
