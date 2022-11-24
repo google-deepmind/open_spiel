@@ -11,6 +11,7 @@ Status                                       | Game
 -------------------------------------------- | ----
 <font color="orange"><b>~</b></font>         | [2048](#2048)
 <font color="orange"><b>~</b></font>         | [Amazons](#amazons)
+<font color="orange"><b>~</b></font>         | [Atari](#atari)
 ![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
@@ -101,6 +102,15 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Game_of_the_Amazons)
+
+### Atari
+
+*   Agent plays classic games from
+    [Gym's Atari Environments](https://www.gymlibrary.dev/environments/atari/),
+    such as Breakout.
+*   Single player.
+*   Most games are non-deterministic.
+*   Perfect information.
 
 ### Backgammon
 
