@@ -756,10 +756,11 @@ class RNaDSolver(policy_lib.Policy):
 
     # Create initial parameters.
     env_step = self._state_as_env_step(self._ex_state)
-    self.params = self.network.init(self._next_rng_key(), env_step)
-    self.params_target = self.network.init(self._next_rng_key(), env_step)
-    self.params_prev = self.network.init(self._next_rng_key(), env_step)
-    self.params_prev_ = self.network.init(self._next_rng_key(), env_step)
+    key = self._next_rng_key()  # Make sure to use the same key for all.
+    self.params = self.network.init(key, env_step)
+    self.params_target = self.network.init(key, env_step)
+    self.params_prev = self.network.init(key, env_step)
+    self.params_prev_ = self.network.init(key, env_step)
 
     # Parameter optimizers.
     self.optimizer = optax_optimizer(
