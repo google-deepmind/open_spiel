@@ -640,14 +640,21 @@ class RNaDConfig:
 @chex.dataclass(frozen=True)
 class EnvStep:
   """Holds the tensor data representing the current game state."""
+  # Indicates whether the state is a valid one or just a padding. Shape: [...]
+  # The terminal state being the first one to be marked !valid.
+  # All other tensors in EnvStep contain data, but only for valid timesteps.
+  # Once !valid the data needs to be ignored, since it's a duplicate of
+  # some other previous state.
+  # The rewards is the only exception that contains reward values
+  # in the terminal state, which is marked !valid.
+  # TODO(author16): This is a confusion point and would need to be clarified.
+  valid: chex.Array = ()
   # The single tensor representing the state observation. Shape: [..., ??]
   obs: chex.Array = ()
   # The legal actions mask for the current player. Shape: [..., A]
   legal: chex.Array = ()
   # The current player id as an int. Shape: [...]
   player_id: chex.Array = ()
-  # Indicates whether the state is a valid one or just a padding. Shape: [...]
-  valid: chex.Array = ()
   # The rewards of all the players. Shape: [..., P]
   rewards: chex.Array = ()
 
@@ -934,8 +941,17 @@ class RNaDSolver(policy_lib.Policy):
     return subkey
 
   def _state_as_env_step(self, state: pyspiel.State) -> EnvStep:
+    # A terminal state must be communicated to players, however since
+    # it's a terminal state things like the state_representation or
+    # the set of legal actions are meaningless and only needed
+    # for the sake of creating well a defined trajectory tensor.
+    # Therefore the code below:
+    # - extracts the rewards
+    # - if the state is terminal, uses a dummy other state for other fields.
+    rewards = np.array(state.returns(), dtype=np.float64)
+
     valid = not state.is_terminal()
-    if state.is_terminal():
+    if not valid:
       state = self._ex_state
 
     if self.config.state_representation == "observation":
@@ -947,12 +963,13 @@ class RNaDSolver(policy_lib.Policy):
           f"Invalid state_representation: {self.config.state_representation}. "
           "Must be either 'info_set' or 'observation'.")
 
+    # TODO(author16): clarify the story around rewards and valid.
     return EnvStep(
         obs=np.array(obs, dtype=np.float64),
         legal=np.array(state.legal_actions_mask(), dtype=np.int8),
         player_id=np.array(state.current_player(), dtype=np.float64),
         valid=np.array(valid, dtype=np.float64),
-        rewards=np.array(state.returns(), dtype=np.float64))
+        rewards=rewards)
 
   def action_probabilities(self,
                            state: pyspiel.State,
