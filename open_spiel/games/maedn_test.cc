@@ -27,29 +27,19 @@ namespace testing = open_spiel::testing;
 void BasicMaednTests() {
   testing::LoadGameTest("maedn");
 
-  std::shared_ptr<const Game> game = LoadGame("maedn", 
+  std::shared_ptr<const Game> game = LoadGame("maedn",
     {{"players", GameParameter(2)},
-    {"twoPlayersOpposite", GameParameter(true)}});  
+    {"twoPlayersOpposite", GameParameter(true)}});
 
   testing::RandomSimTest(*game, 100);
-
-  game = LoadGame("maedn", 
-    {{"players", GameParameter(2)},
-    {"twoPlayersOpposite", GameParameter(true)}});  
-
   testing::RandomSimTestWithUndo(*game, 100);
 
   for (int players = 2; players <= 4; players++) {
-    game = LoadGame("maedn", 
+    game = LoadGame("maedn",
       {{"players", GameParameter(players)},
-      {"twoPlayersOpposite", GameParameter(false)}});  
-      
+      {"twoPlayersOpposite", GameParameter(false)}});
+
     testing::RandomSimTest(*game, 100);
-
-    game = LoadGame("maedn", 
-      {{"players", GameParameter(players)},
-      {"twoPlayersOpposite", GameParameter(false)}});  
-
     testing::RandomSimTestWithUndo(*game, 100);
   }
 }
@@ -211,11 +201,11 @@ std::string MINIMAL_WINS_EXPECTED_TERMINAL_STATES[] = {
   "Dice: \n",
 };
 
-void PlayMinimalGameToWin(int players, 
-                          bool twoPlayersOpposite, 
-                          int ply, 
+void PlayMinimalGameToWin(int players,
+                          bool twoPlayersOpposite,
+                          int ply,
                           int terminalStateScenarioNumber) {
-  std::shared_ptr<const Game> game = LoadGame("maedn", 
+  std::shared_ptr<const Game> game = LoadGame("maedn",
     {{"players", GameParameter(players)},
     {"twoPlayersOpposite", GameParameter(twoPlayersOpposite)}});
 
@@ -223,57 +213,57 @@ void PlayMinimalGameToWin(int players,
 
   // other players do nothing
   for (int i = 0; i < ply; i++) {
-    state->ApplyAction(0); // dice 1 for other player
-    state->ApplyAction(0); // player passes
+    state->ApplyAction(0);  // dice 1 for other player
+    state->ApplyAction(0);  // player passes
   }
 
   for (int i = 0; i < 4; i++) {
-    state->ApplyAction(5); // dice 6
-    state->ApplyAction(1); // bring in piece
-    state->ApplyAction(5); // dice 6
+    state->ApplyAction(5);    // dice 6
+    state->ApplyAction(1);    // bring in piece
+    state->ApplyAction(5);    // dice 6
     state->ApplyAction(2);
-    state->ApplyAction(5); // dice 6
+    state->ApplyAction(5);    // dice 6
     state->ApplyAction(8);
-    state->ApplyAction(5); // dice 6
+    state->ApplyAction(5);    // dice 6
     state->ApplyAction(14);
-    state->ApplyAction(5); // dice 6
+    state->ApplyAction(5);    // dice 6
     state->ApplyAction(20);
-    state->ApplyAction(5); // dice 6
+    state->ApplyAction(5);    // dice 6
     state->ApplyAction(26);
-    state->ApplyAction(5); // dice 6
+    state->ApplyAction(5);    // dice 6
     state->ApplyAction(32);
     if (i == 0 || i == 1) {
-      state->ApplyAction(5); // dice 6
+      state->ApplyAction(5);  // dice 6
       state->ApplyAction(38);
     }
     if (i == 0) {
-      state->ApplyAction(0); // dice 1
+      state->ApplyAction(0);  // dice 1
       state->ApplyAction(44);
 
       // other players do nothing
       for (int i = 0; i < players - 1; i++) {
-        state->ApplyAction(0); // dice 1 for other player
-        state->ApplyAction(0); // player passes
+        state->ApplyAction(0);  // dice 1 for other player
+        state->ApplyAction(0);  // player passes
       }
     } else if (i == 2) {
-      state->ApplyAction(4); // dice 5
+      state->ApplyAction(4);    // dice 5
       state->ApplyAction(38);
 
       // other players do nothing
       for (int i = 0; i < players - 1; i++) {
-        state->ApplyAction(0); // dice 1 for other player
-        state->ApplyAction(0); // player passes
+        state->ApplyAction(0);  // dice 1 for other player
+        state->ApplyAction(0);  // player passes
       }
     }
   }
 
   SPIEL_CHECK_FALSE(state->IsTerminal());
-  state->ApplyAction(3); // dice 4
+  state->ApplyAction(3);   // dice 4
   state->ApplyAction(38);
 
   std::cout << "Testing minimal win for " << players << "players, player "
             << ply << "wins" << std::endl
-            << "Terminal state:" << std::endl 
+            << "Terminal state:" << std::endl
             << state->ToString() << std::endl;
 
   SPIEL_CHECK_TRUE(state->IsTerminal());
@@ -310,9 +300,9 @@ void MinimalGameToWin() {
     }
 
     for (int ply = 0; ply < players; ply++) {
-      PlayMinimalGameToWin(players, 
-                           two_players_opposite, 
-                           ply, 
+      PlayMinimalGameToWin(players,
+                           two_players_opposite,
+                           ply,
                            terminal_state_scenario_number++);
     }
   }
@@ -340,19 +330,19 @@ void ObservationTensorTest(const State &state) {
 }
 
 void CheckObservationTensor() {
-  std::shared_ptr<const Game> game = LoadGame("maedn", 
+  std::shared_ptr<const Game> game = LoadGame("maedn",
     {{"players", GameParameter(2)},
-    {"twoPlayersOpposite", GameParameter(true)}});  
+    {"twoPlayersOpposite", GameParameter(true)}});
 
-  testing::RandomSimTest(*game, 100, true, false, true, 
+  testing::RandomSimTest(*game, 100, true, false, true,
                          &ObservationTensorTest);
 
   for (int players = 2; players <= 4; players++) {
-    std::shared_ptr<const Game> game = LoadGame("maedn", 
+    std::shared_ptr<const Game> game = LoadGame("maedn",
       {{"players", GameParameter(players)},
-      {"twoPlayersOpposite", GameParameter(false)}});  
-      
-    testing::RandomSimTest(*game, 100, true, false, true, 
+      {"twoPlayersOpposite", GameParameter(false)}});
+
+    testing::RandomSimTest(*game, 100, true, false, true,
                           &ObservationTensorTest);
   }
 }

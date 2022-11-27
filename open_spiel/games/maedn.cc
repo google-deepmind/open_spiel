@@ -38,8 +38,7 @@ const std::vector<std::pair<Action, double>> kChanceOutcomes = {
     std::pair<Action, double>(5, 1.0 / 6),
 };
 
-const std::vector<int> kChanceOutcomeValues =
-    {1, 2, 3, 4, 5, 6};
+const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
 
 int NumPiecesPerPlayer(const Game* game) {
   return kNumPiecesPerPlayer;
@@ -62,12 +61,7 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-      // Number of Players (2 to 4)
       {"players", GameParameter(2)},
-      // If two players play, two different settings are possible:
-      // Either players can play side by side or they can play on
-      // opposite sides. Since opposite sides are more fair, default
-      // value is true.
       {"twoPlayersOpposite", GameParameter(true)},
     }};
 
@@ -98,7 +92,7 @@ std::string CurPlayerToString(Player cur_player) {
 }
 
 std::string MaednState::ActionToString(Player player,
-                                            Action move_id) const {
+                                       Action move_id) const {
   if (player == kChancePlayerId) {
     // Normal chance roll.
     return absl::StrCat("chance outcome ", move_id,
@@ -110,7 +104,8 @@ std::string MaednState::ActionToString(Player player,
     } else if (move_id == kPassAction) {
       return absl::StrCat(move_id, " - passes");
     } else {
-      return absl::StrCat(move_id, " - moves piece on field ", move_id-2);
+      return absl::StrCat(move_id, " - moves piece on field ",
+                          move_id-kFieldActionsOffset);
     }
   }
 }
@@ -127,7 +122,7 @@ void MaednState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
   SPIEL_CHECK_EQ(values.size(), kStateEncodingSize);
   auto value_it = values.begin();
-  
+
   // Tensor should contain state from the player's PoV, so relative
   // positions are used and converted to absolute positions.
   int position = PlayerToPosition(player);
@@ -141,8 +136,8 @@ void MaednState::ObservationTensor(Player player,
   }
 
   // Rotated goal fields to one hot encoded tensor.
-  for (int p = 0; p < kNumPlayers; p++) {
-    int ply_position = PlayerToPosition((player + p) % kNumPlayers);
+  for (int p = 0; p < kMaxNumPlayers; p++) {
+    int ply_position = PlayerToPosition((player + p) % kMaxNumPlayers);
     for (int i = 0; i < kNumGoalFieldsPerPlayer; i++) {
       int abs_pos = RelPosToAbsPos(kNumCommonFields + i, ply_position);
       int piece = board_[abs_pos];
@@ -154,20 +149,20 @@ void MaednState::ObservationTensor(Player player,
   }
 
   // Rotated number of pieces outside of field per player.
-  for (int p = 0; p < kNumPlayers; p++) {
-    *value_it++ = (out_[(player + p) % kNumPlayers]);
+  for (int p = 0; p < kMaxNumPlayers; p++) {
+    *value_it++ = (out_[(player + p) % kMaxNumPlayers]);
   }
 
   if (cur_player_ == kChancePlayerId) {
     // Encode chance player with all zeros.
-    for (int i = 0; i < kNumPlayers; i++) {
+    for (int i = 0; i < kMaxNumPlayers; i++) {
       *value_it++ = 0;
     }
   } else {
-    int rotated_current_player = (num_players_ + cur_player_ - player) % num_players_;
-
+    int rotated_current_player = (num_players_ + cur_player_ - player)
+                                 % num_players_;
     // Rotated current player id to one hot encoded tensor.
-    for (int i = 0; i < kNumPlayers; i++) {
+    for (int i = 0; i < kMaxNumPlayers; i++) {
       *value_it++ = (rotated_current_player == i) ? 1 : 0;
     }
   }
@@ -182,7 +177,7 @@ void MaednState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(value_it, values.end());
 }
 
-void MaednState::FromObservationTensor(Player player, 
+void MaednState::FromObservationTensor(Player player,
                                        absl::Span<float> values,
                                        Player prev_player,
                                        int prev_dice) {
@@ -194,7 +189,7 @@ void MaednState::FromObservationTensor(Player player,
   prev_dice_ = prev_dice;
 
   auto value_it = values.begin();
-  
+
   // Tensor should contain state from the player's PoV, so relative
   // positions are used and converted to absolute positions.
   int position = PlayerToPosition(player);
@@ -204,30 +199,30 @@ void MaednState::FromObservationTensor(Player player,
     int two = *value_it++;
     int three = *value_it++;
     int four = *value_it++;
-    int piece = one ? 1 : (two ? 2 : (three ? 3 : (four ? 4 : 0)));    
+    int piece = one ? 1 : (two ? 2 : (three ? 3 : (four ? 4 : 0)));
     board_[abs_pos] = piece;
   }
 
   // rotated goal fields to one hot encoded tensor
-  for (int p = 0; p < kNumPlayers; p++) {
-    int ply_position = PlayerToPosition((player + p) % kNumPlayers);
+  for (int p = 0; p < kMaxNumPlayers; p++) {
+    int ply_position = PlayerToPosition((player + p) % kMaxNumPlayers);
     for (int i = 0; i < kNumGoalFieldsPerPlayer; i++) {
       int abs_pos = RelPosToAbsPos(kNumCommonFields + i, ply_position);
       int one = *value_it++;
       int two = *value_it++;
       int three = *value_it++;
-      int four = *value_it++;      
-      int piece = one ? 1 : (two ? 2 : (three ? 3 : (four ? 4 : 0)));    
+      int four = *value_it++;
+      int piece = one ? 1 : (two ? 2 : (three ? 3 : (four ? 4 : 0)));
       board_[abs_pos] = piece;
     }
   }
 
   // rotated number of pieces outside of field per player
-  for (int p = 0; p < kNumPlayers; p++) {
-    out_[(player + p) % kNumPlayers] = *value_it++;
+  for (int p = 0; p < kMaxNumPlayers; p++) {
+    out_[(player + p) % kMaxNumPlayers] = *value_it++;
   }
 
-  int zero = *value_it++;      
+  int zero = *value_it++;
   int one = *value_it++;
   int two = *value_it++;
   int three = *value_it++;
@@ -236,18 +231,18 @@ void MaednState::FromObservationTensor(Player player,
     cur_player_ = kChancePlayerId;
   } else {
     int rotated_current_player = zero ? 0 : (one ? 1 : (two ? 2 : 3));
-    
+
     cur_player_ = (rotated_current_player + player) % num_players_;
   }
 
-  int dice_1 = *value_it++;      
+  int dice_1 = *value_it++;
   int dice_2 = *value_it++;
   int dice_3 = *value_it++;
   int dice_4 = *value_it++;
   int dice_5 = *value_it++;
   int dice_6 = *value_it++;
 
-  dice_ = dice_1 ? 1 : (dice_2 ? 2 : (dice_3 ? 3 : dice_4 ? 4 : 
+  dice_ = dice_1 ? 1 : (dice_2 ? 2 : (dice_3 ? 3 : dice_4 ? 4 :
           (dice_5 ? 5 : (dice_6 ? 6 : 0))));
 
   SPIEL_CHECK_EQ(value_it, values.end());
@@ -268,7 +263,7 @@ MaednState::MaednState(std::shared_ptr<const Game> game,
   for (; i < num_players_; i++) {
     out_.push_back(4);
   }
-  for (; i < kNumPlayers; i++) {
+  for (; i < kMaxNumPlayers; i++) {
     out_.push_back(0);
   }
 }
@@ -288,10 +283,10 @@ void MaednState::DoApplyAction(Action move) {
     dice_ = kChanceOutcomeValues[move];
     if (prev_dice_ == 6) {
       // if last dice roll was a 6, same player moves again
-      cur_player_ = prev_player_;      
+      cur_player_ = prev_player_;
     } else {
       // next player
-      cur_player_ = ( prev_player_ + 1 ) % num_players_;
+      cur_player_ = (prev_player_ + 1) % num_players_;
       turns_++;
     }
     return;
@@ -301,17 +296,17 @@ void MaednState::DoApplyAction(Action move) {
   int thrown_out_player = -1;
 
   if (move != kPassAction) {
-
     if (move == kBringInAction) {
       // Bring in new piece.
       int players_first_field = GetPlayersFirstField(cur_player_);
-  
+
       thrown_out_player = board_[players_first_field] - 1;
       board_[players_first_field] = cur_player_ + 1;
       out_[cur_player_]--;
     } else {
       // Normal piece move.
-      std::pair<int, int> fields = GetFieldsFromAction(move, cur_player_, dice_);
+      std::pair<int, int> fields =
+        GetFieldsFromAction(move, cur_player_, dice_);
 
       board_[fields.first] = 0;
       thrown_out_player = board_[fields.second] - 1;
@@ -324,8 +319,8 @@ void MaednState::DoApplyAction(Action move) {
   }
 
   turn_history_info_.push_back(
-      TurnHistoryInfo(cur_player_, prev_player_, 
-                      dice_, prev_dice_, 
+      TurnHistoryInfo(cur_player_, prev_player_,
+                      dice_, prev_dice_,
                       move, thrown_out_player));
 
   prev_player_ = cur_player_;
@@ -355,7 +350,8 @@ void MaednState::UndoAction(Player player, Action action) {
         out_[cur_player_]++;
       } else {
         // Normal piece move.
-        std::pair<int, int> fields = GetFieldsFromAction(action, cur_player_, dice_);
+        std::pair<int, int> fields =
+          GetFieldsFromAction(action, cur_player_, dice_);
 
         board_[fields.first] = cur_player_ + 1;
         board_[fields.second] = thi.thrown_out_player + 1;
@@ -378,13 +374,13 @@ std::pair<int, int> MaednState::GetFieldsFromAction(Action action,
   int relative_source_field = action - kFieldActionsOffset;
   int relative_target_field = relative_source_field + dice;
 
-  return {RelPosToAbsPos(relative_source_field, position), 
+  return {RelPosToAbsPos(relative_source_field, position),
           RelPosToAbsPos(relative_target_field, position)};
 }
 
 int MaednState::RelPosToAbsPos(int relative_position, int position) const {
   if (relative_position < kNumCommonFields) {
-    int players_first_field = (kNumCommonFields / kNumPlayers) * position;
+    int players_first_field = (kNumCommonFields / kMaxNumPlayers) * position;
     return (relative_position + players_first_field) % kNumCommonFields;
   } else {
     return kNumGoalFieldsPerPlayer * position + relative_position;
@@ -393,8 +389,8 @@ int MaednState::RelPosToAbsPos(int relative_position, int position) const {
 
 int MaednState::AbsPosToRelPos(int absolute_position, int position) const {
   if (absolute_position < kNumCommonFields) {
-    int playersFirstField = (kNumCommonFields / kNumPlayers) * position;
-    return (kNumCommonFields + absolute_position - playersFirstField) 
+    int playersFirstField = (kNumCommonFields / kMaxNumPlayers) * position;
+    return (kNumCommonFields + absolute_position - playersFirstField)
            % kNumCommonFields;
   } else {
     return absolute_position - kNumGoalFieldsPerPlayer * position;
@@ -403,7 +399,7 @@ int MaednState::AbsPosToRelPos(int absolute_position, int position) const {
 
 int MaednState::GetPlayersFirstField(Player player) const {
   int position = PlayerToPosition(player);
-  return (kNumCommonFields / kNumPlayers) * position;
+  return (kNumCommonFields / kMaxNumPlayers) * position;
 }
 
 std::vector<std::pair<Action, double>> MaednState::ChanceOutcomes() const {
@@ -420,8 +416,8 @@ std::vector<Action> MaednState::LegalActions() const {
   // Follows these rules in this exact order:
   // - If a player's own piece is standing on the start field
   //   and player has at least one piece off the board, player
-  //   MUST move the piece on the start field away unless it is 
-  //   blocked by another own piece. If that is the case, 
+  //   MUST move the piece on the start field away unless it is
+  //   blocked by another own piece. If that is the case,
   //   player is free to move any own piece.
   // - If player rolls a 6 and has at least one piece off the
   //   board, player MUST bring in a new piece.
@@ -453,18 +449,17 @@ std::vector<Action> MaednState::LegalActions() const {
     }
   }
 
-  // Look for pieces of current player on board if there is
-  // at least one:
+  // Look for pieces of current player on board if there is at least one:
   if (out_[cur_player_] < 4) {
     int position = PlayerToPosition(cur_player_);
     const int max_field = kNumCommonFields + kNumGoalFieldsPerPlayer - dice_;
-    for (int relative_source_field = 0; relative_source_field < max_field; 
+    for (int relative_source_field = 0; relative_source_field < max_field;
          relative_source_field++) {
       int relative_target_field = relative_source_field + dice_;
 
-      int absolute_source_field = RelPosToAbsPos(relative_source_field, 
+      int absolute_source_field = RelPosToAbsPos(relative_source_field,
                                                position);
-      int absolute_target_field = RelPosToAbsPos(relative_target_field, 
+      int absolute_target_field = RelPosToAbsPos(relative_target_field,
                                                position);
 
       if (board_[absolute_source_field] == cur_player_ + 1) {
@@ -485,17 +480,17 @@ std::vector<Action> MaednState::LegalActions() const {
 
 std::string MaednState::ToString() const {
   std::vector<std::string> board_array = {
-      ". .     o-o-S     . .", 
-      ". .     o . o     . .", 
-      "        o . o        ", 
-      "        o . o        ", 
-      "S-o-o-o-o . o-o-o-o-o", 
-      "o . . . .   . . . . o", 
-      "o-o-o-o-o . o-o-o-o-S", 
-      "        o . o        ", 
-      "        o . o        ", 
-      ". .     o . o     . .", 
-      ". .     S-o-o     . .", 
+      ". .     o-o-S     . .",
+      ". .     o . o     . .",
+      "        o . o        ",
+      "        o . o        ",
+      "S-o-o-o-o . o-o-o-o-o",
+      "o . . . .   . . . . o",
+      "o-o-o-o-o . o-o-o-o-S",
+      "        o . o        ",
+      "        o . o        ",
+      ". .     o . o     . .",
+      ". .     S-o-o     . .",
   };
 
   // Fill the board.
@@ -506,7 +501,7 @@ std::string MaednState::ToString() const {
     }
   }
   // Pieces off the board.
-  for (int ply = 0; ply < kNumPlayers; ply++) {
+  for (int ply = 0; ply < kMaxNumPlayers; ply++) {
     int out = out_[ply];
     int position = PlayerToPosition(ply);
     int offset = kNumFields + kNumGoalFieldsPerPlayer * position;

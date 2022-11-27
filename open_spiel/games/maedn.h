@@ -20,11 +20,12 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "open_spiel/spiel.h"
 
 // An implementation of Mensch-Aergere-Dich-Nicht (see
-// https://de.wikipedia.org/wiki/Mensch_%C3%A4rgere_Dich_nicht)
+// https://en.wikipedia.org/wiki/Mensch_%C3%A4rgere_Dich_nicht)
 //
 // Rules used:
 // - start field must be cleared as soon as possible
@@ -34,12 +35,16 @@
 // - pieces may jump over each other on four final fields
 //
 // Parameters:
-//   none yet
+// - players: Number of Players (2 to 4)
+// - twoPlayersOpposite:
+//   If two players play, two different settings are possible:
+//   Either players can play side by side or they can play on opposite sides.
+//   Since opposite sides are more fair, default value is true.
 
 namespace open_spiel {
 namespace maedn {
 
-inline constexpr const int kNumPlayers = 4;
+inline constexpr const int kMaxNumPlayers = 4;
 inline constexpr const int kNumChanceOutcomes = 6;
 inline constexpr const int kRedPlayerId = 0;
 inline constexpr const int kBluePlayerId = 1;
@@ -60,13 +65,13 @@ inline constexpr const int kOutPos = -1;
 
 // Action modelling (with ideas from Marc Lancot):
 // The first action [0] is to pass (necessary if player cannot move any
-// piece). The second action is to bring in a new piece. Once a piece is 
-// on the field, there are 43 fields a piece can stand on and be moved away 
+// piece). The second action is to bring in a new piece. Once a piece is
+// on the field, there are 43 fields a piece can stand on and be moved away
 // from that field. Actions are coded as the field a move starts from, from
 // each player's own PoV. That means that action 2 means to move a piece on
-// field 0 for player 0 but a piece on field 10 for player 1 and so on. So 
-// there are 43 actions for moves, one action to bring in a new piece and 
-// one action to pass. Total number of possible actions is 45 
+// field 0 for player 0 but a piece on field 10 for player 1 and so on. So
+// there are 43 actions for moves, one action to bring in a new piece and
+// one action to pass. Total number of possible actions is 45
 // ({ 0, 1, 2, ..., 44 }).
 inline constexpr const int kNumDistinctActions = 45;
 
@@ -76,8 +81,8 @@ inline constexpr const Action kFieldActionsOffset = 2;
 
 // See ObservationTensorShape for details.
 inline constexpr const int kBoardEncodingSize = 4 * kNumFields;
-inline constexpr const int kStateEncodingSize = 
-    kNumPlayers + kBoardEncodingSize + kNumPlayers + kNumChanceOutcomes;
+inline constexpr const int kStateEncodingSize =
+    kMaxNumPlayers + kBoardEncodingSize + kMaxNumPlayers + kNumChanceOutcomes;
 
 struct Coords {
   int x;
@@ -115,7 +120,7 @@ struct TurnHistoryInfo {
   int prev_dice;
   Action action;
   int thrown_out_player;
-  TurnHistoryInfo(int _player, int _prev_player, 
+  TurnHistoryInfo(int _player, int _prev_player,
                   int _dice, int _prev_dice,
                   int _action, int _thrown_out_player)
       : player(_player),
@@ -156,16 +161,14 @@ class MaednState : public State {
                 const std::vector<int>& board,
                 const std::vector<int>& out);
   // Setter function similar to SetState, used to test ObservationTensor.
-  // Some values are not part of ObservationTensor (like prev_player_ and 
+  // Some values are not part of ObservationTensor (like prev_player_ and
   // prev_dice_) and so have to be given from outside. History is not part
   // of ObservationTensor either, so calls to UndoAction will cause undefined
   // behaviour!
-  void FromObservationTensor(Player player, 
-                             absl::Span<float> values, 
+  void FromObservationTensor(Player player,
+                             absl::Span<float> values,
                              Player prev_player,
                              int prev_dice);
-
-  int dice() const { return dice_; }
 
  protected:
   void DoApplyAction(Action move_id) override;
@@ -173,19 +176,19 @@ class MaednState : public State {
  private:
   void SetupInitialBoard();
   void RollDice(int outcome);
-  std::pair<int, int> GetFieldsFromAction(Action action, 
-                                          Player player, 
+  std::pair<int, int> GetFieldsFromAction(Action action,
+                                          Player player,
                                           int dice) const;
   int RelPosToAbsPos(int relative_position, int position) const;
   int AbsPosToRelPos(int absolute_position, int position) const;
   int GetPlayersFirstField(Player player) const;
-  
+
   int PlayerToPosition(Player player) const {
     // Position is equal to player except if two players play on opposite
     // sides, in this case position of player 1 is 2. For completeness,
     // in this case position of player 2 is 1, so that even for iterations
     // over 4 players no position is used twice.
-    return num_players_ == 2 && two_players_opposite_ && 
+    return num_players_ == 2 && two_players_opposite_ &&
            (player == 1 || player == 2) ?
            3 - player : player;
   }
@@ -195,11 +198,11 @@ class MaednState : public State {
   Player prev_player_;
   const bool two_players_opposite_;
   int turns_;
-  int dice_;             // Current dice roll.
-  int prev_dice_;        // Last dice roll.
-  std::vector<int> out_; // Number of pieces of each player outside of field.
+  int dice_;              // Current dice roll.
+  int prev_dice_;         // Last dice roll.
+  std::vector<int> out_;  // Number of pieces of each player outside of field.
 
-  // Board consists of 40 common fields, starting with the set-in field of 
+  // Board consists of 40 common fields, starting with the set-in field of
   // player 0. After that, four goal fields of each player follow, beginning
   // with player 0 again.
   // Player 0 starts on field 0, goes up to field 39 and continues into
@@ -226,9 +229,9 @@ class MaednGame : public Game {
   }
 
   // Classic six sided dice.
-  int MaxChanceOutcomes() const override { return 6; }
+  int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
 
-  // There is arbitrarily chosen number to ensure the game is finite.
+  // Arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
 
   // Upper bound: chance node per move, with an initial chance node for

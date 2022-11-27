@@ -274,10 +274,6 @@ add_executable(backgammon_test backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(backgammon_test backgammon_test)
 
-add_executable(maedn_test maedn_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(maedn_test maedn_test)
-
 add_executable(bargaining_instance_generator bargaining_instance_generator.cc
                ${OPEN_SPIEL_OBJECTS})
 add_executable(bargaining_test bargaining_test.cc ${OPEN_SPIEL_OBJECTS}
@@ -456,6 +452,10 @@ add_executable(liars_dice_test liars_dice_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(liars_dice_test liars_dice_test)
+
+add_executable(maedn_test maedn_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(maedn_test maedn_test)
 
 add_executable(mancala_test mancala_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
