@@ -144,7 +144,11 @@ def main(_):
                                 FLAGS.player1_pop_id)
   ]
 
-  print("Starting eval run")
+  print("Starting eval run.")
+  print(f"Player 0 is (pop_id {FLAGS.player0_pop_id}: " +
+        f"{roshambo_bot_names[FLAGS.player0_pop_id]})")
+  print(f"Player 1 is (pop_id {FLAGS.player1_pop_id}: " +
+        f"{roshambo_bot_names[FLAGS.player1_pop_id]})")
   avg_eval_returns = eval_agents(env, agents, num_players, 100)
   print(avg_eval_returns)
 
