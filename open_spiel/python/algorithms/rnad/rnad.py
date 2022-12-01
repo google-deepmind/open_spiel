@@ -13,6 +13,7 @@
 # limitations under the License.
 """Python implementation of R-NaD (https://arxiv.org/pdf/2206.15378.pdf)."""
 
+import enum
 import functools
 from typing import Any, Callable, Sequence, Tuple
 
@@ -596,6 +597,11 @@ class NerdConfig:
   clip: float = 10_000
 
 
+class StateRepresentation(str, enum.Enum):
+  INFO_SET = "info_set"
+  OBSERVATION = "observation"
+
+
 @chex.dataclass(frozen=True)
 class RNaDConfig:
   """Configuration parameters for the RNaDSolver."""
@@ -605,7 +611,7 @@ class RNaDConfig:
   trajectory_max: int = 10
 
   # The content of the EnvStep.obs tensor.
-  state_representation: str = "info_set"  # or "observation"
+  state_representation: StateRepresentation = StateRepresentation.INFO_SET
 
   # Network configuration.
   policy_network_layers: Sequence[int] = (256, 256)
@@ -955,14 +961,13 @@ class RNaDSolver(policy_lib.Policy):
     if not valid:
       state = self._ex_state
 
-    if self.config.state_representation == "observation":
+    if self.config.state_representation == StateRepresentation.OBSERVATION:
       obs = state.observation_tensor()
-    elif self.config.state_representation == "info_set":
+    elif self.config.state_representation == StateRepresentation.INFO_SET:
       obs = state.information_state_tensor()
     else:
       raise ValueError(
-          f"Invalid state_representation: {self.config.state_representation}. "
-          "Must be either 'info_set' or 'observation'.")
+          f"Invalid StateRepresentation: {self.config.state_representation}.")
 
     # TODO(author16): clarify the story around rewards and valid.
     return EnvStep(
