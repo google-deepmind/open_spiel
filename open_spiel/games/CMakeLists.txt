@@ -60,6 +60,8 @@ set(GAME_SOURCES
   dynamic_routing/dynamic_routing_data.h
   dynamic_routing/dynamic_routing_utils.cc
   dynamic_routing/dynamic_routing_utils.h
+  dou_dizhu.cc
+  dou_dizhu.h
   efg_game.cc
   efg_game.h
   efg_game_data.cc
@@ -382,6 +384,14 @@ add_test(dynamic_routing_test dynamic_routing_test)
 add_executable(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(dynamic_routing_utils_test dynamic_routing_utils_test)
+
+add_executable(dou_dizhu_test dou_dizhu_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dou_dizhu_test dou_dizhu_test)
+
+add_executable(dou_dizhu_utils_test dou_dizhu/dou_dizhu_utils_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dou_dizhu_utils_test dou_dizhu_utils_test)
 
 add_executable(efg_game_test efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

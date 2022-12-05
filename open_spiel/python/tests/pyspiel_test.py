@@ -49,6 +49,7 @@ EXPECTED_GAMES = frozenset([
     "dark_hex",
     "dark_hex_ir",
     "deep_sea",
+    "dou_dizhu",
     "efg_game",
     "euchre",
     "first_sealed_auction",

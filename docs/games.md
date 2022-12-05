@@ -29,6 +29,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
+<font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
 <font color="orange"><b>~</b></font>         | [Euchre](#euchre)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
@@ -299,6 +300,15 @@ Status                                       | Game
 *   Perfect information.
 *   1 players.
 *   [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
+
+### Dou Dizhu
+
+*   A three-player games where one player (dizhu) plays against a team of two (farmers).
+*   Uses a 54-card deck.
+*   Non-deterministic.
+*   Imperfect information.
+*   Three players.
+*   [Wikipeda](https://en.wikipedia.org/wiki/Dou_dizhu)
 
 ### Euchre
 
