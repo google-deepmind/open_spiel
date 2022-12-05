@@ -62,6 +62,8 @@ set(GAME_SOURCES
   dynamic_routing/dynamic_routing_utils.h
   dou_dizhu.cc
   dou_dizhu.h
+  dou_dizhu/dou_dizhu_utils.cc
+  dou_dizhu/dou_dizhu_utils.h
   efg_game.cc
   efg_game.h
   efg_game_data.cc
