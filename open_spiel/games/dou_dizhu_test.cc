@@ -26,7 +26,7 @@ namespace{
 
 void BasicGameTests(){
   testing::LoadGameTest("dou_dizhu");
-  testing::RandomSimTest(*LoadGame("dou_dizhu"), 3);
+  testing::RandomSimTest(*LoadGame("dou_dizhu"), 20);
 }
 
 } // namespace

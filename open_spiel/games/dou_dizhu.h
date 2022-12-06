@@ -15,20 +15,22 @@
 #ifndef OPEN_SPIEL_GAMES_DOU_DIZHU_H_
 #define OPEN_SPIEL_GAMES_DOU_DIZHU_H_
 
-// The game of dou dizhu (the three-player version)
-// For a general description of rule, see https://en.wikipedia.org/wiki/Dou_dizhu
+// The game of dou dizhu (the three-player version).
+// For a general description of the rules, see https://en.wikipedia.org/wiki/Dou_dizhu
 // It uses a standard 54-card deck (including two Jokers).
 // The game starts by randomly picking one card face up, which is then inserted
-// into the shuffled deck. Then each players is dealt 17 cards.
+// into the shuffled deck. Then each player is dealt 17 cards.
 // Then the bidding phase starts. The player who got the face-up card becomes the
 // first one to bid. Bidding round ends if (1) no one bids (2) two consecutive passes
-// (3) maximum bid 3 was bidded. The one who wins the bidding phase become dizhu.
-// Dizhu get the rest 3 cards. The other players are called farmers.
+// (3) maximum bid 3 was bidded. The one who wins the bidding phase becomes dizhu (landlord).
+// Dizhu get the remaining 3 cards. The other players are called peasants.
 // Starting with dizhu, the playing phase consisting of multiple tricks.
 // The leader of a trick can play several allowable categories of hands.
 // The players during a trick can only pass or play hands of the same pattern of
 // higher rank.
-// In this game, suits DOES NOT MATTER.
+// A player becomes the winner of a trick if the other two players passes.
+// And then it becomes the leader of the next trick.
+// In this game, suits DO NOT MATTER.
 //
 // The allowable categories of hands:
 // Solo: a single card
@@ -53,16 +55,15 @@
 // A bomb dominates all other hands except rocket or bombs of higher rank.
 // Bomb/rocket cannot appear in an airplane combination
 // E.g., 333-444-555-666-7777 is prohibited.
-// But in this implementation pair and trio can be kickers
+// But in this implementation any pair and any trio can be kickers
 // For more, see https://rezunli96.github.io/blog/doudizhu_count.html
 //
-// A game ends if a player had played all its card.
+// A game ends if a player has played all their cards.
 // The winning bid determines the initial stake.
-// Each bomb played double the stake.
-// And if (1) dizhu played all its card without any farmer played or
-// (2) dizhu only got played once. Then it's called spring. 
+// Each bomb played doubles the stake.
+// And if (1) both peasants do not play any cards
+// (2) dizhu does not play any cards after its first hand, then it's called spring. 
 // And the stake is also doubled.
-
 
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -76,17 +77,19 @@ namespace open_spiel {
 
     class Trick {
     public:
-      Trick() : Trick{kInvalidPlayer, kInvalidAction} {}
+      Trick() : Trick(kInvalidPlayer, kInvalidAction) {}
       Trick(Player leader, int action);
+      // winning_player_ is the current winner of the trick
       void Play(Player player, int action) 
-      {winning_player_ = player; winning_action_ = action;}
+      {winning_player_ = player; 
+       winning_action_ = action;}
       int WinningAction() const {return winning_action_;}
       Player Winner() const { return winning_player_; }
       Player Leader() const { return leader_; }
 
     private:
       int winning_action_;
-      Player leader_;
+      const Player leader_;
       Player winning_player_;
     };
 
@@ -105,7 +108,7 @@ namespace open_spiel {
         void ObservationTensor(Player player,
                                 absl::Span<float> values) const override;
         std::unique_ptr<State> Clone() const override {
-          return std::unique_ptr<State>(new DouDizhuState(*this));}
+          return absl::make_unique<DouDizhuState>(*this);}
         std::vector<Action> LegalActions() const override;
         std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
         // Current phase.
@@ -114,7 +117,7 @@ namespace open_spiel {
         void DoApplyAction(Action action) override;
       private:
         
-        enum class Phase {kDeal, kAuction, kPlay, kGameOver};
+        
 
         std::vector<Action> DealLegalActions() const;
         std::vector<Action> BiddingLegalActions() const;
@@ -168,7 +171,7 @@ namespace open_spiel {
         int NumDistinctActions() const override {return kRocketActionBase + 1;}
         int MaxChanceOutcomes() const override {return kBiddingActionBase;}
         std::unique_ptr<State> NewInitialState() const override {
-          return std::unique_ptr<State>(new DouDizhuState(shared_from_this()));
+          return absl::make_unique<DouDizhuState>(shared_from_this());
         }
         int NumPlayers() const override { return kNumPlayers; }
         double MinUtility() const override {return kMinUtility;}

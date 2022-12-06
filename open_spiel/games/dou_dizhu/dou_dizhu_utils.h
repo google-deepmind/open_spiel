@@ -22,6 +22,10 @@
 namespace open_spiel{
 namespace dou_dizhu{
 
+
+enum class Phase {kDeal, kAuction, kPlay, kGameOver};
+
+
 inline constexpr int kNumPlayers = 3;
 inline constexpr int kNumCards = 54;
 

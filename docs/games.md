@@ -303,7 +303,7 @@ Status                                       | Game
 
 ### Dou Dizhu
 
-*   A three-player games where one player (dizhu) plays against a team of two (farmers).
+*   A three-player games where one player (dizhu) plays against a team of two (peasants).
 *   Uses a 54-card deck.
 *   Non-deterministic.
 *   Imperfect information.
