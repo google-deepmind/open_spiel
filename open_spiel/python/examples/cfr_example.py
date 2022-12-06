@@ -23,10 +23,10 @@ import pyspiel
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("iterations", 100, "Number of iterations")
+flags.DEFINE_integer("iterations", 100000, "Number of iterations")
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
-flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
+flags.DEFINE_integer("print_freq", 100, "How often to print the exploitability")
 
 
 def main(_):
@@ -34,10 +34,12 @@ def main(_):
   cfr_solver = cfr.CFRSolver(game)
 
   for i in range(FLAGS.iterations):
-    cfr_solver.evaluate_and_update_policy()
+    cfr_solver.evaluate_and_update_policy(explorative=True)
+    cfr_solver.seq_eq_bound_traversal()
     if i % FLAGS.print_freq == 0:
-      conv = exploitability.exploitability(game, cfr_solver.average_policy())
-      print("Iteration {} exploitability {}".format(i, conv))
+      conv = exploitability.exploitability(game, cfr_solver.average_policy())   
+      print("Iteration {} exploitability {} seq_eq_bound {}".format(
+          i, conv, cfr_solver._seq_eq_bound))
 
 
 if __name__ == "__main__":

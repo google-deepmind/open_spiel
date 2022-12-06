@@ -24,6 +24,7 @@ The average policy is what converges to a Nash Equilibrium.
 
 import collections
 import attr
+import math
 import numpy as np
 
 from open_spiel.python import policy
@@ -42,6 +43,10 @@ class _InfoStateNode(object):
   # Same as above for the cumulative of the policy probabilities computed
   # during the policy iterations
   cumulative_policy = attr.ib(factory=lambda: collections.defaultdict(float))
+  # sequential equilibrium bound info
+  avg_cfv_qvalues = attr.ib(factory=lambda: collections.defaultdict(float))
+  avg_cfv_value = 0
+  beta = 0   # this is the \beta_{-i} denominator term from the RPG paper
 
 
 def _apply_regret_matching_plus_reset(info_state_nodes):
@@ -67,7 +72,7 @@ def _apply_regret_matching_plus_reset(info_state_nodes):
         action_to_cum_regret[action] = 0
 
 
-def _update_current_policy(current_policy, info_state_nodes):
+def _update_current_policy(current_policy, info_state_nodes, iteration=None):
   """Updates in place `current_policy` from the cumulative regrets.
 
   This function is a module level function to be reused by both CFRSolver and
@@ -82,7 +87,8 @@ def _update_current_policy(current_policy, info_state_nodes):
 
     for action, value in _regret_matching(
         info_state_node.cumulative_regret,
-        info_state_node.legal_actions).items():
+        info_state_node.legal_actions,
+        iteration=iteration).items():
       state_policy[action] = value
 
 
@@ -172,6 +178,7 @@ class _CFRSolverBase(object):
     self._linear_averaging = linear_averaging
     self._alternating_updates = alternating_updates
     self._regret_matching_plus = regret_matching_plus
+    self._seq_eq_bound = 0
 
   def _initialize_info_state_nodes(self, state):
     """Initializes info_state_nodes.
@@ -336,6 +343,102 @@ class _CFRSolverBase(object):
 
     return state_value
 
+
+  def _seq_eq_bound_traversal_for_player(self, state, policies,
+                                         reach_probabilities, player):
+    """Copied from the function above.
+
+      - Does not motify regrets
+      - Only responsible for one thing: updating the Seq Eq. bound.
+      - Operates on the average policy only
+    """
+    if state.is_terminal():
+      return np.asarray(state.returns())
+
+    if state.is_chance_node():
+      state_value = 0.0
+      for action, action_prob in state.chance_outcomes():
+        assert action_prob > 0
+        new_state = state.child(action)
+        new_reach_probabilities = reach_probabilities.copy()
+        new_reach_probabilities[-1] *= action_prob
+        state_value += action_prob * self._seq_eq_bound_traversal_for_player(
+            new_state, policies, new_reach_probabilities, player)
+      return state_value
+
+    current_player = state.current_player()
+    info_state = state.information_state_string(current_player)
+
+    # No need to continue on this history branch as no update will be performed
+    # for any player.
+    # The value we return here is not used in practice. If the conditional
+    # statement is True, then the last taken action has probability 0 of
+    # occurring, so the returned value is not impacting the parent node value.
+    if all(reach_probabilities[:-1] == 0):
+      return np.zeros(self._num_players)
+
+    state_value = np.zeros(self._num_players)
+
+    # The utilities of the children states are computed recursively. As the
+    # regrets are added to the information state regrets for each state in that
+    # information state, the recursive call can only be made once per child
+    # state. Therefore, the utilities are cached.
+    children_utilities = {}
+
+    info_state_node = self._info_state_nodes[info_state]
+    if policies is None:
+      info_state_policy = self._get_infostate_average_policy(info_state)
+    else:
+      # Only used in CFR-BR      
+      info_state_policy = policies[current_player](info_state)
+    for action in state.legal_actions():
+      action_prob = info_state_policy.get(action, 0.)
+      new_state = state.child(action)
+      new_reach_probabilities = reach_probabilities.copy()
+      new_reach_probabilities[current_player] *= action_prob
+      child_utility = self._seq_eq_bound_traversal_for_player(
+          new_state,
+          policies=policies,
+          reach_probabilities=new_reach_probabilities,
+          player=player)
+
+      state_value += action_prob * child_utility
+      children_utilities[action] = child_utility
+
+    reach_prob = reach_probabilities[current_player]
+    counterfactual_reach_prob = (
+        np.prod(reach_probabilities[:current_player]) *
+        np.prod(reach_probabilities[current_player + 1:]))
+    state_value_for_player = state_value[current_player]
+
+    # Now only update the quantities relevant for the sequential equilibrium bound.
+    for action, action_prob in info_state_policy.items():
+      #cfr_regret = counterfactual_reach_prob * (
+      #  children_utilities[action][current_player] - state_value_for_player)
+      info_state_node.avg_cfv_qvalues[action] += (counterfactual_reach_prob *
+         children_utilities[action][current_player])
+    info_state_node.avg_cfv_value += (counterfactual_reach_prob *
+      state_value_for_player)
+    info_state_node.beta += counterfactual_reach_prob
+
+    return state_value
+
+
+  def _update_seq_eq_bound(self):
+    self._seq_eq_bound = 0
+    for _, info_state_node in self._info_state_nodes.items():
+      # state_policy = current_policy.policy_for_key(info_state)
+      max_cfv_qvalue = max(info_state_node.avg_cfv_qvalues)
+      self._seq_eq_bound += max(0,
+          ((max_cfv_qvalue - info_state_node.avg_cfv_value) /
+          info_state_node.beta))
+      # reset all the quantities to 0
+      info_state_node.beta = 0
+      info_state_node.avg_cfv_value = 0
+      for action in info_state_node.avg_cfv_qvalues:
+        info_state_node.avg_cfv_qvalues[action] = 0
+
+
   def _get_infostate_policy(self, info_state_str):
     """Returns an {action: prob} dictionary for the policy on `info_state`."""
     info_state_node = self._info_state_nodes[info_state_str]
@@ -344,9 +447,18 @@ class _CFRSolverBase(object):
     return {
         action: prob_vec[action] for action in info_state_node.legal_actions
     }
+  
+  def _get_infostate_average_policy(self, info_state_str):
+    """Returns an {action: prob} dictionary for the policy on `info_state`."""
+    info_state_node = self._info_state_nodes[info_state_str]
+    prob_vec = self._average_policy.action_probability_array[
+        info_state_node.index_in_tabular_policy]
+    return {
+        action: prob_vec[action] for action in info_state_node.legal_actions
+    }
 
 
-def _regret_matching(cumulative_regrets, legal_actions):
+def _regret_matching(cumulative_regrets, legal_actions, iteration=None):
   """Returns an info state policy by applying regret-matching.
 
   Args:
@@ -368,6 +480,15 @@ def _regret_matching(cumulative_regrets, legal_actions):
   else:
     for action in legal_actions:
       info_state_policy[action] = 1.0 / len(legal_actions)
+
+  # Check for explorative regret matching. If enabled: mix in eps of the
+  # uniform, where epsilon is 1/sqrt(T)
+  if iteration is not None:
+    eps = 1/math.sqrt(iteration)
+    for action in legal_actions:
+      info_state_policy[action] = (eps * (1.0 / len(legal_actions)) +
+          (1.0 - eps) * info_state_policy[action])
+   
   return info_state_policy
 
 
@@ -415,7 +536,7 @@ class _CFRSolver(_CFRSolverBase):
   ```
   """
 
-  def evaluate_and_update_policy(self):
+  def evaluate_and_update_policy(self, explorative=False):
     """Performs a single step of policy evaluation and policy improvement."""
     self._iteration += 1
     if self._alternating_updates:
@@ -427,7 +548,12 @@ class _CFRSolver(_CFRSolverBase):
             player=player)
         if self._regret_matching_plus:
           _apply_regret_matching_plus_reset(self._info_state_nodes)
-        _update_current_policy(self._current_policy, self._info_state_nodes)
+        if explorative:
+          _update_current_policy(self._current_policy, self._info_state_nodes,
+                                 iteration=self._iteration)
+        else: 
+          _update_current_policy(self._current_policy, self._info_state_nodes)
+
     else:
       self._compute_counterfactual_regret_for_player(
           self._root_node,
@@ -436,7 +562,22 @@ class _CFRSolver(_CFRSolverBase):
           player=None)
       if self._regret_matching_plus:
         _apply_regret_matching_plus_reset(self._info_state_nodes)
-      _update_current_policy(self._current_policy, self._info_state_nodes)
+      if explorative:
+        _update_current_policy(self._current_policy, self._info_state_nodes,
+                               iteration=self._iteration)
+      else:
+        _update_current_policy(self._current_policy, self._info_state_nodes)
+
+  
+  def seq_eq_bound_traversal(self):
+    """Updates the information required to compute the Seq Eq. bound."""
+    self._seq_eq_bound_traversal_for_player(
+        self._root_node,
+        policies=None,
+        reach_probabilities=np.ones(self._game.num_players() + 1),
+        player=None)
+    self._update_seq_eq_bound()
+
 
 
 class CFRPlusSolver(_CFRSolver):
