@@ -182,6 +182,8 @@ std::string DouDizhuState::FormatDeal() const {
 
 
 std::string DouDizhuState::ObservationString(Player player) const{
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
   std::string rv = absl::StrFormat("My hand %s\n", FormatSingleHand(holds_[player]));
   absl::StrAppend(&rv,  absl::StrFormat("Played cards %s\n", FormatSingleHand(played_deck_)));
   absl::StrAppend(&rv, absl::StrFormat("face up card rank: %d", card_rank_face_up_));
