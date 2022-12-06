@@ -348,7 +348,7 @@ TrioCombParams GetSingleTrioCombParams(int action){
   int action_base = GetTrioCombActionBase(action);
   KickerType kicker_type = GetTrioCombKickerType(action);
   int hand_id = (action - action_base);
-  int num_kickers = kNumRanks - 1;
+  int num_kickers = kicker_type == kSolo? kNumRanks - 1: kNumRanks - 3;
   int head = hand_id / num_kickers;
   int kicker_steps = hand_id % num_kickers;
 
@@ -543,7 +543,8 @@ int SingleTrioCombHandToActionId(std::array<int, kNumRanks> hand){
   if(hand[kicker_rank] == 1) action = kTrioWithSoloActionBase;
   else action = kTrioWithPairActionBase;
   // one of the rank had already been taken by the trio
-  action += trio_rank * (kNumRanks - 1);
+  if(hand[kicker_rank] == 1) action += trio_rank * (kNumRanks - 1);
+  else action += trio_rank * (kNumRanks - 3);  // the jokers cannot be the pair
   int kicker_steps = 0;
   for(int rank = 0; rank < kNumRanks; ++rank){
     if(rank == trio_rank) continue;
@@ -713,8 +714,6 @@ void dfs_add_all_airplane_kickers(int chain_head, int chain_length, int depth, i
       std::vector<Action>& action_ids, KickerType kicker_type){
     
   if(chain_length == depth){
-    // std::cout << FormatSingleHand(used_rank) << std::endl;
-    // std::cout << chain_head << ' ' << chain_length << std::endl;
     action_ids.push_back(static_cast<Action>(AirplaneCombHandToActionId(used_rank, chain_head, kicker_type)));
   }else{
     for(int rank = 0; rank <= max_search_rank; ++rank){

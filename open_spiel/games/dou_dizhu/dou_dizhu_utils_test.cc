@@ -301,13 +301,45 @@ void AirplaneCombHandTest(){
 }
 
 
+
+
+void SearchAllActionsTest(){
+  std::array<int, kNumRanks> hand1{};
+  hand1[1] = 1;
+  hand1[2] = 2;
+  hand1[4] = 1;
+  hand1[5] = 1;
+  hand1[7] = 2;
+  hand1[8] = 1;
+  hand1[9] = 2;
+  hand1[11] = 3;
+  hand1[12] = 2;
+  hand1[13] = 1;
+  hand1[14] = 1;
+
+
+  std::cout << absl::StrFormat("Hands: %s", FormatSingleHand(hand1)) << std::endl;
+
+  std::vector<Action> actions1;
+  SearchForLegalActions(actions1, hand1, kInvalidAction);
+  //SPIEL_CHECK_EQ(static_cast<int>(actions3.size()), 1052);
+  std::cout << "Possible actions:" << std::endl;
+  for(auto action: actions1){
+    std::array<int, kNumRanks> possible_hand = ActionToHand(action);
+    std::cout <<"action id " << action << ' ' << FormatSingleHand(possible_hand) << std::endl;
+  }
+}
+
+
+
 } // namespace dou_dizhu
 } // namespace open_spiel
 
 
 int main(){
-  open_spiel::dou_dizhu::SingleRankHandTest();
-  open_spiel::dou_dizhu::ChainOnlyHandTest();
-  open_spiel::dou_dizhu::SingleTrioCombHandTest();
-  open_spiel::dou_dizhu::AirplaneCombHandTest();
+  // open_spiel::dou_dizhu::SingleRankHandTest();
+  // open_spiel::dou_dizhu::ChainOnlyHandTest();
+  // open_spiel::dou_dizhu::SingleTrioCombHandTest();
+  // open_spiel::dou_dizhu::AirplaneCombHandTest();
+  open_spiel::dou_dizhu::SearchAllActionsTest();
 }
