@@ -28,7 +28,7 @@ namespace dou_dizhu{
 
 
 void SingleRankHandTest(){
-  std::array<int, kNumRanks> hand1{}, hand2{}, current_hand{};
+  std::array<int, kNumRanks> hand1{}, hand2{};
   hand1[6] = 3;
   int action_id1 = SingleRankHandToActionId(hand1);
   SPIEL_CHECK_EQ(FormatSingleHand(SingleRankHand(action_id1)), "999");
@@ -39,12 +39,7 @@ void SingleRankHandTest(){
 
 
   // 558999TJJJJKKK
-  current_hand[2] = 2;
-  current_hand[5] = 1;
-  current_hand[6] = 3;
-  current_hand[7] = 1;
-  current_hand[8] = 4;
-  current_hand[10] = 3;
+  std::array<int, kNumRanks> current_hand = {0, 0, 2, 0, 0, 1, 3, 1, 4, 0, 3};
 
 
   std::vector<Action> actions1, actions2, actions3;
@@ -66,42 +61,20 @@ void SingleRankHandTest(){
 
 
 void ChainOnlyHandTest(){
-  std::array<int, kNumRanks> hand1{}, hand2{}, current_hand{};
-  hand1[3] = 3;
-  hand1[4] = 3;
-  hand1[5] = 3;
+  std::array<int, kNumRanks> hand1 = {0, 0, 0, 3, 3, 3};
   int action_id1 = ChainOnlyHandToActionId(hand1);
 
   SPIEL_CHECK_EQ(FormatSingleHand(ChainOnlyHand(action_id1)), "666777888");
 
-  hand2[0] = 2;
-  hand2[1] = 2;
-  hand2[2] = 2;
-  hand2[3] = 2;
-  hand2[4] = 2;
-  hand2[5] = 2;
-  hand2[6] = 2;
-  hand2[7] = 2;
-  hand2[8] = 2;
+
+  std::array<int, kNumRanks> hand2 = {2, 2, 2, 2, 2, 2, 2, 2, 2};
 
   int action_id2 = ChainOnlyHandToActionId(hand2);
   SPIEL_CHECK_EQ(FormatSingleHand(ChainOnlyHand(action_id2)), "33445566778899TTJJ");
 
-
   // 5566777888999TTTJJQQKKAA22(BWJ)(CJ)
-  current_hand[2] = 2;
-  current_hand[3] = 2;
-  current_hand[4] = 3;
-  current_hand[5] = 3;
-  current_hand[6] = 3;
-  current_hand[7] = 3;
-  current_hand[8] = 2;
-  current_hand[9] = 2;
-  current_hand[10] = 2;
-  current_hand[11] = 2;
-  current_hand[12] = 2;
-  current_hand[13] = 1;
-  current_hand[14] = 1;
+  std::array<int, kNumRanks> current_hand = {0, 0, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1};
+  
 
 
   std::vector<Action> actions1, actions2, actions3;
@@ -122,7 +95,7 @@ void ChainOnlyHandTest(){
 
 
 void SingleTrioCombHandTest(){
-  std::array<int, kNumRanks> hand1{}, hand2{}, current_hand{};
+  std::array<int, kNumRanks> hand1{}, hand2{};
 
   //999-(CJ)
   hand1[6] = 3;
@@ -140,17 +113,8 @@ void SingleTrioCombHandTest(){
   SPIEL_CHECK_EQ(FormatSingleHand(SingleTrioCombHand(action_id2)), "33322");
 
   // 666777TTTQQQ222(BWJ)(CJ)
-  current_hand[3] = 3;
-  current_hand[4] = 3;
-
-  current_hand[7] = 3;
-  current_hand[9] = 3;
-
-  current_hand[12] = 3;
-  current_hand[13] = 1;
-  current_hand[14] = 1;
-
-
+  std::array<int, kNumRanks> current_hand = {0, 0, 0, 3, 3, 0, 0, 3, 0, 3, 0, 0, 3, 1, 1};
+  
   std::vector<Action> actions1, actions2, actions3;
 
   // The hands that are greater than 333222 uses trios 666, 777, TTT, QQQ, 222
@@ -170,19 +134,12 @@ void SingleTrioCombHandTest(){
 }
 
 void AirplaneCombHandTest(){
-  std::array<int, kNumRanks> hand1{}, hand2{}, current_hand{};
+
 
   // 888999TTTJJJQQQ-7772(CJ)
+  std::array<int, kNumRanks> hand1 = {0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 0, 1, 0, 1};
 
-  hand1[5] = 3;
-  hand1[6] = 3;
-  hand1[7] = 3;
-  hand1[8] = 3;
-  hand1[9] = 3;
-
-  hand1[4] = 3;
-  hand1[12] = 1;
-  hand1[14] = 1;
+  
   int action_id1 = AirplaneCombHandToActionId(hand1, /*chain_head=*/5, /*kicker_type=*/kSolo);
   SPIEL_CHECK_EQ(FormatSingleHand(AirplaneCombHand(action_id1)), "777888999TTTJJJQQQ2(CJ)");
 
@@ -190,16 +147,7 @@ void AirplaneCombHandTest(){
 
 
   // TTTJJJQQQKKK-33445522
-  hand2[7] = 3;
-  hand2[8] = 3;
-  hand2[9] = 3;
-  hand2[10] = 3;
-
-
-  hand2[0] = 2;
-  hand2[1] = 2;
-  hand2[2] = 2;
-  hand2[12] = 2;
+  std::array<int, kNumRanks> hand2 = {2, 2, 2, 0, 0, 0, 0, 3, 3, 3, 3, 0, 2, 0, 0};
   int action_id2 = AirplaneCombHandToActionId(hand2, /*chain_head=*/7, /*kicker_type=*/kPair);
   SPIEL_CHECK_EQ(FormatSingleHand(AirplaneCombHand(action_id2)), "334455TTTJJJQQQKKK22");
 
@@ -208,18 +156,7 @@ void AirplaneCombHandTest(){
 
 
   // 667899TTTJJJJQQQKKKAAA222(BWJ)(CJ)
-  current_hand[3] = 2;
-  current_hand[4] = 1;
-  current_hand[5] = 1;
-  current_hand[6] = 2;
-  current_hand[7] = 3;
-  current_hand[8] = 4;
-  current_hand[9] = 3;
-  current_hand[10] = 3;
-  current_hand[11] = 3;
-  current_hand[12] = 3;
-  current_hand[13] = 1;
-  current_hand[14] = 1;
+  std::array<int, kNumRanks> current_hand = {0, 0, 0, 2, 1, 1, 2, 3, 4, 3, 3, 3, 3, 1, 1};
   std::vector<Action> actions1, actions2, actions3;
   SearchAirplaneCombActions(actions1, current_hand, /*prev_action=*/action_id1);
   // C(7, 5) - C(5, 3) + 3*(C(6, 3) - C(4, 1)) + C(3, 2) * 5 + 2 + C(6, 2) - 1 = 90
