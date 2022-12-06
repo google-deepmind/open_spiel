@@ -119,7 +119,7 @@ std::array<std::string, kNumRanks> FormatHand(
     const std::array<std::array<int, kNumRanks>, kNumPlayers>& deal) {
 
   std::array<std::string, kNumRanks> cards{};
-  for (int rank = 0; rank < kNumRanks; ++rank) {
+  for (int rank = 0; rank < kNumRanks-2; ++rank) {
     bool is_void = true;
     for (int i = 0; i < deal[player][rank]; ++i) {
       cards[rank].push_back(kRankChar[rank]);
@@ -243,9 +243,16 @@ std::vector<Action> DouDizhuState::LegalActions() const {
 std::vector<Action> DouDizhuState::DealLegalActions() const {
   std::vector<Action> legal_actions;
   legal_actions.reserve(kNumCards - history_.size() + 1);
-  for (int i = 0; i < kNumCards; ++i) {
-    if (dealer_deck_[i]) legal_actions.push_back(i);
+
+  if(card_face_up_position_ == -1){
+    for(int i = 0; i < kDealingActionBase; ++i) legal_actions.push_back(i);
+  }else{
+    for (int i = 0; i < kNumCards; ++i) {
+      if (dealer_deck_[i]) legal_actions.push_back(i+kDealingActionBase);
+    }
   }
+
+
   return legal_actions;
 }
 
@@ -269,7 +276,7 @@ std::vector<Action> DouDizhuState::BiddingLegalActions() const {
 
 std::vector<Action> DouDizhuState::PlayLegalActions() const {
   std::vector<Action> legal_actions;
-  // the leader of a trick must play an action and cannot pass
+  // the leader of a trick must play./ an action and cannot pass
   if(!new_trick_begin_) legal_actions.push_back(kPass);
 
 
@@ -290,10 +297,16 @@ std::vector<std::pair<Action, double>> DouDizhuState::ChanceOutcomes() const {
   for(int i = 0; i < kNumCards; ++i) num_cards_remaining += dealer_deck_[i];
   outcomes.reserve(num_cards_remaining);
 
+  if(card_face_up_position_ == -1){
+    for(int i = 0; i < kDealingActionBase; ++i)
+      outcomes.emplace_back(i, 1.0/static_cast<double>(kDealingActionBase));
+  }else{
+    for (int card = 0; card < kNumCards; ++card)
+      if (dealer_deck_[card]) 
+        outcomes.emplace_back(card+kDealingActionBase, 1.0/static_cast<double>(num_cards_remaining));
+  }
 
-  for (int card = 0; card < kNumCards; ++card)
-    if (dealer_deck_[card]) 
-      outcomes.emplace_back(card, 1.0/static_cast<double>(num_cards_remaining));
+
   return outcomes;
 }
 
@@ -310,22 +323,27 @@ void DouDizhuState::DoApplyAction(Action action) {
   }
 }
 
-void DouDizhuState::ApplyDealAction(int card) {
+void DouDizhuState::ApplyDealAction(int action) {
   // First decide the face up card
-  if(card_rank_face_up_ == kInvalidAction){
-    card_rank_face_up_ = CardToRank(card);
+  if(card_face_up_position_ == -1){
+    card_face_up_position_ = action;
     return;
   }
 
+  int dealing_round = static_cast<int>(history_.size()) - 1;
   // if the current player is dealt the face up card, make it the first one to bid
-  if(card == history_[0].action) first_player_ = (history_.size() - 1) % kNumPlayers;
-
-
-  holds_[((history_.size() - 1) % kNumPlayers)][CardToRank(card)]++;
-  dealer_deck_[card]--;
+  if(dealing_round == history_[0].action){
+    first_player_ = dealing_round % kNumPlayers;
+    card_rank_face_up_ = CardToRank(action-kDealingActionBase);
+  }
+  
+  holds_[((history_.size() - 1) % kNumPlayers)][CardToRank(action-kDealingActionBase)]++;
+  dealer_deck_[action-kDealingActionBase]--;
   if (history_.size() == kNumCards - kNumCardsLeftOver) {
     phase_ = Phase::kAuction;
     current_player_ = first_player_;
+    SPIEL_CHECK_GE(current_player_, 0);
+    SPIEL_CHECK_LE(current_player_, num_players_);
     for (int card = 0; card < kNumCards; ++card)
       if (dealer_deck_[card]){
         cards_left_over_.push_back(CardToRank(card));
@@ -398,6 +416,7 @@ void DouDizhuState::ApplyPlayAction(int action) {
       num_passes_ = 0;
       tricks_.push_back(Trick());
       new_trick_begin_ = true;
+      return;
     }
   } else{ 
 
@@ -416,8 +435,8 @@ void DouDizhuState::ApplyPlayAction(int action) {
       phase_ = Phase::kGameOver;
       return;
     }
-    current_player_ = (current_player_ + 1) % kNumPlayers;
   }
+  current_player_ = (current_player_ + 1) % kNumPlayers;
 }
 
 

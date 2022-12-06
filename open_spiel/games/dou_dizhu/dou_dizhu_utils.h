@@ -58,7 +58,11 @@ inline constexpr int kObservationTensorSize =
 
 
 
-inline constexpr int kBiddingActionBase = kNumCards;
+
+
+inline constexpr int kDealingActionBase = kNumCards - kNumCardsLeftOver;
+
+inline constexpr int kBiddingActionBase = kDealingActionBase + kNumCards;
 
 inline constexpr int kPass = kBiddingActionBase;
 

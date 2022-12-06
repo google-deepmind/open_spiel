@@ -141,6 +141,7 @@ namespace open_spiel {
         int winning_bid_ = 0;
         int trick_played_ = 0;
         int num_played_ = 0; // number of plays during playing phase
+        int card_face_up_position_ = -1;
         int card_rank_face_up_ = kInvalidAction;
         bool new_trick_begin_ = false;
         Player current_player_ = kInvalidPlayer;
@@ -165,7 +166,7 @@ namespace open_spiel {
       public:
         explicit DouDizhuGame(const GameParameters& params);
         int NumDistinctActions() const override {return kRocketActionBase + 1;}
-        int MaxChanceOutcomes() const override {return kNumCards;}
+        int MaxChanceOutcomes() const override {return kBiddingActionBase;}
         std::unique_ptr<State> NewInitialState() const override {
           return std::unique_ptr<State>(new DouDizhuState(shared_from_this()));
         }
