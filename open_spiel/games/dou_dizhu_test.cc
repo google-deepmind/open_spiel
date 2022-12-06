@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #include "open_spiel/abseil-cpp/absl/types/optional.h"
-// #include "open_spiel/spiel.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
