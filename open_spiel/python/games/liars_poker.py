@@ -29,6 +29,9 @@ class Action(enum.IntEnum):
 _NUM_PLAYERS = 2
 _HAND_LENGTH = 3
 _NUM_DIGITS = 3 # Number of digits to include from the range 1, 2, ..., 9, 0
+_FULL_DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+_DECK = [_FULL_DECK[i] for i in range(_NUM_DIGITS)]
+
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_liars_poker",
     long_name="Python Liars Poker",
@@ -40,7 +43,7 @@ _GAME_TYPE = pyspiel.GameType(
     max_num_players=_NUM_PLAYERS,
     min_num_players=_NUM_PLAYERS,
     provides_information_state_string=True,
-    provides_information_state_tensor=False,
+    provides_information_state_tensor=True,
     provides_observation_string=False,
     provides_observation_tensor=True,
     parameter_specification={
@@ -76,27 +79,52 @@ class LiarsPokerState(pyspiel.State):
   def __init__(self, game):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
+    self.hands = [] # List containing the hands for each player, represented as a list.
+    self._current_player = 0
+    self._current_bid = -1
 
   def current_player(self):
-    """Returns id of the next player to move, or TERMINAL if game is over."""
-    if self._game_over:
+    """Returns id of the current player to act.
+    
+    The id is:
+      - TERMINAL if game is over.
+      - CHANCE if a player is drawing a number to fill out their hand.
+      - a number otherwise.
+    """
+    if self._is_terminal:
       return pyspiel.PlayerId.TERMINAL
-    elif len(self.cards) < _NUM_PLAYERS:
+    elif len(self.hands) < _NUM_PLAYERS or len(self.hands[_NUM_PLAYERS - 1]) < _HAND_LENGTH:
       return pyspiel.PlayerId.CHANCE
     else:
-      return self._next_player
+      return self._current_player
+
+  def _is_call_possible(self):
+    raise NotImplementedError()
+
+  def _is_challenge_possible(self):
+    raise NotImplementedError()
 
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
     assert player >= 0
-    return [Action.PASS, Action.BET]
+    actions = []
+    # Any move higher than the current bid is allowed. (Bids start at 0)
+    for b in range(self._current_bid + 1, _HAND_LENGTH * _NUM_PLAYERS):
+      actions.append(b)
+    
+    if self._is_call_possible():
+      actions.append(Action.BID)
+    # TODO: verify Action.BID is not the same as the nubmer 0.
+    if self._is_challenge_possible():
+      actions.append(Action.CHALLENGE)
+    # TODO: add game logic for when all players challenge - automatically count
+    return actions
 
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
     assert self.is_chance_node()
-    outcomes = sorted(_DECK - set(self.cards))
-    p = 1.0 / len(outcomes)
-    return [(o, p) for o in outcomes]
+    probability = 1.0 / len(_DECK)
+    return [(digit, probability) for digit in _DECK]
 
   def _apply_action(self, action):
     """Applies the specified action to the state."""
