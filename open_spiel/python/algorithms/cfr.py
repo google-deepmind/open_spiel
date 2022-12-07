@@ -428,7 +428,7 @@ class _CFRSolverBase(object):
     self._seq_eq_bound = 0
     for _, info_state_node in self._info_state_nodes.items():
       # state_policy = current_policy.policy_for_key(info_state)
-      max_cfv_qvalue = max(info_state_node.avg_cfv_qvalues)
+      max_cfv_qvalue = max(info_state_node.avg_cfv_qvalues.values())
       self._seq_eq_bound += max(0,
           ((max_cfv_qvalue - info_state_node.avg_cfv_value) /
           info_state_node.beta))
