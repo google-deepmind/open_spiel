@@ -46,16 +46,16 @@ void SingleRankHandTest(){
 
 
   // The only hands that are greater than 999 are JJJ and KKK
-  SearchSingleRankActions(actions1, current_hand, /*prev_action=*/action_id1);
+  SearchSingleRankActions(&actions1, current_hand, /*prev_action=*/action_id1);
   SPIEL_CHECK_EQ(static_cast<int>(actions1.size()), 2);
 
   // No hands greater than BWJ
-  SearchSingleRankActions(actions2, current_hand, /*prev_action=*/action_id2);
+  SearchSingleRankActions(&actions2, current_hand, /*prev_action=*/action_id2);
   SPIEL_CHECK_EQ(static_cast<int>(actions2.size()), 0);
 
 
   // 6 solos + 4 pairs + 3 trios + 1 bomb = 14
-  SearchSingleRankActions(actions3, current_hand, /*prev_action=*/kInvalidAction);
+  SearchSingleRankActions(&actions3, current_hand, /*prev_action=*/kInvalidAction);
   SPIEL_CHECK_EQ(static_cast<int>(actions3.size()), 14);
 }
 
@@ -78,18 +78,18 @@ void ChainOnlyHandTest(){
 
 
   std::vector<Action> actions1, actions2, actions3;
-  SearchChainOnlyActions(actions1, current_hand, /*prev_action=*/action_id1);
+  SearchChainOnlyActions(&actions1, current_hand, /*prev_action=*/action_id1);
 
   // The only hands greater than 666777888 are 777888999 and 888999TTT
   SPIEL_CHECK_EQ(static_cast<int>(actions1.size()), 2);
 
-  SearchChainOnlyActions(actions2, current_hand, /*prev_action=*/action_id2);
+  SearchChainOnlyActions(&actions2, current_hand, /*prev_action=*/action_id2);
 
   // The only hands greater than 334455....TTJJ are 5566....QQKK and 6677.....KKAA
   SPIEL_CHECK_EQ(static_cast<int>(actions2.size()), 2);
 
 
-  SearchChainOnlyActions(actions3, current_hand, /*prev_action=*/kInvalidAction);
+  SearchChainOnlyActions(&actions3, current_hand, /*prev_action=*/kInvalidAction);
   SPIEL_CHECK_EQ(static_cast<int>(actions3.size()), 63);
 }
 
@@ -119,17 +119,17 @@ void SingleTrioCombHandTest(){
 
   // The hands that are greater than 333222 uses trios 666, 777, TTT, QQQ, 222
   // And we just enuemerate all possible pairs
-  SearchSingleTrioCombActions(actions1, current_hand, /*prev_action=*/action_id1);
+  SearchSingleTrioCombActions(&actions1, current_hand, /*prev_action=*/action_id1);
   SPIEL_CHECK_EQ(static_cast<int>(actions1.size()), 18);
 
 
 
-  SearchSingleTrioCombActions(actions2, current_hand, /*prev_action=*/action_id2);
+  SearchSingleTrioCombActions(&actions2, current_hand, /*prev_action=*/action_id2);
   SPIEL_CHECK_EQ(static_cast<int>(actions2.size()), 20);
 
 
 
-  SearchSingleTrioCombActions(actions3, current_hand, kInvalidAction);
+  SearchSingleTrioCombActions(&actions3, current_hand, kInvalidAction);
   SPIEL_CHECK_EQ(static_cast<int>(actions3.size()), 50);
 }
 
@@ -158,15 +158,15 @@ void AirplaneCombHandTest(){
   // 667899TTTJJJJQQQKKKAAA222(BWJ)(CJ)
   std::array<int, kNumRanks> current_hand = {0, 0, 0, 2, 1, 1, 2, 3, 4, 3, 3, 3, 3, 1, 1};
   std::vector<Action> actions1, actions2, actions3;
-  SearchAirplaneCombActions(actions1, current_hand, /*prev_action=*/action_id1);
+  SearchAirplaneCombActions(&actions1, current_hand, /*prev_action=*/action_id1);
   // C(7, 5) - C(5, 3) + 3*(C(6, 3) - C(4, 1)) + C(3, 2) * 5 + 2 + C(6, 2) - 1 = 90
   SPIEL_CHECK_EQ(static_cast<int>(actions1.size()), 90);
 
-  // The only hand that greater than TTTJJJQQQKKK-33445522 is JJJQQQKKKAAA-6699TT22
-  SearchAirplaneCombActions(actions2, current_hand, /*prev_action=*/action_id2);
+  // The only hand that is greater than TTTJJJQQQKKK-33445522 is JJJQQQKKKAAA-6699TT22
+  SearchAirplaneCombActions(&actions2, current_hand, /*prev_action=*/action_id2);
   SPIEL_CHECK_EQ(static_cast<int>(actions2.size()), 1);
 
-  SearchAirplaneCombActions(actions3, current_hand, /*prev_action=*/kInvalidAction);
+  SearchAirplaneCombActions(&actions3, current_hand, /*prev_action=*/kInvalidAction);
   SPIEL_CHECK_EQ(static_cast<int>(actions3.size()), 1052);
 }
 
