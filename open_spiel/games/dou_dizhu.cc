@@ -50,7 +50,7 @@ namespace open_spiel {
 DouDizhuGame::DouDizhuGame(const GameParameters& params): Game(kGameType, params){}
 
 DouDizhuState::DouDizhuState(std::shared_ptr<const Game> game): State(game){
-  for (int card = 0; card < kNumCards; ++card) dealer_deck_[card] = 1;
+  absl::c_fill(dealer_deck_, 1);
 }
 
 
@@ -65,9 +65,7 @@ std::string DouDizhuState::ActionToString(Player player, Action action) const{
     if(action >= kAirplaneWithSoloActionBase && action < kBombActionBase){
       return FormatAirplaneCombHand(action);
     }
-    std::array<int, kNumRanks> hand = ActionToHand(action);
-    std::string hand_format = FormatSingleHand(hand);
-    return hand_format;
+    return FormatSingleHand(ActionToHand(action));
   } else SpielFatalError("Non valid action ID!");
 }
 
@@ -205,25 +203,25 @@ void DouDizhuState::WriteObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  std::fill(values.begin(), values.end(), 0.0);
+  absl::c_fill(values, 0.);
   if (phase_ == Phase::kDeal) return;
-  auto ptr = values.begin();
-  int played_deck_base = (kNumRanks - 2) * (kNumSuits + 1) + 2 * 2;
+  auto values_iterator = values.begin();
+  const int played_deck_base = (kNumRanks - 2) * (kNumSuits + 1) + 2 * 2;
   for(int i = 0; i < kNumRanks; ++i){
-    ptr[i * (kNumSuits + 1) + holds_[player][i]] = 1;
-    ptr[played_deck_base + i * (kNumSuits + 1) + played_deck_[i]] = 1;
+    values_iterator[i * (kNumSuits + 1) + holds_[player][i]] = 1;
+    values_iterator[played_deck_base + i * (kNumSuits + 1) + played_deck_[i]] = 1;
   }
 
   if(dizhu_ != kInvalidPlayer){
-    int from_dizhu_base = 2 * played_deck_base;
-    int from_dizhu = (player-dizhu_+kNumPlayers) % kNumPlayers;
-    ptr[from_dizhu_base + from_dizhu] = 1;
+    const int from_dizhu_base = 2 * played_deck_base;
+    const int from_dizhu = (player-dizhu_+kNumPlayers) % kNumPlayers;
+    values_iterator[from_dizhu_base + from_dizhu] = 1;
   }
 
   if(first_player_ != kInvalidPlayer){
-    int start_player_base = 2 * played_deck_base + kNumPlayers;
-    ptr[start_player_base + first_player_] = 1;
-    ptr[start_player_base + kNumPlayers + card_rank_face_up_] = 1;
+    const int start_player_base = 2 * played_deck_base + kNumPlayers;
+    values_iterator[start_player_base + first_player_] = 1;
+    values_iterator[start_player_base + kNumPlayers + card_rank_face_up_] = 1;
   }
 }
 
@@ -259,9 +257,8 @@ std::vector<Action> DouDizhuState::DealLegalActions() const {
 
 
 std::vector<Action> DouDizhuState::BiddingLegalActions() const {
-  std::vector<Action> legal_actions;
+  std::vector<Action> legal_actions = {kPass};
   legal_actions.reserve(kNumBids + 1);
-  legal_actions.push_back(kPass);
 
   for (int bid = winning_bid_ + 1; bid <= kNumBids; ++bid) {
     legal_actions.push_back(kBiddingActionBase + bid);
@@ -281,7 +278,7 @@ std::vector<Action> DouDizhuState::PlayLegalActions() const {
 
 
   std::array<int, kNumRanks> hand = holds_[current_player_];
-  int prev_action = CurrentTrick().WinningAction();
+  const int prev_action = CurrentTrick().WinningAction();
   SearchForLegalActions(legal_actions, hand, prev_action);
 
 
@@ -291,8 +288,6 @@ std::vector<Action> DouDizhuState::PlayLegalActions() const {
 
 std::vector<std::pair<Action, double>> DouDizhuState::ChanceOutcomes() const {
   std::vector<std::pair<Action, double>> outcomes;
-  // int num_cards_remaining = kNumCards - history_.size() + 1;
-
   int num_cards_remaining = 0;
   for(int i = 0; i < kNumCards; ++i) num_cards_remaining += dealer_deck_[i];
   outcomes.reserve(num_cards_remaining);
@@ -330,14 +325,15 @@ void DouDizhuState::ApplyDealAction(int action) {
     return;
   }
 
-  int dealing_round = static_cast<int>(history_.size()) - 1;
+  const int dealing_round = static_cast<int>(history_.size()) - 1;
   // if the current player is dealt the face up card, make it the first one to bid
   if(dealing_round == history_[0].action){
     first_player_ = dealing_round % kNumPlayers;
     card_rank_face_up_ = CardToRank(action-kDealingActionBase);
   }
-  
-  holds_[((history_.size() - 1) % kNumPlayers)][CardToRank(action-kDealingActionBase)]++;
+  const int dealt_player_idx = ((history_.size() - 1) % kNumPlayers);
+  const int dealt_rank = CardToRank(action-kDealingActionBase);
+  holds_[dealt_player_idx][dealt_rank]++;
   dealer_deck_[action-kDealingActionBase]--;
   if (history_.size() == kNumCards - kNumCardsLeftOver) {
     phase_ = Phase::kAuction;
@@ -467,7 +463,7 @@ void DouDizhuState::ScoreUp() {
 
   int paying = winning_bid_;
   for(int i = 0; i < is_spring + bombs_played_; ++i) paying *= 2;
-  int dizhu_sign = (final_winner_ == dizhu_)? 1: -1;
+  const int dizhu_sign = (final_winner_ == dizhu_)? 1: -1;
 
   returns_[dizhu_] = dizhu_sign * 2 * paying;
   returns_[(dizhu_ + 1) % 3] = -dizhu_sign *paying;

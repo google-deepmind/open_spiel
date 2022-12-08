@@ -167,34 +167,34 @@ std::string FormatAirplaneCombHand(int action);
 
 SingleRankHandParams GetSingleRankHandParams(int action);
 std::array<int, kNumRanks> SingleRankHand(int action);
-int SingleRankHandToActionId(std::array<int, kNumRanks>& hand);
-void SearchSingleRankActions(std::vector<Action>& actions, std::array<int, kNumRanks>& hand, int prev_action);
+int SingleRankHandToActionId(const std::array<int, kNumRanks>& hand);
+void SearchSingleRankActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action);
 
 
 ChainOnlyHandParams GetChainOnlyHandParams(int action);
 std::array<int, kNumRanks> ChainOnlyHand(int action);
-int ChainOnlyHandToActionId(std::array<int, kNumRanks>& hand);
-void SearchChainOnlyActions(std::vector<Action>& actions, std::array<int, kNumRanks>& hand, int prev_action);
+int ChainOnlyHandToActionId(const std::array<int, kNumRanks>& hand);
+void SearchChainOnlyActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action);
 
 
 
 TrioCombParams GetSingleTrioCombParams(int action);
 std::array<int, kNumRanks> SingleTrioCombHand(int action);
-int SingleTrioCombHandToActionId(std::array<int, kNumRanks> hand);
-void SearchSingleTrioCombActions(std::vector<Action>& actions, std::array<int, kNumRanks>& hand, int prev_action);
+int SingleTrioCombHandToActionId(const std::array<int, kNumRanks>& hand);
+void SearchSingleTrioCombActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action);
 
 
 TrioCombParams GetAirplaneCombParams(int action);
 std::array<int, kNumRanks> AirplaneCombHand(int action);
-int AirplaneCombHandToActionId(std::array<int, kNumRanks> hand, 
+int AirplaneCombHandToActionId(const std::array<int, kNumRanks>& hand, 
         int chain_head, KickerType kicker_type);
-void SearchAirplaneCombActions(std::vector<Action>& actions, std::array<int, kNumRanks>& hand, int prev_action);
+void SearchAirplaneCombActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action);
 
 
 
 
 std::array<int, kNumRanks> ActionToHand(int action);
-void SearchForLegalActions(std::vector<Action>& legal_actions, std::array<int, kNumRanks>& hand, int prev_action);
+void SearchForLegalActions(std::vector<Action>& legal_actions, const std::array<int, kNumRanks>& hand, int prev_action);
 
 } // namespace dou_dizhu
 } //namespace open_spiel
