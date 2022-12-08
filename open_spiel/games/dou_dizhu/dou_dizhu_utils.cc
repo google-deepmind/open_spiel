@@ -141,7 +141,7 @@ int SingleRankHandToActionId(const std::array<int, kNumRanks>& hand){
 // given an arbitrary hand, search for possible single-rank hands
 // if prev_action = kInvalidAction, search for all possible such hands
 // otherwise, only search for those that are ranked higher than prev_action
-void SearchSingleRankActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
+void SearchSingleRankActions(std::vector<Action>* actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
   std::array<int, kNumRanks> used_hands{};
   SingleRankHandParams prev_action_params;
   int start_rank;
@@ -157,11 +157,11 @@ void SearchSingleRankActions(std::vector<Action>& actions, const std::array<int,
     if(prev_action == kInvalidAction){
       for(int i = 0; i < hand[rank]; ++i) {
         used_hands[rank]++;
-        actions.push_back(SingleRankHandToActionId(used_hands));
+        actions->push_back(SingleRankHandToActionId(used_hands));
       }
     } else if(hand[rank] >= prev_action_params.num_cards) {
         used_hands[rank] =  prev_action_params.num_cards;
-        actions.push_back(SingleRankHandToActionId(used_hands));
+        actions->push_back(SingleRankHandToActionId(used_hands));
       }
     used_hands[rank] = 0;
   }
@@ -279,7 +279,7 @@ int ChainOnlyHandToActionId(const std::array<int, kNumRanks>& hand){
 
 
 
-void SearchChainOnlyActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
+void SearchChainOnlyActions(std::vector<Action>* actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
   ChainOnlyHandParams prev_action_params;
 
   int start_rank;
@@ -310,7 +310,7 @@ void SearchChainOnlyActions(std::vector<Action>& actions, const std::array<int, 
         if(chain_length >= min_length){
           std::array<int, kNumRanks> used_rank{};
           for(int i = 0; i < chain_length; ++i) used_rank[chain_head+i] = n;
-          actions.push_back(ChainOnlyHandToActionId(used_rank));
+          actions->push_back(ChainOnlyHandToActionId(used_rank));
         }
       }
     }
@@ -565,7 +565,7 @@ int SingleTrioCombHandToActionId(const std::array<int, kNumRanks>& hand){
 
 
 
-void SearchSingleTrioCombActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
+void SearchSingleTrioCombActions(std::vector<Action>* actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
   TrioCombParams prev_action_params;
   int start_rank;
   if(prev_action == kInvalidAction) start_rank = 0;
@@ -590,7 +590,7 @@ void SearchSingleTrioCombActions(std::vector<Action>& actions, const std::array<
         std::array<int, kNumRanks> used_hand{};
         used_hand[rank] = 3;
         used_hand[kicker] = static_cast<int>(n);
-        actions.push_back(SingleTrioCombHandToActionId(used_hand));
+        actions->push_back(SingleTrioCombHandToActionId(used_hand));
       }
     }
   }
@@ -607,7 +607,7 @@ void SearchSingleTrioCombActions(std::vector<Action>& actions, const std::array<
 // and the result hand is stored in ans_hand reference
 bool dfs_airplane_kicker(int chain_length, int depth,
               int target_count, int& count, int max_search_rank,
-      absl::Span<int> used_rank, absl::Span<int> ans_hand, 
+      int* used_rank, int* ans_hand, 
       KickerType kicker_type){
     
   if(chain_length == depth){
@@ -638,7 +638,7 @@ bool dfs_airplane_kicker(int chain_length, int depth,
       used_rank[rank]+= kicker_type == kSolo? 1: 2;
       if(dfs_airplane_kicker(chain_length, depth+1, target_count, count, rank, used_rank, ans_hand, kicker_type))
         return true;
-      used_rank[rank]-= kicker_type == kSolo? 1: 2;
+      used_rank[rank] -= kicker_type == kSolo? 1: 2;
     }
   }
   return false;
@@ -655,8 +655,8 @@ std::array<int, kNumRanks> AirplaneCombHand(int action){
   const int kicker_steps = params.kicker_id;
   int count = 0;
   bool found = dfs_airplane_kicker(params.chain_length, 0, kicker_steps, 
-        count, kNumRanks-1, absl::Span<int>(used_rank.begin(), kNumRanks), 
-          absl::Span<int>(hand.begin(), kNumRanks), params.kicker_type);
+        count, kNumRanks-1, used_rank.begin(), 
+          hand.begin(), params.kicker_type);
   SPIEL_CHECK_TRUE(found);
   return hand;
 }
@@ -715,8 +715,7 @@ int AirplaneCombHandToActionId(const std::array<int, kNumRanks>& hand,
 
   std::array<int, kNumRanks> hand_copy(hand);
   bool found = dfs_airplane_kicker(chain_length, 0, -1, count, kNumRanks-1, 
-    absl::Span<int>(used_rank.begin(), kNumRanks), 
-    absl::Span<int>(hand_copy.begin(), kNumRanks), kicker_type);
+    used_rank.begin(), hand_copy.begin(), kicker_type);
   SPIEL_CHECK_TRUE(found);
   
   return action_base + count;
@@ -728,13 +727,13 @@ int AirplaneCombHandToActionId(const std::array<int, kNumRanks>& hand,
 // a dfs backtrack algorithm that found the action ids of all possible airplane combination
 // the action ids are stored in action_ids reference
 void dfs_add_all_airplane_kickers(int chain_head, int chain_length, int depth, int max_search_rank,
-      absl::Span<int> used_rank, absl::Span<const int> ans_hand, 
-      std::vector<Action>& action_ids, KickerType kicker_type){
+      int* used_rank, const int* ans_hand, 
+      std::vector<Action>* action_ids, KickerType kicker_type){
     
   if(chain_length == depth){
     std::array<int, kNumRanks> final_hand{};
     for(int i = 0; i < kNumRanks; ++i) final_hand[i] = used_rank[i];
-    action_ids.push_back(static_cast<Action>(AirplaneCombHandToActionId(final_hand, chain_head, kicker_type)));
+    action_ids->push_back(static_cast<Action>(AirplaneCombHandToActionId(final_hand, chain_head, kicker_type)));
   }else{
     for(int rank = 0; rank <= max_search_rank; ++rank){
       if(rank >= chain_head && rank <= chain_head + chain_length - 1) continue;
@@ -758,7 +757,7 @@ void dfs_add_all_airplane_kickers(int chain_head, int chain_length, int depth, i
   }
 }
 
-void SearchAirplaneCombActions(std::vector<Action>& actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
+void SearchAirplaneCombActions(std::vector<Action>* actions, const std::array<int, kNumRanks>& hand, int prev_action = kInvalidAction){
   TrioCombParams prev_action_params;
   int start_rank;
   if(prev_action == kInvalidAction) start_rank = 0;
@@ -784,8 +783,7 @@ void SearchAirplaneCombActions(std::vector<Action>& actions, const std::array<in
         std::array<int, kNumRanks> used_hand{};
         for(int i = 0; i < chain_length; ++i) used_hand[chain_head+i] = 3;
         dfs_add_all_airplane_kickers(chain_head, chain_length, 0, kNumRanks-1, 
-          absl::Span<int>(used_hand.begin(), kNumRanks), 
-          absl::Span<const int>(hand.begin(), kNumRanks), actions, kicker_type);
+          used_hand.begin(), hand.begin(), actions, kicker_type);
       }
     }
   }
@@ -815,8 +813,8 @@ std::array<int, kNumRanks> ActionToHand(int action){
 }
 
 
-void SearchForLegalActions(std::vector<Action>& legal_actions, const std::array<int, kNumRanks>& hand, int prev_action){
-  if(hand[kNumRanks - 2] && hand[kNumRanks - 1]) legal_actions.push_back(kRocketActionBase);
+void SearchForLegalActions(std::vector<Action>* legal_actions, const std::array<int, kNumRanks>& hand, int prev_action){
+  if(hand[kNumRanks - 2] && hand[kNumRanks - 1]) legal_actions->push_back(kRocketActionBase);
   if(prev_action == kInvalidAction){
     // search for all possible actions
     SearchSingleRankActions(legal_actions, hand, prev_action);
@@ -832,7 +830,7 @@ void SearchForLegalActions(std::vector<Action>& legal_actions, const std::array<
       if(hand[rank] == kNumSuits){
         std::array<int, kNumRanks> used_rank{};
         used_rank[rank] = kNumSuits;
-        legal_actions.push_back(SingleRankHandToActionId(used_rank));
+        legal_actions->push_back(SingleRankHandToActionId(used_rank));
       }
     }
 

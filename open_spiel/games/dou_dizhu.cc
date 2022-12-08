@@ -279,7 +279,7 @@ std::vector<Action> DouDizhuState::PlayLegalActions() const {
 
   std::array<int, kNumRanks> hand = holds_[current_player_];
   const int prev_action = CurrentTrick().WinningAction();
-  SearchForLegalActions(legal_actions, hand, prev_action);
+  SearchForLegalActions(&legal_actions, hand, prev_action);
 
 
   absl::c_sort(legal_actions);
