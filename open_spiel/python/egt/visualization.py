@@ -46,7 +46,7 @@ except ImportError as e:
                "and there is a workaround (run sudo apt install "
                "python-backports.functools-lru-cache. See: "
                "https://github.com/matplotlib/matplotlib/issues/9344.")
-  raise ImportError(str(e))
+  raise ImportError(str(e)) from e
 
 import numpy as np
 
