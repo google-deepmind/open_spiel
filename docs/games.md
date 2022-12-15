@@ -46,6 +46,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
 <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
+<font color="orange"><b>~</b></font>         | [Mensch ärgere Dich nicht](#mensch-aergere-dich-nicht)
 <font color="orange"><b>~</b></font>         | [Mancala](#mancala)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
@@ -484,6 +485,16 @@ Status                                       | Game
 *   Imperfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
+
+### Mensch Aergere Dich Nicht 
+
+*   Players roll dice to move their pegs toward their home row while throwing
+    other players' pegs to the out area.
+*   Traditional game.
+*   Non-deterministic.
+*   Perfect information.
+*   2-4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Mensch_%C3%A4rgere_Dich_nicht)
 
 ### Mancala
 
