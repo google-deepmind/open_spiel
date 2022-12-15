@@ -1,6 +1,5 @@
 FROM ubuntu:20.04 as base
 RUN apt update
-RUN dpkg --add-architecture i386 && apt update
 RUN apt-get -y install \
     clang \
     curl \
