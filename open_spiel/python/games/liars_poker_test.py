@@ -109,14 +109,14 @@ class LiarsPokerTest(absltest.TestCase):
       self.assertGreater(next_action, action)
 
   def _verify_returns(self, game, state):
-    self.assertTrue(state.winner != -1 or state.loser != -1)
+    self.assertTrue(state._winner != -1 or state._loser != -1)
     actual_returns = state.returns()
-    if state.winner != -1:
+    if state._winner != -1:
       expected_returns = [-1.0 for _ in range(game.num_players)]
-      expected_returns[state.winner] = game.num_players - 1
+      expected_returns[state._winner] = game.num_players - 1
     else:
       expected_returns = [1.0 for _ in range(game.num_players)]
-      expected_returns[state.loser] = -1.0 * (game.num_players - 1)
+      expected_returns[state._loser] = -1.0 * (game.num_players - 1)
     self.assertEqual(actual_returns, expected_returns)
 
   def test_single_round(self):

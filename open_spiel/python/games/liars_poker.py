@@ -111,8 +111,8 @@ class LiarsPokerState(pyspiel.State):
 
     # Game over dynamics
     self._game_over = False
-    self.winner = -1
-    self.loser = -1
+    self._winner = -1
+    self._loser = -1
 
   def current_player(self):
     """Returns id of the current player to act.
@@ -196,9 +196,9 @@ class LiarsPokerState(pyspiel.State):
     # If the number of matches are at least the bid_count bid, then the bidder wins.
     # Otherwise everyone else wins.
     if matches >= bid_count:
-      self.winner = self._bid_originator
+      self._winner = self._bid_originator
     else:
-      self.loser = self._bid_originator
+      self._loser = self._bid_originator
 
   def _update_bid_history(self, bid, player):
     """Writes a player's bid into memory."""
@@ -253,10 +253,10 @@ class LiarsPokerState(pyspiel.State):
 
   def returns(self):
     """Total reward for each player over the course of the game so far."""
-    if self.winner != -1:
+    if self._winner != -1:
       bidder_reward = self._num_players - 1
       others_reward = -1.0
-    elif self.loser != -1:
+    elif self._loser != -1:
       bidder_reward = -1 * (self._num_players - 1)
       others_reward = 1.0
     else:
