@@ -74,7 +74,7 @@ class TrainInput(collections.namedtuple(
     observation, legals_mask, policy, value = zip(*train_inputs)
     return TrainInput(
         np.array(observation, dtype=np.float32),
-        np.array(legals_mask, dtype=np.bool),
+        np.array(legals_mask, dtype=bool),
         np.array(policy),
         np.expand_dims(value, 1))
 
@@ -328,7 +328,7 @@ class Model(object):
     return self._session.run(
         [self._value_out, self._policy_softmax],
         feed_dict={self._input: np.array(observation, dtype=np.float32),
-                   self._legals_mask: np.array(legals_mask, dtype=np.bool),
+                   self._legals_mask: np.array(legals_mask, dtype=bool),
                    self._training: False})
 
   def update(self, train_inputs: Sequence[TrainInput]):

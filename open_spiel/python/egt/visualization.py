@@ -206,8 +206,8 @@ class SimplexStreamMask(object):
   """
 
   def __init__(self, density=1.):
-    self._n = np.int(30. * density)
-    self._mask = np.zeros([self._n + 1] * 2 + [2], dtype=np.bool)
+    self._n = int(30. * density)
+    self._mask = np.zeros([self._n + 1] * 2 + [2], dtype=bool)
     self.shape = self._mask.shape
 
   def index(self, point):
@@ -561,7 +561,7 @@ class Dynamics3x3Axes(axes.Axes):
 
     if linewidth == "velocity" or color == "velocity":
       vel_max = 0
-      vel_min = np.float("inf")
+      vel_min = float("inf")
       velocities = []
       for t in trajectories:
         dx = np.apply_along_axis(dynamics, 1, t)

@@ -253,7 +253,7 @@ def main(_):
                  ax_labels=["Episodes", "% optimal actions"])
 
     plot_confusion_matrix(
-        converge_point.astype(np.int), title="Final policy (DQN)")
+        converge_point.astype(int), title="Final policy (DQN)")
 
     plt.show()
 
