@@ -26,7 +26,8 @@ class Action(enum.IntEnum):
   BID = 0
   CHALLENGE = 1
 
-_NUM_PLAYERS = 2
+_MAX_NUM_PLAYERS = 10
+_MIN_NUM_PLAYERS = 2
 _HAND_LENGTH = 3
 _NUM_DIGITS = 3 # Number of digits to include from the range 1, 2, ..., 9, 0
 _FULL_DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
@@ -39,28 +40,33 @@ _GAME_TYPE = pyspiel.GameType(
     information=pyspiel.GameType.Information.IMPERFECT_INFORMATION,
     utility=pyspiel.GameType.Utility.ZERO_SUM,
     reward_model=pyspiel.GameType.RewardModel.TERMINAL,
-    max_num_players=_NUM_PLAYERS,
-    min_num_players=_NUM_PLAYERS,
+    max_num_players=_MAX_NUM_PLAYERS,
+    min_num_players=_MIN_NUM_PLAYERS,
     provides_information_state_string=True,
     provides_information_state_tensor=True,
     provides_observation_string=False,
-    provides_observation_tensor=True,
-    parameter_specification={
-      "num_players": _NUM_PLAYERS,
-      "hand_length": _HAND_LENGTH,
-      "num_digits": _NUM_DIGITS,
-    })
+    provides_observation_tensor=True)
 _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=len(Action),
     max_chance_outcomes=_HAND_LENGTH * _NUM_DIGITS,
-    num_players=_NUM_PLAYERS)
+    num_players=_MIN_NUM_PLAYERS,
+    min_utility=-(_MIN_NUM_PLAYERS - 1), # Reward from being challenged and losing.
+    max_utility=_MIN_NUM_PLAYERS - 1, # Reward for being challenged and winning.
+    utility_sum=0.0,
+    # Number of possible rounds: hand_length * num_digits * num_players
+    # Total moves per round: num_players for non-rebid, num_players-1 for rebid
+    # Max game length: number of possible rounds * total moves per round
+    max_game_length=_HAND_LENGTH * _NUM_DIGITS * _MIN_NUM_PLAYERS**2)
 
 class LiarsPoker(pyspiel.Game):
   """A Python version of Liar's poker."""
 
   def __init__(self, params=None):
     super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
-    self.deck = [_FULL_DECK[i] for i in range(_NUM_DIGITS)]
+    self.deck = [_FULL_DECK[i] for i in range(params.get("num_digits", default=_NUM_DIGITS))]
+    self.num_players = params.get("num_players", default=_MIN_NUM_PLAYERS)
+    self.hand_length = params.get("hand_length", default=_HAND_LENGTH)
+    self.num_digits = params.get("num_digits", default=_NUM_DIGITS)
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
@@ -70,9 +76,10 @@ class LiarsPoker(pyspiel.Game):
     """Returns an object used for observing game state."""
     return LiarsPokerObserver(
       iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False),
-      _NUM_PLAYERS,
-      _HAND_LENGTH,
-      _NUM_DIGITS)
+      self.num_players,
+      self.hand_length,
+      self.num_digits,
+      params)
 
 
 class LiarsPokerState(pyspiel.State):
@@ -82,7 +89,6 @@ class LiarsPokerState(pyspiel.State):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
     # Game attributes
-    # TODO: need to verify have access to these game attributes.
     self._num_players = game.num_players
     self._hand_length = game.hand_length
     self._num_digits = game.num_digits
@@ -90,12 +96,14 @@ class LiarsPokerState(pyspiel.State):
     self.hands = [[] for _ in range(self._num_players)]
 
     # Action dynamics
-    self.actions = [[] for _ in range(self._num_players)]
+    total_possible_bets = game.hand_length * game.num_digits * game.num_players
+    self.bid_history = np.zeros((total_possible_bets, game.num_players))
+    self.challenge_history = np.zeros((total_possible_bets, game.num_players))
     self._current_player = 0
     self._bid_originator = 0
     self._current_bid = -1
     self._num_challenges = 0
-    self._is_rebid = False
+    self.is_rebid = False
 
     # Game over dynamics
     self._game_over = False
@@ -118,22 +126,26 @@ class LiarsPokerState(pyspiel.State):
       return self._current_player
 
   def _is_challenge_possible(self):
+    """A challenge is possible once the first bid is made."""
     return self._current_bid != -1
 
   def _is_rebid_possible(self):
-    return self._num_challenges == self._num_players - 1
+    """A rebid is only possible when all players have challenged the original bid."""
+    return not self.is_rebid and self._num_challenges == self._num_players - 1
 
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
     assert player >= 0
     actions = []
-    # Any move higher than the current bid is allowed. (Bids start at 0)
-    for b in range(self._current_bid + 1, self._num_digits * self._hand_length * self._num_players):
-      actions.append(b)
+
+    if player != self._bid_originator or self._is_rebid_possible():
+      # Any move higher than the current bid is allowed. (Bids start at 0)
+      for b in range(self._current_bid + 1, self._hand_length * self._num_digits * self._num_players):
+        actions.append(b)
     
     if self._is_challenge_possible():
       actions.append(Action.CHALLENGE)
-    # TODO: add game logic for when all players challenge - automatically count
+
     return actions
 
   def chance_outcomes(self):
@@ -144,7 +156,7 @@ class LiarsPokerState(pyspiel.State):
 
   def _decode_bid(self, bid):
     """
-    Turns a bid ID in the range 0 to NUM_DIGITS * HAND_LENGTH * NUM_PLAYERS to a count and number.
+    Turns a bid ID in the range 0 to HAND_LENGTH * NUM_DIGITS * NUM_PLAYERS to a count and number.
 
     For example, take 2 players each with 2 numbers from the deck of 1, 2, and 3.
       - A bid of two 1's would correspond to a bid id 1.
@@ -178,8 +190,16 @@ class LiarsPokerState(pyspiel.State):
     else:
       self._loser = self._bid_originator
 
+  def _update_bid_history(self, bid, player):
+    """Writes a player's bid into memory."""
+    self.bid_history[bid][player] = 1
+
+  def _update_challenge_history(self, bid, player):
+    """Write a player's challenge for a bid into memory."""
+    self.challenge_history[bid][player] = 1
+
   def _apply_action(self, action):
-    """Applies the specified action to the state."""
+    """Applies an action and updates the state."""
     if self.is_chance_node():
       # If we are still populating hands, draw a number for the current player.
       self.hands[self._current_player].append(action)
@@ -187,21 +207,27 @@ class LiarsPokerState(pyspiel.State):
     elif action == Action.CHALLENGE:
       self.actions[self._current_player].append(action)
       assert self._is_challenge_possible()
+      self._update_challenge_history(self._current_bid, self._current_player)
       self._num_challenges += 1
       # If there is no ongoing rebid, check if all players challenge before counting.
       # If there is an ongoing rebid, count once all the players except the bidder challenges.
-      if (not self._is_rebid and self._num_challenges == self._num_players) or (
-        self._is_rebid and self._num_challenges == self._num_players - 1):
+      if (not self.is_rebid and self._num_challenges == self._num_players) or (
+        self.is_rebid and self._num_challenges == self._num_players - 1):
         self._counts()
         self._game_over = True
     else:
       self.actions[self._current_player].append(action)
-      # Set the current bid and bid originator to the action and current player.
+      # Set the current bid to the action.
       self._current_bid = action
+      if self._current_player == self._bid_originator:
+        # If the bid originator is bidding again, we have a rebid.
+        self.is_rebid = True
+      else:
+         # Otherwise, we have a regular bid.
+         self.is_rebid = False
+      # Set the bid originator to the current player.
       self._bid_originator = self._current_player
-      # If all players but the bid originator have chllenged but the originator bids again, we have a rebid.
-      if self._num_challenges == self._num_players - 1:
-        self._is_rebid = True
+      self._update_bid_history(self._current_bid, self._current_player)
       self._num_challenges = 0
     self._current_player = (self._current_player + 1) % self._num_players
 
@@ -222,28 +248,42 @@ class LiarsPokerState(pyspiel.State):
     """Total reward for each player over the course of the game so far."""
     if self._winner != -1:
       bidder_reward = self._num_players - 1
-      others_reward = -1.
+      others_reward = -1.0
+    elif self._loser != -1:
+      bidder_reward = -1 * (self._num_players - 1)
+      others_reward = 1.0
     else:
-      bidder_reward = - self._num_players - 1
-      others_reward = 1.
+      # Game is not over.
+      bidder_reward = 0.0
+      others_reward = 0.0
     return [others_reward if player_id != self._bid_originator else bidder_reward
       for player_id in range(self._num_players)]
 
   def __str__(self):
-    # TODO
     """String for debug purposes. No particular semantics are required."""
     return "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {}, Rebid: {}".format(
       self.hands,
       self._bid_originator,
       self.current_player(),
       self._current_bid,
-      self._is_rebid)
+      self.is_rebid)
 
 
 class LiarsPokerObserver:
-  """Observer, conforming to the PyObserver interface (see observation.py)."""
+  """Observer, conforming to the PyObserver interface (see observation.py).
+  
+    An observation will consist of the following:
+      - One hot encoding of the current player number: [0 0 0 1 0 0 0]
+      - A vector of length hand_length containing the digits in a player's hand.
+      - Two matrices each of size (hand_length * num_digits * num_players, num_players)
+        will store bids and challenges respectively. Each row in the matrix corresponds
+        to a particular bid (e.g. one 1, two 5s, or eight 3s). 0 will represent no
+        action. 1 will represent a player's bid or a player's challenge.
+      - One bit for whether we are rebidding: [1] rebid occuring, [0] otherwise
+      - One bit for whether we are counting: [1] COUNTS called, [0] otherwise
+  """
 
-  def __init__(self, iig_obs_type, num_players, hand_length, num_digits):
+  def __init__(self, iig_obs_type, num_players, hand_length, num_digits, params=None):
     """Initiliazes an empty observation tensor."""
     self.num_players = num_players
     self.hand_length = hand_length
@@ -253,16 +293,20 @@ class LiarsPokerObserver:
     # Pieces are described by their (name, number of elements, and shape).
     pieces = [("player", num_players, (num_players,))] # One-hot encoding for the player id.
     if iig_obs_type.private_info == pyspiel.PrivateInfoType.SINGLE_PLAYER:
-      # One-hot encoding for each digit in a player's hand
-      pieces.append(("private_hand", hand_length * num_digits, (hand_length, num_digits)))
+      # Vector containing the digits in a player's hand
+      pieces.append(("private_hand", hand_length, (hand_length,)))
     if iig_obs_type.public_info:
+      pieces.append(("rebid_state", 1, (1,)))
+      pieces.append(("counts_state", 1, (1,)))
       if iig_obs_type.perfect_recall:
-        # One-hot encoding for a player's moves at every round.
-        total_possible_rounds = num_players * hand_length * num_digits
-        num_actions = 2
-        pieces.append(("action_history",
-                       total_possible_rounds * num_actions,
-                       (total_possible_rounds, num_actions)))
+        # One-hot encodings for players' moves at every round.
+        total_possible_rounds = hand_length * num_digits * num_players
+        pieces.append(("bid_history",
+                       total_possible_rounds * num_players,
+                       (total_possible_rounds, num_players)))
+        pieces.append(("challenge_history",
+                       total_possible_rounds * num_players,
+                       (total_possible_rounds, num_players)))
 
     # Build the single flat tensor.
     total_size = sum(size for name, size, shape in pieces)
@@ -281,11 +325,15 @@ class LiarsPokerObserver:
     if "player" in self.dict:
       self.dict["player"][player] = 1
     if "private_hand" in self.dict and len(state.hands[player]) == self.hand_length:
-      for i in range(len(state.hands[player])):
-        self.dict["private_hand"][i][state.hands[player][i]] = 1
-    if "action_history" in self.dict:
-      for round, action in enumerate(state.actions[player]):
-        self.dict["action_history"][round, action] = 1
+      self.dict["private_hand"] = self.hands[player]
+    if "rebid_state" in self.dict:
+      self.dict["rebid_state"] = state.is_rebid
+    if "counts_state" in self.dict:
+      self.dict["counts_state"] = state.is_terminal()
+    if "bid_history" in self.dict:
+      self.dict["bid_history"] = state.bid_history
+    if "challenge_history" in self.dict:
+      self.dict["challenge_history"] = state.challenge_history
 
   def string_from(self, state, player):
     """Observation of `state` from the PoV of `player`, as a string."""
@@ -294,9 +342,18 @@ class LiarsPokerObserver:
       pieces.append(f"p{player}")
     if "private_hand" in self.dict and len(state.hands[player]) == self.hand_length:
       pieces.append(f"hand:{state.hands[player]}")
-    if "action_history" in self.dict and state.actions[player]:
-      # bc = bid, challenge. b is 0 or 1 and indexes into "bc" to stringify the action.
-      pieces.append("".join("bc"[b] for b in state.actions[player]))
+    if "rebid_state" in self.dict:
+      pieces.append(f"rebid:{state.is_rebid}")
+    if "counts_state" in self.dict:
+      pieces.append(f"rebid:{state.is_terminal()}")
+    if "bid_history" in self.dict:
+      for bid in range(len(state.bid_history)):
+        if np.any(state.bid_history[bid] == 1):
+          pieces.append("b:{}.".format(bid))
+    if "challenge_history" in self.dict:
+      for bid in range(len(state.challenge_history)):
+        if np.any(state.challenge_history[bid] == 1):
+          pieces.append("c:{}.".format(bid))
     return " ".join(str(p) for p in pieces)
 
 # Register the game with the OpenSpiel library
