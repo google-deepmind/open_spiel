@@ -15,8 +15,6 @@
 # Lint as python3
 """Tests for Python Liar's Poker."""
 
-import difflib
-import os
 import pickle
 
 from absl.testing import absltest
@@ -25,9 +23,6 @@ from open_spiel.python.algorithms.get_all_states import get_all_states
 from open_spiel.python.games import liars_poker
 from open_spiel.python.observation import make_observation
 import pyspiel
-
-# TODO: remove?
-_DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 
 class LiarsPokerTest(absltest.TestCase):
