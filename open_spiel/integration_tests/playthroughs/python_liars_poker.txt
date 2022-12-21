@@ -1,14 +1,14 @@
-game: liars_poker
+game: python_liars_poker
 
-GameType.chance_mode = ChanceMode.DETERMINISTIC
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
 GameType.dynamics = Dynamics.SEQUENTIAL
-GameType.information = Information.PERFECT_INFORMATION
+GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Python Liars Poker"
-GameType.max_num_players = 2
+GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = []
+GameType.parameter_specification = ["hand_length", "num_digits", "players"]
 GameType.provides_information_state_string = True
-GameType.provides_information_state_tensor = True 
+GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = False
@@ -16,225 +16,805 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "python_liars_poker"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 9
-PolicyTensorShape() = [9]
-MaxChanceOutcomes() = 0
-GetParameters() = {}
+NumDistinctActions() = 20
+PolicyTensorShape() = [20]
+MaxChanceOutcomes() = 9
+GetParameters() = {hand_length=3,num_digits=3,players=2}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-ObservationTensorShape() = [3, 3, 3]
+InformationStateTensorShape() = player: [2], private_hand: [3], rebid_state: [1], counts_state: [1], bid_history: [18, 2], challenge_history: [18, 2]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 79
+ObservationTensorShape() = player: [2], private_hand: [3], rebid_state: [1], counts_state: [1]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 27
-MaxGameLength() = 9
-ToString() = "liars_poker()"
+ObservationTensorSize() = 7
+MaxGameLength() = 36
+ToString() = "python_liars_poker(hand_length=3,num_digits=3,players=2)"
 
 # State 0
-# ...
-# ...
-# ...
+# Hands: [[], []], Bidder: -1, Current Player: PlayerId.CHANCE, Current Bid: None of None, Rebid: False
 IsTerminal() = False
 History() = []
 HistoryString() = ""
-IsChanceNode() = False
+IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = ""
-InformationStateString(1) = ""
-ObservationString(0) = "...\n...\n..."
-ObservationString(1) = "...\n...\n..."
-ObservationTensor(0):
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◉  ◯◯◯  ◯◯◯
-ObservationTensor(1):
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◉  ◯◯◯  ◯◯◯
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,0)", "x(1,1)", "x(1,2)", "x(2,0)", "x(2,1)", "x(2,2)"]
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = "p0 rebid:[0] counts:[0]"
+InformationStateString(1) = "p1 rebid:[0] counts:[0]"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand: ◯◯◯
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◯
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand: ◯◯◯
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◯
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+ObservationString(0) = "p0 rebid:[0] counts:[0]"
+ObservationString(1) = "p1 rebid:[0] counts:[0]"
+PublicObservationString() = "p0 rebid:[0] counts:[0]"
+PrivateObservationString(0) = "p0"
+PrivateObservationString(1) = "p1"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand: ◯◯◯
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand: ◯◯◯
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◯
+ChanceOutcomes() = [(1, 0.3333333333333333), (2, 0.3333333333333333), (3, 0.3333333333333333)]
+LegalActions() = [1, 2, 3]
+StringLegalActions() = ["Deal:1", "Deal:2", "Deal:3"]
 
-# Apply action "x(2,2)"
-action: 8
+# Apply action "Deal:1"
+action: 1
 
 # State 1
-# ...
-# ...
-# ..x
+# Hands: [[1], []], Bidder: -1, Current Player: PlayerId.CHANCE, Current Bid: None of None, Rebid: False
 IsTerminal() = False
-History() = [8]
-HistoryString() = "8"
-IsChanceNode() = False
+History() = [1]
+HistoryString() = "1"
+IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "8"
-InformationStateString(1) = "8"
-ObservationString(0) = "...\n...\n..x"
-ObservationString(1) = "...\n...\n..x"
-ObservationTensor(0):
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◯  ◯◯◯  ◯◯◉
-ObservationTensor(1):
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◉  ◯◯◯  ◯◯◯
-◉◉◯  ◯◯◯  ◯◯◉
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7]
-StringLegalActions() = ["o(0,0)", "o(0,1)", "o(0,2)", "o(1,0)", "o(1,1)", "o(1,2)", "o(2,0)", "o(2,1)"]
+CurrentPlayer() = PlayerId.CHANCE
+InformationStateString(0) = "p0 rebid:[0] counts:[0]"
+InformationStateString(1) = "p1 rebid:[0] counts:[0]"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand: ◯◯◯
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◯
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand: ◯◯◯
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◯
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+ObservationString(0) = "p0 rebid:[0] counts:[0]"
+ObservationString(1) = "p1 rebid:[0] counts:[0]"
+PublicObservationString() = "p0 rebid:[0] counts:[0]"
+PrivateObservationString(0) = "p0"
+PrivateObservationString(1) = "p1"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand: ◯◯◯
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand: ◯◯◯
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◯
+ChanceOutcomes() = [(1, 0.3333333333333333), (2, 0.3333333333333333), (3, 0.3333333333333333)]
+LegalActions() = [1, 2, 3]
+StringLegalActions() = ["Deal:1", "Deal:2", "Deal:3"]
 
-# Apply action "o(1,0)"
+# Apply action "Deal:3"
 action: 3
 
 # State 2
-# ...
-# o..
-# ..x
-IsTerminal() = False
-History() = [8, 3]
-HistoryString() = "8, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "8, 3"
-InformationStateString(1) = "8, 3"
-ObservationString(0) = "...\no..\n..x"
-ObservationString(1) = "...\no..\n..x"
-ObservationTensor(0):
-◉◉◉  ◯◯◯  ◯◯◯
-◯◉◉  ◉◯◯  ◯◯◯
-◉◉◯  ◯◯◯  ◯◯◉
-ObservationTensor(1):
-◉◉◉  ◯◯◯  ◯◯◯
-◯◉◉  ◉◯◯  ◯◯◯
-◉◉◯  ◯◯◯  ◯◯◉
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [0, 1, 2, 4, 5, 6, 7]
-StringLegalActions() = ["x(0,0)", "x(0,1)", "x(0,2)", "x(1,1)", "x(1,2)", "x(2,0)", "x(2,1)"]
-
-# Apply action "x(2,0)"
-action: 6
+# Apply action "Deal:1"
+action: 1
 
 # State 3
-# ...
-# o..
-# x.x
-IsTerminal() = False
-History() = [8, 3, 6]
-HistoryString() = "8, 3, 6"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "8, 3, 6"
-InformationStateString(1) = "8, 3, 6"
-ObservationString(0) = "...\no..\nx.x"
-ObservationString(1) = "...\no..\nx.x"
-ObservationTensor(0):
-◉◉◉  ◯◯◯  ◯◯◯
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-ObservationTensor(1):
-◉◉◉  ◯◯◯  ◯◯◯
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [0, 1, 2, 4, 5, 7]
-StringLegalActions() = ["o(0,0)", "o(0,1)", "o(0,2)", "o(1,1)", "o(1,2)", "o(2,1)"]
-
-# Apply action "o(0,0)"
-action: 0
+# Apply action "Deal:3"
+action: 3
 
 # State 4
-# o..
-# o..
-# x.x
-IsTerminal() = False
-History() = [8, 3, 6, 0]
-HistoryString() = "8, 3, 6, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "8, 3, 6, 0"
-InformationStateString(1) = "8, 3, 6, 0"
-ObservationString(0) = "o..\no..\nx.x"
-ObservationString(1) = "o..\no..\nx.x"
-ObservationTensor(0):
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-ObservationTensor(1):
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [1, 2, 4, 5, 7]
-StringLegalActions() = ["x(0,1)", "x(0,2)", "x(1,1)", "x(1,2)", "x(2,1)"]
-
-# Apply action "x(0,2)"
+# Apply action "Deal:2"
 action: 2
 
 # State 5
-# o.x
-# o..
-# x.x
+# Apply action "Deal:3"
+action: 3
+
+# State 6
+# Hands: [[1, 1, 2], [3, 3, 3]], Bidder: -1, Current Player: 0, Current Bid: None of None, Rebid: False
 IsTerminal() = False
-History() = [8, 3, 6, 0, 2]
-HistoryString() = "8, 3, 6, 0, 2"
+History() = [1, 3, 1, 3, 2, 3]
+HistoryString() = "1, 3, 1, 3, 2, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0]"
+InformationStateString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0]"
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand = [1, 1, 2]
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◯
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand = [3, 3, 3]
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◯
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+ObservationString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0]"
+ObservationString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0]"
+PublicObservationString() = "p0 rebid:[0] counts:[0]"
+PrivateObservationString(0) = "p0 hand:[1, 1, 2]"
+PrivateObservationString(1) = "p1 hand:[3, 3, 3]"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand = [1, 1, 2]
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand = [3, 3, 3]
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+StringLegalActions() = ["Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet", "Bet"]
+
+# Apply action "Bet"
+action: 15
+
+# State 7
+# Hands: [[1, 1, 2], [3, 3, 3]], Bidder: 0, Current Player: 1, Current Bid: 1 of 3, Rebid: False
+IsTerminal() = False
+History() = [1, 3, 1, 3, 2, 3, 15]
+HistoryString() = "1, 3, 1, 3, 2, 3, 15"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-InformationStateString(0) = "8, 3, 6, 0, 2"
-InformationStateString(1) = "8, 3, 6, 0, 2"
-ObservationString(0) = "o.x\no..\nx.x"
-ObservationString(1) = "o.x\no..\nx.x"
-ObservationTensor(0):
-◯◉◯  ◉◯◯  ◯◯◉
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
-ObservationTensor(1):
-◯◉◯  ◉◯◯  ◯◯◉
-◯◉◉  ◉◯◯  ◯◯◯
-◯◉◯  ◯◯◯  ◉◯◉
+InformationStateString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0] b:13."
+InformationStateString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0] b:13."
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand = [1, 1, 2]
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◯
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand = [3, 3, 3]
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◯
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+ObservationString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0]"
+ObservationString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0]"
+PublicObservationString() = "p0 rebid:[0] counts:[0]"
+PrivateObservationString(0) = "p0 hand:[1, 1, 2]"
+PrivateObservationString(1) = "p1 hand:[3, 3, 3]"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand = [1, 1, 2]
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand = [3, 3, 3]
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [1, 4, 5, 7]
-StringLegalActions() = ["o(0,1)", "o(1,1)", "o(1,2)", "o(2,1)"]
+LegalActions() = [1, 16, 17, 18, 19]
+StringLegalActions() = ["Challenge", "Bet", "Bet", "Bet", "Bet"]
 
-# Apply action "o(0,1)"
-action: 1
+# Apply action "Bet"
+action: 19
 
-# State 6
-# Apply action "x(1,2)"
-action: 5
-
-# State 7
-# oox
-# o.x
-# x.x
-IsTerminal() = True
-History() = [8, 3, 6, 0, 2, 1, 5]
-HistoryString() = "8, 3, 6, 0, 2, 1, 5"
+# State 8
+# Hands: [[1, 1, 2], [3, 3, 3]], Bidder: 1, Current Player: 0, Current Bid: 5 of 3, Rebid: False
+IsTerminal() = False
+History() = [1, 3, 1, 3, 2, 3, 15, 19]
+HistoryString() = "1, 3, 1, 3, 2, 3, 15, 19"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = -4
-InformationStateString(0) = "8, 3, 6, 0, 2, 1, 5"
-InformationStateString(1) = "8, 3, 6, 0, 2, 1, 5"
-ObservationString(0) = "oox\no.x\nx.x"
-ObservationString(1) = "oox\no.x\nx.x"
-ObservationTensor(0):
-◯◯◯  ◉◉◯  ◯◯◉
-◯◉◯  ◉◯◯  ◯◯◉
-◯◉◯  ◯◯◯  ◉◯◉
-ObservationTensor(1):
-◯◯◯  ◉◉◯  ◯◯◉
-◯◉◯  ◉◯◯  ◯◯◉
-◯◉◯  ◯◯◯  ◉◯◉
+CurrentPlayer() = 0
+InformationStateString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0] b:13. b:17."
+InformationStateString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0] b:13. b:17."
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand = [1, 1, 2]
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◯
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◉
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand = [3, 3, 3]
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◯
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◉
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+ObservationString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0]"
+ObservationString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0]"
+PublicObservationString() = "p0 rebid:[0] counts:[0]"
+PrivateObservationString(0) = "p0 hand:[1, 1, 2]"
+PrivateObservationString(1) = "p1 hand:[3, 3, 3]"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand = [1, 1, 2]
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand = [3, 3, 3]
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1]
+StringLegalActions() = ["Challenge"]
+
+# Apply action "Challenge"
+action: 1
+
+# State 9
+# Hands: [[1, 1, 2], [3, 3, 3]], Bidder: 1, Current Player: 1, Current Bid: 5 of 3, Rebid: False
+IsTerminal() = False
+History() = [1, 3, 1, 3, 2, 3, 15, 19, 1]
+HistoryString() = "1, 3, 1, 3, 2, 3, 15, 19, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0] b:13. b:17. c:17."
+InformationStateString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0] b:13. b:17. c:17."
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand = [1, 1, 2]
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◯
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◉
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◉◯
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand = [3, 3, 3]
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◯
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◉
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◉◯
+ObservationString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[0]"
+ObservationString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[0]"
+PublicObservationString() = "p0 rebid:[0] counts:[0]"
+PrivateObservationString(0) = "p0 hand:[1, 1, 2]"
+PrivateObservationString(1) = "p1 hand:[3, 3, 3]"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand = [1, 1, 2]
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◯
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand = [3, 3, 3]
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◯
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1]
+StringLegalActions() = ["Challenge"]
+
+# Apply action "Challenge"
+action: 1
+
+# State 10
+# Hands: [[1, 1, 2], [3, 3, 3]], Bidder: 1, Current Player: PlayerId.TERMINAL, Current Bid: 5 of 3, Rebid: False
+IsTerminal() = True
+History() = [1, 3, 1, 3, 2, 3, 15, 19, 1, 1]
+HistoryString() = "1, 3, 1, 3, 2, 3, 15, 19, 1, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = PlayerId.TERMINAL
+InformationStateString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[1] b:13. b:17. c:17."
+InformationStateString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[1] b:13. b:17. c:17."
+InformationStateTensor(0).player: ◉◯
+InformationStateTensor(0).private_hand = [1, 1, 2]
+InformationStateTensor(0).rebid_state: ◯
+InformationStateTensor(0).counts_state: ◉
+InformationStateTensor(0).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◉
+InformationStateTensor(0).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◉◉
+InformationStateTensor(1).player: ◯◉
+InformationStateTensor(1).private_hand = [3, 3, 3]
+InformationStateTensor(1).rebid_state: ◯
+InformationStateTensor(1).counts_state: ◉
+InformationStateTensor(1).bid_history: ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◉◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◯
+                                       ◯◉
+InformationStateTensor(1).challenge_history: ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◯◯
+                                             ◉◉
+ObservationString(0) = "p0 hand:[1, 1, 2] rebid:[0] counts:[1]"
+ObservationString(1) = "p1 hand:[3, 3, 3] rebid:[0] counts:[1]"
+PublicObservationString() = "p0 rebid:[0] counts:[1]"
+PrivateObservationString(0) = "p0 hand:[1, 1, 2]"
+PrivateObservationString(1) = "p1 hand:[3, 3, 3]"
+ObservationTensor(0).player: ◉◯
+ObservationTensor(0).private_hand = [1, 1, 2]
+ObservationTensor(0).rebid_state: ◯
+ObservationTensor(0).counts_state: ◉
+ObservationTensor(1).player: ◯◉
+ObservationTensor(1).private_hand = [3, 3, 3]
+ObservationTensor(1).rebid_state: ◯
+ObservationTensor(1).counts_state: ◉
 Rewards() = [1, -1]
 Returns() = [1, -1]

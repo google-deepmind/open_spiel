@@ -37,16 +37,18 @@ class LiarsPokerTest(absltest.TestCase):
     game = liars_poker.LiarsPoker()
     state = game.new_initial_state()
     # Ensure no moves have been made.
-    expected_hands = [[] for _ in range(game.num_players)]
+    expected_hands = [[] for _ in range(game.num_players())]
     expected_bidder = -1
     expected_current_player = pyspiel.PlayerId.CHANCE
-    expected_current_bid = -1
+    expected_current_count = 'None'
+    expected_current_number = 'None'
     expected_rebid = False
-    expected = "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {}, Rebid: {}".format(
+    expected = "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {} of {}, Rebid: {}".format(
       expected_hands,
       expected_bidder,
       expected_current_player,
-      expected_current_bid,
+      expected_current_count,
+      expected_current_number,
       expected_rebid
     )
     self.assertEqual(str(state), expected)
@@ -55,8 +57,8 @@ class LiarsPokerTest(absltest.TestCase):
     """Tests hand drawing functions."""
     game = liars_poker.LiarsPoker()
     state = game.new_initial_state()
-    expected_hands = [[] for _ in range(game.num_players)]
-    for i in range(game.num_players * game.hand_length):
+    expected_hands = [[] for _ in range(game.num_players())]
+    for i in range(game.num_players() * game.hand_length):
       # Verify we have chance nodes until all player hands are filled.
       self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
 
@@ -66,7 +68,7 @@ class LiarsPokerTest(absltest.TestCase):
       action = np.random.choice(action_list, p=prob_list)
 
       # Verify players' hands are filled correctly.
-      cur_player = i % game.num_players
+      cur_player = i % game.num_players()
       expected_hands[cur_player].append(action)
       state.apply_action(action)
       self.assertEqual(state.hands, expected_hands)
@@ -77,7 +79,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def _populate_game_hands(self, game, state):
     """Populates players hands for testing."""
-    for _ in range(game.num_players * game.hand_length):
+    for _ in range(game.num_players() * game.hand_length):
       outcomes_with_probs = state.chance_outcomes()
       action_list, prob_list = zip(*outcomes_with_probs)
       action = np.random.choice(action_list, p=prob_list)
@@ -87,8 +89,8 @@ class LiarsPokerTest(absltest.TestCase):
     """Tests a single bid."""
     game = liars_poker.LiarsPoker()
     state = game.new_initial_state()
-    total_possible_bets = game.hand_length * game.num_digits * game.num_players
-    expected_bid_history = np.zeros((total_possible_bets, game.num_players))
+    total_possible_bets = game.hand_length * game.num_digits * game.num_players()
+    expected_bid_history = np.zeros((total_possible_bets, game.num_players()))
   
     # Fill player hands.
     self._populate_game_hands(game, state)
@@ -112,19 +114,19 @@ class LiarsPokerTest(absltest.TestCase):
     self.assertTrue(state._winner != -1 or state._loser != -1)
     actual_returns = state.returns()
     if state._winner != -1:
-      expected_returns = [-1.0 for _ in range(game.num_players)]
-      expected_returns[state._winner] = game.num_players - 1
+      expected_returns = [-1.0 for _ in range(game.num_players())]
+      expected_returns[state._winner] = game.num_players() - 1
     else:
-      expected_returns = [1.0 for _ in range(game.num_players)]
-      expected_returns[state._loser] = -1.0 * (game.num_players - 1)
+      expected_returns = [1.0 for _ in range(game.num_players())]
+      expected_returns[state._loser] = -1.0 * (game.num_players() - 1)
     self.assertEqual(actual_returns, expected_returns)
 
   def test_single_round(self):
     """Runs a single round of bidding followed by a challenge."""
     game = liars_poker.LiarsPoker()
     state = game.new_initial_state()
-    total_possible_bets = game.hand_length * game.num_digits * game.num_players
-    expected_challenge_history = np.zeros((total_possible_bets, game.num_players))
+    total_possible_bets = game.hand_length * game.num_digits * game.num_players()
+    expected_challenge_history = np.zeros((total_possible_bets, game.num_players()))
 
     # Fill player hands.
     self._populate_game_hands(game, state)
@@ -168,7 +170,7 @@ class LiarsPokerTest(absltest.TestCase):
     state.apply_action(3)
     # Verify game is not over.
     self.assertFalse(state.is_terminal())
-    self.assertEqual(state.returns(), [0.0 for _ in range(game.num_players)])
+    self.assertEqual(state.returns(), [0.0 for _ in range(game.num_players())])
     # Player 1 challenges again.
     state.apply_action(liars_poker.Action.CHALLENGE)
 
@@ -191,7 +193,7 @@ class LiarsPokerTest(absltest.TestCase):
     state.apply_action(3)
     # Verify game is not over.
     self.assertFalse(state.is_terminal())
-    self.assertEqual(state.returns(), [0.0 for _ in range(game.num_players)])
+    self.assertEqual(state.returns(), [0.0 for _ in range(game.num_players())])
     # Player 1 bids.
     state.apply_action(4)
     # Verify game is not over.
@@ -209,7 +211,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_game_from_cc(self):
     """Runs the standard game tests, checking API consistency."""
-    game = pyspiel.load_game("python_liars_poker")
+    game = pyspiel.load_game("python_liars_poker", {"players": 2})
     pyspiel.random_sim_test(game, num_sims=10, serialize=False, verbose=True)
 
   def test_pickle(self):

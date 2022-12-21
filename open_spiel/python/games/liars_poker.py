@@ -45,7 +45,12 @@ _GAME_TYPE = pyspiel.GameType(
     provides_information_state_string=True,
     provides_information_state_tensor=True,
     provides_observation_string=False,
-    provides_observation_tensor=True)
+    provides_observation_tensor=True,
+    parameter_specification={
+      "players": _MIN_NUM_PLAYERS,
+      "hand_length": _HAND_LENGTH,
+      "num_digits": _NUM_DIGITS
+    })
 _GAME_INFO = pyspiel.GameInfo(
     # Num actions = total number of cards * number of digits + action enum
     num_distinct_actions=_HAND_LENGTH * _NUM_DIGITS * _MIN_NUM_PLAYERS + len(Action),
@@ -64,9 +69,9 @@ class LiarsPoker(pyspiel.Game):
 
   def __init__(self, params=None):
     super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
-    self.num_players = _MIN_NUM_PLAYERS
-    self.hand_length = _HAND_LENGTH
-    self.num_digits = _NUM_DIGITS
+    game_parameters = self.get_parameters()
+    self.hand_length = game_parameters.get("hand_length", _HAND_LENGTH)
+    self.num_digits = game_parameters.get("num_digits", _NUM_DIGITS)
     self.deck = [_FULL_DECK[i] for i in range(self.num_digits)]
 
   def new_initial_state(self):
@@ -77,7 +82,7 @@ class LiarsPoker(pyspiel.Game):
     """Returns an object used for observing game state."""
     return LiarsPokerObserver(
       iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False),
-      self.num_players,
+      self.num_players(),
       self.hand_length,
       self.num_digits,
       params)
@@ -90,16 +95,16 @@ class LiarsPokerState(pyspiel.State):
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
     # Game attributes
-    self._num_players = game.num_players
+    self._num_players = game.num_players()
     self._hand_length = game.hand_length
     self._num_digits = game.num_digits
     self._deck = game.deck
     self.hands = [[] for _ in range(self._num_players)]
 
     # Action dynamics
-    total_possible_bets = game.hand_length * game.num_digits * game.num_players
-    self.bid_history = np.zeros((total_possible_bets, game.num_players))
-    self.challenge_history = np.zeros((total_possible_bets, game.num_players))
+    total_possible_bets = game.hand_length * game.num_digits * self._num_players
+    self.bid_history = np.zeros((total_possible_bets, self._num_players))
+    self.challenge_history = np.zeros((total_possible_bets, self._num_players))
     self._current_player = 0
     self._bid_offset = len(Action)
     self._max_bid = (self._hand_length * self._num_digits * self._num_players
@@ -268,11 +273,16 @@ class LiarsPokerState(pyspiel.State):
 
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
-    return "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {}, Rebid: {}".format(
+    if self._current_bid != -1:
+      count, number = self._decode_bid(self._current_bid - self._bid_offset)
+    else:
+      count, number = 'None', 'None'
+    return "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {} of {}, Rebid: {}".format(
       self.hands,
       self._bid_originator,
       self.current_player(),
-      self._current_bid,
+      count,
+      number,
       self.is_rebid)
 
 
@@ -332,11 +342,11 @@ class LiarsPokerObserver:
     if "player" in self.dict:
       self.dict["player"][player] = 1
     if "private_hand" in self.dict and len(state.hands[player]) == self.hand_length:
-      self.dict["private_hand"] = state.hands[player]
+      self.dict["private_hand"] = np.asarray(state.hands[player])
     if "rebid_state" in self.dict:
-      self.dict["rebid_state"] = state.is_rebid
+      self.dict["rebid_state"][0] = int(state.is_rebid)
     if "counts_state" in self.dict:
-      self.dict["counts_state"] = state.is_terminal()
+      self.dict["counts_state"][0] = int(state.is_terminal())
     if "bid_history" in self.dict:
       self.dict["bid_history"] = state.bid_history
     if "challenge_history" in self.dict:
@@ -350,9 +360,9 @@ class LiarsPokerObserver:
     if "private_hand" in self.dict and len(state.hands[player]) == self.hand_length:
       pieces.append(f"hand:{state.hands[player]}")
     if "rebid_state" in self.dict:
-      pieces.append(f"rebid:{state.is_rebid}")
+      pieces.append(f"rebid:{[int(state.is_rebid)]}")
     if "counts_state" in self.dict:
-      pieces.append(f"rebid:{state.is_terminal()}")
+      pieces.append(f"counts:{[int(state.is_terminal())]}")
     if "bid_history" in self.dict:
       for bid in range(len(state.bid_history)):
         if np.any(state.bid_history[bid] == 1):
