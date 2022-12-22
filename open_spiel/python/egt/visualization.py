@@ -46,7 +46,7 @@ except ImportError as e:
                "and there is a workaround (run sudo apt install "
                "python-backports.functools-lru-cache. See: "
                "https://github.com/matplotlib/matplotlib/issues/9344.")
-  raise ImportError(str(e))
+  raise ImportError(str(e)) from e
 
 import numpy as np
 
@@ -545,7 +545,7 @@ class Dynamics3x3Axes(axes.Axes):
       p = mask.point(mask.index(p))
       res = self._integrate(p, dynamics, mask, dt=dt)
       if res is not None:
-        t, cells = res
+        t, cells = res  # pylint: disable=unpacking-non-sequence
         cum_len = np.cumsum(
             np.sqrt(
                 np.diff(t[:, 0])**2 + np.diff(t[:, 1])**2 +
