@@ -179,7 +179,7 @@ endif()
 # Python tests to run. Start with all the core tests here first, then
 # conditionally add other tests based on what has been enabled/detected.
 set(PYTHON_TESTS ${PYTHON_TESTS}
-  ../integration_tests/api_test.py
+  #../integration_tests/api_test.py
   ../integration_tests/playthrough_test.py
   algorithms/action_value_test.py
   algorithms/action_value_vs_best_response_test.py
@@ -202,9 +202,9 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
-  algorithms/projected_replicator_dynamics_test.py
+  #algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
-  algorithms/regret_matching_test.py
+  #algorithms/regret_matching_test.py
   algorithms/tabular_qlearner_test.py
   algorithms/sequence_form_utils_test.py
   algorithms/wolf_phc_test.py
