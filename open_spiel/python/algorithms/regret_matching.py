@@ -93,6 +93,20 @@ def _regret_matching_step(payoff_tensors, strategies, regrets, gamma):
   return new_strategies
 
 
+def _average_meta_strategy(num_players, action_space_shapes, window):
+  """Returns the average strategy given a window of strategies."""
+
+  num_strategies = len(window)
+  avg_meta_strategies = [
+    np.zeroes(action_space_shapes[p]) for p in range(num_players)
+  ]
+  for i in range(num_strategies):
+    for p in range(num_players):
+      avg_meta_strategies[p] += window[i][p]
+  for p in range(num_players):
+    avg_meta_strategies[p] /= num_strategies
+  return avg_meta_strategies
+
 def regret_matching(payoff_tensors,
                     initial_strategies=None,
                     iterations=int(1e5),
@@ -139,5 +153,5 @@ def regret_matching(payoff_tensors,
                                            regrets, gamma)
     if i >= iterations - average_over_last_n_strategies:
       meta_strategy_window.append(new_strategies)
-  average_new_strategies = np.mean(meta_strategy_window, axis=0)
-  return average_new_strategies
+  return _average_meta_strategy(number_players, action_space_shapes, meta_strategy_window)
+
