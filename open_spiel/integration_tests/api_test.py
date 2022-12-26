@@ -172,12 +172,11 @@ class EnforceAPIOnFullTreeBase(parameterized.TestCase):
       if state.is_terminal():
         self.assertEqual(pyspiel.PlayerId.TERMINAL, state.current_player())
 
-  # Disabling to help debug current wheel test failures
-  #def test_information_state_no_argument_raises_on_terminal_nodes(self):
-  #  for state in self.all_states:
-  #    if state.is_terminal():
-  #      with self.assertRaises(RuntimeError):
-  #        state.information_state_string()
+  def test_information_state_no_argument_raises_on_terminal_nodes(self):
+    for state in self.all_states:
+      if state.is_terminal():
+        with self.assertRaises(RuntimeError):
+          state.information_state_string()
 
   def test_game_is_perfect_recall(self):
     # We do not count the terminal nodes here.
@@ -580,10 +579,7 @@ def _assert_is_perfect_recall_recursive(state, current_history,
                           for s, a in current_history
                           if s.current_player() == current_player]
 
-      if not all([
-          np.array_equal(x, y)
-          for x, y in zip(expected_infosets_history, infosets_history)
-      ]):
+      if infosets_history != expected_infosets_history:
         raise ValueError("The history as tensor in the same infoset "
                          "are different:\n"
                          "History: {!r}\n".format(state.history()))
