@@ -156,7 +156,7 @@ def _average_meta_strategy(num_players, action_space_shapes, window):
   
   num_strategies = len(window)
   avg_meta_strategies = [
-    np.zeroes(action_space_shapes[p]) for p in range(num_players)
+    np.zeros(action_space_shapes[p]) for p in range(num_players)
   ]
   for i in range(num_strategies):
     for p in range(num_players):
