@@ -202,7 +202,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
-  #algorithms/projected_replicator_dynamics_test.py
+  algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
   #algorithms/regret_matching_test.py
   algorithms/tabular_qlearner_test.py
