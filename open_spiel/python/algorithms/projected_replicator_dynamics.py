@@ -151,6 +151,21 @@ def _projected_replicator_dynamics_step(payoff_tensors, strategies, dt, gamma,
   return new_strategies
 
 
+def _average_meta_strategy(num_players, action_space_shapes, window):
+  """Returns the average strategy given a window of strategies."""
+  
+  num_strategies = len(window)
+  avg_meta_strategies = [
+    np.zeroes(action_space_shapes[p]) for p in range(num_players)
+  ]
+  for i in range(num_strategies):
+    for p in range(num_players):
+      avg_meta_strategies[p] += window[i][p]
+  for p in range(num_players):
+    avg_meta_strategies[p] /= num_strategies
+  return avg_meta_strategies
+  
+
 def projected_replicator_dynamics(payoff_tensors,
                                   prd_initial_strategies=None,
                                   prd_iterations=int(1e5),
@@ -197,5 +212,4 @@ def projected_replicator_dynamics(payoff_tensors,
         payoff_tensors, new_strategies, prd_dt, prd_gamma, use_approx)
     if i >= prd_iterations - average_over_last_n_strategies:
       meta_strategy_window.append(new_strategies)
-  average_new_strategies = np.mean(meta_strategy_window, axis=0)
-  return average_new_strategies
+  return _average_meta_strategy(number_players, action_space_shapes, meta_strategy_window)
