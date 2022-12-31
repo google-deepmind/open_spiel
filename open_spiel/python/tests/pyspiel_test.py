@@ -44,6 +44,7 @@ EXPECTED_GAMES = frozenset([
     "coop_box_pushing",
     "coop_to_1p",
     "coordinated_mp",
+    "crazy_eights",
     "cursor_go",
     "dark_chess",
     "dark_hex",

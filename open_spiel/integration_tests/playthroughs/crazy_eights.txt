@@ -1,0 +1,2439 @@
+game: crazy_eights
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Crazy Eights"
+GameType.max_num_players = 15
+GameType.min_num_players = 2
+GameType.parameter_specification = ["max_draw_cards", "players", "reshuffle", "use_special_cards"]
+GameType.provides_information_state_string = False
+GameType.provides_information_state_tensor = False
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "crazy_eights"
+GameType.utility = Utility.GENERAL_SUM
+
+NumDistinctActions() = 63
+PolicyTensorShape() = [63]
+MaxChanceOutcomes() = 63
+GetParameters() = {max_draw_cards=5,players=5,reshuffle=False,use_special_cards=False}
+NumPlayers() = 5
+MinUtility() = -504.0
+MaxUtility() = 0.0
+UtilitySum() = None
+ObservationTensorShape() = [372]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 372
+MaxGameLength() = 10000
+ToString() = "crazy_eights()"
+
+# State 0
+# Number of cards left in deck: 52
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:                                 Suit C:                                 Suit C:                                 Suit C:
+# Suit D:                                 Suit D:                                 Suit D:                                 Suit D:                                 Suit D:
+# Suit H:                                 Suit H:                                 Suit H:                                 Suit H:                                 Suit H:
+# Suit S:                                 Suit S:                                 Suit S:                                 Suit S:                                 Suit S:
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+ObservationString(3) = ""
+ObservationString(4) = ""
+ObservationTensor(0): zeros(372)
+ObservationTensor(1): zeros(372)
+ObservationTensor(2): zeros(372)
+ObservationTensor(3): zeros(372)
+ObservationTensor(4): zeros(372)
+ChanceOutcomes() = [(58, 0.2), (59, 0.2), (60, 0.2), (61, 0.2), (62, 0.2)]
+LegalActions() = [58, 59, 60, 61, 62]
+StringLegalActions() = ["Decide Player 0 to be the dealer", "Decide Player 1 to be the dealer", "Decide Player 2 to be the dealer", "Decide Player 3 to be the dealer", "Decide Player 4 to be the dealer"]
+
+# Apply action "Decide Player 0 to be the dealer"
+action: 58
+
+# State 1
+# Player 0 becomes the dealer
+# Number of cards left in deck: 52
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:                                 Suit C:                                 Suit C:                                 Suit C:
+# Suit D:                                 Suit D:                                 Suit D:                                 Suit D:                                 Suit D:
+# Suit H:                                 Suit H:                                 Suit H:                                 Suit H:                                 Suit H:
+# Suit S:                                 Suit S:                                 Suit S:                                 Suit S:                                 Suit S:
+IsTerminal() = False
+History() = [58]
+HistoryString() = "58"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationString(2) = ""
+ObservationString(3) = ""
+ObservationString(4) = ""
+ObservationTensor(0): zeros(372)
+ObservationTensor(1): zeros(372)
+ObservationTensor(2): zeros(372)
+ObservationTensor(3): zeros(372)
+ObservationTensor(4): zeros(372)
+ChanceOutcomes() = [(0, 0.019230769230769232), (1, 0.019230769230769232), (2, 0.019230769230769232), (3, 0.019230769230769232), (4, 0.019230769230769232), (5, 0.019230769230769232), (6, 0.019230769230769232), (7, 0.019230769230769232), (8, 0.019230769230769232), (9, 0.019230769230769232), (10, 0.019230769230769232), (11, 0.019230769230769232), (12, 0.019230769230769232), (13, 0.019230769230769232), (14, 0.019230769230769232), (15, 0.019230769230769232), (16, 0.019230769230769232), (17, 0.019230769230769232), (18, 0.019230769230769232), (19, 0.019230769230769232), (20, 0.019230769230769232), (21, 0.019230769230769232), (22, 0.019230769230769232), (23, 0.019230769230769232), (24, 0.019230769230769232), (25, 0.019230769230769232), (26, 0.019230769230769232), (27, 0.019230769230769232), (28, 0.019230769230769232), (29, 0.019230769230769232), (30, 0.019230769230769232), (31, 0.019230769230769232), (32, 0.019230769230769232), (33, 0.019230769230769232), (34, 0.019230769230769232), (35, 0.019230769230769232), (36, 0.019230769230769232), (37, 0.019230769230769232), (38, 0.019230769230769232), (39, 0.019230769230769232), (40, 0.019230769230769232), (41, 0.019230769230769232), (42, 0.019230769230769232), (43, 0.019230769230769232), (44, 0.019230769230769232), (45, 0.019230769230769232), (46, 0.019230769230769232), (47, 0.019230769230769232), (48, 0.019230769230769232), (49, 0.019230769230769232), (50, 0.019230769230769232), (51, 0.019230769230769232)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["C2", "D2", "H2", "S2", "C3", "D3", "H3", "S3", "C4", "D4", "H4", "S4", "C5", "D5", "H5", "S5", "C6", "D6", "H6", "S6", "C7", "D7", "H7", "S7", "C8", "D8", "H8", "S8", "C9", "D9", "H9", "S9", "CT", "DT", "HT", "ST", "CJ", "DJ", "HJ", "SJ", "CQ", "DQ", "HQ", "SQ", "CK", "DK", "HK", "SK", "CA", "DA", "HA", "SA"]
+
+# Apply action "D2"
+action: 1
+
+# State 2
+# Apply action "H4"
+action: 10
+
+# State 3
+# Apply action "DK"
+action: 45
+
+# State 4
+# Apply action "S4"
+action: 11
+
+# State 5
+# Apply action "DT"
+action: 33
+
+# State 6
+# Apply action "CA"
+action: 48
+
+# State 7
+# Apply action "H3"
+action: 6
+
+# State 8
+# Apply action "S8"
+action: 27
+
+# State 9
+# Apply action "CK"
+action: 44
+
+# State 10
+# Apply action "H6"
+action: 18
+
+# State 11
+# Apply action "D7"
+action: 21
+
+# State 12
+# Apply action "S7"
+action: 23
+
+# State 13
+# Apply action "C6"
+action: 16
+
+# State 14
+# Apply action "H7"
+action: 22
+
+# State 15
+# Apply action "HJ"
+action: 38
+
+# State 16
+# Apply action "SQ"
+action: 43
+
+# State 17
+# Apply action "SA"
+action: 51
+
+# State 18
+# Apply action "H2"
+action: 2
+
+# State 19
+# Apply action "DA"
+action: 49
+
+# State 20
+# Apply action "HK"
+action: 46
+
+# State 21
+# Apply action "CJ"
+action: 36
+
+# State 22
+# Apply action "D8"
+action: 25
+
+# State 23
+# Apply action "HA"
+action: 50
+
+# State 24
+# Apply action "S2"
+action: 3
+
+# State 25
+# Apply action "SK"
+action: 47
+
+# State 26
+# Apply action "DJ"
+action: 37
+
+# State 27
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Last card: DJ
+# Last suit: D
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D: 2    7                          Suit D:       8                         Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:       8                         Suit S: 2 4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: DJ\nPrevious suit: D\nStarting counterclockwise, other players have: 6, 5, 5, 5, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D: 2    7       \nSuit H:              \nSuit S:           Q  \nPrevious card: DJ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 5, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:       8      \nSuit H:  34          \nSuit S:      7      A\nPrevious card: DJ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 5, 6, 5 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:       8      \nPrevious card: DJ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 6, 5, 5 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S: 2 4          \nPrevious card: DJ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 6, 5, 5, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000000004000404000000000000200000000000010000000000000800000000000)
+ObservationTensor(1): binvec(372, 0x9aaaaaaaaa9aaaaaaa6aa9aa6a0000000004000404000000000000200000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa99aaaaaaaaaaaa90000000004000404000000000000200000000000008000000000000800000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaa9aaaaaaaa9aa60000000004000404000000000000100000000000010000000000000800000000000)
+ObservationTensor(4): binvec(372, 0xa9aaa9aaaaa6aaaaaaaaaa6a9a0000000004000402000000000000200000000000010000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [1, 21, 36, 52]
+StringLegalActions() = ["D2", "D7", "CJ", "Draw"]
+
+# Apply action "D2"
+action: 1
+
+# State 28
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Last card: D2
+# Last suit: D
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:       8                         Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:       8                         Suit S: 2 4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: D2\nPrevious suit: D\nStarting counterclockwise, other players have: 6, 4, 5, 5, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: D2\nPrevious suit: D\nStarting counterclockwise, other players have: 4, 5, 5, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:       8      \nSuit H:  34          \nSuit S:      7      A\nPrevious card: D2\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 5, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:       8      \nPrevious card: D2\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 6, 4, 5 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S: 2 4          \nPrevious card: D2\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 6, 4, 5, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa4000000000000408000000000000200000000000010000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a4000000000000404000000000000200000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa99aaaaaaaaaaaa94000000000000404000000000000200000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaa9aaaaaaaa9aa64000000000000404000000000000100000000000020000000000000800000000000)
+ObservationTensor(4): binvec(372, 0xa9aaa9aaaaa6aaaaaaaaaa6a9a4000000000000402000000000000400000000000010000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [25, 52]
+StringLegalActions() = ["D8", "Draw"]
+
+# Apply action "D8"
+action: 25
+
+# State 29
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Last card: D8
+# Last suit: D
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:       8                         Suit S: 2 4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: D8\nPrevious suit: D\nStarting counterclockwise, other players have: 6, 4, 4, 5, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: D8\nPrevious suit: D\nStarting counterclockwise, other players have: 4, 4, 5, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: D8\nPrevious suit: D\nStarting counterclockwise, other players have: 4, 5, 5, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:       8      \nPrevious card: D8\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 6, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S: 2 4          \nPrevious card: D8\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 6, 4, 4, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000004000000408000000000000400000000000010000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a0000004000000408000000000000200000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa90000004000000404000000000000200000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaa9aaaaaaaa9aa60000004000000404000000000000100000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xa9aaa9aaaaa6aaaaaaaaaa6a9a0000004000000402000000000000400000000000020000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [54, 55, 56, 57]
+StringLegalActions() = ["Nominate suit C", "Nominate suit D", "Nominate suit H", "Nominate suit S"]
+
+# Apply action "Nominate suit S"
+action: 57
+
+# State 30
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Last card: D8
+# Last suit: S
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:       8                         Suit S: 2 4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: D8\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 4, 4, 5, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: D8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 5, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: D8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 5, 5, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:       8      \nPrevious card: D8\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 5, 6, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S: 2 4          \nPrevious card: D8\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 6, 4, 4, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000004000000108000000000000400000000000010000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a0000004000000108000000000000200000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa90000004000000104000000000000200000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaa9aaaaaaaa9aa60000004000000104000000000000100000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xa9aaa9aaaaa6aaaaaaaaaa6a9a0000004000000102000000000000400000000000020000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [27, 52]
+StringLegalActions() = ["S8", "Draw"]
+
+# Apply action "S8"
+action: 27
+
+# State 31
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Last card: S8
+# Last suit: S
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:                                 Suit S: 2 4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 4, 4, 4, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 4, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 5, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 5, 6, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S: 2 4          \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 6, 4, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000001000000108000000000000400000000000020000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a0000001000000108000000000000400000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa90000001000000108000000000000200000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa60000001000000104000000000000100000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xa9aaa9aaaaa6aaaaaaaaaa6a9a0000001000000102000000000000400000000000020000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [54, 55, 56, 57]
+StringLegalActions() = ["Nominate suit C", "Nominate suit D", "Nominate suit H", "Nominate suit S"]
+
+# Apply action "Nominate suit S"
+action: 57
+
+# State 32
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Last card: S8
+# Last suit: S
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:                                 Suit S: 2 4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 4
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 4, 4, 4, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 4, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 5, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 5, 6, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S: 2 4          \nPrevious card: S8\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 6, 4, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000001000000108000000000000400000000000020000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a0000001000000108000000000000400000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa90000001000000108000000000000200000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa60000001000000104000000000000100000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xa9aaa9aaaaa6aaaaaaaaaa6a9a0000001000000102000000000000400000000000020000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [3, 11, 52]
+StringLegalActions() = ["S2", "S4", "Draw"]
+
+# Apply action "S2"
+action: 3
+
+# State 33
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Last card: S2
+# Last suit: S
+# Number of cards left in deck: 26
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:                                 Suit S:   4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 4, 4, 4, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 4, 4, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 4, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 6, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   4          \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 6, 4, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa1000000000000108000000000000400000000000020000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a1000000000000108000000000000400000000000020000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa91000000000000108000000000000400000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa61000000000000108000000000000100000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9aaaaa6aaaaaaaaaa6a9a1000000000000102000000000000400000000000020000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [47, 52]
+StringLegalActions() = ["SK", "Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 34
+# Apply action "C2"
+action: 0
+
+# State 35
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Last card: S2
+# Last suit: S
+# Number of cards left in deck: 25
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C: 2                               Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:                                 Suit S:   4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "Currently I have: \nSuit C: 2            \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 7, 4, 4, 4, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 4, 4, 7 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 4, 7, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 4, 7, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   4          \nPrevious card: S2\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 7, 4, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0x6aaaaaaaa6aaaaaa9a96aaa5aa1000000000000108000000000000400000000000020000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a1000000000000108000000000000400000000000020000000000000200000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa91000000000000108000000000000400000000000004000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa61000000000000108000000000000080000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9aaaaa6aaaaaaaaaa6a9a1000000000000101000000000000400000000000020000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [0, 47, 52]
+StringLegalActions() = ["C2", "SK", "Draw"]
+
+# Apply action "C2"
+action: 0
+
+# State 36
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Last card: C2
+# Last suit: C
+# Number of cards left in deck: 25
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:          J  A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:                                 Suit S:   4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: C2\nPrevious suit: C\nStarting counterclockwise, other players have: 6, 4, 4, 4, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:          J  A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: C2\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 4, 4, 4, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: C2\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 4, 4, 6, 4 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: C2\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 4, 6, 4, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   4          \nPrevious card: C2\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 6, 4, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa8000000000000808000000000000400000000000020000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaa6aa9aa6a8000000000000808000000000000400000000000020000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa98000000000000808000000000000400000000000008000000000001000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa68000000000000808000000000000100000000000020000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9aaaaa6aaaaaaaaaa6a9a8000000000000802000000000000400000000000020000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [36, 48, 52]
+StringLegalActions() = ["CJ", "CA", "Draw"]
+
+# Apply action "CJ"
+action: 36
+
+# State 37
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Last card: CJ
+# Last suit: C
+# Number of cards left in deck: 25
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:             A                   Suit C:                                 Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:                                 Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7      A                   Suit S:                                 Suit S:   4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: CJ\nPrevious suit: C\nStarting counterclockwise, other players have: 6, 3, 4, 4, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:             A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: CJ\nPrevious suit: C\nStarting counterclockwise, other players have: 3, 4, 4, 4, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:              \nSuit D:              \nSuit H:  34          \nSuit S:      7      A\nPrevious card: CJ\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 4, 4, 6, 3 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: CJ\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 4, 6, 3, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   4          \nPrevious card: CJ\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 6, 3, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000000008000810000000000000400000000000020000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaaaaa9aa6a0000000008000808000000000000400000000000020000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaaa6a6aaaaa9aaaaaaaaaaaaa90000000008000808000000000000400000000000008000000000002000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa60000000008000808000000000000100000000000040000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9aaaaa6aaaaaaaaaa6a9a0000000008000802000000000000800000000000020000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [52]
+StringLegalActions() = ["Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 38
+# Apply action "D3"
+action: 5
+
+# State 39
+# Apply action "Draw"
+action: 52
+
+# State 40
+# Apply action "CQ"
+action: 40
+
+# State 41
+# Apply action "Draw"
+action: 52
+
+# State 42
+# Apply action "C7"
+action: 20
+
+# State 43
+# Apply action "Draw"
+action: 52
+
+# State 44
+# Apply action "S9"
+action: 31
+
+# State 45
+# Apply action "CQ"
+action: 40
+
+# State 46
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Last card: CQ
+# Last suit: C
+# Number of cards left in deck: 21
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:             A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7 9    A                   Suit S:                                 Suit S:   4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: CQ\nPrevious suit: C\nStarting counterclockwise, other players have: 6, 3, 7, 4, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:             A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: CQ\nPrevious suit: C\nStarting counterclockwise, other players have: 3, 7, 4, 4, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:  34          \nSuit S:      7 9    A\nPrevious card: CQ\nPrevious suit: C\nStarting counterclockwise, other players have: 7, 4, 4, 6, 3 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: CQ\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 4, 6, 3, 7 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   4          \nPrevious card: CQ\nPrevious suit: C\nStarting counterclockwise, other players have: 4, 6, 3, 7, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000000000800810000000000000080000000000020000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaaaaa9aa6a0000000000800801000000000000400000000000020000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaa96a6aaaa69aaa9aaaaaaaaa90000000000800808000000000000400000000000008000000000002000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa60000000000800808000000000000100000000000040000000000000200000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9aaaaa6aaaaaaaaaa6a9a0000000000800802000000000000800000000000004000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [16, 52]
+StringLegalActions() = ["C6", "Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 47
+# Apply action "DQ"
+action: 41
+
+# State 48
+# Apply action "Draw"
+action: 52
+
+# State 49
+# Apply action "SJ"
+action: 39
+
+# State 50
+# Apply action "DQ"
+action: 41
+
+# State 51
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Last card: DQ
+# Last suit: D
+# Number of cards left in deck: 19
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:             A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7 9    A                   Suit S:          J                      Suit S:   4
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 4
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 6, 3, 7, 5, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:             A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 3, 7, 5, 4, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:  34          \nSuit S:      7 9    A\nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 7, 5, 4, 6, 3 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:          J   \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 4, 6, 3, 7 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   4          \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 4, 6, 3, 7, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000000000400410000000000000080000000000010000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaaaaa9aa6a0000000000400401000000000000200000000000020000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaa96a6aaaa69aaa9aaaaaaaaa90000000000400404000000000000400000000000008000000000002000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaa9aa9aa60000000000400408000000000000100000000000040000000000000200000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9aaaaa6aaaaaaaaaa6a9a0000000000400402000000000000800000000000004000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [49, 52]
+StringLegalActions() = ["DA", "Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 52
+# Apply action "S5"
+action: 15
+
+# State 53
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Last card: DQ
+# Last suit: D
+# Number of cards left in deck: 18
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:             A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:      7
+# Suit S:            K                    Suit S:           Q                     Suit S:      7 9    A                   Suit S:          J                      Suit S:   45
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 4
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 6, 3, 7, 5, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:             A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 3, 7, 5, 5, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:  34          \nSuit S:      7 9    A\nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 7, 5, 5, 6, 3 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:          J   \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 5, 6, 3, 7 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:      7       \nSuit S:   45         \nPrevious card: DQ\nPrevious suit: D\nStarting counterclockwise, other players have: 5, 6, 3, 7, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000000000400410000000000000080000000000010000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaaaaa9aa6a0000000000400401000000000000200000000000010000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaa96a6aaaa69aaa9aaaaaaaaa90000000000400404000000000000200000000000008000000000002000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaa9aa9aa60000000000400404000000000000100000000000040000000000000200000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9a9aaa6aaaaaaaaaa6a9a0000000000400402000000000000800000000000004000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [49, 52]
+StringLegalActions() = ["DA", "Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 54
+# Apply action "H5"
+action: 14
+
+# State 55
+# Apply action "Draw"
+action: 52
+
+# State 56
+# Apply action "HQ"
+action: 42
+
+# State 57
+# Apply action "Draw"
+action: 52
+
+# State 58
+# Apply action "H8"
+action: 26
+
+# State 59
+# Apply action "HQ"
+action: 42
+
+# State 60
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Last card: HQ
+# Last suit: H
+# Number of cards left in deck: 15
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:             A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:    5 78
+# Suit S:            K                    Suit S:           Q                     Suit S:      7 9    A                   Suit S:          J                      Suit S:   45
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: HQ\nPrevious suit: H\nStarting counterclockwise, other players have: 6, 3, 7, 5, 7 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:             A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: HQ\nPrevious suit: H\nStarting counterclockwise, other players have: 3, 7, 5, 7, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:  34          \nSuit S:      7 9    A\nPrevious card: HQ\nPrevious suit: H\nStarting counterclockwise, other players have: 7, 5, 7, 6, 3 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:          J   \nPrevious card: HQ\nPrevious suit: H\nStarting counterclockwise, other players have: 5, 7, 6, 3, 7 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 78      \nSuit S:   45         \nPrevious card: HQ\nPrevious suit: H\nStarting counterclockwise, other players have: 7, 6, 3, 7, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000000000200210000000000000080000000000010000000000000200000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaaaaa9aa6a0000000000200201000000000000200000000000004000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaa96a6aaaa69aaa9aaaaaaaaa90000000000200204000000000000080000000000008000000000002000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaa9aa9aa60000000000200201000000000000100000000000040000000000000200000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9a5aaa6a6aaaaaaaa6a9a0000000000200202000000000000800000000000004000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [18, 38, 46, 52]
+StringLegalActions() = ["H6", "HJ", "HK", "Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 61
+# Apply action "C8"
+action: 24
+
+# State 62
+# Apply action "C8"
+action: 24
+
+# State 63
+# Apply action "Nominate suit H"
+action: 56
+
+# State 64
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Last card: C8
+# Last suit: H
+# Number of cards left in deck: 14
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:                                 Suit C:             A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:         TJ                      Suit D:      7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6    J K                    Suit H:                                 Suit H:  34                             Suit H: 2           A                   Suit H:    5 78
+# Suit S:            K                    Suit S:           Q                     Suit S:      7 9    A                   Suit S:          J                      Suit S:   45
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "Currently I have: \nSuit C:              \nSuit D:         TJ   \nSuit H:     6    J K \nSuit S:            K \nPrevious card: C8\nPrevious suit: H\nStarting counterclockwise, other players have: 6, 3, 7, 5, 7 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:             A\nSuit D:      7       \nSuit H:              \nSuit S:           Q  \nPrevious card: C8\nPrevious suit: H\nStarting counterclockwise, other players have: 3, 7, 5, 7, 6 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:  34          \nSuit S:      7 9    A\nPrevious card: C8\nPrevious suit: H\nStarting counterclockwise, other players have: 7, 5, 7, 6, 3 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:          J   \nPrevious card: C8\nPrevious suit: H\nStarting counterclockwise, other players have: 5, 7, 6, 3, 7 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 78      \nSuit S:   45         \nPrevious card: C8\nPrevious suit: H\nStarting counterclockwise, other players have: 7, 6, 3, 7, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaaa6aaaaaa9a96aaa5aa0000008000000210000000000000080000000000010000000000000200000000000)
+ObservationTensor(1): binvec(372, 0xaaaaaaaaaa9aaaaaaaaaa9aa6a0000008000000201000000000000200000000000004000000000000400000000000)
+ObservationTensor(2): binvec(372, 0xaa96a6aaaa69aaa9aaaaaaaaa90000008000000204000000000000080000000000008000000000002000000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaa9aa9aa60000008000000201000000000000100000000000040000000000000200000000000)
+ObservationTensor(4): binvec(372, 0xaaaaa9a5aaa6a6aaaaaaaa6a9a0000008000000202000000000000800000000000004000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [52]
+StringLegalActions() = ["Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 65
+# Apply action "CT"
+action: 32
+
+# State 66
+# Apply action "Draw"
+action: 52
+
+# State 67
+# Apply action "C5"
+action: 12
+
+# State 68
+# Apply action "Draw"
+action: 52
+
+# State 69
+# Apply action "C4"
+action: 8
+
+# State 70
+# Apply action "Draw"
+action: 52
+
+# State 71
+# Apply action "ST"
+action: 35
+
+# State 72
+# Apply action "Draw"
+action: 52
+
+# State 73
+# Apply action "D5"
+action: 13
+
+# State 74
+# Apply action "Pass"
+action: 53
+
+# State 75
+# Apply action "Draw"
+action: 52
+
+# State 76
+# Apply action "S6"
+action: 19
+
+# State 77
+# Apply action "H3"
+action: 6
+
+# State 78
+# Apply action "Draw"
+action: 52
+
+# State 79
+# Apply action "S3"
+action: 7
+
+# State 80
+# Apply action "S3"
+action: 7
+
+# State 81
+# Apply action "S4"
+action: 11
+
+# State 82
+# Apply action "SK"
+action: 47
+
+# State 83
+# Apply action "ST"
+action: 35
+
+# State 84
+# Apply action "S6"
+action: 19
+
+# State 85
+# Apply action "SJ"
+action: 39
+
+# State 86
+# Apply action "H8"
+action: 26
+
+# State 87
+# Apply action "Nominate suit S"
+action: 57
+
+# State 88
+# Apply action "Draw"
+action: 52
+
+# State 89
+# Apply action "C9"
+action: 28
+
+# State 90
+# Apply action "Draw"
+action: 52
+
+# State 91
+# Apply action "D6"
+action: 17
+
+# State 92
+# Apply action "Draw"
+action: 52
+
+# State 93
+# Apply action "D9"
+action: 29
+
+# State 94
+# Apply action "Draw"
+action: 52
+
+# State 95
+# Apply action "H9"
+action: 30
+
+# State 96
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Player 1 starts drawing
+# Player 1 draws CT
+# Player 1 starts drawing
+# Player 1 draws C5
+# Player 1 starts drawing
+# Player 1 draws C4
+# Player 1 starts drawing
+# Player 1 draws ST
+# Player 1 starts drawing
+# Player 1 draws D5
+# Player 1 passes
+# Player 2 starts drawing
+# Player 2 draws S6
+# Player 2 plays H3
+# Player 3 starts drawing
+# Player 3 draws S3
+# Player 3 plays S3
+# Player 4 plays S4
+# Player 0 plays SK
+# Player 1 plays ST
+# Player 2 plays S6
+# Player 3 plays SJ
+# Player 4 plays H8
+# Player 4 nominates suit S
+# Player 0 starts drawing
+# Player 0 draws C9
+# Player 0 starts drawing
+# Player 0 draws D6
+# Player 0 starts drawing
+# Player 0 draws D9
+# Player 0 starts drawing
+# Player 0 draws H9
+# Last card: H8
+# Last suit: S
+# Number of cards left in deck: 3
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:        9                        Suit C:   45    T   A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:     6  9TJ                      Suit D:    5 7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6  9 J K                    Suit H:                                 Suit H:   4                             Suit H: 2           A                   Suit H:    5 7
+# Suit S:                                 Suit S:           Q                     Suit S:      7 9    A                   Suit S:                                 Suit S:    5
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "Currently I have: \nSuit C:        9     \nSuit D:     6  9TJ   \nSuit H:     6  9 J K \nSuit S:              \nPrevious card: H8\nPrevious suit: S\nStarting counterclockwise, other players have: 9, 7, 6, 4, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:   45    T   A\nSuit D:    5 7       \nSuit H:              \nSuit S:           Q  \nPrevious card: H8\nPrevious suit: S\nStarting counterclockwise, other players have: 7, 6, 4, 5, 9 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:   4          \nSuit S:      7 9    A\nPrevious card: H8\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 4, 5, 9, 7 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: H8\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 5, 9, 7, 6 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 7       \nSuit S:    5         \nPrevious card: H8\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 9, 7, 6, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaa96aaaa569a96aaa6aa0000002000000101000000000000100000000000020000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaa6a5aaa9aaaaa6aaaa9aa6a0000002000000102000000000000400000000000010000000000000080000000000)
+ObservationTensor(2): binvec(372, 0xaa9aa6aaaa69aaa9aaaaaaaaa90000002000000108000000000000200000000000001000000000000200000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa60000002000000104000000000000020000000000004000000000000400000000000)
+ObservationTensor(4): binvec(372, 0xaaaaaaa5aaa6aaaaaaaaaa6a9a0000002000000100400000000000080000000000008000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [52]
+StringLegalActions() = ["Draw"]
+
+# Apply action "Draw"
+action: 52
+
+# State 97
+# Apply action "HT"
+action: 34
+
+# State 98
+# Apply action "Pass"
+action: 53
+
+# State 99
+# Apply action "SQ"
+action: 43
+
+# State 100
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Player 1 starts drawing
+# Player 1 draws CT
+# Player 1 starts drawing
+# Player 1 draws C5
+# Player 1 starts drawing
+# Player 1 draws C4
+# Player 1 starts drawing
+# Player 1 draws ST
+# Player 1 starts drawing
+# Player 1 draws D5
+# Player 1 passes
+# Player 2 starts drawing
+# Player 2 draws S6
+# Player 2 plays H3
+# Player 3 starts drawing
+# Player 3 draws S3
+# Player 3 plays S3
+# Player 4 plays S4
+# Player 0 plays SK
+# Player 1 plays ST
+# Player 2 plays S6
+# Player 3 plays SJ
+# Player 4 plays H8
+# Player 4 nominates suit S
+# Player 0 starts drawing
+# Player 0 draws C9
+# Player 0 starts drawing
+# Player 0 draws D6
+# Player 0 starts drawing
+# Player 0 draws D9
+# Player 0 starts drawing
+# Player 0 draws H9
+# Player 0 starts drawing
+# Player 0 draws HT
+# Player 0 passes
+# Player 1 plays SQ
+# Last card: SQ
+# Last suit: S
+# Number of cards left in deck: 2
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:        9                        Suit C:   45    T   A                   Suit C:      7                          Suit C:     6                           Suit C:            K
+# Suit D:     6  9TJ                      Suit D:    5 7                          Suit D:  3                              Suit D:            K                    Suit D:             A
+# Suit H:     6  9TJ K                    Suit H:                                 Suit H:   4                             Suit H: 2           A                   Suit H:    5 7
+# Suit S:                                 Suit S:                                 Suit S:      7 9    A                   Suit S:                                 Suit S:    5
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "Currently I have: \nSuit C:        9     \nSuit D:     6  9TJ   \nSuit H:     6  9TJ K \nSuit S:              \nPrevious card: SQ\nPrevious suit: S\nStarting counterclockwise, other players have: 10, 6, 6, 4, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:   45    T   A\nSuit D:    5 7       \nSuit H:              \nSuit S:              \nPrevious card: SQ\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 6, 4, 5, 10 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:   4          \nSuit S:      7 9    A\nPrevious card: SQ\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 4, 5, 10, 6 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:     6        \nSuit D:            K \nSuit H: 2           A\nSuit S:              \nPrevious card: SQ\nPrevious suit: S\nStarting counterclockwise, other players have: 4, 5, 10, 6, 6 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 7       \nSuit S:    5         \nPrevious card: SQ\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 10, 6, 6, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaa96aaaa569696aaa6aa0000000000100102000000000000100000000000020000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaa6a5aaa9aaaaa6aaaaaaa6a0000000000100102000000000000400000000000010000000000000040000000000)
+ObservationTensor(2): binvec(372, 0xaa9aa6aaaa69aaa9aaaaaaaaa90000000000100108000000000000200000000000000800000000000400000000000)
+ObservationTensor(3): binvec(372, 0xa6aaaaaa6aaaaaaaaaaaaa9aa60000000000100104000000000000010000000000008000000000000400000000000)
+ObservationTensor(4): binvec(372, 0xaaaaaaa5aaa6aaaaaaaaaa6a9a0000000000100100200000000000100000000000008000000000001000000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [23, 31, 51, 52]
+StringLegalActions() = ["S7", "S9", "SA", "Draw"]
+
+# Apply action "S9"
+action: 31
+
+# State 101
+# Apply action "Draw"
+action: 52
+
+# State 102
+# Apply action "D4"
+action: 9
+
+# State 103
+# Apply action "Draw"
+action: 52
+
+# State 104
+# Apply action "C3"
+action: 4
+
+# State 105
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Player 1 starts drawing
+# Player 1 draws CT
+# Player 1 starts drawing
+# Player 1 draws C5
+# Player 1 starts drawing
+# Player 1 draws C4
+# Player 1 starts drawing
+# Player 1 draws ST
+# Player 1 starts drawing
+# Player 1 draws D5
+# Player 1 passes
+# Player 2 starts drawing
+# Player 2 draws S6
+# Player 2 plays H3
+# Player 3 starts drawing
+# Player 3 draws S3
+# Player 3 plays S3
+# Player 4 plays S4
+# Player 0 plays SK
+# Player 1 plays ST
+# Player 2 plays S6
+# Player 3 plays SJ
+# Player 4 plays H8
+# Player 4 nominates suit S
+# Player 0 starts drawing
+# Player 0 draws C9
+# Player 0 starts drawing
+# Player 0 draws D6
+# Player 0 starts drawing
+# Player 0 draws D9
+# Player 0 starts drawing
+# Player 0 draws H9
+# Player 0 starts drawing
+# Player 0 draws HT
+# Player 0 passes
+# Player 1 plays SQ
+# Player 2 plays S9
+# Player 3 starts drawing
+# Player 3 draws D4
+# Player 3 starts drawing
+# Player 3 draws C3
+# Last card: S9
+# Last suit: S
+# Number of cards left in deck: 0
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:        9                        Suit C:   45    T   A                   Suit C:      7                          Suit C:  3  6                           Suit C:            K
+# Suit D:     6  9TJ                      Suit D:    5 7                          Suit D:  3                              Suit D:   4        K                    Suit D:             A
+# Suit H:     6  9TJ K                    Suit H:                                 Suit H:   4                             Suit H: 2           A                   Suit H:    5 7
+# Suit S:                                 Suit S:                                 Suit S:      7      A                   Suit S:                                 Suit S:    5
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 3
+ObservationString(0) = "Currently I have: \nSuit C:        9     \nSuit D:     6  9TJ   \nSuit H:     6  9TJ K \nSuit S:              \nPrevious card: S9\nPrevious suit: S\nStarting counterclockwise, other players have: 10, 6, 5, 6, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:   45    T   A\nSuit D:    5 7       \nSuit H:              \nSuit S:              \nPrevious card: S9\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 5, 6, 5, 10 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:   4          \nSuit S:      7      A\nPrevious card: S9\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 6, 5, 10, 6 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:  3  6        \nSuit D:   4        K \nSuit H: 2           A\nSuit S:              \nPrevious card: S9\nPrevious suit: S\nStarting counterclockwise, other players have: 6, 5, 10, 6, 5 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 7       \nSuit S:    5         \nPrevious card: S9\nPrevious suit: S\nStarting counterclockwise, other players have: 5, 10, 6, 5, 6 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaa96aaaa569696aaa6aa0000000100000102000000000000200000000000008000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaa6a5aaa9aaaaa6aaaaaaa6a0000000100000104000000000000100000000000010000000000000040000000000)
+ObservationTensor(2): binvec(372, 0xaa9aa6aaaa69aaaaaaaaaaaaa90000000100000102000000000000200000000000000800000000000400000000000)
+ObservationTensor(3): binvec(372, 0xa66a9aaa6aaaaaaaaaaaaa9aa60000000100000104000000000000010000000000008000000000000800000000000)
+ObservationTensor(4): binvec(372, 0xaaaaaaa5aaa6aaaaaaaaaa6a9a0000000100000100200000000000100000000000010000000000000400000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [53]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 53
+
+# State 106
+# Apply action "Pass"
+action: 53
+
+# State 107
+# Apply action "H9"
+action: 30
+
+# State 108
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Player 1 starts drawing
+# Player 1 draws CT
+# Player 1 starts drawing
+# Player 1 draws C5
+# Player 1 starts drawing
+# Player 1 draws C4
+# Player 1 starts drawing
+# Player 1 draws ST
+# Player 1 starts drawing
+# Player 1 draws D5
+# Player 1 passes
+# Player 2 starts drawing
+# Player 2 draws S6
+# Player 2 plays H3
+# Player 3 starts drawing
+# Player 3 draws S3
+# Player 3 plays S3
+# Player 4 plays S4
+# Player 0 plays SK
+# Player 1 plays ST
+# Player 2 plays S6
+# Player 3 plays SJ
+# Player 4 plays H8
+# Player 4 nominates suit S
+# Player 0 starts drawing
+# Player 0 draws C9
+# Player 0 starts drawing
+# Player 0 draws D6
+# Player 0 starts drawing
+# Player 0 draws D9
+# Player 0 starts drawing
+# Player 0 draws H9
+# Player 0 starts drawing
+# Player 0 draws HT
+# Player 0 passes
+# Player 1 plays SQ
+# Player 2 plays S9
+# Player 3 starts drawing
+# Player 3 draws D4
+# Player 3 starts drawing
+# Player 3 draws C3
+# Player 3 passes
+# Player 4 passes
+# Player 0 plays H9
+# Last card: H9
+# Last suit: H
+# Number of cards left in deck: 0
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:        9                        Suit C:   45    T   A                   Suit C:      7                          Suit C:  3  6                           Suit C:            K
+# Suit D:     6  9TJ                      Suit D:    5 7                          Suit D:  3                              Suit D:   4        K                    Suit D:             A
+# Suit H:     6   TJ K                    Suit H:                                 Suit H:   4                             Suit H: 2           A                   Suit H:    5 7
+# Suit S:                                 Suit S:                                 Suit S:      7      A                   Suit S:                                 Suit S:    5
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4, 53, 53, 30]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4, 53, 53, 30"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "Currently I have: \nSuit C:        9     \nSuit D:     6  9TJ   \nSuit H:     6   TJ K \nSuit S:              \nPrevious card: H9\nPrevious suit: H\nStarting counterclockwise, other players have: 9, 6, 5, 6, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:   45    T   A\nSuit D:    5 7       \nSuit H:              \nSuit S:              \nPrevious card: H9\nPrevious suit: H\nStarting counterclockwise, other players have: 6, 5, 6, 5, 9 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:   4          \nSuit S:      7      A\nPrevious card: H9\nPrevious suit: H\nStarting counterclockwise, other players have: 5, 6, 5, 9, 6 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:  3  6        \nSuit D:   4        K \nSuit H: 2           A\nSuit S:              \nPrevious card: H9\nPrevious suit: H\nStarting counterclockwise, other players have: 6, 5, 9, 6, 5 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 7       \nSuit S:    5         \nPrevious card: H9\nPrevious suit: H\nStarting counterclockwise, other players have: 5, 9, 6, 5, 6 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaa96aaaa5a9696aaa6aa0000000200000202000000000000200000000000008000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaa6a5aaa9aaaaa6aaaaaaa6a0000000200000204000000000000100000000000010000000000000080000000000)
+ObservationTensor(2): binvec(372, 0xaa9aa6aaaa69aaaaaaaaaaaaa90000000200000202000000000000200000000000001000000000000400000000000)
+ObservationTensor(3): binvec(372, 0xa66a9aaa6aaaaaaaaaaaaa9aa60000000200000204000000000000020000000000008000000000000800000000000)
+ObservationTensor(4): binvec(372, 0xaaaaaaa5aaa6aaaaaaaaaa6a9a0000000200000200400000000000100000000000010000000000000400000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [53]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 53
+
+# State 109
+# Apply action "H4"
+action: 10
+
+# State 110
+# Apply action "H2"
+action: 2
+
+# State 111
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Player 1 starts drawing
+# Player 1 draws CT
+# Player 1 starts drawing
+# Player 1 draws C5
+# Player 1 starts drawing
+# Player 1 draws C4
+# Player 1 starts drawing
+# Player 1 draws ST
+# Player 1 starts drawing
+# Player 1 draws D5
+# Player 1 passes
+# Player 2 starts drawing
+# Player 2 draws S6
+# Player 2 plays H3
+# Player 3 starts drawing
+# Player 3 draws S3
+# Player 3 plays S3
+# Player 4 plays S4
+# Player 0 plays SK
+# Player 1 plays ST
+# Player 2 plays S6
+# Player 3 plays SJ
+# Player 4 plays H8
+# Player 4 nominates suit S
+# Player 0 starts drawing
+# Player 0 draws C9
+# Player 0 starts drawing
+# Player 0 draws D6
+# Player 0 starts drawing
+# Player 0 draws D9
+# Player 0 starts drawing
+# Player 0 draws H9
+# Player 0 starts drawing
+# Player 0 draws HT
+# Player 0 passes
+# Player 1 plays SQ
+# Player 2 plays S9
+# Player 3 starts drawing
+# Player 3 draws D4
+# Player 3 starts drawing
+# Player 3 draws C3
+# Player 3 passes
+# Player 4 passes
+# Player 0 plays H9
+# Player 1 passes
+# Player 2 plays H4
+# Player 3 plays H2
+# Last card: H2
+# Last suit: H
+# Number of cards left in deck: 0
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:        9                        Suit C:   45    T   A                   Suit C:      7                          Suit C:  3  6                           Suit C:            K
+# Suit D:     6  9TJ                      Suit D:    5 7                          Suit D:  3                              Suit D:   4        K                    Suit D:             A
+# Suit H:     6   TJ K                    Suit H:                                 Suit H:                                 Suit H:             A                   Suit H:    5 7
+# Suit S:                                 Suit S:                                 Suit S:      7      A                   Suit S:                                 Suit S:    5
+IsTerminal() = False
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4, 53, 53, 30, 53, 10, 2]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4, 53, 53, 30, 53, 10, 2"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 4
+ObservationString(0) = "Currently I have: \nSuit C:        9     \nSuit D:     6  9TJ   \nSuit H:     6   TJ K \nSuit S:              \nPrevious card: H2\nPrevious suit: H\nStarting counterclockwise, other players have: 9, 6, 4, 5, 5 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:   45    T   A\nSuit D:    5 7       \nSuit H:              \nSuit S:              \nPrevious card: H2\nPrevious suit: H\nStarting counterclockwise, other players have: 6, 4, 5, 5, 9 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:              \nSuit S:      7      A\nPrevious card: H2\nPrevious suit: H\nStarting counterclockwise, other players have: 4, 5, 5, 9, 6 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:  3  6        \nSuit D:   4        K \nSuit H:             A\nSuit S:              \nPrevious card: H2\nPrevious suit: H\nStarting counterclockwise, other players have: 5, 5, 9, 6, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5 7       \nSuit S:    5         \nPrevious card: H2\nPrevious suit: H\nStarting counterclockwise, other players have: 5, 9, 6, 4, 5 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaa96aaaa5a9696aaa6aa2000000000000202000000000000400000000000010000000000000800000000000)
+ObservationTensor(1): binvec(372, 0xaaaa6a5aaa9aaaaa6aaaaaaa6a2000000000000208000000000000200000000000010000000000000080000000000)
+ObservationTensor(2): binvec(372, 0xaa9aaaaaaa69aaaaaaaaaaaaa92000000000000204000000000000200000000000001000000000000400000000000)
+ObservationTensor(3): binvec(372, 0xaa6a9aaa6aaaaaaaaaaaaa9aa62000000000000204000000000000020000000000008000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xaaaaaaa5aaa6aaaaaaaaaa6a9a2000000000000200400000000000100000000000020000000000000800000000000)
+Rewards() = [0, 0, 0, 0, 0]
+Returns() = [0, 0, 0, 0, 0]
+LegalActions() = [14, 22, 53]
+StringLegalActions() = ["H5", "H7", "Pass"]
+
+# Apply action "H7"
+action: 22
+
+# State 112
+# Apply action "HK"
+action: 46
+
+# State 113
+# Apply action "Pass"
+action: 53
+
+# State 114
+# Apply action "Pass"
+action: 53
+
+# State 115
+# Apply action "Pass"
+action: 53
+
+# State 116
+# Apply action "Pass"
+action: 53
+
+# State 117
+# Apply action "H6"
+action: 18
+
+# State 118
+# Apply action "Pass"
+action: 53
+
+# State 119
+# Apply action "Pass"
+action: 53
+
+# State 120
+# Apply action "HA"
+action: 50
+
+# State 121
+# Apply action "Pass"
+action: 53
+
+# State 122
+# Apply action "Pass"
+action: 53
+
+# State 123
+# Apply action "Pass"
+action: 53
+
+# State 124
+# Apply action "Pass"
+action: 53
+
+# State 125
+# Apply action "Pass"
+action: 53
+
+# State 126
+# Apply action "Pass"
+action: 53
+
+# State 127
+# Player 0 becomes the dealer
+# Player 1 is dealt D2
+# Player 2 is dealt H4
+# Player 3 is dealt DK
+# Player 4 is dealt S4
+# Player 0 is dealt DT
+# Player 1 is dealt CA
+# Player 2 is dealt H3
+# Player 3 is dealt S8
+# Player 4 is dealt CK
+# Player 0 is dealt H6
+# Player 1 is dealt D7
+# Player 2 is dealt S7
+# Player 3 is dealt C6
+# Player 4 is dealt H7
+# Player 0 is dealt HJ
+# Player 1 is dealt SQ
+# Player 2 is dealt SA
+# Player 3 is dealt H2
+# Player 4 is dealt DA
+# Player 0 is dealt HK
+# Player 1 is dealt CJ
+# Player 2 is dealt D8
+# Player 3 is dealt HA
+# Player 4 is dealt S2
+# Player 0 is dealt SK
+# Player 0 draws DJ
+# Player 1 plays D2
+# Player 2 plays D8
+# Player 2 nominates suit S
+# Player 3 plays S8
+# Player 3 nominates suit S
+# Player 4 plays S2
+# Player 0 starts drawing
+# Player 0 draws C2
+# Player 0 plays C2
+# Player 1 plays CJ
+# Player 2 starts drawing
+# Player 2 draws D3
+# Player 2 starts drawing
+# Player 2 draws CQ
+# Player 2 starts drawing
+# Player 2 draws C7
+# Player 2 starts drawing
+# Player 2 draws S9
+# Player 2 plays CQ
+# Player 3 starts drawing
+# Player 3 draws DQ
+# Player 3 starts drawing
+# Player 3 draws SJ
+# Player 3 plays DQ
+# Player 4 starts drawing
+# Player 4 draws S5
+# Player 4 starts drawing
+# Player 4 draws H5
+# Player 4 starts drawing
+# Player 4 draws HQ
+# Player 4 starts drawing
+# Player 4 draws H8
+# Player 4 plays HQ
+# Player 0 starts drawing
+# Player 0 draws C8
+# Player 0 plays C8
+# Player 0 nominates suit H
+# Player 1 starts drawing
+# Player 1 draws CT
+# Player 1 starts drawing
+# Player 1 draws C5
+# Player 1 starts drawing
+# Player 1 draws C4
+# Player 1 starts drawing
+# Player 1 draws ST
+# Player 1 starts drawing
+# Player 1 draws D5
+# Player 1 passes
+# Player 2 starts drawing
+# Player 2 draws S6
+# Player 2 plays H3
+# Player 3 starts drawing
+# Player 3 draws S3
+# Player 3 plays S3
+# Player 4 plays S4
+# Player 0 plays SK
+# Player 1 plays ST
+# Player 2 plays S6
+# Player 3 plays SJ
+# Player 4 plays H8
+# Player 4 nominates suit S
+# Player 0 starts drawing
+# Player 0 draws C9
+# Player 0 starts drawing
+# Player 0 draws D6
+# Player 0 starts drawing
+# Player 0 draws D9
+# Player 0 starts drawing
+# Player 0 draws H9
+# Player 0 starts drawing
+# Player 0 draws HT
+# Player 0 passes
+# Player 1 plays SQ
+# Player 2 plays S9
+# Player 3 starts drawing
+# Player 3 draws D4
+# Player 3 starts drawing
+# Player 3 draws C3
+# Player 3 passes
+# Player 4 passes
+# Player 0 plays H9
+# Player 1 passes
+# Player 2 plays H4
+# Player 3 plays H2
+# Player 4 plays H7
+# Player 0 plays HK
+# Player 1 passes
+# Player 2 passes
+# Player 3 passes
+# Player 4 passes
+# Player 0 plays H6
+# Player 1 passes
+# Player 2 passes
+# Player 3 plays HA
+# Player 4 passes
+# Player 0 passes
+# Player 1 passes
+# Player 2 passes
+# Player 3 passes
+# Player 4 passes
+# Last card: HA
+# Last suit: H
+# Number of cards left in deck: 0
+# Player 0:                               Player 1:                               Player 2:                               Player 3:                               Player 4:
+# Suit C:        9                        Suit C:   45    T   A                   Suit C:      7                          Suit C:  3  6                           Suit C:            K
+# Suit D:     6  9TJ                      Suit D:    5 7                          Suit D:  3                              Suit D:   4        K                    Suit D:             A
+# Suit H:         TJ                      Suit H:                                 Suit H:                                 Suit H:                                 Suit H:    5
+# Suit S:                                 Suit S:                                 Suit S:      7      A                   Suit S:                                 Suit S:    5
+IsTerminal() = True
+History() = [58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4, 53, 53, 30, 53, 10, 2, 22, 46, 53, 53, 53, 53, 18, 53, 53, 50, 53, 53, 53, 53, 53, 53]
+HistoryString() = "58, 1, 10, 45, 11, 33, 48, 6, 27, 44, 18, 21, 23, 16, 22, 38, 43, 51, 2, 49, 46, 36, 25, 50, 3, 47, 37, 1, 25, 57, 27, 57, 3, 52, 0, 0, 36, 52, 5, 52, 40, 52, 20, 52, 31, 40, 52, 41, 52, 39, 41, 52, 15, 52, 14, 52, 42, 52, 26, 42, 52, 24, 24, 56, 52, 32, 52, 12, 52, 8, 52, 35, 52, 13, 53, 52, 19, 6, 52, 7, 7, 11, 47, 35, 19, 39, 26, 57, 52, 28, 52, 17, 52, 29, 52, 30, 52, 34, 53, 43, 31, 52, 9, 52, 4, 53, 53, 30, 53, 10, 2, 22, 46, 53, 53, 53, 53, 18, 53, 53, 50, 53, 53, 53, 53, 53, 53"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+ObservationString(0) = "Currently I have: \nSuit C:        9     \nSuit D:     6  9TJ   \nSuit H:         TJ   \nSuit S:              \nPrevious card: HA\nPrevious suit: H\nStarting counterclockwise, other players have: 7, 6, 4, 4, 4 cards.\n"
+ObservationString(1) = "Currently I have: \nSuit C:   45    T   A\nSuit D:    5 7       \nSuit H:              \nSuit S:              \nPrevious card: HA\nPrevious suit: H\nStarting counterclockwise, other players have: 6, 4, 4, 4, 7 cards.\n"
+ObservationString(2) = "Currently I have: \nSuit C:      7       \nSuit D:  3           \nSuit H:              \nSuit S:      7      A\nPrevious card: HA\nPrevious suit: H\nStarting counterclockwise, other players have: 4, 4, 4, 7, 6 cards.\n"
+ObservationString(3) = "Currently I have: \nSuit C:  3  6        \nSuit D:   4        K \nSuit H:              \nSuit S:              \nPrevious card: HA\nPrevious suit: H\nStarting counterclockwise, other players have: 4, 4, 7, 6, 4 cards.\n"
+ObservationString(4) = "Currently I have: \nSuit C:            K \nSuit D:             A\nSuit H:    5         \nSuit S:    5         \nPrevious card: HA\nPrevious suit: H\nStarting counterclockwise, other players have: 4, 7, 6, 4, 4 cards.\n"
+ObservationTensor(0): binvec(372, 0xaaaaaaaa9aaaaa5a9696aaaaaa0000000000002202000000000000400000000000020000000000001000000000000)
+ObservationTensor(1): binvec(372, 0xaaaa6a5aaa9aaaaa6aaaaaaa6a0000000000002208000000000000400000000000020000000000000200000000000)
+ObservationTensor(2): binvec(372, 0xaa9aaaaaaa69aaaaaaaaaaaaa90000000000002208000000000000400000000000004000000000000400000000000)
+ObservationTensor(3): binvec(372, 0xaa6a9aaa6aaaaaaaaaaaaa9aaa0000000000002208000000000000080000000000008000000000001000000000000)
+ObservationTensor(4): binvec(372, 0xaaaaaaa5aaaaaaaaaaaaaa6a9a0000000000002201000000000000100000000000020000000000001000000000000)
+Rewards() = [-171, -106, -64, -45, -53]
+Returns() = [-171, -106, -64, -45, -53]
