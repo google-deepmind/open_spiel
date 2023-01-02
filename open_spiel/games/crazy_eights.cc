@@ -424,7 +424,7 @@ void CrazyEightsState::ApplyDealAction(int action){
           direction_ *=-1;
           return;
         } else if(rank == kDrawTwoRank){
-          num_draws_left_ += 2;
+          num_draws_from_twos_left_ += 2;
           current_player_ = (current_player_ + 1) % num_players_;
           return;
         }
@@ -459,14 +459,14 @@ void CrazyEightsState::ApplyDealAction(int action){
   // if has accumlated 2s and has decided to draw these 2s from previous plays
   if(start_draw_twos_) {
     SPIEL_CHECK_TRUE(use_special_cards_);
-    num_draws_left_--;
+    num_draws_from_twos_left_--;
     // assume if there is no card in the pile then the liability is cleared
     if(!num_cards_left_) {
       // if it is due to that the pile is exhausted during drawing +2s, counted as a pass
-      if(!num_draws_left_) num_passes_++;
-      num_draws_left_ = 0;
+      if(!num_draws_from_twos_left_) num_passes_++;
+      num_draws_from_twos_left_ = 0;
     }
-    if(!num_draws_left_) {
+    if(!num_draws_from_twos_left_) {
       start_draw_twos_ = false;
       phase_ = Phase::kPlay;
       current_player_ = (current_player_ + direction_ + num_players_) % num_players_;
@@ -475,11 +475,11 @@ void CrazyEightsState::ApplyDealAction(int action){
   }
 
   // lastly, consider when the player draws card without having a previous +2 card
-  num_draws_++;
+  num_draws_before_play_++;
   phase_ = Phase::kPlay;
 
-  if(!num_cards_left_) num_draws_ = max_draw_cards_;
-  if(num_draws_ == max_draw_cards_){
+  if(!num_cards_left_) num_draws_before_play_ = max_draw_cards_;
+  if(num_draws_before_play_ == max_draw_cards_){
     can_pass_action_ = true;
   }
 }
@@ -516,7 +516,7 @@ std::vector<Action> CrazyEightsState::PlayLegalActions() const {
     legal_actions.push_back(kPass);
   }
 
-  if(num_draws_left_){
+  if(num_draws_from_twos_left_){
     SPIEL_CHECK_GT(num_cards_left_, 0);
 
   
@@ -533,7 +533,7 @@ std::vector<Action> CrazyEightsState::PlayLegalActions() const {
     }
   } else{
     SearchLegalCards(&legal_actions, hands_[current_player_], GetRank(last_card_), last_suit_);
-    if(num_cards_left_ && num_draws_ != max_draw_cards_) {
+    if(num_cards_left_ && num_draws_before_play_ != max_draw_cards_) {
       SPIEL_CHECK_FALSE(can_pass_action_);
       legal_actions.push_back(kDraw);
     }
@@ -562,7 +562,9 @@ void CrazyEightsState::ApplyPlayAction(int action){
       ScoreUp();
       return;
     }
-    if(max_draw_cards_ == num_draws_) num_draws_ = 0;
+    if(max_draw_cards_ == num_draws_before_play_) {
+      num_draws_before_play_ = 0;
+    }
     current_player_ = (current_player_ + direction_ + num_players_) % num_players_;
     if(num_cards_left_) can_pass_action_ = false;
     return;
@@ -571,7 +573,7 @@ void CrazyEightsState::ApplyPlayAction(int action){
   if(action == kDraw){
     SPIEL_CHECK_FALSE(can_pass_action_);
     phase_ = kDeal;
-    if(num_draws_left_) start_draw_twos_ = true;
+    if(num_draws_from_twos_left_) start_draw_twos_ = true;
     return;
   } else if(nominate_suits_){
     SPIEL_CHECK_LE(action, kDecideDealerActionBase);
@@ -583,7 +585,7 @@ void CrazyEightsState::ApplyPlayAction(int action){
   }
   else {
     can_pass_action_ = false;
-    num_draws_ = 0;
+    num_draws_before_play_ = 0;
     bool all_played = AfterPlayCard(action);
     if(all_played){
       phase_ = kGameOver;
@@ -617,7 +619,7 @@ void CrazyEightsState::ApplyPlayAction(int action){
         // if there is no card currently available in the pile, assume the next player
         // doesn't have to draw cards in the next round, and just view it played
         // a normal card
-        if(num_cards_left_) num_draws_left_ += 2;
+        if(num_cards_left_) num_draws_from_twos_left_ += 2;
         current_player_ = (current_player_ + direction_ + num_players_) % num_players_;
         return;
       }

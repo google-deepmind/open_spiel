@@ -150,11 +150,11 @@ class CrazyEightsState: public State{
 
 
     // the current accmulated +2 cards to be drawn
-    int num_draws_left_ = 0;
+    int num_draws_from_twos_left_ = 0;
 
     // the number of consecutive draws for current_player_ so far
     // this is not used for +2 cases
-    int num_draws_ = 0;
+    int num_draws_before_play_ = 0;
 
     // the number of cards player can draw
     int num_cards_left_;
