@@ -35,8 +35,10 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_episodes", int(5e4), "Number of train episodes.")
 flags.DEFINE_boolean(
-    "iteractive_play", True,
-    "Whether to run an interactive play with the agent after training.")
+    "interactive_play",
+    True,
+    "Whether to run an interactive play with the agent after training.",
+)
 
 
 def pretty_board(time_step):
@@ -120,7 +122,7 @@ def main(_):
     for agent in agents:
       agent.step(time_step)
 
-  if not FLAGS.iteractive_play:
+  if not FLAGS.interactive_play:
     return
 
   # 2. Play from the command line against the trained agent.
