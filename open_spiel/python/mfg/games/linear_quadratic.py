@@ -38,7 +38,7 @@ _VOLATILITY = 1.0
 _CROSS_Q = 0.01
 _KAPPA = 0.5
 _TERMINAL_COST = 1.0
-_DELTA_T = 1.0  # 3.0/_HORIZON
+_DELTA_T = 1.0
 _N_ACTIONS_PER_SIDE = 3
 _SPATIAL_BIAS = 0
 
@@ -52,7 +52,7 @@ _DEFAULT_PARAMS = {
     "cross_q": _CROSS_Q,
     "kappa": _KAPPA,
     "terminal_cost": _TERMINAL_COST,
-    "spatial_bias": _SPATIAL_BIAS
+    "spatial_bias": _SPATIAL_BIAS,
 }
 
 _GAME_TYPE = pyspiel.GameType(
@@ -69,19 +69,19 @@ _GAME_TYPE = pyspiel.GameType(
     provides_information_state_tensor=False,
     provides_observation_string=True,
     provides_observation_tensor=True,
-    parameter_specification=_DEFAULT_PARAMS)
+    parameter_specification=_DEFAULT_PARAMS,
+)
 
 
 class MFGLinearQuadraticGame(pyspiel.Game):
-  """A Mean-Field Linear QUadratic game.
+  """A Mean-Field Linear Quadratic game.
 
-
-    A game starts by an initial chance node that select the initial state
-    of the player in the MFG.
-    Then the game sequentially alternates between:
-      - An action selection node (Where the player Id >= 0)
-      - A chance node (the player id is pyspiel.PlayerId.CHANCE)
-      - A Mean Field node (the player id is pyspiel.PlayerId.MEAN_FIELD)
+  For now, only single-population setting is covered. A game starts by an
+  initial chance node that selects the initial state of the player in the MFG.
+  Then the game sequentially alternates between:
+    - An action selection node (where the player id is >= 0)
+    - A chance node (the player id is pyspiel.PlayerId.CHANCE)
+    - A Mean Field node (the player id is pyspiel.PlayerId.MEAN_FIELD)
   """
 
   # pylint:disable=dangerous-default-value
@@ -89,8 +89,9 @@ class MFGLinearQuadraticGame(pyspiel.Game):
     self.size = params.get("size", _SIZE)
     self.horizon = params.get("horizon", _HORIZON)
     self.dt = params.get("dt", _DELTA_T)
-    self.n_actions_per_side = params.get("n_actions_per_side",
-                                         _N_ACTIONS_PER_SIDE)
+    self.n_actions_per_side = params.get(
+        "n_actions_per_side", _N_ACTIONS_PER_SIDE
+    )
     self.volatility = params.get("volatility", _VOLATILITY)
     self.mean_revert = params.get("mean_revert", _MEAN_REVERT)
     self.cross_q = params.get("cross_q", _CROSS_Q)
@@ -105,7 +106,8 @@ class MFGLinearQuadraticGame(pyspiel.Game):
         min_utility=-np.inf,
         max_utility=+np.inf,
         utility_sum=0.0,
-        max_game_length=self.horizon)
+        max_game_length=self.horizon,
+    )
     super().__init__(_GAME_TYPE, game_info, params)
 
   def new_initial_state(self):
@@ -114,8 +116,9 @@ class MFGLinearQuadraticGame(pyspiel.Game):
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns an object used for observing game state."""
-    if ((iig_obs_type is None) or
-        (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
+    if (iig_obs_type is None) or (
+        iig_obs_type.public_info and not iig_obs_type.perfect_recall
+    ):
       return Observer(params, self)
     return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
@@ -151,13 +154,13 @@ class MFGLinearQuadraticState(pyspiel.State):
 
     # Represents the current probability distribution over game states.
     # Initialized with a uniform distribution.
-    self._distribution = [1. / self.size for i in range(self.size)]
+    self._distribution = [1.0 / self.size for i in range(self.size)]
 
   def to_string(self):
     return self.state_to_str(self.x, self.tick)
 
   def state_to_str(self, x, tick, player_id=pyspiel.PlayerId.DEFAULT_PLAYER_ID):
-    """A string that uniquely identify a triplet x, t, player_id."""
+    """A string that uniquely identifies a triplet x, t, player_id."""
     if self.x is None:
       return "initial"
 
@@ -168,7 +171,8 @@ class MFGLinearQuadraticState(pyspiel.State):
     elif self._player_id == pyspiel.PlayerId.CHANCE:
       return "({}, {})_a_mu".format(x, tick)
     raise ValueError(
-        "player_id is not mean field, chance or default player id.")
+        "player_id is not mean field, chance or default player id."
+    )
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every perfect-information sequential-move game.
@@ -181,20 +185,28 @@ class MFGLinearQuadraticState(pyspiel.State):
     """Returns a list of legal actions for player and MFG nodes."""
     if player == pyspiel.PlayerId.MEAN_FIELD:
       return []
-    if (player == pyspiel.PlayerId.DEFAULT_PLAYER_ID and
-        player == self.current_player()):
+    if (
+        player == pyspiel.PlayerId.DEFAULT_PLAYER_ID
+        and player == self.current_player()
+    ):
       return list(range(self.n_actions))
-    raise ValueError(f"Unexpected player {player}. "
-                     "Expected a mean field or current player 0.")
+    raise ValueError(
+        f"Unexpected player {player}. "
+        "Expected a mean field or current player 0."
+    )
 
   def _apply_action(self, action):
     """Applies the specified action to the state."""
     if self._player_id == pyspiel.PlayerId.MEAN_FIELD:
       raise ValueError(
-          "_apply_action should not be called at a MEAN_FIELD state.")
+          "_apply_action should not be called at a MEAN_FIELD state."
+      )
     self.return_value = self._rewards()
 
-    assert self._player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID or self._player_id == pyspiel.PlayerId.CHANCE
+    assert (
+        self._player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID
+        or self._player_id == pyspiel.PlayerId.CHANCE
+    )
 
     if self.x is None:
       self.x = action
@@ -202,8 +214,9 @@ class MFGLinearQuadraticState(pyspiel.State):
       return
 
     if action < 0 or action >= self.n_actions:
-      raise ValueError("The action is between 0 and {} at any node".format(
-          self.n_actions))
+      raise ValueError(
+          "The action is between 0 and {} at any node".format(self.n_actions)
+      )
 
     move = self.action_to_move(action)
     if self._player_id == pyspiel.PlayerId.CHANCE:
@@ -212,7 +225,7 @@ class MFGLinearQuadraticState(pyspiel.State):
       self._player_id = pyspiel.PlayerId.MEAN_FIELD
       self.tick += 1
     elif self._player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
-      dist_mean = (self.distribution_average() - self.x)
+      dist_mean = self.distribution_average() - self.x
       full_move = move
       full_move += self.mean_revert * dist_mean
       full_move *= self.dt
@@ -240,12 +253,14 @@ class MFGLinearQuadraticState(pyspiel.State):
 
     a = np.array(self.actions_to_position())
     gaussian_vals = scipy.stats.norm.cdf(
-        a + 0.5, scale=self.volatility) - scipy.stats.norm.cdf(
-            a - 0.5, scale=self.volatility)
-    gaussian_vals[0] += scipy.stats.norm.cdf(
-        a[0] - 0.5, scale=self.volatility) - 0.0
+        a + 0.5, scale=self.volatility
+    ) - scipy.stats.norm.cdf(a - 0.5, scale=self.volatility)
+    gaussian_vals[0] += (
+        scipy.stats.norm.cdf(a[0] - 0.5, scale=self.volatility) - 0.0
+    )
     gaussian_vals[-1] += 1.0 - scipy.stats.norm.cdf(
-        a[-1] + 0.5, scale=self.volatility)
+        a[-1] + 0.5, scale=self.volatility
+    )
     return [
         (act, p) for act, p in zip(list(range(self.n_actions)), gaussian_vals)
     ]
@@ -273,7 +288,8 @@ class MFGLinearQuadraticState(pyspiel.State):
     """
     if self._player_id != pyspiel.PlayerId.MEAN_FIELD:
       raise ValueError(
-          "update_distribution should only be called at a MEAN_FIELD state.")
+          "update_distribution should only be called at a MEAN_FIELD state."
+      )
     self._distribution = distribution.copy()
     self._player_id = pyspiel.PlayerId.DEFAULT_PLAYER_ID
 
@@ -301,25 +317,32 @@ class MFGLinearQuadraticState(pyspiel.State):
     T = self.horizon
     t = self.t
 
-    R = (K + q)**2 + (kappa - q**2)
+    R = (K + q) ** 2 + (kappa - q**2)
     deltap = -(K + q) + math.sqrt(R)
     deltam = -(K + q) - math.sqrt(R)
-    numerator = -(kappa - q**2) * (math.exp(
-        (deltap - deltam) * (T - t)) - 1) - c * (
-            deltap * math.exp((deltap - deltam) * (T - t)) - deltam)
-    denominator = (deltam * math.exp(
-        (deltap - deltam) * (T - t)) - deltap) - c * (
-            math.exp((deltap - deltam) * (T - t)) - 1)
+    numerator = -(kappa - q**2) * (
+        math.exp((deltap - deltam) * (T - t)) - 1
+    ) - c * (deltap * math.exp((deltap - deltam) * (T - t)) - deltam)
+    denominator = (
+        deltam * math.exp((deltap - deltam) * (T - t)) - deltap
+    ) - c * (math.exp((deltap - deltam) * (T - t)) - 1)
     return numerator / denominator
 
   def _rewards(self):
     """Reward for the player for this state."""
     if self._player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
-      dist_mean = (self.distribution_average() - self.x)
+      dist_mean = self.distribution_average() - self.x
 
       move = self.action_to_move(self._last_action)
-      action_reward = self.dt / 2 * (-move**2 + 2 * self.cross_q * move *
-                                     dist_mean - self.kappa * dist_mean**2)
+      action_reward = (
+          self.dt
+          / 2
+          * (
+              -(move**2)
+              + 2 * self.cross_q * move * dist_mean
+              - self.kappa * dist_mean**2
+          )
+      )
 
       if self.is_terminal():
         terminal_reward = -self.terminal_cost * dist_mean**2 / 2.0
@@ -330,8 +353,7 @@ class MFGLinearQuadraticState(pyspiel.State):
 
   def rewards(self) -> List[float]:
     """Rewards for all players."""
-    # For now, only single-population (single-player) mean field games
-    # are supported.
+    # For now, only single-population mean field games are supported.
     return [self._rewards()]
 
   def _returns(self):
@@ -340,14 +362,14 @@ class MFGLinearQuadraticState(pyspiel.State):
 
   def returns(self) -> List[float]:
     """Returns for all players."""
-    # For now, only single-population (single-player) mean field games
-    # are supported.
+    # For now, only single-population mean field games are supported.
     return [self._returns()]
 
   def __str__(self):
     """A string that uniquely identify the current state."""
     return self.state_to_str(
-        x=self.x, tick=self.tick, player_id=self._player_id)
+        x=self.x, tick=self.tick, player_id=self._player_id
+    )
 
 
 class Observer:
@@ -363,7 +385,7 @@ class Observer:
     self.dict = {
         "x": self.tensor[0],
         "t": self.tensor[1],
-        "observation": self.tensor
+        "observation": self.tensor,
     }
 
   def set_from(self, state, player: int):
@@ -378,7 +400,8 @@ class Observer:
     if state.x is not None:
       if not 0 <= state.x < self.size:
         raise ValueError(
-            f"Expected {state} x position to be in [0, {self.size})")
+            f"Expected {state} x position to be in [0, {self.size})"
+        )
       self.dict["x"] = np.array([state.x])
     if not 0 <= state.t <= self.horizon:
       raise ValueError(f"Expected {state} time to be in [0, {self.horizon}]")
