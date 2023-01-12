@@ -295,9 +295,10 @@ TabularPolicy GetUniformPolicy(const Game& game) {
   return GetEmptyTabularPolicy(game, /*initialize_to_uniform=*/true);
 }
 
-TabularPolicy GetRandomPolicy(const Game& game, int seed) {
+template <typename RandomNumberDistribution>
+TabularPolicy SamplePolicy(
+  const Game& game, int seed, RandomNumberDistribution& dist) {
   std::mt19937 gen(seed);
-  std::uniform_real_distribution<double> dist(0, 1);
   TabularPolicy policy = GetEmptyTabularPolicy(game);
   std::unordered_map<std::string, ActionsAndProbs>& policy_table =
       policy.PolicyTable();
@@ -330,6 +331,16 @@ TabularPolicy GetRandomPolicy(const Game& game, int seed) {
     kv.second = state_policy;
   }
   return policy;
+}
+
+TabularPolicy GetRandomPolicy(const Game& game, int seed) {
+  std::uniform_real_distribution<double> dist(0, 1);
+  return SamplePolicy(game, seed, dist);
+}
+
+TabularPolicy GetFlatDirichletPolicy(const Game& game, int seed) {
+  std::gamma_distribution<double> dist(1.0, 1.0);
+  return SamplePolicy(game, seed, dist);
 }
 
 TabularPolicy GetFirstActionPolicy(const Game& game) {

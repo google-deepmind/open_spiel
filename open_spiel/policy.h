@@ -380,6 +380,7 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game,
                                     bool initialize_to_uniform = false);
 TabularPolicy GetUniformPolicy(const Game& game);
 TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
+TabularPolicy GetFlatDirichletPolicy(const Game& game, int seed = 0);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
 // Returns a preferred action policy as a tabular policy.
