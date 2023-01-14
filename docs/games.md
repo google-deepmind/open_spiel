@@ -296,7 +296,7 @@ Status                                       | Game
 
 *   A precursor of UNO (see [here](https://www.unorules.org/crazy-eights/)).
 *   Players try to match the rank or suit of the previous played card.
-*   Eights are viewed as wild cards
+*   Eights are viewed as wild cards.
 *   In an alternative version, special cards such as skip, reverse, draw-two are permitted.
 *   Nondeterministic.
 *   Imperfect information.
