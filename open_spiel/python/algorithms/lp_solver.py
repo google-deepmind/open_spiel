@@ -456,7 +456,7 @@ def iterated_dominance(game_or_payoffs, mode, tol=1e-7):
   payoffs = utils.game_payoffs_array(game_or_payoffs) if isinstance(
       game_or_payoffs, pyspiel.NormalFormGame) else np.asfarray(game_or_payoffs)
   live_actions = [
-      np.ones(num_actions, np.bool) for num_actions in payoffs.shape[1:]
+      np.ones(num_actions, bool) for num_actions in payoffs.shape[1:]
   ]
   progress = True
   while progress:

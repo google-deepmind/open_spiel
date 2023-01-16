@@ -185,7 +185,7 @@ void actor(const open_spiel::Game& game, const AlphaZeroConfig& config, int num,
   } else {
     logger.reset(new NoopLogger());
   }
-  std::mt19937 rng;
+  std::mt19937 rng(absl::ToUnixNanos(absl::Now()));
   absl::uniform_real_distribution<double> dist(0.0, 1.0);
   std::vector<std::unique_ptr<MCTSBot>> bots;
   bots.reserve(2);

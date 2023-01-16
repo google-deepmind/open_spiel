@@ -28,16 +28,25 @@ using open_spiel::colored_trails::ColoredTrailsState;
 using open_spiel::colored_trails::Trade;
 using open_spiel::colored_trails::Board;
 
+using open_spiel::colored_trails::kDefaultNumColors;
+using open_spiel::colored_trails::kNumChipsLowerBound;
+using open_spiel::colored_trails::kNumChipsUpperBound;
+
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(ColoredTrailsGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(ColoredTrailsState);
 
 void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
+  m.attr("NUM_COLORS") = py::int_(kDefaultNumColors);
+  m.attr("NUM_CHIPS_LOWER_BOUND") = py::int_(kNumChipsLowerBound);
+  m.attr("NUM_CHIPS_UPPER_BOUND") = py::int_(kNumChipsUpperBound);
+
   py::class_<Trade>(m, "Trade")
       // arguments: giving, receiving
       .def(py::init<const std::vector<int>&, const std::vector<int>&>())
       .def_readwrite("giving", &Trade::giving)
       .def_readwrite("receiving", &Trade::receiving)
-      .def("to_string", &Trade::ToString);
+      .def("to_string", &Trade::ToString)
+      .def("__str__", &Trade::ToString);
 
   py::class_<Board>(m, "Board")
       .def(py::init<>())
@@ -54,6 +63,10 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
       .def_readonly("chips", &Board::chips)
       // list if positions of the players and the flag (the last element)
       .def_readonly("positions", &Board::positions)
+      // arguments: (player: List[int], trade: trade)
+      .def("apply_trade", &Board::ApplyTrade)
+      // no arguments; returns a clone of this board
+      .def("clone", &Board::Clone)
       // in_bounds(row, col); returns true/false
       .def("in_bounds", &Board::InBounds)
       // return a string description of the board, as in the instances file
@@ -63,7 +76,12 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
 
   py::classh<ColoredTrailsState, State>(m, "ColoredTrailsState")
       .def("get_board", &ColoredTrailsState::board)
+      // arguments: none, returns list of current proposals (in order made)
       .def("get_proposals", &ColoredTrailsState::proposals)
+      // arguments: (player: int, chips: List[int], proposal: Trade,
+      //             rng_rolls: List[float]), returns nothing.
+      .def("set_chips_and_trade_proposals",
+           &ColoredTrailsState::SetChipsAndTradeProposal)
       // Pickle support
       .def(py::pickle(
           [](const ColoredTrailsState& state) {  // __getstate__
@@ -77,13 +95,30 @@ void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
           }));
 
   py::classh<ColoredTrailsGame, Game>(m, "ColoredTrailsGame")
-    // Pickle support
-    .def(py::pickle(
-        [](std::shared_ptr<const ColoredTrailsGame> game) {  // __getstate__
-          return game->ToString();
-        },
-        [](const std::string& data) {  // __setstate__
-          return std::dynamic_pointer_cast<ColoredTrailsGame>(
-              std::const_pointer_cast<Game>(LoadGame(data)));
-        }));
+      // arguments(trade_action: int); returns Trade
+      .def("lookup_trade", &ColoredTrailsGame::LookupTrade)
+      // arguments (player: int); returns responder action to trade with player
+      .def("responder_trade_with_player_action",
+           &ColoredTrailsGame::ResponderTradeWithPlayerAction)
+      // no arguments; returns the pass action
+      .def("pass_action", &ColoredTrailsGame::PassAction)
+      // arguments (seed: int, board: Board, player: int)
+      // returns: (board, action)
+      .def("sample_random_board_completion",
+           &ColoredTrailsGame::SampleRandomBoardCompletion)
+      // Pickle support
+      .def(py::pickle(
+          [](std::shared_ptr<const ColoredTrailsGame> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            return std::dynamic_pointer_cast<ColoredTrailsGame>(
+                std::const_pointer_cast<Game>(LoadGame(data)));
+          }));
+
+  // arguments: (player: int, board: board). Returns the gain of the player.
+  m.def("score", &colored_trails::Score);
+
+  // arguments: (combo: List[int])
+  m.def("combo_to_string", &colored_trails::ComboToString);
 }

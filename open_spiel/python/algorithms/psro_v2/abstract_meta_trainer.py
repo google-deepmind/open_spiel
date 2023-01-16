@@ -47,11 +47,12 @@ def _process_string_or_callable(string_or_callable, dictionary):
 
   try:
     return dictionary[string_or_callable]
-  except KeyError:
+  except KeyError as e:
     raise NotImplementedError("Input type / value not supported. Accepted types"
                               ": string, callable. Acceptable string values : "
                               "{}. Input provided : {}".format(
-                                  list(dictionary.keys()), string_or_callable))
+                                  list(dictionary.keys()),
+                                  string_or_callable)) from e
 
 
 def sample_episode(state, policies):

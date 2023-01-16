@@ -173,7 +173,7 @@ class MFGCrowdModellingState(pyspiel.State):
             "The action is between 0 and self.size - 1 at an init chance node")
       self._x = action
       self._is_chance_init = False
-      self._player_id = 0
+      self._player_id = pyspiel.PlayerId.DEFAULT_PLAYER_ID
     elif self._player_id == pyspiel.PlayerId.CHANCE:
       # Here the action is between 0 and 2
       if action < 0 or action > 2:
@@ -182,7 +182,7 @@ class MFGCrowdModellingState(pyspiel.State):
       self._x = (self.x + self._ACTION_TO_MOVE[action]) % self.size
       self._t += 1
       self._player_id = pyspiel.PlayerId.MEAN_FIELD
-    elif self._player_id == 0:
+    elif self._player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
       # Here the action is between 0 and 2
       if action < 0 or action > 2:
         raise ValueError(
@@ -235,7 +235,7 @@ class MFGCrowdModellingState(pyspiel.State):
 
   def _rewards(self):
     """Reward for the player for this state."""
-    if self._player_id == 0:
+    if self._player_id == pyspiel.PlayerId.DEFAULT_PLAYER_ID:
       r_x = 1 - (1.0 * np.abs(self.x - self.size // 2)) / (self.size // 2)
       r_a = -(1.0 * np.abs(self._ACTION_TO_MOVE[self._last_action])) / self.size
       r_mu = - np.log(self._distribution[self.x] + _EPSILON)

@@ -57,7 +57,7 @@ def main_loop(unused_arg):
       num_actions=num_actions,
       loss_str=FLAGS.algorithm,
       hidden_layers_sizes=[128, 128],
-      batch_size=128,
+      lambda_=1.0,
       entropy_cost=0.01,
       critic_learning_rate=0.1,
       pi_learning_rate=0.1,

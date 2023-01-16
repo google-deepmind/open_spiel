@@ -180,6 +180,7 @@ class EFGGame : public Game {
   std::unique_ptr<Node> NewNode() const;
   void ParseGame();
   void ParsePrologue();
+  std::string NextPayoffToken();
   std::string NextToken();
   void AdvancePosition();
   std::string GetLine(int line) const;

@@ -71,6 +71,8 @@ inline constexpr int kInformationStateTensorSize =
     + kNumCards                       // Current hand
     + kNumTricks * kTrickTensorSize;  // History of tricks
 
+enum class Phase { kDealerSelection, kDeal, kBidding, kDiscard, kGoAlone, kPlay,
+                   kGameOver };
 enum class Suit { kInvalidSuit = -1, kClubs = 0, kDiamonds = 1,
                   kHearts = 2, kSpades = 3 };
 enum Seat { kNorth, kEast, kSouth, kWest };
@@ -105,15 +107,18 @@ class Trick {
   Trick(Player leader, Suit trump_suit, int card);
   void Play(Player player, int card);
   Suit LedSuit() const { return led_suit_; }
-  Player Winner() const { return winning_player_; }
+  Suit TrumpSuit() const { return trump_suit_; }
+  bool TrumpPlayed() const { return trump_played_; }
   Player Leader() const { return leader_; }
+  Player Winner() const { return winning_player_; }
   std::vector<int> Cards() const { return cards_; }
 
  private:
   int winning_card_;
   Suit led_suit_;
   Suit trump_suit_;
-  Player leader_;
+  bool trump_played_;
+  Player leader_;  // First player to throw.
   Player winning_player_;
   std::vector<int> cards_;
 };
@@ -122,11 +127,11 @@ class EuchreState : public State {
  public:
   EuchreState(std::shared_ptr<const Game> game, bool allow_lone_defender,
               bool stick_the_dealer);
-  Player CurrentPlayer() const override;
+  Player CurrentPlayer() const override { return current_player_; }
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
-  std::vector<double> Returns() const override;
+  std::vector<double> Returns() const override { return points_; }
   void InformationStateTensor(Player player,
                               absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
@@ -142,6 +147,7 @@ class EuchreState : public State {
   int Discard() const { return discard_; }
   int TrumpSuit() const { return static_cast<int>(trump_suit_); }
   int LeftBower() const { return left_bower_; }
+  int RightBower() const { return right_bower_; }
   int Declarer() const { return declarer_; }
   int FirstDefender() const { return first_defender_; }
   int DeclarerPartner() const { return declarer_partner_; }
@@ -149,24 +155,20 @@ class EuchreState : public State {
   absl::optional<bool> DeclarerGoAlone() const { return declarer_go_alone_; }
   Player LoneDefender() const { return lone_defender_; }
   std::vector<bool> ActivePlayers() const { return active_players_; }
-  std::vector<double> Points() const { return points_; }
   Player Dealer() const { return dealer_; }
 
-  enum class Phase {
-    kDealerSelection, kDeal, kBidding, kDiscard, kGoAlone, kPlay, kGameOver };
   Phase CurrentPhase() const { return phase_; }
 
   int CurrentTrickIndex() const {
     return std::min(num_cards_played_ / num_active_players_,
                     static_cast<int>(tricks_.size()));
   }
+  Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
+  const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
 
   std::array<absl::optional<Player>, kNumCards> CardHolder() const {
     return holder_;
   }
-  int CardRank(int card) const { return euchre::CardRank(card); }
-  Suit CardSuit(int card) const { return euchre::CardSuit(card); }
-  std::string CardString(int card) const { return euchre::CardString(card); }
   std::vector<Trick> Tricks() const;
 
  protected:
@@ -188,8 +190,6 @@ class EuchreState : public State {
 
   void ComputeScore();
 
-  Trick& CurrentTrick() { return tricks_[CurrentTrickIndex()]; }
-  const Trick& CurrentTrick() const { return tricks_[CurrentTrickIndex()]; }
   std::array<std::string, kNumSuits> FormatHand(int player,
                                                 bool mark_voids) const;
   std::string FormatBidding() const;
@@ -207,9 +207,10 @@ class EuchreState : public State {
   int discard_ = kInvalidAction;
   Suit trump_suit_ = Suit::kInvalidSuit;
   int left_bower_ = kInvalidAction;
+  int right_bower_ = kInvalidAction;
   Player declarer_ = kInvalidPlayer;
-  Player first_defender_ = kInvalidPlayer;
   Player declarer_partner_ = kInvalidPlayer;
+  Player first_defender_ = kInvalidPlayer;
   Player second_defender_ = kInvalidPlayer;
   absl::optional<bool> declarer_go_alone_;
   Player lone_defender_ = kInvalidPlayer;
@@ -251,9 +252,6 @@ class EuchreGame : public Game {
         (kNumPlayers * kNumTricks) +  // Deal hands
         1;                            // Upcard
   }
-
-  int MaxBids() const { return kMaxBids; }
-  int NumCards() const { return kNumCards; }
 
  private:
   const bool allow_lone_defender_;

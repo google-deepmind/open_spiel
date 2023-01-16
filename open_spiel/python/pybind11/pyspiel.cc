@@ -36,6 +36,7 @@
 #include "open_spiel/python/pybind11/games_chess.h"
 #include "open_spiel/python/pybind11/games_colored_trails.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
+#include "open_spiel/python/pybind11/games_gin_rummy.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
@@ -277,6 +278,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (Action(State::*)(const std::string&) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
+      .def("to_string", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
       .def("is_initial_state", &State::IsInitialState)
       .def("move_number", &State::MoveNumber)
@@ -623,6 +625,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_chess(m);   // Chess game.
   init_pyspiel_games_colored_trails(m);   // Colored Trails game.
   init_pyspiel_games_euchre(m);  // Game-specific functions for euchre.
+  init_pyspiel_games_gin_rummy(m);  // Game-specific functions for gin_rummy.
   init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
   init_pyspiel_games_leduc_poker(m);  // Leduc poker game.
   init_pyspiel_games_negotiation(m);  // Negotiation game.

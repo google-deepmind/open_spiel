@@ -22,6 +22,7 @@
 
 // Several function return absl::optional or lists of absl::optional, so must
 // use pybind11_abseil here.
+#include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::euchre::EuchreGame);
@@ -34,30 +35,74 @@ using euchre::EuchreGame;
 using euchre::EuchreState;
 
 void init_pyspiel_games_euchre(py::module& m) {
-  py::classh<EuchreState, State> state_class(m, "EuchreState");
-  state_class.def("num_cards_dealt", &EuchreState::NumCardsDealt)
+  py::module_ euchre = m.def_submodule("euchre");
+
+  euchre.attr("JACK_RANK") = py::int_(euchre::kJackRank);
+  euchre.attr("NUM_SUITS") = py::int_(euchre::kNumSuits);
+  euchre.attr("NUM_CARDS_PER_SUIT") = py::int_(euchre::kNumCardsPerSuit);
+  euchre.attr("NUM_CARDS") = py::int_(euchre::kNumCards);
+  euchre.attr("PASS_ACTION") = py::int_(euchre::kPassAction);
+  euchre.attr("CLUBS_TRUMP_ACTION") = py::int_(euchre::kClubsTrumpAction);
+  euchre.attr("DIAMONDS_TRUMP_ACTION") = py::int_(euchre::kDiamondsTrumpAction);
+  euchre.attr("HEARTS_TRUMP_ACTION") = py::int_(euchre::kHeartsTrumpAction);
+  euchre.attr("SPADES_TRUMP_ACTION") = py::int_(euchre::kSpadesTrumpAction);
+  euchre.attr("GO_ALONE_ACTION") = py::int_(euchre::kGoAloneAction);
+  euchre.attr("PLAY_WITH_PARTNER_ACTION") = py::int_(
+      euchre::kPlayWithPartnerAction);
+  euchre.attr("MAX_BIDS") = py::int_(euchre::kMaxBids);
+  euchre.attr("NUM_TRICKS") = py::int_(euchre::kNumTricks);
+  euchre.attr("FULL_HAND_SIZE") = py::int_(euchre::kFullHandSize);
+
+  euchre.def("card_string", euchre::CardString);
+  euchre.def("card_rank", py::overload_cast<int>(euchre::CardRank));
+  euchre.def("card_rank",
+             py::overload_cast<int, euchre::Suit>(euchre::CardRank));
+  euchre.def("card_suit", py::overload_cast<int>(euchre::CardSuit));
+  euchre.def("card_suit",
+             py::overload_cast<int, euchre::Suit>(euchre::CardSuit));
+
+  py::enum_<euchre::Suit>(euchre, "Suit")
+    .value("INVALID_SUIT", euchre::Suit::kInvalidSuit)
+    .value("CLUBS", euchre::Suit::kClubs)
+    .value("DIAMONDS", euchre::Suit::kDiamonds)
+    .value("HEARTS", euchre::Suit::kHearts)
+    .value("SPADES", euchre::Suit::kSpades)
+    .export_values();
+
+  py::enum_<euchre::Phase>(euchre, "Phase")
+      .value("DEALER_SELECTION", euchre::Phase::kDealerSelection)
+      .value("DEAL", euchre::Phase::kDeal)
+      .value("BIDDING", euchre::Phase::kBidding)
+      .value("DISCARD", euchre::Phase::kDiscard)
+      .value("GO_ALONE", euchre::Phase::kGoAlone)
+      .value("PLAY", euchre::Phase::kPlay)
+      .value("GAME_OVER", euchre::Phase::kGameOver)
+      .export_values();
+
+  py::classh<EuchreState, State> state_class(euchre, "EuchreState");
+  state_class
+      .def("num_cards_dealt", &EuchreState::NumCardsDealt)
       .def("num_cards_played", &EuchreState::NumCardsPlayed)
       .def("num_passes", &EuchreState::NumPasses)
       .def("upcard", &EuchreState::Upcard)
       .def("discard", &EuchreState::Discard)
       .def("trump_suit", &EuchreState::TrumpSuit)
       .def("left_bower", &EuchreState::LeftBower)
+      .def("right_bower", &EuchreState::RightBower)
       .def("declarer", &EuchreState::Declarer)
-      .def("first_defender", &EuchreState::FirstDefender)
       .def("declarer_partner", &EuchreState::DeclarerPartner)
+      .def("first_defender", &EuchreState::FirstDefender)
       .def("second_defender", &EuchreState::SecondDefender)
       .def("declarer_go_alone", &EuchreState::DeclarerGoAlone)
       .def("lone_defender", &EuchreState::LoneDefender)
       .def("active_players", &EuchreState::ActivePlayers)
       .def("dealer", &EuchreState::Dealer)
       .def("current_phase", &EuchreState::CurrentPhase)
+      .def("current_trick_index", &EuchreState::CurrentTrickIndex)
+      .def("current_trick",
+           py::overload_cast<>(&EuchreState::CurrentTrick, py::const_))
       .def("card_holder", &EuchreState::CardHolder)
-      .def("card_rank", &EuchreState::CardRank)
-      .def("card_suit", &EuchreState::CardSuit)
-      .def("card_string", &EuchreState::CardString)
-      .def("points", &EuchreState::Points)
       .def("tricks", &EuchreState::Tricks)
-      .def("current_trick", &EuchreState::CurrentTrickIndex)
       // Pickle support
       .def(py::pickle(
           [](const EuchreState& state) {  // __getstate__
@@ -69,33 +114,15 @@ void init_pyspiel_games_euchre(py::module& m) {
             return dynamic_cast<EuchreState*>(game_and_state.second.release());
           }));
 
-  py::enum_<euchre::Suit>(state_class, "Suit")
-    .value("INVALID_SUIT", euchre::Suit::kInvalidSuit)
-    .value("CLUBS", euchre::Suit::kClubs)
-    .value("DIAMONDS", euchre::Suit::kDiamonds)
-    .value("HEARTS", euchre::Suit::kHearts)
-    .value("SPADES", euchre::Suit::kSpades)
-    .export_values();
-
   py::class_<euchre::Trick>(state_class, "Trick")
       .def("led_suit", &euchre::Trick::LedSuit)
+      .def("trump_suit", &euchre::Trick::TrumpSuit)
+      .def("trump_played", &euchre::Trick::TrumpPlayed)
+      .def("leader", &euchre::Trick::Leader)
       .def("winner", &euchre::Trick::Winner)
-      .def("cards", &euchre::Trick::Cards)
-      .def("leader", &euchre::Trick::Leader);
-
-  py::enum_<euchre::EuchreState::Phase>(state_class, "Phase")
-      .value("DEALER_SELECTION", euchre::EuchreState::Phase::kDealerSelection)
-      .value("DEAL", euchre::EuchreState::Phase::kDeal)
-      .value("BIDDING", euchre::EuchreState::Phase::kBidding)
-      .value("DISCARD", euchre::EuchreState::Phase::kDiscard)
-      .value("GO_ALONE", euchre::EuchreState::Phase::kGoAlone)
-      .value("PLAY", euchre::EuchreState::Phase::kPlay)
-      .value("GAME_OVER", euchre::EuchreState::Phase::kGameOver)
-      .export_values();
+      .def("cards", &euchre::Trick::Cards);
 
   py::classh<EuchreGame, Game>(m, "EuchreGame")
-      .def("max_bids", &EuchreGame::MaxBids)
-      .def("num_cards", &EuchreGame::NumCards)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const EuchreGame> game) {  // __getstate__

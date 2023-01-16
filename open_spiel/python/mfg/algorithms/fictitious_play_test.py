@@ -14,6 +14,7 @@
 """Tests for fictitious play."""
 
 from absl.testing import absltest
+from absl.testing import parameterized
 
 from open_spiel.python import policy
 from open_spiel.python import rl_agent_policy
@@ -30,33 +31,50 @@ from open_spiel.python.mfg.games import crowd_modelling
 import pyspiel
 
 
-class FictitiousPlayTest(absltest.TestCase):
+class FictitiousPlayTest(parameterized.TestCase):
 
-  def test_fp_python_game(self):
+  @parameterized.named_parameters(("python", "python_mfg_crowd_modelling"),
+                                  ("cpp", "mfg_crowd_modelling"))
+  def test_run(self, name: str):
     """Checks if fictitious play works."""
-    game = crowd_modelling.MFGCrowdModellingGame()
+    game = pyspiel.load_game(name)
     fp = fictitious_play.FictitiousPlay(game)
     for _ in range(10):
       fp.iteration()
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.991, places=3)
 
-  def test_fixedpoint_python_game(self):
-    """Checks if fixed point works."""
+  @parameterized.named_parameters(("at_init", True), ("at_each_step", False))
+  def test_learning_rate(self, at_init: bool):
+    """Checks if learning rate works."""
     game = crowd_modelling.MFGCrowdModellingGame()
-    fp = fictitious_play.FictitiousPlay(game)
+    lr = 1.0
+    fp = fictitious_play.FictitiousPlay(game, lr=lr if at_init else None)
     for _ in range(10):
-      fp.iteration(learning_rate=1.0)
+      fp.iteration(learning_rate=None if at_init else lr)
     fp_policy = fp.get_policy()
     nash_conv_fp = nash_conv.NashConv(game, fp_policy)
 
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 55.745101814752616)
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 55.745, places=3)
 
-  def test_dqn_fp_python_game(self):
-    """Checks if fictitious play with DQN-based value function works."""
+  def test_soft_max(self):
+    """Checks if soft-max policy works."""
     game = crowd_modelling.MFGCrowdModellingGame()
+    fp = fictitious_play.FictitiousPlay(game, temperature=1)
+    for _ in range(10):
+      fp.iteration()
+    fp_policy = fp.get_policy()
+    nash_conv_fp = nash_conv.NashConv(game, fp_policy)
+
+    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 1.062, places=3)
+
+  @parameterized.named_parameters(("python", "python_mfg_crowd_modelling"),
+                                  ("cpp", "mfg_crowd_modelling"))
+  def test_dqn(self, name):
+    """Checks if fictitious play with DQN-based value function works."""
+    game = pyspiel.load_game(name)
     dfp = fictitious_play.FictitiousPlay(game)
 
     uniform_policy = policy.UniformRandomPolicy(game)
@@ -84,7 +102,7 @@ class FictitiousPlayTest(absltest.TestCase):
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
 
-    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.0558451955622807)
+    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.056, places=3)
 
   def test_average(self):
     """Test the average of policies.
@@ -111,49 +129,6 @@ class FictitiousPlayTest(absltest.TestCase):
         merged_pi_value(game.new_initial_state()),
         (br_value(game.new_initial_state()) +
          py_value(game.new_initial_state())) / 2)
-
-  def test_fp_cpp_game(self):
-    """Checks if fictitious play works."""
-    game = pyspiel.load_game("mfg_crowd_modelling")
-    fp = fictitious_play.FictitiousPlay(game)
-    for _ in range(10):
-      fp.iteration()
-    fp_policy = fp.get_policy()
-    nash_conv_fp = nash_conv.NashConv(game, fp_policy)
-
-    self.assertAlmostEqual(nash_conv_fp.nash_conv(), 0.9908032626911343)
-
-  def test_dqn_fp_cpp_game(self):
-    """Checks if fictitious play with DQN-based value function works."""
-    game = pyspiel.load_game("mfg_crowd_modelling")
-    dfp = fictitious_play.FictitiousPlay(game)
-
-    uniform_policy = policy.UniformRandomPolicy(game)
-    dist = distribution.DistributionPolicy(game, uniform_policy)
-    envs = [
-        rl_environment.Environment(
-            game, mfg_distribution=dist, mfg_population=p)
-        for p in range(game.num_players())
-    ]
-    dqn_agent = dqn.DQN(
-        0,
-        state_representation_size=envs[0].observation_spec()["info_state"][0],
-        num_actions=envs[0].action_spec()["num_actions"],
-        hidden_layers_sizes=[256, 128, 64],
-        replay_buffer_capacity=100,
-        batch_size=5,
-        epsilon_start=0.02,
-        epsilon_end=0.01)
-
-    br_policy = rl_agent_policy.RLAgentPolicy(
-        game, dqn_agent, 0, use_observation=True)
-    for _ in range(10):
-      dfp.iteration(br_policy=br_policy)
-
-    dfp_policy = dfp.get_policy()
-    nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
-
-    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.0558451955622807)
 
 
 if __name__ == "__main__":

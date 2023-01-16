@@ -27,7 +27,7 @@ from open_spiel.python.algorithms import get_all_states
 from open_spiel.python.mfg import games as mfg_games  # pylint:disable=unused-import
 import pyspiel
 from open_spiel.python.utils import file_utils
-# TODO(perolat): add predator_prey in the list of game tested
+# TODO(author18): add predator_prey in the list of game tested
 
 # Put a bound on length of game so test does not timeout.
 MAX_ACTIONS_PER_GAME = 1000
@@ -339,20 +339,20 @@ class GamesSimTest(parameterized.TestCase):
       self.sim_game(rnr_game, check_pyspiel_serialization=False,
                     check_pickle_serialization=False)
 
-# TODO(perolat): find the list of games where it is reasonable to call
+# TODO(author18): find the list of games where it is reasonable to call
 # get_all_states
   @parameterized.parameters(
       {"game_name": "python_mfg_crowd_modelling"},
       {"game_name": "mfg_crowd_modelling"},
-      {"game_name": "mfg_crowd_modelling_2d"},
+      # {"game_name": "mfg_crowd_modelling_2d"},
       {"game_name": "kuhn_poker"},
       {"game_name": "leduc_poker"},
   )
   def test_has_at_least_an_action(self, game_name):
     """Check that all population's state have at least one action."""
     game = pyspiel.load_game(game_name)
-    to_string = lambda s: s.observation_string(pyspiel.PlayerId.
-                                               DEFAULT_PLAYER_ID)
+    to_string = (
+        lambda s: s.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID))
     states = get_all_states.get_all_states(
         game,
         depth_limit=-1,

@@ -60,6 +60,10 @@ set(GAME_SOURCES
   dynamic_routing/dynamic_routing_data.h
   dynamic_routing/dynamic_routing_utils.cc
   dynamic_routing/dynamic_routing_utils.h
+  dou_dizhu.cc
+  dou_dizhu.h
+  dou_dizhu/dou_dizhu_utils.cc
+  dou_dizhu/dou_dizhu_utils.h
   efg_game.cc
   efg_game.h
   efg_game_data.cc
@@ -96,6 +100,8 @@ set(GAME_SOURCES
   lewis_signaling.h
   liars_dice.cc
   liars_dice.h
+  maedn.cc
+  maedn.h
   mancala.cc
   mancala.h
   markov_soccer.cc
@@ -383,6 +389,14 @@ add_executable(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_
                $<TARGET_OBJECTS:tests>)
 add_test(dynamic_routing_utils_test dynamic_routing_utils_test)
 
+add_executable(dou_dizhu_test dou_dizhu_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dou_dizhu_test dou_dizhu_test)
+
+add_executable(dou_dizhu_utils_test dou_dizhu/dou_dizhu_utils_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dou_dizhu_utils_test dou_dizhu_utils_test)
+
 add_executable(efg_game_test efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(efg_game_test efg_game_test)
@@ -450,6 +464,10 @@ add_executable(liars_dice_test liars_dice_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(liars_dice_test liars_dice_test)
+
+add_executable(maedn_test maedn_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(maedn_test maedn_test)
 
 add_executable(mancala_test mancala_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

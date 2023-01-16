@@ -95,6 +95,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_colored_trails.h
   pybind11/games_euchre.cc
   pybind11/games_euchre.h
+  pybind11/games_gin_rummy.cc
+  pybind11/games_gin_rummy.h
   pybind11/games_kuhn_poker.cc
   pybind11/games_kuhn_poker.h
   pybind11/games_leduc_poker.cc
@@ -196,6 +198,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/mcts_agent_test.py
   algorithms/mcts_test.py
   algorithms/minimax_test.py
+  algorithms/nfg_utils_test.py
   algorithms/noisy_policy_test.py
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
@@ -233,6 +236,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/game_transforms_test.py
   tests/games_bridge_test.py
   tests/games_euchre_test.py
+  tests/games_gin_rummy_test.py
   tests/games_sim_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
@@ -252,6 +256,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
     jax/policy_gradient_jax_test.py
+    algorithms/rnad/rnad_test.py
     mfg/algorithms/fictitious_play_test.py
   )
 endif()
@@ -266,6 +271,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
       pytorch/policy_gradient_pytorch_test.py
+      pytorch/ppo_pytorch_test.py
       pytorch/neurd_pytorch_test.py
   )
 endif()

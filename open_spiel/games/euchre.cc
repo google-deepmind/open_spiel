@@ -546,6 +546,7 @@ void EuchreState::ApplyBiddingAction(int action) {
       default:
         SpielFatalError("Invalid bidding action.");
     }
+    right_bower_ = Card(trump_suit_, kJackRank);
     left_bower_ = Card(same_color_suit[trump_suit_], kJackRank);
     if (num_passes_ < kNumPlayers) {
       // Top card was ordered up to dealer in first round of bidding.
@@ -642,10 +643,6 @@ void EuchreState::ApplyPlayAction(int card) {
   }
 }
 
-Player EuchreState::CurrentPlayer() const {
-  return current_player_;
-}
-
 void EuchreState::ComputeScore() {
   SPIEL_CHECK_TRUE(IsTerminal());
   std::vector<int> tricks_won(kNumPlayers, 0);
@@ -677,10 +674,6 @@ void EuchreState::ComputeScore() {
   }
 }
 
-std::vector<double> EuchreState::Returns() const {
-  return points_;
-}
-
 std::vector<Trick> EuchreState::Tricks() const {
   return std::vector<Trick>(tricks_.begin(), tricks_.end());
 }
@@ -689,6 +682,8 @@ Trick::Trick(Player leader, Suit trump_suit, int card)
     : winning_card_(card),
       led_suit_(CardSuit(card, trump_suit)),
       trump_suit_(trump_suit),
+      trump_played_(trump_suit != Suit::kInvalidSuit &&
+                    trump_suit == led_suit_),
       leader_(leader),
       winning_player_(leader),
       cards_{card} {}
@@ -699,6 +694,7 @@ void Trick::Play(Player player, int card) {
   bool new_winner = false;
   if (winning_player_ == kInvalidPlayer) new_winner = true;
   if (CardSuit(card, trump_suit_) == trump_suit_) {
+    trump_played_ = true;
     if (CardSuit(winning_card_, trump_suit_) == trump_suit_) {
       if (CardRank(card, trump_suit_) > CardRank(winning_card_, trump_suit_)) {
         new_winner = true;

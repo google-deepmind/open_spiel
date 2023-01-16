@@ -41,9 +41,86 @@ namespace testing = open_spiel::testing;
 
 void BasicBargainingTests() {
   testing::LoadGameTest("bargaining");
+  testing::RandomSimTest(*LoadGame("bargaining"), 10);
+  testing::RandomSimTest(*LoadGame("bargaining(prob_end=0.1)"), 10);
+  testing::RandomSimTest(*LoadGame("bargaining(discount=0.9)"), 10);
+  testing::RandomSimTest(*LoadGame("bargaining(max_turns=200)"), 10);
+}
 
-  // Game creation and legal actions are fairly heavy, so only run 1 sim.
-  testing::RandomSimTest(*LoadGame("bargaining"), 100);
+void BargainingMaxTurnsTest() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining(max_turns=200)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  int num_turns = 200;
+  while (num_turns > 0) {
+    if (state->IsChanceNode()) {
+      ActionsAndProbs chance_outcomes = state->ChanceOutcomes();
+      state->ApplyAction(chance_outcomes[0].first);
+    } else {
+      SPIEL_CHECK_TRUE(!state->IsTerminal());
+      num_turns--;
+      std::vector<Action> legal_actions = state->LegalActions();
+      state->ApplyAction(legal_actions[0]);
+    }
+  }
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+}
+
+void BargainingDiscountTest() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining(discount=0.9)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  BargainingState* bargaining_state =
+      static_cast<BargainingState*>(state.get());
+  ActionsAndProbs chance_outcomes = state->ChanceOutcomes();
+  state->ApplyAction(chance_outcomes[0].first);
+  std::vector<Action> legal_actions = state->LegalActions();
+  state->ApplyAction(legal_actions[0]);
+  state->ApplyAction(legal_actions[0]);
+  state->ApplyAction(legal_actions[0]);
+  state->ApplyAction(legal_actions[0]);
+  state->ApplyAction(bargaining_state->AgreeAction());
+  // P0 offers [0,0,0] then P1, then P0, then P1, then P0 agrees.
+  // P0 would get 10, but it's discounted by 0.9 three times
+  SPIEL_CHECK_FLOAT_EQ(state->PlayerReturn(0), 0.9 * 0.9 * 0.9 * 10);
+  SPIEL_CHECK_FLOAT_EQ(state->PlayerReturn(1), 0.0);
+}
+
+void BargainingProbEndContinueTest() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining(prob_end=0.1)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(state->ChanceOutcomes()[0].first);
+  std::vector<Action> legal_actions = state->LegalActions();
+  state->ApplyAction(legal_actions[0]);
+  state->ApplyAction(legal_actions[0]);
+  for (int i = 0; i < (bargaining::kDefaultMaxTurns - 2); ++i) {
+    SPIEL_CHECK_TRUE(state->IsChanceNode());
+    state->ApplyAction(state->ChanceOutcomes()[0].first);
+    SPIEL_CHECK_TRUE(!state->IsChanceNode());
+    legal_actions = state->LegalActions();
+    state->ApplyAction(legal_actions[0]);
+  }
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+}
+
+void BargainingProbEndEndTest() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining(prob_end=0.1)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  state->ApplyAction(state->ChanceOutcomes()[0].first);
+  std::vector<Action> legal_actions = state->LegalActions();
+  state->ApplyAction(legal_actions[0]);
+  state->ApplyAction(legal_actions[0]);
+  for (int i = 0; i < (bargaining::kDefaultMaxTurns - 4); ++i) {
+    SPIEL_CHECK_TRUE(state->IsChanceNode());
+    state->ApplyAction(state->ChanceOutcomes()[0].first);
+    SPIEL_CHECK_TRUE(!state->IsChanceNode());
+    legal_actions = state->LegalActions();
+    state->ApplyAction(legal_actions[0]);
+  }
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  SPIEL_CHECK_TRUE(!state->IsTerminal());
+  state->ApplyAction(state->ChanceOutcomes()[1].first);
+  SPIEL_CHECK_TRUE(state->IsTerminal());
+  SPIEL_CHECK_FLOAT_EQ(state->PlayerReturn(0), 0.0);
+  SPIEL_CHECK_FLOAT_EQ(state->PlayerReturn(1), 0.0);
 }
 
 void BasicBargainingFromInstancesFileTests() {
@@ -68,4 +145,8 @@ int main(int argc, char** argv) {
   if (absl::GetFlag(FLAGS_enable_instances_file_test)) {
     open_spiel::bargaining::BasicBargainingFromInstancesFileTests();
   }
+  open_spiel::bargaining::BargainingMaxTurnsTest();
+  open_spiel::bargaining::BargainingDiscountTest();
+  open_spiel::bargaining::BargainingProbEndContinueTest();
+  open_spiel::bargaining::BargainingProbEndEndTest();
 }

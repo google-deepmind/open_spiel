@@ -25,6 +25,12 @@ die() {
 set -e  # exit when any command fails
 set -x  # show evaluation trace
 
+PYBIN="python3"
+if [[ "$1" != "" ]]; then
+  PYBIN=$1
+fi
+${PYBIN} --version
+
 MYDIR="$(dirname "$(realpath "$0")")"
 
 # Calling this file from the project root is not allowed,
@@ -229,12 +235,12 @@ fi
 
 # Install other system-wide packages.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  EXT_DEPS="virtualenv clang cmake curl python3 python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
+  EXT_DEPS="virtualenv clang cmake curl python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    EXT_DEPS="${EXT_DEPS} rust-all cargo"
+    EXT_DEPS="${EXT_DEPS} rustc cargo"
   fi
 
   APT_GET=`which apt-get`
@@ -258,7 +264,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     sudo apt-get -y install $EXT_DEPS
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
-    cargo install bindgen
+    if [[ ! -f $HOME/.cargo/bin/bindgen ]]; then
+      cargo install bindgen-cli
+    fi
   fi
 
   if [[ "$TRAVIS" ]]; then
@@ -286,12 +294,14 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   fi
   if [[ ${OPEN_SPIEL_BUILD_WITH_RUST:-"OFF"} == "ON" ]]; then
     [[ -x `which rustc` ]] || brew install rust || echo "** Warning: failed 'brew install rust' -- continuing"
-    cargo install bindgen
+    if [[ ! -f $HOME/.cargo/bin/bindgen ]]; then
+      cargo install bindgen-cli
+    fi
   fi
 
   curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-  python3 get-pip.py
-  python3 -m pip install virtualenv
+  ${PYBIN} get-pip.py
+  ${PYBIN} -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."

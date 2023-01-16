@@ -299,7 +299,7 @@ def main(_):
 
     for i, cp in enumerate(converge_point_list):
       plot_confusion_matrix(
-          cp.astype(np.int),
+          cp.astype(int),
           title="Final policy (Tabular {})".format(labels[i]))
 
     plt.show()

@@ -579,10 +579,7 @@ def _assert_is_perfect_recall_recursive(state, current_history,
                           for s, a in current_history
                           if s.current_player() == current_player]
 
-      if not all([
-          np.array_equal(x, y)
-          for x, y in zip(expected_infosets_history, infosets_history)
-      ]):
+      if infosets_history != expected_infosets_history:
         raise ValueError("The history as tensor in the same infoset "
                          "are different:\n"
                          "History: {!r}\n".format(state.history()))

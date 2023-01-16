@@ -29,7 +29,6 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(TinyBridgeAuctionState);
 
 void open_spiel::init_pyspiel_games_tiny_bridge(py::module& m) {
   py::classh<TinyBridgePlayState, State>(m, "TinyBridgePlayState")
-      .def("to_string", &TinyBridgePlayState::ToString)
       // Pickle support
       .def(py::pickle(
           [](const TinyBridgePlayState& state) {  // __getstate__
@@ -43,7 +42,6 @@ void open_spiel::init_pyspiel_games_tiny_bridge(py::module& m) {
           }));
 
   py::classh<TinyBridgeAuctionState, State>(m, "TinyBridgeAuctionState")
-      .def("to_string", &TinyBridgeAuctionState::ToString)
       // Pickle support
       .def(py::pickle(
           [](const TinyBridgeAuctionState& state) {  // __getstate__

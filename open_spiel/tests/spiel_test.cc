@@ -51,6 +51,14 @@ void KuhnTests() {
   }
 }
 
+void GameEqualityTests() {
+  // 2 players is the default in kuhn poker.
+  SPIEL_CHECK_TRUE(
+      *LoadGame("kuhn_poker") == *LoadGame("kuhn_poker(players=2)"));
+  SPIEL_CHECK_FALSE(
+      *LoadGame("kuhn_poker") == *LoadGame("kuhn_poker(players=3)"));
+}
+
 void TicTacToeTests() {
   auto tic_tac_toe = LoadGame("tic_tac_toe");
   NoChanceOutcomesTest(*tic_tac_toe);
@@ -329,6 +337,7 @@ void PolicySerializationTest() {
 int main(int argc, char** argv) {
   open_spiel::testing::GeneralTests();
   open_spiel::testing::KuhnTests();
+  open_spiel::testing::GameEqualityTests();
   open_spiel::testing::TicTacToeTests();
   open_spiel::testing::FlatJointactionTest();
   open_spiel::testing::PolicyTest();

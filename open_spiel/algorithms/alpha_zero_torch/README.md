@@ -7,6 +7,10 @@ To build and use this implementation, you must set the optional global variables
 `OPEN_SPIEL_BUILD_WITH_LIBTORCH` and `OPEN_SPIEL_BUILD_WITH_LIBNOP` to `ON` when
 installing dependencies and building OpenSpiel.
 
+**Note**: Note: there are currently known problems with the C++ PyTorch:
+inteferences with pybind11 versions. Until it is properly fixed, please see
+[the workaround described here](https://github.com/deepmind/open_spiel/issues/966#issuecomment-1322982393).
+
 Then, to get started, see `examples/alpha_zero_torch_example.cc`.
 
 Important note: this implementation was a user contribution (see

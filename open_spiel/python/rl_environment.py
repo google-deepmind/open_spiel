@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Reinforcement Learning (RL) Environment for Open Spiel.
 
 This module wraps Open Spiel Python interface providing an RL-friendly API. It
@@ -257,6 +256,10 @@ class Environment(object):
     if self._include_full_state:
       observations["serialized_state"] = pyspiel.serialize_game_and_state(
           self._game, self._state)
+
+    # For gym environments
+    if hasattr(self._state, "last_info"):
+      observations["info"] = self._state.last_info
 
     return TimeStep(
         observations=observations,

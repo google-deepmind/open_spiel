@@ -258,11 +258,14 @@ def main(_):
   print(f"Writing instances database: {FLAGS.instances_file}")
   write_instances_file(negotiations, FLAGS.instances_file)
 
-  # Human NBS
+  # Human averages + NBS
+  human_rewards = np.zeros(2, dtype=np.float64)
   avg_human_nbs = 0
   for neg in negotiations:
-    avg_human_nbs += np.prod(neg.rewards)
-  avg_human_nbs /= len(negotiations)
+    human_rewards += neg.rewards
+  human_rewards /= len(negotiations)
+  avg_human_nbs += np.prod(human_rewards)
+  print(f"Average human rewards: {human_rewards}")
   print(f"Average human NBS: {avg_human_nbs}")
 
   game = pyspiel.load_game("bargaining",
