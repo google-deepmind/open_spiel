@@ -53,7 +53,7 @@ def get_critic_update_fn(agent_id: int, critic_network: hk.Transformed, optimize
     def loss_fn(params, batch: TransitionBatch):
         td_learning = vmap(partial(rlax.td_learning, stop_target_gradients=True))
         info_states, rewards = batch.info_state[agent_id], batch.reward[agent_id]
-        discounts = batch.discount
+        discounts = jnp.stack([batch.discount] * rewards.shape[0], axis=0)
         values = critic_network.apply(params, info_states)
         v_tm1 = values[:, :-1].reshape(-1)
         v_t = values[:, 1:].reshape(-1)
@@ -93,9 +93,8 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         v_tp1, v_t = values[:, :, 1:], values[:, :, :-1]
         o_t, a_t = o_t[:, :, :-1], a_t[:, :, :-1]
         r_t = r_t[:, :, :-1]
-        discounts = jnp.stack([batch.discount] * len(a_t), axis=0)[:, :, 1:]  # assume same discounts for all agents
-        compute_return = vmap(vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0)))
-        G_t = compute_return(r_t=r_t, discount_t=discounts, v_t=v_tp1)
+        compute_return = vmap(vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0, discount_t=batch.discount[1:])))
+        G_t = compute_return(r_t=r_t, v_t=v_tp1)
         adv_t = G_t - v_t
 
         # Standardize returns
@@ -146,7 +145,8 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             v_t, v_tp1 = values[:, :-1], values[:, 1:]
             logits = policy_network.apply(params, o_t).logits
             compute_return = vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0))
-            G_t = compute_return(r_t=r_t[:, :-1], discount_t=batch.discount[:, :-1], v_t=v_tp1)
+            discounts = jnp.stack([batch.discount] * r_t.shape[0], axis=0)
+            G_t = compute_return(r_t=r_t[:, :-1], discount_t=discounts[:, :-1], v_t=v_tp1)
             adv_t = G_t - v_t
             loss = vmap(rlax.policy_gradient_loss)(logits[:, :-1], a_t[:, :-1], adv_t, jnp.ones_like(adv_t))
             return loss.mean()
@@ -354,7 +354,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
 
     def step(self, time_step: TimeStep, is_evaluation=False):
         """
-        Produces an action and possible triggers a parameter update. LOLA agents depend on having access to previous
+        Produces an action and possibly triggers a parameter update. LOLA agents depend on having access to previous
         actions made by the opponent. Assumes that the field "observations" of time_step contains a field "actions" and
         its first axis is indexed by the player id.
         Similar, the fields "rewards" and "legal_actions" are assumed to be of shape (num_players,).
@@ -417,7 +417,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         Returns: None
 
         """
-        self._step_counter += 1
+        self._step_counter += time_step.observations["batch_size"]
         if self._prev_time_step:
             transition = self._make_transition(time_step)
             self._data.append(transition)
@@ -445,7 +445,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         Indicates whether to update or not.
         Returns: True, if the number of episodes in the buffer is equal to the batch size. False otherwise.
         """
-        return self._episode_counter % self._batch_size == 0 and self._episode_counter > 0
+        return self._step_counter >= self._batch_size * self._episode_counter and self._episode_counter > 0
 
     def _update_agent(self, batch: TransitionBatch) -> typing.Dict:
         """
@@ -494,12 +494,16 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             if transition.terminal:
                 max_episode_length = max(max_episode_length, len(episode))
                 batch = jax.tree_map(lambda *xs: jnp.stack(xs), *episode)
+                batch = batch.replace(
+                    info_state=batch.info_state.transpose(1,2,0,3),
+                    action=batch.action.transpose(1,2,0),
+                    legal_actions_mask=batch.legal_actions_mask.T,
+                    reward=batch.reward.transpose(1,2,0),
+                    values=batch.values.transpose(1,2,0)
+                )
                 batches.append(batch)
                 episode.clear()
-        padded = jax.tree_util.tree_map(lambda x: jnp.pad(x, pad_width=max_episode_length - len(x)), batches)
-        batch = jax.tree_util.tree_map(lambda *xs: jnp.stack(xs), *padded)
-        batch = jax.tree_util.tree_map(lambda x: jnp.moveaxis(x, 2, 0) if len(x.shape) > 2 else x, batch)
-        return batch
+        return batches[0]
 
     def _update_policy(self, batch: TransitionBatch):
         self._train_state, metrics = self._policy_update_fns[self.player_id](self._train_state, batch)

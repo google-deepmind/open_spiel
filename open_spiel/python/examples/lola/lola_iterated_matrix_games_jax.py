@@ -15,6 +15,7 @@ from absl import flags
 from dm_env import Environment
 
 from open_spiel.python import rl_environment
+from open_spiel.python.environments.iterated_matrix_game_env import IteratedPrisonersDilemmaEnv
 from open_spiel.python.jax.lola import LolaPolicyGradientAgent
 
 warnings.simplefilter('ignore', FutureWarning)
@@ -27,14 +28,14 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 128, "Number of episodes in a batch.")
-flags.DEFINE_integer("game_iterations", 15, "Number of iterated plays.")
+flags.DEFINE_integer("batch_size", 1024, "Number of episodes in a batch.")
+flags.DEFINE_integer("game_iterations", 128, "Number of iterated plays.")
 flags.DEFINE_float("policy_lr", 0.005, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 0.01, "Critic learning rate.")
+flags.DEFINE_float("critic_lr", 0.005, "Critic learning rate.")
 flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
-flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
+flags.DEFINE_integer("policy_update_interval", 5, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
 flags.DEFINE_bool("use_opponent_modelling", True, "If false, ground truth opponent weights are used.")
@@ -57,7 +58,7 @@ def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment,
     num_actions = env.action_spec()['num_actions']
     episode_stats = ','.join(f'{k}={v:.2f}' for k, v in stats.items())
     action_probs = get_action_probs(policy_params=agent.train_state.policy_params[agent.player_id],
-                                    num_actions=num_actions)
+                                    num_actions=num_actions[agent.player_id])
     probs = ', '.join(action_probs)
     print(f'[epoch {epoch}] Agent {agent.player_id}: {episode_stats} | {probs}')
 
@@ -70,10 +71,10 @@ def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_epi
             observations["current_player"] = pyspiel.PlayerId.SIMULTANEOUS
         observations["actions"] = []
 
-        values = np.zeros(len(agents))
-        for agent in agents:
+        values = []
+        for agent in sorted(agents, key=lambda a: a.player_id):
             v_fn = agent.get_value_fn()
-            values[agent.player_id] = v_fn(observations["info_state"][agent.player_id])
+            values.append(jax.vmap(v_fn)(observations["info_state"][agent.player_id]))
 
         observations["values"] = jnp.stack(values, axis=0)
         observations["actions"] = actions
@@ -91,7 +92,8 @@ def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_epi
                 output = agent.step(time_step, is_evaluation=eval)
                 agents_output.append(output)
                 action_list.append(output.action)
-            time_step = env.step(action_list)
+            actions = np.stack(action_list, axis=1)
+            time_step = env.step(actions)
             t += 1
             time_step = postprocess(timestep=time_step, actions=action_list)
             episode.append(time_step)
@@ -110,8 +112,8 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         player_id=player_id,
         opponent_ids=[1 - player_id],
         seed=key,
-        info_state_size=env.observation_spec()["info_state"],
-        num_actions=env.action_spec()["num_actions"],
+        info_state_size=env.observation_spec()["info_state"][player_id],
+        num_actions=env.action_spec()["num_actions"][player_id],
         policy=policy_network,
         critic=critic_network,
         batch_size=FLAGS.batch_size,
@@ -142,6 +144,7 @@ def make_iterated_matrix_game(game: str, config: dict) -> rl_environment.Environ
     matrix_game = pyspiel.load_matrix_game(game)
     game = pyspiel.create_repeated_game(matrix_game, config)
     env = rl_environment.Environment(game)
+    env = IteratedPrisonersDilemmaEnv(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size)
     logging.info("Env specs: %s", env.observation_spec())
     logging.info("Action specs: %s", env.action_spec())
     return env
@@ -158,14 +161,17 @@ def main(_):
     rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
     for experiment in range(10):
         env = make_iterated_matrix_game(FLAGS.game, env_config)
-        networks = make_agent_networks(num_actions=env.action_spec()["num_actions"])
-        policy_network, critic_network = networks
+        agents = []
+        for player_id in range(env.num_players):
+            networks = make_agent_networks(num_actions=env.action_spec()["num_actions"][player_id])
+            policy_network, critic_network = networks
+            agent = make_agent(key=next(rng), player_id=player_id, env=env, networks=networks)
+            agents.append(agent)
 
-        agents = [make_agent(key=next(rng), player_id=i, env=env, networks=networks) for i in range(env.num_players)]
         update_weights(agents[0], agents[1])
 
         for epoch in range(FLAGS.epochs):
-            batch = collect_batch(env=env, agents=agents, n_episodes=FLAGS.batch_size, eval=False)
+            batch = collect_batch(env=env, agents=agents, n_episodes=1, eval=False)
             update_weights(agents[0], agents[1])
 
             for agent in agents:
