@@ -86,6 +86,7 @@ constexpr int kDecideDealerActionBase = kNominateSuitActionBase + kNumSuits;
 // 50 for each 8, 10 for each face card, and face values
 // for others. then it is totally 4 * (2+3+..7+50+9+10+4*10)
 constexpr double kMaxPenality = 544;
+constexpr int kMaxTurnLimit = 10000;
 
 enum Phase { kDeal = 0, kPlay, kGameOver };
 enum Suit { kClubs = 0, kDiamonds, kHearts, kSpades };
@@ -156,6 +157,8 @@ class CrazyEightsState : public State {
     // the number of cards player can draw
     int num_cards_left_;
 
+    int num_plays = 0;
+
     int last_card_ = kInvalidAction;
     int last_suit_ = -1;
 
@@ -206,7 +209,7 @@ class CrazyEightsGame : public Game {
         }
     }
     // In principle, the game can run indefinitely
-    int MaxGameLength() const override { return 10000; }
+    int MaxGameLength() const override { return kMaxTurnLimit; }
     int GetMaxDrawCards() const { return max_draw_cards_; }
 
    private:

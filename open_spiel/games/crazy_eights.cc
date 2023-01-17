@@ -630,10 +630,11 @@ void CrazyEightsState::ApplyPlayAction(int action) {
         nominate_suits_ = false;
         return;
     } else {
+        num_plays++;
         can_pass_action_ = false;
         num_draws_before_play_ = 0;
         bool all_played = CheckAllCardsPlayed(action);
-        if (all_played) {
+        if (all_played || num_plays >= kMaxTurnLimit) {
             phase_ = kGameOver;
             ScoreUp();
         }
