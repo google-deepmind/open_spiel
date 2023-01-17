@@ -60,7 +60,8 @@ def get_critic_update_fn(agent_id: int, critic_network: hk.Transformed, optimize
         r_t = rewards[:, 1:].reshape(-1)
         d_t = discounts[:, 1:].reshape(-1)
         td_error = td_learning(v_tm1=v_tm1, r_t=r_t, discount_t=d_t, v_t=v_t)
-        return td_error.mean()
+        return jnp.square(td_error).mean()
+        #return jnp.mean((jnp.squeeze(values) - rewards) ** 2)
 
     def update(train_state: TrainState, batch: TransitionBatch):
         loss, grads = jax.value_and_grad(loss_fn)(train_state.critic_params, batch)
@@ -93,22 +94,31 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
         v_tp1, v_t = values[:, :, 1:], values[:, :, :-1]
         o_t, a_t = o_t[:, :, :-1], a_t[:, :, :-1]
         r_t = r_t[:, :, :-1]
-        compute_return = vmap(vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0, discount_t=batch.discount[1:])))
+        compute_return = vmap(vmap(partial(rlax.lambda_returns, lambda_=1.0, discount_t=batch.discount[1:])))
         G_t = compute_return(r_t=r_t, v_t=v_tp1)
-        adv_t = G_t - v_t
+        adv_t =  G_t - v_t
 
         # Standardize returns
-        #adv_t = vmap(lambda x: (x - x.mean()) / (x.std() + 1e-8))(adv_t)
+        adv_t = vmap(lambda x: (x - x.mean()) / (x.std() + 1e-8))(adv_t)
 
         def objective(params, opp_params, adv_t):
-            agent_unravel = flat_param_dict[agent][1]
-            opp_unravel = flat_param_dict[opp][1]
-            logp = policy_network.apply(agent_unravel(params), o_t[agent]).log_prob(a_t[agent])
-            opp_logp = policy_network.apply(opp_unravel(opp_params), o_t[opp]).log_prob(a_t[opp])
-            cumlogp_t = logp.cumsum(-1)
-            oppcumlogp_t = opp_logp.cumsum(-1)
-            joint_cumlogp_t = magic_box(cumlogp_t + oppcumlogp_t)
-            return (adv_t * joint_cumlogp_t).sum(-1).mean()
+            logp = policy_network.apply(unravel_fns[agent](params), o_t[agent]).log_prob(a_t[agent])
+            opp_logp = policy_network.apply(unravel_fns[opp](opp_params), o_t[opp]).log_prob(a_t[opp])
+
+            cum_discount = jnp.cumprod(batch.discount, axis=-1) / batch.discount[0]
+            discounted_rewards = batch.reward[agent] * cum_discount
+            discounted_values = batch.values[agent] * cum_discount
+            dependencies = jnp.cumsum(logp + opp_logp, axis=-1)
+            dice_obj = jnp.mean(jnp.sum(magic_box(dependencies) * adv_t, axis=-1))
+            #baseline = jnp.mean(jnp.sum((1-magic_box(logp + opp_logp)) * discounted_values, axis=-1))
+            #dice_obj = dice_obj + baseline
+
+            #cumlogp_t = logp.cumsum(-1)
+            #oppcumlogp_t = opp_logp.cumsum(-1)
+            #joint_cumlogp_t = magic_box(cumlogp_t + oppcumlogp_t)
+           # return (adv_t * joint_cumlogp_t).sum(-1).mean()
+
+            return dice_obj
 
         # Define agent losses
         L0 = partial(objective, adv_t=adv_t[agent])
@@ -145,9 +155,10 @@ def get_policy_update_fn(agent_id: int, policy_network: hk.Transformed, critic_n
             v_t, v_tp1 = values[:, :-1], values[:, 1:]
             logits = policy_network.apply(params, o_t).logits
             compute_return = vmap(partial(rlax.n_step_bootstrapped_returns, n=1, lambda_t=0.0))
+            compute_return = vmap(partial(rlax.lambda_returns))
             discounts = jnp.stack([batch.discount] * r_t.shape[0], axis=0)
-            G_t = compute_return(r_t=r_t[:, :-1], discount_t=discounts[:, :-1], v_t=v_tp1)
-            adv_t = G_t - v_t
+            G_t = compute_return(r_t=r_t[:, :-1], discount_t=discounts[:, :-1], v_t=jnp.zeros_like(v_tp1))
+            adv_t = G_t #- v_t
             loss = vmap(rlax.policy_gradient_loss)(logits[:, :-1], a_t[:, :-1], adv_t, jnp.ones_like(adv_t))
             return loss.mean()
 

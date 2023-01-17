@@ -15,7 +15,7 @@ from absl import flags
 from dm_env import Environment
 
 from open_spiel.python import rl_environment
-from open_spiel.python.environments.iterated_matrix_game_env import IteratedPrisonersDilemmaEnv
+from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemmaEnv
 from open_spiel.python.jax.lola import LolaPolicyGradientAgent
 
 warnings.simplefilter('ignore', FutureWarning)
@@ -29,23 +29,24 @@ flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
 flags.DEFINE_integer("batch_size", 1024, "Number of episodes in a batch.")
-flags.DEFINE_integer("game_iterations", 128, "Number of iterated plays.")
+flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
 flags.DEFINE_float("policy_lr", 0.005, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 0.005, "Critic learning rate.")
+flags.DEFINE_float("critic_lr", 1, "Critic learning rate.")
 flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
-flags.DEFINE_float("discount", 0.96, "Discount factor.")
-flags.DEFINE_integer("policy_update_interval", 5, "Number of critic updates per before policy is updated.")
+flags.DEFINE_float("discount", 1.0, "Discount factor.")
+flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
-flags.DEFINE_bool("use_opponent_modelling", True, "If false, ground truth opponent weights are used.")
-
+flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
+flags.DEFINE_bool("include_remaining_iterations", True, "If true, the percentage of the remaining iterations are included in the observations.")
 def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
     def get_action_probs(policy_params: hk.Params, num_actions: int) -> List[str]:
         states = jnp.append(jnp.concatenate([jnp.zeros((1, num_actions * 2)), jnp.eye(num_actions * 2)], axis=0),
                             jnp.zeros((5, 1)), axis=-1)
         states = jnp.concatenate([jnp.zeros((1, num_actions * 2)), jnp.eye(num_actions * 2)], axis=0)
-
+        if FLAGS.include_remaining_iterations:
+            states = jnp.concatenate([states, jnp.ones((5, 1))], axis=-1)
         logits = policy_network.apply(policy_params, states).logits
         probs = jax.nn.softmax(logits, axis=1)
         prob_strings = []
@@ -141,10 +142,7 @@ def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transforme
 
 def make_iterated_matrix_game(game: str, config: dict) -> rl_environment.Environment:
     logging.info("Creating game %s", FLAGS.game)
-    matrix_game = pyspiel.load_matrix_game(game)
-    game = pyspiel.create_repeated_game(matrix_game, config)
-    env = rl_environment.Environment(game)
-    env = IteratedPrisonersDilemmaEnv(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size)
+    env = IteratedPrisonersDilemmaEnv(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, include_remaining_iterations=FLAGS.include_remaining_iterations)
     logging.info("Env specs: %s", env.observation_spec())
     logging.info("Action specs: %s", env.action_spec())
     return env
@@ -158,7 +156,7 @@ def update_weights(agent: LolaPolicyGradientAgent, opponent: LolaPolicyGradientA
 def main(_):
     print(FLAGS.seed)
     env_config = {"num_repetitions": FLAGS.game_iterations, "batch_size": FLAGS.batch_size}
-    rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
+    rng = hk.PRNGSequence(key_or_seed=42)
     for experiment in range(10):
         env = make_iterated_matrix_game(FLAGS.game, env_config)
         agents = []
