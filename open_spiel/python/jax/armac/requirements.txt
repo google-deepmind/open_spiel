@@ -1,0 +1,5 @@
+jax
+chex
+dm-haiku
+open_spiel
+optax|
