@@ -56,7 +56,7 @@ DouDizhuState::DouDizhuState(std::shared_ptr<const Game> game) : State(game) {
 
 std::string DouDizhuState::ActionToString(Player player, Action action) const {
   if (action < kBiddingActionBase) {
-    return RankString(CardToRank(action));
+    return absl::StrFormat("Deal %s", CardString(action));
   } else if (action == kPass) {
     return "Pass";
   } else if (action > kPass && action < kPlayActionBase) {

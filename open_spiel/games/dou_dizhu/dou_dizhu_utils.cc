@@ -27,6 +27,13 @@ int CardToRank(int card) {
   return card % (kNumRanks - 2);
 }
 
+int CardToSuit(int card) {
+  if (card == kNumCards - 2 || card == kNumCards - 1) {
+    SpielFatalError("No Suit defined for Jokers");
+  }
+  return card / (kNumRanks - 2);
+}
+
 std::string RankString(int rank) {
   if (rank < kNumRanks - 2)
     return std::string(1, kRankChar[rank]);
@@ -36,6 +43,16 @@ std::string RankString(int rank) {
     return "(CJ)";
   else
     SpielFatalError("Non valid rank");
+}
+
+std::string CardString(int card) {
+  int rank = CardToRank(card);
+  if (rank >= kNumRanks - 2) {
+    return RankString(rank);
+  } else {
+    int suit = CardToSuit(card);
+    return absl::StrFormat("%c%c", kSuitChar[suit], kRankChar[rank]);
+  }
 }
 
 std::string FormatSingleHand(absl::Span<const int> hand) {
