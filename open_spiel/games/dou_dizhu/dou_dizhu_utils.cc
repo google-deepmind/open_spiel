@@ -51,6 +51,8 @@ std::string CardString(int card) {
     return RankString(rank);
   } else {
     int suit = CardToSuit(card);
+    SPIEL_CHECK_GE(suit, 0);
+    SPIEL_CHECK_LT(suit, kNumSuits);
     return absl::StrFormat("%c%c", kSuitChar[suit], kRankChar[rank]);
   }
 }
