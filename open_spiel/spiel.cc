@@ -247,7 +247,7 @@ State::State(std::shared_ptr<const Game> game)
 
 void NormalizePolicy(ActionsAndProbs* policy) {
   const double sum = absl::c_accumulate(
-      *policy, 0.0, [](double& a, auto& b) { return a + b.second; });
+      *policy, 0.0, [](double a, auto& b) { return a + b.second; });
   absl::c_for_each(*policy, [sum](auto& o) { o.second /= sum; });
 }
 

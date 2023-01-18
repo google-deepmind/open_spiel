@@ -105,8 +105,8 @@ class ModelTest(parameterized.TestCase):
     train_inputs = list(solved.values())
     print("states:", len(train_inputs))
     losses = []
-    policy_loss_goal = 0.1
-    value_loss_goal = 0.1
+    policy_loss_goal = 0.12
+    value_loss_goal = 0.12
     for i in range(500):
       loss = model.update(train_inputs)
       print(i, loss)

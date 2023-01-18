@@ -30,6 +30,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
+<font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
 <font color="orange"><b>~</b></font>         | [Euchre](#euchre)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
 ![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
@@ -46,6 +47,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
 <font color="orange"><b>~</b></font>         | [Liar's Poker](#liars-poker)
+<font color="orange"><b>~</b></font>         | [Mensch ärgere Dich nicht](#mensch-aergere-dich-nicht)
 <font color="orange"><b>~</b></font>         | [Mancala](#mancala)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
 ![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
@@ -311,6 +313,16 @@ Status                                       | Game
 *   1 players.
 *   [Osband et al. '17, Deep Exploration via Randomized Value Functions](https://arxiv.org/abs/1703.07608)
 
+### Dou Dizhu
+
+*   A three-player games where one player (dizhu) plays against a team of two
+    (peasants).
+*   Uses a 54-card deck.
+*   Non-deterministic.
+*   Imperfect information.
+*   Three players.
+*   [Wikipeda](https://en.wikipedia.org/wiki/Dou_dizhu)
+
 ### Euchre
 
 *   Trick-taking card game where players compete in pairs.
@@ -475,6 +487,7 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
 
+
 ### Liar's Poker
 
 *   Players bid and bluff on the state of all hands, given only the state of
@@ -485,6 +498,18 @@ Status                                       | Game
 *   Imperfect information
 *   2 or more players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_poker)
+
+
+### Mensch Aergere Dich Nicht 
+
+*   Players roll dice to move their pegs toward their home row while throwing
+    other players' pegs to the out area.
+*   Traditional game.
+*   Non-deterministic.
+*   Perfect information.
+*   2-4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Mensch_%C3%A4rgere_Dich_nicht)
+
 
 ### Mancala
 
