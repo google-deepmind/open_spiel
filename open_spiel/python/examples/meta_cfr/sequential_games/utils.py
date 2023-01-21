@@ -47,7 +47,8 @@ def get_batched_input(input_list: List[jax.numpy.DeviceArray],
                                   1) - len(input_list)
   idx_sample = np.random.choice(len(input_list), items_to_sample)
   input_zip = np.array(
-      list(zip(input_list, infostate_list, illegal_action_list)))
+      list(zip(input_list, infostate_list, illegal_action_list)),
+      dtype=object)
   input_lst_sample = input_zip[idx_sample]
   input_sample, infostate_sample, illegal_action_sample = zip(*input_lst_sample)
 

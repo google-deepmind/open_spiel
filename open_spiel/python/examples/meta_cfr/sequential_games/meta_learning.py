@@ -445,7 +445,7 @@ class MetaCFRRegretAgent:
         for _ in range(FLAGS.num_batches):
           batch = next(data_loader)
           cfvalues, infoset = zip(*batch)
-          cfvalues = np.array(list(cfvalues))
+          cfvalues = np.array(list(cfvalues), dtype=object)
           cfvalues = utils.mask(cfvalues, infoset, len(self._all_actions),
                                 FLAGS.batch_size)
           self.optimize_infoset(cfvalues, infoset, self._infostate_map,
