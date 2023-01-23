@@ -108,6 +108,7 @@ EXPECTED_GAMES = frozenset([
     "python_mfg_predator_prey",
     "python_kuhn_poker",
     "python_tic_tac_toe",
+    "python_liars_poker",
     "quoridor",
     "repeated_game",
     "rbc",

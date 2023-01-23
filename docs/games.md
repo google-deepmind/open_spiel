@@ -46,6 +46,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
 <font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
 ![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
+<font color="orange"><b>~</b></font>         | [Liar's Poker](#liars-poker)
 <font color="orange"><b>~</b></font>         | [Mensch ärgere Dich nicht](#mensch-aergere-dich-nicht)
 <font color="orange"><b>~</b></font>         | [Mancala](#mancala)
 <font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
@@ -485,6 +486,17 @@ Status                                       | Game
 *   Imperfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
+
+### Liar's Poker
+
+*   Players bid and bluff on the state of all hands, given only the state of
+    their hand.
+*   Cards with bidding.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information
+*   2 or more players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_poker)
 
 ### Mensch Aergere Dich Nicht 
 
