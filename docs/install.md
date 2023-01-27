@@ -118,7 +118,7 @@ In a nutshell:
     ```
 
     Additionally, if you intend to use one of the
-    [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you
+    [optional Python dependencies](/open_spiel/scripts/python_extra_deps.sh), you
     must manually install and/or upgrade them, e.g.: `bash pip install --upgrade
     torch==x.xx.x jax==x.x.x` where `x.xx.x` should be the desired version
     numbers (which can be found at the link above).
