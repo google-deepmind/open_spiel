@@ -59,9 +59,11 @@ class NFSP(rl_agent.AbstractAgent):
                min_buffer_size_to_learn=1000,
                learn_every=64,
                optimizer_str="sgd",
+               device=None,
                **kwargs):
     """Initialize the `NFSP` agent."""
     self.player_id = player_id
+    self._device = device
     self._num_actions = num_actions
     self._layer_sizes = hidden_layers_sizes
     self._batch_size = batch_size
@@ -85,7 +87,7 @@ class NFSP(rl_agent.AbstractAgent):
         "optimizer_str": optimizer_str,
     })
     self._rl_agent = dqn.DQN(player_id, state_representation_size,
-                             num_actions, hidden_layers_sizes, **kwargs)
+                             num_actions, hidden_layers_sizes, device=device, **kwargs)
 
     # Keep track of the last training loss achieved in an update step.
     self._last_rl_loss_value = lambda: self._rl_agent.loss
@@ -94,6 +96,8 @@ class NFSP(rl_agent.AbstractAgent):
     # Average policy network.
     self._avg_network = dqn.MLP(state_representation_size,
                                 self._layer_sizes, num_actions)
+    if device is not None:
+      self._avg_network.to(device)
 
     self._savers = [
         ("q_network", self._rl_agent._q_network),
@@ -127,8 +131,8 @@ class NFSP(rl_agent.AbstractAgent):
 
   def _act(self, info_state, legal_actions):
     info_state = np.reshape(info_state, [1, -1])
-    action_values = self._avg_network(torch.Tensor(info_state))
-    action_probs = F.softmax(action_values, dim=1).detach()
+    action_values = self._avg_network(torch.tensor(info_state, dtype=torch.float32, device=self._device))
+    action_probs = F.softmax(action_values, dim=1).detach().cpu()
 
     self._last_action_values = action_values[0]
     # Remove illegal actions, normalize probs
@@ -228,8 +232,8 @@ class NFSP(rl_agent.AbstractAgent):
       return None
 
     transitions = self._reservoir_buffer.sample(self._batch_size)
-    info_states = torch.Tensor([t.info_state for t in transitions])
-    action_probs = torch.Tensor([t.action_probs for t in transitions])
+    info_states = torch.tensor(np.array([t.info_state for t in transitions]), dtype=torch.float32, device=self._device)
+    action_probs = torch.tensor(np.array([t.action_probs for t in transitions]), device=self._device)
 
     self.optimizer.zero_grad()
     loss = F.cross_entropy(self._avg_network(info_states),

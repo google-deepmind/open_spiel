@@ -58,10 +58,10 @@ class SonnetLinear(nn.Module):
     # pytorch default: initialized from
     # uniform(-sqrt(1/in_features), sqrt(1/in_features))
     self._weight = nn.Parameter(
-        torch.Tensor(
+        torch.tensor(
             stats.truncnorm.rvs(
                 lower, upper, loc=mean, scale=stddev, size=[out_size,
-                                                            in_size])))
+                                                            in_size]), dtype=torch.float32))
     self._bias = nn.Parameter(torch.zeros([out_size]))
 
   def forward(self, tensor):
@@ -130,7 +130,8 @@ class DQN(rl_agent.AbstractAgent):
                epsilon_end=0.1,
                epsilon_decay_duration=int(1e6),
                optimizer_str="sgd",
-               loss_str="mse"):
+               loss_str="mse",
+               device=None):
     """Initialize the DQN agent."""
 
     # This call to locals() is used to store every argument used to initialize
@@ -138,6 +139,7 @@ class DQN(rl_agent.AbstractAgent):
     self._kwargs = locals()
 
     self.player_id = player_id
+    self._device = device
     self._num_actions = num_actions
     if isinstance(hidden_layers_sizes, int):
       hidden_layers_sizes = [hidden_layers_sizes]
@@ -171,6 +173,9 @@ class DQN(rl_agent.AbstractAgent):
 
     self._target_q_network = MLP(state_representation_size, self._layer_sizes,
                                  num_actions)
+    if device is not None:
+      self._q_network.to(device)
+      self._target_q_network.to(device)
 
     if loss_str == "mse":
       self.loss_class = F.mse_loss
@@ -281,7 +286,7 @@ class DQN(rl_agent.AbstractAgent):
       action = np.random.choice(legal_actions)
       probs[legal_actions] = 1.0 / len(legal_actions)
     else:
-      info_state = torch.Tensor(np.reshape(info_state, [1, -1]))
+      info_state = torch.tensor(np.reshape(info_state, [1, -1]), dtype=torch.float32, device=self._device)
       q_values = self._q_network(info_state).detach()[0]
       legal_q_values = q_values[legal_actions]
       action = legal_actions[torch.argmax(legal_q_values)]
@@ -313,18 +318,18 @@ class DQN(rl_agent.AbstractAgent):
       return None
 
     transitions = self._replay_buffer.sample(self._batch_size)
-    info_states = torch.Tensor([t.info_state for t in transitions])
+    info_states = torch.tensor([t.info_state for t in transitions], device=self._device)
     actions = torch.LongTensor([t.action for t in transitions])
-    rewards = torch.Tensor([t.reward for t in transitions])
-    next_info_states = torch.Tensor([t.next_info_state for t in transitions])
-    are_final_steps = torch.Tensor([t.is_final_step for t in transitions])
-    legal_actions_mask = torch.Tensor(
-        np.array([t.legal_actions_mask for t in transitions]))
+    rewards = torch.tensor([t.reward for t in transitions], device=self._device)
+    next_info_states = torch.tensor([t.next_info_state for t in transitions], device=self._device)
+    are_final_steps = torch.tensor([t.is_final_step for t in transitions], device=self._device)
+    legal_actions_mask = torch.tensor(
+        np.array([t.legal_actions_mask for t in transitions]), dtype=torch.bool, device=self._device)
 
     self._q_values = self._q_network(info_states)
     self._target_q_values = self._target_q_network(next_info_states).detach()
 
-    illegal_actions_mask = 1 - legal_actions_mask
+    illegal_actions_mask = ~legal_actions_mask
     legal_target_q_values = self._target_q_values.masked_fill(
         illegal_actions_mask, ILLEGAL_ACTION_LOGITS_PENALTY)
     max_next_q = torch.max(legal_target_q_values, dim=1)[0]
