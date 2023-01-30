@@ -319,7 +319,7 @@ class DQN(rl_agent.AbstractAgent):
 
     transitions = self._replay_buffer.sample(self._batch_size)
     info_states = torch.tensor([t.info_state for t in transitions], device=self._device)
-    actions = torch.LongTensor([t.action for t in transitions])
+    actions = torch.tensor([t.action for t in transitions], dtype=torch.long)
     rewards = torch.tensor([t.reward for t in transitions], device=self._device)
     next_info_states = torch.tensor([t.next_info_state for t in transitions], device=self._device)
     are_final_steps = torch.tensor([t.is_final_step for t in transitions], device=self._device)
