@@ -58,3 +58,7 @@ open_spiel/cmake-build-debug/
 Package.resolved
 # Visual Studio generated files
 open_spiel/.vs
+
+.cache/
+open_spiel/pybind11_abseil/
+output.txt

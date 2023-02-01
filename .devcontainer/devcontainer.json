@@ -1,0 +1,28 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/cpp
+{
+    "name": "open_spiel",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "mounts": [
+        {
+            "source": "${localWorkspaceFolder}/.devcontainer",
+            "target": "${containerWorkspaceFolder}/.devcontainer",
+            "type": "bind"
+        }
+    ],
+    "remoteEnv": {
+        "PYTHONPATH": "${containerEnv:PYTHONPATH}:${containerWorkspaceFolder}:${containerWorkspaceFolder}/build/python"
+    },
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    // "features": {},
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": "./.devcontainer/postCreateCommand.sh"
+    // Configure tool-specific properties.
+    // "customizations": {},
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+}
