@@ -17,6 +17,7 @@ class IteratedMatrixGame(Environment):
         self._batch_size = batch_size
         self._include_remaining_iterations = include_remaining_iterations
         self._t = 0
+        self._actions = np.arange(np.prod(self.action_spec()['num_actions'])).reshape(*[payoff_matrix.shape[p] for p in range(self._num_players)])
 
     def one_hot(self, x, n):
         return np.eye(n)[x]
@@ -27,7 +28,7 @@ class IteratedMatrixGame(Environment):
 
     def observation_spec(self):
         return dict(
-            info_state=tuple([np.sum(self._payoff_matrix.shape[:-1]) + (1 if self._include_remaining_iterations else 0)] for _ in range(self._num_players)),
+            info_state=tuple([np.sum(self._payoff_matrix.shape[:-1]) + 1 + (1 if self._include_remaining_iterations else 0)] for _ in range(self._num_players)),
             legal_actions=tuple([self._payoff_matrix.shape[p] for p in range(self._num_players)]),
             current_player=()
         )
@@ -44,7 +45,7 @@ class IteratedMatrixGame(Environment):
         if actions.ndim == 1:
             actions = actions[None, :]
         payoffs = self._payoff_matrix[tuple(actions.T)]
-        info_state = np.concatenate([self.one_hot(actions[:, p], self._payoff_matrix.shape[p]) for p in range(self.num_players)], axis=-1)
+        info_state = self.one_hot(self._actions[tuple(actions.T)], n=np.max(self._actions) + 2)
         rewards = [np.squeeze(p) for p in np.split(payoffs, indices_or_sections=self._num_players, axis=1)]
         discounts = [np.ones_like(r) for r in rewards]
         if self._t == self._iterations - 1:
@@ -59,7 +60,7 @@ class IteratedMatrixGame(Environment):
         return TimeStep(
             observations=dict(
                 info_state=info_state,
-                legal_actions=[np.arange(self.action_spec()['num_actions'][p]) for p in range(self.num_players)],
+                legal_actions=np.array([[np.arange(self.action_spec()['num_actions'][p])] * self._batch_size for p in range(self.num_players)]),
                 batch_size=actions.shape[0],
                 current_player=PlayerId.SIMULTANEOUS
             ),
@@ -71,6 +72,8 @@ class IteratedMatrixGame(Environment):
     def reset(self):
         self._t = 0
         info_state = np.squeeze(np.zeros((self.num_players, self._batch_size, *self.observation_spec()["info_state"][0])))
+        info_state = np.zeros((self.num_players, self._batch_size, *self.observation_spec()["info_state"][0]))
+        info_state[..., -1] = 1.0
         if self._include_remaining_iterations:
             info_state[..., -1] = 1.0
         rewards = np.squeeze(np.zeros((self.num_players, self._batch_size)))
@@ -78,7 +81,7 @@ class IteratedMatrixGame(Environment):
         return TimeStep(
             observations=dict(
                 info_state=[np.squeeze(s).astype(np.float32) for s in info_state],
-                legal_actions=[np.arange(self.action_spec()['num_actions'][p]) for p in range(self.num_players)],
+                legal_actions=np.array([[np.arange(self.action_spec()['num_actions'][p])] * self._batch_size for p in range(self.num_players)]),
                 batch_size=self._batch_size,
                 current_player=PlayerId.SIMULTANEOUS
             ),

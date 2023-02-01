@@ -4,7 +4,10 @@ import typing
 import warnings
 from typing import List, Tuple
 
+import aim
+from aim import Run
 import distrax
+import haiku
 import haiku as hk
 import jax.numpy as jnp
 import jax.tree_util
@@ -25,33 +28,40 @@ Example that trains two agents using LOLA (Foerster et al., 2018) on iterated ma
 the paper. 
 """
 FLAGS = flags.FLAGS
-flags.DEFINE_integer("seed", random.randint(0, 10000000), "Random seed.")
+flags.DEFINE_integer("seed", random.choice([42]), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 1024, "Number of episodes in a batch.")
+flags.DEFINE_integer("batch_size", 4096, "Number of episodes in a batch.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.005, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 1, "Critic learning rate.")
-flags.DEFINE_float("lola_weight", 1.0, "Weighting factor for the LOLA correction term. Zero resembles standard PG.")
+flags.DEFINE_float("policy_lr", 0.05, "Policy learning rate.")
+flags.DEFINE_float("critic_lr", 0.1, "Critic learning rate.")
+flags.DEFINE_string("correction_type", 'dice', "Either 'lola', 'dice' or None.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
-flags.DEFINE_float("discount", 1.0, "Discount factor.")
+flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
 flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
-flags.DEFINE_bool("include_remaining_iterations", True, "If true, the percentage of the remaining iterations are included in the observations.")
-def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
+flags.DEFINE_bool("include_remaining_iterations", False, "If true, the percentage of the remaining iterations are included in the observations.")
+def log_epoch_data(run: Run, epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
     def get_action_probs(policy_params: hk.Params, num_actions: int) -> List[str]:
-        states = jnp.append(jnp.concatenate([jnp.zeros((1, num_actions * 2)), jnp.eye(num_actions * 2)], axis=0),
-                            jnp.zeros((5, 1)), axis=-1)
-        states = jnp.concatenate([jnp.zeros((1, num_actions * 2)), jnp.eye(num_actions * 2)], axis=0)
-        if FLAGS.include_remaining_iterations:
-            states = jnp.concatenate([states, jnp.ones((5, 1))], axis=-1)
-        logits = policy_network.apply(policy_params, states).logits
-        probs = jax.nn.softmax(logits, axis=1)
+        cases = [['CC', 'CD'], ['DC', 'DD']]
         prob_strings = []
-        for i, name in enumerate(['s0', 'CC', 'CD', 'DC', 'DD']):
-            prob_strings.append(f'P(C|{name})={probs[i][0]:.3f}')
+        state = env.reset().observations['info_state'][agent.player_id][0]
+        prob = policy_network.apply(policy_params, state).prob(0)
+        prob_strings.append(f'P(C|s0)={prob:.3f}')
+        run.track(prob, name=f'P(C|s0)', context={'agent': agent.player_id})
+        for a1 in range(env.action_spec()['num_actions'][0]):
+            for a2 in range(env.action_spec()['num_actions'][1]):
+                action = jnp.array([a1, a2])
+                state = env.step(action).observations['info_state'][agent.player_id]
+                if FLAGS.include_remaining_iterations:
+                    state = jnp.concatenate([state, jnp.array([1])], axis=-1)
+                prob = policy_network.apply(policy_params, state).prob(0)
+                string = f'P(C|{cases[a1][a2]})={prob:.3f}'
+                prob_strings.append(string)
+                run.track(prob, name=f'P(C|{cases[a1][a2]})', context={'agent': agent.player_id})
+
         return prob_strings
 
     avg_step_reward = np.mean([[time_step.rewards[agent.player_id] for time_step in episode] for episode in eval_batch])
@@ -61,6 +71,7 @@ def log_epoch_data(epoch: int, agent: LolaPolicyGradientAgent, env: Environment,
     action_probs = get_action_probs(policy_params=agent.train_state.policy_params[agent.player_id],
                                     num_actions=num_actions[agent.player_id])
     probs = ', '.join(action_probs)
+    run.track(avg_step_reward, name='avg_step_reward', context={'agent': agent.player_id})
     print(f'[epoch {epoch}] Agent {agent.player_id}: {episode_stats} | {probs}')
 
 
@@ -122,7 +133,7 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         critic_learning_rate=FLAGS.critic_lr,
         policy_update_interval=FLAGS.policy_update_interval,
         discount=FLAGS.discount,
-        correction_weight=FLAGS.lola_weight,
+        correction_type=FLAGS.correction_type,
         clip_grad_norm=FLAGS.correction_max_grad_norm,
         use_jit=FLAGS.use_jit
     )
@@ -130,23 +141,15 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
 
 def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transformed]:
     def policy(obs):
-        logits = hk.nets.MLP(output_sizes=[num_actions], with_bias=True)(obs)
+        # w_init=haiku.initializers.Constant(1), b_init=haiku.initializers.Constant(0)
+        logits = hk.nets.MLP(output_sizes=[num_actions], with_bias=False, w_init=haiku.initializers.Constant(1))(obs)
         return distrax.Categorical(logits=logits)
 
     def value_fn(obs):
-        values = hk.nets.MLP(output_sizes=[1], with_bias=True)(obs)
-        return values
+        w = hk.get_parameter("w", [5], init=jnp.zeros)
+        return w[jnp.argmax(obs, axis=-1)].reshape(*obs.shape[:-1], 1)
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))
-
-
-def make_iterated_matrix_game(game: str, config: dict) -> rl_environment.Environment:
-    logging.info("Creating game %s", FLAGS.game)
-    env = IteratedPrisonersDilemmaEnv(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, include_remaining_iterations=FLAGS.include_remaining_iterations)
-    logging.info("Env specs: %s", env.observation_spec())
-    logging.info("Action specs: %s", env.action_spec())
-    return env
-
 
 def update_weights(agent: LolaPolicyGradientAgent, opponent: LolaPolicyGradientAgent):
     agent.update_params(state=opponent.train_state, player_id=opponent.player_id)
@@ -154,11 +157,22 @@ def update_weights(agent: LolaPolicyGradientAgent, opponent: LolaPolicyGradientA
 
 
 def main(_):
-    print(FLAGS.seed)
-    env_config = {"num_repetitions": FLAGS.game_iterations, "batch_size": FLAGS.batch_size}
-    rng = hk.PRNGSequence(key_or_seed=42)
-    for experiment in range(10):
-        env = make_iterated_matrix_game(FLAGS.game, env_config)
+    run = Run(experiment='lola')
+    run["hparams"] = {
+        "seed": FLAGS.seed,
+        "batch_size": FLAGS.batch_size,
+        "discount": FLAGS.discount,
+        "policy_lr": FLAGS.policy_lr,
+        "critic_lr": FLAGS.critic_lr,
+        "policy_update_interval": FLAGS.policy_update_interval,
+        "correction_type": FLAGS.correction_type,
+        "correction_max_grad_norm": FLAGS.correction_max_grad_norm,
+        "use_jit": FLAGS.use_jit
+    }
+
+    rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
+    for experiment in range(1):
+        env = IteratedPrisonersDilemmaEnv(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, include_remaining_iterations=FLAGS.include_remaining_iterations)
         agents = []
         for player_id in range(env.num_players):
             networks = make_agent_networks(num_actions=env.action_spec()["num_actions"][player_id])
@@ -167,14 +181,19 @@ def main(_):
             agents.append(agent)
 
         update_weights(agents[0], agents[1])
-
-        for epoch in range(FLAGS.epochs):
+        batch = collect_batch(env=env, agents=agents, n_episodes=1, eval=True)
+        for agent in agents:
+            log_epoch_data(epoch=0, run=run, agent=agent, env=env, eval_batch=batch, policy_network=policy_network)
+        for epoch in range(1, FLAGS.epochs+1):
             batch = collect_batch(env=env, agents=agents, n_episodes=1, eval=False)
+            for agent in agents:
+                for k, v in agent._metrics[-1].items():
+                    run.track(v, name=k, context={"agent": agent.player_id})
+
             update_weights(agents[0], agents[1])
 
             for agent in agents:
-                log_epoch_data(epoch=epoch, agent=agent, env=env, eval_batch=batch, policy_network=policy_network)
-
+                log_epoch_data(epoch=epoch, agent=agent, run=run, env=env, eval_batch=batch, policy_network=policy_network)
         print('#' * 100)
 
 
