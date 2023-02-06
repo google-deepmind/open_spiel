@@ -143,8 +143,12 @@ void PolicyTest() {
   auto random_policy_default_seed = [](const Game& game) {
     return GetRandomPolicy(game);
   };
+  auto flat_dirichlet_policy_default_seed = [](const Game& game) {
+    return GetFlatDirichletPolicy(game);
+  };
   std::vector<PolicyGenerator> policy_generators = {
-      GetUniformPolicy, random_policy_default_seed, GetFirstActionPolicy};
+      GetUniformPolicy, random_policy_default_seed, GetFirstActionPolicy,
+      flat_dirichlet_policy_default_seed};
 
   // For some reason, this can't seem to be brace-initialized, so instead we use
   // push_back.

@@ -19,6 +19,8 @@ https://onlinelibrary.wiley.com/doi/abs/10.1111/1468-0262.00153
 """
 
 import numpy as np
+from open_spiel.python.algorithms import nfg_utils
+
 
 # Start with initial regrets of 1 / denom
 INITIAL_REGRET_DENOM = 1e6
@@ -131,13 +133,12 @@ def regret_matching(payoff_tensors,
       for k in range(number_players)
   ]
 
-  average_over_last_n_strategies = average_over_last_n_strategies or iterations
+  averager = nfg_utils.StrategyAverager(number_players, action_space_shapes,
+                                        average_over_last_n_strategies)
+  averager.append(new_strategies)
 
-  meta_strategy_window = []
-  for i in range(iterations):
+  for _ in range(iterations):
     new_strategies = _regret_matching_step(payoff_tensors, new_strategies,
                                            regrets, gamma)
-    if i >= iterations - average_over_last_n_strategies:
-      meta_strategy_window.append(new_strategies)
-  average_new_strategies = np.mean(meta_strategy_window, axis=0)
-  return average_new_strategies
+    averager.append(new_strategies)
+  return averager.average_strategies()

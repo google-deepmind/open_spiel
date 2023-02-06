@@ -109,7 +109,12 @@ class CommonTest(parameterized.TestCase):
     test_policy_on_game(self, _LEDUC_POKER, policy_object)
 
   @parameterized.named_parameters([
-      ("pyspiel.UniformRandom", pyspiel.UniformRandomPolicy(_LEDUC_POKER)),
+      ("pyspiel.UniformRandomPolicy",
+       pyspiel.UniformRandomPolicy(_LEDUC_POKER)),
+      ("pyspiel.GetRandomPolicy",
+       pyspiel.GetRandomPolicy(_LEDUC_POKER, 1)),
+      ("pyspiel.GetFlatDirichletPolicy",
+       pyspiel.GetFlatDirichletPolicy(_LEDUC_POKER, 1)),
   ])
   def test_cpp_policies_on_leduc(self, policy_object):
     test_policy_on_game(self, _LEDUC_POKER, policy_object)

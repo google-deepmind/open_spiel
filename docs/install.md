@@ -118,7 +118,7 @@ In a nutshell:
     ```
 
     Additionally, if you intend to use one of the
-    [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you
+    optional Python dependencies (see [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)), you
     must manually install and/or upgrade them, e.g.: `bash pip install --upgrade
     torch==x.xx.x jax==x.x.x` where `x.xx.x` should be the desired version
     numbers (which can be found at the link above).
@@ -280,7 +280,7 @@ python3 -m pip install --upgrade -r requirements.txt
 
 ##### Optional dependencies
 
-Additionally, if you intend to use one of the [optional Python dependencies](open_spiel/scripts/python_extra_deps.sh), you must manually install and/or upgrade them. The installation scripts will not install or upgrade these dependencies. e.g.:
+Additionally, if you intend to use one of the optional Python dependencies (see [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)), you must manually install and/or upgrade them. The installation scripts will not install or upgrade these dependencies. e.g.:
 
 ```bash
 python3 -m pip install --upgrade torch==x.xx.x jax==x.x.x
