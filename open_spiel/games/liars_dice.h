@@ -26,7 +26,8 @@
 // A simple game that includes chance and imperfect information
 // https://en.wikipedia.org/wiki/Liar%27s_dice
 //
-// Currently only supports a single round and two players.
+// Currently only supports a single round and two players. 
+// The highest face (`dice_sides`) is wild.
 //
 // Parameters:
 //   "bidding_rule" string   bidding variants ("reset-face" or
