@@ -44,8 +44,10 @@ class IteratedMatrixGame(Environment):
     def step(self, actions: np.ndarray):
         if actions.ndim == 1:
             actions = actions[None, :]
+        #payoffs = self._payoff_matrix[tuple(actions.T)]
         payoffs = self._payoff_matrix[tuple(actions.T)]
-        info_state = self.one_hot(self._actions[tuple(actions.T)], n=np.max(self._actions) + 2)
+        s1 = self.one_hot(self._actions[tuple(actions.T)] + 1, n=np.max(self._actions) + 2)
+        s2 = self.one_hot(self._actions[tuple(actions[..., ::-1].T)] + 1, n=np.max(self._actions) + 2)
         rewards = [np.squeeze(p) for p in np.split(payoffs, indices_or_sections=self._num_players, axis=1)]
         discounts = [np.ones_like(r) for r in rewards]
         if self._t == self._iterations - 1:
@@ -54,9 +56,11 @@ class IteratedMatrixGame(Environment):
             step_type = StepType.MID
         self._t += 1
         remaining_iters = float((self._iterations - self._t)) / self._iterations
+
+        info_state = [s1, s2]
         if self._include_remaining_iterations:
-            info_state = np.concatenate([info_state, np.full((self._batch_size, 1), fill_value=remaining_iters)], axis=-1)
-        info_state = [np.squeeze(info_state).astype(np.float32)] * self._num_players
+            info_state = np.concatenate([info_state, np.full((self._batch_size, 1), fill_value=remaining_iters)],
+                                        axis=-1)
         return TimeStep(
             observations=dict(
                 info_state=info_state,
@@ -73,7 +77,7 @@ class IteratedMatrixGame(Environment):
         self._t = 0
         info_state = np.squeeze(np.zeros((self.num_players, self._batch_size, *self.observation_spec()["info_state"][0])))
         info_state = np.zeros((self.num_players, self._batch_size, *self.observation_spec()["info_state"][0]))
-        info_state[..., -1] = 1.0
+        info_state[..., 0] = 1.0
         if self._include_remaining_iterations:
             info_state[..., -1] = 1.0
         rewards = np.squeeze(np.zeros((self.num_players, self._batch_size)))

@@ -33,8 +33,8 @@ flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
 flags.DEFINE_integer("batch_size", 4096, "Number of episodes in a batch.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.05, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 0.1, "Critic learning rate.")
+flags.DEFINE_float("policy_lr", 0.1, "Policy learning rate.")
+flags.DEFINE_float("critic_lr", 0.3, "Critic learning rate.")
 flags.DEFINE_string("correction_type", 'dice', "Either 'lola', 'dice' or None.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
@@ -44,32 +44,20 @@ flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enable
 flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
 flags.DEFINE_bool("include_remaining_iterations", False, "If true, the percentage of the remaining iterations are included in the observations.")
 def log_epoch_data(run: Run, epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
-    def get_action_probs(policy_params: hk.Params, num_actions: int) -> List[str]:
-        cases = [['CC', 'CD'], ['DC', 'DD']]
+    def get_action_probs(policy_params: hk.Params) -> List[str]:
+        states = ['s0', 'CC', 'CD', 'DC', 'DD']
         prob_strings = []
-        state = env.reset().observations['info_state'][agent.player_id][0]
-        prob = policy_network.apply(policy_params, state).prob(0)
-        prob_strings.append(f'P(C|s0)={prob:.3f}')
-        run.track(prob, name=f'P(C|s0)', context={'agent': agent.player_id})
-        for a1 in range(env.action_spec()['num_actions'][0]):
-            for a2 in range(env.action_spec()['num_actions'][1]):
-                action = jnp.array([a1, a2])
-                state = env.step(action).observations['info_state'][agent.player_id]
-                if FLAGS.include_remaining_iterations:
-                    state = jnp.concatenate([state, jnp.array([1])], axis=-1)
-                prob = policy_network.apply(policy_params, state).prob(0)
-                string = f'P(C|{cases[a1][a2]})={prob:.3f}'
-                prob_strings.append(string)
-                run.track(prob, name=f'P(C|{cases[a1][a2]})', context={'agent': agent.player_id})
-
+        for i, s in enumerate(states):
+            state = np.eye(len(states))[i]
+            prob = policy_network.apply(policy_params, state).prob(0)
+            prob_strings.append(f'P(C|{s})={prob:.3f}')
+            run.track(prob.item(), name=f'P(C|{s})', context={'agent': agent.player_id})
         return prob_strings
 
     avg_step_reward = np.mean([[time_step.rewards[agent.player_id] for time_step in episode] for episode in eval_batch])
     stats = dict(avg_step_reward=avg_step_reward)
-    num_actions = env.action_spec()['num_actions']
     episode_stats = ','.join(f'{k}={v:.2f}' for k, v in stats.items())
-    action_probs = get_action_probs(policy_params=agent.train_state.policy_params[agent.player_id],
-                                    num_actions=num_actions[agent.player_id])
+    action_probs = get_action_probs(policy_params=agent.train_state.policy_params[agent.player_id])
     probs = ', '.join(action_probs)
     run.track(avg_step_reward, name='avg_step_reward', context={'agent': agent.player_id})
     print(f'[epoch {epoch}] Agent {agent.player_id}: {episode_stats} | {probs}')
@@ -142,7 +130,8 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
 def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transformed]:
     def policy(obs):
         # w_init=haiku.initializers.Constant(1), b_init=haiku.initializers.Constant(0)
-        logits = hk.nets.MLP(output_sizes=[num_actions], with_bias=False, w_init=haiku.initializers.Constant(1))(obs)
+        theta = hk.get_parameter('theta', init=haiku.initializers.Constant(0), shape=(5,2))
+        logits = jnp.select(obs, theta)
         return distrax.Categorical(logits=logits)
 
     def value_fn(obs):
@@ -188,7 +177,8 @@ def main(_):
             batch = collect_batch(env=env, agents=agents, n_episodes=1, eval=False)
             for agent in agents:
                 for k, v in agent._metrics[-1].items():
-                    run.track(v, name=k, context={"agent": agent.player_id})
+                    #run.track(v, name=k, context={"agent": agent.player_id})
+                    pass
 
             update_weights(agents[0], agents[1])
 
