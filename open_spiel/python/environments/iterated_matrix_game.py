@@ -75,7 +75,6 @@ class IteratedMatrixGame(Environment):
 
     def reset(self):
         self._t = 0
-        info_state = np.squeeze(np.zeros((self.num_players, self._batch_size, *self.observation_spec()["info_state"][0])))
         info_state = np.zeros((self.num_players, self._batch_size, *self.observation_spec()["info_state"][0]))
         info_state[..., 0] = 1.0
         if self._include_remaining_iterations:
@@ -94,10 +93,10 @@ class IteratedMatrixGame(Environment):
             step_type=StepType.FIRST
         )
 
-def IteratedPrisonersDilemmaEnv(iterations: int, batch_size=1, include_remaining_iterations=True):
+def IteratedPrisonersDilemma(iterations: int, batch_size=1):
     return IteratedMatrixGame(
         payoff_matrix=np.array([[[-1,-1], [-3,0]], [[0,-3], [-2,-2]]]),
         iterations=iterations,
         batch_size=batch_size,
-        include_remaining_iterations=include_remaining_iterations
+        include_remaining_iterations=False
     )

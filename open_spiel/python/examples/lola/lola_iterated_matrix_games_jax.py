@@ -18,7 +18,6 @@ from absl import flags
 from dm_env import Environment
 
 from open_spiel.python import rl_environment
-from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemmaEnv
 from open_spiel.python.jax.lola import LolaPolicyGradientAgent
 
 warnings.simplefilter('ignore', FutureWarning)
@@ -31,7 +30,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", random.choice([42]), "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 4096, "Number of episodes in a batch.")
+flags.DEFINE_integer("batch_size", 128, "Number of episodes in a batch.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
 flags.DEFINE_float("policy_lr", 0.1, "Policy learning rate.")
 flags.DEFINE_float("critic_lr", 0.3, "Critic learning rate.")
@@ -123,7 +122,8 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         discount=FLAGS.discount,
         correction_type=FLAGS.correction_type,
         clip_grad_norm=FLAGS.correction_max_grad_norm,
-        use_jit=FLAGS.use_jit
+        use_jit=FLAGS.use_jit,
+        env=env
     )
 
 
@@ -139,6 +139,13 @@ def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transforme
         return w[jnp.argmax(obs, axis=-1)].reshape(*obs.shape[:-1], 1)
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))
+
+def make_env(iterations: int, batch_size: int, jitted: bool = False):
+    if jitted:
+        from open_spiel.python.environments.iterated_matrix_game_jax import IteratedPrisonersDilemma
+    else:
+        from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemma
+    return IteratedPrisonersDilemma(iterations=iterations, batch_size=batch_size)
 
 def update_weights(agent: LolaPolicyGradientAgent, opponent: LolaPolicyGradientAgent):
     agent.update_params(state=opponent.train_state, player_id=opponent.player_id)
@@ -161,7 +168,7 @@ def main(_):
 
     rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
     for experiment in range(1):
-        env = IteratedPrisonersDilemmaEnv(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, include_remaining_iterations=FLAGS.include_remaining_iterations)
+        env = make_env(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, jitted=False)
         agents = []
         for player_id in range(env.num_players):
             networks = make_agent_networks(num_actions=env.action_spec()["num_actions"][player_id])

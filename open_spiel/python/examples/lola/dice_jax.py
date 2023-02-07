@@ -144,12 +144,6 @@ class Agent():
         self.value_optimizer = optax.adam(learning_rate=hp.lr_v)
         self.value_opt_state = self.value_optimizer.init(self.values)
 
-    def theta_update(self, objective, other_theta, other_values, key):
-        grads, memory = jax.grad(objective, has_aux=True)(self.theta, other_theta, self.values, other_values, key)
-        updates, opt_state = self.theta_optimizer.update(grads, self.theta_opt_state)
-        self.theta = optax.apply_updates(self.theta, updates)
-        self.theta_opt_state = opt_state
-        return memory
 
     def value_update(self, states, rewards):
         def loss(params):
@@ -165,7 +159,7 @@ class Agent():
 
 
     def out_lookahead(self, other_theta, other_values, n_lookaheads):
-        def inner(theta, other_theta, values, other_values, key):
+        def lookahead_update(theta, other_theta, values, other_values, key):
             other_theta = other_theta.copy()
             for k in range(n_lookaheads):
                 # estimate other's gradients from in_lookahead:
@@ -175,7 +169,6 @@ class Agent():
                 other_theta = other_theta - hp.lr_in * other_grad
 
             key, k_out = jax.random.split(key)
-
             step = env.reset()
             states, lp1s, lp2s, vs, rs = [], [], [], [], []
             for t in range(hp.len_rollout):
@@ -194,10 +187,7 @@ class Agent():
 
 
         key, k_out = jax.random.split(self.key)
-        start = time.time()
-        grads, memory = jax.grad(inner, has_aux=True)(self.theta, other_theta, self.values, other_values, k_out)
-        end = time.time()
-        #print("out lookahead took", end - start, "seconds")
+        grads, memory = jax.grad(lookahead_update, has_aux=True)(self.theta, other_theta, self.values, other_values, k_out)
         updates, opt_state = self.theta_optimizer.update(grads, self.theta_opt_state)
         self.theta = optax.apply_updates(self.theta, updates)
         self.theta_opt_state = opt_state
@@ -209,7 +199,6 @@ def play(key, agent1, agent2, n_lookaheads):
 
     print("start iterations with", n_lookaheads, "lookaheads:")
     for update in tqdm(range(hp.n_update)):
-        start = time.time()
         # copy other's parameters:
         theta1_ = jnp.array(agent1.theta)
         values1_ = jnp.array(agent1.values)
@@ -224,16 +213,12 @@ def play(key, agent1, agent2, n_lookaheads):
         score = step(sample_key, agent1.theta, agent2.theta, agent1.values, agent2.values)
         joint_scores.append(0.5 * (score[0] + score[1]))
 
-        # print
-        states = jnp.eye(5, dtype=int)
         if update % 10 == 0:
             p1 = [distrax.Categorical(logits=agent1.theta[i]).prob(0).item() for i in range(5)]
             p2 = [distrax.Categorical(logits=agent2.theta[i]).prob(0).item() for i in range(5)]
             print('update', update, 'score (%.3f,%.3f)' % (score[0], score[1]),
                   'policy (agent1) = {%.3f, %.3f, %.3f, %.3f, %.3f}' % (p1[0], p1[1], p1[2], p1[3], p1[4]),
                   ' (agent2) = {%.3f, %.3f, %.3f, %.3f, %.3f}' % (p2[0], p2[1], p2[2], p2[3], p2[4]))
-        end = time.time()
-        #print("loop time:", end - start, "seconds")
 
 
     return joint_scores
