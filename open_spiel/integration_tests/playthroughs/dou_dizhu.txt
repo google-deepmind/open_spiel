@@ -77,8 +77,8 @@ ChanceOutcomes() = [(0, 0.0196078431372549), (1, 0.0196078431372549), (2, 0.0196
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
 StringLegalActions() = ["Decide first card up position 0", "Decide first card up position 1", "Decide first card up position 2", "Decide first card up position 3", "Decide first card up position 4", "Decide first card up position 5", "Decide first card up position 6", "Decide first card up position 7", "Decide first card up position 8", "Decide first card up position 9", "Decide first card up position 10", "Decide first card up position 11", "Decide first card up position 12", "Decide first card up position 13", "Decide first card up position 14", "Decide first card up position 15", "Decide first card up position 16", "Decide first card up position 17", "Decide first card up position 18", "Decide first card up position 19", "Decide first card up position 20", "Decide first card up position 21", "Decide first card up position 22", "Decide first card up position 23", "Decide first card up position 24", "Decide first card up position 25", "Decide first card up position 26", "Decide first card up position 27", "Decide first card up position 28", "Decide first card up position 29", "Decide first card up position 30", "Decide first card up position 31", "Decide first card up position 32", "Decide first card up position 33", "Decide first card up position 34", "Decide first card up position 35", "Decide first card up position 36", "Decide first card up position 37", "Decide first card up position 38", "Decide first card up position 39", "Decide first card up position 40", "Decide first card up position 41", "Decide first card up position 42", "Decide first card up position 43", "Decide first card up position 44", "Decide first card up position 45", "Decide first card up position 46", "Decide first card up position 47", "Decide first card up position 48", "Decide first card up position 49", "Decide first card up position 50"]
 
-# Apply action "Decide first card up position 15"
-action: 15
+# Apply action "Decide first card up position 29"
+action: 29
 
 # State 1
 #
@@ -112,8 +112,8 @@ action: 15
 #
 #
 IsTerminal() = False
-History() = [15]
-HistoryString() = "15"
+History() = [29]
+HistoryString() = "29"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
@@ -125,1668 +125,1633 @@ ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯�
 ObservationTensor(2): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(51, 0.018518518518518517), (52, 0.018518518518518517), (53, 0.018518518518518517), (54, 0.018518518518518517), (55, 0.018518518518518517), (56, 0.018518518518518517), (57, 0.018518518518518517), (58, 0.018518518518518517), (59, 0.018518518518518517), (60, 0.018518518518518517), (61, 0.018518518518518517), (62, 0.018518518518518517), (63, 0.018518518518518517), (64, 0.018518518518518517), (65, 0.018518518518518517), (66, 0.018518518518518517), (67, 0.018518518518518517), (68, 0.018518518518518517), (69, 0.018518518518518517), (70, 0.018518518518518517), (71, 0.018518518518518517), (72, 0.018518518518518517), (73, 0.018518518518518517), (74, 0.018518518518518517), (75, 0.018518518518518517), (76, 0.018518518518518517), (77, 0.018518518518518517), (78, 0.018518518518518517), (79, 0.018518518518518517), (80, 0.018518518518518517), (81, 0.018518518518518517), (82, 0.018518518518518517), (83, 0.018518518518518517), (84, 0.018518518518518517), (85, 0.018518518518518517), (86, 0.018518518518518517), (87, 0.018518518518518517), (88, 0.018518518518518517), (89, 0.018518518518518517), (90, 0.018518518518518517), (91, 0.018518518518518517), (92, 0.018518518518518517), (93, 0.018518518518518517), (94, 0.018518518518518517), (95, 0.018518518518518517), (96, 0.018518518518518517), (97, 0.018518518518518517), (98, 0.018518518518518517), (99, 0.018518518518518517), (100, 0.018518518518518517), (101, 0.018518518518518517), (102, 0.018518518518518517), (103, 0.018518518518518517), (104, 0.018518518518518517)]
 LegalActions() = [51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104]
-StringLegalActions() = ["56789TJQKA", "3456789TJQK", "456789TJQKA", "3456789TJQKA", "33", "44", "55", "66", "77", "88", "99", "TT", "JJ", "QQ", "KK", "AA", "22", "334455", "445566", "556677", "667788", "778899", "8899TT", "99TTJJ", "TTJJQQ", "JJQQKK", "QQKKAA", "33445566", "44556677", "55667788", "66778899", "778899TT", "8899TTJJ", "99TTJJQQ", "TTJJQQKK", "JJQQKKAA", "3344556677", "4455667788", "5566778899", "66778899TT", "778899TTJJ", "8899TTJJQQ", "99TTJJQQKK", "TTJJQQKKAA", "334455667788", "445566778899", "5566778899TT", "66778899TTJJ", "778899TTJJQQ", "8899TTJJQQKK", "99TTJJQQKKAA", "33445566778899", "445566778899TT", "5566778899TTJJ"]
+StringLegalActions() = ["Deal C3", "Deal C4", "Deal C5", "Deal C6", "Deal C7", "Deal C8", "Deal C9", "Deal CT", "Deal CJ", "Deal CQ", "Deal CK", "Deal CA", "Deal C2", "Deal D3", "Deal D4", "Deal D5", "Deal D6", "Deal D7", "Deal D8", "Deal D9", "Deal DT", "Deal DJ", "Deal DQ", "Deal DK", "Deal DA", "Deal D2", "Deal H3", "Deal H4", "Deal H5", "Deal H6", "Deal H7", "Deal H8", "Deal H9", "Deal HT", "Deal HJ", "Deal HQ", "Deal HK", "Deal HA", "Deal H2", "Deal S3", "Deal S4", "Deal S5", "Deal S6", "Deal S7", "Deal S8", "Deal S9", "Deal ST", "Deal SJ", "Deal SQ", "Deal SK", "Deal SA", "Deal S2", "Deal (BWJ)", "Deal (CJ)"]
 
-# Apply action "778899TTJJ"
-action: 91
-
-# State 2
-# Apply action "KK"
-action: 65
-
-# State 3
-# Apply action "5566778899TT"
-action: 97
-
-# State 4
-# Apply action "8899TT"
-action: 73
-
-# State 5
-# Apply action "44"
-action: 56
-
-# State 6
-# Apply action "TT"
-action: 62
-
-# State 7
-# Apply action "3456789TJQK"
-action: 52
-
-# State 8
-# Apply action "66778899"
-action: 81
-
-# State 9
-# Apply action "22"
-action: 67
-
-# State 10
-# Apply action "8899TTJJQQ"
-action: 92
-
-# State 11
-# Apply action "8899TTJJ"
-action: 83
-
-# State 12
-# Apply action "4455667788"
-action: 88
-
-# State 13
-# Apply action "99TTJJQQ"
-action: 84
-
-# State 14
-# Apply action "JJQQKKAA"
-action: 86
-
-# State 15
-# Apply action "99TTJJQQKK"
-action: 93
-
-# State 16
-# Apply action "445566778899TT"
-action: 103
-
-# State 17
-# Apply action "55"
-action: 57
-
-# State 18
-# Apply action "QQ"
-action: 64
-
-# State 19
-# Apply action "88"
-action: 60
-
-# State 20
-# Apply action "33445566"
+# Apply action "Deal H4"
 action: 78
 
-# State 21
-# Apply action "778899TTJJQQ"
-action: 99
+# State 2
+# Apply action "Deal CA"
+action: 62
 
-# State 22
-# Apply action "44556677"
-action: 79
-
-# State 23
-# Apply action "33"
-action: 55
-
-# State 24
-# Apply action "667788"
-action: 71
-
-# State 25
-# Apply action "5566778899"
-action: 89
-
-# State 26
-# Apply action "3344556677"
-action: 87
-
-# State 27
-# Apply action "334455667788"
-action: 95
-
-# State 28
-# Apply action "33445566778899"
-action: 102
-
-# State 29
-# Apply action "778899"
-action: 72
-
-# State 30
-# Apply action "TTJJQQKK"
-action: 85
-
-# State 31
-# Apply action "JJQQKK"
-action: 76
-
-# State 32
-# Apply action "99"
-action: 61
-
-# State 33
-# Apply action "TTJJQQKKAA"
-action: 94
-
-# State 34
-# Apply action "JJ"
-action: 63
-
-# State 35
-# Apply action "QQKKAA"
-action: 77
-
-# State 36
-# Apply action "3456789TJQKA"
-action: 54
-
-# State 37
-# Apply action "5566778899TTJJ"
-action: 104
-
-# State 38
-# Apply action "77"
-action: 59
-
-# State 39
-# Apply action "445566778899"
-action: 96
-
-# State 40
-# Apply action "66778899TT"
-action: 90
-
-# State 41
-# Apply action "AA"
-action: 66
-
-# State 42
-# Apply action "8899TTJJQQKK"
-action: 100
-
-# State 43
-# Apply action "445566"
-action: 69
-
-# State 44
-# Apply action "66778899TTJJ"
-action: 98
-
-# State 45
-# Apply action "556677"
-action: 70
-
-# State 46
-# Apply action "55667788"
-action: 80
-
-# State 47
-# Apply action "99TTJJ"
-action: 74
-
-# State 48
-# Apply action "334455"
-action: 68
-
-# State 49
-# Apply action "TTJJQQ"
+# State 3
+# Apply action "Deal DA"
 action: 75
 
+# State 4
+# Apply action "Deal SJ"
+action: 98
+
+# State 5
+# Apply action "Deal C7"
+action: 55
+
+# State 6
+# Apply action "Deal DT"
+action: 71
+
+# State 7
+# Apply action "Deal S3"
+action: 90
+
+# State 8
+# Apply action "Deal S9"
+action: 96
+
+# State 9
+# Apply action "Deal SQ"
+action: 99
+
+# State 10
+# Apply action "Deal HQ"
+action: 86
+
+# State 11
+# Apply action "Deal C8"
+action: 56
+
+# State 12
+# Apply action "Deal (CJ)"
+action: 104
+
+# State 13
+# Apply action "Deal S8"
+action: 95
+
+# State 14
+# Apply action "Deal ST"
+action: 97
+
+# State 15
+# Apply action "Deal D8"
+action: 69
+
+# State 16
+# Apply action "Deal H7"
+action: 81
+
+# State 17
+# Apply action "Deal HK"
+action: 87
+
+# State 18
+# Apply action "Deal C9"
+action: 57
+
+# State 19
+# Apply action "Deal CJ"
+action: 59
+
+# State 20
+# Apply action "Deal S6"
+action: 93
+
+# State 21
+# Apply action "Deal D7"
+action: 68
+
+# State 22
+# Apply action "Deal H3"
+action: 77
+
+# State 23
+# Apply action "Deal CQ"
+action: 60
+
+# State 24
+# Apply action "Deal CT"
+action: 58
+
+# State 25
+# Apply action "Deal C2"
+action: 63
+
+# State 26
+# Apply action "Deal H6"
+action: 80
+
+# State 27
+# Apply action "Deal D6"
+action: 67
+
+# State 28
+# Apply action "Deal SK"
+action: 100
+
+# State 29
+# Apply action "Deal (BWJ)"
+action: 103
+
+# State 30
+# Apply action "Deal D9"
+action: 70
+
+# State 31
+# Apply action "Deal H2"
+action: 89
+
+# State 32
+# Apply action "Deal S4"
+action: 91
+
+# State 33
+# Apply action "Deal DQ"
+action: 73
+
+# State 34
+# Apply action "Deal HJ"
+action: 85
+
+# State 35
+# Apply action "Deal H8"
+action: 82
+
+# State 36
+# Apply action "Deal D2"
+action: 76
+
+# State 37
+# Apply action "Deal HT"
+action: 84
+
+# State 38
+# Apply action "Deal SA"
+action: 101
+
+# State 39
+# Apply action "Deal D5"
+action: 66
+
+# State 40
+# Apply action "Deal C6"
+action: 54
+
+# State 41
+# Apply action "Deal S7"
+action: 94
+
+# State 42
+# Apply action "Deal D4"
+action: 65
+
+# State 43
+# Apply action "Deal DK"
+action: 74
+
+# State 44
+# Apply action "Deal CK"
+action: 61
+
+# State 45
+# Apply action "Deal C5"
+action: 53
+
+# State 46
+# Apply action "Deal C4"
+action: 52
+
+# State 47
+# Apply action "Deal S2"
+action: 102
+
+# State 48
+# Apply action "Deal HA"
+action: 88
+
+# State 49
+# Apply action "Deal D3"
+action: 64
+
 # State 50
-# Apply action "56789TJQKA"
+# Apply action "Deal C3"
 action: 51
 
 # State 51
-# Apply action "66"
-action: 58
+# Apply action "Deal DJ"
+action: 72
 
 # State 52
-# 33              3
-# 44
-# 5
-#                 666
-# 77              77
-# 8               8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-#                 AA
-#
-#
-#
-#         3
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# AA              AA
+# 2               2
+# (BWJ)
+#                 (CJ)
+#         333
 #         44
-#         55
-#         6
 #
+#         6
+#         7
 #         8
 #
 #         T
+#         JJJ
+#         Q
+#         KK
 #
-#         QQ
+#         22
 #
-#         A
-#         2222
-#         (BWJ)
-#         (CJ)
+#
 IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58"
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "My hand 33344678TJJJQKK22\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKAA2(BWJ)\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2(CJ)\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0, 1, 2, 3]
+StringLegalActions() = ["Pass", "Bid 1", "Bid 2", "Bid 3"]
+
+# Apply action "Bid 1"
+action: 1
+
+# State 53
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# AA              AA
+# 2               2
+# (BWJ)
+#                 (CJ)
+#         333
+#         44
+#
+#         6
+#         7
+#         8
+#
+#         T
+#         JJJ
+#         Q
+#         KK
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "My hand 3445568TQQA2222(BWJ)(CJ)\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(1) = "My hand 3344577899JJJQKKK\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationString(2) = "My hand 366677899TTTJQKAA\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+ObservationString(0) = "My hand 33344678TJJJQKK22\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(1) = "My hand 346677889TQKKAA2(BWJ)\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationString(2) = "My hand 45567899TTJQQAA2(CJ)\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0, 0, 0]
 Returns() = [0, 0, 0]
-LegalActions() = [0, 1, 2, 3]
-StringLegalActions() = ["Decide first card up position 0", "Decide first card up position 1", "Decide first card up position 2", "Decide first card up position 3"]
+LegalActions() = [0, 2, 3]
+StringLegalActions() = ["Pass", "Bid 2", "Bid 3"]
 
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 53
-# 33              3
-# 44
-# 5
-#                 666
-# 77              77
-# 8               8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-#                 AA
-#
-#
-#
-#         3
-#         44
-#         55
-#         6
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#         (BWJ)
-#         (CJ)
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "My hand 3445568TQQA2222(BWJ)(CJ)\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(1) = "My hand 3344577899JJJQKKK\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationString(2) = "My hand 366677899TTTJQKAA\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0, 1, 2, 3]
-StringLegalActions() = ["Decide first card up position 0", "Decide first card up position 1", "Decide first card up position 2", "Decide first card up position 3"]
-
-# Apply action "Decide first card up position 3"
+# Apply action "Bid 3"
 action: 3
 
 # State 54
-# 33              3
-# 44
-# 55
-#                 666
-# 77              77
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
 # 88              8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-# A               AA
-#
-#
-#
-#         3
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# AA              AA
+# 2               2
+# (BWJ)
+#                 (CJ)
+#         333
 #         44
 #         55
 #         6
-#
+#         7
 #         8
-#
+#         9
 #         T
+#         JJJ
+#         Q
+#         KK
 #
-#         QQ
+#         22
 #
-#         A
-#         2222
-#         (BWJ)
-#         (CJ)
+#
 # Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
+# Player 2 played Bid 1
+# Player 0 played Bid 3
 IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3"
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "My hand 3445568TQQA2222(BWJ)(CJ)\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 334455778899JJJQKKKA\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQKAA\nPlayed cards \nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
+CurrentPlayer() = 0
+ObservationString(0) = "My hand 33344556789TJJJQKK22\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKAA2(BWJ)\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2(CJ)\nPlayed cards \nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
 Rewards() = [0, 0, 0]
 Returns() = [0, 0, 0]
-LegalActions() = [4, 5, 6, 8, 9, 10, 12, 13, 14, 15, 55, 56, 57, 59, 60, 61, 63, 65, 68, 72, 128, 130, 245, 246, 247, 249, 250, 251, 253, 254, 255, 273, 274, 275, 277, 278, 279, 281, 282, 283, 411, 412, 413, 415, 416, 417, 420, 435, 436, 437, 439, 440, 441, 443]
-StringLegalActions() = ["Decide first card up position 4", "Decide first card up position 5", "Decide first card up position 6", "Decide first card up position 8", "Decide first card up position 9", "Decide first card up position 10", "Decide first card up position 12", "Decide first card up position 13", "Decide first card up position 14", "Decide first card up position 15", "33", "44", "55", "77", "88", "99", "JJ", "KK", "334455", "778899", "JJJ", "KKK", "3JJJ", "4JJJ", "5JJJ", "7JJJ", "8JJJ", "9JJJ", "JJJQ", "JJJK", "JJJA", "3KKK", "4KKK", "5KKK", "7KKK", "8KKK", "9KKK", "JKKK", "QKKK", "KKKA", "33JJJ", "44JJJ", "55JJJ", "77JJJ", "88JJJ", "99JJJ", "JJJKK", "33KKK", "44KKK", "55KKK", "77KKK", "88KKK", "99KKK", "JJKKK"]
+LegalActions() = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 34, 35, 36, 37, 38, 40, 41, 42, 43, 45, 46, 47, 49, 50, 52, 55, 56, 57, 63, 65, 67, 68, 120, 128, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 144, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 256, 315, 316, 322, 324, 326, 411, 412, 413, 420, 422]
+StringLegalActions() = ["3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "2", "34567", "45678", "56789", "6789T", "789TJ", "89TJQ", "9TJQK", "345678", "456789", "56789T", "6789TJ", "789TJQ", "89TJQK", "3456789", "456789T", "56789TJ", "6789TJQ", "789TJQK", "3456789T", "456789TJ", "56789TJQ", "6789TJQK", "3456789TJ", "456789TJQ", "56789TJQK", "3456789TJQ", "456789TJQK", "3456789TJQK", "33", "44", "55", "JJ", "KK", "22", "334455", "333", "JJJ", "3334", "3335", "3336", "3337", "3338", "3339", "333T", "333J", "333Q", "333K", "3332", "3JJJ", "4JJJ", "5JJJ", "6JJJ", "7JJJ", "8JJJ", "9JJJ", "TJJJ", "JJJQ", "JJJK", "JJJ2", "33344", "33355", "333JJ", "333KK", "33322", "33JJJ", "44JJJ", "55JJJ", "JJJKK", "JJJ22"]
 
-# Apply action "77"
-action: 59
+# Apply action "8"
+action: 9
 
 # State 55
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
 # 88              8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-# A               AA
-#
-#
-#
-#         3
-#         44
-#         55
-#         6
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#         (BWJ)
-#         (CJ)
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-ObservationString(0) = "My hand 3445568TQQA2222(BWJ)(CJ)\nPlayed cards 77\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJJQKKKA\nPlayed cards 77\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQKAA\nPlayed cards 77\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0, 61, 62, 66]
-StringLegalActions() = ["Decide first card up position 0", "99", "TT", "AA"]
-
-# Apply action "AA"
-action: 66
-
-# State 56
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-# A
-#
-#
-#
-#         3
-#         44
-#         55
-#         6
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#         (BWJ)
-#         (CJ)
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "My hand 3445568TQQA2222(BWJ)(CJ)\nPlayed cards 77AA\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJJQKKKA\nPlayed cards 77AA\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQK\nPlayed cards 77AA\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0, 67, 26055, 26056]
-StringLegalActions() = ["Decide first card up position 0", "22", "2222", "(BWJ)(CJ)"]
-
-# Apply action "(BWJ)(CJ)"
-action: 26056
-
-# State 57
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-# A
-#
-#
-#
-#         3
-#         44
-#         55
-#         6
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "My hand 3445568TQQA2222\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJJQKKKA\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQK\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0]
-StringLegalActions() = ["Decide first card up position 0"]
-
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 58
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-# A
-#
-#
-#
-#         3
-#         44
-#         55
-#         6
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-ObservationString(0) = "My hand 3445568TQQA2222\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJJQKKKA\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQK\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0]
-StringLegalActions() = ["Decide first card up position 0"]
-
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 59
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJJ             J
-# Q               Q
-# KKK             K
-# A
-#
-#
-#
-#         3
-#         44
-#         55
-#         6
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "My hand 3445568TQQA2222\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJJQKKKA\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQK\nPlayed cards 77AA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [4, 5, 6, 7, 9, 11, 13, 15, 16, 56, 57, 64, 67, 132, 301, 302, 303, 304, 306, 308, 310, 312, 460, 461, 468, 26055]
-StringLegalActions() = ["Decide first card up position 4", "Decide first card up position 5", "Decide first card up position 6", "Decide first card up position 7", "Decide first card up position 9", "Decide first card up position 11", "Decide first card up position 13", "Decide first card up position 15", "Decide first card up position 16", "44", "55", "QQ", "22", "222", "3222", "4222", "5222", "6222", "8222", "T222", "Q222", "A222", "44222", "55222", "QQ222", "2222"]
-
-# Apply action "Decide first card up position 7"
-action: 7
-
-# State 60
-# Apply action "Decide first card up position 12"
-action: 12
-
-# State 61
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJ              J
-# Q               Q
-# KKK             K
-# A
-#
-#
-#
-#         3
-#         44
-#         55
-#
-#
-#         8
-#
-#         T
-#
-#         QQ
-#
-#         A
-#         2222
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-ObservationString(0) = "My hand 344558TQQA2222\nPlayed cards 677JAA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJQKKKA\nPlayed cards 677JAA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQK\nPlayed cards 677JAA(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◉◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0, 13, 14]
-StringLegalActions() = ["Decide first card up position 0", "Decide first card up position 13", "Decide first card up position 14"]
-
-# Apply action "Decide first card up position 14"
-action: 14
-
-# State 62
-# Apply action "Decide first card up position 16"
-action: 16
-
-# State 63
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 64
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 65
-# Apply action "44222"
-action: 460
-
-# State 66
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 67
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 68
-# Apply action "Decide first card up position 4"
-action: 4
-
-# State 69
-# Apply action "Decide first card up position 14"
-action: 14
-
-# State 70
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 71
-# Apply action "Decide first card up position 15"
-action: 15
-
-# State 72
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 73
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 74
-# Apply action "QQ"
-action: 64
-
-# State 75
-# Apply action "KK"
-action: 65
-
-# State 76
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 77
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 78
-# Apply action "Decide first card up position 13"
-action: 13
-
-# State 79
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 80
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 81
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJ              J
-#                 Q
-#
-# A
-#
-#
-#
-#
-#
-#         55
-#
-#
-#         8
-#
-#         T
-#
-#
-#
-#
-#
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
-# Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "My hand 558T\nPlayed cards 344677JQQQKKKKAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJA\nPlayed cards 344677JQQQKKKKAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQ\nPlayed cards 344677JQQQKKKKAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [4, 5, 6, 9, 10, 12, 15, 55, 56, 57, 60, 61, 63, 68]
-StringLegalActions() = ["Decide first card up position 4", "Decide first card up position 5", "Decide first card up position 6", "Decide first card up position 9", "Decide first card up position 10", "Decide first card up position 12", "Decide first card up position 15", "33", "44", "55", "88", "99", "JJ", "334455"]
-
-# Apply action "Decide first card up position 15"
-action: 15
-
-# State 82
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 83
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
-# JJ              J
-#                 Q
-#
-#
-#
-#
-#
-#
-#
-#         55
-#
-#
-#         8
-#
-#         T
-#
-#
-#
-#
-#
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
-# Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 15
-# Player 2 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "My hand 558T\nPlayed cards 344677JQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899JJ\nPlayed cards 344677JQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQ\nPlayed cards 344677JQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0]
-StringLegalActions() = ["Decide first card up position 0"]
-
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 84
-# Apply action "JJ"
-action: 63
-
-# State 85
-# 33              3
-# 44
-# 55
-#                 666
-#                 77
-# 88              8
-# 99              99
-#                 TTT
+# 9               99
+# T               TT
 #                 J
-#                 Q
-#
-#
-#
-#
-#
-#
-#
-#         55
-#
-#
-#         8
-#
-#         T
-#
-#
-#
-#
-#
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
-# Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 15
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played JJ
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-ObservationString(0) = "My hand 558T\nPlayed cards 344677JJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344558899\nPlayed cards 344677JJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 366677899TTTJQ\nPlayed cards 344677JJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0]
-StringLegalActions() = ["Decide first card up position 0"]
-
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 86
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 87
-# Apply action "Decide first card up position 10"
-action: 10
-
-# State 88
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 89
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 90
-# Apply action "88"
-action: 60
-
-# State 91
-# Apply action "TT"
-action: 62
-
-# State 92
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 93
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 94
-# Apply action "99"
-action: 61
-
-# State 95
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 96
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 97
-# Apply action "66"
-action: 58
-
-# State 98
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 99
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 100
-# Apply action "Decide first card up position 9"
-action: 9
-
-# State 101
-# Apply action "Decide first card up position 11"
-action: 11
-
-# State 102
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 103
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 104
-# Apply action "Decide first card up position 9"
-action: 9
-
-# State 105
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 106
-# Apply action "Decide first card up position 12"
-action: 12
-
-# State 107
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 108
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 109
-# Apply action "Decide first card up position 8"
-action: 8
-
-# State 110
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 111
-# 33              3
-# 44
-# 55
-#                 6
-#                 7
-#
-# 9
-#                 T
-#
-#                 Q
-#
-#
-#
-#
-#
-#
-#
-#         55
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
-# Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 15
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played JJ
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 10
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played 88
-# Player 2 played TT
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 99
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 66
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 9
-# Player 0 played Decide first card up position 11
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 9
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 12
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 8
-# Player 0 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "My hand 55\nPlayed cards 3446667778888999TTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344559\nPlayed cards 3446667778888999TTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 367TQ\nPlayed cards 3446667778888999TTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0, 10]
-StringLegalActions() = ["Decide first card up position 0", "Decide first card up position 10"]
-
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 112
-# Apply action "Decide first card up position 11"
-action: 11
-
-# State 113
-# 33              3
-# 44
-# 55
-#                 6
-#                 7
-#
-# 9
-#
-#
-#                 Q
-#
-#
-#
-#
-#
-#
-#
-#         55
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
-# Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 15
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played JJ
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 10
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played 88
-# Player 2 played TT
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 99
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 66
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 9
-# Player 0 played Decide first card up position 11
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 9
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 12
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 8
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 11
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0, 0, 11]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0, 0, 11"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "My hand 55\nPlayed cards 3446667778888999TTTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344559\nPlayed cards 3446667778888999TTTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 367Q\nPlayed cards 3446667778888999TTTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0]
-StringLegalActions() = ["Decide first card up position 0"]
-
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 114
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 115
-# 33              3
-# 44
-# 55
-#                 6
-#                 7
-#
-# 9
-#
-#
-#                 Q
-#
-#
-#
-#
-#
-#
-#
-#         55
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-# Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
-# Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
-# Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 15
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played JJ
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 10
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played 88
-# Player 2 played TT
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 99
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 66
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 9
-# Player 0 played Decide first card up position 11
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 9
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 12
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 8
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 11
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-IsTerminal() = False
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0, 0, 11, 0, 0]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0, 0, 11, 0, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-ObservationString(0) = "My hand 55\nPlayed cards 3446667778888999TTTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 3344559\nPlayed cards 3446667778888999TTTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand 367Q\nPlayed cards 3446667778888999TTTTJJJJQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [4, 7, 8, 13]
-StringLegalActions() = ["Decide first card up position 4", "Decide first card up position 7", "Decide first card up position 8", "Decide first card up position 13"]
-
-# Apply action "Decide first card up position 8"
-action: 8
-
-# State 116
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 117
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 118
-# Apply action "Decide first card up position 4"
-action: 4
-
-# State 119
-# Apply action "Decide first card up position 6"
-action: 6
-
-# State 120
-# Apply action "Decide first card up position 10"
-action: 10
-
-# State 121
-# Apply action "Decide first card up position 13"
-action: 13
-
-# State 122
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 123
-# Apply action "Decide first card up position 0"
-action: 0
-
-# State 124
-# Apply action "Decide first card up position 7"
-action: 7
-
-# State 125
-# 33
-# 4
-# 5               555
-# 66              66
-# 7               7
-# 888             88
-#                 999
-# TTT             T
-# J               J
-# QQQ             Q
-#                 KK
-# A
-# 22              2
-#
-#
-#         33
+# Q               QQ
+# KK
+# AA              AA
+# 2               2
+# (BWJ)
+#                 (CJ)
+#         333
 #         44
-#         5
-#
+#         55
+#         6
 #         7
 #
 #         9
+#         T
+#         JJJ
+#         Q
+#         KK
 #
-#         JJ
-#
-#         K
-#         AAAA
 #         22
-#         (BWJ)
+#
 #
 # Bidding phase begin
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 3
+# Player 2 played Bid 1
+# Player 0 played Bid 3
 # Playing phase begin
-# Player 1 played 77
-# Player 2 played AA
-# Player 0 played (BWJ)(CJ)
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 7
-# Player 1 played Decide first card up position 12
-# Player 2 played Decide first card up position 14
-# Player 0 played Decide first card up position 16
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played 44222
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 4
-# Player 1 played Decide first card up position 14
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 15
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played QQ
+# Player 0 played 8
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "My hand 3334455679TJJJQKK22\nPlayed cards 8\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKAA2(BWJ)\nPlayed cards 8\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2(CJ)\nPlayed cards 8\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0, 10, 11, 13, 14, 15, 16, 17]
+StringLegalActions() = ["Pass", "9", "T", "Q", "K", "A", "2", "(BWJ)"]
+
+# Apply action "A"
+action: 15
+
+# State 56
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# A               AA
+# 2               2
+# (BWJ)
+#                 (CJ)
+#         333
+#         44
+#         55
+#         6
+#         7
+#
+#         9
+#         T
+#         JJJ
+#         Q
+#         KK
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "My hand 3334455679TJJJQKK22\nPlayed cards 8A\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKA2(BWJ)\nPlayed cards 8A\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2(CJ)\nPlayed cards 8A\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0, 16, 18]
+StringLegalActions() = ["Pass", "2", "(CJ)"]
+
+# Apply action "(CJ)"
+action: 18
+
+# State 57
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# A               AA
+# 2               2
+# (BWJ)
+#
+#         333
+#         44
+#         55
+#         6
+#         7
+#
+#         9
+#         T
+#         JJJ
+#         Q
+#         KK
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "My hand 3334455679TJJJQKK22\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKA2(BWJ)\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 58
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# A               AA
+# 2               2
+# (BWJ)
+#
+#         333
+#         44
+#         55
+#         6
+#         7
+#
+#         9
+#         T
+#         JJJ
+#         Q
+#         KK
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "My hand 3334455679TJJJQKK22\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKA2(BWJ)\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 59
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q               QQ
+# KK
+# A               AA
+# 2               2
+# (BWJ)
+#
+#         333
+#         44
+#         55
+#         6
+#         7
+#
+#         9
+#         T
+#         JJJ
+#         Q
+#         KK
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "My hand 3334455679TJJJQKK22\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKA2(BWJ)\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJQQAA2\nPlayed cards 8A(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 20, 21, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 41, 42, 46, 57, 61, 62, 64, 66]
+StringLegalActions() = ["4", "5", "6", "7", "8", "9", "T", "J", "Q", "A", "2", "45678", "56789", "6789T", "789TJ", "89TJQ", "456789", "56789T", "6789TJ", "789TJQ", "456789T", "56789TJ", "6789TJQ", "456789TJ", "56789TJQ", "456789TJQ", "55", "99", "TT", "QQ", "AA"]
+
+# Apply action "QQ"
+action: 64
+
+# State 60
+# Apply action "Pass"
+action: 0
+
+# State 61
+# 3
+# 4               4
+#                 55
+# 66              6
+# 77              7
+# 88              8
+# 9               99
+# T               TT
+#                 J
+# Q
+# KK
+# A               AA
+# 2               2
+# (BWJ)
+#
+#         333
+#         44
+#         55
+#         6
+#         7
+#
+#         9
+#         T
+#         JJJ
+#         Q
+#         KK
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "My hand 3334455679TJJJQKK22\nPlayed cards 8QQA(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 346677889TQKKA2(BWJ)\nPlayed cards 8QQA(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 45567899TTJAA2\nPlayed cards 8QQA(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0, 65]
+StringLegalActions() = ["Pass", "KK"]
+
+# Apply action "KK"
+action: 65
+
+# State 62
+# Apply action "Pass"
+action: 0
+
+# State 63
+# Apply action "Pass"
+action: 0
+
+# State 64
+# Apply action "667788"
+action: 71
+
+# State 65
+# Apply action "Pass"
+action: 0
+
+# State 66
+# Apply action "Pass"
+action: 0
+
+# State 67
+# Apply action "3"
+action: 4
+
+# State 68
+# Apply action "7"
+action: 8
+
+# State 69
+# Apply action "Q"
+action: 13
+
+# State 70
+# Apply action "2"
+action: 16
+
+# State 71
+# Apply action "Pass"
+action: 0
+
+# State 72
+# Apply action "Pass"
+action: 0
+
+# State 73
+# Apply action "Q"
+action: 13
+
+# State 74
+# Apply action "A"
+action: 15
+
+# State 75
+# Apply action "Pass"
+action: 0
+
+# State 76
+# Apply action "Pass"
+action: 0
+
+# State 77
+# Apply action "TT"
+action: 62
+
+# State 78
+# Apply action "KK"
+action: 65
+
+# State 79
+# Apply action "Pass"
+action: 0
+
+# State 80
+# Apply action "Pass"
+action: 0
+
+# State 81
+#
+# 4               4
+#                 55
+#                 6
+#
+#                 8
+# 9               99
+# T
+#                 J
+#
+#
+# A               A
+#                 2
+# (BWJ)
+#
+#         333
+#         44
+#         55
+#         6
+#         7
+#
+#         9
+#         T
+#         JJJ
+#
+#
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
 # Player 1 played KK
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 13
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 15
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played JJ
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 10
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 0
-# Player 1 played 88
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
 # Player 2 played TT
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "My hand 3334455679TJJJ22\nPlayed cards 366777888TTQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 49TA(BWJ)\nPlayed cards 366777888TTQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 4556899JA2\nPlayed cards 366777888TTQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [4, 5, 6, 7, 8, 10, 11, 12, 16, 19, 55, 56, 57, 63, 67, 68, 120, 128, 133, 134, 135, 136, 138, 139, 140, 144, 245, 246, 247, 248, 249, 251, 252, 256, 315, 316, 322, 326, 411, 412, 413, 422]
+StringLegalActions() = ["3", "4", "5", "6", "7", "9", "T", "J", "2", "34567", "33", "44", "55", "JJ", "22", "334455", "333", "JJJ", "3334", "3335", "3336", "3337", "3339", "333T", "333J", "3332", "3JJJ", "4JJJ", "5JJJ", "6JJJ", "7JJJ", "9JJJ", "TJJJ", "JJJ2", "33344", "33355", "333JJ", "33322", "33JJJ", "44JJJ", "55JJJ", "JJJ22"]
+
+# Apply action "3337"
+action: 136
+
+# State 82
+# Apply action "Pass"
+action: 0
+
+# State 83
+#
+# 4               4
+#                 55
+#                 6
+#
+#                 8
+# 9               99
+# T
+#                 J
+#
+#
+# A               A
+#                 2
+# (BWJ)
+#
+#
+#         44
+#         55
+#         6
+#
+#
+#         9
+#         T
+#         JJJ
+#
+#
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+# Player 1 played KK
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played TT
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 3337
+# Player 1 played Pass
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "My hand 445569TJJJ22\nPlayed cards 3333667777888TTQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 49TA(BWJ)\nPlayed cards 3333667777888TTQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 4556899JA2\nPlayed cards 3333667777888TTQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◉◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◉◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 84
+# Apply action "44JJJ"
+action: 412
+
+# State 85
+#
+# 4               4
+#                 55
+#                 6
+#
+#                 8
+# 9               99
+# T
+#                 J
+#
+#
+# A               A
+#                 2
+# (BWJ)
+#
+#
+#
+#         55
+#         6
+#
+#
+#         9
+#         T
+#
+#
+#
+#
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+# Player 1 played KK
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played TT
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 3337
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 44JJJ
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "My hand 5569T22\nPlayed cards 333344667777888TTJJJQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 49TA(BWJ)\nPlayed cards 333344667777888TTJJJQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 4556899JA2\nPlayed cards 333344667777888TTJJJQQQQKKKKAA2(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◉◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◉◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 86
+# Apply action "Pass"
+action: 0
+
+# State 87
+# Apply action "2"
+action: 16
+
+# State 88
+# Apply action "(BWJ)"
+action: 17
+
+# State 89
+# Apply action "Pass"
+action: 0
+
+# State 90
+# Apply action "Pass"
+action: 0
+
+# State 91
+# Apply action "A"
+action: 15
+
+# State 92
+# Apply action "2"
+action: 16
+
+# State 93
+# Apply action "Pass"
+action: 0
+
+# State 94
+# Apply action "Pass"
+action: 0
+
+# State 95
+# Apply action "8"
+action: 9
+
+# State 96
+# Apply action "9"
+action: 10
+
+# State 97
+# Apply action "Pass"
+action: 0
+
+# State 98
+# Apply action "A"
+action: 15
+
+# State 99
+# Apply action "Pass"
+action: 0
+
+# State 100
+# Apply action "Pass"
+action: 0
+
+# State 101
+# Apply action "J"
+action: 12
+
+# State 102
+# Apply action "2"
+action: 16
+
+# State 103
+# Apply action "Pass"
+action: 0
+
+# State 104
+# Apply action "Pass"
+action: 0
+
+# State 105
+# Apply action "55"
+action: 57
+
+# State 106
+# Apply action "Pass"
+action: 0
+
+# State 107
+# Apply action "99"
+action: 61
+
+# State 108
+# Apply action "Pass"
+action: 0
+
+# State 109
+# Apply action "Pass"
+action: 0
+
+# State 110
+# Apply action "4"
+action: 5
+
+# State 111
+#
+# 4
+#                 55
+#                 6
+#
+#
+# 9
+# T
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#         6
+#
+#
+#
+#         T
+#
+#
+#
+#
+#
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+# Player 1 played KK
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played TT
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 3337
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 44JJJ
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 2
+# Player 1 played (BWJ)
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played A
+# Player 2 played 2
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 8
+# Player 0 played 9
+# Player 1 played Pass
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played J
+# Player 0 played 2
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 55
+# Player 1 played Pass
 # Player 2 played 99
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played 66
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 9
-# Player 0 played Decide first card up position 11
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 0
-# Player 0 played Decide first card up position 9
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 12
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 8
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 11
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 8
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 4
-# Player 0 played Decide first card up position 6
-# Player 1 played Decide first card up position 10
-# Player 2 played Decide first card up position 13
-# Player 0 played Decide first card up position 0
-# Player 1 played Decide first card up position 0
-# Player 2 played Decide first card up position 7
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 4
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "My hand 6T\nPlayed cards 3333444556677778888999TTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 49T\nPlayed cards 3333444556677778888999TTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 556\nPlayed cards 3333444556677778888999TTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0, 7, 11]
+StringLegalActions() = ["Pass", "6", "T"]
+
+# Apply action "6"
+action: 7
+
+# State 112
+# Apply action "T"
+action: 11
+
+# State 113
+#
+# 4
+#                 55
+#                 6
+#
+#
+# 9
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#         T
+#
+#
+#
+#
+#
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+# Player 1 played KK
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played TT
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 3337
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 44JJJ
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 2
+# Player 1 played (BWJ)
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played A
+# Player 2 played 2
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 8
+# Player 0 played 9
+# Player 1 played Pass
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played J
+# Player 0 played 2
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 55
+# Player 1 played Pass
+# Player 2 played 99
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 4
+# Player 0 played 6
+# Player 1 played T
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5, 7, 11]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5, 7, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 2
+ObservationString(0) = "My hand T\nPlayed cards 33334445566677778888999TTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 49\nPlayed cards 33334445566677778888999TTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 556\nPlayed cards 33334445566677778888999TTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [0]
+StringLegalActions() = ["Pass"]
+
+# Apply action "Pass"
+action: 0
+
+# State 114
+# Apply action "Pass"
+action: 0
+
+# State 115
+#
+# 4
+#                 55
+#                 6
+#
+#
+# 9
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#         T
+#
+#
+#
+#
+#
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+# Player 1 played KK
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played TT
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 3337
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 44JJJ
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 2
+# Player 1 played (BWJ)
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played A
+# Player 2 played 2
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 8
+# Player 0 played 9
+# Player 1 played Pass
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played J
+# Player 0 played 2
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 55
+# Player 1 played Pass
+# Player 2 played 99
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 4
+# Player 0 played 6
+# Player 1 played T
+# Player 2 played Pass
+# Player 0 played Pass
+IsTerminal() = False
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5, 7, 11, 0, 0]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5, 7, 11, 0, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "My hand T\nPlayed cards 33334445566677778888999TTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 49\nPlayed cards 33334445566677778888999TTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 556\nPlayed cards 33334445566677778888999TTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [0, 0, 0]
+Returns() = [0, 0, 0]
+LegalActions() = [5, 10]
+StringLegalActions() = ["4", "9"]
+
+# Apply action "9"
+action: 10
+
+# State 116
+# Apply action "Pass"
+action: 0
+
+# State 117
+# Apply action "T"
+action: 11
+
+# State 118
+# 33              3
+# 4
+# 5               5
+# 6               6
+# 7               7
+# 88
+# 99              9
+# T               TTT
+# JJ              J
+#                 QQ
+# KK
+# A               AA
+#                 222
+#                 (BWJ)
+# (CJ)
+#         3
+#
+#         5555
+#         66
+#         77
+#         8
+#         99
+#
+#         J
+#         QQ
+#         KK
+#         A
+#         22
+#
+#
+# Bidding phase begin
+# Player 2 played Bid 1
+# Player 0 played Bid 3
+# Playing phase begin
+# Player 0 played 8
+# Player 1 played A
+# Player 2 played (CJ)
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played QQ
+# Player 0 played Pass
+# Player 1 played KK
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 667788
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 3
+# Player 2 played 7
+# Player 0 played Q
+# Player 1 played 2
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played Q
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played TT
+# Player 0 played KK
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 3337
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 44JJJ
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 2
+# Player 1 played (BWJ)
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played A
+# Player 2 played 2
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 8
+# Player 0 played 9
+# Player 1 played Pass
+# Player 2 played A
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played J
+# Player 0 played 2
+# Player 1 played Pass
+# Player 2 played Pass
+# Player 0 played 55
+# Player 1 played Pass
+# Player 2 played 99
+# Player 0 played Pass
+# Player 1 played Pass
+# Player 2 played 4
+# Player 0 played 6
+# Player 1 played T
+# Player 2 played Pass
+# Player 0 played Pass
+# Player 1 played 9
+# Player 2 played Pass
+# Player 0 played T
 # The results are:
 # Player 0 got 6.000000
-# Player 1 got -12.000000
-# Player 2 got 6.000000
+# Player 1 got -3.000000
+# Player 2 got -3.000000
 IsTerminal() = True
-History() = [15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0, 0, 11, 0, 0, 8, 0, 0, 4, 6, 10, 13, 0, 0, 7]
-HistoryString() = "15, 91, 65, 97, 73, 56, 62, 52, 81, 67, 92, 83, 88, 84, 86, 93, 103, 57, 64, 60, 78, 99, 79, 55, 71, 89, 87, 95, 102, 72, 85, 76, 61, 94, 63, 77, 54, 104, 59, 96, 90, 66, 100, 69, 98, 70, 80, 74, 68, 75, 51, 58, 0, 3, 59, 66, 26056, 0, 0, 7, 12, 14, 16, 0, 0, 460, 0, 0, 4, 14, 0, 15, 0, 0, 64, 65, 0, 0, 13, 0, 0, 15, 0, 0, 63, 0, 0, 10, 0, 0, 60, 62, 0, 0, 61, 0, 0, 58, 0, 0, 9, 11, 0, 0, 9, 0, 12, 0, 0, 8, 0, 0, 11, 0, 0, 8, 0, 0, 4, 6, 10, 13, 0, 0, 7"
+History() = [29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5, 7, 11, 0, 0, 10, 0, 11]
+HistoryString() = "29, 78, 62, 75, 98, 55, 71, 90, 96, 99, 86, 56, 104, 95, 97, 69, 81, 87, 57, 59, 93, 68, 77, 60, 58, 63, 80, 67, 100, 103, 70, 89, 91, 73, 85, 82, 76, 84, 101, 66, 54, 94, 65, 74, 61, 53, 52, 102, 88, 64, 51, 72, 1, 3, 9, 15, 18, 0, 0, 64, 0, 65, 0, 0, 71, 0, 0, 4, 8, 13, 16, 0, 0, 13, 15, 0, 0, 62, 65, 0, 0, 136, 0, 0, 412, 0, 0, 16, 17, 0, 0, 15, 16, 0, 0, 9, 10, 0, 15, 0, 0, 12, 16, 0, 0, 57, 0, 61, 0, 0, 5, 7, 11, 0, 0, 10, 0, 11"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "My hand 5\nPlayed cards 334456666777788889999TTTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 2"
-ObservationString(1) = "My hand 334455\nPlayed cards 334456666777788889999TTTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 0"
-ObservationString(2) = "My hand \nPlayed cards 334456666777788889999TTTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 13start player: 0My position from Dizhu: 1"
-ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(1): ◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-ObservationTensor(2): ◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯
-Rewards() = [6, -12, 6]
-Returns() = [6, -12, 6]
+ObservationString(0) = "My hand \nPlayed cards 333344455666777788889999TTTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 0"
+ObservationString(1) = "My hand 4\nPlayed cards 333344455666777788889999TTTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 1"
+ObservationString(2) = "My hand 556\nPlayed cards 333344455666777788889999TTTTJJJJQQQQKKKKAAAA2222(BWJ)(CJ)\nface up card rank: 6start player: 2My position from Dizhu: 2"
+ObservationTensor(0): ◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◉◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(1): ◉◯◯◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◉◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+ObservationTensor(2): ◉◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◉◯◯◯◉◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯
+Rewards() = [6, -3, -3]
+Returns() = [6, -3, -3]
