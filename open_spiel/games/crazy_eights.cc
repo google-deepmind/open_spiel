@@ -121,26 +121,31 @@ CrazyEightsState::CrazyEightsState(std::shared_ptr<const Game> game,
 
 std::string CrazyEightsState::ActionToString(Player player,
                                              Action action) const {
-    std::string str;
-    if (action < kDraw) {
-        absl::StrAppend(&str, GetCardStr(action));
-    } else if (action == kDraw) {
-        absl::StrAppend(&str, "Draw");
-    } else if (action == kPass) {
-        absl::StrAppend(&str, "Pass");
-    } else if (action < kDecideDealerActionBase) {
-        absl::StrAppend(
-            &str, absl::StrFormat("Nominate suit %c",
-                                  kSuitChar[action - kNominateSuitActionBase]));
-    } else if (action < kDecideDealerActionBase + num_players_) {
-        absl::StrAppend(&str,
-                        absl::StrFormat("Decide Player %d to be the dealer",
-                                        action - kDecideDealerActionBase));
-    } else {
-        SpielFatalError("Non valid action ID!");
+    if (player == kChancePlayerId) {
+        if (action < kDraw) {
+            return absl::StrFormat("Deal %s", GetCardStr(action));
+        } else if (action < kDecideDealerActionBase + num_players_) {
+            return absl::StrFormat("Decide Player %d to be the dealer",
+                                   action - kDecideDealerActionBase);
+        } else {
+            SpielFatalError(absl::StrFormat(
+                "Non action valid Id  %d for chance player", action));
+        }
     }
 
-    return str;
+    if (action < kDraw) {
+        return absl::StrFormat("Play %s", GetCardStr(action));
+    } else if (action == kDraw) {
+        return "Draw";
+    } else if (action == kPass) {
+        return "Pass";
+    } else if (action < kNominateSuitActionBase + kNumSuits) {
+        return absl::StrFormat("Nominate suit %c",
+                               kSuitChar[action - kNominateSuitActionBase]);
+    } else {
+        SpielFatalError(
+            absl::StrFormat("Non valid Id %d for player: %d", action, player));
+    }
 }
 
 std::vector<std::string> CrazyEightsState::FormatHand(Player player) const {
@@ -228,7 +233,8 @@ std::string CrazyEightsState::ToString() const {
                     absl::StrAppend(&str, absl::StrFormat("Player %d passes\n",
                                                           playing_player));
                 } else if (history_[i].action >= kNominateSuitActionBase &&
-                           history_[i].action < kDecideDealerActionBase) {
+                           history_[i].action <
+                               kNominateSuitActionBase + kNumSuits) {
                     int suit = history_[i].action - kNominateSuitActionBase;
                     absl::StrAppend(
                         &str, absl::StrFormat("Player %d nominates suit %c\n",
@@ -622,7 +628,7 @@ void CrazyEightsState::ApplyPlayAction(int action) {
         if (num_draws_from_twos_left_) start_draw_twos_ = true;
         return;
     } else if (nominate_suits_) {
-        SPIEL_CHECK_LE(action, kDecideDealerActionBase);
+        SPIEL_CHECK_LT(action, kNominateSuitActionBase + kNumSuits);
         SPIEL_CHECK_GE(action, kNominateSuitActionBase);
         last_suit_ = action - kNominateSuitActionBase;
         current_player_ =
