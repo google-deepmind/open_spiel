@@ -38,8 +38,6 @@ from open_spiel.python.utils.reservoir_buffer import ReservoirBuffer
 Transition = collections.namedtuple(
     "Transition", "info_state action_probs legal_actions_mask")
 
-ILLEGAL_ACTION_LOGITS_PENALTY = -1e9
-
 MODE = enum.Enum("mode", "best_response average_policy")
 
 

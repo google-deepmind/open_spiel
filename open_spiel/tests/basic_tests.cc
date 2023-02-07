@@ -254,6 +254,31 @@ void CheckObservables(const Game& game,
   }
 }
 
+void CheckActionStringsAreUniqueForPlayer(const Game& game, State& state,
+                                          Player player) {
+  absl::flat_hash_set<std::string> action_strings;
+  for (Action action : state.LegalActions(player)) {
+    const auto action_str = state.ActionToString(player, action);
+    const auto& [unused, was_inserted] = action_strings.insert(action_str);
+    SPIEL_CHECK_TRUE_WSI(
+        was_inserted,
+        absl::StrCat("Duplicate action string '", action_str, "' in state"),
+        game, state);
+  }
+}
+
+void CheckActionStringsAreUnique(const Game& game, State& state) {
+  if (state.IsTerminal() || state.IsMeanFieldNode()) return;
+  if (state.IsSimultaneousNode()) {
+    for (int player = 0; player < game.NumPlayers(); ++player) {
+      CheckActionStringsAreUniqueForPlayer(game, state, player);
+    }
+  } else{
+    // Also works for chance node.
+    CheckActionStringsAreUniqueForPlayer(game, state, state.CurrentPlayer());
+  }
+}
+
 // This is used for mean-field games.
 std::vector<double> RandomDistribution(int num_states, std::mt19937* rng) {
   std::uniform_real_distribution<double> rand(0, 1);
@@ -326,6 +351,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 
     LegalActionsIsEmptyForOtherPlayers(game, *state);
     CheckLegalActionsAreSorted(game, *state);
+    CheckActionStringsAreUnique(game, *state);
 
     // Test cloning the state.
     std::unique_ptr<open_spiel::State> state_copy = state->Clone();

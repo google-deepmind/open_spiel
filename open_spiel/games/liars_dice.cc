@@ -239,11 +239,7 @@ std::vector<Action> LiarsDiceState::LegalActions() const {
   if (IsTerminal()) return {};
   // A chance node is a single die roll.
   if (IsChanceNode()) {
-    std::vector<Action> outcomes(dice_sides());
-    for (int i = 0; i < dice_sides(); i++) {
-      outcomes[i] = i;
-    }
-    return outcomes;
+    return LegalChanceOutcomes();
   }
 
   std::vector<Action> actions;

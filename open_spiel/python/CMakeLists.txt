@@ -222,6 +222,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/data_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
+  games/liars_poker_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/mirror_descent_test.py
@@ -235,6 +236,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/bot_test.py
   tests/game_transforms_test.py
   tests/games_bridge_test.py
+  tests/games_chess_test.py
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_sim_test.py
