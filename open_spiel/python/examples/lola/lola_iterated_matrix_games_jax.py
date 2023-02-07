@@ -1,107 +1,83 @@
-import logging
-import random
-import typing
 import warnings
 from typing import List, Tuple
 
-import aim
-from aim import Run
 import distrax
 import haiku
 import haiku as hk
 import jax.numpy as jnp
 import jax.tree_util
 import numpy as np
-import pyspiel
 from absl import app
 from absl import flags
-from dm_env import Environment
+from aim import Run
 
-from open_spiel.python import rl_environment
+from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemma
 from open_spiel.python.jax.lola import LolaPolicyGradientAgent
+from open_spiel.python.rl_environment import Environment, TimeStep
 
 warnings.simplefilter('ignore', FutureWarning)
 
 """
-Example that trains two agents using LOLA (Foerster et al., 2018) on iterated matrix games. Hyperparameters are taken from
-the paper. 
+Example that trains two agents using LOLA (Foerster et al., 2017) and LOLA-DiCE (Foerster et al., 2018)
+on iterated matrix games. Hyperparameters are taken from the paper and https://github.com/alexis-jacq/LOLA_DiCE.
 """
 FLAGS = flags.FLAGS
-flags.DEFINE_integer("seed", random.choice([42]), "Random seed.")
+flags.DEFINE_integer("seed", 42, "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
-flags.DEFINE_integer("epochs", 1000, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 128, "Number of episodes in a batch.")
+flags.DEFINE_integer("epochs", 200, "Number of training iterations.")
+flags.DEFINE_integer("batch_size", 256, "Number of episodes in a batch.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.1, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 0.3, "Critic learning rate.")
+flags.DEFINE_float("policy_lr", 0.2, "Policy learning rate.")
+flags.DEFINE_float("opp_policy_lr", 0.3, "Policy learning rate.")
+flags.DEFINE_float("critic_lr", 0.1, "Critic learning rate.")
 flags.DEFINE_string("correction_type", 'dice', "Either 'lola', 'dice' or None.")
+flags.DEFINE_integer("n_lookaheads", 0, "Number of lookaheads for LOLA correction.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
 flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
 flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
-flags.DEFINE_bool("include_remaining_iterations", False, "If true, the percentage of the remaining iterations are included in the observations.")
-def log_epoch_data(run: Run, epoch: int, agent: LolaPolicyGradientAgent, env: Environment, eval_batch, policy_network):
-    def get_action_probs(policy_params: hk.Params) -> List[str]:
+
+def log_epoch_data(run: Run, epoch: int, agents: List[LolaPolicyGradientAgent], eval_batch):
+    def get_action_probs(agent: LolaPolicyGradientAgent) -> List[str]:
         states = ['s0', 'CC', 'CD', 'DC', 'DD']
         prob_strings = []
+        params = agent.train_state.policy_params[agent.player_id]
         for i, s in enumerate(states):
             state = np.eye(len(states))[i]
-            prob = policy_network.apply(policy_params, state).prob(0)
+            prob = agent.policy_network.apply(params, state).prob(0)
             prob_strings.append(f'P(C|{s})={prob:.3f}')
             run.track(prob.item(), name=f'P(C|{s})', context={'agent': agent.player_id})
         return prob_strings
 
-    avg_step_reward = np.mean([[time_step.rewards[agent.player_id] for time_step in episode] for episode in eval_batch])
-    stats = dict(avg_step_reward=avg_step_reward)
-    episode_stats = ','.join(f'{k}={v:.2f}' for k, v in stats.items())
-    action_probs = get_action_probs(policy_params=agent.train_state.policy_params[agent.player_id])
-    probs = ', '.join(action_probs)
-    run.track(avg_step_reward, name='avg_step_reward', context={'agent': agent.player_id})
-    print(f'[epoch {epoch}] Agent {agent.player_id}: {episode_stats} | {probs}')
+    for agent in agents:
+        avg_step_reward = np.mean([ts.rewards[agent.player_id] for ts in eval_batch])
+        probs = get_action_probs(agent)
+        probs = ', '.join(probs)
+        run.track(avg_step_reward, name='avg_step_reward', context={'agent': agent.player_id})
+        print(f'[epoch {epoch}] Agent {agent.player_id}: {avg_step_reward:.2f} | {probs}')
 
 
-def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], n_episodes: int, eval: bool):
-    def postprocess(timestep: rl_environment.TimeStep, actions: typing.List) -> rl_environment.TimeStep:
-        observations = timestep.observations.copy()
+def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], eval: bool):
+    def get_values(time_step: TimeStep, agent: LolaPolicyGradientAgent) -> jnp.ndarray:
+        v_fn = agent.get_value_fn()
+        return jax.vmap(v_fn)(time_step.observations["info_state"][agent.player_id])
 
-        if timestep.first():
-            observations["current_player"] = pyspiel.PlayerId.SIMULTANEOUS
-        observations["actions"] = []
+    episode = []
+    time_step = env.reset()
+    episode.append(time_step)
+    while not time_step.last():
+        values = np.stack([get_values(time_step, agent) for agent in agents], axis=0)
+        time_step.observations["values"] = values
+        actions = [agent.step(time_step, is_evaluation=eval).action for agent in agents]
+        time_step = env.step(np.stack(actions, axis=1))
+        time_step.observations["actions"] = np.stack(actions, axis=0)
+        episode.append(time_step)
 
-        values = []
-        for agent in sorted(agents, key=lambda a: a.player_id):
-            v_fn = agent.get_value_fn()
-            values.append(jax.vmap(v_fn)(observations["info_state"][agent.player_id]))
-
-        observations["values"] = jnp.stack(values, axis=0)
-        observations["actions"] = actions
-        return timestep._replace(observations=observations)
-
-    episodes = []
-    for _ in range(n_episodes):
-        time_step = env.reset()
-        t = 0
-        time_step = postprocess(time_step, actions=None)
-        episode = []
-        while not time_step.last():
-            agents_output, action_list = [], []
-            for agent in agents:
-                output = agent.step(time_step, is_evaluation=eval)
-                agents_output.append(output)
-                action_list.append(output.action)
-            actions = np.stack(action_list, axis=1)
-            time_step = env.step(actions)
-            t += 1
-            time_step = postprocess(timestep=time_step, actions=action_list)
-            episode.append(time_step)
-
-        for agent in agents:
-            agent.step(time_step, is_evaluation=eval)
-        episodes.append(episode)
-
-    return episodes
+    for agent in agents:
+        agent.step(time_step, is_evaluation=eval)
+    return episode
 
 
 def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
@@ -123,76 +99,74 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         correction_type=FLAGS.correction_type,
         clip_grad_norm=FLAGS.correction_max_grad_norm,
         use_jit=FLAGS.use_jit,
+        n_lookaheads=FLAGS.n_lookaheads,
         env=env
     )
 
 
-def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transformed]:
+def make_agent_networks(num_states: int, num_actions: int) -> Tuple[hk.Transformed, hk.Transformed]:
     def policy(obs):
-        # w_init=haiku.initializers.Constant(1), b_init=haiku.initializers.Constant(0)
-        theta = hk.get_parameter('theta', init=haiku.initializers.Constant(0), shape=(5,2))
+        theta = hk.get_parameter('theta', init=haiku.initializers.Constant(0), shape=(num_states, num_actions))
         logits = jnp.select(obs, theta)
         return distrax.Categorical(logits=logits)
 
     def value_fn(obs):
-        w = hk.get_parameter("w", [5], init=jnp.zeros)
+        w = hk.get_parameter("w", [num_states], init=jnp.zeros)
         return w[jnp.argmax(obs, axis=-1)].reshape(*obs.shape[:-1], 1)
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))
 
-def make_env(iterations: int, batch_size: int, jitted: bool = False):
-    if jitted:
-        from open_spiel.python.environments.iterated_matrix_game_jax import IteratedPrisonersDilemma
-    else:
-        from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemma
+def make_env(iterations: int, batch_size: int):
     return IteratedPrisonersDilemma(iterations=iterations, batch_size=batch_size)
 
-def update_weights(agent: LolaPolicyGradientAgent, opponent: LolaPolicyGradientAgent):
-    agent.update_params(state=opponent.train_state, player_id=opponent.player_id)
-    opponent.update_params(state=agent.train_state, player_id=agent.player_id)
+def setup_agents(env: Environment, rng: hk.PRNGSequence) -> List[LolaPolicyGradientAgent]:
+    agents = []
+    num_actions = env.action_spec()["num_actions"]
+    num_states = env.observation_spec()["info_state"]
+    for player_id in range(env.num_players):
+        networks = make_agent_networks(num_states=num_states[player_id], num_actions=num_actions[player_id])
+        agent = make_agent(key=next(rng), player_id=player_id, env=env, networks=networks)
+        agents.append(agent)
+    return agents
+
+def update_weights(agents: List[LolaPolicyGradientAgent]):
+    for agent in agents:
+        for opp in filter(lambda a: a.player_id != agent.player_id, agents):
+            agent.update_params(state=opp.train_state, player_id=opp.player_id)
 
 
 def main(_):
-    run = Run(experiment='lola')
+    run = Run(experiment='opponent_shaping')
     run["hparams"] = {
         "seed": FLAGS.seed,
         "batch_size": FLAGS.batch_size,
+        "game_iterations": FLAGS.game_iterations,
+        "with_opp_modelling": FLAGS.use_opponent_modelling,
         "discount": FLAGS.discount,
         "policy_lr": FLAGS.policy_lr,
         "critic_lr": FLAGS.critic_lr,
         "policy_update_interval": FLAGS.policy_update_interval,
         "correction_type": FLAGS.correction_type,
         "correction_max_grad_norm": FLAGS.correction_max_grad_norm,
+        "n_lookaheads": FLAGS.n_lookaheads,
         "use_jit": FLAGS.use_jit
     }
 
     rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
-    for experiment in range(1):
-        env = make_env(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, jitted=False)
-        agents = []
-        for player_id in range(env.num_players):
-            networks = make_agent_networks(num_actions=env.action_spec()["num_actions"][player_id])
-            policy_network, critic_network = networks
-            agent = make_agent(key=next(rng), player_id=player_id, env=env, networks=networks)
-            agents.append(agent)
+    env = make_env(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size)
+    agents = setup_agents(env=env, rng=rng)
 
-        update_weights(agents[0], agents[1])
-        batch = collect_batch(env=env, agents=agents, n_episodes=1, eval=True)
-        for agent in agents:
-            log_epoch_data(epoch=0, run=run, agent=agent, env=env, eval_batch=batch, policy_network=policy_network)
-        for epoch in range(1, FLAGS.epochs+1):
-            batch = collect_batch(env=env, agents=agents, n_episodes=1, eval=False)
-            for agent in agents:
-                for k, v in agent._metrics[-1].items():
-                    #run.track(v, name=k, context={"agent": agent.player_id})
-                    pass
+    if not FLAGS.use_opponent_modelling:
+        update_weights(agents)
 
-            update_weights(agents[0], agents[1])
-
-            for agent in agents:
-                log_epoch_data(epoch=epoch, agent=agent, run=run, env=env, eval_batch=batch, policy_network=policy_network)
+    batch = collect_batch(env=env, agents=agents, eval=True)
+    log_epoch_data(epoch=0, agents=agents, run=run, eval_batch=batch)
+    for epoch in range(1, FLAGS.epochs+1):
+        batch = collect_batch(env=env, agents=agents, eval=False)
+        if not FLAGS.use_opponent_modelling:
+            update_weights(agents)
+        log_epoch_data(epoch=epoch, agents=agents, run=run, eval_batch=batch)
         print('#' * 100)
-
 
 if __name__ == "__main__":
     app.run(main)

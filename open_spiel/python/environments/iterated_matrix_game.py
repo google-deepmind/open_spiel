@@ -1,9 +1,5 @@
 import numpy as np
-import pyspiel
 from pyspiel import PlayerId
-
-import open_spiel.python.rl_environment
-from open_spiel.python import rl_environment
 
 from open_spiel.python.rl_environment import Environment, TimeStep, StepType
 
@@ -44,7 +40,6 @@ class IteratedMatrixGame(Environment):
     def step(self, actions: np.ndarray):
         if actions.ndim == 1:
             actions = actions[None, :]
-        #payoffs = self._payoff_matrix[tuple(actions.T)]
         payoffs = self._payoff_matrix[tuple(actions.T)]
         s1 = self.one_hot(self._actions[tuple(actions.T)] + 1, n=np.max(self._actions) + 2)
         s2 = self.one_hot(self._actions[tuple(actions[..., ::-1].T)] + 1, n=np.max(self._actions) + 2)
