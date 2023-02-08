@@ -25,13 +25,13 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", 42, "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 200, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 256, "Number of episodes in a batch.")
+flags.DEFINE_integer("batch_size", 4096, "Number of episodes in a batch.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.2, "Policy learning rate.")
-flags.DEFINE_float("opp_policy_lr", 0.3, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 0.1, "Critic learning rate.")
-flags.DEFINE_string("correction_type", 'dice', "Either 'lola', 'dice' or None.")
-flags.DEFINE_integer("n_lookaheads", 0, "Number of lookaheads for LOLA correction.")
+flags.DEFINE_float("policy_lr", 0.1, "Policy learning rate.")
+flags.DEFINE_float("opp_policy_lr", 0.1, "Policy learning rate.")
+flags.DEFINE_float("critic_lr", 0.3, "Critic learning rate.")
+flags.DEFINE_string("correction_type", 'lola', "Either 'lola', 'dice' or None.")
+flags.DEFINE_integer("n_lookaheads", 1, "Number of lookaheads for LOLA correction.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
@@ -93,6 +93,7 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         critic=critic_network,
         batch_size=FLAGS.batch_size,
         pi_learning_rate=FLAGS.policy_lr,
+        opp_policy_learning_rate=FLAGS.opp_policy_lr,
         critic_learning_rate=FLAGS.critic_lr,
         policy_update_interval=FLAGS.policy_update_interval,
         discount=FLAGS.discount,
@@ -122,9 +123,9 @@ def make_env(iterations: int, batch_size: int):
 def setup_agents(env: Environment, rng: hk.PRNGSequence) -> List[LolaPolicyGradientAgent]:
     agents = []
     num_actions = env.action_spec()["num_actions"]
-    num_states = env.observation_spec()["info_state"]
+    info_state_shape = env.observation_spec()["info_state"]
     for player_id in range(env.num_players):
-        networks = make_agent_networks(num_states=num_states[player_id], num_actions=num_actions[player_id])
+        networks = make_agent_networks(num_states=info_state_shape[player_id][0], num_actions=num_actions[player_id])
         agent = make_agent(key=next(rng), player_id=player_id, env=env, networks=networks)
         agents.append(agent)
     return agents
@@ -144,6 +145,7 @@ def main(_):
         "with_opp_modelling": FLAGS.use_opponent_modelling,
         "discount": FLAGS.discount,
         "policy_lr": FLAGS.policy_lr,
+        "opp_policy_lr": FLAGS.opp_policy_lr,
         "critic_lr": FLAGS.critic_lr,
         "policy_update_interval": FLAGS.policy_update_interval,
         "correction_type": FLAGS.correction_type,

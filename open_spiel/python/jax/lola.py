@@ -64,7 +64,7 @@ def get_critic_update_fn(
 
     def loss_fn(params, batch: TransitionBatch):
         info_states, rewards = batch.info_state[agent_id], batch.reward[agent_id]
-        discounts = jnp.ones_like(rewards) * gamma * 0
+        discounts = jnp.ones_like(rewards) * gamma
         values = critic_network.apply(params, info_states).squeeze()
         v_tm1 = values[:, :-1].reshape(-1)
         v_t = values[:, 1:].reshape(-1)
@@ -104,6 +104,7 @@ def get_dice_update_fn(
         critic_network: hk.Transformed,
         optimizer: optax.TransformUpdateFn,
         pi_lr: float,
+        opp_pi_lr: float,
         env: rl_environment.Environment,
         n_lookaheads: int = 1,
         gamma: float = 0.99,
@@ -170,7 +171,7 @@ def get_dice_update_fn(
                     rewards=trajectories['rewards'][0],
                     values=critic_network.apply(train_state.critic_params[opp_id], trajectories['states'][0])
                 )
-                other_theta = jax.tree_util.tree_map(lambda param, grad: param - pi_lr * grad, other_theta, other_grad)
+                other_theta = jax.tree_util.tree_map(lambda param, grad: param - opp_pi_lr * grad, other_theta, other_grad)
 
             trajectories = rollout(params, other_theta)
             values = critic_network.apply(train_state.critic_params[id], trajectories['states'][0])
@@ -237,8 +238,8 @@ def get_lola_update_fn(
         a_t, o_t, r_t, values = batch.action, batch.info_state, batch.reward, batch.values
         params, unravel_fns = flat_params(train_state.policy_params)
 
-        compute_returns = partial(rlax.lambda_returns, discount_t=batch.discount, lambda_=1.0)
-        G_t = vmap(vmap(compute_returns))(r_t=r_t, v_t=values)
+        compute_returns = partial(rlax.lambda_returns, lambda_=1.0)
+        G_t = vmap(vmap(compute_returns))(r_t=r_t, v_t=values, discount_t=jnp.full_like(r_t, gamma))
         b_t = G_t.mean(axis=1, keepdims=True)
         G_t = G_t - b_t
 
@@ -260,7 +261,7 @@ def get_lola_update_fn(
         a_t, o_t, r_t, values = batch.action[id], batch.info_state[id], batch.reward[id], batch.values[id]
         logits_t = vmap(vmap(lambda s: policy_network.apply(params, s).logits))(o_t)
         discount = jnp.full(r_t.shape, gamma)
-        G = rlax.lambda_returns(r_t=r_t, v_t=values, discount_t=discount, lambda_=1.0)
+        G = vmap(rlax.lambda_returns)(r_t=r_t, v_t=values, discount_t=discount, lambda_=jnp.ones_like(discount))
         adv_t = G - values
         loss = vmap(rlax.policy_gradient_loss)(logits_t=logits_t, a_t=a_t, adv_t=adv_t, w_t=jnp.ones_like(adv_t))
         return loss.mean()
@@ -278,7 +279,7 @@ def get_lola_update_fn(
         """
         loss, policy_grads = jax.value_and_grad(policy_loss)(train_state.policy_params[agent_id], agent_id, batch)
         correction = lola_correction(train_state, batch)
-        policy_grads = jax.tree_util.tree_map(lambda grad, corr: grad + correction, policy_grads, correction)
+        policy_grads = jax.tree_util.tree_map(lambda grad, corr: grad - corr, policy_grads, correction)
         updates, opt_state = optimizer(policy_grads, train_state.policy_opt_states[agent_id])
         policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
         new_policy_params = deepcopy(train_state.policy_params)
@@ -332,6 +333,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  batch_size: int = 16,
                  critic_learning_rate: typing.Union[float, optax.Schedule] = 0.01,
                  pi_learning_rate: typing.Union[float, optax.Schedule] = 0.001,
+                 opp_policy_learning_rate: typing.Union[float, optax.Schedule] = 0.001,
                  opponent_model_learning_rate: typing.Union[float, optax.Schedule] = 0.001,
                  clip_grad_norm: float = 0.5,
                  policy_update_interval: int = 8,
@@ -381,6 +383,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                 critic_network=critic,
                 optimizer=self._policy_opt.update,
                 pi_lr=pi_learning_rate,
+                opp_pi_lr=opp_policy_learning_rate,
                 gamma=discount,
                 n_lookaheads=n_lookaheads,
                 env=env
