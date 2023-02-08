@@ -33,6 +33,8 @@
 //     "suit_isomorphism"  bool   player observations do not distinguish
 //                                between cards of different suits with
 //                                the same rank              (default = false)
+//     "num_ranks"         int    number of ranks. if not set, it defaults to
+//                                players+1                  (default = -1)
 
 #ifndef OPEN_SPIEL_GAMES_LEDUC_POKER_H_
 #define OPEN_SPIEL_GAMES_LEDUC_POKER_H_
@@ -72,7 +74,7 @@ enum ActionType { kFold = 0, kCall = 1, kRaise = 2 };
 class LeducState : public State {
  public:
   explicit LeducState(std::shared_ptr<const Game> game,
-                      bool action_mapping, bool suit_isomorphism);
+                      bool action_mapping, bool suit_isomorphism, int total_cards);
 
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action move) const override;
