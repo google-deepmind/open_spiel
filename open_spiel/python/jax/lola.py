@@ -42,6 +42,11 @@ class TrainState(typing.NamedTuple):
 
 UpdateFn = typing.Callable[[TrainState, TransitionBatch], typing.Tuple[TrainState, typing.Dict]]
 
+def get_minibatches(batch: TransitionBatch, num_minibatches: int) -> typing.Iterator[TransitionBatch]:
+    for i in range(num_minibatches):
+        start, end = i * (batch.reward.shape[1] // num_minibatches), (i + 1) * (batch.reward.shape[1] // num_minibatches)  #
+        mini_batch = jax.tree_util.tree_map(lambda x: x[:, start:end] if len(x.shape) > 2 else x, batch)
+        yield mini_batch
 
 def get_critic_update_fn(
         agent_id: int,
@@ -77,10 +82,7 @@ def get_critic_update_fn(
         losses = []
         critic_params = train_state.critic_params[agent_id]
         opt_state = train_state.critic_opt_state[agent_id]
-        for i in range(num_minibatches):
-            start, end = i * (batch.reward.shape[1] // num_minibatches), (i + 1) * (
-                        batch.reward.shape[1] // num_minibatches)  #
-            mini_batch = jax.tree_util.tree_map(lambda x: x[:, start:end] if len(x.shape) > 2 else x, batch)
+        for mini_batch in get_minibatches(batch, num_minibatches):
             loss, grads = jax.value_and_grad(loss_fn)(critic_params, mini_batch)
             updates, opt_state = optimizer(grads, opt_state)
             critic_params = optax.apply_updates(critic_params, updates)
@@ -92,7 +94,7 @@ def get_critic_update_fn(
         state = train_state \
             ._replace(critic_params=new_params) \
             ._replace(critic_opt_state=new_opt_states)
-        return state, dict(loss=jnp.mean(jnp.array(losses)).item())
+        return state, dict(loss=jnp.mean(jnp.array(losses)))
 
     return update
 
@@ -295,7 +297,7 @@ def get_lola_update_fn(
 
 
 def get_opponent_update_fn(agent_id: int, policy_network: hk.Transformed,
-                           optimizer: optax.TransformUpdateFn) -> UpdateFn:
+                           optimizer: optax.TransformUpdateFn, num_minibatches: int = 1) -> UpdateFn:
     def loss_fn(params, batch: TransitionBatch):
         def loss(p, states, actions):
             log_prob = policy_network.apply(p, states).log_prob(actions)
@@ -306,9 +308,14 @@ def get_opponent_update_fn(agent_id: int, policy_network: hk.Transformed,
         return -log_probs.sum(axis=-1).mean()
 
     def update(train_state: TrainState, batch: TransitionBatch) -> typing.Tuple[TrainState, typing.Dict]:
-        loss, policy_grads = jax.value_and_grad(loss_fn)(train_state.policy_params[agent_id], batch)
-        updates, opt_state = optimizer(policy_grads, train_state.policy_opt_states[agent_id])
-        policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
+        policy_params = train_state.policy_params[agent_id]
+        opt_state = train_state.policy_opt_states[agent_id]
+
+        for mini_batch in get_minibatches(batch, num_minibatches):
+            loss, policy_grads = jax.value_and_grad(loss_fn)(policy_params, mini_batch)
+            updates, opt_state = optimizer(policy_grads, opt_state)
+            policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
+
         new_policy_params = deepcopy(train_state.policy_params)
         new_opt_states = deepcopy(train_state.policy_opt_states)
         new_policy_params[agent_id] = policy_params
@@ -343,6 +350,8 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  correction_type='lola',
                  use_jit: bool = False,
                  n_lookaheads: int = 1,
+                 num_critic_mini_batches: int = 1,
+                 num_opponent_updates: int = 1,
                  env: typing.Optional[rl_environment.Environment] = None
                  ):
 
@@ -351,6 +360,8 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         self._batch_size = batch_size
         self._policy_update_interval = policy_update_interval
         self._discount = discount
+        self._num_opponent_updates = num_opponent_updates
+        self._num_mini_batches = num_critic_mini_batches
         self._prev_time_step = None
         self._prev_action = None
         self._data = []
@@ -403,13 +414,18 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         critic_update_fn = get_critic_update_fn(
             agent_id=player_id,
             critic_network=critic,
-            optimizer=self._critic_opt.update
+            optimizer=self._critic_opt.update,
+            num_minibatches=num_critic_mini_batches
         )
         self._critic_update_fn = jax.jit(critic_update_fn) if use_jit else critic_update_fn
 
         for opponent in opponent_ids:
-            opp_update_fn = get_opponent_update_fn(agent_id=opponent, policy_network=policy,
-                                                   optimizer=self._opponent_opt.update)
+            opp_update_fn = get_opponent_update_fn(
+                agent_id=opponent,
+                policy_network=policy,
+                optimizer=self._opponent_opt.update,
+                num_minibatches=num_opponent_updates
+            )
             self._policy_update_fns[opponent] = jax.jit(opp_update_fn) if use_jit else opp_update_fn
 
     @property
@@ -658,9 +674,10 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
 
     def _update_opponents(self, batch: TransitionBatch):
         update_metrics = {}
-        for opponent in self._opponent_ids:
-            self._train_state, metrics = self._policy_update_fns[opponent](self._train_state, batch)
-            update_metrics.update({f'agent_{opponent}/{k}': v for k, v in metrics.items()})
+        for _ in range(self._num_opponent_updates):
+            for opponent in self._opponent_ids:
+                self._train_state, metrics = self._policy_update_fns[opponent](self._train_state, batch)
+                update_metrics.update({f'agent_{opponent}/{k}': v for k, v in metrics.items()})
         return update_metrics
 
     def _make_transition(self, time_step: TimeStep):
