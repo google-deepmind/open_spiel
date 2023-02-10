@@ -103,7 +103,6 @@ class PathfindingGame : public SimMoveGame {
   int NumPlayers() const override;
   double MinUtility() const override;
   double MaxUtility() const override;
-  double UtilitySum() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return horizon_; }
   int MaxChanceNodesInHistory() const override { return MaxGameLength(); }

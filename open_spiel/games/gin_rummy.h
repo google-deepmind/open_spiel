@@ -232,7 +232,7 @@ class GinRummyGame : public Game {
   double MaxUtility() const override {
     return kMaxPossibleDeadwood + gin_bonus_;
   }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
         new GinRummyState(shared_from_this(), oklahoma_, knock_card_,

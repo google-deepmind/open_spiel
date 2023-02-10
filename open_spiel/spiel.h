@@ -177,7 +177,7 @@ struct GameInfo {
 
   // The total utility for all players, if this is a constant-sum-utility game.
   // Should be zero if the game is zero-sum.
-  double utility_sum;
+  absl::optional<double> utility_sum;
 
   // The maximum number of player decisions in a game. Does not include chance
   // events. For a simultaneous action game, this is the maximum number of joint
@@ -806,11 +806,8 @@ class Game : public std::enable_shared_from_this<Game> {
   const GameType& GetType() const { return game_type_; }
 
   // The total utility for all players, if this is a constant-sum-utility game.
-  // Should return 0. if the game is zero-sum.
-  virtual double UtilitySum() const {
-    SpielFatalError("UtilitySum unimplemented.");
-    return 0.;
-  }
+  // Should return 0 if the game is zero-sum.
+  virtual absl::optional<double> UtilitySum() const { return absl::nullopt; }
 
   // Describes the structure of the information state representation in a
   // tensor-like format. This is especially useful for experiments involving

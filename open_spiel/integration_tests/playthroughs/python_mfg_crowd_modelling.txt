@@ -23,7 +23,7 @@ GetParameters() = {horizon=10,size=10}
 NumPlayers() = 1
 MinUtility() = -inf
 MaxUtility() = inf
-UtilitySum() = 0.0
+UtilitySum() = None
 ObservationTensorShape() = x: [10], t: [11]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 21

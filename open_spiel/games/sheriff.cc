@@ -376,10 +376,6 @@ double SheriffGame::MaxUtility() const {
                    static_cast<double>(conf.max_items) * conf.item_penalty});
 }
 
-double SheriffGame::UtilitySum() const {
-  SpielFatalError("Called `UtilitySum()` on a general sum Sheriff game.");
-}
-
 int SheriffGame::MaxGameLength() const { return 2 * conf.num_rounds + 1; }
 
 std::string SheriffGame::ActionToString(Player player, Action action_id) const {

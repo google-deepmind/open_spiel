@@ -225,10 +225,11 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<GameInfo> game_info(m, "GameInfo");
   game_info
-      .def(py::init<int, int, int, double, double, double, int>(),
+      .def(py::init<int, int, int, double, double, absl::optional<double>,
+                    int>(),
            py::arg("num_distinct_actions"), py::arg("max_chance_outcomes"),
            py::arg("num_players"), py::arg("min_utility"),
-           py::arg("max_utility"), py::arg("utility_sum") = 0,
+           py::arg("max_utility"), py::arg("utility_sum") = absl::nullopt,
            py::arg("max_game_length"))
       .def(py::init<const GameInfo&>())
       .def_readonly("num_distinct_actions", &GameInfo::num_distinct_actions)

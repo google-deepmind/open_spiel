@@ -171,6 +171,7 @@ class DouDizhuGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinUtility; }
   double MaxUtility() const override { return kMaxUtility; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

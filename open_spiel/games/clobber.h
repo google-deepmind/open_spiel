@@ -141,7 +141,7 @@ class ClobberGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
     return {kNumPlayers + 1, rows_, columns_};

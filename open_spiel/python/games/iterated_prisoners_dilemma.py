@@ -69,8 +69,11 @@ class IteratedPrisonersDilemmaGame(pyspiel.Game):
             num_players=2,
             min_utility=np.min(_PAYOFF) * max_game_length,
             max_utility=np.max(_PAYOFF) * max_game_length,
-            utility_sum=0.0,
-            max_game_length=max_game_length), params)
+            utility_sum=None,
+            max_game_length=max_game_length,
+        ),
+        params,
+    )
     self._termination_probability = params["termination_probability"]
 
   def new_initial_state(self):

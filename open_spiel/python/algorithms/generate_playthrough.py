@@ -235,8 +235,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         game,
         imperfect_information_observation_type=None,
         params=observation_params)
-  except (RuntimeError, ValueError) as e:
-    print("Warning: unable to build an observation: ", e)
+  except (RuntimeError, ValueError):
+    pass
 
   infostate_observation = None
   # TODO(author11) reinstate this restriction
@@ -255,7 +255,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   # as it would yield unncessarily redundant information for perfect info games.
   # The default observation is the same as the public observation, while private
   # observations are always empty.
-  if game_type.information == pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+  if game_type.information == game_type.Information.IMPERFECT_INFORMATION:
     try:
       public_observation = make_observation(
           game,
@@ -308,11 +308,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line("NumPlayers() = {}".format(game.num_players()))
   add_line("MinUtility() = {:.5}".format(game.min_utility()))
   add_line("MaxUtility() = {:.5}".format(game.max_utility()))
-  try:
-    utility_sum = game.utility_sum()
-  except RuntimeError:
-    utility_sum = None
-  add_line("UtilitySum() = {}".format(utility_sum))
+  add_line("UtilitySum() = {}".format(game.utility_sum()))
   if infostate_observation and infostate_observation.tensor is not None:
     add_line("InformationStateTensorShape() = {}".format(
         format_shapes(infostate_observation.dict)))
@@ -512,18 +508,18 @@ def update_path(path, shard_index=0, num_shards=1):
         pyspiel.load_game(kwargs["game_string"])
       except pyspiel.SpielError as e:
         if "Unknown game" in str(e):
-          print("[Skipped] Skipping game ", filename, " as ",
-                kwargs["game_string"], " is not available.")
+          print(f"\x1b[0J[Skipped] Skipping game {filename} as ",
+                f"{kwargs['game_string']} is not available.")
           continue
         else:
           raise
       new = playthrough(**kwargs)
       if original == new:
-        print("        {}".format(filename))
+        print(f"\x1b[0J        {filename}", end="\r")
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)
-        print("Updated {}".format(filename))
+        print(f"\x1b[0JUpdated {filename}")
     except Exception as e:  # pylint: disable=broad-except
-      print("{} failed: {}".format(filename, e))
+      print(f"\x1b[0J{filename} failed: {e}")
       raise

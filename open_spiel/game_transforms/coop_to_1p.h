@@ -171,7 +171,9 @@ class CoopTo1pGame : public Game {
   int MaxChanceOutcomes() const override { return game_->MaxChanceOutcomes(); }
   double MinUtility() const override { return game_->MinUtility(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
-  double UtilitySum() const override { return game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    return game_->UtilitySum();
+  }
 
  private:
   std::shared_ptr<const Game> game_;

@@ -691,7 +691,7 @@ GoofspielGame::GoofspielGame(const GameParameters& params)
           ParseReturnsType(ParameterValue<std::string>("returns_type"))),
       impinfo_(ParameterValue<bool>("imp_info")),
       egocentric_(ParameterValue<bool>("egocentric")) {
-  // Override the zero-sum utility in the game type if general-sum returns.
+  // Override the zero-sum utility in the game type if total point scoring.
   if (returns_type_ == ReturnsType::kTotalPoints) {
     game_type_.utility = GameType::Utility::kGeneralSum;
   }
@@ -825,6 +825,14 @@ double GoofspielGame::MaxUtility() const {
     SpielFatalError("Unrecognized returns type.");
   }
 }
+
+absl::optional<double> GoofspielGame::UtilitySum() const {
+  if (returns_type_ == ReturnsType::kTotalPoints)
+    return absl::nullopt;
+  else
+    return 0;
+}
+
 std::shared_ptr<Observer> GoofspielGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {

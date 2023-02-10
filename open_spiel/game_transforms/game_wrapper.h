@@ -119,7 +119,9 @@ class WrappedGame : public Game {
   int NumPlayers() const override { return game_->NumPlayers(); }
   double MinUtility() const override { return game_->MinUtility(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
-  double UtilitySum() const override { return game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    return game_->UtilitySum();
+  }
 
   std::vector<int> InformationStateTensorShape() const override {
     return game_->InformationStateTensorShape();
