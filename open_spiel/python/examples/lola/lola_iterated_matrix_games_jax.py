@@ -25,20 +25,20 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", 42, "Random seed.")
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
 flags.DEFINE_integer("epochs", 200, "Number of training iterations.")
-flags.DEFINE_integer("batch_size", 1024, "Number of episodes in a batch.")
+flags.DEFINE_integer("batch_size", 4096, "Number of episodes in a batch.")
 flags.DEFINE_integer("critic_mini_batches", 1, "Number of minibatches for critic.")
 flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
-flags.DEFINE_float("policy_lr", 0.1, "Policy learning rate.")
-flags.DEFINE_float("opp_policy_lr", 0.1, "Policy learning rate.")
-flags.DEFINE_float("critic_lr", 0.3, "Critic learning rate.")
-flags.DEFINE_string("correction_type", 'dice', "Either 'lola', 'dice' or None.")
+flags.DEFINE_float("policy_lr", 0.3, "Policy learning rate.")
+flags.DEFINE_float("opp_policy_lr", 0.3, "Policy learning rate.")
+flags.DEFINE_float("critic_lr", 0.9, "Critic learning rate.")
+flags.DEFINE_string("correction_type", 'lola', "Either 'lola', 'dice' or None.")
 flags.DEFINE_integer("n_lookaheads", 1, "Number of lookaheads for LOLA correction.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
 flags.DEFINE_integer("policy_update_interval", 1, "Number of critic updates per before policy is updated.")
 flags.DEFINE_integer("eval_batch_size", 30, "Random seed.")
-flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enabled.")
-flags.DEFINE_bool("use_opponent_modelling", True, "If false, ground truth opponent weights are used.")
+flags.DEFINE_bool("use_jit", True, "If true, JAX jit compilation will be enabled.")
+flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
 flags.DEFINE_integer("opp_policy_mini_batches", 8, "Number of minibatches for opponent policy.")
 
 def log_epoch_data(run: Run, epoch: int, agents: List[LolaPolicyGradientAgent], eval_batch):
@@ -101,6 +101,7 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         critic_learning_rate=FLAGS.critic_lr,
         policy_update_interval=FLAGS.policy_update_interval,
         discount=FLAGS.discount,
+        critic_discount=0, # Predict only the immediate reward (iterated matrix games are not markovian)
         correction_type=FLAGS.correction_type,
         clip_grad_norm=FLAGS.correction_max_grad_norm,
         use_jit=FLAGS.use_jit,

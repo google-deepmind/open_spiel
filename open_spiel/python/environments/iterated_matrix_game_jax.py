@@ -63,7 +63,7 @@ def make_env_fns(payoff_matrix: jnp.ndarray, iterations: int, batch_size=1):
         )
 
     # return step, reset
-    return jax.jit(step), reset
+    return jax.jit(step), jax.jit(reset)
 
 
 
