@@ -135,7 +135,7 @@ class SquadroState : public State {
 class SquadroGame : public Game {
  public:
   explicit SquadroGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kCols; }
+  int NumDistinctActions() const override { return kNumActions; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new SquadroState(shared_from_this()));
   }
