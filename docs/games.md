@@ -28,6 +28,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
+<font color="orange"><b>~</b></font>         | [Crazy Eights](#crazy-eights)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
 <font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
@@ -292,6 +293,18 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
 
+### Crazy Eights
+
+*   A precursor of UNO (see [here](https://www.unorules.org/crazy-eights/)).
+*   Players try to match the rank or suit of the previous played card.
+*   Eights are viewed as wild cards.
+*   In an alternative version, special cards such as skip, reverse, draw-two are
+    permitted.
+*   Nondeterministic.
+*   Imperfect information.
+*   >=2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Crazy_Eights)
+
 ### Dark Hex
 
 *   Hex, except the opponent's tokens are hidden. (Imperfect-information
@@ -321,7 +334,7 @@ Status                                       | Game
 *   Non-deterministic.
 *   Imperfect information.
 *   Three players.
-*   [Wikipeda](https://en.wikipedia.org/wiki/Dou_dizhu)
+*   [Wikipedia](https://en.wikipedia.org/wiki/Dou_dizhu)
 
 ### Euchre
 
