@@ -55,14 +55,21 @@ DouDizhuState::DouDizhuState(std::shared_ptr<const Game> game) : State(game) {
 }
 
 std::string DouDizhuState::ActionToString(Player player, Action action) const {
-  if (action < kDealingActionBase) {
-    return absl::StrFormat("Decide first card up position %d", action);
-  } else if (action < kBiddingActionBase) {
-    return absl::StrFormat("Deal %s", CardString(action-kDealingActionBase));
-  } else if (action == kPass) {
+  if (player == kChancePlayerId) {
+    if (action < kDealingActionBase) {
+      return absl::StrCat("Decide first card up position ", action);
+    } else if (action < kDealingActionBase + kNumCards) {
+      return absl::StrCat("Deal ", CardString(action - kDealingActionBase));
+    } else {
+      SpielFatalError(
+          absl::StrFormat("Non valid ID %d for chance player", action));
+    }
+  }
+
+  if (action == kPass) {
     return "Pass";
   } else if (action > kPass && action < kPlayActionBase) {
-    return absl::StrFormat("Bid %d", action - kBiddingActionBase);
+    return absl::StrCat("Bid ", action - kBiddingActionBase);
   } else if (action >= kPlayActionBase && action <= kRocketActionBase) {
     // For aiplane combinations, need special treatment to resolve ambiguity
     if (action >= kAirplaneWithSoloActionBase && action < kBombActionBase) {
