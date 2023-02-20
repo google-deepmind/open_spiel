@@ -26,12 +26,17 @@ import os
 import re
 from typing import Optional
 
+from absl import flags
 import numpy as np
 
 from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 from open_spiel.python.observation import make_observation
 import pyspiel
+
+_USE_ACTION_IDS = flags.DEFINE_bool(
+    "playthough_use_action_ids", default=True,
+    help="Whether to use action names or ids when regenerating playthroughs")
 
 
 def _escape(x):
@@ -235,8 +240,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
         game,
         imperfect_information_observation_type=None,
         params=observation_params)
-  except (RuntimeError, ValueError) as e:
-    print("Warning: unable to build an observation: ", e)
+  except (RuntimeError, ValueError):
+    pass
 
   infostate_observation = None
   # TODO(author11) reinstate this restriction
@@ -255,7 +260,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   # as it would yield unncessarily redundant information for perfect info games.
   # The default observation is the same as the public observation, while private
   # observations are always empty.
-  if game_type.information == pyspiel.GameType.Information.IMPERFECT_INFORMATION:
+  if game_type.information == game_type.Information.IMPERFECT_INFORMATION:
     try:
       public_observation = make_observation(
           game,
@@ -308,11 +313,7 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   add_line("NumPlayers() = {}".format(game.num_players()))
   add_line("MinUtility() = {:.5}".format(game.min_utility()))
   add_line("MaxUtility() = {:.5}".format(game.max_utility()))
-  try:
-    utility_sum = game.utility_sum()
-  except RuntimeError:
-    utility_sum = None
-  add_line("UtilitySum() = {}".format(utility_sum))
+  add_line("UtilitySum() = {}".format(game.utility_sum()))
   if infostate_observation and infostate_observation.tensor is not None:
     add_line("InformationStateTensorShape() = {}".format(
         format_shapes(infostate_observation.dict)))
@@ -415,6 +416,9 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
                               for x in state.legal_actions(player))))
       if state_idx < len(action_sequence):
         actions = action_sequence[state_idx]
+        for i, a in enumerate(actions):
+          if isinstance(a, str):
+            actions[i] = state.string_to_action(i, a)
       else:
         actions = []
         for pl in players:
@@ -436,6 +440,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
           for x in state.legal_actions())))
       if state_idx < len(action_sequence):
         action = action_sequence[state_idx]
+        if isinstance(action, str):
+          action = state.string_to_action(state.current_player(), action)
       else:
         action = rng.choice(state.legal_actions())
       add_line("")
@@ -468,22 +474,36 @@ def _playthrough_params(lines):
     ValueError if the playthrough is not valid.
   """
   params = {"action_sequence": []}
+  use_action_ids = _USE_ACTION_IDS.value
   for line in lines:
-    match_game = re.match(r"^game: (.*)$", line)
-    match_observation_params = re.match(r"^observation_params: (.*)$", line)
-    match_action = re.match(r"^action: (.*)$", line)
-    match_actions = re.match(r"^actions: \[(.*)\]$", line)
+    match_game = re.fullmatch(r"game: (.*)", line)
+    match_observation_params = re.fullmatch(r"observation_params: (.*)", line)
+    match_update_distribution = (line == "action: update_distribution")
+    if use_action_ids:
+      match_action = re.fullmatch(r"action: (.*)", line)
+      match_actions = re.fullmatch(r"actions: \[(.*)\]", line)
+    else:
+      match_action = re.fullmatch(r'# Apply action "(.*)"', line)
+      match_actions = re.fullmatch(r"# Apply joint action \[(.*)\]", line)
     if match_game:
       params["game_string"] = match_game.group(1)
-    if match_observation_params:
+    elif match_observation_params:
       params["observation_params_string"] = match_observation_params.group(1)
-    if match_action:
+    elif match_update_distribution:
+      params["action_sequence"].append("update_distribution")
+    elif match_action:
       matched = match_action.group(1)
-      params["action_sequence"].append(matched if matched ==
-                                       "update_distribution" else int(matched))
-    if match_actions:
-      params["action_sequence"].append(
-          [int(x) for x in match_actions.group(1).split(", ")])
+      if use_action_ids:
+        params["action_sequence"].append(int(matched))
+      else:
+        params["action_sequence"].append(matched)
+    elif match_actions:
+      if use_action_ids:
+        params["action_sequence"].append(
+            [int(x) for x in match_actions.group(1).split(", ")])
+      else:
+        params["action_sequence"].append(
+            [x[1:-1] for x in match_actions.group(1).split(", ")])
   if "game_string" in params:
     return params
   raise ValueError("Could not find params")
@@ -512,18 +532,18 @@ def update_path(path, shard_index=0, num_shards=1):
         pyspiel.load_game(kwargs["game_string"])
       except pyspiel.SpielError as e:
         if "Unknown game" in str(e):
-          print("[Skipped] Skipping game ", filename, " as ",
-                kwargs["game_string"], " is not available.")
+          print(f"\x1b[0J[Skipped] Skipping game {filename} as ",
+                f"{kwargs['game_string']} is not available.")
           continue
         else:
           raise
       new = playthrough(**kwargs)
       if original == new:
-        print("        {}".format(filename))
+        print(f"\x1b[0J        {filename}", end="\r")
       else:
         with open(os.path.join(path, filename), "w") as f:
           f.write(new)
-        print("Updated {}".format(filename))
+        print(f"\x1b[0JUpdated {filename}")
     except Exception as e:  # pylint: disable=broad-except
-      print("{} failed: {}".format(filename, e))
+      print(f"\x1b[0J{filename} failed: {e}")
       raise

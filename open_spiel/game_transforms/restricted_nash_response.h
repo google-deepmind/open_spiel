@@ -148,7 +148,9 @@ class RestrictedNashResponseGame : public WrappedGame {
 
   double MaxUtility() const override { return game_->MaxUtility(); }
 
-  double UtilitySum() const override { return game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    return game_->UtilitySum();
+  }
 
   std::vector<int> InformationStateTensorShape() const override {
     // Underlying game plus

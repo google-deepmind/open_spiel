@@ -15,6 +15,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
@@ -61,6 +62,10 @@
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
 #endif
+
+// Flags governing Open Spiel behaviour
+ABSL_FLAG(bool, log_exceptions_to_stderr, true,
+          "Log all exceptions raised in OpenSpiel C++ code to stderr.");
 
 // This file contains OpenSpiel's Python API. The best place to see an overview
 // of the API is to refer to python/examples/example.py. Generally, all the core
@@ -225,10 +230,11 @@ PYBIND11_MODULE(pyspiel, m) {
 
   py::class_<GameInfo> game_info(m, "GameInfo");
   game_info
-      .def(py::init<int, int, int, double, double, double, int>(),
+      .def(py::init<int, int, int, double, double, absl::optional<double>,
+                    int>(),
            py::arg("num_distinct_actions"), py::arg("max_chance_outcomes"),
            py::arg("num_players"), py::arg("min_utility"),
-           py::arg("max_utility"), py::arg("utility_sum") = 0,
+           py::arg("max_utility"), py::arg("utility_sum") = absl::nullopt,
            py::arg("max_game_length"))
       .def(py::init<const GameInfo&>())
       .def_readonly("num_distinct_actions", &GameInfo::num_distinct_actions)
@@ -608,7 +614,9 @@ PYBIND11_MODULE(pyspiel, m) {
   // the Python interface only. When used from C++, OpenSpiel will never raise
   // exceptions - the process will be terminated instead.
   open_spiel::SetErrorHandler([](const std::string& string) {
-    std::cerr << "OpenSpiel exception: " << string << std::endl << std::flush;
+    if (absl::GetFlag(FLAGS_log_exceptions_to_stderr)) {
+      std::cerr << "OpenSpiel exception: " << string << std::endl << std::flush;
+    }
     throw SpielException(string);
   });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);

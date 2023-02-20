@@ -118,7 +118,7 @@ class EFGGame : public Game {
   int NumDistinctActions() const override;
   int NumPlayers() const override;
   double MinUtility() const override;
-  double UtilitySum() const override;
+  absl::optional<double> UtilitySum() const override;
   double MaxUtility() const override;
   int MaxGameLength() const override;
   int MaxChanceNodesInHistory() const override;

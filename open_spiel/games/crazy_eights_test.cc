@@ -23,105 +23,104 @@ namespace crazy_eights {
 namespace {
 
 void BasicGameTests() {
-    testing::LoadGameTest("crazy_eights");
-    for (int players = 2; players <= 6; ++players) {
-        for (bool b : {false, true}) {
-            testing::RandomSimTest(
-                *LoadGame("crazy_eights",
-                          {{"players", GameParameter(players)},
-                           {"use_special_cards", GameParameter(b)}}),
-                5);
-        }
+  testing::LoadGameTest("crazy_eights");
+  for (int players = 2; players <= 6; ++players) {
+    for (bool b : {false, true}) {
+      testing::RandomSimTest(
+          *LoadGame("crazy_eights", {{"players", GameParameter(players)},
+                                     {"use_special_cards", GameParameter(b)}}),
+          5);
     }
+  }
 }
 
 void SpecialCardTests() {
-    std::shared_ptr<const Game> game =
-        LoadGame("crazy_eights", {{"players", GameParameter(4)},
-                                  {"use_special_cards", GameParameter(true)}});
+  std::shared_ptr<const Game> game =
+      LoadGame("crazy_eights", {{"players", GameParameter(4)},
+                                {"use_special_cards", GameParameter(true)}});
 
-    std::unique_ptr<State> state = game->NewInitialState();
-    // 0 is the dealer
-    state->ApplyAction(kDecideDealerActionBase);
-    // Player0 has (S2)(H8)(DQ)(SK)(SA)
-    // Player1 has (C2)(C3)(S8)(HQ)(CA)
-    // Player2 has (D2)(C8)(C9)(SQ)(DA)
-    // Player3 has (H2)(D8)(CQ)(CK)(HA)
-    std::vector<int> dealt_cards = {0,  1,  2,  3,  4,  24, 25, 26, 27, 28,
-                                    40, 41, 42, 43, 44, 47, 48, 49, 50, 51};
+  std::unique_ptr<State> state = game->NewInitialState();
+  // 0 is the dealer
+  state->ApplyAction(kDecideDealerActionBase);
+  // Player0 has (S2)(H8)(DQ)(SK)(SA)
+  // Player1 has (C2)(C3)(S8)(HQ)(CA)
+  // Player2 has (D2)(C8)(C9)(SQ)(DA)
+  // Player3 has (H2)(D8)(CQ)(CK)(HA)
+  std::vector<int> dealt_cards = {0,  1,  2,  3,  4,  24, 25, 26, 27, 28,
+                                  40, 41, 42, 43, 44, 47, 48, 49, 50, 51};
 
-    for (auto card : dealt_cards) state->ApplyAction(card);
+  for (auto card : dealt_cards) state->ApplyAction(card);
 
-    // The first card is D3
-    state->ApplyAction(5);
+  // The first card is D3
+  state->ApplyAction(5);
 
-    // Player 1 plays C3
-    state->ApplyAction(4);
+  // Player 1 plays C3
+  state->ApplyAction(4);
 
-    // Player 2 plays C8
-    state->ApplyAction(24);
+  // Player 2 plays C8
+  state->ApplyAction(24);
 
-    // Check the current actions are color nomination
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
-    std::vector<Action> legal_actions = state->LegalActions();
-    SPIEL_CHECK_EQ(static_cast<int>(legal_actions.size()), kNumSuits);
+  // Check the current actions are color nomination
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(static_cast<int>(legal_actions.size()), kNumSuits);
 
-    for (int i = 0; i < kNumSuits; ++i) {
-        SPIEL_CHECK_GE(legal_actions[i], kNominateSuitActionBase);
-        SPIEL_CHECK_LT(legal_actions[i], kNominateSuitActionBase + kNumSuits);
-    }
+  for (int i = 0; i < kNumSuits; ++i) {
+    SPIEL_CHECK_GE(legal_actions[i], kNominateSuitActionBase);
+    SPIEL_CHECK_LT(legal_actions[i], kNominateSuitActionBase + kNumSuits);
+  }
 
-    // The next suit is H
-    state->ApplyAction(kNominateSuitActionBase + 2);
+  // The next suit is H
+  state->ApplyAction(kNominateSuitActionBase + 2);
 
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
-    // Player 3 plays HA
-    state->ApplyAction(50);
-    // Reverse direction to player 2
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
-    // Player 2 plays DA
-    state->ApplyAction(49);
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
-    // Reverse direction to player 3
-    // Player 3 plays D8
-    state->ApplyAction(25);
-    // Player 3 nominates D
-    state->ApplyAction(kNominateSuitActionBase + 1);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
+  // Player 3 plays HA
+  state->ApplyAction(50);
+  // Reverse direction to player 2
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  // Player 2 plays DA
+  state->ApplyAction(49);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
+  // Reverse direction to player 3
+  // Player 3 plays D8
+  state->ApplyAction(25);
+  // Player 3 nominates D
+  state->ApplyAction(kNominateSuitActionBase + 1);
 
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
-    // Player 0 plays DQ
-    state->ApplyAction(41);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  // Player 0 plays DQ
+  state->ApplyAction(41);
 
-    // Player 1 is skipped, next is player 2
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  // Player 1 is skipped, next is player 2
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
 
-    // Player 2 plays D2!
-    state->ApplyAction(1);
-    // Player 3 only has two actions: H2 or start drawing
-    legal_actions = state->LegalActions();
-    SPIEL_CHECK_EQ(static_cast<int>(legal_actions.size()), 2);
-    SPIEL_CHECK_EQ(legal_actions[0], 2);
-    SPIEL_CHECK_EQ(legal_actions[1], kDraw);
-    // Let's stack the twos!
-    state->ApplyAction(2);
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
+  // Player 2 plays D2!
+  state->ApplyAction(1);
+  // Player 3 only has two actions: H2 or start drawing
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(static_cast<int>(legal_actions.size()), 2);
+  SPIEL_CHECK_EQ(legal_actions[0], 2);
+  SPIEL_CHECK_EQ(legal_actions[1], kDraw);
+  // Let's stack the twos!
+  state->ApplyAction(2);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 0);
 
-    // Keep stacking
-    state->ApplyAction(3);
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
+  // Keep stacking
+  state->ApplyAction(3);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 1);
 
-    // Keep stacking
-    state->ApplyAction(0);
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
-    legal_actions = state->LegalActions();
-    SPIEL_CHECK_EQ(static_cast<int>(legal_actions.size()), 1);
-    // Player 2 has to draw 8 cards
+  // Keep stacking
+  state->ApplyAction(0);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 2);
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_EQ(static_cast<int>(legal_actions.size()), 1);
+  // Player 2 has to draw 8 cards
 
-    state->ApplyAction(kDraw);
-    std::vector<int> draw_cards = {6, 7, 8, 9, 10, 11, 12, 13};
-    for (auto card : draw_cards) state->ApplyAction(card);
-    // Then it is player 3's turn
-    SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
+  state->ApplyAction(kDraw);
+  std::vector<int> draw_cards = {6, 7, 8, 9, 10, 11, 12, 13};
+  for (auto card : draw_cards) state->ApplyAction(card);
+  // Then it is player 3's turn
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), 3);
 }
 
 }  // namespace
@@ -129,6 +128,6 @@ void SpecialCardTests() {
 }  // namespace open_spiel
 
 int main() {
-    open_spiel::crazy_eights::BasicGameTests();
-    open_spiel::crazy_eights::SpecialCardTests();
+  open_spiel::crazy_eights::BasicGameTests();
+  open_spiel::crazy_eights::SpecialCardTests();
 }
