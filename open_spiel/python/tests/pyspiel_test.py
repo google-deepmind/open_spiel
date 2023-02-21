@@ -128,6 +128,7 @@ EXPECTED_GAMES = frozenset([
     "turn_based_simultaneous_game",
     "ultimate_tic_tac_toe",
     "y",
+    "python_domino",
 ])
 
 
