@@ -324,6 +324,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       egt/visualization_test.py
       games/kuhn_poker_test.py
       tests/matrix_game_utils_test.py
+      games/domino_test.py
   )
 endif()
 
