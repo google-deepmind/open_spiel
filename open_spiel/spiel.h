@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_SPIEL_H_
 #define OPEN_SPIEL_SPIEL_H_
 
+#include <cmath>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -808,6 +809,17 @@ class Game : public std::enable_shared_from_this<Game> {
   // The total utility for all players, if this is a constant-sum-utility game.
   // Should return 0 if the game is zero-sum.
   virtual absl::optional<double> UtilitySum() const { return absl::nullopt; }
+
+  // Helper methods when absl::optional is not available
+  virtual bool HasUtilitySum() const { return UtilitySum().has_value(); }
+  virtual double UtilitySumValue() const {
+    absl::optional<double> maybe_sum = UtilitySum();
+    if (!maybe_sum.has_value()) {
+      return std::nan("");
+    } else {
+      return *maybe_sum;
+    }
+  }
 
   // Describes the structure of the information state representation in a
   // tensor-like format. This is especially useful for experiments involving
