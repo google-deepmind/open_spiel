@@ -55,6 +55,10 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
+// Includes needed for absl::optional.
+#include "pybind11/include/pybind11/detail/common.h"
+#include "pybind11_abseil/absl_casters.h"
+
 // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
 #include "open_spiel/games/gamut/gamut_pybind11.h"
