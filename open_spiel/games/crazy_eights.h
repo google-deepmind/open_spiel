@@ -62,7 +62,8 @@
 // action id 52: a player draw a card from the dealer's deck.
 // action id 53: a player passes if it had already drawn max_draw_cards.
 // action id 54, 55, 56, 57: a player nominate one of the four suit.
-// (for chance) action id 52, 53, ...., 52 + num_player-1: decide the dealer.
+// (for chance) action id 0, 1,...., 51 are cards to be drawn
+// action id 52, 53, ...., 52 + num_player-1: decide the dealer.
 //
 // An observation contains:
 // (1) the current hand I have
