@@ -404,7 +404,7 @@ void UniversalPokerState::InformationStateTensor(
       values[offset + (2 * i)] = 0;
       values[offset + (2 * i) + 1] = 1;
     } else if (actionSeq[i] == 'a') {
-      // Encode raise as 01.
+      // Encode all-in as 11.
       values[offset + (2 * i)] = 1;
       values[offset + (2 * i) + 1] = 1;
     } else if (actionSeq[i] == 'f') {
