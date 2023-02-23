@@ -115,6 +115,7 @@ void init_pyspiel_games_euchre(py::module& m) {
           }));
 
   py::class_<euchre::Trick>(state_class, "Trick")
+      .def("winning_card", &euchre::Trick::WinningCard)
       .def("led_suit", &euchre::Trick::LedSuit)
       .def("trump_suit", &euchre::Trick::TrumpSuit)
       .def("trump_played", &euchre::Trick::TrumpPlayed)
