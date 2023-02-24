@@ -339,6 +339,18 @@ void ObserverRegisterer::RegisterObserver(const std::string& game_name,
   observers()[key] = creator;
 }
 
+std::shared_ptr<Observer> MakeSingleTensorObserver(
+    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) {
+  return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
+}
+
+RegisterSingleTensorObserver::RegisterSingleTensorObserver(
+    const std::string& game_name) {
+  ObserverRegisterer single_tensor(game_name, "single_tensor",
+                                   MakeSingleTensorObserver);
+}
+
 std::shared_ptr<Observer> ObserverRegisterer::CreateByName(
     const std::string& observer_name,
     const Game& game,
