@@ -59,6 +59,15 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+std::shared_ptr<Observer> MakeSingleTensorObserver(
+    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
+    const GameParameters& params) {
+  return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
+}
+
+ObserverRegisterer single_tensor(
+    kGameType.short_name, "single_tensor", MakeSingleTensorObserver);
 }  // namespace
 
 class KuhnObserver : public Observer {
@@ -426,8 +435,12 @@ double KuhnGame::MinUtility() const {
 std::shared_ptr<Observer> KuhnGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
-  if (!params.empty()) SpielFatalError("Observation params not supported");
-  return std::make_shared<KuhnObserver>(iig_obs_type.value_or(kDefaultObsType));
+  if (params.empty()) {
+    return std::make_shared<KuhnObserver>(
+        iig_obs_type.value_or(kDefaultObsType));
+  } else {
+    return MakeRegisteredObserver(iig_obs_type, params);
+  }
 }
 
 TabularPolicy GetAlwaysPassPolicy(const Game& game) {

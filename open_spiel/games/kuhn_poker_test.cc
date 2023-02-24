@@ -34,6 +34,9 @@ void BasicKuhnTests() {
     testing::RandomSimTest(
         *LoadGame("kuhn_poker", {{"players", GameParameter(players)}}), 100);
   }
+  auto observer = LoadGame("kuhn_poker")
+                      ->MakeObserver(kDefaultObsType,
+                                     GameParametersFromString("single_tensor"));
 }
 
 void CountStates() {
