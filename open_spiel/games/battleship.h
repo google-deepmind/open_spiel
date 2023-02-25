@@ -187,7 +187,7 @@ class BattleshipGame final : public Game {
   int NumPlayers() const override { return 2; }
   double MinUtility() const override;
   double MaxUtility() const override;
-  double UtilitySum() const override;
+  absl::optional<double> UtilitySum() const override;
   int MaxGameLength() const override;
   std::string ActionToString(Player player, Action action_id) const override;
   std::vector<int> InformationStateTensorShape() const override;

@@ -238,6 +238,7 @@ class EuchreGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinScore; }
   double MaxUtility() const override { return kMaxScore; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::vector<int> InformationStateTensorShape() const override {
     return {kInformationStateTensorSize};
   }

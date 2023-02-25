@@ -138,7 +138,6 @@ class SheriffGame final : public Game {
   int NumPlayers() const override { return 2; }
   double MinUtility() const override;
   double MaxUtility() const override;
-  double UtilitySum() const override;
   int MaxGameLength() const override;
   std::string ActionToString(Player player, Action action_id) const override;
   std::vector<int> InformationStateTensorShape() const override;
@@ -159,13 +158,13 @@ class SheriffGame final : public Game {
   // correspond to bribing actions (action 3 + num_items means that a bribe of
   // 0 is selected.
 
-  Action SerializeItemPlacementAction(const uint32_t num_illegal_items) const;
-  Action SerializeBribe(const uint32_t bribe) const;
-  Action SerializeInspectionFeedback(const bool feedback) const;
+  Action SerializeItemPlacementAction(uint32_t num_illegal_items) const;
+  Action SerializeBribe(uint32_t bribe) const;
+  Action SerializeInspectionFeedback(bool feedback) const;
 
-  uint32_t DeserializeItemPlacementAction(const Action action_id) const;
-  uint32_t DeserializeBribe(const Action action_id) const;
-  bool DeserializeInspectionFeedback(const Action action_id) const;
+  uint32_t DeserializeItemPlacementAction(Action action_id) const;
+  uint32_t DeserializeBribe(Action action_id) const;
+  bool DeserializeInspectionFeedback(Action action_id) const;
 
   // Members
   // =======
@@ -186,7 +185,7 @@ class SheriffGame final : public Game {
 
 class SheriffState final : public State {
  public:
-  explicit SheriffState(const std::shared_ptr<const SheriffGame> sheriff_game);
+  explicit SheriffState(std::shared_ptr<const SheriffGame> sheriff_game);
   ~SheriffState() = default;
 
   // Virtual functions inherited by OpenSpiel's `State` interface

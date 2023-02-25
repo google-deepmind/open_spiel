@@ -955,13 +955,11 @@ double BattleshipGame::MaxUtility() const {
   return max_utility;
 }
 
-double BattleshipGame::UtilitySum() const {
+absl::optional<double> BattleshipGame::UtilitySum() const {
   if (std::abs(conf.loss_multiplier - 1.0) < kFloatTolerance) {
     return 0.0;
   } else {
-    SpielFatalError(
-        "Called `UtilitySum()` on a general sum Battleship game: set "
-        "loss_multiplier = 1.0 for a zero-sum game.");
+    return absl::nullopt;
   }
 }
 

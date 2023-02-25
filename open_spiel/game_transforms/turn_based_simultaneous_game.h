@@ -96,7 +96,9 @@ class TurnBasedSimultaneousGame : public Game {
   int NumPlayers() const override { return game_->NumPlayers(); }
   double MinUtility() const override { return game_->MinUtility(); }
   double MaxUtility() const override { return game_->MaxUtility(); }
-  double UtilitySum() const override { return game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    return game_->UtilitySum();
+  }
   std::vector<int> InformationStateTensorShape() const override {
     // We flatten the representation of the underlying game and add one-hot
     // indications of the to-play player and the observing player.

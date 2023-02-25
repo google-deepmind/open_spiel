@@ -160,7 +160,9 @@ class CursorGoGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
 
   double MinUtility() const override { return kLossUtility; }
-  double UtilitySum() const override { return kLossUtility + kWinUtility; }
+  absl::optional<double> UtilitySum() const override {
+    return kLossUtility + kWinUtility;
+  }
   double MaxUtility() const override { return kWinUtility; }
 
   int MaxGameLength() const override {

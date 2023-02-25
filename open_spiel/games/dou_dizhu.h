@@ -164,13 +164,16 @@ class DouDizhuGame : public Game {
  public:
   explicit DouDizhuGame(const GameParameters& params);
   int NumDistinctActions() const override { return kRocketActionBase + 1; }
-  int MaxChanceOutcomes() const override { return kBiddingActionBase; }
+  int MaxChanceOutcomes() const override {
+    return kDealingActionBase + kNumCards;
+  }
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<DouDizhuState>(shared_from_this());
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kMinUtility; }
   double MaxUtility() const override { return kMaxUtility; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

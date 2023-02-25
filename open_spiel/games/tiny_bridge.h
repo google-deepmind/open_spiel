@@ -110,7 +110,7 @@ class TinyBridgeGame4p : public Game {
   std::unique_ptr<State> NewInitialState() const override;
   int NumPlayers() const override { return 4; }
   double MinUtility() const override { return -160; }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 160; }
   int MaxGameLength() const override { return 57; }
   // TODO: verify whether this bound is tight and/or tighten it.

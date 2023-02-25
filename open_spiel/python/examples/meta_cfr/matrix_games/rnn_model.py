@@ -40,7 +40,7 @@ class RNNModel(hk.RNNCore):
         x = layer(x)
     return x, tuple(curr_state)
 
-  def initial_state(self, batch_size: int):
+  def initial_state(self, batch_size: Optional[int]):
     layerwise_init_state = []
     for layer in self._layers:
       if isinstance(layer, hk.RNNCore):

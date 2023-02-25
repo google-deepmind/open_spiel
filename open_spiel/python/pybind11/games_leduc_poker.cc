@@ -22,15 +22,35 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::leduc_poker::LeducState;
+using open_spiel::leduc_poker::ActionType;
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(LeducState);
 
 void open_spiel::init_pyspiel_games_leduc_poker(py::module& m) {
-  py::classh<LeducState, State>(m, "LeducState")
+  py::module_ leduc_poker = m.def_submodule("leduc_poker");
+
+  leduc_poker.attr("INVALID_CARD") = py::int_(
+    open_spiel::leduc_poker::kInvalidCard);
+
+  py::enum_<ActionType>(leduc_poker, "ActionType")
+    .value("FOLD", ActionType::kFold)
+    .value("CALL", ActionType::kCall)
+    .value("RAISE", ActionType::kRaise)
+    .export_values();
+
+  py::classh<LeducState, State>(leduc_poker, "LeducState")
       // Gets the private cards; no arguments, returns vector of ints.
       .def("get_private_cards", &LeducState::GetPrivateCards)
       // Sets the private cards; takes a vector of ints, no returns.
       .def("set_private_cards", &LeducState::SetPrivateCards)
+      // Expose additional state features.
+      .def("private_card", &LeducState::private_card)
+      .def("public_card", &LeducState::public_card)
+      .def("round", &LeducState::round)
+      .def("money", &LeducState::GetMoney)
+      .def("pot", &LeducState::GetPot)
+      .def("round1", &LeducState::GetRound1)
+      .def("round2", &LeducState::GetRound2)
       // Pickle support
       .def(py::pickle(
           [](const LeducState& state) {  // __getstate__
