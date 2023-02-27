@@ -60,14 +60,7 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
-std::shared_ptr<Observer> MakeSingleTensorObserver(
-    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
-    const GameParameters& params) {
-  return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
-}
-
-ObserverRegisterer single_tensor(
-    kGameType.short_name, "single_tensor", MakeSingleTensorObserver);
+open_spiel::RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
 class KuhnObserver : public Observer {
