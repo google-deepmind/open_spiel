@@ -52,7 +52,7 @@ _GAME_INFO = pyspiel.GameInfo(
     max_utility=69,
     # first player hand: (6,6) (6,5) (5,5) (6,4) (4,5) (6,3) (4,4) , second player hand is empty. can be reduced.
     num_players=_NUM_PLAYERS,
-    max_game_length=30,  # 16 chance nodes + 14 player nodes
+    max_game_length=28,  # deal: 14 chance nodes + play: 14 player nodes
     utility_sum=0.0)
 
 
