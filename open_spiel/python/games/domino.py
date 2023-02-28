@@ -15,18 +15,18 @@ _NUM_PLAYERS = 2
 #      then the highest single edge of the highest weighted tile.
 
 # full deck sorted by rank:
-_DECK = frozenset([(6, 6), (5, 5), (4, 4), (3, 3), (2, 2), (1, 1), (0, 0),
-                   (5, 6),
-                   (4, 6),
-                   (3, 6), (4, 5),
-                   (2, 6), (3, 5),
-                   (1, 6), (2, 5), (3, 4),
-                   (0, 6), (1, 5), (2, 4),
-                   (0, 5), (1, 4), (2, 3),
-                   (0, 4), (1, 3),
-                   (0, 3), (1, 2),
-                   (0, 2),
-                   (0, 1)])
+_DECK = frozenset([(6., 6.), (5., 5.), (4., 4.), (3., 3.), (2., 2.), (1., 1.), (0., 0.),
+                   (5., 6.),
+                   (4., 6.),
+                   (3., 6.), (4., 5.),
+                   (2., 6.), (3., 5.),
+                   (1., 6.), (2., 5.), (3., 4.),
+                   (0., 6.), (1., 5.), (2., 4.),
+                   (0., 5.), (1., 4.), (2., 3.),
+                   (0., 4.), (1., 3.),
+                   (0., 3.), (1., 2.),
+                   (0., 2.),
+                   (0., 1.)])
 
 _HAND_SIZE = 7
 
@@ -81,7 +81,7 @@ class Action:
         return new_edges
 
     def __str__(self):
-        return f'p{self.player} | tile={self.tile_to_put} | pip={self.open_pip} | new_edges={self.new_edges}'
+        return f'p{self.player} tile:{self.tile_to_put} pip:{self.open_pip} new_edges:{self.new_edges}'
 
     def __repr__(self):
         return self.__str__()
@@ -177,6 +177,9 @@ class DominoState(pyspiel.State):
             if staring_hand == 1:
                 self.hands[0], self.hands[1] = self.hands[1], self.hands[0]
 
+            self.hands[0].sort()
+            self.hands[1].sort()
+
             self._next_player = 0
             # calc all possible move for the first player to play
             self.player_legal_actions = self.get_legal_actions(self._next_player)
@@ -220,6 +223,10 @@ class DominoState(pyspiel.State):
 
     def returns(self):
         """Total reward for each player over the course of the game so far."""
+
+        if not self.is_terminal():
+            return [0, 0]
+
         sum_of_pips0 = sum(t[0] + t[1] for t in self.hands[0])
         sum_of_pips1 = sum(t[0] + t[1] for t in self.hands[1])
 
@@ -235,7 +242,7 @@ class DominoState(pyspiel.State):
         hand0 = [str(c) for c in self.hands[0]]
         hand1 = [str(c) for c in self.hands[1]]
         history = [str(a) for a in self.gameHistory]
-        s = f'hand0:{hand0}, hand1:{hand1}, history:{history}'
+        s = f'hand0:{hand0} hand1:{hand1} history:{history}'
         return s
 
 
@@ -251,7 +258,7 @@ class DominoObserver:
         pieces = [("player", 2, (2,))]
 
         if iig_obs_type.private_info == pyspiel.PrivateInfoType.SINGLE_PLAYER:
-            pieces.append(("hand", 14, (7, 2)))
+            pieces.append(("hand", 21, (7, 3)))
 
         if iig_obs_type.public_info:
             if iig_obs_type.perfect_recall:
@@ -291,34 +298,34 @@ class DominoObserver:
                 self.dict["edges"][0] = state.open_edges[0]
                 self.dict["edges"][1] = state.open_edges[1]
             else:
-                self.dict["edges"][0] = 0
-                self.dict["edges"][1] = 0
+                self.dict["edges"][0] = 0.
+                self.dict["edges"][1] = 0.
 
         if "hand" in self.dict:
             for i, tile in enumerate(state.hands[player]):
                 self.dict["hand"][i][0] = tile[0]
                 self.dict["hand"][i][1] = tile[1]
+                self.dict["hand"][i][2] = 1.
+
 
         if "history" in self.dict:
             for i, action in enumerate(state.gameHistory):
                 self.dict["history"][i][0] = action.tile_to_put[0]
                 self.dict["history"][i][1] = action.tile_to_put[1]
-                newEdges = action.new_edges
-                self.dict["history"][i][2] = newEdges[0]
-                self.dict["history"][i][3] = newEdges[1]
-                self.dict["history"][i][4] = 1 if action.player == state.current_player() else 0
-                self.dict["history"][i][5] = 1
+                self.dict["history"][i][2] = action.new_edges[0]
+                self.dict["history"][i][3] = action.new_edges[1]
+                self.dict["history"][i][4] = 1. if action.player == state.current_player() else 0.
+                self.dict["history"][i][5] = 1.
 
         if "last_move" in self.dict:
             if state.gameHistory:
                 action = state.gameHistory[-1]
                 self.dict["last_move"][0] = action.tile_to_put[0]
                 self.dict["last_move"][1] = action.tile_to_put[1]
-                newEdges = action.new_edges
-                self.dict["last_move"][2] = newEdges[0]
-                self.dict["last_move"][3] = newEdges[1]
-                self.dict["last_move"][4] = 1 if action.player == state.current_player() else 0
-                self.dict["last_move"][5] = 1
+                self.dict["last_move"][2] = action.new_edges[0]
+                self.dict["last_move"][3] = action.new_edges[1]
+                self.dict["last_move"][4] = 1. if action.player == state.current_player() else 0.
+                self.dict["last_move"][5] = 1.
 
     def string_from(self, state, player):
         """Observation of `state` from the PoV of `player`, as a string."""
@@ -329,6 +336,8 @@ class DominoObserver:
             pieces.append(f"hand:{state.hands[player]}")
         if "history" in self.dict:
             pieces.append(f"history:{str(state.gameHistory)}")
+        if "last_move" in self.dict and state.gameHistory:
+            pieces.append(f"last_move:{str(state.gameHistory[-1])}")
         return " ".join(str(p) for p in pieces)
 
 
