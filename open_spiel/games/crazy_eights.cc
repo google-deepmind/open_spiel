@@ -121,25 +121,31 @@ CrazyEightsState::CrazyEightsState(std::shared_ptr<const Game> game,
 
 std::string CrazyEightsState::ActionToString(Player player,
                                              Action action) const {
-  std::string str;
-  if (action < kDraw) {
-    absl::StrAppend(&str, GetCardStr(action));
-  } else if (action == kDraw) {
-    absl::StrAppend(&str, "Draw");
-  } else if (action == kPass) {
-    absl::StrAppend(&str, "Pass");
-  } else if (action < kDecideDealerActionBase) {
-    absl::StrAppend(
-        &str, absl::StrFormat("Nominate suit %c",
-                              kSuitChar[action - kNominateSuitActionBase]));
-  } else if (action < kDecideDealerActionBase + num_players_) {
-    absl::StrAppend(&str, absl::StrFormat("Decide Player %d to be the dealer",
-                                          action - kDecideDealerActionBase));
-  } else {
-    SpielFatalError("Non valid action ID!");
+  if (player == kChancePlayerId) {
+    if (action < kDraw) {
+      return absl::StrFormat("Deal %s", GetCardStr(action));
+    } else if (action < kDecideDealerActionBase + num_players_) {
+      return absl::StrFormat("Decide Player %d to be the dealer",
+                             action - kDecideDealerActionBase);
+    } else {
+      SpielFatalError(
+          absl::StrFormat("Non action valid Id  %d for chance player", action));
+    }
   }
 
-  return str;
+  if (action < kDraw) {
+    return absl::StrFormat("Play %s", GetCardStr(action));
+  } else if (action == kDraw) {
+    return "Draw";
+  } else if (action == kPass) {
+    return "Pass";
+  } else if (action < kNominateSuitActionBase + kNumSuits) {
+    return absl::StrFormat("Nominate suit %c",
+                           kSuitChar[action - kNominateSuitActionBase]);
+  } else {
+    SpielFatalError(
+        absl::StrFormat("Non valid Id %d for player: %d", action, player));
+  }
 }
 
 std::vector<std::string> CrazyEightsState::FormatHand(Player player) const {
@@ -159,6 +165,7 @@ std::vector<std::string> CrazyEightsState::FormatHand(Player player) const {
 std::string CrazyEightsState::FormatAllHands() const {
   std::string hands_str;
   std::vector<std::vector<std::string>> all_hands;
+  all_hands.reserve(num_players_);
   for (int player = 0; player < num_players_; ++player) {
     all_hands.push_back(FormatHand(player));
   }
@@ -221,7 +228,7 @@ std::string CrazyEightsState::ToString() const {
           absl::StrAppend(
               &str, absl::StrFormat("Player %d passes\n", playing_player));
         } else if (history_[i].action >= kNominateSuitActionBase &&
-                   history_[i].action < kDecideDealerActionBase) {
+                   history_[i].action < kNominateSuitActionBase + kNumSuits) {
           int suit = history_[i].action - kNominateSuitActionBase;
           absl::StrAppend(&str,
                           absl::StrFormat("Player %d nominates suit %c\n",
@@ -338,10 +345,9 @@ std::vector<Action> CrazyEightsState::LegalActions() const {
 std::vector<std::pair<Action, double>> CrazyEightsState::ChanceOutcomes()
     const {
   std::vector<std::pair<Action, double>> outcomes;
-
-  if (!history_.size()) {
+  if (history_.empty()) {
     for (int player = 0; player < num_players_; ++player) {
-      outcomes.emplace_back(player + kDecideDealerActionBase,
+        outcomes.emplace_back(player + kDecideDealerActionBase,
                             1.0 / num_players_);
     }
   } else {
@@ -355,7 +361,7 @@ std::vector<std::pair<Action, double>> CrazyEightsState::ChanceOutcomes()
     for (int card = 0; card < kNumCards; ++card) {
       if (dealer_deck_[card]) {
         outcomes.emplace_back(card, static_cast<double>(dealer_deck_[card]) /
-                                        num_cards_remaining);
+                              num_cards_remaining);
       }
     }
   }
@@ -377,12 +383,15 @@ void CrazyEightsState::DoApplyAction(Action action) {
 
 std::vector<Action> CrazyEightsState::DealLegalActions() const {
   std::vector<Action> legal_actions;
-  if (!history_.size()) {
-    for (int player = 0; player < num_players_; ++player)
+  if (history_.empty()) {
+    for (int player = 0; player < num_players_; ++player) {
       legal_actions.push_back(kDecideDealerActionBase + player);
+    }
   } else {
     for (int card = 0; card < kNumCards; ++card) {
-      if (dealer_deck_[card]) legal_actions.push_back(card);
+      if (dealer_deck_[card]) {
+        legal_actions.push_back(card);
+      }
     }
   }
   return legal_actions;
@@ -404,7 +413,7 @@ void CrazyEightsState::Reshuffle() {
 
 void CrazyEightsState::ApplyDealAction(int action) {
   // determine the dealer
-  if (!history_.size()) {
+  if (history_.empty()) {
     dealer_ = action - kDecideDealerActionBase;
     current_player_ = (dealer_ + 1) % num_players_;
     return;
@@ -441,7 +450,8 @@ void CrazyEightsState::ApplyDealAction(int action) {
           current_player_ = (current_player_ + 2) % num_players_;
           return;
         } else if (rank == kReverseRank) {
-          current_player_ = (current_player_ - 1 + num_players_) % num_players_;
+          current_player_ = (current_player_ - 1 + num_players_) %
+                             num_players_;
           direction_ *= -1;
           return;
         } else if (rank == kDrawTwoRank) {
@@ -490,8 +500,8 @@ void CrazyEightsState::ApplyDealAction(int action) {
     if (!num_draws_from_twos_left_) {
       start_draw_twos_ = false;
       phase_ = Phase::kPlay;
-      current_player_ =
-          (current_player_ + direction_ + num_players_) % num_players_;
+      current_player_ = (current_player_ + direction_ +
+            num_players_) % num_players_;
     }
     return;
   }
@@ -514,12 +524,12 @@ void SearchLegalCards(std::vector<Action>* legal_actions,
     if (hand[card] == 0) continue;
     Suit suit = GetSuit(card);
     int rank = GetRank(card);
-    if (rank == kEightRank)
+    if (rank == kEightRank) {
       legal_actions->push_back(card);
-    else if (last_suit == suit || last_rank == rank)
+    } else if (last_suit == suit || last_rank == rank) {
       legal_actions->push_back(card);
+    }
   }
-  return;
 }
 
 std::vector<Action> CrazyEightsState::PlayLegalActions() const {
@@ -556,10 +566,11 @@ std::vector<Action> CrazyEightsState::PlayLegalActions() const {
       if (hands_[current_player_][card] == 0) continue;
       Suit suit = GetSuit(card);
       int rank = GetRank(card);
-      if (rank == kEightRank)
+      if (rank == kEightRank) {
         legal_actions.push_back(card);
-      else if (last_suit_ == suit || GetRank(last_card_) == rank)
+      } else if (last_suit_ == suit || GetRank(last_card_) == rank) {
         legal_actions.push_back(card);
+      }
     }
     if (num_cards_left_ && num_draws_before_play_ != max_draw_cards_) {
       SPIEL_CHECK_FALSE(can_pass_action_);
@@ -582,15 +593,18 @@ bool CrazyEightsState::CheckAllCardsPlayed(int action) {
 
 void CrazyEightsState::ApplyPlayAction(int action) {
   if (action == kPass) {
-    if (!num_cards_left_)
+    if (!num_cards_left_) {
       num_passes_++;
-    else
+    } else {
       num_passes_ = 0;
+    }
+
     if (num_passes_ == num_players_ + 1) {
       phase_ = kGameOver;
       ScoreUp();
       return;
     }
+
     if (max_draw_cards_ == num_draws_before_play_) {
       num_draws_before_play_ = 0;
     }
@@ -605,14 +619,14 @@ void CrazyEightsState::ApplyPlayAction(int action) {
   if (action == kDraw) {
     SPIEL_CHECK_FALSE(can_pass_action_);
     phase_ = kDeal;
-    if (num_draws_from_twos_left_) start_draw_twos_ = true;
+    if (num_draws_from_twos_left_) { start_draw_twos_ = true; }
     return;
   } else if (nominate_suits_) {
-    SPIEL_CHECK_LE(action, kDecideDealerActionBase);
+    SPIEL_CHECK_LT(action, kNominateSuitActionBase + kNumSuits);
     SPIEL_CHECK_GE(action, kNominateSuitActionBase);
     last_suit_ = action - kNominateSuitActionBase;
     current_player_ =
-        (current_player_ + direction_ + num_players_) % num_players_;
+       (current_player_ + direction_ + num_players_) % num_players_;
     nominate_suits_ = false;
     return;
   } else {
@@ -667,12 +681,13 @@ void CrazyEightsState::ApplyPlayAction(int action) {
 }
 
 Player CrazyEightsState::CurrentPlayer() const {
-  if (phase_ == Phase::kDeal)
+  if (phase_ == Phase::kDeal) {
     return kChancePlayerId;
-  else if (phase_ == Phase::kGameOver)
+  } else if (phase_ == Phase::kGameOver) {
     return kTerminalPlayerId;
-  else
+  } else {
     return current_player_;
+  }
 }
 
 void CrazyEightsState::ScoreUp() {
@@ -680,12 +695,13 @@ void CrazyEightsState::ScoreUp() {
     for (int card = 0; card < kNumCards; ++card) {
       if (!hands_[player][card]) continue;
       int rank = GetRank(card);
-      if (rank == kEightRank)
+      if (rank == kEightRank) {
         returns_[player] -= 50 * hands_[player][card];
-      else if (rank >= 9)
+      } else if (rank >= 9) {
         returns_[player] -= 10 * hands_[player][card];
-      else
+      } else {
         returns_[player] -= (card + 2) * hands_[player][card];
+      }
     }
   }
 }

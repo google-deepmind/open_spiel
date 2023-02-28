@@ -62,7 +62,8 @@
 // action id 52: a player draw a card from the dealer's deck.
 // action id 53: a player passes if it had already drawn max_draw_cards.
 // action id 54, 55, 56, 57: a player nominate one of the four suit.
-// action id 58, 59, ...., 58 + num_player-1: decide the dealer.
+// (for chance) action id 0, 1,...., 51 are cards to be drawn
+// action id 52, 53, ...., 52 + num_player-1: decide the dealer.
 //
 // An observation contains:
 // (1) the current hand I have
@@ -82,7 +83,7 @@ constexpr int kNumSuits = 4;
 constexpr int kDraw = kNumCards;
 constexpr int kPass = kDraw + 1;
 constexpr int kNominateSuitActionBase = kPass + 1;
-constexpr int kDecideDealerActionBase = kNominateSuitActionBase + kNumSuits;
+constexpr int kDecideDealerActionBase = kNumCards;
 // 50 for each 8, 10 for each face card, and face values
 // for others. then it is totally 4 * (2+3+..7+50+9+10+4*10)
 constexpr double kMaxPenality = 544;
@@ -181,7 +182,7 @@ class CrazyEightsGame : public Game {
  public:
   explicit CrazyEightsGame(const GameParameters& params);
   int NumDistinctActions() const override {
-    return kDecideDealerActionBase + num_players_;
+    return kNominateSuitActionBase + kNumSuits;
   }
   int MaxChanceOutcomes() const override {
     return kDecideDealerActionBase + num_players_;
