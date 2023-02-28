@@ -16,7 +16,7 @@
 """Tests for Python Kuhn Poker."""
 
 from absl.testing import absltest
-
+from open_spiel.python.algorithms.get_all_states import get_all_states
 import pyspiel
 
 class DominoTest(absltest.TestCase):
