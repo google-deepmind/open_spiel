@@ -16,16 +16,8 @@
 """Tests for Python Kuhn Poker."""
 
 from absl.testing import absltest
-import numpy as np
 
-from open_spiel.python import policy
-from open_spiel.python.algorithms import exploitability
-from open_spiel.python.algorithms import sequence_form_lp
-from open_spiel.python.algorithms.get_all_states import get_all_states
-from open_spiel.python.games import kuhn_poker  # pylint: disable=unused-import
-from open_spiel.python.observation import make_observation
 import pyspiel
-
 
 class DominoTest(absltest.TestCase):
 
