@@ -18,21 +18,39 @@
 from absl.testing import absltest
 
 import pyspiel
+from open_spiel.python.pybind11.pyspiel import gin_rummy
 
 
 class GamesGinRummyTest(absltest.TestCase):
 
   def test_bindings(self):
+    # gin_rummy submodule attributes
+    self.assertEqual(gin_rummy.DEFAULT_NUM_RANKS, 13)
+    self.assertEqual(gin_rummy.DEFAULT_NUM_SUITS, 4)
+    self.assertEqual(gin_rummy.DEFAULT_NUM_CARDS, 52)
+    self.assertEqual(gin_rummy.NUM_PLAYERS, 2)
+    self.assertEqual(gin_rummy.MAX_POSSIBLE_DEADWOOD, 98)
+    self.assertEqual(gin_rummy.MAX_NUM_DRAW_UPCARD_ACTIONS, 50)
+    self.assertEqual(gin_rummy.DEFAULT_HAND_SIZE, 10)
+    self.assertEqual(gin_rummy.WALL_STOCK_SIZE, 2)
+    self.assertEqual(gin_rummy.DEFAULT_KNOCK_CARD, 10)
+    self.assertEqual(gin_rummy.DEFAULT_GIN_BONUS, 25)
+    self.assertEqual(gin_rummy.DEFAULT_UNDERCUT_BONUS, 25)
+    self.assertEqual(gin_rummy.DRAW_UPCARD_ACTION, 52)
+    self.assertEqual(gin_rummy.DRAW_STOCK_ACTION, 53)
+    self.assertEqual(gin_rummy.PASS_ACTION, 54)
+    self.assertEqual(gin_rummy.KNOCK_ACTION, 55)
+    self.assertEqual(gin_rummy.MELD_ACTION_BASE, 56)
+    self.assertEqual(gin_rummy.NUM_MELD_ACTIONS, 185)
+    self.assertEqual(gin_rummy.NUM_DISTINCT_ACTIONS, 241)
+    self.assertEqual(gin_rummy.OBSERVATION_TENSOR_SIZE, 644)
+    # Game bindings
     game = pyspiel.load_game('gin_rummy')
     self.assertFalse(game.oklahoma())
     self.assertEqual(game.knock_card(), 10)
-    self.assertEqual(game.draw_upcard_action(), 52)
-    self.assertEqual(game.draw_stock_action(), 53)
-    self.assertEqual(game.pass_action(), 54)
-    self.assertEqual(game.knock_action(), 55)
-    self.assertEqual(game.meld_action_base(), 56)
+    # State bindings
     state = game.new_initial_state()
-    self.assertEqual(state.current_phase(), state.Phase.DEAL)
+    self.assertEqual(state.current_phase(), gin_rummy.Phase.DEAL)
     self.assertEqual(state.current_player(), pyspiel.PlayerId.CHANCE)
     self.assertIsNone(state.upcard())
     self.assertEqual(state.stock_size(), 52)
@@ -43,7 +61,11 @@ class GamesGinRummyTest(absltest.TestCase):
     self.assertEqual(state.pass_on_first_upcard(), [False, False])
     self.assertEqual(state.layed_melds(), [[], []])
     self.assertEqual(state.layoffs(), [])
-    utils = pyspiel.GinRummyUtils(13, 4, 10)  # 13 ranks, 4 suits, 10 hand size
+    self.assertFalse(state.finished_layoffs())
+    # Utils
+    utils = gin_rummy.GinRummyUtils(gin_rummy.DEFAULT_NUM_RANKS,
+                                    gin_rummy.DEFAULT_NUM_SUITS,
+                                    gin_rummy.DEFAULT_HAND_SIZE)
     self.assertEqual(utils.card_string(0), 'As')
     self.assertEqual(utils.hand_to_string([0, 1, 2]),
                      '+--------------------------+\n'

@@ -86,6 +86,17 @@ inline constexpr int kObservationTensorSize =
     + kDefaultNumCards      // Stock size
     + kNumMeldActions * 2;  // Layed melds of both players
 
+enum class Phase {
+  kDeal,
+  kFirstUpcard,
+  kDraw,
+  kDiscard,
+  kKnock,
+  kLayoff,
+  kWall,
+  kGameOver
+};
+
 class GinRummyGame;
 class GinRummyObserver;
 
@@ -107,19 +118,9 @@ class GinRummyState : public State {
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
-  enum class Phase {
-    kDeal,
-    kFirstUpcard,
-    kDraw,
-    kDiscard,
-    kKnock,
-    kLayoff,
-    kWall,
-    kGameOver
-  };
-
   // Used for Python bindings.
   Phase CurrentPhase() const { return phase_; }
+  bool FinishedLayoffs() const { return finished_layoffs_ ; }
   absl::optional<int> Upcard() const { return upcard_; }
   int StockSize() const { return stock_size_; }
   std::vector<std::vector<int>> Hands() const { return hands_; }
@@ -258,11 +259,6 @@ class GinRummyGame : public Game {
   // Used for Python bindings.
   bool Oklahoma() const { return oklahoma_; }
   int KnockCard() const { return knock_card_; }
-  int DrawUpcardAction() const { return kDrawUpcardAction; }
-  int DrawStockAction() const { return kDrawStockAction; }
-  int PassAction() const { return kPassAction; }
-  int KnockAction() const { return kKnockAction; }
-  int MeldActionBase() const { return kMeldActionBase; }
 
  private:
   const bool oklahoma_;
