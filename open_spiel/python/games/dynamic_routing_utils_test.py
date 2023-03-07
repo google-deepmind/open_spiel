@@ -76,43 +76,43 @@ class NetworkTest(absltest.TestCase):
       self.network.get_road_section_from_action_id(0)
 
   def test_num_links_method(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_num_actions_method(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_links(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_check_list_of_vehicles_is_correct_method(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_check_list_of_od_demand_is_correct_method(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_str_method(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_get_travel_time_methods(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_assert_valid_action_methods(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_default_travel_time_methods(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
   def test_customable_travel_time_methods(self):
-    # TODO(cabannes): write.
+    # Write.
     pass
 
 
