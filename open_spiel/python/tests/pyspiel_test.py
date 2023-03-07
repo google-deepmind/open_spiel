@@ -24,6 +24,7 @@ import pyspiel
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = frozenset([
     "2048",
+    "add_noise",
     "amazons",
     "backgammon",
     "bargaining",
@@ -158,6 +159,7 @@ class PyspielTest(absltest.TestCase):
     expected = [
         # Being non-default-loadable prevents various automated tests.
         # Only add games here if there is no sensible default for a parameter.
+        "add_noise",
         "efg_game",
         "nfg_game",
         "misere",
