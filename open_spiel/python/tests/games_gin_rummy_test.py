@@ -18,7 +18,7 @@
 from absl.testing import absltest
 
 import pyspiel
-from open_spiel.python.pybind11.pyspiel import gin_rummy
+gin_rummy = pyspiel.gin_rummy
 
 
 class GamesGinRummyTest(absltest.TestCase):
