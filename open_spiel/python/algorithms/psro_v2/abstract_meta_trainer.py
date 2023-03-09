@@ -196,7 +196,8 @@ class AbstractMetaTrainer(object):
   def update_meta_strategies(self):
     self._meta_strategy_probabilities = self._meta_strategy_method(self)
     if self.symmetric_game:
-      self._meta_strategy_probabilities = [self._meta_strategy_probabilities[0]]
+      self._meta_strategy_probabilities = [
+          self._meta_strategy_probabilities[0]]
 
   def update_agents(self):
     return NotImplementedError("update_agents not implemented.")
@@ -233,14 +234,15 @@ class AbstractMetaTrainer(object):
   def get_meta_game(self):
     """Returns the meta game matrix."""
     meta_games = self._meta_games
-    if self.symmetric_game:
-      meta_games = self._game_num_players * meta_games
     return [np.copy(a) for a in meta_games]
 
   def get_policies(self):
     """Returns the players' policies."""
     policies = self._policies
     if self.symmetric_game:
+      # Notice that the following line returns N references to the same policy
+      # This might not be correct for certain applications.
+      # E.g., a DQN BR oracle with player_id information
       policies = self._game_num_players * policies
     return policies
 
