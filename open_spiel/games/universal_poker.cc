@@ -755,6 +755,9 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     }
     return legal_actions;
   } else {
+    if (acpc_state_.IsFinished()) {
+      return legal_actions;
+    }
     if (acpc_state_.IsValidAction(
             acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0)) {
       legal_actions.push_back(kFold);
