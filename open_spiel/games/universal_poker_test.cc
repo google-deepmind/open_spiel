@@ -213,6 +213,11 @@ void BasicUniversalPokerTests() {
   // testing::RandomSimBenchmark("universal_poker", 10000, false);
 
   testing::CheckChanceOutcomes(*LoadGame("universal_poker"));
+
+  auto observer = LoadGame("universal_poker")
+                      ->MakeObserver(kDefaultObsType,
+                                     GameParametersFromString("single_tensor"));
+  testing::RandomSimTestCustomObserver(*LoadGame("universal_poker"), observer);
 }
 
 constexpr absl::string_view kHULHString =

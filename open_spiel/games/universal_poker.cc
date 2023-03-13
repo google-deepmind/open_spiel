@@ -181,6 +181,8 @@ std::shared_ptr<const Game> Factory(const GameParameters &params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+open_spiel::RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 // Returns how many actions are available at a choice node (3 when limit
 // and 4 for no limit).
 // TODO(author2): Is that a bug? There are 5 actions? Is no limit means

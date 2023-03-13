@@ -36,6 +36,11 @@ void BasicGameTests() {
   testing::ChanceOutcomesTest(*LoadGame("hearts"));
   testing::RandomSimTest(*LoadGame("hearts"), 10);
   testing::ResampleInfostateTest(*LoadGame("hearts"), /*num_sims=*/10);
+
+  auto observer = LoadGame("hearts")
+                      ->MakeObserver(kInfoStateObsType,
+                                     GameParametersFromString("single_tensor"));
+  testing::RandomSimTestCustomObserver(*LoadGame("hearts"), observer);
 }
 
 void ShootTheMoonTest() {
