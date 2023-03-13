@@ -182,10 +182,7 @@ class JointPolicyAggregator(object):
       state_key = self._state_key(state, pid)
 
       self._policy[state_key] = {}
-      used_moves = []
-      for k in range(len(policies)):
-        used_moves += [a[0] for a in policies[k].items()]
-      used_moves = np.unique(used_moves)
+      used_moves = state.legal_actions(pid)
 
 
       for uid in used_moves:

@@ -190,10 +190,7 @@ class PolicyAggregator(object):
       policies = self._policy_pool(state, pid)
       state_key = self._state_key(state, pid)
       self._policy[state_key] = {}
-      used_moves = []
-      for k in range(len(policies)):
-        used_moves += [a[0] for a in policies[k].items()]
-      used_moves = np.unique(used_moves)
+      used_moves = state.legal_actions(pid)
 
 
       for uid in used_moves:
@@ -252,10 +249,7 @@ class PolicyAggregator(object):
         if state_key not in self._policy:
           self._policy[state_key] = {}
 
-      used_moves = []
-      for k in range(len(legal_policies)):
-        used_moves += [a[0] for a in legal_policies[k].items()]
-      used_moves = np.unique(used_moves)
+      used_moves = state.legal_actions(turn_player)
 
       for uid in used_moves:
         new_reaches = copy.deepcopy(my_reaches)
