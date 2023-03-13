@@ -347,11 +347,13 @@ void BridgeState::WriteObservationTensor(Player player,
     ptr += kNumPlayers * kNumCards;
 
     // Current trick
-    int leader = tricks_[current_trick].Leader();
-    for (int i = 0; i < this_trick_cards_played; ++i) {
-      int card = history_[this_trick_start + i].action;
-      int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
-      ptr[relative_player * kNumCards + card] = 1;
+    if (phase_ != Phase::kGameOver) {
+      int leader = tricks_[current_trick].Leader();
+      for (int i = 0; i < this_trick_cards_played; ++i) {
+        int card = history_[this_trick_start + i].action;
+        int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
+        ptr[relative_player * kNumCards + card] = 1;
+      }
     }
     ptr += kNumPlayers * kNumCards;
 
