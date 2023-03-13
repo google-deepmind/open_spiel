@@ -238,7 +238,7 @@ class JointPolicyAggregator(object):
     if pid == current_player:
       # update the current node
       # will need the observation to query the policies
-      if state not in self._policy:
+      if state_key not in self._policy:
         self._policy[state_key] = {}
 
     for action in state.legal_actions():
