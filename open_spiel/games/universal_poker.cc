@@ -1098,8 +1098,8 @@ int UniversalPokerGame::MaxGameLength() const {
     length += (maxStack+maxBlind-1)/maxBlind;
   } else {
     while (maxStack > maxBlind) {
-      maxStack /= 2.0;         // You have always to bet the pot size
-      length += NumPlayers();  // Each player has to react
+      maxStack /= 2.0;             // You have always to bet the pot size
+      length += NumPlayers() - 1;  // 1 player bets, and n-2 players call
     }
   }
   return length;
