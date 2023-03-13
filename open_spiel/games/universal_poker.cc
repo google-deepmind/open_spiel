@@ -972,8 +972,6 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
       potSize_(ParameterValue<int>("potSize")),
       boardCards_(ParameterValue<std::string>("boardCards")),
       handReaches_(ParameterValue<std::string>("handReaches")) {
-  max_game_length_ = MaxGameLength();
-  SPIEL_CHECK_TRUE(max_game_length_.has_value());
   std::string betting_abstraction =
       ParameterValue<std::string>("bettingAbstraction");
   if (betting_abstraction == "fc") {
@@ -988,6 +986,8 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     SpielFatalError(absl::StrFormat("bettingAbstraction: %s not supported.",
                                     betting_abstraction));
   }
+  max_game_length_ = MaxGameLength();
+  SPIEL_CHECK_TRUE(max_game_length_.has_value());
 }
 
 std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
@@ -1091,10 +1091,16 @@ int UniversalPokerGame::MaxGameLength() const {
     maxBlind =
         acpc_game_.BlindSize(p) > maxBlind ? acpc_game_.BlindSize(p) : maxBlind;
   }
-
-  while (maxStack > maxBlind) {
-    maxStack /= 2.0;         // You have always to bet the pot size
-    length += NumPlayers();  // Each player has to react
+  if ((betting_abstraction_==BettingAbstraction::kFULLGAME) || (betting_abstraction_==BettingAbstraction::kFCHPA)){
+    // with fullgame, the longest game comes from each player can bet/raise the big blind every action.
+    // with FCHPA, the longest game is when each player bets/raise half-pot every action.
+    // however, for now we'll just use the fullgame value for FCHPA too, although it is a big overestimate.
+    length += (maxStack+maxBlind-1)/maxBlind;
+  } else {
+    while (maxStack > maxBlind) {
+      maxStack /= 2.0;         // You have always to bet the pot size
+      length += NumPlayers();  // Each player has to react
+    }
   }
   return length;
 }
