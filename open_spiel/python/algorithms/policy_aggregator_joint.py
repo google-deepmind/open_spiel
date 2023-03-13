@@ -178,12 +178,7 @@ class JointPolicyAggregator(object):
       return
 
     if state.is_simultaneous_node():
-      # assert (self._game_type.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS
-      #        ), "Game must be simultaneous-move"
-      # assert (self._game_type.chance_mode == pyspiel.GameType.ChanceMode
-      #         .DETERMINISTIC), "Chance nodes not supported"
-      # assert (self._game_type.information == pyspiel.GameType.Information
-      #         .ONE_SHOT), "Only one-shot NFGs supported"
+
       policies = _aggregate_at_state(self._joint_policies, state, pid)
       state_key = self._state_key(state, pid)
 
@@ -230,17 +225,6 @@ class JointPolicyAggregator(object):
           self._rec_aggregate(pid, new_state, new_reaches)
       return
 
-
-
-      # for player_policies, weight in zip(policies, my_reaches):
-      #   player_policy = player_policies[pid]
-      #   for action in player_policy.keys():
-      #     if action in self._policy[state_key]:
-      #       self._policy[state_key][action] += weight * player_policy[action]
-      #     else:
-      #       self._policy[state_key][action] = weight * player_policy[action]
-      # # No recursion because we only support one shot simultaneous games.
-      # return
 
     if state.is_chance_node():
       for action in state.legal_actions():
