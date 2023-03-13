@@ -22,8 +22,8 @@ policy.
 import copy
 from open_spiel.python import policy
 import pyspiel
-import itertools
 import numpy as np
+import itertools
 
 
 def _aggregate_at_state(joint_policies, state, player):
@@ -178,7 +178,6 @@ class JointPolicyAggregator(object):
       return
 
     if state.is_simultaneous_node():
-
       policies = _aggregate_at_state(self._joint_policies, state, pid)
       state_key = self._state_key(state, pid)
 
@@ -225,7 +224,6 @@ class JointPolicyAggregator(object):
           self._rec_aggregate(pid, new_state, new_reaches)
       return
 
-
     if state.is_chance_node():
       for action in state.legal_actions():
         new_state = state.child(action)
@@ -240,7 +238,7 @@ class JointPolicyAggregator(object):
     if pid == current_player:
       # update the current node
       # will need the observation to query the policies
-      if state_key not in self._policy:
+      if state not in self._policy:
         self._policy[state_key] = {}
 
     for action in state.legal_actions():
