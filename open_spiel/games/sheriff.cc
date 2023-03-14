@@ -54,6 +54,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 template <typename T>
 void StrAppendVector(std::string* s, const std::vector<T>& v) {
   absl::StrAppend(s, "[");

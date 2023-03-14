@@ -64,6 +64,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 PointsOrder ParsePointsOrder(const std::string& po_str) {
   if (po_str == "random") {
     return PointsOrder::kRandom;

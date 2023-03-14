@@ -52,6 +52,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 // Adds a plane to the information state vector corresponding to the presence
 // and absence of the given piece type and colour at each square.
 void AddPieceTypePlane(Color color, PieceType piece_type,

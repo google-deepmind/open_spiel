@@ -86,7 +86,11 @@ std::shared_ptr<const Game> ImperfectRecallFactory(
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+RegisterSingleTensorObserver single_tensor1(kGameType.short_name);
+
 REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
+RegisterSingleTensorObserver single_tensor_imperfect_recall(
+    kImperfectRecallGameType.short_name);
 
 }  // namespace
 

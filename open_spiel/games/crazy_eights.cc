@@ -64,6 +64,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 Suit GetSuit(int action) {
   SPIEL_CHECK_GE(action, 0);
   SPIEL_CHECK_LT(action, kNumCards);

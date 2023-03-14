@@ -67,6 +67,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 GridSpec ParseGrid(const std::string& grid_string, int max_num_players) {
   GridSpec grid{/*num_rows=*/0, /*num_cols=*/0};
   int row = 0;

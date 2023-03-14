@@ -75,6 +75,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 // A call is one of Pass, Double, Redouble, or a bid.
 // Bids are a combination of a number of tricks (level + 6) and denomination
 // (trump suit or no-trumps).

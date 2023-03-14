@@ -47,6 +47,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace matching_pennies
 
 // Rock, Paper, Scissors.
@@ -77,6 +79,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace rock_paper_scissors
 
 // Rock, Paper, Scissors.
@@ -110,6 +114,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace biased_rock_paper_scissors
 
 // Rock, Paper, Scissors, Water: a variant of RPS by Martin Schmid which adds
@@ -143,6 +149,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace rock_paper_scissors_water
 
 // A general-sum variant of Rock, Paper, Scissors. Often used as a
@@ -176,6 +184,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace shapleys_game
 
 // Prisoner's Dilemma.
@@ -204,6 +214,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace prisoners_dilemma
 
 // Stag Hunt.
@@ -232,6 +244,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace stag_hunt
 
 // Coordination.
@@ -260,6 +274,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace coordination
 
 // Chicken-Dare game.
@@ -289,6 +305,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace chicken_dare
 
 // Bach or Stravinksy game.
@@ -318,6 +336,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace bach_or_stravinsky
 
 
