@@ -437,7 +437,7 @@ void FullNLBettingTest3() {
 }
 
 // Check that a max length game works and infostate tensors are all unique.
-void FullNLBettingTest3() {
+void FullNLBettingTest4() {
   std::shared_ptr<const Game> game = LoadGame(
       "universal_poker(betting=nolimit,"
                       "numPlayers=2,"
@@ -489,8 +489,9 @@ void FullNLBettingTest3() {
   }
   state->ApplyAction(1); // call
   SPIEL_CHECK_EQ(state->LegalActions().size(), 0);
+  std::cout << state->ToString() << std::endl;
   SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
-      "STATE:0:cr200c/r300r400r500r600r700r800r900r1000r1100r1200r1300r1400r1500r1600r1700r1800r1900c:2c|3c/4c"));
+      "ACPC State: STATE:0:cr200c/cr300r400r500r600r700r800r900r1000r1100r1200r1300r1400r1500r1600r1700r1800r1900c:2c|3c/4c"));
 }
 
 void ChanceDealRegressionTest() {
@@ -771,6 +772,7 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::FullNLBettingTest1();
   open_spiel::universal_poker::FullNLBettingTest2();
   open_spiel::universal_poker::FullNLBettingTest3();
+  open_spiel::universal_poker::FullNLBettingTest4();
   open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
   open_spiel::universal_poker::CanConvertActionsCorrectly();
   open_spiel::universal_poker::TestFCHPA();
