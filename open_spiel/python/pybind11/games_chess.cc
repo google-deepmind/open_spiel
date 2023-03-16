@@ -68,10 +68,15 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
       .def_readonly("to_square", &Move::to)
       .def_readonly("piece", &Move::piece)
       .def_readonly("promotion_type", &Move::promotion_type)
-      .def_readonly("is_castling", &Move::is_castling);
+      .def_readonly("is_castling", &Move::is_castling)
+      .def("to_string", &Move::ToString)
+      .def("to_san", &Move::ToSAN)
+      .def("to_lan", &Move::ToLAN);
 
   py::classh<ChessBoard>(chess, "ChessBoard")
-      .def("has_legal_moves", &ChessBoard::HasLegalMoves);
+      .def("has_legal_moves", &ChessBoard::HasLegalMoves)
+      .def("debug_string", &ChessBoard::DebugString)
+      .def("to_unicode_string", &ChessBoard::ToUnicodeString);
 
   py::classh<ChessState, State>(m, "ChessState")
       .def("board", py::overload_cast<>(&ChessState::Board))
