@@ -234,7 +234,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
   const std::string handReaches =
       game->GetParameters().at("handReaches").string_value();
   if (!handReaches.empty()) {
-    std::stringstream iss( handReaches );
+    std::stringstream iss(handReaches);
     double number;
     while ( iss >> number ) {
       handReaches_.push_back(number);
@@ -1082,10 +1082,17 @@ int UniversalPokerGame::MaxGameLength() const {
   length += acpc_game_.GetTotalNbBoardCards() +
             acpc_game_.GetNbHoleCardsRequired() * acpc_game_.GetNbPlayers();
 
+  // The longest game (with a single betting round, for simplicity) consists of:
+  // n-1 players checking,
+  // 1 player betting, n-2 players calling,
+  // 1 player raising, n-2 players calling,
+  // etc...,
+  // 1 player raising, n-1 players calling
+
   // Check Actions
   length += (NumPlayers() * acpc_game_.NumRounds());
 
-  // Bet Actions
+  // Bet/Raise/Call Actions
   double maxStack = 0;
   double maxBlind = 0;
   for (uint32_t p = 0; p < NumPlayers(); p++) {
@@ -1094,17 +1101,29 @@ int UniversalPokerGame::MaxGameLength() const {
     maxBlind =
         acpc_game_.BlindSize(p) > maxBlind ? acpc_game_.BlindSize(p) : maxBlind;
   }
-  if ((betting_abstraction_==BettingAbstraction::kFULLGAME) || (betting_abstraction_==BettingAbstraction::kFCHPA)){
-    // with fullgame, the longest game comes from each player can bet/raise the big blind every action.
-    // with FCHPA, the longest game is when each player bets/raise half-pot every action.
-    // however, for now we'll just use the fullgame value for FCHPA too, although it is a big overestimate.
-    length += (maxStack+maxBlind-1)/maxBlind;
-  } else {
-    while (maxStack > maxBlind) {
-      maxStack /= 2.0;             // You have always to bet the pot size
-      length += NumPlayers() - 1;  // 1 player bets, and n-2 players call
+
+  int max_num_raises = 0;
+  if (betting_abstraction_ == BettingAbstraction::kFC) {
+    // no raises
+  } else if (betting_abstraction_ == BettingAbstraction::kFCPA) {
+    double pot_size = maxBlind * NumPlayers();
+    while (pot_size / NumPlayers() < maxStack) {
+      max_num_raises++;
+      pot_size += pot_size * NumPlayers();
     }
+  } else if (betting_abstraction_ == BettingAbstraction::kFCHPA) {
+    double pot_size = maxBlind * NumPlayers();
+    while (pot_size / NumPlayers() < maxStack) {
+      max_num_raises++;
+      pot_size += NumPlayers() * pot_size/2;
+    }
+  } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
+    max_num_raises = (maxStack + maxBlind - 1)/maxBlind;  // ceil divide
+  } else {
+    SpielFatalError("Unknown Betting Abstraction");
   }
+  // each bet/raise is followed by n-2 calls, for a total of n-1 actions:
+  length += max_num_raises * (NumPlayers() - 1);
   return length;
 }
 

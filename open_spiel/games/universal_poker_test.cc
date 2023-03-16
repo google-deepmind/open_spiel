@@ -17,6 +17,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <set>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -459,39 +460,40 @@ void FullNLBettingTest4() {
   tensor = state->InformationStateTensor();
   SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
   information_state_tensor_set.insert(tensor);
-  state->ApplyAction(1);   // check
+  state->ApplyAction(1);    // check
   // check the infostate tensor and add to set
   tensor = state->InformationStateTensor();
   SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
   information_state_tensor_set.insert(tensor);
-  state->ApplyAction(200); //min bet
+  state->ApplyAction(200);  // min bet
   // check the infostate tensor and add to set
   tensor = state->InformationStateTensor();
   SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
   information_state_tensor_set.insert(tensor);
-  state->ApplyAction(1);   // call
+  state->ApplyAction(1);    // call
   state->ApplyAction(state->LegalActions()[0]);  // deal flop
   // check the infostate tensor and add to set
   tensor = state->InformationStateTensor();
   SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
   information_state_tensor_set.insert(tensor);
-  state->ApplyAction(1);  // check
+  state->ApplyAction(1);    // check
   // check the infostate tensor and add to set
   tensor = state->InformationStateTensor();
   SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
   information_state_tensor_set.insert(tensor);
-  for (int i=300; i < 2000; i+=100){
+  for (int i=300; i < 2000; i+=100) {
     state->ApplyAction(i);  // min bet/raise
     // check the infostate tensor and add to set
     tensor = state->InformationStateTensor();
     SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
     information_state_tensor_set.insert(tensor);
   }
-  state->ApplyAction(1); // call
+  state->ApplyAction(1);    // call
   SPIEL_CHECK_EQ(state->LegalActions().size(), 0);
   std::cout << state->ToString() << std::endl;
   SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
-      "ACPC State: STATE:0:cr200c/cr300r400r500r600r700r800r900r1000r1100r1200r1300r1400r1500r1600r1700r1800r1900c:2c|3c/4c"));
+      "ACPC State: STATE:0:cr200c/cr300r400r500r600r700r800r900r1000r1100"
+      "r1200r1300r1400r1500r1600r1700r1800r1900c:2c|3c/4c"));
 }
 
 void ChanceDealRegressionTest() {

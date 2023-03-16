@@ -24,13 +24,13 @@ NumPlayers() = 2
 MinUtility() = -1200.0
 MaxUtility() = 1200.0
 UtilitySum() = 0.0
-InformationStateTensorShape() = [74]
+InformationStateTensorShape() = [72]
 InformationStateTensorLayout() = TensorLayout.CHW
-InformationStateTensorSize() = 74
+InformationStateTensorSize() = 72
 ObservationTensorShape() = [52]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 52
-MaxGameLength() = 12
+MaxGameLength() = 11
 ToString() = "universal_poker()"
 
 # State 0
@@ -54,8 +54,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Public: ][Sequences: ]"
 InformationStateString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Public: ][Sequences: ]"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100[Private: ][Ante: 100 100]"
 ObservationString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100[Private: ][Ante: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
@@ -88,8 +88,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: 5c][Public: ][Sequences: ]"
 InformationStateString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100][Private: ][Public: ][Sequences: ]"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100[Private: 5c][Ante: 100 100]"
 ObservationString(1) = "[Round 0][Player: -1][Pot: 200][Money: 1100 1100[Private: ][Ante: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
@@ -121,8 +121,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 5c][Public: ][Sequences: ]"
 InformationStateString(1) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100][Private: 5d][Public: ][Sequences: ]"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100[Private: 5c][Ante: 100 100]"
 ObservationString(1) = "[Round 0][Player: 0][Pot: 200][Money: 1100 1100[Private: 5d][Ante: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
@@ -155,8 +155,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 1
 InformationStateString(0) = "[Round 0][Player: 1][Pot: 200][Money: 1100 1100][Private: 5c][Public: ][Sequences: c]"
 InformationStateString(1) = "[Round 0][Player: 1][Pot: 200][Money: 1100 1100][Private: 5d][Public: ][Sequences: c]"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 0][Player: 1][Pot: 200][Money: 1100 1100[Private: 5c][Ante: 100 100]"
 ObservationString(1) = "[Round 0][Player: 1][Pot: 200][Money: 1100 1100[Private: 5d][Ante: 100 100]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 100.0]
@@ -189,8 +189,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "[Round 0][Player: 0][Pot: 600][Money: 1100 900][Private: 5c][Public: ][Sequences: cr300]"
 InformationStateString(1) = "[Round 0][Player: 0][Pot: 600][Money: 1100 900][Private: 5d][Public: ][Sequences: cr300]"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 0][Player: 0][Pot: 600][Money: 1100 900[Private: 5c][Ante: 100 300]"
 ObservationString(1) = "[Round 0][Player: 0][Pot: 600][Money: 1100 900[Private: 5d][Ante: 100 300]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 300.0]
@@ -225,8 +225,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -4
 InformationStateString(0) = "[Round 0][Player: -4][Pot: 300][Money: 1100 900][Private: 5c][Public: ][Sequences: cr300f]"
 InformationStateString(1) = "[Round 0][Player: -4][Pot: 300][Money: 1100 900][Private: 5d][Public: ][Sequences: cr300f]"
-InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationString(0) = "[Round 0][Player: -4][Pot: 300][Money: 1100 900[Private: 5c][Ante: 100 300]"
 ObservationString(1) = "[Round 0][Player: -4][Pot: 300][Money: 1100 900[Private: 5d][Ante: 100 300]"
 ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 100.0, 300.0]
