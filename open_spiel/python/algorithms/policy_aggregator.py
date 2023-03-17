@@ -186,6 +186,7 @@ class PolicyAggregator(object):
     if state.is_terminal():
       return
     elif state.is_simultaneous_node():
+      
 
       policies = self._policy_pool(state, pid)
       state_key = self._state_key(state, pid)
@@ -221,9 +222,8 @@ class PolicyAggregator(object):
           for i in range(len(policies)):
             # compute the new reach for each policy for this action
             new_reaches[pid][i] *= policies[i].get(uid, 0)
-            # add reach * prob(a) for this policy to the computed policy
           
-          joint_action = list(other_joint_action[:pid] + (uid,)+other_joint_action[pid:])
+          joint_action = list(other_joint_action[:pid] + (uid,) + other_joint_action[pid:])
           new_state = state.clone()
           new_state.apply_actions(joint_action)
           self._rec_aggregate(pid, new_state, new_reaches)

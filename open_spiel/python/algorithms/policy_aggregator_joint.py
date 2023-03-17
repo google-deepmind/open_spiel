@@ -213,7 +213,6 @@ class JointPolicyAggregator(object):
           for i in range(len(policies)):
             # compute the new reach for each policy for this action
             new_reaches[i] *= policies[i].get(uid, 0)
-            # add reach * prob(a) for this policy to the computed policy
           
           joint_action = list(other_joint_action[:pid] + (uid,)+other_joint_action[pid:])
           new_state = state.clone()
