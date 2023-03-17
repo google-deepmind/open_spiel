@@ -173,6 +173,7 @@ def get_dice_update_fn(
                     rewards=trajectories['rewards'][0],
                     values=critic_network.apply(train_state.critic_params[opp_id], trajectories['states'][0])
                 )
+                # Update the other player's policy:
                 other_theta = jax.tree_util.tree_map(lambda param, grad: param - opp_pi_lr * grad, other_theta, other_grad)
 
             trajectories = rollout(params, other_theta)
@@ -227,7 +228,8 @@ def get_lola_update_fn(
         policy_network: hk.Transformed,
         optimizer: optax.TransformUpdateFn,
         pi_lr: float,
-        gamma: float = 0.99
+        gamma: float = 0.99,
+        lola_weight: float = 1.0
 ) -> UpdateFn:
     def flat_params(params):
         flat_param_dict = dict([(agent_id, jax.flatten_util.ravel_pytree(p)) for agent_id, p in params.items()])
@@ -294,7 +296,7 @@ def get_lola_update_fn(
         """
         loss, policy_grads = jax.value_and_grad(policy_loss)(train_state.policy_params[agent_id], agent_id, batch)
         correction = lola_correction(train_state, batch)
-        policy_grads = jax.tree_util.tree_map(lambda grad, corr: grad - corr, policy_grads, correction)
+        policy_grads = jax.tree_util.tree_map(lambda grad, corr: grad - lola_weight * corr, policy_grads, correction)
         updates, opt_state = optimizer(policy_grads, train_state.policy_opt_states[agent_id])
         policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
         train_state = TrainState(
@@ -359,7 +361,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  critic_discount: float = 0.99,
                  seed: jax.random.PRNGKey = 42,
                  fit_opponent_model=True,
-                 correction_type='lola',
+                 correction_type: str = 'lola',
                  use_jit: bool = False,
                  n_lookaheads: int = 1,
                  num_critic_mini_batches: int = 1,
@@ -411,14 +413,20 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                 n_lookaheads=n_lookaheads,
                 env=env
             )
-        else:
+        elif correction_type == 'lola' or correction_type == 'none':
+            # if correction_type is none, use standard policy gradient without corrections
+            lola_weight = 1.0 if correction_type == 'lola' else 0.0
             update_fn = get_lola_update_fn(
                 agent_id=player_id,
                 policy_network=policy,
                 pi_lr=pi_learning_rate,
-                optimizer=self._policy_opt.update
+                optimizer=self._policy_opt.update,
+                lola_weight=lola_weight,
             )
             policy_update_fn = jax.jit(update_fn) if use_jit else update_fn
+        else:
+            raise ValueError(f'Unknown correction type: {correction_type}')
+
 
         critic_update_fn = get_critic_update_fn(
             agent_id=player_id,
@@ -461,12 +469,11 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
     def critic_network(self):
         return self._critic_network
 
-    @property
-    def metrics(self):
-        if len(self._metrics) > 0:
-            return jax.tree_util.tree_map(lambda *xs: np.mean(np.array(xs)), *self._metrics)
-        else:
+    def metrics(self, return_last_only: bool = True):
+        if len(self._metrics) == 0:
             return {}
+        metrics = self._metrics[-1] if return_last_only else self._metrics
+        return metrics
 
     def update_params(self, state: TrainState, player_id: int) -> None:
         """

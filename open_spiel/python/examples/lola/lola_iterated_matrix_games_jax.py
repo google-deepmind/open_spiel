@@ -1,3 +1,5 @@
+import itertools
+import typing
 import warnings
 from typing import List, Tuple
 
@@ -11,8 +13,9 @@ from absl import app
 from absl import flags
 from aim import Run
 
-from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemma
-from open_spiel.python.jax.lola import LolaPolicyGradientAgent
+from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemma, IteratedMatchingPennies
+from open_spiel.python.jax.lola_jax import LolaPolicyGradientAgent
+from open_spiel.python.jax.policy_gradient import PolicyGradient
 from open_spiel.python.rl_environment import Environment, TimeStep
 
 warnings.simplefilter('ignore', FutureWarning)
@@ -23,7 +26,7 @@ on iterated matrix games. Hyperparameters are taken from the paper and https://g
 """
 FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", 42, "Random seed.")
-flags.DEFINE_string("game", "matrix_pd", "Name of the game.")
+flags.DEFINE_string("game", "ipd", "Name of the game.")
 flags.DEFINE_integer("epochs", 200, "Number of training iterations.")
 flags.DEFINE_integer("batch_size", 4096, "Number of episodes in a batch.")
 flags.DEFINE_integer("critic_mini_batches", 1, "Number of minibatches for critic.")
@@ -31,7 +34,7 @@ flags.DEFINE_integer("game_iterations", 150, "Number of iterated plays.")
 flags.DEFINE_float("policy_lr", 0.3, "Policy learning rate.")
 flags.DEFINE_float("opp_policy_lr", 0.3, "Policy learning rate.")
 flags.DEFINE_float("critic_lr", 0.9, "Critic learning rate.")
-flags.DEFINE_string("correction_type", 'lola', "Either 'lola', 'dice' or None.")
+flags.DEFINE_string("correction_type", 'none', "Either 'lola', 'dice' or 'none'.")
 flags.DEFINE_integer("n_lookaheads", 1, "Number of lookaheads for LOLA correction.")
 flags.DEFINE_float("correction_max_grad_norm", None, "Maximum gradient norm of LOLA correction.")
 flags.DEFINE_float("discount", 0.96, "Discount factor.")
@@ -41,22 +44,28 @@ flags.DEFINE_bool("use_jit", True, "If true, JAX jit compilation will be enabled
 flags.DEFINE_bool("use_opponent_modelling", False, "If false, ground truth opponent weights are used.")
 flags.DEFINE_integer("opp_policy_mini_batches", 8, "Number of minibatches for opponent policy.")
 
+def get_action_probs(agent: LolaPolicyGradientAgent, game: str) -> List[typing.Dict[str, typing.Any]]:
+    actions = ['C', 'D'] if game == 'ipd' else ['H', 'T']
+    states = [''.join(s) for s in itertools.product(actions, repeat=2)] + ['s0']
+    params = agent.train_state.policy_params[agent.player_id]
+    action_probs = []
+    for i, s in enumerate(states):
+        state = np.eye(len(states))[i]
+        prob = agent.policy_network.apply(params, state).prob(0)
+        action = actions[0]
+        action_probs.append(dict(prob=prob.item(), name=f'P({action}|{s})'))
+    return action_probs
 def log_epoch_data(run: Run, epoch: int, agents: List[LolaPolicyGradientAgent], eval_batch):
-    def get_action_probs(agent: LolaPolicyGradientAgent) -> List[str]:
-        states = ['s0', 'CC', 'CD', 'DC', 'DD']
-        prob_strings = []
-        params = agent.train_state.policy_params[agent.player_id]
-        for i, s in enumerate(states):
-            state = np.eye(len(states))[i]
-            prob = agent.policy_network.apply(params, state).prob(0)
-            prob_strings.append(f'P(C|{s})={prob:.3f}')
-            run.track(prob.item(), name=f'P(C|{s})', context={'agent': agent.player_id})
-        return prob_strings
 
     for agent in agents:
         avg_step_reward = np.mean([ts.rewards[agent.player_id] for ts in eval_batch])
-        probs = get_action_probs(agent)
-        probs = ', '.join(probs)
+        probs = get_action_probs(agent, game=FLAGS.game)
+        for info in probs:
+            run.track(info['prob'], name=info['name'], context={'agent': agent.player_id})
+        probs = ', '.join([f'{info["name"]}: {info["prob"]:.2f}' for info in probs])
+        metrics = agent.metrics()
+        for k, v in metrics.items():
+            run.track(v.item(), name=k, context={'agent': agent.player_id})
         run.track(avg_step_reward, name='avg_step_reward', context={'agent': agent.player_id})
         print(f'[epoch {epoch}] Agent {agent.player_id}: {avg_step_reward:.2f} | {probs}')
 
@@ -101,7 +110,7 @@ def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
         critic_learning_rate=FLAGS.critic_lr,
         policy_update_interval=FLAGS.policy_update_interval,
         discount=FLAGS.discount,
-        critic_discount=0, # Predict only the immediate reward (iterated matrix games are not markovian)
+        critic_discount=0, # Predict only the immediate reward (only for iterated matrix games)
         correction_type=FLAGS.correction_type,
         clip_grad_norm=FLAGS.correction_max_grad_norm,
         use_jit=FLAGS.use_jit,
@@ -122,8 +131,11 @@ def make_agent_networks(num_states: int, num_actions: int) -> Tuple[hk.Transform
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))
 
-def make_env(iterations: int, batch_size: int):
-    return IteratedPrisonersDilemma(iterations=iterations, batch_size=batch_size)
+def make_env(game: str, iterations: int, batch_size: int):
+    if game == 'ipd':
+        return IteratedPrisonersDilemma(iterations=iterations, batch_size=batch_size)
+    elif game == 'imp':
+        return IteratedMatchingPennies(iterations=iterations, batch_size=batch_size)
 
 def setup_agents(env: Environment, rng: hk.PRNGSequence) -> List[LolaPolicyGradientAgent]:
     agents = []
@@ -142,7 +154,7 @@ def update_weights(agents: List[LolaPolicyGradientAgent]):
 
 
 def main(_):
-    run = Run(experiment='opponent_shaping')
+    run = Run(experiment=f'opponent_shaping_{FLAGS.game}_{FLAGS.correction_type}')
     run["hparams"] = {
         "seed": FLAGS.seed,
         "batch_size": FLAGS.batch_size,
@@ -159,8 +171,9 @@ def main(_):
         "use_jit": FLAGS.use_jit
     }
 
+
     rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
-    env = make_env(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size)
+    env = make_env(iterations=FLAGS.game_iterations, batch_size=FLAGS.batch_size, game=FLAGS.game)
     agents = setup_agents(env=env, rng=rng)
 
     if not FLAGS.use_opponent_modelling:

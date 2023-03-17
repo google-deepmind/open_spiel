@@ -34,7 +34,7 @@ class IteratedMatrixGame(Environment):
             num_actions=tuple([self._payoff_matrix.shape[p] for p in range(self._num_players)]),
             min=tuple([0 for p in range(self._num_players)]),
             max=tuple([self._payoff_matrix.shape[p]-1 for p in range(self._num_players)]),
-            dtype=int,
+            dtype=int
         )
 
     def step(self, actions: np.ndarray):
@@ -91,6 +91,14 @@ class IteratedMatrixGame(Environment):
 def IteratedPrisonersDilemma(iterations: int, batch_size=1):
     return IteratedMatrixGame(
         payoff_matrix=np.array([[[-1,-1], [-3,0]], [[0,-3], [-2,-2]]]),
+        iterations=iterations,
+        batch_size=batch_size,
+        include_remaining_iterations=False
+    )
+
+def IteratedMatchingPennies(iterations: int, batch_size=1):
+    return IteratedMatrixGame(
+        payoff_matrix=np.array([[[1,-1], [-1,1]], [[-1, 1], [1, -1]]]),
         iterations=iterations,
         batch_size=batch_size,
         include_remaining_iterations=False
