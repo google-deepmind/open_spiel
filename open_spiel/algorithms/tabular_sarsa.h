@@ -77,6 +77,7 @@ class TabularSarsaSolver {
   double lambda_;
   std::mt19937 rng_;
   absl::flat_hash_map<std::pair<std::string, Action>, double> values_;
+  absl::flat_hash_map<std::pair<std::string, Action>, double> eligibility_traces_;
 };
 
 }  // namespace algorithms
