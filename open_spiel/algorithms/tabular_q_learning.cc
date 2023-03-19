@@ -162,7 +162,6 @@ void TabularQLearningSolver::RunIteration() {
     double new_q_value = reward + discount_factor_ * next_q_value;
 
     double prev_q_val = values_[{key, curr_action}];
-    lambda_ = 0.1;
     if (lambda_ == 0) {
       // If lambda_ is equal to zero run sarsa as usual. It's not necessary
       // to update eligibility traces.
