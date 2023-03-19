@@ -179,9 +179,9 @@ void TabularSarsaSolver::RunIteration() {
         action = q_cell.first.second;
         prev_q_val_tmp = q_cell.second;
 
-        values_[{state, action}] +=
-            learning_rate_ *
-            (new_q_value - prev_q_val) * eligibility_traces_[{state, action}];
+        values_[{state, action}] += learning_rate_ *
+                                    (new_q_value - prev_q_val) *
+                                    eligibility_traces_[{state, action}];
         eligibility_traces_[{state, action}] *= discount_factor_ * lambda_;
       }
     }

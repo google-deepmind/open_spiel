@@ -178,9 +178,9 @@ void TabularQLearningSolver::RunIteration() {
         action = q_cell.first.second;
         prev_q_val_tmp = q_cell.second;
 
-        values_[{state, action}] +=
-            learning_rate_ *
-            (new_q_value - prev_q_val) * eligibility_traces_[{state, action}];
+        values_[{state, action}] += learning_rate_ *
+                                    (new_q_value - prev_q_val) *
+                                    eligibility_traces_[{state, action}];
         if (random_action_) {
           eligibility_traces_[{state, action}] = 0;
         } else {
