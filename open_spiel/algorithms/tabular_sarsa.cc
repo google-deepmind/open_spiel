@@ -103,8 +103,8 @@ TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game,
       learning_rate_(learning_rate),
       discount_factor_(discount_factor),
       lambda_(lambda) {
-  // Only support lambda=0 for now.
-  SPIEL_CHECK_EQ(lambda_, 0);
+  SPIEL_CHECK_LE(lambda_, 1);
+  SPIEL_CHECK_GE(lambda_, 0);
 
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);

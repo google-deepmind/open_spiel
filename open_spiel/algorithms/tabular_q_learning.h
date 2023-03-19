@@ -34,7 +34,13 @@ namespace algorithms {
 //
 // Based on the implementation in Sutton and Barto, Intro to RL. Second Edition,
 // 2018. Section 6.5.
-// Note: current implementation only supports full bootstrapping (lambda = 0).
+//
+// Includes implementation of Watkins’s Q(lambda) which can be found in
+// Sutton and Barto, Intro to RL. Second Edition, 2018. Section 12.10.
+// Eligibility traces are implemented with the "accumulate"
+// method (+1 at each iteration) instead of "replace" implementation
+// (doesn't sum trace values). Parameter lambda_ determines the level
+// of bootstraping.
 
 class TabularQLearningSolver {
   static inline constexpr double kDefaultDepthLimit = -1;
@@ -78,7 +84,10 @@ class TabularQLearningSolver {
   double discount_factor_;
   double lambda_;
   std::mt19937 rng_;
+  bool random_action_;
   absl::flat_hash_map<std::pair<std::string, Action>, double> values_;
+  absl::flat_hash_map<std::pair<std::string, Action>,
+      double> eligibility_traces_;
 };
 
 }  // namespace algorithms

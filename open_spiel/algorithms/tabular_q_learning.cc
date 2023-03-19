@@ -63,9 +63,11 @@ Action TabularQLearningSolver::SampleActionFromEpsilonGreedyPolicy(
 
   if (absl::Uniform(rng_, 0.0, 1.0) < epsilon_) {
     // Choose a random action
+    random_action_ = true;
     return legal_actions[absl::Uniform<int>(rng_, 0, legal_actions.size())];
   }
   // Choose the best action
+  random_action_ = false;
   return GetBestAction(state, min_utility);
 }
 
@@ -84,8 +86,9 @@ TabularQLearningSolver::TabularQLearningSolver(std::shared_ptr<const Game> game)
       learning_rate_(kDefaultLearningRate),
       discount_factor_(kDefaultDiscountFactor),
       lambda_(kDefaultLambda) {
-  // Only support lambda=0 for now.
-  SPIEL_CHECK_EQ(lambda_, 0);
+  SPIEL_CHECK_LE(lambda_, 1);
+  SPIEL_CHECK_GE(lambda_, 0);
+  random_action_ = false;
 
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
@@ -109,8 +112,9 @@ TabularQLearningSolver::TabularQLearningSolver(
       learning_rate_(learning_rate),
       discount_factor_(discount_factor),
       lambda_(lambda) {
-  // Only support lambda=0 for now.
-  SPIEL_CHECK_EQ(lambda_, 0);
+  SPIEL_CHECK_LE(lambda_, 1);
+  SPIEL_CHECK_GE(lambda_, 0);
+  random_action_ = false;
 
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
@@ -158,7 +162,33 @@ void TabularQLearningSolver::RunIteration() {
     double new_q_value = reward + discount_factor_ * next_q_value;
 
     double prev_q_val = values_[{key, curr_action}];
-    values_[{key, curr_action}] += learning_rate_ * (new_q_value - prev_q_val);
+    lambda_ = 0.1;
+    if (lambda_ == 0) {
+      // If lambda_ is equal to zero run sarsa as usual. It's not necessary
+      // to update eligibility traces.
+      values_[{key, curr_action}] +=
+          learning_rate_ * (new_q_value - prev_q_val);
+    } else {
+      eligibility_traces_[{key, curr_action}] += 1;
+      std::string state;
+      Action action;
+      double prev_q_val_tmp;
+
+      for (auto q_cell : values_) {
+        state = q_cell.first.first;
+        action = q_cell.first.second;
+        prev_q_val_tmp = q_cell.second;
+
+        values_[{state, action}] +=
+            learning_rate_ *
+            (new_q_value - prev_q_val) * eligibility_traces_[{state, action}];
+        if (random_action_) {
+          eligibility_traces_[{state, action}] = 0;
+        } else {
+          eligibility_traces_[{state, action}] *= discount_factor_ * lambda_;
+        }
+      }
+    }
 
     curr_state = std::move(next_state);
   }
