@@ -234,7 +234,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
   const std::string handReaches =
       game->GetParameters().at("handReaches").string_value();
   if (!handReaches.empty()) {
-    std::stringstream iss( handReaches );
+    std::stringstream iss(handReaches);
     double number;
     while ( iss >> number ) {
       handReaches_.push_back(number);
@@ -755,6 +755,9 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     }
     return legal_actions;
   } else {
+    if (acpc_state_.IsFinished()) {
+      return legal_actions;
+    }
     if (acpc_state_.IsValidAction(
             acpc_cpp::ACPCState::ACPCActionType::ACPC_FOLD, 0)) {
       legal_actions.push_back(kFold);
@@ -972,8 +975,6 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
       potSize_(ParameterValue<int>("potSize")),
       boardCards_(ParameterValue<std::string>("boardCards")),
       handReaches_(ParameterValue<std::string>("handReaches")) {
-  max_game_length_ = MaxGameLength();
-  SPIEL_CHECK_TRUE(max_game_length_.has_value());
   std::string betting_abstraction =
       ParameterValue<std::string>("bettingAbstraction");
   if (betting_abstraction == "fc") {
@@ -988,6 +989,8 @@ UniversalPokerGame::UniversalPokerGame(const GameParameters &params)
     SpielFatalError(absl::StrFormat("bettingAbstraction: %s not supported.",
                                     betting_abstraction));
   }
+  max_game_length_ = MaxGameLength();
+  SPIEL_CHECK_TRUE(max_game_length_.has_value());
 }
 
 std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
@@ -1079,10 +1082,17 @@ int UniversalPokerGame::MaxGameLength() const {
   length += acpc_game_.GetTotalNbBoardCards() +
             acpc_game_.GetNbHoleCardsRequired() * acpc_game_.GetNbPlayers();
 
+  // The longest game (with a single betting round, for simplicity) consists of:
+  // n-1 players checking,
+  // 1 player betting, n-2 players calling,
+  // 1 player raising, n-2 players calling,
+  // etc...,
+  // 1 player raising, n-1 players calling
+
   // Check Actions
   length += (NumPlayers() * acpc_game_.NumRounds());
 
-  // Bet Actions
+  // Bet/Raise/Call Actions
   double maxStack = 0;
   double maxBlind = 0;
   for (uint32_t p = 0; p < NumPlayers(); p++) {
@@ -1092,10 +1102,28 @@ int UniversalPokerGame::MaxGameLength() const {
         acpc_game_.BlindSize(p) > maxBlind ? acpc_game_.BlindSize(p) : maxBlind;
   }
 
-  while (maxStack > maxBlind) {
-    maxStack /= 2.0;         // You have always to bet the pot size
-    length += NumPlayers();  // Each player has to react
+  int max_num_raises = 0;
+  if (betting_abstraction_ == BettingAbstraction::kFC) {
+    // no raises
+  } else if (betting_abstraction_ == BettingAbstraction::kFCPA) {
+    double pot_size = maxBlind * NumPlayers();
+    while (pot_size / NumPlayers() < maxStack) {
+      max_num_raises++;
+      pot_size += pot_size * NumPlayers();
+    }
+  } else if (betting_abstraction_ == BettingAbstraction::kFCHPA) {
+    double pot_size = maxBlind * NumPlayers();
+    while (pot_size / NumPlayers() < maxStack) {
+      max_num_raises++;
+      pot_size += NumPlayers() * pot_size/2;
+    }
+  } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
+    max_num_raises = (maxStack + maxBlind - 1)/maxBlind;  // ceil divide
+  } else {
+    SpielFatalError("Unknown Betting Abstraction");
   }
+  // each bet/raise is followed by n-2 calls, for a total of n-1 actions:
+  length += max_num_raises * (NumPlayers() - 1);
   return length;
 }
 

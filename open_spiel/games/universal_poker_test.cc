@@ -17,6 +17,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <set>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -436,6 +437,65 @@ void FullNLBettingTest3() {
       ":2c2d|2h2s|3c3d/3h3s4c/4d/4h"));
 }
 
+// Check that a max length game works and infostate tensors are all unique.
+void FullNLBettingTest4() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+                      "numPlayers=2,"
+                      "numRounds=2,"
+                      "blind=100 50,"
+                      "numSuits=1,"
+                      "numRanks=4,"
+                      "numHoleCards=1,"
+                      "numBoardCards=0 1,"
+                      "stack=2000 2000,"
+                      "bettingAbstraction=fullgame)");
+  std::set<std::vector<float>> information_state_tensor_set;
+  std::vector<float> tensor;
+  std::unique_ptr<State> state = game->NewInitialState();
+  SPIEL_CHECK_EQ(game->NumDistinctActions(), 2001);
+  // deal cards
+  while (state->IsChanceNode()) state->ApplyAction(state->LegalActions()[0]);
+  // check the infostate tensor and add to set
+  tensor = state->InformationStateTensor();
+  SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
+  information_state_tensor_set.insert(tensor);
+  state->ApplyAction(1);    // check
+  // check the infostate tensor and add to set
+  tensor = state->InformationStateTensor();
+  SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
+  information_state_tensor_set.insert(tensor);
+  state->ApplyAction(200);  // min bet
+  // check the infostate tensor and add to set
+  tensor = state->InformationStateTensor();
+  SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
+  information_state_tensor_set.insert(tensor);
+  state->ApplyAction(1);    // call
+  state->ApplyAction(state->LegalActions()[0]);  // deal flop
+  // check the infostate tensor and add to set
+  tensor = state->InformationStateTensor();
+  SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
+  information_state_tensor_set.insert(tensor);
+  state->ApplyAction(1);    // check
+  // check the infostate tensor and add to set
+  tensor = state->InformationStateTensor();
+  SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
+  information_state_tensor_set.insert(tensor);
+  for (int i=300; i < 2000; i+=100) {
+    state->ApplyAction(i);  // min bet/raise
+    // check the infostate tensor and add to set
+    tensor = state->InformationStateTensor();
+    SPIEL_CHECK_FALSE(information_state_tensor_set.count(tensor));
+    information_state_tensor_set.insert(tensor);
+  }
+  state->ApplyAction(1);    // call
+  SPIEL_CHECK_EQ(state->LegalActions().size(), 0);
+  std::cout << state->ToString() << std::endl;
+  SPIEL_CHECK_TRUE(absl::StrContains(state->ToString(),
+      "ACPC State: STATE:0:cr200c/cr300r400r500r600r700r800r900r1000r1100"
+      "r1200r1300r1400r1500r1600r1700r1800r1900c:2c|3c/4c"));
+}
+
 void ChanceDealRegressionTest() {
   std::shared_ptr<const Game> game = LoadGame(
       "universal_poker(betting=nolimit,"
@@ -714,6 +774,7 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::FullNLBettingTest1();
   open_spiel::universal_poker::FullNLBettingTest2();
   open_spiel::universal_poker::FullNLBettingTest3();
+  open_spiel::universal_poker::FullNLBettingTest4();
   open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
   open_spiel::universal_poker::CanConvertActionsCorrectly();
   open_spiel::universal_poker::TestFCHPA();
