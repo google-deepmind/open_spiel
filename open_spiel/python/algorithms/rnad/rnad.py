@@ -127,7 +127,7 @@ class EntropySchedule:
     alpha = jnp.minimum(
         (2.0 * (learner_step - iteration_start)) / iteration_size, 1.0)
 
-    return alpha, update_target_net
+    return alpha, update_target_net  # pytype: disable=bad-return-type  # jax-types
 
 
 @chex.dataclass(frozen=True)
