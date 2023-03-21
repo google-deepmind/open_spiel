@@ -194,13 +194,7 @@ class BlockDominoesState(pyspiel.State):
       hand_to_add_tile.append(tile)
 
       if not len(self.hands[0]) == len(self.hands[1]) == _HAND_SIZE:
-        return  # another tile to deal
-      # check which hand is playing first, and assigned it to player 0
-      hand0_starting_value = min(map(_DECK.index, self.hands[0]))
-      hand1_starting_value = min(map(_DECK.index, self.hands[1]))
-
-      if hand0_starting_value > hand1_starting_value:
-        self.hands[0], self.hands[1] = self.hands[1], self.hands[0]
+        return  # another tiles to deal
 
       for hand in self.hands:
         hand.sort()
