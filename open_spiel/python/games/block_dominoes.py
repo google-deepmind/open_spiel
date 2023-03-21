@@ -18,36 +18,15 @@ https://en.wikipedia.org/wiki/Dominoes#Blocking_game
 """
 
 import copy
+import itertools
 
 import numpy as np
 
 import pyspiel
 
 _NUM_PLAYERS = 2
-
-# The first player to play is the one holding the highest rank tile.
-# The rank of tiles is the following:
-#   1. Highest double.
-#   2. If none of the players hold a double, then highest weight.
-#   3. If the highest weighted tile of both players has the same weight
-#      then the highest single edge of the highest weighted tile.
-
-# full deck sorted by rank:
-_DECK = [(6., 6.), (5., 5.), (4., 4.), (3., 3.), (2., 2.), (1., 1.), (0., 0.),
-         (5., 6.),
-         (4., 6.),
-         (3., 6.), (4., 5.),
-         (2., 6.), (3., 5.),
-         (1., 6.), (2., 5.), (3., 4.),
-         (0., 6.), (1., 5.), (2., 4.),
-         (0., 5.), (1., 4.), (2., 3.),
-         (0., 4.), (1., 3.),
-         (0., 3.), (1., 2.),
-         (0., 2.),
-         (0., 1.)]
-
 _PIPS = [0., 1., 2., 3., 4., 5., 6.]
-
+_DECK = list(itertools.combinations_with_replacement(_PIPS, 2))
 _EDGES = [None, 0., 1., 2., 3., 4., 5., 6.]
 
 
@@ -71,7 +50,7 @@ def create_possible_actions():
   for player in range(_NUM_PLAYERS):
     for tile in _DECK:
       for edge in _EDGES:
-        if edge in tile or edge is None:  # can we play t on p?
+        if edge in tile or edge is None:  # can we play tile on edge?
           actions.append(Action(player, tile, edge))
   return actions
 
