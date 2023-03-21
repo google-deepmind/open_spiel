@@ -64,8 +64,7 @@ class DominoBlockTest(absltest.TestCase):
     self.deal_hands(state, [hand0, hand1])
 
     self.apply_action(state, block_dominoes.Action(0, (6., 6.), None))
-    # Both players don't hold tile with 6, therefore both blocked and the game hand
-
+    # Both players don't hold tile with 6, therefore both blocked and the game end
     self.assertTrue(state.is_terminal())
     self.assertEqual(state.returns()[0], -45)
     self.assertEqual(state.returns()[1], 45)
