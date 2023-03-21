@@ -13,14 +13,14 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Python Domino Block."""
+"""Tests for Python Block Dominoes."""
 
 from absl.testing import absltest
 from open_spiel.python.algorithms.get_all_states import get_all_states
 import pyspiel
 import block_dominoes
 
-class DominoBlockTest(absltest.TestCase):
+class DominoesBlockTest(absltest.TestCase):
 
   def test_game_from_cc(self):
     """Runs our standard game tests, checking API consistency."""

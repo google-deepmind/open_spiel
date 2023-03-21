@@ -14,7 +14,7 @@
 
 # Lint as python3
 """Block Dominoes implemented in Python.
-https://www.dominorules.com/block
+https://en.wikipedia.org/wiki/Dominoes#Blocking_game
 """
 
 import copy
