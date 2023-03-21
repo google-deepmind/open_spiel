@@ -102,7 +102,7 @@ EXPECTED_GAMES = frozenset([
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",
-    "python_domino",
+    "python_block_dominoes",
     "python_dynamic_routing",
     "python_iterated_prisoners_dilemma",
     "python_mfg_crowd_modelling",
