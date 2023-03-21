@@ -22,6 +22,7 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/bots/uci/uci_bot.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -286,6 +287,11 @@ void init_pyspiel_bots(py::module& m) {
         return MakePolicyBot(*game, player_id, seed, policy);
       },
       "A bot that samples from a policy.");
+
+  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
+      py::arg("move_time"), py::arg("ponder"), py::arg("options"),
+      "Bot that can play chess using UCI chess engine.");
+
 
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
   m.attr("ROSHAMBO_NUM_THROWS") = py::int_(open_spiel::roshambo::kNumThrows);
