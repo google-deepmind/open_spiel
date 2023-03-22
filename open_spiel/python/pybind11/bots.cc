@@ -22,6 +22,7 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 #include "open_spiel/bots/uci/uci_bot.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
@@ -303,5 +304,14 @@ void init_pyspiel_bots(py::module& m) {
         py::arg("player_id"), py::arg("bot_name"),
         py::arg("num_throws") = open_spiel::roshambo::kNumThrows);
 #endif
+
+  m.def(
+      "make_simple_gin_rummy_bot",
+      [](const GameParameters& params,
+         int player_id) -> std::unique_ptr<open_spiel::Bot> {
+        return std::make_unique<gin_rummy::SimpleGinRummyBot>(params,
+                                                              player_id);
+      },
+      py::arg("params"), py::arg("player_id"));
 }
 }  // namespace open_spiel
