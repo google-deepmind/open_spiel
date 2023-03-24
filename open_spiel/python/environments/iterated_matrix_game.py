@@ -103,3 +103,10 @@ def IteratedMatchingPennies(iterations: int, batch_size=1):
         batch_size=batch_size,
         include_remaining_iterations=False
     )
+
+if __name__ == '__main__':
+    env= IteratedPrisonersDilemma(iterations=10, batch_size=4)
+    ts = env.reset()
+    while not ts.last():
+        ts = env.step(np.random.randint(0, 2, size=(4, 2)))
+        print(ts)

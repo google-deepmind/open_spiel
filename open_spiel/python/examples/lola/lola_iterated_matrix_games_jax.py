@@ -16,7 +16,7 @@ import wandb
 
 
 from open_spiel.python.environments.iterated_matrix_game import IteratedPrisonersDilemma, IteratedMatchingPennies
-from open_spiel.python.jax.lola_jax import LolaPolicyGradientAgent
+from open_spiel.python.jax.opponent_shaping import OpponentShapingAgent
 from open_spiel.python.rl_environment import Environment, TimeStep
 
 warnings.simplefilter('ignore', FutureWarning)
@@ -46,8 +46,9 @@ flags.DEFINE_bool("use_jit", False, "If true, JAX jit compilation will be enable
 flags.DEFINE_bool("use_opponent_modelling", True, "If false, ground truth opponent weights are used.")
 flags.DEFINE_integer("opp_policy_mini_batches", 8, "Number of minibatches for opponent policy.")
 flags.DEFINE_float("opponent_model_learning_rate", 0.3, "Learning rate for opponent model.")
+flags.DEFINE_bool("debug", False, "If true, debug mode is enabled.")
 
-def get_action_probs(agent: LolaPolicyGradientAgent, game: str) -> List[typing.Dict[str, typing.Any]]:
+def get_action_probs(agent: OpponentShapingAgent, game: str) -> List[typing.Dict[str, typing.Any]]:
     actions = ['C', 'D'] if game == 'ipd' else ['H', 'T']
     states = ['s0'] + [''.join(s) for s in itertools.product(actions, repeat=2)]
     params = agent.train_state.policy_params[agent.player_id]
@@ -58,7 +59,7 @@ def get_action_probs(agent: LolaPolicyGradientAgent, game: str) -> List[typing.D
         action = actions[0]
         action_probs.append(dict(prob=prob.item(), name=f'P({action}|{s})'))
     return action_probs
-def log_epoch_data(epoch: int, agents: List[LolaPolicyGradientAgent], eval_batch):
+def log_epoch_data(epoch: int, agents: List[OpponentShapingAgent], eval_batch):
     logs = {}
     for agent in agents:
         avg_step_reward = np.mean([ts.rewards[agent.player_id] for ts in eval_batch])
@@ -75,20 +76,19 @@ def log_epoch_data(epoch: int, agents: List[LolaPolicyGradientAgent], eval_batch
     wandb.log(logs)
 
 
-def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], eval: bool):
-    def get_values(time_step: TimeStep, agent: LolaPolicyGradientAgent) -> jnp.ndarray:
-        v_fn = agent.get_value_fn()
-        return jax.vmap(v_fn)(time_step.observations["info_state"][agent.player_id])
-
+def collect_batch(env: Environment, agents: List[OpponentShapingAgent], eval: bool):
     episode = []
     time_step = env.reset()
     episode.append(time_step)
     while not time_step.last():
-        values = np.stack([get_values(time_step, agent) for agent in agents], axis=0)
-        time_step.observations["values"] = values
-        actions = [agent.step(time_step, is_evaluation=eval).action for agent in agents]
+        actions = []
+        for agent in agents:
+            action, _ = agent.step(time_step, is_evaluation=eval)
+            if action is not None:
+                action = action.squeeze()
+            actions.append(action)
         time_step = env.step(np.stack(actions, axis=1))
-        time_step.observations["actions"] = np.stack(actions, axis=0)
+        time_step.observations["actions"] = actions
         episode.append(time_step)
 
     for agent in agents:
@@ -99,7 +99,7 @@ def collect_batch(env: Environment, agents: List[LolaPolicyGradientAgent], eval:
 def make_agent(key: jax.random.PRNGKey, player_id: int, env: Environment,
                networks: Tuple[hk.Transformed, hk.Transformed]):
     policy_network, critic_network = networks
-    return LolaPolicyGradientAgent(
+    return OpponentShapingAgent(
         player_id=player_id,
         opponent_ids=[1 - player_id],
         seed=key,
@@ -129,6 +129,7 @@ def make_agent_networks(num_states: int, num_actions: int) -> Tuple[hk.Transform
     def policy(obs):
         theta = hk.get_parameter('theta', init=haiku.initializers.Constant(0), shape=(num_states, num_actions))
         logits = jnp.select(obs, theta)
+        logits = jnp.nan_to_num(logits)
         return distrax.Categorical(logits=logits)
 
     def value_fn(obs):
@@ -143,7 +144,7 @@ def make_env(game: str, iterations: int, batch_size: int):
     elif game == 'imp':
         return IteratedMatchingPennies(iterations=iterations, batch_size=batch_size)
 
-def setup_agents(env: Environment, rng: hk.PRNGSequence) -> List[LolaPolicyGradientAgent]:
+def setup_agents(env: Environment, rng: hk.PRNGSequence) -> List[OpponentShapingAgent]:
     agents = []
     num_actions = env.action_spec()["num_actions"]
     info_state_shape = env.observation_spec()["info_state"]
@@ -153,7 +154,7 @@ def setup_agents(env: Environment, rng: hk.PRNGSequence) -> List[LolaPolicyGradi
         agents.append(agent)
     return agents
 
-def update_weights(agents: List[LolaPolicyGradientAgent]):
+def update_weights(agents: List[OpponentShapingAgent]):
     for agent in agents:
         for opp in filter(lambda a: a.player_id != agent.player_id, agents):
             agent.update_params(state=opp.train_state, player_id=opp.player_id)
@@ -184,7 +185,8 @@ def main(_):
             'use_opponent_modelling': FLAGS.use_opponent_modelling,
             'opp_policy_mini_batches': FLAGS.opp_policy_mini_batches,
             'opponent_model_learning_rate': FLAGS.opponent_model_learning_rate
-        }
+        },
+        mode='disabled' if FLAGS.debug else 'online'
     )
 
     rng = hk.PRNGSequence(key_or_seed=FLAGS.seed)
