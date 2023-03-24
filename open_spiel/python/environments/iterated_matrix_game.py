@@ -24,7 +24,7 @@ class IteratedMatrixGame(Environment):
 
     def observation_spec(self):
         return dict(
-            info_state=tuple([np.sum(self._payoff_matrix.shape[:-1]) + 1 + (1 if self._include_remaining_iterations else 0)] for _ in range(self._num_players)),
+            info_state=tuple([np.prod(self._payoff_matrix.shape[:-1]) + (1 if self._include_remaining_iterations else 0)] for _ in range(self._num_players)),
             legal_actions=tuple([self._payoff_matrix.shape[p] for p in range(self._num_players)]),
             current_player=()
         )
