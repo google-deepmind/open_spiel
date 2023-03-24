@@ -118,18 +118,25 @@ def get_dice_update_fn(
     @partial(jax.vmap, in_axes=(None, 0, 0))
     def get_action(params, s, rng_key):
         pi = policy_network.apply(params, s)
-        return pi.sample(seed=rng_key)
+        action = pi.sample(seed=rng_key)
+        return action
 
     def rollout(params, other_params):
         states, rewards, values, actions = [], [], [], []
         step = env.reset()
+        batch_size = step.observations['batch_size'] if 'batch_size' in step.observations else 1
         while not step.last():
-            s1, s2 = step.observations['info_state'][0], step.observations['info_state'][1]
-            a1 = get_action(params, s1, jax.random.split(next(rng), num=step.observations['batch_size']))
-            a2 = get_action(other_params, s2, jax.random.split(next(rng), num=step.observations['batch_size']))
+            obs = step.observations
+            s1, s2 = jnp.array(obs['info_state'][0]), jnp.array(obs['info_state'][1])
+            if batch_size == 1:
+                s1, s2 = s1[None, :], s2[None, :]
+            a1 = get_action(params, s1, jax.random.split(next(rng), num=batch_size))
+            a2 = get_action(other_params, s2, jax.random.split(next(rng), num=batch_size))
             a = jnp.stack([a1, a2], axis=1)
-            step = env.step(a)
-            r1, r2 = step.rewards[0], step.rewards[1]
+            step = env.step(a.squeeze())
+            r1, r2 = jnp.array(step.rewards[0]), jnp.array(step.rewards[1])
+            if batch_size == 1:
+                r1, r2 = r1[None], r2[None]
             actions.append(a.T)
             states.append(jnp.stack([s1, s2], axis=0))
             rewards.append(jnp.stack([r1, r2], axis=0))
@@ -173,6 +180,7 @@ def get_dice_update_fn(
                     rewards=trajectories['rewards'][0],
                     values=critic_network.apply(train_state.critic_params[opp_id], trajectories['states'][0])
                 )
+                # Update the other player's policy:
                 other_theta = jax.tree_util.tree_map(lambda param, grad: param - opp_pi_lr * grad, other_theta, other_grad)
 
             trajectories = rollout(params, other_theta)
@@ -227,7 +235,8 @@ def get_lola_update_fn(
         policy_network: hk.Transformed,
         optimizer: optax.TransformUpdateFn,
         pi_lr: float,
-        gamma: float = 0.99
+        gamma: float = 0.99,
+        lola_weight: float = 1.0
 ) -> UpdateFn:
     def flat_params(params):
         flat_param_dict = dict([(agent_id, jax.flatten_util.ravel_pytree(p)) for agent_id, p in params.items()])
@@ -294,7 +303,7 @@ def get_lola_update_fn(
         """
         loss, policy_grads = jax.value_and_grad(policy_loss)(train_state.policy_params[agent_id], agent_id, batch)
         correction = lola_correction(train_state, batch)
-        policy_grads = jax.tree_util.tree_map(lambda grad, corr: grad - corr, policy_grads, correction)
+        policy_grads = jax.tree_util.tree_map(lambda grad, corr: grad - lola_weight * corr, policy_grads, correction)
         updates, opt_state = optimizer(policy_grads, train_state.policy_opt_states[agent_id])
         policy_params = optax.apply_updates(train_state.policy_params[agent_id], updates)
         train_state = TrainState(
@@ -339,7 +348,7 @@ def get_opponent_update_fn(agent_id: int, policy_network: hk.Transformed,
     return update
 
 
-class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
+class OpponentShapingAgent(rl_agent.AbstractAgent):
 
     def __init__(self,
                  player_id: int,
@@ -359,7 +368,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                  critic_discount: float = 0.99,
                  seed: jax.random.PRNGKey = 42,
                  fit_opponent_model=True,
-                 correction_type='lola',
+                 correction_type: str = 'lola',
                  use_jit: bool = False,
                  n_lookaheads: int = 1,
                  num_critic_mini_batches: int = 1,
@@ -411,14 +420,20 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                 n_lookaheads=n_lookaheads,
                 env=env
             )
-        else:
+        elif correction_type == 'lola' or correction_type == 'none':
+            # if correction_type is none, use standard policy gradient without corrections
+            lola_weight = 1.0 if correction_type == 'lola' else 0.0
             update_fn = get_lola_update_fn(
                 agent_id=player_id,
                 policy_network=policy,
                 pi_lr=pi_learning_rate,
-                optimizer=self._policy_opt.update
+                optimizer=self._policy_opt.update,
+                lola_weight=lola_weight,
             )
             policy_update_fn = jax.jit(update_fn) if use_jit else update_fn
+        else:
+            raise ValueError(f'Unknown correction type: {correction_type}')
+
 
         critic_update_fn = get_critic_update_fn(
             agent_id=player_id,
@@ -461,12 +476,11 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
     def critic_network(self):
         return self._critic_network
 
-    @property
-    def metrics(self):
-        if len(self._metrics) > 0:
-            return jax.tree_util.tree_map(lambda *xs: np.mean(np.array(xs)), *self._metrics)
-        else:
+    def metrics(self, return_last_only: bool = True):
+        if len(self._metrics) == 0:
             return {}
+        metrics = self._metrics[-1] if return_last_only else self._metrics
+        return metrics
 
     def update_params(self, state: TrainState, player_id: int) -> None:
         """
@@ -541,14 +555,21 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         """
         do_step = time_step.is_simultaneous_move() or self.player_id == time_step.current_player()
         action, probs = None, []
-        policy = vmap(self._current_policy, in_axes=(0, 0, None))
+        batch_policy = vmap(self._current_policy, in_axes=(0, 0, None))
         if not time_step.last() and do_step:
             info_state = time_step.observations["info_state"][self.player_id]
             legal_actions = time_step.observations["legal_actions"][self.player_id]
             action_mask = np.zeros(self._num_actions)
             action_mask[legal_actions] = 1
-            sample_keys = jax.random.split(next(self._rng), time_step.observations['batch_size'])
-            action, probs = policy(sample_keys, info_state, action_mask)
+
+            # If we are not in a batched environment, we need to add a batch dimension
+            if not 'batch_size' in time_step.observations:
+                info_state = jnp.array(info_state)[None]
+                batch_size = 1
+            else:
+                batch_size = time_step.observations['batch_size']
+            sample_keys = jax.random.split(next(self._rng), batch_size)
+            action, probs = batch_policy(sample_keys, info_state, action_mask)
 
         if not is_evaluation:
             self._store_time_step(time_step=time_step, action=action)
@@ -589,7 +610,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         Returns: None
 
         """
-        self._step_counter += time_step.observations["batch_size"]
+        self._step_counter += time_step.observations["batch_size"] if 'batch_size' in time_step.observations else 1
         if self._prev_time_step:
             transition = self._make_transition(time_step)
             self._data.append(transition)
@@ -598,6 +619,11 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
             self._prev_action = None
             self._episode_counter += 1
         else:
+            obs = time_step.observations["info_state"]
+            time_step.observations["values"] = jnp.stack([
+                self._critic_network.apply(self.train_state.critic_params[id], jnp.array(obs[id])).squeeze(-1)
+                for id in sorted(self.train_state.critic_params.keys())
+            ])
             self._prev_time_step = time_step
             self._prev_action = action
 
@@ -616,7 +642,7 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         Indicates whether to update or not.
         Returns: True, if the number of episodes in the buffer is equal to the batch size. False otherwise.
         """
-        return self._step_counter >= self._batch_size * self._episode_counter and self._episode_counter > 0
+        return self._step_counter >= self._batch_size * (self._num_learn_steps+1) and self._episode_counter > 0
 
     def _update_agent(self, batch: TransitionBatch) -> typing.Dict:
         """
@@ -677,9 +703,9 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
                     action=batch.action.transpose(1, 2, 0),
                     legal_actions_mask=batch.legal_actions_mask.T,
                     reward=batch.reward.transpose(1, 2, 0),
-                    values=batch.values.squeeze().transpose(1, 2, 0),
-                    discount=batch.discount.transpose(1, 0),
-                    terminal=batch.terminal.transpose(1, 0)
+                    values=batch.values.transpose(1, 2, 0),
+                    discount=batch.discount.transpose(1, 2, 0),
+                    terminal=batch.terminal.transpose(1, 2, 0)
                 )
                 batches.append(batch)
                 episode.clear()
@@ -710,14 +736,18 @@ class LolaPolicyGradientAgent(rl_agent.AbstractAgent):
         legal_actions_mask[..., legal_actions] = 1
         actions = np.array(time_step.observations["actions"])
         rewards = np.array(time_step.rewards)
+        discounts = self._discount * (1 - time_step.last()) * np.ones_like(rewards)
+        terminal = time_step.last() * np.ones_like(rewards)
         obs = np.array(self._prev_time_step.observations["info_state"])
         transition = TransitionBatch(
             info_state=obs,
             action=actions,
             reward=rewards,
-            discount=np.array([self._discount * (1 - time_step.last())] * len(self._train_state.policy_params)),
-            terminal=np.array([time_step.last()] * len(self._train_state.policy_params), dtype=np.float32),
+            discount=discounts,
+            terminal=terminal,
             legal_actions_mask=legal_actions_mask,
             values=self._prev_time_step.observations["values"]
         )
+        if len(rewards.shape) < 2: # if not a batch, add a batch dimension
+            transition = jax.tree_map(lambda x: x[None], transition)
         return transition

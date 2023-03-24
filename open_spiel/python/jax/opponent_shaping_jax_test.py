@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for open_spiel.python.jax.lola."""
-
+import typing
 from typing import Tuple
 
 import distrax
 import haiku as hk
 import jax
+import jax.numpy as jnp
 import numpy as np
 import pyspiel
 from absl.testing import absltest
 from absl.testing import parameterized
 
 from open_spiel.python import rl_environment
-from open_spiel.python.jax.lola import LolaPolicyGradientAgent
+from open_spiel.python.jax.opponent_shaping import OpponentShapingAgent
 
 SEED = 24984617
 
@@ -40,6 +41,7 @@ def make_iterated_matrix_game(game: str, iterations=5, batch_size=8) -> rl_envir
 def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transformed]:
     def policy(obs):
         logits = hk.nets.MLP(output_sizes=[8, 8, num_actions], with_bias=True)(obs)
+        logits = jnp.nan_to_num(logits)
         return distrax.Categorical(logits=logits)
 
     def value_fn(obs):
@@ -48,6 +50,20 @@ def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transforme
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))
 
+def run_agents(agents: typing.List[OpponentShapingAgent], env: rl_environment.Environment, num_steps=1000):
+        time_step = env.reset()
+        for _ in range(num_steps):
+            actions = []
+            for agent in agents:
+                action, _ = agent.step(time_step)
+                if action is not None:
+                    action = action.squeeze()
+                actions.append(action)
+            if time_step.last():
+                time_step = env.reset()
+            else:
+                time_step = env.step(actions)
+                time_step.observations["actions"] = np.array(actions)
 
 class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
@@ -55,17 +71,20 @@ class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
     def test_run_game(self, game_name):
         batch_size = 8
         iterations = 5
-        env = make_iterated_matrix_game(game_name, batch_size=batch_size, iterations=iterations)
+        env = make_iterated_matrix_game(game_name, batch_size=1, iterations=iterations)
         env.seed(SEED)
         key = jax.random.PRNGKey(SEED)
         num_actions = env.action_spec()["num_actions"]
         policy_network, critic_network = make_agent_networks(num_actions=num_actions)
 
         agents = [
-            LolaPolicyGradientAgent(
+            OpponentShapingAgent(
                 player_id=i,
                 opponent_ids=[1 - i],
                 seed=key,
+                correction_type='lola',
+                env=env,
+                n_lookaheads=1,
                 info_state_size=env.observation_spec()["info_state"],
                 num_actions=env.action_spec()["num_actions"],
                 policy=policy_network,
@@ -75,21 +94,49 @@ class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
                 critic_learning_rate=1.0,
                 policy_update_interval=2,
                 discount=0.96,
-                correction_weight=1.0,
-                use_jit=True
+                use_jit=False
             )
             for i in range(2)
         ]
+        run_agents(agents=agents, env=env, num_steps=batch_size*10)
 
-        for _ in range(2 * batch_size):
-            time_step = env.reset()
-            while not time_step.last():
-                actions = [agent.step(time_step).action for agent in agents]
-                time_step = env.step(actions)
-                time_step.observations["actions"] = np.array(actions)
+class DicePolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
-            for agent in agents:
-                agent.step(time_step)
+    @parameterized.parameters(["matrix_pd"])
+    def test_run_game(self, game_name):
+        batch_size = 8
+        iterations = 5
+        env = make_iterated_matrix_game(game_name, batch_size=1, iterations=iterations)
+        env.seed(SEED)
+        key = jax.random.PRNGKey(SEED)
+        num_actions = env.action_spec()["num_actions"]
+        policy_network, critic_network = make_agent_networks(num_actions=num_actions)
+
+        agents = [
+            OpponentShapingAgent(
+                player_id=i,
+                opponent_ids=[1 - i],
+                seed=key,
+                correction_type='dice',
+                env=env,
+                n_lookaheads=2,
+                info_state_size=env.observation_spec()["info_state"],
+                num_actions=env.action_spec()["num_actions"],
+                policy=policy_network,
+                critic=critic_network,
+                batch_size=batch_size,
+                pi_learning_rate=0.005,
+                critic_learning_rate=1.0,
+                policy_update_interval=2,
+                discount=0.96,
+                use_jit=False
+            )
+            for i in range(2)
+        ]
+        run_agents(agents=agents, env=env, num_steps=batch_size*10)
+
+
+
 
 
 if __name__ == "__main__":

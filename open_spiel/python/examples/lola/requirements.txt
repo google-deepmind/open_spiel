@@ -1,6 +1,8 @@
-aim
+wandb
 jax
+jax[cuda] -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 distrax
 optax
 dm-haiku
 rlax
+open_spiel

@@ -24,7 +24,7 @@ class IteratedMatrixGame(Environment):
 
     def observation_spec(self):
         return dict(
-            info_state=tuple([np.sum(self._payoff_matrix.shape[:-1]) + 1 + (1 if self._include_remaining_iterations else 0)] for _ in range(self._num_players)),
+            info_state=tuple([np.prod(self._payoff_matrix.shape[:-1]) + 1 + (1 if self._include_remaining_iterations else 0)] for _ in range(self._num_players)),
             legal_actions=tuple([self._payoff_matrix.shape[p] for p in range(self._num_players)]),
             current_player=()
         )
@@ -34,7 +34,7 @@ class IteratedMatrixGame(Environment):
             num_actions=tuple([self._payoff_matrix.shape[p] for p in range(self._num_players)]),
             min=tuple([0 for p in range(self._num_players)]),
             max=tuple([self._payoff_matrix.shape[p]-1 for p in range(self._num_players)]),
-            dtype=int,
+            dtype=int
         )
 
     def step(self, actions: np.ndarray):
@@ -95,3 +95,18 @@ def IteratedPrisonersDilemma(iterations: int, batch_size=1):
         batch_size=batch_size,
         include_remaining_iterations=False
     )
+
+def IteratedMatchingPennies(iterations: int, batch_size=1):
+    return IteratedMatrixGame(
+        payoff_matrix=np.array([[[1,-1], [-1,1]], [[-1, 1], [1, -1]]]),
+        iterations=iterations,
+        batch_size=batch_size,
+        include_remaining_iterations=False
+    )
+
+if __name__ == '__main__':
+    env= IteratedPrisonersDilemma(iterations=10, batch_size=4)
+    ts = env.reset()
+    while not ts.last():
+        ts = env.step(np.random.randint(0, 2, size=(4, 2)))
+        print(ts)
