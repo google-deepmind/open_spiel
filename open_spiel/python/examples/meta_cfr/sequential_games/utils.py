@@ -27,7 +27,7 @@ from open_spiel.python.examples.meta_cfr.sequential_games.typing import Infostat
 from open_spiel.python.examples.meta_cfr.sequential_games.typing import Params
 
 
-def get_batched_input(input_list: List[jax.numpy.DeviceArray],
+def get_batched_input(input_list: List[jax.Array],
                       infostate_list: List[InfostateNode],
                       illegal_action_list: List[List[int]], batch_size: int):
   """Returns list of function arguments extended to be consistent with batch size.
@@ -95,7 +95,7 @@ def filter_terminal_infostates(infostates_map: InfostateMapping):
 
 def get_network_output(net_apply: ApplyFn, net_params: Params,
                        net_input: np.ndarray, illegal_actions: List[int],
-                       key: hk.PRNGSequence) -> jax.numpy.DeviceArray:
+                       key: hk.PRNGSequence) -> jax.Array:
   """Returns policy generated as output of model.
 
   Args:
@@ -119,7 +119,7 @@ def get_network_output(net_apply: ApplyFn, net_params: Params,
 def get_network_output_batched(
     net_apply: ApplyFn, net_params: Params, net_input: np.ndarray,
     all_illegal_actions: List[List[int]],
-    key: hk.PRNGSequence) -> List[jax.numpy.DeviceArray]:
+    key: hk.PRNGSequence) -> List[jax.Array]:
   """Returns policy of batched input generated as output of model.
 
   Args:

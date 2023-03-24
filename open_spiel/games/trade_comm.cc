@@ -55,6 +55,8 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 std::pair<int, int> DecodeAllocation(Action chance_action, int num_items) {
   return { chance_action / num_items, chance_action % num_items };
 }

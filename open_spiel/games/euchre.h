@@ -99,13 +99,13 @@ inline std::string CardString(int card) {
 }
 
 
-
 // State of a single trick.
 class Trick {
  public:
   Trick() : Trick{kInvalidPlayer, Suit::kInvalidSuit, kInvalidAction} {}
   Trick(Player leader, Suit trump_suit, int card);
   void Play(Player player, int card);
+  int WinningCard() const { return winning_card_; }
   Suit LedSuit() const { return led_suit_; }
   Suit TrumpSuit() const { return trump_suit_; }
   bool TrumpPlayed() const { return trump_played_; }

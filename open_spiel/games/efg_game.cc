@@ -60,6 +60,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 std::string NodeToString(const Node* node) {
   std::string str = "";
   if (node->type == NodeType::kTerminal) {

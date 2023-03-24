@@ -17,9 +17,7 @@
 #include <stdint.h>
 
 #include <memory>
-#include <new>
 #include <string>
-#include <utility>
 
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
@@ -99,8 +97,7 @@ class PyBot : public Bot {
         "inform_action",  // Name of function in Python
         InformAction,     // Name of function in C++
         state,            // Arguments
-        player_id,
-        action);
+        player_id, action);
   }
   void InformActions(const State& state,
                      const std::vector<Action>& actions) override {
@@ -153,7 +150,7 @@ class PyBot : public Bot {
 }  // namespace
 
 void init_pyspiel_bots(py::module& m) {
-  py::class_<Bot, PyBot> bot(m, "Bot");
+  py::classh<Bot, PyBot> bot(m, "Bot");
   bot.def(py::init<>())
       .def("step", &Bot::Step)
       .def("restart", &Bot::Restart)
@@ -227,7 +224,7 @@ void init_pyspiel_bots(py::module& m) {
       .def("to_string", &SearchNode::ToString)
       .def("children_str", &SearchNode::ChildrenStr);
 
-  py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
+  py::classh<algorithms::MCTSBot, Bot>(m, "MCTSBot")
       .def(
           py::init([](std::shared_ptr<const Game> game,
                       std::shared_ptr<Evaluator> evaluator, double uct_c,
@@ -253,7 +250,7 @@ void init_pyspiel_bots(py::module& m) {
              algorithms::ISMCTSFinalPolicyType::kMaxVisitCount)
       .value("MAX_VALUE", algorithms::ISMCTSFinalPolicyType::kMaxValue);
 
-  py::class_<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
+  py::classh<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
       .def(py::init<int, std::shared_ptr<Evaluator>, double, int, int,
                     algorithms::ISMCTSFinalPolicyType, bool, bool>(),
            py::arg("seed"), py::arg("evaluator"), py::arg("uct_c"),

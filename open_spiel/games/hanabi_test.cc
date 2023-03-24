@@ -15,6 +15,7 @@
 #include "open_spiel/games/hanabi.h"
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -32,6 +33,11 @@ void BasicHanabiTests() {
     testing::RandomSimTest(
         *LoadGame("hanabi", {{"players", GameParameter(players)}}), 100);
   }
+
+  auto observer = LoadGame("hanabi")
+                      ->MakeObserver(kDefaultObsType,
+                                     GameParametersFromString("single_tensor"));
+  testing::RandomSimTestCustomObserver(*LoadGame("hanabi"), observer);
 }
 
 }  // namespace

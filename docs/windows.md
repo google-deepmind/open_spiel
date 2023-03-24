@@ -16,7 +16,7 @@ any bugs or problems you encounter.
 
 This option will describe how to install and use OpenSpiel on Windows 10 via
 [Visual Studio Community Edition](https://visualstudio.microsoft.com/vs/community/).
-This process has been written for Windows 10 and tested on Windos 10 Home
+This process has been written for Windows 10 and tested on Windows 10 Home
 Version 20H2, build 19042.1415 (installed on Nov 26th, 2021).
 
 When installing Visual Studio, enable the C++ and Python development, and also
@@ -29,7 +29,7 @@ You will need to have the following dependencies installed:
 *   [git](https://gitforwindows.org/)
 *   [Python](https://www.python.org/downloads/windows/). Note: get the latest
     3.9 release as OpenSpiel has not been tested on 3.10 yet. Also, tick the box
-    during instalation to ensure Python executable is in your path.
+    during installation to ensure Python executable is in your path.
 *   Recommended: Windows Terminal / Powershell.
 
 The rest of the instructions will assume that OpenSpiel is cloned in
@@ -174,7 +174,7 @@ This process has been written for Windows 10, and tested on Windows 10 build
     directory and the `open_spiel` directory.
 
     When using a virtualenv, the following should be added to
-    `<virtualenv>/bin/activate`. For a system-wide install, ddd it in your
+    `<virtualenv>/bin/activate`. For a system-wide install, add it in your
     `.bashrc` or `.profile`.
 
     ```bash
@@ -186,7 +186,7 @@ This process has been written for Windows 10, and tested on Windows 10 build
 
 9.  Running the first example
 
-    In the `build` directory, running `examples/example` will prints out a list
+    In the `build` directory, running `examples/example` will print out a list
     of registered games and the usage. Now, let’s play game of Tic-Tac-Toe with
     uniform random players:
 

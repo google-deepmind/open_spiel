@@ -58,6 +58,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+open_spiel::RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 std::map<Suit, Suit> same_color_suit {
   {Suit::kClubs, Suit::kSpades}, {Suit::kSpades, Suit::kClubs},
   {Suit::kDiamonds, Suit::kHearts}, {Suit::kHearts, Suit::kDiamonds}};

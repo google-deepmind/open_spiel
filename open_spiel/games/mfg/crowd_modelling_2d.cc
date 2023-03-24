@@ -181,6 +181,8 @@ std::vector<int> StringListToInts(std::vector<absl::string_view> strings,
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 }  // namespace
 
 CrowdModelling2dState::CrowdModelling2dState(

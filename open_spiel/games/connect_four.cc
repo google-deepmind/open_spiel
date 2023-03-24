@@ -48,6 +48,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 CellState PlayerToState(Player player) {
   switch (player) {
     case 0:

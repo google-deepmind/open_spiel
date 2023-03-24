@@ -1,4 +1,4 @@
-// Copyright 2022 DeepMind Technologies Limited
+// Copyright 2021 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,30 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/observer.h"
+#include "open_spiel/game_transforms/add_noise.h"
+
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
-namespace euchre {
+namespace add_noise {
 namespace {
 
-void BasicGameTests() {
-  testing::LoadGameTest("euchre");
-  testing::ChanceOutcomesTest(*LoadGame("euchre"));
-  testing::RandomSimTest(*LoadGame("euchre"), 10);
+namespace testing = open_spiel::testing;
 
-  auto observer = LoadGame("euchre")
-                      ->MakeObserver(kInfoStateObsType,
-                                     GameParametersFromString("single_tensor"));
-  testing::RandomSimTestCustomObserver(*LoadGame("euchre"), observer);
+void BasicTests() {
+  testing::LoadGameTest("add_noise(epsilon=1.,seed=1,game=kuhn_poker())");
+  testing::RandomSimTest(
+      *LoadGame("add_noise(epsilon=1.,seed=1,game=kuhn_poker())"), 100);
 }
-
 
 }  // namespace
-}  // namespace euchre
+}  // namespace add_noise
 }  // namespace open_spiel
 
-int main(int argc, char** argv) {
-  open_spiel::euchre::BasicGameTests();
-}
+int main(int argc, char** argv) { open_spiel::add_noise::BasicTests(); }
