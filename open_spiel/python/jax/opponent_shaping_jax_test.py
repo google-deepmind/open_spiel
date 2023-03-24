@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for open_spiel.python.jax.lola."""
+"""Tests for open_spiel.python.jax.opponent_shaping."""
 import typing
 from typing import Tuple
 
@@ -82,7 +82,7 @@ class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
                 player_id=i,
                 opponent_ids=[1 - i],
                 seed=key,
-                correction_type='lola',
+                correction_type='opponent_shaping',
                 env=env,
                 n_lookaheads=1,
                 info_state_size=env.observation_spec()["info_state"],

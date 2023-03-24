@@ -368,7 +368,7 @@ class OpponentShapingAgent(rl_agent.AbstractAgent):
                  critic_discount: float = 0.99,
                  seed: jax.random.PRNGKey = 42,
                  fit_opponent_model=True,
-                 correction_type: str = 'lola',
+                 correction_type: str = 'opponent_shaping',
                  use_jit: bool = False,
                  n_lookaheads: int = 1,
                  num_critic_mini_batches: int = 1,
@@ -420,9 +420,9 @@ class OpponentShapingAgent(rl_agent.AbstractAgent):
                 n_lookaheads=n_lookaheads,
                 env=env
             )
-        elif correction_type == 'lola' or correction_type == 'none':
+        elif correction_type == 'opponent_shaping' or correction_type == 'none':
             # if correction_type is none, use standard policy gradient without corrections
-            lola_weight = 1.0 if correction_type == 'lola' else 0.0
+            lola_weight = 1.0 if correction_type == 'opponent_shaping' else 0.0
             update_fn = get_lola_update_fn(
                 agent_id=player_id,
                 policy_network=policy,
