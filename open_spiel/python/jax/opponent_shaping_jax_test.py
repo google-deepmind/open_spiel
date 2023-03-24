@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for open_spiel.python.jax.lola."""
-
+import typing
 from typing import Tuple
 
 import distrax
@@ -50,12 +50,25 @@ def make_agent_networks(num_actions: int) -> Tuple[hk.Transformed, hk.Transforme
 
     return hk.without_apply_rng(hk.transform(policy)), hk.without_apply_rng(hk.transform(value_fn))
 
+def run_agents(agents: typing.List[OpponentShapingAgent], env: rl_environment.Environment, num_steps=1000):
+        time_step = env.reset()
+        for _ in range(num_steps):
+            actions = []
+            for agent in agents:
+                action, _ = agent.step(time_step)
+                if action is not None:
+                    action = action.squeeze()
+                actions.append(action)
+            if time_step.last():
+                time_step = env.reset()
+            else:
+                time_step = env.step(actions)
+                time_step.observations["actions"] = np.array(actions)
 
 class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
 
     @parameterized.parameters(["matrix_pd"])
     def test_run_game(self, game_name):
-        jax.default_device = jax.devices("cpu")[0]
         batch_size = 8
         iterations = 5
         env = make_iterated_matrix_game(game_name, batch_size=1, iterations=iterations)
@@ -69,7 +82,7 @@ class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
                 player_id=i,
                 opponent_ids=[1 - i],
                 seed=key,
-                correction_type='dice',
+                correction_type='lola',
                 env=env,
                 n_lookaheads=1,
                 info_state_size=env.observation_spec()["info_state"],
@@ -85,19 +98,44 @@ class LolaPolicyGradientTest(parameterized.TestCase, absltest.TestCase):
             )
             for i in range(2)
         ]
-        time_step = env.reset()
-        for _ in range(5 * batch_size):
-            actions = []
-            for agent in agents:
-                action, _ = agent.step(time_step)
-                if action is not None:
-                    action = action.squeeze()
-                actions.append(action)
-            if time_step.last():
-                time_step = env.reset()
-            else:
-                time_step = env.step(actions)
-                time_step.observations["actions"] = np.array(actions)
+        run_agents(agents=agents, env=env, num_steps=batch_size*10)
+
+class DicePolicyGradientTest(parameterized.TestCase, absltest.TestCase):
+
+    @parameterized.parameters(["matrix_pd"])
+    def test_run_game(self, game_name):
+        batch_size = 8
+        iterations = 5
+        env = make_iterated_matrix_game(game_name, batch_size=1, iterations=iterations)
+        env.seed(SEED)
+        key = jax.random.PRNGKey(SEED)
+        num_actions = env.action_spec()["num_actions"]
+        policy_network, critic_network = make_agent_networks(num_actions=num_actions)
+
+        agents = [
+            OpponentShapingAgent(
+                player_id=i,
+                opponent_ids=[1 - i],
+                seed=key,
+                correction_type='dice',
+                env=env,
+                n_lookaheads=2,
+                info_state_size=env.observation_spec()["info_state"],
+                num_actions=env.action_spec()["num_actions"],
+                policy=policy_network,
+                critic=critic_network,
+                batch_size=batch_size,
+                pi_learning_rate=0.005,
+                critic_learning_rate=1.0,
+                policy_update_interval=2,
+                discount=0.96,
+                use_jit=False
+            )
+            for i in range(2)
+        ]
+        run_agents(agents=agents, env=env, num_steps=batch_size*10)
+
+
 
 
 
