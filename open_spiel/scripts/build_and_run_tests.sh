@@ -129,7 +129,8 @@ trap cleanup EXIT
 
 if [[ $ARG_install == "true" ]]; then
   echo -e "\e[33mInstalling the requirements (use --noinstall to skip).\e[0m"
-  ${PYBIN} -m pip install --upgrade -r ./requirements.txt
+  # From within the virtual environment, use python3 directly for pip
+  python3 -m pip install --upgrade -r ./requirements.txt
 else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
