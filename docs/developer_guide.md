@@ -73,10 +73,9 @@ ideal to first be aware of the general API (see `spiel.h`).
     be clear from the game you copied from. If not, each API function that is
     overridden will be fully documented in superclasses in `spiel.h`.
 8.  Run your code through a linter so it conforms to Google's
-    [style guides](https://google.github.io/styleguide/). For C++ use
-    [cpplint](https://pypi.org/project/cpplint/), for Python either
-    [pylint](https://google.github.io/styleguide/pyguide.html#21-lint)
-    or [YAPF](https://github.com/google/yapf/).
+    [style guides](https://google.github.io/styleguide/). For C++ and Python
+    use [cpplint](https://pypi.org/project/cpplint/). There is also
+    [YAPF](https://github.com/google/yapf/) for Python as well.
 9.  Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
 10. Add a playthrough file to catch regressions:
