@@ -32,8 +32,8 @@ def mip_nash(game, objective, solver='GLPK_MI'):
       min f(x_0, x_1, p_mat)
       s.t.
       (u_0, u_1 are Nash payoffs variables of player 0 and 1)
-      p_mat[0] * x_1 <= u0 
-      x_0^T*p_mat[1] <= u1
+      p_mat[0] * x_1 <= u_0 
+      x_0^T*p_mat[1] <= u_1
       (if a pure strategy is in the support then its payoff is Nash payoff)
       u_0 - p_mat[0] * x_1 <= u_max_0 * b_0 
       u_1 - x_0^T*p_mat[1] <= u_max_1 * b_1
