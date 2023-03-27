@@ -29,25 +29,25 @@ from open_spiel.python.egt.utils import game_payoffs_array
 def mip_nash(game, objective, solver='GLPK_MI'):
   """Solves for the optimal Nash for two-player general-sum games.
     Using mixed-integer programming:
-      min f(x, y, p_mat)
+      min f(x_0, x_1, p_mat)
       s.t.
-      (u0, u1 are Nash payoffs variables of player 0 and 1)
-      p_mat[0] * y <= u0 
-      x^T*p_mat[1] <= u1
+      (u_0, u_1 are Nash payoffs variables of player 0 and 1)
+      p_mat[0] * x_1 <= u0 
+      x_0^T*p_mat[1] <= u1
       (if a pure strategy is in the support then its payoff is Nash payoff)
-      u0 - p_mat[0] * y <= U0 * b0 
-      u1 - x^T*p_mat[1] <= U1 * b1
+      u_0 - p_mat[0] * x_1 <= u_max_0 * b_0 
+      u_1 - x_0^T*p_mat[1] <= u_max_1 * b_1
       (if a pure strategy is not in the support its probability mass is 0)
-      x <= 1 - b0
-      y <= 1 - b1
+      x_0 <= 1 - b_0
+      x_1 <= 1 - b_1
       (probability constraints)
-      x >= 0
-      1^T * x = 1
-      y >= 0
-      1^T * y = 1
-      for all n, b0[n] \in {0, 1},
-      for all m, b1[m] \in {0, 1},
-      U0, U1 are the maximum payoff differences of player 0 and 1.
+      x_0 >= 0
+      1^T * x_0 = 1
+      x_1 >= 0
+      1^T * x_1 = 1
+      for all n, b_0[n] in {0, 1},
+      for all m, b_1[m] in {0, 1},
+      u_max_0, u_max_1 are the maximum payoff differences of player 0 and 1.
     This formulation is a basic one that may only work well 
     for simple objective function or low-dimensional inputs.
     To handle more complex cases, It is possible to extend this by 
@@ -57,7 +57,7 @@ def mip_nash(game, objective, solver='GLPK_MI'):
     objective: a string representing the objective (e.g., MAX_SOCIAL_WELFARE)
     solver: the mixed-integer solver used by cvxpy
   Returns:
-    optimal Nash (x, y)
+    optimal Nash (x_0, x_1)
   """
 
   p_mat = game_payoffs_array(game)
@@ -67,60 +67,60 @@ def mip_nash(game, objective, solver='GLPK_MI'):
   assert len(p_mat) == 2
   assert p_mat[0].shape == p_mat[1].shape
 
-  (M, N) = p_mat[0].shape
+  (m_0, m_1) = p_mat[0].shape
 
-  U0 = np.max(p_mat[0]) - np.min(p_mat[0])
-  U1 = np.max(p_mat[1]) - np.min(p_mat[1])
+  u_max_0 = np.max(p_mat[0]) - np.min(p_mat[0])
+  u_max_1 = np.max(p_mat[1]) - np.min(p_mat[1])
 
-  x = cp.Variable(M)
-  y = cp.Variable(N)
-  u0 = cp.Variable(1)
-  u1 = cp.Variable(1)
-  b0 = cp.Variable(M, boolean=True)
-  b1 = cp.Variable(N, boolean=True)
+  x_0 = cp.Variable(m_0)
+  x_1 = cp.Variable(m_1)
+  u_0 = cp.Variable(1)
+  u_1 = cp.Variable(1)
+  b_0 = cp.Variable(m_0, boolean=True)
+  b_1 = cp.Variable(m_1, boolean=True)
 
-  u_m = p_mat[0] @ y
-  u_n = x @ p_mat[1]
+  u_m = p_mat[0] @ x_1
+  u_n = x_0 @ p_mat[1]
 
   # probabilities constraints
-  constraints = [x >= 0, y >= 0, cp.sum(x) == 1, cp.sum(y) == 1]
+  constraints = [x_0 >= 0, x_1 >= 0, cp.sum(x_0) == 1, cp.sum(x_1) == 1]
   # support constraints
-  constraints.extend([u_m <= u0, u0-u_m <= U0 * b0, x <= 1-b0])
-  constraints.extend([u_n <= u1, u1-u_n <= U1 * b1, y <= 1-b1])
+  constraints.extend([u_m <= u_0, u_0-u_m <= u_max_0 * b_0, x_0 <= 1-b_0])
+  constraints.extend([u_n <= u_1, u_1-u_n <= u_max_1 * b_1, x_1 <= 1-b_1])
 
-  variables = {'x': x, 'y': y, 'u0': u0,
-               'u1': u1, 'b0': b0, 'b1': b1, 'p_mat': p_mat}
+  variables = {'x_0': x_0, 'x_1': x_1, 'u_0': u_0,
+               'u_1': u_1, 'b_0': b_0, 'b_1': b_1, 'p_mat': p_mat}
 
   obj = TWO_PLAYER_OBJECTIVE[objective](variables)
   prob = cp.Problem(obj, constraints)
   prob.solve(solver=solver)
 
-  return _simplex_projection(x.value.reshape(-1)), _simplex_projection(y.value.reshape(-1))
+  return _simplex_projection(x_0.value.reshape(-1)), _simplex_projection(x_1.value.reshape(-1))
 
 
 def max_social_welfare_two_player(variables):
   """Max social welfare objective."""
-  return cp.Maximize(variables['u0'] + variables['u1'])
+  return cp.Maximize(variables['u_0'] + variables['u_1'])
 
 
 def min_social_welfare_two_player(variables):
   """Min social welfare objective."""
-  return cp.Minimize(variables['u0'] + variables['u1'])
+  return cp.Minimize(variables['u_0'] + variables['u_1'])
 
 
 def max_support_two_player(variables):
   """Max support objective."""
-  return cp.Minimize(cp.sum(variables['b0']) + cp.sum(variables['b1']))
+  return cp.Minimize(cp.sum(variables['b_0']) + cp.sum(variables['b_1']))
 
 
 def min_support_two_player(variables):
   """Min support objective."""
-  return cp.Maximize(cp.sum(variables['b0']) + cp.sum(variables['b1']))
+  return cp.Maximize(cp.sum(variables['b_0']) + cp.sum(variables['b_1']))
 
 
 def max_gini_two_player(variables):
   """Max gini objective."""
-  return cp.Minimize(cp.sum(cp.square(variables['x'])) + cp.sum(cp.square(variables['y'])))
+  return cp.Minimize(cp.sum(cp.square(variables['x_0'])) + cp.sum(cp.square(variables['x_1'])))
 
 
 TWO_PLAYER_OBJECTIVE = {
