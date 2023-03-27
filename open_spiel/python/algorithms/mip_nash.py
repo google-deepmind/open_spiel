@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''MIP-Nash.
+"""MIP-Nash.
 
-Based on the first formulation of https://dl.acm.org/doi/10.5555/1619410.1619413.
-Compute optimal Nash equilibrium of two-player general-sum games by solving a mixed-integer programming problem.
-'''
+Based on the first formulation of
+ https://dl.acm.org/doi/10.5555/1619410.1619413.
+Compute optimal Nash equilibrium of two-player general-sum games 
+by solving a mixed-integer programming problem.
+"""
 
 
 import numpy as np
@@ -46,8 +48,10 @@ def mip_nash(game, objective, solver='GLPK_MI'):
       for all n, b0[n] \in {0, 1},
       for all m, b1[m] \in {0, 1},
       U0, U1 are the maximum payoff differences of player 0 and 1.
-    This formulation is a basic one that may only work well for simple objective function or low-dimensional inputs.
-    To handle more complex cases, It is possible to extend this by using advanced internal solvers or piecewise linear approximation of the objective.
+    This formulation is a basic one that may only work well 
+    for simple objective function or low-dimensional inputs.
+    To handle more complex cases, It is possible to extend this by 
+    using advanced internal solvers or piecewise linear approximation of the objective.
   Args:
     game: a pyspiel matrix game object
     objective: a string representing the objective (e.g., MAX_SOCIAL_WELFARE)
@@ -94,24 +98,28 @@ def mip_nash(game, objective, solver='GLPK_MI'):
   return _simplex_projection(x.value.reshape(-1)), _simplex_projection(y.value.reshape(-1))
 
 
-
 def max_social_welfare_two_player(variables):
+  """Max social welfare objective."""
   return cp.Maximize(variables['u0'] + variables['u1'])
 
 
 def min_social_welfare_two_player(variables):
+  """Min social welfare objective."""
   return cp.Minimize(variables['u0'] + variables['u1'])
 
 
 def max_support_two_player(variables):
+  """Max support objective."""
   return cp.Minimize(cp.sum(variables['b0']) + cp.sum(variables['b1']))
 
 
 def min_support_two_player(variables):
+  """Min support objective."""
   return cp.Maximize(cp.sum(variables['b0']) + cp.sum(variables['b1']))
 
 
 def max_gini_two_player(variables):
+  """Max gini objective."""
   return cp.Minimize(cp.sum(cp.square(variables['x'])) + cp.sum(cp.square(variables['y'])))
 
 
