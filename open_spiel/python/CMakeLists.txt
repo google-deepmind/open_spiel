@@ -219,6 +219,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   egt/utils_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
+  games/block_dominoes_test.py
   games/data_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
