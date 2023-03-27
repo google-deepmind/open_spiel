@@ -56,7 +56,7 @@ class JointPolicyAggregatorTest(parameterized.TestCase):
         probs = list(state_action_probs.values())
         expected_prob = 1. / len(probs)
         for prob in probs:
-          self.assertEqual(expected_prob, prob)
+          self.assertAlmostEqual(expected_prob, prob, places=10)
 
 
 if __name__ == "__main__":
