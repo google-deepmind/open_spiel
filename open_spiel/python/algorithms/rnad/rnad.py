@@ -892,8 +892,8 @@ class RNaDSolver(policy_lib.Policy):
         params_prev=self.params_prev,
         params_prev_=self.params_prev_,
         # Optimizer state.
-        optimizer=self.optimizer.state,
-        optimizer_target=self.optimizer_target.state,
+        optimizer=self.optimizer.state,  # pytype: disable=attribute-error  # always-use-return-annotations
+        optimizer_target=self.optimizer_target.state,  # pytype: disable=attribute-error  # always-use-return-annotations
     )
 
   def __setstate__(self, state):
