@@ -46,6 +46,8 @@ class GamesChessTest(absltest.TestCase):
       state.apply_action(action)
     print(board.to_unicode_string())
     print(board.debug_string())
+    print("Moves history:")
+    print(" ".join([move.to_lan() for move in state.moves_history()]))
     self.assertTrue(state.is_terminal())
 
 
