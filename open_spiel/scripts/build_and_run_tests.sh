@@ -95,8 +95,6 @@ then
   continue
 fi
 
-PYVERSION=$($PYBIN -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-
 VENV_DIR="./venv"
 if [[ $ARG_virtualenv == "true" ]]; then
   if ! [ -d "$VENV_DIR" ]; then
@@ -116,6 +114,9 @@ if [[ $ARG_virtualenv == "true" ]]; then
     echo -e "\e[33mReusing virtualenv from $VENV_DIR.\e[0m"
   fi
   source $VENV_DIR/bin/activate
+  # When you're in a virtual environment, the python binary should be just python3.
+  # Otherwise, it uses the environment's python.
+  PYBIN="python3"
 fi
 
 # We only exit the virtualenv if we were asked to create one.
@@ -129,12 +130,12 @@ trap cleanup EXIT
 
 if [[ $ARG_install == "true" ]]; then
   echo -e "\e[33mInstalling the requirements (use --noinstall to skip).\e[0m"
-  # From within the virtual environment, use python3 directly for pip
-  python3 -m pip install --upgrade -r ./requirements.txt
+  $PYBIN -m pip install --upgrade -r ./requirements.txt
 else
   echo -e "\e[33mSkipping installation of requirements.txt.\e[0m"
 fi
 
+PYVERSION=$($PYBIN -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
 BUILD_DIR="$ARG_build_dir"
 mkdir -p $BUILD_DIR
 
