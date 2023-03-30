@@ -48,10 +48,12 @@ def mip_nash(game, objective, solver='GLPK_MI'):
       for all n, b_0[n] in {0, 1},
       for all m, b_1[m] in {0, 1},
       u_max_0, u_max_1 are the maximum payoff differences of player 0 and 1.
-    This formulation is a basic one that may only work well 
+    Note: this formulation is a basic one that may only work well 
     for simple objective function or low-dimensional inputs.
-    To handle more complex cases, It is possible to extend this by 
-    using advanced internal solvers or piecewise linear approximation of the objective.
+    GLPK_MI solver only handles linear objective.
+    To handle nonlinear and high-dimensional cases, 
+    it is recommended to use advance solvers such as GUROBI,
+    or use a piecewise linear approximation of the objective.
   Args:
     game: a pyspiel matrix game object
     objective: a string representing the objective (e.g., MAX_SOCIAL_WELFARE)
