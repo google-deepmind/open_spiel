@@ -238,7 +238,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   PYTHON_PKGS="python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
   if [[ "$OS_PYTHON_VERSION" == "3.11" ]]; then
     # Need to special-case this until it's installed by default.
-    PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk"
+    PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk python3.11-venv"
   fi
   EXT_DEPS="virtualenv clang cmake curl $PYTHON_PKGS"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
