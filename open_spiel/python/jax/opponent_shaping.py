@@ -200,6 +200,13 @@ def get_dice_update_fn(
     }
 
   def dice_correction(train_state: TrainState):
+    """
+        Computes the dice update for the given train state.
+        Args:
+            train_state: The current train state.
+        Returns:
+            The updated train state with the new policy params and metrics dict.
+    """
 
     @jax.jit
     def dice_objective(params, other_params, states, actions, rewards, values):
