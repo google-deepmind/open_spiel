@@ -218,6 +218,81 @@ std::vector<double> ExpectedReturnsImpl(
   SPIEL_CHECK_EQ(values.size(), state.NumPlayers());
   return values;
 }
+
+std::vector<double> ExpectedReturnsOfDeterministicPoliciesFromSeedsImpl(
+  const State& state,
+  const std::vector<int>& policy_seeds,
+  const std::vector<const Policy*>& policies) {
+  if (state.IsTerminal()) {
+    return state.Rewards();
+  }
+  const int num_players = state.NumPlayers();
+  std::vector<double> values(num_players, 0.0);
+  if (state.IsSimultaneousNode()) {
+    SpielFatalError("Simultaneous not implemented.");
+  } else if (state.IsChanceNode()) {
+    ActionsAndProbs actions_and_probs = state.ChanceOutcomes();
+    for (const auto& action_and_prob : actions_and_probs) {
+      if (action_and_prob.second <= 0.0) continue;
+      std::unique_ptr<const State> child = state.Child(action_and_prob.first);
+      const std::vector<double> child_values = (
+          ExpectedReturnsOfDeterministicPoliciesFromSeedsImpl(
+              *child, policy_seeds, policies));
+      for (auto p = Player{0}; p < num_players; ++p) {
+        values[p] += action_and_prob.second * child_values[p];
+      }
+    }
+  } else {
+    // Get information state string.
+    std::string info_state_string = state.InformationStateString();
+    const int player = state.CurrentPlayer();
+
+    // Search for policy in policies.
+    ActionsAndProbs actions_and_probs = {};
+    for (const auto& policy : policies) {
+      actions_and_probs = policy->GetStatePolicy(state);
+      if (!actions_and_probs.empty()) {
+        break;
+      }
+    }
+    if (!actions_and_probs.empty()) {
+      for (const auto& action_and_prob : actions_and_probs) {
+        if (action_and_prob.second <= 0.0) continue;
+        std::unique_ptr<const State> child = state.Child(action_and_prob.first);
+        const std::vector<double> child_values = (
+            ExpectedReturnsOfDeterministicPoliciesFromSeedsImpl(
+                *child, policy_seeds, policies));
+        for (auto p = Player{0}; p < num_players; ++p) {
+          values[p] += action_and_prob.second * child_values[p];
+        }
+      }
+      return values;
+    }
+
+    // Determine the state seed from the policy seed.
+    auto state_seed = std::hash<std::string>{}(info_state_string);
+    state_seed += policy_seeds[player];
+    state_seed += state.MoveNumber() * num_players;
+    state_seed += player;
+    std::mt19937 gen(state_seed);
+
+    const auto legal_actions = state.LegalActions();
+    std::uniform_int_distribution<int> dist(0, legal_actions.size() - 1);
+    const int sampled_action_index = dist(gen);
+    const Action action = legal_actions[sampled_action_index];
+
+    SPIEL_CHECK_GE(action, 0);
+    std::unique_ptr<const State> child = state.Child(action);
+    std::vector<double> child_values = (
+        ExpectedReturnsOfDeterministicPoliciesFromSeedsImpl(
+            *child, policy_seeds, policies));
+    for (auto p = Player{0}; p < num_players; ++p) {
+      values[p] += child_values[p];
+    }
+  }
+  SPIEL_CHECK_EQ(values.size(), state.NumPlayers());
+  return values;
+}
 }  // namespace
 
 std::vector<double> ExpectedReturns(const State& state,
@@ -266,6 +341,24 @@ std::vector<double> ExpectedReturns(const State& state,
         prob_cut_threshold);
   }
 }
+
+
+std::vector<double> ExpectedReturnsOfDeterministicPoliciesFromSeeds(
+    const State& state, const std::vector<int>& policy_seeds) {
+  const std::vector<const Policy*>& policies = {};
+  SPIEL_CHECK_EQ(policy_seeds.size(), state.NumPlayers());
+  return ExpectedReturnsOfDeterministicPoliciesFromSeedsImpl(
+      state, policy_seeds, policies);
+}
+
+std::vector<double> ExpectedReturnsOfDeterministicPoliciesFromSeeds(
+    const State& state, const std::vector<int>& policy_seeds,
+    const std::vector<const Policy*>& policies) {
+  SPIEL_CHECK_EQ(policy_seeds.size(), state.NumPlayers());
+  return ExpectedReturnsOfDeterministicPoliciesFromSeedsImpl(
+      state, policy_seeds, policies);
+}
+
 
 }  // namespace algorithms
 }  // namespace open_spiel
