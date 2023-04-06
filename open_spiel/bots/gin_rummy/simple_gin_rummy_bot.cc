@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel.h"
@@ -38,6 +39,16 @@ ActionsAndProbs SimpleGinRummyBot::GetPolicy(const State& state) {
   for (auto action : legal_actions)
     policy.emplace_back(action, action == chosen_action ? 1.0 : 0.0);
   return policy;
+}
+
+std::pair<ActionsAndProbs, Action> SimpleGinRummyBot::StepWithPolicy(
+    const State& state) {
+  ActionsAndProbs policy;
+  auto legal_actions = state.LegalActions(player_id_);
+  auto chosen_action = Step(state);
+  for (auto action : legal_actions)
+    policy.emplace_back(action, action == chosen_action ? 1.0 : 0.0);
+  return {policy, chosen_action};
 }
 
 Action SimpleGinRummyBot::Step(const State& state) {
