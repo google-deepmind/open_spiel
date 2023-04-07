@@ -192,7 +192,5 @@ void TabularSarsaSolver::RunIteration() {
     curr_action = next_action;
   }
 }
-
-
 }  // namespace algorithms
 }  // namespace open_spiel
