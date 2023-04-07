@@ -137,7 +137,7 @@ void TabularQLearningTest_Catch_Lambda01_Win() {
 
 void TabularQLearningTest_Catch_Lambda01FasterThanLambda00() {
   // Eligibility traces (lambda > 0.0) always achieves victory with less
-  // training steps w.r.t. SARSA(lambda=0.0)
+  // training steps w.r.t. Q-learning(lambda=0.0)
   std::shared_ptr<const Game> game = LoadGame("catch");
   open_spiel::algorithms::TabularQLearningSolver
       tabular_q_learning_solver_lambda00(game, -1.0, 0.1, 0.01, 0.99, 0.0);

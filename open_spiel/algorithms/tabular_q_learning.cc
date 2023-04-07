@@ -163,8 +163,8 @@ void TabularQLearningSolver::RunIteration() {
 
     double prev_q_val = values_[{key, curr_action}];
     if (lambda_ == 0) {
-      // If lambda_ is equal to zero run sarsa as usual. It's not necessary
-      // to update eligibility traces.
+      // If lambda_ is equal to zero run Q-learning as usual.
+      // It's not necessary to update eligibility traces.
       values_[{key, curr_action}] +=
           learning_rate_ * (new_q_value - prev_q_val);
     } else {
