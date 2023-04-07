@@ -164,11 +164,13 @@ void TabularSarsaSolver::RunIteration() {
 
     double prev_q_val = values_[{key, curr_action}];
     if (lambda_ == 0) {
-      // If lambda_ is equal to zero run sarsa as usual. It's not necessary
+      // If lambda_ is equal to zero, run sarsa as usual. It's not necessary
       // to update eligibility traces.
       values_[{key, curr_action}] +=
           learning_rate_ * (new_q_value - prev_q_val);
     } else {
+      double lambda =
+          player != next_state->CurrentPlayer() ? -lambda_ : lambda_;
       eligibility_traces_[{key, curr_action}] += 1;
       std::string state;
       Action action;
@@ -182,7 +184,7 @@ void TabularSarsaSolver::RunIteration() {
         values_[{state, action}] += learning_rate_ *
                                     (new_q_value - prev_q_val) *
                                     eligibility_traces_[{state, action}];
-        eligibility_traces_[{state, action}] *= discount_factor_ * lambda_;
+        eligibility_traces_[{state, action}] *= discount_factor_ * lambda;
       }
     }
 
@@ -190,5 +192,7 @@ void TabularSarsaSolver::RunIteration() {
     curr_action = next_action;
   }
 }
+
+
 }  // namespace algorithms
 }  // namespace open_spiel

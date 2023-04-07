@@ -168,6 +168,8 @@ void TabularQLearningSolver::RunIteration() {
       values_[{key, curr_action}] +=
           learning_rate_ * (new_q_value - prev_q_val);
     } else {
+      double lambda =
+          player != next_state->CurrentPlayer() ? -lambda_ : lambda_;
       eligibility_traces_[{key, curr_action}] += 1;
       std::string state;
       Action action;
@@ -184,7 +186,7 @@ void TabularQLearningSolver::RunIteration() {
         if (random_action_) {
           eligibility_traces_[{state, action}] = 0;
         } else {
-          eligibility_traces_[{state, action}] *= discount_factor_ * lambda_;
+          eligibility_traces_[{state, action}] *= discount_factor_ * lambda;
         }
       }
     }
