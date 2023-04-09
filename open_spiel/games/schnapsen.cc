@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <string>
 
 #include "spiel_globals.h"
 #include "spiel_utils.h"
@@ -25,15 +26,15 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
+    /*parameter_specification=*/{} // no parameters
 };
 
-std::shared_ptr<const Game> Factory(const GameParameters& params) {
+std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new SchnapsenGame(params));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-}  // namespace
+} // namespace
 
 Player GetOtherPlayer(Player player) { return Player{(player + 1) % 2}; }
 
@@ -43,31 +44,64 @@ int GetValue(int action) { return action % kSuits; }
 
 int GetCardScore(int action) {
   switch (GetValue(action)) {
-    case 0:
-      return 2;
-    case 1:
-      return 3;
-    case 2:
-      return 4;
-    case 3:
-      return 10;
-    case 4:
-      return 11;
-    default:
-      SpielFatalError("Unknown Marker.");
+  case 0:
+    return 2;
+  case 1:
+    return 3;
+  case 2:
+    return 4;
+  case 3:
+    return 10;
+  case 4:
+    return 11;
+  default:
+    SpielFatalError("Unknown Marker.");
   }
 }
 
-bool All(const std::array<bool, kCards>& cards) {
+std::string GetValueString(int action) {
+  switch (GetValue(action)) {
+  case 0:
+    return "J";
+  case 1:
+    return "Q";
+  case 2:
+    return "K";
+  case 3:
+    return "T";
+  case 4:
+    return "A";
+  default:
+    SpielFatalError("Unknown Marker.");
+  }
+}
+
+std::string GetSuitString(int action) {
+  // Arbitrary order, only used for printing.
+  switch (GetSuit(action)) {
+  case 0:
+    return "♠";
+  case 1:
+    return "♥";
+  case 2:
+    return "♣";
+  case 3:
+    return "♦";
+  default:
+    SpielFatalError("Unknown Marker.");
+  }
+}
+
+bool All(const std::array<bool, kCards> &cards) {
   return std::all_of(cards.begin(), cards.end(), [](bool v) { return v; });
 }
-bool Any(const std::array<bool, kCards>& cards) {
+bool Any(const std::array<bool, kCards> &cards) {
   return std::any_of(cards.begin(), cards.end(), [](bool v) { return v; });
 }
-bool Count(const std::array<bool, kCards>& cards) {
+bool Count(const std::array<bool, kCards> &cards) {
   return std::accumulate(cards.begin(), cards.end(), 0);
 }
-std::vector<Action> Actions(const std::array<bool, kCards>& cards) {
+std::vector<Action> Actions(const std::array<bool, kCards> &cards) {
   std::vector<Action> numbers;
   for (int card = 0; card < kCards; card++) {
     if (cards[card]) {
@@ -76,6 +110,17 @@ std::vector<Action> Actions(const std::array<bool, kCards>& cards) {
   }
 
   return numbers;
+}
+
+std::string FormattedCard(int card) {
+  int suit = GetSuit(card);
+  int value = GetValue(card);
+}
+
+std::string SchnapsenState::ToString() const {
+  "Points player 0: " + std::to_string(scores_[0]) + "\n" +
+      "Points player 1: " + std::to_string(scores_[1]) + "\n" +
+      "Hand player 0: " + std::to_string(scores_[1]) + "\n" +
 }
 
 bool GetWinnerReturn(int loser_score) {
@@ -191,7 +236,8 @@ void SchnapsenState::DoApplyAction(Action action) {
 }
 
 std::vector<Action> SchnapsenState::LegalActions() const {
-  if (IsTerminal()) return {};
+  if (IsTerminal())
+    return {};
 
   if (active_player_ == kChancePlayerId) {
     return Actions(stack_cards_);
@@ -225,5 +271,5 @@ std::vector<std::pair<Action, double>> SchnapsenState::ChanceOutcomes() const {
   return chance_outcomes;
 };
 
-}  // namespace schnapsen
-}  // namespace open_spiel
+} // namespace schnapsen
+} // namespace open_spiel
