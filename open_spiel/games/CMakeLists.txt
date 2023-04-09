@@ -151,6 +151,8 @@ set(GAME_SOURCES
   quoridor.h
   rbc.cc
   rbc.h
+  schnapsen.cc
+  schnapsen.h
   sheriff.cc
   sheriff.h
   skat.cc
