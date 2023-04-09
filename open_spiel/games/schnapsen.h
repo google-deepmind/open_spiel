@@ -4,6 +4,7 @@
 #include <array>
 #include <map>
 #include <memory>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -19,11 +20,17 @@ inline constexpr int kValues = 5;
 inline constexpr int kCards = kSuits * kValues;
 inline constexpr int kHandSize = 5;
 inline constexpr int kWinningScore = 66;
+inline constexpr int kCutOffScore = 33;
 inline constexpr int kNoCard = -1;
-
-// TODO: Add history, etc.
-inline constexpr int kInformationStateTensorSize = kCards  // Current hand
-                                                   + 1;    // Who goes first
+inline constexpr int kInformationStateTensorSize =
+    kValues        // Open card value, if any
+    + kSuits       // Open card suit, if any
+    + kCards       // Current hand
+    + kValues      // Attout open value, if any
+    + kSuits       // Attout suit
+    + kNumPlayers  // Scores
+    + kCards       // Played cards
+    ;
 
 class SchnapsenState : public State {
  public:
@@ -57,18 +64,29 @@ class SchnapsenState : public State {
 
  protected:
   void DoApplyAction(Action action_id) override;
-  void ApplyChanceAction(Action action);
-  void ApplyPlayerAction(Action action);
+
+ private:
+  // TODO: Add "zudrehen", "zwanziger", "vierziger"
+  enum class ActionType { kDealAttout, kDraw, kPlay };
+  struct PlayerActionType {
+    Player player;
+    ActionType action_type;
+  };
+
+  std::queue<PlayerActionType> next_actions_;
+
+  void DealAttout(Action action);
+  void DrawCard(Action action, Player player);
+  void PlayCard(Action action, Player player);
+  bool CanDrawCard() const;
   Player GetWinner() const;
   std::array<std::array<bool, kCards>, kNumPlayers> hands_;
   std::array<bool, kCards> played_cards_;
-  // For convenience, so it does not need to be recomputed every time.
   std::array<bool, kCards> stack_cards_;
-  int open_card_;
-  int attout_suit_;
+  int open_card_ = kNoCard;
+  int attout_suit_ = kNoCard;
   int attout_open_card_ = kNoCard;
-  std::array<int, kNumPlayers> scores_;
-  Player active_player_;
+  std::array<int, kNumPlayers> scores_{0};
   Player last_trick_winner_ = kInvalidPlayer;
 };
 

@@ -1,0 +1,399 @@
+game: schnapsen
+
+GameType.chance_mode = ChanceMode.EXPLICIT_STOCHASTIC
+GameType.dynamics = Dynamics.SEQUENTIAL
+GameType.information = Information.IMPERFECT_INFORMATION
+GameType.long_name = "Schnapsen"
+GameType.max_num_players = 2
+GameType.min_num_players = 2
+GameType.parameter_specification = []
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
+GameType.provides_observation_string = True
+GameType.provides_observation_tensor = True
+GameType.provides_factored_observation_string = False
+GameType.reward_model = RewardModel.TERMINAL
+GameType.short_name = "schnapsen"
+GameType.utility = Utility.ZERO_SUM
+
+NumDistinctActions() = 20
+PolicyTensorShape() = [20]
+MaxChanceOutcomes() = 20
+GetParameters() = {}
+NumPlayers() = 2
+MinUtility() = -3.0
+MaxUtility() = 3.0
+UtilitySum() = 0.0
+InformationStateTensorShape() = [60]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 60
+ObservationTensorShape() = [0]
+ObservationTensorLayout() = TensorLayout.CHW
+ObservationTensorSize() = 0
+MaxGameLength() = 20
+ToString() = "schnapsen()"
+
+# State 0
+# Open card: XX
+# Hand player 0:
+# Hand player 1:
+# Attout: XX
+# Points player 0: 0
+# Points player 1: 0
+# Stack size: 20
+# Stack: J♠Q♠K♠T♠A♠J♥Q♥K♥T♥A♥J♣Q♣K♣T♣A♣J♦Q♦K♦T♦A♦
+# Played cards
+IsTerminal() = False
+History() = []
+HistoryString() = ""
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "XX\n\nXX\n0\n0\n\n"
+InformationStateString(1) = "XX\n\nXX\n0\n0\n\n"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+ChanceOutcomes() = [(0, 0.05), (1, 0.05), (2, 0.05), (3, 0.05), (4, 0.05), (5, 0.05), (6, 0.05), (7, 0.05), (8, 0.05), (9, 0.05), (10, 0.05), (11, 0.05), (12, 0.05), (13, 0.05), (14, 0.05), (15, 0.05), (16, 0.05), (17, 0.05), (18, 0.05), (19, 0.05)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+StringLegalActions() = ["J♠", "Q♠", "K♠", "T♠", "A♠", "J♥", "Q♥", "K♥", "T♥", "A♥", "J♣", "Q♣", "K♣", "T♣", "A♣", "J♦", "Q♦", "K♦", "T♦", "A♦"]
+
+# Apply action "A♥"
+action: 9
+
+# State 1
+# Open card: XX
+# Hand player 0:
+# Hand player 1:
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 0
+# Stack size: 19
+# Stack: J♠Q♠K♠T♠A♠J♥Q♥K♥T♥J♣Q♣K♣T♣A♣J♦Q♦K♦T♦A♦
+# Played cards
+IsTerminal() = False
+History() = [9]
+HistoryString() = "9"
+IsChanceNode() = True
+IsSimultaneousNode() = False
+CurrentPlayer() = -1
+InformationStateString(0) = "XX\n\nA♥\n0\n0\n\n"
+InformationStateString(1) = "XX\n\nA♥\n0\n0\n\n"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+ChanceOutcomes() = [(0, 0.05263157894736842), (1, 0.05263157894736842), (2, 0.05263157894736842), (3, 0.05263157894736842), (4, 0.05263157894736842), (5, 0.05263157894736842), (6, 0.05263157894736842), (7, 0.05263157894736842), (8, 0.05263157894736842), (10, 0.05263157894736842), (11, 0.05263157894736842), (12, 0.05263157894736842), (13, 0.05263157894736842), (14, 0.05263157894736842), (15, 0.05263157894736842), (16, 0.05263157894736842), (17, 0.05263157894736842), (18, 0.05263157894736842), (19, 0.05263157894736842)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+StringLegalActions() = ["J♠", "Q♠", "K♠", "T♠", "A♠", "J♥", "Q♥", "K♥", "T♥", "J♣", "Q♣", "K♣", "T♣", "A♣", "J♦", "Q♦", "K♦", "T♦", "A♦"]
+
+# Apply action "Q♠"
+action: 1
+
+# State 2
+# Apply action "T♥"
+action: 8
+
+# State 3
+# Apply action "J♠"
+action: 0
+
+# State 4
+# Apply action "A♦"
+action: 19
+
+# State 5
+# Apply action "T♦"
+action: 18
+
+# State 6
+# Apply action "J♥"
+action: 5
+
+# State 7
+# Apply action "Q♥"
+action: 6
+
+# State 8
+# Apply action "A♣"
+action: 14
+
+# State 9
+# Apply action "J♣"
+action: 10
+
+# State 10
+# Apply action "T♣"
+action: 13
+
+# State 11
+# Open card: XX
+# Hand player 0: J♠Q♠Q♥J♣T♦
+# Hand player 1: J♥T♥T♣A♣A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 0
+# Stack size: 9
+# Stack: K♠T♠A♠K♥Q♣K♣J♦Q♦K♦
+# Played cards
+IsTerminal() = False
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "XX\nJ♠Q♠Q♥J♣T♦\nA♥\n0\n0\n\n"
+InformationStateString(1) = "XX\nJ♥T♥T♣A♣A♦\nA♥\n0\n0\n\n"
+InformationStateTensor(0): ◯◯◯◯◯◯◯◯◯◉◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 1, 6, 10, 18]
+StringLegalActions() = ["J♠", "Q♠", "Q♥", "J♣", "T♦"]
+
+# Apply action "J♠"
+action: 0
+
+# State 12
+# Open card: J♠
+# Hand player 0: Q♠Q♥J♣T♦
+# Hand player 1: J♥T♥T♣A♣A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 0
+# Stack size: 9
+# Stack: K♠T♠A♠K♥Q♣K♣J♦Q♦K♦
+# Played cards J♠
+IsTerminal() = False
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "J♠\nQ♠Q♥J♣T♦\nA♥\n0\n0\nJ♠\n"
+InformationStateString(1) = "J♠\nJ♥T♥T♣A♣A♦\nA♥\n0\n0\nJ♠\n"
+InformationStateTensor(0): ◉◯◯◯◯◉◯◯◯◯◉◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1): ◉◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◉◯◯◯◯◉◉◯◯◯◯◉◯◯◯◯◉◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [5, 8, 13, 14, 19]
+StringLegalActions() = ["J♥", "T♥", "T♣", "A♣", "A♦"]
+
+# Apply action "T♥"
+action: 8
+
+# State 13
+# Apply action "T♠"
+action: 3
+
+# State 14
+# Apply action "Q♣"
+action: 11
+
+# State 15
+# Open card: XX
+# Hand player 0: Q♠Q♥J♣Q♣T♦
+# Hand player 1: T♠J♥T♣A♣A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 12
+# Stack size: 7
+# Stack: K♠A♠K♥K♣J♦Q♦K♦
+# Played cards J♠T♥
+IsTerminal() = False
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "XX\nQ♠Q♥J♣Q♣T♦\nA♥\n0\n12\nJ♠T♥\n"
+InformationStateString(1) = "XX\nT♠J♥T♣A♣A♦\nA♥\n12\n0\nJ♠T♥\n"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.18182, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.18182, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [3, 5, 13, 14, 19]
+StringLegalActions() = ["T♠", "J♥", "T♣", "A♣", "A♦"]
+
+# Apply action "T♣"
+action: 13
+
+# State 16
+# Open card: T♣
+# Hand player 0: Q♠Q♥J♣Q♣T♦
+# Hand player 1: T♠J♥A♣A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 12
+# Stack size: 7
+# Stack: K♠A♠K♥K♣J♦Q♦K♦
+# Played cards J♠T♥T♣
+IsTerminal() = False
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "T♣\nQ♠Q♥J♣Q♣T♦\nA♥\n0\n12\nJ♠T♥T♣\n"
+InformationStateString(1) = "T♣\nT♠J♥A♣A♦\nA♥\n12\n0\nJ♠T♥T♣\n"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.18182, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.18182, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 6, 10, 11, 18]
+StringLegalActions() = ["Q♠", "Q♥", "J♣", "Q♣", "T♦"]
+
+# Apply action "Q♠"
+action: 1
+
+# State 17
+# Apply action "K♣"
+action: 12
+
+# State 18
+# Apply action "J♦"
+action: 15
+
+# State 19
+# Open card: XX
+# Hand player 0: Q♥J♣Q♣J♦T♦
+# Hand player 1: T♠J♥K♣A♣A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 25
+# Stack size: 5
+# Stack: K♠A♠K♥Q♦K♦
+# Played cards J♠Q♠T♥T♣
+IsTerminal() = False
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13, 1, 12, 15]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13, 1, 12, 15"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "XX\nQ♥J♣Q♣J♦T♦\nA♥\n0\n25\nJ♠Q♠T♥T♣\n"
+InformationStateString(1) = "XX\nT♠J♥K♣A♣A♦\nA♥\n25\n0\nJ♠Q♠T♥T♣\n"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.37879, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.37879, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [3, 5, 12, 14, 19]
+StringLegalActions() = ["T♠", "J♥", "K♣", "A♣", "A♦"]
+
+# Apply action "A♣"
+action: 14
+
+# State 20
+# Open card: A♣
+# Hand player 0: Q♥J♣Q♣J♦T♦
+# Hand player 1: T♠J♥K♣A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 25
+# Stack size: 5
+# Stack: K♠A♠K♥Q♦K♦
+# Played cards J♠Q♠T♥T♣A♣
+IsTerminal() = False
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13, 1, 12, 15, 14]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13, 1, 12, 15, 14"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "A♣\nQ♥J♣Q♣J♦T♦\nA♥\n0\n25\nJ♠Q♠T♥T♣A♣\n"
+InformationStateString(1) = "A♣\nT♠J♥K♣A♦\nA♥\n25\n0\nJ♠Q♠T♥T♣A♣\n"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.37879, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.37879, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [6, 10, 11, 15, 18]
+StringLegalActions() = ["Q♥", "J♣", "Q♣", "J♦", "T♦"]
+
+# Apply action "J♦"
+action: 15
+
+# State 21
+# Apply action "K♦"
+action: 17
+
+# State 22
+# Apply action "K♥"
+action: 7
+
+# State 23
+# Apply action "T♠"
+action: 3
+
+# State 24
+# Apply action "T♦"
+action: 18
+
+# State 25
+# Apply action "A♠"
+action: 4
+
+# State 26
+# Apply action "K♠"
+action: 2
+
+# State 27
+# Apply action "A♠"
+action: 4
+
+# State 28
+# Apply action "Q♣"
+action: 11
+
+# State 29
+# Open card: XX
+# Hand player 0: K♠Q♥K♥J♣
+# Hand player 1: J♥K♣K♦A♦
+# Attout: A♥
+# Points player 0: 0
+# Points player 1: 72
+# Stack size: 1
+# Stack: Q♦
+# Played cards J♠Q♠T♠A♠T♥Q♣T♣A♣J♦T♦
+IsTerminal() = True
+History() = [9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13, 1, 12, 15, 14, 15, 17, 7, 3, 18, 4, 2, 4, 11]
+HistoryString() = "9, 1, 8, 0, 19, 18, 5, 6, 14, 10, 13, 0, 8, 3, 11, 13, 1, 12, 15, 14, 15, 17, 7, 3, 18, 4, 2, 4, 11"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = -4
+InformationStateString(0) = "XX\nK♠Q♥K♥J♣\nA♥\n0\n72\nJ♠Q♠T♠A♠T♥Q♣T♣A♣J♦T♦\n"
+InformationStateString(1) = "XX\nJ♥K♣K♦A♦\nA♥\n72\n0\nJ♠Q♠T♠A♠T♥Q♣T♣A♣J♦T♦\n"
+InformationStateTensor(0) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.09091, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0]
+InformationStateTensor(1) = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.09091, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0]
+ObservationString(0) = ""
+ObservationString(1) = ""
+ObservationTensor(0) = []
+ObservationTensor(1) = []
+Rewards() = [-1, 1]
+Returns() = [-1, 1]
