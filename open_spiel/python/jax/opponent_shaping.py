@@ -3,6 +3,11 @@ JAX implementation of LOLA (Foerster et al., 2018) and LOLA-DiCE
 (Foerster et al. 2018). The DiCE implementation is also based on the pytorch 
 implementation from https://github.com/alexis-jacq/LOLA_DiCE 
 by Alexis David Jacq.
+
+Both algorithm implementations, LOLA and LOLA-DiCE, currently support only
+two-player simultaneous move games and assume access to the opponent's
+actions (the observation field in the time step must contain a key
+'actions' with the opponent's actions).
 """
 
 import typing
