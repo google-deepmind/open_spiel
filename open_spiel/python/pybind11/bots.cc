@@ -22,6 +22,8 @@
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
+#include "open_spiel/bots/uci/uci_bot.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -287,6 +289,11 @@ void init_pyspiel_bots(py::module& m) {
       },
       "A bot that samples from a policy.");
 
+  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
+      py::arg("move_time"), py::arg("ponder"), py::arg("options"),
+      "Bot that can play chess using UCI chess engine.");
+
+
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
   m.attr("ROSHAMBO_NUM_THROWS") = py::int_(open_spiel::roshambo::kNumThrows);
   m.attr("ROSHAMBO_NUM_BOTS") = py::int_(open_spiel::roshambo::kNumBots);
@@ -297,5 +304,14 @@ void init_pyspiel_bots(py::module& m) {
         py::arg("player_id"), py::arg("bot_name"),
         py::arg("num_throws") = open_spiel::roshambo::kNumThrows);
 #endif
+
+  m.def(
+      "make_simple_gin_rummy_bot",
+      [](const GameParameters& params,
+         int player_id) -> std::unique_ptr<open_spiel::Bot> {
+        return std::make_unique<gin_rummy::SimpleGinRummyBot>(params,
+                                                              player_id);
+      },
+      py::arg("params"), py::arg("player_id"));
 }
 }  // namespace open_spiel

@@ -20,6 +20,7 @@
 
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -101,12 +102,17 @@ std::vector<double> ExpectedReturnsImpl(
       SpielFatalError("Error in ExpectedReturnsImpl; infostate not found.");
     }
     values = state.Rewards();
+    float total_prob = 0.0;
     for (const Action action : state.LegalActions()) {
       std::unique_ptr<State> child = state.Child(action);
+      // GetProb can return -1 for legal actions not in the policy. We treat
+      // these as having zero probability, but check that at least some actions
+      // have positive probability.
       double action_prob = GetProb(state_policy, action);
-      SPIEL_CHECK_GE(action_prob, 0.0);
       SPIEL_CHECK_LE(action_prob, 1.0);
       if (action_prob > prob_cut_threshold) {
+        SPIEL_CHECK_GE(action_prob, 0.0);
+        total_prob += action_prob;
         std::vector<double> child_values =
             ExpectedReturnsImpl(
                 *child, policy_func, depth_limit - 1, prob_cut_threshold);
@@ -115,6 +121,9 @@ std::vector<double> ExpectedReturnsImpl(
         }
       }
     }
+    // Check that there is a least some positive mass on at least one action.
+    // Consider using: SPIEL_CHECK_FLOAT_EQ(total_prob, 1.0);
+    SPIEL_CHECK_GT(total_prob, 0.0);
   }
   SPIEL_CHECK_EQ(values.size(), state.NumPlayers());
   return values;

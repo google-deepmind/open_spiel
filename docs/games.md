@@ -16,6 +16,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
+<font color="orange"><b>~</b></font>         | [Block Dominoes](#block-dominoes)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
@@ -159,6 +160,17 @@ Status                                       | Game
 *   Imperfect information.
 *   1 player.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Blackjack)
+
+### Block Dominoes
+
+*   Most simple version of dominoes.
+*   Consists of 28 tiles, featuring all combinations of spot counts (also called
+    pips or dots) between zero and six.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   2 players.
+*   [Wikipedia]([https://en.wikipedia.org/wiki/Blackjack]\(https://en.wikipedia.org/wiki/Dominoes#Blocking_game\))
 
 ### Breakthrough
 

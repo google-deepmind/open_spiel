@@ -50,7 +50,7 @@ _TIC_TAC_TOE_STATES = [
 ]
 
 
-def test_policy_on_game(self, game, policy_object):
+def test_policy_on_game(self, game, policy_object, player=-1):
   """Checks the policy conforms to the conventions.
 
   Checks the Policy.action_probabilities contains only legal actions (but not
@@ -62,6 +62,7 @@ def test_policy_on_game(self, game, policy_object):
       function to test policies.
     game: A `pyspiel.Game`, same as the one used in the policy.
     policy_object: A `policy.Policy` object on `game`. to test.
+    player: Restrict testing policy to a player.
   """
 
   all_states = get_all_states.get_all_states(
@@ -92,7 +93,10 @@ def test_policy_on_game(self, game, policy_object):
     for prob in action_probabilities.values():
       sum_ += prob
       self.assertGreaterEqual(prob, 0)
-    self.assertAlmostEqual(1, sum_)
+    if player < 0 or state.current_player() == player:
+      self.assertAlmostEqual(1, sum_)
+    else:
+      self.assertAlmostEqual(0, sum_)
 
 
 _LEDUC_POKER = pyspiel.load_game("leduc_poker")
@@ -115,9 +119,22 @@ class CommonTest(parameterized.TestCase):
        pyspiel.GetRandomPolicy(_LEDUC_POKER, 1)),
       ("pyspiel.GetFlatDirichletPolicy",
        pyspiel.GetFlatDirichletPolicy(_LEDUC_POKER, 1)),
+      ("pyspiel.GetRandomDeterministicPolicy",
+       pyspiel.GetRandomDeterministicPolicy(_LEDUC_POKER, 1)),
   ])
   def test_cpp_policies_on_leduc(self, policy_object):
     test_policy_on_game(self, _LEDUC_POKER, policy_object)
+
+  @parameterized.named_parameters([
+      ("pyspiel.GetRandomPolicy0",
+       pyspiel.GetRandomPolicy(_LEDUC_POKER, 1, 0), 0),
+      ("pyspiel.GetFlatDirichletPolicy1",
+       pyspiel.GetFlatDirichletPolicy(_LEDUC_POKER, 1, 1), 1),
+      ("pyspiel.GetRandomDeterministicPolicym1",
+       pyspiel.GetRandomDeterministicPolicy(_LEDUC_POKER, 1, -1), -1),
+  ])
+  def test_cpp_player_policies_on_leduc(self, policy_object, player):
+    test_policy_on_game(self, _LEDUC_POKER, policy_object, player)
 
 
 class TabularTicTacToePolicyTest(parameterized.TestCase):

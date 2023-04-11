@@ -29,6 +29,9 @@ namespace algorithms {
 // prob_cut_threshold > 0 will cut the tree search if the reach probability
 // goes below this value resulting in an approximate return.
 //
+// Policies need not be complete; any missing legal actions will be assumed to
+// have zero probability.
+//
 // The second overloaded function acts the same way, except assumes that all of
 // the players' policies are encapsulated in one joint policy.
 //

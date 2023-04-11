@@ -369,11 +369,10 @@ std::string PyState::Serialize() const {
 }
 
 int PyState::MeanFieldPopulation() const {
-  // Use a python population() implementation if available.
-  PYBIND11_OVERRIDE_IMPL(int, State, "mean_field_population");
-
-  // Otherwise, default to behavior from the base class.
-  return State::MeanFieldPopulation();
+  // Use a Python implementation if available, fall back to the C++
+  // implementation if not.
+  PYBIND11_OVERRIDE_NAME(int, State, "mean_field_population",
+                              MeanFieldPopulation, /* no arguments */);
 }
 
 }  // namespace open_spiel
