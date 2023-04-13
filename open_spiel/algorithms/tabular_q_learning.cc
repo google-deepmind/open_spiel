@@ -173,12 +173,10 @@ void TabularQLearningSolver::RunIteration() {
       eligibility_traces_[{key, curr_action}] += 1;
       std::string state;
       Action action;
-      double prev_q_val_tmp;
 
       for (auto q_cell : values_) {
         state = q_cell.first.first;
         action = q_cell.first.second;
-        prev_q_val_tmp = q_cell.second;
 
         values_[{state, action}] += learning_rate_ *
                                     (new_q_value - prev_q_val) *
