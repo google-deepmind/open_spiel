@@ -443,6 +443,22 @@ class ObserverRegisterer {
   }
 };
 
+// Registers an observer named "single_tensor" which falls back to
+// state.observation_tensor or state.information_state_tensor (which generate a
+// single tensor).
+//
+// Note that one cannot pass empty ObservationParams to
+// game->MakeObserver(...) to achieve the same behavior in general:
+// leduc, goofspiel and many other games will generate multiple tensors in that
+// case.
+//
+// Use:
+// RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+class RegisterSingleTensorObserver {
+ public:
+  RegisterSingleTensorObserver(const std::string& game_name);
+};
+
 // Pure function that creates a tensor from an observer. Slower than using an
 // Observation, but threadsafe. This is useful when you cannot keep an
 // Observation around to use multiple times.

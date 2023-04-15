@@ -19,9 +19,8 @@ policy by sweeping over the state space.
 """
 
 import copy
-import numpy as np
+import itertools
 from open_spiel.python import policy
-import pyspiel
 
 
 class PolicyFunction(policy.Policy):
@@ -74,12 +73,9 @@ class PolicyFunction(policy.Policy):
     """
     state_key = self._state_key(state, player_id=player_id)
     if state.is_simultaneous_node():
-      # Policy aggregator doesn't yet support simultaneous moves nodes.
-      # The below lines are one step towards that direction.
-      result = []
-      for player_pol in self._policies:
-        result.append(player_pol[state_key])
-      return result
+      # for simultaneous node, assume player id must be provided
+      assert player_id >= 0
+      return self._policies[player_id][state_key]
     if player_id is None:
       player_id = state.current_player()
     return self._policies[player_id][state_key]
@@ -188,29 +184,47 @@ class PolicyAggregator(object):
     if state.is_terminal():
       return
     elif state.is_simultaneous_node():
-      # TODO(author10): this is assuming that if there is a sim.-move state, it is
-      #               the only state, i.e., the game is a normal-form game
-      def assert_type(cond, msg):
-        assert cond, msg
-      assert_type(self._game_type.dynamics ==
-                  pyspiel.GameType.Dynamics.SIMULTANEOUS,
-                  "Game must be simultaneous-move")
-      assert_type(self._game_type.chance_mode ==
-                  pyspiel.GameType.ChanceMode.DETERMINISTIC,
-                  "Chance nodes not supported")
-      assert_type(self._game_type.information ==
-                  pyspiel.GameType.Information.ONE_SHOT,
-                  "Only one-shot NFGs supported")
+
       policies = self._policy_pool(state, pid)
       state_key = self._state_key(state, pid)
       self._policy[state_key] = {}
-      for player_policy, weight in zip(policies, my_reaches[pid]):
-        for action in player_policy.keys():
-          if action in self._policy[state_key]:
-            self._policy[state_key][action] += weight * player_policy[action]
+      used_moves = state.legal_actions(pid)
+
+      for uid in used_moves:
+        new_reaches = copy.deepcopy(my_reaches)
+        for i in range(len(policies)):
+          # compute the new reach for each policy for this action
+          new_reaches[pid][i] *= policies[i].get(uid, 0)
+          # add reach * prob(a) for this policy to the computed policy
+          if uid in self._policy[state_key].keys():
+            self._policy[state_key][uid] += new_reaches[pid][i]
           else:
-            self._policy[state_key][action] = weight * player_policy[action]
+            self._policy[state_key][uid] = new_reaches[pid][i]
+
+      num_players = self._game.num_players()
+      all_other_used_moves = []
+      for player in range(num_players):
+        if player != pid:
+          all_other_used_moves.append(state.legal_actions(player))
+
+      other_joint_actions = itertools.product(*all_other_used_moves)
+
+      # enumerate every possible other-agent actions for next-state
+      for other_joint_action in other_joint_actions:
+        for uid in used_moves:
+          new_reaches = copy.deepcopy(my_reaches)
+          for i in range(len(policies)):
+            # compute the new reach for each policy for this action
+            new_reaches[pid][i] *= policies[i].get(uid, 0)
+
+          joint_action = list(
+              other_joint_action[:pid] + (uid,) + other_joint_action[pid:]
+          )
+          new_state = state.clone()
+          new_state.apply_actions(joint_action)
+          self._rec_aggregate(pid, new_state, new_reaches)
       return
+
     elif state.is_chance_node():
       # do not factor in opponent reaches
       outcomes, _ = zip(*state.chance_outcomes())
@@ -228,13 +242,10 @@ class PolicyAggregator(object):
       if pid == turn_player:
         # update the current node
         # will need the observation to query the policies
-        if state not in self._policy:
+        if state_key not in self._policy:
           self._policy[state_key] = {}
 
-      used_moves = []
-      for k in range(len(legal_policies)):
-        used_moves += [a[0] for a in legal_policies[k].items()]
-      used_moves = np.unique(used_moves)
+      used_moves = state.legal_actions(turn_player)
 
       for uid in used_moves:
         new_reaches = copy.deepcopy(my_reaches)

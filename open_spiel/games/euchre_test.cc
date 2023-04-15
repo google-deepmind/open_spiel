@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -23,6 +24,11 @@ void BasicGameTests() {
   testing::LoadGameTest("euchre");
   testing::ChanceOutcomesTest(*LoadGame("euchre"));
   testing::RandomSimTest(*LoadGame("euchre"), 10);
+
+  auto observer = LoadGame("euchre")
+                      ->MakeObserver(kInfoStateObsType,
+                                     GameParametersFromString("single_tensor"));
+  testing::RandomSimTestCustomObserver(*LoadGame("euchre"), observer);
 }
 
 

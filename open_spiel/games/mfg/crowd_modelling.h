@@ -126,7 +126,6 @@ class CrowdModellingGame : public Game {
   double MinUtility() const override {
     return -std::numeric_limits<double>::infinity();
   }
-  double UtilitySum() const override { return 0; }
   double MaxUtility() const override {
     return std::numeric_limits<double>::infinity();
   }

@@ -131,7 +131,7 @@ class MissingPlayerRepeatedMatchingPenniesGame : public SimMoveGame {
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -num_players_; }
   double MaxUtility() const override { return num_players_; }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   int MaxGameLength() const override { return num_players_; }
 
  private:

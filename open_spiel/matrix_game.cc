@@ -59,6 +59,30 @@ GameType::Utility GetUtilityType(const std::vector<double>& row_player_utils,
     return GameType::Utility::kGeneralSum;
   }
 }
+
+absl::optional<double> GetUtilitySum(
+    const std::vector<double>& row_player_utils,
+    const std::vector<double>& col_player_utils) {
+  double util_sum = 0;
+  bool constant_sum = true;
+  for (int i = 0; i < row_player_utils.size(); ++i) {
+    if (i == 0) {
+      util_sum = row_player_utils[i] + col_player_utils[i];
+    } else {
+      if (constant_sum &&
+          !Near(row_player_utils[i] + col_player_utils[i], util_sum)) {
+        constant_sum = false;
+      }
+    }
+  }
+
+  if (constant_sum) {
+    return Near(util_sum, 0.0) ? 0 : util_sum;
+  } else {
+    return absl::nullopt;
+  }
+}
+
 }  // namespace
 
 MatrixState::MatrixState(std::shared_ptr<const Game> game)
@@ -184,6 +208,10 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
 
   return std::shared_ptr<const MatrixGame>(new MatrixGame(
       game_type, {}, row_names, col_names, flat_row_utils, flat_col_utils));
+}
+
+absl::optional<double> MatrixGame::UtilitySum() const {
+  return GetUtilitySum(row_utilities_, col_utilities_);
 }
 
 }  // namespace matrix_game

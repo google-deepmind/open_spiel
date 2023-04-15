@@ -27,7 +27,7 @@ class Dataset:
   def __init__(self, train_dataset: List[Tuple[List[List[float]],
                                                InfostateNode]],
                batch_size: int):
-    self._train_dataset = np.array(train_dataset)
+    self._train_dataset = np.array(train_dataset, dtype=object)
     self._size = self._train_dataset.shape[0]
     self._batch_size = batch_size
 

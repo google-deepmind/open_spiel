@@ -74,16 +74,7 @@ std::string StatelessActionToString(Action action) {
   }
 }
 
-// Provides the observations / infostates as defined on the state
-// as a single tensor.
-std::shared_ptr<Observer> MakeSingleTensorObserver(
-    const Game& game, absl::optional<IIGObservationType> iig_obs_type,
-    const GameParameters& params) {
-  return std::shared_ptr<Observer>(game.MakeBuiltInObserver(iig_obs_type));
-}
-
-ObserverRegisterer single_tensor(
-    kGameType.short_name, "single_tensor", MakeSingleTensorObserver);
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
 // The Observer class is responsible for creating representations of the game

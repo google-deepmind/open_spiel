@@ -1,4 +1,6 @@
 add_library (game_transforms OBJECT
+  add_noise.cc
+  add_noise.h
   coop_to_1p.cc
   coop_to_1p.h
   efg_writer.cc
@@ -35,6 +37,12 @@ add_executable(misere_test
                ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(misere_test misere_test)
+
+add_executable(add_noise_test
+               add_noise_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(add_noise_test add_noise_test)
 
 add_executable(coop_to_1p_test
                coop_to_1p_test.cc

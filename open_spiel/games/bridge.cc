@@ -75,6 +75,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 // A call is one of Pass, Double, Redouble, or a bid.
 // Bids are a combination of a number of tricks (level + 6) and denomination
 // (trump suit or no-trumps).
@@ -347,11 +349,13 @@ void BridgeState::WriteObservationTensor(Player player,
     ptr += kNumPlayers * kNumCards;
 
     // Current trick
-    int leader = tricks_[current_trick].Leader();
-    for (int i = 0; i < this_trick_cards_played; ++i) {
-      int card = history_[this_trick_start + i].action;
-      int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
-      ptr[relative_player * kNumCards + card] = 1;
+    if (phase_ != Phase::kGameOver) {
+      int leader = tricks_[current_trick].Leader();
+      for (int i = 0; i < this_trick_cards_played; ++i) {
+        int card = history_[this_trick_start + i].action;
+        int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
+        ptr[relative_player * kNumCards + card] = 1;
+      }
     }
     ptr += kNumPlayers * kNumCards;
 

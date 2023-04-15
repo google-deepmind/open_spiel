@@ -63,6 +63,8 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 std::string TurnTypeToString(TurnType turn_type) {
   if (turn_type == TurnType::kProposal) {
     return "Proposal";

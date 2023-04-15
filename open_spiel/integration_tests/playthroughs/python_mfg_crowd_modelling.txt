@@ -23,7 +23,7 @@ GetParameters() = {horizon=10,size=10}
 NumPlayers() = 1
 MinUtility() = -inf
 MaxUtility() = inf
-UtilitySum() = 0.0
+UtilitySum() = None
 ObservationTensorShape() = x: [10], t: [11]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 21
@@ -56,7 +56,7 @@ History() = [5]
 HistoryString() = "5"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = 0
+CurrentPlayer() = PlayerId.DEFAULT_PLAYER_ID
 InformationStateString(0) = "5"
 ObservationString(0) = "(5, 0)"
 ObservationTensor(0).x: ◯◯◯◯◯◉◯◯◯◯

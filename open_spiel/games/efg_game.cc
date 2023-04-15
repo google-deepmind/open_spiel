@@ -21,6 +21,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -58,6 +59,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 std::string NodeToString(const Node* node) {
   std::string str = "";
@@ -243,7 +246,12 @@ int EFGGame::NumPlayers() const { return num_players_; }
 
 double EFGGame::MinUtility() const { return min_util_.value(); }
 
-double EFGGame::UtilitySum() const { return util_sum_.value(); }
+absl::optional<double> EFGGame::UtilitySum() const {
+  if (constant_sum_)
+    return util_sum_;
+  else
+    return absl::nullopt;
+}
 
 double EFGGame::MaxUtility() const { return max_util_.value(); }
 
@@ -353,7 +361,7 @@ std::unique_ptr<Node> EFGGame::NewNode() const {
       " while parsing line #", line_, ":\n", GetLine(line_)))
 
 bool EFGGame::ParseDoubleValue(const std::string& str, double* value) const {
-  if (str.find('/') != std::string::npos) {
+  if (absl::StrContains(str, '/')) {
     // Check for rational number of the form X/Y
     std::vector<std::string> parts = absl::StrSplit(str, '/');
     SPIEL_EFG_PARSE_CHECK_EQ(parts.size(), 2);

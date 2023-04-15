@@ -72,7 +72,6 @@ class MatchingPennies3pGame : public NormalFormGame {
 
   int NumPlayers() const override { return 3; }
   double MinUtility() const override { return -1; }
-  double UtilitySum() const override { return 0; }
   double MaxUtility() const override { return +1; }
 };
 

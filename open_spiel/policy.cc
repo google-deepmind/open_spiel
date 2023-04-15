@@ -249,7 +249,8 @@ ActionsAndProbs PartialTabularPolicy::GetStatePolicy(
 }
 
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
-                                    bool initialize_to_uniform) {
+                                    bool initialize_to_uniform,
+                                    Player player) {
   std::unordered_map<std::string, ActionsAndProbs> policy;
   if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError("Game is not sequential.");
@@ -272,20 +273,24 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game,
       std::vector<Action> legal_actions = state->LegalActions();
       const int num_legal_actions = legal_actions.size();
       SPIEL_CHECK_GT(num_legal_actions, 0.);
-      double action_probability = 1.;
-      if (initialize_to_uniform) {
-        action_probability = 1. / num_legal_actions;
-      }
-
-      infostate_policy.reserve(num_legal_actions);
       for (Action action : legal_actions) {
         to_visit.push_back(state->Child(action));
-        infostate_policy.push_back({action, action_probability});
       }
-      if (infostate_policy.empty()) {
-        SpielFatalError("State has zero legal actions.");
+      if (player < 0 || state->IsPlayerActing(player)) {
+        double action_probability = 1.;
+        if (initialize_to_uniform) {
+          action_probability = 1. / num_legal_actions;
+        }
+        ActionsAndProbs infostate_policy;
+        infostate_policy.reserve(num_legal_actions);
+        for (Action action : legal_actions) {
+          infostate_policy.push_back({action, action_probability});
+        }
+        if (infostate_policy.empty()) {
+          SpielFatalError("State has zero legal actions.");
+        }
+        policy.insert({state->InformationStateString(), infostate_policy});
       }
-      policy.insert({state->InformationStateString(), infostate_policy});
     }
   }
   return TabularPolicy(policy);
@@ -295,10 +300,11 @@ TabularPolicy GetUniformPolicy(const Game& game) {
   return GetEmptyTabularPolicy(game, /*initialize_to_uniform=*/true);
 }
 
-TabularPolicy GetRandomPolicy(const Game& game, int seed) {
+template <typename RandomNumberDistribution>
+TabularPolicy SamplePolicy(
+  const Game& game, int seed, RandomNumberDistribution& dist, Player player) {
   std::mt19937 gen(seed);
-  std::uniform_real_distribution<double> dist(0, 1);
-  TabularPolicy policy = GetEmptyTabularPolicy(game);
+  TabularPolicy policy = GetEmptyTabularPolicy(game, false, player);
   std::unordered_map<std::string, ActionsAndProbs>& policy_table =
       policy.PolicyTable();
   for (auto& kv : policy_table) {
@@ -310,8 +316,8 @@ TabularPolicy GetRandomPolicy(const Game& game, int seed) {
     double sum = 0;
     double prob;
     for (const auto& action_and_prob : kv.second) {
-      // We multiply the original probability by a random number between 0
-      // and 1. We then normalize. This has the effect of randomly permuting the
+      // We multiply the original probability by a random number greater than
+      // 0. We then normalize. This has the effect of randomly permuting the
       // policy but all illegal actions still have zero probability.
       prob = dist(gen) * action_and_prob.second;
       sum += prob;
@@ -330,6 +336,73 @@ TabularPolicy GetRandomPolicy(const Game& game, int seed) {
     kv.second = state_policy;
   }
   return policy;
+}
+
+TabularPolicy GetRandomPolicy(const Game& game, int seed, Player player) {
+  std::uniform_real_distribution<double> dist(0, 1);
+  return SamplePolicy(game, seed, dist, player);
+}
+
+TabularPolicy GetFlatDirichletPolicy(
+    const Game& game, int seed, Player player) {
+  std::gamma_distribution<double> dist(1.0, 1.0);
+  return SamplePolicy(game, seed, dist, player);
+}
+
+TabularPolicy GetRandomDeterministicPolicy(
+    const Game& game, int seed, Player player) {
+  std::mt19937 gen(seed);
+  std::unordered_map<int, std::uniform_int_distribution<int>> dists;
+  std::unordered_map<std::string, ActionsAndProbs> policy;
+  if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
+    SpielFatalError("Game is not sequential.");
+    return TabularPolicy(policy);
+  }
+  const GameType::Information information = game.GetType().information;
+  std::list<std::unique_ptr<State>> to_visit;
+  to_visit.push_back(game.NewInitialState());
+  while (!to_visit.empty()) {
+    std::unique_ptr<State> state = std::move(to_visit.back());
+    to_visit.pop_back();
+    if (state->IsTerminal()) {
+      continue;
+    } else if (state->IsChanceNode()) {
+      for (const auto& outcome_and_prob : state->ChanceOutcomes()) {
+        to_visit.emplace_back(state->Child(outcome_and_prob.first));
+      }
+    } else if (player < 0 || state->IsPlayerActing(player)) {
+      std::vector<Action> legal_actions = state->LegalActions();
+      const int num_legal_actions = legal_actions.size();
+      SPIEL_CHECK_GT(num_legal_actions, 0.);
+      if (dists.count(num_legal_actions) == 0) {
+        std::uniform_int_distribution<int> dist(0, num_legal_actions - 1);
+        dists.insert({num_legal_actions, std::move(dist)});
+      }
+      const int legal_action_index = dists[num_legal_actions](gen);
+      SPIEL_CHECK_GE(legal_action_index, 0);
+      SPIEL_CHECK_LT(legal_action_index, num_legal_actions);
+      const int action = legal_actions[legal_action_index];
+      ActionsAndProbs infostate_policy;
+      infostate_policy.reserve(1);
+      infostate_policy.push_back({action, 1.0});
+      policy.insert({state->InformationStateString(), infostate_policy});
+      if (information == GameType::Information::kPerfectInformation) {
+        to_visit.push_back(state->Child(action));
+      } else {
+        for (Action action : legal_actions) {
+          to_visit.push_back(state->Child(action));
+        }
+      }
+    } else {
+      std::vector<Action> legal_actions = state->LegalActions();
+      const int num_legal_actions = legal_actions.size();
+      SPIEL_CHECK_GT(num_legal_actions, 0.);
+      for (Action action : legal_actions) {
+        to_visit.push_back(state->Child(action));
+      }
+    }
+  }
+  return TabularPolicy(policy);
 }
 
 TabularPolicy GetFirstActionPolicy(const Game& game) {

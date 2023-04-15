@@ -20,8 +20,8 @@ policy.
 """
 
 import copy
+import itertools
 from open_spiel.python import policy
-import pyspiel
 
 
 def _aggregate_at_state(joint_policies, state, player):
@@ -176,25 +176,45 @@ class JointPolicyAggregator(object):
       return
 
     if state.is_simultaneous_node():
-      assert (self._game_type.dynamics == pyspiel.GameType.Dynamics.SIMULTANEOUS
-             ), "Game must be simultaneous-move"
-      assert (self._game_type.chance_mode == pyspiel.GameType.ChanceMode
-              .DETERMINISTIC), "Chance nodes not supported"
-      assert (self._game_type.information == pyspiel.GameType.Information
-              .ONE_SHOT), "Only one-shot NFGs supported"
       policies = _aggregate_at_state(self._joint_policies, state, pid)
       state_key = self._state_key(state, pid)
 
       self._policy[state_key] = {}
+      used_moves = state.legal_actions(pid)
 
-      for player_policies, weight in zip(policies, my_reaches):
-        player_policy = player_policies[pid]
-        for action in player_policy.keys():
-          if action in self._policy[state_key]:
-            self._policy[state_key][action] += weight * player_policy[action]
+      for uid in used_moves:
+        new_reaches = copy.deepcopy(my_reaches)
+        for i in range(len(policies)):
+          # compute the new reach for each policy for this action
+          new_reaches[i] *= policies[i].get(uid, 0)
+          # add reach * prob(a) for this policy to the computed policy
+          if uid in self._policy[state_key].keys():
+            self._policy[state_key][uid] += new_reaches[i]
           else:
-            self._policy[state_key][action] = weight * player_policy[action]
-      # No recursion because we only support one shot simultaneous games.
+            self._policy[state_key][uid] = new_reaches[i]
+
+      num_players = self._game.num_players()
+      all_other_used_moves = []
+      for player in range(num_players):
+        if player != pid:
+          all_other_used_moves.append(state.legal_actions(player))
+
+      other_joint_actions = itertools.product(*all_other_used_moves)
+
+      # enumerate every possible other-agent actions for next-state
+      for other_joint_action in other_joint_actions:
+        for uid in used_moves:
+          new_reaches = copy.deepcopy(my_reaches)
+          for i in range(len(policies)):
+            # compute the new reach for each policy for this action
+            new_reaches[i] *= policies[i].get(uid, 0)
+
+          joint_action = list(
+              other_joint_action[:pid] + (uid,) + other_joint_action[pid:]
+          )
+          new_state = state.clone()
+          new_state.apply_actions(joint_action)
+          self._rec_aggregate(pid, new_state, new_reaches)
       return
 
     if state.is_chance_node():
@@ -211,7 +231,7 @@ class JointPolicyAggregator(object):
     if pid == current_player:
       # update the current node
       # will need the observation to query the policies
-      if state not in self._policy:
+      if state_key not in self._policy:
         self._policy[state_key] = {}
 
     for action in state.legal_actions():

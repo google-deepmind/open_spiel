@@ -283,7 +283,7 @@ class BackgammonGame : public Game {
 
   int NumPlayers() const override { return 2; }
   double MinUtility() const override { return -MaxUtility(); }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override;
 
   std::vector<int> ObservationTensorShape() const override {

@@ -34,6 +34,7 @@ open_spiel/libnop/libnop/
 open_spiel/games/bridge/double_dummy_solver/
 open_spiel/games/universal_poker/double_dummy_solver/
 open_spiel/games/hanabi/hanabi-learning-environment/
+/open_spiel/pybind11_abseil/
 pybind11/
 
 # Install artifacts

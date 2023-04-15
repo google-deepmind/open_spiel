@@ -71,6 +71,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+open_spiel::RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 }  // namespace
 
 HeartsGame::HeartsGame(const GameParameters& params)

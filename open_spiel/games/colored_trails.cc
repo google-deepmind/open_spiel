@@ -63,6 +63,8 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 bool IsLegalTrade(
     const Board& board, const Trade& trade,
     const std::vector<int>& proposer_chips,

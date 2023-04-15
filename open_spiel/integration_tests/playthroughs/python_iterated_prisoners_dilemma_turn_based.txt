@@ -23,7 +23,7 @@ GetParameters() = {game=python_iterated_prisoners_dilemma(max_game_length=9999,t
 NumPlayers() = 2
 MinUtility() = 0.0
 MaxUtility() = 9.999e+04
-UtilitySum() = 0.0
+UtilitySum() = None
 MaxGameLength() = 19998
 ToString() = "turn_based_simultaneous_game(game=python_iterated_prisoners_dilemma(max_game_length=9999,termination_probability=0.125))"
 

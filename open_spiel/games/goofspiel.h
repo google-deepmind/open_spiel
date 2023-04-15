@@ -149,7 +149,7 @@ class GoofspielGame : public Game {
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override;
   double MaxUtility() const override;
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override;
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return num_cards_; }

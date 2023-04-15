@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>   // for std::nan
+
 #include "jlcxx/jlcxx.hpp"
 #include "jlcxx/stl.hpp"
 #include "open_spiel/algorithms/best_response.h"
@@ -375,7 +377,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("min_utility", &open_spiel::Game::MinUtility)
       .method("max_utility", &open_spiel::Game::MaxUtility)
       .method("get_type", &open_spiel::Game::GetType)
-      .method("utility_sum", &open_spiel::Game::UtilitySum)
+      .method("utility_sum",
+              [](open_spiel::Game& g) {
+                return g.UtilitySum().value_or(std::nan(""));
+              })
       .method("information_state_tensor_shape",
               &open_spiel::Game::InformationStateTensorShape)
       .method("information_state_tensor_size",

@@ -23,7 +23,7 @@ GetParameters() = {eta=1.0,horizon=10,num_action=3,num_chance_action=3,seed=0,si
 NumPlayers() = 1
 MinUtility() = -inf
 MaxUtility() = inf
-UtilitySum() = 0.0
+UtilitySum() = None
 ObservationTensorShape() = [21]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 21
