@@ -27,8 +27,8 @@ BID_ACTION_OFFSET = 1
 
 _MAX_NUM_PLAYERS = 10
 _MIN_NUM_PLAYERS = 2
-_HAND_LENGTH = 3
-_NUM_DIGITS = 3 # Number of digits to include from the range 1, 2, ..., 9, 0
+_HAND_LENGTH = 10
+_NUM_DIGITS = 10 # Number of digits to include from the range 1, 2, ..., 9, 0
 _FULL_DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 
 _GAME_TYPE = pyspiel.GameType(
