@@ -61,6 +61,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 bool ObserverHasString(IIGObservationType iig_obs_type) {
   return !iig_obs_type.perfect_recall ||
          (iig_obs_type.public_info &&

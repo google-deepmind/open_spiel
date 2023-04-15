@@ -93,8 +93,11 @@ class RepeatedGame : public SimMoveGame {
   double MaxUtility() const override {
     return stage_game_->MaxUtility() * num_repetitions_;
   }
-  double UtilitySum() const override {
-    return stage_game_->UtilitySum() * num_repetitions_;
+  absl::optional<double> UtilitySum() const override {
+    auto per_stage_utility_sum = stage_game_->UtilitySum();
+    return !per_stage_utility_sum.has_value()
+               ? per_stage_utility_sum
+               : per_stage_utility_sum.value() * num_repetitions_;
   }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;

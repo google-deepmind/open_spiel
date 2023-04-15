@@ -146,7 +146,9 @@ class DarkHexGame : public Game {
   }
   int NumPlayers() const override { return game_->NumPlayers(); }
   double MinUtility() const override { return game_->MinUtility(); }
-  double UtilitySum() const override { return game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    return game_->UtilitySum();
+  }
   double MaxUtility() const override { return game_->MaxUtility(); }
 
   std::vector<int> InformationStateTensorShape() const override;

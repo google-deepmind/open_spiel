@@ -286,7 +286,7 @@ void MinimalGameToWin() {
   int terminal_state_scenario_number = 0;
   for (int scenario = 0; scenario < 4; scenario++) {
     int players;
-    bool two_players_opposite;
+    bool two_players_opposite = false;
     if (scenario == 0) {
       players = 2;
       two_players_opposite = false;

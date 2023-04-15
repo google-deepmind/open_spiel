@@ -128,13 +128,15 @@ class CheckersState : public State {
     return board_[row * columns_ + column];
   }
   std::vector<Action> LegalActions() const override;
+  int ObservationPlane(CellState state, Player player) const;
+  int GetRow() const { return rows_; }
+  int GetCollumn() const { return columns_; }
+  int GetCellState() const { return kCellStates; }
 
  protected:
   void DoApplyAction(Action action) override;
 
  private:
-  int ObservationPlane(CellState state, Player player) const;
-
   Player current_player_ = 0;  // Player zero (White, 'o') goes first.
   Player outcome_ = kInvalidPlayer;
   // Piece in the board who can do multiple jump.
@@ -158,7 +160,7 @@ class CheckersGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
     return {kCellStates, rows_, columns_};

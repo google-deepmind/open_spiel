@@ -64,7 +64,11 @@ class MisereGame : public WrappedGame {
 
   double MinUtility() const override { return -game_->MaxUtility(); }
   double MaxUtility() const override { return -game_->MinUtility(); }
-  double UtilitySum() const override { return -game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    auto base_game_utility_sum = game_->UtilitySum();
+    return !base_game_utility_sum.has_value() ? base_game_utility_sum
+                                              : -base_game_utility_sum.value();
+  }
 };
 
 }  // namespace open_spiel

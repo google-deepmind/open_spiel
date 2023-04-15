@@ -66,6 +66,7 @@ class GamesEuchreTest(absltest.TestCase):
                      euchre.Suit.SPADES)
     self.assertEqual(euchre.card_string(8), 'CJ')
     trick = state.tricks()[state.current_trick_index()]
+    self.assertEqual(trick.winning_card(), pyspiel.INVALID_ACTION)
     self.assertEqual(trick.led_suit(), euchre.Suit.INVALID_SUIT)
     self.assertEqual(trick.trump_suit(), euchre.Suit.INVALID_SUIT)
     self.assertFalse(trick.trump_played())

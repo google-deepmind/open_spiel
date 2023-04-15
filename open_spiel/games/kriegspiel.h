@@ -224,7 +224,7 @@ class KriegspielGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return kLossUtility; }
-  double UtilitySum() const override { return kDrawUtility; }
+  absl::optional<double> UtilitySum() const override { return kDrawUtility; }
   double MaxUtility() const override { return kWinUtility; }
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return kMaxGameLength; }

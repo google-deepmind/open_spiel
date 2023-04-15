@@ -680,6 +680,13 @@ double LaserTagGame::MaxUtility() const {
   }
 }
 
+absl::optional<double> LaserTagGame::UtilitySum() const {
+  if (zero_sum_)
+    return 0;
+  else
+    return absl::nullopt;
+}
+
 std::vector<int> LaserTagGame::ObservationTensorShape() const {
   if (fully_obs_) {
     return {kCellStates, grid_.num_rows, grid_.num_cols};

@@ -34,7 +34,7 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_integer("num_episodes", int(5e4), "Number of train episodes.")
 flags.DEFINE_boolean(
-    "iteractive_play", True,
+    "interactive_play", True,
     "Whether to run an interactive play with the agent after training.")
 
 
@@ -135,7 +135,7 @@ def main(_):
     r_mean = eval_against_random_bots(env, agents, random_agents, 1000)
     logging.info("Mean episode rewards: %s", r_mean)
 
-    if not FLAGS.iteractive_play:
+    if not FLAGS.interactive_play:
       return
 
     # Play from the command line against the trained DQN agent.

@@ -34,7 +34,9 @@
 // in one place to help with consistency.
 
 namespace open_spiel {
+
 class NormalFormGame;
+class Bot;
 
 namespace matrix_game {
 class MatrixGame;
@@ -43,6 +45,12 @@ class MatrixGame;
 namespace tensor_game {
 class TensorGame;
 }
+
+namespace algorithms {
+class MCTSBot;
+class ISMCTSBot;
+}  // namespace algorithms
+
 }  // namespace open_spiel
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::State);
@@ -50,6 +58,9 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Game);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::NormalFormGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::matrix_game::MatrixGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::tensor_game::TensorGame);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Bot);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::algorithms::MCTSBot);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::algorithms::ISMCTSBot);
 
 // Custom caster for GameParameter (essentially a variant).
 namespace pybind11 {

@@ -103,7 +103,11 @@ const LiarsDiceGame* UnwrapGame(const Game* game) {
 }  // namespace
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 REGISTER_SPIEL_GAME(kImperfectRecallGameType, ImperfectRecallFactory);
+RegisterSingleTensorObserver single_tensor_imperfect_recall(
+    kImperfectRecallGameType.short_name);
 
 LiarsDiceState::LiarsDiceState(std::shared_ptr<const Game> game,
                                int total_num_dice, int max_dice_per_player,
@@ -239,11 +243,7 @@ std::vector<Action> LiarsDiceState::LegalActions() const {
   if (IsTerminal()) return {};
   // A chance node is a single die roll.
   if (IsChanceNode()) {
-    std::vector<Action> outcomes(dice_sides());
-    for (int i = 0; i < dice_sides(); i++) {
-      outcomes[i] = i;
-    }
-    return outcomes;
+    return LegalChanceOutcomes();
   }
 
   std::vector<Action> actions;

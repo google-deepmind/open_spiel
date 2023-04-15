@@ -226,6 +226,7 @@ class BridgeGame : public Game {
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -kMaxScore; }
   double MaxUtility() const override { return kMaxScore; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::vector<int> ObservationTensorShape() const override {
     return {kObservationTensorSize};
   }

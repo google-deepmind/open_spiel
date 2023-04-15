@@ -16,6 +16,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
+<font color="orange"><b>~</b></font>         | [Block Dominoes](#block-dominoes)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
@@ -28,6 +29,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
 <font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
 ![](_static/green_circ10.png "green circle") | [Chess](#chess)
+<font color="orange"><b>~</b></font>         | [Crazy Eights](#crazy-eights)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
 <font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
@@ -158,6 +160,17 @@ Status                                       | Game
 *   Imperfect information.
 *   1 player.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Blackjack)
+
+### Block Dominoes
+
+*   Most simple version of dominoes.
+*   Consists of 28 tiles, featuring all combinations of spot counts (also called
+    pips or dots) between zero and six.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   2 players.
+*   [Wikipedia]([https://en.wikipedia.org/wiki/Blackjack]\(https://en.wikipedia.org/wiki/Dominoes#Blocking_game\))
 
 ### Breakthrough
 
@@ -292,6 +305,18 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
 
+### Crazy Eights
+
+*   A precursor of UNO (see [here](https://www.unorules.org/crazy-eights/)).
+*   Players try to match the rank or suit of the previous played card.
+*   Eights are viewed as wild cards.
+*   In an alternative version, special cards such as skip, reverse, draw-two are
+    permitted.
+*   Nondeterministic.
+*   Imperfect information.
+*   >=2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Crazy_Eights)
+
 ### Dark Hex
 
 *   Hex, except the opponent's tokens are hidden. (Imperfect-information
@@ -321,7 +346,7 @@ Status                                       | Game
 *   Non-deterministic.
 *   Imperfect information.
 *   Three players.
-*   [Wikipeda](https://en.wikipedia.org/wiki/Dou_dizhu)
+*   [Wikipedia](https://en.wikipedia.org/wiki/Dou_dizhu)
 
 ### Euchre
 
@@ -487,7 +512,6 @@ Status                                       | Game
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_dice)
 
-
 ### Liar's Poker
 
 *   Players bid and bluff on the state of all hands, given only the state of
@@ -499,7 +523,6 @@ Status                                       | Game
 *   2 or more players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Liar%27s_poker)
 
-
 ### Mensch Aergere Dich Nicht 
 
 *   Players roll dice to move their pegs toward their home row while throwing
@@ -509,7 +532,6 @@ Status                                       | Game
 *   Perfect information.
 *   2-4 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Mensch_%C3%A4rgere_Dich_nicht)
-
 
 ### Mancala
 

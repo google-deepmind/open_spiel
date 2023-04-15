@@ -23,7 +23,7 @@ GetParameters() = {allow_lone_defender=False,stick_the_dealer=True}
 NumPlayers() = 4
 MinUtility() = -4.0
 MaxUtility() = 4.0
-UtilitySum() = None
+UtilitySum() = 0.0
 InformationStateTensorShape() = [935]
 InformationStateTensorLayout() = TensorLayout.CHW
 InformationStateTensorSize() = 935

@@ -24,6 +24,7 @@ import pyspiel
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = frozenset([
     "2048",
+    "add_noise",
     "amazons",
     "backgammon",
     "bargaining",
@@ -44,6 +45,7 @@ EXPECTED_GAMES = frozenset([
     "coop_box_pushing",
     "coop_to_1p",
     "coordinated_mp",
+    "crazy_eights",
     "cursor_go",
     "dark_chess",
     "dark_hex",
@@ -101,6 +103,7 @@ EXPECTED_GAMES = frozenset([
     "phantom_ttt",
     "phantom_ttt_ir",
     "pig",
+    "python_block_dominoes",
     "python_dynamic_routing",
     "python_iterated_prisoners_dilemma",
     "python_mfg_crowd_modelling",
@@ -157,6 +160,7 @@ class PyspielTest(absltest.TestCase):
     expected = [
         # Being non-default-loadable prevents various automated tests.
         # Only add games here if there is no sensible default for a parameter.
+        "add_noise",
         "efg_game",
         "nfg_game",
         "misere",

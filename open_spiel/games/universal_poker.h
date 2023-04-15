@@ -201,7 +201,7 @@ class UniversalPokerGame : public Game {
   double MinUtility() const override;
   double MaxUtility() const override;
   int MaxChanceOutcomes() const override;
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override;

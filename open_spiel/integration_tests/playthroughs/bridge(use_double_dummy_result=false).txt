@@ -23,7 +23,7 @@ GetParameters() = {dealer_vul=False,non_dealer_vul=False,use_double_dummy_result
 NumPlayers() = 4
 MinUtility() = -7600.0
 MaxUtility() = 7600.0
-UtilitySum() = None
+UtilitySum() = 0.0
 ObservationTensorShape() = [571]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 571

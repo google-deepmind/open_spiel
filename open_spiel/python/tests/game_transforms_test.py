@@ -42,8 +42,7 @@ class RepeatedGameTest(absltest.TestCase):
     stage_game = pyspiel.load_game("matrix_pd")
     repeated_game = pyspiel.create_repeated_game(stage_game,
                                                  {"num_repetitions": 5})
-    with self.assertRaises(pyspiel.SpielError):
-      repeated_game.utility_sum()
+    assert repeated_game.utility_sum() is None
 
 
 if __name__ == "__main__":

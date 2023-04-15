@@ -57,6 +57,8 @@ std::shared_ptr<Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 }  // namespace
 
 DeepSeaState::DeepSeaState(std::shared_ptr<const Game> game) : State(game) {

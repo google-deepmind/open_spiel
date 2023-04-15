@@ -83,6 +83,8 @@ std::string StateToString(int x, int t, Action last_action, Player player_id,
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 }  // namespace
 
 GarnetState::GarnetState(std::shared_ptr<const Game> game, int size,

@@ -246,7 +246,7 @@ class RbcGame : public Game {
   }
   int NumPlayers() const override { return chess::NumPlayers(); }
   double MinUtility() const override { return LossUtility(); }
-  double UtilitySum() const override { return DrawUtility(); }
+  absl::optional<double> UtilitySum() const override { return DrawUtility(); }
   double MaxUtility() const override { return WinUtility(); }
   std::vector<int> ObservationTensorShape() const override {
     std::vector<int> shape{

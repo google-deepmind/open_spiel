@@ -55,7 +55,7 @@ inline constexpr int kObservationTensorSize =
 
 inline constexpr int kDealingActionBase = kNumCards - kNumCardsLeftOver;
 
-inline constexpr int kBiddingActionBase = kDealingActionBase + kNumCards;
+inline constexpr int kBiddingActionBase = 0;
 
 inline constexpr int kPass = kBiddingActionBase;
 
@@ -98,6 +98,8 @@ inline constexpr int kNumKickersAirplanePairCombChainOfLengthThree = 120;
 inline constexpr int kNumKickersAirplanePairCombChainOfLengthFour = 126;
 
 constexpr char kRankChar[] = "3456789TJQKA2";
+// only for dealing phase usages
+constexpr char kSuitChar[] = "CDHS";
 
 enum KickerType { kSolo = 1, kPair };
 
@@ -137,6 +139,7 @@ struct TrioCombParams {
 
 int CardToRank(int card);
 std::string RankString(int rank);
+std::string CardString(int card);
 std::string FormatSingleHand(absl::Span<const int> hand);
 std::string FormatAirplaneCombHand(int action);
 

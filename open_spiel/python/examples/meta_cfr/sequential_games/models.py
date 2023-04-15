@@ -154,7 +154,7 @@ class OptimizerModel:
     self.rng = jax.random.PRNGKey(10)
 
     mlp_sizes_list = [
-        int(mlp_sizes.strip()) for mlp_size in mlp_sizes.split(",")
+        int(mlp_size.strip()) for mlp_size in mlp_sizes.split(",")
     ]
     mlp_sizes_list.append(self.num_actions)
     lstm_sizes_list = [

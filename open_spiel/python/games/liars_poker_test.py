@@ -19,9 +19,8 @@ import pickle
 
 from absl.testing import absltest
 import numpy as np
-from open_spiel.python.algorithms.get_all_states import get_all_states
+
 from open_spiel.python.games import liars_poker
-from open_spiel.python.observation import make_observation
 import pyspiel
 
 
@@ -35,16 +34,19 @@ class LiarsPokerTest(absltest.TestCase):
     expected_hands = [[] for _ in range(game.num_players())]
     expected_bidder = -1
     expected_current_player = pyspiel.PlayerId.CHANCE
-    expected_current_count = 'None'
-    expected_current_number = 'None'
+    expected_current_count = "None"
+    expected_current_number = "None"
     expected_rebid = False
-    expected = "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {} of {}, Rebid: {}".format(
-      expected_hands,
-      expected_bidder,
-      expected_current_player,
-      expected_current_count,
-      expected_current_number,
-      expected_rebid
+    expected = (
+        "Hands: {}, Bidder: {}, Current Player: {}, Current Bid: {} of {},"
+        " Rebid: {}".format(
+            expected_hands,
+            expected_bidder,
+            expected_current_player,
+            expected_current_count,
+            expected_current_number,
+            expected_rebid,
+        )
     )
     self.assertEqual(str(state), expected)
 
@@ -84,20 +86,22 @@ class LiarsPokerTest(absltest.TestCase):
     """Tests a single bid."""
     game = liars_poker.LiarsPoker({'hand_length': 3, 'num_digits': 3})
     state = game.new_initial_state()
-    expected_bid_history = np.zeros((state.total_possible_bids, state.num_players()))
-  
+    expected_bid_history = np.zeros(
+        (state.total_possible_bids, state.num_players())
+    )
+
     # Fill players hands.
     self._populate_game_hands(game, state)
     # After all hands are filled, have player 0 bid.
     cur_player = state.current_player()
     action = 2
     state.apply_action(action)
-  
+
     # Verify bid history is updated correctly.
     bid_offset = liars_poker.BID_ACTION_OFFSET
     expected_bid_history[action - bid_offset][cur_player] = 1
     self.assertTrue((state.bid_history == expected_bid_history).all())
-  
+
     # Verify next set of legal bids is greater than the current bid.
     for next_action in state.legal_actions():
       if next_action == liars_poker.CHALLENGE_ACTION:
@@ -119,7 +123,9 @@ class LiarsPokerTest(absltest.TestCase):
     """Runs a single round of bidding followed by a challenge."""
     game = liars_poker.LiarsPoker({'hand_length': 3, 'num_digits': 3})
     state = game.new_initial_state()
-    expected_challenge_history = np.zeros((state.total_possible_bids, state.num_players()))
+    expected_challenge_history = np.zeros(
+        (state.total_possible_bids, state.num_players())
+    )
 
     # Fill players hands.
     self._populate_game_hands(game, state)
@@ -128,26 +134,30 @@ class LiarsPokerTest(absltest.TestCase):
     state.apply_action(action)
     # Verify challenge action is available to the next player.
     challenge = liars_poker.CHALLENGE_ACTION
-    self.assertTrue(challenge in state.legal_actions())
+    self.assertIn(challenge, state.legal_actions())
     # Player 1 challenges.
     cur_player = state.current_player()
     state.apply_action(challenge)
     bid_offset = liars_poker.BID_ACTION_OFFSET
     expected_challenge_history[action - bid_offset][cur_player] = 1
     # Verify challenge history is updated correctly.
-    self.assertTrue((state.challenge_history == expected_challenge_history).all())
+    self.assertTrue(
+        (state.challenge_history == expected_challenge_history).all()
+    )
     # Original bidder challenges, thus agreeing to a count.
     cur_player = state.current_player()
     state.apply_action(challenge)
     expected_challenge_history[action - bid_offset][cur_player] = 1
     # Verify challenge history is updated correctly.
-    self.assertTrue((state.challenge_history == expected_challenge_history).all())
-  
+    self.assertTrue(
+        (state.challenge_history == expected_challenge_history).all()
+    )
+
     # Verify game is over.
     self.assertTrue(state.is_terminal())
     # Verify returns.
     self._verify_returns(game, state)
-  
+
   def test_single_deterministic_round(self):
     """Runs a single round where cards are dealt deterministically."""
     game = liars_poker.LiarsPoker({'hand_length': 3, 'num_digits': 3})
@@ -170,11 +180,10 @@ class LiarsPokerTest(absltest.TestCase):
     state.apply_action(liars_poker.CHALLENGE_ACTION)
     # Verify game ends with player 0 losing.
     self.assertTrue(state.is_terminal())
-    self.assertTrue(state.loser() == 0)
+    self.assertEqual(state.loser(), 0)
     expected_returns = [1.0 for _ in range(game.num_players())]
     expected_returns[state.loser()] = -1.0 * (game.num_players() - 1)
     self.assertEqual(state.returns(), expected_returns)
-
 
   def test_single_rebid(self):
     """Runs a 2 player game where a rebid is enacted."""
@@ -221,7 +230,8 @@ class LiarsPokerTest(absltest.TestCase):
     self.assertFalse(state.is_terminal())
     # Player 0 challenges.
     state.apply_action(liars_poker.CHALLENGE_ACTION)
-    # Verify we're not rebidding and counts is only called once both players challenge.
+    # Verify we're not rebidding and counts is only called once both players
+    # challenge.
     self.assertFalse(state.is_terminal())
     # Player 1 challenges and ends the game with a counts.
     state.apply_action(liars_poker.CHALLENGE_ACTION)
@@ -268,7 +278,9 @@ class LiarsPokerTest(absltest.TestCase):
     self.assertEqual(state._current_player, clone._current_player)
     self.assertEqual(state._current_action, clone._current_action)
     np.testing.assert_array_equal(state.bid_history, clone.bid_history)
-    np.testing.assert_array_equal(state.challenge_history, clone.challenge_history)
+    np.testing.assert_array_equal(
+        state.challenge_history, clone.challenge_history
+    )
 
 
 if __name__ == "__main__":

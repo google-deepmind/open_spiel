@@ -170,7 +170,7 @@ class OwareGame : public Game {
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
 
   int MaxGameLength() const override { return kMaxGameLength; }

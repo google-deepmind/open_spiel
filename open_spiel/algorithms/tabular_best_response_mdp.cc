@@ -22,7 +22,6 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/simultaneous_move_game.h"
@@ -404,7 +403,7 @@ TabularBestResponseMDPInfo TabularBestResponseMDP::Exploitability() {
   TabularBestResponseMDPInfo br_info = ComputeBestResponses();
   br_info.nash_conv = absl::c_accumulate(br_info.br_values, 0.0);
   br_info.exploitability =
-      (br_info.nash_conv - game_.UtilitySum()) / num_players_;
+      (br_info.nash_conv - *game_.UtilitySum()) / num_players_;
   return br_info;
 }
 

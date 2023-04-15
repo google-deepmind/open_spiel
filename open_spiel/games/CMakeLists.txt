@@ -48,6 +48,8 @@ set(GAME_SOURCES
   coop_box_pushing.h
   coordinated_mp.cc
   coordinated_mp.h
+  crazy_eights.cc
+  crazy_eights.h
   cursor_go.cc
   cursor_go.h
   dark_chess.cc
@@ -351,6 +353,10 @@ add_executable(coordinated_mp_test coordinated_mp_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:tests>
         $<TARGET_OBJECTS:algorithms>)
 add_test(coordinated_mp_test coordinated_mp_test)
+
+add_executable(crazy_eights_test crazy_eights_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(crazy_eights_test crazy_eights_test)
 
 add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
