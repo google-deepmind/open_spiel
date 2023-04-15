@@ -158,8 +158,8 @@ class LiarsPokerState(pyspiel.State):
     if player != self._bid_originator or self._is_rebid_possible():
       # Any move higher than the current bid is allowed.
       # Bids start at BID_ACTION_OFFSET (1) as 0 represents the challenge action.
-      for bid in range(self._current_action + 1, self._max_bid):
-        actions.append(bid + BID_ACTION_OFFSET)
+      for bid in range(max(BID_ACTION_OFFSET, self._current_action + 1), self._max_bid):
+        actions.append(bid)
 
     return actions
 
