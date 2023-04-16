@@ -122,8 +122,13 @@ void init_pyspiel_policy(py::module& m) {
       .def("policy_table",
            py::overload_cast<>(&open_spiel::PartialTabularPolicy::PolicyTable));
 
-  m.def("GetRandomPolicy", &open_spiel::GetRandomPolicy);
-  m.def("GetFlatDirichletPolicy", &open_spiel::GetFlatDirichletPolicy);
+  m.def("GetRandomPolicy", &open_spiel::GetRandomPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
+  m.def("GetFlatDirichletPolicy", &open_spiel::GetFlatDirichletPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
+  m.def("GetRandomDeterministicPolicy",
+      &open_spiel::GetRandomDeterministicPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
   py::class_<open_spiel::UniformPolicy,
              std::shared_ptr<open_spiel::UniformPolicy>, open_spiel::Policy>(

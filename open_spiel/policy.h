@@ -374,11 +374,18 @@ class PreferredActionPolicy : public Policy {
 TabularPolicy ToTabularPolicy(const Game& game, const Policy* policy);
 
 // Helper functions that generate policies for testing.
+// The player parameter can be used to only generate policies for a single
+// player. By default -1 will generate policies for all players.
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
-                                    bool initialize_to_uniform = false);
+                                    bool initialize_to_uniform = false,
+                                    Player player = -1);
 TabularPolicy GetUniformPolicy(const Game& game);
-TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
-TabularPolicy GetFlatDirichletPolicy(const Game& game, int seed = 0);
+TabularPolicy GetRandomPolicy(
+    const Game& game, int seed = 0, Player player = -1);
+TabularPolicy GetFlatDirichletPolicy(
+    const Game& game, int seed = 0, Player player = -1);
+TabularPolicy GetRandomDeterministicPolicy(
+    const Game& game, int seed = 0, Player player = -1);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
 // Returns a preferred action policy as a tabular policy.

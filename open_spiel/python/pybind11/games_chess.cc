@@ -82,6 +82,7 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
       .def("board", py::overload_cast<>(&ChessState::Board))
       .def("debug_string", &ChessState::DebugString)
       .def("parse_move_to_action", &ChessState::ParseMoveToAction)
+      .def("moves_history", py::overload_cast<>(&ChessState::MovesHistory))
       // Pickle support
       .def(py::pickle(
           [](const ChessState& state) {  // __getstate__

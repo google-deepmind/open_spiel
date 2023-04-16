@@ -234,10 +234,10 @@ void DarkHexState::InformationStateTensor(Player player,
       values[offset + 1 + player_with_action.second] = 1.0;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       // If the number of turns are revealed, then each of the other player's
-      // actions will show up as unknowns. Here, num_cells_ + 1 is used to
+      // actions will show up as unknowns. Here, num_cells_ is used to
       // encode "unknown".
       values[offset] = player_with_action.first;
-      values[offset + 1 + num_cells_ + 1] = 1.0;
+      values[offset + 1 + num_cells_] = 1.0;
     } else {
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
     }
@@ -321,7 +321,7 @@ std::vector<int> DarkHexGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
     return {num_cells_ * kCellStates};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {num_cells_ * kCellStates + longest_sequence_};
+    return {num_cells_ * kCellStates + longest_sequence_ + 1};
   } else {
     SpielFatalError("Uknown observation type");
   }
