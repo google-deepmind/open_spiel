@@ -95,11 +95,15 @@ class NashAveragingTest(parameterized.TestCase):
 
   @parameterized.named_parameters(
       ("game2", game2, dom_idxs2),)
-  def test_avt_games_with_multiple_dominant_strategy(self, game, dom_idxs):
-    (agent_strategy, _), _ = nash_averaging(game, a_v_a=False)
-    with self.subTest("dominated strategies have zero Nash probs"):
+  def test_avt_games_with_multiple_dominant_strategies(self, game, dom_idxs):
+    (agent_strategy, _), (agent_values, _) = nash_averaging(game, a_v_a=False)
+    with self.subTest("dominant strategies have equal Nash probs"):
       for idx in dom_idxs:
         self.assertAlmostEqual(agent_strategy[idx].item(), 1/len(dom_idxs2))
+
+    with self.subTest("dominant strategies have equal Nash values"):
+      values = [agent_values[idx] for idx in dom_idxs]
+      self.assertAlmostEqual(np.abs(np.max(values)-np.min(values)), 0.0)
 
 if __name__ == "__main__":
   absltest.main()
