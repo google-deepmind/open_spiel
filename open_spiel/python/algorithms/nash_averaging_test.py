@@ -35,11 +35,31 @@ game_rps = pyspiel.create_matrix_game(
 eq_rps = np.asarray([1 / 3, 1 / 3, 1 / 3])
 value_rps = np.asarray([0., 0., 0.])
 
-# game with one dominated strategy
+# game with one dominated strategy (AvA case)
 p_mat0 = np.asarray([[0.0, 234., 34., -270.], [-234., 0., -38., -464.],
                      [-34., 38., 0., -270.], [270., 464., 270., 0.]])
 game0 = pyspiel.create_matrix_game(p_mat0, -p_mat0)
 dominated_idxs0 = [0, 1, 2]
+
+
+# game with one dominated strategy (AvT case)
+p_mat1 = np.asarray([[0.0, 0.0, 0.0],
+                     [1.0, 10.0, 100.0],
+                     [2.0, 20.0, 200.0],
+                     [3.0, 30.0, 300.0]])
+game1 = pyspiel.create_matrix_game(p_mat1, -p_mat1)
+dominated_idxs1 = [0, 1, 2]
+
+
+
+# game with one multiple dominant strategy (AvT case)
+p_mat2 = np.asarray([[0.0, 0.0, 0.0],
+                     [1.0, 10.0, 100.0],
+                     [2.0, 20.0, 200.0],
+                     [3.0, 30.0, 300.0],
+                     [3.0, 30.0, 300.0]])
+game2 = pyspiel.create_matrix_game(p_mat2, -p_mat2)
+dom_idxs2 = [3, 4]
 
 
 class NashAveragingTest(parameterized.TestCase):
@@ -59,12 +79,27 @@ class NashAveragingTest(parameterized.TestCase):
 
   @parameterized.named_parameters(
       ("game0", game0, dominated_idxs0),)
-  def test_games_with_dominated_strategy(self, game, dom_idxs0):
+  def test_ava_games_with_dominated_strategy(self, game, dominated_idxs):
     maxent_nash, _ = nash_averaging(game)
     with self.subTest("dominated strategies have zero Nash probs"):
-      for idx in dom_idxs0:
+      for idx in dominated_idxs:
         self.assertAlmostEqual(maxent_nash[idx].item(), 0.0)
 
+  @parameterized.named_parameters(
+      ("game1", game1, dominated_idxs1),)
+  def test_avt_games_with_dominated_strategy(self, game, dominated_idxs):
+    (agent_strategy, _), _ = nash_averaging(game, a_v_a=False)
+    with self.subTest("dominated strategies have zero Nash probs"):
+      for idx in dominated_idxs:
+        self.assertAlmostEqual(agent_strategy[idx].item(), 0.0)
+
+  @parameterized.named_parameters(
+      ("game2", game2, dom_idxs2),)
+  def test_avt_games_with_multiple_dominant_strategy(self, game, dom_idxs):
+    (agent_strategy, _), _ = nash_averaging(game, a_v_a=False)
+    with self.subTest("dominated strategies have zero Nash probs"):
+      for idx in dom_idxs:
+        self.assertAlmostEqual(agent_strategy[idx].item(), 1/len(dom_idxs2))
 
 if __name__ == "__main__":
   absltest.main()

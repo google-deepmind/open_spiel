@@ -23,7 +23,7 @@ import numpy as np
 from open_spiel.python.egt.utils import game_payoffs_array
 
 
-def _max_entropy_symmetric_nash(p_mat, num_tasks=None, eps=1e-9):
+def _max_entropy_symmetric_nash(p_mat, eps=1e-9):
   """Solves for the maxent symmetric nash for symmetric 2P zero-sum games.
 
     Using convex programming:
@@ -31,16 +31,10 @@ def _max_entropy_symmetric_nash(p_mat, num_tasks=None, eps=1e-9):
       s.t.
       p_mat.dot(p) <= 0, since game value must be 0
       p >= 0
-      (in Agent-vs-Agent setting)
       1^T * p = 1
-      (in Agent-vs-Task setting)
-      1^T * p[:-num_tasks] = 1
-      1^T * p[-num_tasks:] = 1
 
   Args:
     p_mat: an N*N anti-symmetric payoff matrix for the row player
-    num_tasks: if None or 0, then it is Agent-vs-Agent case
-    otherwise, there are num_tasks in Agent-vs-Task case
     eps: minimum probability threshold
 
   Returns:
@@ -51,17 +45,58 @@ def _max_entropy_symmetric_nash(p_mat, num_tasks=None, eps=1e-9):
   x = cp.Variable(shape=n)
   obj = cp.Maximize(cp.sum(cp.entr(x)))
   constraints = [p_mat @ x <= 0, x >= eps * np.ones(n)]
-  if num_tasks:
-    constraints.append(cp.sum(x[:-num_tasks]) == 1)
-    constraints.append(cp.sum(x[-num_tasks:]) == 1)
-  else:
-    constraints.append(cp.sum(x) == 1)
+  constraints.append(cp.sum(x) == 1)
   prob = cp.Problem(obj, constraints)
   prob.solve()
   return x.value.reshape((-1, 1))
 
 
+def _max_entropy_symmetric_nash_avt(p_mat, num_agents, num_tasks, eps=1e-9):
+  """Solves for the maxent symmetric nash for symmetric 2P zero-sum games,
+    for agent-vs-task cases.
 
+    Using convex programming:
+      min x^Tlog(x) + y^Tlog(y)
+      s.t.
+      x >= 0
+      1^T * x = 1
+      y >= 0
+      1^T * y = 1
+      forall s, such that s has exactly one unit mass on an agent strategy
+      and one unit mass on a task strategy,
+      s^T*p_mat*z <= 0, where z = [x, y], since game-value is 0.
+
+  Args:
+    p_mat: an N*N anti-symmetric payoff matrix for the row player
+    num_agents: number of agents
+    num_tasks: number of tasks
+    eps: minimum probability threshold
+
+  Returns:
+    (x*, y*): a maxent symmetric nash
+  """
+  assert np.array_equal(p_mat, -p_mat.T) and eps >= 0 and eps <= 0.5
+  n = len(p_mat)
+  assert n == num_agents + num_tasks
+  x = cp.Variable(shape=num_agents)
+  y = cp.Variable(shape=num_tasks)
+  z = cp.hstack([x, y])
+  obj = cp.Maximize(cp.sum(cp.entr(z)))
+  constraints = [x >= eps * np.ones(num_agents), cp.sum(x) == 1,
+                 y >= eps * np.ones(num_tasks), cp.sum(y) == 1]
+
+  dev_payoffs = p_mat @ z
+  for a_idx in range(num_agents):
+    for t_idx in range(num_tasks):
+      pure_strategy = np.zeros(n)
+      pure_strategy[a_idx] = 1
+      pure_strategy[num_agents + t_idx] = 1
+      pure_strategy = pure_strategy.reshape((1, -1))
+      constraints.append(pure_strategy @ dev_payoffs <= 0)
+
+  prob = cp.Problem(obj, constraints)
+  prob.solve()
+  return x.value.reshape((-1, 1)), y.value.reshape((-1, 1))
 
 
 def nash_averaging_avt_matrix(s_mat, eps=0.0):
@@ -78,13 +113,13 @@ def nash_averaging_avt_matrix(s_mat, eps=0.0):
     nash_avg_score: the expected payoff under maxent_nash
   """
   m, n = s_mat.shape
-  min_payoffs = np.min(s_mat, axis=1).reshape((m, 1))
-  max_payoffs = np.max(s_mat, axis=1).reshape((m, 1))
+  min_payoffs = np.min(s_mat, axis=0)
+  max_payoffs = np.max(s_mat, axis=0)
   std_p_mat = (s_mat - min_payoffs)/(max_payoffs-min_payoffs)
   a_mat = np.block([[np.zeros(shape=(m, m)), std_p_mat],
                     [-std_p_mat.T, np.zeros(shape=(n, n))]])
-  maxent_nash = np.array(_max_entropy_symmetric_nash(a_mat, num_tasks=n, eps=eps))
-  pa, pe = maxent_nash[:m], maxent_nash[m:]
+  pa, pe = np.array(_max_entropy_symmetric_nash_avt(
+      a_mat, num_agents=m, num_tasks=n, eps=eps))
   return (pa, pe), (std_p_mat.dot(pe), -std_p_mat.T.dot(pa))
 
 
