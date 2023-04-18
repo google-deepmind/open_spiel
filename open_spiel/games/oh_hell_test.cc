@@ -49,6 +49,8 @@ void BasicGameTests() {
   testing::LoadGameTest("oh_hell");
   testing::ChanceOutcomesTest(*LoadGame("oh_hell"));
   testing::RandomSimTest(*LoadGame("oh_hell"), 3);
+  testing::RandomSimTest(
+      *LoadGame("oh_hell(off_bid_penalty=true,points_per_trick=2)"), 1);
   testing::ResampleInfostateTest(*LoadGame("oh_hell"), /*num_sims=*/10);
 }
 
