@@ -76,6 +76,7 @@
 #include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
+#include "algorithms_infostate_tree.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 
@@ -748,6 +749,7 @@ PYBIND11_MODULE(pyspiel, m) {
     throw SpielException(string);
   });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
+  py::register_exception<ForbiddenException>(m, "ForbiddenError", PyExc_RuntimeError);
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                     // Bots and bot-related algorithms.
@@ -783,6 +785,7 @@ PYBIND11_MODULE(pyspiel, m) {
   bind_repeated_pokerkit_state_struct(m);  // C++ struct for a Python game.
   init_pyspiel_observer(m);                 // Observers and observations.
   init_pyspiel_utils(m);                    // Utilities.
+  init_pyspiel_infostate_tree(m);  // Infostate-Tree and associated classes (Id etc.)
 
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT

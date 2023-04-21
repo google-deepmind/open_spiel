@@ -21,78 +21,21 @@
 
 namespace py = ::pybind11;
 
-template <typename T>
-class MockUniquePtr {
-  public:
-   MockUniquePtr() noexcept : ptr_(nullptr) {}
-
-   explicit MockUniquePtr(T* ptr) noexcept : ptr_(ptr) {}
-
-   ~MockUniquePtr() = default;
-
-   MockUniquePtr(const MockUniquePtr& other) noexcept : ptr_(other.get()) {}
-
-   MockUniquePtr& operator=(const MockUniquePtr& other) noexcept {
-      reset(other.get());
-      return *this;
-   }
-
-   MockUniquePtr(MockUniquePtr&& other) noexcept : ptr_(other.release()) {}
-
-   MockUniquePtr& operator=(MockUniquePtr&& other) noexcept {
-      reset(other.release());
-      return *this;
-   }
-
-   T* get() const noexcept {
-      return ptr_;
-   }
-
-   T* release() noexcept {
-      T* ptr = ptr_;
-      ptr_ = nullptr;
-      return ptr;
-   }
-
-   void reset(T* ptr = nullptr) noexcept {
-      ptr_ = ptr;
-   }
-
-   T& operator*() const noexcept {
-      return *ptr_;
-   }
-
-   T* operator->() const noexcept {
-      return ptr_;
-   }
-
-   explicit operator bool() const noexcept {
-      return ptr_ != nullptr;
-   }
-
-  private:
-   T* ptr_;
-};
-
-PYBIND11_DECLARE_HOLDER_TYPE(T, MockUniquePtr<T>, true);
-
 namespace open_spiel {
-
-
 
 using namespace algorithms;
 
+// using node_uniq_ptr = std::unique_ptr< InfostateNode, py::nodelete >;
+using infostatenode_holder_ptr = MockUniquePtr< InfostateNode >;
+// using const_node_uniq_ptr = std::unique_ptr< const InfostateNode, py::nodelete >;
+using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
+
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
-   py::class_< InfostateNode, MockUniquePtr< InfostateNode > >(
-      m, "InfostateNode", py::is_final()
-   )
+   py::class_< InfostateNode, infostatenode_holder_ptr >(m, "InfostateNode", py::is_final())
       .def_property_readonly("tree", &InfostateNode::tree, py::return_value_policy::reference)
       .def_property_readonly(
-         "parent",
-         [](const InfostateNode &node) {
-            return std::unique_ptr< InfostateNode, py::nodelete >{node.parent()};
-         }
+         "parent", [](const InfostateNode &node) { return infostatenode_holder_ptr{node.parent()}; }
       )
       .def_property_readonly("incoming_index", &InfostateNode::incoming_index)
       .def_property_readonly("type", &InfostateNode::type)
@@ -100,15 +43,32 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       .def_property_readonly("is_root_node", &InfostateNode::is_root_node)
       .def_property_readonly("has_infostate_string", &InfostateNode::has_infostate_string)
       .def_property_readonly("infostate_string", &InfostateNode::infostate_string)
+      .def_property_readonly("num_children", &InfostateNode::num_children)
+      .def_property_readonly("child_iterator", &InfostateNode::child_iterator)
       .def(
          "child_at",
          [](const InfostateNode &node, int index) {
-            return std::unique_ptr< InfostateNode, py::nodelete >{node.child_at(index)};
+            return infostatenode_holder_ptr{node.child_at(index)};
          },
          py::arg("index")
       )
-      .def_property_readonly("num_children", &InfostateNode::num_children)
-      .def_property_readonly("child_iterator", &InfostateNode::child_iterator);
+      .def(
+         "__copy__",
+         [](const InfostateNode &node) {
+            throw ForbiddenException(
+               "InfostateNode cannot be copied, because its lifetime is managed by the owning "
+               "InfostateTree. Store a variable naming the associated tree to ensure the node's "
+               "lifetime."
+            );
+         }
+      )
+      .def("__deepcopy__", [](const InfostateNode &node) {
+         throw ForbiddenException(
+            "InfostateNode cannot be copied, because its lifetime is managed by the owning "
+            "InfostateTree. Store a variable naming the associated tree to ensure the node's "
+            "lifetime."
+         );
+      });
 
    py::enum_< InfostateNodeType >(m, "InfostateNodeType")
       .value("decision", InfostateNodeType::kDecisionInfostateNode)
@@ -117,13 +77,8 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       .export_values();
 }
 
-//using node_uniq_ptr = std::unique_ptr< InfostateNode, py::nodelete >;
-using node_uniq_ptr = MockUniquePtr< InfostateNode >;
-//using const_node_uniq_ptr = std::unique_ptr< const InfostateNode, py::nodelete >;
-using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
-
 struct ToUniquePtrFunctor {
-   auto operator()(InfostateNode *ptr) const noexcept { return node_uniq_ptr{ptr}; }
+   auto operator()(InfostateNode *ptr) const noexcept { return infostatenode_holder_ptr{ptr}; }
 };
 
 template <
@@ -150,6 +105,8 @@ auto to_unique_ptr_vec(
 
 void init_pyspiel_infostate_tree(::pybind11::module &m)
 {
+   // Infostate-Tree nodes and NodeType enum
+   init_pyspiel_infostate_node(m);
    // suffix is float despite using double, since python's floating point type is double precision.
    init_pyspiel_treevector_bundle< double >(m, "Float");
    // a generic tree vector bundle holding any type of python object
@@ -171,7 +128,9 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
 
    m.def("is_valid_sf_strategy", &IsValidSfStrategy);
 
-   py::bind_vector< std::vector< std::vector< node_uniq_ptr > > >(m, "NodeVector2D");
+   py::bind_vector< std::vector< std::vector< infostatenode_holder_ptr > > >(
+      m, "InfostateNodeVector2D"
+   );
 
    py::class_< InfostateTree, std::shared_ptr< InfostateTree > >(m, "InfostateTree")
       .def(
@@ -217,7 +176,9 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
          py::arg("start_nodes"),
          py::arg("max_move_ahead_limit") = 1000
       )
-      .def("root", [](InfostateTree &tree) { return node_uniq_ptr{tree.mutable_root()}; })
+      .def(
+         "root", [](InfostateTree &tree) { return infostatenode_holder_ptr{tree.mutable_root()}; }
+      )
       .def("root_branching_factor", &InfostateTree::root_branching_factor)
       .def("acting_player", &InfostateTree::acting_player)
       .def("tree_height", &InfostateTree::tree_height)
@@ -228,7 +189,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def(
          "observation_infostate",
          [](InfostateTree &tree, const SequenceId &id) {
-            return node_uniq_ptr{tree.observation_infostate(id)};
+            return infostatenode_holder_ptr{tree.observation_infostate(id)};
          }
       )
       .def(
@@ -246,9 +207,10 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
          [](InfostateTree &tree, const SequenceId &id) {
             auto node_opt = tree.DecisionForSequence(id);
             if(not node_opt.has_value()) {
-               return absl::optional< node_uniq_ptr >{};
+               return absl::optional< infostatenode_holder_ptr >{};
             } else {
-               return absl::optional< node_uniq_ptr >{node_uniq_ptr{*node_opt}};
+               return absl::optional< infostatenode_holder_ptr >{
+                  infostatenode_holder_ptr{*node_opt}};
             }
          }
       )
@@ -256,7 +218,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def(
          "decision_infostate",
          [](InfostateTree &tree, const DecisionId &id) {
-            return node_uniq_ptr{tree.decision_infostate(id)};
+            return infostatenode_holder_ptr{tree.decision_infostate(id)};
          }
       )
       .def(
@@ -268,7 +230,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def(
          "all_decision_infostates",
          [](const InfostateTree &tree) {
-            return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+            return to_unique_ptr_vec< std::vector< infostatenode_holder_ptr > >(
                tree.AllDecisionInfostates(), ToUniquePtrFunctor{}
             );
          }
@@ -278,7 +240,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def(
          "leaf_nodes",
          [](const InfostateTree &tree) {
-            return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+            return to_unique_ptr_vec< std::vector< infostatenode_holder_ptr > >(
                tree.leaf_nodes(), ToUniquePtrFunctor{}
             );
          }
@@ -286,16 +248,16 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def(
          "leaf_node",
          [](const InfostateTree &tree, const LeafId &id) {
-            return node_uniq_ptr{tree.leaf_node(id)};
+            return infostatenode_holder_ptr{tree.leaf_node(id)};
          }
       )
       .def(
          "nodes_at_depths",
          [](const InfostateTree &tree) {
-            return to_unique_ptr_vec< std::vector< std::vector< node_uniq_ptr > > >(
+            return to_unique_ptr_vec< std::vector< std::vector< infostatenode_holder_ptr > > >(
                tree.nodes_at_depths(),
                [](const auto &internal_vec) {
-                  return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+                  return to_unique_ptr_vec< std::vector< infostatenode_holder_ptr > >(
                      internal_vec, ToUniquePtrFunctor{}
                   );
                }
@@ -313,7 +275,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
                throw std::invalid_argument("'depth' must be non-negative.");
             }
             // convert the raw node vector again into a vector of non-deleting node unique pointer.
-            return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+            return to_unique_ptr_vec< std::vector< infostatenode_holder_ptr > >(
                tree.nodes_at_depth(py::cast< size_t >(depth)), ToUniquePtrFunctor{}
             );
          },
