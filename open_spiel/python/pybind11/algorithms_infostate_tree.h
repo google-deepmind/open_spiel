@@ -21,6 +21,10 @@ namespace open_spiel {
 
 void init_pyspiel_infostate_tree(::pybind11::module& m);
 
+void init_pyspiel_infostate_node(::pybind11::module& m);
+
+void init_pyspiel_vec_with_uniqeptrs_iterator(::pybind11::module& m);
+
 template < typename T >
 void init_pyspiel_treevector_bundle(::pybind11::module& m, std::string& typestr);
 

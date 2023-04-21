@@ -25,27 +25,22 @@ using namespace algorithms;
 template < typename T >
 void init_pyspiel_treevector_bundle(::pybind11::module &m, std::string typestr)
 {
-   std::string treeplex_pyclass_name = std::string("TreeplexVector") + typestr;
-   ::pybind11::class_< TreeplexVector< T > >(m, treeplex_pyclass_name.c_str())
+   ::pybind11::class_< TreeplexVector< T > >(m, (std::string("TreeplexVector") + typestr).c_str())
       .def(::pybind11::init< const InfostateTree * >())
       .def(::pybind11::init< const InfostateTree *, std::vector< T > >())
-      .def(
-         "__getitem__",
-         [](const TreeplexVector< T > &self, const SequenceId &id) { return self[id]; }
-      )
+      .def("view", [](const TreeplexVector< T > &self, const SequenceId &id) { return self[id]; })
+      .def("__getitem__", [](TreeplexVector< T > &self, const SequenceId &id) { return self[id]; })
       .def("__len__", &TreeplexVector< T >::size)
       .def("__repr__", &TreeplexVector< T >::operator<<);
 
-   std::string leafvector_pyclass_name = std::string("LeafVector") + typestr;
-   ::pybind11::class_< LeafVector< T > >(m, leafvector_pyclass_name.c_str())
+   ::pybind11::class_< LeafVector< T > >(m, (std::string("LeafVector") + typestr).c_str())
       .def(::pybind11::init< const InfostateTree * >())
       .def(::pybind11::init< const InfostateTree *, std::vector< T > >())
       .def("__getitem__", [](const LeafVector< T > &self, const LeafId &id) { return self[id]; })
       .def("__len__", &LeafVector< T >::size)
       .def("__repr__", &LeafVector< T >::operator<<);
 
-   std::string decisionvector_pyclass_name = std::string("DecisionVector") + typestr;
-   ::pybind11::class_< DecisionVector< T > >(m, decisionvector_pyclass_name.c_str())
+   ::pybind11::class_< DecisionVector< T > >(m, (std::string("DecisionVector") + typestr).c_str())
       .def(::pybind11::init< const InfostateTree * >())
       .def(::pybind11::init< const InfostateTree *, std::vector< T > >())
       .def(
