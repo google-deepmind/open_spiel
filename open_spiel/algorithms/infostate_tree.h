@@ -292,7 +292,7 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<InfostateNode*>& start_nodes,
     bool store_world_states = false, int max_move_ahead_limit = 1000);
 
-class InfostateTree final {
+class InfostateTree final : public std::enable_shared_from_this<InfostateTree> {
   // Note that only MakeInfostateTree is allowed to call the constructor
   // to ensure the trees are always allocated on heap. We do this so that all
   // the collected pointers are valid throughout the tree's lifetime even if
@@ -313,6 +313,10 @@ class InfostateTree final {
       const std::vector<const InfostateNode*>&, bool, int);
 
  public:
+  // -- gain shared ownership of the allocated infostate object
+  std::shared_ptr< InfostateTree > shared_ptr() { return shared_from_this(); }
+  std::shared_ptr< const InfostateTree > shared_ptr() const { return shared_from_this(); }
+
   // -- Root accessors ---------------------------------------------------------
   const InfostateNode& root() const { return *root_; }
   InfostateNode* mutable_root() { return root_.get(); }
@@ -352,7 +356,7 @@ class InfostateTree final {
   // Returns `None` if the sequence is the empty sequence.
   absl::optional<DecisionId> DecisionIdForSequence(const SequenceId&) const;
   // Returns `None` if the sequence is the empty sequence.
-  absl::optional<InfostateNode*> DecisionForSequence(const SequenceId&);
+  absl::optional<InfostateNode*> DecisionForSequence(const SequenceId& sequence_id) const;
   // Returns whether the sequence ends with the last action the player can make.
   bool IsLeafSequence(const SequenceId&) const;
 

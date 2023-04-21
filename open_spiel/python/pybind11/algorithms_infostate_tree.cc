@@ -21,6 +21,7 @@
 
 namespace py = ::pybind11;
 
+
 namespace open_spiel {
 
 using namespace algorithms;
@@ -31,7 +32,7 @@ using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
    py::class_< InfostateNode, infostatenode_holder_ptr >(m, "InfostateNode", py::is_final())
-      .def("tree", &InfostateNode::tree, py::return_value_policy::reference_internal)
+      .def("tree", [](const InfostateNode &node) { return node.tree().shared_ptr(); })
       .def(
          "parent", [](const InfostateNode &node) { return infostatenode_holder_ptr{node.parent()}; }
       )
@@ -77,6 +78,7 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
          },
          py::arg("index")
       )
+      .def("make_certificate", &InfostateNode::MakeCertificate)
       .def(
          "__copy__",
          [](const InfostateNode &node) {
@@ -89,14 +91,22 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
             );
          }
       )
-      .def("__deepcopy__", [](const InfostateNode &node) {
-         throw ForbiddenException(
-            "InfostateNode cannot be copied, because its "
-            "lifetime is managed by the owning "
-            "InfostateTree. Store a variable naming the "
-            "associated tree to ensure the node's "
-            "lifetime."
-         );
+      .def(
+         "__deepcopy__",
+         [](const InfostateNode &node) {
+            throw ForbiddenException(
+               "InfostateNode cannot be copied, because its "
+               "lifetime is managed by the owning "
+               "InfostateTree. Store a variable naming the "
+               "associated tree to ensure the node's "
+               "lifetime."
+            );
+         }
+      )
+      .def("address_str", [](const InfostateNode &node) {
+         std::stringstream ss;
+         ss << &node;
+         return ss.str();
       });
 
    py::enum_< InfostateNodeType >(m, "InfostateNodeType")
@@ -162,7 +172,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       m, "InfostateNodeVector2D"
    );
 
-   py::class_< InfostateTree, std::shared_ptr< InfostateTree > >(m, "InfostateTree")
+   py::class_< InfostateTree, std::shared_ptr< InfostateTree > >(m, "InfostateTree", py::is_final())
       .def(
          py::init([](const Game &game, Player acting_player, int max_move_limit) {
             return MakeInfostateTree(game, acting_player, max_move_limit);
@@ -240,12 +250,6 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def("is_leaf_sequence", &InfostateTree::IsLeafSequence)
       .def(
          "decision_infostate",
-         [](InfostateTree &tree, const DecisionId &id) {
-            return infostatenode_holder_ptr{tree.decision_infostate(id)};
-         }
-      )
-      .def(
-         "decision_infostate_view",
          [](const InfostateTree &tree, const DecisionId &id) {
             return const_node_uniq_ptr{tree.decision_infostate(id)};
          }
@@ -308,10 +312,30 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       )
       .def("best_response", &InfostateTree::BestResponse, py::arg("gradient"))
       .def("best_response_value", &InfostateTree::BestResponseValue, py::arg("gradient"))
-      .def("__repr__", [](const InfostateTree &tree) {
-         std::ostringstream oss;
-         oss << tree;
-         return oss.str();
+      .def(
+         "__repr__",
+         [](const InfostateTree &tree) {
+            std::ostringstream oss;
+            oss << tree;
+            return oss.str();
+         }
+      )
+      .def(
+         "__copy__",
+         [](const InfostateTree &) {
+            throw ForbiddenException(
+               "InfostateTree cannot be copied, because its "
+               "internal structure is entangled during construction. "
+               "Create a new tree instead."
+            );
+         }
+      )
+      .def("__deepcopy__", [](const InfostateTree &) {
+         throw ForbiddenException(
+            "InfostateTree cannot be copied, because its "
+            "internal structure is entangled during construction. "
+            "Create a new tree instead."
+         );
       });
 }
 
