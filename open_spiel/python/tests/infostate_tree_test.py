@@ -65,7 +65,6 @@ class InfostateTreeTest(parameterized.TestCase):
         gc.collect()  # force garbage collection
         self.assertIsNone(wptr())
 
-
     @parameterized.parameters(
         [
             # test for matrix mp
@@ -243,6 +242,92 @@ class InfostateTreeTest(parameterized.TestCase):
         with self.assertRaises(TypeError) as context:
             pyspiel.InfostateNode()
             self.assertTrue("No constructor defined" in context.exception)
+        # disallowing copying is enforced
+        tree = pyspiel.InfostateTree(pyspiel.load_game("kuhn_poker"), 0)
+        root = tree.root()
+        with self.assertRaises(pyspiel.ForbiddenError) as context:
+            copy(root)
+            deepcopy(root)
+
+    def test_treevector_binding(self):
+        game = pyspiel.load_game("kuhn_poker")
+        tree = pyspiel.InfostateTree(game, 0)
+        # ensure constructors are bound with the respective args
+        treeplex_vec = pyspiel.TreeplexVector(tree)
+        leaf_vec = pyspiel.LeafVector(tree)
+        decision_vec = pyspiel.DecisionVector(tree)
+
+        self.assertEqual(len(treeplex_vec), 13)
+        self.assertEqual(len(leaf_vec), 30)
+        self.assertEqual(len(decision_vec), 6)
+
+        tree.all_decision_ids()
+        seq_id_range = tree.all_sequence_ids()
+        n_ids = 0
+        for id_ in seq_id_range:
+            n_ids += 1
+        self.assertEqual(n_ids, 13)
+        seq_id = next(iter(tree.all_sequence_ids()))
+        seq_id_copy = copy(seq_id)
+        self.assertEqual(seq_id.id(), 0)
+        self.assertFalse(seq_id.is_undefined())
+        self.assertIsNone(seq_id.next())
+        self.assertNotEqual(seq_id, seq_id_copy)
+
+    def test_sequence_id_labeling(self):
+        for pl in range(2):
+            tree = pyspiel.InfostateTree(pyspiel.load_game("kuhn_poker"), pl)
+
+            for depth in range(tree.tree_height() + 1):
+                for node in tree.nodes_at_depth(depth):
+                    self.assertLessEqual(
+                        node.start_sequence_id().id(), node.sequence_id().id()
+                    )
+                    self.assertLessEqual(
+                        node.end_sequence_id().id(), node.sequence_id().id()
+                    )
+
+            # Check labeling was done from the deepest nodes.
+            depth = float("inf")  # Some large number.
+            for id in tree.all_sequence_ids():
+                node = tree.observation_infostate(id)
+                self.assertLessEqual(node.depth(), depth)
+                depth = node.depth()
+                # Longer sequences (extensions) must have the corresponding
+                # infostate nodes placed deeper.
+                for extension in node.all_sequence_ids():
+                    child = tree.observation_infostate(extension)
+                    self.assertLess(node.depth(), child.depth())
+
+    def test_best_response(self):
+        tree0 = pyspiel.InfostateTree(pyspiel.load_game("matrix_mp"), 0)
+        tree1 = pyspiel.InfostateTree(pyspiel.load_game("matrix_mp"), 1)
+        for alpha in range(0, 10):
+            alpha /= 10.0
+            br_value = max(2 * alpha - 1, -2 * alpha + 1)
+            grad0 = pyspiel.LeafVectorFloat(
+                tree0,
+                [1.0 * alpha, -1.0 * (1.0 - alpha), -1.0 * alpha, 1.0 * (1.0 - alpha)],
+            )
+            self.assertAlmostEqual(tree0.best_response_value(grad0), br_value)
+
+            grad1 = pyspiel.LeafVectorFloat(
+                tree1,
+                [-1.0 * alpha, 1.0 * (1.0 - alpha), 1.0 * alpha, -1.0 * (1.0 - alpha)],
+            )
+            self.assertAlmostEqual(tree1.best_response_value(grad1), br_value)
+
+            grad0_tp = pyspiel.TreeplexVectorFloat(
+                tree0, [-1.0 + 2.0 * alpha, 1.0 - 2.0 * alpha, 0.0]
+            )
+            actual_response = tree0.best_response(grad0_tp)
+            self.assertAlmostEqual(actual_response[0], br_value)
+
+            grad1_tp = pyspiel.TreeplexVectorFloat(
+                tree1, [1.0 - 2.0 * alpha, -1.0 + 2.0 * alpha, 0.0]
+            )
+            actual_response = tree1.best_response(grad1_tp)
+            self.assertAlmostEqual(actual_response[0], br_value)
 
 
 if __name__ == "__main__":

@@ -30,7 +30,9 @@ void _init_pyspiel_treevector_bundle_impl(
    const std::string &type_name
 )
 {
-   ::pybind11::class_< TreeVectorDerived< T > >(m, (template_name + type_name).c_str())
+   ::pybind11::class_< TreeVectorDerived< T >, std::shared_ptr< TreeVectorDerived< T > > >(
+      m, (template_name + type_name).c_str()
+   )
       .def(::pybind11::init< const InfostateTree * >(), ::pybind11::arg("tree"))
       .def(
          ::pybind11::init< const InfostateTree *, std::vector< T > >(),
@@ -43,7 +45,16 @@ void _init_pyspiel_treevector_bundle_impl(
          ::pybind11::arg("id")
       )
       .def("__len__", &TreeVectorDerived< T >::size)
-      .def("__repr__", &TreeVectorDerived< T >::operator<<);
+      .def("__repr__", &TreeVectorDerived< T >::operator<<)
+      .def(
+         "__copy__",
+         [](const std::shared_ptr< TreeVectorDerived< T > > &self) {
+            return std::shared_ptr< TreeVectorDerived< T > >(self);
+         }
+      )
+      .def("__deepcopy__", [](const TreeVectorDerived< T > &self) {
+         return TreeVectorDerived< T >{self};
+      });
 }
 }  // namespace detail
 
@@ -72,7 +83,9 @@ void init_pyspiel_node_id(::pybind11::module &m, const std::string &class_name)
       .def("is_undefined", &Self::is_undefined)
       .def("next", &Self::next)
       .def("__eq__", &Self::operator==)
-      .def("__ne__", &Self::operator!=);
+      .def("__ne__", &Self::operator!=)
+      .def("__copy__", [](const Self &self) { return Self(self); })
+      .def("__deepcopy__", [](const Self &self) { return Self(self); });
 }
 
 template < class Id >
