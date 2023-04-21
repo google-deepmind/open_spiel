@@ -26,6 +26,9 @@ endif()
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+  pybind11/algorithms_infostate_tree.cc
+  pybind11/algorithms_infostate_tree.tcc
+  pybind11/algorithms_infostate_tree.h
   pybind11/algorithms_corr_dist.cc
   pybind11/algorithms_corr_dist.h
   pybind11/algorithms_trajectories.cc
