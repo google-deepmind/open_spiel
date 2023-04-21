@@ -22,40 +22,52 @@ namespace open_spiel {
 
 using namespace algorithms;
 
-template < typename T >
-void init_pyspiel_treevector_bundle(::pybind11::module &m, std::string typestr)
+namespace detail {
+template < typename T, template < typename > class TreeVectorDerived, typename IdType >
+void _init_pyspiel_treevector_bundle_impl(
+   ::pybind11::module &m,
+   const std::string &template_name,
+   const std::string &type_name
+)
 {
-   ::pybind11::class_< TreeplexVector< T > >(m, (std::string("TreeplexVector") + typestr).c_str())
-      .def(::pybind11::init< const InfostateTree * >())
-      .def(::pybind11::init< const InfostateTree *, std::vector< T > >())
-      .def("view", [](const TreeplexVector< T > &self, const SequenceId &id) { return self[id]; })
-      .def("__getitem__", [](TreeplexVector< T > &self, const SequenceId &id) { return self[id]; })
-      .def("__len__", &TreeplexVector< T >::size)
-      .def("__repr__", &TreeplexVector< T >::operator<<);
-
-   ::pybind11::class_< LeafVector< T > >(m, (std::string("LeafVector") + typestr).c_str())
-      .def(::pybind11::init< const InfostateTree * >())
-      .def(::pybind11::init< const InfostateTree *, std::vector< T > >())
-      .def("__getitem__", [](const LeafVector< T > &self, const LeafId &id) { return self[id]; })
-      .def("__len__", &LeafVector< T >::size)
-      .def("__repr__", &LeafVector< T >::operator<<);
-
-   ::pybind11::class_< DecisionVector< T > >(m, (std::string("DecisionVector") + typestr).c_str())
-      .def(::pybind11::init< const InfostateTree * >())
-      .def(::pybind11::init< const InfostateTree *, std::vector< T > >())
+   ::pybind11::class_< TreeVectorDerived< T > >(m, (template_name + type_name).c_str())
+      .def(::pybind11::init< const InfostateTree * >(), ::pybind11::arg("tree"))
+      .def(
+         ::pybind11::init< const InfostateTree *, std::vector< T > >(),
+         ::pybind11::arg("tree"),
+         ::pybind11::arg("vec")
+      )
       .def(
          "__getitem__",
-         [](const DecisionVector< T > &self, const DecisionId &id) { return self[id]; }
+         [](const TreeVectorDerived< T > &self, const IdType &id) { return self[id]; },
+         ::pybind11::arg("id")
       )
-      .def("__len__", &DecisionVector< T >::size)
-      .def("__repr__", &DecisionVector< T >::operator<<);
+      .def("__len__", &TreeVectorDerived< T >::size)
+      .def("__repr__", &TreeVectorDerived< T >::operator<<);
+}
+}  // namespace detail
+
+template < typename T >
+void init_pyspiel_treevector_bundle(::pybind11::module &m, const std::string &typestr)
+{
+   detail::_init_pyspiel_treevector_bundle_impl< T, TreeplexVector, SequenceId >(
+      m, "TreeplexVector", typestr
+   );
+   detail::_init_pyspiel_treevector_bundle_impl< T, LeafVector, LeafId >(m, "LeafVector", typestr);
+   detail::_init_pyspiel_treevector_bundle_impl< T, DecisionVector, DecisionId >(
+      m, "DecisionVector", typestr
+   );
 }
 
 template < typename Self >
 void init_pyspiel_node_id(::pybind11::module &m, const std::string &class_name)
 {
    ::pybind11::class_< Self >(m, class_name.c_str())
-      .def(::pybind11::init< size_t, const InfostateTree * >())
+      .def(
+         ::pybind11::init< size_t, const InfostateTree * >(),
+         ::pybind11::arg("id_value"),
+         ::pybind11::arg("tree")
+      )
       .def("id", &Self::id)
       .def("is_undefined", &Self::is_undefined)
       .def("next", &Self::next)
@@ -67,7 +79,12 @@ template < class Id >
 void init_pyspiel_range(::pybind11::module &m, const std::string &name)
 {
    ::pybind11::class_< Range< Id > >(m, name.c_str())
-      .def(::pybind11::init< size_t, size_t, const InfostateTree * >())
+      .def(
+         ::pybind11::init< size_t, size_t, const InfostateTree * >(),
+         ::pybind11::arg("start"),
+         ::pybind11::arg("end"),
+         ::pybind11::arg("tree")
+      )
       .def(
          "__iter__",
          [](const Range< Id > &r) { return ::pybind11::make_iterator(r.begin(), r.end()); },
