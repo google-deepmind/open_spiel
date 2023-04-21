@@ -252,7 +252,7 @@ class Range {
   const size_t end_;
   const InfostateTree* tree_;
 
-public:
+ public:
   Range(size_t start, size_t end, const InfostateTree* tree)
       : start_(start), end_(end), tree_(tree) {
     SPIEL_CHECK_LE(start_, end_);
@@ -312,7 +312,7 @@ class InfostateTree final {
   friend std::shared_ptr<InfostateTree> MakeInfostateTree(
       const std::vector<const InfostateNode*>&, bool, int);
 
-public:
+ public:
   // -- Root accessors ---------------------------------------------------------
   const InfostateNode& root() const { return *root_; }
   InfostateNode* mutable_root() { return root_.get(); }
@@ -403,7 +403,7 @@ public:
    // -- For debugging ----------------------------------------------------------
    friend std::ostream& operator<<(std::ostream& os, const InfostateTree& tree);
 
-private:
+ private:
   const Player acting_player_;
   const std::shared_ptr<Observer> infostate_observer_;
   const std::unique_ptr<InfostateNode> root_;
@@ -464,7 +464,7 @@ class VecWithUniquePtrsIterator {
   int pos_;
   const std::vector<std::unique_ptr<T>>& vec_;
 
-public:
+ public:
   explicit VecWithUniquePtrsIterator(const std::vector<std::unique_ptr<T>>& vec,
                                      int pos = 0)
       : pos_(pos), vec_(vec) {}
@@ -657,7 +657,7 @@ class InfostateNode final {
   // of (isomorphic) trees.
   std::string MakeCertificate() const;
 
-private:
+ private:
   // Make sure that the subtree ends at the requested target depth by inserting
   // dummy observation nodes with one outcome.
   void RebalanceSubtree(int target_depth, int current_depth);
@@ -702,7 +702,7 @@ class TreeVector {
   const InfostateTree* tree_;
   std::vector<T> vec_;
 
-public:
+ public:
   explicit TreeVector(const InfostateTree* tree)
       : tree_(tree), vec_(tree_->num_ids(Id(kUndefinedNodeId, tree))) {}
   TreeVector(const InfostateTree* tree, std::vector<T> vec)
