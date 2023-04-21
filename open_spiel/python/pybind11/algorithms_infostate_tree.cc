@@ -17,33 +17,74 @@
 #include <utility>
 
 #include "open_spiel/algorithms/infostate_tree.h"
+#include "pybind11/stl_bind.h"
+
+namespace py = ::pybind11;
+
+template <typename T>
+class MockUniquePtr {
+  public:
+   MockUniquePtr() noexcept : ptr_(nullptr) {}
+
+   explicit MockUniquePtr(T* ptr) noexcept : ptr_(ptr) {}
+
+   ~MockUniquePtr() = default;
+
+   MockUniquePtr(const MockUniquePtr& other) noexcept : ptr_(other.get()) {}
+
+   MockUniquePtr& operator=(const MockUniquePtr& other) noexcept {
+      reset(other.get());
+      return *this;
+   }
+
+   MockUniquePtr(MockUniquePtr&& other) noexcept : ptr_(other.release()) {}
+
+   MockUniquePtr& operator=(MockUniquePtr&& other) noexcept {
+      reset(other.release());
+      return *this;
+   }
+
+   T* get() const noexcept {
+      return ptr_;
+   }
+
+   T* release() noexcept {
+      T* ptr = ptr_;
+      ptr_ = nullptr;
+      return ptr;
+   }
+
+   void reset(T* ptr = nullptr) noexcept {
+      ptr_ = ptr;
+   }
+
+   T& operator*() const noexcept {
+      return *ptr_;
+   }
+
+   T* operator->() const noexcept {
+      return ptr_;
+   }
+
+   explicit operator bool() const noexcept {
+      return ptr_ != nullptr;
+   }
+
+  private:
+   T* ptr_;
+};
+
+PYBIND11_DECLARE_HOLDER_TYPE(T, MockUniquePtr<T>, true);
 
 namespace open_spiel {
 
+
+
 using namespace algorithms;
-namespace py = ::pybind11;
-
-void init_pyspiel_sequence_id(::pybind11::module &m)
-{
-   init_pyspiel_node_id< SequenceId >(m, "SequenceId");
-   m.attr("UNDEFINED_SEQUENCE_ID") = ::pybind11::cast(kUndefinedSequenceId);
-}
-
-void init_pyspiel_decision_id(::pybind11::module &m)
-{
-   init_pyspiel_node_id< DecisionId >(m, "DecisionId");
-   m.attr("UNDEFINED_DECISION_ID") = ::pybind11::cast(kUndefinedDecisionId);
-}
-
-void init_pyspiel_leaf_id(::pybind11::module &m)
-{
-   init_pyspiel_node_id< LeafId >(m, "LeafId");
-   m.attr("UNDEFINED_LEAF_ID") = ::pybind11::cast(kUndefinedLeafId);
-}
 
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
-   py::class_< InfostateNode, std::unique_ptr< InfostateNode, py::nodelete > >(
+   py::class_< InfostateNode, MockUniquePtr< InfostateNode > >(
       m, "InfostateNode", py::is_final()
    )
       .def_property_readonly("tree", &InfostateNode::tree, py::return_value_policy::reference)
@@ -60,7 +101,11 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       .def_property_readonly("has_infostate_string", &InfostateNode::has_infostate_string)
       .def_property_readonly("infostate_string", &InfostateNode::infostate_string)
       .def(
-         "child_at", &InfostateNode::child_at, py::arg("index"), py::return_value_policy::reference
+         "child_at",
+         [](const InfostateNode &node, int index) {
+            return std::unique_ptr< InfostateNode, py::nodelete >{node.child_at(index)};
+         },
+         py::arg("index")
       )
       .def_property_readonly("num_children", &InfostateNode::num_children)
       .def_property_readonly("child_iterator", &InfostateNode::child_iterator);
@@ -72,36 +117,61 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       .export_values();
 }
 
-void init_pyspiel_vec_with_uniqptrs_iterator(::pybind11::module &m)
+//using node_uniq_ptr = std::unique_ptr< InfostateNode, py::nodelete >;
+using node_uniq_ptr = MockUniquePtr< InfostateNode >;
+//using const_node_uniq_ptr = std::unique_ptr< const InfostateNode, py::nodelete >;
+using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
+
+struct ToUniquePtrFunctor {
+   auto operator()(InfostateNode *ptr) const noexcept { return node_uniq_ptr{ptr}; }
+};
+
+template <
+   typename ContainerOut,
+   typename TransformFunctor = ToUniquePtrFunctor,
+   template < class... > class Container = std::vector,
+   typename Value = InfostateNode *,
+   typename... RestTs >
+auto to_unique_ptr_vec(
+   const Container< Value, RestTs... > &node_container,
+   TransformFunctor transformer
+)
 {
-   py::class_< VecWithUniquePtrsIterator< InfostateNode > >(m, "InfostateNodeVecIterator")
-      .def(
-         "__iter__",
-         [](VecWithUniquePtrsIterator< InfostateNode > &it
-         ) -> VecWithUniquePtrsIterator< InfostateNode > & { return it; }
-      )
-      .def(
-         "__next__",
-         &VecWithUniquePtrsIterator< InfostateNode >::operator++,
-         py::return_value_policy::reference
-      )
-      .def("__eq__", &VecWithUniquePtrsIterator< InfostateNode >::operator==)
-      .def("__ne__", &VecWithUniquePtrsIterator< InfostateNode >::operator!=);
+   ContainerOut internal_vec{};
+   internal_vec.reserve(node_container.size());
+   std::transform(
+      node_container.begin(),
+      node_container.end(),
+      std::back_insert_iterator(internal_vec),
+      transformer
+   );
+   return internal_vec;
 }
 
 void init_pyspiel_infostate_tree(::pybind11::module &m)
 {
-   m.attr("DUMMY_ROOT_NODE_INFOSTATE") = algorithms::kDummyRootNodeInfostate;
-   m.attr("FILLER_INFOSTATE") = algorithms::kFillerInfostate;
-   m.attr("UNDEFINED_LEAF_ID") = kUndefinedLeafId;
-
-   m.def("is_valid_sf_strategy", &IsValidSfStrategy);
-
-   // the suffix is float despite using double, since it python the default floating point type is a
-   // double.
+   // suffix is float despite using double, since python's floating point type is double precision.
    init_pyspiel_treevector_bundle< double >(m, "Float");
    // a generic tree vector bundle holding any type of python object
    init_pyspiel_treevector_bundle< py::object >(m, "");
+   // bind a range for every possible id type
+   init_pyspiel_range< SequenceId >(m, "SequenceIdRange");
+   init_pyspiel_range< DecisionId >(m, "DecisionIdRange");
+   init_pyspiel_range< LeafId >(m, "LeafIdRange");
+
+   init_pyspiel_node_id< SequenceId >(m, "SequenceId");
+   init_pyspiel_node_id< DecisionId >(m, "DecisionId");
+   init_pyspiel_node_id< LeafId >(m, "LeafId");
+
+   m.attr("UNDEFINED_DECISION_ID") = ::pybind11::cast(kUndefinedDecisionId);
+   m.attr("UNDEFINED_LEAF_ID") = ::pybind11::cast(kUndefinedLeafId);
+   m.attr("UNDEFINED_SEQUENCE_ID") = ::pybind11::cast(kUndefinedSequenceId);
+   m.attr("DUMMY_ROOT_NODE_INFOSTATE") = ::pybind11::cast(algorithms::kDummyRootNodeInfostate);
+   m.attr("FILLER_INFOSTATE") = ::pybind11::cast(algorithms::kFillerInfostate);
+
+   m.def("is_valid_sf_strategy", &IsValidSfStrategy);
+
+   py::bind_vector< std::vector< std::vector< node_uniq_ptr > > >(m, "NodeVector2D");
 
    py::class_< InfostateTree, std::shared_ptr< InfostateTree > >(m, "InfostateTree")
       .def(
@@ -147,12 +217,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
          py::arg("start_nodes"),
          py::arg("max_move_ahead_limit") = 1000
       )
-      .def(
-         "root",
-         [](InfostateTree &tree) {
-            return std::unique_ptr< InfostateNode, py::nodelete >{tree.mutable_root()};
-         }
-      )
+      .def("root", [](InfostateTree &tree) { return node_uniq_ptr{tree.mutable_root()}; })
       .def("root_branching_factor", &InfostateTree::root_branching_factor)
       .def("acting_player", &InfostateTree::acting_player)
       .def("tree_height", &InfostateTree::tree_height)
@@ -162,44 +227,98 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def("empty_sequence", &InfostateTree::empty_sequence)
       .def(
          "observation_infostate",
-         py::overload_cast< const SequenceId & >(&InfostateTree::observation_infostate),
-         py::return_value_policy::reference
+         [](InfostateTree &tree, const SequenceId &id) {
+            return node_uniq_ptr{tree.observation_infostate(id)};
+         }
       )
       .def(
-         "observation_infostate",
-         py::overload_cast< const SequenceId & >(&InfostateTree::observation_infostate, py::const_),
-         py::return_value_policy::reference
+         "observation_infostate_view",
+         [](const InfostateTree &tree, const SequenceId &id) {
+            return std::unique_ptr< const InfostateNode, py::nodelete >{
+               tree.observation_infostate(id)};
+         }
       )
       .def("all_sequence_ids", &InfostateTree::AllSequenceIds)
       .def("decision_ids_with_parent_seq", &InfostateTree::DecisionIdsWithParentSeq)
       .def("decision_id_for_sequence", &InfostateTree::DecisionIdForSequence)
       .def(
          "decision_for_sequence",
-         &InfostateTree::DecisionForSequence,
-         py::return_value_policy::reference
+         [](InfostateTree &tree, const SequenceId &id) {
+            auto node_opt = tree.DecisionForSequence(id);
+            if(not node_opt.has_value()) {
+               return absl::optional< node_uniq_ptr >{};
+            } else {
+               return absl::optional< node_uniq_ptr >{node_uniq_ptr{*node_opt}};
+            }
+         }
       )
       .def("is_leaf_sequence", &InfostateTree::IsLeafSequence)
       .def(
          "decision_infostate",
-         py::overload_cast< const DecisionId & >(&InfostateTree::decision_infostate),
-         py::return_value_policy::reference
+         [](InfostateTree &tree, const DecisionId &id) {
+            return node_uniq_ptr{tree.decision_infostate(id)};
+         }
       )
       .def(
-         "decision_infostate",
-         py::overload_cast< const DecisionId & >(&InfostateTree::decision_infostate, py::const_),
-         py::return_value_policy::reference
+         "decision_infostate_view",
+         [](const InfostateTree &tree, const DecisionId &id) {
+            return const_node_uniq_ptr{tree.decision_infostate(id)};
+         }
       )
       .def(
          "all_decision_infostates",
-         &InfostateTree::AllDecisionInfostates,
-         py::return_value_policy::reference
+         [](const InfostateTree &tree) {
+            return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+               tree.AllDecisionInfostates(), ToUniquePtrFunctor{}
+            );
+         }
       )
       .def("all_decision_ids", &InfostateTree::AllDecisionIds)
       .def("decision_id_from_infostate_string", &InfostateTree::DecisionIdFromInfostateString)
-      .def("leaf_nodes", &InfostateTree::leaf_nodes, py::return_value_policy::reference)
-      .def("leaf_node", &InfostateTree::leaf_node, py::return_value_policy::reference)
-      .def("nodes_at_depths", &InfostateTree::nodes_at_depths, py::return_value_policy::reference)
-      .def("nodes_at_depth", &InfostateTree::nodes_at_depth, py::return_value_policy::reference)
+      .def(
+         "leaf_nodes",
+         [](const InfostateTree &tree) {
+            return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+               tree.leaf_nodes(), ToUniquePtrFunctor{}
+            );
+         }
+      )
+      .def(
+         "leaf_node",
+         [](const InfostateTree &tree, const LeafId &id) {
+            return node_uniq_ptr{tree.leaf_node(id)};
+         }
+      )
+      .def(
+         "nodes_at_depths",
+         [](const InfostateTree &tree) {
+            return to_unique_ptr_vec< std::vector< std::vector< node_uniq_ptr > > >(
+               tree.nodes_at_depths(),
+               [](const auto &internal_vec) {
+                  return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+                     internal_vec, ToUniquePtrFunctor{}
+                  );
+               }
+            );
+         }
+      )
+      .def(
+         "nodes_at_depth",
+         [](const InfostateTree &tree, const py::int_ &depth) {
+            // we accept a py::int_ here instead of directly asking for a size_t, since whatever
+            // pybind11 would cast to size_t in order to fulifll the type requirement would simply
+            // be byte-cast into size_t. This would turn negative values into high integers, instead
+            // of throwing an error.
+            if(depth < py::int_(0)) {
+               throw std::invalid_argument("'depth' must be non-negative.");
+            }
+            // convert the raw node vector again into a vector of non-deleting node unique pointer.
+            return to_unique_ptr_vec< std::vector< node_uniq_ptr > >(
+               tree.nodes_at_depth(py::cast< size_t >(depth)), ToUniquePtrFunctor{}
+            );
+         },
+         py::arg("depth")
+      )
       .def("best_response", &InfostateTree::BestResponse, py::arg("gradient"))
       .def("best_response_value", &InfostateTree::BestResponseValue, py::arg("gradient"))
       .def("__repr__", [](const InfostateTree &tree) {

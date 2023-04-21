@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_PYTHON_PYBIND11_INFOSTATE_TREE_H
 
 #include "open_spiel/python/pybind11/pybind11.h"
+#include "pybind11_abseil/absl_casters.h"
 
 namespace open_spiel {
 
@@ -23,24 +24,16 @@ void init_pyspiel_infostate_tree(::pybind11::module& m);
 
 void init_pyspiel_infostate_node(::pybind11::module& m);
 
-void init_pyspiel_vec_with_uniqeptrs_iterator(::pybind11::module& m);
-
 template < typename T >
 void init_pyspiel_treevector_bundle(::pybind11::module& m, std::string& typestr);
 
 template < typename Self >
 void init_pyspiel_node_id(::pybind11::module& m, const std::string& class_name);
-void init_pyspiel_sequence_id(::pybind11::module& m);
-void init_pyspiel_decision_id(::pybind11::module& m);
-void init_pyspiel_leaf_id(::pybind11::module& m);
 
 // Bind the Range class
 template < class Id >
 void init_pyspiel_range(::pybind11::module& m, const std::string& name);
 
-// Bind the RangeIterator class
-template < class Id >
-void init_pyspiel_range_iterator(::pybind11::module& m, const std::string& name);
 
 }  // namespace open_spiel
 

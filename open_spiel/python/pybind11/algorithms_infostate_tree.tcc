@@ -70,7 +70,7 @@ void init_pyspiel_range(::pybind11::module &m, const std::string &name)
       .def(::pybind11::init< size_t, size_t, const InfostateTree * >())
       .def(
          "__iter__",
-         [](const Range< Id > &r) -> RangeIterator< Id > {
+         [](const Range< Id > &r) {
             return ::pybind11::make_iterator(r.begin(), r.end());
          },
          ::pybind11::keep_alive< 0, 1 >()
@@ -81,30 +81,6 @@ void init_pyspiel_range(::pybind11::module &m, const std::string &name)
       });
 }
 
-template < class Id >
-void init_pyspiel_range_iterator(::pybind11::module &m, const std::string &name)
-{
-   ::pybind11::class_< RangeIterator< Id > >(m, name.c_str())
-      .def(::pybind11::init< size_t, const InfostateTree * >())
-      .def(
-         "__iter__", [](const RangeIterator< Id > &it) -> const RangeIterator< Id > & { return it; }
-      )
-      .def(
-         "__next__",
-         [](RangeIterator< Id > &it) -> Id {
-            if(it.id_ == it.tree_->num_nodes()) {
-               throw ::pybind11::stop_iteration();
-            }
-            return *it++;
-         }
-      )
-      .def("__eq__", &RangeIterator< Id >::operator==)
-      .def("__ne__", &RangeIterator< Id >::operator!=)
-      .def("__repr__", [](const RangeIterator< Id > &it) {
-         return "<" + std::string(typeid(RangeIterator< Id >).name()) + " object at "
-                + std::to_string(reinterpret_cast< std::uintptr_t >(&it)) + ">";
-      });
-}
 
 }  // namespace open_spiel
 
