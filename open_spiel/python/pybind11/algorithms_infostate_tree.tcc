@@ -70,17 +70,10 @@ void init_pyspiel_range(::pybind11::module &m, const std::string &name)
       .def(::pybind11::init< size_t, size_t, const InfostateTree * >())
       .def(
          "__iter__",
-         [](const Range< Id > &r) {
-            return ::pybind11::make_iterator(r.begin(), r.end());
-         },
+         [](const Range< Id > &r) { return ::pybind11::make_iterator(r.begin(), r.end()); },
          ::pybind11::keep_alive< 0, 1 >()
-      )
-      .def("__repr__", [](const Range< Id > &r) {
-         return "<" + std::string(typeid(Range< Id >).name()) + " object at "
-                + std::to_string(reinterpret_cast< std::uintptr_t >(&r)) + ">";
-      });
+      );
 }
-
 
 }  // namespace open_spiel
 

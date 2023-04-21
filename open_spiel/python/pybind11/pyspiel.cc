@@ -36,6 +36,7 @@
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/algorithms_corr_dist.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
+#include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/evaluation_elo.h"
 #include "open_spiel/python/pybind11/evaluation_sco.h"
@@ -76,7 +77,6 @@
 #include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Includes needed for absl::optional.
-#include "algorithms_infostate_tree.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 

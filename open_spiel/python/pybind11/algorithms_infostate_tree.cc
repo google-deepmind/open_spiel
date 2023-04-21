@@ -27,13 +27,16 @@ using namespace algorithms;
 
 // using node_uniq_ptr = std::unique_ptr< InfostateNode, py::nodelete >;
 using infostatenode_holder_ptr = MockUniquePtr< InfostateNode >;
-// using const_node_uniq_ptr = std::unique_ptr< const InfostateNode, py::nodelete >;
+// using const_node_uniq_ptr = std::unique_ptr< const InfostateNode,
+// py::nodelete >;
 using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
 
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
    py::class_< InfostateNode, infostatenode_holder_ptr >(m, "InfostateNode", py::is_final())
-      .def_property_readonly("tree", &InfostateNode::tree, py::return_value_policy::reference)
+      .def_property_readonly(
+         "tree", &InfostateNode::tree, py::return_value_policy::reference_internal
+      )
       .def_property_readonly(
          "parent", [](const InfostateNode &node) { return infostatenode_holder_ptr{node.parent()}; }
       )
@@ -45,6 +48,35 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       .def_property_readonly("infostate_string", &InfostateNode::infostate_string)
       .def_property_readonly("num_children", &InfostateNode::num_children)
       .def_property_readonly("child_iterator", &InfostateNode::child_iterator)
+      .def_property_readonly(
+         "terminal_history",
+         &InfostateNode::TerminalHistory,
+         py::return_value_policy::reference_internal
+      )
+      .def_property_readonly("sequence_id", &InfostateNode::sequence_id)
+      .def_property_readonly("start_sequence_id", &InfostateNode::start_sequence_id)
+      .def_property_readonly("end_sequence_id", &InfostateNode::end_sequence_id)
+      .def_property_readonly("all_sequence_ids", &InfostateNode::AllSequenceIds)
+      .def_property_readonly("decision_id", &InfostateNode::decision_id)
+      .def_property_readonly(
+         "legal_actions", &InfostateNode::legal_actions, py::return_value_policy::reference_internal
+      )
+      .def_property_readonly("is_leaf_node", &InfostateNode::is_leaf_node)
+      .def_property_readonly("terminal_utility", &InfostateNode::terminal_utility)
+      .def_property_readonly(
+         "terminal_chance_reach_prob", &InfostateNode::terminal_chance_reach_prob
+      )
+      .def_property_readonly("corresponding_states_size", &InfostateNode::corresponding_states_size)
+      .def_property_readonly(
+         "corresponding_states",
+         &InfostateNode::corresponding_states,
+         py::return_value_policy::reference_internal
+      )
+      .def_property_readonly(
+         "corresponding_chance_reach_probs",
+         &InfostateNode::corresponding_chance_reach_probs,
+         py::return_value_policy::reference_internal
+      )
       .def(
          "child_at",
          [](const InfostateNode &node, int index) {
@@ -56,23 +88,27 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
          "__copy__",
          [](const InfostateNode &node) {
             throw ForbiddenException(
-               "InfostateNode cannot be copied, because its lifetime is managed by the owning "
-               "InfostateTree. Store a variable naming the associated tree to ensure the node's "
+               "InfostateNode cannot be copied, because its "
+               "lifetime is managed by the owning "
+               "InfostateTree. Store a variable naming the "
+               "associated tree to ensure the node's "
                "lifetime."
             );
          }
       )
       .def("__deepcopy__", [](const InfostateNode &node) {
          throw ForbiddenException(
-            "InfostateNode cannot be copied, because its lifetime is managed by the owning "
-            "InfostateTree. Store a variable naming the associated tree to ensure the node's "
+            "InfostateNode cannot be copied, because its "
+            "lifetime is managed by the owning "
+            "InfostateTree. Store a variable naming the "
+            "associated tree to ensure the node's "
             "lifetime."
          );
       });
 
    py::enum_< InfostateNodeType >(m, "InfostateNodeType")
       .value("decision", InfostateNodeType::kDecisionInfostateNode)
-      .value("observation_infostate_node", InfostateNodeType::kObservationInfostateNode)
+      .value("observation", InfostateNodeType::kObservationInfostateNode)
       .value("terminal", InfostateNodeType::kTerminalInfostateNode)
       .export_values();
 }
@@ -107,7 +143,8 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
 {
    // Infostate-Tree nodes and NodeType enum
    init_pyspiel_infostate_node(m);
-   // suffix is float despite using double, since python's floating point type is double precision.
+   // suffix is float despite using double, since python's floating point type is
+   // double precision.
    init_pyspiel_treevector_bundle< double >(m, "Float");
    // a generic tree vector bundle holding any type of python object
    init_pyspiel_treevector_bundle< py::object >(m, "");
@@ -267,14 +304,16 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def(
          "nodes_at_depth",
          [](const InfostateTree &tree, const py::int_ &depth) {
-            // we accept a py::int_ here instead of directly asking for a size_t, since whatever
-            // pybind11 would cast to size_t in order to fulifll the type requirement would simply
-            // be byte-cast into size_t. This would turn negative values into high integers, instead
-            // of throwing an error.
+            // we accept a py::int_ here instead of directly asking for a
+            // size_t, since whatever pybind11 would cast to size_t in order to
+            // fulifll the type requirement would simply be byte-cast into
+            // size_t. This would turn negative values into high integers,
+            // instead of throwing an error.
             if(depth < py::int_(0)) {
                throw std::invalid_argument("'depth' must be non-negative.");
             }
-            // convert the raw node vector again into a vector of non-deleting node unique pointer.
+            // convert the raw node vector again into a vector of non-deleting
+            // node unique pointer.
             return to_unique_ptr_vec< std::vector< infostatenode_holder_ptr > >(
                tree.nodes_at_depth(py::cast< size_t >(depth)), ToUniquePtrFunctor{}
             );
