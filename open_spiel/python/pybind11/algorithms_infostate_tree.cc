@@ -21,7 +21,6 @@
 
 namespace py = ::pybind11;
 
-
 namespace open_spiel {
 
 using namespace algorithms;
@@ -221,20 +220,15 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
       .def("empty_sequence", &InfostateTree::empty_sequence)
       .def(
          "observation_infostate",
-         [](InfostateTree &tree, const SequenceId &id) {
-            return infostatenode_holder_ptr{tree.observation_infostate(id)};
-         }
-      )
-      .def(
-         "observation_infostate_view",
          [](const InfostateTree &tree, const SequenceId &id) {
             return std::unique_ptr< const InfostateNode, py::nodelete >{
                tree.observation_infostate(id)};
-         }
+         },
+         py::arg("sequence_id")
       )
       .def("all_sequence_ids", &InfostateTree::AllSequenceIds)
-      .def("decision_ids_with_parent_seq", &InfostateTree::DecisionIdsWithParentSeq)
-      .def("decision_id_for_sequence", &InfostateTree::DecisionIdForSequence)
+      .def("decision_ids_with_parent_seq", &InfostateTree::DecisionIdsWithParentSeq, py::arg("sequence_id"))
+      .def("decision_id_for_sequence", &InfostateTree::DecisionIdForSequence, py::arg("sequence_id"))
       .def(
          "decision_for_sequence",
          [](InfostateTree &tree, const SequenceId &id) {
@@ -245,14 +239,16 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
                return absl::optional< infostatenode_holder_ptr >{
                   infostatenode_holder_ptr{*node_opt}};
             }
-         }
+         },
+         py::arg("sequence_id")
       )
       .def("is_leaf_sequence", &InfostateTree::IsLeafSequence)
       .def(
          "decision_infostate",
          [](const InfostateTree &tree, const DecisionId &id) {
             return const_node_uniq_ptr{tree.decision_infostate(id)};
-         }
+         },
+         py::arg("decision_id")
       )
       .def(
          "all_decision_infostates",
@@ -263,7 +259,11 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
          }
       )
       .def("all_decision_ids", &InfostateTree::AllDecisionIds)
-      .def("decision_id_from_infostate_string", &InfostateTree::DecisionIdFromInfostateString)
+      .def(
+         "decision_id_from_infostate_string",
+         &InfostateTree::DecisionIdFromInfostateString,
+         py::arg("infostate_string")
+      )
       .def(
          "leaf_nodes",
          [](const InfostateTree &tree) {
@@ -276,7 +276,8 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
          "leaf_node",
          [](const InfostateTree &tree, const LeafId &id) {
             return infostatenode_holder_ptr{tree.leaf_node(id)};
-         }
+         },
+         py::arg("leaf_id")
       )
       .def(
          "nodes_at_depths",
