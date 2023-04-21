@@ -34,45 +34,45 @@ using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
    py::class_< InfostateNode, infostatenode_holder_ptr >(m, "InfostateNode", py::is_final())
-      .def_property_readonly(
+      .def(
          "tree", &InfostateNode::tree, py::return_value_policy::reference_internal
       )
-      .def_property_readonly(
+      .def(
          "parent", [](const InfostateNode &node) { return infostatenode_holder_ptr{node.parent()}; }
       )
-      .def_property_readonly("incoming_index", &InfostateNode::incoming_index)
-      .def_property_readonly("type", &InfostateNode::type)
-      .def_property_readonly("depth", &InfostateNode::depth)
-      .def_property_readonly("is_root_node", &InfostateNode::is_root_node)
-      .def_property_readonly("has_infostate_string", &InfostateNode::has_infostate_string)
-      .def_property_readonly("infostate_string", &InfostateNode::infostate_string)
-      .def_property_readonly("num_children", &InfostateNode::num_children)
-      .def_property_readonly("child_iterator", &InfostateNode::child_iterator)
-      .def_property_readonly(
+      .def("incoming_index", &InfostateNode::incoming_index)
+      .def("type", &InfostateNode::type)
+      .def("depth", &InfostateNode::depth)
+      .def("is_root_node", &InfostateNode::is_root_node)
+      .def("has_infostate_string", &InfostateNode::has_infostate_string)
+      .def("infostate_string", &InfostateNode::infostate_string)
+      .def("num_children", &InfostateNode::num_children)
+      .def("child_iterator", &InfostateNode::child_iterator)
+      .def(
          "terminal_history",
          &InfostateNode::TerminalHistory,
          py::return_value_policy::reference_internal
       )
-      .def_property_readonly("sequence_id", &InfostateNode::sequence_id)
-      .def_property_readonly("start_sequence_id", &InfostateNode::start_sequence_id)
-      .def_property_readonly("end_sequence_id", &InfostateNode::end_sequence_id)
-      .def_property_readonly("all_sequence_ids", &InfostateNode::AllSequenceIds)
-      .def_property_readonly("decision_id", &InfostateNode::decision_id)
-      .def_property_readonly(
+      .def("sequence_id", &InfostateNode::sequence_id)
+      .def("start_sequence_id", &InfostateNode::start_sequence_id)
+      .def("end_sequence_id", &InfostateNode::end_sequence_id)
+      .def("all_sequence_ids", &InfostateNode::AllSequenceIds)
+      .def("decision_id", &InfostateNode::decision_id)
+      .def(
          "legal_actions", &InfostateNode::legal_actions, py::return_value_policy::reference_internal
       )
-      .def_property_readonly("is_leaf_node", &InfostateNode::is_leaf_node)
-      .def_property_readonly("terminal_utility", &InfostateNode::terminal_utility)
-      .def_property_readonly(
+      .def("is_leaf_node", &InfostateNode::is_leaf_node)
+      .def("terminal_utility", &InfostateNode::terminal_utility)
+      .def(
          "terminal_chance_reach_prob", &InfostateNode::terminal_chance_reach_prob
       )
-      .def_property_readonly("corresponding_states_size", &InfostateNode::corresponding_states_size)
-      .def_property_readonly(
+      .def("corresponding_states_size", &InfostateNode::corresponding_states_size)
+      .def(
          "corresponding_states",
          &InfostateNode::corresponding_states,
          py::return_value_policy::reference_internal
       )
-      .def_property_readonly(
+      .def(
          "corresponding_chance_reach_probs",
          &InfostateNode::corresponding_chance_reach_probs,
          py::return_value_policy::reference_internal
