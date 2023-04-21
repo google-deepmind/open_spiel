@@ -25,18 +25,13 @@ namespace open_spiel {
 
 using namespace algorithms;
 
-// using node_uniq_ptr = std::unique_ptr< InfostateNode, py::nodelete >;
 using infostatenode_holder_ptr = MockUniquePtr< InfostateNode >;
-// using const_node_uniq_ptr = std::unique_ptr< const InfostateNode,
-// py::nodelete >;
 using const_node_uniq_ptr = MockUniquePtr< const InfostateNode >;
 
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
    py::class_< InfostateNode, infostatenode_holder_ptr >(m, "InfostateNode", py::is_final())
-      .def(
-         "tree", &InfostateNode::tree, py::return_value_policy::reference_internal
-      )
+      .def("tree", &InfostateNode::tree, py::return_value_policy::reference_internal)
       .def(
          "parent", [](const InfostateNode &node) { return infostatenode_holder_ptr{node.parent()}; }
       )
@@ -63,9 +58,7 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       )
       .def("is_leaf_node", &InfostateNode::is_leaf_node)
       .def("terminal_utility", &InfostateNode::terminal_utility)
-      .def(
-         "terminal_chance_reach_prob", &InfostateNode::terminal_chance_reach_prob
-      )
+      .def("terminal_chance_reach_prob", &InfostateNode::terminal_chance_reach_prob)
       .def("corresponding_states_size", &InfostateNode::corresponding_states_size)
       .def(
          "corresponding_states",
@@ -143,8 +136,8 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
 {
    // Infostate-Tree nodes and NodeType enum
    init_pyspiel_infostate_node(m);
-   // suffix is float despite using double, since python's floating point type is
-   // double precision.
+   // suffix is float despite using double, since python's floating point type
+   // is double precision.
    init_pyspiel_treevector_bundle< double >(m, "Float");
    // a generic tree vector bundle holding any type of python object
    init_pyspiel_treevector_bundle< py::object >(m, "");
@@ -196,7 +189,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
          py::arg("chance_reach_probs"),
          py::arg("infostate_observer"),
          py::arg("acting_player"),
-         py::arg("max_move_ahead_limit") = 1000
+         py::arg("max_move_limit") = 1000
       )
       .def(
          py::init([](const std::vector< const InfostateNode * > &start_nodes,
@@ -204,14 +197,7 @@ void init_pyspiel_infostate_tree(::pybind11::module &m)
             return MakeInfostateTree(start_nodes, max_move_ahead_limit);
          }),
          py::arg("start_nodes"),
-         py::arg("max_move_ahead_limit") = 1000
-      )
-      .def(
-         py::init([](const std::vector< InfostateNode * > &start_nodes, int max_move_ahead_limit) {
-            return MakeInfostateTree(start_nodes, max_move_ahead_limit);
-         }),
-         py::arg("start_nodes"),
-         py::arg("max_move_ahead_limit") = 1000
+         py::arg("max_move_limit") = 1000
       )
       .def(
          "root", [](InfostateTree &tree) { return infostatenode_holder_ptr{tree.mutable_root()}; }
