@@ -20,6 +20,7 @@ import pyspiel
 import gc
 from copy import copy, deepcopy
 import weakref
+from typing import Iterator, Iterable
 
 
 class InfostateTreeTest(parameterized.TestCase):
@@ -248,6 +249,13 @@ class InfostateTreeTest(parameterized.TestCase):
         with self.assertRaises(pyspiel.ForbiddenError) as context:
             copy(root)
             deepcopy(root)
+
+        self.assertIsInstance(root, Iterable)
+        self.assertIsInstance(iter(root), Iterator)
+        self.assertEqual(root, next(iter(root)).parent())
+
+        for child in root:
+            pass
 
     def test_treevector_binding(self):
         game = pyspiel.load_game("kuhn_poker")

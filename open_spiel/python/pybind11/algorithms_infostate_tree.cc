@@ -28,6 +28,22 @@ using namespace algorithms;
 using infostatenode_holder_ptr = MockUniquePtr< InfostateNode >;
 using const_infostatenode_holder_ptr = MockUniquePtr< const InfostateNode >;
 
+class InfostateNodeChildIterator {
+   using iter_type = VecWithUniquePtrsIterator< InfostateNode >;
+
+   iter_type iter_;
+
+  public:
+   explicit InfostateNodeChildIterator(iter_type it) : iter_(it) {}
+   decltype(auto) operator++() { return ++iter_; }
+   bool operator==(const InfostateNodeChildIterator &other) const { return iter_ == other.iter_; }
+   bool operator!=(const InfostateNodeChildIterator &other) const { return ! (*this == other); }
+   // this dereferencing operator wrap is the reason for the restructuring of the class
+   decltype(auto) operator*() { return infostatenode_holder_ptr{*iter_}; }
+   auto begin() const { return InfostateNodeChildIterator{iter_.begin()}; }
+   auto end() const { return InfostateNodeChildIterator{iter_.end()}; }
+};
+
 void init_pyspiel_infostate_node(::pybind11::module &m)
 {
    py::class_< InfostateNode, infostatenode_holder_ptr >(m, "InfostateNode", py::is_final())
@@ -42,7 +58,6 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       .def("has_infostate_string", &InfostateNode::has_infostate_string)
       .def("infostate_string", &InfostateNode::infostate_string)
       .def("num_children", &InfostateNode::num_children)
-      .def("child_iterator", &InfostateNode::child_iterator)
       .def(
          "terminal_history",
          &InfostateNode::TerminalHistory,
@@ -79,6 +94,23 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
       )
       .def("make_certificate", &InfostateNode::MakeCertificate)
       .def(
+         "address_str",
+         [](const InfostateNode &node) {
+            std::stringstream ss;
+            ss << &node;
+            return ss.str();
+         }
+      )
+      .def(
+         "__iter__",
+         [](const InfostateNode &node) {
+            return py::make_iterator(
+               InfostateNodeChildIterator{node.child_iterator().begin()},
+               InfostateNodeChildIterator{node.child_iterator().end()}
+            );
+         }
+      )
+      .def(
          "__copy__",
          [](const InfostateNode &node) {
             throw ForbiddenException(
@@ -90,22 +122,14 @@ void init_pyspiel_infostate_node(::pybind11::module &m)
             );
          }
       )
-      .def(
-         "__deepcopy__",
-         [](const InfostateNode &node) {
-            throw ForbiddenException(
-               "InfostateNode cannot be copied, because its "
-               "lifetime is managed by the owning "
-               "InfostateTree. Store a variable naming the "
-               "associated tree to ensure the node's "
-               "lifetime."
-            );
-         }
-      )
-      .def("address_str", [](const InfostateNode &node) {
-         std::stringstream ss;
-         ss << &node;
-         return ss.str();
+      .def("__deepcopy__", [](const InfostateNode &node) {
+         throw ForbiddenException(
+            "InfostateNode cannot be copied, because its "
+            "lifetime is managed by the owning "
+            "InfostateTree. Store a variable naming the "
+            "associated tree to ensure the node's "
+            "lifetime."
+         );
       });
 
    py::enum_< InfostateNodeType >(m, "InfostateNodeType")
