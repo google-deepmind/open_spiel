@@ -130,6 +130,7 @@ EXPECTED_GAMES = frozenset([
     "turn_based_simultaneous_game",
     "ultimate_tic_tac_toe",
     "y",
+    "zerosum",
 ])
 
 
@@ -169,6 +170,7 @@ class PyspielTest(absltest.TestCase):
         "repeated_game",
         "restricted_nash_response",
         "start_at",
+        "zerosum",
     ]
     self.assertCountEqual(non_default_loadable, expected)
 
