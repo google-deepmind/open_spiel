@@ -1,8 +1,13 @@
 wandb
-jax
-jax[cuda] -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 distrax
 optax
 dm-haiku
 rlax
 open_spiel
+jax
+
+# If you need cuda support, uncomment the following line. You might need change
+# the cuda version depending on your nvidia-driver version and you might need
+# to upgrade jax afterwards.
+
+# jax[cuda12_pip] -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
