@@ -135,20 +135,6 @@ void init_pyspiel_policy(py::module& m) {
       .def("set_policy",
            py::overload_cast<const Policy*>(&TabularBestResponse::SetPolicy));
 
-//  py::class_<open_spiel::Policy, std::shared_ptr<open_spiel::Policy>>(m,
-//                                                                      "Policy")
-//      .def("action_probabilities",
-//           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
-//               const open_spiel::State&) const) &
-//               open_spiel::Policy::GetStatePolicyAsMap)
-//      .def("get_state_policy", (ActionsAndProbs(open_spiel::Policy::*)(
-//                                   const open_spiel::State&) const) &
-//                                   open_spiel::Policy::GetStatePolicy)
-//      .def("get_state_policy_as_map",
-//           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
-//               const std::string&) const) &
-//               open_spiel::Policy::GetStatePolicyAsMap);
-
   // A tabular policy represented internally as a map. Note that this
   // implementation is not directly compatible with the Python TabularPolicy
   // implementation; the latter is implemented as a table of size
