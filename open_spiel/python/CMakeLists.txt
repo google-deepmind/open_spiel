@@ -258,6 +258,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     algorithms/rnad/rnad_test.py
     mfg/algorithms/fictitious_play_test.py
