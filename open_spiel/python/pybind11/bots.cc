@@ -289,9 +289,11 @@ void init_pyspiel_bots(py::module& m) {
       },
       "A bot that samples from a policy.");
 
+#ifndef _WIN32
   m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
       py::arg("move_time"), py::arg("ponder"), py::arg("options"),
       "Bot that can play chess using UCI chess engine.");
+#endif
 
 
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
