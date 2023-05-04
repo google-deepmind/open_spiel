@@ -313,9 +313,13 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/adidas_test.py
       algorithms/double_oracle_test.py
       algorithms/jpsro_test.py
-      algorithms/lp_solver_test.py
-      algorithms/nash_averaging_test.py
-      algorithms/mip_nash_test.py
+      # Disabled until cvxopt provides binary wheels for Python 3.11.
+      # See https://github.com/cvxopt/cvxopt/issues/228.
+      # algorithms/lp_solver_test.py
+      algorithms/nash_averaging_test.py      
+      # mip_nash_test uses GPLK_MI solver from cvxopt.
+      # Disabling for the same reason as lp_solver_test, see above.
+      # algorithms/mip_nash_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
       algorithms/stackelberg_lp_test.py
