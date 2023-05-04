@@ -59,3 +59,4 @@ open_spiel/cmake-build-debug/
 Package.resolved
 # Visual Studio generated files
 open_spiel/.vs
+/.env

@@ -291,6 +291,23 @@ void init_pyspiel_policy(py::module& m) {
         py::arg("use_infostate_get_policy"),
         py::arg("prob_cut_threshold") = 0.0);
 
+  m.def("expected_returns_of_deterministic_policies_from_seeds",
+        py::overload_cast<const State&, const std::vector<int>&>(
+            &open_spiel::algorithms::
+                ExpectedReturnsOfDeterministicPoliciesFromSeeds),
+        py::call_guard<py::gil_scoped_release>(),
+        "Computes the undiscounted expected returns from seeds.",
+        py::arg("state"), py::arg("policy_seeds"));
+
+  m.def("expected_returns_of_deterministic_policies_from_seeds",
+        py::overload_cast<const State&, const std::vector<int>&,
+                          const std::vector<const Policy*>&>(
+            &open_spiel::algorithms::
+                ExpectedReturnsOfDeterministicPoliciesFromSeeds),
+        py::call_guard<py::gil_scoped_release>(),
+        "Computes the expected returns from seeds and policies.",
+        py::arg("state"), py::arg("policy_seeds"), py::arg("policies"));
+
   m.def(
       "exploitability",
       [](std::shared_ptr<const Game> game, const Policy& policy) {

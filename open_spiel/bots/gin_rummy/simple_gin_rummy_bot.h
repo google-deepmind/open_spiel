@@ -48,6 +48,7 @@
 //   total deadwood count. If two different meld arrangements are equal in this
 //   regard, one is chosen arbitrarily. No layoffs are made if opponent knocks.
 
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -55,6 +56,7 @@
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -72,6 +74,8 @@ class SimpleGinRummyBot : public Bot {
   void Restart() override;
   Action Step(const State& state) override;
   bool ProvidesPolicy() override { return true; }
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override;
   ActionsAndProbs GetPolicy(const State& state) override;
 
  private:
@@ -83,9 +87,10 @@ class SimpleGinRummyBot : public Bot {
   bool knocked_ = false;
   std::vector<Action> next_actions_;
 
-  std::vector<int> GetBestDeadwood(const std::vector<int> hand,
+  std::vector<int> GetBestDeadwood(
+      const std::vector<int> hand,
       const absl::optional<int> card = absl::nullopt) const;
-  int GetDiscard(const std::vector<int> &hand) const;
+  int GetDiscard(const std::vector<int>& hand) const;
   std::vector<int> GetMelds(std::vector<int> hand) const;
 };
 
@@ -93,4 +98,3 @@ class SimpleGinRummyBot : public Bot {
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_BOTS_GIN_RUMMY_SIMPLE_GIN_RUMMY_BOT_H_
-

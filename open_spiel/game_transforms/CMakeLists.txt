@@ -14,9 +14,11 @@ add_library (game_transforms OBJECT
   restricted_nash_response.cc
   restricted_nash_response.h
   start_at.cc
-  start_at.h  
+  start_at.h
   turn_based_simultaneous_game.cc
   turn_based_simultaneous_game.h
+  zerosum.cc
+  zerosum.h
 )
 target_include_directories (game_transforms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -73,3 +75,9 @@ add_executable(start_at_test
   ${OPEN_SPIEL_OBJECTS}
   $<TARGET_OBJECTS:tests>)
 add_test(start_at_test start_at_test)
+
+add_executable(zerosum_test
+               zerosum_test.cc
+               ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(zerosum_test zerosum_test)
