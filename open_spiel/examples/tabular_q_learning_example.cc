@@ -68,6 +68,48 @@ void SolveTicTacToe() {
   SPIEL_CHECK_EQ(state->Rewards()[1], 0);
 }
 
+void SolveTicTacToeEligibilityTraces() {
+  std::shared_ptr<const Game> game = open_spiel::LoadGame("tic_tac_toe");
+  open_spiel::algorithms::TabularQLearningSolver
+      tabular_q_learning_solver_lambda00(game, -1.0, 0.0001, 0.01, 0.99, 0.0);
+  open_spiel::algorithms::TabularQLearningSolver
+      tabular_q_learning_solver_lambda01(game, -1.0, 0.0001, 0.001, 0.99, 0.1);
+
+  int count_tie_games_lambda00 = 0;
+  int count_tie_games_lambda01 = 0;
+  for (int i = 1; i < 10000; i++) {
+    tabular_q_learning_solver_lambda00.RunIteration();
+
+    const absl::flat_hash_map<std::pair<std::string, Action>, double>&
+        q_values_lambda00 = tabular_q_learning_solver_lambda00.GetQValueTable();
+    std::unique_ptr<State> state = game->NewInitialState();
+
+    while (!state->IsTerminal()) {
+      state->ApplyAction(GetOptimalAction(q_values_lambda00, state));
+    }
+
+    count_tie_games_lambda00 += state->Rewards()[0] == 0 ? 1 : 0;
+  }
+
+  for (int i = 1; i < 10000; i++) {
+    tabular_q_learning_solver_lambda01.RunIteration();
+
+    const absl::flat_hash_map<std::pair<std::string, Action>, double>&
+        q_values_lambda01 = tabular_q_learning_solver_lambda01.GetQValueTable();
+    std::unique_ptr<State> state = game->NewInitialState();
+
+    while (!state->IsTerminal()) {
+      state->ApplyAction(GetOptimalAction(q_values_lambda01, state));
+    }
+
+    count_tie_games_lambda01 += state->Rewards()[0] == 0 ? 1 : 0;
+  }
+
+  //  Q-Learning(0.1) gets equilibrium faster than Q-Learning(0.0).
+  //  More ties in the same amount of time.
+  SPIEL_CHECK_GT(count_tie_games_lambda01, count_tie_games_lambda00);
+}
+
 void SolveCatch() {
   std::shared_ptr<const Game> game = open_spiel::LoadGame("catch");
   open_spiel::algorithms::TabularQLearningSolver tabular_q_learning_solver(
@@ -96,6 +138,7 @@ void SolveCatch() {
 
 int main(int argc, char** argv) {
   SolveTicTacToe();
+  SolveTicTacToeEligibilityTraces();
   SolveCatch();
   return 0;
 }

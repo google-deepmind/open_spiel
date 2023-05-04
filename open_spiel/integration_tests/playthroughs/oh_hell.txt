@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Oh Hell!"
 GameType.max_num_players = 7
 GameType.min_num_players = 3
-GameType.parameter_specification = ["num_cards_per_suit", "num_suits", "num_tricks_fixed", "players"]
+GameType.parameter_specification = ["num_cards_per_suit", "num_suits", "num_tricks_fixed", "off_bid_penalty", "players", "points_per_trick"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 70
 PolicyTensorShape() = [70]
 MaxChanceOutcomes() = 52
-GetParameters() = {num_cards_per_suit=13,num_suits=4,num_tricks_fixed=-1,players=3}
+GetParameters() = {num_cards_per_suit=13,num_suits=4,num_tricks_fixed=-1,off_bid_penalty=False,players=3,points_per_trick=1}
 NumPlayers() = 3
 MinUtility() = 0.0
 MaxUtility() = 27.0

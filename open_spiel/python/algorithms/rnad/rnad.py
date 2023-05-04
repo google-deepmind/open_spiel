@@ -66,7 +66,8 @@ class EntropySchedule:
                          "ince the last iteration size is repeated forever.")
     except ValueError as e:
       raise ValueError(
-          f"Entropy iteration schedule: repeats ({repeats}) and sizes ({sizes})."
+          f"Entropy iteration schedule: repeats ({repeats}) and sizes"
+          f" ({sizes})."
       ) from e
 
     schedule = [0]
@@ -739,7 +740,9 @@ class RNaDSolver(policy_lib.Policy):
     def network(
         env_step: EnvStep
     ) -> Tuple[chex.Array, chex.Array, chex.Array, chex.Array]:
-      mlp_torso = hk.nets.MLP(self.config.policy_network_layers)
+      mlp_torso = hk.nets.MLP(
+          self.config.policy_network_layers, activate_final=True
+      )
       torso = mlp_torso(env_step.obs)
 
       mlp_policy_head = hk.nets.MLP([self._game.num_distinct_actions()])
