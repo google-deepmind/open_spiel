@@ -87,6 +87,7 @@ class DQNTest(tf.test.TestCase):
       for agent in agents:
         agent.step(time_step)
 
+  @absltest.skip("Causing a segmentation fault on wheel tests")
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
     game = "hanabi"
