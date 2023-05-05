@@ -14,6 +14,7 @@
 
 """Tests for open_spiel.python.algorithms.dqn."""
 
+from absl.testing import absltest
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_environment

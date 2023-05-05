@@ -16,6 +16,7 @@
 
 import itertools
 
+from absl.testing import absltest
 from absl.testing import parameterized
 import tensorflow.compat.v1 as tf
 
