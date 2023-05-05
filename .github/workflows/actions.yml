@@ -12,7 +12,7 @@ jobs:
       matrix:
         include:
         # Most current platform.
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.11"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
