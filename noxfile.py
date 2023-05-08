@@ -32,13 +32,13 @@ def tests(session):
   session.install("-r", "requirements.txt")
   child_env = os.environ.copy()
   child_env["OPEN_SPIEL_BUILD_ALL"] = "ON"
-  if child_env["OPEN_SPIEL_ENABLE_JAX"] == "ON":
+  if child_env.get("OPEN_SPIEL_ENABLE_JAX") == "ON":
     session.install(*child_env["OPEN_SPIEL_PYTHON_JAX_DEPS"].split())
-  if child_env["OPEN_SPIEL_ENABLE_PYTORCH"] == "ON":
+  if child_env.get("OPEN_SPIEL_ENABLE_PYTORCH") == "ON":
     session.install(*child_env["OPEN_SPIEL_PYTHON_PYTORCH_DEPS"].split())
-  if child_env["OPEN_SPIEL_ENABLE_TENSORFLOW"] == "ON":
+  if child_env.get("OPEN_SPIEL_ENABLE_TENSORFLOW") == "ON":
     session.install(*child_env["OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS"].split())
-  if child_env["OPEN_SPIEL_ENABLE_PYTHON_MISC"] == "ON":
+  if child_env.get("OPEN_SPIEL_ENABLE_PYTHON_MISC") == "ON":
     session.install(*child_env["OPEN_SPIEL_PYTHON_MISC_DEPS"].split())
   session.run("python3", "setup.py", "build", env=child_env)
   session.run("python3", "setup.py", "install", env=child_env)
