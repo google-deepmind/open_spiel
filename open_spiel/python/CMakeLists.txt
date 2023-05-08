@@ -175,6 +175,11 @@ if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)
 endif()
 
+# Note: cvxopt does not yet support binary wheels for Python 3.11.
+# It has been temporary removed from the python_extra_deps.
+# As a result, several tests are disabled until a cvxopt wheel becomes
+# available for Python 3.11.
+# See https://github.com/cvxopt/cvxopt/issues/228 for discussion.
 
 # Python tests to run. Start with all the core tests here first, then
 # conditionally add other tests based on what has been enabled/detected.
@@ -312,21 +317,26 @@ endif()
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/adidas_test.py
-      algorithms/double_oracle_test.py
+      # Temporarily disabled due to dependency on cvxopt.
+      # algorithms/double_oracle_test.py
       algorithms/jpsro_test.py
-      algorithms/lp_solver_test.py
+      # Temporarily disabled due to dependency on cvxopt.
+      # algorithms/lp_solver_test.py
       algorithms/nash_averaging_test.py
-      algorithms/mip_nash_test.py
+      # Temporarily disabled due to dependency on cvxopt.
+      # algorithms/mip_nash_test.py
       algorithms/response_graph_ucb_test.py
-      algorithms/sequence_form_lp_test.py
-      algorithms/stackelberg_lp_test.py
-      algorithms/tabular_multiagent_qlearner.py
-      algorithms/value_iteration_test.py
+      # Temporarily disabled due to dependency on cvxopt.
+      # algorithms/sequence_form_lp_test.py
+      # algorithms/stackelberg_lp_test.py
+      # algorithms/tabular_multiagent_qlearner.py
+      # algorithms/value_iteration_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
-      games/kuhn_poker_test.py
-      tests/matrix_game_utils_test.py
+      # Temporarily disabled due to dependency on cvxopt.
+      # games/kuhn_poker_test.py
+      # tests/matrix_game_utils_test.py
   )
 endif()
 
