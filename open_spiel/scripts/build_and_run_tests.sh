@@ -116,6 +116,7 @@ if [[ $ARG_virtualenv == "true" ]]; then
   else
     echo -e "\e[33mReusing virtualenv from $VENV_DIR.\e[0m"
   fi
+  PYBIN=python
   source $VENV_DIR/bin/activate
   # When you're in a virtual environment, the python binary should be just python3.
   # Otherwise, it uses the environment's python.
