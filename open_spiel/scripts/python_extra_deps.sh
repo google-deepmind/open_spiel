@@ -30,4 +30,4 @@ export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.23.5 tensorflow==2.12.0 tenso
 # Note: cvxopt temporarily removed until binary wheels are available for Python 3.11
 # See https://github.com/cvxopt/cvxopt/issues/228 for discussion.
 # Some tests also disabled. See python/CMakeLists.txt
-export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"
+export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxopt==1.3.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"

@@ -317,26 +317,21 @@ endif()
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/adidas_test.py
-      # Temporarily disabled due to dependency on cvxopt.
-      # algorithms/double_oracle_test.py
+      algorithms/double_oracle_test.py
       algorithms/jpsro_test.py
-      # Temporarily disabled due to dependency on cvxopt.
-      # algorithms/lp_solver_test.py
+      algorithms/lp_solver_test.py
       algorithms/nash_averaging_test.py
-      # Temporarily disabled due to dependency on cvxopt.
-      # algorithms/mip_nash_test.py
+      algorithms/mip_nash_test.py
       algorithms/response_graph_ucb_test.py
-      # Temporarily disabled due to dependency on cvxopt.
-      # algorithms/sequence_form_lp_test.py
-      # algorithms/stackelberg_lp_test.py
-      # algorithms/tabular_multiagent_qlearner.py
-      # algorithms/value_iteration_test.py
+      algorithms/sequence_form_lp_test.py
+      algorithms/stackelberg_lp_test.py
+      algorithms/tabular_multiagent_qlearner.py
+      algorithms/value_iteration_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
-      # Temporarily disabled due to dependency on cvxopt.
-      # games/kuhn_poker_test.py
-      # tests/matrix_game_utils_test.py
+      games/kuhn_poker_test.py
+      tests/matrix_game_utils_test.py
   )
 endif()
 
