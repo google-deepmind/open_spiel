@@ -35,11 +35,14 @@ class InfostateNodeChildIterator {
 
   public:
    explicit InfostateNodeChildIterator(iter_type it) : iter_(it) {}
-   decltype(auto) operator++() { return ++iter_; }
+   InfostateNodeChildIterator& operator++() { ++iter_; return *this; }
    bool operator==(const InfostateNodeChildIterator &other) const { return iter_ == other.iter_; }
    bool operator!=(const InfostateNodeChildIterator &other) const { return ! (*this == other); }
-   // this dereferencing operator wrap is the reason for the restructuring of the class
-   decltype(auto) operator*() { return infostatenode_holder_ptr{*iter_}; }
+
+   // this dereferencing operator wrap is the reason for the class adaptor.
+   // We need to ensure that each node is wrapped in a non owning unique ptr mock.
+   auto operator*() { return infostatenode_holder_ptr{*iter_}; }
+
    auto begin() const { return InfostateNodeChildIterator{iter_.begin()}; }
    auto end() const { return InfostateNodeChildIterator{iter_.end()}; }
 };
