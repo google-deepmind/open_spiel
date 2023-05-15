@@ -27,7 +27,4 @@
 export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.3.24 jaxlib==0.3.24 dm-haiku==0.0.8 optax==0.1.3 chex==0.1.5 rlax==0.1.5 distrax==0.1.3"
 export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==1.13.0"
 export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.23.5 tensorflow==2.12.0 tensorflow-probability==0.19.0 tensorflow_datasets==4.9.2 keras==2.12.0"
-# Note: cvxopt temporarily removed until binary wheels are available for Python 3.11
-# See https://github.com/cvxopt/cvxopt/issues/228 for discussion.
-# Some tests also disabled. See python/CMakeLists.txt
-export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"
+export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxopt==1.3.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"
