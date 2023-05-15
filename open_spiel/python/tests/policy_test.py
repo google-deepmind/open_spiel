@@ -52,33 +52,17 @@ _TIC_TAC_TOE_STATES = [
 
 class DerivedPolicyTest(absltest.TestCase):
     def test_derive_from_policy(self):
-        try:
-            # equivalent to:
-            # class DerivedPolicy(pyspiel.Policy):
-            #   def action_probabilities(self, state):
-            #       return {0: 0.1, 1: 0.9}
-            #   def get_state_policy(self, infostate):
-            #       return {10: 0.9, 11: 0.1}
-            policy_class = type(
-                'DerivedPolicy',
-                # base classes tuple
-                (pyspiel.Policy,),
-                # member function overrides
-                {
-                    'action_probabilities': lambda this, state: {0: 0.1, 1: 0.9},
-                    'get_state_policy': lambda this, istate: {10: 0.9, 11: 0.1}
-                }
-            )
-        except KeyboardInterrupt:
-            # we don't silently ignore keyboard interrupts
-            raise
-        except Exception as e:
-            # deriving from policy failed. Report the exception.
-            self.fail(f"Exception raised: {e}")
 
-        policy = policy_class()
-        self.assertEqual(policy_class.__name__, 'DerivedPolicy')
-        self.assertEqual(policy_class.__bases__, (pyspiel.Policy,))
+        class DerivedPolicy(pyspiel.Policy):
+
+            def action_probabilities(self, state):
+                return {0: 0.1, 1: 0.9}
+
+            def get_state_policy(self, infostate):
+                return {10: 0.9, 11: 0.1}
+
+        policy = DerivedPolicy()
+        self.assertEqual(DerivedPolicy.__bases__, (pyspiel.Policy,))
         self.assertIsInstance(policy, pyspiel.Policy)
         self.assertEqual(
             policy.action_probabilities(pyspiel.load_game("kuhn_poker").new_initial_state()),
@@ -92,11 +76,8 @@ class DerivedPolicyTest(absltest.TestCase):
             policy.get_state_policy("some infostate"),
             {10: 0.9, 11: 0.1}
         )
-        try:
+        with self.assertRaises(RuntimeError):
             policy.serialize()
-        except RuntimeError as e:
-            # we expect this to fail as we didn't implement serialize() in the derived class.
-            pass
 
 
 

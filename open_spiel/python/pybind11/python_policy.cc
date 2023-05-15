@@ -4,6 +4,11 @@
 
 #include "open_spiel/spiel_utils.h"
 
+
+#ifndef SINGLE_ARG
+   #define SINGLE_ARG(...) __VA_ARGS__
+#endif
+
 namespace open_spiel {
 
 std::pair< std::vector< Action >, std::vector< double > >

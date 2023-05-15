@@ -2,9 +2,6 @@
 #ifndef OPEN_SPIEL_PYTHON_POLICY_H
 #define OPEN_SPIEL_PYTHON_POLICY_H
 
-#ifndef SINGLE_ARG
-   #define SINGLE_ARG(...) __VA_ARGS__
-#endif
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
