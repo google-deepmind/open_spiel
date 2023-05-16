@@ -94,7 +94,7 @@ void init_pyspiel_policy(py::module& m) {
          )
          .def(
             "get_state_policy_as_parallel_vectors",
-            py::overload_cast< const std::string >(
+            py::overload_cast< const std::string& >(
                &Policy::GetStatePolicyAsParallelVectors,
                py::const_
             ),

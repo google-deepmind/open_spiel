@@ -22,7 +22,7 @@ PyPolicy::GetStatePolicyAsParallelVectors(const State& state) const
    );
 }
 std::pair< std::vector< Action >, std::vector< double > >
-PyPolicy::GetStatePolicyAsParallelVectors(const std::string info_state) const
+PyPolicy::GetStatePolicyAsParallelVectors(const std::string& info_state) const
 {
    PYBIND11_OVERRIDE(
       SINGLE_ARG(std::pair< std::vector< Action >, std::vector< double > >),
