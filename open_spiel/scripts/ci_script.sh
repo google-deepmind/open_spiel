@@ -31,6 +31,7 @@ elif [[ "$OS" = "Darwin" ]]; then
   brew link --force python@${OS_PYTHON_VERSION}
 fi
 
+
 PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
 PYBIN=${PYBIN:-"python"}
 PYBIN=${PYBIN:-"python3"}
@@ -41,7 +42,7 @@ source ./open_spiel/scripts/python_extra_deps.sh
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
 
-if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
+if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
 else
