@@ -45,6 +45,7 @@ using ::open_spiel::algorithms::TabularBestResponseMDPInfo;
 namespace py = ::pybind11;
 }  // namespace
 
+
 void init_pyspiel_policy(py::module& m) {
    py::class_<
       Policy,
@@ -111,7 +112,7 @@ void init_pyspiel_policy(py::module& m) {
          );
 
    auto ptt = m.def_submodule(
-      "policy_trampoline_testing", "Internal test functions for exposing the policy class."
+      "_policy_trampoline_testing", "Internal test functions for calling policy member functions."
    );
    ptt.def("call_action_probabilities", [](const Policy& policy, const State& state) {
       return policy.GetStatePolicyAsMap(state);
@@ -142,8 +143,8 @@ void init_pyspiel_policy(py::module& m) {
    );
    ptt.def(
       "call_serialize",
-      [](const Policy& policy, std::string_view precision, std::string_view delimiter = "<~>") {
-         return policy.Serialize();
+      [](const Policy& policy, int precision, const std::string& delimiter = "<~>") {
+         return policy.Serialize(precision, delimiter);
       }
    );
 
