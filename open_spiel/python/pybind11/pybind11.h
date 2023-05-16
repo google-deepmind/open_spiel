@@ -35,6 +35,12 @@
 
 namespace open_spiel {
 
+class Policy;
+class TabularPolicy;
+class PartialTabularPolicy;
+class UniformPolicy;
+class PreferredActionPolicy;
+
 class NormalFormGame;
 class Bot;
 
@@ -55,6 +61,11 @@ class ISMCTSBot;
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::State);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Game);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Policy);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::TabularPolicy);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::PartialTabularPolicy);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::UniformPolicy);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::PreferredActionPolicy);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::NormalFormGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::matrix_game::MatrixGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::tensor_game::TensorGame);

@@ -32,6 +32,7 @@
 #include "open_spiel/spiel.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "open_spiel/python/pybind11/python_policy.h"
+
 namespace open_spiel {
 namespace {
 
@@ -47,11 +48,7 @@ namespace py = ::pybind11;
 
 
 void init_pyspiel_policy(py::module& m) {
-   py::class_<
-      Policy,
-      std::shared_ptr<Policy>,
-      PyPolicy
-   > policy(m, "Policy");
+   py::classh<Policy, PyPolicy> policy(m, "Policy");
    policy.def(py::init<>())
          .def(
             "action_probabilities",
@@ -179,17 +176,14 @@ void init_pyspiel_policy(py::module& m) {
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::class_<open_spiel::TabularPolicy,
-             std::shared_ptr<open_spiel::TabularPolicy>, open_spiel::Policy>(
+  py::classh<open_spiel::TabularPolicy, open_spiel::Policy>(
       m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
 
-  py::class_<open_spiel::PartialTabularPolicy,
-             std::shared_ptr<open_spiel::PartialTabularPolicy>,
-             open_spiel::TabularPolicy>(m, "PartialTabularPolicy")
+  py::classh<open_spiel::PartialTabularPolicy, open_spiel::Policy >(m, "PartialTabularPolicy")
       .def(py::init<>())
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&,
@@ -218,15 +212,13 @@ void init_pyspiel_policy(py::module& m) {
       &open_spiel::GetRandomDeterministicPolicy,
       py::arg("game"), py::arg("seed"), py::arg("player") = -1);
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
-  py::class_<open_spiel::UniformPolicy,
-             std::shared_ptr<open_spiel::UniformPolicy>, open_spiel::Policy>(
+
+  py::classh<open_spiel::UniformPolicy, open_spiel::Policy>(
       m, "UniformPolicy")
       .def(py::init<>())
       .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
 
-  py::class_<open_spiel::PreferredActionPolicy,
-             std::shared_ptr<open_spiel::PreferredActionPolicy>,
-             open_spiel::Policy>(m, "PreferredActionPolicy")
+  py::classh<open_spiel::PreferredActionPolicy, open_spiel::Policy>(m, "PreferredActionPolicy")
       .def(py::init<const std::vector<Action>&>())
       .def("get_state_policy",
            &open_spiel::PreferredActionPolicy::GetStatePolicy);
