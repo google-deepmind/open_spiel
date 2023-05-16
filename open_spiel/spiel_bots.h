@@ -157,6 +157,14 @@ class Bot {
           "policy.");
     }
   }
+
+  // Creates a clone of the bot with an independent copy of its internal state.
+  // The original bot and the clone are completely independent.
+  // The Clone method should be as cheap to execute as possible.
+  virtual bool IsClonable() const { return false; }
+  virtual std::unique_ptr<Bot> Clone() {
+    SpielFatalError("Clone method not implemented.");
+  }
 };
 
 class BotFactory {
