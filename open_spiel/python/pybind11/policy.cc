@@ -110,6 +110,43 @@ void init_pyspiel_policy(py::module& m) {
             "Serializes the policy to a string."
          );
 
+   auto ptt = m.def_submodule(
+      "policy_trampoline_testing", "Internal test functions for exposing the policy class."
+   );
+   ptt.def("call_action_probabilities", [](const Policy& policy, const State& state) {
+      return policy.GetStatePolicyAsMap(state);
+   });
+   ptt.def("call_action_probabilities", [](const Policy& policy, const std::string& info_state) {
+      return policy.GetStatePolicyAsMap(info_state);
+   });
+   ptt.def("call_get_state_policy", [](const Policy& policy, const State& state) {
+      return policy.GetStatePolicy(state);
+   });
+   ptt.def("call_get_state_policy", [](const Policy& policy, const State& state, Player player) {
+      return policy.GetStatePolicy(state, player);
+   });
+   ptt.def("call_get_state_policy", [](const Policy& policy, const std::string& info_state) {
+      return policy.GetStatePolicy(info_state);
+   });
+   ptt.def(
+      "call_get_state_policy_as_parallel_vectors",
+      [](const Policy& policy, const State& state) {
+         return policy.GetStatePolicyAsParallelVectors(state);
+      }
+   );
+   ptt.def(
+      "call_get_state_policy_as_parallel_vectors",
+      [](const Policy& policy, const std::string& info_state) {
+         return policy.GetStatePolicyAsParallelVectors(info_state);
+      }
+   );
+   ptt.def(
+      "call_serialize",
+      [](const Policy& policy, std::string_view precision, std::string_view delimiter = "<~>") {
+         return policy.Serialize();
+      }
+   );
+
   py::class_<TabularBestResponse>(m, "TabularBestResponse")
       .def(py::init<const open_spiel::Game&, int,
                     const std::unordered_map<std::string,
