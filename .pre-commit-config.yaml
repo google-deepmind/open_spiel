@@ -15,9 +15,9 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
-#        Check docstring-first currently clashes with an integrated file:
-#        open_spiel/python/algorithms/psro_v2/strategy_selectors.py:281: Multiple module docstrings (first docstring on line 15).
-#      - id: check-docstring-first
+      #        Check docstring-first currently clashes with an integrated file:
+      #        open_spiel/python/algorithms/psro_v2/strategy_selectors.py:281: Multiple module docstrings (first docstring on line 15).
+      #      - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-symlinks
       - id: check-toml
@@ -34,8 +34,8 @@ repos:
     hooks:
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
-#        Python-no-log-warn clashes in multiple places where logging.warn has been used
-#      - id: python-no-log-warn
+      #        Python-no-log-warn clashes in multiple places where logging.warn has been used
+      #      - id: python-no-log-warn
       - id: python-no-eval
       - id: python-use-type-annotations
 
@@ -44,16 +44,26 @@ repos:
     rev: "5.12.0"
     hooks:
       - id: isort
-        args: ["--profile", "black"]
+        args: [ "--profile", "black" ]
 
-  # Format Python code
-  -   repo: https://github.com/psf/black
-      rev: 23.3.0
-      hooks:
-        - id: black
-          language_version: python3
-          types: [python]
-          args: ["--config", "black.cfg"]
+  - repo: https://github.com/google/pyink
+    rev: 23.3.0
+    hooks:
+      - id: pyink
+        # It is recommended to specify the latest version of Python
+        # supported by your project here, or alternatively use
+        # pre-commit's default_language_version, see
+        # https://pre-commit.com/#top_level-default_language_version
+        language_version: python3
+        types: [python]
+
+#  # Format Python code
+#  - repo: https://github.com/psf/black
+#    rev: 23.3.0
+#    hooks:
+#      - id: black
+#        language_version: python3
+#        types: [ python ]
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format
@@ -62,10 +72,24 @@ repos:
       - id: clang-format
         types_or: [ c++, c, cuda ]
 
-  # CMake format and lint the CMakeLists.txt files
+  # CMake format the CMakeLists.txt files
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:
       - id: cmake-format
         additional_dependencies:
           - pyyaml
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [ python ]
+        args:
+          [
+            "-rn", # Only display messages
+            "-sn", # Don't display the score
+            "--rcfile=.pylintrc",
+          ]
