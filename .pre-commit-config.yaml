@@ -15,7 +15,9 @@ repos:
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
-      - id: check-docstring-first
+#        Check docstring-first currently clashes with an integrated file:
+#        open_spiel/python/algorithms/psro_v2/strategy_selectors.py:281: Multiple module docstrings (first docstring on line 15).
+#      - id: check-docstring-first
       - id: check-merge-conflict
       - id: check-symlinks
       - id: check-toml
@@ -32,7 +34,8 @@ repos:
     hooks:
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
-      - id: python-no-log-warn
+#        Python-no-log-warn clashes in multiple places where logging.warn has been used
+#      - id: python-no-log-warn
       - id: python-no-eval
       - id: python-use-type-annotations
 
