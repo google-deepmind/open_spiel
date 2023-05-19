@@ -1,3 +1,5 @@
+
+
 name: build_and_test
 
 on:
@@ -7,65 +9,91 @@ on:
     branches: [ master ]
 
 jobs:
+  precommit_checks:
+    runs-on: 'ubuntu-latest'
+    name: Pre-Commit Checks
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Update pip
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install pylint
+        run: |
+          python -m pip install pylint
+
+      - name: Install and run pre-commit
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files
+
   build:
+    needs: precommit_checks
     strategy:
       matrix:
         include:
-        # Most current platform.
-        - os: ubuntu-22.04
-          OS_PYTHON_VERSION: "3.11"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Standard (most current) platforms and versions.
-        - os: ubuntu-22.04
-          OS_PYTHON_VERSION: "3.10"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "ON"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.6/or-tools_amd64_ubuntu-22.04_cpp_v9.6.2534.tar.gz"
-        - os: ubuntu-22.04
-          OS_PYTHON_VERSION: "3.10"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: macos-12
-          OS_PYTHON_VERSION: "3.9"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Standard or older platforms with older Python versions.
-        - os: macos-11
-          OS_PYTHON_VERSION: "3.8"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Build and run tests with all optional dependencies, including building a
-        # shared library with linkable third party dependencies in place.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: "3.9"
-          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          TRAVIS_USE_NOX: 0
-          BUILD_SHARED_LIB: "ON"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # One older platform with oldest Python version on that platform.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: "3.8"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          # Most current platform.
+          - os: ubuntu-22.04
+            OS_PYTHON_VERSION: "3.11"
+            TRAVIS_USE_NOX: 0
+            DEFAULT_OPTIONAL_DEPENDENCY: "ON"
+            BUILD_SHARED_LIB: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          # Standard (most current) platforms and versions.
+          - os: ubuntu-22.04
+            OS_PYTHON_VERSION: "3.10"
+            TRAVIS_USE_NOX: 0
+            DEFAULT_OPTIONAL_DEPENDENCY: "ON"
+            BUILD_SHARED_LIB: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "ON"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.6/or-tools_amd64_ubuntu-22.04_cpp_v9.6.2534.tar.gz"
+          - os: ubuntu-22.04
+            OS_PYTHON_VERSION: "3.10"
+            TRAVIS_USE_NOX: 0
+            DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+            BUILD_SHARED_LIB: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          - os: macos-12
+            OS_PYTHON_VERSION: "3.9"
+            TRAVIS_USE_NOX: 0
+            DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+            BUILD_SHARED_LIB: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          # Standard or older platforms with older Python versions.
+          - os: macos-11
+            OS_PYTHON_VERSION: "3.8"
+            TRAVIS_USE_NOX: 0
+            DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+            BUILD_SHARED_LIB: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          # Build and run tests with all optional dependencies, including building a
+          # shared library with linkable third party dependencies in place.
+          - os: ubuntu-20.04
+            OS_PYTHON_VERSION: "3.9"
+            DEFAULT_OPTIONAL_DEPENDENCY: "ON"
+            TRAVIS_USE_NOX: 0
+            BUILD_SHARED_LIB: "ON"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          # One older platform with oldest Python version on that platform.
+          - os: ubuntu-20.04
+            OS_PYTHON_VERSION: "3.8"
+            TRAVIS_USE_NOX: 0
+            DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+            BUILD_SHARED_LIB: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+            OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
 
     runs-on: ${{ matrix.os }}
     env:
@@ -82,21 +110,21 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: julia-actions/setup-julia@v1
-      with:
-        version: 1.8
-    - name: Ad-hoc fix
-      if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
-      run: |
-        # workaround for https://github.com/deepmind/open_spiel/issues/606
-        sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
-    - name: Install
-      run: |
-        pwd
-        chmod +x install.sh
-        ./install.sh
-    - name: Build and test
-      run: |
-        python3 --version
-        ./open_spiel/scripts/ci_script.sh
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: 1.8
+      - name: Ad-hoc fix
+        if: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY == 'ON' }}
+        run: |
+          # workaround for https://github.com/deepmind/open_spiel/issues/606
+          sudo cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $(julia --startup-file=no -e 'using Libdl;print(abspath(joinpath(Libdl.dlpath("libjulia"), "..", "julia")))')
+      - name: Install
+        run: |
+          pwd
+          chmod +x install.sh
+          ./install.sh
+      - name: Build and test
+        run: |
+          python3 --version
+          ./open_spiel/scripts/ci_script.sh
