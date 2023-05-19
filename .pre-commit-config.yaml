@@ -28,7 +28,7 @@ repos:
       - id: requirements-txt-fixer
       - id: trailing-whitespace
 
-  # Check for common mistakes
+  # Check for basic python "dont's"
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: "v1.10.0"
     hooks:
@@ -44,7 +44,6 @@ repos:
     rev: "5.12.0"
     hooks:
       - id: isort
-        args: [ "--profile", "black" ]
 
 #  # Format Python code with black
 #  black uses an uncompromisable 4-indent as the formatting basis of
