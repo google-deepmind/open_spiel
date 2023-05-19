@@ -46,24 +46,24 @@ repos:
       - id: isort
         args: [ "--profile", "black" ]
 
-  - repo: https://github.com/google/pyink
-    rev: 23.3.0
-    hooks:
-      - id: pyink
-        # It is recommended to specify the latest version of Python
-        # supported by your project here, or alternatively use
-        # pre-commit's default_language_version, see
-        # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3
-        types: [python]
-
-#  # Format Python code
+#  # Format Python code with black
+#  black uses an uncompromisable 4-indent as the formatting basis of
+#  python files which clashes with google's pylint configuration.
+#  That's why we are using pyink instead which allows 2-indent.
 #  - repo: https://github.com/psf/black
 #    rev: 23.3.0
 #    hooks:
 #      - id: black
 #        language_version: python3
 #        types: [ python ]
+
+    # Format Python code with pyink
+  - repo: https://github.com/google/pyink
+    rev: 23.3.0
+    hooks:
+      - id: pyink
+        language_version: python3
+        types: [python]
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format
@@ -80,6 +80,7 @@ repos:
         additional_dependencies:
           - pyyaml
 
+  # Lint python code with PyLint
   - repo: local
     hooks:
       - id: pylint
