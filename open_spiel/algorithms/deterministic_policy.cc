@@ -58,8 +58,7 @@ DeterministicTabularPolicy::DeterministicTabularPolicy(const Game& game,
   CreateTable(game, player);
 }
 
-ActionsAndProbs DeterministicTabularPolicy::GetStatePolicy(
-    const std::string& info_state) const {
+ActionsAndProbs DeterministicTabularPolicy::GetStatePolicy(std::string_view info_state) const {
   auto iter = table_.find(info_state);
   SPIEL_CHECK_TRUE(iter != table_.end());
   ActionsAndProbs state_policy;

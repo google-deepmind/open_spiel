@@ -172,7 +172,7 @@ class ExplorativeSamplingPolicy : public CFRCurrentPolicy {
   }
 
   ActionsAndProbs GetStatePolicy(const State& state) const override;
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override;
 };
 
 // No biasing target is specified -- do not target any special infostate.

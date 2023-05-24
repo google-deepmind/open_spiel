@@ -22,8 +22,10 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/utils/heterogenous_lookup.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 
@@ -99,9 +101,13 @@ struct CFRInfoStateValues {
 
 CFRInfoStateValues DeserializeCFRInfoStateValues(absl::string_view serialized);
 
-// A type for tables holding CFR values.
+// A type for tables holding CFR values. Allows heterogenous lookup
 using CFRInfoStateValuesTable =
-    std::unordered_map<std::string, CFRInfoStateValues>;
+    ::absl::node_hash_map<
+        std::string,
+        CFRInfoStateValues,
+        internal::StringHasher,
+        internal::StringEq>;
 
 // The result parameter is passed by pointer in order to avoid copying/moving
 // the string once the table is fully serialized (CFRInfoStateValuesTable
@@ -134,7 +140,7 @@ class CFRAveragePolicy : public Policy {
   };
   ActionsAndProbs GetStatePolicy(const State& state,
                                  Player player) const override;
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override;
   TabularPolicy AsTabular() const;
 
  private:
@@ -159,7 +165,7 @@ class CFRCurrentPolicy : public Policy {
   };
   ActionsAndProbs GetStatePolicy(const State& state,
                                  Player player) const override;
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override;
   TabularPolicy AsTabular() const;
 
  private:

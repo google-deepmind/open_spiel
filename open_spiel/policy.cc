@@ -238,9 +238,8 @@ ActionsAndProbs PartialTabularPolicy::GetStatePolicy(const State& state,
   }
 }
 
-ActionsAndProbs PartialTabularPolicy::GetStatePolicy(
-    const std::string& info_state) const {
-  auto iter = policy_table_.find(info_state);
+ActionsAndProbs PartialTabularPolicy::GetStatePolicy(std::string_view info_state) const {
+  auto iter = policy_table_.find(std::string(info_state));
   if (iter == policy_table_.end()) {
     return fallback_policy_->GetStatePolicy(info_state);
   } else {

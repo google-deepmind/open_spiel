@@ -92,8 +92,8 @@ class AFCETabularPolicy : public TabularPolicy {
  public:
   AFCETabularPolicy(const CorrDistConfig& config) : config_(config) {}
 
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override {
-    SpielFatalError("GetStatePolicy(const std::string&) should not be called.");
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override {
+    SpielFatalError("GetStatePolicy(std::string_view) should not be called.");
     return TabularPolicy::GetStatePolicy(info_state);
   }
   ActionsAndProbs GetStatePolicy(const State& state, Player pl) const override {

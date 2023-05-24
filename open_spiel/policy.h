@@ -77,7 +77,7 @@ class Policy {
 
   // A convenience method for callers that want to use arrays.
   virtual std::pair<std::vector<Action>, std::vector<double>>
-  GetStatePolicyAsParallelVectors(const std::string info_state) const {
+  GetStatePolicyAsParallelVectors(std::string_view info_state) const {
     std::pair<std::vector<Action>, std::vector<double>> parray;
     for (const auto& action_and_prob : GetStatePolicy(info_state)) {
       parray.first.push_back(action_and_prob.first);
@@ -96,7 +96,7 @@ class Policy {
   }
 
   virtual std::unordered_map<Action, double> GetStatePolicyAsMap(
-      const std::string& info_state) const {
+      std::string_view info_state) const {
     std::unordered_map<Action, double> pmap;
     for (const auto& action_and_prob : GetStatePolicy(info_state)) {
       pmap[action_and_prob.first] = action_and_prob.second;
@@ -123,8 +123,8 @@ class Policy {
   // If the policy is not available at the state, returns and empty list.
   // It is sufficient for subclasses to override only this method, but not all
   // forms of policies will be able to do so from just the information state.
-  virtual ActionsAndProbs GetStatePolicy(const std::string& info_state) const {
-    SpielFatalError("GetStatePolicy(const std::string&) unimplemented.");
+  virtual ActionsAndProbs GetStatePolicy(std::string_view info_state) const {
+    SpielFatalError("GetStatePolicy(std::string_view) unimplemented.");
   }
 
   // Each override must write out the class’s identity followed by ":" as the
@@ -180,8 +180,8 @@ class TabularPolicy : public Policy {
     }
   }
 
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override {
-    auto iter = policy_table_.find(info_state);
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override {
+    auto iter = policy_table_.find(std::string(info_state));
     if (iter == policy_table_.end()) {
       return {};
     } else {
@@ -296,7 +296,7 @@ class PartialTabularPolicy : public TabularPolicy {
   ActionsAndProbs GetStatePolicy(const State& state) const override;
   ActionsAndProbs GetStatePolicy(const State& state,
                                  Player player) const override;
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override;
 
  private:
   std::shared_ptr<Policy> fallback_policy_;

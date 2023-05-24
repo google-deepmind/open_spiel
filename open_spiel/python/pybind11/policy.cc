@@ -82,7 +82,7 @@ void init_pyspiel_policy(py::module& m) {
                                    open_spiel::Policy::GetStatePolicy)
       .def("get_state_policy_as_map",
            (std::unordered_map<Action, double>(open_spiel::Policy::*)(
-               const std::string&) const) &
+               std::string_view) const) &
                open_spiel::Policy::GetStatePolicyAsMap);
 
   // A tabular policy represented internally as a map. Note that this
@@ -114,7 +114,7 @@ void init_pyspiel_policy(py::module& m) {
           (ActionsAndProbs(open_spiel::Policy::*)(const State&, Player) const) &
               open_spiel::PartialTabularPolicy::GetStatePolicy)
       .def("get_state_policy",
-           (ActionsAndProbs(open_spiel::Policy::*)(const std::string&) const) &
+           (ActionsAndProbs(open_spiel::Policy::*)(std::string_view) const) &
                open_spiel::PartialTabularPolicy::GetStatePolicy)
       .def("set_prob", &open_spiel::PartialTabularPolicy::SetProb)
       .def("set_state_policy",

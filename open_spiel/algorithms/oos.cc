@@ -61,8 +61,7 @@ ActionsAndProbs ExplorativeSamplingPolicy::GetStatePolicy(
   SpielFatalError("Could not get policy for this state.");
 }
 
-ActionsAndProbs ExplorativeSamplingPolicy::GetStatePolicy(
-    const std::string& info_state) const {
+ActionsAndProbs ExplorativeSamplingPolicy::GetStatePolicy(std::string_view info_state) const {
   auto policy = CFRCurrentPolicy::GetStatePolicy(info_state);
   const double unif = 1. / policy.size();
   for (auto& [_, prob] : policy) {

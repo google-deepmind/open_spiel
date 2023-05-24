@@ -84,8 +84,7 @@ ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
   return actions_and_probs;
 }
 
-ActionsAndProbs CFRAveragePolicy::GetStatePolicy(
-    const std::string& info_state) const {
+ActionsAndProbs CFRAveragePolicy::GetStatePolicy(std::string_view info_state) const {
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     if (default_policy_) {
@@ -153,8 +152,7 @@ ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
                                                   actions_and_probs);
 }
 
-ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(
-    const std::string& info_state) const {
+ActionsAndProbs CFRCurrentPolicy::GetStatePolicy(std::string_view info_state) const {
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     if (default_policy_) {

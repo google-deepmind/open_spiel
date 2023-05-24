@@ -27,6 +27,8 @@
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/heterogenous_lookup.h"
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -76,7 +78,7 @@ class DeterministicTabularPolicy : public Policy {
   // legal action (index 0 in the legal actions list).
   DeterministicTabularPolicy(const Game& game, Player player);
 
-  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
+  ActionsAndProbs GetStatePolicy(std::string_view info_state) const override;
   Action GetAction(const std::string& info_state) const;
 
   // Returns the current deterministic policy as a TabularPolicy.
@@ -110,7 +112,7 @@ class DeterministicTabularPolicy : public Policy {
  private:
   void CreateTable(const Game& game, Player player);
 
-  std::map<std::string, LegalsWithIndex> table_;
+  absl::btree_map<std::string, LegalsWithIndex, internal::StringCmp> table_;
   Player player_;
 };
 
