@@ -568,7 +568,7 @@ class InfostateNode final {
     return infostate_string_ != kFillerInfostate &&
            infostate_string_ != kDummyRootNodeInfostate;
   }
-  std::string_view infostate_string() const {
+  const std::string& infostate_string() const {
     // Avoid working with empty infostate strings.
     SPIEL_DCHECK_TRUE(has_infostate_string());
     return infostate_string_;
