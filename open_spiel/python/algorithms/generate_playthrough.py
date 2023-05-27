@@ -232,26 +232,20 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     seed = np.random.randint(2**32 - 1)
   game_type = game.get_type()
 
-  default_observation = None
-  try:
-    observation_params = pyspiel.game_parameters_from_string(
-        observation_params_string) if observation_params_string else None
-    default_observation = make_observation(
-        game,
-        imperfect_information_observation_type=None,
-        params=observation_params)
-  except (RuntimeError, ValueError):
-    pass
+  observation_params = (
+      pyspiel.game_parameters_from_string(observation_params_string)
+      if observation_params_string
+      else None
+  )
+  default_observation = make_observation(
+      game,
+      imperfect_information_observation_type=None,
+      params=observation_params,
+  )
 
-  infostate_observation = None
-  # TODO(author11) reinstate this restriction
-  # if game_type.information in (pyspiel.IMPERFECT_INFORMATION,
-  #                              pyspiel.ONE_SHOT):
-  try:
-    infostate_observation = make_observation(
-        game, pyspiel.IIGObservationType(perfect_recall=True))
-  except (RuntimeError, ValueError):
-    pass
+  infostate_observation = make_observation(
+      game, pyspiel.IIGObservationType(perfect_recall=True)
+  )
 
   public_observation = None
   private_observation = None
@@ -261,24 +255,22 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   # The default observation is the same as the public observation, while private
   # observations are always empty.
   if game_type.information == game_type.Information.IMPERFECT_INFORMATION:
-    try:
-      public_observation = make_observation(
-          game,
-          pyspiel.IIGObservationType(
-              public_info=True,
-              perfect_recall=False,
-              private_info=pyspiel.PrivateInfoType.NONE))
-    except (RuntimeError, ValueError):
-      pass
-    try:
-      private_observation = make_observation(
-          game,
-          pyspiel.IIGObservationType(
-              public_info=False,
-              perfect_recall=False,
-              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
-    except (RuntimeError, ValueError):
-      pass
+    public_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=True,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.NONE,
+        ),
+    )
+    private_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=False,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER,
+        ),
+    )
 
   add_line("")
   add_line("GameType.chance_mode = {}".format(game_type.chance_mode))

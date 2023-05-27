@@ -134,7 +134,8 @@ class Trick {
 class OhHellState : public State {
  public:
   OhHellState(std::shared_ptr<const Game> game, int num_players,
-              DeckProperties deck_props, int num_tricks_fixed);
+              DeckProperties deck_props, int num_tricks_fixed,
+              bool off_bid_penalty, int points_per_trick);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -194,6 +195,8 @@ class OhHellState : public State {
   const int num_players_;
   const int num_tricks_fixed_;
   const DeckProperties deck_props_;
+  const bool off_bid_penalty_;
+  const int points_per_trick_;
 
   std::vector<int> num_tricks_won_;
   std::vector<int> bids_;
@@ -219,14 +222,20 @@ class OhHellGame : public Game {
   int MaxChanceOutcomes() const override { return deck_props_.NumCards(); }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new OhHellState(
-        shared_from_this(), /*num_players=*/num_players_,
-        /*deck_props=*/deck_props_, /*num_tricks_fixed=*/num_tricks_fixed_));
+        shared_from_this(),
+        /*num_players=*/num_players_,
+        /*deck_props=*/deck_props_,
+        /*num_tricks_fixed=*/num_tricks_fixed_,
+        /*off_bid_penalty=*/off_bid_penalty_,
+        /*points_per_trick=*/points_per_trick_));
   }
   int NumPlayers() const override { return num_players_; }
-  double MinUtility() const override { return 0; }
+  double MinUtility() const override {
+    if (off_bid_penalty_) return (- MaxNumTricks() * points_per_trick_);
+    return 0;
+  }
   double MaxUtility() const override {
-    if (num_tricks_fixed_ > 0) return num_tricks_fixed_ + kMadeBidBonus;
-    return MaxNumTricks() + kMadeBidBonus;
+    return MaxNumTricks() * points_per_trick_ + kMadeBidBonus;
   }
   // select dealer and number of tricks (kNumPreDealChanceActions)
   // deal (MaxNumTricks() * num_players + kNumTrumpDeal)
@@ -252,6 +261,8 @@ class OhHellGame : public Game {
   const int num_players_;
   const DeckProperties deck_props_;
   const int num_tricks_fixed_;
+  const bool off_bid_penalty_;
+  const int points_per_trick_;
 };
 
 }  // namespace oh_hell

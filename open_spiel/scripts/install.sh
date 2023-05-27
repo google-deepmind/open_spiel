@@ -113,7 +113,7 @@ fi
 
 DIR="open_spiel/abseil-cpp"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b '20211102.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
+  cached_clone -b '20230125.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
 fi
 
 DIR="open_spiel/pybind11_abseil"
@@ -235,7 +235,12 @@ fi
 
 # Install other system-wide packages.
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  EXT_DEPS="virtualenv clang cmake curl python3-dev python3-pip python3-setuptools python3-wheel python3-tk"
+  PYTHON_PKGS="python3-dev python3-pip python3-setuptools python3-wheel python3-tk python3-venv"
+  if [[ "$OS_PYTHON_VERSION" == "3.11" ]]; then
+    # Need to special-case this until it's installed by default.
+    PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk python3.11-venv"
+  fi
+  EXT_DEPS="virtualenv clang cmake curl $PYTHON_PKGS"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
     EXT_DEPS="${EXT_DEPS} golang"
   fi

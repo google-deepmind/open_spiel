@@ -16,6 +16,12 @@ a shared library once, and then load it dynamically at runtime. This page walks
 through how to do this assuming a bash shell on Linux, but is very similar on
 MacOS or for other shells.
 
+## Install Dependencies
+
+The dependencies of OpenSpiel need to be installed before it can be used as a
+library. On MacOS and Debian/Ubuntu Linux, this is often simply just running
+`./install.sh`. Please see the [installation from source instructions](https://github.com/deepmind/open_spiel/blob/master/docs/install.md#installation-from-source) for more details.
+
 ## Compiling OpenSpiel as a Shared Library
 
 To build OpenSpiel as a shared library, simply run:
@@ -49,8 +55,8 @@ do it every time you load the library. Of course, if you are already using
 ```
 cd ../open_spiel/examples
 clang++ -I${HOME}/open_spiel -I${HOME}/open_spiel/open_spiel/abseil-cpp \
-        -L${HOME}/open_spiel/build -lopen_spiel -std=c++17 \
-        -o shared_library_example shared_library_example.cc
+        -std=c++17 -o shared_library_example shared_library_example.cc \
+        -L${HOME}/open_spiel/build  -lopen_spiel
 ```
 
 The first two flags are the include directory paths and the third is the link

@@ -936,6 +936,9 @@ class Game : public std::enable_shared_from_this<Game> {
   }
 
   // Returns an Observer, used to obtain observations of the game state.
+  // If the requested iig_obs_type is not supported by the game, the
+  // implementation must return a nullptr. If params are provided and
+  // unsupported this can result in an error.
   // The observations are created according to requested observation type.
   // Games can include additional observation fields when requested by
   // `params`.
@@ -955,7 +958,8 @@ class Game : public std::enable_shared_from_this<Game> {
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const;
   // Returns an observer that uses the observation or informationstate tensor
-  // or string as defined directly on the state.
+  // or string as defined directly on the state. Returns a nullptr if the
+  // requested iig_obs_type is not supported.
   std::shared_ptr<Observer> MakeBuiltInObserver(
       absl::optional<IIGObservationType> iig_obs_type) const;
 

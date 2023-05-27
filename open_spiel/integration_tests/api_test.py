@@ -382,17 +382,17 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
             self.assertEmpty(state.legal_actions(player), msg=msg)
 
   def test_private_information_contents(self):
-    try:
-      private_observation = make_observation(
-          self.game,
-          pyspiel.IIGObservationType(
-              public_info=False,
-              perfect_recall=False,
-              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
-    except (RuntimeError, ValueError):
-      return
+    private_observation = make_observation(
+        self.game,
+        pyspiel.IIGObservationType(
+            public_info=False,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER,
+        ),
+    )
 
-    if private_observation.string_from(self.some_states[0], 0) is None:
+    if (not private_observation
+        or private_observation.string_from(self.some_states[0], 0) is None):
       return
 
     player_has_private_info = [False] * self.game.num_players()
@@ -410,14 +410,15 @@ class EnforceAPIOnPartialTreeBase(parameterized.TestCase):
       self.assertFalse(any(player_has_private_info))
 
   def test_no_invalid_public_observations(self):
-    try:
-      public_observation = make_observation(
-          self.game,
-          pyspiel.IIGObservationType(
-              public_info=True,
-              perfect_recall=False,
-              private_info=pyspiel.PrivateInfoType.NONE))
-    except (ValueError, RuntimeError):
+    public_observation = make_observation(
+        self.game,
+        pyspiel.IIGObservationType(
+            public_info=True,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.NONE,
+        ),
+    )
+    if not public_observation:
       return
 
     if public_observation.string_from(self.some_states[0], 0) is None:

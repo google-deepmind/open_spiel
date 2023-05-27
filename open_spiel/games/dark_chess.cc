@@ -588,8 +588,11 @@ std::shared_ptr<Observer> DarkChessGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters& params) const {
   if (!params.empty()) SpielFatalError("Observation params not supported");
-  return std::make_shared<DarkChessObserver>(
-      iig_obs_type.value_or(kDefaultObsType));
+  IIGObservationType obs_type = iig_obs_type.value_or(kDefaultObsType);
+  if (ObserverHasString(obs_type) || ObserverHasTensor(obs_type)) {
+    return std::make_shared<DarkChessObserver>(obs_type);
+  }
+  return nullptr;
 }
 
 }  // namespace dark_chess
