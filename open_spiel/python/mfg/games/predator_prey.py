@@ -116,7 +116,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
         num_players=num_players,
         min_utility=-np.inf,
         max_utility=+np.inf,
-        utility_sum=0.0,
+        utility_sum=None,
         max_game_length=self.horizon)
 
     # Represents the current probability distribution over game states
@@ -340,8 +340,8 @@ class MFGPredatorPreyState(pyspiel.State):
     # This logic needs to match the ordering defined in distribution_support().
     index = population + self.num_players() * (pos[1] + self.size * pos[0])
     assert 0 <= index < len(self._distribution.value), (
-        f"Invalid index {index} vs dist length: {len(self._distribution.value)}, "
-        f"population={population}, pos={pos}, state={self}")
+        f"Invalid index {index} vs dist length: {len(self._distribution.value)}"
+        f", population={population}, pos={pos}, state={self}")
     return self._distribution.value[index]
 
   def update_distribution(self, distribution):

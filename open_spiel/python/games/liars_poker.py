@@ -25,8 +25,8 @@ BID_ACTION_OFFSET = 1
 
 _MAX_NUM_PLAYERS = 10
 _MIN_NUM_PLAYERS = 2
-_HAND_LENGTH = 3
-_NUM_DIGITS = 3  # Number of digits to include from the range 1, 2, ..., 9, 0
+_HAND_LENGTH = 10
+_NUM_DIGITS = 10  # Number of digits to include from the range 1, 2, ..., 9, 0
 _FULL_DECK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 
 _GAME_TYPE = pyspiel.GameType(
@@ -174,9 +174,12 @@ class LiarsPokerState(pyspiel.State):
 
     if player != self._bid_originator or self._is_rebid_possible():
       # Any move higher than the current bid is allowed.
-      # Bids start at BID_ACTION_OFFSET.
-      for bid in range(self._current_action + 1, self._max_bid):
-        actions.append(bid + BID_ACTION_OFFSET)
+      # Bids start at BID_ACTION_OFFSET (1) as 0 represents the challenge
+      # action.
+      for bid in range(
+          max(BID_ACTION_OFFSET, self._current_action + 1), self._max_bid
+      ):
+        actions.append(bid)
 
     return actions
 

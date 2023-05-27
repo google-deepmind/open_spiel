@@ -72,7 +72,7 @@ class MFGCrowdModellingGame(pyspiel.Game):
         num_players=_NUM_PLAYERS,
         min_utility=-np.inf,
         max_utility=+np.inf,
-        utility_sum=0.0,
+        utility_sum=None,
         max_game_length=params["horizon"])
     super().__init__(_GAME_TYPE, game_info, params)
     self.size = params["size"]

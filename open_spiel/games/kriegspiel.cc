@@ -675,8 +675,11 @@ std::shared_ptr<Observer> KriegspielGame::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const GameParameters &params) const {
   if (!params.empty()) SpielFatalError("Observation params not supported");
-  return std::make_shared<KriegspielObserver>(
-      iig_obs_type.value_or(kDefaultObsType));
+  IIGObservationType obs_type = iig_obs_type.value_or(kDefaultObsType);
+  if (ObserverHasString(obs_type) || ObserverHasTensor(obs_type)) {
+    return std::make_shared<KriegspielObserver>(obs_type);
+  }
+  return nullptr;
 }
 
 }  // namespace kriegspiel

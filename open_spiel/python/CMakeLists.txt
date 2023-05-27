@@ -175,6 +175,11 @@ if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)
 endif()
 
+# Note: cvxopt does not yet support binary wheels for Python 3.11.
+# It has been temporary removed from the python_extra_deps.
+# As a result, several tests are disabled until a cvxopt wheel becomes
+# available for Python 3.11.
+# See https://github.com/cvxopt/cvxopt/issues/228 for discussion.
 
 # Python tests to run. Start with all the core tests here first, then
 # conditionally add other tests based on what has been enabled/detected.
@@ -219,6 +224,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   egt/utils_test.py
   environments/catch_test.py
   environments/cliff_walking_test.py
+  games/block_dominoes_test.py
   games/data_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
@@ -257,6 +263,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
+    jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     algorithms/rnad/rnad_test.py
     mfg/algorithms/fictitious_play_test.py
@@ -314,6 +321,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/jpsro_test.py
       algorithms/lp_solver_test.py
       algorithms/nash_averaging_test.py
+      algorithms/mip_nash_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
       algorithms/stackelberg_lp_test.py

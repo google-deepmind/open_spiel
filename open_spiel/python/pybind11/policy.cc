@@ -122,8 +122,13 @@ void init_pyspiel_policy(py::module& m) {
       .def("policy_table",
            py::overload_cast<>(&open_spiel::PartialTabularPolicy::PolicyTable));
 
-  m.def("GetRandomPolicy", &open_spiel::GetRandomPolicy);
-  m.def("GetFlatDirichletPolicy", &open_spiel::GetFlatDirichletPolicy);
+  m.def("GetRandomPolicy", &open_spiel::GetRandomPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
+  m.def("GetFlatDirichletPolicy", &open_spiel::GetFlatDirichletPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
+  m.def("GetRandomDeterministicPolicy",
+      &open_spiel::GetRandomDeterministicPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
   py::class_<open_spiel::UniformPolicy,
              std::shared_ptr<open_spiel::UniformPolicy>, open_spiel::Policy>(
@@ -285,6 +290,23 @@ void init_pyspiel_policy(py::module& m) {
         py::arg("state"), py::arg("joint_policy"), py::arg("depth_limit"),
         py::arg("use_infostate_get_policy"),
         py::arg("prob_cut_threshold") = 0.0);
+
+  m.def("expected_returns_of_deterministic_policies_from_seeds",
+        py::overload_cast<const State&, const std::vector<int>&>(
+            &open_spiel::algorithms::
+                ExpectedReturnsOfDeterministicPoliciesFromSeeds),
+        py::call_guard<py::gil_scoped_release>(),
+        "Computes the undiscounted expected returns from seeds.",
+        py::arg("state"), py::arg("policy_seeds"));
+
+  m.def("expected_returns_of_deterministic_policies_from_seeds",
+        py::overload_cast<const State&, const std::vector<int>&,
+                          const std::vector<const Policy*>&>(
+            &open_spiel::algorithms::
+                ExpectedReturnsOfDeterministicPoliciesFromSeeds),
+        py::call_guard<py::gil_scoped_release>(),
+        "Computes the expected returns from seeds and policies.",
+        py::arg("state"), py::arg("policy_seeds"), py::arg("policies"));
 
   m.def(
       "exploitability",

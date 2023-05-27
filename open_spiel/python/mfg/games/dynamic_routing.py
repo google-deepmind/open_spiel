@@ -290,7 +290,7 @@ class MeanFieldRoutingGameState(pyspiel.State):
     self._vehicle_location = None
     self._vehicle_destination = None
     self._max_arrival_time = self.get_game().max_game_length()
-    # TODO(cabannes): cap maximum link waiting time to faster simulations.
+    # Cap maximum link waiting time to faster simulations.
     self._max_waiting_time = self._max_arrival_time
     self._waiting_time = WAITING_TIME_NOT_ASSIGNED
 

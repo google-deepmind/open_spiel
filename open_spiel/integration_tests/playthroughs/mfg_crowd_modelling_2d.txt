@@ -23,7 +23,7 @@ GetParameters() = {crowd_aversion_coef=1.0,forbidden_states=[],horizon=10,initia
 NumPlayers() = 1
 MinUtility() = -inf
 MaxUtility() = inf
-UtilitySum() = 0.0
+UtilitySum() = None
 ObservationTensorShape() = [31]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 31

@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/oh_hell.h"
 
+#include <cstdlib>
 #include <memory>
 #include <algorithm>
 
@@ -51,6 +52,14 @@ const GameType kGameType{
         // (num_suits * num_cards_per_suit - 1) / num_players,
         // default is to choose randomly in the legal range every game
         {"num_tricks_fixed", GameParameter(kRandomNumTricks)},
+        // In case of no off-bid penalty, players receive `points_per_trick`
+        // per trick made, plus a bonus if their bid was correct.
+        // In case of an off-bid penalty, if a player missed their bid, they
+        // receive a penalty of `points_per_trick` times the number of tricks
+        // they are above or below their bid and only if the bid was correct
+        // they receive `points_per_trick` per trick made plus a bonus.
+        {"off_bid_penalty", GameParameter(false)},
+        {"points_per_trick", GameParameter(1)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -59,6 +68,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 }  // namespace
 
 OhHellGame::OhHellGame(const GameParameters& params)
@@ -66,7 +77,9 @@ OhHellGame::OhHellGame(const GameParameters& params)
       num_players_(ParameterValue<int>("players")),
       deck_props_(ParameterValue<int>("num_suits"),
                   ParameterValue<int>("num_cards_per_suit")),
-      num_tricks_fixed_(ParameterValue<int>("num_tricks_fixed")) {
+      num_tricks_fixed_(ParameterValue<int>("num_tricks_fixed")),
+      off_bid_penalty_(ParameterValue<bool>("off_bid_penalty")),
+      points_per_trick_(ParameterValue<int>("points_per_trick")) {
   SPIEL_CHECK_TRUE(num_players_ >= kMinNumPlayers &&
                    num_players_ <= kMaxNumPlayers);
   SPIEL_CHECK_TRUE(deck_props_.NumSuits() >= kMinNumSuits &&
@@ -95,11 +108,14 @@ std::vector<int> OhHellGame::InformationStateTensorShape() const {
 }
 
 OhHellState::OhHellState(std::shared_ptr<const Game> game, int num_players,
-                         DeckProperties deck_props, int num_tricks_fixed)
+                         DeckProperties deck_props, int num_tricks_fixed,
+                         bool off_bid_penalty, int points_per_trick)
     : State(game),
       num_players_(num_players),
       num_tricks_fixed_(num_tricks_fixed),
-      deck_props_(deck_props) {
+      deck_props_(deck_props),
+      off_bid_penalty_(off_bid_penalty),
+      points_per_trick_(points_per_trick) {
   bids_.resize(num_players_);
   // need to differentiate between no bid and a bid of 0
   std::fill(bids_.begin(), bids_.end(), kInvalidBid);
@@ -420,9 +436,19 @@ Player OhHellState::CurrentPlayer() const {
 void OhHellState::ComputeScore() {
   SPIEL_CHECK_TRUE(IsTerminal());
   for (Player player = 0; player < num_players_; ++player) {
-    returns_[player] = num_tricks_won_[player];
-    if (num_tricks_won_[player] == bids_[player]) {
-      returns_[player] += kMadeBidBonus;
+    if (off_bid_penalty_) {
+      if (num_tricks_won_[player] == bids_[player]) {
+        returns_[player] =
+            points_per_trick_ * num_tricks_won_[player] + kMadeBidBonus;
+      } else {
+        int diff = num_tricks_won_[player] - bids_[player];
+        returns_[player] = -(points_per_trick_ * abs(diff));
+      }
+    } else {
+      returns_[player] = points_per_trick_ * num_tricks_won_[player];
+      if (num_tricks_won_[player] == bids_[player]) {
+        returns_[player] += kMadeBidBonus;
+      }
     }
   }
 }

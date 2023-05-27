@@ -150,7 +150,9 @@ class GoGame : public Game {
   int NumPlayers() const override { return go::NumPlayers(); }
 
   double MinUtility() const override { return LossUtility(); }
-  double UtilitySum() const override { return LossUtility() + WinUtility(); }
+  absl::optional<double> UtilitySum() const override {
+    return LossUtility() + WinUtility();
+  }
   double MaxUtility() const override { return WinUtility(); }
 
   int MaxGameLength() const override { return max_game_length_; }

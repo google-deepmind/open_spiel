@@ -85,6 +85,8 @@ class MatrixGame : public NormalFormGame {
         *std::max_element(begin(col_utilities_), end(col_utilities_)));
   }
 
+  absl::optional<double> UtilitySum() const override;
+
   std::string ActionToString(Player player, Action action) const override {
     switch (player) {
       case 0: {

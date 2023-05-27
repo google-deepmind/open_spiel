@@ -23,7 +23,7 @@ GetParameters() = {grid=A.*..**\n..*....\n....*a.\n,group_reward=100.0,horizon=1
 NumPlayers() = 1
 MinUtility() = -10.0
 MaxUtility() = 200.0
-UtilitySum() = 0.0
+UtilitySum() = None
 ObservationTensorShape() = [5, 3, 7]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 105

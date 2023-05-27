@@ -66,7 +66,8 @@ class EntropySchedule:
                          "ince the last iteration size is repeated forever.")
     except ValueError as e:
       raise ValueError(
-          f"Entropy iteration schedule: repeats ({repeats}) and sizes ({sizes})."
+          f"Entropy iteration schedule: repeats ({repeats}) and sizes"
+          f" ({sizes})."
       ) from e
 
     schedule = [0]
@@ -127,7 +128,7 @@ class EntropySchedule:
     alpha = jnp.minimum(
         (2.0 * (learner_step - iteration_start)) / iteration_size, 1.0)
 
-    return alpha, update_target_net
+    return alpha, update_target_net  # pytype: disable=bad-return-type  # jax-types
 
 
 @chex.dataclass(frozen=True)
@@ -305,7 +306,7 @@ def _player_others(player_ids: chex.Array, valid: chex.Array,
     player_other: is 1 for the current player and -1 for others [..., 1].
   """
   chex.assert_equal_shape((player_ids, valid))
-  current_player_tensor = (player_ids == player).astype(jnp.int32)
+  current_player_tensor = (player_ids == player).astype(jnp.int32)  # pytype: disable=attribute-error  # numpy-scalars
 
   res = 2 * current_player_tensor - 1
   res = res * valid
@@ -488,7 +489,7 @@ def v_trace(
 
     # Invalid turn: init_state_v_trace and (zero target, learning_output)
     # pyformat: disable
-    return _where(valid,
+    return _where(valid,  # pytype: disable=bad-return-type  # numpy-scalars
                   _where((player_id == player),
                          (our_carry, (our_v_target, our_learning_output)),
                          (opp_carry, (opp_v_target, opp_learning_output))),
@@ -654,28 +655,28 @@ class EnvStep:
   # The rewards is the only exception that contains reward values
   # in the terminal state, which is marked !valid.
   # TODO(author16): This is a confusion point and would need to be clarified.
-  valid: chex.Array = ()
+  valid: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
   # The single tensor representing the state observation. Shape: [..., ??]
-  obs: chex.Array = ()
+  obs: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
   # The legal actions mask for the current player. Shape: [..., A]
-  legal: chex.Array = ()
+  legal: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
   # The current player id as an int. Shape: [...]
-  player_id: chex.Array = ()
+  player_id: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
   # The rewards of all the players. Shape: [..., P]
-  rewards: chex.Array = ()
+  rewards: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
 
 
 @chex.dataclass(frozen=True)
 class ActorStep:
   """The actor step tensor summary."""
   # The action (as one-hot) of the current player. Shape: [..., A]
-  action_oh: chex.Array = ()
+  action_oh: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
   # The policy of the current player. Shape: [..., A]
-  policy: chex.Array = ()
+  policy: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
   # The rewards of all the players. Shape: [..., P]
   # Note - these are rewards obtained *after* the actor step, and thus
   # these are the same as EnvStep.rewards visible before the *next* step.
-  rewards: chex.Array = ()
+  rewards: chex.Array = ()  # pytype: disable=annotation-type-mismatch  # numpy-scalars
 
 
 @chex.dataclass(frozen=True)
@@ -700,7 +701,7 @@ def optax_optimizer(
     state: chex.Array
 
     def __call__(self, params: Params, grads: Params) -> Params:
-      updates, self.state = update_fn(grads, self.state)
+      updates, self.state = update_fn(grads, self.state)  # pytype: disable=annotation-type-mismatch  # numpy-scalars
       return optax.apply_updates(params, updates)
 
   return OptaxOptimizer(state=init_fn(params))
@@ -739,7 +740,9 @@ class RNaDSolver(policy_lib.Policy):
     def network(
         env_step: EnvStep
     ) -> Tuple[chex.Array, chex.Array, chex.Array, chex.Array]:
-      mlp_torso = hk.nets.MLP(self.config.policy_network_layers)
+      mlp_torso = hk.nets.MLP(
+          self.config.policy_network_layers, activate_final=True
+      )
       torso = mlp_torso(env_step.obs)
 
       mlp_policy_head = hk.nets.MLP([self._game.num_distinct_actions()])
@@ -833,7 +836,7 @@ class RNaDSolver(policy_lib.Policy):
         importance_sampling_correction,
         clip=self.config.nerd.clip,
         threshold=self.config.nerd.beta)
-    return loss_v + loss_nerd
+    return loss_v + loss_nerd  # pytype: disable=bad-return-type  # numpy-scalars
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def update_parameters(
@@ -892,8 +895,8 @@ class RNaDSolver(policy_lib.Policy):
         params_prev=self.params_prev,
         params_prev_=self.params_prev_,
         # Optimizer state.
-        optimizer=self.optimizer.state,
-        optimizer_target=self.optimizer_target.state,
+        optimizer=self.optimizer.state,  # pytype: disable=attribute-error  # always-use-return-annotations
+        optimizer_target=self.optimizer_target.state,  # pytype: disable=attribute-error  # always-use-return-annotations
     )
 
   def __setstate__(self, state):
@@ -1011,7 +1014,7 @@ class RNaDSolver(policy_lib.Policy):
     action_oh = np.zeros(pi.shape, dtype="float64")
     action_oh[range(pi.shape[0]), action] = 1.0
 
-    actor_step = ActorStep(policy=pi, action_oh=action_oh, rewards=())
+    actor_step = ActorStep(policy=pi, action_oh=action_oh, rewards=())  # pytype: disable=wrong-arg-types  # numpy-scalars
 
     return action, actor_step
 

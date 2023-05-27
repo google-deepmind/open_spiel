@@ -38,9 +38,49 @@ using gin_rummy::GinRummyState;
 using gin_rummy::GinRummyUtils;
 
 void init_pyspiel_games_gin_rummy(py::module& m) {
-  py::classh<GinRummyState, State> state_class(m, "GinRummyState");
-  state_class.def("current_phase", &GinRummyState::CurrentPhase)
+  py::module_ gin_rummy = m.def_submodule("gin_rummy");
+
+  gin_rummy.attr("DEFAULT_NUM_RANKS") = py::int_(gin_rummy::kDefaultNumRanks);
+  gin_rummy.attr("DEFAULT_NUM_SUITS") = py::int_(gin_rummy::kDefaultNumSuits);
+  gin_rummy.attr("DEFAULT_NUM_CARDS") = py::int_(gin_rummy::kDefaultNumCards);
+  gin_rummy.attr("NUM_PLAYERS") = py::int_(gin_rummy::kNumPlayers);
+  gin_rummy.attr("MAX_POSSIBLE_DEADWOOD") = py::int_(
+      gin_rummy::kMaxPossibleDeadwood);
+  gin_rummy.attr("MAX_NUM_DRAW_UPCARD_ACTIONS") = py::int_(
+      gin_rummy::kMaxNumDrawUpcardActions);
+  gin_rummy.attr("DEFAULT_HAND_SIZE") = py::int_(gin_rummy::kDefaultHandSize);
+  gin_rummy.attr("WALL_STOCK_SIZE") = py::int_(gin_rummy::kWallStockSize);
+  gin_rummy.attr("DEFAULT_KNOCK_CARD") = py::int_(gin_rummy::kDefaultKnockCard);
+  gin_rummy.attr("DEFAULT_GIN_BONUS") = py::int_(gin_rummy::kDefaultGinBonus);
+  gin_rummy.attr("DEFAULT_UNDERCUT_BONUS") = py::int_(
+      gin_rummy::kDefaultUndercutBonus);
+  gin_rummy.attr("DRAW_UPCARD_ACTION") = py::int_(gin_rummy::kDrawUpcardAction);
+  gin_rummy.attr("DRAW_STOCK_ACTION") = py::int_(gin_rummy::kDrawStockAction);
+  gin_rummy.attr("PASS_ACTION") = py::int_(gin_rummy::kPassAction);
+  gin_rummy.attr("KNOCK_ACTION") = py::int_(gin_rummy::kKnockAction);
+  gin_rummy.attr("MELD_ACTION_BASE") = py::int_(gin_rummy::kMeldActionBase);
+  gin_rummy.attr("NUM_MELD_ACTIONS") = py::int_(gin_rummy::kNumMeldActions);
+  gin_rummy.attr("NUM_DISTINCT_ACTIONS") = py::int_(
+      gin_rummy::kNumDistinctActions);
+  gin_rummy.attr("OBSERVATION_TENSOR_SIZE") = py::int_(
+      gin_rummy::kObservationTensorSize);
+
+  py::enum_<gin_rummy::Phase>(gin_rummy, "Phase")
+      .value("DEAL", gin_rummy::Phase::kDeal)
+      .value("FIRST_UPCARD", gin_rummy::Phase::kFirstUpcard)
+      .value("DRAW", gin_rummy::Phase::kDraw)
+      .value("DISCARD", gin_rummy::Phase::kDiscard)
+      .value("KNOCK", gin_rummy::Phase::kKnock)
+      .value("LAYOFF", gin_rummy::Phase::kLayoff)
+      .value("WALL", gin_rummy::Phase::kWall)
+      .value("GAME_OVER", gin_rummy::Phase::kGameOver)
+      .export_values();
+
+  py::classh<GinRummyState, State> state_class(gin_rummy, "GinRummyState");
+  state_class
+      .def("current_phase", &GinRummyState::CurrentPhase)
       .def("current_player", &GinRummyState::CurrentPlayer)
+      .def("finished_layoffs", &GinRummyState::FinishedLayoffs)
       .def("upcard", &GinRummyState::Upcard)
       .def("stock_size", &GinRummyState::StockSize)
       .def("hands", &GinRummyState::Hands)
@@ -62,25 +102,9 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
                 game_and_state.second.release());
           }));
 
-  py::enum_<gin_rummy::GinRummyState::Phase>(state_class, "Phase")
-      .value("DEAL", gin_rummy::GinRummyState::Phase::kDeal)
-      .value("FIRST_UPCARD", gin_rummy::GinRummyState::Phase::kFirstUpcard)
-      .value("DRAW", gin_rummy::GinRummyState::Phase::kDraw)
-      .value("DISCARD", gin_rummy::GinRummyState::Phase::kDiscard)
-      .value("KNOCK", gin_rummy::GinRummyState::Phase::kKnock)
-      .value("LAYOFF", gin_rummy::GinRummyState::Phase::kLayoff)
-      .value("WALL", gin_rummy::GinRummyState::Phase::kWall)
-      .value("GAME_OVER", gin_rummy::GinRummyState::Phase::kGameOver)
-      .export_values();
-
   py::classh<GinRummyGame, Game>(m, "GinRummyGame")
       .def("oklahoma", &GinRummyGame::Oklahoma)
       .def("knock_card", &GinRummyGame::KnockCard)
-      .def("draw_upcard_action", &GinRummyGame::DrawUpcardAction)
-      .def("draw_stock_action", &GinRummyGame::DrawStockAction)
-      .def("pass_action", &GinRummyGame::PassAction)
-      .def("knock_action", &GinRummyGame::KnockAction)
-      .def("meld_action_base", &GinRummyGame::MeldActionBase)
       // Pickle support
       .def(py::pickle(
           [](std::shared_ptr<const GinRummyGame> game) {  // __getstate__
@@ -91,7 +115,7 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
                 std::const_pointer_cast<Game>(LoadGame(data)));
           }));
 
-  py::class_<GinRummyUtils>(m, "GinRummyUtils")
+  py::class_<GinRummyUtils>(gin_rummy, "GinRummyUtils")
       .def(py::init<int, int, int>())
       .def("card_string", &GinRummyUtils::CardString)
       .def("hand_to_string", &GinRummyUtils::HandToString)

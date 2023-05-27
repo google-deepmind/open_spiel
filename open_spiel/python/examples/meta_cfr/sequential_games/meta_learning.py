@@ -253,7 +253,7 @@ def cfr_br_meta_data(
         player_2_last_best_response_values[-1],
     )
 
-  return (
+  return (  # pytype: disable=bad-return-type  # jax-ndarray
       counterfactual_values_player1,
       counterfactual_values_player2,
       player_2_last_best_response_values,
@@ -440,7 +440,7 @@ class MetaCFRRegretAgent:
           cfvalues = cfvalues_per_player[player_ix][infoset.infostate_string]
           train_dataset.append((cfvalues, infoset))
 
-        dataset = dataset_generator.Dataset(train_dataset, FLAGS.batch_size)
+        dataset = dataset_generator.Dataset(train_dataset, FLAGS.batch_size)  # pytype: disable=wrong-arg-types  # jax-ndarray
         data_loader = dataset.get_batch()
         for _ in range(FLAGS.num_batches):
           batch = next(data_loader)

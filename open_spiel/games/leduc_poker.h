@@ -100,6 +100,19 @@ class LeducState : public State {
   // Gets the private cards.
   std::vector<int> GetPrivateCards() const { return private_cards_; }
 
+  // Gets the public card.
+  int GetPublicCard() const { return public_card_; }
+
+  // Gets number of chips in pot.
+  int GetPot() const { return pot_; }
+
+  // Gets how much money each player has.
+  std::vector<double> GetMoney() const { return money_; }
+
+  // Gets the action sequence of rounds 1 & 2.
+  std::vector<int> GetRound1() const { return round1_sequence_; }
+  std::vector<int> GetRound2() const { return round2_sequence_; }
+
   // Sets the private cards to specific ones. Note that this function does not
   // change the history, so any functions relying on the history will not longer
   // work properly.
@@ -197,7 +210,7 @@ class LeducGame : public Game {
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override;
   double MaxUtility() const override;
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   constexpr int MaxBetsPerRound() const {

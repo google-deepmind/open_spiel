@@ -289,7 +289,7 @@ class MaednGame : public Game {
 
   int NumPlayers() const override { return num_players_; }
   double MinUtility() const override { return -MaxUtility(); }
-  double UtilitySum() const override { return 0; }
+  absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 3; }
 
   std::vector<int> ObservationTensorShape() const override {

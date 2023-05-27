@@ -820,6 +820,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 BattleshipGame::BattleshipGame(const GameParameters& params)
     : Game(kGameType, params) {
   conf.board_width = ParameterValue<int>("board_width");
@@ -955,13 +957,11 @@ double BattleshipGame::MaxUtility() const {
   return max_utility;
 }
 
-double BattleshipGame::UtilitySum() const {
+absl::optional<double> BattleshipGame::UtilitySum() const {
   if (std::abs(conf.loss_multiplier - 1.0) < kFloatTolerance) {
     return 0.0;
   } else {
-    SpielFatalError(
-        "Called `UtilitySum()` on a general sum Battleship game: set "
-        "loss_multiplier = 1.0 for a zero-sum game.");
+    return absl::nullopt;
   }
 }
 

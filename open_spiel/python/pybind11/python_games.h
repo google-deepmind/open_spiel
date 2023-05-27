@@ -40,7 +40,9 @@ class PyGame : public Game {
   int NumPlayers() const override { return info_.num_players; }
   double MinUtility() const override { return info_.min_utility; }
   double MaxUtility() const override { return info_.max_utility; }
-  double UtilitySum() const override { return info_.utility_sum; }
+  absl::optional<double> UtilitySum() const override {
+    return info_.utility_sum;
+  }
   int MaxGameLength() const override { return info_.max_game_length; }
   int MaxChanceOutcomes() const override { return info_.max_chance_outcomes; }
   std::shared_ptr<Observer> MakeObserver(

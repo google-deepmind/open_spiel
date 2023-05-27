@@ -34,11 +34,12 @@ Action TabularSarsaSolver::GetBestAction(const State& state,
                                          double min_utility) {
   vector<Action> legal_actions = state.LegalActions();
   SPIEL_CHECK_GT(legal_actions.size(), 0);
-  Action best_action = legal_actions[0];
+  const auto state_str = state.ToString();
 
+  Action best_action = legal_actions[0];
   double value = min_utility;
   for (const Action& action : legal_actions) {
-    double q_val = values_[{state.ToString(), action}];
+    double q_val = values_[{state_str, action}];
     if (q_val >= value) {
       value = q_val;
       best_action = action;
@@ -77,8 +78,8 @@ TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game)
       learning_rate_(kDefaultLearningRate),
       discount_factor_(kDefaultDiscountFactor),
       lambda_(kDefaultLambda) {
-  // Only support lambda=0 for now.
-  SPIEL_CHECK_EQ(lambda_, 0);
+  SPIEL_CHECK_LE(lambda_, 1);
+  SPIEL_CHECK_GE(lambda_, 0);
 
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
@@ -103,8 +104,8 @@ TabularSarsaSolver::TabularSarsaSolver(std::shared_ptr<const Game> game,
       learning_rate_(learning_rate),
       discount_factor_(discount_factor),
       lambda_(lambda) {
-  // Only support lambda=0 for now.
-  SPIEL_CHECK_EQ(lambda_, 0);
+  SPIEL_CHECK_LE(lambda_, 1);
+  SPIEL_CHECK_GE(lambda_, 0);
 
   // Currently only supports 1-player or 2-player zero sum games
   SPIEL_CHECK_TRUE(game_->NumPlayers() == 1 || game_->NumPlayers() == 2);
@@ -163,7 +164,26 @@ void TabularSarsaSolver::RunIteration() {
     double new_q_value = reward + discount_factor_ * next_q_value;
 
     double prev_q_val = values_[{key, curr_action}];
-    values_[{key, curr_action}] += learning_rate_ * (new_q_value - prev_q_val);
+    if (lambda_ == 0) {
+      // If lambda_ is equal to zero, run sarsa as usual. It's not necessary
+      // to update eligibility traces.
+      values_[{key, curr_action}] +=
+          learning_rate_ * (new_q_value - prev_q_val);
+    } else {
+      double lambda =
+          player != next_state->CurrentPlayer() ? -lambda_ : lambda_;
+      eligibility_traces_[{key, curr_action}] += 1;
+
+      for (const auto& q_cell : values_) {
+        std::string state = q_cell.first.first;
+        Action action = q_cell.first.second;
+
+        values_[{state, action}] += learning_rate_ *
+                                    (new_q_value - prev_q_val) *
+                                    eligibility_traces_[{state, action}];
+        eligibility_traces_[{state, action}] *= discount_factor_ * lambda;
+      }
+    }
 
     curr_state = std::move(next_state);
     curr_action = next_action;

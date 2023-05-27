@@ -107,7 +107,9 @@ class PhantomTTTGame : public Game {
   }
   int NumPlayers() const override { return game_->NumPlayers(); }
   double MinUtility() const override { return game_->MinUtility(); }
-  double UtilitySum() const override { return game_->UtilitySum(); }
+  absl::optional<double> UtilitySum() const override {
+    return game_->UtilitySum();
+  }
   double MaxUtility() const override { return game_->MaxUtility(); }
   std::string ActionToString(Player player, Action action_id) const override {
     return game_->ActionToString(player, action_id);

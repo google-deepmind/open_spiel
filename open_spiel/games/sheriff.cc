@@ -54,6 +54,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 template <typename T>
 void StrAppendVector(std::string* s, const std::vector<T>& v) {
   absl::StrAppend(s, "[");
@@ -374,10 +376,6 @@ double SheriffGame::MaxUtility() const {
   return std::max({conf.sheriff_penalty, static_cast<double>(conf.max_bribe),
                    static_cast<double>(conf.max_items) * conf.item_value,
                    static_cast<double>(conf.max_items) * conf.item_penalty});
-}
-
-double SheriffGame::UtilitySum() const {
-  SpielFatalError("Called `UtilitySum()` on a general sum Sheriff game.");
 }
 
 int SheriffGame::MaxGameLength() const { return 2 * conf.num_rounds + 1; }

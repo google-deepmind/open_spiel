@@ -152,25 +152,24 @@ class DynamicRoutingGameTest(absltest.TestCase):
 
   def test_game_evolution_first_action_policy(self):
     """Check game deterministic evolution under first action policy."""
-    # TODO(cabannes): test evolution of the game as expected (test value of the
-    # state).
-    # TODO(cabannes): test legal_actions().
+    # Test evolution of the game as expected (test value of the state).
+    # test legal_actions().
 
   def test_observer_correct(self):
     """Check that the observer is correclty updated."""
-    # TODO(cabannes): add test about observer and tensor being updated.
+    # Add test about observer and tensor being updated.
 
   def test_apply_actions_error_no_movement_with_negative_waiting_time(self):
     """Check that a vehicle cannot choose to not move if it has to move."""
-    # TODO(cabannes): test apply_actions().
+    # Test apply_actions().
 
   def test_apply_actions_error_wrong_movement_with_negative_waiting_time(self):
     """Check that a vehicle cannot choose to move to a not successor link."""
-    # TODO(cabannes): test apply_actions().
+    # Test apply_actions().
 
   def test_apply_actions_error_movement_with_positive_waiting_time(self):
     """Check that a vehicle cannot choose to move if it cannot move yet."""
-    # TODO(cabannes): test apply_actions().
+    # Test apply_actions().
 
   def test_braess_paradox(self):
     """Test that Braess paradox can be reproduced with the mean field game."""
@@ -293,16 +292,14 @@ class DynamicRoutingGameTest(absltest.TestCase):
             self._path[player_id] = "bottom"
 
     ne_policy = NashEquilibriumBraess(game)
-    # TODO(cabannes): debug issue with nash conv computation and uncomment the
-    # following line.
+    # Debug issue with nash conv computation and uncomment yhe following line.
     # self.assertEqual(exploitability.nash_conv(game, ne_policy), 0.0)
     self.assertSequenceAlmostEqual(
         -expected_game_score.policy_value(game.new_initial_state(), ne_policy),
         [3.75] * num_player)
 
     so_policy = SocialOptimumBraess(game)
-    # TODO(cabannes): debug issue with nash conv computation and uncomment the
-    # following line.
+    # Debug issue with nash conv computation and uncomment the following line.
     # self.assertEqual(exploitability.nash_conv(game, so_policy), 0.125)
     self.assertSequenceAlmostEqual(
         -expected_game_score.policy_value(game.new_initial_state(), so_policy),

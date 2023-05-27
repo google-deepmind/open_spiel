@@ -22,10 +22,7 @@
 #include <set>
 #include <string>
 
-#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
-#include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -189,24 +186,28 @@ void TestHistoryContainsActions(const Game& game,
 void CheckReturnsSum(const Game& game, const State& state) {
   std::vector<double> returns = state.Returns();
   double rsum = std::accumulate(returns.begin(), returns.end(), 0.0);
+  absl::optional<double> utility_sum = game.UtilitySum();
 
   switch (game.GetType().utility) {
     case GameType::Utility::kZeroSum: {
+      SPIEL_CHECK_EQ(utility_sum, 0.0);
       SPIEL_CHECK_TRUE(Near(rsum, 0.0, kRewardEpsilon));
       break;
     }
     case GameType::Utility::kConstantSum: {
-      SPIEL_CHECK_TRUE(Near(rsum, game.UtilitySum(), kRewardEpsilon));
+      SPIEL_CHECK_TRUE(utility_sum.has_value());
+      SPIEL_CHECK_FLOAT_NEAR(rsum, *utility_sum, kRewardEpsilon);
       break;
     }
     case GameType::Utility::kIdentical: {
+      SPIEL_CHECK_FALSE(utility_sum.has_value());
       for (int i = 1; i < returns.size(); ++i) {
         SPIEL_CHECK_TRUE(Near(returns[i], returns[i - 1], kRewardEpsilon));
       }
       break;
     }
     case GameType::Utility::kGeneralSum: {
-      break;
+      SPIEL_CHECK_FALSE(utility_sum.has_value());
     }
   }
 }
