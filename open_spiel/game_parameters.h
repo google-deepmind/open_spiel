@@ -36,8 +36,8 @@ class GameParameter;
 
 using GameParameters = std::map<std::string, GameParameter>;
 std::string GameParametersToString(const GameParameters& game_params);
-GameParameter GameParameterFromString(const std::string& str);
-GameParameters GameParametersFromString(const std::string& game_string);
+GameParameter GameParameterFromString(std::string_view str);
+GameParameters GameParametersFromString(std::string_view game_string);
 
 inline constexpr const char* kDefaultNameDelimiter = "=";
 inline constexpr const char* kDefaultParameterDelimiter = "|||";
@@ -60,7 +60,7 @@ class GameParameter {
 
   explicit GameParameter(std::string value, bool is_mandatory = false)
       : is_mandatory_(is_mandatory),
-        string_value_(value),
+        string_value_(std::move(value)),
         type_(Type::kString) {}
 
   // Allows construction of a `GameParameter` from a string literal. This method
@@ -105,8 +105,7 @@ class GameParameter {
 
   // Everything necessary to reconstruct the parameter in string form:
   // type <delimiter> value <delimiter> is_mandatory.
-  std::string Serialize(
-      const std::string& delimiter = kDefaultInternalDelimiter) const;
+  std::string Serialize(std::string_view delimiter = kDefaultInternalDelimiter) const;
 
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
@@ -189,15 +188,15 @@ std::string GameParameterTypeToString(const GameParameter::Type& type);
 // assumes none of the delimeters appears in the string values
 std::string SerializeGameParameters(
     const GameParameters& game_params,
-    const std::string& name_delimiter = kDefaultNameDelimiter,
-    const std::string& parameter_delimeter = kDefaultParameterDelimiter);
+    std::string_view name_delimiter = kDefaultNameDelimiter,
+    std::string_view parameter_delimeter = kDefaultParameterDelimiter);
 GameParameters DeserializeGameParameters(
-    const std::string& data,
-    const std::string& name_delimiter = kDefaultNameDelimiter,
-    const std::string& parameter_delimeter = kDefaultParameterDelimiter);
+    std::string_view data,
+    std::string_view name_delimiter = kDefaultNameDelimiter,
+    std::string_view parameter_delimeter = kDefaultParameterDelimiter);
 GameParameter DeserializeGameParameter(
-    const std::string& data,
-    const std::string& delimiter = kDefaultInternalDelimiter);
+    std::string_view data,
+    std::string_view delimiter = kDefaultInternalDelimiter);
 
 inline bool IsParameterSpecified(const GameParameters& table,
                                  const std::string& key) {

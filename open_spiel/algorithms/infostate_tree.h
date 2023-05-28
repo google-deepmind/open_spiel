@@ -536,7 +536,7 @@ class InfostateNode final {
   // Only InfostateTree is allowed to construct nodes.
   InfostateNode(const InfostateTree& tree, InfostateNode* parent,
                 int incoming_index, InfostateNodeType type,
-                const std::string& infostate_string, double terminal_utility,
+                std::string  infostate_string, double terminal_utility,
                 double terminal_ch_reach_prob, size_t depth,
                 std::vector<Action> legal_actions,
                 std::vector<Action> terminal_history);

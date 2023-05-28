@@ -75,7 +75,7 @@ std::string GameParameter::ToString() const {
   }
 }
 
-std::string GameParameter::Serialize(const std::string& delimiter) const {
+std::string GameParameter::Serialize(std::string_view delimiter) const {
   std::string val;
   switch (type_) {
     case Type::kString:
@@ -91,8 +91,8 @@ std::string GameParameter::Serialize(const std::string& delimiter) const {
                       delimiter, is_mandatory() ? "true" : "false");
 }
 
-GameParameter DeserializeGameParameter(const std::string& data,
-                                       const std::string& delimiter) {
+GameParameter DeserializeGameParameter(std::string_view data,
+                                       std::string_view delimiter) {
   std::vector<std::string> parts = absl::StrSplit(data, delimiter);
   SPIEL_CHECK_EQ(parts.size(), 3);
   bool mandatory = (parts[2] == "True" || parts[2] == "true");
@@ -119,8 +119,8 @@ GameParameter DeserializeGameParameter(const std::string& data,
 }
 
 std::string SerializeGameParameters(const GameParameters& game_params,
-                                    const std::string& name_delimiter,
-                                    const std::string& parameter_delimeter) {
+                                    std::string_view name_delimiter,
+                                    std::string_view parameter_delimeter) {
   std::list<std::string> serialized_params;
 
   for (const auto& key_val : game_params) {
@@ -134,9 +134,9 @@ std::string SerializeGameParameters(const GameParameters& game_params,
   return absl::StrJoin(serialized_params, parameter_delimeter);
 }
 
-GameParameters DeserializeGameParameters(
-    const std::string& data, const std::string& name_delimiter,
-    const std::string& parameter_delimeter) {
+GameParameters DeserializeGameParameters(std::string_view data,
+                                         std::string_view name_delimiter,
+                                         std::string_view parameter_delimeter) {
   GameParameters game_params;
   std::vector<std::string> parts = absl::StrSplit(data, parameter_delimeter);
 
@@ -170,7 +170,7 @@ std::string GameParametersToString(const GameParameters& game_params) {
   return str;
 }
 
-GameParameter GameParameterFromString(const std::string& str) {
+GameParameter GameParameterFromString(std::string_view str) {
   if (str == "True" || str == "true") {
     return GameParameter(true);
   } else if (str == "False" || str == "false") {
@@ -188,19 +188,19 @@ GameParameter GameParameterFromString(const std::string& str) {
   } else if (str.back() == ')') {
     return GameParameter(GameParametersFromString(str));
   } else {
-    return GameParameter(str);
+    return GameParameter(str.data());
   }
 }
 
-GameParameters GameParametersFromString(const std::string& game_string) {
+GameParameters GameParametersFromString(std::string_view game_string) {
   GameParameters params;
   if (game_string.empty()) return params;
   int first_paren = game_string.find('(');
   if (first_paren == std::string::npos) {
-    params["name"] = GameParameter(game_string);
+    params["name"] = GameParameter(game_string.data());
     return params;
   }
-  params["name"] = GameParameter(game_string.substr(0, first_paren));
+  params["name"] = GameParameter(game_string.substr(0, first_paren).data());
   int start = first_paren + 1;
   int parens = 1;
   int equals = -1;
@@ -214,7 +214,7 @@ GameParameters GameParametersFromString(const std::string& game_string) {
     }
     if ((game_string[i] == ',' && parens == 1) ||
         (game_string[i] == ')' && parens == 0 && i > start + 1)) {
-      params[game_string.substr(start, equals - start)] =
+      params[std::string(game_string.substr(start, equals - start))] =
           GameParameterFromString(
               game_string.substr(equals + 1, i - equals - 1));
       start = i + 1;
@@ -290,16 +290,7 @@ double GameParameter::value_with_default(double default_value) const {
   }
 }
 template <>
-const std::string& GameParameter::value_with_default(
-    const std::string& default_value) const {
-  if (has_string_value()) {
-    return string_value();
-  } else {
-    return default_value;
-  }
-}
-template <>
-std::string GameParameter::value_with_default(std::string default_value) const {
+std::string_view GameParameter::value_with_default(std::string_view default_value) const {
   if (has_string_value()) {
     return string_value();
   } else {
