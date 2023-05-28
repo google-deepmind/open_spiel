@@ -182,8 +182,8 @@ std::string BoolToStr(bool b);
 // Converts a vector of pairs to a string.
 template <class A, class B>
 std::string VectorOfPairsToString(const std::vector<std::pair<A, B>>& vec,
-                                  const std::string& delimiter,
-                                  const std::string& pair_delimiter);
+                                  std::string_view delimiter,
+                                  std::string_view pair_delimiter);
 
 // Returns whether the absolute difference between floating point values a and
 // b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
@@ -351,10 +351,10 @@ bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
 // RuntimeException to the caller, containing the error message.
 
 // Report a runtime error.
-[[noreturn]] void SpielFatalError(const std::string& error_msg);
+[[noreturn]] void SpielFatalError(std::string_view error_msg);
 
 // Specify a new error handler.
-using ErrorHandler = void (*)(const std::string&);
+using ErrorHandler = void (*)(std::string_view);
 void SetErrorHandler(ErrorHandler error_handler);
 
 // A ProbabilitySampler that samples uniformly from a distribution.

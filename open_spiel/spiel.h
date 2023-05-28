@@ -32,10 +32,12 @@
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/heterogenous_lookup.h"
 
 namespace open_spiel {
 
@@ -300,7 +302,7 @@ class State {
   // Note: This currently just loops over all legal actions, converts them into
   // a string, and checks equality, so it can be very slow.
   virtual Action StringToAction(Player player,
-                                const std::string& action_str) const;
+                                std::string_view action_str) const;
   Action StringToAction(const std::string& action_str) const {
     return StringToAction(CurrentPlayer(), action_str);
   }
@@ -1048,29 +1050,33 @@ class GameRegisterer {
   using CreateFunc =
       std::function<std::shared_ptr<const Game>(const GameParameters& params)>;
 
-  GameRegisterer(const GameType& game_type, CreateFunc creator);
+  GameRegisterer(const GameType& game_type, const CreateFunc& creator);
 
-  static std::shared_ptr<const Game> CreateByName(const std::string& short_name,
+  static std::shared_ptr<const Game> CreateByName(std::string_view short_name,
                                                   const GameParameters& params);
 
   static std::vector<std::string> RegisteredNames();
   static std::vector<GameType> RegisteredGames();
-  static bool IsValidName(const std::string& short_name);
-  static void RegisterGame(const GameType& game_type, CreateFunc creator);
+  static bool IsValidName(std::string_view short_name);
+  static void RegisterGame(const GameType& game_type, const CreateFunc& creator);
 
  private:
   // Returns a "global" map of registrations (i.e. an object that lives from
   // initialization to the end of the program). Note that we do not just use
   // a static data member, as we want the map to be initialized before first
   // use.
-  static std::map<std::string, std::pair<GameType, CreateFunc>>& factories() {
-    static std::map<std::string, std::pair<GameType, CreateFunc>> impl;
+  static absl::btree_map<std::string, std::pair<GameType, CreateFunc>,
+                         internal::StringCmp> &
+  factories() {
+    static absl::btree_map<std::string, std::pair<GameType, CreateFunc>,
+                           internal::StringCmp>
+        impl;
     return impl;
   }
 };
 
 // Returns true if the game is registered, false otherwise.
-bool IsGameRegistered(const std::string& short_name);
+bool IsGameRegistered(std::string_view short_name);
 
 // Returns a list of registered games' short names.
 std::vector<std::string> RegisteredGames();
@@ -1078,14 +1084,14 @@ std::vector<std::string> RegisteredGames();
 // Returns a list of registered game types.
 std::vector<GameType> RegisteredGameTypes();
 
-std::shared_ptr<const Game> DeserializeGame(const std::string& serialized);
+std::shared_ptr<const Game> DeserializeGame(std::string_view serialized);
 
 // Returns a new game object from the specified string, which is the short
 // name plus optional parameters, e.g. "go(komi=4.5,board_size=19)"
-std::shared_ptr<const Game> LoadGame(const std::string& game_string);
+std::shared_ptr<const Game> LoadGame(std::string_view game_string);
 
 // Returns a new game object with the specified parameters.
-std::shared_ptr<const Game> LoadGame(const std::string& short_name,
+std::shared_ptr<const Game> LoadGame(std::string_view short_name,
                                      const GameParameters& params);
 
 // Returns a new game object with the specified parameters; reads the name
@@ -1141,7 +1147,7 @@ std::string SerializeGameAndState(const Game& game, const State& state);
 // kSampledStochastic, as there is currently no general way to set the state's
 // seed.
 std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
-DeserializeGameAndState(const std::string& serialized_state);
+DeserializeGameAndState(std::string_view serialized_state);
 
 // Convert GameTypes from and to strings. Used for serialization of objects
 // that contain them.

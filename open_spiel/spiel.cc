@@ -131,12 +131,12 @@ bool GameType::ContainsRequiredParameters() const {
   return false;
 }
 
-GameRegisterer::GameRegisterer(const GameType& game_type, CreateFunc creator) {
+GameRegisterer::GameRegisterer(const GameType& game_type, const CreateFunc& creator) {
   RegisterGame(game_type, creator);
 }
 
 std::shared_ptr<const Game> GameRegisterer::CreateByName(
-    const std::string& short_name, const GameParameters& params) {
+    std::string_view short_name, const GameParameters& params) {
   auto iter = factories().find(short_name);
   if (iter == factories().end()) {
     SpielFatalError(absl::StrCat("Unknown game '", short_name,
@@ -165,16 +165,16 @@ std::vector<GameType> GameRegisterer::RegisteredGames() {
   return games;
 }
 
-bool GameRegisterer::IsValidName(const std::string& short_name) {
+bool GameRegisterer::IsValidName(std::string_view short_name) {
   return factories().find(short_name) != factories().end();
 }
 
 void GameRegisterer::RegisterGame(const GameType& game_type,
-                                  GameRegisterer::CreateFunc creator) {
+                                  const GameRegisterer::CreateFunc& creator) {
   factories()[game_type.short_name] = std::make_pair(game_type, creator);
 }
 
-bool IsGameRegistered(const std::string& short_name) {
+bool IsGameRegistered(std::string_view short_name) {
   return GameRegisterer::IsValidName(short_name);
 }
 
@@ -186,7 +186,7 @@ std::vector<GameType> RegisteredGameTypes() {
   return GameRegisterer::RegisteredGames();
 }
 
-std::shared_ptr<const Game> DeserializeGame(const std::string& serialized) {
+std::shared_ptr<const Game> DeserializeGame(std::string_view serialized) {
   std::pair<std::string, std::string> game_and_rng_state =
       absl::StrSplit(serialized, kSerializeGameRNGStateSectionHeader);
 
@@ -208,11 +208,11 @@ std::shared_ptr<const Game> DeserializeGame(const std::string& serialized) {
   return game;
 }
 
-std::shared_ptr<const Game> LoadGame(const std::string& game_string) {
+std::shared_ptr<const Game> LoadGame(std::string_view game_string) {
   return LoadGame(GameParametersFromString(game_string));
 }
 
-std::shared_ptr<const Game> LoadGame(const std::string& short_name,
+std::shared_ptr<const Game> LoadGame(std::string_view short_name,
                                      const GameParameters& params) {
   std::shared_ptr<const Game> result =
       GameRegisterer::CreateByName(short_name, params);
@@ -310,8 +310,7 @@ std::string State::Serialize() const {
   return absl::StrCat(absl::StrJoin(History(), "\n"), "\n");
 }
 
-Action State::StringToAction(Player player,
-                             const std::string& action_str) const {
+Action State::StringToAction(Player player, std::string_view action_str) const {
   for (const Action action : LegalActions()) {
     if (action_str == ActionToString(player, action)) return action;
   }
@@ -448,7 +447,7 @@ std::string SerializeGameAndState(const Game& game, const State& state) {
 }
 
 std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
-DeserializeGameAndState(const std::string& serialized_state) {
+DeserializeGameAndState(std::string_view serialized_state) {
   std::vector<std::string> lines = absl::StrSplit(serialized_state, '\n');
 
   enum Section { kInvalid = -1, kMeta = 0, kGame = 1, kState = 2 };

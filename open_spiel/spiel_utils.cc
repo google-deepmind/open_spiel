@@ -116,7 +116,7 @@ std::string FormatDouble(double value) {
   return double_str;
 }
 
-void SpielDefaultErrorHandler(const std::string& error_msg) {
+void SpielDefaultErrorHandler(std::string_view error_msg) {
   std::cerr << "Spiel Fatal Error: " << error_msg << std::endl
             << std::endl
             << std::flush;
@@ -129,7 +129,7 @@ void SetErrorHandler(ErrorHandler new_error_handler) {
   error_handler = new_error_handler;
 }
 
-void SpielFatalError(const std::string& error_msg) {
+void SpielFatalError(std::string_view error_msg) {
   error_handler(error_msg);
   // The error handler should not return. If it does, we will abort the process.
   std::cerr << "Error handler failure - exiting" << std::endl;
@@ -154,8 +154,8 @@ std::string BoolToStr(bool b) { return b ? "true" : "false"; }
 
 template <class A, class B>
 std::string VectorOfPairsToString(std::vector<std::pair<A, B>>& vec,
-                                  const std::string& delimiter,
-                                  const std::string& pair_delimiter) {
+                                  std::string_view delimiter,
+                                  std::string_view pair_delimiter) {
   std::string str;
   for (int i = 0; i < vec.size(); ++i) {
     absl::StrAppend(&str, vec[i].first, pair_delimiter, vec[i].second);

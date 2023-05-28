@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_ALGORITHMS_CORR_DIST_CCE_H_
 #define OPEN_SPIEL_ALGORITHMS_CORR_DIST_CCE_H_
 
+#include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -63,10 +64,10 @@ class CCEState : public WrappedState {
 
 class CCEGame : public WrappedGame {
  public:
-  CCEGame(std::shared_ptr<const Game> game, CorrDistConfig config,
+  CCEGame(const std::shared_ptr<const Game>& game, CorrDistConfig config,
           const CorrelationDevice& mu)
       : WrappedGame(game, game->GetType(), game->GetParameters()),
-        config_(config),
+        config_(std::move(config)),
         mu_(mu),
         orig_num_distinct_actions_(game->NumDistinctActions()) {}
 

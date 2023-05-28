@@ -92,7 +92,7 @@ namespace py = ::pybind11;
 // Python, and exit the process otherwise.
 class SpielException : public std::exception {
  public:
-  explicit SpielException(std::string message) : message_(message) {}
+  explicit SpielException(std::string_view message) : message_(message) {}
   const char* what() const noexcept override { return message_.c_str(); }
 
  private:
@@ -282,7 +282,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("action_to_string",
            (std::string(State::*)(Action) const) & State::ActionToString)
       .def("string_to_action",
-           (Action(State::*)(Player, const std::string&) const) &
+           (Action(State::*)(Player, std::string_view) const) &
                State::StringToAction)
       .def("string_to_action",
            (Action(State::*)(const std::string&) const) & State::StringToAction)
@@ -555,12 +555,12 @@ PYBIND11_MODULE(pyspiel, m) {
         "Get the Gambit .nfg text for a normal-form game.");
 
   m.def("load_game",
-        py::overload_cast<const std::string&>(&open_spiel::LoadGame),
+        py::overload_cast<std::string_view>(&open_spiel::LoadGame),
         "Returns a new game object for the specified short name using default "
         "parameters");
 
   m.def("load_game",
-        py::overload_cast<const std::string&, const GameParameters&>(
+        py::overload_cast<std::string_view, const GameParameters&>(
             &open_spiel::LoadGame),
         "Returns a new game object for the specified short name using given "
         "parameters");
@@ -617,7 +617,7 @@ PYBIND11_MODULE(pyspiel, m) {
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise
   // exceptions - the process will be terminated instead.
-  open_spiel::SetErrorHandler([](const std::string& string) {
+  open_spiel::SetErrorHandler([](std::string_view string) {
     if (absl::GetFlag(FLAGS_log_exceptions_to_stderr)) {
       std::cerr << "OpenSpiel exception: " << string << std::endl << std::flush;
     }
