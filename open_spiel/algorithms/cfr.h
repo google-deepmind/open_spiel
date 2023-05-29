@@ -122,7 +122,7 @@ void SerializeCFRInfoStateValuesTable(
 // avoid copying/moving the table once fully deserialized.
 void DeserializeCFRInfoStateValuesTable(absl::string_view serialized,
                                         CFRInfoStateValuesTable* result,
-                                        std::string delimiter = "<~>");
+                                        std::string_view delimiter = "<~>");
 
 // A policy that extracts the average policy from the CFR table values, which
 // can be passed to tabular exploitability.
@@ -328,8 +328,8 @@ class CFRSolver : public CFRSolverBase {
   std::string SerializeThisType() const { return "CFRSolver"; }
 };
 
-std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
-                                                std::string delimiter = "<~>");
+std::unique_ptr<CFRSolver> DeserializeCFRSolver(std::string_view serialized,
+                     std::string_view delimiter = "<~>");
 
 // CFR+ implementation.
 //
@@ -357,8 +357,8 @@ class CFRPlusSolver : public CFRSolverBase {
   std::string SerializeThisType() const { return "CFRPlusSolver"; }
 };
 
-std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
-    const std::string& serialized, std::string delimiter = "<~>");
+std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(std::string_view serialized,
+                         std::string_view delimiter = "<~>");
 
 struct PartiallyDeserializedCFRSolver {
   PartiallyDeserializedCFRSolver(std::shared_ptr<const Game> game,
@@ -375,8 +375,7 @@ struct PartiallyDeserializedCFRSolver {
   absl::string_view serialized_cfr_values_table;
 };
 
-PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
-    const std::string& serialized);
+PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(std::string_view serialized);
 
 }  // namespace algorithms
 }  // namespace open_spiel

@@ -188,7 +188,7 @@ GameParameter GameParameterFromString(std::string_view str) {
   } else if (str.back() == ')') {
     return GameParameter(GameParametersFromString(str));
   } else {
-    return GameParameter(str.data());
+    return GameParameter(str);
   }
 }
 
@@ -197,10 +197,10 @@ GameParameters GameParametersFromString(std::string_view game_string) {
   if (game_string.empty()) return params;
   int first_paren = game_string.find('(');
   if (first_paren == std::string::npos) {
-    params["name"] = GameParameter(game_string.data());
+    params["name"] = GameParameter(game_string);
     return params;
   }
-  params["name"] = GameParameter(game_string.substr(0, first_paren).data());
+  params["name"] = GameParameter(game_string.substr(0, first_paren));
   int start = first_paren + 1;
   int parens = 1;
   int equals = -1;
@@ -214,14 +214,17 @@ GameParameters GameParametersFromString(std::string_view game_string) {
     }
     if ((game_string[i] == ',' && parens == 1) ||
         (game_string[i] == ')' && parens == 0 && i > start + 1)) {
-      params[std::string(game_string.substr(start, equals - start))] =
-          GameParameterFromString(
-              game_string.substr(equals + 1, i - equals - 1));
+      auto param_name = std::string{game_string.substr(start, equals - start)};
+      auto param_content = game_string.substr(equals + 1, i - equals - 1);
+      params.emplace(std::move(param_name),
+                     GameParameterFromString(param_content));
       start = i + 1;
       equals = -1;
     }
   }
-  if (parens > 0) SpielFatalError("Missing closing bracket ')'.");
+  if (parens > 0) {
+    SpielFatalError("Missing closing bracket ')'.");
+  }
   return params;
 }
 

@@ -659,7 +659,7 @@ void SerializeCFRInfoStateValuesTable(
 
 void DeserializeCFRInfoStateValuesTable(absl::string_view serialized,
                                         CFRInfoStateValuesTable* result,
-                                        std::string delimiter) {
+                                        std::string_view delimiter) {
   if (serialized.empty()) return;
 
   std::vector<absl::string_view> splits = absl::StrSplit(serialized, delimiter);
@@ -693,8 +693,8 @@ void CFRSolverBase::ApplyRegretMatching() {
   }
 }
 
-std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
-                                                std::string delimiter) {
+std::unique_ptr<CFRSolver> DeserializeCFRSolver(std::string_view serialized,
+                                                std::string_view delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "CFRSolver");
   auto solver = std::make_unique<CFRSolver>(
@@ -705,8 +705,8 @@ std::unique_ptr<CFRSolver> DeserializeCFRSolver(const std::string& serialized,
   return solver;
 }
 
-std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
-    const std::string& serialized, std::string delimiter) {
+std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(std::string_view serialized,
+                         std::string_view delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "CFRPlusSolver");
   auto solver = std::make_unique<CFRPlusSolver>(
@@ -717,8 +717,7 @@ std::unique_ptr<CFRPlusSolver> DeserializeCFRPlusSolver(
   return solver;
 }
 
-PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(
-    const std::string& serialized) {
+PartiallyDeserializedCFRSolver PartiallyDeserializeCFRSolver(std::string_view serialized) {
   // We don't copy the CFR values table section due to potential large size.
   enum Section {
     kInvalid = -1,

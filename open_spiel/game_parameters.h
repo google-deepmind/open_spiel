@@ -58,9 +58,9 @@ class GameParameter {
         double_value_(value),
         type_(Type::kDouble) {}
 
-  explicit GameParameter(std::string value, bool is_mandatory = false)
+  explicit GameParameter(std::string_view value, bool is_mandatory = false)
       : is_mandatory_(is_mandatory),
-        string_value_(std::move(value)),
+        string_value_(value),
         type_(Type::kString) {}
 
   // Allows construction of a `GameParameter` from a string literal. This method

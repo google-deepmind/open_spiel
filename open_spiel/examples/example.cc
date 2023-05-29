@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
   // Print out registered games.
   std::cerr << "Registered games:" << std::endl;
   std::vector<std::string> names = open_spiel::RegisteredGames();
-  for (const std::string& name : names) {
+  for (std::string_view name : names) {
     std::cerr << name << std::endl;
   }
 
