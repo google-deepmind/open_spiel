@@ -82,7 +82,7 @@ void CFRBRSolver::EvaluateAndUpdatePolicy() {
 }
 
 std::unique_ptr<CFRBRSolver> DeserializeCFRBRSolver(
-    const std::string& serialized, std::string delimiter) {
+    std::string_view serialized, std::string delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "CFRBRSolver");
   auto solver = std::make_unique<CFRBRSolver>(

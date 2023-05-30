@@ -338,7 +338,7 @@ void CheckBestResponsesAgaintGoldenResponses(
     std::unordered_map<std::string, Action>& best_responses) {
   SPIEL_CHECK_EQ(best_responses.size(), golden_actions.size());
   for (const auto& infostate_and_best_response : golden_actions) {
-    const std::string& infostate = infostate_and_best_response.first;
+    std::string infostate = infostate_and_best_response.first;
     Action action = infostate_and_best_response.second;
     auto it = best_responses.find(infostate);
     if (it == best_responses.end())
@@ -492,7 +492,7 @@ void KuhnPokerExploitabilityDescentMinimalSimulationPid0() {
   auto actual_best_responses = GetExploitabilityDescentBestResponses();
   SPIEL_CHECK_EQ(best_responses.size(), actual_best_responses.size());
   for (const auto& infostate_and_action : actual_best_responses) {
-    const std::string& infostate = infostate_and_action.first;
+    std::string infostate = infostate_and_action.first;
     Action action = infostate_and_action.second;
     auto it = best_responses.find(infostate);
     if (it == best_responses.end())
@@ -511,7 +511,7 @@ void CheckBestResponseValuesAgainstGoldenValues(
     const std::vector<std::pair<std::string, double>>& golden_values) {
   TabularBestResponse best_response(game, best_responder, &policy);
   for (const auto& history_and_value : golden_values) {
-    const std::string& history = history_and_value.first;
+    std::string_view history = history_and_value.first;
     if (!Near(best_response.Value(history), history_and_value.second)) {
       SpielFatalError(absl::StrCat("Value calculated for history '", history,
                                    "' is equal to ",

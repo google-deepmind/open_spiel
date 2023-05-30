@@ -54,13 +54,17 @@ namespace algorithms {
 
 class TabularBestResponse {
  public:
+   using table_type =
+       absl::node_hash_map<std::string, ActionsAndProbs, internal::StringHasher,
+                           internal::StringEq>;
+
   TabularBestResponse(const Game& game, Player best_responder,
                       const Policy* policy,
                       const float prob_cut_threshold = -1.0,
                       const float action_value_tolerance = -1.0);
   TabularBestResponse(
       const Game& game, Player best_responder,
-      const std::unordered_map<std::string, ActionsAndProbs>& policy_table,
+      const table_type& policy_table,
       const float prob_cut_threshold = -1.0,
       const float action_value_tolerance = -1.0);
 
@@ -69,7 +73,7 @@ class TabularBestResponse {
   // Returns the action that maximizes utility for the agent at the given
   // infostate. The infostate must correspond to a decision node for
   // best_responder.
-  Action BestResponseAction(const std::string& infostate);
+  Action BestResponseAction(const std::basic_string<char>& infostate);
   Action BestResponseAction(const State& state) {
     SPIEL_CHECK_EQ(state.CurrentPlayer(), best_responder_);
     return BestResponseAction(state.InformationStateString(best_responder_));
@@ -78,7 +82,7 @@ class TabularBestResponse {
   // Returns all the actions that maximize utility for the agent at the given
   // infostate. The infostate must correspond to a decision node for
   // best_responder.
-  std::vector<Action> BestResponseActions(const std::string& infostate,
+  std::vector<Action> BestResponseActions(std::string_view infostate,
                                           double tolerance);
   std::vector<Action> BestResponseActions(const State& state,
                                           double tolerance) {
@@ -90,7 +94,7 @@ class TabularBestResponse {
   // Returns the values of all actions at this info state. The infostate must
   // correspond to a decision node for best_responder.
   std::vector<std::pair<Action, double>> BestResponseActionValues(
-      const std::string& infostate);
+      std::string_view infostate);
   std::vector<std::pair<Action, double>> BestResponseActionValues(
       const State& state) {
     SPIEL_CHECK_EQ(state.CurrentPlayer(), best_responder_);
@@ -124,7 +128,7 @@ class TabularBestResponse {
 
   // Returns the expected utility for best_responder when playing the game
   // beginning at history.
-  double Value(const std::string& history);
+  double Value(std::string_view history);
   double Value(const State& state) { return Value(state.HistoryString()); }
 
   // Changes the policy that we are calculating a best response to. This is
@@ -142,13 +146,12 @@ class TabularBestResponse {
   }
 
   // Set the policy given a policy table. This stores the table internally.
-  void SetPolicy(
-      const std::unordered_map<std::string, ActionsAndProbs>& policy_table) {
+  void SetPolicy(const table_type &policy_table) {
     tabular_policy_container_ = TabularPolicy(policy_table);
     SetPolicy(&tabular_policy_container_);
   }
 
- private:
+private:
   // For chance nodes, we recursively calculate the value of each child node,
   // and weight them by the probability of reaching each child.
   double HandleChanceCase(HistoryNode* node);
@@ -195,14 +198,15 @@ class TabularBestResponse {
       infosets_;
 
   // Caches all best responses calculated so far (for each infostate).
-  std::unordered_map<std::string, ActionsAndProbs> best_response_policy_;
+  table_type best_response_policy_;
 
   // Caches all best responses calculated so far (for each infostate) in case of
   // biased deterministic best-response.
   std::unordered_map<std::string, Action> best_response_actions_;
 
   // Caches all values calculated so far (for each history).
-  std::unordered_map<std::string, double> value_cache_;
+  absl::node_hash_map<std::string, double, internal::StringHasher,
+                      internal::StringEq> value_cache_;
   std::unique_ptr<State> root_;
 
   // Keep a cache of an empty policy to avoid recomputing it.

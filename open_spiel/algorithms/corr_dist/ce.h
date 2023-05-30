@@ -49,7 +49,7 @@ class CEState : public WrappedState {
   std::string InformationStateString(Player player) const override;
   std::string ToString() const override;
 
-  ActionsAndProbs RecommendedStatePolicy(const std::string& info_state) const;
+  ActionsAndProbs RecommendedStatePolicy(std::string_view info_state) const;
 
  protected:
   void DoApplyAction(Action action_id) override;

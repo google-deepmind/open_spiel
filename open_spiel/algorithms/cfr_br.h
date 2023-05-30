@@ -52,7 +52,7 @@ class CFRBRSolver : public CFRSolverBase {
 };
 
 std::unique_ptr<CFRBRSolver> DeserializeCFRBRSolver(
-    const std::string& serialized, std::string delimiter = "<~>");
+    std::string_view serialized, std::string delimiter = "<~>");
 
 }  // namespace algorithms
 }  // namespace open_spiel

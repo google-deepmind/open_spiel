@@ -407,7 +407,7 @@ std::vector<double> CFRSolverBase::ComputeCounterFactualRegret(
 void CFRSolverBase::GetInfoStatePolicyFromPolicy(
     std::vector<double>* info_state_policy,
     const std::vector<Action>& legal_actions, const Policy* policy,
-    const std::string& info_state) const {
+    std::string_view info_state) const {
   ActionsAndProbs actions_and_probs = policy->GetStatePolicy(info_state);
   info_state_policy->reserve(legal_actions.size());
 
@@ -476,7 +476,7 @@ bool CFRSolverBase::AllPlayersHaveZeroReachProb(
 }
 
 std::vector<double> CFRSolverBase::GetPolicy(
-    const std::string& info_state, const std::vector<Action>& legal_actions) {
+    std::string_view info_state, const std::vector<Action>& legal_actions) {
   auto entry = info_states_.find(info_state);
   if (entry == info_states_.end()) {
     info_states_[info_state] = CFRInfoStateValues(legal_actions);

@@ -53,7 +53,7 @@ TabularBestResponse::TabularBestResponse(const Game& game,
 
 TabularBestResponse::TabularBestResponse(
     const Game& game, Player best_responder,
-    const std::unordered_map<std::string, ActionsAndProbs>& policy_table,
+    const table_type& policy_table,
     const float prob_cut_threshold, const float action_value_tolerance)
     : best_responder_(best_responder),
       tabular_policy_container_(policy_table),
@@ -164,7 +164,7 @@ double TabularBestResponse::HandleChanceCase(HistoryNode* node) {
   SPIEL_CHECK_FLOAT_EQ(prob_sum, 1.0);
   return value;
 }
-double TabularBestResponse::Value(const std::string& history) {
+double TabularBestResponse::Value(std::string_view history) {
   auto it = value_cache_.find(history);
   if (it != value_cache_.end()) return it->second;
   HistoryNode* node = tree_.GetByHistory(history);
@@ -219,14 +219,14 @@ Action TabularBestResponse::BestResponseAction(const std::string& infostate) {
   for (const auto& action : infoset[0].first->GetChildActions()) {
     double prob = 0.0;
     if (action == best_action) prob = 1.0;
-    actions_and_probs.push_back(std::make_pair(action, prob));
+    actions_and_probs.emplace_back(action, prob);
   }
   best_response_policy_[infostate] = actions_and_probs;
   best_response_actions_[infostate] = best_action;
   return best_action;
 }
 std::vector<Action> TabularBestResponse::BestResponseActions(
-    const std::string& infostate, double tolerance) {
+    std::string_view infostate, double tolerance) {
   std::set<Action> best_actions;
   std::vector<std::pair<Action, double>> action_values;
   std::vector<std::pair<HistoryNode*, double>> infoset =
@@ -243,7 +243,7 @@ std::vector<Action> TabularBestResponse::BestResponseActions(
       SPIEL_CHECK_TRUE(child_node != nullptr);
       value += prob * Value(child_node->GetHistory());
     }
-    action_values.push_back({action, value});
+    action_values.emplace_back(action, value);
     if (value > best_value) {
       best_value = value;
     }
@@ -260,13 +260,13 @@ std::vector<Action> TabularBestResponse::BestResponseActions(
     if (best_actions.count(action)) {
       prob = 1.0 / best_actions.size();
     }
-    actions_and_probs.push_back(std::make_pair(action, prob));
+    actions_and_probs.emplace_back(action, prob);
   }
   best_response_policy_[infostate] = actions_and_probs;
   return std::vector<Action>(best_actions.begin(), best_actions.end());
 }
 std::vector<std::pair<Action, double>>
-TabularBestResponse::BestResponseActionValues(const std::string& infostate) {
+TabularBestResponse::BestResponseActionValues(std::string_view infostate) {
   std::vector<std::pair<Action, double>> action_values;
   std::vector<std::pair<HistoryNode*, double>> infoset =
       infosets_.at(infostate);

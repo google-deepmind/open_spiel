@@ -122,7 +122,7 @@ void CFRTest_KuhnPokerRunsWithThreePlayers(bool linear_averaging,
 
 // Tests the convergence of CFR in a specific game. Only computes nashconv
 // if the upper bound is positive.
-void CFRTest_GeneralMultiplePlayerTest(const std::string& game_name,
+void CFRTest_GeneralMultiplePlayerTest(std::string_view game_name,
                                        int num_players, int num_iterations,
                                        double nashconv_upper_bound) {
   std::shared_ptr<const Game> game =

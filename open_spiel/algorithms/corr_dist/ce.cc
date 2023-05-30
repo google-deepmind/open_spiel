@@ -97,7 +97,7 @@ void CEState::DoApplyAction(Action action_id) {
 }
 
 ActionsAndProbs CEState::RecommendedStatePolicy(
-    const std::string& info_state) const {
+    std::string_view info_state) const {
   SPIEL_CHECK_GE(rec_index_, 0);
   return mu_[rec_index_].second.GetStatePolicy(info_state);
 }
@@ -116,7 +116,7 @@ CEGame::CEGame(std::shared_ptr<const Game> game, CorrDistConfig config,
         GetAllInformationStates(*game);
     SPIEL_CHECK_EQ(all_infostates.size(), game->NumPlayers());
     for (Player p = 0; p < all_infostates.size(); ++p) {
-      for (const std::string& info_state : all_infostates[p]) {
+      for (std::string_view info_state : all_infostates[p]) {
         const auto iter = info_state_to_player_.find(info_state);
         if (iter != info_state_to_player_.end()) {
           SpielFatalError("Duplicate information set found!");

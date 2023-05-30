@@ -42,7 +42,7 @@ using TensorBool = Eigen::Tensor<bool, 2, Eigen::RowMajor>;
 using TensorMapBool = Eigen::TensorMap<TensorBool, Eigen::Aligned>;
 
 bool CreateGraphDef(const Game& game, double learning_rate,
-    double weight_decay, const std::string& path, const std::string& filename,
+    double weight_decay, std::string_view path, const std::string& filename,
     std::string nn_model, int nn_width, int nn_depth, bool verbose) {
   return RunPython("open_spiel.python.algorithms.alpha_zero.export_model",
                    {

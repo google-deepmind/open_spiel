@@ -279,16 +279,16 @@ class CFRSolverBase {
   void GetInfoStatePolicyFromPolicy(std::vector<double>* info_state_policy,
                                     const std::vector<Action>& legal_actions,
                                     const Policy* policy,
-                                    const std::string& info_state) const;
+                                    std::string_view info_state) const;
 
   // Get the policy at this information state. The probabilities are ordered in
   // the same order as legal_actions.
-  std::vector<double> GetPolicy(const std::string& info_state,
+  std::vector<double> GetPolicy(std::string_view info_state,
                                 const std::vector<Action>& legal_actions);
 
   void ApplyRegretMatchingPlusReset();
 
-  std::vector<double> RegretMatching(const std::string& info_state,
+  std::vector<double> RegretMatching(std::string_view info_state,
                                      const std::vector<Action>& legal_actions);
 
   bool AllPlayersHaveZeroReachProb(
