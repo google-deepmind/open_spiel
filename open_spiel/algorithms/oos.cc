@@ -435,7 +435,7 @@ double OOSAlgorithm::IterationPlayerNode(State* h, double rm_h_pl,
 }
 
 PlayerNodeOutcome OOSAlgorithm::SampleExistingTree(
-    State* h, const std::string& info_state, CFRInfoStateValues* values,
+    State* h, std::string_view info_state, CFRInfoStateValues* values,
     double rm_h_pl, double rm_h_opp, double bs_h_all, double us_h_all,
     double us_h_cn, Player exploringPl) {
   SPIEL_DCHECK_TRUE(h->IsPlayerNode());
@@ -468,7 +468,7 @@ PlayerNodeOutcome OOSAlgorithm::SampleExistingTree(
 }
 
 PlayerNodeOutcome OOSAlgorithm::IncrementallyBuildTree(
-    State* h, const std::string& info_state, double s_h_all,
+    State* h, std::string_view info_state, double s_h_all,
     Player exploringPl) {
   SPIEL_DCHECK_FALSE(std::isnan(s_h_all));
   ++stats_.rollouts;

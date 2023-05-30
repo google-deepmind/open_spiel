@@ -27,7 +27,7 @@ namespace algorithms {
 // Similar to open_spiel::LoadGame but returns specifically a matrix game type
 // so that the subclass's specific methods are accessible.
 std::shared_ptr<const matrix_game::MatrixGame> LoadMatrixGame(
-    const std::string& name);
+    std::string_view name);
 
 // Clones a two-player normal-form game and returns it as a MatrixGame. These
 // functions exist because some implementations are more general than

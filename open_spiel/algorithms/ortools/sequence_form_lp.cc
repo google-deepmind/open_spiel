@@ -29,7 +29,7 @@ namespace ortools {
 namespace opres = operations_research;
 
 SequenceFormLpSpecification::SequenceFormLpSpecification(
-    const Game& game, const std::string& solver_id)
+    const Game& game, std::string_view solver_id)
     : SequenceFormLpSpecification(
           {
               MakeInfostateTree(game, 0),
@@ -39,7 +39,7 @@ SequenceFormLpSpecification::SequenceFormLpSpecification(
 
 SequenceFormLpSpecification::SequenceFormLpSpecification(
     std::vector<std::shared_ptr<InfostateTree>> trees,
-    const std::string& solver_id)
+    std::string_view solver_id)
     : trees_(std::move(trees)),
       terminal_bijection_(ConnectTerminals(*trees_[0], *trees_[1])),
       solver_(MPSolver::CreateSolver(solver_id)),

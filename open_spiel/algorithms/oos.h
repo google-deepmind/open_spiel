@@ -313,10 +313,10 @@ class OOSAlgorithm {
 
   // Simulate an outcome starting from specified history.
   PlayerNodeOutcome IncrementallyBuildTree(State* h,
-                                           const std::string& info_state,
+                                           std::string_view info_state,
                                            double s_h_all, Player exploringPl);
 
-  PlayerNodeOutcome SampleExistingTree(State* h, const std::string& info_state,
+  PlayerNodeOutcome SampleExistingTree(State* h, std::string_view info_state,
                                        CFRInfoStateValues* values,
                                        double rm_h_pl, double rm_h_opp,
                                        double bs_h_all, double us_h_all,

@@ -83,7 +83,7 @@ struct NodeSpecification {
 class SequenceFormLpSpecification {
  public:
   SequenceFormLpSpecification(
-      const Game& game, const std::string& solver_id = kDefaultLinProgSolver);
+      const Game& game, std::string_view solver_id = kDefaultLinProgSolver);
   SequenceFormLpSpecification(
       std::vector<std::shared_ptr<InfostateTree>> trees,
       const std::string& solver_id = kDefaultLinProgSolver);

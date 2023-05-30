@@ -91,7 +91,7 @@ class HistoryTree {
 
   HistoryNode* Root() { return root_.get(); }
 
-  HistoryNode* GetByHistory(const std::string& history);
+  HistoryNode* GetByHistory(std::string_view history);
   HistoryNode* GetByHistory(const State& state) {
     return GetByHistory(state.HistoryString());
   }

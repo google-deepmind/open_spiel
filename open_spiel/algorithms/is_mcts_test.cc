@@ -52,7 +52,7 @@ void PlayGame(const Game& game, algorithms::ISMCTSBot* bot, std::mt19937* rng) {
   std::cout << "Returns: " << absl::StrJoin(state->Returns(), " ") << std::endl;
 }
 
-void ISMCTSTest_PlayGame(const std::string& game_name) {
+void ISMCTSTest_PlayGame(std::string_view game_name) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
   auto evaluator =
       std::make_shared<algorithms::RandomRolloutEvaluator>(1, kSeed);

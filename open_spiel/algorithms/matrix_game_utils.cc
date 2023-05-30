@@ -26,7 +26,7 @@ namespace algorithms {
 
 using open_spiel::matrix_game::MatrixGame;
 
-std::shared_ptr<const MatrixGame> LoadMatrixGame(const std::string& name) {
+std::shared_ptr<const MatrixGame> LoadMatrixGame(std::string_view name) {
   std::shared_ptr<const Game> game = LoadGame(name);
   // Make sure it is indeed a matrix game.
   const MatrixGame* matrix_game = dynamic_cast<const MatrixGame*>(game.get());

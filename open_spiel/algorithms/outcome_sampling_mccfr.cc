@@ -241,7 +241,7 @@ double OutcomeSamplingMCCFRSolver::SampleEpisode(
 }
 
 std::unique_ptr<OutcomeSamplingMCCFRSolver>
-DeserializeOutcomeSamplingMCCFRSolver(const std::string& serialized,
+DeserializeOutcomeSamplingMCCFRSolver(std::string_view serialized,
                                       std::string delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "OutcomeSamplingMCCFRSolver");

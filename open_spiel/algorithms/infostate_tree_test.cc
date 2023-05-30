@@ -58,7 +58,7 @@ bool RecomputeBalance(const InfostateTree& tree) {
   return IsNodeBalanced(tree.root(), tree.tree_height());
 }
 
-std::shared_ptr<InfostateTree> MakeTree(const std::string& game_name,
+std::shared_ptr<InfostateTree> MakeTree(std::string_view game_name,
                                         Player player,
                                         int max_move_limit = 1000) {
   std::shared_ptr<InfostateTree> tree =
@@ -68,7 +68,7 @@ std::shared_ptr<InfostateTree> MakeTree(const std::string& game_name,
 }
 
 std::shared_ptr<InfostateTree> MakeTree(
-    const std::string& game_name, Player player,
+    std::string_view game_name, Player player,
     const std::vector<std::vector<Action>>& start_histories,
     const std::vector<double>& start_reaches, int max_move_limit = 1000) {
   const std::shared_ptr<const Game> game = LoadGame(game_name);
@@ -359,7 +359,7 @@ void CheckContinuation(const InfostateTree& tree) {
   }
 }
 
-void BuildAllDepths(const std::string& game_name) {
+void BuildAllDepths(std::string_view game_name) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
   const int max_moves = game->MaxMoveNumber();
   for (int move_limit = 0; move_limit < max_moves; ++move_limit) {

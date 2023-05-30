@@ -53,7 +53,7 @@ void FSICFRNode::ApplyRegretMatching() {
 
 FSICFRNode* FSICFRGraph::GetOrCreateDecisionNode(
     const std::vector<Action>& legal_actions,
-    const std::string& info_state_string, Player player, int max_predecessors,
+    std::string_view info_state_string, Player player, int max_predecessors,
     int chance_id) {
   auto iter = string_key_to_node_id_map_.find(info_state_string);
   if (iter != string_key_to_node_id_map_.end()) {
@@ -80,7 +80,7 @@ FSICFRNode* FSICFRGraph::GetOrCreateDecisionNode(
 }
 
 FSICFRNode* FSICFRGraph::GetOrCreateTerminalNode(
-    const std::string& terminal_string_key, double p0_utility,
+    std::string_view terminal_string_key, double p0_utility,
     int max_predecessors) {
   auto iter = string_key_to_node_id_map_.find(terminal_string_key);
   if (iter != string_key_to_node_id_map_.end()) {

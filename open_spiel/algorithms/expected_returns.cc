@@ -33,7 +33,7 @@ namespace {
 // InfostateString as that gives us a 2x speedup.
 std::vector<double> ExpectedReturnsImpl(
     const State& state,
-    const std::function<ActionsAndProbs(Player, const std::string&)>&
+    const std::function<ActionsAndProbs(Player, std::string_view)>&
         policy_func,
     int depth_limit,
     float prob_cut_threshold) {
@@ -303,7 +303,7 @@ std::vector<double> ExpectedReturns(const State& state,
   if (use_infostate_get_policy) {
     return ExpectedReturnsImpl(
         state,
-        [&policies](Player player, const std::string& info_state) {
+        [&policies](Player player, std::string_view info_state) {
           return policies[player]->GetStatePolicy(info_state);
         },
         depth_limit,
@@ -326,7 +326,7 @@ std::vector<double> ExpectedReturns(const State& state,
   if (use_infostate_get_policy) {
     return ExpectedReturnsImpl(
         state,
-        [&joint_policy](Player player, const std::string& info_state) {
+        [&joint_policy](Player player, std::string_view info_state) {
           return joint_policy.GetStatePolicy(info_state);
         },
         depth_limit,

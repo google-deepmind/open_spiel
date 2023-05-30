@@ -77,10 +77,10 @@ class FSICFRGraph {
  public:
   FSICFRGraph() {}
   FSICFRNode* GetOrCreateDecisionNode(const std::vector<Action>& legal_actions,
-                                      const std::string& info_state_string,
+                                      std::string_view info_state_string,
                                       Player player, int max_predecessors,
                                       int chance_id);
-  FSICFRNode* GetOrCreateTerminalNode(const std::string& terminal_string_key,
+  FSICFRNode* GetOrCreateTerminalNode(std::string_view terminal_string_key,
                                       double p0_utility, int max_predecessors);
   FSICFRNode* GetNode(int id) const {
     if (id < 0 || id >= nodes_.size()) {

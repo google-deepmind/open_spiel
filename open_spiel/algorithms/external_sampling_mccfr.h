@@ -113,7 +113,7 @@ class ExternalSamplingMCCFRSolver {
 };
 
 std::unique_ptr<ExternalSamplingMCCFRSolver>
-DeserializeExternalSamplingMCCFRSolver(const std::string& serialized,
+DeserializeExternalSamplingMCCFRSolver(std::string_view serialized,
                                        std::string delimiter = "<~>");
 
 }  // namespace algorithms

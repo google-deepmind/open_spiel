@@ -230,7 +230,7 @@ void ExternalSamplingMCCFRSolver::FullUpdateAverage(
 }
 
 std::unique_ptr<ExternalSamplingMCCFRSolver>
-DeserializeExternalSamplingMCCFRSolver(const std::string& serialized,
+DeserializeExternalSamplingMCCFRSolver(std::string_view serialized,
                                        std::string delimiter) {
   auto partial = PartiallyDeserializeCFRSolver(serialized);
   SPIEL_CHECK_EQ(partial.solver_type, "ExternalSamplingMCCFRSolver");

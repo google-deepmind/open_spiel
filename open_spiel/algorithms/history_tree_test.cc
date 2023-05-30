@@ -61,7 +61,7 @@ void TestGameTree() {
       if (tree.Root() == nullptr) {
         SpielFatalError("Root of HistoryTree is null for game: " + game_name);
       }
-      for (const std::string& history : tree.GetHistories()) {
+      for (std::string_view history : tree.GetHistories()) {
         HistoryNode* node = tree.GetByHistory(history);
         if (node == nullptr) {
           SpielFatalError(absl::StrCat("node is null for history: ", history,
@@ -151,7 +151,7 @@ void TestInfoSetsHaveRightNumberOfGameStates() {
   auto infosets =
       GetAllInfoSets(game->NewInitialState(), best_responder, &policy, &tree);
   for (const auto& kv : infosets) {
-    const std::string& infostate = kv.first;
+    std::string_view infostate = kv.first;
     const std::vector<std::pair<HistoryNode*, double>>& histories = kv.second;
     int num_histories = histories.size();
     // The infostate represented by the empty string corresponds to the root
@@ -182,7 +182,7 @@ void TestGetAllInfoSetsMatchesInfoStates() {
     auto infosets =
         GetAllInfoSets(game->NewInitialState(), best_responder, &policy, &tree);
     for (const auto& kv : infosets) {
-      const std::string& infostate = kv.first;
+      std::string_view infostate = kv.first;
       for (const auto& state_and_prob : kv.second) {
         HistoryNode* node = state_and_prob.first;
         if (node == nullptr) SpielFatalError("Node is null.");

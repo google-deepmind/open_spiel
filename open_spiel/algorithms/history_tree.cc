@@ -136,7 +136,7 @@ std::vector<Action> HistoryNode::GetChildActions() const {
   return actions;
 }
 
-HistoryNode* HistoryTree::GetByHistory(const std::string& history) {
+HistoryNode* HistoryTree::GetByHistory(std::string_view history) {
   auto it = state_to_node_.find(history);
   if (it == state_to_node_.end()) {
     SpielFatalError(absl::StrCat("Node is null for history: '", history, "'"));

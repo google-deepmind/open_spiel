@@ -79,7 +79,7 @@ class DeterministicTabularPolicy : public Policy {
   DeterministicTabularPolicy(const Game& game, Player player);
 
   ActionsAndProbs GetStatePolicy(std::string_view info_state) const override;
-  Action GetAction(const std::string& info_state) const;
+  Action GetAction(std::string_view info_state) const;
 
   // Returns the current deterministic policy as a TabularPolicy.
   TabularPolicy GetTabularPolicy() const;
@@ -107,7 +107,7 @@ class DeterministicTabularPolicy : public Policy {
 
   // Returns a string representation of the policy, using the specified
   // delimiter to separate information state and action.
-  std::string ToString(const std::string& delimiter) const;
+  std::string ToString(std::string_view delimiter) const;
 
  private:
   void CreateTable(const Game& game, Player player);

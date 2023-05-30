@@ -284,9 +284,9 @@ std::string PublicObservationHistory::ToString() const {
   return absl::StrJoin(history_, ", ");
 }
 
-void PublicObservationHistory::push_back(const std::string& observation) {
+void PublicObservationHistory::push_back(std::string_view observation) {
   SPIEL_CHECK_FALSE(observation.empty());
-  history_.push_back(observation);
+  history_.emplace_back(observation);
 }
 
 bool PublicObservationHistory::CheckStateCorrespondenceInSimulation(

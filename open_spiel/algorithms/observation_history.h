@@ -225,7 +225,7 @@ class PublicObservationHistory {
  private:
   std::shared_ptr<Observer> observer_;
 
-  void push_back(const std::string& observation);
+  void push_back(std::string_view observation);
   bool CheckStateCorrespondenceInSimulation(const State& state,
                                             int until_time) const;
 };

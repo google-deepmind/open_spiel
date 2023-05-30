@@ -364,7 +364,7 @@ class InfostateTree final {
     return Range<DecisionId>(0, decision_infostates_.size(), this);
   }
   DecisionId DecisionIdFromInfostateString(
-      const std::string& infostate_string) const;
+      std::string_view infostate_string) const;
 
   // -- Leaf operations --------------------------------------------------------
   const std::vector<InfostateNode*>& leaf_nodes() const {
@@ -408,7 +408,7 @@ class InfostateTree final {
   // Utility functions whenever we create a new node for the tree.
   std::unique_ptr<InfostateNode> MakeNode(InfostateNode* parent,
                                           InfostateNodeType type,
-                                          const std::string& infostate_string,
+                                          std::string_view infostate_string,
                                           double terminal_utility,
                                           double terminal_ch_reach_prob,
                                           size_t depth,
@@ -645,7 +645,7 @@ class InfostateNode final {
                   int at_index);
 
   InfostateNode* AddChild(std::unique_ptr<InfostateNode> child);
-  InfostateNode* GetChild(const std::string& infostate_string) const;
+  InfostateNode* GetChild(std::string_view infostate_string) const;
 };
 
 namespace internal {

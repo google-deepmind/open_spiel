@@ -25,7 +25,7 @@ namespace {
 
 constexpr double kErrorTolerance = 1e-14;
 
-void TestGameValueAndExploitability(const std::string& game_name,
+void TestGameValueAndExploitability(std::string_view game_name,
                                     double expected_game_value) {
   std::shared_ptr<const Game> game = LoadGame(game_name);
   SequenceFormLpSpecification specification(*game);
