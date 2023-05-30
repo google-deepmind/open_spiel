@@ -51,24 +51,24 @@ const GameType kGameTypeGeneralSum{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"horizon", GameParameter(kDefaultHorizon)},
-     {"zero_sum", GameParameter(kDefaultZeroSum)},
-     {"grid", GameParameter(std::string(kDefaultGrid))},
-     {"fully_obs", GameParameter(kDefaultFullyObs)},
-     {"obs_front", GameParameter(kDefaultObsFront)},
-     {"obs_back", GameParameter(kDefaultObsBack)},
-     {"obs_side", GameParameter(kDefaultObsSide)}}};
+    {{"horizon", MakeGameParameter(kDefaultHorizon)},
+     {"zero_sum", MakeGameParameter(kDefaultZeroSum)},
+     {"grid", MakeGameParameter(std::string(kDefaultGrid))},
+     {"fully_obs", MakeGameParameter(kDefaultFullyObs)},
+     {"obs_front", MakeGameParameter(kDefaultObsFront)},
+     {"obs_back", MakeGameParameter(kDefaultObsBack)},
+     {"obs_side", MakeGameParameter(kDefaultObsSide)}}};
 
 GameType GameTypeForParams(const GameParameters& params) {
   auto game_type = kGameTypeGeneralSum;
   bool is_zero_sum = kDefaultZeroSum;
   auto it = params.find("zero_sum");
-  if (it != params.end()) is_zero_sum = it->second.bool_value();
+  if (it != params.end()) is_zero_sum = it->second->bool_value();
   if (is_zero_sum) game_type.utility = GameType::Utility::kZeroSum;
 
   bool is_perfect_info = kDefaultFullyObs;
   it = params.find("fully_obs");
-  if (it != params.end()) is_perfect_info = it->second.bool_value();
+  if (it != params.end()) is_perfect_info = it->second->bool_value();
   if (!is_perfect_info) {
     game_type.information = GameType::Information::kImperfectInformation;
   }
@@ -134,13 +134,13 @@ LaserTagState::LaserTagState(std::shared_ptr<const Game> game, const Grid& grid)
     : SimMoveState(game), grid_(grid) {
   GameParameters params = game_->GetParameters();
   auto it = params.find("fully_obs");
-  if (it != params.end()) fully_obs_ = it->second.bool_value();
+  if (it != params.end()) fully_obs_ = it->second->bool_value();
   it = params.find("obs_front");
-  if (it != params.end()) obs_front_ = it->second.int_value();
+  if (it != params.end()) obs_front_ = it->second->int_value();
   it = params.find("obs_back");
-  if (it != params.end()) obs_back_ = it->second.int_value();
+  if (it != params.end()) obs_back_ = it->second->int_value();
   it = params.find("obs_side");
-  if (it != params.end()) obs_side_ = it->second.int_value();
+  if (it != params.end()) obs_side_ = it->second->int_value();
 }
 
 std::string LaserTagState::ActionToString(int player, Action action_id) const {

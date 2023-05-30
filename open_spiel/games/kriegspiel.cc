@@ -41,10 +41,10 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"board_size", GameParameter(8)},
-     {"fen", GameParameter(GameParameter::Type::kString, false)},
-     {"threefold_repetition", GameParameter(true)},
-     {"50_move_rule", GameParameter(true)}}};
+    {{"board_size", MakeGameParameter(8)},
+     {"fen", MakeGameParameter(GameParameter::Type::kString, false)},
+     {"threefold_repetition", MakeGameParameter(true)},
+     {"50_move_rule", MakeGameParameter(true)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new KriegspielGame(params));

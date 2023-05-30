@@ -39,9 +39,9 @@ void BasicLaserTagTests() {
 
 void SimpleTagTests(int horizon, bool zero_sum, std::string grid) {
   std::shared_ptr<const Game> game =
-      LoadGame("laser_tag", {{"horizon", GameParameter(horizon)},
-                             {"zero_sum", GameParameter(zero_sum)},
-                             {"grid", GameParameter(grid)}});
+      LoadGame("laser_tag", {{"horizon", MakeGameParameter(horizon)},
+                             {"zero_sum", MakeGameParameter(zero_sum)},
+                             {"grid", MakeGameParameter(grid)}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B top-right
@@ -130,18 +130,18 @@ void BasicLaserTagTestsBigGrid() {
       "**..**....**........**\n"
       "*....................S\n";
   testing::ChanceOutcomesTest(
-      *LoadGame("laser_tag", {{"grid", GameParameter(std::string(big_grid))}}));
+      *LoadGame("laser_tag", {{"grid", MakeGameParameter(std::string(big_grid))}}));
   testing::RandomSimTest(
-      *LoadGame("laser_tag", {{"grid", GameParameter(std::string(big_grid))}}),
+      *LoadGame("laser_tag", {{"grid", MakeGameParameter(std::string(big_grid))}}),
       10);
 }
 
 void BasicPartiallyObservableLaserTagTests() {
   testing::ChanceOutcomesTest(
-      *LoadGame("laser_tag", {{"fully_obs", GameParameter(false)}}));
+      *LoadGame("laser_tag", {{"fully_obs", MakeGameParameter(false)}}));
 
   testing::RandomSimTest(
-      *LoadGame("laser_tag", {{"fully_obs", GameParameter(false)}}), 100);
+      *LoadGame("laser_tag", {{"fully_obs", MakeGameParameter(false)}}), 100);
 }
 
 std::vector<float> get_obs_tensor_from_string(const std::string& obs_string,
@@ -178,11 +178,11 @@ std::vector<float> get_obs_tensor_from_string(const std::string& obs_string,
 void PartiallyObservableLaserTagDefaultObsTests() {
   float tolerence = 0.0001;
   std::shared_ptr<const Game> game =
-      LoadGame("laser_tag", {{"fully_obs", GameParameter(false)},
-                             {"obs_front", GameParameter(17)},
-                             {"obs_back", GameParameter(2)},
-                             {"obs_side", GameParameter(10)},
-                             {"grid", GameParameter(laser_tag::kDefaultGrid)}});
+      LoadGame("laser_tag", {{"fully_obs", MakeGameParameter(false)},
+                             {"obs_front", MakeGameParameter(17)},
+                             {"obs_back", MakeGameParameter(2)},
+                             {"obs_side", MakeGameParameter(10)},
+                             {"grid", MakeGameParameter(laser_tag::kDefaultGrid)}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B top-right
   state->ApplyAction(kTopLeftSpawnOutcome);   // Spawn A top-left
@@ -338,11 +338,11 @@ void PartiallyObservableLaserTagDefaultObsTests() {
 void PartiallyObservableLaserTagSmallObsTests() {
   float tolerence = 0.0001;
   std::shared_ptr<const Game> game =
-      LoadGame("laser_tag", {{"fully_obs", GameParameter(false)},
-                             {"obs_front", GameParameter(2)},
-                             {"obs_back", GameParameter(1)},
-                             {"obs_side", GameParameter(1)},
-                             {"grid", GameParameter(laser_tag::kDefaultGrid)}});
+      LoadGame("laser_tag", {{"fully_obs", MakeGameParameter(false)},
+                             {"obs_front", MakeGameParameter(2)},
+                             {"obs_back", MakeGameParameter(1)},
+                             {"obs_side", MakeGameParameter(1)},
+                             {"grid", MakeGameParameter(laser_tag::kDefaultGrid)}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(kTopRightSpawnOutcome);  // Spawn B top-right

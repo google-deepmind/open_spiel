@@ -49,9 +49,9 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"num_states", GameParameter(kDefaultNumStates)},
-     {"num_messages", GameParameter(kDefaultNumMessages)},
-     {"payoffs", GameParameter(std::string(kDefaultPayoffs))}}};
+    {{"num_states", MakeGameParameter(kDefaultNumStates)},
+     {"num_messages", MakeGameParameter(kDefaultNumMessages)},
+     {"payoffs", MakeGameParameter(std::string(kDefaultPayoffs))}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LewisSignalingGame(params));

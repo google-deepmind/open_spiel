@@ -32,7 +32,7 @@ void BasicKuhnTests() {
   testing::RandomSimTestWithUndo(*LoadGame("kuhn_poker"), 1);
   for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
-        *LoadGame("kuhn_poker", {{"players", GameParameter(players)}}), 100);
+        *LoadGame("kuhn_poker", {{"players", MakeGameParameter(players)}}), 100);
   }
   auto observer = LoadGame("kuhn_poker")
                       ->MakeObserver(kDefaultObsType,
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
   open_spiel::kuhn_poker::CountStates();
   open_spiel::kuhn_poker::PolicyTest();
   open_spiel::testing::CheckChanceOutcomes(*open_spiel::LoadGame(
-      "kuhn_poker", {{"players", open_spiel::GameParameter(3)}}));
+      "kuhn_poker", {{"players", open_spiel::MakeGameParameter(3)}}));
   open_spiel::testing::RandomSimTest(*open_spiel::LoadGame("kuhn_poker"),
                                      /*num_sims=*/10);
   open_spiel::testing::ResampleInfostateTest(

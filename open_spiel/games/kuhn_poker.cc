@@ -49,7 +49,7 @@ const GameType kGameType{/*short_name=*/"kuhn_poker",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)}},
+                         {{"players", MakeGameParameter(kDefaultPlayers)}},
                          /*default_loadable=*/true,
                          /*provides_factored_observation_string=*/true,
                         };

@@ -51,9 +51,9 @@ const GameType kGameType{/*short_name=*/"leduc_poker",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)},
-                          {"action_mapping", GameParameter(false)},
-                          {"suit_isomorphism", GameParameter(false)}}};
+                         {{"players", MakeGameParameter(kDefaultPlayers)},
+                          {"action_mapping", MakeGameParameter(false)},
+                          {"suit_isomorphism", MakeGameParameter(false)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new LeducGame(params));

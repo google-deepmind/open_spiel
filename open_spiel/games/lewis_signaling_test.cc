@@ -59,8 +59,8 @@ void LargePayoffMatrixTest() {
   std::vector<double> pay = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
   std::string pay_str = "1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1";
   int num_states = 4;
-  GameParameters params = {{"num_states", GameParameter(num_states)},
-                           {"payoffs", GameParameter(pay_str)}};
+  GameParameters params = {{"num_states", MakeGameParameter(num_states)},
+                           {"payoffs", MakeGameParameter(pay_str)}};
   for (int i = 0; i < num_states; ++i) {
     for (int j = 0; j < num_states; ++j) {
       std::shared_ptr<const Game> game = LoadGame("lewis_signaling", params);
