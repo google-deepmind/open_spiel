@@ -35,15 +35,15 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    {{"game", GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
-     {"epsilon", GameParameter(1.0, /*is_mandatory=*/true)},
-     {"seed", GameParameter(1, /*is_mandatory=*/true)}},
+    {{"game", MakeGameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
+     {"epsilon", MakeGameParameter(1.0, /*is_mandatory=*/true)},
+     {"seed", MakeGameParameter(1, /*is_mandatory=*/true)}},
     /*default_loadable=*/false,
     /*provides_factored_observation_string=*/true,
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  auto game = LoadGame(params.at("game").game_value());
+  auto game = LoadGame(params.at("game")->game_value());
   GameType game_type = game->GetType();
   // Only terminal reward models are supported.
   SPIEL_CHECK_EQ(game_type.reward_model, GameType::RewardModel::kTerminal);
@@ -51,8 +51,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
   game_type.short_name = kGameType.short_name;
   game_type.long_name =
       absl::StrCat("Add noise to", " game=", game_type.long_name,
-                   " epsilon=", params.at("epsilon").double_value(),
-                   " seed=", params.at("seed").int_value());
+                   " epsilon=", params.at("epsilon")->double_value(),
+                   " seed=", params.at("seed")->int_value());
   return std::make_shared<AddNoiseGame>(game, game_type, params);
 }
 

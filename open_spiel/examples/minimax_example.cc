@@ -37,8 +37,8 @@ int BlackPieceAdvantage(const State& state) {
 
 void PlayBreakthrough() {
   std::shared_ptr<const Game> game =
-      LoadGame("breakthrough", {{"rows", GameParameter(6)},
-                                {"columns", GameParameter(6)}});
+      LoadGame("breakthrough", {{"rows", MakeGameParameter(6)},
+                                {"columns", MakeGameParameter(6)}});
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
     std::cout << std::endl << state->ToString() << std::endl;
@@ -71,8 +71,8 @@ int FirstPlayerAdvantage(const State& state) {
 
 void PlayPig(std::mt19937& rng) {
   std::shared_ptr<const Game> game =
-      LoadGame("pig", {{"winscore", GameParameter(kWinscorePig)},
-                       {"diceoutcomes", GameParameter(kDiceoutcomesPig)}});
+      LoadGame("pig", {{"winscore", MakeGameParameter(kWinscorePig)},
+                       {"diceoutcomes", MakeGameParameter(kDiceoutcomesPig)}});
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
     std::cout << std::endl << state->ToString() << std::endl;

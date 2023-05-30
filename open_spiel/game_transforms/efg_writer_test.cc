@@ -35,7 +35,7 @@ void WriteAndLoadGame(std::string game_name) {
   EFGWriter(*base_game, filename).Write();
 
   std::shared_ptr<const Game> efg_game =
-      LoadGame("efg_game", {{"filename", GameParameter(filename)}});
+      LoadGame("efg_game", {{"filename", MakeGameParameter(filename)}});
   SPIEL_CHECK_TRUE(efg_game != nullptr);
   GameType base_game_type = base_game->GetType();
   GameType efg_game_type = efg_game->GetType();

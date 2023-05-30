@@ -34,7 +34,7 @@ const GameType kGameType{/*short_name=*/"coop_to_1p",
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
-                         {{"game", GameParameter(GameParameter::Type::kGame)}}};
+                         {{"game", MakeGameParameter(GameParameter::Type::kGame)}}};
 
 GameType CoopTo1pGameType(GameType underlying_game_type) {
   GameType game_type = kGameType;
@@ -45,7 +45,7 @@ GameType CoopTo1pGameType(GameType underlying_game_type) {
 }
 
 std::unique_ptr<Game> Factory(const GameParameters& params) {
-  auto game = params.count("game") ? LoadGame(params.at("game").game_value())
+  auto game = params.count("game") ? LoadGame(params.at("game")->game_value())
                                    : LoadGame("tiny_hanabi");
   GameType game_type = CoopTo1pGameType(game->GetType());
   return std::unique_ptr<Game>(

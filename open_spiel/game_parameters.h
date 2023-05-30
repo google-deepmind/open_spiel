@@ -37,29 +37,27 @@ namespace open_spiel {
 //
 class GameParameter;
 
-// NOTE: the usage of std::map< std::string, GameParameter>
-// (alias: GameParameters) as a member of GameParamter as type is
-// undefined behaviour in c++17. This is due to GameParameter remaining
-// an incomplete type at this point of its class definition. Incomplete
-// value types as template type argument are only allowed for certain
-// containers in the std library (e.g. shared/unique_ptr pre c++17 and
-// certain containers such as vector or list as of c++17).
-// 'map' has not yet defined behaviour for incomplete value types.
-// This forces us to wrap the value type in a unique_ptr
-//using GameParameters =
-//    absl::flat_hash_map<std::string, GameParameter, internal::StringHasher,
-//                        internal::StringEq>;
+// NOTE: the usage of a member of type std::map< std::string, GameParameter>
+// (alias: GameParameters) within GameParamter  is undefined behaviour in c++17.
+// This is due to GameParameter remaining an incomplete type at this point of
+// its class definition. Incomplete value types as template type argument are
+// only allowed for certain containers in the std library (e.g.
+// shared/unique_ptr already pre c++17 and certain containers such as vector or
+// list as of c++17). 'std::map' has not yet defined behaviour for incomplete
+// value types. This forces us to wrap the value type in a smart ptr and change
+// the semantics of interacting with the map values
 using GameParameters =
     absl::btree_map<std::string, std::shared_ptr<const GameParameter>,
                     internal::StringCmp>;
 std::string GameParametersToString(const GameParameters& game_params);
 GameParameters GameParametersFromString(std::string_view game_string);
 
-/// use SFINAE to filter out any passed types that are not `GameParameters`
+/// Compare two `GameParameters` values for equality.
+///
+/// uses SFINAE to filter out any passed types that are not `GameParameters`
 /// NOTE: we use a templated function here to avoid duplicating code for
 /// const l-values and pure rvalues which can be treated the same way in the
-/// function body (but a const ref only declaration would force a copy on
-/// r-values)
+/// function body (a const ref only declaration would force a copy on r-values)
 template <typename T1, typename T2,
           typename = std::enable_if_t<
               internal::all_of_v<GameParameters, internal::remove_cvref_t<T1>,
@@ -129,55 +127,6 @@ class GameParameter {
       : is_mandatory_(is_mandatory),
         game_value_(std::move(value)),
         type_(Type::kGame) {}
-//
-//  // Copy constructor
-//  GameParameter(const GameParameter &other)
-//      : is_mandatory_(other.is_mandatory_), int_value_(other.int_value_),
-//        double_value_(other.double_value_), string_value_(other.string_value_),
-//        bool_value_(other.bool_value_), game_value_(other.game_value_), type_(other.type_) {
-//
-////    CopyGameParameters(other.game_value_, game_value_);
-//  }
-//
-//  // Move constructor
-//  GameParameter(GameParameter &&other) noexcept
-//      : is_mandatory_(other.is_mandatory_), int_value_(other.int_value_),
-//        double_value_(other.double_value_),
-//        string_value_(std::move(other.string_value_)),
-//        bool_value_(other.bool_value_),
-//        game_value_(std::move(other.game_value_)), type_(other.type_) {}
-//
-//  // Copy assignment operator
-//  GameParameter &operator=(const GameParameter &other) {
-//    if (this != &other) {
-//      is_mandatory_ = other.is_mandatory_;
-//      int_value_ = other.int_value_;
-//      double_value_ = other.double_value_;
-//      string_value_ = other.string_value_;
-//      bool_value_ = other.bool_value_;
-//      game_value_ = other.game_value_;
-//      type_ = other.type_;
-//      // copy the game parameters manually
-////      game_value_.clear();
-////      CopyGameParameters(other.game_value_, game_value_);
-//    }
-//    return *this;
-//  }
-//
-//  // Move assignment operator
-//  GameParameter &operator=(GameParameter &&other) noexcept {
-//    if (this != &other) {
-//      is_mandatory_ = other.is_mandatory_;
-//      int_value_ = other.int_value_;
-//      double_value_ = other.double_value_;
-//      string_value_ = std::move(other.string_value_);
-//      bool_value_ = other.bool_value_;
-//      game_value_ = std::move(other.game_value_);
-//      type_ = other.type_;
-//    }
-//    return *this;
-//  }
-//  ~GameParameter() = default;
 
   static GameParameter FromString(std::string_view str);
 

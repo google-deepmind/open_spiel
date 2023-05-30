@@ -101,13 +101,13 @@ int main(int argc, char** argv) {
         return Failure("Game doesn't support setting the board size");
       }
       if (args.empty()) {
-        return Success(params["board_size"].ToString());
+        return Success(params["board_size"]->ToString());
       }
       int board_size;
       if (!absl::SimpleAtoi(args[0], &board_size)) {
         return Failure("Failed to parse first arg as an int");
       }
-      params["board_size"] = open_spiel::GameParameter(board_size);
+      params["board_size"] = open_spiel::MakeGameParameter(board_size);
       game = open_spiel::LoadGame(game->GetType().short_name, params);
       state = game->NewInitialState();
       bot = MakeBot(*game, evaluator);

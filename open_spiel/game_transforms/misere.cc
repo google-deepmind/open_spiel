@@ -31,7 +31,7 @@ const GameType kGameType{/*short_name=*/"misere",
                          /*provides_information_state_tensor=*/true,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
-                         {{"game", GameParameter(GameParameter::Type::kGame,
+                         {{"game", MakeGameParameter(GameParameter::Type::kGame,
                                                  /*is_mandatory=*/true)}},
                          /*default_loadable=*/false,
                          /*provides_factored_observation_string=*/true,
@@ -44,7 +44,7 @@ GameType MisereGameType(GameType game_type) {
 }
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  auto game = LoadGame(params.at("game").game_value());
+  auto game = LoadGame(params.at("game")->game_value());
   GameType game_type = MisereGameType(game->GetType());
   return std::shared_ptr<const Game>(new MisereGame(game, game_type, params));
 }

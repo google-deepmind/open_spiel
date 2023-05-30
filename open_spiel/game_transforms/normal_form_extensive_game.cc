@@ -42,11 +42,11 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     {{"game",
-      GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}},
+      MakeGameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}},
     /*default_loadable=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  return ExtensiveToTensorGame(*LoadGame(params.at("game").game_value()));
+  return ExtensiveToTensorGame(*LoadGame(params.at("game")->game_value()));
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
