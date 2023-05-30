@@ -303,7 +303,7 @@ class State {
   // a string, and checks equality, so it can be very slow.
   virtual Action StringToAction(Player player,
                                 std::string_view action_str) const;
-  Action StringToAction(const std::string& action_str) const {
+  Action StringToAction(std::string_view action_str) const {
     return StringToAction(CurrentPlayer(), action_str);
   }
 
@@ -765,7 +765,7 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
-  virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
+  virtual std::unique_ptr<State> NewInitialState(std::string_view str) const {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
 
@@ -867,7 +867,7 @@ class Game : public std::enable_shared_from_this<Game> {
   //
   // If this method is overridden, then it should be the inverse of
   // State::Serialize (i.e. that method should also be overridden).
-  virtual std::unique_ptr<State> DeserializeState(const std::string& str) const;
+  virtual std::unique_ptr<State> DeserializeState(std::string_view str) const;
 
   // The maximum length of any one game (in terms of number of decision nodes
   // visited in the game tree). For a simultaneous action game, this is the
@@ -933,7 +933,7 @@ class Game : public std::enable_shared_from_this<Game> {
   // SetRNGState is const despite the fact that it changes game's internal
   // state. Sampled stochastic games need to be explicit about mutability of the
   // RNG, i.e. have to use the mutable keyword.
-  virtual void SetRNGState(const std::string& rng_state) const {
+  virtual void SetRNGState(std::string_view rng_state) const {
     SpielFatalError("SetRNGState unimplemented.");
   }
 
@@ -976,8 +976,11 @@ class Game : public std::enable_shared_from_this<Game> {
   }
 
  protected:
-  Game(GameType game_type, GameParameters game_parameters)
-      : game_type_(game_type), game_parameters_(game_parameters) {}
+  Game(GameType game_type, const GameParameters& game_parameters)
+       : game_type_(std::move(game_type)),
+         game_parameters_(game_parameters) {
+//    CopyGameParameters(game_parameters, game_parameters_);
+  }
 
   // Access to game parameters. Returns the value provided by the user. If not:
   // - Defaults to the value stored as the default in
@@ -1155,7 +1158,7 @@ DeserializeGameAndState(std::string_view serialized_state);
 // contributor. See https://github.com/deepmind/open_spiel/issues/234 for
 // details.
 std::string GameTypeToString(const GameType& game_type);
-GameType GameTypeFromString(const std::string& game_type_str);
+GameType GameTypeFromString(std::string_view game_type_str);
 
 std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action);
 
@@ -1171,7 +1174,7 @@ std::string ActionsToString(const State& state,
 
 // A utility to broadcast an error message with game and state info.
 // It is a wrapper around SpielFatalError and meant to facilitate debugging.
-void SpielFatalErrorWithStateInfo(const std::string& error_msg,
+void SpielFatalErrorWithStateInfo(std::string_view error_msg,
                                   const Game& game,
                                   const State& state);
 

@@ -249,13 +249,13 @@ std::unique_ptr<Bot> MakeStatefulRandomBot(const Game& game, Player player_id,
   return std::make_unique<StatefulRandomBot>(game, player_id, seed);
 }
 
-BotRegisterer::BotRegisterer(const std::string& bot_name,
+BotRegisterer::BotRegisterer(std::string_view bot_name,
                              std::unique_ptr<BotFactory> factory) {
   RegisterBot(bot_name, std::move(factory));
 }
 
 std::unique_ptr<Bot> BotRegisterer::CreateByName(
-    const std::string& bot_name, std::shared_ptr<const Game> game,
+    std::string_view bot_name, std::shared_ptr<const Game> game,
     Player player_id, const GameParameters& params) {
   auto iter = factories().find(bot_name);
   if (iter == factories().end()) {
@@ -295,7 +295,7 @@ std::vector<std::string> BotRegisterer::BotsThatCanPlayGame(const Game& game) {
   return bot_names;
 }
 
-void BotRegisterer::RegisterBot(const std::string& bot_name,
+void BotRegisterer::RegisterBot(std::string_view bot_name,
                                 std::unique_ptr<BotFactory> factory) {
   factories()[bot_name] = std::move(factory);
 }
@@ -310,15 +310,15 @@ std::vector<std::string> RegisteredBots() {
   return BotRegisterer::RegisteredBots();
 }
 
-bool BotRegisterer::IsBotRegistered(const std::string& bot_name) {
+bool BotRegisterer::IsBotRegistered(std::string_view bot_name) {
   return factories().find(bot_name) != factories().end();
 }
 
-bool IsBotRegistered(const std::string& bot_name) {
+bool IsBotRegistered(std::string_view bot_name) {
   return BotRegisterer::IsBotRegistered(bot_name);
 }
 
-std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+std::unique_ptr<Bot> LoadBot(std::string_view bot_name,
                              const std::shared_ptr<const Game>& game,
                              Player player_id) {
   GameParameters params = GameParametersFromString(bot_name);
@@ -330,7 +330,7 @@ std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
   return LoadBot(params["name"].string_value(), game, player_id, params);
 }
 
-std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+std::unique_ptr<Bot> LoadBot(std::string_view bot_name,
                              const std::shared_ptr<const Game>& game,
                              Player player_id, const GameParameters& params) {
   std::unique_ptr<Bot> result =

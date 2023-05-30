@@ -79,7 +79,7 @@ void init_pyspiel_referee(py::module& m) {
   // https://gist.github.com/asford/544323a5da7dddad2c9174490eb5ed06
   py::class_<higc::Referee> referee(m, "Referee");
   referee
-      .def(py::init<const std::string&, const std::vector<std::string>&, int,
+      .def(py::init<std::string_view, const std::vector<std::string>&, int,
                     higc::TournamentSettings>(),
            py::arg("game_name"), py::arg("executables"), py::arg("seed") = 42,
            py::arg("settings") = higc::TournamentSettings())

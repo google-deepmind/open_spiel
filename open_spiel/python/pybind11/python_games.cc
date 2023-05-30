@@ -300,7 +300,7 @@ py::dict PyDict(const State& state) {
   }
 }
 
-std::unique_ptr<State> PyGame::DeserializeState(const std::string& str) const {
+std::unique_ptr<State> PyGame::DeserializeState(std::string_view str) const {
   std::unique_ptr<State> state = NewInitialState();
   open_spiel::down_cast<PyState*>(state.get())->Deserialize(str);
   return state;
@@ -326,7 +326,7 @@ inline constexpr const absl::string_view kTagHistory = "history=";
 inline constexpr const absl::string_view kTagMoveNumber = "move_number=";
 inline constexpr const absl::string_view kTagDict = "__dict__=";
 
-void PyState::Deserialize(const std::string& str) {
+void PyState::Deserialize(std::string_view str) {
   std::vector<absl::string_view> pieces =
       absl::StrSplit(str, absl::MaxSplits('\n', 2));
   SPIEL_CHECK_EQ(pieces.size(), 3);

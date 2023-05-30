@@ -28,11 +28,11 @@ namespace py = ::pybind11;
 
 void init_pyspiel_game_transforms(py::module& m) {
   m.def("load_game_as_turn_based",
-        py::overload_cast<const std::string&>(&LoadGameAsTurnBased),
+        py::overload_cast<std::string_view>(&LoadGameAsTurnBased),
         "Converts a simultaneous game into an turn-based game with infosets.");
 
   m.def("load_game_as_turn_based",
-        py::overload_cast<const std::string&, const GameParameters&>(
+        py::overload_cast<std::string_view, const GameParameters&>(
             &LoadGameAsTurnBased),
         "Converts a simultaneous game into an turn-based game with infosets.");
 
@@ -55,7 +55,7 @@ void init_pyspiel_game_transforms(py::module& m) {
       "Creates a repeated game from a stage game.");
 
   m.def("create_repeated_game",
-        py::overload_cast<const std::string&, const GameParameters&>(
+        py::overload_cast<std::string_view, const GameParameters&>(
             &CreateRepeatedGame),
         "Creates a repeated game from a stage game.");
 }

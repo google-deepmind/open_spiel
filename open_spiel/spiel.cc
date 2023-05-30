@@ -240,7 +240,7 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
 }
 
 State::State(std::shared_ptr<const Game> game)
-    : game_(game),
+    : game_(std::move(game)),
       num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
       move_number_(0) {}
@@ -389,7 +389,7 @@ std::vector<std::unique_ptr<State>> Game::NewInitialStates() const {
   return states;
 }
 
-std::unique_ptr<State> Game::DeserializeState(const std::string& str) const {
+std::unique_ptr<State> Game::DeserializeState(std::string_view str) const {
   // This does not work for games with sampled chance nodes and for mean field
   //  games. See comments in State::Serialize() for the explanation. If you wish
   //  to serialize states in such games, you must implement custom serialization
@@ -651,7 +651,7 @@ std::string Game::ToString() const {
 }
 
 std::string GameTypeToString(const GameType& game_type) {
-  std::string str = "";
+  std::string str{};
 
   absl::StrAppend(&str, "short_name: ", game_type.short_name, "\n");
   absl::StrAppend(&str, "long_name: ", game_type.long_name, "\n");
@@ -703,7 +703,7 @@ std::string GameTypeToString(const GameType& game_type) {
   return str;
 }
 
-GameType GameTypeFromString(const std::string& game_type_str) {
+GameType GameTypeFromString(std::string_view game_type_str) {
   std::map<std::string, std::string> game_type_values;
   std::vector<std::string> parts = absl::StrSplit(game_type_str, '\n');
 
@@ -822,7 +822,7 @@ std::string ActionsToString(const State& state,
       "[", absl::StrJoin(ActionsToStrings(state, actions), ", "), "]");
 }
 
-void SpielFatalErrorWithStateInfo(const std::string& error_msg,
+void SpielFatalErrorWithStateInfo(std::string_view error_msg,
                                   const Game& game,
                                   const State& state) {
   // A fatal error wrapper designed to return useful debugging information.

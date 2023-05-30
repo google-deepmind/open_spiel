@@ -69,7 +69,7 @@ void init_pyspiel_games_bridge(py::module& m) {
            &BridgeGame::PublicObservationTensorSize)
       // Pickle support
       .def(py::pickle(
-          [](std::shared_ptr<const BridgeGame> game) {  // __getstate__
+          [](const std::shared_ptr<const BridgeGame>& game) {  // __getstate__
             return game->ToString();
           },
           [](const std::string& data) {  // __setstate__

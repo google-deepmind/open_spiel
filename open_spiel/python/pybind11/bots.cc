@@ -167,14 +167,14 @@ void init_pyspiel_bots(py::module& m) {
 
   m.def(
       "load_bot",
-      py::overload_cast<const std::string&, const std::shared_ptr<const Game>&,
+      py::overload_cast<std::string_view, const std::shared_ptr<const Game>&,
                         Player>(&open_spiel::LoadBot),
       py::arg("bot_name"), py::arg("game"), py::arg("player"),
       "Returns a new bot object for the specified bot name using default "
       "parameters");
   m.def(
       "load_bot",
-      py::overload_cast<const std::string&, const std::shared_ptr<const Game>&,
+      py::overload_cast<std::string_view, const std::shared_ptr<const Game>&,
                         Player, const GameParameters&>(&open_spiel::LoadBot),
       py::arg("bot_name"), py::arg("game"), py::arg("player"),
       py::arg("params"),

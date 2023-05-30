@@ -285,7 +285,7 @@ PYBIND11_MODULE(pyspiel, m) {
            (Action(State::*)(Player, std::string_view) const) &
                State::StringToAction)
       .def("string_to_action",
-           (Action(State::*)(const std::string&) const) & State::StringToAction)
+           (Action(State::*)(std::string_view) const) & State::StringToAction)
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
       .def("to_string", &State::ToString)
@@ -353,7 +353,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("new_initial_state",
            [](const Game* self) { return self->NewInitialState(); })
       .def("new_initial_state",
-           [](const Game* self, const std::string& s) {
+           [](const Game* self, std::string_view s) {
              return self->NewInitialState(s);
            })
       .def("new_initial_state_for_population",
@@ -498,7 +498,7 @@ PYBIND11_MODULE(pyspiel, m) {
         &open_spiel::TurnBasedGoofspielGameString);
 
   m.def("create_matrix_game",
-        py::overload_cast<const std::string&, const std::string&,
+        py::overload_cast<std::string_view, std::string_view,
                           const std::vector<std::string>&,
                           const std::vector<std::string>&,
                           const std::vector<std::vector<double>>&,
@@ -513,7 +513,7 @@ PYBIND11_MODULE(pyspiel, m) {
         "Creates an arbitrary matrix game from dimensions and utilities.");
 
   m.def("create_tensor_game",
-        py::overload_cast<const std::string&, const std::string&,
+        py::overload_cast<std::string_view, std::string_view,
                           const std::vector<std::vector<std::string>>&,
                           const std::vector<std::vector<double>>&>(
             &open_spiel::tensor_game::CreateTensorGame),
@@ -597,7 +597,7 @@ PYBIND11_MODULE(pyspiel, m) {
 
   m.def(
       "deserialize_game_and_state",
-      [](const std::string& data) {
+      [](std::string_view data) {
         auto rv = open_spiel::DeserializeGameAndState(data);
         return std::make_pair(rv.first, std::move(rv.second));
       },

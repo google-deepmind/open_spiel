@@ -48,25 +48,23 @@ namespace py = ::pybind11;
 void init_pyspiel_policy(py::module& m) {
   py::class_<TabularBestResponse>(m, "TabularBestResponse")
       .def(py::init<const open_spiel::Game&, int,
-                    const std::unordered_map<std::string,
-                                             open_spiel::ActionsAndProbs>&>())
+                    const typename TabularBestResponse::table_type&>())
       .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*>())
       .def(py::init<
            const open_spiel::Game&, int,
-           const std::unordered_map<std::string, open_spiel::ActionsAndProbs>&,
+           const typename TabularBestResponse::table_type&,
            const float, const float>())
       .def(py::init<const open_spiel::Game&, int, const open_spiel::Policy*,
                     const float, const float>())
       .def("value",
-           py::overload_cast<const std::string&>(&TabularBestResponse::Value))
+           py::overload_cast<std::string_view>(&TabularBestResponse::Value))
       .def("value_from_state", py::overload_cast<const open_spiel::State&>(
                                    &TabularBestResponse::Value))
       .def("get_best_response_policy",
            &TabularBestResponse::GetBestResponsePolicy)
       .def("get_best_response_actions",
            &TabularBestResponse::GetBestResponseActions)
-      .def("set_policy", py::overload_cast<const std::unordered_map<
-                             std::string, open_spiel::ActionsAndProbs>&>(
+      .def("set_policy", py::overload_cast<const typename TabularBestResponse::table_type&>(
                              &TabularBestResponse::SetPolicy))
       .def("set_policy",
            py::overload_cast<const Policy*>(&TabularBestResponse::SetPolicy));
@@ -94,7 +92,7 @@ void init_pyspiel_policy(py::module& m) {
   py::class_<open_spiel::TabularPolicy,
              std::shared_ptr<open_spiel::TabularPolicy>, open_spiel::Policy>(
       m, "TabularPolicy")
-      .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
+      .def(py::init<const typename TabularBestResponse::table_type&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
@@ -103,8 +101,8 @@ void init_pyspiel_policy(py::module& m) {
              std::shared_ptr<open_spiel::PartialTabularPolicy>,
              open_spiel::TabularPolicy>(m, "PartialTabularPolicy")
       .def(py::init<>())
-      .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
-      .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&,
+      .def(py::init<const typename TabularBestResponse::table_type&>())
+      .def(py::init<const typename TabularBestResponse::table_type&,
                     std::shared_ptr<Policy>>())
       .def("get_state_policy",
            (ActionsAndProbs(open_spiel::Policy::*)(const State&) const) &
@@ -144,7 +142,7 @@ void init_pyspiel_policy(py::module& m) {
            &open_spiel::PreferredActionPolicy::GetStatePolicy);
 
   py::class_<open_spiel::algorithms::CFRSolver>(m, "CFRSolver")
-      .def(py::init([](std::shared_ptr<const Game> game) {
+      .def(py::init([](const std::shared_ptr<const Game>& game) {
         return new algorithms::CFRSolver(*game);
       }))
       .def("evaluate_and_update_policy",
@@ -162,7 +160,7 @@ void init_pyspiel_policy(py::module& m) {
           }));
 
   py::class_<open_spiel::algorithms::CFRPlusSolver>(m, "CFRPlusSolver")
-      .def(py::init([](std::shared_ptr<const Game> game) {
+      .def(py::init([](const std::shared_ptr<const Game>& game) {
         return new algorithms::CFRPlusSolver(*game);
       }))
       .def("evaluate_and_update_policy",
@@ -182,7 +180,7 @@ void init_pyspiel_policy(py::module& m) {
           }));
 
   py::class_<open_spiel::algorithms::CFRBRSolver>(m, "CFRBRSolver")
-      .def(py::init([](std::shared_ptr<const Game> game) {
+      .def(py::init([](const std::shared_ptr<const Game>& game) {
         return new algorithms::CFRBRSolver(*game);
       }))
       .def("evaluate_and_update_policy",
@@ -205,7 +203,7 @@ void init_pyspiel_policy(py::module& m) {
 
   py::class_<open_spiel::algorithms::ExternalSamplingMCCFRSolver>(
       m, "ExternalSamplingMCCFRSolver")
-      .def(py::init([](std::shared_ptr<const Game> game, int seed,
+      .def(py::init([](const std::shared_ptr<const Game>& game, int seed,
                        algorithms::AverageType average_type) {
              return new algorithms::ExternalSamplingMCCFRSolver(*game, seed,
                                                                 average_type);
@@ -230,7 +228,7 @@ void init_pyspiel_policy(py::module& m) {
   py::class_<open_spiel::algorithms::OutcomeSamplingMCCFRSolver>(
       m, "OutcomeSamplingMCCFRSolver")
       .def(py::init(
-               [](std::shared_ptr<const Game> game, double epsilon, int seed) {
+               [](const std::shared_ptr<const Game>& game, double epsilon, int seed) {
                  return new algorithms::OutcomeSamplingMCCFRSolver(
                      *game, epsilon, seed);
                }),
@@ -310,7 +308,7 @@ void init_pyspiel_policy(py::module& m) {
 
   m.def(
       "exploitability",
-      [](std::shared_ptr<const Game> game, const Policy& policy) {
+      [](const std::shared_ptr<const Game>& game, const Policy& policy) {
         return Exploitability(*game, policy);
       },
       "Returns the sum of the utility that a best responder wins when when "
@@ -322,7 +320,7 @@ void init_pyspiel_policy(py::module& m) {
 
   m.def(
       "exploitability",
-      [](std::shared_ptr<const Game> game,
+      [](const std::shared_ptr<const Game>& game,
          const std::unordered_map<std::string, ActionsAndProbs>& policy) {
         return Exploitability(*game, policy);
       },
@@ -335,7 +333,7 @@ void init_pyspiel_policy(py::module& m) {
 
   m.def(
       "nash_conv",
-      [](std::shared_ptr<const Game> game, const Policy& policy,
+      [](const std::shared_ptr<const Game>& game, const Policy& policy,
          bool use_state_get_policy) {
         return NashConv(*game, policy, use_state_get_policy);
       },
@@ -345,14 +343,14 @@ void init_pyspiel_policy(py::module& m) {
       "while the opposing player maintains their current strategy (which "
       "for a Nash equilibrium, this value is 0). The third parameter is to "
       "indicate whether to use the Policy::GetStatePolicy(const State&) "
-      "instead of Policy::GetStatePolicy(const std::string& info_state) for "
+      "instead of Policy::GetStatePolicy(std::string_view info_state) for "
       "computation of the on-policy expected values.",
       py::arg("game"), py::arg("policy"),
       py::arg("use_state_get_policy") = false);
 
   m.def(
       "nash_conv",
-      [](std::shared_ptr<const Game> game,
+      [](const std::shared_ptr<const Game>& game,
          const std::unordered_map<std::string, ActionsAndProbs>& policy) {
         return NashConv(*game, policy);
       },
