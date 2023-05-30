@@ -39,7 +39,7 @@ class SerializableCircularBuffer : public CircularBuffer<T> {
       : CircularBuffer<T>(max_size) {}
 
   // Serialize the data of the buffer to a file.
-  void SaveBuffer(const std::string& path) const {
+  void SaveBuffer(std::string_view path) const {
     nop::Serializer<nop::StreamWriter<std::ofstream>> serializer{path};
     serializer.Write(this->max_size_);
     serializer.Write(this->total_added_);
@@ -47,7 +47,7 @@ class SerializableCircularBuffer : public CircularBuffer<T> {
   }
 
   // Populate the buffer with data from a saved buffer's file.
-  void LoadBuffer(const std::string& path) {
+  void LoadBuffer(std::string_view path) {
     nop::Deserializer<nop::StreamReader<std::ifstream>> deserializer{path};
 
     // Ensure this buffer's max size equals the max size of the saved buffer.

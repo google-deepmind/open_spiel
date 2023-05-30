@@ -110,7 +110,7 @@ class Value : public std::variant<Null, bool, int64_t, double, std::string,
   bool operator==(const char* o) const {
     return IsString() && GetString() == o;
   }
-  bool operator==(const std::string& o) const {
+  bool operator==(std::string_view o) const {
     return IsString() && GetString() == o;
   }
   bool operator==(const Array& o) const { return IsArray() && GetArray() == o; }

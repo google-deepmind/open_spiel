@@ -27,7 +27,7 @@ namespace open_spiel::json {
 
 namespace {
 
-std::string Escape(const std::string& input) {
+std::string Escape(std::string_view input) {
   std::string out;
   out.reserve(input.length());
   for (const char c : input) {

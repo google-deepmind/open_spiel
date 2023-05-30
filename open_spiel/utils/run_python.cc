@@ -19,8 +19,8 @@
 
 namespace open_spiel {
 
-bool RunPython(const std::string& python_command,
-               const std::string& module,
+bool RunPython(std::string_view python_command,
+               std::string_view module,
                const std::vector<std::string>& args) {
   // If this fails, make sure your PYTHONPATH environment variable is correct.
   return 0 == std::system(absl::StrCat(
@@ -28,7 +28,7 @@ bool RunPython(const std::string& python_command,
 }
 
 
-bool RunPython(const std::string& module,
+bool RunPython(std::string_view module,
                const std::vector<std::string>& args) {
   return RunPython(kDefaultPythonCommand, module, args);
 }
