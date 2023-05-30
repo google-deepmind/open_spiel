@@ -35,7 +35,7 @@ constexpr char kDefaultPayoffString[] =
     // Cards: 2, 2
     "10;0;0;4;8;4;10;0;0";
 
-std::vector<int> ParsePayoffString(const std::string& str) {
+std::vector<int> ParsePayoffString(std::string_view str) {
   std::vector<std::string> pieces = absl::StrSplit(str, ';');
   std::vector<int> payoff;
   for (const auto& piece : pieces) {

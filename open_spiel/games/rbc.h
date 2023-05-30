@@ -137,7 +137,7 @@ class RbcState : public State {
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   RbcState(std::shared_ptr<const Game> game, int board_size,
-           const std::string& fen);
+           std::string_view fen);
 
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(Board().ToPlay());
@@ -241,7 +241,7 @@ class RbcGame : public Game {
     return absl::make_unique<RbcState>(shared_from_this(), board_size_, fen_);
   }
   std::unique_ptr<State> NewInitialState(
-      const std::string& fen) const override {
+      std::string_view fen) const override {
     return absl::make_unique<RbcState>(shared_from_this(), board_size_, fen);
   }
   int NumPlayers() const override { return chess::NumPlayers(); }

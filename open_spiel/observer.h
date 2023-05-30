@@ -51,6 +51,7 @@
 #include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -418,15 +419,15 @@ class ObserverRegisterer {
       const Game& game, absl::optional<IIGObservationType> iig_obs_type,
       const ObservationParams& params)>;
 
-  ObserverRegisterer(const std::string& game_name,
-                     const std::string& observer_name,
+  ObserverRegisterer(std::string_view game_name,
+                     std::string_view observer_name,
                      CreateFunc creator);
-  static void RegisterObserver(const std::string& game_name,
-                               const std::string& observer_name,
+  static void RegisterObserver(std::string_view game_name,
+                               std::string_view observer_name,
                                CreateFunc creator);
 
   static std::shared_ptr<Observer> CreateByName(
-      const std::string& observer_name,
+      std::string_view observer_name,
       const Game& game,
       absl::optional<IIGObservationType> iig_obs_type,
       const ObservationParams& params);
@@ -436,11 +437,13 @@ class ObserverRegisterer {
   // initialization to the end of the program). Note that we do not just use
   // a static data member, as we want the map to be initialized before first
   // use.
-  static std::map<std::pair<std::string, std::string>, CreateFunc>&
+  static absl::btree_map<std::pair<std::string, std::string>, CreateFunc, internal::StringPairCmp>&
   observers() {
-    static std::map<std::pair<std::string, std::string>, CreateFunc> impl;
+    static absl::btree_map<std::pair<std::string, std::string>, CreateFunc,
+                           internal::StringPairCmp>
+        impl;
     return impl;
-  }
+   }
 };
 
 // Registers an observer named "single_tensor" which falls back to
@@ -456,7 +459,7 @@ class ObserverRegisterer {
 // RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 class RegisterSingleTensorObserver {
  public:
-  RegisterSingleTensorObserver(const std::string& game_name);
+  RegisterSingleTensorObserver(std::string_view game_name);
 };
 
 // Pure function that creates a tensor from an observer. Slower than using an

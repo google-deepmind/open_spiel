@@ -230,7 +230,7 @@ class MatrixState : public NFGState {
 // Create a matrix game with the specified utilities and row/column names.
 // Utilities must be in row-major form.
 std::shared_ptr<const MatrixGame> CreateMatrixGame(
-    const std::string& short_name, const std::string& long_name,
+    std::string_view short_name, std::string_view long_name,
     const std::vector<std::string>& row_names,
     const std::vector<std::string>& col_names,
     const std::vector<std::vector<double>>& row_player_utils,
@@ -240,7 +240,7 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
 // ("short_name", "Long Name", row player utilities, col player utilities).
 // Utilities must be in row-major order.
 std::shared_ptr<const MatrixGame> CreateMatrixGame(
-    const std::string& short_name, const std::string& long_name,
+    std::string_view short_name, std::string_view long_name,
     const std::vector<std::string>& row_names,
     const std::vector<std::string>& col_names,
     const std::vector<double>& flat_row_utils,

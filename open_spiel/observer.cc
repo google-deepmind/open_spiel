@@ -327,14 +327,14 @@ bool IIGObservationType::operator==(const IIGObservationType& other) {
          private_info == other.private_info;
 }
 
-ObserverRegisterer::ObserverRegisterer(const std::string& game_name,
-                                       const std::string& observer_name,
+ObserverRegisterer::ObserverRegisterer(std::string_view game_name,
+                                       std::string_view observer_name,
                                        CreateFunc creator) {
   RegisterObserver(game_name, observer_name, creator);
 }
 
-void ObserverRegisterer::RegisterObserver(const std::string& game_name,
-                                          const std::string& observer_name,
+void ObserverRegisterer::RegisterObserver(std::string_view game_name,
+                                          std::string_view observer_name,
                                           CreateFunc creator) {
   auto key = std::pair(game_name, observer_name);
   if (observers().find(key) != observers().end()) {
@@ -351,13 +351,13 @@ std::shared_ptr<Observer> MakeSingleTensorObserver(
 }
 
 RegisterSingleTensorObserver::RegisterSingleTensorObserver(
-    const std::string& game_name) {
+    std::string_view game_name) {
   ObserverRegisterer single_tensor(game_name, "single_tensor",
                                    MakeSingleTensorObserver);
 }
 
 std::shared_ptr<Observer> ObserverRegisterer::CreateByName(
-    const std::string& observer_name,
+    std::string_view observer_name,
     const Game& game,
     absl::optional<IIGObservationType> iig_obs_type,
     const ObservationParams& params) {

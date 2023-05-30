@@ -60,9 +60,9 @@ class TarokGame : public Game {
   int MaxGameLength() const override;
 
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
   std::string GetRNGState() const override;
-  void SetRNGState(const std::string& rng_state) const override;
+  void SetRNGState(std::string_view rng_state) const override;
 
  private:
   friend class TarokState;
@@ -188,8 +188,8 @@ class TarokState : public State {
   static void MoveActionFromTo(Action action_id, std::vector<Action>* from,
                                std::vector<Action>* to);
   const Card& ActionToCard(Action action_id) const;
-  void AppendToAllInformationStates(const std::string& appendix);
-  void AppendToInformationState(Player player, const std::string& appendix);
+  void AppendToAllInformationStates(std::string_view appendix);
+  void AppendToInformationState(Player player, std::string_view appendix);
 
   std::shared_ptr<const TarokGame> tarok_parent_game_;
   int card_dealing_seed_ = kDefaultSeed;

@@ -359,14 +359,14 @@ class StonesNGemsGame : public Game {
   double MaxUtility() const override;
   std::vector<int> ObservationTensorShape() const override;
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
   std::string GetRNGState() const override;
-  void SetRNGState(const std::string& rng_state) const override;
+  void SetRNGState(std::string_view rng_state) const override;
 
   std::mt19937* rng() const { return &rng_; }
 
  protected:
-  Grid ParseGrid(const std::string& grid_string, double blob_max_percentage);
+  Grid ParseGrid(std::string_view grid_string, double blob_max_percentage);
 
  private:
   bool obs_show_ids_;         // Flag to show IDs in observation tensor

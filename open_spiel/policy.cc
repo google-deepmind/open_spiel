@@ -113,7 +113,7 @@ ActionsAndProbs FirstActionStatePolicy(const State& state, Player player) {
   return actions_and_probs;
 }
 
-std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
+std::unique_ptr<Policy> DeserializePolicy(std::string_view serialized,
                                           std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
@@ -135,7 +135,7 @@ TabularPolicy::TabularPolicy(const Game& game)
     : TabularPolicy(GetRandomPolicy(game)) {}
 
 std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
-    const std::string& serialized, std::string delimiter) {
+    std::string_view serialized, std::string delimiter) {
   // Class’s identity is the very first line, see Policy::Serialize
   // for more info.
   std::pair<std::string, absl::string_view> cls_and_content =
@@ -193,7 +193,7 @@ const std::string TabularPolicy::ToStringSorted() const {
 
   std::sort(keys.begin(), keys.end());
   std::string str = "";
-  for (const std::string& key : keys) {
+  for (std::string_view key : keys) {
     absl::StrAppend(&str, key, ": ");
     for (const auto& policy : policy_table_.at(key)) {
       absl::StrAppend(&str, " ", policy.first, "=", policy.second);
@@ -209,15 +209,15 @@ PartialTabularPolicy::PartialTabularPolicy()
       fallback_policy_(std::make_shared<UniformPolicy>()) {}
 
 PartialTabularPolicy::PartialTabularPolicy(
-      const std::unordered_map<std::string, ActionsAndProbs>& table)
+      const table_type& table)
     : TabularPolicy(table),
       fallback_policy_(std::make_shared<UniformPolicy>()) {}
 
 PartialTabularPolicy::PartialTabularPolicy(
-      const std::unordered_map<std::string, ActionsAndProbs>& table,
+      const table_type& table,
       std::shared_ptr<Policy> fallback_policy)
     : TabularPolicy(table),
-      fallback_policy_(fallback_policy) {}
+      fallback_policy_(std::move(fallback_policy)) {}
 
 ActionsAndProbs PartialTabularPolicy::GetStatePolicy(const State& state) const {
   auto iter = policy_table_.find(state.InformationStateString());
@@ -250,10 +250,10 @@ ActionsAndProbs PartialTabularPolicy::GetStatePolicy(std::string_view info_state
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
                                     bool initialize_to_uniform,
                                     Player player) {
-  std::unordered_map<std::string, ActionsAndProbs> policy;
+  TabularPolicy::table_type policy;
   if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError("Game is not sequential.");
-    return TabularPolicy(policy);
+    return policy;
   }
   std::list<std::unique_ptr<State>> to_visit;
   to_visit.push_back(game.NewInitialState());
@@ -292,7 +292,7 @@ TabularPolicy GetEmptyTabularPolicy(const Game& game,
       }
     }
   }
-  return TabularPolicy(policy);
+  return policy;
 }
 
 TabularPolicy GetUniformPolicy(const Game& game) {
@@ -304,7 +304,7 @@ TabularPolicy SamplePolicy(
   const Game& game, int seed, RandomNumberDistribution& dist, Player player) {
   std::mt19937 gen(seed);
   TabularPolicy policy = GetEmptyTabularPolicy(game, false, player);
-  std::unordered_map<std::string, ActionsAndProbs>& policy_table =
+  TabularPolicy::table_type& policy_table =
       policy.PolicyTable();
   for (auto& kv : policy_table) {
     ActionsAndProbs state_policy;
@@ -352,10 +352,10 @@ TabularPolicy GetRandomDeterministicPolicy(
     const Game& game, int seed, Player player) {
   std::mt19937 gen(seed);
   std::unordered_map<int, std::uniform_int_distribution<int>> dists;
-  std::unordered_map<std::string, ActionsAndProbs> policy;
+  TabularPolicy::table_type policy;
   if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError("Game is not sequential.");
-    return TabularPolicy(policy);
+    return policy;
   }
   const GameType::Information information = game.GetType().information;
   std::list<std::unique_ptr<State>> to_visit;
@@ -375,7 +375,7 @@ TabularPolicy GetRandomDeterministicPolicy(
       SPIEL_CHECK_GT(num_legal_actions, 0.);
       if (dists.count(num_legal_actions) == 0) {
         std::uniform_int_distribution<int> dist(0, num_legal_actions - 1);
-        dists.insert({num_legal_actions, std::move(dist)});
+        dists.insert({num_legal_actions, dist});
       }
       const int legal_action_index = dists[num_legal_actions](gen);
       SPIEL_CHECK_GE(legal_action_index, 0);
@@ -383,7 +383,7 @@ TabularPolicy GetRandomDeterministicPolicy(
       const int action = legal_actions[legal_action_index];
       ActionsAndProbs infostate_policy;
       infostate_policy.reserve(1);
-      infostate_policy.push_back({action, 1.0});
+      infostate_policy.emplace_back(action, 1.0);
       policy.insert({state->InformationStateString(), infostate_policy});
       if (information == GameType::Information::kPerfectInformation) {
         to_visit.push_back(state->Child(action));
@@ -401,14 +401,14 @@ TabularPolicy GetRandomDeterministicPolicy(
       }
     }
   }
-  return TabularPolicy(policy);
+  return policy;
 }
 
 TabularPolicy GetFirstActionPolicy(const Game& game) {
-  std::unordered_map<std::string, ActionsAndProbs> policy;
+  TabularPolicy::table_type  policy;
   if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError("Game is not sequential.");
-    return TabularPolicy(policy);
+    return policy;
   }
   std::vector<std::unique_ptr<State>> to_visit;
   to_visit.push_back(game.NewInitialState());
@@ -434,10 +434,10 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
         to_visit.push_back(state->Child(action));
         if (!first_legal_action_found) {
           first_legal_action_found = true;
-          infostate_policy.push_back({action, 1.});
+          infostate_policy.emplace_back(action, 1.);
 
         } else {
-          infostate_policy.push_back({action, 0.});
+          infostate_policy.emplace_back(action, 0.);
         }
       }
       if (infostate_policy.empty()) {
@@ -446,7 +446,7 @@ TabularPolicy GetFirstActionPolicy(const Game& game) {
       policy[state->InformationStateString()] = std::move(infostate_policy);
     }
   }
-  return TabularPolicy(policy);
+  return policy;
 }
 
 ActionsAndProbs PreferredActionPolicy::GetStatePolicy(const State& state,

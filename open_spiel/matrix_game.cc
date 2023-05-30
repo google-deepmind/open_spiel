@@ -165,7 +165,7 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
 // Create a matrix game with the specified utilities and row/column names.
 // Utilities must be in row-major form.
 std::shared_ptr<const MatrixGame> CreateMatrixGame(
-    const std::string& short_name, const std::string& long_name,
+    std::string_view short_name, std::string_view long_name,
     const std::vector<std::string>& row_names,
     const std::vector<std::string>& col_names,
     const std::vector<std::vector<double>>& row_player_utils,
@@ -181,7 +181,7 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
 }
 
 std::shared_ptr<const MatrixGame> CreateMatrixGame(
-    const std::string& short_name, const std::string& long_name,
+    std::string_view short_name, std::string_view long_name,
     const std::vector<std::string>& row_names,
     const std::vector<std::string>& col_names,
     const std::vector<double>& flat_row_utils,
@@ -190,8 +190,8 @@ std::shared_ptr<const MatrixGame> CreateMatrixGame(
   GameType::Utility utility = GetUtilityType(flat_row_utils, flat_col_utils);
 
   GameType game_type{
-      /*short_name=*/short_name,
-      /*long_name=*/long_name,
+      /*short_name=*/std::string{short_name},
+      /*long_name=*/std::string{long_name},
       GameType::Dynamics::kSimultaneous,
       GameType::ChanceMode::kDeterministic,
       GameType::Information::kOneShot,

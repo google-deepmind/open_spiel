@@ -91,7 +91,7 @@ int TarokGame::MaxGameLength() const {
 }
 
 std::unique_ptr<State> TarokGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   std::unique_ptr<TarokState> state = NewInitialTarokState();
   if (str.empty()) return state;
 
@@ -118,9 +118,9 @@ std::string TarokGame::GetRNGState() const {
   return rng_stream.str();
 }
 
-void TarokGame::SetRNGState(const std::string& rng_state) const {
+void TarokGame::SetRNGState(std::string_view rng_state) const {
   if (rng_state.empty()) return;
-  std::istringstream rng_stream(rng_state);
+  std::istringstream rng_stream(std::string{rng_state});
   rng_stream >> rng_;
 }
 
@@ -1000,14 +1000,14 @@ const Card& TarokState::ActionToCard(Action action_id) const {
   return tarok_parent_game_->card_deck_.at(action_id);
 }
 
-void TarokState::AppendToAllInformationStates(const std::string& appendix) {
+void TarokState::AppendToAllInformationStates(std::string_view appendix) {
   for (int i = 0; i < num_players_; i++) {
     absl::StrAppend(&players_info_states_.at(i), appendix);
   }
 }
 
 void TarokState::AppendToInformationState(Player player,
-                                          const std::string& appendix) {
+                                          std::string_view appendix) {
   absl::StrAppend(&players_info_states_.at(player), appendix);
 }
 

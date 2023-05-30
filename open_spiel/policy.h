@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/serialization.h"
@@ -140,7 +141,7 @@ class Policy {
   }
 };
 
-std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
+std::unique_ptr<Policy> DeserializePolicy(std::string_view serialized,
                                           std::string delimiter = "<~>");
 
 // A tabular policy represented internally as a map. Note that this
@@ -151,10 +152,14 @@ std::unique_ptr<Policy> DeserializePolicy(const std::string& serialized,
 // in the open_spiel/python/policy.py file.
 class TabularPolicy : public Policy {
  public:
+  using table_type =
+      absl::node_hash_map<std::string, ActionsAndProbs, internal::StringHasher,
+                          internal::StringEq>;
+
   TabularPolicy() = default;
   TabularPolicy(const Game& game);  // Construct a uniform random policy.
   TabularPolicy(const TabularPolicy& other) = default;
-  TabularPolicy(const std::unordered_map<std::string, ActionsAndProbs>& table)
+  TabularPolicy(const table_type& table)
       : policy_table_(table) {}
 
   // Converts a policy to a TabularPolicy.
@@ -240,25 +245,26 @@ class TabularPolicy : public Policy {
   // Set the probability for action at the info state. If the info state is not
   // in the policy, it is added. If the action is not in the info state policy,
   // it is added. Otherwise it is modified.
-  void SetProb(const std::string& info_state, Action action, double prob) {
+  void SetProb(std::string_view info_state, Action action, double prob) {
     auto iter = policy_table_.find(info_state);
     if (iter == policy_table_.end()) {
-      auto iter_and_bool = policy_table_.insert({info_state, {}});
+      auto iter_and_bool =
+          policy_table_.emplace(std::string{info_state}, ActionsAndProbs{});
       iter = iter_and_bool.first;
     }
     open_spiel::SetProb(&(iter->second), action, prob);
   }
 
-  void SetStatePolicy(const std::string& info_state,
+  void SetStatePolicy(std::string_view info_state,
                       const ActionsAndProbs& state_policy) {
     policy_table_[info_state] = state_policy;
   }
 
-  std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() {
+  table_type& PolicyTable() {
     return policy_table_;
   }
 
-  const std::unordered_map<std::string, ActionsAndProbs>& PolicyTable() const {
+  const table_type& PolicyTable() const {
     return policy_table_;
   }
 
@@ -268,7 +274,7 @@ class TabularPolicy : public Policy {
   const std::string ToStringSorted() const;
 
  protected:
-  std::unordered_map<std::string, ActionsAndProbs> policy_table_;
+  table_type policy_table_;
 };
 
 // A partial tabular policy is one that is not entirely complete: only a subset
@@ -276,21 +282,23 @@ class TabularPolicy : public Policy {
 // a specific fallback policy is queried instead.
 class PartialTabularPolicy : public TabularPolicy {
  public:
+   using table_type =
+       absl::node_hash_map<std::string, ActionsAndProbs, internal::StringHasher,
+                           internal::StringEq>;
+
   // Creates an empty partial tabular policy with a uniform fallback policy.
   PartialTabularPolicy();
 
-  // Creates a partial tabular policy with the specified table with a uniform
-  // fallback policy.
-  PartialTabularPolicy(
-      const std::unordered_map<std::string, ActionsAndProbs>& table);
+   // Creates a partial tabular policy with the specified table with a uniform
+   // fallback policy.
+   PartialTabularPolicy(const table_type &table);
 
-  // Creates a partial tabular policy with the specified table with the
-  // specified fallback policy.
-  PartialTabularPolicy(
-      const std::unordered_map<std::string, ActionsAndProbs>& table,
-      std::shared_ptr<Policy> fallback_policy);
+   // Creates a partial tabular policy with the specified table with the
+   // specified fallback policy.
+   PartialTabularPolicy(const table_type &table,
+                        std::shared_ptr<Policy> fallback_policy);
 
-  // These retrieval methods are all modified in the same way: they first check
+   // These retrieval methods are all modified in the same way: they first check
   // if the key is in the table. If so, they return the state policy from the
   // table. Otherwise, they forward the call to the fallback policy.
   ActionsAndProbs GetStatePolicy(const State& state) const override;
@@ -303,7 +311,7 @@ class PartialTabularPolicy : public TabularPolicy {
 };
 
 std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
-    const std::string& serialized, std::string delimiter = "<~>");
+    std::string_view serialized, std::string delimiter = "<~>");
 
 // Chooses all legal actions with equal probability. This is equivalent to the
 // tabular version, except that this works for large games.

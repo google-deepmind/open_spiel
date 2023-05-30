@@ -57,7 +57,7 @@ bool AllActionsInOtherActions(const std::vector<Action>& actions,
   return true;
 }
 
-Action CardLongNameToAction(const std::string& long_name) {
+Action CardLongNameToAction(std::string_view long_name) {
   for (int i = 0; i < card_deck.size(); i++) {
     if (card_deck.at(i).long_name == long_name) return i;
   }

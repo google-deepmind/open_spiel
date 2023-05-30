@@ -81,7 +81,7 @@ Seat CharToSeat(char c) {
   SpielFatalError(absl::StrCat("Unknown hand '", std::string(1, c), "'"));
 }
 
-int StringToCard(const std::string& s) {
+int StringToCard(std::string_view s) {
   return CharToRank(s[1]) + kNumRanks * CharToTrumps(s[0]);
 }
 

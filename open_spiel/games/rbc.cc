@@ -233,7 +233,7 @@ class RbcObserver : public Observer {
 
   void WritePieces(chess::Color color, chess::PieceType piece_type,
                    const chess::ChessBoard& board, int sense_location,
-                   int sense_size, const std::string& prefix,
+                   int sense_size, std::string_view prefix,
                    Allocator* allocator) const {
     const std::string type_string = chess::PieceTypeToString(
         piece_type, /*uppercase=*/color == chess::Color::kWhite);
@@ -241,7 +241,7 @@ class RbcObserver : public Observer {
     int inner_size = board_size - sense_size + 1;
     chess::Square sense_square =
         chess::IndexToSquare(sense_location, inner_size);
-    auto out = allocator->Get(prefix + "_" + type_string + "_pieces",
+    auto out = allocator->Get(absl::StrCat(prefix, "_", type_string, "_pieces"),
                               {board_size, board_size});
 
     if (sense_location < 0) return;  // No sense window specified.
@@ -258,7 +258,7 @@ class RbcObserver : public Observer {
     }
   }
 
-  void WriteScalar(int val, int min, int max, const std::string& field_name,
+  void WriteScalar(int val, int min, int max, std::string_view field_name,
                    Allocator* allocator) const {
     SPIEL_DCHECK_LT(min, max);
     SPIEL_DCHECK_GE(val, min);
@@ -268,13 +268,13 @@ class RbcObserver : public Observer {
   }
 
   // Adds a binary scalar plane.
-  void WriteBinary(bool val, const std::string& field_name,
+  void WriteBinary(bool val, std::string_view field_name,
                    Allocator* allocator) const {
     WriteScalar(val ? 1 : 0, 0, 1, field_name, allocator);
   }
 
   void WritePrivateInfoTensor(const RbcState& state, int player,
-                              const std::string& prefix,
+                              std::string_view prefix,
                               Allocator* allocator) const {
     chess::Color color = chess::PlayerToColor(player);
 
@@ -293,10 +293,10 @@ class RbcObserver : public Observer {
     // Castling rights.
     WriteBinary(
         state.Board().CastlingRight(color, chess::CastlingDirection::kLeft),
-        prefix + "_left_castling", allocator);
+        absl::StrCat(prefix, "_left_castling"), allocator);
     WriteBinary(
         state.Board().CastlingRight(color, chess::CastlingDirection::kRight),
-        prefix + "_right_castling", allocator);
+        absl::StrCat(prefix, "_right_castling"), allocator);
 
     // Last sensing
     for (const chess::PieceType& piece_type : chess::kPieceTypes) {
@@ -309,7 +309,7 @@ class RbcObserver : public Observer {
                                : kSenseLocationNonSpecified;
       WritePieces(static_cast<chess::Color>(1 - player), piece_type,
                   state.Board(), sense_location, state.game()->sense_size(),
-                  prefix + "_sense", allocator);
+                  absl::StrCat(prefix, "_sense"), allocator);
     }
   }
 
@@ -341,7 +341,7 @@ class RbcObserver : public Observer {
 };
 
 RbcState::RbcState(std::shared_ptr<const Game> game, int board_size,
-                   const std::string& fen)
+                   std::string_view fen)
     : State(game),
       start_board_(*chess::ChessBoard::BoardFromFEN(
           fen, board_size,

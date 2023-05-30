@@ -66,7 +66,7 @@ void TestRepetitionDraw() {
 }
 
 // Helper function. Get the named tensor.
-SpanTensor GetSpanTensor(Observation& obs, const std::string& name) {
+SpanTensor GetSpanTensor(Observation& obs, std::string_view name) {
   for (SpanTensor span_tensor : obs.tensors()) {
     if (span_tensor.info().name() == name) return span_tensor;
   }
