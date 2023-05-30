@@ -196,10 +196,10 @@ std::unique_ptr<Bot> MakeFixedActionPreferenceBot(
 
 class BotRegisterer {
  public:
-  BotRegisterer(const std::string& bot_name,
+  BotRegisterer(std::string_view bot_name,
                 std::unique_ptr<BotFactory> factory);
 
-  static std::unique_ptr<Bot> CreateByName(const std::string& bot_name,
+  static std::unique_ptr<Bot> CreateByName(std::string_view bot_name,
                                            std::shared_ptr<const Game> game,
                                            Player player_id,
                                            const GameParameters& params);
@@ -208,8 +208,8 @@ class BotRegisterer {
   static std::vector<std::string> BotsThatCanPlayGame(const Game& game);
 
   static std::vector<std::string> RegisteredBots();
-  static bool IsBotRegistered(const std::string& bot_name);
-  static void RegisterBot(const std::string& bot_name,
+  static bool IsBotRegistered(std::string_view bot_name);
+  static void RegisterBot(std::string_view bot_name,
                           std::unique_ptr<BotFactory> factory);
 
  private:
@@ -217,14 +217,18 @@ class BotRegisterer {
   // initialization to the end of the program). Note that we do not just use
   // a static data member, as we want the map to be initialized before first
   // use.
-  static std::map<std::string, std::unique_ptr<BotFactory>>& factories() {
-    static std::map<std::string, std::unique_ptr<BotFactory>> impl;
+   static absl::btree_map<std::string, std::unique_ptr<BotFactory>,
+                          internal::StringCmp> &
+   factories() {
+    static absl::btree_map<std::string, std::unique_ptr<BotFactory>,
+                           internal::StringCmp>
+        impl;
     return impl;
-  }
+   }
 };
 
 // Returns true if the bot is registered, false otherwise.
-bool IsBotRegistered(const std::string& bot_name);
+bool IsBotRegistered(std::string_view bot_name);
 
 // Returns a list of registered bots' short names.
 std::vector<std::string> RegisteredBots();
@@ -241,12 +245,12 @@ std::vector<std::string> BotsThatCanPlayGame(const Game& game);
 // Returns a new bot from the specified string, which is the short
 // name plus optional parameters, e.g.
 // "fixed_action_preference(action_list=0;1;2;3)"
-std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+std::unique_ptr<Bot> LoadBot(std::string_view bot_name,
                              const std::shared_ptr<const Game>& game,
                              Player player_id);
 
 // Returns a new bot with the specified parameters.
-std::unique_ptr<Bot> LoadBot(const std::string& bot_name,
+std::unique_ptr<Bot> LoadBot(std::string_view bot_name,
                              const std::shared_ptr<const Game>& game,
                              Player player_id,
                              const GameParameters& bot_params);

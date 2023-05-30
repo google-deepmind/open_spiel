@@ -38,8 +38,8 @@ GameType::Utility GetUtilityType(
   bool identical = true;
   for (int i = 0; i < utils[0].size(); ++i) {
     double util_sum_i = 0;
-    for (int player = 0; player < utils.size(); ++player) {
-      util_sum_i += utils[player][i];
+    for (const auto & util : utils) {
+      util_sum_i += util[i];
     }
 
     if (i == 0) {
@@ -72,7 +72,7 @@ GameType::Utility GetUtilityType(
 }
 }  // namespace
 
-TensorState::TensorState(std::shared_ptr<const Game> game)
+TensorState::TensorState(const std::shared_ptr<const Game>& game)
     : NFGState(game),
       tensor_game_(static_cast<const TensorGame*>(game.get())) {}
 
@@ -107,7 +107,7 @@ std::shared_ptr<const TensorGame> CreateTensorGame(
 // Utilities must be in row-major form.
 
 std::shared_ptr<const TensorGame> CreateTensorGame(
-    const std::string& short_name, const std::string& long_name,
+    std::string_view short_name, std::string_view long_name,
     const std::vector<std::vector<std::string>>& action_names,
     const std::vector<std::vector<double>>& utils) {
   const int size =
@@ -122,8 +122,8 @@ std::shared_ptr<const TensorGame> CreateTensorGame(
   const GameType::Utility utility = GetUtilityType(utils);
 
   const GameType game_type{
-      /*short_name=*/short_name,
-      /*long_name=*/long_name,
+      /*short_name=*/std::string{short_name},
+      /*long_name=*/std::string{long_name},
       GameType::Dynamics::kSimultaneous,
       GameType::ChanceMode::kDeterministic,
       GameType::Information::kOneShot,

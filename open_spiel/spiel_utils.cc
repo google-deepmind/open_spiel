@@ -78,8 +78,8 @@ std::vector<int> UnrankActionMixedBase(Action action,
   return digits;
 }
 
-absl::optional<std::string> FindFile(const std::string& filename, int levels) {
-  std::string candidate_filename = filename;
+absl::optional<std::string> FindFile(std::string_view filename, int levels) {
+  std::string candidate_filename{filename};
   for (int i = 0; i <= levels; ++i) {
     if (i == 0) {
       std::ifstream file(candidate_filename.c_str());

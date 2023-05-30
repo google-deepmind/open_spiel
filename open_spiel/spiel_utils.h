@@ -166,7 +166,7 @@ int PreviousPlayerRoundRobin(Player player, int nplayers);
 // 3 and filename is my.txt, it will look for ./my.txt, ../my.txt, ../../my.txt,
 // and ../../../my.txt, return the first file found or absl::nullopt if not
 // found.
-absl::optional<std::string> FindFile(const std::string& filename, int levels);
+absl::optional<std::string> FindFile(std::string_view filename, int levels);
 
 // Normalizes the span.
 void Normalize(absl::Span<double> weights);
@@ -287,7 +287,7 @@ bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
       __FILE__, ":", __LINE__, " CHECK_TRUE(", #x, ")"))
 
 // A verbose checker that will print state info:
-// Use as SPIEL_CHECK_TRUE_WSI(bool cond, const std::string& error_message,
+// Use as SPIEL_CHECK_TRUE_WSI(bool cond, std::string_view error_message,
 //                             const Game& game_ref, const State& state_ref)
 #define SPIEL_CHECK_TRUE_WSI(x, e, g, s)                         \
   while (!(x))                                                   \

@@ -163,7 +163,7 @@ class TensorGame : public NormalFormGame {
 
 class TensorState : public NFGState {
  public:
-  explicit TensorState(std::shared_ptr<const Game> game);
+  explicit TensorState(const std::shared_ptr<const Game>& game);
   explicit TensorState(const TensorState&) = default;
 
   std::vector<Action> LegalActions(Player player) const override {
@@ -223,7 +223,7 @@ class TensorState : public NFGState {
 
 
 std::shared_ptr<const TensorGame> CreateTensorGame(
-    const std::string& short_name, const std::string& long_name,
+    std::string_view short_name, std::string_view long_name,
     const std::vector<std::vector<std::string>>& action_names,
     const std::vector<std::vector<double>>& utils);
 
