@@ -28,8 +28,8 @@ void BasicOwareTests() {
   testing::NoChanceOutcomesTest(*LoadGame("oware"));
 
   testing::RandomSimTest(
-      *LoadGame("oware", {{"num_houses_per_player", GameParameter(2)},
-                          {"num_seeds_per_house", GameParameter(2)}}),
+      *LoadGame("oware", {{"num_houses_per_player", MakeGameParameter(2)},
+                          {"num_seeds_per_house", MakeGameParameter(2)}}),
       10);
 }
 

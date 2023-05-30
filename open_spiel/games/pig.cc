@@ -57,11 +57,11 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"players", GameParameter(kDefaultPlayers)},
-        {"horizon", GameParameter(kDefaultHorizon)},
-        {"winscore", GameParameter(kDefaultWinScore)},
-        {"diceoutcomes", GameParameter(kDefaultDiceOutcomes)},
-        {"piglet", GameParameter(kDefaultPiglet)},
+        {"players", MakeGameParameter(kDefaultPlayers)},
+        {"horizon", MakeGameParameter(kDefaultHorizon)},
+        {"winscore", MakeGameParameter(kDefaultWinScore)},
+        {"diceoutcomes", MakeGameParameter(kDefaultDiceOutcomes)},
+        {"piglet", MakeGameParameter(kDefaultPiglet)},
     }};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {

@@ -40,7 +40,7 @@ void BasicPathfindingTests() {
   testing::RandomSimTest(*LoadGame("pathfinding"), 1);
   testing::RandomSimTest(
       *LoadGame("pathfinding",
-                {{"grid", GameParameter(kExampleMultiAgentGrid)}}),
+                {{"grid", MakeGameParameter(kExampleMultiAgentGrid)}}),
       1);
 }
 
@@ -51,7 +51,7 @@ void BasicCongestionSimulationTests() {
       "Cf.b*ag\n";
   std::shared_ptr<const Game> game = LoadGame(
       "pathfinding",
-      {{"grid", GameParameter(kSmallGrid)}, {"horizon", GameParameter(100)}});
+      {{"grid", MakeGameParameter(kSmallGrid)}, {"horizon", MakeGameParameter(100)}});
   testing::RandomSimTest(*game, 100);
 }
 
@@ -65,7 +65,7 @@ void ChainMovementTests() {
       "....f.....\n";
   std::shared_ptr<const Game> game = LoadGame(
       "pathfinding",
-      {{"grid", GameParameter(kGrid)}, {"horizon", GameParameter(100)}});
+      {{"grid", MakeGameParameter(kGrid)}, {"horizon", MakeGameParameter(100)}});
 
   std::unique_ptr<State> state = game->NewInitialState();
   auto* pf_state = static_cast<PathfindingState*>(state.get());
@@ -99,7 +99,7 @@ void BasicHeadOnCollisionTest() {
       "..........\n";
   std::shared_ptr<const Game> game = LoadGame(
       "pathfinding",
-      {{"grid", GameParameter(kGrid)}, {"horizon", GameParameter(100)}});
+      {{"grid", MakeGameParameter(kGrid)}, {"horizon", MakeGameParameter(100)}});
 
   std::unique_ptr<State> state = game->NewInitialState();
 
@@ -145,7 +145,7 @@ void HeadOnCollision3pTest() {
       "..........\n";
   std::shared_ptr<const Game> game = LoadGame(
       "pathfinding",
-      {{"grid", GameParameter(kGrid)}, {"horizon", GameParameter(100)}});
+      {{"grid", MakeGameParameter(kGrid)}, {"horizon", MakeGameParameter(100)}});
 
   std::unique_ptr<State> state = game->NewInitialState();
 
@@ -190,7 +190,7 @@ void HeadOnCollision4pTest() {
       "..........\n";
   std::shared_ptr<const Game> game = LoadGame(
       "pathfinding",
-      {{"grid", GameParameter(kGrid)}, {"horizon", GameParameter(100)}});
+      {{"grid", MakeGameParameter(kGrid)}, {"horizon", MakeGameParameter(100)}});
 
   std::unique_ptr<State> state = game->NewInitialState();
 
@@ -236,7 +236,7 @@ void WallCollision4pTest() {
       "..........\n";
   std::shared_ptr<const Game> game = LoadGame(
       "pathfinding",
-      {{"grid", GameParameter(kGrid)}, {"horizon", GameParameter(100)}});
+      {{"grid", MakeGameParameter(kGrid)}, {"horizon", MakeGameParameter(100)}});
 
   std::unique_ptr<State> state = game->NewInitialState();
   std::string state_str = state->ToString();

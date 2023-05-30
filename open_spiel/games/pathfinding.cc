@@ -54,12 +54,12 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"horizon", GameParameter(kDefaultHorizon)},
-     {"grid", GameParameter(std::string(kDefaultSingleAgentGrid))},
-     {"group_reward", GameParameter(kDefaultGroupReward)},
-     {"players", GameParameter(kDefaultNumPlayers)},
-     {"solve_reward", GameParameter(kDefaultSolveReward)},
-     {"step_reward", GameParameter(kDefaultStepReward)}}};
+    {{"horizon", MakeGameParameter(kDefaultHorizon)},
+     {"grid", MakeGameParameter(std::string(kDefaultSingleAgentGrid))},
+     {"group_reward", MakeGameParameter(kDefaultGroupReward)},
+     {"players", MakeGameParameter(kDefaultNumPlayers)},
+     {"solve_reward", MakeGameParameter(kDefaultSolveReward)},
+     {"step_reward", MakeGameParameter(kDefaultStepReward)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PathfindingGame(params));

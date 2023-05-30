@@ -30,7 +30,7 @@ constexpr float kKomi = 7.5;
 
 void BasicGoTests() {
   GameParameters params;
-  params["board_size"] = GameParameter(9);
+  params["board_size"] = MakeGameParameter(9);
 
   testing::LoadGameTest("phantom_go");
   testing::NoChanceOutcomesTest(*LoadGame("phantom_go"));
@@ -40,7 +40,7 @@ void BasicGoTests() {
 
 void CloneTest() {
   GameParameters params;
-  params["board_size"] = GameParameter(kBoardSize);
+  params["board_size"] = MakeGameParameter(kBoardSize);
   std::shared_ptr<const Game> game = LoadGame("phantom_go", params);
   PhantomGoState state(game, kBoardSize, kKomi, 0);
   state.ApplyAction(5);
@@ -58,9 +58,9 @@ void CloneTest() {
 
 void HandicapTest() {
   std::shared_ptr<const Game> game = LoadGame(
-      "phantom_go", {{"board_size", open_spiel::GameParameter(kBoardSize)},
-                     {"komi", open_spiel::GameParameter(kKomi)},
-                     {"handicap", open_spiel::GameParameter(1)}});
+      "phantom_go", {{"board_size", open_spiel::MakeGameParameter(kBoardSize)},
+                     {"komi", open_spiel::MakeGameParameter(kKomi)},
+                     {"handicap", open_spiel::MakeGameParameter(1)}});
   PhantomGoState state(game, kBoardSize, kKomi, 2);
   SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("d4")), GoColor::kBlack);
@@ -68,7 +68,7 @@ void HandicapTest() {
 
 void IllegalMoveTest() {
   GameParameters params;
-  params["board_size"] = GameParameter(kBoardSize);
+  params["board_size"] = MakeGameParameter(kBoardSize);
   std::shared_ptr<const Game> game = LoadGame("phantom_go", params);
   PhantomGoState state(game, kBoardSize, kKomi, 0);
   SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kBlack));
@@ -80,7 +80,7 @@ void IllegalMoveTest() {
 
 void StoneCountTest() {
   GameParameters params;
-  params["board_size"] = GameParameter(kBoardSize);
+  params["board_size"] = MakeGameParameter(kBoardSize);
   std::shared_ptr<const Game> game = LoadGame("phantom_go", params);
   PhantomGoState state(game, kBoardSize, kKomi, 0);
   SPIEL_CHECK_EQ(state.board().GetStoneCount()[(uint8_t)GoColor::kBlack], 0);
@@ -95,7 +95,7 @@ void StoneCountTest() {
 
 void ConcreteActionsAreUsedInTheAPI() {
   std::shared_ptr<const Game> game = LoadGame(
-      "phantom_go", {{"board_size", open_spiel::GameParameter(kBoardSize)}});
+      "phantom_go", {{"board_size", open_spiel::MakeGameParameter(kBoardSize)}});
   std::unique_ptr<State> state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->NumDistinctActions(), kBoardSize * kBoardSize + 1);

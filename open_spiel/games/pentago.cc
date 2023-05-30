@@ -41,7 +41,7 @@ const GameType kGameType{/*short_name=*/"pentago",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"ansi_color_output", GameParameter(false)},
+                             {"ansi_color_output", MakeGameParameter(false)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

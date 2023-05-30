@@ -52,7 +52,7 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
+    {{"obstype", MakeGameParameter(std::string(kDefaultObsType))}}};
 
 const GameType kImperfectRecallGameType{
     /*short_name=*/"phantom_ttt_ir",
@@ -69,7 +69,7 @@ const GameType kImperfectRecallGameType{
     /*provides_observation_string=*/false,
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
+    {{"obstype", MakeGameParameter(std::string(kDefaultObsType))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PhantomTTTGame(params, kGameType));

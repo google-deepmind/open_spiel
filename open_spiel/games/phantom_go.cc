@@ -41,15 +41,15 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"komi", GameParameter(7.5)},
-     {"board_size", GameParameter(9)},
-     {"handicap", GameParameter(0)},
+    {{"komi", MakeGameParameter(7.5)},
+     {"board_size", MakeGameParameter(9)},
+     {"handicap", MakeGameParameter(0)},
      // After the maximum game length, the game will end arbitrarily and the
      // score is computed as usual (i.e. number of stones + komi).
      // It's advised to only use shorter games to compute win-rates.
      // When not provided, it defaults to DefaultMaxGameLength(board_size)
      {"max_game_length",
-      GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
+      MakeGameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)}},
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {

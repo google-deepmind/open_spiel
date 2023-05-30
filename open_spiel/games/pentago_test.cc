@@ -29,7 +29,7 @@ void BasicPentagoTests() {
 
   // Ansi colors!
   testing::RandomSimTest(
-      *LoadGame("pentago", {{"ansi_color_output", GameParameter(true)}}), 1);
+      *LoadGame("pentago", {{"ansi_color_output", MakeGameParameter(true)}}), 1);
   testing::RandomSimTest(*LoadGame("pentago(ansi_color_output=True)"), 10);
 }
 

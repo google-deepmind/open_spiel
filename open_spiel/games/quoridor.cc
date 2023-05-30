@@ -46,12 +46,12 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"board_size", GameParameter(kDefaultBoardSize)},
+        {"board_size", MakeGameParameter(kDefaultBoardSize)},
         // A default will be computed from the board_size
         {"wall_count",
-         GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
-        {"ansi_color_output", GameParameter(false)},
-        {"players", GameParameter(kMinNumPlayers, false)},
+         MakeGameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
+        {"ansi_color_output", MakeGameParameter(false)},
+        {"players", MakeGameParameter(kMinNumPlayers, false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

@@ -39,8 +39,8 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"num_houses_per_player", GameParameter(kDefaultHousesPerPlayer)},
-     {"num_seeds_per_house", GameParameter(kDdefaultSeedsPerHouse)}}};
+    {{"num_houses_per_player", MakeGameParameter(kDefaultHousesPerPlayer)},
+     {"num_seeds_per_house", MakeGameParameter(kDdefaultSeedsPerHouse)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new OwareGame(params));

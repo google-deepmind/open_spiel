@@ -27,10 +27,10 @@ void BasicPigTests() {
   testing::RandomSimTest(*LoadGame("pig"), 100);
   for (Player players = 3; players <= 5; players++) {
     testing::RandomSimTest(
-        *LoadGame("pig", {{"players", GameParameter(players)}}), 100);
+        *LoadGame("pig", {{"players", MakeGameParameter(players)}}), 100);
   }
-  testing::RandomSimTest(*LoadGame("pig", {{"winscore", GameParameter(25)},
-                                           {"piglet", GameParameter(true)}}),
+  testing::RandomSimTest(*LoadGame("pig", {{"winscore", MakeGameParameter(25)},
+                                           {"piglet", MakeGameParameter(true)}}),
                          100);
 }
 
