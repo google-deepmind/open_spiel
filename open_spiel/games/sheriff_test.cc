@@ -34,12 +34,12 @@ namespace testing = open_spiel::testing;
 void BasicSheriffTest() {
   for (int num_rounds = 1; num_rounds <= 6; ++num_rounds) {
     const std::shared_ptr<const Game> game =
-        LoadGame("sheriff", {{"item_penalty", GameParameter(2.0)},
-                             {"item_value", GameParameter(1.5)},
-                             {"sheriff_penalty", GameParameter(3.14)},
-                             {"max_bribe", GameParameter(10)},
-                             {"max_items", GameParameter(10)},
-                             {"num_rounds", GameParameter(num_rounds)}});
+        LoadGame("sheriff", {{"item_penalty", MakeGameParameter(2.0)},
+                             {"item_value", MakeGameParameter(1.5)},
+                             {"sheriff_penalty", MakeGameParameter(3.14)},
+                             {"max_bribe", MakeGameParameter(10)},
+                             {"max_items", MakeGameParameter(10)},
+                             {"num_rounds", MakeGameParameter(num_rounds)}});
     testing::RandomSimTestWithUndo(*game, 100);
     testing::NoChanceOutcomesTest(*game);
   }
@@ -112,9 +112,9 @@ void TestGameSizes() {
          const uint32_t num_rounds) -> std::shared_ptr<const Game> {
     return LoadGame(
         "sheriff",
-        {{"max_bribe", GameParameter(static_cast<int>(max_bribe))},
-         {"max_items", GameParameter(static_cast<int>(max_items))},
-         {"num_rounds", GameParameter(static_cast<int>(num_rounds))}});
+        {{"max_bribe", MakeGameParameter(static_cast<int>(max_bribe))},
+         {"max_items", MakeGameParameter(static_cast<int>(max_items))},
+         {"num_rounds", MakeGameParameter(static_cast<int>(num_rounds))}});
   };
 
   GameSize size = ComputeGameSize(ConstructInstance(3, 3, 1));

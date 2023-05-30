@@ -180,7 +180,7 @@ void TestPawnBreachingMoveTwoSquares() {
 
 void BasicRbcTests(int board_size) {
   GameParameters params;
-  params["board_size"] = GameParameter(board_size);
+  params["board_size"] = MakeGameParameter(board_size);
 
   testing::LoadGameTest("rbc");
   testing::NoChanceOutcomesTest(*LoadGame("rbc", params));

@@ -44,11 +44,11 @@ void BasicStonesNGemsTestsWithParams() {
 
   testing::ChanceOutcomesTest(
       *LoadGame("stones_and_gems",
-                {{"magic_wall_steps", GameParameter(20)},
-                 {"blob_chance", GameParameter(50)},
-                 {"blob_max_percentage", GameParameter(0.25)},
-                 {"rng_seed", GameParameter(1)},
-                 {"grid", GameParameter(std::string(kTestDefaultGrid))}}));
+                {{"magic_wall_steps", MakeGameParameter(20)},
+                 {"blob_chance", MakeGameParameter(50)},
+                 {"blob_max_percentage", MakeGameParameter(0.25)},
+                 {"rng_seed", MakeGameParameter(1)},
+                 {"grid", MakeGameParameter(std::string(kTestDefaultGrid))}}));
 }
 
 void ExtendedStonesNGemsTest() {
@@ -120,12 +120,12 @@ void ExtendedStonesNGemsTest() {
 
   std::shared_ptr<const Game> game =
       LoadGame("stones_and_gems",
-               {{"magic_wall_steps", GameParameter(20)},
-                {"blob_chance", GameParameter(50)},
-                {"blob_max_percentage", GameParameter(0.25)},
-                {"rng_seed", GameParameter(1)},
-                {"grid", GameParameter(std::string(kTestDefaultGrid))},
-                {"obs_show_ids", GameParameter(true)}});
+               {{"magic_wall_steps", MakeGameParameter(20)},
+                {"blob_chance", MakeGameParameter(50)},
+                {"blob_max_percentage", MakeGameParameter(0.25)},
+                {"rng_seed", MakeGameParameter(1)},
+                {"grid", MakeGameParameter(std::string(kTestDefaultGrid))},
+                {"obs_show_ids", MakeGameParameter(true)}});
   std::unique_ptr<State> state = game->NewInitialState();
 
   // Check max utility

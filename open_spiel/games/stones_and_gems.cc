@@ -417,12 +417,12 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obs_show_ids", GameParameter(kDefaultObsShowIDs)},
-     {"magic_wall_steps", GameParameter(kDefaultMagicWallSteps)},
-     {"blob_chance", GameParameter(kDefaultBlobChance)},
-     {"blob_max_percentage", GameParameter(kDefaultBlobMaxPercentage)},
-     {"rng_seed", GameParameter(0)},
-     {"grid", GameParameter(std::string(kDefaultGrid))}}};
+    {{"obs_show_ids", MakeGameParameter(kDefaultObsShowIDs)},
+     {"magic_wall_steps", MakeGameParameter(kDefaultMagicWallSteps)},
+     {"blob_chance", MakeGameParameter(kDefaultBlobChance)},
+     {"blob_max_percentage", MakeGameParameter(kDefaultBlobMaxPercentage)},
+     {"rng_seed", MakeGameParameter(0)},
+     {"grid", MakeGameParameter(std::string(kDefaultGrid))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
   return std::shared_ptr<const Game>(new StonesNGemsGame(params));

@@ -93,7 +93,7 @@ void BasicGameTests() {
 
 // cards tests
 void CardDeckShufflingSeedTest() {
-  auto game = NewTarokGame(GameParameters({{"rng_seed", GameParameter(0)}}));
+  auto game = NewTarokGame(GameParameters({{"rng_seed", MakeGameParameter(0)}}));
 
   // subsequent shuffles within the same game should be different
   auto state1 = game->NewInitialTarokState();
@@ -102,7 +102,7 @@ void CardDeckShufflingSeedTest() {
   state2->ApplyAction(0);
   SPIEL_CHECK_NE(state1->PlayerCards(0), state2->PlayerCards(0));
 
-  game = NewTarokGame(GameParameters({{"rng_seed", GameParameter(0)}}));
+  game = NewTarokGame(GameParameters({{"rng_seed", MakeGameParameter(0)}}));
   // shuffles should be the same when recreating a game with the same seed
   auto state3 = game->NewInitialTarokState();
   state3->ApplyAction(0);
@@ -392,7 +392,7 @@ void BiddingPhase3PlayersTest4() {
 
 void BiddingPhase4PlayersTest1() {
   // scenario: all players pass
-  auto game = NewTarokGame(GameParameters({{"players", GameParameter(4)}}));
+  auto game = NewTarokGame(GameParameters({{"players", MakeGameParameter(4)}}));
   auto state = game->NewInitialTarokState();
   state->ApplyAction(kDealCardsAction);
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kBidding);
@@ -441,7 +441,7 @@ void BiddingPhase4PlayersTest1() {
 
 void BiddingPhase4PlayersTest2() {
   // scenario: forehand bids one, player 2 bids one, others pass
-  auto game = NewTarokGame(GameParameters({{"players", GameParameter(4)}}));
+  auto game = NewTarokGame(GameParameters({{"players", MakeGameParameter(4)}}));
   auto state = game->NewInitialTarokState();
   state->ApplyAction(kDealCardsAction);
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kBidding);
@@ -505,7 +505,7 @@ void BiddingPhase4PlayersTest2() {
 void BiddingPhase4PlayersTest3() {
   // scenario: player 1 bids solo three, player 3 eventually bids solo one,
   // others pass
-  auto game = NewTarokGame(GameParameters({{"players", GameParameter(4)}}));
+  auto game = NewTarokGame(GameParameters({{"players", MakeGameParameter(4)}}));
   auto state = game->NewInitialTarokState();
   state->ApplyAction(kDealCardsAction);
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kBidding);
@@ -567,7 +567,7 @@ void BiddingPhase4PlayersTest3() {
 
 void BiddingPhase4PlayersTest4() {
   // scenario: player 2 bids beggar, others pass
-  auto game = NewTarokGame(GameParameters({{"players", GameParameter(4)}}));
+  auto game = NewTarokGame(GameParameters({{"players", MakeGameParameter(4)}}));
   auto state = game->NewInitialTarokState();
   state->ApplyAction(kDealCardsAction);
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kBidding);
@@ -620,7 +620,7 @@ void BiddingPhase4PlayersTest4() {
 void BiddingPhase4PlayersTest5() {
   // scenario: forehand passes, player 1 bids open beggar, player 2 bids colour
   // valat without, player 3 bids valat without
-  auto game = NewTarokGame(GameParameters({{"players", GameParameter(4)}}));
+  auto game = NewTarokGame(GameParameters({{"players", MakeGameParameter(4)}}));
   auto state = game->NewInitialTarokState();
   state->ApplyAction(kDealCardsAction);
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kBidding);
@@ -871,7 +871,7 @@ void TalonExchangePhaseTest6() {
 void TalonExchangePhaseTest7() {
   // check that taroks and kings cannot be exchanged
   auto state =
-      StateAfterActions(GameParameters({{"rng_seed", GameParameter(42)}}),
+      StateAfterActions(GameParameters({{"rng_seed", MakeGameParameter(42)}}),
                         {kDealCardsAction, kBidPassAction, kBidOneAction,
                          kBidPassAction, kBidOneAction, 1});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
@@ -888,8 +888,8 @@ void TalonExchangePhaseTest7() {
 void TalonExchangePhaseTest8() {
   // check that tarok can be exchanged if player has no other choice
   auto state =
-      StateAfterActions(GameParameters({{"players", GameParameter(4)},
-                                        {"rng_seed", GameParameter(141750)}}),
+      StateAfterActions(GameParameters({{"players", MakeGameParameter(4)},
+                                        {"rng_seed", MakeGameParameter(141750)}}),
                         {kDealCardsAction, kBidPassAction, kBidPassAction,
                          kBidPassAction, kBidSoloTwoAction});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTalonExchange);
@@ -923,7 +923,7 @@ void TalonExchangePhaseTest8() {
 
 // tricks playing phase tests
 static inline const GameParameters kTricksPlayingGameParams = GameParameters(
-    {{"players", GameParameter(3)}, {"rng_seed", GameParameter(634317)}});
+    {{"players", MakeGameParameter(3)}, {"rng_seed", MakeGameParameter(634317)}});
 
 // the above "rng_seed" yields:
 //
@@ -1215,7 +1215,7 @@ void TricksPlayingPhaseTest7() {
 void CapturedMondTest1() {
   // mond captured by skis
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(634317)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 0, 49});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
@@ -1237,7 +1237,7 @@ void CapturedMondTest1() {
 void CapturedMondTest2() {
   // mond captured by pagat (emperor trick)
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(634317)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 0, 49});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
@@ -1259,7 +1259,7 @@ void CapturedMondTest2() {
 void CapturedMondTest3() {
   // mond taken from talon
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(497200)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(497200)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 3, 49});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
@@ -1271,7 +1271,7 @@ void CapturedMondTest3() {
 void CapturedMondTest4() {
   // mond left in talon
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(497200)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(497200)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOneAction, 0, 49});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOne);
@@ -1284,7 +1284,7 @@ void CapturedMondTest5() {
   // mond left in talon but won with a called king
   auto state = StateAfterActions(
       GameParameters(
-          {{"players", GameParameter(4)}, {"rng_seed", GameParameter(297029)}}),
+          {{"players", MakeGameParameter(4)}, {"rng_seed", MakeGameParameter(297029)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidPassAction,
        kBidOneAction, kKingOfSpadesAction, 2, 49});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
@@ -1309,7 +1309,7 @@ void CapturedMondTest5() {
 void CapturedMondTest6() {
   // mond captured by ally should also be penalized
   auto state =
-      StateAfterActions(GameParameters({{"rng_seed", GameParameter(634317)}}),
+      StateAfterActions(GameParameters({{"rng_seed", MakeGameParameter(634317)}}),
                         {kDealCardsAction, kBidPassAction, kBidOneAction,
                          kBidPassAction, kBidOneAction, 0, 22});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
@@ -1332,7 +1332,7 @@ void CapturedMondTest6() {
 void CapturedMondTest7() {
   // mond captured in klop should not be penalized
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(634317)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidKlopAction});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kKlop);
@@ -1354,7 +1354,7 @@ void CapturedMondTest7() {
 void CapturedMondTest8() {
   // mond captured in bagger should not be penalized
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(634317)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidBeggarAction});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kBeggar);
@@ -1376,7 +1376,7 @@ void CapturedMondTest8() {
 void CapturedMondTest9() {
   // mond captured in open bagger should not be penalized
   auto state = StateAfterActions(
-      GameParameters({{"rng_seed", GameParameter(634317)}}),
+      GameParameters({{"rng_seed", MakeGameParameter(634317)}}),
       {kDealCardsAction, kBidPassAction, kBidPassAction, kBidOpenBeggarAction});
   SPIEL_CHECK_EQ(state->CurrentGamePhase(), GamePhase::kTricksPlaying);
   SPIEL_CHECK_EQ(state->SelectedContractName(), ContractName::kOpenBeggar);

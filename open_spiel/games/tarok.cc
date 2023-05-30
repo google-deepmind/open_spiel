@@ -37,8 +37,8 @@ const GameType kGameType{"tarok",            // short_name
                          false,  // provides_observation_string
                          false,  // provides_observation_tensor
                          // parameter_specification
-                         {{"players", GameParameter(kDefaultNumPLayers)},
-                          {"rng_seed", GameParameter(kDefaultSeed)}}};
+                         {{"players", MakeGameParameter(kDefaultNumPLayers)},
+                          {"rng_seed", MakeGameParameter(kDefaultSeed)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TarokGame(params));

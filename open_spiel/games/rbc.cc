@@ -45,9 +45,9 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"board_size", GameParameter(8)},
-     {"sense_size", GameParameter(3)},
-     {"fen", GameParameter(GameParameter::Type::kString, false)}}};
+    {{"board_size", MakeGameParameter(8)},
+     {"sense_size", MakeGameParameter(3)},
+     {"fen", MakeGameParameter(GameParameter::Type::kString, false)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::make_shared<RbcGame>(params);

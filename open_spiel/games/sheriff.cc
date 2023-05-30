@@ -42,12 +42,12 @@ const GameType kGameType{
     /* provides_observation_string = */ false,
     /* provides_observation_tensor = */ false,
     /* parameter_specification = */
-    {{"item_penalty", GameParameter(kDefaultItemPenalty)},
-     {"item_value", GameParameter(kDefaultItemValue)},
-     {"sheriff_penalty", GameParameter(kDefaultSheriffPenalty)},
-     {"max_bribe", GameParameter(kDefaultMaxBribe)},
-     {"max_items", GameParameter(kDefaultMaxItems)},
-     {"num_rounds", GameParameter(kDefaultNumRounds)}}};
+    {{"item_penalty", MakeGameParameter(kDefaultItemPenalty)},
+     {"item_value", MakeGameParameter(kDefaultItemValue)},
+     {"sheriff_penalty", MakeGameParameter(kDefaultSheriffPenalty)},
+     {"max_bribe", MakeGameParameter(kDefaultMaxBribe)},
+     {"max_items", MakeGameParameter(kDefaultMaxItems)},
+     {"num_rounds", MakeGameParameter(kDefaultNumRounds)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::make_shared<const SheriffGame>(params);

@@ -35,9 +35,9 @@ const GameType kGameType{/*short_name=*/"solitaire",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"players", GameParameter(kDefaultPlayers)},
-                          {"is_colored", GameParameter(kDefaultIsColored)},
-                          {"depth_limit", GameParameter(kDefaultDepthLimit)}}};
+                         {{"players", MakeGameParameter(kDefaultPlayers)},
+                          {"is_colored", MakeGameParameter(kDefaultIsColored)},
+                          {"depth_limit", MakeGameParameter(kDefaultDepthLimit)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new SolitaireGame(params));
@@ -945,8 +945,8 @@ SolitaireState::SolitaireState(std::shared_ptr<const Game> game)
     : State(game), waste_() {
   // Extract parameters from `game`
   auto parameters = game->GetParameters();
-  is_colored_ = parameters.at("is_colored").bool_value();
-  depth_limit_ = parameters.at("depth_limit").int_value();
+  is_colored_ = parameters.at("is_colored")->bool_value();
+  depth_limit_ = parameters.at("depth_limit")->int_value();
 
   // Create foundations_
   for (const auto& suit_ : kSuits) {

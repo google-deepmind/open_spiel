@@ -43,13 +43,13 @@ void BasicQuoridorTests() {
 
   // Ansi colors!
   testing::RandomSimTest(
-      *LoadGame("quoridor", {{"board_size", GameParameter(9)},
-                             {"ansi_color_output", GameParameter(true)}}),
+      *LoadGame("quoridor", {{"board_size", MakeGameParameter(9)},
+                             {"ansi_color_output", MakeGameParameter(true)}}),
       3);
   testing::RandomSimTest(
-      *LoadGame("quoridor", {{"board_size", GameParameter(9)},
-                             {"ansi_color_output", GameParameter(true)},
-                             {"players", GameParameter(3)}}),
+      *LoadGame("quoridor", {{"board_size", MakeGameParameter(9)},
+                             {"ansi_color_output", MakeGameParameter(true)},
+                             {"players", MakeGameParameter(3)}}),
       3);
   testing::RandomSimTest(
       *LoadGame("quoridor(board_size=5,ansi_color_output=True)"), 3);
