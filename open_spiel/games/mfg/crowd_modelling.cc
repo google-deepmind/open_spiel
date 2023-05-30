@@ -47,8 +47,8 @@ const GameType kGameType{/*short_name=*/"mfg_crowd_modelling",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"size", GameParameter(kDefaultSize)},
-                          {"horizon", GameParameter(kDefaultHorizon)}},
+                         {{"size", MakeGameParameter(kDefaultSize)},
+                          {"horizon", MakeGameParameter(kDefaultHorizon)}},
                          /*default_loadable*/true,
                          /*provides_factored_observation_string*/false};
 

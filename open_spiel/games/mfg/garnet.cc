@@ -50,13 +50,13 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"size", GameParameter(kDefaultSize)},
-     {"horizon", GameParameter(kDefaultHorizon)},
-     {"seed", GameParameter(kDefaultSeed)},
-     {"num_action", GameParameter(kDefaultNumActions)},
-     {"num_chance_action", GameParameter(kDefaultNumChanceActions)},
-     {"sparsity_factor", GameParameter(kDefaultSparsityFactor)},
-     {"eta", GameParameter(kDefaultEta)}},
+    {{"size", MakeGameParameter(kDefaultSize)},
+     {"horizon", MakeGameParameter(kDefaultHorizon)},
+     {"seed", MakeGameParameter(kDefaultSeed)},
+     {"num_action", MakeGameParameter(kDefaultNumActions)},
+     {"num_chance_action", MakeGameParameter(kDefaultNumChanceActions)},
+     {"sparsity_factor", MakeGameParameter(kDefaultSparsityFactor)},
+     {"eta", MakeGameParameter(kDefaultEta)}},
     /*default_loadable*/ true,
     /*provides_factored_observation_string*/ false};
 

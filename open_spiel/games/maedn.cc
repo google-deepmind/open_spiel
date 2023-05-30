@@ -56,8 +56,8 @@ const GameType kGameType{/*short_name=*/"maedn",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"players", GameParameter(2)},
-                             {"twoPlayersOpposite", GameParameter(true)},
+                             {"players", MakeGameParameter(2)},
+                             {"twoPlayersOpposite", MakeGameParameter(true)},
                          }};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {

@@ -28,15 +28,15 @@ void BasicMaednTests() {
   testing::LoadGameTest("maedn");
 
   std::shared_ptr<const Game> game =
-      LoadGame("maedn", {{"players", GameParameter(2)},
-                         {"twoPlayersOpposite", GameParameter(true)}});
+      LoadGame("maedn", {{"players", MakeGameParameter(2)},
+                         {"twoPlayersOpposite", MakeGameParameter(true)}});
 
   testing::RandomSimTest(*game, 100);
   testing::RandomSimTestWithUndo(*game, 100);
 
   for (int players = 2; players <= 4; players++) {
-    game = LoadGame("maedn", {{"players", GameParameter(players)},
-                              {"twoPlayersOpposite", GameParameter(false)}});
+    game = LoadGame("maedn", {{"players", MakeGameParameter(players)},
+                              {"twoPlayersOpposite", MakeGameParameter(false)}});
 
     testing::RandomSimTest(*game, 100);
     testing::RandomSimTestWithUndo(*game, 100);
@@ -203,8 +203,8 @@ const char* MINIMAL_WINS_EXPECTED_TERMINAL_STATES[] = {
 void PlayMinimalGameToWin(int players, bool twoPlayersOpposite, int ply,
                           int terminalStateScenarioNumber) {
   std::shared_ptr<const Game> game = LoadGame(
-      "maedn", {{"players", GameParameter(players)},
-                {"twoPlayersOpposite", GameParameter(twoPlayersOpposite)}});
+      "maedn", {{"players", MakeGameParameter(players)},
+                {"twoPlayersOpposite", MakeGameParameter(twoPlayersOpposite)}});
 
   auto state = game->NewInitialState();
 
@@ -327,15 +327,15 @@ void ObservationTensorTest(const State &state) {
 
 void CheckObservationTensor() {
   std::shared_ptr<const Game> game =
-      LoadGame("maedn", {{"players", GameParameter(2)},
-                         {"twoPlayersOpposite", GameParameter(true)}});
+      LoadGame("maedn", {{"players", MakeGameParameter(2)},
+                         {"twoPlayersOpposite", MakeGameParameter(true)}});
 
   testing::RandomSimTest(*game, 100, true, false, true, &ObservationTensorTest);
 
   for (int players = 2; players <= 4; players++) {
     std::shared_ptr<const Game> game =
-        LoadGame("maedn", {{"players", GameParameter(players)},
-                           {"twoPlayersOpposite", GameParameter(false)}});
+        LoadGame("maedn", {{"players", MakeGameParameter(players)},
+                           {"twoPlayersOpposite", MakeGameParameter(false)}});
 
     testing::RandomSimTest(*game, 100, true, false, true,
                            &ObservationTensorTest);

@@ -55,8 +55,8 @@ const GameType kGameType{/*short_name=*/"markov_soccer",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"horizon", GameParameter(kDefaultHorizon)},
-                          {"grid", GameParameter(std::string(kDefaultGrid))}}};
+                         {{"horizon", MakeGameParameter(kDefaultHorizon)},
+                          {"grid", MakeGameParameter(std::string(kDefaultGrid))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new MarkovSoccerGame(params));

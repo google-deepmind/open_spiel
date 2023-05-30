@@ -42,8 +42,8 @@ void BasicMarkovSoccerTests() {
 
   testing::RandomSimTest(
       *LoadGame("markov_soccer",
-                {{"horizon", GameParameter(100)},
-                 {"grid", GameParameter(std::string(big_grid))}}),
+                {{"horizon", MakeGameParameter(100)},
+                 {"grid", MakeGameParameter(std::string(big_grid))}}),
       100);
 }
 

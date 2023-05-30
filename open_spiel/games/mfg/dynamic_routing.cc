@@ -55,11 +55,11 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
-    {{"max_num_time_step", GameParameter(10)},
-     {"time_step_length", GameParameter(kDefaultTimeStepLength)},
-     {"players", GameParameter(-1)},
-     {"network", GameParameter(kDefaultNetworkName)},
-     {"perform_sanity_checks", GameParameter(true)}},
+    {{"max_num_time_step", MakeGameParameter(10)},
+     {"time_step_length", MakeGameParameter(kDefaultTimeStepLength)},
+     {"players", MakeGameParameter(-1)},
+     {"network", MakeGameParameter(kDefaultNetworkName)},
+     {"perform_sanity_checks", MakeGameParameter(true)}},
     /*default_loadable*/ true,
     /*provides_factored_observation_string*/ true};
 

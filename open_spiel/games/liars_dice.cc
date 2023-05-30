@@ -51,10 +51,10 @@ const GameType kGameType{
     /*provides_observation_string=*/false,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)},
-     {"numdice", GameParameter(kDefaultNumDice)},
-     {"dice_sides", GameParameter(kDefaultDiceSides)},
-     {"bidding_rule", GameParameter(kDefaultBiddingRule)}}};
+    {{"players", MakeGameParameter(kDefaultPlayers)},
+     {"numdice", MakeGameParameter(kDefaultNumDice)},
+     {"dice_sides", MakeGameParameter(kDefaultDiceSides)},
+     {"bidding_rule", MakeGameParameter(kDefaultBiddingRule)}}};
 
 const GameType kImperfectRecallGameType{
     /*short_name=*/"liars_dice_ir",
@@ -71,11 +71,11 @@ const GameType kImperfectRecallGameType{
     /*provides_observation_string=*/false,
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)},
-     {"numdice", GameParameter(kDefaultNumDice)},
-     {"dice_sides", GameParameter(kDefaultDiceSides)},
-     {"bidding_rule", GameParameter(kDefaultBiddingRule)},
-     {"recall_length", GameParameter(kDefaultRecallLength)}}};
+    {{"players", MakeGameParameter(kDefaultPlayers)},
+     {"numdice", MakeGameParameter(kDefaultNumDice)},
+     {"dice_sides", MakeGameParameter(kDefaultDiceSides)},
+     {"bidding_rule", MakeGameParameter(kDefaultBiddingRule)},
+     {"recall_length", MakeGameParameter(kDefaultRecallLength)}}};
 
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

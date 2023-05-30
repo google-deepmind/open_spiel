@@ -50,12 +50,12 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"enable_proposals", GameParameter(kDefaultEnableProposals)},
-     {"enable_utterances", GameParameter(kDefaultEnableUtterances)},
-     {"num_items", GameParameter(kDefaultNumItems)},
-     {"num_symbols", GameParameter(kDefaultNumSymbols)},
-     {"rng_seed", GameParameter(kDefaultSeed)},
-     {"utterance_dim", GameParameter(kDefaultUtteranceDim)}}};
+    {{"enable_proposals", MakeGameParameter(kDefaultEnableProposals)},
+     {"enable_utterances", MakeGameParameter(kDefaultEnableUtterances)},
+     {"num_items", MakeGameParameter(kDefaultNumItems)},
+     {"num_symbols", MakeGameParameter(kDefaultNumSymbols)},
+     {"rng_seed", MakeGameParameter(kDefaultSeed)},
+     {"utterance_dim", MakeGameParameter(kDefaultUtteranceDim)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new NegotiationGame(params));
@@ -258,7 +258,7 @@ void NegotiationState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(offset, values.size());
 }
 
-NegotiationState::NegotiationState(std::shared_ptr<const Game> game)
+NegotiationState::NegotiationState(const std::shared_ptr<const Game>& game)
     : State(game),
       parent_game_(static_cast<const NegotiationGame&>(*game)),
       enable_proposals_(parent_game_.EnableProposals()),
