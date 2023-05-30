@@ -66,10 +66,10 @@ class SimpleGinRummyBot : public Bot {
   SimpleGinRummyBot(GameParameters params, const Player player_id)
       : params_(params),
         player_id_(player_id),
-        hand_size_(params["hand_size"].int_value()),
-        utils_(GinRummyUtils(params["num_ranks"].int_value(),
-                             params["num_suits"].int_value(),
-                             params["hand_size"].int_value())) {}
+        hand_size_(params["hand_size"]->int_value()),
+        utils_(GinRummyUtils(params["num_ranks"]->int_value(),
+                             params["num_suits"]->int_value(),
+                             params["hand_size"]->int_value())) {}
 
   void Restart() override;
   Action Step(const State& state) override;

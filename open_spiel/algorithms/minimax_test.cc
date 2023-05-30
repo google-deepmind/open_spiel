@@ -74,7 +74,7 @@ int FirstPlayerAdvantage(const State& state) {
 
 void ExpectiminimaxSearchTest_Pig() {
   std::shared_ptr<const Game> game =
-      LoadGame("pig", {{"diceoutcomes", GameParameter(3)}});
+      LoadGame("pig", {{"diceoutcomes", MakeGameParameter(3)}});
   std::pair<double, Action> value_and_action = ExpectiminimaxSearch(
       *game, nullptr, FirstPlayerAdvantage, 2, kInvalidPlayer);
   SPIEL_CHECK_EQ(1.0 / 3 * 2 + 1.0 / 3 * 3, value_and_action.first);

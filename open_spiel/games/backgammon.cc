@@ -84,9 +84,9 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"hyper_backgammon", GameParameter(kDefaultHyperBackgammon)},
+    {{"hyper_backgammon", MakeGameParameter(kDefaultHyperBackgammon)},
      {"scoring_type",
-      GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
+      MakeGameParameter(static_cast<std::string>(kDefaultScoringType))}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BackgammonGame(params));

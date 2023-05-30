@@ -41,7 +41,7 @@ void MakeAllRoshamboBots() {
 // we can test that the bots are perceiving the game correctly.
 void RoshamboBotHistoryTest() {
   GameParameters params;
-  params["num_repetitions"] = GameParameter(roshambo::kNumThrows);
+  params["num_repetitions"] = MakeGameParameter(roshambo::kNumThrows);
   std::shared_ptr<const Game> game = CreateRepeatedGame("matrix_rps", params);
 
   std::vector<std::unique_ptr<Bot>> bots;
@@ -75,7 +75,7 @@ void RoshamboBotBasicPlayGame() {
   int num_games = 5;
   std::mt19937 rng(Seed());
   GameParameters params;
-  params["num_repetitions"] = GameParameter(roshambo::kNumThrows);
+  params["num_repetitions"] = MakeGameParameter(roshambo::kNumThrows);
   std::shared_ptr<const Game> game = CreateRepeatedGame("matrix_rps", params);
   std::vector<std::unique_ptr<Bot>> bots;
 

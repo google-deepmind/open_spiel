@@ -72,7 +72,7 @@ void BasicBackgammonTestsVaryScoring() {
   for (std::string scoring :
        {"winloss_scoring", "enable_gammons", "full_scoring"}) {
     auto game =
-        LoadGame("backgammon", {{"scoring_type", GameParameter(scoring)}});
+        LoadGame("backgammon", {{"scoring_type", MakeGameParameter(scoring)}});
     testing::ChanceOutcomesTest(*game);
     testing::RandomSimTestWithUndo(*game, 10);
     testing::RandomSimTest(*game, 10);
@@ -83,8 +83,8 @@ void BasicHyperBackgammonTestsVaryScoring() {
   for (std::string scoring :
        {"winloss_scoring", "enable_gammons", "full_scoring"}) {
     auto game =
-        LoadGame("backgammon", {{"scoring_type", GameParameter(scoring)},
-                                {"hyper_backgammon", GameParameter(true)}});
+        LoadGame("backgammon", {{"scoring_type", MakeGameParameter(scoring)},
+                                {"hyper_backgammon", MakeGameParameter(true)}});
     testing::ChanceOutcomesTest(*game);
     testing::RandomSimTestWithUndo(*game, 10);
     testing::RandomSimTest(*game, 10);
@@ -574,7 +574,7 @@ void HumanReadableNotation() {
 
 void BasicHyperBackgammonTest() {
   std::shared_ptr<const Game> game =
-      LoadGame("backgammon", {{"hyper_backgammon", GameParameter(true)}});
+      LoadGame("backgammon", {{"hyper_backgammon", MakeGameParameter(true)}});
   std::unique_ptr<State> state = game->NewInitialState();
   BackgammonState* bstate = static_cast<BackgammonState*>(state.get());
   SPIEL_CHECK_EQ(bstate->CountTotalCheckers(kXPlayerId), 3);

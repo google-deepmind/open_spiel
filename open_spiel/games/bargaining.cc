@@ -49,10 +49,10 @@ const GameType kGameType{/*short_name=*/"bargaining",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"instances_file", GameParameter("")},
-                          {"max_turns", GameParameter(kDefaultMaxTurns)},
-                          {"discount", GameParameter(kDefaultDiscount)},
-                          {"prob_end", GameParameter(kDefaultProbEnd)}}};
+                         {{"instances_file", MakeGameParameter("")},
+                          {"max_turns", MakeGameParameter(kDefaultMaxTurns)},
+                          {"discount", MakeGameParameter(kDefaultDiscount)},
+                          {"prob_end", MakeGameParameter(kDefaultProbEnd)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BargainingGame(params));

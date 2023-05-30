@@ -57,7 +57,7 @@ const GameType kGameType{/*short_name=*/"mprmp",
                          /*provides_observation_string=*/false,
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
-                         {{"num_players", GameParameter(4)}}};
+                         {{"num_players", MakeGameParameter(4)}}};
 
 class MissingPlayerRepeatedMatchingPenniesState : public SimMoveState {
  public:

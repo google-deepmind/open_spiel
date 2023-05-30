@@ -64,9 +64,9 @@ void CFRTest_KuhnPoker() {
 void CFRTest_IIGoof4() {
   // Random points order.
   std::shared_ptr<const Game> game = LoadGameAsTurnBased(
-      "goofspiel", {{"imp_info", GameParameter(true)},
-                    {"points_order", GameParameter(std::string("random"))},
-                    {"num_cards", GameParameter(4)}});
+      "goofspiel", {{"imp_info", MakeGameParameter(true)},
+                    {"points_order", MakeGameParameter("random")},
+                    {"num_cards", MakeGameParameter(4)}});
 
   CFRSolver solver(*game);
   for (int i = 0; i < 100; i++) {
@@ -78,9 +78,9 @@ void CFRTest_IIGoof4() {
 
   // Fixed points order.
   game = LoadGameAsTurnBased(
-      "goofspiel", {{"imp_info", GameParameter(true)},
-                    {"points_order", GameParameter(std::string("descending"))},
-                    {"num_cards", GameParameter(4)}});
+      "goofspiel", {{"imp_info", MakeGameParameter(true)},
+                    {"points_order", MakeGameParameter("descending")},
+                    {"num_cards", MakeGameParameter(4)}});
 
   CFRSolver solver2(*game);
   for (int i = 0; i < 1000; i++) {
@@ -107,7 +107,7 @@ void CFRTest_KuhnPokerRunsWithThreePlayers(bool linear_averaging,
                                            bool alternating_updates) {
   int num_players = 3;
   std::shared_ptr<const Game> game =
-      LoadGame("kuhn_poker", {{"players", GameParameter(num_players)}});
+      LoadGame("kuhn_poker", {{"players", MakeGameParameter(num_players)}});
   CFRSolverBase solver(*game, alternating_updates, linear_averaging,
                        regret_matching_plus);
   for (int i = 0; i < 10; i++) {
@@ -126,7 +126,7 @@ void CFRTest_GeneralMultiplePlayerTest(std::string_view game_name,
                                        int num_players, int num_iterations,
                                        double nashconv_upper_bound) {
   std::shared_ptr<const Game> game =
-      LoadGame(game_name, {{"players", GameParameter(num_players)}});
+      LoadGame(game_name, {{"players", MakeGameParameter(num_players)}});
   CFRSolverBase solver(*game,
                        /*alternating_updates=*/true,
                        /*linear_averaging=*/false,

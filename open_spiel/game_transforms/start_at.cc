@@ -37,19 +37,19 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/true,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    {{"game", GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
+    {{"game", MakeGameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
      {"history",
-      GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)}},
+      MakeGameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)}},
     /*default_loadable=*/false,
     /*provides_factored_observation_string=*/true,
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
-  auto game = LoadGame(params.at("game").game_value());
+  auto game = LoadGame(params.at("game")->game_value());
   GameType game_type = game->GetType();
   game_type.short_name = kGameType.short_name;
   game_type.long_name =
-      absl::StrCat("StartAt history=", params.at("history").string_value(),
+      absl::StrCat("StartAt history=", params.at("history")->string_value(),
                    " game=", game_type.long_name);
   return std::make_shared<StartAtTransformationGame>(game, game_type, params);
 }
@@ -89,7 +89,7 @@ StartAtTransformationGame::StartAtTransformationGame(
     : WrappedGame(game, game_type, game_parameters),
       start_state_(StateFromHistory(
           game,
-          HistoryFromString(game_parameters.at("history").string_value()))) {}
+          HistoryFromString(game_parameters.at("history")->string_value()))) {}
 
 std::unique_ptr<State> StartAtTransformationGame::NewInitialState() const {
   return std::make_unique<StartAtTransformationState>(shared_from_this(),

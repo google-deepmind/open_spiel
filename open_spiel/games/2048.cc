@@ -50,7 +50,7 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    {{"max_tile", GameParameter(kDefaultMaxTile)}}};
+    {{"max_tile", MakeGameParameter(kDefaultMaxTile)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TwentyFortyEightGame(params));

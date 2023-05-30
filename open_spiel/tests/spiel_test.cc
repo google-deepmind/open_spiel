@@ -53,23 +53,6 @@ void KuhnTests() {
 
 void GameEqualityTests() {
   // 2 players is the default in kuhn poker.
-//  auto g1 = LoadGame("kuhn_poker") ;
-//  auto g2 = LoadGame("kuhn_poker(players=2)");
-//  auto g3 = LoadGame("kuhn_poker(players=3)");
-//  volatile bool same_name = g1->GetType().short_name == g2->GetType().short_name;
-//  volatile bool same_name2 = g1->GetType().short_name == g3->GetType().short_name;
-//   auto params1 = g1->GetParameters();
-//   auto params2 = g2->GetParameters();
-//   auto params3 = g3->GetParameters();
-////  volatile bool same_params = GameParametersEquality(g1->GetParameters(), g2->GetParameters());
-//  volatile bool same_params = GameParametersEquality(g1->GetParameters(), params2);
-//  volatile bool same_params2 = GameParametersEquality(params1, g3->GetParameters());
-//  volatile bool same_params3 = GameParametersEquality(g1->GetParameters(), g2->GetParameters());
-//  volatile bool same_params4 = GameParametersEquality(g1->GetParameters(), g3->GetParameters());
-//  volatile bool comp1 = (*g1 == *g2);
-//  volatile bool comp2 = (*g1 == *g3);
-//  std::cout << comp1 << std::endl;
-//  std::cout << comp2 << std::endl;
   SPIEL_CHECK_TRUE(
       *LoadGame("kuhn_poker") == *LoadGame("kuhn_poker(players=2)"));
   SPIEL_CHECK_FALSE(

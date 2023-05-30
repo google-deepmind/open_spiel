@@ -63,7 +63,7 @@ void LeducTest() {
 
 void GoofspielTest() {
   std::shared_ptr<const open_spiel::Game> game = open_spiel::LoadGame(
-      "goofspiel", {{"num_cards", open_spiel::GameParameter(3)}});
+      "goofspiel", {{"num_cards", open_spiel::MakeGameParameter(3)}});
   LegalActionsMap map_both = algorithms::GetLegalActionsMap(
       *game, /*depth_limit=*/-1, open_spiel::kInvalidPlayer);
   SPIEL_CHECK_GT(map_both.size(), 0);

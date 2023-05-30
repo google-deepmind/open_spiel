@@ -32,7 +32,7 @@ void BasicRepeatedGameTest() {
   // Test loading from a pre-loaded stage game.
   std::shared_ptr<const Game> stage_game = LoadGame("matrix_rps");
   GameParameters params;
-  params["num_repetitions"] = GameParameter(10);
+  params["num_repetitions"] = MakeGameParameter(10);
   std::shared_ptr<const Game> repeated_game =
       CreateRepeatedGame(*stage_game, params);
   SPIEL_CHECK_TRUE(repeated_game != nullptr);
@@ -74,7 +74,7 @@ void RepeatedRockPaperScissorsTest(std::shared_ptr<const Game> repeated_game) {
 
 void RepeatedRockPaperScissorsDefaultsTest() {
   GameParameters params;
-  params["num_repetitions"] = GameParameter(3);
+  params["num_repetitions"] = MakeGameParameter(3);
   std::shared_ptr<const Game> repeated_game =
       CreateRepeatedGame("matrix_rps", params);
   SPIEL_CHECK_EQ(repeated_game->GetType().max_num_players, 2);
@@ -93,8 +93,8 @@ void RepeatedRockPaperScissorsDefaultsTest() {
 
 void RepeatedRockPaperScissorsRecallTwoTest() {
   GameParameters params;
-  params["num_repetitions"] = GameParameter(1000);
-  params["recall"] = GameParameter(2);
+  params["num_repetitions"] = MakeGameParameter(1000);
+  params["recall"] = MakeGameParameter(2);
   std::shared_ptr<const Game> repeated_game =
       CreateRepeatedGame("matrix_rps", params);
   SPIEL_CHECK_EQ(repeated_game->GetType().max_num_players, 2);
@@ -138,8 +138,8 @@ void RepeatedRockPaperScissorsRecallTwoTest() {
 
 void RepeatedRockPaperScissorsInfoStateEnabledTest() {
   GameParameters params;
-  params["num_repetitions"] = GameParameter(3);
-  params["enable_infostate"] = GameParameter(true);
+  params["num_repetitions"] = MakeGameParameter(3);
+  params["enable_infostate"] = MakeGameParameter(true);
   std::shared_ptr<const Game> repeated_game =
       CreateRepeatedGame("matrix_rps", params);
   SPIEL_CHECK_EQ(repeated_game->GetType().max_num_players, 2);
@@ -172,7 +172,7 @@ void RepeatedRockPaperScissorsInfoStateEnabledTest() {
 
 void RepeatedPrisonersDilemaTest() {
   GameParameters params;
-  params["num_repetitions"] = GameParameter(2);
+  params["num_repetitions"] = MakeGameParameter(2);
   std::shared_ptr<const Game> repeated_game =
       CreateRepeatedGame("matrix_pd", params);
   SPIEL_CHECK_EQ(repeated_game->GetType().max_num_players, 2);

@@ -42,14 +42,14 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     {{"game",
-      GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
-     {"fixed_player", GameParameter(kDefaultFixedPlayer)},
-     {"p", GameParameter(kDefaultP)}},
+      MakeGameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)},
+     {"fixed_player", MakeGameParameter(kDefaultFixedPlayer)},
+     {"p", MakeGameParameter(kDefaultP)}},
     /*default_loadable=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return ConvertToRNR(
-      *LoadGame(params.at("game").game_value()),
+      *LoadGame(params.at("game")->game_value()),
       ParameterValue<int>(params, "fixed_player", kDefaultFixedPlayer),
       ParameterValue<double>(params, "p", kDefaultP),
       std::make_shared<UniformPolicy>());
