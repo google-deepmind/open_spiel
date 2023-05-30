@@ -51,10 +51,10 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"players", GameParameter(kDefaultPlayers)},
-     {"max_draw_cards", GameParameter(kDefaultMaxDrawCards)},
-     {"use_special_cards", GameParameter(false)},
-     {"reshuffle", GameParameter(false)}},
+    {{"players", MakeGameParameter(kDefaultPlayers)},
+     {"max_draw_cards", MakeGameParameter(kDefaultMaxDrawCards)},
+     {"use_special_cards", MakeGameParameter(false)},
+     {"reshuffle", MakeGameParameter(false)}},
     /*default_loadable=*/true,
 };
 

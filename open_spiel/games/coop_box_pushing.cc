@@ -80,8 +80,8 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"fully_observable", GameParameter(kDefaultFullyObservable)},
-     {"horizon", GameParameter(kDefaultHorizon)}}};
+    {{"fully_observable", MakeGameParameter(kDefaultFullyObservable)},
+     {"horizon", MakeGameParameter(kDefaultHorizon)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new CoopBoxPushingGame(params));

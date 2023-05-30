@@ -26,12 +26,12 @@ void BasicCoinGameTests() {
   testing::RandomSimTest(
       *LoadGame("coin_game",
                 {
-                    {"players", GameParameter(3)},
-                    {"rows", GameParameter(7)},
-                    {"columns", GameParameter(10)},
-                    {"num_extra_coin_colors", GameParameter(2)},
-                    {"episode_length", GameParameter(100)},
-                    {"num_coins_per_color", GameParameter(2)},
+                    {"players", MakeGameParameter(3)},
+                    {"rows", MakeGameParameter(7)},
+                    {"columns", MakeGameParameter(10)},
+                    {"num_extra_coin_colors", MakeGameParameter(2)},
+                    {"episode_length", MakeGameParameter(100)},
+                    {"num_coins_per_color", MakeGameParameter(2)},
                 }),
       10);
 }
@@ -39,12 +39,12 @@ void BasicCoinGameTests() {
 void GetAllStatesTest() {
   // Getting all states (on a small game) can find corner case bugs.
   const std::shared_ptr<const Game> game =
-      LoadGame("coin_game", {{"players", GameParameter(2)},
-                             {"rows", GameParameter(2)},
-                             {"columns", GameParameter(3)},
-                             {"num_extra_coin_colors", GameParameter(0)},
-                             {"episode_length", GameParameter(2)},
-                             {"num_coins_per_color", GameParameter(2)}});
+      LoadGame("coin_game", {{"players", MakeGameParameter(2)},
+                             {"rows", MakeGameParameter(2)},
+                             {"columns", MakeGameParameter(3)},
+                             {"num_extra_coin_colors", MakeGameParameter(0)},
+                             {"episode_length", MakeGameParameter(2)},
+                             {"num_coins_per_color", MakeGameParameter(2)}});
   auto states = algorithms::GetAllStates(*game,
                                          /*depth_limit=*/-1,
                                          /*include_terminals=*/true,

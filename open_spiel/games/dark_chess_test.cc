@@ -24,7 +24,7 @@ namespace testing = open_spiel::testing;
 
 void BasicDarkChessTests(int board_size) {
   GameParameters params;
-  params["board_size"] = GameParameter(board_size);
+  params["board_size"] = MakeGameParameter(board_size);
 
   testing::LoadGameTest("dark_chess");
   testing::NoChanceOutcomesTest(*LoadGame("dark_chess", params));

@@ -49,10 +49,10 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"komi", GameParameter(7.5)},
-        {"board_size", GameParameter(19)},
-        {"handicap", GameParameter(0)},
-        {"max_cursor_moves", GameParameter(100)},
+        {"komi", MakeGameParameter(7.5)},
+        {"board_size", MakeGameParameter(19)},
+        {"handicap", MakeGameParameter(0)},
+        {"max_cursor_moves", MakeGameParameter(100)},
     },
 };
 

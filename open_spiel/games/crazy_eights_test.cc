@@ -27,8 +27,8 @@ void BasicGameTests() {
   for (int players = 2; players <= 6; ++players) {
     for (bool b : {false, true}) {
       testing::RandomSimTest(
-          *LoadGame("crazy_eights", {{"players", GameParameter(players)},
-                                     {"use_special_cards", GameParameter(b)}}),
+          *LoadGame("crazy_eights", {{"players", MakeGameParameter(players)},
+                                     {"use_special_cards", MakeGameParameter(b)}}),
           5);
     }
   }
@@ -36,8 +36,8 @@ void BasicGameTests() {
 
 void SpecialCardTests() {
   std::shared_ptr<const Game> game =
-      LoadGame("crazy_eights", {{"players", GameParameter(4)},
-                                {"use_special_cards", GameParameter(true)}});
+      LoadGame("crazy_eights", {{"players", MakeGameParameter(4)},
+                                {"use_special_cards", MakeGameParameter(true)}});
 
   std::unique_ptr<State> state = game->NewInitialState();
   // 0 is the dealer

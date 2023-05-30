@@ -53,14 +53,14 @@ const GameType kGameType{
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
-        {"players", GameParameter(kDefaultPlayers)},
-        {"rows", GameParameter(kDefaultRows)},
-        {"columns", GameParameter(kDefaultColumns)},
-        {"episode_length", GameParameter(kDefaultEpisodeLength)},
+        {"players", MakeGameParameter(kDefaultPlayers)},
+        {"rows", MakeGameParameter(kDefaultRows)},
+        {"columns", MakeGameParameter(kDefaultColumns)},
+        {"episode_length", MakeGameParameter(kDefaultEpisodeLength)},
         // Number of extra coin colors to use apart from the
         // players' preferred color.
-        {"num_extra_coin_colors", GameParameter(kDefaultExtraCoinColors)},
-        {"num_coins_per_color", GameParameter(kDefaultCoinsPerColor)},
+        {"num_extra_coin_colors", MakeGameParameter(kDefaultExtraCoinColors)},
+        {"num_coins_per_color", MakeGameParameter(kDefaultCoinsPerColor)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

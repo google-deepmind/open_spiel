@@ -49,11 +49,11 @@ const GameType kGameType{/*short_name=*/"dark_hex",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"obstype", GameParameter(kDefaultObsType)},
-                          {"gameversion", GameParameter(kDefaultGameVersion)},
-                          {"board_size", GameParameter(kDefaultBoardSize)},
-                          {"num_cols", GameParameter(kDefaultNumCols)},
-                          {"num_rows", GameParameter(kDefaultNumRows)}}};
+                         {{"obstype", MakeGameParameter(kDefaultObsType)},
+                          {"gameversion", MakeGameParameter(kDefaultGameVersion)},
+                          {"board_size", MakeGameParameter(kDefaultBoardSize)},
+                          {"num_cols", MakeGameParameter(kDefaultNumCols)},
+                          {"num_rows", MakeGameParameter(kDefaultNumRows)}}};
 
 const GameType kImperfectRecallGameType{
     /*short_name=*/"dark_hex_ir",
@@ -70,11 +70,11 @@ const GameType kImperfectRecallGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(kDefaultObsType)},
-     {"gameversion", GameParameter(kDefaultGameVersion)},
-     {"board_size", GameParameter(kDefaultBoardSize)},
-     {"num_cols", GameParameter(kDefaultNumCols)},
-     {"num_rows", GameParameter(kDefaultNumRows)}}};
+    {{"obstype", MakeGameParameter(kDefaultObsType)},
+     {"gameversion", MakeGameParameter(kDefaultGameVersion)},
+     {"board_size", MakeGameParameter(kDefaultBoardSize)},
+     {"num_cols", MakeGameParameter(kDefaultNumCols)},
+     {"num_rows", MakeGameParameter(kDefaultNumRows)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new DarkHexGame(params, kGameType));
@@ -281,10 +281,10 @@ DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
     : Game(game_type, params),
       game_(std::static_pointer_cast<const hex::HexGame>(LoadGame(
           "hex",
-          {{"num_cols", GameParameter(ParameterValue<int>(
+          {{"num_cols", MakeGameParameter(ParameterValue<int>(
                             "num_cols", ParameterValue<int>("board_size")))},
            {"num_rows",
-            GameParameter(ParameterValue<int>(
+            MakeGameParameter(ParameterValue<int>(
                 "num_rows", ParameterValue<int>("board_size")))}}))),
       num_cols_(
           ParameterValue<int>("num_cols", ParameterValue<int>("board_size"))),
