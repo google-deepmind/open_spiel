@@ -92,6 +92,7 @@ EXPECTED_GAMES = frozenset([
     "negotiation",
     "nfg_game",
     "nim",
+    "nine_mens_morris",
     "normal_form_extensive_game",
     "oh_hell",
     "oshi_zumo",

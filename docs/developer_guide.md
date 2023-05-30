@@ -74,15 +74,20 @@ ideal to first be aware of the general API (see `open_spiel/spiel.h`).
     `NewGameState` to reflect your new game’s logic. Most API functions should
     be clear from the game you copied from. If not, each API function that is
     overridden will be fully documented in superclasses in `open_spiel/spiel.h`.
-8.  Run your code through a linter so it conforms to Google's
-    [style guides](https://google.github.io/styleguide/). For C++
-    use [cpplint](https://pypi.org/project/cpplint/). For Python, use
+8.  To test the game as it is being built, you can play test the functionality
+    interactively using `ConsolePlayTest` in
+    `open_spiel/tests/console_play_test.h`. At the very least, the test should
+    include some random simulation tests (see other game's tests for an
+    example).
+9.  Run your code through a linter so it conforms to Google's
+    [style guides](https://google.github.io/styleguide/). For C++ use
+    [cpplint](https://pypi.org/project/cpplint/). For Python, use
     [pylint](https://pypi.org/project/pylint/) with the
     [pylintrc from the Google style guide](https://google.github.io/styleguide/pyguide.html).
     There is also [YAPF](https://github.com/google/yapf/) for Python as well.
-9.  Once done, rebuild and rerun the tests to ensure everything passes
+10. Once done, rebuild and rerun the tests to ensure everything passes
     (including your new game’s test!).
-10. Add a playthrough file to catch regressions:
+11. Add a playthrough file to catch regressions:
     *   Run `./open_spiel/scripts/generate_new_playthrough.sh new_game` to
         generate a random game, to be used by integration tests to prevent any
         regression. `open_spiel/integration_tests/playthrough_test.py` will
