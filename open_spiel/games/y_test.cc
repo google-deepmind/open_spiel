@@ -36,8 +36,8 @@ void BasicYTests() {
 
   // Ansi colors!
   testing::RandomSimTest(
-      *LoadGame("y", {{"board_size", GameParameter(9)},
-                      {"ansi_color_output", GameParameter(true)}}),
+      *LoadGame("y", {{"board_size", MakeGameParameter(9)},
+                      {"ansi_color_output", MakeGameParameter(true)}}),
       1);
   testing::RandomSimTest(*LoadGame("y(board_size=10,ansi_color_output=True)"),
                          3);

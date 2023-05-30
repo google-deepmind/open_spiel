@@ -89,9 +89,10 @@ struct type_caster<open_spiel::GameParameter> {
       return true;
     } else {
       auto dict = src.cast<pybind11::dict>();
-      std::map<std::string, open_spiel::GameParameter> d;
-      for (const auto& [k, v] : dict) {
-        d[k.cast<std::string>()] = v.cast<open_spiel::GameParameter>();
+      open_spiel::GameParameters d;
+      for (const auto &[k, v] : dict) {
+        d[k.cast<std::string>()] =
+            open_spiel::MakeGameParameter(v.cast<open_spiel::GameParameter>());
       }
       value = open_spiel::GameParameter(d);
       return true;

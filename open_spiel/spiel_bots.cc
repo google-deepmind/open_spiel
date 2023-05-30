@@ -184,7 +184,7 @@ class UniformRandomBotFactory : public BotFactory {
                               const GameParameters& bot_params) const override {
     int seed = 0;
     if (IsParameterSpecified(bot_params, "seed")) {
-      const GameParameter& seed_param = bot_params.at("seed");
+      const GameParameter& seed_param = *bot_params.at("seed");
       seed = seed_param.int_value();
     } else {
       absl::BitGen gen;
@@ -235,7 +235,7 @@ class FixedActionPreferenceFactory : public BotFactory {
                               const GameParameters& bot_params) const override {
     std::vector<Action> actions{0, 1, 2, 3, 4, 5, 6, 7};
     if (IsParameterSpecified(bot_params, "actions")) {
-      const GameParameter& actions_param = bot_params.at("actions");
+      const GameParameter& actions_param = *bot_params.at("actions");
       actions = ActionsFromStr(actions_param.string_value(), ":");
     }
     return MakeFixedActionPreferenceBot(player_id, actions);
@@ -327,7 +327,7 @@ std::unique_ptr<Bot> LoadBot(std::string_view bot_name,
   // want. Otherwise, this will use the "long name", which includes the config.
   // e.g. if the bot_name is "my_bot(parameter=value)", then we want the
   // bot_name here to be "my_bot", not "my_bot(parameter=value)".
-  return LoadBot(params["name"].string_value(), game, player_id, params);
+  return LoadBot(params["name"]->string_value(), game, player_id, params);
 }
 
 std::unique_ptr<Bot> LoadBot(std::string_view bot_name,

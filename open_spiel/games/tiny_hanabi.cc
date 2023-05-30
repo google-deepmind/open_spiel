@@ -67,10 +67,10 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"num_players", GameParameter(2)},
-        {"num_chance", GameParameter(2)},
-        {"num_actions", GameParameter(3)},
-        {"payoff", GameParameter(std::string(kDefaultPayoffString))},
+        {"num_players", MakeGameParameter(2)},
+        {"num_chance", MakeGameParameter(2)},
+        {"num_actions", MakeGameParameter(3)},
+        {"payoff", MakeGameParameter(std::string(kDefaultPayoffString))},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

@@ -70,17 +70,17 @@ void ValidateParams(const GameParameters& params,
           "Unknown parameter '", param.first,
           "'. Available parameters are: ", ListValidParameters(param_spec)));
     }
-    if (it->second.type() != param.second.type()) {
+    if (it->second->type() != param.second->type()) {
       SpielFatalError(absl::StrCat(
           "Wrong type for parameter ", param.first,
-          ". Expected type: ", GameParameterTypeToString(it->second.type()),
-          ", got ", GameParameterTypeToString(param.second.type()), " with ",
-          param.second.ToString()));
+          ". Expected type: ", GameParameter::TypeToString(it->second->type()),
+          ", got ", GameParameter::TypeToString(param.second->type()), " with ",
+          param.second->ToString()));
     }
   }
   // Check we aren't missing any mandatory parameters.
   for (const auto& param : param_spec) {
-    if (param.second.is_mandatory() && !params.count(param.first)) {
+    if (param.second->is_mandatory() && !params.count(param.first)) {
       SpielFatalError(absl::StrCat("Missing parameter ", param.first));
     }
   }
@@ -124,7 +124,7 @@ StateType State::GetType() const {
 
 bool GameType::ContainsRequiredParameters() const {
   for (const auto& key_val : parameter_specification) {
-    if (key_val.second.is_mandatory()) {
+    if (key_val.second->is_mandatory()) {
       return true;
     }
   }
@@ -222,13 +222,14 @@ std::shared_ptr<const Game> LoadGame(std::string_view short_name,
   return result;
 }
 
+
 std::shared_ptr<const Game> LoadGame(GameParameters params) {
   auto it = params.find("name");
   if (it == params.end()) {
     SpielFatalError(absl::StrCat("No 'name' parameter in params: ",
                                  GameParametersToString(params)));
   }
-  std::string name = it->second.string_value();
+  std::string name = it->second->string_value();
   params.erase(it);
   std::shared_ptr<const Game> result =
       GameRegisterer::CreateByName(name, params);
@@ -239,8 +240,8 @@ std::shared_ptr<const Game> LoadGame(GameParameters params) {
   return result;
 }
 
-State::State(std::shared_ptr<const Game> game)
-    : game_(std::move(game)),
+State::State(const std::shared_ptr<const Game>& game)
+    : game_(game),
       num_distinct_actions_(game->NumDistinctActions()),
       num_players_(game->NumPlayers()),
       move_number_(0) {}
@@ -646,7 +647,7 @@ std::string Game::Serialize() const {
 
 std::string Game::ToString() const {
   GameParameters params = game_parameters_;
-  params["name"] = GameParameter(game_type_.short_name);
+  params["name"] = MakeGameParameter(game_type_.short_name);
   return GameParametersToString(params);
 }
 

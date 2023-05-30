@@ -221,7 +221,7 @@ class State {
   // since this shared pointer to the parent is required, Game objects cannot
   // be used as value types and should always be created via a shared pointer.
   // See the documentation of the Game object for further details.
-  State(std::shared_ptr<const Game> game);
+  State(const std::shared_ptr<const Game>& game);
   State(const State&) = default;
 
   // Returns current player. Player numbers start from 0.
@@ -920,7 +920,7 @@ class Game : public std::enable_shared_from_this<Game> {
     // instead of game_parameters_ makes sure that game equality is independent
     // of the presence of explicitly passed game parameters with default values.
     return game_type_.short_name == other.game_type_.short_name &&
-           GetParameters() == other.GetParameters();
+           GameParametersEquality(GetParameters(), other.GetParameters());
   }
 
   // Get and set game's internal RNG state for de/serialization purposes. These
@@ -982,53 +982,13 @@ class Game : public std::enable_shared_from_this<Game> {
 //    CopyGameParameters(game_parameters, game_parameters_);
   }
 
-  // Access to game parameters. Returns the value provided by the user. If not:
+   // Access to game parameters. Returns the value provided by the user. If not:
   // - Defaults to the value stored as the default in
   // game_type.parameter_specification if the `default_value` is absl::nullopt
   // - Returns `default_value` if provided.
   template <typename T>
-  T ParameterValue(const std::string& key,
-                   absl::optional<T> default_value = absl::nullopt) const {
-    // Return the value if found.
-    auto iter = game_parameters_.find(key);
-    if (iter != game_parameters_.end()) {
-      return iter->second.value<T>();
-    }
-
-    // Pick the defaulted value.
-    GameParameter default_game_parameter;
-    if (default_value.has_value()) {
-      default_game_parameter = GameParameter(default_value.value());
-    } else {
-      auto default_iter = game_type_.parameter_specification.find(key);
-      if (default_iter == game_type_.parameter_specification.end()) {
-        SpielFatalError(absl::StrCat("The parameter for ", key,
-                                     " is missing in game ", ToString()));
-      }
-      default_game_parameter = default_iter->second;
-    }
-
-    // Return the default value, storing it.
-    absl::MutexLock lock(&mutex_defaulted_parameters_);
-    iter = defaulted_parameters_.find(key);
-    if (iter == defaulted_parameters_.end()) {
-      // We haven't previously defaulted this value, so store the default we
-      // used.
-      defaulted_parameters_[key] = default_game_parameter;
-    } else {
-      // Already defaulted, so check we are being consistent.
-      // Using different default values at different times means the game isn't
-      // well-defined.
-      if (default_game_parameter != iter->second) {
-        SpielFatalError(absl::StrCat("Parameter ", key, " is defaulted to ",
-                                     default_game_parameter.ToReprString(),
-                                     " having previously been defaulted to ",
-                                     iter->second.ToReprString(), " in game ",
-                                     ToString()));
-      }
-    }
-    return default_game_parameter.value<T>();
-  }
+  T ParameterValue(std::string_view key,
+                   absl::optional<T> default_value = absl::nullopt) const;
 
   // The game type.
   GameType game_type_;
@@ -1042,6 +1002,55 @@ class Game : public std::enable_shared_from_this<Game> {
       ABSL_GUARDED_BY(mutex_defaulted_parameters_);
   mutable absl::Mutex mutex_defaulted_parameters_;
 };
+
+template <typename T>
+T Game::ParameterValue(std::string_view key,
+                       absl::optional<T> default_value) const
+{
+  // Return the value if found.
+  auto iter = game_parameters_.find(key);
+  if (iter != game_parameters_.end()) {
+    return iter->second->value<T>();
+  }
+
+  // Pick the defaulted value.
+  GameParameter default_game_parameter;
+  if (default_value.has_value()) {
+    default_game_parameter = GameParameter(default_value.value());
+  } else {
+    auto default_iter = game_type_.parameter_specification.find(key);
+    if (default_iter == game_type_.parameter_specification.end()) {
+      SpielFatalError(absl::StrCat("The parameter for ", key,
+                                   " is missing in game ", ToString()));
+    }
+    default_game_parameter = *default_iter->second;
+  }
+
+  // Return the default value, storing it.
+  absl::MutexLock lock(&mutex_defaulted_parameters_);
+  iter = defaulted_parameters_.find(key);
+  if (iter == defaulted_parameters_.end()) {
+    // We haven't previously defaulted this value, so store the default we
+    // used.
+    defaulted_parameters_.emplace(
+        key,
+        MakeGameParameter(default_game_parameter));
+  } else {
+    // Already defaulted, so check we are being consistent.
+    // Using different default values at different times means the game isn't
+    // well-defined.
+    if (default_game_parameter != *iter->second) {
+      SpielFatalError(absl::StrCat("Parameter ", key, " is defaulted to ",
+                                   default_game_parameter.ToReprString(),
+                                   " having previously been defaulted to ",
+                                   iter->second->ToReprString(), " in game ",
+                                   ToString()));
+    }
+  }
+  return default_game_parameter.value<T>();
+}
+
+
 
 #define CONCAT_(x, y) x##y
 #define CONCAT(x, y) CONCAT_(x, y)

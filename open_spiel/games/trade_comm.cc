@@ -47,7 +47,7 @@ const GameType kGameType{/*short_name=*/"trade_comm",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"num_items", GameParameter(kDefaultNumItems)}}};
+                         {{"num_items", MakeGameParameter(kDefaultNumItems)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new TradeCommGame(params));

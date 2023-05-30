@@ -60,17 +60,17 @@ constexpr absl::string_view kKuhnLimit3P =
      "numBoardCards = 0\n"
      "END GAMEDEF\n");
 GameParameters KuhnLimit3PParameters() {
-  return {{"betting", GameParameter(std::string("limit"))},
-          {"numPlayers", GameParameter(3)},
-          {"numRounds", GameParameter(1)},
-          {"blind", GameParameter(std::string("1 1 1"))},
-          {"raiseSize", GameParameter(std::string("1"))},
-          {"firstPlayer", GameParameter(std::string("1"))},
-          {"maxRaises", GameParameter(std::string("1"))},
-          {"numSuits", GameParameter(1)},
-          {"numRanks", GameParameter(4)},
-          {"numHoleCards", GameParameter(1)},
-          {"numBoardCards", GameParameter(std::string("0"))}};
+  return {{"betting", MakeGameParameter(std::string("limit"))},
+          {"numPlayers", MakeGameParameter(3)},
+          {"numRounds", MakeGameParameter(1)},
+          {"blind", MakeGameParameter(std::string("1 1 1"))},
+          {"raiseSize", MakeGameParameter(std::string("1"))},
+          {"firstPlayer", MakeGameParameter(std::string("1"))},
+          {"maxRaises", MakeGameParameter(std::string("1"))},
+          {"numSuits", MakeGameParameter(1)},
+          {"numRanks", MakeGameParameter(4)},
+          {"numHoleCards", MakeGameParameter(1)},
+          {"numBoardCards", MakeGameParameter(std::string("0"))}};
 }
 
 constexpr absl::string_view kHoldemNoLimit6P =
@@ -87,22 +87,22 @@ constexpr absl::string_view kHoldemNoLimit6P =
      "numBoardCards = 0 3 1 1\n"
      "END GAMEDEF\n");
 GameParameters HoldemNoLimit6PParameters() {
-  return {{"betting", GameParameter(std::string("nolimit"))},
-          {"numPlayers", GameParameter(6)},
-          {"numRounds", GameParameter(4)},
+  return {{"betting", MakeGameParameter(std::string("nolimit"))},
+          {"numPlayers", MakeGameParameter(6)},
+          {"numRounds", MakeGameParameter(4)},
           {"stack",
-           GameParameter(std::string("20000 20000 20000 20000 20000 20000"))},
-          {"blind", GameParameter(std::string("50 100 0 0 0 0"))},
-          {"firstPlayer", GameParameter(std::string("3 1 1 1"))},
-          {"numSuits", GameParameter(4)},
-          {"numRanks", GameParameter(13)},
-          {"numHoleCards", GameParameter(2)},
-          {"numBoardCards", GameParameter(std::string("0 3 1 1"))}};
+           MakeGameParameter(std::string("20000 20000 20000 20000 20000 20000"))},
+          {"blind", MakeGameParameter(std::string("50 100 0 0 0 0"))},
+          {"firstPlayer", MakeGameParameter(std::string("3 1 1 1"))},
+          {"numSuits", MakeGameParameter(4)},
+          {"numRanks", MakeGameParameter(13)},
+          {"numHoleCards", MakeGameParameter(2)},
+          {"numBoardCards", MakeGameParameter(std::string("0 3 1 1"))}};
 }
 
 void LoadKuhnLimitWithAndWithoutGameDef() {
   UniversalPokerGame kuhn_limit_3p_gamedef(
-      {{"gamedef", GameParameter(std::string(kKuhnLimit3P))}});
+      {{"gamedef", MakeGameParameter(std::string(kKuhnLimit3P))}});
   UniversalPokerGame kuhn_limit_3p(KuhnLimit3PParameters());
 
   SPIEL_CHECK_EQ(kuhn_limit_3p_gamedef.GetACPCGame()->ToString(),
@@ -113,7 +113,7 @@ void LoadKuhnLimitWithAndWithoutGameDef() {
 
 void LoadHoldemNoLimit6PWithAndWithoutGameDef() {
   UniversalPokerGame holdem_no_limit_6p_gamedef(
-      {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
+      {{"gamedef", MakeGameParameter(std::string(kHoldemNoLimit6P))}});
   UniversalPokerGame holdem_no_limit_6p(HoldemNoLimit6PParameters());
 
   SPIEL_CHECK_EQ(holdem_no_limit_6p_gamedef.GetACPCGame()->ToString(),
@@ -127,7 +127,7 @@ void LoadAndRunGamesFullParameters() {
   std::shared_ptr<const Game> kuhn_limit_3p =
       LoadGame("universal_poker", KuhnLimit3PParameters());
   std::shared_ptr<const Game> os_kuhn_3p =
-      LoadGame("kuhn_poker", {{"players", GameParameter(3)}});
+      LoadGame("kuhn_poker", {{"players", MakeGameParameter(3)}});
   SPIEL_CHECK_GT(kuhn_limit_3p->MaxGameLength(), os_kuhn_3p->MaxGameLength());
   testing::RandomSimTestNoSerialize(*kuhn_limit_3p, 1);
   // TODO(b/145688976): The serialization is also broken
@@ -146,7 +146,7 @@ void LoadAndRunGamesFullParameters() {
 void LoadAndRunGameFromGameDef() {
   std::shared_ptr<const Game> holdem_nolimit_6p =
       LoadGame("universal_poker",
-               {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
+               {{"gamedef", MakeGameParameter(std::string(kHoldemNoLimit6P))}});
   testing::RandomSimTestNoSerialize(*holdem_nolimit_6p, 1);
   // TODO(b/145688976): The serialization is also broken
   // testing::RandomSimTest(*holdem_nolimit_6p, 1);

@@ -42,8 +42,8 @@ const GameType kGameType{/*short_name=*/"y",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"board_size", GameParameter(kDefaultBoardSize)},
-                             {"ansi_color_output", GameParameter(false)},
+                             {"board_size", MakeGameParameter(kDefaultBoardSize)},
+                             {"ansi_color_output", MakeGameParameter(false)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

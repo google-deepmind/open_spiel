@@ -118,51 +118,51 @@ const GameType kGameType{
 
      // The ACPC gamedef string.  When present, it will take precedence over
      // everything and no other argument should be provided.
-     {"gamedef", GameParameter(std::string(""))},
+     {"gamedef", MakeGameParameter(std::string(""))},
      // Instead of a single gamedef, specifying each line is also possible.
      // The documentation is adapted from project_acpc_server/game.cc.
      //
      // Number of Players (up to 10)
-     {"numPlayers", GameParameter(2)},
+     {"numPlayers", MakeGameParameter(2)},
      // Betting Type "limit" "nolimit"
-     {"betting", GameParameter(std::string("nolimit"))},
+     {"betting", MakeGameParameter(std::string("nolimit"))},
      // The stack size for each player at the start of each hand (for
      // no-limit). It will be ignored on "limit".
      // TODO(author2): It's unclear what happens on limit. It defaults to
      // INT32_MAX for all players when not provided.
-     {"stack", GameParameter(std::string("1200 1200"))},
+     {"stack", MakeGameParameter(std::string("1200 1200"))},
      // The size of the blinds for each player (relative to the dealer)
-     {"blind", GameParameter(std::string("100 100"))},
+     {"blind", MakeGameParameter(std::string("100 100"))},
      // The size of raises on each round (for limit games only) as numrounds
      // integers. It will be ignored for nolimit games.
-     {"raiseSize", GameParameter(std::string("100 100"))},
+     {"raiseSize", MakeGameParameter(std::string("100 100"))},
      // Number of betting rounds per hand of the game
-     {"numRounds", GameParameter(2)},
+     {"numRounds", MakeGameParameter(2)},
      // The player that acts first (relative to the dealer) on each round
-     {"firstPlayer", GameParameter(std::string("1 1"))},
+     {"firstPlayer", MakeGameParameter(std::string("1 1"))},
      // maxraises - the maximum number of raises on each round. If not
      // specified, it will default to UINT8_MAX.
-     {"maxRaises", GameParameter(std::string(""))},
+     {"maxRaises", MakeGameParameter(std::string(""))},
      // The number of different suits in the deck
-     {"numSuits", GameParameter(4)},
+     {"numSuits", MakeGameParameter(4)},
      // The number of different ranks in the deck
-     {"numRanks", GameParameter(6)},
+     {"numRanks", MakeGameParameter(6)},
      // The number of private cards to  deal to each player
-     {"numHoleCards", GameParameter(1)},
+     {"numHoleCards", MakeGameParameter(1)},
      // The number of cards revealed on each round
-     {"numBoardCards", GameParameter(std::string("0 1"))},
+     {"numBoardCards", MakeGameParameter(std::string("0 1"))},
      // Specify which actions are available to the player, in both limit and
      // nolimit games. Available options are: "fc" for fold and check/call.
      // "fcpa" for fold, check/call, bet pot and all in (default).
      // Use "fullgame" for the unabstracted game.
-     {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+     {"bettingAbstraction", MakeGameParameter(std::string("fcpa"))},
 
      // ------------------------------------------------------------------------
      // Following parameters are used to specify specific subgame.
-     {"potSize", GameParameter(0)},
+     {"potSize", MakeGameParameter(0)},
      // Board cards that have been revealed. Must be in the format
      // of logic::CardSet -- kSuitChars, kRankChars
-     {"boardCards", GameParameter("")},
+     {"boardCards", MakeGameParameter("")},
      // A space separated list of reach probabilities for each player in a
      // subgame. When there are in total N cards in the deck, two players,
      // and each player gets 2 cards, there should be:
@@ -172,7 +172,7 @@ const GameType kGameType{
      //
      // N*(N-1) reach probabilities.
      // Currently supported only for the setting of 2 players, 4 suits, 13 cards
-     {"handReaches", GameParameter("")},
+     {"handReaches", MakeGameParameter("")},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -205,13 +205,13 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
                                ->betting_abstraction()) {
   // -- Optionally apply subgame parameters. -----------------------------------
   // Pot size.
-  const int pot_size = game->GetParameters().at("potSize").int_value();
+  const int pot_size = game->GetParameters().at("potSize")->int_value();
   if (pot_size > 0) {
     acpc_state_.SetPotSize(pot_size);
   }
   // Board cards.
   const std::string board_cards =
-      game->GetParameters().at("boardCards").string_value();
+      game->GetParameters().at("boardCards")->string_value();
   if (!board_cards.empty()) {
     // Add the cards.
     logic::CardSet cs(board_cards);
@@ -232,7 +232,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
   }
   // Set specific hand reach probabilities.
   const std::string handReaches =
-      game->GetParameters().at("handReaches").string_value();
+      game->GetParameters().at("handReaches")->string_value();
   if (!handReaches.empty()) {
     std::stringstream iss(handReaches);
     double number;
@@ -1440,7 +1440,7 @@ class UniformRestrictedActionsFactory : public BotFactory {
                               Player player_id,
                               const GameParameters &bot_params) const override {
     SPIEL_CHECK_GT(bot_params.count("policy_name"), 0);
-    absl::string_view policy_name = bot_params.at("policy_name").string_value();
+    absl::string_view policy_name = bot_params.at("policy_name")->string_value();
     if (policy_name == "AlwaysCall") {
       return MakePolicyBot(/*seed=*/0,
                            std::make_shared<UniformRestrictedActions>(

@@ -130,7 +130,7 @@ std::shared_ptr<Observer> Game::MakeRegisteredObserver(
     SpielFatalError("A 'name' parameter is expected to create a registered "
                     "observer");
   }
-  auto name = iter->second.string_value();
+  auto name = iter->second->string_value();
   return ObserverRegisterer::CreateByName(name, *this, iig_obs_type, params);
 }
 
