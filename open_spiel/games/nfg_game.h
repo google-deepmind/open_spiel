@@ -25,7 +25,7 @@ namespace nfg_game {
 
 // A Gambit .NFG file reader. Currently only the payoff version is supported.
 // See http://www.gambit-project.org/gambit13/formats.html for details.
-std::shared_ptr<const Game> LoadNFGGame(const std::string& data);
+std::shared_ptr<const Game> LoadNFGGame(std::string_view data);
 
 }  // namespace nfg_game
 }  // namespace open_spiel

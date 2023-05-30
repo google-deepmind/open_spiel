@@ -138,10 +138,9 @@ class CrowdModellingGame : public Game {
   int MaxChanceOutcomes() const override {
     return std::max(size_, kNumChanceActions);
   }
-  std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+  std::unique_ptr<State> DeserializeState(std::string_view str) const override;
 
- private:
+private:
   const int size_;
   const int horizon_;
 };

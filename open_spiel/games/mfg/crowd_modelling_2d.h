@@ -66,7 +66,7 @@ inline constexpr const char* kDefaultPositionalRewardValue = "[]";
 inline constexpr int kNeutralAction = 2;
 
 std::vector<absl::string_view> ProcessStringParam(
-    const std::string& string_param_str, int max_size);
+    std::string_view string_param_str, int max_size);
 
 // Game state.
 // The high-level state transitions are as follows:
@@ -88,20 +88,20 @@ class CrowdModelling2dState : public State {
   // '[float;...;float]'. Example : "[]" or "[0.5;0.5]"
   CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
                         bool only_distribution_reward,
-                        const std::string& forbidden_states,
-                        const std::string& initial_distribution,
-                        const std::string& initial_distribution_value,
-                        const std::string& positional_reward,
-                        const std::string& positional_reward_value,
+                        std::string_view forbidden_states,
+                        std::string_view initial_distribution,
+                        std::string_view initial_distribution_value,
+                        std::string_view positional_reward,
+                        std::string_view positional_reward_value,
                         bool with_congestion, double noise_intensity,
                         double crowd_aversion_coef);
   CrowdModelling2dState(std::shared_ptr<const Game> game, int size, int horizon,
                         bool only_distribution_reward,
-                        const std::string& forbidden_states,
-                        const std::string& initial_distribution,
-                        const std::string& initial_distribution_value,
-                        const std::string& positional_reward,
-                        const std::string& positional_reward_value,
+                        std::string_view forbidden_states,
+                        std::string_view initial_distribution,
+                        std::string_view initial_distribution_value,
+                        std::string_view positional_reward,
+                        std::string_view positional_reward_value,
                         Player current_player, bool is_chance_init_, int x,
                         int y, int t, int last_action, double return_value,
                         const std::vector<double>& distribution,
@@ -199,7 +199,7 @@ class CrowdModelling2dGame : public Game {
     return std::max(size_ * size_, kNumChanceActions);
   }
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
 
  private:
   const int size_;

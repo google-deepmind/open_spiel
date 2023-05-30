@@ -240,8 +240,8 @@ std::vector<int> CrowdModellingGame::ObservationTensorShape() const {
   return {size_ + horizon_ + 1};
 }
 
-std::unique_ptr<State> CrowdModellingGame::DeserializeState(
-    const std::string& str) const {
+std::unique_ptr<State>
+CrowdModellingGame::DeserializeState(std::string_view str) const {
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   if (lines.size() != 2) {
     SpielFatalError(absl::StrCat("Expected 2 lines in serialized state, got: ",

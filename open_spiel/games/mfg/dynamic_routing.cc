@@ -102,7 +102,7 @@ MeanFieldRoutingGame::MeanFieldRoutingGame(const GameParameters& params)
 }
 
 std::unique_ptr<State> MeanFieldRoutingGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   std::vector<std::string> properties = absl::StrSplit(str, ',');
   if (properties.size() != 10) {
     SpielFatalError(

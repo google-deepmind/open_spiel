@@ -308,7 +308,7 @@ class MeanFieldRoutingGame : public Game {
 
   // Deserialize a formatted string to MeanFieldRoutingGameState.
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
 
  private:
   std::string network_name_;

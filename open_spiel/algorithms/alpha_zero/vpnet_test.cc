@@ -78,7 +78,7 @@ std::vector<VPNetModel::TrainInputs> SolveGame() {
   return train_inputs;
 }
 
-VPNetModel BuildModel(const Game& game, const std::string& nn_model,
+VPNetModel BuildModel(const Game& game, std::string_view nn_model,
                        bool create_graph) {
   std::string tmp_dir = open_spiel::file::GetTmpDir();
   std::string filename = absl::StrCat(

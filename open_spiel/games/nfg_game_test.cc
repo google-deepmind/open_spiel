@@ -144,7 +144,7 @@ void NFGExportReloadTestInternalGames() {
       "blotto(players=3,coins=5,fields=3)",
   };
 
-  for (const std::string& game_string : game_strings) {
+  for (std::string_view game_string : game_strings) {
     // Load a native game, write it to NFG, parse the NFG, and export again.
     // Both .nfg strings should be identical.
     std::shared_ptr<const Game> general_game = LoadGame(game_string);

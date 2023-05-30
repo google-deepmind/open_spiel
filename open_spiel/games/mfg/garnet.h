@@ -147,7 +147,7 @@ class GarnetGame : public Game {
     return std::max(size_, num_chance_action_);
   }
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
 
  private:
   const int size_;

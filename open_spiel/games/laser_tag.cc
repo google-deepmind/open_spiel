@@ -696,7 +696,7 @@ std::vector<int> LaserTagGame::ObservationTensorShape() const {
 }
 
 namespace {
-Grid ParseGrid(const std::string& grid_string) {
+Grid ParseGrid(std::string_view grid_string) {
   Grid grid{/*num_rows=*/0, /*num_cols=*/0};
   int row = 0;
   int col = 0;

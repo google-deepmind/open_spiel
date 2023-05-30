@@ -35,7 +35,7 @@ namespace open_spiel {
 namespace crowd_modelling_2d {
 
 std::vector<absl::string_view> ProcessStringParam(
-    const std::string& string_param_str, int max_size) {
+    std::string_view string_param_str, int max_size) {
   // ProcessStringParam takes a parameter string and split it is a sequence of
   // substring. Example:
   // "" -> {}
@@ -187,11 +187,11 @@ RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 CrowdModelling2dState::CrowdModelling2dState(
     std::shared_ptr<const Game> game, int size, int horizon,
-    bool only_distribution_reward, const std::string& forbidden_states,
-    const std::string& initial_distribution,
-    const std::string& initial_distribution_value,
-    const std::string& positional_reward,
-    const std::string& positional_reward_value, bool with_congestion,
+    bool only_distribution_reward, std::string_view forbidden_states,
+    std::string_view initial_distribution,
+    std::string_view initial_distribution_value,
+    std::string_view positional_reward,
+    std::string_view positional_reward_value, bool with_congestion,
     double noise_intensity, double crowd_aversion_coef)
     : State(game),
       size_(size),
@@ -278,11 +278,11 @@ CrowdModelling2dState::CrowdModelling2dState(
 
 CrowdModelling2dState::CrowdModelling2dState(
     std::shared_ptr<const Game> game, int size, int horizon,
-    bool only_distribution_reward, const std::string& forbidden_states,
-    const std::string& initial_distribution,
-    const std::string& initial_distribution_value,
-    const std::string& positional_reward,
-    const std::string& positional_reward_value, Player current_player,
+    bool only_distribution_reward, std::string_view forbidden_states,
+    std::string_view initial_distribution,
+    std::string_view initial_distribution_value,
+    std::string_view positional_reward,
+    std::string_view positional_reward_value, Player current_player,
     bool is_chance_init, int x, int y, int t, int last_action,
     double return_value, const std::vector<double>& distribution,
     bool with_congestion, double noise_intensity, double crowd_aversion_coef)
@@ -532,7 +532,7 @@ std::vector<int> CrowdModelling2dGame::ObservationTensorShape() const {
 }
 
 std::unique_ptr<State> CrowdModelling2dGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   if (lines.size() != 2) {
     SpielFatalError(absl::StrCat("Expected 2 lines in serialized state, got: ",

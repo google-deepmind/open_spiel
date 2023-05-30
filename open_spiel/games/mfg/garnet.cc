@@ -348,7 +348,7 @@ std::vector<int> GarnetGame::ObservationTensorShape() const {
 }
 
 std::unique_ptr<State> GarnetGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   if (lines.size() != 2) {
     SpielFatalError(absl::StrCat("Expected 2 lines in serialized state, got: ",

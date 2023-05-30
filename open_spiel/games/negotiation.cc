@@ -566,7 +566,7 @@ std::string NegotiationState::Serialize() const {
 }
 
 std::unique_ptr<State> NegotiationGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   if (str == "chance") {
     return NewInitialState();
   } else {
@@ -617,9 +617,9 @@ std::string NegotiationGame::GetRNGState() const {
   return rng_stream.str();
 }
 
-void NegotiationGame::SetRNGState(const std::string& rng_state) const {
+void NegotiationGame::SetRNGState(std::string_view rng_state) const {
   if (rng_state.empty()) return;
-  std::istringstream rng_stream(rng_state);
+  std::istringstream rng_stream(std::string{rng_state});
   rng_stream >> *rng_;
 }
 

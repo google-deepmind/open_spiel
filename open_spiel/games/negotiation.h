@@ -178,9 +178,9 @@ class NegotiationGame : public Game {
   std::vector<int> ObservationTensorShape() const override;
 
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
   std::string GetRNGState() const;
-  void SetRNGState(const std::string& rng_state) const;
+  void SetRNGState(std::string_view rng_state) const;
 
   std::mt19937* RNG() const { return rng_.get(); }
   bool EnableProposals() const { return enable_proposals_; }
