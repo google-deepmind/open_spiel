@@ -50,21 +50,21 @@ void BasicCheckersTests() {
   // 10x10 Board
   testing::RandomSimTest(
       *LoadGame("checkers",
-                {{"rows", GameParameter(10)}, {"columns", GameParameter(10)}}),
+                {{"rows", MakeGameParameter(10)}, {"columns", MakeGameParameter(10)}}),
       100);
   testing::RandomSimTestWithUndo(
       *LoadGame("checkers",
-                {{"rows", GameParameter(10)}, {"columns", GameParameter(10)}}),
+                {{"rows", MakeGameParameter(10)}, {"columns", MakeGameParameter(10)}}),
       10);
 
   // 12x12 Board
   testing::RandomSimTest(
       *LoadGame("checkers",
-                {{"rows", GameParameter(12)}, {"columns", GameParameter(12)}}),
+                {{"rows", MakeGameParameter(12)}, {"columns", MakeGameParameter(12)}}),
       100);
   testing::RandomSimTestWithUndo(
       *LoadGame("checkers",
-                {{"rows", GameParameter(12)}, {"columns", GameParameter(12)}}),
+                {{"rows", MakeGameParameter(12)}, {"columns", MakeGameParameter(12)}}),
       10);
 
   auto observer = LoadGame("checkers")

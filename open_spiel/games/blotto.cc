@@ -42,9 +42,9 @@ const GameType kGameType{/*short_name=*/"blotto",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"coins", GameParameter(kDefaultNumCoins)},
-                          {"fields", GameParameter(kDefaultNumFields)},
-                          {"players", GameParameter(kDefaultNumPlayers)}}};
+                         {{"coins", MakeGameParameter(kDefaultNumCoins)},
+                          {"fields", MakeGameParameter(kDefaultNumFields)},
+                          {"players", MakeGameParameter(kDefaultNumPlayers)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BlottoGame(params));

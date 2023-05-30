@@ -42,9 +42,9 @@ const GameType kGameType{/*short_name=*/"cliff_walking",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"height", GameParameter(kDefaultHeight)},
-                          {"width", GameParameter(kDefaultWidth)},
-                          {"horizon", GameParameter(kDefaultHorizon)}}};
+                         {{"height", MakeGameParameter(kDefaultHeight)},
+                          {"width", MakeGameParameter(kDefaultWidth)},
+                          {"horizon", MakeGameParameter(kDefaultHorizon)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<Game>(new CliffWalkingGame(params));

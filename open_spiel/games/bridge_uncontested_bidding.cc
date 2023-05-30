@@ -59,10 +59,10 @@ const GameType kGameType{
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
-        {"subgame", GameParameter(static_cast<std::string>(""))},
-        {"rng_seed", GameParameter(0)},
-        {"relative_scoring", GameParameter(false)},
-        {"num_redeals", GameParameter(kDefaultNumRedeals)},
+        {"subgame", MakeGameParameter(static_cast<std::string>(""))},
+        {"rng_seed", MakeGameParameter(0)},
+        {"relative_scoring", MakeGameParameter(false)},
+        {"num_redeals", MakeGameParameter(kDefaultNumRedeals)},
     },
 };
 

@@ -805,13 +805,13 @@ const GameType kGameType{
     /* provides_observation_string = */ true,
     /* provides_observation_tensor = */ false,
     /* parameter_specification = */
-    {{"board_width", GameParameter(kDefaultBoardWidth)},
-     {"board_height", GameParameter(kDefaultBoardHeight)},
-     {"ship_sizes", GameParameter(kDefaultShipSizes)},
-     {"ship_values", GameParameter(kDefaultShipValues)},
-     {"num_shots", GameParameter(kDefaultNumShots)},
-     {"allow_repeated_shots", GameParameter(kDefaultAllowRepeatedShots)},
-     {"loss_multiplier", GameParameter(kDefaultLossMultiplier)}}};
+    {{"board_width", MakeGameParameter(kDefaultBoardWidth)},
+     {"board_height", MakeGameParameter(kDefaultBoardHeight)},
+     {"ship_sizes", MakeGameParameter(kDefaultShipSizes)},
+     {"ship_values", MakeGameParameter(kDefaultShipValues)},
+     {"num_shots", MakeGameParameter(kDefaultNumShots)},
+     {"allow_repeated_shots", MakeGameParameter(kDefaultAllowRepeatedShots)},
+     {"loss_multiplier", MakeGameParameter(kDefaultLossMultiplier)}}};
 
 constexpr int kMaxDimension = 10;
 

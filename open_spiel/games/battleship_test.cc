@@ -41,13 +41,13 @@ void BasicBattleshipTest() {
   // Some basic tests on a small 2x2 instance.
   for (int num_shots = 1; num_shots <= 3; ++num_shots) {
     const std::shared_ptr<const Game> game =
-        LoadGame("battleship", {{"board_width", GameParameter(2)},
-                                {"board_height", GameParameter(2)},
-                                {"ship_sizes", GameParameter("[1;2]")},
-                                {"ship_values", GameParameter("[1;2]")},
-                                {"num_shots", GameParameter(num_shots)},
-                                {"allow_repeated_shots", GameParameter(false)},
-                                {"loss_multiplier", GameParameter(2.0)}});
+        LoadGame("battleship", {{"board_width", MakeGameParameter(2)},
+                                {"board_height", MakeGameParameter(2)},
+                                {"ship_sizes", MakeGameParameter("[1;2]")},
+                                {"ship_values", MakeGameParameter("[1;2]")},
+                                {"num_shots", MakeGameParameter(num_shots)},
+                                {"allow_repeated_shots", MakeGameParameter(false)},
+                                {"loss_multiplier", MakeGameParameter(2.0)}});
     testing::RandomSimTestWithUndo(*game, absl::GetFlag(FLAGS_num_sims));
     testing::NoChanceOutcomesTest(*game);
   }
@@ -56,24 +56,24 @@ void BasicBattleshipTest() {
 void RandomTestsOnLargeBoards() {
   // Allow repeated shots.
   std::shared_ptr<const Game> game =
-      LoadGame("battleship", {{"board_width", GameParameter(10)},
-                              {"board_height", GameParameter(10)},
-                              {"ship_sizes", GameParameter("[2;3;3;4;5]")},
-                              {"ship_values", GameParameter("[1;1;1;1;1]")},
-                              {"num_shots", GameParameter(50)},
-                              {"allow_repeated_shots", GameParameter(true)},
-                              {"loss_multiplier", GameParameter(1.0)}});
+      LoadGame("battleship", {{"board_width", MakeGameParameter(10)},
+                              {"board_height", MakeGameParameter(10)},
+                              {"ship_sizes", MakeGameParameter("[2;3;3;4;5]")},
+                              {"ship_values", MakeGameParameter("[1;1;1;1;1]")},
+                              {"num_shots", MakeGameParameter(50)},
+                              {"allow_repeated_shots", MakeGameParameter(true)},
+                              {"loss_multiplier", MakeGameParameter(1.0)}});
   testing::NoChanceOutcomesTest(*game);
   testing::RandomSimTestWithUndo(*game, absl::GetFlag(FLAGS_num_sims));
 
   // Repeated shots not allowed.
-  game = LoadGame("battleship", {{"board_width", GameParameter(10)},
-                                 {"board_height", GameParameter(10)},
-                                 {"ship_sizes", GameParameter("[2;3;3;4;5]")},
-                                 {"ship_values", GameParameter("[1;1;1;1;1]")},
-                                 {"num_shots", GameParameter(50)},
-                                 {"allow_repeated_shots", GameParameter(false)},
-                                 {"loss_multiplier", GameParameter(1.0)}});
+  game = LoadGame("battleship", {{"board_width", MakeGameParameter(10)},
+                                 {"board_height", MakeGameParameter(10)},
+                                 {"ship_sizes", MakeGameParameter("[2;3;3;4;5]")},
+                                 {"ship_values", MakeGameParameter("[1;1;1;1;1]")},
+                                 {"num_shots", MakeGameParameter(50)},
+                                 {"allow_repeated_shots", MakeGameParameter(false)},
+                                 {"loss_multiplier", MakeGameParameter(1.0)}});
   testing::NoChanceOutcomesTest(*game);
   testing::RandomSimTestWithUndo(*game, absl::GetFlag(FLAGS_num_sims));
 }
@@ -82,10 +82,10 @@ void TestZeroSumTrait() {
   // We check that when the loss multiplier is 1.0, the game is registered as
   // zero sum.
   std::shared_ptr<const Game> game =
-      LoadGame("battleship", {{"loss_multiplier", GameParameter(2.0)}});
+      LoadGame("battleship", {{"loss_multiplier", MakeGameParameter(2.0)}});
   SPIEL_CHECK_EQ(game->GetType().utility, GameType::Utility::kGeneralSum);
 
-  game = LoadGame("battleship", {{"loss_multiplier", GameParameter(1.0)}});
+  game = LoadGame("battleship", {{"loss_multiplier", MakeGameParameter(1.0)}});
   SPIEL_CHECK_EQ(game->GetType().utility, GameType::Utility::kZeroSum);
 }
 
@@ -94,10 +94,10 @@ void TestTightLayout1() {
   // that the the first ship is not placed at the center of the board.
 
   const std::shared_ptr<const Game> game =
-      LoadGame("battleship", {{"board_width", GameParameter(4)},
-                              {"board_height", GameParameter(1)},
-                              {"ship_sizes", GameParameter("[2;2]")},
-                              {"ship_values", GameParameter("[1;1]")}});
+      LoadGame("battleship", {{"board_width", MakeGameParameter(4)},
+                              {"board_height", MakeGameParameter(1)},
+                              {"ship_sizes", MakeGameParameter("[2;2]")},
+                              {"ship_values", MakeGameParameter("[1;1]")}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
@@ -164,10 +164,10 @@ void TestTightLayout2() {
   // vertically.
 
   const std::shared_ptr<const Game> game =
-      LoadGame("battleship", {{"board_width", GameParameter(3)},
-                              {"board_height", GameParameter(2)},
-                              {"ship_sizes", GameParameter("[2;3]")},
-                              {"ship_values", GameParameter("[1;1]")}});
+      LoadGame("battleship", {{"board_width", MakeGameParameter(3)},
+                              {"board_height", MakeGameParameter(2)},
+                              {"ship_sizes", MakeGameParameter("[2;3]")},
+                              {"ship_values", MakeGameParameter("[1;1]")}});
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), Player{0});
   {
@@ -259,13 +259,13 @@ void TestNashEquilibriumInSmallBoard() {
   // https://papers.nips.cc/paper/9122-correlation-in-extensive-form-games-saddle-point-formulation-and-benchmarks.pdf#page=7
 
   const std::shared_ptr<const Game> game =
-      LoadGame("battleship", {{"board_width", GameParameter(3)},
-                              {"board_height", GameParameter(1)},
-                              {"ship_sizes", GameParameter("[1]")},
-                              {"ship_values", GameParameter("[1.0]")},
-                              {"num_shots", GameParameter(2)},
-                              {"allow_repeated_shots", GameParameter(false)},
-                              {"loss_multiplier", GameParameter(2.0)}});
+      LoadGame("battleship", {{"board_width", MakeGameParameter(3)},
+                              {"board_height", MakeGameParameter(1)},
+                              {"ship_sizes", MakeGameParameter("[1]")},
+                              {"ship_values", MakeGameParameter("[1.0]")},
+                              {"num_shots", MakeGameParameter(2)},
+                              {"allow_repeated_shots", MakeGameParameter(false)},
+                              {"loss_multiplier", MakeGameParameter(2.0)}});
   SPIEL_CHECK_EQ(game->GetType().utility, GameType::Utility::kGeneralSum);
 
   const TabularPolicy policy = GetUniformPolicy(*game);
@@ -371,13 +371,13 @@ void TestGameSizes() {
     const GameParameter ship_values(ship_sizes_str);
 
     return LoadGame("battleship",
-                    {{"board_width", board_width},
-                     {"board_height", board_height},
-                     {"ship_sizes", ship_sizes},
-                     {"ship_values", ship_values},
-                     {"num_shots", GameParameter(num_shots)},
-                     {"allow_repeated_shots", GameParameter(false)},
-                     {"loss_multiplier", GameParameter(2.0)}});
+                    {{"board_width", MakeGameParameter(board_width)},
+                     {"board_height", MakeGameParameter(board_height)},
+                     {"ship_sizes", MakeGameParameter(ship_sizes)},
+                     {"ship_values", MakeGameParameter(ship_values)},
+                     {"num_shots", MakeGameParameter(num_shots)},
+                     {"allow_repeated_shots", MakeGameParameter(false)},
+                     {"loss_multiplier", MakeGameParameter(2.0)}});
   };
 
   // 2x2 grid, 2 shots, ships sizes [1].

@@ -228,8 +228,8 @@ std::pair<T, T>
 SplitAnnotations(std::conditional_t<memory_safe, const T &, T> move);
 
 template <>
-std::pair<std::string, std::string>
-SplitAnnotations<true>(const std::string &move) {
+std::pair<std::string, std::string> inline SplitAnnotations<true>(
+    const std::string &move) {
   for (int i = 0; i < move.size(); ++i) {
     if (!IsMoveCharacter(move[i])) {
       return {move.substr(0, i), std::string{absl::ClippedSubstr(move, i)}};
@@ -238,8 +238,8 @@ SplitAnnotations<true>(const std::string &move) {
   return {move, ""};
 }
 template <>
-std::pair<std::string_view, std::string_view>
-SplitAnnotations<false>(std::string_view move) {
+std::pair<std::string_view, std::string_view> inline SplitAnnotations<false>(
+    std::string_view move) {
   for (int i = 0; i < move.size(); ++i) {
     if (!IsMoveCharacter(move[i])) {
       return {move.substr(0, i), absl::ClippedSubstr(move, i)};

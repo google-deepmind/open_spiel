@@ -58,8 +58,8 @@ const GameType kGameType{/*short_name=*/"checkers",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"rows", GameParameter(kDefaultRows)},
-                          {"columns", GameParameter(kDefaultColumns)}}};
+                         {{"rows", MakeGameParameter(kDefaultRows)},
+                          {"columns", MakeGameParameter(kDefaultColumns)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new CheckersGame(params));
