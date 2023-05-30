@@ -82,7 +82,7 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: julia-actions/setup-julia@v1
       with:
         version: 1.8
