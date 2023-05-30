@@ -76,7 +76,7 @@ class ClobberState : public State {
   explicit ClobberState(std::shared_ptr<const Game> game, int rows,
                         int columns);
   explicit ClobberState(std::shared_ptr<const Game> game, int rows, int columns,
-                        const std::string& board_string);
+                        std::string_view board_string);
   Player CurrentPlayer() const override {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
@@ -132,7 +132,7 @@ class ClobberGame : public Game {
   explicit ClobberGame(const GameParameters& params);
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState(
-      const std::string& board_string) const override {
+      std::string_view board_string) const override {
     return absl::make_unique<ClobberState>(shared_from_this(), rows_, columns_,
                                            board_string);
   }

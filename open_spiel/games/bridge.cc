@@ -884,7 +884,7 @@ std::string BridgeState::Serialize() const {
 }
 
 std::unique_ptr<State> BridgeGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   if (!UseDoubleDummyResult()) return Game::DeserializeState(str);
   auto state = absl::make_unique<BridgeState>(
       shared_from_this(), UseDoubleDummyResult(), IsDealerVulnerable(),

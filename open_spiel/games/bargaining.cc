@@ -437,16 +437,16 @@ std::unique_ptr<State> BargainingState::Clone() const {
   return std::unique_ptr<State>(new BargainingState(*this));
 }
 
-void BargainingGame::ParseInstancesFile(const std::string& filename) {
-  open_spiel::file::File infile(filename, "r");
+void BargainingGame::ParseInstancesFile(std::string_view filename) {
+  open_spiel::file::File infile(std::string{filename}, "r");
   std::string contents = infile.ReadContents();
   ParseInstancesString(contents);
 }
 
-void BargainingGame::ParseInstancesString(const std::string& instances_string) {
+void BargainingGame::ParseInstancesString(std::string_view instances_string) {
   std::vector<std::string> lines = absl::StrSplit(instances_string, '\n');
   SPIEL_CHECK_GT(lines.size(), 1);
-  for (const std::string& line : lines) {
+  for (std::string_view line : lines) {
     if (!line.empty()) {
       std::vector<std::string> parts = absl::StrSplit(line, ' ');
       SPIEL_CHECK_EQ(parts.size(), kNumItemTypes);

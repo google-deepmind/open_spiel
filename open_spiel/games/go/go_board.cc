@@ -673,7 +673,7 @@ float TrompTaylorScore(const GoBoard& board, float komi, int handicap) {
   return score;
 }
 
-GoBoard CreateBoard(const std::string& initial_stones) {
+GoBoard CreateBoard(std::string_view initial_stones) {
   GoBoard board(19);
 
   int row = 0;

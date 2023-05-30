@@ -452,7 +452,7 @@ TabularPolicy GetOptimalPolicy(double alpha) {
   SPIEL_CHECK_GE(alpha, 0.);
   SPIEL_CHECK_LE(alpha, 1. / 3);
   const double three_alpha = 3 * alpha;
-  std::unordered_map<std::string, ActionsAndProbs> policy;
+  TabularPolicy::table_type policy;
 
   // All infostates have two actions: Pass (0) and Bet (1).
   // Player 0
@@ -470,7 +470,7 @@ TabularPolicy GetOptimalPolicy(double alpha) {
   policy["1b"] = {{0, 2. / 3.}, {1, 1. / 3.}};
   policy["2p"] = {{0, 0}, {1, 1}};
   policy["2b"] = {{0, 0}, {1, 1}};
-  return TabularPolicy(policy);
+  return policy;
 }
 
 }  // namespace kuhn_poker

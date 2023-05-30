@@ -512,9 +512,9 @@ bool GeneratesUmpireMessage(const chess::ChessBoard &chess_board,
 }
 
 KriegspielState::KriegspielState(std::shared_ptr<const Game> game,
-                                 int board_size, const std::string &fen,
+                                 int board_size, std::string_view fen,
                                  bool threefold_repetition, bool rule_50_move)
-    : State(game),
+    : State(std::move(game)),
       start_board_(*chess::ChessBoard::BoardFromFEN(fen, board_size, false)),
       current_board_(start_board_),
       threefold_repetition_(threefold_repetition),

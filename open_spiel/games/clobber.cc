@@ -175,7 +175,7 @@ ClobberState::ClobberState(std::shared_ptr<const Game> game, int rows,
 }
 
 ClobberState::ClobberState(std::shared_ptr<const Game> game, int rows,
-                           int columns, const std::string& board_string)
+                           int columns, std::string_view board_string)
     : State(game), rows_(rows), columns_(columns) {
   SPIEL_CHECK_GE(rows_, 1);
   SPIEL_CHECK_GE(columns_, 1);

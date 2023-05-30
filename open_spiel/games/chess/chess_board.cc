@@ -32,14 +32,7 @@ bool IsMoveCharacter(char c) {
          (c >= '0' && c <= '9');
 }
 
-std::pair<std::string, std::string> SplitAnnotations(const std::string &move) {
-  for (int i = 0; i < move.size(); ++i) {
-    if (!IsMoveCharacter(move[i])) {
-      return {move.substr(0, i), std::string(absl::ClippedSubstr(move, i))};
-    }
-  }
-  return {move, ""};
-}
+
 
 std::string ColorToString(Color c) {
   switch (c) {
@@ -153,7 +146,7 @@ std::string Piece::ToString() const {
                                 : absl::AsciiStrToLower(base);
 }
 
-absl::optional<Square> SquareFromString(const std::string &s) {
+absl::optional<Square> SquareFromString(std::string_view s) {
   if (s.size() != 2) return kInvalidSquare;
 
   auto file = ParseFile(s[0]);
@@ -348,7 +341,7 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
 }
 
 /*static*/ absl::optional<ChessBoard> ChessBoard::BoardFromFEN(
-    const std::string &fen, int board_size,
+    std::string_view fen, int board_size,
     bool king_in_check_allowed, bool allow_pass_move) {
   /* An FEN string includes a board position, side to play, castling
    * rights, ep square, 50 moves clock, and full move number. In that order.
@@ -806,7 +799,7 @@ bool ChessBoard::HasSufficientMaterial() const {
   return dark_bishop_exists && light_bishop_exists;
 }
 
-absl::optional<Move> ChessBoard::ParseMove(const std::string &move) const {
+absl::optional<Move> ChessBoard::ParseMove(std::string_view move) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
   // SAN moves will never have this form because an SAN move that starts with
@@ -826,8 +819,8 @@ absl::optional<Move> ChessBoard::ParseMove(const std::string &move) const {
 }
 
 absl::optional<Move> ChessBoard::ParseSANMove(
-    const std::string &move_str) const {
-  std::string move = move_str;
+    std::string_view move) const {
+//  std::string move = move_str;
 
   if (move.empty()) return absl::nullopt;
 
@@ -859,7 +852,7 @@ absl::optional<Move> ChessBoard::ParseSANMove(
     return absl::nullopt;
   }
 
-  auto move_annotation = SplitAnnotations(move);
+  auto move_annotation = SplitAnnotations<false>(move);
   move = move_annotation.first;
   if (move.empty()) { return absl::nullopt; }
 
@@ -927,7 +920,7 @@ absl::optional<Move> ChessBoard::ParseSANMove(
   if (!annotation.empty() && annotation[0] == '=') {
     if (annotation.size() < 2) { return absl::nullopt; }
     auto maybe_piece = PieceTypeFromChar(annotation[1]);
-    if (!maybe_piece) return absl::optional<Move>();
+    if (!maybe_piece) return {};
     promotion_type = maybe_piece;
   }
 
@@ -947,10 +940,10 @@ absl::optional<Move> ChessBoard::ParseSANMove(
   if (candidates.size() == 1) return candidates[0];
   std::cerr << "expected exactly one matching move, got " << candidates.size()
             << std::endl;
-  return absl::optional<Move>();
+  return {};
 }
 
-absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move) const {
+absl::optional<Move> ChessBoard::ParseLANMove(std::string_view move) const {
   if (move.empty()) { return absl::nullopt; }
 
   // Long algebraic notation moves (of the variant we care about) are in one of

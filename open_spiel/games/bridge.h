@@ -237,7 +237,7 @@ class BridgeGame : public Game {
   int MaxChanceNodesInHistory() const override { return kNumCards; }
 
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
 
   // How many contracts there are (including declarer and double status).
   int NumPossibleContracts() const { return kNumContracts; }

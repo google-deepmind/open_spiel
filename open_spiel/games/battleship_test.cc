@@ -357,8 +357,8 @@ void TestGameSizes() {
   // Since the value of the ships and the loss multiplier do not affect the game
   // size, the lambda fills those parameters with 2
   const auto ConstructInstance =
-      [](const std::string& grid, const int num_shots,
-         const std::string& ship_sizes_str) -> std::shared_ptr<const Game> {
+      [](std::string_view grid, const int num_shots,
+         std::string_view ship_sizes_str) -> std::shared_ptr<const Game> {
     std::vector<std::string> grid_dimensions = absl::StrSplit(grid, 'x');
     SPIEL_CHECK_EQ(grid_dimensions.size(), 2);
 

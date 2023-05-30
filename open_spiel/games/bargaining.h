@@ -183,8 +183,8 @@ class BargainingGame : public Game {
       const std::vector<int>& quantities) const;
 
  private:
-  void ParseInstancesFile(const std::string& filename);
-  void ParseInstancesString(const std::string& instances_string);
+  void ParseInstancesFile(std::string_view filename);
+  void ParseInstancesString(std::string_view instances_string);
   void CreateOffers();
 
   std::vector<Instance> all_instances_;

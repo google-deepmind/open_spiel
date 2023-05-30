@@ -124,7 +124,7 @@ class KriegspielState : public State {
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   KriegspielState(std::shared_ptr<const Game> game, int board_size,
-                  const std::string& fen, bool threefold_repetition,
+                  std::string_view fen, bool threefold_repetition,
                   bool rule_50_move);
   KriegspielState(const KriegspielState&) = default;
 

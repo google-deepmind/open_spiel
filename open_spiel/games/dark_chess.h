@@ -63,7 +63,7 @@ class DarkChessState : public State {
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   DarkChessState(std::shared_ptr<const Game> game, int board_size,
-                 const std::string& fen);
+                 std::string_view fen);
   DarkChessState(const DarkChessState&) = default;
 
   DarkChessState& operator=(const DarkChessState&) = default;

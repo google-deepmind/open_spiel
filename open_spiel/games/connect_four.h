@@ -62,7 +62,7 @@ class ConnectFourState : public State {
  public:
   ConnectFourState(std::shared_ptr<const Game>);
   explicit ConnectFourState(std::shared_ptr<const Game> game,
-                            const std::string& str);
+                            std::string_view str);
   ConnectFourState(const ConnectFourState& other) = default;
 
   Player CurrentPlayer() const override;

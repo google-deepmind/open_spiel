@@ -115,7 +115,7 @@ std::string UncontestedBiddingState::ActionToString(Player player,
       std::string(1, kDenominationChar[Denomination(action_id)]));
 }
 
-Action ActionFromString(const std::string& str) {
+Action ActionFromString(std::string_view str) {
   if (str == "Pass") return kPass;
   SPIEL_CHECK_EQ(str.length(), 2);
   auto level = str[0] - '0';
@@ -396,7 +396,7 @@ UncontestedBiddingGame::UncontestedBiddingGame(const GameParameters& params)
 // Deserialize the deal and auction
 // e.g. "AKQJ.543.QJ8.T92 97532.A2.9.QJ853 2N-3C"
 std::unique_ptr<State> UncontestedBiddingGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   if (str.empty()) {
     return absl::make_unique<UncontestedBiddingState>(
         shared_from_this(), reference_contracts_, deal_filter_, forced_actions_,
@@ -452,7 +452,7 @@ std::string UncontestedBiddingGame::GetRNGState() const {
   return std::to_string(rng_seed_);
 }
 
-void UncontestedBiddingGame::SetRNGState(const std::string& rng_state) const {
+void UncontestedBiddingGame::SetRNGState(std::string_view rng_state) const {
   if (rng_state.empty()) return;
   SPIEL_CHECK_TRUE(absl::SimpleAtoi(rng_state, &rng_seed_));
 }

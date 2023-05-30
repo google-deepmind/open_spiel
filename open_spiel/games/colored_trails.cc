@@ -202,7 +202,7 @@ std::string Board::PrettyBoardString() const {
   return str;
 }
 
-void Board::ParseFromLine(const std::string& line) {
+void Board::ParseFromLine(std::string_view line) {
   // Example: 4 5 3 AAEDCABCDAAABBEE AACCCD AAAC BBCEE 14 7 0 2
   std::vector<std::string> parts = absl::StrSplit(line, ' ');
   SPIEL_CHECK_EQ(parts.size(), 3 + 2 * num_players + 2);

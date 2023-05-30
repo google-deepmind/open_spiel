@@ -118,7 +118,7 @@ float ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
 }
 
 float ValueAt(const std::vector<float>& v, const std::vector<int>& shape,
-              int plane, const std::string& square) {
+              int plane, std::string_view square) {
   Square sq = *SquareFromString(square);
   return ValueAt(v, shape, plane, sq.x, sq.y);
 }

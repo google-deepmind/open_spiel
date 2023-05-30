@@ -128,7 +128,7 @@ inline std::string FileToString(int8_t file) {
 inline constexpr std::array<Offset, 8> kKnightOffsets = {
     {{-2, -1}, {-2, 1}, {-1, -2}, {-1, 2}, {2, -1}, {2, 1}, {1, -2}, {1, 2}}};
 
-absl::optional<Square> SquareFromString(const std::string& s);
+absl::optional<Square> SquareFromString(std::string_view s);
 
 bool IsLongDiagonal(const chess::Square& from_sq, const chess::Square& to_sq,
                     int board_size);
@@ -221,7 +221,38 @@ inline std::ostream& operator<<(std::ostream& stream, const Move& m) {
 
 bool IsMoveCharacter(char c);
 
-std::pair<std::string, std::string> SplitAnnotations(const std::string& move);
+template <
+    bool memory_safe = true,
+    typename T = std::conditional_t<memory_safe, std::string, std::string_view>>
+std::pair<T, T>
+SplitAnnotations(std::conditional_t<memory_safe, const T &, T> move);
+
+template <>
+std::pair<std::string, std::string>
+SplitAnnotations<true>(const std::string &move) {
+  for (int i = 0; i < move.size(); ++i) {
+    if (!IsMoveCharacter(move[i])) {
+      return {move.substr(0, i), std::string{absl::ClippedSubstr(move, i)}};
+    }
+  }
+  return {move, ""};
+}
+template <>
+std::pair<std::string_view, std::string_view>
+SplitAnnotations<false>(std::string_view move) {
+  for (int i = 0; i < move.size(); ++i) {
+    if (!IsMoveCharacter(move[i])) {
+      return {move.substr(0, i), absl::ClippedSubstr(move, i)};
+    }
+  }
+  return {move, ""};
+}
+
+//std::pair<std::string, std::string> SplitAnnotations(const std::string &move);
+//
+//struct view_tag {};
+//std::pair<std::string_view, std::string_view>
+//SplitAnnotations(std::string_view move, view_tag);
 
 inline constexpr int kMaxBoardSize = 8;
 inline constexpr int kDefaultBoardSize = 8;
@@ -260,7 +291,7 @@ class ChessBoard {
   // Constructs a chess board at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   static absl::optional<ChessBoard> BoardFromFEN(
-      const std::string& fen, int board_size = 8,
+      std::string_view fen, int board_size = 8,
       bool king_in_check_allowed = false,
       bool allow_pass_move = false);
 
@@ -346,19 +377,19 @@ class ChessBoard {
 
   // Parses a move in standard algebraic notation or long algebraic notation
   // (see below). Returns absl::nullopt on failure.
-  absl::optional<Move> ParseMove(const std::string& move) const;
+  absl::optional<Move> ParseMove(std::string_view move) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.
   // https://en.wikipedia.org/wiki/Algebraic_notation_(chess).
   // Returns absl::nullopt on failure.
-  absl::optional<Move> ParseSANMove(const std::string& move) const;
+  absl::optional<Move> ParseSANMove(std::string_view move) const;
 
   // Parses a move in long algebraic notation.
   // Long algebraic notation is not standardized and there are many variants,
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
   // Returns absl::nullopt on failure.
-  absl::optional<Move> ParseLANMove(const std::string& move) const;
+  absl::optional<Move> ParseLANMove(std::string_view move) const;
 
   void ApplyMove(const Move& move);
 

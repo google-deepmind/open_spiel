@@ -66,7 +66,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
-PointsOrder ParsePointsOrder(const std::string& po_str) {
+PointsOrder ParsePointsOrder(std::string_view po_str) {
   if (po_str == "random") {
     return PointsOrder::kRandom;
   } else if (po_str == "descending") {
@@ -79,7 +79,7 @@ PointsOrder ParsePointsOrder(const std::string& po_str) {
   }
 }
 
-ReturnsType ParseReturnsType(const std::string& returns_type_str) {
+ReturnsType ParseReturnsType(std::string_view returns_type_str) {
   if (returns_type_str == "win_loss") {
     return ReturnsType::kWinLoss;
   } else if (returns_type_str == "point_difference") {

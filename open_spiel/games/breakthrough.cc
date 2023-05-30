@@ -400,7 +400,7 @@ std::string BreakthroughState::Serialize() const {
 }
 
 std::unique_ptr<State> BreakthroughGame::DeserializeState(
-    const std::string& str) const {
+    std::string_view str) const {
   std::unique_ptr<State> state = NewInitialState();
 
   if (str.length() != rows_ * cols_) {

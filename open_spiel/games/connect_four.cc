@@ -230,8 +230,8 @@ ConnectFourGame::ConnectFourGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
 ConnectFourState::ConnectFourState(std::shared_ptr<const Game> game,
-                                   const std::string& str)
-    : State(game) {
+                                   std::string_view str)
+    : State(std::move(game)) {
   int xs = 0;
   int os = 0;
   int r = 5;

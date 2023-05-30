@@ -127,7 +127,7 @@ class ChessState : public State {
 
   // Constructs a chess state at the given position in Forsyth-Edwards Notation.
   // https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  ChessState(std::shared_ptr<const Game> game, const std::string& fen);
+  ChessState(std::shared_ptr<const Game> game, std::string_view fen);
   ChessState(const ChessState&) = default;
 
   ChessState& operator=(const ChessState&) = default;
@@ -169,7 +169,7 @@ class ChessState : public State {
   // Returns an action parsed from standard algebraic notation or long
   // algebraic notation (using ChessBoard::ParseMove), or kInvalidAction if
   // the parsing fails.
-  Action ParseMoveToAction(const std::string& move_str) const;
+  Action ParseMoveToAction(std::string_view move_str) const;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -219,8 +219,8 @@ class ChessGame : public Game {
     return chess::NumDistinctActions();
   }
   std::unique_ptr<State> NewInitialState(
-      const std::string& fen) const override {
-    return absl::make_unique<ChessState>(shared_from_this(), fen);
+      std::string_view fen) const override {
+    return absl::make_unique<ChessState>(shared_from_this(), std::string{fen});
   }
   std::unique_ptr<State> NewInitialState() const override {
     return absl::make_unique<ChessState>(shared_from_this());

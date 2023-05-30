@@ -127,20 +127,20 @@ class EFGGame : public Game {
   std::vector<int> InformationStateTensorShape() const override;
 
   // Gets the player / decision node action associated to this label.
-  Action GetAction(const std::string& label) const {
+  Action GetAction(std::string_view label) const {
     auto iter = action_ids_.find(label);
     SPIEL_CHECK_TRUE(iter != action_ids_.end());
     return iter->second;
   }
 
   // Gets the chance node action associated to this label.
-  Action GetChanceAction(const std::string& label) const {
+  Action GetChanceAction(std::string_view label) const {
     auto iter = chance_action_ids_.find(label);
     SPIEL_CHECK_TRUE(iter != chance_action_ids_.end());
     return iter->second;
   }
 
-  Action AddOrGetAction(const std::string& label) {
+  Action AddOrGetAction(std::string_view label) {
     auto iter = action_ids_.find(label);
     if (iter != action_ids_.end()) {
       return iter->second;
@@ -150,7 +150,7 @@ class EFGGame : public Game {
     return new_action;
   }
 
-  Action AddOrGetChanceOutcome(const std::string& label) {
+  Action AddOrGetChanceOutcome(std::string_view label) {
     auto iter = chance_action_ids_.find(label);
     if (iter != chance_action_ids_.end()) {
       return iter->second;
@@ -167,7 +167,7 @@ class EFGGame : public Game {
   // GetInformationStateStringByName if the names are unique and there is a
   // one-to-one correspondence with infoset numbers!
   std::string GetInformationStateStringByName(Player player,
-                                              const std::string& name) const;
+                                              std::string_view name) const;
   std::string GetInformationStateStringByNumber(Player player,
                                                 int number) const;
 

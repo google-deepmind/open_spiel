@@ -115,7 +115,7 @@ class BreakthroughGame : public Game {
   }
 
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      std::string_view str) const override;
 
  private:
   int rows_ = -1;

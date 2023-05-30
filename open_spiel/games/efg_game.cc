@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <utility>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -89,7 +90,7 @@ std::string NodeToString(const Node* node) {
 }
 
 std::string EFGInformationStateString(Player owner, Player observer, int number,
-                                      const std::string& name) {
+                                      std::string_view name) {
   return absl::StrCat(owner, "-", observer, "-", number, "-", name);
 }
 }  // namespace
@@ -770,7 +771,7 @@ std::string EFGGame::PrettyTree(const Node* node,
 }
 
 std::string EFGGame::GetInformationStateStringByName(
-    Player player, const std::string& name) const {
+    Player player, std::string_view name) const {
   const auto& iter = infoset_name_to_player_num_.find(name);
   if (iter == infoset_name_to_player_num_.end()) {
     SpielFatalError(absl::StrCat("Information state not found: ", name));

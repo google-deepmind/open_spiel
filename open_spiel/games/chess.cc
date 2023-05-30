@@ -91,7 +91,7 @@ ChessState::ChessState(std::shared_ptr<const Game> game)
   repetitions_[current_board_.HashValue()] = 1;
 }
 
-ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
+ChessState::ChessState(std::shared_ptr<const Game> game, std::string_view fen)
     : State(game) {
   auto maybe_board = ChessBoard::BoardFromFEN(fen);
   SPIEL_CHECK_TRUE(maybe_board);
@@ -100,7 +100,7 @@ ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
   repetitions_[current_board_.HashValue()] = 1;
 }
 
-Action ChessState::ParseMoveToAction(const std::string& move_str) const {
+Action ChessState::ParseMoveToAction(std::string_view move_str) const {
   absl::optional<Move> move = Board().ParseMove(move_str);
   if (!move.has_value()) {
     return kInvalidAction;
