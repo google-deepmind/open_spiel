@@ -285,7 +285,7 @@ std::shared_ptr<const Game> ConvertToTurnBased(const Game& game) {
       new TurnBasedSimultaneousGame(game.shared_from_this()));
 }
 
-std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name) {
+std::shared_ptr<const Game> LoadGameAsTurnBased(std::string_view name) {
   auto game = LoadGame(name);
   if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous) {
     return ConvertToTurnBased(*game);
@@ -294,7 +294,7 @@ std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name) {
   }
 }
 
-std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
+std::shared_ptr<const Game> LoadGameAsTurnBased(std::string_view name,
                                                 const GameParameters& params) {
   auto game = LoadGame(name, params);
   if (game->GetType().dynamics == GameType::Dynamics::kSimultaneous) {

@@ -109,7 +109,7 @@ class OutcomeSamplingMCCFRSolver {
 };
 
 std::unique_ptr<OutcomeSamplingMCCFRSolver>
-DeserializeOutcomeSamplingMCCFRSolver(const std::string& serialized,
+DeserializeOutcomeSamplingMCCFRSolver(std::string_view serialized,
                                       std::string delimiter = "<~>");
 
 }  // namespace algorithms

@@ -125,8 +125,8 @@ std::shared_ptr<const Game> ConvertToTurnBased(const Game& game);
 
 // These are equivalent to LoadGame but converts the game to turn-based if it is
 // not already one. They are simple wrappers provided for the Python API.
-std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name);
-std::shared_ptr<const Game> LoadGameAsTurnBased(const std::string& name,
+std::shared_ptr<const Game> LoadGameAsTurnBased(std::string_view name);
+std::shared_ptr<const Game> LoadGameAsTurnBased(std::string_view name,
                                                 const GameParameters& params);
 
 }  // namespace open_spiel

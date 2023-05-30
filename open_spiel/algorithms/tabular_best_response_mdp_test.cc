@@ -29,7 +29,7 @@ namespace {
 constexpr int kNumLiarsDiceCFRIterations = 1;
 constexpr double kFloatTolerance = 1e-12;
 
-double NashConvTest(const std::string& game_string, const Policy& policy,
+double NashConvTest(std::string_view game_string, const Policy& policy,
                     absl::optional<double> expected_nash_conv = absl::nullopt) {
   std::shared_ptr<const Game> game = LoadGame(game_string);
   TabularBestResponseMDP tbr(*game, policy);
@@ -117,7 +117,7 @@ void GoofspielGameTests() {
     "goofspiel(num_cards=3,points_order=descending)",
   };
 
-  for (const std::string& game_string : game_strings) {
+  for (std::string_view game_string : game_strings) {
     std::string tbs_game_string =
         absl::StrCat("turn_based_simultaneous_game(game=", game_string, ")");
     std::shared_ptr<const Game> tbs_game = LoadGame(tbs_game_string);

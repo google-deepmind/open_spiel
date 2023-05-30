@@ -23,7 +23,7 @@ namespace algorithms {
 
 using open_spiel::tensor_game::TensorGame;
 
-std::shared_ptr<const TensorGame> LoadTensorGame(const std::string& name) {
+std::shared_ptr<const TensorGame> LoadTensorGame(std::string_view name) {
   std::shared_ptr<const Game> game = LoadGame(name);
   // Make sure it is indeed a tensor game.
   const TensorGame* tensor_game = dynamic_cast<const TensorGame*>(game.get());

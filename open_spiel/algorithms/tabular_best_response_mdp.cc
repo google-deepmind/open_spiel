@@ -33,7 +33,7 @@ namespace {
 constexpr double kSolveTolerance = 1e-12;
 }  // namespace
 
-MDPNode::MDPNode(const std::string& node_key)
+MDPNode::MDPNode(std::string_view node_key)
     : terminal_(false), total_weight_(0), children_(), value_(0),
       node_key_(node_key) {}
 
@@ -47,14 +47,14 @@ MDP::MDP() : terminal_node_uid_(0), num_nonterminal_nodes_(0) {
   node_map_[kRootKey]->add_weight(1.0);
 }
 
-MDPNode *MDP::CreateTerminalNode(const std::string &node_key) {
+MDPNode *MDP::CreateTerminalNode(std::string_view node_key) {
   ++terminal_node_uid_;
   MDPNode *terminal_node = LookupOrCreateNode(node_key, true);
   terminal_node->set_terminal(true);
   return terminal_node;
 }
 
-MDPNode *MDP::LookupOrCreateNode(const std::string &node_key, bool terminal) {
+MDPNode *MDP::LookupOrCreateNode(std::string_view node_key, bool terminal) {
   const auto &iter = node_map_.find(node_key);
   if (iter != node_map_.end()) {
     return iter->second.get();

@@ -74,7 +74,7 @@ namespace algorithms {
 
 class MDPNode {
  public:
-  explicit MDPNode(const std::string& node_key);
+  explicit MDPNode(std::string_view node_key);
 
   bool terminal() const { return terminal_; }
   double total_weight() const { return total_weight_; }
@@ -104,8 +104,8 @@ class MDPNode {
 class MDP {
  public:
   MDP();
-  MDPNode* CreateTerminalNode(const std::string& node_key);
-  MDPNode* LookupOrCreateNode(const std::string& node_key,
+  MDPNode* CreateTerminalNode(std::string_view node_key);
+  MDPNode* LookupOrCreateNode(std::string_view node_key,
                               bool terminal = false);
   MDPNode* RootNode() { return node_map_[kRootKey].get(); }
 

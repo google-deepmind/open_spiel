@@ -39,7 +39,7 @@ struct MDPState {
 void AddTransition(
     absl::flat_hash_map<Action, vector<std::pair<std::string, double>>>*
         transitions,
-    const std::string& key, const std::unique_ptr<State>& state) {
+    std::string_view key, const std::unique_ptr<State>& state) {
   for (Action action : state->LegalActions()) {
     std::unique_ptr<State> next_state = state->Child(action);
     vector<std::pair<std::string, double>> possibilities;
@@ -63,7 +63,7 @@ void InitializeMaps(
     const std::map<std::string, std::unique_ptr<State>>& states,
     absl::flat_hash_map<std::string, MDPState>* mdp_state_nodes) {
   for (const auto& kv : states) {
-    const std::string& key = kv.first;
+    std::string_view key = kv.first;
     if (kv.second->IsTerminal()) {
       // For both 1-player and 2-player zero sum games, suffices to look at
       // player 0's utility
@@ -155,7 +155,7 @@ absl::flat_hash_map<std::string, double> PolicyIteration(const Game& game,
     do {
       error = 0;
       for (const auto& kv : states) {
-        const std::string& key = kv.first;
+        std::string_view key = kv.first;
         if (kv.second->IsTerminal()) continue;
 
         // Evaluate the state value function
@@ -173,7 +173,7 @@ absl::flat_hash_map<std::string, double> PolicyIteration(const Game& game,
     double max_utility = game.MaxUtility();
     policy_stable = true;
     for (const auto& kv : states) {
-      const std::string& key = kv.first;
+      std::string_view key = kv.first;
       if (kv.second->IsTerminal()) continue;
 
       Player player = kv.second->CurrentPlayer();

@@ -28,7 +28,7 @@ namespace algorithms {
 // so that the subclass's specific methods are accessible.
 
 std::shared_ptr<const tensor_game::TensorGame> LoadTensorGame(
-    const std::string& name);
+    std::string_view name);
 
 // Clones a normal-form game and returns it as a TensorGame.
 

@@ -114,7 +114,7 @@ class RepeatedGame : public SimMoveGame {
 std::shared_ptr<const Game> CreateRepeatedGame(const Game& stage_game,
                                                const GameParameters& params);
 std::shared_ptr<const Game> CreateRepeatedGame(
-    const std::string& stage_game_name, const GameParameters& params);
+    std::string_view stage_game_name, const GameParameters& params);
 
 }  // namespace open_spiel
 
