@@ -50,6 +50,7 @@ class PyBot : public Bot {
   ~PyBot() override = default;
 
   using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
+  using BotUniquePtr = std::unique_ptr<Bot>;
 
   // Choose and execute an action in a game. The bot should return its
   // distribution over actions and also its selected action.
@@ -148,6 +149,24 @@ class PyBot : public Bot {
         state                // Arguments
     );
   }
+
+  bool IsClonable() const override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,           // Return type (must be a simple token for macro parser)
+        Bot,            // Parent class
+        "is_clonable",  // Name of function in Python
+        IsClonable,     // Name of function in C++
+    );
+  }
+
+  std::unique_ptr<Bot> Clone() override {
+    PYBIND11_OVERLOAD_NAME(
+        BotUniquePtr,  // Return type (must be a simple token for macro parser)
+        Bot,           // Parent class
+        "clone",       // Name of function in Python
+        Clone,         // Name of function in C++
+    );
+  }
 };
 }  // namespace
 
@@ -163,7 +182,9 @@ void init_pyspiel_bots(py::module& m) {
       .def("inform_actions", &Bot::InformActions)
       .def("provides_policy", &Bot::ProvidesPolicy)
       .def("get_policy", &Bot::GetPolicy)
-      .def("step_with_policy", &Bot::StepWithPolicy);
+      .def("step_with_policy", &Bot::StepWithPolicy)
+      .def("is_clonable", &Bot::IsClonable)
+      .def("clone", &Bot::Clone);
 
   m.def(
       "load_bot",

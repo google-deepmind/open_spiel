@@ -48,11 +48,11 @@
 //   total deadwood count. If two different meld arrangements are equal in this
 //   regard, one is chosen arbitrarily. No layoffs are made if opponent knocks.
 
+#include <memory>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/games/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -63,7 +63,8 @@ namespace gin_rummy {
 
 class SimpleGinRummyBot : public Bot {
  public:
-  SimpleGinRummyBot(GameParameters params, const Player player_id)
+
+  SimpleGinRummyBot(GameParameters params, Player player_id)
       : params_(params),
         player_id_(player_id),
         hand_size_(params["hand_size"]->int_value()),
@@ -73,10 +74,17 @@ class SimpleGinRummyBot : public Bot {
 
   void Restart() override;
   Action Step(const State& state) override;
+
   bool ProvidesPolicy() override { return true; }
   std::pair<ActionsAndProbs, Action> StepWithPolicy(
       const State& state) override;
   ActionsAndProbs GetPolicy(const State& state) override;
+
+  bool IsClonable() const override { return true; }
+  std::unique_ptr<Bot> Clone() override {
+    return std::make_unique<SimpleGinRummyBot>(*this);
+  }
+  SimpleGinRummyBot(const SimpleGinRummyBot& other) = default;
 
  private:
   GameParameters params_;
@@ -88,8 +96,7 @@ class SimpleGinRummyBot : public Bot {
   std::vector<Action> next_actions_;
 
   std::vector<int> GetBestDeadwood(
-      const std::vector<int> hand,
-      const absl::optional<int> card = absl::nullopt) const;
+      std::vector<int> hand, absl::optional<int> card = absl::nullopt) const;
   int GetDiscard(const std::vector<int>& hand) const;
   std::vector<int> GetMelds(std::vector<int> hand) const;
 };

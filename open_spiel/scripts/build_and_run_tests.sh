@@ -165,8 +165,8 @@ function print_tests_failed {
   echo -e "\033[31mAt least one test failed.\e[0m"
   echo "If this is the first time you have run these tests, try:"
   echo "python3 -m pip install -r requirements.txt"
-  echo "Note that outside a virtualenv, you will need to install the system "
-  echo "wide matplotlib: sudo apt-get install python-matplotlib"
+  echo "Note that outside a virtualenv, you will need to install the "
+  echo "system-wide matplotlib: sudo apt-get install python-matplotlib"
   exit 1
 }
 

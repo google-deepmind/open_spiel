@@ -62,6 +62,12 @@ class UniformRandomBot : public Bot {
     return std::make_pair(policy, policy[selection].first);
   }
 
+  bool IsClonable() const override { return true; }
+  std::unique_ptr<Bot> Clone() override {
+    return std::make_unique<UniformRandomBot>(*this);
+  }
+  UniformRandomBot(const UniformRandomBot& other) = default;
+
  private:
   const Player player_id_;
   std::mt19937 rng_;
@@ -92,6 +98,12 @@ class StatefulRandomBot : public UniformRandomBot {
     state_->ApplyAction(ret.second);
     return ret;
   }
+
+  std::unique_ptr<Bot> Clone() override {
+    return std::make_unique<StatefulRandomBot>(*this);
+  }
+  StatefulRandomBot(const StatefulRandomBot& other)
+      : UniformRandomBot(other), state_(other.state_->Clone()) {}
 
  private:
   void CheckStatesEqual(const State& state1, const State& state2) const {
@@ -126,6 +138,12 @@ class PolicyBot : public Bot {
     return {actions_and_probs, SampleAction(actions_and_probs, rng_).first};
   }
 
+  bool IsClonable() const override { return true; }
+  std::unique_ptr<Bot> Clone() override {
+    return std::make_unique<PolicyBot>(*this);
+  }
+  PolicyBot(const PolicyBot& other) = default;
+
  private:
   std::mt19937 rng_;
   std::shared_ptr<Policy> policy_;
@@ -159,6 +177,12 @@ class FixedActionPreferenceBot : public Bot {
     ActionsAndProbs actions_and_probs = GetPolicy(state);
     return {actions_and_probs, actions_and_probs[0].first};
   }
+
+  bool IsClonable() const override { return true; }
+  std::unique_ptr<Bot> Clone() override {
+    return std::make_unique<FixedActionPreferenceBot>(*this);
+  }
+  FixedActionPreferenceBot(const FixedActionPreferenceBot& other) = default;
 
  private:
   const Player player_id_;

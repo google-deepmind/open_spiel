@@ -55,8 +55,8 @@ class BuildExt(build_ext):
     except OSError as e:
       ext_names = ", ".join(e.name for e in self.extensions)
       raise RuntimeError(
-          f"CMake must be installed to build the following extensions: {ext_names}"
-      ) from e
+          "CMake must be installed to build" +
+          f"the following extensions: {ext_names}") from e
     print("Found CMake")
 
     cxx = "clang++"
@@ -129,7 +129,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="1.2",
+    version="1.3",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",
