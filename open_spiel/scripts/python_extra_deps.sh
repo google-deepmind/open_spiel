@@ -18,9 +18,9 @@
 # Python API, but are required by certain algorithms or tools. Packages here
 # are for testing purposes: they are not installed by any of the install
 # scripts, and are referred to only in the testing scripts run on GitHub, so
-# they must installed separately. The versions are pinned to ensure that tests
-# are covering only those versions supported by the algorithms that use them,
-# but could work for other versions too.
+# they must be installed separately. The versions are pinned to ensure that
+# tests are covering only those versions supported by the algorithms that use
+# them, but could work for other versions too.
 #
 # To enable specific tests, please use the environment variables found in
 # scripts/global_variables.sh
