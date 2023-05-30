@@ -31,13 +31,13 @@ void GameConfigSimTest() {
            cps += 5) {
         if (suits * cps - 1 >= players) {
           open_spiel::GameParameters params;
-          params["players"] = GameParameter(players);
-          params["num_suits"] = GameParameter(suits);
-          params["num_cards_per_suit"] = GameParameter(cps);
+          params["players"] = MakeGameParameter(players);
+          params["num_suits"] = MakeGameParameter(suits);
+          params["num_cards_per_suit"] = MakeGameParameter(cps);
           // test with a randomly selected number of tricks
           testing::RandomSimTest(*LoadGame("oh_hell", params), 1);
           // test with a fixed number of tricks
-          params["num_tricks_fixed"] = GameParameter(1);
+          params["num_tricks_fixed"] = MakeGameParameter(1);
           testing::RandomSimTest(*LoadGame("oh_hell", params), 1);
         }
       }
@@ -206,9 +206,9 @@ void InformationStateTensorTest(int num_games = 10) {
   int num_suits = kMaxNumSuits;
   int num_cards_per_suit = kMaxNumCardsPerSuit;
   open_spiel::GameParameters params;
-  params["players"] = GameParameter(num_players);
-  params["num_suits"] = GameParameter(num_suits);
-  params["num_cards_per_suit"] = GameParameter(num_cards_per_suit);
+  params["players"] = MakeGameParameter(num_players);
+  params["num_suits"] = MakeGameParameter(num_suits);
+  params["num_cards_per_suit"] = MakeGameParameter(num_cards_per_suit);
   DeckProperties deck_props = DeckProperties(num_suits, num_cards_per_suit);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("oh_hell", params);

@@ -32,20 +32,20 @@ void BasicNegotiationTests() {
   // Try without utterances.
   std::cout << "\nStarting no utterances test..." << std::endl;
   testing::RandomSimTest(
-      *LoadGame("negotiation", {{"enable_utterances", GameParameter(false)}}),
+      *LoadGame("negotiation", {{"enable_utterances", MakeGameParameter(false)}}),
       100);
 
   // Try without utterances and without proposals
   std::cout << "\nStarting no utterances and no proposals test..." << std::endl;
   testing::RandomSimTest(
-      *LoadGame("negotiation", {{"enable_utterances", GameParameter(false)},
-                                {"enable_proposals", GameParameter(false)}}),
+      *LoadGame("negotiation", {{"enable_utterances", MakeGameParameter(false)},
+                                {"enable_proposals", MakeGameParameter(false)}}),
       100);
 
   // Try without without proposals
   std::cout << "\nStarting no utterances and no proposals test..." << std::endl;
   testing::RandomSimTest(
-      *LoadGame("negotiation", {{"enable_proposals", GameParameter(false)}}),
+      *LoadGame("negotiation", {{"enable_proposals", MakeGameParameter(false)}}),
       100);
 }
 

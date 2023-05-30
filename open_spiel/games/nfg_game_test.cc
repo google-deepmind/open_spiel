@@ -99,7 +99,7 @@ void NFGLoadSampleFromFile() {
   if (file.has_value()) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("nfg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("nfg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     GameType type = game->GetType();
     SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSimultaneous);
@@ -118,7 +118,7 @@ void NFGLoadMatchingPennies3pFromFile() {
   if (file.has_value()) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("nfg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("nfg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     const TensorGame* tensor_game = dynamic_cast<const TensorGame*>(game.get());
     SPIEL_CHECK_TRUE(tensor_game != nullptr);

@@ -32,8 +32,8 @@ void BasicOshiZumoTests() {
 
 void CountStates() {
   std::shared_ptr<const Game> game =
-      LoadGame("oshi_zumo", {{"horizon", open_spiel::GameParameter(5)},
-                             {"coins", open_spiel::GameParameter(5)}});
+      LoadGame("oshi_zumo", {{"horizon", open_spiel::MakeGameParameter(5)},
+                             {"coins", open_spiel::MakeGameParameter(5)}});
   auto states = algorithms::GetAllStates(*game, /*depth_limit=*/-1,
                                          /*include_terminals=*/true,
                                          /*include_chance_states=*/true);
@@ -48,7 +48,7 @@ void CountStates() {
 int main(int argc, char **argv) {
   open_spiel::oshi_zumo::BasicOshiZumoTests();
   std::shared_ptr<const open_spiel::Game> game = open_spiel::LoadGame(
-      "oshi_zumo", {{"horizon", open_spiel::GameParameter(5)}});
+      "oshi_zumo", {{"horizon", open_spiel::MakeGameParameter(5)}});
   open_spiel::oshi_zumo::CountStates();
   open_spiel::testing::RandomSimTest(*game, /*num_sims=*/10);
 }

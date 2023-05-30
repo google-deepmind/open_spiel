@@ -51,11 +51,11 @@ const GameType kGameType{/*short_name=*/"oshi_zumo",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"alesia", GameParameter(kDefaultAlesia)},
-                          {"coins", GameParameter(kDefaultCoins)},
-                          {"size", GameParameter(kDefaultSize)},
-                          {"horizon", GameParameter(kDefaultHorizon)},
-                          {"min_bid", GameParameter(kDefaultMinBid)}}};
+                         {{"alesia", MakeGameParameter(kDefaultAlesia)},
+                          {"coins", MakeGameParameter(kDefaultCoins)},
+                          {"size", MakeGameParameter(kDefaultSize)},
+                          {"horizon", MakeGameParameter(kDefaultHorizon)},
+                          {"min_bid", MakeGameParameter(kDefaultMinBid)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new OshiZumoGame(params));

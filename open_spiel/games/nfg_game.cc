@@ -51,7 +51,7 @@ const GameType kGameType{/*short_name=*/"nfg_game",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
-                         {{"filename", GameParameter(std::string(""))}},
+                         {{"filename", MakeGameParameter(std::string(""))}},
                          /*default_loadable=*/false};
 
 class NFGGameParser {
@@ -290,7 +290,7 @@ class NFGGameParser {
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   // return std::shared_ptr<const Game>(new EFGGame(params));
-  std::string filename = params.at("filename").string_value();
+  std::string filename = params.at("filename")->string_value();
   std::string string_data = file::ReadContentsFromFile(filename, "r");
 
   SPIEL_CHECK_GT(string_data.size(), 0);

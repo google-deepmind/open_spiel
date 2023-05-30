@@ -30,21 +30,21 @@ void BasicNimTests() {
   testing::RandomSimTest(
       *LoadGame("nim",
                 {
-                    {"pile_sizes", GameParameter("100;200;300")},
+                    {"pile_sizes", MakeGameParameter("100;200;300")},
                 }),
       10);
   testing::RandomSimTest(
       *LoadGame("nim",
                 {
                     {"pile_sizes",
-                     GameParameter("10000;2000;3000;12414;1515;53252;1;35126")},
+                     MakeGameParameter("10000;2000;3000;12414;1515;53252;1;35126")},
                 }),
       10);
   testing::RandomSimTest(
       *LoadGame("nim",
                 {
-                    {"pile_sizes", GameParameter("1;2;3;4;5;6;7;8;9;10")},
-                    {"is_misere", GameParameter(false)},
+                    {"pile_sizes", MakeGameParameter("1;2;3;4;5;6;7;8;9;10")},
+                    {"is_misere", MakeGameParameter(false)},
                 }),
       10);
 }
@@ -52,8 +52,8 @@ void BasicNimTests() {
 void SinglePileNormalTest() {
   std::shared_ptr<const Game> game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("100")},
-                          {"is_misere", GameParameter(false)},
+                          {"pile_sizes", MakeGameParameter("100")},
+                          {"is_misere", MakeGameParameter(false)},
                       });
   std::unique_ptr<State> state = game->NewInitialState();
   std::vector<Action> actions = state->LegalActions();
@@ -68,7 +68,7 @@ void SinglePileNormalTest() {
 void SinglePileMisereTest() {
   std::shared_ptr<const Game> game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("100")},
+                          {"pile_sizes", MakeGameParameter("100")},
                       });
   std::unique_ptr<State> state = game->NewInitialState();
   std::vector<Action> actions = state->LegalActions();
@@ -83,8 +83,8 @@ void SinglePileMisereTest() {
 void VISinglePileNormalTest() {
   std::shared_ptr<const Game> game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("100")},
-                          {"is_misere", GameParameter(false)},
+                          {"pile_sizes", MakeGameParameter("100")},
+                          {"is_misere", MakeGameParameter(false)},
                       });
   auto values = algorithms::ValueIteration(*game, -1, 0.01);
   SPIEL_CHECK_EQ(values["(0): 100"], 1);
@@ -93,7 +93,7 @@ void VISinglePileNormalTest() {
 void VISinglePileMisereTest() {
   std::shared_ptr<const Game> game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("100")},
+                          {"pile_sizes", MakeGameParameter("100")},
                       });
   auto values = algorithms::ValueIteration(*game, -1, 0.01);
   SPIEL_CHECK_EQ(values["(0): 100"], 1);
@@ -105,8 +105,8 @@ void VISinglePileMisereTest() {
 void VIThreeOnesNormalTest() {
   std::shared_ptr<const Game> normal_game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("1;1;1")},
-                          {"is_misere", GameParameter(false)},
+                          {"pile_sizes", MakeGameParameter("1;1;1")},
+                          {"is_misere", MakeGameParameter(false)},
                       });
   auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
   SPIEL_CHECK_EQ(values["(0): 1 1 1"], 1);
@@ -115,7 +115,7 @@ void VIThreeOnesNormalTest() {
 void VIThreeOnesMisereTest() {
   std::shared_ptr<const Game> game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("1;1;1")},
+                          {"pile_sizes", MakeGameParameter("1;1;1")},
                       });
   auto values = algorithms::ValueIteration(*game, -1, 0.01);
   SPIEL_CHECK_EQ(values["(0): 1 1 1"], -1);
@@ -124,8 +124,8 @@ void VIThreeOnesMisereTest() {
 void VIThreePilesTest() {
   std::shared_ptr<const Game> normal_game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("5;8;13")},
-                          {"is_misere", GameParameter(false)},
+                          {"pile_sizes", MakeGameParameter("5;8;13")},
+                          {"is_misere", MakeGameParameter(false)},
                       });
   auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
   SPIEL_CHECK_EQ(values["(0): 5 8 13"], -1);
@@ -134,8 +134,8 @@ void VIThreePilesTest() {
 void VIFourPilesTest() {
   std::shared_ptr<const Game> normal_game =
       LoadGame("nim", {
-                          {"pile_sizes", GameParameter("2;3;8;10")},
-                          {"is_misere", GameParameter(false)},
+                          {"pile_sizes", MakeGameParameter("2;3;8;10")},
+                          {"is_misere", MakeGameParameter(false)},
                       });
   auto values = algorithms::ValueIteration(*normal_game, -1, 0.01);
   SPIEL_CHECK_EQ(values["(0): 2 3 8 10"], 1);

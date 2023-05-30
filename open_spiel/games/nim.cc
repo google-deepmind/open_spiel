@@ -60,8 +60,8 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     {
-        {"pile_sizes", GameParameter(std::string(kDefaultPileSizes))},
-        {"is_misere", GameParameter(kDefaultIsMisere)},
+        {"pile_sizes", MakeGameParameter(std::string(kDefaultPileSizes))},
+        {"is_misere", MakeGameParameter(kDefaultIsMisere)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {

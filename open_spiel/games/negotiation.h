@@ -73,7 +73,7 @@ class NegotiationGame;
 
 class NegotiationState : public State {
  public:
-  NegotiationState(std::shared_ptr<const Game> game);
+  NegotiationState(const std::shared_ptr<const Game>& game);
   NegotiationState(const NegotiationState&) = default;
 
   Player CurrentPlayer() const override;

@@ -45,21 +45,21 @@ const GameType kGameType{
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
-        {"players", GameParameter(kMinNumPlayers)},
-        {"num_suits", GameParameter(kMaxNumSuits)},
-        {"num_cards_per_suit", GameParameter(kMaxNumCardsPerSuit)},
+        {"players", MakeGameParameter(kMinNumPlayers)},
+        {"num_suits", MakeGameParameter(kMaxNumSuits)},
+        {"num_cards_per_suit", MakeGameParameter(kMaxNumCardsPerSuit)},
         // number of tricks in the game, must be between 1 and
         // (num_suits * num_cards_per_suit - 1) / num_players,
         // default is to choose randomly in the legal range every game
-        {"num_tricks_fixed", GameParameter(kRandomNumTricks)},
+        {"num_tricks_fixed", MakeGameParameter(kRandomNumTricks)},
         // In case of no off-bid penalty, players receive `points_per_trick`
         // per trick made, plus a bonus if their bid was correct.
         // In case of an off-bid penalty, if a player missed their bid, they
         // receive a penalty of `points_per_trick` times the number of tricks
         // they are above or below their bid and only if the bid was correct
         // they receive `points_per_trick` per trick made plus a bonus.
-        {"off_bid_penalty", GameParameter(false)},
-        {"points_per_trick", GameParameter(1)},
+        {"off_bid_penalty", MakeGameParameter(false)},
+        {"points_per_trick", MakeGameParameter(1)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
