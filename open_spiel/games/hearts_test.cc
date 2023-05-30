@@ -265,7 +265,7 @@ std::string InformationStateTensorToString(Player player,
 void InformationStateTensorTest(int num_games = 100) {
   std::mt19937 rng(time(0));
   GameParameters params;
-  params["jd_bonus"] = GameParameter(true);
+  params["jd_bonus"] = MakeGameParameter(true);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("hearts", params);
   for (int i = 0; i < num_games; ++i) {

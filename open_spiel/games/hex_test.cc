@@ -23,7 +23,7 @@ namespace testing = open_spiel::testing;
 
 void TestBoardOrientation() {
   std::shared_ptr<const Game> game = LoadGame(
-      "hex", {{"num_cols", GameParameter(3)}, {"num_rows", GameParameter(4)}});
+      "hex", {{"num_cols", MakeGameParameter(3)}, {"num_rows", MakeGameParameter(4)}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(1);
   state->ApplyAction(2);

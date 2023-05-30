@@ -31,7 +31,7 @@ void BasicHanabiTests() {
   testing::RandomSimTest(*LoadGame("hanabi"), 100);
   for (int players = 3; players <= 5; players++) {
     testing::RandomSimTest(
-        *LoadGame("hanabi", {{"players", GameParameter(players)}}), 100);
+        *LoadGame("hanabi", {{"players", MakeGameParameter(players)}}), 100);
   }
 
   auto observer = LoadGame("hanabi")

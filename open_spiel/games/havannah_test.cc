@@ -38,8 +38,8 @@ void BasicHavannahTests() {
 
   // Ansi colors!
   testing::RandomSimTest(
-      *LoadGame("havannah", {{"board_size", GameParameter(6)},
-                             {"ansi_color_output", GameParameter(true)}}),
+      *LoadGame("havannah", {{"board_size", MakeGameParameter(6)},
+                             {"ansi_color_output", MakeGameParameter(true)}}),
       3);
   testing::RandomSimTest(
       *LoadGame("havannah(board_size=5,ansi_color_output=True)"), 3);

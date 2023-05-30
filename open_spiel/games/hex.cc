@@ -41,9 +41,9 @@ const GameType kGameType{/*short_name=*/"hex",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"board_size", GameParameter(kDefaultBoardSize)},
-                             {"num_cols", GameParameter(kDefaultBoardSize)},
-                             {"num_rows", GameParameter(kDefaultBoardSize)},
+                             {"board_size", MakeGameParameter(kDefaultBoardSize)},
+                             {"num_cols", MakeGameParameter(kDefaultBoardSize)},
+                             {"num_rows", MakeGameParameter(kDefaultBoardSize)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

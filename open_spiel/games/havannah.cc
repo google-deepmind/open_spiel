@@ -44,9 +44,9 @@ const GameType kGameType{/*short_name=*/"havannah",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"board_size", GameParameter(kDefaultBoardSize)},
-                             {"swap", GameParameter(false)},
-                             {"ansi_color_output", GameParameter(false)},
+                             {"board_size", MakeGameParameter(kDefaultBoardSize)},
+                             {"swap", MakeGameParameter(false)},
+                             {"ansi_color_output", MakeGameParameter(false)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

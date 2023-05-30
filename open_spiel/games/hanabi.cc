@@ -39,15 +39,15 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"players", GameParameter(GameParameter::Type::kInt)},
-        {"colors", GameParameter(GameParameter::Type::kInt)},
-        {"ranks", GameParameter(GameParameter::Type::kInt)},
-        {"hand_size", GameParameter(GameParameter::Type::kInt)},
-        {"max_information_tokens", GameParameter(GameParameter::Type::kInt)},
-        {"max_life_tokens", GameParameter(GameParameter::Type::kInt)},
-        {"seed", GameParameter(GameParameter::Type::kInt)},
-        {"random_start_player", GameParameter(GameParameter::Type::kBool)},
-        {"observation_type", GameParameter(GameParameter::Type::kString)},
+        {"players", MakeGameParameter(GameParameter::Type::kInt)},
+        {"colors", MakeGameParameter(GameParameter::Type::kInt)},
+        {"ranks", MakeGameParameter(GameParameter::Type::kInt)},
+        {"hand_size", MakeGameParameter(GameParameter::Type::kInt)},
+        {"max_information_tokens", MakeGameParameter(GameParameter::Type::kInt)},
+        {"max_life_tokens", MakeGameParameter(GameParameter::Type::kInt)},
+        {"seed", MakeGameParameter(GameParameter::Type::kInt)},
+        {"random_start_player", MakeGameParameter(GameParameter::Type::kBool)},
+        {"observation_type", MakeGameParameter(GameParameter::Type::kString)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

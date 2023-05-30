@@ -46,23 +46,23 @@ const GameType kGameType{
     /*parameter_specification=*/
     {
         // Pass cards at the beginning of the hand.
-        {"pass_cards", GameParameter(true)},
+        {"pass_cards", MakeGameParameter(true)},
         // Cannot play hearts or QS on first trick.
-        {"no_pts_on_first_trick", GameParameter(true)},
+        {"no_pts_on_first_trick", MakeGameParameter(true)},
         // First player to play can lead any club.
-        {"can_lead_any_club", GameParameter(false)},
+        {"can_lead_any_club", MakeGameParameter(false)},
         // -10 for taking JD.
-        {"jd_bonus", GameParameter(false)},
+        {"jd_bonus", MakeGameParameter(false)},
         // -5 for taking no tricks.
-        {"avoid_all_tricks_bonus", GameParameter(false)},
+        {"avoid_all_tricks_bonus", MakeGameParameter(false)},
         // Must break hearts.
-        {"must_break_hearts", GameParameter(true)},
+        {"must_break_hearts", MakeGameParameter(true)},
         // QS breaks hearts.
-        {"qs_breaks_hearts", GameParameter(true)},
+        {"qs_breaks_hearts", MakeGameParameter(true)},
         // If aside from QS only hearts remain, player is
         // permitted to lead hearts even if hearts are
         // not broken.
-        {"can_lead_hearts_instead_of_qs", GameParameter(false)},
+        {"can_lead_hearts_instead_of_qs", MakeGameParameter(false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

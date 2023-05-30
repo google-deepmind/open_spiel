@@ -34,8 +34,8 @@ void BasicGoofspielTests() {
          {"win_loss", "point_difference", "total_points"}) {
       testing::RandomSimTest(
           *LoadGame("goofspiel",
-                    {{"players", GameParameter(players)},
-                     {"returns_type", GameParameter(returns_type)}}),
+                    {{"players", MakeGameParameter(players)},
+                     {"returns_type", MakeGameParameter(returns_type)}}),
           10);
     }
   }
@@ -43,29 +43,29 @@ void BasicGoofspielTests() {
 
 void LegalActionsValidAtEveryState() {
   GameParameters params;
-  params["imp_info"] = GameParameter(true);
-  params["num_cards"] = GameParameter(4);
-  params["points_order"] = GameParameter(std::string("descending"));
+  params["imp_info"] = MakeGameParameter(true);
+  params["num_cards"] = MakeGameParameter(4);
+  params["points_order"] = MakeGameParameter(std::string("descending"));
   std::shared_ptr<const Game> game = LoadGameAsTurnBased("goofspiel", params);
   testing::RandomSimTest(*game, /*num_sims=*/10);
 }
 
 void GoofspielWithLimitedTurns() {
   GameParameters params;
-  params["imp_info"] = GameParameter(true);
-  params["num_cards"] = GameParameter(13);
-  params["num_turns"] = GameParameter(3);
-  params["points_order"] = GameParameter(std::string("descending"));
+  params["imp_info"] = MakeGameParameter(true);
+  params["num_cards"] = MakeGameParameter(13);
+  params["num_turns"] = MakeGameParameter(3);
+  params["points_order"] = MakeGameParameter(std::string("descending"));
   testing::RandomSimTest(*LoadGame("goofspiel", params), 10);
 }
 
 void EgocentricViewOfSymmetricActions() {
   GameParameters params;
-  params["imp_info"] = GameParameter(true);
-  params["egocentric"] = GameParameter(true);
-  params["num_cards"] = GameParameter(4);
-  params["players"] = GameParameter(3);
-  params["points_order"] = GameParameter(std::string("descending"));
+  params["imp_info"] = MakeGameParameter(true);
+  params["egocentric"] = MakeGameParameter(true);
+  params["num_cards"] = MakeGameParameter(4);
+  params["players"] = MakeGameParameter(3);
+  params["points_order"] = MakeGameParameter(std::string("descending"));
   std::shared_ptr<const Game> game = LoadGame("goofspiel", params);
 
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
