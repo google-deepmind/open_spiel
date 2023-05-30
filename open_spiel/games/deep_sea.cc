@@ -45,10 +45,10 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"size", GameParameter(kDefaultSize)},
-        {"seed", GameParameter(kDefaultSeed)},
-        {"unscaled_move_cost", GameParameter(kDefaultUnscaledMoveCost)},
-        {"randomize_actions", GameParameter(kDefaultRandomizeActions)},
+        {"size", MakeGameParameter(kDefaultSize)},
+        {"seed", MakeGameParameter(kDefaultSeed)},
+        {"unscaled_move_cost", MakeGameParameter(kDefaultUnscaledMoveCost)},
+        {"randomize_actions", MakeGameParameter(kDefaultRandomizeActions)},
     }};
 
 std::shared_ptr<Game> Factory(const GameParameters& params) {

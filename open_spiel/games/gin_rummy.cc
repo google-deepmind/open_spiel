@@ -46,13 +46,13 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
     {
-        {"oklahoma", GameParameter(false)},
-        {"knock_card", GameParameter(kDefaultKnockCard)},
-        {"gin_bonus", GameParameter(kDefaultGinBonus)},
-        {"undercut_bonus", GameParameter(kDefaultUndercutBonus)},
-        {"num_ranks", GameParameter(kDefaultNumRanks)},
-        {"num_suits", GameParameter(kDefaultNumSuits)},
-        {"hand_size", GameParameter(kDefaultHandSize)},
+        {"oklahoma", MakeGameParameter(false)},
+        {"knock_card", MakeGameParameter(kDefaultKnockCard)},
+        {"gin_bonus", MakeGameParameter(kDefaultGinBonus)},
+        {"undercut_bonus", MakeGameParameter(kDefaultUndercutBonus)},
+        {"num_ranks", MakeGameParameter(kDefaultNumRanks)},
+        {"num_suits", MakeGameParameter(kDefaultNumSuits)},
+        {"hand_size", MakeGameParameter(kDefaultHandSize)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

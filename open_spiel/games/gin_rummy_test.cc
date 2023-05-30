@@ -133,7 +133,7 @@ void MeldTests() {
 void GameplayTest1() {
   GameParameters params;
   // Modify undercut bonus game parameter as an additional test.
-  params["undercut_bonus"] = GameParameter(20);
+  params["undercut_bonus"] = MakeGameParameter(20);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("gin_rummy", params);
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
@@ -448,7 +448,7 @@ void MaxGameLengthTest() {
 // skill level as correct strategy changes in response to the knock card.
 void OklahomaTest() {
   GameParameters params;
-  params["oklahoma"] = GameParameter(true);
+  params["oklahoma"] = MakeGameParameter(true);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("gin_rummy", params);
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
@@ -582,9 +582,9 @@ void DeckSizeTests() {
                  "+--------------------+\n");
   // Random sims with 10x3 deck size.
   GameParameters params;
-  params["num_ranks"] = GameParameter(10);
-  params["num_suits"] = GameParameter(3);
-  params["hand_size"] = GameParameter(7);
+  params["num_ranks"] = MakeGameParameter(10);
+  params["num_suits"] = MakeGameParameter(3);
+  params["hand_size"] = MakeGameParameter(7);
   std::shared_ptr<const open_spiel::Game> game =
       open_spiel::LoadGame("gin_rummy", params);
   testing::RandomSimTest(*game, 10);

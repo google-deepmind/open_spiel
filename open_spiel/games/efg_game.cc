@@ -52,7 +52,7 @@ const GameType kGameType{/*short_name=*/"efg_game",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
-                         {{"filename", GameParameter(std::string(""))}},
+                         {{"filename", MakeGameParameter(std::string(""))}},
                          /*default_loadable=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

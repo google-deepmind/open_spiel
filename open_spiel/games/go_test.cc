@@ -30,7 +30,7 @@ constexpr float kKomi = 7.5;
 
 void BasicGoTests() {
   GameParameters params;
-  params["board_size"] = GameParameter(13);
+  params["board_size"] = MakeGameParameter(13);
 
   testing::LoadGameTest("go");
   testing::NoChanceOutcomesTest(*LoadGame("go"));
@@ -40,9 +40,9 @@ void BasicGoTests() {
 
 void HandicapTest() {
   std::shared_ptr<const Game> game =
-      LoadGame("go", {{"board_size", open_spiel::GameParameter(kBoardSize)},
-                      {"komi", open_spiel::GameParameter(kKomi)},
-                      {"handicap", open_spiel::GameParameter(2)}});
+      LoadGame("go", {{"board_size", open_spiel::MakeGameParameter(kBoardSize)},
+                      {"komi", open_spiel::MakeGameParameter(kKomi)},
+                      {"handicap", open_spiel::MakeGameParameter(2)}});
   GoState state(game, kBoardSize, kKomi, 2);
   SPIEL_CHECK_EQ(state.CurrentPlayer(), ColorToPlayer(GoColor::kWhite));
   SPIEL_CHECK_EQ(state.board().PointColor(MakePoint("d4")), GoColor::kBlack);
@@ -52,7 +52,7 @@ void HandicapTest() {
 void ConcreteActionsAreUsedInTheAPI() {
   int board_size = 13;
   std::shared_ptr<const Game> game =
-      LoadGame("go", {{"board_size", open_spiel::GameParameter(board_size)}});
+      LoadGame("go", {{"board_size", open_spiel::MakeGameParameter(board_size)}});
   std::unique_ptr<State> state = game->NewInitialState();
 
   SPIEL_CHECK_EQ(state->NumDistinctActions(), board_size * board_size + 1);

@@ -38,8 +38,8 @@ const GameType kGameType{/*short_name=*/"first_sealed_auction",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {
-                             {"players", GameParameter(kDefaultPlayers)},
-                             {"max_value", GameParameter(kDefaultMaxValue)},
+                             {"players", MakeGameParameter(kDefaultPlayers)},
+                             {"max_value", MakeGameParameter(kDefaultMaxValue)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

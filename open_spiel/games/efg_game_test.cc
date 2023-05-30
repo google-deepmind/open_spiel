@@ -102,7 +102,7 @@ void EFGGameCommasFromFile() {
   if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("efg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     GameType type = game->GetType();
     SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
@@ -120,7 +120,7 @@ void EFGGameSimTestsSampleFromFile() {
   if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("efg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     testing::RandomSimTest(*game, 100);
   }
@@ -131,7 +131,7 @@ void EFGGameSimTestsKuhnFromFile() {
   if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("efg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     GameType type = game->GetType();
     SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
@@ -150,7 +150,7 @@ void EFGGameSimTestsLeducFromFile() {
   if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("efg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     GameType type = game->GetType();
     SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
@@ -169,7 +169,7 @@ void EFGGameSimTestsSignalingFromFile() {
   if (file != absl::nullopt) {
     std::cout << "Found file: " << file.value() << "; running sim test.";
     std::shared_ptr<const Game> game =
-        LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+        LoadGame("efg_game", {{"filename", MakeGameParameter(file.value())}});
     SPIEL_CHECK_TRUE(game != nullptr);
     GameType type = game->GetType();
     SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);
@@ -191,7 +191,7 @@ void EFGGameSimTestsExtendedFromFile() {
     if (file != absl::nullopt) {
       std::cout << "Found file: " << file.value() << "; running sim test.";
       std::shared_ptr<const Game> game =
-          LoadGame("efg_game", {{"filename", GameParameter(file.value())}});
+          LoadGame("efg_game", {{"filename", MakeGameParameter(file.value())}});
       SPIEL_CHECK_TRUE(game != nullptr);
       GameType type = game->GetType();
       SPIEL_CHECK_EQ(type.dynamics, GameType::Dynamics::kSequential);

@@ -48,8 +48,8 @@ const GameType kGameType{
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
     {
-        {"allow_lone_defender", GameParameter(false)},
-        {"stick_the_dealer", GameParameter(true)},
+        {"allow_lone_defender", MakeGameParameter(false)},
+        {"stick_the_dealer", MakeGameParameter(true)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {

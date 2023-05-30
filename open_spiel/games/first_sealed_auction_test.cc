@@ -33,8 +33,8 @@ void BasicFPSBATests(const GameParameters& params) {
 
 void TieBreak() {
   std::shared_ptr<const Game> game = LoadGame(
-      "first_sealed_auction", {{"players", open_spiel::GameParameter(3)},
-                               {"max_value", open_spiel::GameParameter(5)}});
+      "first_sealed_auction", {{"players", open_spiel::MakeGameParameter(3)},
+                               {"max_value", open_spiel::MakeGameParameter(5)}});
   std::vector<int64_t> action({1, 2, 3, 4, 5});
   auto state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->LegalActions(), std::vector<int64_t>({1, 2, 3, 4, 5}));
@@ -61,13 +61,13 @@ void TieBreak() {
 int main(int argc, char** argv) {
   open_spiel::first_sealed_auction::BasicFPSBATests({});
   open_spiel::first_sealed_auction::BasicFPSBATests(
-      {{"players", open_spiel::GameParameter(1)},
-       {"max_value", open_spiel::GameParameter(1)}});
+      {{"players", open_spiel::MakeGameParameter(1)},
+       {"max_value", open_spiel::MakeGameParameter(1)}});
   open_spiel::first_sealed_auction::BasicFPSBATests(
-      {{"players", open_spiel::GameParameter(10)},
-       {"max_value", open_spiel::GameParameter(2)}});
+      {{"players", open_spiel::MakeGameParameter(10)},
+       {"max_value", open_spiel::MakeGameParameter(2)}});
   open_spiel::first_sealed_auction::BasicFPSBATests(
-      {{"players", open_spiel::GameParameter(2)},
-       {"max_value", open_spiel::GameParameter(40)}});
+      {{"players", open_spiel::MakeGameParameter(2)},
+       {"max_value", open_spiel::MakeGameParameter(40)}});
   open_spiel::first_sealed_auction::TieBreak();
 }

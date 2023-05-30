@@ -23,9 +23,9 @@ namespace testing = open_spiel::testing;
 
 void GameBlackWinWithCollisionAndObs() {
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"num_cols", GameParameter(3)},
-                            {"num_rows", GameParameter(3)},
-                            {"obstype", GameParameter("reveal-numturns")}});
+      LoadGame("dark_hex", {{"num_cols", MakeGameParameter(3)},
+                            {"num_rows", MakeGameParameter(3)},
+                            {"obstype", MakeGameParameter("reveal-numturns")}});
   std::unique_ptr<State> state = game->NewInitialState();
   std::vector<Action> lm = state->LegalActions();  // initial legal moves
   // . . .
@@ -80,7 +80,7 @@ void GameBlackWinsMaximumCollisions() {
   //   . . .   . . .   . . .   . . .   . . .
   std::shared_ptr<const Game> game = LoadGame(
       "dark_hex",
-      {{"num_cols", GameParameter(3)}, {"num_rows", GameParameter(3)}});
+      {{"num_cols", MakeGameParameter(3)}, {"num_rows", MakeGameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   std::array play_seq = {0, 1, 4, 2, 7, 5, 8, 6};  // 3 is the terminal move
   for (int i = 0; i < play_seq.size(); ++i) {
@@ -97,7 +97,7 @@ void GameBlackWinsMaximumCollisions() {
 void GameUnevenBoardBlackWin() {
   std::shared_ptr<const Game> game = LoadGame(
       "dark_hex",
-      {{"num_cols", GameParameter(4)}, {"num_rows", GameParameter(3)}});
+      {{"num_cols", MakeGameParameter(4)}, {"num_rows", MakeGameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(8);
   state->ApplyAction(5);
@@ -115,7 +115,7 @@ void GameUnevenBoardBlackWin() {
 void GameUnevenBoardWhiteWin() {
   std::shared_ptr<const Game> game = LoadGame(
       "dark_hex",
-      {{"num_cols", GameParameter(4)}, {"num_rows", GameParameter(3)}});
+      {{"num_cols", MakeGameParameter(4)}, {"num_rows", MakeGameParameter(3)}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(8);
   state->ApplyAction(5);
@@ -146,9 +146,9 @@ void ClassicalDarkHexTests() {
 
 void AbruptDHCustomTest() {
   std::shared_ptr<const Game> game =
-      LoadGame("dark_hex", {{"num_cols", GameParameter(2)},
-                            {"num_rows", GameParameter(2)},
-                            {"gameversion", GameParameter("adh")}});
+      LoadGame("dark_hex", {{"num_cols", MakeGameParameter(2)},
+                            {"num_rows", MakeGameParameter(2)},
+                            {"gameversion", MakeGameParameter("adh")}});
   std::unique_ptr<State> state = game->NewInitialState();
   state->ApplyAction(0);
   state->ApplyAction(0);

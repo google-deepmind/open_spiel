@@ -100,7 +100,7 @@ std::shared_ptr<const Game> GamutGenerator::GenerateGame(
     int ret_code = system(full_cmd.c_str());
     SPIEL_CHECK_EQ(ret_code, 0);
     SPIEL_CHECK_TRUE(file::Exists(tmp_filename));
-    game = LoadGame("nfg_game", {{"filename", GameParameter(tmp_filename)}});
+    game = LoadGame("nfg_game", {{"filename", MakeGameParameter(tmp_filename)}});
     file::Remove(tmp_filename);
   }
   return game;
