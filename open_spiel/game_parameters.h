@@ -23,6 +23,9 @@
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/heterogenous_lookup.h"
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 
 namespace open_spiel {
 
@@ -34,10 +37,51 @@ namespace open_spiel {
 //
 class GameParameter;
 
-using GameParameters = std::map<std::string, GameParameter>;
+// NOTE: the usage of std::map< std::string, GameParameter>
+// (alias: GameParameters) as a member of GameParamter as type is
+// undefined behaviour in c++17. This is due to GameParameter remaining
+// an incomplete type at this point of its class definition. Incomplete
+// value types as template type argument are only allowed for certain
+// containers in the std library (e.g. shared/unique_ptr pre c++17 and
+// certain containers such as vector or list as of c++17).
+// 'map' has not yet defined behaviour for incomplete value types.
+// This forces us to wrap the value type in a unique_ptr
+//using GameParameters =
+//    absl::flat_hash_map<std::string, GameParameter, internal::StringHasher,
+//                        internal::StringEq>;
+using GameParameters =
+    absl::btree_map<std::string, std::shared_ptr<const GameParameter>,
+                    internal::StringCmp>;
 std::string GameParametersToString(const GameParameters& game_params);
-GameParameter GameParameterFromString(std::string_view str);
 GameParameters GameParametersFromString(std::string_view game_string);
+
+/// use SFINAE to filter out any passed types that are not `GameParameters`
+/// NOTE: we use a templated function here to avoid duplicating code for
+/// const l-values and pure rvalues which can be treated the same way in the
+/// function body (but a const ref only declaration would force a copy on
+/// r-values)
+template <typename T1, typename T2,
+          typename = std::enable_if_t<
+              internal::all_of_v<GameParameters, internal::remove_cvref_t<T1>,
+                                 internal::remove_cvref_t<T2>>>>
+bool GameParametersEquality(T1 &&parameters1, T2 &&parameters2) {
+  return (parameters1.size() == parameters2.size()) and
+         std::all_of(parameters1.begin(), parameters1.end(),
+                     [&, end_it = parameters2.end()](const auto &key_val) {
+                       const auto &[key, parameter_sptr] = key_val;
+                       auto search_it = parameters2.find(key);
+                       if (search_it == end_it) {
+                         // key of parameter set 1 is not present in parameter
+                         // set 2
+                         // --> the two sets are not equal
+                         return false;
+                       }
+                       // key is present in the second set --> compare the
+                       // values of both
+                       // (we need to deref because they are shared ptrs)
+                       return *(search_it->second) == *parameter_sptr;
+                     });
+}
 
 inline constexpr const char* kDefaultNameDelimiter = "=";
 inline constexpr const char* kDefaultParameterDelimiter = "|||";
@@ -85,6 +129,57 @@ class GameParameter {
       : is_mandatory_(is_mandatory),
         game_value_(std::move(value)),
         type_(Type::kGame) {}
+//
+//  // Copy constructor
+//  GameParameter(const GameParameter &other)
+//      : is_mandatory_(other.is_mandatory_), int_value_(other.int_value_),
+//        double_value_(other.double_value_), string_value_(other.string_value_),
+//        bool_value_(other.bool_value_), game_value_(other.game_value_), type_(other.type_) {
+//
+////    CopyGameParameters(other.game_value_, game_value_);
+//  }
+//
+//  // Move constructor
+//  GameParameter(GameParameter &&other) noexcept
+//      : is_mandatory_(other.is_mandatory_), int_value_(other.int_value_),
+//        double_value_(other.double_value_),
+//        string_value_(std::move(other.string_value_)),
+//        bool_value_(other.bool_value_),
+//        game_value_(std::move(other.game_value_)), type_(other.type_) {}
+//
+//  // Copy assignment operator
+//  GameParameter &operator=(const GameParameter &other) {
+//    if (this != &other) {
+//      is_mandatory_ = other.is_mandatory_;
+//      int_value_ = other.int_value_;
+//      double_value_ = other.double_value_;
+//      string_value_ = other.string_value_;
+//      bool_value_ = other.bool_value_;
+//      game_value_ = other.game_value_;
+//      type_ = other.type_;
+//      // copy the game parameters manually
+////      game_value_.clear();
+////      CopyGameParameters(other.game_value_, game_value_);
+//    }
+//    return *this;
+//  }
+//
+//  // Move assignment operator
+//  GameParameter &operator=(GameParameter &&other) noexcept {
+//    if (this != &other) {
+//      is_mandatory_ = other.is_mandatory_;
+//      int_value_ = other.int_value_;
+//      double_value_ = other.double_value_;
+//      string_value_ = std::move(other.string_value_);
+//      bool_value_ = other.bool_value_;
+//      game_value_ = std::move(other.game_value_);
+//      type_ = other.type_;
+//    }
+//    return *this;
+//  }
+//  ~GameParameter() = default;
+
+  static GameParameter FromString(std::string_view str);
 
   bool has_int_value() const { return type_ == Type::kInt; }
   bool has_double_value() const { return type_ == Type::kDouble; }
@@ -105,7 +200,10 @@ class GameParameter {
 
   // Everything necessary to reconstruct the parameter in string form:
   // type <delimiter> value <delimiter> is_mandatory.
-  std::string Serialize(std::string_view delimiter = kDefaultInternalDelimiter) const;
+  std::string
+  Serialize(std::string_view delimiter = kDefaultInternalDelimiter) const;
+
+  static std::string TypeToString(const GameParameter::Type &type);
 
   int int_value() const {
     SPIEL_CHECK_TRUE(type_ == Type::kInt);
@@ -168,7 +266,7 @@ class GameParameter {
 
   // Default initializations are required here. This is because some games mark
   // parameters as not mandatory and also do not specify default values when
-  // registering the game type.. instead, setting the documented defaults upon
+  // registering the game type... instead, setting the documented defaults upon
   // game creation (often due to missing information at registration time).
   // This causes a problem when inspecting the game types themselves, even after
   // the game is created via Game::GetType(), which returns the type as it was
@@ -181,7 +279,19 @@ class GameParameter {
   Type type_;
 };
 
-std::string GameParameterTypeToString(const GameParameter::Type& type);
+template <typename... Args>
+std::shared_ptr<const GameParameter> MakeGameParameter(Args &&...args) {
+  return std::make_shared<const GameParameter>(std::forward<Args>(args)...);
+}
+
+struct from_string_tag {};
+
+// resolve ambiguity with the constructor (string_view, bool=defaulted)
+// by tag dispatch (no-op construction)
+inline std::shared_ptr<const GameParameter>
+MakeGameParameter(std::string_view str, from_string_tag) {
+  return std::make_shared<const GameParameter>(GameParameter::FromString(str));
+}
 
 // Game Parameters and Game Parameter Serialization/Deserialization form:
 // param_name=type/value/is_mandatory|param_name_2=type2/value2/is_mandatory2
@@ -204,7 +314,7 @@ inline bool IsParameterSpecified(const GameParameters& table,
 }
 
 template <typename T>
-T ParameterValue(const GameParameters& params, const std::string& key,
+T ParameterValue(const GameParameters& params, std::string_view key,
                  absl::optional<T> default_value = absl::nullopt) {
   auto iter = params.find(key);
   if (iter == params.end()) {
@@ -215,7 +325,7 @@ T ParameterValue(const GameParameters& params, const std::string& key,
 
     return *default_value;
   } else {
-    return iter->second.value<T>();
+    return iter->second->value<T>();
   }
 }
 

@@ -87,7 +87,7 @@ std::string GameParameter::Serialize(std::string_view delimiter) const {
     default:
       val = ToString();
   }
-  return absl::StrCat(GameParameterTypeToString(type_), delimiter, val,
+  return absl::StrCat(TypeToString(type_), delimiter, val,
                       delimiter, is_mandatory() ? "true" : "false");
 }
 
@@ -124,8 +124,8 @@ std::string SerializeGameParameters(const GameParameters& game_params,
   std::list<std::string> serialized_params;
 
   for (const auto& key_val : game_params) {
-    std::string name = key_val.first;
-    GameParameter parameter = key_val.second;
+    std::string_view name = key_val.first;
+    const GameParameter& parameter = *key_val.second;
 
     serialized_params.push_back(
         absl::StrCat(name, name_delimiter, parameter.Serialize()));
@@ -144,8 +144,9 @@ GameParameters DeserializeGameParameters(std::string_view data,
     if (!part.empty()) {
       std::pair<std::string, std::string> pair =
           absl::StrSplit(part, name_delimiter);
-      game_params.insert(std::pair<std::string, GameParameter>(
-          pair.first, DeserializeGameParameter(pair.second)));
+      game_params.emplace(
+          std::pair{pair.first,
+                    MakeGameParameter(DeserializeGameParameter(pair.second))});
     }
   }
   return game_params;
@@ -154,7 +155,7 @@ GameParameters DeserializeGameParameters(std::string_view data,
 std::string GameParametersToString(const GameParameters& game_params) {
   std::string str;
   if (game_params.empty()) return "";
-  if (game_params.count("name")) str = game_params.at("name").string_value();
+  if (game_params.count("name")) str = game_params.at("name")->string_value();
   str.push_back('(');
   bool first = true;
   for (const auto& key_val : game_params) {
@@ -162,7 +163,7 @@ std::string GameParametersToString(const GameParameters& game_params) {
       if (!first) str.push_back(',');
       str.append(key_val.first);
       str.append("=");
-      str.append(key_val.second.ToString());
+      str.append(key_val.second->ToString());
       first = false;
     }
   }
@@ -170,7 +171,7 @@ std::string GameParametersToString(const GameParameters& game_params) {
   return str;
 }
 
-GameParameter GameParameterFromString(std::string_view str) {
+GameParameter GameParameter::FromString(std::string_view str) {
   if (str == "True" || str == "true") {
     return GameParameter(true);
   } else if (str == "False" || str == "false") {
@@ -197,10 +198,10 @@ GameParameters GameParametersFromString(std::string_view game_string) {
   if (game_string.empty()) return params;
   int first_paren = game_string.find('(');
   if (first_paren == std::string::npos) {
-    params["name"] = GameParameter(game_string);
+    params["name"] = MakeGameParameter(game_string);
     return params;
   }
-  params["name"] = GameParameter(game_string.substr(0, first_paren));
+  params["name"] = MakeGameParameter(game_string.substr(0, first_paren));
   int start = first_paren + 1;
   int parens = 1;
   int equals = -1;
@@ -217,7 +218,7 @@ GameParameters GameParametersFromString(std::string_view game_string) {
       auto param_name = std::string{game_string.substr(start, equals - start)};
       auto param_content = game_string.substr(equals + 1, i - equals - 1);
       params.emplace(std::move(param_name),
-                     GameParameterFromString(param_content));
+                     MakeGameParameter(param_content, from_string_tag{}));
       start = i + 1;
       equals = -1;
     }
@@ -228,7 +229,19 @@ GameParameters GameParametersFromString(std::string_view game_string) {
   return params;
 }
 
-std::string GameParameterTypeToString(const GameParameter::Type& type) {
+void CopyGameParameters(const GameParameters &source_params,
+                        GameParameters &target_params) {
+  // copy `source_params` into `target_params` whereever `target_params`
+  // does not have the key already
+  std::transform(source_params.begin(), source_params.end(),
+                 std::inserter(target_params, target_params.begin()),
+                 [](const auto &key_val) {
+                   const auto &[key, val] = key_val;
+                   return std::pair{key, MakeGameParameter(*val)};
+                 });
+}
+
+std::string GameParameter::TypeToString(const GameParameter::Type& type) {
   switch (type) {
     case GameParameter::Type::kUnset:
       return "kUnset";
@@ -273,7 +286,9 @@ const GameParameters& GameParameter::value() const {
 }
 template <>
 GameParameters GameParameter::value() const {
-  return game_value();
+  GameParameters params;
+  CopyGameParameters(game_value(), params);
+  return params;
 }
 
 template <>
