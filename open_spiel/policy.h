@@ -77,7 +77,7 @@ class Policy {
 
   // A convenience method for callers that want to use arrays.
   virtual std::pair<std::vector<Action>, std::vector<double>>
-  GetStatePolicyAsParallelVectors(const std::string info_state) const {
+  GetStatePolicyAsParallelVectors(const std::string& info_state) const {
     std::pair<std::vector<Action>, std::vector<double>> parray;
     for (const auto& action_and_prob : GetStatePolicy(info_state)) {
       parray.first.push_back(action_and_prob.first);

@@ -29,6 +29,7 @@
 #include "open_spiel/algorithms/tabular_exploitability.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/python_policy.h"
 #include "open_spiel/spiel.h"
 #include "pybind11/include/pybind11/detail/common.h"
 
@@ -46,6 +47,92 @@ namespace py = ::pybind11;
 }  // namespace
 
 void init_pyspiel_policy(py::module& m) {
+  py::classh<Policy, PyPolicy> policy(m, "Policy");
+  policy.def(py::init<>())
+      .def("action_probabilities",
+           py::overload_cast<const State&>(&Policy::GetStatePolicyAsMap,
+                                           py::const_),
+           py::arg("state"),
+           "Returns a dictionary mapping actions to probabilities for the "
+           "policy at the given "
+           "state.")
+      .def("action_probabilities",
+           py::overload_cast<const std::string&>(&Policy::GetStatePolicyAsMap,
+                                                 py::const_),
+           py::arg("info_state"),
+           "Returns a dictionary mapping actions to probabilities for the "
+           "policy at the given "
+           "information state.")
+      .def("get_state_policy",
+           py::overload_cast<const State&>(&Policy::GetStatePolicy, py::const_),
+           py::arg("state"),
+           "Returns a list of (action, prob) pairs for the policy at the given "
+           "state.")
+      .def("get_state_policy",
+           py::overload_cast<const State&, Player>(&Policy::GetStatePolicy,
+                                                   py::const_),
+           py::arg("state"), py::arg("player"),
+           "Returns a list of (action, prob) pairs for the policy for the "
+           "specified player at the "
+           "given state.")
+      .def("get_state_policy",
+           py::overload_cast<const std::string&>(&Policy::GetStatePolicy,
+                                                 py::const_),
+           py::arg("info_state"),
+           "Returns a list of (action, prob) pairs for the policy at the given "
+           "info state.")
+      .def("get_state_policy_as_parallel_vectors",
+           py::overload_cast<const State&>(
+               &Policy::GetStatePolicyAsParallelVectors, py::const_),
+           py::arg("state"),
+           "Returns a pair of parallel vectors (actions, probs) for the policy "
+           "at the given state.")
+      .def("get_state_policy_as_parallel_vectors",
+           py::overload_cast<const std::string&>(
+               &Policy::GetStatePolicyAsParallelVectors, py::const_),
+           py::arg("info_state"),
+           "Returns a pair of parallel vectors (actions, probs) for the policy "
+           "at the given "
+           "information state.")
+      .def("serialize", &Policy::Serialize, py::arg("double_precision") = -1,
+           py::arg("delimiter") = "<~>", "Serializes the policy to a string.");
+
+  auto ptt = m.def_submodule(
+      "_policy_trampoline_testing",
+      "Internal test functions for calling policy member functions.");
+  ptt.def("call_action_probabilities",
+          [](const Policy& policy, const State& state) {
+            return policy.GetStatePolicyAsMap(state);
+          });
+  ptt.def("call_action_probabilities",
+          [](const Policy& policy, const std::string& info_state) {
+            return policy.GetStatePolicyAsMap(info_state);
+          });
+  ptt.def("call_get_state_policy",
+          [](const Policy& policy, const State& state) {
+            return policy.GetStatePolicy(state);
+          });
+  ptt.def("call_get_state_policy",
+          [](const Policy& policy, const State& state, Player player) {
+            return policy.GetStatePolicy(state, player);
+          });
+  ptt.def("call_get_state_policy",
+          [](const Policy& policy, const std::string& info_state) {
+            return policy.GetStatePolicy(info_state);
+          });
+  ptt.def("call_get_state_policy_as_parallel_vectors",
+          [](const Policy& policy, const State& state) {
+            return policy.GetStatePolicyAsParallelVectors(state);
+          });
+  ptt.def("call_get_state_policy_as_parallel_vectors",
+          [](const Policy& policy, const std::string& info_state) {
+            return policy.GetStatePolicyAsParallelVectors(info_state);
+          });
+  ptt.def("call_serialize", [](const Policy& policy, int precision,
+                               const std::string& delimiter = "<~>") {
+    return policy.Serialize(precision, delimiter);
+  });
+
   py::class_<TabularBestResponse>(m, "TabularBestResponse")
       .def(py::init<const open_spiel::Game&, int,
                     const std::unordered_map<std::string,
@@ -71,37 +158,20 @@ void init_pyspiel_policy(py::module& m) {
       .def("set_policy",
            py::overload_cast<const Policy*>(&TabularBestResponse::SetPolicy));
 
-  py::class_<open_spiel::Policy, std::shared_ptr<open_spiel::Policy>>(m,
-                                                                      "Policy")
-      .def("action_probabilities",
-           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
-               const open_spiel::State&) const) &
-               open_spiel::Policy::GetStatePolicyAsMap)
-      .def("get_state_policy", (ActionsAndProbs(open_spiel::Policy::*)(
-                                   const open_spiel::State&) const) &
-                                   open_spiel::Policy::GetStatePolicy)
-      .def("get_state_policy_as_map",
-           (std::unordered_map<Action, double>(open_spiel::Policy::*)(
-               const std::string&) const) &
-               open_spiel::Policy::GetStatePolicyAsMap);
-
   // A tabular policy represented internally as a map. Note that this
   // implementation is not directly compatible with the Python TabularPolicy
   // implementation; the latter is implemented as a table of size
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::class_<open_spiel::TabularPolicy,
-             std::shared_ptr<open_spiel::TabularPolicy>, open_spiel::Policy>(
-      m, "TabularPolicy")
+  py::classh<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
       .def("policy_table",
            py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
 
-  py::class_<open_spiel::PartialTabularPolicy,
-             std::shared_ptr<open_spiel::PartialTabularPolicy>,
-             open_spiel::TabularPolicy>(m, "PartialTabularPolicy")
+  py::classh<open_spiel::PartialTabularPolicy, open_spiel::Policy>(
+      m, "PartialTabularPolicy")
       .def(py::init<>())
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&,
@@ -130,15 +200,13 @@ void init_pyspiel_policy(py::module& m) {
       &open_spiel::GetRandomDeterministicPolicy,
       py::arg("game"), py::arg("seed"), py::arg("player") = -1);
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
-  py::class_<open_spiel::UniformPolicy,
-             std::shared_ptr<open_spiel::UniformPolicy>, open_spiel::Policy>(
-      m, "UniformPolicy")
+
+  py::classh<open_spiel::UniformPolicy, open_spiel::Policy>(m, "UniformPolicy")
       .def(py::init<>())
       .def("get_state_policy", &open_spiel::UniformPolicy::GetStatePolicy);
 
-  py::class_<open_spiel::PreferredActionPolicy,
-             std::shared_ptr<open_spiel::PreferredActionPolicy>,
-             open_spiel::Policy>(m, "PreferredActionPolicy")
+  py::classh<open_spiel::PreferredActionPolicy, open_spiel::Policy>(
+      m, "PreferredActionPolicy")
       .def(py::init<const std::vector<Action>&>())
       .def("get_state_policy",
            &open_spiel::PreferredActionPolicy::GetStatePolicy);

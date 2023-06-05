@@ -119,6 +119,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/pyspiel.cc
   pybind11/python_games.cc
   pybind11/python_games.h
+  pybind11/python_policy.cc
+  pybind11/python_policy.h
   pybind11/utils.cc
   pybind11/utils.h
   )

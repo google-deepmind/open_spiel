@@ -23,6 +23,7 @@ from open_spiel.python import policy
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
+
 SEED = 187461917
 
 _TIC_TAC_TOE_STATES = [
@@ -48,6 +49,93 @@ _TIC_TAC_TOE_STATES = [
         "legal_actions": (0, 1, 2, 3, 4, 5, 6, 7, 8)
     }
 ]
+
+
+class DerivedPolicyTest(absltest.TestCase):
+
+  def test_derive_from_policy(self):
+    class DerivedPolicy(pyspiel.Policy):
+
+      def action_probabilities(self, state):
+        return {0: 0.1, 1: 0.9}
+
+      def get_state_policy(self, infostate):
+        return {10: 0.9, 11: 0.1}
+
+    policy_obj = DerivedPolicy()
+    self.assertEqual(DerivedPolicy.__bases__, (pyspiel.Policy,))
+    self.assertIsInstance(policy_obj, pyspiel.Policy)
+    self.assertEqual(
+        {0: 0.1, 1: 0.9},
+        policy_obj.action_probabilities(
+            pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        {0: 0.1, 1: 0.9}, policy_obj.action_probabilities("some infostate")
+    )
+    self.assertEqual(
+        {10: 0.9, 11: 0.1}, policy_obj.get_state_policy("some infostate")
+    )
+    with self.assertRaises(RuntimeError):
+      policy_obj.serialize()
+
+  def test_cpp_policy_from_py(self):
+    class DerivedPolicy(pyspiel.Policy):
+
+      def action_probabilities(self, state):
+        return {0: 0.0, 1: 0.0}
+
+      def get_state_policy(self, infostate):
+        return [(2, 0.0), (3, 0.0)]
+
+      def get_state_policy_as_parallel_vectors(self, state):
+        if isinstance(state, str):
+          return [4, 5], [0, 0]
+        else:
+          return [6, 7], [0, 0]
+
+      def serialize(self, precision, delim):
+        return f"Serialized string, {precision=}, {delim=}"
+
+    policy_obj = DerivedPolicy()
+    self.assertEqual(
+        {0: 0.0, 1: 0.0},
+        pyspiel._policy_trampoline_testing.call_action_probabilities(
+            policy_obj, pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        {0: 0.0, 1: 0.0},
+        pyspiel._policy_trampoline_testing.call_action_probabilities(
+            policy_obj, "some infostate"),
+    )
+    self.assertEqual(
+        [(2, 0.0), (3, 0.0)],
+        pyspiel._policy_trampoline_testing.call_get_state_policy(
+            policy_obj, pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        [(2, 0.0), (3, 0.0)],
+        pyspiel._policy_trampoline_testing.call_get_state_policy(
+            policy_obj, "some infostate"),
+    )
+    self.assertEqual(
+        ([4, 5], [0, 0]),
+        pyspiel._policy_trampoline_testing.call_get_state_policy_as_parallel_vectors(
+            policy_obj, "some infostate"),
+    )
+    self.assertEqual(
+        ([6, 7], [0, 0]),
+        pyspiel._policy_trampoline_testing.call_get_state_policy_as_parallel_vectors(
+            policy_obj, pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        pyspiel._policy_trampoline_testing.call_serialize(policy_obj, 3, "!?"),
+        "Serialized string, precision=3, delim='!?'",
+    )
 
 
 def test_policy_on_game(self, game, policy_object, player=-1):
