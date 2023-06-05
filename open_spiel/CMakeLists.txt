@@ -4,6 +4,8 @@
 # https://gitlab.kitware.com/cmake/cmake/-/issues/19123
 cmake_minimum_required (VERSION 3.17)
 project (open_spiel)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 
 # Define some nice terminal colors.
 if(NOT WIN32)
@@ -121,7 +123,7 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBNOP         OFF
   "Build with support for libnop.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBTORCH       OFF
   "Build with support for libtorch.")
-openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC  OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC  ON
   "Build with support for Tensorflow C++ API.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_PYTHON         ON
   "Build binary for Python.")

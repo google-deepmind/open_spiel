@@ -775,6 +775,22 @@ class Game : public std::enable_shared_from_this<Game> {
   // populations, which is equal to the number of players).
   virtual std::vector<std::unique_ptr<State>> NewInitialStates() const;
 
+
+  virtual std::unique_ptr<State> NewInitialEnvironmentStates() const
+  {
+      return NewInitialState();
+  }
+
+  virtual std::unique_ptr<State> NewInitialEnvironmentStates(const std::string& str) const
+  {
+      return NewInitialState(str);
+  }
+
+    virtual std::vector<std::unique_ptr<State>> NewInitialEnvironmentStates(int num) const
+    {
+      return NewInitialStates();
+    }
+
   // Maximum number of distinct chance outcomes for chance nodes in the game.
   virtual int MaxChanceOutcomes() const { return 0; }
 
