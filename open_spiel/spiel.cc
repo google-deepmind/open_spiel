@@ -651,7 +651,32 @@ std::string Game::ToString() const {
   return GameParametersToString(params);
 }
 
-std::string GameTypeToString(const GameType& game_type) {
+    int Game::ObservationTensorSize() const
+    {
+        switch(ObservationTensorShapeSpecs())
+        {
+            case Game::TensorShapeSpecs::kUnknown:
+                SpielFatalError("ObservationTensorShapeSpecs() returned kUnknown");
+            case Game::TensorShapeSpecs::kScalar:
+                return 1;
+            case Game::TensorShapeSpecs::kVector:
+                return ObservationTensorShape().empty() ? 0 : absl::c_accumulate(ObservationTensorShape(),1, std::multiplies<>());
+            case Game::TensorShapeSpecs::kNestedList:
+                return ObservationTensorShape().empty() ? 0 : absl::c_accumulate(ObservationTensorsShapeList(),0,
+                                             [](const int& acc, const auto& v)
+                                             {
+                                                return acc+absl::c_accumulate(v,1,std::multiplies<>());
+                                             });
+            case Game::TensorShapeSpecs::kNestedMap:
+                return ObservationTensorShape().empty() ? 0 : absl::c_accumulate(ObservationTensorsShapeMap(),0,
+                                             [](const int& acc, const auto& v)
+                                             {
+                                                return acc+absl::c_accumulate(v.second,1,std::multiplies<>());
+                                             });
+        }
+    }
+
+    std::string GameTypeToString(const GameType& game_type) {
   std::string str = "";
 
   absl::StrAppend(&str, "short_name: ", game_type.short_name, "\n");
@@ -803,7 +828,16 @@ int State::MeanFieldPopulation() const {
   return 0;
 }
 
-std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action) {
+    Game::TensorShapeSpecs Game::ObservationTensorShapeSpecs() const {
+        return Game::TensorShapeSpecs::kVector;
+    }
+
+    Game::TensorShapeSpecs Game::InformationStateTensorShapeSpecs() const {
+        return Game::TensorShapeSpecs::kVector;
+    }
+
+
+    std::ostream& operator<<(std::ostream& os, const State::PlayerAction& action) {
   os << absl::StreamFormat("PlayerAction(player=%i,action=%i)", action.player,
                            action.action);
   return os;

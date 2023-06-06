@@ -225,6 +225,15 @@ MPGMetaGame::MPGMetaGame(const GameParameters& params)
         return std::unique_ptr<State>(new MPGState(shared_from_this()));
     }
 
+    Game::TensorShapeSpecs MPGMetaGame::ObservationTensorShapeSpecs() const {
+        return Game::TensorShapeSpecs::kNestedList;
+    }
+
+    int MPGMetaGame::MaxGameLength() const
+    {
+        return game_parameters_.at("max_moves").int_value();
+    }
+
 
     WeightedGraphType WeightedGraphType::dual() const
     {

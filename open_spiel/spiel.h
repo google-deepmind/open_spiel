@@ -498,7 +498,7 @@ class State {
   // There are currently no use-case for calling this function with
   // `kChancePlayerId`. Thus, games are expected to raise an error in those
   // cases.
-  //
+  //kScalar
   // Implementations should start with (and it's tested in api_test.py):
   //   SPIEL_CHECK_GE(player, 0);
   //   SPIEL_CHECK_LT(player, num_players_);
@@ -554,7 +554,8 @@ class State {
     SpielFatalError("ObservationTensor unimplemented!");
   }
   std::vector<float> ObservationTensor(Player player) const;
-  std::vector<float> ObservationTensor() const {
+  std::vector<float> ObservationTensor() const
+  {
     return ObservationTensor(CurrentPlayer());
   }
   void ObservationTensor(Player player, std::vector<float>* values) const;
@@ -878,13 +879,22 @@ class Game : public std::enable_shared_from_this<Game> {
     return TensorLayout::kCHW;
   }
 
-  // The size of the (flat) vector needed for the observation tensor-like
+    enum class TensorShapeSpecs
+    {
+      kUnknown=-1,
+        kScalar=0,
+        kVector,
+        kNestedMap,
+        kNestedList
+    };
+
+    virtual TensorShapeSpecs ObservationTensorShapeSpecs() const;
+    virtual TensorShapeSpecs InformationStateTensorShapeSpecs() const;
+
+
+    // The size of the (flat) vector needed for the observation tensor-like
   // format.
-  int ObservationTensorSize() const {
-    std::vector<int> shape = ObservationTensorShape();
-    return shape.empty() ? 0
-                         : absl::c_accumulate(shape, 1, std::multiplies<int>());
-  }
+  virtual int ObservationTensorSize() const;
 
   // Describes the structure of the policy representation in a
   // tensor-like format. This is especially useful for experiments involving

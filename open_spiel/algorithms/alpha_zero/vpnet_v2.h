@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPNET_H_
-#define OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPNET_H_
+#ifndef OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPNETV2_H_
+#define OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPNETV2_H_
 
 #include "open_spiel/spiel.h"
+#include "vpnet.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/protobuf/meta_graph.pb.h"
 #include "tensorflow/core/public/session.h"
+#include <tensorflow/cc/saved_model/loader.h>
+
 
 namespace open_spiel::algorithms
 {
@@ -27,81 +30,33 @@ namespace open_spiel::algorithms
 // There are three options for nn_model: mlp, conv2d and resnet.
 // The nn_width is the number of hidden units for the mlp, and filters for
 // conv/resnet. The nn_depth is number of layers for all three.
-bool CreateGraphDef(
+bool CreateGraphDefV2(
     const Game& game, double learning_rate,
     double weight_decay, const std::string& path, const std::string& filename,
     std::string nn_model, int nn_width, int nn_depth, bool verbose = false);
 
 
-class VPNetModel {
+class VPNetModelV2 {
   // TODO(author7): Save and restore checkpoints:
   // https://stackoverflow.com/questions/37508771/how-to-save-and-restore-a-tensorflow-graph-and-its-state-in-c
   // https://stackoverflow.com/questions/35508866/tensorflow-different-ways-to-export-and-run-graph-in-c/43639305#43639305
   // https://www.tensorflow.org/api_docs/python/tf/compat/v1/train/Saver
 
  public:
-  class LossInfo {
-   public:
-    LossInfo() {}
-    LossInfo(double policy, double value, double l2) :
-      policy_(policy), value_(value), l2_(l2), batches_(1) {}
+  using LossInfo=VPNetModel::LossInfo;
+  using InferenceInputs=VPNetModel::InferenceInputs;
+  using InferenceOutputs=VPNetModel::InferenceOutputs;
+  using TrainInputs=VPNetModel::TrainInputs;
 
-    // Merge another LossInfo into this one.
-    LossInfo& operator+=(const LossInfo& other) {
-      policy_ += other.policy_;
-      value_ += other.value_;
-      l2_ += other.l2_;
-      batches_ += other.batches_;
-      return *this;
-    }
-
-    // Return the average losses over all merged into this one.
-    double Policy() const { return policy_ / batches_; }
-    double Value() const { return value_ / batches_; }
-    double L2() const { return l2_ / batches_; }
-    double Total() const { return Policy() + Value() + L2(); }
-
-   private:
-    double policy_ = 0;
-    double value_ = 0;
-    double l2_ = 0;
-    int batches_ = 0;
-  };
-
-  struct InferenceInputs {
-    std::vector<Action> legal_actions;
-    std::vector<float> observations;
-
-    bool operator==(const InferenceInputs& o) const {
-      return legal_actions == o.legal_actions && observations == o.observations;
-    }
-
-    template <typename H>
-    friend H AbslHashValue(H h, const InferenceInputs& in) {
-      return H::combine(std::move(h), in.legal_actions, in.observations);
-    }
-  };
-  struct InferenceOutputs {
-    double value;
-    ActionsAndProbs policy;
-  };
-
-  struct TrainInputs {
-    std::vector<Action> legal_actions;
-    std::vector<float> observations;
-    ActionsAndProbs policy;
-    double value;
-  };
-
-  VPNetModel(const Game& game, const std::string& path,
+  VPNetModelV2(const Game& game, const std::string& path,
              const std::string& file_name,
              const std::string& device = "/cpu:0");
 
   // Move only, not copyable.
-  VPNetModel(VPNetModel&& other) = default;
-  VPNetModel& operator=(VPNetModel&& other) = default;
-  VPNetModel(const VPNetModel&) = delete;
-  VPNetModel& operator=(const VPNetModel&) = delete;
+  VPNetModelV2(VPNetModelV2&& other) = default;
+  VPNetModelV2& operator=(VPNetModelV2&& other) = default;
+  VPNetModelV2(const VPNetModelV2&) = delete;
+  VPNetModelV2& operator=(const VPNetModelV2&) = delete;
 
   // Inference: Get both at the same time.
   std::vector<InferenceOutputs> Inference(
@@ -129,9 +84,10 @@ class VPNetModel {
   // Inputs for inference & training separated to have different fixed sizes
   tensorflow::Session* tf_session_ = nullptr;
   tensorflow::MetaGraphDef meta_graph_def_;
+  tensorflow::SavedModelBundle saved_model_bundle_;
   tensorflow::SessionOptions tf_opts_;
 };
 
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPNET_H_
+#endif  // OPEN_SPIEL_ALGORITHMS_ALPHA_ZERO_VPNETV2_H_

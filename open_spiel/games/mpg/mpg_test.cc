@@ -23,9 +23,9 @@ namespace open_spiel::mpg
         namespace testing = open_spiel::testing;
 
         void BasicMPGTests() {
-          testing::LoadGameTest("mpg");
-          testing::NoChanceOutcomesTest(*LoadGame("mpg"));
-          testing::RandomSimTest(*LoadGame("mpg"), 100);
+          testing::LoadGameTest("mpg(max_moves=20)");
+          testing::NoChanceOutcomesTest(*LoadGame("mpg(max_moves=20)"));
+          testing::RandomSimTest(*LoadGame("mpg(max_moves=20)"), 100);
         }
 
     }  // namespace

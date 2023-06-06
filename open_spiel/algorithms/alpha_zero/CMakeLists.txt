@@ -9,6 +9,8 @@ if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
     vpevaluator.cc
     vpnet.h
     vpnet.cc
+    vpnet_v2.h
+    vpnet_v2.cc
   )
   target_include_directories (alpha_zero PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -46,9 +46,9 @@ namespace open_spiel::mpg
         WeightType weight;
         WeightedOutgoingEdge(NodeType to, WeightType weight): to(to), weight(weight){}
     };
-    struct WeightedGraphType: public std::vector<std::unordered_map<NodeType,WeightType>>
+    struct WeightedGraphType: public std::vector<std::map<NodeType,WeightType>>
     {
-        using std::vector<std::unordered_map<NodeType,WeightType>>::vector;
+        using std::vector<std::map<NodeType,WeightType>>::vector;
         [[nodiscard]] WeightedGraphType dual() const;
         WeightedGraphType operator~() const;
         static WeightedGraphType from_string(const std::string& str);
@@ -74,7 +74,7 @@ namespace open_spiel::mpg
 
         Player CurrentPlayer() const override
         {
-        return IsTerminal() ? kTerminalPlayerId : current_player_;
+            return IsTerminal() ? kTerminalPlayerId : current_player_;
         }
         std::string ActionToString(Player player, Action action_id) const override;
         std::string ToString() const override;
@@ -99,7 +99,7 @@ namespace open_spiel::mpg
 
       void DoApplyAction(Action move) override;
       NodeType current_state = 0;
-      const WeightedGraphType &graph;
+      WeightedGraphType graph;
       WeightType mean_payoff = 0;
       std::stack<NodeType> state_history;
 
@@ -136,6 +136,8 @@ namespace open_spiel::mpg
         return {kCellStates, kNumRows, kNumCols};
       }
 
+      Game::TensorShapeSpecs ObservationTensorShapeSpecs() const override;
+
       std::vector<std::vector<int>> ObservationTensorsShapeList() const override
       {
           return {{game_info->graph.size(),game_info->graph.size(),2},{1}};
@@ -143,7 +145,7 @@ namespace open_spiel::mpg
 
         std::unique_ptr<State> NewInitialEnvironmentState() const override;
 
-      int MaxGameLength() const override { return kNumCells; }
+      int MaxGameLength() const override;
       std::string ActionToString(Player player, Action action_id) const override;
       const WeightedGraphType &GetGraph() const { return game_info->graph; }
         NodeType GetStartingState() const { return game_info->starting_state; }
