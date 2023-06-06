@@ -181,8 +181,10 @@ set(GAME_SOURCES
   ultimate_tic_tac_toe.cc
   y.cc
   y.h
-  mpg.cc
-  mpg.h
+  mpg/mpg.cc
+  mpg/mpg.h
+    mpg/mpg_generator.cc
+  mpg/mpg_generator.h
 )
 
 if (${OPEN_SPIEL_BUILD_WITH_HANABI})
@@ -621,7 +623,7 @@ add_executable(y_test y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(y_test y_test)
 
-add_executable(mpg_test mpg_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(mpg_test mpg/mpg_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:tests>)
 add_test(mpg_test mpg_test)
 

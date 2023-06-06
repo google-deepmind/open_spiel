@@ -853,6 +853,27 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::vector<int> ObservationTensorShape() const {
     SpielFatalError("ObservationTensorShape unimplemented.");
   }
+
+    // Describes the structure of the observation representation in a
+    // map of tensor-like formats. This is especially useful for experiments involving
+    // reinforcement learning and neural networks. Note: the actual observation is
+    // returned in a 1-D vector by State::ObservationTensor -
+    // see the documentation of that function for details of the data layout.
+  virtual std::map<std::string, std::vector<int>> ObservationTensorsShapeMap() const
+  {
+      SpielFatalError("ObservationTensorsShapeMap unimplemented.");
+  }
+
+    // Describes the structure of the observation representation in a list of
+    // tensor-like formats. This is especially useful for experiments involving
+    // reinforcement learning and neural networks with multiple inputs. Note: the actual observation is
+    // returned in a 1-D vector by State::ObservationTensor -
+    // see the documentation of that function for details of the data layout.
+  virtual std::vector<std::vector<int>> ObservationTensorsShapeList() const
+  {
+        SpielFatalError("ObservationTensorsList unimplemented.");
+  }
+
   virtual TensorLayout ObservationTensorLayout() const {
     return TensorLayout::kCHW;
   }
