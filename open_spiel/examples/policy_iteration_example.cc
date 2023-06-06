@@ -23,7 +23,7 @@
 // Example code for using policy iteration algorithm to solve tic-tac-toe.
 int main(int argc, char** argv) {
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("tic_tac_toe");
+      open_spiel::LoadGame("mpg(max_moves=30)");
 
   absl::flat_hash_map<std::string, double> solution =
       open_spiel::algorithms::PolicyIteration(*game, -1, 0.01);
@@ -33,10 +33,5 @@ int main(int argc, char** argv) {
               << "Value: " << kv.second << std::endl;
   }
 
-  std::string initial_state = "...\n...\n...";
-  std::string cross_win_state = "...\n...\n.ox";
-  std::string naught_win_state = "x..\noo.\nxx.";
-  SPIEL_CHECK_EQ(solution[initial_state], 0);
-  SPIEL_CHECK_EQ(solution[cross_win_state], 1);
-  SPIEL_CHECK_EQ(solution[naught_win_state], -1);
+
 }

@@ -24,8 +24,8 @@
 #include "mpg_generator.h"
 
 namespace open_spiel::mpg {
-    //std::unique_ptr<MetaFactory> metaFactory = std::make_unique<ExampleFactory>();
-    std::unique_ptr<MetaFactory> metaFactory = std::make_unique<UniformGnpMetaFactory>(20,0.5,-1,1,199);
+    std::unique_ptr<MetaFactory> metaFactory = std::make_unique<ExampleFactory>();
+    //std::unique_ptr<MetaFactory> metaFactory = std::make_unique<UniformGnpMetaFactory>(20,0.5,-1,1,199);
 
     namespace
     {
