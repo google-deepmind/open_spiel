@@ -42,6 +42,8 @@ ABSL_FLAG(bool, solve, true, "Whether to use MCTS-Solver.");
 ABSL_FLAG(uint_fast32_t, seed, 0, "Seed for MCTS.");
 ABSL_FLAG(bool, verbose, false, "Show the MCTS stats of possible moves.");
 ABSL_FLAG(bool, quiet, false, "Show the MCTS stats of possible moves.");
+ABSL_FLAG(bool, dynamic, false, "Whether the game is dynamic.");
+
 
 uint_fast32_t Seed() {
   uint_fast32_t seed = absl::GetFlag(FLAGS_seed);
@@ -79,7 +81,12 @@ std::pair<std::vector<double>, std::vector<std::string>> PlayGame(
     std::vector<std::unique_ptr<open_spiel::Bot>>& bots, std::mt19937& rng,
     const std::vector<std::string>& initial_actions) {
   bool quiet = absl::GetFlag(FLAGS_quiet);
-  std::unique_ptr<open_spiel::State> state = game.NewInitialState();
+  bool isGameDynamic = absl::GetFlag(FLAGS_dynamic);
+  std::unique_ptr<open_spiel::State> state;
+  if (isGameDynamic)
+    state = game.NewInitialState();
+  else
+    state = game.NewInitialEnvironmentState();
   std::vector<std::string> history;
 
   for (const auto& action_str : initial_actions) {
@@ -185,6 +192,5 @@ int main(int argc, char** argv) {
             << std::endl;
   std::cerr << "Overall returns: " << absl::StrJoin(overall_returns, ",")
             << std::endl;
-
   return 0;
 }

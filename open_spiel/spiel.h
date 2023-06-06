@@ -776,12 +776,12 @@ class Game : public std::enable_shared_from_this<Game> {
   virtual std::vector<std::unique_ptr<State>> NewInitialStates() const;
 
 
-  virtual std::unique_ptr<State> NewInitialEnvironmentStates() const
+  virtual std::unique_ptr<State> NewInitialEnvironmentState() const
   {
       return NewInitialState();
   }
 
-  virtual std::unique_ptr<State> NewInitialEnvironmentStates(const std::string& str) const
+  virtual std::unique_ptr<State> NewInitialEnvironmentState(const std::string& str) const
   {
       return NewInitialState(str);
   }

@@ -63,7 +63,6 @@ namespace open_spiel::mpg
         using std::vector<std::vector<bool>>::vector;
     };
 
-
     // State of an in-play game.
     class MPGState : public State
     {
@@ -101,7 +100,6 @@ namespace open_spiel::mpg
       void DoApplyAction(Action move) override;
       NodeType current_state = 0;
       const WeightedGraphType &graph;
-      const AdjacencyMatrixType &adjacency_matrix;
       WeightType mean_payoff = 0;
       std::stack<NodeType> state_history;
 
@@ -113,16 +111,23 @@ namespace open_spiel::mpg
       int num_moves_ = 0;
     };
 
+
+    struct MPGGameInfo
+    {
+        WeightedGraphType graph;
+        NodeType starting_state;
+        MPGGameInfo()= default;
+        MPGGameInfo(WeightedGraphType graph, NodeType starting_state);
+    };
+
     // Game object.
-    class MPGGame : public Game
+    class MPGMetaGame : public Game
     {
      public:
-      explicit MPGGame(const GameParameters& params);
-      MPGGame(const GameParameters&params, WeightedGraphType graph, NodeType initial_state);
+      explicit MPGMetaGame(const GameParameters& params);
+      MPGMetaGame(const GameParameters&params, WeightedGraphType graph, NodeType initial_state);
       int NumDistinctActions() const override { return kNumCells; }
-      std::unique_ptr<State> NewInitialState() const override {
-        return std::unique_ptr<State>(new MPGState(shared_from_this()));
-      }
+      std::unique_ptr<State> NewInitialState() const override;
       int NumPlayers() const override { return kNumPlayers; }
       double MinUtility() const override { return -1; }
       absl::optional<double> UtilitySum() const override { return 0; }
@@ -133,18 +138,17 @@ namespace open_spiel::mpg
 
       std::vector<std::vector<int>> ObservationTensorsShapeList() const override
       {
-          return {{graph.size(),graph.size(),2},{1}};
+          return {{game_info->graph.size(),game_info->graph.size(),2},{1}};
       }
+
+        std::unique_ptr<State> NewInitialEnvironmentState() const override;
 
       int MaxGameLength() const override { return kNumCells; }
       std::string ActionToString(Player player, Action action_id) const override;
-      const WeightedGraphType &GetGraph() const { return graph; }
-        const AdjacencyMatrixType &GetAdjacencyMatrix() const { return adjacency_matrix; }
-        NodeType GetStartingState() const { return starting_state; }
+      const WeightedGraphType &GetGraph() const { return game_info->graph; }
+        NodeType GetStartingState() const { return game_info->starting_state; }
     private:
-        WeightedGraphType graph;
-        AdjacencyMatrixType adjacency_matrix;
-        NodeType starting_state;
+        std::unique_ptr<MPGGameInfo> game_info;
     };
 
     NodeType PlayerToState(Player player);

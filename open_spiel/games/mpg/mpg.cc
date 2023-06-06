@@ -24,45 +24,8 @@
 #include "mpg_generator.h"
 
 namespace open_spiel::mpg {
-    std::unique_ptr<MetaFactory> metaFactory = std::make_unique<ExampleFactory>();
-
-    std::vector<NodeType> choose(NodeType n, int k, std::mt19937_64 &rng, bool distinct)
-    {
-        if(!distinct)
-        {
-            std::uniform_int_distribution<NodeType> dist(0,n-1);
-            std::vector<NodeType> result(n);
-            for(int i=0;i<k;i++)
-            {
-                auto j=dist(rng);
-                result[i]=j;
-            }
-            return result;
-        }
-        if(k>n)
-            throw std::invalid_argument("k must be less than or equal to n for distinct=true");
-        else if(k<choose_parameters::threshold*n)
-        {
-            std::vector<NodeType> result;
-            std::unordered_set<NodeType> v_set;
-            while(v_set.size()<k)
-            {
-                std::uniform_int_distribution<NodeType> dist(0,n-1);
-                auto j=dist(rng);
-                v_set.insert(j);
-            }
-            for(auto i:v_set)
-                result.push_back(i);
-            return result;
-        }
-        else
-        {
-            std::vector<NodeType> result(n);
-            for(int i=0;i<n;i++)
-                result[i]=i;
-            return choose(result,k,rng,distinct);
-        }
-    }
+    //std::unique_ptr<MetaFactory> metaFactory = std::make_unique<ExampleFactory>();
+    std::unique_ptr<MetaFactory> metaFactory = std::make_unique<UniformGnpMetaFactory>(20,0.5,-1,1,199);
 
     namespace
     {
@@ -129,17 +92,17 @@ std::string MPGState::ActionToString(Player player,
   return game_->ActionToString(player, action_id);
 }
 
-MPGState::MPGState(std::shared_ptr<const Game> game) : State(game), graph(dynamic_cast<const MPGGame*>(game.get())->GetGraph()),
-    adjacency_matrix(dynamic_cast<const MPGGame*>(game.get())->GetAdjacencyMatrix()),
-    current_state(dynamic_cast<const MPGGame*>(game.get())->GetStartingState()), current_player_(0),
-    num_moves_(0), state_history({0})
+MPGState::MPGState(std::shared_ptr<const Game> game) : State(game), graph(dynamic_cast<const MPGMetaGame*>(game.get())->GetGraph()),
+                                                       current_state(dynamic_cast<const MPGMetaGame*>(game.get())->GetStartingState()), current_player_(0),
+                                                       num_moves_(0), state_history({0})
 {
 }
 
 std::string MPGState::ToString() const {
 
     std::ostringstream stream;
-    stream << "Graph: \n{";
+    stream << "@@@\n";
+    stream << "@Graph: \n{";
     for(int i = 0; i < graph.size(); i++)
   {
       stream << i << ": ";
@@ -148,9 +111,10 @@ std::string MPGState::ToString() const {
       stream << "\n";
   }
     stream << "}\n";
-    stream << "Current state: " << current_state << "\n";
-    stream << "Current player: " << current_player_ << "\n";
-
+    stream << "@Current state: " << current_state << "\n";
+    stream << "@Current player: " << current_player_ << "\n";
+    stream << "@Number of moves: " << num_moves_ << "\n";
+    stream << "@@@\n";
   return stream.str();
 }
 
@@ -232,19 +196,33 @@ std::unique_ptr<State> MPGState::Clone() const {
   return std::unique_ptr<State>(new MPGState(*this));
 }
 
-std::string MPGGame::ActionToString(Player player,
-                                          Action action_id) const {
+std::string MPGMetaGame::ActionToString(Player player,
+                                        Action action_id) const {
   return absl::StrCat(action_id);
 }
 
-MPGGame::MPGGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+MPGMetaGame::MPGMetaGame(const GameParameters& params)
+    : Game(kGameType, params) , game_info(std::make_unique<MPGGameInfo>())
+    {}
 
-    MPGGame::MPGGame(const GameParameters &_params, WeightedGraphType _graph, NodeType starting_state): Game(kGameType, _params), graph(std::move(_graph)),
-                                                                                                      adjacency_matrix(graph.size(), std::vector<bool>(graph.size(), false)), starting_state(starting_state)
+
+
+    MPGMetaGame::MPGMetaGame(const GameParameters &_params, WeightedGraphType _graph, NodeType starting_state): Game(kGameType, _params),
+        game_info(std::make_unique<MPGGameInfo>(std::move(_graph), starting_state))
     {
-        for(int u = 0; u < graph.size(); u++) for(auto [v, w]: graph[u])
-            adjacency_matrix[u][v]= true;
+    }
+
+    std::unique_ptr<State> MPGMetaGame::NewInitialEnvironmentState() const
+    {
+        auto newGame= metaFactory->CreateGame(game_parameters_);
+        auto mpgNewGame= dynamic_cast<const MPGMetaGame*>(newGame.get());
+        game_info->graph= mpgNewGame->GetGraph();
+        game_info->starting_state= mpgNewGame->GetStartingState();
+        return NewInitialState();
+    }
+
+    std::unique_ptr<State> MPGMetaGame::NewInitialState() const {
+        return std::unique_ptr<State>(new MPGState(shared_from_this()));
     }
 
 
@@ -280,5 +258,9 @@ MPGGame::MPGGame(const GameParameters& params)
             graph[u].emplace(v, w);
         }
         return graph;
+    }
+
+    MPGGameInfo::MPGGameInfo(WeightedGraphType graph, NodeType starting_state) : graph(std::move(graph)), starting_state(starting_state)
+    {
     }
 }  // namespace open_spiel

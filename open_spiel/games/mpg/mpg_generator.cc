@@ -7,6 +7,44 @@
 namespace open_spiel::mpg
 {
 
+    std::vector<NodeType> choose(NodeType n, int k, std::mt19937_64 &rng, bool distinct)
+    {
+        if(!distinct)
+        {
+            std::uniform_int_distribution<NodeType> dist(0,n-1);
+            std::vector<NodeType> result(n);
+            for(int i=0;i<k;i++)
+            {
+                auto j=dist(rng);
+                result[i]=j;
+            }
+            return result;
+        }
+        if(k>n)
+            throw std::invalid_argument("k must be less than or equal to n for distinct=true");
+        else if(k<choose_parameters::threshold*n)
+        {
+            std::vector<NodeType> result;
+            std::unordered_set<NodeType> v_set;
+            while(v_set.size()<k)
+            {
+                std::uniform_int_distribution<NodeType> dist(0,n-1);
+                auto j=dist(rng);
+                v_set.insert(j);
+            }
+            for(auto i:v_set)
+                result.push_back(i);
+            return result;
+        }
+        else
+        {
+            std::vector<NodeType> result(n);
+            for(int i=0;i<n;i++)
+                result[i]=i;
+            return choose(result,k,rng,distinct);
+        }
+    }
+
     DiscreteUniformWeightGenerator::DiscreteUniformWeightGenerator(size_t a, size_t b, std::uint64_t seed): rng(seed),std::uniform_int_distribution<size_t>(a,b)
     {
     }
@@ -76,7 +114,7 @@ namespace open_spiel::mpg
     {
         auto G=weighted_graph_generator->operator()();
         std::uniform_int_distribution<NodeType> dist(0,G.size()-1);
-        return std::make_shared<MPGGame>(params,G,dist(rng));
+        return std::make_shared<MPGMetaGame>(params, G, dist(rng));
     }
 
     UniformGnpMetaFactory::UniformGnpMetaFactory(NodeType n, WeightType p,WeightType a,WeightType b, std::uint64_t seed): GeneratorMetaFactory(
@@ -100,6 +138,6 @@ namespace open_spiel::mpg
 5 7 0
 7 1 0
 0 1 5)");
-        return std::make_shared<MPGGame>(params,G,0);
+        return std::make_shared<MPGMetaGame>(params, G, 0);
     }
 }
