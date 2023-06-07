@@ -173,6 +173,9 @@ namespace open_spiel::mpg
         std::unique_ptr<EnvironmentFactory> environment_factory;
         mutable std::shared_ptr<Environment> last_environment;
         mutable absl::Mutex environment_mutex;
+        mutable std::map<int, std::shared_ptr<Environment>> environment_cache;
+        int cache_max_size=100;
+        mutable int current_id=0;
     };
 
     NodeType PlayerToState(Player player);

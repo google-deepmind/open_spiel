@@ -21,7 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/spiel.h"
 
-ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
+ABSL_FLAG(std::string, game, "mpg(max_moves=50,max_size=200,generator=gnp,generator_params=200 0.5 -1 1,compact_string=True)", "The name of the game to play.");
 ABSL_FLAG(int, sims, 1000, "How many simulations to run.");
 ABSL_FLAG(int, attempts, 5, "How many sets of simulations to run.");
 ABSL_FLAG(bool, verbose, false,

@@ -23,6 +23,7 @@ add_test(matrix_example_test matrix_example)
 add_executable(mcts_example mcts_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(mcts_example_test mcts_example)
 
+
 add_executable(minimax_example minimax_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(minimax_example_test minimax_example)
 
@@ -37,6 +38,18 @@ add_executable(tabular_sarsa_example tabular_sarsa_example.cc ${OPEN_SPIEL_OBJEC
 add_executable(tabular_q_learning_example tabular_q_learning_example.cc ${OPEN_SPIEL_OBJECTS})
 
 add_executable(count_all_states count_all_states.cc ${OPEN_SPIEL_OBJECTS})
+
+
+if(${OPEN_SPIEL_BUILD_WITH_BOOST})
+  target_link_libraries(mcts_example Boost::iostreams)
+  target_link_libraries(minimax_example Boost::iostreams)
+    target_link_libraries(policy_iteration_example Boost::iostreams)
+  target_link_libraries(benchmark_game Boost::iostreams)
+  target_link_libraries(tabular_sarsa_example Boost::iostreams)
+  target_link_libraries(tabular_q_learning_example Boost::iostreams)
+  target_link_libraries(imperfect_recall_mccfr Boost::iostreams)
+
+endif()
 
 if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   add_executable(alpha_zero_example alpha_zero_example.cc ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:alpha_zero>)

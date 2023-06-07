@@ -137,6 +137,8 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_RUST           OFF
   "Build with support for Rust API.")
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_BOOST           ON
+        "Build with support for Boost API.")
 
 if (WIN32)
   if (OPEN_SPIEL_BUILD_WITH_HIGC)
@@ -296,6 +298,11 @@ if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   add_compile_definitions(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   find_package(TensorflowCC REQUIRED)
 endif()
+if(OPEN_SPIEL_BUILD_WITH_BOOST)
+    find_package(Boost REQUIRED COMPONENTS iostreams)
+    include_directories(${Boost_INCLUDE_DIRS})
+  set(BOOST_LIBS Boost::iostreams)
+endif()
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named
@@ -365,6 +372,7 @@ if (BUILD_SHARED_LIB)
     # Optionally link external dependencies, for example OrTools for solving
     # linear programs.
     ${ORTOOLS_LIBS}
+    ${BOOST_LIBS}
   )
 endif()
 

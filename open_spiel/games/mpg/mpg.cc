@@ -18,10 +18,12 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <iomanip>
 
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 #include "mpg_generator.h"
+#include "string_compress.h"
 
 namespace open_spiel::mpg {
     //std::unique_ptr<MetaFactory> metaFactory = std::make_unique<ExampleFactory>();
@@ -48,7 +50,8 @@ namespace open_spiel::mpg {
                                          {"generator",GameParameter(GameParameter::Type::kString,true)},
                                          {"max_size",GameParameter(GameParameter::Type::kInt,true)},
                                          {"generator_params", GameParameter(GameParameter::Type::kString,false)},
-                                         {"specs_file",GameParameter(GameParameter::Type::kString,false)}}  // no parameters
+                                         {"specs_file",GameParameter(GameParameter::Type::kString,false)},
+                                         {"compact_string",GameParameter(GameParameter::Type::kBool)}}  // no parameters
         };
 
 
@@ -156,24 +159,40 @@ namespace open_spiel::mpg {
     {
     }
 
-    std::string MPGEnvironmentState::ToString() const {
-
+    std::string MPGEnvironmentState::ToString() const
+    {
         std::ostringstream stream;
-        stream << "@@@\n";
-        stream << "@Graph: \n{";
-        for(int i = 0; i < environment->graph.size(); i++)
-      {
-          stream << i << ": ";
-          for(auto [v, w]: environment->graph[i])
-              stream << "(" << v << ", " << w << ") ";
-          stream << "\n";
-      }
-        stream << "}\n";
-        stream << "@Current state: " << current_state << "\n";
-        stream << "@Current player: " << current_player_ << "\n";
-        stream << "@Number of moves: " << num_moves_ << "\n";
-        stream << "@@@\n";
-      return stream.str();
+        if (game_->GetParameters().count("compact_string") && game_->GetParameters().at("compact_string").bool_value())
+        {
+            for(int i = 0; i < environment->graph.size(); i++)
+            {
+                stream << i << ":";
+                for(auto [v, w]: environment->graph[i])
+                    stream  << v << ":" << std::setprecision(3) << w << ":";
+                stream << "\n";
+            }
+            stream << current_state << ':' << current_player_;
+            return base64_encode(bzip_compress(stream.str()));
+        }
+        else
+        {
+            stream << "@@@\n";
+            stream << "@Graph: \n{";
+            for(int i = 0; i < environment->graph.size(); i++)
+            {
+                stream << i << ": ";
+                for(auto [v, w]: environment->graph[i])
+                    stream << "(" << v << ", " << w << ") ";
+                stream << "\n";
+            }
+            stream << "}\n";
+            stream << "@Current state: " << current_state << "\n";
+            stream << "@Current player: " << current_player_ << "\n";
+            stream << "@Number of moves: " << num_moves_ << "\n";
+            stream << "@@@\n";
+            return stream.str();
+        }
+
     }
 
     bool MPGEnvironmentState::IsTerminal() const {
@@ -361,4 +380,5 @@ namespace open_spiel::mpg {
     Environment::Environment(WeightedGraphType graph, NodeType starting_state) : graph(std::move(graph)), starting_state(starting_state)
     {
     }
+
 }  // namespace open_spiel
