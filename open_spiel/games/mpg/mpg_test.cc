@@ -19,15 +19,13 @@ namespace open_spiel::mpg
 {
     namespace
     {
-
         namespace testing = open_spiel::testing;
-
-        void BasicMPGTests() {
-          testing::LoadGameTest("mpg(max_moves=20)");
-          testing::NoChanceOutcomesTest(*LoadGame("mpg(max_moves=20)"));
-          testing::RandomSimTest(*LoadGame("mpg(max_moves=20)"), 100);
+        void BasicMPGTests()
+        {
+          testing::LoadGameTest("mpg(max_moves=20,max_size=20,generator=gnp,generator_params=20 0.5 -1 1)");
+          testing::NoChanceOutcomesTest(*LoadGame("mpg(max_moves=20,max_size=20,generator=gnp,generator_params=20 0.5 -1 1)"));
+          testing::RandomSimTest(*LoadGame("mpg(max_moves=20,max_size=20,generator=gnp,generator_params=20 0.5 -1 1)"), 100);
         }
-
     }  // namespace
 }  // namespace open_spiel
 

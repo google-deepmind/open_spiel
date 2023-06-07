@@ -46,33 +46,63 @@ namespace open_spiel::mpg
         WeightType weight;
         WeightedOutgoingEdge(NodeType to, WeightType weight): to(to), weight(weight){}
     };
+
+    struct  AdjacencyMatrixType: public std::vector<std::vector<bool>>
+    {
+        using std::vector<std::vector<bool>>::vector;
+    };
+
     struct WeightedGraphType: public std::vector<std::map<NodeType,WeightType>>
     {
         using std::vector<std::map<NodeType,WeightType>>::vector;
         [[nodiscard]] WeightedGraphType dual() const;
         WeightedGraphType operator~() const;
         static WeightedGraphType from_string(const std::string& str);
+        [[nodiscard]] AdjacencyMatrixType adjacency_matrix() const;
     };
     struct  GraphType :public std::vector<std::vector<NodeType>>
     {
         using std::vector<std::vector<NodeType>>::vector;
-
     };
-    struct  AdjacencyMatrixType: public std::vector<std::vector<bool>>
+
+    std::ostream& operator<< (std::ostream& os, const WeightedGraphType& graph);
+    std::ostream& operator<< (std::ostream& os, const GraphType& graph);
+    std::ostream& operator<< (std::ostream& os, const AdjacencyMatrixType& graph);
+
+
+    enum ObservationAxis : size_t
     {
-        using std::vector<std::vector<bool>>::vector;
+        kAdjacencyMatrix = 0,
+        kWeightsMatrix
+    };
+
+    enum PlayerIdentifier : size_t
+    {
+        kPlayer1 = 0,
+        kPlayer2,
+        kMaxPlayer = kPlayer1,
+        kMinPlayer = kPlayer2
+    };
+
+    struct Environment
+    {
+        WeightedGraphType graph;
+        NodeType starting_state{};
+        Environment()= default;
+        Environment(WeightedGraphType graph, NodeType starting_state);
     };
 
     // State of an in-play game.
-    class MPGState : public State
+    class MPGEnvironmentState : public State
     {
      public:
-        MPGState(std::shared_ptr<const Game> game);
+        MPGEnvironmentState(std::shared_ptr<const Game> game,std::shared_ptr<Environment> environment);
+        explicit MPGEnvironmentState(const std::shared_ptr<const Game>& game);
 
-        MPGState(const MPGState&) = default;
-        MPGState& operator=(const MPGState&) = default;
+        MPGEnvironmentState(const MPGEnvironmentState&) = default;
+        MPGEnvironmentState& operator=(const MPGEnvironmentState&) = default;
 
-        Player CurrentPlayer() const override
+        [[nodiscard]] Player CurrentPlayer() const override
         {
             return IsTerminal() ? kTerminalPlayerId : current_player_;
         }
@@ -90,7 +120,7 @@ namespace open_spiel::mpg
         NodeType StateAt(NodeType cell) const { return cell; }
         Player outcome() const { return outcome_; }
 
-        virtual int MaxNumMoves() const;
+        [[nodiscard]] virtual int MaxNumMoves() const;
 
         // Only used by Ultimate Tic-Tac-Toe.
         void SetCurrentPlayer(Player player) { current_player_ = player; }
@@ -99,58 +129,50 @@ namespace open_spiel::mpg
 
       void DoApplyAction(Action move) override;
       NodeType current_state = 0;
-      WeightedGraphType graph;
       WeightType mean_payoff = 0;
-      std::stack<NodeType> state_history;
+      std::vector<NodeType> state_history;
+      std::shared_ptr<Environment> environment;
 
      private:
-      bool HasLine(Player player) const;  // Does this player have a line?
-      bool IsFull() const;                // Is the board full?
       Player current_player_ = 0;         // Player zero goes first
       Player outcome_ = kInvalidPlayer;
       int num_moves_ = 0;
+      friend class MPGMetaGame;
     };
 
-
-    struct MPGGameInfo
-    {
-        WeightedGraphType graph;
-        NodeType starting_state;
-        MPGGameInfo()= default;
-        MPGGameInfo(WeightedGraphType graph, NodeType starting_state);
-    };
 
     // Game object.
     class MPGMetaGame : public Game
     {
      public:
-      explicit MPGMetaGame(const GameParameters& params);
-      MPGMetaGame(const GameParameters&params, WeightedGraphType graph, NodeType initial_state);
-      int NumDistinctActions() const override { return kNumCells; }
+      explicit MPGMetaGame(const GameParameters&params, std::unique_ptr<class EnvironmentFactory> environment_factory = nullptr);
+      int NumDistinctActions() const override;
       std::unique_ptr<State> NewInitialState() const override;
       int NumPlayers() const override { return kNumPlayers; }
       double MinUtility() const override { return -1; }
       absl::optional<double> UtilitySum() const override { return 0; }
       double MaxUtility() const override { return 1; }
       std::vector<int> ObservationTensorShape() const override {
-        return {kCellStates, kNumRows, kNumCols};
+          throw std::runtime_error("Not implemented");
       }
 
       Game::TensorShapeSpecs ObservationTensorShapeSpecs() const override;
 
       std::vector<std::vector<int>> ObservationTensorsShapeList() const override
       {
-          return {{game_info->graph.size(),game_info->graph.size(),2},{1}};
+          return {{MaxGraphSize(),MaxGraphSize(),2},{1}};
       }
 
         std::unique_ptr<State> NewInitialEnvironmentState() const override;
 
       int MaxGameLength() const override;
+      int MaxGraphSize() const;
       std::string ActionToString(Player player, Action action_id) const override;
-      const WeightedGraphType &GetGraph() const { return game_info->graph; }
-        NodeType GetStartingState() const { return game_info->starting_state; }
-    private:
-        std::unique_ptr<MPGGameInfo> game_info;
+      std::shared_ptr<Environment> GetLastEnvironment() const;
+    protected:
+        std::unique_ptr<EnvironmentFactory> environment_factory;
+        mutable std::shared_ptr<Environment> last_environment;
+        mutable absl::Mutex environment_mutex;
     };
 
     NodeType PlayerToState(Player player);

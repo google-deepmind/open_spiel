@@ -219,6 +219,16 @@ namespace open_spiel::mpg
         GraphType operator()() override;
     };
 
+    class SinklessGnpGenerator: public GraphGenerator
+    {
+        std::uint64_t n;
+        double p;
+        std::mt19937_64 rng;
+    public:
+        SinklessGnpGenerator(std::uint64_t n, double p, std::uint64_t seed = 0);
+        GraphType operator()() override;
+    };
+
 
     class WeightGenerator
     {
@@ -263,43 +273,56 @@ namespace open_spiel::mpg
 
     };
 
-
     class MetaFactory
     {
     public:
         virtual ~MetaFactory() = default;
         virtual std::shared_ptr<const Game> CreateGame(const GameParameters& params)  = 0;
     };
+
+    class ParserMetaFactory : public MetaFactory
+    {
+    public:
+        std::shared_ptr<const Game> CreateGame(const GameParameters& params) override;
+    };
     extern std::unique_ptr<MetaFactory> metaFactory;
 
-    class GeneratorMetaFactory : public MetaFactory
+    class EnvironmentFactory
+    {
+        public:
+        virtual ~EnvironmentFactory()=default;
+        virtual std::shared_ptr<Environment> NewEnvironment(const MPGMetaGame &metaGame)=0;
+    };
+
+
+    class GeneratorEnvironmentFactory : public EnvironmentFactory
     {
         std::shared_ptr<WeightedGraphGenerator> weighted_graph_generator;
         std::mt19937_64 rng;
     public:
-        explicit GeneratorMetaFactory(std::shared_ptr<WeightedGraphGenerator> weighted_graph_generator, std::uint64_t seed=0);
-        [[nodiscard]] std::shared_ptr<const Game> CreateGame(const GameParameters& params)  override;
+        explicit GeneratorEnvironmentFactory(std::shared_ptr<WeightedGraphGenerator> weighted_graph_generator, std::uint64_t seed=0);
+        [[nodiscard]] std::shared_ptr<Environment> NewEnvironment(const MPGMetaGame &metaGame)  override;
     };
 
-    class UniformGnpMetaFactory : public GeneratorMetaFactory
+    class UniformGnpEnvironmentFactory : public GeneratorEnvironmentFactory
     {
 
     public:
-        UniformGnpMetaFactory(NodeType n, WeightType p, WeightType a,WeightType b, std::uint64_t seed = 0);
+        UniformGnpEnvironmentFactory(NodeType n, WeightType p, WeightType a, WeightType b, std::uint64_t seed = 0);
     };
 
-    class DeterministicFactory :public MetaFactory
+    class DeterministicEnvironmentFactory : public EnvironmentFactory
     {
     public:
-        virtual ~DeterministicFactory() = default;
-        virtual std::shared_ptr<const Game> CreateGame(const GameParameters& params)  = 0;
+        ~DeterministicEnvironmentFactory() override = default;
+        std::shared_ptr<Environment> NewEnvironment(const MPGMetaGame& metaGame)  override = 0;
     };
 
-    class ExampleFactory : public DeterministicFactory
+    class ExampleEnvironmentFactory : public DeterministicEnvironmentFactory
     {
     public:
-        virtual ~ExampleFactory() = default;
-        virtual std::shared_ptr<const Game> CreateGame(const GameParameters& params);
+        ~ExampleEnvironmentFactory() override = default;
+        std::shared_ptr<Environment> NewEnvironment(const MPGMetaGame& metaGame) override;
     };
 }
 

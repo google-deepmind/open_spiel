@@ -662,7 +662,7 @@ std::string Game::ToString() const {
             case Game::TensorShapeSpecs::kVector:
                 return ObservationTensorShape().empty() ? 0 : absl::c_accumulate(ObservationTensorShape(),1, std::multiplies<>());
             case Game::TensorShapeSpecs::kNestedList:
-                return ObservationTensorShape().empty() ? 0 : absl::c_accumulate(ObservationTensorsShapeList(),0,
+                return absl::c_accumulate(ObservationTensorsShapeList(),0,
                                              [](const int& acc, const auto& v)
                                              {
                                                 return acc+absl::c_accumulate(v,1,std::multiplies<>());

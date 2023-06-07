@@ -104,21 +104,21 @@ namespace open_spiel::mpg
         return W;
     }
 
-    GeneratorMetaFactory::GeneratorMetaFactory(std::shared_ptr<WeightedGraphGenerator> weighted_graph_generator, std::uint64_t seed) : weighted_graph_generator(std::move(weighted_graph_generator)),
-        rng(seed)
+    GeneratorEnvironmentFactory::GeneratorEnvironmentFactory(std::shared_ptr<WeightedGraphGenerator> weighted_graph_generator, std::uint64_t seed) : weighted_graph_generator(std::move(weighted_graph_generator)),
+                                                                                                                                                               rng(seed)
     {
 
     }
 
-    std::shared_ptr<const Game> GeneratorMetaFactory::CreateGame(const GameParameters &params)
+    std::shared_ptr<Environment> GeneratorEnvironmentFactory::NewEnvironment(const MPGMetaGame &metaGame)
     {
         auto G=weighted_graph_generator->operator()();
         std::uniform_int_distribution<NodeType> dist(0,G.size()-1);
-        return std::make_shared<MPGMetaGame>(params, G, dist(rng));
+        return std::make_shared<Environment>(G, dist(rng));
     }
 
-    UniformGnpMetaFactory::UniformGnpMetaFactory(NodeType n, WeightType p,WeightType a,WeightType b, std::uint64_t seed): GeneratorMetaFactory(
-                    std::make_shared<WeightedGraphGenerator>(std::make_shared<GnpGenerator>(n,p,seed),
+    UniformGnpEnvironmentFactory::UniformGnpEnvironmentFactory(NodeType n, WeightType p, WeightType a, WeightType b, std::uint64_t seed): GeneratorEnvironmentFactory(
+                    std::make_shared<WeightedGraphGenerator>(std::make_shared<SinklessGnpGenerator>(n,p,seed),
                     std::make_shared<UniformWeightGenerator>(a,b,seed)),
                     seed
                     )
@@ -126,7 +126,7 @@ namespace open_spiel::mpg
 
     }
 
-    std::shared_ptr<const Game> ExampleFactory::CreateGame(const GameParameters &params) {
+    std::shared_ptr<Environment> ExampleEnvironmentFactory::NewEnvironment(const MPGMetaGame& metaGame) {
         auto G=WeightedGraphType::from_string(R"(1 2 5
 2 3 -7
 3 7 0
@@ -138,6 +138,65 @@ namespace open_spiel::mpg
 5 7 0
 7 1 0
 0 1 5)");
-        return std::make_shared<MPGMetaGame>(params, G, 0);
+        return std::make_shared<Environment>(G, 0);
+    }
+
+    SinklessGnpGenerator::SinklessGnpGenerator(std::uint64_t n, double p, std::uint64_t seed) : n(n),p(p),rng(seed)
+    {
+    }
+
+    GraphType SinklessGnpGenerator::operator()()
+    {
+        GraphType G(n);
+        std::binomial_distribution<NodeType> degree_distribution(n,p);
+        for(NodeType u=0;u<n;u++)
+        {
+            NodeType d=0;
+            while(d==0)
+                d=degree_distribution(rng);
+            G[u]= choose(n,d,rng);
+        }
+        return G;
+    }
+
+    std::shared_ptr<const Game> ParserMetaFactory::CreateGame(const GameParameters &params) 
+    {
+        std::string game_generator=params.at("generator").string_value();
+        if(game_generator=="example")
+        {
+            return std::make_shared<MPGMetaGame>(params, std::make_unique<ExampleEnvironmentFactory>());
+        }
+        else if(game_generator == "gnp")
+        {
+            std::string generator_params=params.at("generator_params").string_value();
+            std::stringstream ss(generator_params);
+            try {
+                ss.exceptions(std::ios::failbit);
+                std::uint64_t n;
+                double p,a,b;
+                ss>>n>>p >> a >> b;
+                std::uint64_t seed=0;
+                if(!ss.eof())
+                    ss >> seed;
+                return std::make_shared<MPGMetaGame>(params, std::make_unique<UniformGnpEnvironmentFactory>(n,p,a,b,seed));
+            }
+            catch (std::ios::failure& e)
+            {
+                throw std::invalid_argument("Invalid generator_params for gnp: "+generator_params);
+            }
+
+        }
+        else if(game_generator == "file")
+        {
+            throw std::invalid_argument("file not implemented");
+        }
+        else if(game_generator == "folder")
+        {
+            throw std::invalid_argument("folder not implemented");
+        }
+        else if (game_generator == "specification")
+        {
+            throw std::invalid_argument("specification not implemented");
+        }
     }
 }
