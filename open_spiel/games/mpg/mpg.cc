@@ -51,7 +51,7 @@ namespace open_spiel::mpg {
                                          {"max_size",GameParameter(GameParameter::Type::kInt,true)},
                                          {"generator_params", GameParameter(GameParameter::Type::kString,false)},
                                          {"specs_file",GameParameter(GameParameter::Type::kString,false)},
-                                         {"compact_string",GameParameter(GameParameter::Type::kBool)}}  // no parameters
+                                         {"representation",GameParameter(GameParameter::Type::kString)}}  // no parameters
         };
 
 
@@ -162,19 +162,7 @@ namespace open_spiel::mpg {
     std::string MPGEnvironmentState::ToString() const
     {
         std::ostringstream stream;
-        if (game_->GetParameters().count("compact_string") && game_->GetParameters().at("compact_string").bool_value())
-        {
-            for(int i = 0; i < environment->graph.size(); i++)
-            {
-                stream << i << ":";
-                for(auto [v, w]: environment->graph[i])
-                    stream  << v << ":" << std::setprecision(3) << w << ":";
-                stream << "\n";
-            }
-            stream << current_state << ':' << current_player_;
-            return base64_encode(bzip_compress(stream.str()));
-        }
-        else
+        if(!game_->GetParameters().count("representation") || game_->GetParameters().at("representation").string_value()=="normal")
         {
             stream << "@@@\n";
             stream << "@Graph: \n{";
@@ -192,7 +180,40 @@ namespace open_spiel::mpg {
             stream << "@@@\n";
             return stream.str();
         }
-
+        else if (game_->GetParameters().at("representation").string_value() == "compressed")
+        {
+            for(int i = 0; i < environment->graph.size(); i++)
+            {
+                stream << i << ":";
+                for(auto [v, w]: environment->graph[i])
+                    stream  << v << ":" << std::setprecision(3) << w << ":";
+                stream << "\n";
+            }
+            stream << current_state << ':' << current_player_;
+            return base64_encode(bzip_compress(stream.str()));
+        }
+        else if (game_->GetParameters().at("representation").string_value() == "hash")
+        {
+            for(int i = 0; i < environment->graph.size(); i++)
+            {
+                stream << i << ":";
+                for(auto [v, w]: environment->graph[i])
+                    stream  << v << ":" << std::setprecision(3) << w << ":";
+                stream << "\n";
+            }
+            stream << current_state << ':' << current_player_;
+            return std::to_string(std::hash<std::string>{}(stream.str()));
+        }
+        else if(game_->GetParameters().at("representation").string_value() == "minimal")
+        {
+            stream << current_state << ':' << current_player_;
+            return stream.str();
+        }
+        else
+        {
+            std::cerr << "Unknown representation: " << game_->GetParameters().at("representation").string_value() << "\n";
+            exit(1);
+        }
     }
 
     bool MPGEnvironmentState::IsTerminal() const {

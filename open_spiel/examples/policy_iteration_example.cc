@@ -22,7 +22,7 @@
 // Example code for using policy iteration algorithm to solve tic-tac-toe.
 int main(int argc, char** argv) {
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("mpg(max_moves=5,max_size=20,generator=gnp,generator_params=20 0.5 -1 1,compact_string=True)");
+      open_spiel::LoadGame("mpg(max_moves=5,max_size=20,generator=gnp,generator_params=20 0.5 -1 1,representation=hash)");
 
   absl::flat_hash_map<std::string, double> solution =
       open_spiel::algorithms::PolicyIteration(*game, -1, 0.01);
