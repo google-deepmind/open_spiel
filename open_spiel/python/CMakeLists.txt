@@ -74,6 +74,10 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW STREQUAL AUTO)
 endif()
 
 
+if(${OPEN_SPIEL_BUILD_WITH_BOOST})
+  set(MPG_PY_SRC pybind11/games_mpg.h pybind11/games_mpg.cc)
+endif()
+
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
@@ -121,6 +125,7 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/python_games.h
   pybind11/utils.cc
   pybind11/utils.h
+  ${MPG_PY_SRC}
   )
 
 if (OPEN_SPIEL_BUILD_WITH_HIGC)
@@ -145,7 +150,11 @@ if (OPEN_SPIEL_BUILD_WITH_XINXIN)
 endif()
 
 add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
-target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
+if(OPEN_SPIEL_BUILD_WITH_BOOST)
+  target_link_libraries(pyspiel Boost::iostreams)
+endif()
+
+  target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
 # Without this, the binary is called `libpyspiel.so`
 set_target_properties(pyspiel PROPERTIES PREFIX "")

@@ -307,6 +307,14 @@ namespace open_spiel::mpg {
         state_history={current_state};
      }
 
+    WeightType MPGEnvironmentState::GetMeanPayoff() const {
+        return mean_payoff;
+    }
+
+    NodeType MPGEnvironmentState::GetCurrentState() const {
+        return current_state;
+    }
+
     std::string MPGMetaGame::ActionToString(Player player,
                                             Action action_id) const
     {

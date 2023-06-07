@@ -19,13 +19,23 @@
 #include "open_spiel/games/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "abseil-cpp/absl/flags/flag.h"
+#include "abseil-cpp/absl/flags/parse.h"
 // Example code for using policy iteration algorithm to solve tic-tac-toe.
-int main(int argc, char** argv) {
-  std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("mpg(max_moves=5,max_size=20,generator=gnp,generator_params=20 0.5 -1 1,representation=hash)");
+ABSL_FLAG(std::string, game, "mpg", "The name of the game to play.");
+ABSL_FLAG(int, depth_limit, -1,
+"Depth limit until which to compute value iteration.");
+ABSL_FLAG(double, threshold, 0.01,
+"Threshold accuracy at which to stop value iteration.");
+int main(int argc, char** argv)
+{
+    absl::ParseCommandLine(argc, argv);
+
+    std::shared_ptr<const open_spiel::Game> game =
+      open_spiel::LoadGame(absl::GetFlag(FLAGS_game));
 
   absl::flat_hash_map<std::string, double> solution =
-      open_spiel::algorithms::PolicyIteration(*game, -1, 0.01);
+      open_spiel::algorithms::PolicyIteration(*game, absl::GetFlag(FLAGS_depth_limit), absl::GetFlag(FLAGS_threshold));
   for (const auto& kv : solution) {
     std::cerr << "State: " << std::endl
               << kv.first << std::endl

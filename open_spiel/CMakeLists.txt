@@ -162,7 +162,7 @@ endif()
 openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
   "Enable miscellaneous Python dependencies.")
 
-openspiel_optional_dependency(OPEN_SPIEL_BUILDING_WHEEL           OFF
+openspiel_optional_dependency(OPEN_SPIEL_BUILDING_WHEEL           ON
   "Building a Python wheel?")
 
 # Needed to disable Abseil tests.
@@ -302,6 +302,7 @@ if(OPEN_SPIEL_BUILD_WITH_BOOST)
     find_package(Boost REQUIRED COMPONENTS iostreams)
     include_directories(${Boost_INCLUDE_DIRS})
   set(BOOST_LIBS Boost::iostreams)
+  link_libraries(Boost::iostreams)
 endif()
 
 # We have the parent of this directory in the include path, so that we can

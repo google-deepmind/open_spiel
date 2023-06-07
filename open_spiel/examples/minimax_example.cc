@@ -19,12 +19,23 @@
 #include "open_spiel/games/pig.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "abseil-cpp/absl/flags/flag.h"
+#include "abseil-cpp/absl/flags/parse.h"
+#include "games/mpg/mpg.h"
 
-inline constexpr int kSearchDepth = 2;
+inline constexpr int kSearchDepth = 5;
 inline constexpr int kSearchDepthPig = 10;
 inline constexpr int kWinscorePig = 30;
 inline constexpr int kDiceoutcomesPig = 2;
 inline constexpr int kSeed = 726345721;
+
+ABSL_FLAG(std::string, game, "tic_tac_toe", "The name of the game to play.");
+
+ABSL_FLAG(int, depth, kSearchDepth, "Search depth.");
+ABSL_FLAG(int, search_depth_pig, kSearchDepthPig, "Search depth for pig.");
+ABSL_FLAG(int, win_score_pig, kWinscorePig, "Win score for pig.");
+ABSL_FLAG(std::uint64_t, seed, kSeed, "Random seed.");
+
 
 namespace open_spiel {
 namespace {
@@ -110,8 +121,39 @@ void PlayPig(std::mt19937& rng) {
 }  // namespace
 }  // namespace open_spiel
 
-int main(int argc, char **argv) {
-  std::mt19937 rng(kSeed);  // Random number generator.
-  open_spiel::PlayBreakthrough();
-  open_spiel::PlayPig(rng);
+
+double MPGDepthEvaluate(const open_spiel::State& state) {
+  using namespace open_spiel;
+  auto mpgState=dynamic_cast<const mpg::MPGEnvironmentState&>(state);
+  return mpgState.GetMeanPayoff();
+}
+
+double GameZeroEvaluate(const open_spiel::State& state) {
+  return 0;
+}
+
+int main(int argc, char **argv)
+{
+    absl::ParseCommandLine(argc, argv);
+    auto game=open_spiel::LoadGame(absl::GetFlag(FLAGS_game));
+    using namespace open_spiel;
+    std::unique_ptr<State> state = game->NewInitialState();
+    while (!state->IsTerminal()) {
+        std::cout << std::endl << state->ToString() << std::endl;
+
+        Player player = state->CurrentPlayer();
+        std::pair<double, Action> value_action = algorithms::AlphaBetaSearch(
+                *game, state.get(),game->GetType().short_name =="mpg"?  MPGDepthEvaluate : GameZeroEvaluate,
+                kSearchDepth, player);
+
+        std::cout << std::endl << "Player " << player << " choosing action "
+                  << state->ActionToString(player, value_action.second)
+                  << " with heuristic value " << value_action.first
+                  << std::endl;
+
+        state->ApplyAction(value_action.second);
+    }
+
+    std::cout << "Terminal state: " << std::endl;
+    std::cout << state->ToString() << std::endl;
 }

@@ -21,7 +21,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-ABSL_FLAG(std::string, game_name, "kuhn_poker", "Game to run CFR on.");
+ABSL_FLAG(std::string, game, "kuhn_poker", "Game to run CFR on.");
 ABSL_FLAG(int, num_iters, 1000, "How many iters to run for.");
 ABSL_FLAG(int, report_every, 100, "How often to report exploitability.");
 
@@ -29,7 +29,7 @@ ABSL_FLAG(int, report_every, 100, "How often to report exploitability.");
 int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame(absl::GetFlag(FLAGS_game_name));
+      open_spiel::LoadGame(absl::GetFlag(FLAGS_game));
   open_spiel::algorithms::CFRSolver solver(*game);
   std::cerr << "Starting CFR on " << game->GetType().short_name
             << "..." << std::endl;

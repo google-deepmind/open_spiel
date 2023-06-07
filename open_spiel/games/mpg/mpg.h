@@ -124,7 +124,8 @@ namespace open_spiel::mpg
 
         // Only used by Ultimate Tic-Tac-Toe.
         void SetCurrentPlayer(Player player) { current_player_ = player; }
-
+        NodeType GetCurrentState() const;
+        WeightType GetMeanPayoff() const;
      protected:
 
       void DoApplyAction(Action move) override;

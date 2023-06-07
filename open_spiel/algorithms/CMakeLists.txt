@@ -192,3 +192,8 @@ add_subdirectory (alpha_zero)
 add_subdirectory (alpha_zero_mpg)
 add_subdirectory (alpha_zero_torch)
 add_subdirectory (dqn_torch)
+
+if(${OPEN_SPIEL_BUILT_WITH_BOOST})
+
+
+endif()

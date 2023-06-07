@@ -48,6 +48,10 @@ if(${OPEN_SPIEL_BUILD_WITH_BOOST})
   target_link_libraries(tabular_sarsa_example Boost::iostreams)
   target_link_libraries(tabular_q_learning_example Boost::iostreams)
   target_link_libraries(imperfect_recall_mccfr Boost::iostreams)
+  target_link_libraries(cfr_example Boost::iostreams)
+  target_link_libraries(value_iteration_example Boost::iostreams)
+  target_link_libraries(cfr_multi_equilibria_example Boost::iostreams)
+  target_link_libraries(imperfect_recall_mccfr Boost::iostreams)
 
 endif()
 

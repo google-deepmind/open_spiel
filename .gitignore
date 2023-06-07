@@ -42,6 +42,7 @@ download_cache/
 get-pip.py
 open_spiel/scripts/shflags
 open_spiel/scripts/jill.sh
+open_spiel.egg-info
 
 # julia wrapper
 Manifest.toml

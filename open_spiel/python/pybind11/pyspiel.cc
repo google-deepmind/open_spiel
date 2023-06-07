@@ -99,6 +99,21 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
+/**
+ * Helper template function to resolve overloaded functions.
+ * */
+ namespace
+ {
+     template<class... Args, class T, class R>
+     auto resolve(R (T::*m)(Args...)) -> decltype(m)
+     { return m; }
+
+     template<class T, class R>
+     auto resolve(R (T::*m)(void)) -> decltype(m)
+     { return m; }
+ }
+
+
 // Definintion of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
@@ -345,6 +360,13 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("distribution_support", &State::DistributionSupport)
       .def("update_distribution", &State::UpdateDistribution)
       .def("mean_field_population", &State::MeanFieldPopulation);
+  py::enum_<Game::TensorShapeSpecs>(state, "TensorShapeSpecs")
+          .value("UNKNOWN", Game::TensorShapeSpecs::kUnknown)
+            .value("VECTOR", Game::TensorShapeSpecs::kVector)
+            .value("NESTED_LIST", Game::TensorShapeSpecs::kNestedList)
+            .value("NESTED_DICT", Game::TensorShapeSpecs::kNestedMap)
+            .value("NESTED_MAP", Game::TensorShapeSpecs::kNestedMap);
+
 
   py::classh<Game, PyGame> game(m, "Game");
   game.def(py::init<GameType, GameInfo, GameParameters>())
@@ -356,7 +378,9 @@ PYBIND11_MODULE(pyspiel, m) {
            [](const Game* self, const std::string& s) {
              return self->NewInitialState(s);
            })
-      .def("new_initial_state_for_population",
+       .def("new_initial_environment_state", static_cast<std::unique_ptr<State>(Game::*)() const>(&Game::NewInitialEnvironmentState))
+          .def("new_initial_environment_state", static_cast<std::unique_ptr<State>(Game::*)(const std::string&) const>(&Game::NewInitialEnvironmentState))
+          .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)
       .def("get_parameters", &Game::GetParameters)
@@ -372,7 +396,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("observation_tensor_shape", &Game::ObservationTensorShape)
       .def("observation_tensor_layout", &Game::ObservationTensorLayout)
       .def("observation_tensor_size", &Game::ObservationTensorSize)
-      .def("policy_tensor_shape", &Game::PolicyTensorShape)
+      .def("observation_tensor_shape_specs", &Game::ObservationTensorShapeSpecs)
+    .def("policy_tensor_shape", &Game::PolicyTensorShape)
       .def("deserialize_state", &Game::DeserializeState)
       .def("max_game_length", &Game::MaxGameLength)
       .def("action_to_string", &Game::ActionToString)
