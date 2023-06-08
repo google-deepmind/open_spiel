@@ -17,14 +17,14 @@
 from absl import app
 from absl import flags
 
-from open_spiel.python.algorithms.alpha_zero import model as model_lib
+from open_spiel.python.algorithms.alpha_zero import model_v2 as model_lib
 import pyspiel
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("game", None, "Name of the game")
 flags.DEFINE_string("path", None, "Directory to save graph")
 flags.DEFINE_string("graph_def", None, "Filename for the graph")
-flags.DEFINE_enum("nn_model", "resnet", model_lib.Model.valid_model_types,
+flags.DEFINE_enum("nn_model", "resnet", model_lib.valid_model_types,
                   "What type of model should be used?.")
 flags.DEFINE_integer("nn_width", 2 ** 7, "How wide should the network be.")
 flags.DEFINE_integer("nn_depth", 10, "How deep should the network be.")
@@ -34,24 +34,22 @@ flags.DEFINE_bool("verbose", False, "Print information about the model.")
 flags.mark_flag_as_required("game")
 flags.mark_flag_as_required("path")
 flags.mark_flag_as_required("graph_def")
+from keras.utils.layer_utils import count_params
 
 
 def main(_):
   game = pyspiel.load_game(FLAGS.game)
-  model = model_lib.Model.build_model(
-      FLAGS.nn_model, game.observation_tensor_shape(),
-      game.num_distinct_actions(), FLAGS.nn_width, FLAGS.nn_depth,
-      FLAGS.weight_decay, FLAGS.learning_rate, FLAGS.path)
-  model.write_graph(FLAGS.graph_def)
+  model = model_lib.ModelV2()
+  model.model.save(FLAGS.graph_def)
 
   if FLAGS.verbose:
     print("Game:", FLAGS.game)
     print("Model type: %s(%s, %s)" % (FLAGS.nn_model, FLAGS.nn_width,
                                       FLAGS.nn_depth))
-    print("Model size:", model.num_trainable_variables, "variables")
+    print("Model size:", count_params(model.model.trainable_variables), "variables")
     print("Variables:")
-    model.print_trainable_variables()
-
+    for v in model.model.trainable_variables:
+        print("  ", v.name, v.shape)
 
 if __name__ == "__main__":
   app.run(main)
