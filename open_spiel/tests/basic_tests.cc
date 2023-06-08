@@ -533,7 +533,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
                    bool mask_test,
                    const std::function<void(const State&)>& state_checker_fn,
-                   int mean_field_population) {
+                   int mean_field_population,
+                   std::shared_ptr<Observer> observer) {
   std::mt19937 rng;
   if (verbose) {
     std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
@@ -541,7 +542,7 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
   }
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
-                     verbose, mask_test, nullptr, state_checker_fn,
+                     verbose, mask_test, observer, state_checker_fn,
                      mean_field_population);
   }
 }
