@@ -187,8 +187,8 @@ class UtilsTest(parameterized.TestCase):
     """Test `sample_from_simplex`."""
     x = utils.sample_from_simplex(n, dim=dim, vmin=vmin)
     np.testing.assert_allclose(np.sum(x, axis=1), np.ones(n))
-    self.assertTrue(np.alltrue(x <= 1. - vmin))
-    self.assertTrue(np.alltrue(x >= vmin))
+    self.assertTrue(np.all(x <= 1. - vmin))
+    self.assertTrue(np.all(x >= vmin))
 
 
 if __name__ == "__main__":
