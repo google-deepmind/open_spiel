@@ -22,6 +22,7 @@
 #include <set>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_set.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -608,8 +609,8 @@ void CheckChanceOutcomes(const State& state) {
           "\nLegalActions(kChancePlayerId): ",
           absl::StrJoin(legal_actions, ", ")));
     }
-    std::set<Action> legal_action_set(legal_actions.begin(),
-                                      legal_actions.end());
+    absl::btree_set<Action> legal_action_set(legal_actions.begin(),
+                                             legal_actions.end());
     auto chance_outcomes = state.ChanceOutcomes();
 
     std::vector<Action> chance_outcome_actions;
@@ -629,8 +630,8 @@ void CheckChanceOutcomes(const State& state) {
       }
       sum += prob;
     }
-    std::set<Action> chance_outcome_actions_set(chance_outcome_actions.begin(),
-                                                chance_outcome_actions.end());
+    absl::btree_set<Action> chance_outcome_actions_set(
+        chance_outcome_actions.begin(), chance_outcome_actions.end());
     if (chance_outcome_actions.size() != chance_outcome_actions_set.size()) {
       std::sort(chance_outcome_actions.begin(), chance_outcome_actions.end());
       SpielFatalError(absl::StrCat(
