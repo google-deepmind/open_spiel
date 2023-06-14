@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
@@ -705,7 +706,7 @@ std::string GameTypeToString(const GameType& game_type) {
 }
 
 GameType GameTypeFromString(const std::string& game_type_str) {
-  std::map<std::string, std::string> game_type_values;
+  absl::btree_map<std::string, std::string> game_type_values;
   std::vector<std::string> parts = absl::StrSplit(game_type_str, '\n');
 
   SPIEL_CHECK_EQ(parts.size(), 15);
