@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_set.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/algorithms/history_tree.h"
 #include "open_spiel/policy.h"
@@ -227,7 +228,7 @@ Action TabularBestResponse::BestResponseAction(const std::string& infostate) {
 }
 std::vector<Action> TabularBestResponse::BestResponseActions(
     const std::string& infostate, double tolerance) {
-  std::set<Action> best_actions;
+  absl::btree_set<Action> best_actions;
   std::vector<std::pair<Action, double>> action_values;
   std::vector<std::pair<HistoryNode*, double>> infoset =
       infosets_.at(infostate);
