@@ -87,13 +87,21 @@ void ConsolePlayTest(
   bool applied_action = true;
   std::unique_ptr<State> new_state;
 
-  while (!state->IsTerminal()) {
+  while (true) {
     if (applied_action) {
       std::cout << state->ToString() << std::endl << std::endl;
     }
     applied_action = false;
     Player player = state->CurrentPlayer();
     std::vector<Action> legal_actions = state->LegalActions();
+
+    if (state->IsTerminal()) {
+      std::cout << "Warning! State is terminal. Returns: ";
+      for (Player p = 0; p < game.NumPlayers(); ++p) {
+        std::cout << state->PlayerReturn(p) << " ";
+      }
+      std::cout << std::endl;
+    }
 
     if (bots != nullptr && bots->at(player) != nullptr) {
       Action action = bots->at(player)->Step(*state);
@@ -109,12 +117,14 @@ void ConsolePlayTest(
       if (line.empty()) {
         PrintHelpMenu();
       } else if (line == "#b") {
+        Action last_action = state->History().back();
         new_state = game.NewInitialState();
         std::vector<Action> history = state->History();
         for (int i = 0; i < history.size() - 1; ++i) {
           new_state->ApplyAction(history[i]);
         }
         state = std::move(new_state);
+        std::cout << "Popped action: " << last_action << std::endl;
         applied_action = true;
       } else if (line == "#q") {
         return;

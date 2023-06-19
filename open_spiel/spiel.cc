@@ -26,7 +26,9 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
+#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -830,6 +832,49 @@ void SpielFatalErrorWithStateInfo(const std::string& error_msg,
   // A fatal error wrapper designed to return useful debugging information.
   const std::string& info = SerializeGameAndState(game, state);
   SpielFatalError(absl::StrCat(error_msg, "Serialized state:\n", info));
+}
+
+std::pair<std::shared_ptr<const Game>,
+          std::unique_ptr<State>> BuildStateFromHistoryString(
+    const std::string& game_string,
+    const std::string& history,
+    int max_steps) {
+  std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>> game_and_state;
+  game_and_state.first = LoadGame(game_string);
+  game_and_state.second = game_and_state.first->NewInitialState();
+  std::string history_copy(absl::StripAsciiWhitespace(history));
+  if (history_copy[0] == '[') {
+    history_copy = history_copy.substr(1);
+  }
+  if (history_copy[history_copy.length() - 1] == ']') {
+    history_copy = history_copy.substr(0, history_copy.length() - 1);
+  }
+
+  std::vector<Action> legal_actions;
+  State* state = game_and_state.second.get();
+  int steps = 0;
+  std::vector<std::string> parts = absl::StrSplit(history_copy, ',');
+  for (const std::string& part : parts) {
+    if (max_steps > 0 && steps >= max_steps) {
+      break;
+    }
+    Action action;
+    bool atoi_ret = absl::SimpleAtoi(absl::StripAsciiWhitespace(part), &action);
+    if (!atoi_ret) {
+      SpielFatalError(absl::StrCat("Problem parsing action: ", part));
+    }
+    legal_actions = state->LegalActions();
+    if (absl::c_find(legal_actions, action) == legal_actions.end()) {
+      SpielFatalError(absl::StrCat("Illegal move detected!\nState:\n",
+                                   state->ToString(), "\nAction: ", action,
+                                   " (", state->ActionToString(action), ")\n",
+                                   "History: ", state->HistoryString()));
+    }
+    state->ApplyAction(action);
+    steps++;
+  }
+
+  return game_and_state;
 }
 
 }  // namespace open_spiel
