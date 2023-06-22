@@ -75,10 +75,10 @@ jobs:
           ${CI_PYBIN} -m pip install --upgrade setuptools
           ${CI_PYBIN} -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
-          ${CI_PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-          ${CI_PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-          ${CI_PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-          ${CI_PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           ${CI_PYBIN} -m pip install twine
           ${CI_PYBIN} -m pip install cibuildwheel==2.11.1
       - name: Build sdist

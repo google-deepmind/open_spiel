@@ -70,7 +70,7 @@ class _Observation:
       self.tensor = np.frombuffer(self._observation, np.float32)
       offset = 0
       for tensor_info in self._observation.tensors_info():
-        size = np.product(tensor_info.shape, dtype=np.int64)
+        size = np.prod(tensor_info.shape, dtype=np.int64)
         values = self.tensor[offset:offset + size].reshape(tensor_info.shape)
         self.dict[tensor_info.name] = values
         offset += size

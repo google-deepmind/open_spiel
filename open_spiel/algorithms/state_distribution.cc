@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/simultaneous_move_game.h"
@@ -162,7 +163,7 @@ HistoryDistribution GetStateDistribution(const State& state,
 
   // Generate the (info state, action) map for the current player using
   // the state's history.
-  std::map<std::string, Action> infostate_action_map;
+  absl::btree_map<std::string, Action> infostate_action_map;
   std::vector<Action> history = state.History();
   std::unique_ptr<State> tmp_state = game->NewInitialState();
   for (Action action : history) {

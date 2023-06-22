@@ -22,6 +22,7 @@
 #include <set>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_set.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -533,7 +534,8 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
 void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
                    bool mask_test,
                    const std::function<void(const State&)>& state_checker_fn,
-                   int mean_field_population) {
+                   int mean_field_population,
+                   std::shared_ptr<Observer> observer) {
   std::mt19937 rng;
   if (verbose) {
     std::cout << "\nRandomSimTest, game = " << game.GetType().short_name
@@ -541,7 +543,7 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize, bool verbose,
   }
   for (int sim = 0; sim < num_sims; ++sim) {
     RandomSimulation(&rng, game, /*undo=*/false, /*serialize=*/serialize,
-                     verbose, mask_test, nullptr, state_checker_fn,
+                     verbose, mask_test, observer, state_checker_fn,
                      mean_field_population);
   }
 }
@@ -607,8 +609,8 @@ void CheckChanceOutcomes(const State& state) {
           "\nLegalActions(kChancePlayerId): ",
           absl::StrJoin(legal_actions, ", ")));
     }
-    std::set<Action> legal_action_set(legal_actions.begin(),
-                                      legal_actions.end());
+    absl::btree_set<Action> legal_action_set(legal_actions.begin(),
+                                             legal_actions.end());
     auto chance_outcomes = state.ChanceOutcomes();
 
     std::vector<Action> chance_outcome_actions;
@@ -628,8 +630,8 @@ void CheckChanceOutcomes(const State& state) {
       }
       sum += prob;
     }
-    std::set<Action> chance_outcome_actions_set(chance_outcome_actions.begin(),
-                                                chance_outcome_actions.end());
+    absl::btree_set<Action> chance_outcome_actions_set(
+        chance_outcome_actions.begin(), chance_outcome_actions.end());
     if (chance_outcome_actions.size() != chance_outcome_actions_set.size()) {
       std::sort(chance_outcome_actions.begin(), chance_outcome_actions.end());
       SpielFatalError(absl::StrCat(

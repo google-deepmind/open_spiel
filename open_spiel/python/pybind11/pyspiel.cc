@@ -99,7 +99,7 @@ class SpielException : public std::exception {
   std::string message_;
 };
 
-// Definintion of our Python module.
+// Definition of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
 
@@ -612,7 +612,13 @@ PYBIND11_MODULE(pyspiel, m) {
         py::arg("mask_test") = true,
         py::arg("state_checker_fn") =
             py::cpp_function(&testing::DefaultStateChecker),
-        py::arg("mean_field_population") = -1, "Run the C++ tests on a game");
+        py::arg("mean_field_population") = -1, py::arg("observer") = nullptr,
+        "Run the C++ tests on a game");
+
+  m.def("build_state_from_history_string", BuildStateFromHistoryString,
+        "Builds a state from a game string and history string.",
+        py::arg("game_string"), py::arg("history_string"),
+        py::arg("max_steps") = -1);
 
   // Set an error handler that will raise exceptions. These exceptions are for
   // the Python interface only. When used from C++, OpenSpiel will never raise

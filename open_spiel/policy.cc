@@ -26,6 +26,7 @@
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/charconv.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
@@ -352,7 +353,7 @@ TabularPolicy GetFlatDirichletPolicy(
 TabularPolicy GetRandomDeterministicPolicy(
     const Game& game, int seed, Player player) {
   std::mt19937 gen(seed);
-  std::unordered_map<int, std::uniform_int_distribution<int>> dists;
+  absl::node_hash_map<int, std::uniform_int_distribution<int>> dists;
   std::unordered_map<std::string, ActionsAndProbs> policy;
   if (game.GetType().dynamics != GameType::Dynamics::kSequential) {
     SpielFatalError("Game is not sequential.");

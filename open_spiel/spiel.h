@@ -1169,6 +1169,18 @@ void SpielFatalErrorWithStateInfo(const std::string& error_msg,
                                   const Game& game,
                                   const State& state);
 
+
+// Builds the state from a history string. Checks legalities of every action
+// on the way. The history string is a comma-separated actions with whitespace
+// allowed, and can include square brackets on either side:
+//    E.g. "[1, 3, 4, 5, 6]"  and "57,12,72,85" are both valid.
+// Proceeds up to a maximum of max_steps, unless max_steps is negative, in
+// which case it proceeds until the end of the sequence.
+std::pair<std::shared_ptr<const Game>,
+          std::unique_ptr<State>> BuildStateFromHistoryString(
+    const std::string& game_string, const std::string& history,
+    int max_steps = -1);
+
 }  // namespace open_spiel
 
 #endif  // OPEN_SPIEL_SPIEL_H_
