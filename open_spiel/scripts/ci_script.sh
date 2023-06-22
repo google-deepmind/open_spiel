@@ -42,7 +42,7 @@ source ./open_spiel/scripts/python_extra_deps.sh
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
 
-if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
+if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
 else
@@ -58,7 +58,7 @@ python --version
 pip install --upgrade -r requirements.txt
 
 [[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
 [[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
 [[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
