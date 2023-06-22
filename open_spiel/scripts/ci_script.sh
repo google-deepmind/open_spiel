@@ -57,10 +57,10 @@ source ./venv/bin/activate
 python --version
 pip install --upgrade -r requirements.txt
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-reuse-hashes --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-reuse-hashes --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --no-reuse-hashes --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-reuse-hashes --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 ./open_spiel/scripts/build_and_run_tests.sh
 
