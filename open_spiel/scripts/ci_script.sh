@@ -44,6 +44,7 @@ ${PYBIN} -m pip install --upgrade setuptools
 
 if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
+  sudo apt-get install python3-venv
   ${PYBIN} -m venv ./venv
 else
   # Ubuntu 20.04 and earlier
