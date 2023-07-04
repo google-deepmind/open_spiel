@@ -306,6 +306,7 @@ void BackgammonState::ObservationTensor(Player player,
   // The format of this vector is described in Section 3.4 of "G. Tesauro,
   // Practical issues in temporal-difference learning, 1994."
   // https://link.springer.com/article/10.1007/BF00992697
+  // The values of the dice are added in the last two positions of the vector.
   for (int count : board_[player]) {
     *value_it++ = ((count == 1) ? 1 : 0);
     *value_it++ = ((count == 2) ? 1 : 0);
@@ -325,6 +326,9 @@ void BackgammonState::ObservationTensor(Player player,
   *value_it++ = (bar_[opponent]);
   *value_it++ = (scores_[opponent]);
   *value_it++ = ((cur_player_ == opponent) ? 1 : 0);
+
+  *value_it++ = ((!dice_.empty()) ? dice_[0] : 0);
+  *value_it++ = ((dice_.size() > 1) ? dice_[1] : 0);
 
   SPIEL_CHECK_EQ(value_it, values.end());
 }

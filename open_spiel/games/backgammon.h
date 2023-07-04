@@ -71,7 +71,7 @@ inline constexpr const int kNumDistinctActions = 1352;
 // See ObservationTensorShape for details.
 inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
 inline constexpr const int kStateEncodingSize =
-    3 * kNumPlayers + kBoardEncodingSize;
+    3 * kNumPlayers + kBoardEncodingSize + 2;
 inline constexpr const char* kDefaultScoringType = "winloss_scoring";
 inline constexpr bool kDefaultHyperBackgammon = false;
 
@@ -303,6 +303,8 @@ class BackgammonGame : public Game {
     // One double for the number of checkers on the bar for the opponent.
     // One double for the number of checkers scored for the opponent.
     // One double for whether it's the opponent's turn (1 or 0).
+    // One double for the first dice's value.
+    // One double for the second dice's value.
 
     return {kStateEncodingSize};
   }
