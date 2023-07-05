@@ -121,6 +121,7 @@ EXPECTED_GAMES = frozenset([
     "skat",
     "start_at",
     "solitaire",
+    "squadro",
     "stones_and_gems",
     "tarok",
     "tic_tac_toe",

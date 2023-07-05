@@ -79,6 +79,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
 <font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
 <font color="orange"><b>~</b></font>         | [Solitaire (K+)](#solitaire-k)
+<font color="orange"><b>~</b></font>         | [Squadro](#squadro)
 ![](_static/green_circ10.png "green circle") | [Tic-Tac-Toe](#tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Tiny Bridge](#tiny-bridge)
 ![](_static/green_circ10.png "green circle") | [Tiny Hanabi](#tiny-hanabi)
@@ -824,6 +825,16 @@ Status                                       | Game
 *   1 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and
     [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
+
+### Squadro
+
+*   Each turn, players can move their one of their pieces on the board.
+*   Uses tokens on a grid.
+*   Modern game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [bgg](https://boardgamegeek.com/boardgame/245222/squadro)
 
 ### Tic-Tac-Toe
 
