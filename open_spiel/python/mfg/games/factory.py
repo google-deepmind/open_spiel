@@ -21,6 +21,7 @@ from open_spiel.python.games import dynamic_routing_data
 from open_spiel.python.mfg import games  # pylint: disable=unused-import
 from open_spiel.python.mfg.games import crowd_modelling_2d
 from open_spiel.python.mfg.games import dynamic_routing
+from open_spiel.python.mfg.games import predator_prey
 import pyspiel
 
 # For each game, the setting with the game name, e.g. python_mfg_dynamic_routing
@@ -61,7 +62,8 @@ GAME_SETTINGS = {
         "time_step_length": 0.5,
     },
     # Predator and prey game.
-    "predator_prey_5x5x3": {},
+    "predator_prey_5x5x3": {**predator_prey.THREE_POPULATIONS,},
+    "predator_prey_5x5x4": {**predator_prey.FOUR_POPULATIONS,},
     # Linear-quadratic game.
     "linear_quadratic": {}
 }

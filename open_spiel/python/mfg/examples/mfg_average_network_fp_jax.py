@@ -18,7 +18,6 @@ from typing import Sequence
 
 from absl import flags
 import jax
-from jax.config import config
 
 from open_spiel.python import policy as policy_std
 from open_spiel.python import rl_environment
@@ -32,8 +31,6 @@ from open_spiel.python.mfg.games import factory
 from open_spiel.python.utils import app
 from open_spiel.python.utils import metrics
 from open_spiel.python.utils import training
-
-FLAGS = flags.FLAGS
 
 _GAME_NAME = flags.DEFINE_string('game_name', 'mfg_crowd_modelling_2d',
                                  'Name of the game.')
@@ -245,5 +242,5 @@ def main(argv: Sequence[str]) -> None:
 
 
 if __name__ == '__main__':
-  config.parse_flags_with_absl()
+  jax.config.parse_flags_with_absl()
   app.run(main)

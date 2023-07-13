@@ -214,9 +214,29 @@ class GamesSimTest(parameterized.TestCase):
   def test_multiplayer_game(self, game_info, num_players):
     if game_info.short_name == "python_mfg_predator_prey":
       reward_matrix = np.ones((num_players, num_players))
+      # Construct an initial distribution matrix of suitable dimensions.
+      zero_mat = np.zeros((5, 5))
+      pop_1 = zero_mat.copy()
+      pop_1[0, 0] = 1.0
+      pop_1 = pop_1.tolist()
+      pop_2 = zero_mat.copy()
+      pop_2[0, -1] = 1.0
+      pop_2 = pop_2.tolist()
+      pop_3 = zero_mat.copy()
+      pop_3[-1, 0] = 1.0
+      pop_3 = pop_3.tolist()
+      pop_4 = zero_mat.copy()
+      pop_4[-1, -1] = 1.0
+      pop_4 = pop_4.tolist()
+      pops = [pop_1, pop_2, pop_3, pop_4]
+      init_distrib = []
+      for p in range(num_players):
+        init_distrib += pops[p%4]
+      init_distrib = np.array(init_distrib)
       dict_args = {
           "players": num_players,
-          "reward_matrix": " ".join(str(v) for v in reward_matrix.flatten())
+          "reward_matrix": " ".join(str(v) for v in reward_matrix.flatten()),
+          "init_distrib": " ".join(str(v) for v in init_distrib.flatten()),
       }
     else:
       dict_args = {"players": num_players}
