@@ -1,4 +1,4 @@
-# Copyright 2023 DeepMind Technologies Limited
+# Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,10 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 #Modified: 2023 James Flynn
 #Original: https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/algorithms/cfr.py
-
 """Python implementation of the counterfactual regret minimization algorithm.
 
 One iteration of CFR consists of:
@@ -25,7 +23,6 @@ One iteration of CFR consists of:
 The average policy is what converges to a Nash Equilibrium.
 """
 
-import collections
 import attr
 import copy
 import numpy as np
@@ -48,18 +45,16 @@ class _InfoStateNode(object):
 
   #An array representing
   history = attr.ib()
-  updates = attr.ib()
-  updated = attr.ib()
 
-  cumulative_regret = attr.ib(factory=lambda: collections.defaultdict(float))
+  cumulative_regret = attr.ib(factory=lambda: defaultdict(float))
   # Same as above for the cumulative of the policy probabilities computed
   # during the policy iterations
-  cumulative_policy = attr.ib(factory=lambda: collections.defaultdict(float))
-  y_values = attr.ib(factory=lambda: collections.defaultdict(float))
+  cumulative_policy = attr.ib(factory=lambda: defaultdict(float))
+  y_values = attr.ib(factory=lambda: defaultdict(float))
 
 
 class _EFRSolverBase(object):
-  def __init__(self, game, _deviation_gen, discounting, discounting_parameters):
+  def __init__(self, game, _deviation_gen):
     assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, ()
 
     self._game = game
@@ -72,19 +67,16 @@ class _EFRSolverBase(object):
     self._deviation_gen = _deviation_gen
 
     self._info_state_nodes = {}
-    hist = {player : [] for player in range(self._num_players)}
-    self._initialize_info_state_nodes(self._root_node, hist, [[] for _ in range(self._num_players)],[[] for _ in range(self._num_players)])
+    hist = {player: [] for player in range(self._num_players)}
+    unif_probs = [[] for _ in range(self._num_players)],
+    empty_path_indices = [[] for _ in range(self._num_players)]
+    self._initialize_info_state_nodes(self._root_node, hist, unif_probs, empty_path_indices)
 
     self._iteration = 1  # For possible linear-averaging.
 
-    self.discounting = discounting
-    self.alpha = discounting_parameters[0]
-    self.beta = discounting_parameters[1]
-    self.gamma = discounting_parameters[2]
-
-    self._str_to_action = {}
   def return_cumulative_regret(self):
     return {list(self._info_state_nodes.keys())[i]: list(self._info_state_nodes.values())[i].cumulative_regret for i in range(len(self._info_state_nodes.keys()))}
+  
   def current_policy(self):
     return self._current_policy
 
@@ -111,9 +103,7 @@ class _EFRSolverBase(object):
           index_in_tabular_policy=self._current_policy.state_lookup[info_state],
           relizable_deviations = None,
           history = history[current_player].copy(),
-          current_history_probs = copy.deepcopy(path_indices[current_player]),
-          updates = 0,
-          updated = False
+          current_history_probs = copy.deepcopy(path_indices[current_player])
           )
       prior_possible_actions = []
       for i in range(len(info_state_node.current_history_probs)):
@@ -155,22 +145,13 @@ class _EFRSolverBase(object):
         #change too infostate
         mem_reach_probs = create_probs_from_index(info_state_node.current_history_probs, current_policy)
         deviation_reach_prob = deviations[devation].player_deviation_reach_probability(mem_reach_probs)
-        accum_regret_discount = 1
-        if self.discounting == True:
-          #No point in discounting 0 regret
-          if info_state_node.y_values[deviations[devation]]>0:
-            talpha = self._iteration**self.alpha
-            accum_regret_discount = talpha/(talpha+1)
-        info_state_node.y_values[deviations[devation]] = info_state_node.y_values[deviations[devation]]*accum_regret_discount + max(0,info_state_node.cumulative_regret[devation])*deviation_reach_prob
+        info_state_node.y_values[deviations[devation]] = info_state_node.y_values[deviations[devation]] + max(0,info_state_node.cumulative_regret[devation])*deviation_reach_prob
 
       #Might be incorrect
       state_policy = current_policy.policy_for_key(info_state)
       #print 
       for action, value in self._regret_matching(info_state_node.legal_actions, info_state_node).items():
         state_policy[action] = value
-      info_state_node.updated = True
-
-      info_state_node.updates +=1 
 
       for action in info_state_node.legal_actions:
         new_state = state.child(action)
@@ -220,7 +201,7 @@ class _EFRSolverBase(object):
 
     info_state_node = self._info_state_nodes[info_state]
     #Reset y values
-    info_state_node.y_values = collections.defaultdict(float)
+    info_state_node.y_values = defaultdict(float)
     if policies is None:
       info_state_policy = self._get_infostate_policy(info_state)
     else:
@@ -229,10 +210,7 @@ class _EFRSolverBase(object):
     reach_prob = reach_probabilities[current_player]
     for action in state.legal_actions():
       action_prob = info_state_policy.get(action, 0.)
-      current_policy_discount = 1.0
-      if self.discounting == True:
-        current_policy_discount = (self._iteration/self._iteration)**self.gamma
-      info_state_node.cumulative_policy[action] = info_state_node.cumulative_policy[action]*current_policy_discount + action_prob * reach_prob
+      info_state_node.cumulative_policy[action] = info_state_node.cumulative_policy[action] + action_prob * reach_prob
       new_state = state.child(action)
       new_reach_probabilities = reach_probabilities.copy()
       assert action_prob <= 1
@@ -257,7 +235,7 @@ class _EFRSolverBase(object):
       memory_reach_probs = create_probs_from_index(info_state_node.current_history_probs,self.current_policy())
       player_current_memory_reach_prob = deviation.player_deviation_reach_probability(memory_reach_probs)
       
-      deviation_regret = player_current_memory_reach_prob  *((devation_cf_value*counterfactual_reach_prob) - (counterfactual_reach_prob * state_value_for_player))
+      deviation_regret = player_current_memory_reach_prob * ((devation_cf_value*counterfactual_reach_prob) - (counterfactual_reach_prob * state_value_for_player))
 
       info_state_node.cumulative_regret[deviationIndex] += deviation_regret
     return state_value
@@ -277,8 +255,8 @@ def __get_infostate_policy_array(self, info_state_str):
     info_state_node.index_in_tabular_policy]
 
 class _EFRSolver(_EFRSolverBase):
-  def __init__(self, game, _deviation_gen, discounting, discounting_parameters):
-    super().__init__(game, _deviation_gen, discounting, discounting_parameters)
+  def __init__(self, game, _deviation_gen):
+    super().__init__(game, _deviation_gen)
 
   def evaluate_and_update_policy(self):
     """Performs a single step of policy evaluation and policy improvement."""
@@ -287,12 +265,11 @@ class _EFRSolver(_EFRSolverBase):
       policies=None,
       reach_probabilities=np.ones(self._game.num_players() + 1),
       player=None)
-    history = [ [] for _ in range(self._num_players)]
-    self._update_current_policy(self._root_node,self._current_policy)
-    self._iteration+= 1
+    self._update_current_policy(self._root_node, self._current_policy)
+    self._iteration += 1
 
 class EFRSolver(_EFRSolver):
-  def __init__(self, game, deviations_name, discounting = False, discounting_parameters = [1,1,1]):
+  def __init__(self, game, deviations_name):
 
     #Takes the deviation sets used for learning from Deviation_Sets
     external_only = False
@@ -308,8 +285,6 @@ class EFRSolver(_EFRSolver):
       external_only = True
     elif deviations_name == "informed cf" or deviations_name == "informed counterfactual":
       deviation_sets = return_informed_CF
-    elif deviations_name == "swap cf" or deviations_name == "swap counterfactual":
-      deviation_sets = return_swap_cf
     elif deviations_name == "bps" or deviations_name == "blind partial sequence":
       deviation_sets = return_blind_partial_sequence
       external_only = True
@@ -324,11 +299,7 @@ class EFRSolver(_EFRSolver):
     else:
       print("Unsupported Deviation Set")
       return None
-    super(EFRSolver, self).__init__(game, 
-        _deviation_gen = deviation_sets,
-        discounting = discounting,
-        discounting_parameters = discounting_parameters
-        )
+    super(EFRSolver, self).__init__(game, _deviation_gen=deviation_sets)
     self._external_only = external_only
   def _regret_matching(self, legal_actions, info_set_node):
     """Returns an info state policy by applying regret-matching.
@@ -357,7 +328,6 @@ class EFRSolver(_EFRSolver):
       num_actions = len(info_set_node.legal_actions)
       weighted_deviation_matrix = -np.eye(num_actions)
       
-      #Calculate the 
       for dev in list(info_set_node.y_values.keys()): 
         weighted_deviation_matrix += (info_set_node.y_values[dev]/z) * dev.return_transform_matrix()
 
@@ -368,20 +338,18 @@ class EFRSolver(_EFRSolver):
       b = np.reshape(b, (num_actions+1, 1))
 
       strategy = lstsq(weighted_deviation_matrix, b)[0]
-      normalised_strategy = strategy
-      #Adopt same cutting strategy as author's code
-      normalised_strategy[np.where(normalised_strategy<0)] = 0
-      normalised_strategy[np.where(normalised_strategy>1)] = 1
 
-      #Should be irrelavant
-      normalised_strategy = normalised_strategy/sum(normalised_strategy)
-      for index in range(len(normalised_strategy)):
-        info_state_policy[info_set_node.legal_actions[index]] = normalised_strategy[index]
+      #Adopt same cutting strategy as paper author's code
+      strategy[np.where(strategy<0)] = 0
+      strategy[np.where(strategy>1)] = 1
+
+      strategy = strategy/sum(strategy)
+      for index in range(len(strategy)):
+        info_state_policy[info_set_node.legal_actions[index]] = strategy[index]
     #Use a uniform strategy as sum of all regrets is negative
     else:
       for index in range(len(legal_actions)):
         info_state_policy[legal_actions[index]] = 1.0 / len(legal_actions)
-    
     return info_state_policy
         
 def _update_average_policy(average_policy, info_state_nodes):
@@ -405,7 +373,8 @@ def _update_average_policy(average_policy, info_state_nodes):
     else:
       for action, action_prob_sum in info_state_policies_sum.items():
         state_policy[action] = action_prob_sum / probabilities_sum
-      
+
+
 def strat_dict_to_array(sd):
   actions = list(sd.keys())
   strategy = np.zeros((len(actions),1))
@@ -413,11 +382,13 @@ def strat_dict_to_array(sd):
     strategy[action][0] = sd[actions[action]]
   return strategy
 
+
 def array_to_strat_dict(sa, legal_actions):
   sd = {}
   for action in legal_actions:
     sd[action] = sa[action]
   return sd
+
 
 def create_probs_from_index(indices, current_policy):
   path_to_state = []
@@ -622,10 +593,10 @@ def return_behavourial(num_actions, history, prior_legal_actions):
             memory_weights = np.concatenate((np.ones(deviation_info), np.zeros(len(history) - deviation_info)))
             for prior_memory_actions in prior_possible_memory_actions:
                 prior_memory_actions = np.concatenate((prior_memory_actions, np.zeros(len(history) - len(prior_memory_actions))))
-                for i in range (len(history) - len(prior_memory_actions)):
+                for i in range(len(history) - len(prior_memory_actions)):
                     prior_memory_actions.append(0)
                 prior_memory_actions_cp = prior_memory_actions.copy()
-                internal = return_all_non_identity_internal_deviations(num_actions,[memory_weights], prior_memory_actions_cp, prior_memory_actions_cp)
+                internal = return_all_non_identity_internal_deviations(num_actions, [memory_weights], prior_memory_actions_cp, prior_memory_actions_cp)
                 for i in internal:
                     deviations.append(i)
 
@@ -644,19 +615,19 @@ class LocalDeviationWithTimeSelection(object):
     use_unmodified_history = attr.ib()
     
     def __init__(self, target, source, num_actions, prior_actions_weight, prior_memory_actions, is_external, use_unmodified_history = True):
-            """"
-            Args:
-               target: the action that will be played when the deviation is triggered
-               source: the action that will trigger the target action if (used only by internal deviations, i.e is_external = False)
-               num_actions: the integer of actions
-               prior_actions_weight:
-               is_external: a boolean use to determine whether to create an internal or external type deviation
-               use_unmodified_history: 
-            """
-            self.localSwapTransform = LocalSwapTransform(target, source, num_actions, is_external = is_external)
-            self.prior_actions_weight = prior_actions_weight
-            self.prior_memory_actions = prior_memory_actions
-            self.use_unmodified_history = use_unmodified_history
+        """"
+        Args:
+        target: the action that will be played when the deviation is triggered
+        source: the action that will trigger the target action if (used only by internal deviations, i.e is_external = False)  
+        num_actions: the integer of actions
+        prior_actions_weight:
+        is_external: a boolean use to determine whether to create an internal or external type deviation
+        use_unmodified_history: 
+        """
+        self.localSwapTransform = LocalSwapTransform(target, source, num_actions, is_external = is_external)
+        self.prior_actions_weight = prior_actions_weight
+        self.prior_memory_actions = prior_memory_actions
+        self.use_unmodified_history = use_unmodified_history
 
     #If a pure strategy, a pure strategy will be returned (aka function works for both actions and strategies as input)
     def deviate(self,strategy):
@@ -665,30 +636,17 @@ class LocalDeviationWithTimeSelection(object):
         return self.localSwapTransform.matrix_transform
     def player_deviation_reach_probability(self, prior_possible_action_probabilities):
         try:
-            if self.prior_actions_weight == None:
-                return 1.0
-            elif self.prior_memory_actions == None:
-                return 1.0
+          if self.prior_actions_weight == None or self.prior_memory_actions == None or prior_possible_action_probabilities:
+            return 1.0
         except:
-            try:
-                if prior_possible_action_probabilities == None:
-                    return 1.0
-            except:
-                try:
-                    if self.prior_memory_actions == None:
-                        return 1.0
-                except:
-                    pass
-
+            return 1.0
+        
         memory_action_probabilities = np.ones(len(self.prior_actions_weight))
         #Reconstruct memory probabilities from history provided to the deviation to reach info set and the current memory probs
         memory_weightings = self.prior_actions_weight.copy()
         if self.use_unmodified_history:
             for state in range(len(self.prior_memory_actions)):
                 if not self.prior_actions_weight[state] == 0:
-                    #Append this, create an array of these and multiply (migt need to cast to an np array)
-                    #print(prior_possible_action_probabilities)
-                    #print(self.prior_memory_actions)
                     memory_action_probabilities[state] = (prior_possible_action_probabilities[state][self.prior_memory_actions[state]])
                 else:
                     memory_action_probabilities[state] = 1
@@ -696,7 +654,8 @@ class LocalDeviationWithTimeSelection(object):
         path_probability = np.multiply(memory_weightings, memory_action_probabilities)
         memory_reach_probability = np.prod(path_probability)
         return memory_reach_probability
-    def __eq__(self,other):
+    
+    def __eq__(self, other):
         if self.localSwapTransform == other.localSwapTransform:
             return True
         else:
@@ -705,7 +664,7 @@ class LocalDeviationWithTimeSelection(object):
         return hash(self.localSwapTransform)
 
 #Methods to return all
-def return_all_non_identity_internal_deviations(num_actions, possible_prior_weights, prior_memory_actions, history):
+def return_all_non_identity_internal_deviations(num_actions, possible_prior_weights, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
         for target in range(num_actions):
@@ -715,7 +674,7 @@ def return_all_non_identity_internal_deviations(num_actions, possible_prior_weig
     return deviations
 
 #EXCLUDES IDENTITY
-def return_all_internal_modified_deviations(num_actions,  possible_prior_weights, possible_prior_memory_actions, prior_memory_actions, history):
+def return_all_internal_modified_deviations(num_actions,  possible_prior_weights, possible_prior_memory_actions, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
         try:
@@ -738,7 +697,7 @@ def return_all_internal_modified_deviations(num_actions,  possible_prior_weights
                 prior_memory_actions[modificationIndex] = previous_action
     return deviations
 
-def return_all_external_deviations(num_actions,  possible_prior_weights, prior_memory_actions, history):
+def return_all_external_deviations(num_actions,  possible_prior_weights, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
         for target in range(num_actions):
@@ -746,7 +705,7 @@ def return_all_external_deviations(num_actions,  possible_prior_weights, prior_m
     return deviations
 
 #Modify last action as required
-def return_all_external_modified_deviations(num_actions,  possible_prior_weights, possible_prior_memory_actions, prior_memory_actions, history):
+def return_all_external_modified_deviations(num_actions,  possible_prior_weights, possible_prior_memory_actions, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
         try:
@@ -765,7 +724,7 @@ def return_all_external_modified_deviations(num_actions,  possible_prior_weights
                 prior_memory_actions[modificationIndex] = previous_action
     return deviations
 
-def return_identity_deviation(num_actions,  possible_prior_weights, prior_memory_actions, history):
+def return_identity_deviation(num_actions,  possible_prior_weights, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
         deviations.append(LocalDeviationWithTimeSelection(0, 0, num_actions, prior_actions_weight, prior_memory_actions, False))
@@ -801,12 +760,12 @@ class LocalSwapTransform(object):
         else:
             return False
     def __hash__(self):
-        separator = "£$"
+        separator = " "
         return hash(str(self.sourceAction)+separator+str(self.targetAction)+separator+str(self.actionsNum)+ separator +str(self.is_external))
     #If a pure strategy, a pure strategy will be returned (aka function works for both actions and strategies as input)
     def deviate(self,strategy):
         """
-        Returns the 
+        Returns the deviation strategy
 
         """
         return np.matmul(self.matrix_transform, strategy)
