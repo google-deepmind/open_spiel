@@ -65,7 +65,9 @@ GAME_SETTINGS = {
     "predator_prey_5x5x3": {**predator_prey.THREE_POPULATIONS,},
     "predator_prey_5x5x4": {**predator_prey.FOUR_POPULATIONS,},
     # Linear-quadratic game.
-    "linear_quadratic": {}
+    "linear_quadratic": {},
+    # Periodic aversion game.
+    "periodic_aversion": {}
 }
 
 # Default settings for the games.
@@ -74,6 +76,7 @@ GAME_SETTINGS.update({
     "mfg_crowd_modelling_2d": GAME_SETTINGS["crowd_modelling_2d_10x10"],
     "mfg_dynamic_routing": GAME_SETTINGS["dynamic_routing_line"],
     "python_mfg_dynamic_routing": GAME_SETTINGS["dynamic_routing_line"],
+    "python_mfg_periodic_aversion": GAME_SETTINGS["periodic_aversion"],
     "python_mfg_predator_prey": GAME_SETTINGS["predator_prey_5x5x3"],
 })
 

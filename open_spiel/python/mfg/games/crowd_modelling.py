@@ -25,7 +25,7 @@ to the game in section 4.2.
 from typing import Any, List, Mapping
 import numpy as np
 
-from open_spiel.python.observation import IIGObserverForPublicInfoGame
+from open_spiel.python import observation
 import pyspiel
 
 _NUM_PLAYERS = 1
@@ -87,7 +87,7 @@ class MFGCrowdModellingGame(pyspiel.Game):
     if ((iig_obs_type is None) or
         (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
       return Observer(params, self)
-    return IIGObserverForPublicInfoGame(iig_obs_type, params)
+    return observation.IIGObserverForPublicInfoGame(iig_obs_type, params)
 
   def max_chance_nodes_in_history(self):
     """Maximun chance nodes in game history."""
@@ -118,7 +118,7 @@ class MFGCrowdModellingState(pyspiel.State):
 
     # Represents the current probability distribution over game states.
     # Initialized with a uniform distribution.
-    self._distribution = [1. / self.size for i in range(self.size)]
+    self._distribution = [1. / self.size for _ in range(self.size)]
 
   @property
   def x(self):

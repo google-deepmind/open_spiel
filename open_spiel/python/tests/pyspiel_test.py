@@ -109,6 +109,7 @@ EXPECTED_GAMES = frozenset([
     "python_iterated_prisoners_dilemma",
     "python_mfg_crowd_modelling",
     "python_mfg_dynamic_routing",
+    "python_mfg_periodic_aversion",
     "python_mfg_predator_prey",
     "python_kuhn_poker",
     "python_tic_tac_toe",

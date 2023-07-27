@@ -13,27 +13,27 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Python Linear Quadratic game."""
+"""Tests for Python Periodic Aversion game."""
 
 from absl.testing import absltest
 import numpy as np
-from open_spiel.python.mfg.games import linear_quadratic
+from open_spiel.python.mfg.games import periodic_aversion
 import pyspiel
 
 MFG_STR_CONST = "_a"
 
 
-class MFGLinearQuadraticGameTest(absltest.TestCase):
+class MFGPeriodicAversionTest(absltest.TestCase):
 
   def test_load(self):
-    game = pyspiel.load_game("mean_field_lin_quad")
+    game = pyspiel.load_game("python_mfg_periodic_aversion")
     game.new_initial_state()
 
   def test_create(self):
     """Checks we can create the game and clone states."""
-    game = linear_quadratic.MFGLinearQuadraticGame()
-    self.assertEqual(game.size, linear_quadratic._SIZE)
-    self.assertEqual(game.horizon, linear_quadratic._HORIZON)
+    game = periodic_aversion.MFGPeriodicAversionGame()
+    self.assertEqual(game.size, periodic_aversion._SIZE)
+    self.assertEqual(game.horizon, periodic_aversion._HORIZON)
     self.assertEqual(game.get_type().dynamics,
                      pyspiel.GameType.Dynamics.MEAN_FIELD)
     print("Num distinct actions:", game.num_distinct_actions())
@@ -43,8 +43,8 @@ class MFGLinearQuadraticGameTest(absltest.TestCase):
     print("Cloned initial state:", clone)
 
   def test_create_with_params(self):
-    game = pyspiel.load_game("mean_field_lin_quad(horizon=30,size=100)")
-    self.assertEqual(game.size, 100)
+    game = pyspiel.load_game("python_mfg_periodic_aversion(horizon=30,size=41)")
+    self.assertEqual(game.size, 41)
     self.assertEqual(game.horizon, 30)
 
   def check_cloning(self, state):
@@ -61,8 +61,8 @@ class MFGLinearQuadraticGameTest(absltest.TestCase):
     """Tests basic API functions."""
     np.random.seed(7)
     horizon = 30
-    size = 100
-    game = linear_quadratic.MFGLinearQuadraticGame(params={
+    size = 41
+    game = periodic_aversion.MFGPeriodicAversionGame(params={
         "horizon": horizon,
         "size": size
     })
