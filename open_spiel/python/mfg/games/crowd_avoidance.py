@@ -13,21 +13,20 @@
 # limitations under the License.
 
 # Lint as python3
-"""Mean Field predator-prey game, implemented in Python.
+"""Mean Field Crowd Avoidance game, implemented in Python.
 
-This corresponds to the predator-prey game described in section 5.4 of
-"Scaling up Mean Field Games with Online Mirror Descent"
-(https://arxiv.org/abs/2103.00623)
+This corresponds to an environment in which two populations try to avoid each
+other.
 
 The environment is configurable in the following high-level ways:
-- Number of populations.
-- Reward matrix.
+- Congestion coefficients matrix.
 - Initial distribution.
 - Geometry (torus, basic square).
 """
 
 import enum
 import functools
+import math
 from typing import Any, List, Mapping, Optional, Tuple
 
 import numpy as np
@@ -42,125 +41,122 @@ class Geometry(enum.IntEnum):
   TORUS = 1
 
 
-_DEFAULT_SIZE = 5
+_DEFAULT_SIZE = 7
+_DEFAULT_HORIZON = 10
 _NUM_ACTIONS = 5
 _NUM_CHANCE = 5
-DEFAULT_REWARD_MATRIX_THREE_POPULATIONS = np.array(
-    # The first population is attracted to the second and tries to avoid the
-    # third one.
-    [[0, -1, 1], [1, 0, -1], [-1, 1, 0]]
+_DEFAULT_CONGESTION_MATRIX = np.array(
+    # The first population feels congestion with respect to the second one,
+    # and vice-versa.
+    [[0, 1], [1, 0]]
 )
-DEFAULT_REWARD_MATRIX_FOUR_POPULATIONS = np.array(
-    # The first population is attracted to the second and tries to avoid the
-    # third one, and so on.
-    [[0, 1, 0, -1], [-1, 0, 1, 0], [0, -1, 0, 1], [1, 0, -1, 0]]
-)
+_DEFAULT_NUM_PLAYERS = 2
 # Each population starts in a corner.
-DEFAULT_INIT_DISTRIB_THREE_POPULATIONS = np.array([
+_DEFAULT_INIT_DISTRIB = np.array([
     # First population
-    [1.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.4, 0.4, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     # Second population
-    [0.0, 0.0, 0.0, 0.0, 1.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    # Third population
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [1.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.4, 0.4, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
 ])
-DEFAULT_INIT_DISTRIB_FOUR_POPULATIONS = np.array([
-    # First population
-    [1.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    # Second population
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [1.0, 0.0, 0.0, 0.0, 0.0],
-    # Third population
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 1.0],
-    # Fourth population
-    [0.0, 0.0, 0.0, 0.0, 1.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-    [0.0, 0.0, 0.0, 0.0, 0.0],
-])
+
+
+def grid_to_forbidden_states(grid):
+  """Converts a grid into string representation of forbidden states.
+
+  Args:
+    grid: Rows of the grid. '#' character denotes a forbidden state. All rows
+      should have the same number of columns, i.e. cells.
+
+  Returns:
+    String representation of forbidden states in the form of x (column) and y
+    (row) pairs, e.g. [1|1;0|2].
+  """
+  forbidden_states = []
+  num_cols = len(grid[0])
+  for y, row in enumerate(grid):
+    assert len(row) == num_cols, f"Number of columns should be {num_cols}."
+    for x, cell in enumerate(row):
+      if cell == "#":
+        forbidden_states.append(f"{x}|{y}")
+  return "[" + ";".join(forbidden_states) + "]"
+
+
+def pairs_string_to_list(positions: str) -> List[np.ndarray]:
+  """Converts a string representing positions into a list of positions."""
+  pos = positions[1:-1]  # remove [ and ]
+  split = pos.split(";")
+  return [np.array([i for i in s.split("|")]) for s in split]
+
+
+forbidden_states_grid = [
+    "#######",
+    "#  #  #",
+    "#     #",
+    "#  #  #",
+    "#     #",
+    "#  #  #",
+    "#######",
+]
+_DEFAULT_FORBIDDEN_STATES = grid_to_forbidden_states(forbidden_states_grid)
+
+forbidden_states_indicator = np.array(
+    [
+        [math.nan if c == "#" else 0 for c in [*row]]
+        for row in forbidden_states_grid
+    ]
+)
+
+_DEFAULT_PROBA_NOISE = 0.5
 
 _DEFAULT_GEOMETRY = Geometry.SQUARE
-_DEFAULT_NOISE_PROBABILITY = 0.8
-_DEFAULT_CONGESTION_COEFF = 1.0
 
-THREE_POPULATIONS = {
+_DEFAULT_COEF_CONGESTION = 0.0
+
+_DEFAULT_COEF_TARGET = 1.0
+
+_DEFAULT_PARAMS = {
     "size": _DEFAULT_SIZE,
-    "horizon": 10,
-    "players": 3,
-    # The reward matrix is represented as a string containing a
+    "horizon": _DEFAULT_HORIZON,
+    "players": _DEFAULT_NUM_PLAYERS,
+    # The congestion matrix is represented as a string containing a
     # space-separated list of values.
     # Its size defines the number of populations in the mean field game.
-    "reward_matrix": " ".join(
-        str(v) for v in DEFAULT_REWARD_MATRIX_THREE_POPULATIONS.flatten()
+    "congestion_matrix": " ".join(
+        str(v) for v in _DEFAULT_CONGESTION_MATRIX.flatten()
     ),
     "geometry": _DEFAULT_GEOMETRY,
-    "init_distrib": " ".join(
-        str(v) for v in DEFAULT_INIT_DISTRIB_THREE_POPULATIONS.flatten()
-    ),
+    "init_distrib": " ".join(str(v) for v in _DEFAULT_INIT_DISTRIB.flatten()),
     # Probability that the transition is affected by noise
-    "noise_probability": _DEFAULT_NOISE_PROBABILITY,
+    "proba_noise": _DEFAULT_PROBA_NOISE,
     # Weight of congestion term in the reward
-    "congestion_coeff": _DEFAULT_CONGESTION_COEFF,
+    "coef_congestion": _DEFAULT_COEF_CONGESTION,
+    "forbidden_states": _DEFAULT_FORBIDDEN_STATES,
+    "coef_target": _DEFAULT_COEF_TARGET,
 }
-
-FOUR_POPULATIONS = {
-    "size": _DEFAULT_SIZE,
-    "horizon": 20,
-    "players": 4,
-    # The reward matrix is represented as a string containing a
-    # space-separated list of values.
-    # Its size defines the number of populations in the mean field game.
-    "reward_matrix": " ".join(
-        str(v) for v in DEFAULT_REWARD_MATRIX_FOUR_POPULATIONS.flatten()
-    ),
-    "geometry": _DEFAULT_GEOMETRY,
-    "init_distrib": " ".join(
-        str(v) for v in DEFAULT_INIT_DISTRIB_FOUR_POPULATIONS.flatten()
-    ),
-    # Probability that the transition is affected by noise
-    "noise_probability": _DEFAULT_NOISE_PROBABILITY,
-    # Weight of congestion term in the reward
-    "congestion_coeff": _DEFAULT_CONGESTION_COEFF,
-}
-
-
-_DEFAULT_PARAMS = THREE_POPULATIONS
 
 _GAME_TYPE = pyspiel.GameType(
-    short_name="python_mfg_predator_prey",
-    long_name="Python Mean Field Predator Prey",
+    short_name="python_mfg_crowd_avoidance",
+    long_name="Python Mean Field Crowd Avoidance",
     dynamics=pyspiel.GameType.Dynamics.MEAN_FIELD,
     chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
     information=pyspiel.GameType.Information.PERFECT_INFORMATION,
     utility=pyspiel.GameType.Utility.GENERAL_SUM,
     reward_model=pyspiel.GameType.RewardModel.REWARDS,
     # We cannot pass math.inf here, so we pass a very high integer value.
-    max_num_players=1000000000,
-    min_num_players=1,
+    max_num_players=2,
+    min_num_players=2,
     provides_information_state_string=True,
     provides_information_state_tensor=False,
     provides_observation_string=True,
@@ -184,24 +180,25 @@ def _state_to_str(x, y, t, population, player_id):
     return f"(pop={population}, t={t}_a_mu, pos=[{x} {y}])"
 
 
-class MFGPredatorPreyGame(pyspiel.Game):
-  """Predator-prey multi-population MFG."""
+class MFGCrowdAvoidanceGame(pyspiel.Game):
+  """Multi-population MFG."""
 
   # pylint:disable=dangerous-default-value
   def __init__(self, params: Mapping[str, Any] = _DEFAULT_PARAMS):
     self.size = get_param("size", params)
     self.horizon = get_param("horizon", params)
-    flat_reward_matrix = np.fromstring(
-        get_param("reward_matrix", params), dtype=np.float64, sep=" "
+    flat_congestion_matrix = np.fromstring(
+        get_param("congestion_matrix", params), dtype=np.float64, sep=" "
     )
     num_players = get_param("players", params)
-    if len(flat_reward_matrix) != num_players**2:
+    if len(flat_congestion_matrix) != num_players**2:
       raise ValueError(
-          "Reward matrix passed in flat representation does not represent a "
-          f"square matrix: {flat_reward_matrix}"
-          f" with number of players: {num_players}"
+          "Congestion matrix passed in flat representation does not represent "
+          f"a square matrix: {flat_congestion_matrix}"
       )
-    self.reward_matrix = flat_reward_matrix.reshape([num_players, num_players])
+    self.congestion_matrix = flat_congestion_matrix.reshape(
+        [num_players, num_players]
+    )
     self.geometry = get_param("geometry", params)
     num_states = self.size**2
     game_info = pyspiel.GameInfo(
@@ -213,9 +210,15 @@ class MFGPredatorPreyGame(pyspiel.Game):
         utility_sum=None,
         max_game_length=self.horizon,
     )
+    self.proba_noise = get_param("proba_noise", params)
+    self.coef_congestion = get_param("coef_congestion", params)
+    self.forbidden_states = pairs_string_to_list(
+        get_param("forbidden_states", params)
+    )
+    self.coef_target = get_param("coef_target", params)
+    # TODO(lauriere): should be given as a parameter of the model.
+    self.target_positions = np.array([[5, 3], [1, 3]])
 
-    self.noise_probability = get_param("noise_probability", params)
-    self.congestion_coeff = get_param("congestion_coeff", params)
     # Represents the current probability distribution over game states
     # (when grouped for each population).
     str_init_distrib = get_param("init_distrib", params)
@@ -227,8 +230,6 @@ class MFGPredatorPreyGame(pyspiel.Game):
         raise ValueError(
             "Initial distribution matrix passed in flat representation does"
             f" not represent a sequence of square matrices: {flat_init_distrib}"
-            f" with number of players: {num_players}"
-            f" and size: {self.size}"
         )
       self.initial_distribution = flat_init_distrib
     else:
@@ -246,7 +247,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
     ApplyAction() will fail. Proper playable states should be
     instantiated with new_initial_state_for_population().
     """
-    return MFGPredatorPreyState(self)
+    return MFGCrowdAvoidanceState(self)
 
   def max_chance_nodes_in_history(self):
     """Maximun chance nodes in game history."""
@@ -254,7 +255,7 @@ class MFGPredatorPreyGame(pyspiel.Game):
 
   def new_initial_state_for_population(self, population):
     """State corresponding to the start of a game for a given population."""
-    return MFGPredatorPreyState(self, population)
+    return MFGCrowdAvoidanceState(self, population)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns an object used for observing game state."""
@@ -278,8 +279,8 @@ def merged_to_pos(merged_pos: int, size: int) -> np.ndarray:
   return np.array([merged_pos % size, merged_pos // size])
 
 
-class MFGPredatorPreyState(pyspiel.State):
-  """State for the predator-prey MFG."""
+class MFGCrowdAvoidanceState(pyspiel.State):
+  """State for the avoidance MFG."""
 
   # Maps legal actions to the corresponding move on the grid of the game.
   _ACTION_TO_MOVE = {
@@ -296,7 +297,7 @@ class MFGPredatorPreyState(pyspiel.State):
     """Constructor; should only be called by Game.new_initial_state.*.
 
     Args:
-      game: MFGPredatorPreyGame for which a state should be created.
+      game: MFGCrowdAvoidanceGame for which a state should be created.
       population: ID of the population to create this state for. Must be in [0,
         num_players()) or None. States with population=None cannot be used to
         perform game actions.
@@ -318,12 +319,15 @@ class MFGPredatorPreyState(pyspiel.State):
     # Number of states in the grid.
     self.num_states = self.size**2
     self.horizon = game.horizon
-    self.reward_matrix = game.reward_matrix
+    self.congestion_matrix = game.congestion_matrix
     self.geometry = game.geometry
     self._returns = np.zeros([self.num_players()], dtype=np.float64)
     self._distribution = shared_value.SharedValue(game.initial_distribution)
-    self.noise_probability = game.noise_probability
-    self.congestion_coeff = game.congestion_coeff
+    self.proba_noise = game.proba_noise
+    self.coef_congestion = game.coef_congestion
+    self.forbidden_states = game.forbidden_states
+    self.coef_target = game.coef_target
+    self.target_positions = game.target_positions
 
   @property
   def population(self):
@@ -371,18 +375,27 @@ class MFGPredatorPreyState(pyspiel.State):
           or not 0 <= self._population < self.num_players()
       ):
         raise ValueError(f"Invalid population {self._population}")
+      p = self._population % 2
+      dist = self._distribution.value
+      dist_p = dist[p * self.num_states : (p + 1) * self.num_states]
+      pos_indices_flat = np.nonzero(dist_p)[0]
+      pos_indices = [
+          np.array([i % self.size, (i - i % self.size) // self.size])
+          for i in pos_indices_flat
+      ]
+      # Beware: In the initial distribution representation, x and y correspond
+      # respectively to the row and the column, but in the state representation,
+      # they correspond to the column and the row.
       return [
-          (i, self._distribution.value[self._population * self.num_states + i])
-          for i in range(self.num_states)
-          if self._distribution.value[self._population * self.num_states + i]
-          != 0.0
+          (pos_to_merged(i, self.size), dist_p[i[1] * self.size + i[0]])
+          for i in pos_indices
       ]
     return [
-        (0, 1.0 - self.noise_probability),
-        (1, self.noise_probability / 4.0),
-        (2, self.noise_probability / 4.0),
-        (3, self.noise_probability / 4.0),
-        (4, self.noise_probability / 4.0),
+        (0, 1.0 - self.proba_noise),
+        (1, self.proba_noise / 4.0),
+        (2, self.proba_noise / 4.0),
+        (3, self.proba_noise / 4.0),
+        (4, self.proba_noise / 4.0),
     ]
 
   def update_pos(self, action):
@@ -393,7 +406,11 @@ class MFGPredatorPreyState(pyspiel.State):
           f"got {action}"
       )
     candidate_pos = self._pos + self._ACTION_TO_MOVE[action]
-    if self.geometry == Geometry.TORUS:
+    # if candidate_pos in self.forbidden_states:
+    # if np.any(np.all(candidate_pos == self.forbidden_states, axis=1)):
+    if any(np.array_equal(candidate_pos, x) for x in self.forbidden_states):
+      candidate_pos = self._pos
+    elif self.geometry == Geometry.TORUS:
       candidate_pos += self.size
       candidate_pos %= self.size
     else:
@@ -473,8 +490,9 @@ class MFGPredatorPreyState(pyspiel.State):
     # This logic needs to match the ordering defined in distribution_support().
     index = population + self.num_players() * (pos[1] + self.size * pos[0])
     assert 0 <= index < len(self._distribution.value), (
-        f"Invalid index {index} vs dist length: {len(self._distribution.value)}"
-        f", population={population}, pos={pos}, state={self}"
+        f"Invalid index {index} vs dist length:"
+        f" {len(self._distribution.value)}, population={population}, pos={pos},"
+        f" state={self}"
     )
     return self._distribution.value[index]
 
@@ -510,17 +528,13 @@ class MFGPredatorPreyState(pyspiel.State):
     return self._player_id
 
   def rewards(self) -> List[float]:
-    """Predator-prey rewards for all populations.
-
-    See section 5.4, paragraph Environment in https://arxiv.org/abs/2103.00623.
+    """Crowd avoidance rewards for all populations.
 
     Returns:
       One float per population.
     """
     if int(self._player_id) < 0:
       return [0.0] * self.num_players()
-    # TODO(author15): Remove this eps once b/191064186 is fixed.
-    eps = 1e-25
     densities = np.array(
         [
             self.get_pos_proba(self._pos, population)
@@ -528,8 +542,13 @@ class MFGPredatorPreyState(pyspiel.State):
         ],
         dtype=np.float64,
     )
-    rew = -self.congestion_coeff * np.log(densities + eps) + np.dot(
-        self.reward_matrix, densities
+    rew = -self.coef_congestion * np.dot(self.congestion_matrix, densities)
+    # Rewards for target positions.
+    rew[0] += self.coef_target * np.array_equal(
+        self._pos, self.target_positions[0]
+    )
+    rew[1] += self.coef_target * np.array_equal(
+        self._pos, self.target_positions[1]
     )
     return list(rew)
 
@@ -561,7 +580,7 @@ class Observer:
         "t": self.tensor[self.size * 2 :],
     }
 
-  def set_from(self, state: MFGPredatorPreyState, player: int):
+  def set_from(self, state: MFGCrowdAvoidanceState, player: int):
     """Updates `tensor` and `dict` to reflect `state` from PoV of `player`."""
     del player
     # We update the observation via the shaped tensor since indexing is more
@@ -586,4 +605,4 @@ class Observer:
     return str(state)
 
 
-pyspiel.register_game(_GAME_TYPE, MFGPredatorPreyGame)
+pyspiel.register_game(_GAME_TYPE, MFGCrowdAvoidanceGame)

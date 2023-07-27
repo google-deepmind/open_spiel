@@ -30,6 +30,8 @@ import pyspiel
 # implementations, e.g. Python or C++, of the same game. Empty parameters use
 # the default values as specified in the game.
 GAME_SETTINGS = {
+    # Crowd avoidance game.
+    "crowd_avoidance": {},
     # 2D crowd modelling game.
     "crowd_modelling_2d_10x10": {},
     "crowd_modelling_2d_four_rooms": {
@@ -62,16 +64,21 @@ GAME_SETTINGS = {
         "time_step_length": 0.5,
     },
     # Predator and prey game.
-    "predator_prey_5x5x3": {**predator_prey.THREE_POPULATIONS,},
-    "predator_prey_5x5x4": {**predator_prey.FOUR_POPULATIONS,},
+    "predator_prey_5x5x3": {
+        **predator_prey.THREE_POPULATIONS,
+    },
+    "predator_prey_5x5x4": {
+        **predator_prey.FOUR_POPULATIONS,
+    },
     # Linear-quadratic game.
     "linear_quadratic": {},
     # Periodic aversion game.
-    "periodic_aversion": {}
+    "periodic_aversion": {},
 }
 
 # Default settings for the games.
 GAME_SETTINGS.update({
+    "python_mfg_crowd_avoidance": GAME_SETTINGS["crowd_avoidance"],
     "mean_field_lin_quad": GAME_SETTINGS["linear_quadratic"],
     "mfg_crowd_modelling_2d": GAME_SETTINGS["crowd_modelling_2d_10x10"],
     "mfg_dynamic_routing": GAME_SETTINGS["dynamic_routing_line"],
