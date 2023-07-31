@@ -38,6 +38,10 @@ SPIEL_GAMES_LIST = pyspiel.registered_games()
 # All games loadable without parameter values.
 SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 
+# A list of games to exclude from the general simulation tests. This should
+# remain empty, but it is helpful to use while a game is under construction.
+SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = []
+
 # TODO(b/141950198): Stop hard-coding the number of loadable games.
 assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
 
@@ -197,6 +201,9 @@ class GamesSimTest(parameterized.TestCase):
   @parameterized.named_parameters((game_info.short_name, game_info)
                                   for game_info in SPIEL_LOADABLE_GAMES_LIST)
   def test_game_sim(self, game_info):
+    if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
+      print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
+      return
     game = pyspiel.load_game(game_info.short_name)
     self.assertLessEqual(game_info.min_num_players, game.num_players())
     self.assertLessEqual(game.num_players(), game_info.max_num_players)
