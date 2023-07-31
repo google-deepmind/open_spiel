@@ -54,7 +54,7 @@ ObservationTensor(1):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◉◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◯◉
 ◯◉◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◯◉◉◉
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉
-ChanceOutcomes() = [(2, 0.5), (3, 0.5)]
+ChanceOutcomes() = [(2,0.5), (3,0.5)]
 LegalActions() = [2, 3]
 StringLegalActions() = ["(ball at 1,2)", "(ball at 2,2)"]
 
@@ -118,7 +118,7 @@ ObservationTensor(1):
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◉◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◯◉
 ◯◉◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◉◯◯  ◉◯◯◉◉
 ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◯◯◯◯◯  ◉◉◉◉◉
-ChanceOutcomes() = [(0, 0.5), (1, 0.5)]
+ChanceOutcomes() = [(0,0.5), (1,0.5)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["(A's action first)", "(B's action first)"]
 

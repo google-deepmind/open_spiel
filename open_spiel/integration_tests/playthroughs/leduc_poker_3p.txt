@@ -102,7 +102,7 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).community_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-ChanceOutcomes() = [(0, 0.125), (1, 0.125), (2, 0.125), (3, 0.125), (4, 0.125), (5, 0.125), (6, 0.125), (7, 0.125)]
+ChanceOutcomes() = [(0,0.125), (1,0.125), (2,0.125), (3,0.125), (4,0.125), (5,0.125), (6,0.125), (7,0.125)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7]
 StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
 
@@ -178,7 +178,7 @@ ObservationTensor(2).player: ◯◯◉
 ObservationTensor(2).private_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).community_card: ◯◯◯◯◯◯◯◯
 ObservationTensor(2).pot_contribution: ◉◉◉
-ChanceOutcomes() = [(0, 0.14285714285714285), (1, 0.14285714285714285), (2, 0.14285714285714285), (3, 0.14285714285714285), (5, 0.14285714285714285), (6, 0.14285714285714285), (7, 0.14285714285714285)]
+ChanceOutcomes() = [(0,0.142857), (1,0.142857), (2,0.142857), (3,0.142857), (5,0.142857), (6,0.142857), (7,0.142857)]
 LegalActions() = [0, 1, 2, 3, 5, 6, 7]
 StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
 

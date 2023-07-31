@@ -48,7 +48,7 @@ ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).x: ◯◯◯◯◯◯◯
 ObservationTensor(1).y: ◯◯◯◯◯◯◯
 ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [(19, 0.2), (32, 0.4), (33, 0.4)]
+ChanceOutcomes() = [(19,0.2), (32,0.4), (33,0.4)]
 LegalActions() = [19, 32, 33]
 StringLegalActions() = ["init_position=19", "init_position=32", "init_position=33"]
 
@@ -99,7 +99,7 @@ ObservationTensor(0).t: ◉◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).x: ◯◯◯◯◉◯◯
 ObservationTensor(1).y: ◯◯◯◉◯◯◯
 ObservationTensor(1).t: ◉◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [(0, 0.5), (1, 0.125), (2, 0.125), (3, 0.125), (4, 0.125)]
+ChanceOutcomes() = [(0,0.5), (1,0.125), (2,0.125), (3,0.125), (4,0.125)]
 LegalActions() = [0, 1, 2, 3, 4]
 StringLegalActions() = ["[0 0]", "[1 0]", "[0 1]", "[ 0 -1]", "[-1  0]"]
 

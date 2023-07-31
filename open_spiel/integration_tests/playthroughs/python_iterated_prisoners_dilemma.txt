@@ -61,7 +61,7 @@ InformationStateString(0) = "us:C op:C"
 InformationStateString(1) = "us:C op:C"
 ObservationString(0) = "us:C op:C"
 ObservationString(1) = "us:C op:C"
-ChanceOutcomes() = [(<Chance.CONTINUE: 0>, 0.875), (<Chance.STOP: 1>, 0.125)]
+ChanceOutcomes() = [(0,0.875), (1,0.125)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["CONTINUE", "STOP"]
 
@@ -102,7 +102,7 @@ InformationStateString(0) = "us:CC op:CD"
 InformationStateString(1) = "us:CD op:CC"
 ObservationString(0) = "us:CC op:CD"
 ObservationString(1) = "us:CD op:CC"
-ChanceOutcomes() = [(<Chance.CONTINUE: 0>, 0.875), (<Chance.STOP: 1>, 0.125)]
+ChanceOutcomes() = [(0,0.875), (1,0.125)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["CONTINUE", "STOP"]
 

@@ -43,7 +43,7 @@ ObservationString(1) = "ChanceNode -- no observation"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 SerializeState() = "chance"
-ChanceOutcomes() = [(0, 1.0)]
+ChanceOutcomes() = [(0,1)]
 LegalActions() = [0]
 StringLegalActions() = ["chance outcome 0"]
 
