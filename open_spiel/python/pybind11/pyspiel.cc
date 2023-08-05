@@ -480,6 +480,7 @@ PYBIND11_MODULE(pyspiel, m) {
              return py::array_t<double>(game.Shape(), &utilities[0]);
            })
       .def("action_name", &TensorGame::ActionName)
+      .def("as_matrix_game", &TensorGame::AsMatrixGame)
       .def(py::pickle(                                  // Pickle support
           [](std::shared_ptr<const TensorGame> game) {  // __getstate__
             return game->ToString();
@@ -664,7 +665,7 @@ PYBIND11_MODULE(pyspiel, m) {
 #if OPEN_SPIEL_BUILD_WITH_HIGC
   init_pyspiel_referee(m);
 #endif
-}
+}  // NOLINT
 
 }  // namespace
 }  // namespace open_spiel

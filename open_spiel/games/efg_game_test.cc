@@ -31,22 +31,22 @@ namespace {
 namespace testing = open_spiel::testing;
 
 // Sample game from Gambit
-const char* kCommasFilename = "open_spiel/games/efg/commas.efg";
+const char* kCommasFilename = "third_party/open_spiel/games/efg/commas.efg";
 
-const char* kSampleFilename = "open_spiel/games/efg/sample.efg";
-const char* kKuhnFilename = "open_spiel/games/efg/kuhn_poker.efg";
-const char* kLeducFilename = "open_spiel/games/efg/leduc_poker.efg";
+const char* kSampleFilename = "third_party/open_spiel/games/efg/sample.efg";
+const char* kKuhnFilename = "third_party/open_spiel/games/efg/kuhn_poker.efg";
+const char* kLeducFilename = "third_party/open_spiel/games/efg/leduc_poker.efg";
 const char* kSignalingFilename =
-    "open_spiel/games/efg/signaling_vonstengel_forges_2008.efg";
+    "third_party/open_spiel/games/efg/signaling_vonstengel_forges_2008.efg";
 
 // Example games from Morrill et al.
 // "Hindsight and Sequential Rationality of Correlated Play"
 const char* kExtendedBosFilename =
-    "open_spiel/games/efg/extended_bos.efg";
+    "third_party/open_spiel/games/efg/extended_bos.efg";
 const char* kExtendedMPFilename =
-    "open_spiel/games/efg/extended_mp.efg";
+    "third_party/open_spiel/games/efg/extended_mp.efg";
 const char* kExtendedShapleysFilename =
-    "open_spiel/games/efg/extended_shapleys.efg";
+    "third_party/open_spiel/games/efg/extended_shapleys.efg";
 
 void EFGGameSimTestsSampleFromData() {
   std::shared_ptr<const Game> game = LoadEFGGame(GetSampleEFGData());
