@@ -1,116 +1,116 @@
 set(GAME_SOURCES
-  2048.cc
-  2048.h
-  amazons.cc
-  amazons.h
-  backgammon.cc
-  backgammon.h
-  bargaining.cc
-  bargaining.h
-  battleship.cc
-  battleship.h
-  battleship_types.h
-  battleship_types.cc
-  blackjack.cc
-  blackjack.h
-  blotto.cc
-  blotto.h
-  breakthrough.cc
-  breakthrough.h
-  bridge.cc
-  bridge.h
+  2048/2048.cc
+  2048/2048.h
+  amazons/amazons.cc
+  amazons/amazons.h
+  backgammon/backgammon.cc
+  backgammon/backgammon.h
+  bargaining/bargaining.cc
+  bargaining/bargaining.h
+  battleship/battleship.cc
+  battleship/battleship.h
+  battleship/battleship_types.h
+  battleship/battleship_types.cc
+  blackjack/blackjack.cc
+  blackjack/blackjack.h
+  blotto/blotto.cc
+  blotto/blotto.h
+  breakthrough/breakthrough.cc
+  breakthrough/breakthrough.h
+  bridge/bridge.cc
+  bridge/bridge.h
   bridge/bridge_scoring.cc
   bridge/bridge_scoring.h
-  bridge_uncontested_bidding.cc
-  bridge_uncontested_bidding.h
-  catch.cc
-  catch.h
-  checkers.cc
-  checkers.h
-  chess.cc
-  chess.h
+  bridge/bridge_uncontested_bidding.cc
+  bridge/bridge_uncontested_bidding.h
+  catch/catch.cc
+  catch/catch.h
+  checkers/checkers.cc
+  checkers/checkers.h
+  chess/chess.cc
+  chess/chess.h
   chess/chess_board.cc
   chess/chess_board.h
   chess/chess_common.cc
   chess/chess_common.h
-  cliff_walking.cc
-  cliff_walking.h
-  clobber.cc
-  clobber.h
-  coin_game.cc
-  coin_game.h
-  colored_trails.cc
-  colored_trails.h
+  cliff_walking/cliff_walking.cc
+  cliff_walking/cliff_walking.h
+  clobber/clobber.cc
+  clobber/clobber.h
+  coin_game/coin_game.cc
+  coin_game/coin_game.h
+  colored_trails/colored_trails.cc
+  colored_trails/colored_trails.h
   colored_trails/colored_trails_utils.cc
-  connect_four.cc
-  connect_four.h
-  coop_box_pushing.cc
-  coop_box_pushing.h
-  coordinated_mp.cc
-  coordinated_mp.h
-  crazy_eights.cc
-  crazy_eights.h
-  cursor_go.cc
-  cursor_go.h
-  dark_chess.cc
-  dark_chess.h
-  dark_hex.cc
-  dark_hex.h
-  deep_sea.cc
-  deep_sea.h
+  connect_four/connect_four.cc
+  connect_four/connect_four.h
+  coop_box_pushing/coop_box_pushing.cc
+  coop_box_pushing/coop_box_pushing.h
+  coordinated_mp/coordinated_mp.cc
+  coordinated_mp/coordinated_mp.h
+  crazy_eights/crazy_eights.cc
+  crazy_eights/crazy_eights.h
+  cursor_go/cursor_go.cc
+  cursor_go/cursor_go.h
+  dark_chess/dark_chess.cc
+  dark_chess/dark_chess.h
+  dark_hex/dark_hex.cc
+  dark_hex/dark_hex.h
+  deep_sea/deep_sea.cc
+  deep_sea/deep_sea.h
   dynamic_routing/dynamic_routing_data.cc
   dynamic_routing/dynamic_routing_data.h
   dynamic_routing/dynamic_routing_utils.cc
   dynamic_routing/dynamic_routing_utils.h
-  dou_dizhu.cc
-  dou_dizhu.h
+  dou_dizhu/dou_dizhu.cc
+  dou_dizhu/dou_dizhu.h
   dou_dizhu/dou_dizhu_utils.cc
   dou_dizhu/dou_dizhu_utils.h
-  efg_game.cc
-  efg_game.h
-  efg_game_data.cc
-  efg_game_data.h
-  euchre.cc
-  euchre.h
-  first_sealed_auction.cc
-  first_sealed_auction.h
-  gin_rummy.cc
-  gin_rummy.h
+  efg_game/efg_game.cc
+  efg_game/efg_game.h
+  efg_game/efg_game_data.cc
+  efg_game/efg_game_data.h
+  euchre/euchre.cc
+  euchre/euchre.h
+  first_sealed_auction/first_sealed_auction.cc
+  first_sealed_auction/first_sealed_auction.h
+  gin_rummy/gin_rummy.cc
+  gin_rummy/gin_rummy.h
   gin_rummy/gin_rummy_utils.cc
   gin_rummy/gin_rummy_utils.h
-  go.cc
-  go.h
+  go/go.cc
+  go/go.h
   go/go_board.cc
   go/go_board.h
-  goofspiel.cc
-  goofspiel.h
-  havannah.cc
-  havannah.h
-  hearts.cc
-  hearts.h
-  hex.cc
-  hex.h
-  kriegspiel.cc
-  kriegspiel.h
-  kuhn_poker.cc
-  kuhn_poker.h
-  laser_tag.cc
-  laser_tag.h
-  leduc_poker.cc
-  leduc_poker.h
-  lewis_signaling.cc
-  lewis_signaling.h
-  liars_dice.cc
-  liars_dice.h
-  maedn.cc
-  maedn.h
-  mancala.cc
-  mancala.h
-  markov_soccer.cc
-  markov_soccer.h
-  matching_pennies_3p.cc
-  matching_pennies_3p.h
-  matrix_games.cc
+  goofspiel/goofspiel.cc
+  goofspiel/goofspiel.h
+  havannah/havannah.cc
+  havannah/havannah.h
+  hearts/hearts.cc
+  hearts/hearts.h
+  hex/hex.cc
+  hex/hex.h
+  kriegspiel/kriegspiel.cc
+  kriegspiel/kriegspiel.h
+  kuhn_poker/kuhn_poker.cc
+  kuhn_poker/kuhn_poker.h
+  laser_tag/laser_tag.cc
+  laser_tag/laser_tag.h
+  leduc_poker/leduc_poker.cc
+  leduc_poker/leduc_poker.h
+  lewis_signaling/lewis_signaling.cc
+  lewis_signaling/lewis_signaling.h
+  liars_dice/liars_dice.cc
+  liars_dice/liars_dice.h
+  maedn/maedn.cc
+  maedn/maedn.h
+  mancala/mancala.cc
+  mancala/mancala.h
+  markov_soccer/markov_soccer.cc
+  markov_soccer/markov_soccer.h
+  matching_pennies_3p/matching_pennies_3p.cc
+  matching_pennies_3p/matching_pennies_3p.h
+  matrix_games/matrix_games.cc
   mfg/crowd_modelling.cc
   mfg/crowd_modelling.h
   mfg/crowd_modelling_2d.cc
@@ -119,68 +119,68 @@ set(GAME_SOURCES
   mfg/dynamic_routing.h
   mfg/garnet.cc
   mfg/garnet.h
-  morpion_solitaire.cc
-  morpion_solitaire.h
-  negotiation.cc
-  negotiation.h
-  nfg_game.cc
-  nfg_game.h
-  nine_mens_morris.cc
-  nine_mens_morris.h
-  nim.cc
-  nim.h
-  oh_hell.cc
-  oh_hell.h
-  oshi_zumo.cc
-  oshi_zumo.h
-  othello.cc
-  othello.h
-  oware.cc
-  oware.h
+  morpion_solitaire/morpion_solitaire.cc
+  morpion_solitaire/morpion_solitaire.h
+  negotiation/negotiation.cc
+  negotiation/negotiation.h
+  nfg_game/nfg_game.cc
+  nfg_game/nfg_game.h
+  nine_mens_morris/nine_mens_morris.cc
+  nine_mens_morris/nine_mens_morris.h
+  nim/nim.cc
+  nim/nim.h
+  oh_hell/oh_hell.cc
+  oh_hell/oh_hell.h
+  oshi_zumo/oshi_zumo.cc
+  oshi_zumo/oshi_zumo.h
+  othello/othello.cc
+  othello/othello.h
+  oware/oware.cc
+  oware/oware.h
   oware/oware_board.cc
   oware/oware_board.h
-  pathfinding.cc
-  pathfinding.h
-  pentago.cc
-  pentago.h
-  phantom_go.h
-  phantom_go.cc
+  pathfinding/pathfinding.cc
+  pathfinding/pathfinding.h
+  pentago/pentago.cc
+  pentago/pentago.h
+  phantom_go/phantom_go.h
+  phantom_go/phantom_go.cc
   phantom_go/phantom_go_board.h
   phantom_go/phantom_go_board.cc
-  phantom_ttt.cc
-  phantom_ttt.h
-  pig.cc
-  pig.h
-  quoridor.cc
-  quoridor.h
-  rbc.cc
-  rbc.h
-  sheriff.cc
-  sheriff.h
-  skat.cc
-  skat.h
-  solitaire.cc
-  solitaire.h
-  stones_and_gems.cc
-  stones_and_gems.h
-  tarok.cc
-  tarok.h
+  phantom_ttt/phantom_ttt.cc
+  phantom_ttt/phantom_ttt.h
+  pig/pig.cc
+  pig/pig.h
+  quoridor/quoridor.cc
+  quoridor/quoridor.h
+  rbc/rbc.cc
+  rbc/rbc.h
+  sheriff/sheriff.cc
+  sheriff/sheriff.h
+  skat/skat.cc
+  skat/skat.h
+  solitaire/solitaire.cc
+  solitaire/solitaire.h
+  stones_and_gems/stones_and_gems.cc
+  stones_and_gems/stones_and_gems.h
+  tarok/tarok.cc
+  tarok/tarok.h
   tarok/cards.cc
   tarok/cards.h
   tarok/contracts.cc
   tarok/contracts.h
-  tic_tac_toe.cc
-  tic_tac_toe.h
-  tiny_bridge.cc
-  tiny_bridge.h
-  tiny_hanabi.cc
-  tiny_hanabi.h
-  trade_comm.cc
-  trade_comm.h
-  ultimate_tic_tac_toe.h
-  ultimate_tic_tac_toe.cc
-  y.cc
-  y.h
+  tic_tac_toe/tic_tac_toe.cc
+  tic_tac_toe/tic_tac_toe.h
+  tiny_bridge/tiny_bridge.cc
+  tiny_bridge/tiny_bridge.h
+  tiny_hanabi/tiny_hanabi.cc
+  tiny_hanabi/tiny_hanabi.h
+  trade_comm/trade_comm.cc
+  trade_comm/trade_comm.h
+  ultimate_tic_tac_toe/ultimate_tic_tac_toe.h
+  ultimate_tic_tac_toe/ultimate_tic_tac_toe.cc
+  y/y.cc
+  y/y.h
 )
 
 if (${OPEN_SPIEL_BUILD_WITH_HANABI})
