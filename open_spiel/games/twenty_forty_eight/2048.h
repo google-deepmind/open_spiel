@@ -41,6 +41,8 @@
 namespace open_spiel {
 namespace twenty_forty_eight {
 
+enum Move { kMoveUp = 0, kMoveRight = 1, kMoveDown = 2, kMoveLeft = 3 };
+
 constexpr int kNumPlayers = 1;
 constexpr int kRows = 4;
 constexpr int kColumns = 4;
@@ -124,6 +126,7 @@ class TwentyFortyEightState : public State {
   bool TileMatchesAvailable() const;
   void PrepareTiles();
   int GetCellContent(int r, int c) const;
+  bool DoesActionChangeBoard(Action action) const;
 
   const TwentyFortyEightGame& parent_game_;
   Player current_player_ = kChancePlayerId;

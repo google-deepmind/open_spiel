@@ -30,8 +30,6 @@ namespace open_spiel {
 namespace twenty_forty_eight {
 namespace {
 
-enum Move { kMoveUp = 0, kMoveRight = 1, kMoveDown = 2, kMoveLeft = 3 };
-
 constexpr std::array<Action, 4> kPlayerActions = {kMoveUp, kMoveRight,
                                                   kMoveDown, kMoveLeft};
 
@@ -57,8 +55,6 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
-
-RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 constexpr bool InBounds(int r, int c) {
   return r >= 0 && r < kRows && c >= 0 && c < kColumns;
@@ -228,6 +224,29 @@ void TwentyFortyEightState::DoApplyAction(Action action) {
   total_actions_++;
 }
 
+bool TwentyFortyEightState::DoesActionChangeBoard(Action action) const {  
+  const std::array<std::array<int, 4>, 2>& traversals = kTraversals[action];
+  for (int r : traversals[0]) {
+    for (int c : traversals[1]) {
+      int tile = GetCellContent(r, c);
+      if (tile > 0) {
+        std::array<Coordinate, 2> positions =
+            FindFarthestPosition(r, c, action);
+        Coordinate farthest_pos = positions[0];
+        Coordinate next_pos = positions[1];
+        int next_cell = GetCellContent(next_pos.row, next_pos.column);
+        if (next_cell > 0 && next_cell == tile &&
+            !BoardAt(next_pos).is_merged) {
+          return true;
+        } else if (farthest_pos.row != r || farthest_pos.column != c) {
+          return true;
+        }        
+      }
+    }
+  }
+  return false;
+}
+
 std::string TwentyFortyEightState::ActionToString(Player player,
                                                   Action action_id) const {
   if (player == kChancePlayerId) {
@@ -295,7 +314,19 @@ std::vector<Action> TwentyFortyEightState::LegalActions() const {
   }
 
   // Construct a vector from the array.
-  return std::vector<Action>(kPlayerActions.begin(), kPlayerActions.end());
+  std::vector<Action> actions = std::vector<Action>(kPlayerActions.begin(), kPlayerActions.end());
+  std::vector<Action> actions_allowed = {};
+
+  for (Action action: actions) {
+    if (DoesActionChangeBoard(action))
+      actions_allowed.push_back(action);
+  }
+  return actions_allowed;
+  
+  // for (vector<my_class>::reverse_iterator i = my_vector.rbegin(); 
+  //       i != my_vector.rend(); ++i ) { 
+
+  // } 
 }
 
 std::string TwentyFortyEightState::ToString() const {
