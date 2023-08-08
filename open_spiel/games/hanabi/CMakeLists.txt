@@ -23,7 +23,7 @@ add_library(hanabi_learning_environment OBJECT
 target_include_directories (hanabi_learning_environment PUBLIC hanabi-learning-environment/hanabi_learning_environment)
 target_include_directories (games PUBLIC hanabi-learning-environment/hanabi_learning_environment)
 
-add_executable(hanabi_test ../hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(hanabi_test hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(hanabi_test hanabi_test)
 target_include_directories (hanabi_test PUBLIC hanabi-learning-environment/hanabi_learning_environment)

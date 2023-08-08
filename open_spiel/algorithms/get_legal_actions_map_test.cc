@@ -16,9 +16,9 @@
 
 #include <unordered_map>
 
-#include "open_spiel/games/goofspiel.h"
-#include "open_spiel/games/kuhn_poker.h"
-#include "open_spiel/games/leduc_poker.h"
+#include "open_spiel/games/goofspiel/goofspiel.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
+#include "open_spiel/games/leduc_poker/leduc_poker.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace algorithms = open_spiel::algorithms;

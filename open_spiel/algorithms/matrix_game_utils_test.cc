@@ -14,7 +14,7 @@
 
 #include "open_spiel/algorithms/matrix_game_utils.h"
 
-#include "open_spiel/games/kuhn_poker.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
 
 namespace open_spiel {
 namespace algorithms {

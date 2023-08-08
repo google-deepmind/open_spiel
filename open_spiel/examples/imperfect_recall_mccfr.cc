@@ -20,7 +20,7 @@
 #include "open_spiel/algorithms/tabular_best_response_mdp.h"
 #include "open_spiel/algorithms/external_sampling_mccfr.h"
 #include "open_spiel/algorithms/outcome_sampling_mccfr.h"
-#include "open_spiel/games/phantom_ttt.h"
+#include "open_spiel/games/phantom_ttt/phantom_ttt.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

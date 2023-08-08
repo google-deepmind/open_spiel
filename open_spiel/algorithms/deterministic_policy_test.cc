@@ -14,8 +14,8 @@
 
 #include "open_spiel/algorithms/deterministic_policy.h"
 
-#include "open_spiel/games/kuhn_poker.h"
-#include "open_spiel/games/leduc_poker.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
+#include "open_spiel/games/leduc_poker/leduc_poker.h"
 
 namespace open_spiel {
 namespace algorithms {

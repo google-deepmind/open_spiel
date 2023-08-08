@@ -14,7 +14,7 @@
 
 #include "open_spiel/python/pybind11/games_chess.h"
 
-#include "open_spiel/games/chess.h"
+#include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel.h"

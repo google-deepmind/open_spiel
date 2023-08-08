@@ -14,7 +14,7 @@
 
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 
-#include "open_spiel/games/tiny_bridge.h"
+#include "open_spiel/games/tiny_bridge/tiny_bridge.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 

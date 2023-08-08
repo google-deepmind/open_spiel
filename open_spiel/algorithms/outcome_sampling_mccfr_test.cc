@@ -19,8 +19,8 @@
 #include <random>
 
 #include "open_spiel/algorithms/tabular_exploitability.h"
-#include "open_spiel/games/kuhn_poker.h"
-#include "open_spiel/games/leduc_poker.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
+#include "open_spiel/games/leduc_poker/leduc_poker.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
