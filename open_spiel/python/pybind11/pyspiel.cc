@@ -21,9 +21,9 @@
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/games/efg_game.h"
-#include "open_spiel/games/efg_game_data.h"
-#include "open_spiel/games/nfg_game.h"
+#include "open_spiel/games/efg_game/efg_game.h"
+#include "open_spiel/games/efg_game/efg_game_data.h"
+#include "open_spiel/games/nfg_game/nfg_game.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
@@ -481,6 +481,7 @@ PYBIND11_MODULE(pyspiel, m) {
              return py::array_t<double>(game.Shape(), &utilities[0]);
            })
       .def("action_name", &TensorGame::ActionName)
+      .def("as_matrix_game", &TensorGame::AsMatrixGame)
       .def(py::pickle(                                  // Pickle support
           [](std::shared_ptr<const TensorGame> game) {  // __getstate__
             return game->ToString();
@@ -666,7 +667,7 @@ PYBIND11_MODULE(pyspiel, m) {
 #if OPEN_SPIEL_BUILD_WITH_HIGC
   init_pyspiel_referee(m);
 #endif
-}
+}  // NOLINT
 
 }  // namespace
 }  // namespace open_spiel

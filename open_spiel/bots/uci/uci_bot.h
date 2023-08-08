@@ -17,7 +17,7 @@
 #define OPEN_SPIEL_BOTS_UCI_BOT_H_
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/games/chess.h"
+#include "open_spiel/games/chess/chess.h"
 #include "open_spiel/spiel_bots.h"
 
 // **IMPORTANT NOTE** The basic test currently hangs, so consider this bot

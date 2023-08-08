@@ -14,7 +14,7 @@
 
 #include "open_spiel/python/pybind11/games_bargaining.h"
 
-#include "open_spiel/games/bargaining.h"
+#include "open_spiel/games/bargaining/bargaining.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 

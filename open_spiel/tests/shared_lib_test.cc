@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-#include "open_spiel/games/kuhn_poker.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

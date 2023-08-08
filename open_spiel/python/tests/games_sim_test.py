@@ -277,13 +277,13 @@ class GamesSimTest(parameterized.TestCase):
           check_pickle_serialization=False)
     # EFG games loaded by file should serialize properly:
     filename = file_utils.find_file(
-        "open_spiel/games/efg/sample.efg", 2)
+        "third_party/open_spiel/games/efg/sample.efg", 2)
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
         self.sim_game(game)
     filename = file_utils.find_file(
-        "open_spiel/games/efg/sample.efg", 2)
+        "third_party/open_spiel/games/efg/sample.efg", 2)
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):

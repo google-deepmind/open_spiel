@@ -22,7 +22,7 @@
 
 #include "open_spiel/bots/xinxin/hearts/Hearts.h"
 #include "open_spiel/bots/xinxin/hearts/iiMonteCarlo.h"
-#include "open_spiel/games/hearts.h"
+#include "open_spiel/games/hearts/hearts.h"
 #include "open_spiel/spiel_bots.h"
 
 namespace open_spiel {

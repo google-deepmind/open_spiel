@@ -18,8 +18,8 @@
 #include <memory>
 #include <utility>
 
-#include "open_spiel/games/goofspiel.h"
-#include "open_spiel/games/kuhn_poker.h"
+#include "open_spiel/games/goofspiel/goofspiel.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
