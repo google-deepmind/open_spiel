@@ -387,7 +387,7 @@ add_executable(deep_sea_test deep_sea/deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(deep_sea_test deep_sea_test)
 
-add_executable(dots_and_boxes_test dots_and_boxes_test.cc ${OPEN_SPIEL_OBJECTS}
+add_executable(dots_and_boxes_test dots_and_boxes/dots_and_boxes_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(dots_and_boxes_test dots_and_boxes_test)
 
