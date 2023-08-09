@@ -56,6 +56,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 constexpr bool InBounds(int r, int c) {
   return r >= 0 && r < kRows && c >= 0 && c < kColumns;
 }
@@ -315,18 +317,13 @@ std::vector<Action> TwentyFortyEightState::LegalActions() const {
 
   // Construct a vector from the array.
   std::vector<Action> actions = std::vector<Action>(kPlayerActions.begin(), kPlayerActions.end());
+  
   std::vector<Action> actions_allowed = {};
-
   for (Action action: actions) {
     if (DoesActionChangeBoard(action))
       actions_allowed.push_back(action);
   }
-  return actions_allowed;
-  
-  // for (vector<my_class>::reverse_iterator i = my_vector.rbegin(); 
-  //       i != my_vector.rend(); ++i ) { 
-
-  // } 
+  return actions_allowed;  
 }
 
 std::string TwentyFortyEightState::ToString() const {

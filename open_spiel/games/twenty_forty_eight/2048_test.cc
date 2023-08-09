@@ -122,27 +122,17 @@ void GameWonTest() {
 //    0    0    0    0
 //    0    0    0    0
 //    2    0    0    2
-// No random tiles should appear if the board didn't change after player move
-// void BoardNotChangedTest() {
-//   std::shared_ptr<const Game> game = LoadGame("2048");
-//   std::unique_ptr<State> state = game->NewInitialState();
-//   TwentyFortyEightState* cstate =
-//       static_cast<TwentyFortyEightState*>(state.get());
-//   cstate->SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2});
-//   cstate->ApplyAction(cstate->LegalActions()[2]);
-//   // Check the board remained the same after player move
-//   for (int r = 0; r < kRows; r++) {
-//     for (int c = 0; c < kColumns; c++) {
-//       if (!(r == 3 && c == 0) && !(r == 3 || c == 3)) {
-//         SPIEL_CHECK_EQ(cstate->BoardAt(r, c).value, 0);
-//       }
-//     }
-//   }
-//   SPIEL_CHECK_EQ(cstate->BoardAt(3, 0).value, 2);
-//   SPIEL_CHECK_EQ(cstate->BoardAt(3, 3).value, 2);
-//   // Check move didn't go to random player since board didn't change
-//   SPIEL_CHECK_EQ(cstate->CurrentPlayer(), 0);
-// }
+// Down should not be a legal action here as it does not change the board
+void BoardNotChangedTest() {
+  std::shared_ptr<const Game> game = LoadGame("2048");
+  std::unique_ptr<State> state = game->NewInitialState();
+  TwentyFortyEightState* cstate =
+      static_cast<TwentyFortyEightState*>(state.get());
+  cstate->SetCustomBoard({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2});
+  for (Action action : cstate->LegalActions()) {
+    SPIEL_CHECK_NE(action, kMoveDown);
+  }
+}
 
 }  // namespace
 }  // namespace twenty_forty_eight
@@ -157,5 +147,5 @@ int main(int argc, char** argv) {
   open_spiel::twenty_forty_eight::OneMergePerTurnTest();
   open_spiel::twenty_forty_eight::TerminalStateTest();
   open_spiel::twenty_forty_eight::GameWonTest();
-  // open_spiel::twenty_forty_eight::BoardNotChangedTest();
+  open_spiel::twenty_forty_eight::BoardNotChangedTest();
 }
