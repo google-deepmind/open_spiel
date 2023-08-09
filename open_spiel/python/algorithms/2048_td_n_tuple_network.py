@@ -35,8 +35,8 @@ tuple_paths = [[0, 1, 2, 3, 4, 5],[4, 5, 6, 7, 8, 9],
     [0, 1, 2, 4, 5, 6],[4, 5, 6, 8, 9, 10],]
 n_tuple_network_size = len(tuple_paths)
 
-vector_shape = (n_tuple_network_size,) + (max_tuple_index,) * n_tuple_size
-look_up_table = np.zeros(vector_shape)
+look_up_table_shape = (n_tuple_network_size,) + (max_tuple_index,) * n_tuple_size
+look_up_table = np.zeros(look_up_table_shape)
 alpha = 0.02
 
 def main(argv):
@@ -59,6 +59,7 @@ def main(argv):
                 state.apply_action(best_action)
                 states_in_episode.append(state.clone())
 
+        sum_rewards += state.returns()[0]
         largest_tile_from_episode = max(state.observation_tensor(0))
         if (largest_tile_from_episode > largest_tile):
             largest_tile = largest_tile_from_episode
@@ -66,8 +67,7 @@ def main(argv):
             max_score = state.returns()[0]
         
         learn(states_in_episode)
-
-        sum_rewards += state.returns()[0]
+        
         if (ep + 1) % FLAGS.eval_every == 0:
             logging.info(f"[{ep + 1}] Average Score: {int(sum_rewards / FLAGS.eval_every)}, Max Score: {int(max_score)}, Largest Tile Reached: {int(largest_tile)}")            
             sum_rewards = 0
@@ -82,10 +82,10 @@ def learn(states):
         target = state.rewards()[0] + update(state, alpha * error)
 
 def update(state, adjust):
-    value = 0
+    v = 0
     for idx, path in enumerate(tuple_paths):
-        value += update_tuple(idx, path, state, adjust)
-    return value
+        v += update_tuple(idx, path, state, adjust)
+    return v
 
 def update_tuple(idx, path, state, adjust):
     observation_tensor = state.observation_tensor(0)
