@@ -1,5 +1,7 @@
 # Available games
 
+In general, see the implementation source code for details including game options, observations and actions.
+
 ![](_static/green_circ10.png "green circle"): thoroughly-tested. In many cases,
 we verified against known values and/or reproduced results from papers.
 
@@ -205,6 +207,7 @@ Status                                       | Game
 
 ### Catch
 
+*   [Implementation Source code](https://github.com/deepmind/open_spiel/tree/master/open_spiel/games/catch)
 *   Agent must move horizontally to 'catch' a descending ball. Designed to test
     basic learning.
 *   Agent on a grid.
@@ -827,6 +830,7 @@ Status                                       | Game
 
 ### Tic-Tac-Toe
 
+*   [Implementation Source code](https://github.com/deepmind/open_spiel/tree/master/open_spiel/games/tic_tac_toe)
 *   Players place tokens to try and form a pattern.
 *   Uses tokens on a grid.
 *   Traditional game.
@@ -868,6 +872,7 @@ Status                                       | Game
 
 ### Ultimate Tic-Tac-Toe
 
+*   [Implementation Source code](https://github.com/deepmind/open_spiel/tree/master/open_spiel/games/ultimate_tic_tac_toe)
 *   Players try and form a pattern in local boards and a meta-board.
 *   Uses tokens on a grid.
 *   Deterministic.
