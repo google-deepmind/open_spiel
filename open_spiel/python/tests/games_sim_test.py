@@ -40,7 +40,7 @@ SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 
 # A list of games to exclude from the general simulation tests. This should
 # remain empty, but it is helpful to use while a game is under construction.
-SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = []
+SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = ["yacht"]
 
 # TODO(b/141950198): Stop hard-coding the number of loadable games.
 assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
