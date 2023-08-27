@@ -42,7 +42,7 @@ class EntropySchedule:
 
   Example
     EntropySchedule([3, 5, 10], [2, 4, 1])
-    =>   [0, 3, 6, 11, 16, 21, 26, 10]
+    =>   [0, 3, 6, 11, 16, 21, 26, 36]
           | 3 x2 |      5 x4     | 10 x1
   """
 
