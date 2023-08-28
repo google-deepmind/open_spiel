@@ -350,6 +350,15 @@ class GamesSimTest(parameterized.TestCase):
     private_cards = state.get_private_cards()
     self.assertEqual(private_cards, [2, 3])
 
+  def test_dots_and_boxes_with_notation(self):
+    game = pyspiel.load_game("dots_and_boxes")
+    state = game.new_initial_state()
+    state.apply_action(0)  # horizontal 0, 0
+    state.apply_action(1)  # horizontal 0, 1
+    # check that we can retrieve the notiation
+    dbn = state.dbn_string()
+    self.assertEqual(dbn, "110000000000")
+
   @parameterized.parameters(
       {"game_name": "blotto"},
       {"game_name": "goofspiel"},
@@ -366,8 +375,8 @@ class GamesSimTest(parameterized.TestCase):
       self.sim_game(rnr_game, check_pyspiel_serialization=False,
                     check_pickle_serialization=False)
 
-# TODO(author18): find the list of games where it is reasonable to call
-# get_all_states
+  # TODO(author18): find the list of games where it is reasonable to call
+  # get_all_states
   @parameterized.parameters(
       {"game_name": "python_mfg_crowd_modelling"},
       {"game_name": "mfg_crowd_modelling"},

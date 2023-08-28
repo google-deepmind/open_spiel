@@ -32,6 +32,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Crazy Eights](#crazy-eights)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
+![](_static/green_circ10.png "green circle") | [Dots and Boxes](#dots-and-boxes)
 <font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
 <font color="orange"><b>~</b></font>         | [Euchre](#euchre)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
@@ -305,6 +306,15 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
+
+### Dots and Boxes
+
+*   Players put lines between dots to form boxes to get points.
+*   Traditional game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Dots_and_Boxes)
 
 ### Crazy Eights
 

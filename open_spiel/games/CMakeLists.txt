@@ -56,6 +56,8 @@ set(GAME_SOURCES
   dark_hex/dark_hex.h
   deep_sea/deep_sea.cc
   deep_sea/deep_sea.h
+  dots_and_boxes/dots_and_boxes.cc
+  dots_and_boxes/dots_and_boxes.h
   dynamic_routing/dynamic_routing_data.cc
   dynamic_routing/dynamic_routing_data.h
   dynamic_routing/dynamic_routing_utils.cc
@@ -384,6 +386,10 @@ add_test(dark_hex_test dark_hex_test)
 add_executable(deep_sea_test deep_sea/deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(deep_sea_test deep_sea_test)
+
+add_executable(dots_and_boxes_test dots_and_boxes/dots_and_boxes_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(dots_and_boxes_test dots_and_boxes_test)
 
 add_executable(dynamic_routing_data_test dynamic_routing/dynamic_routing_data_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
