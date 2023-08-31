@@ -197,7 +197,7 @@ def remove_epsilon_negative_probs(probs, epsilon=1e-9):
     # Ensures these negative probabilities aren't large in magnitude, as that is
     # unexpected and likely not due to numerical precision issues
     print("Probabilities received were: {}".format(probs[probs < 0]))
-    assert np.alltrue(np.min(probs[probs < 0]) > -1.*epsilon), (
+    assert np.all(np.min(probs[probs < 0]) > -1.*epsilon), (
         "Negative Probabilities received were: {}".format(probs[probs < 0]))
 
     probs[probs < 0] = 0
@@ -219,7 +219,7 @@ def get_joint_strategy_from_marginals(probabilities):
     probas_shapes = [1] * len(probabilities)
     probas_shapes[i] = -1
     probas.append(np.array(probabilities[i]).reshape(probas_shapes))
-  return np.product(probas)
+  return np.prod(probas)
 
 
 def alpharank_strategy(solver, return_joint=False, **unused_kwargs):

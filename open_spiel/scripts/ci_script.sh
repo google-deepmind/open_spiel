@@ -24,12 +24,15 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo apt-get install python3.9 python3.9-dev
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 1
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+  # Still needed to support using venv on Ubuntu 20.04:
+  sudo apt-get install python3.9-venv
 elif [[ "$OS" = "Darwin" ]]; then
   # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
   # install the specific versions we've requested on MacOS.
   brew install python@${OS_PYTHON_VERSION}
   brew link --force python@${OS_PYTHON_VERSION}
 fi
+
 
 PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
 PYBIN=${PYBIN:-"python"}
@@ -41,7 +44,7 @@ source ./open_spiel/scripts/python_extra_deps.sh
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
 
-if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.10" ]]; then
+if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
 else
@@ -56,10 +59,10 @@ source ./venv/bin/activate
 python --version
 pip install --upgrade -r requirements.txt
 
-[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+[[ "$OPEN_SPIEL_ENABLE_JAX" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTORCH" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+[[ "$OPEN_SPIEL_ENABLE_TENSORFLOW" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+[[ "$OPEN_SPIEL_ENABLE_PYTHON_MISC" = "ON" ]] && pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 
 ./open_spiel/scripts/build_and_run_tests.sh
 

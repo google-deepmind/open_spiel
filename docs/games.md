@@ -16,6 +16,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
 <font color="orange"><b>~</b></font>         | [Battleship](#battleship)
 <font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
+<font color="orange"><b>~</b></font>         | [Block Dominoes](#block-dominoes)
 ![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
 ![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
 ![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
@@ -31,6 +32,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Crazy Eights](#crazy-eights)
 <font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
 <font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
+![](_static/green_circ10.png "green circle") | [Dots and Boxes](#dots-and-boxes)
 <font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
 <font color="orange"><b>~</b></font>         | [Euchre](#euchre)
 ![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
@@ -61,6 +63,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
 ![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
 <font color="orange"><b>~</b></font>         | [Nim](#nim)
+<font color="orange"><b>~</b></font>         | [Nine men's morris](#nine_mens_morris)
 <font color="orange"><b>~</b></font>         | [Oh Hell](#oh-hell)
 ![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
 ![](_static/green_circ10.png "green circle") | [Oware](#oware)
@@ -159,6 +162,17 @@ Status                                       | Game
 *   Imperfect information.
 *   1 player.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Blackjack)
+
+### Block Dominoes
+
+*   Most simple version of dominoes.
+*   Consists of 28 tiles, featuring all combinations of spot counts (also called
+    pips or dots) between zero and six.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   2 players.
+*   [Wikipedia]([https://en.wikipedia.org/wiki/Blackjack]\(https://en.wikipedia.org/wiki/Dominoes#Blocking_game\))
 
 ### Breakthrough
 
@@ -292,6 +306,15 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Chess)
+
+### Dots and Boxes
+
+*   Players put lines between dots to form boxes to get points.
+*   Traditional game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Dots_and_Boxes)
 
 ### Crazy Eights
 
@@ -615,6 +638,16 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Nim)
+
+### Nine men's morris
+
+*   Two players put and move stones on the board to try to form mills (three
+    adjacent stones in a line) to capture the other player's stones.
+*   Traditional game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Nine_men%27s_morris)
 
 ### Oh Hell
 

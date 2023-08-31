@@ -38,6 +38,12 @@ _USE_ACTION_IDS = flags.DEFINE_bool(
     "playthough_use_action_ids", default=True,
     help="Whether to use action names or ids when regenerating playthroughs")
 
+# Precision can differ depending on the system and context where the playthrough
+# is generated versus where they are re-generated for testing purposes. To
+# ensure that tests don't fail due to precision, we set the tolarance
+# accordingly.
+_FLOAT_DECIMAL_PLACES = 6
+
 
 def _escape(x):
   """Returns a newline-free backslash-escaped version of the given string."""
@@ -81,11 +87,16 @@ def _format_matrix(mat):
 
 
 def _format_float(x):
-  return "{:.15g}".format(x)
+  return ("{:." + str(_FLOAT_DECIMAL_PLACES) + "g}").format(x)
 
 
 def _format_float_vector(v):
   return "[" + ", ".join([_format_float(x) for x in v]) + "]"
+
+
+def _format_chance_outcomes(chance_outcomes):
+  return "[" + ", ".join(["({},{})".format(outcome, _format_float(prob))
+                          for (outcome, prob) in chance_outcomes]) + "]"
 
 
 def _format_tensor(tensor, tensor_name, max_cols=120):
@@ -232,26 +243,20 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     seed = np.random.randint(2**32 - 1)
   game_type = game.get_type()
 
-  default_observation = None
-  try:
-    observation_params = pyspiel.game_parameters_from_string(
-        observation_params_string) if observation_params_string else None
-    default_observation = make_observation(
-        game,
-        imperfect_information_observation_type=None,
-        params=observation_params)
-  except (RuntimeError, ValueError):
-    pass
+  observation_params = (
+      pyspiel.game_parameters_from_string(observation_params_string)
+      if observation_params_string
+      else None
+  )
+  default_observation = make_observation(
+      game,
+      imperfect_information_observation_type=None,
+      params=observation_params,
+  )
 
-  infostate_observation = None
-  # TODO(author11) reinstate this restriction
-  # if game_type.information in (pyspiel.IMPERFECT_INFORMATION,
-  #                              pyspiel.ONE_SHOT):
-  try:
-    infostate_observation = make_observation(
-        game, pyspiel.IIGObservationType(perfect_recall=True))
-  except (RuntimeError, ValueError):
-    pass
+  infostate_observation = make_observation(
+      game, pyspiel.IIGObservationType(perfect_recall=True)
+  )
 
   public_observation = None
   private_observation = None
@@ -261,24 +266,22 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
   # The default observation is the same as the public observation, while private
   # observations are always empty.
   if game_type.information == game_type.Information.IMPERFECT_INFORMATION:
-    try:
-      public_observation = make_observation(
-          game,
-          pyspiel.IIGObservationType(
-              public_info=True,
-              perfect_recall=False,
-              private_info=pyspiel.PrivateInfoType.NONE))
-    except (RuntimeError, ValueError):
-      pass
-    try:
-      private_observation = make_observation(
-          game,
-          pyspiel.IIGObservationType(
-              public_info=False,
-              perfect_recall=False,
-              private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER))
-    except (RuntimeError, ValueError):
-      pass
+    public_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=True,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.NONE,
+        ),
+    )
+    private_observation = make_observation(
+        game,
+        pyspiel.IIGObservationType(
+            public_info=False,
+            perfect_recall=False,
+            private_info=pyspiel.PrivateInfoType.SINGLE_PLAYER,
+        ),
+    )
 
   add_line("")
   add_line("GameType.chance_mode = {}".format(game_type.chance_mode))
@@ -392,7 +395,8 @@ def playthrough_lines(game_string, alsologtostdout=False, action_sequence=None,
     if state.is_terminal():
       break
     if state.is_chance_node():
-      add_line("ChanceOutcomes() = {}".format(state.chance_outcomes()))
+      add_line("ChanceOutcomes() = {}".format(
+          _format_chance_outcomes(state.chance_outcomes())))
     if state.is_mean_field_node():
       add_line("DistributionSupport() = {}".format(
           state.distribution_support()))
@@ -525,7 +529,11 @@ def replay(filename):
 
 def update_path(path, shard_index=0, num_shards=1):
   """Regenerates all playthroughs in the path."""
-  for filename in sorted(os.listdir(path))[shard_index::num_shards]:
+  if os.path.isfile(path):
+    file_list = [path]
+  else:
+    file_list = sorted(os.listdir(path))
+  for filename in file_list[shard_index::num_shards]:
     try:
       original, kwargs = _read_playthrough(os.path.join(path, filename))
       try:

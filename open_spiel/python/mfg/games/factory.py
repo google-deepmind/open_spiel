@@ -21,6 +21,7 @@ from open_spiel.python.games import dynamic_routing_data
 from open_spiel.python.mfg import games  # pylint: disable=unused-import
 from open_spiel.python.mfg.games import crowd_modelling_2d
 from open_spiel.python.mfg.games import dynamic_routing
+from open_spiel.python.mfg.games import predator_prey
 import pyspiel
 
 # For each game, the setting with the game name, e.g. python_mfg_dynamic_routing
@@ -29,6 +30,8 @@ import pyspiel
 # implementations, e.g. Python or C++, of the same game. Empty parameters use
 # the default values as specified in the game.
 GAME_SETTINGS = {
+    # Crowd avoidance game.
+    "crowd_avoidance": {},
     # 2D crowd modelling game.
     "crowd_modelling_2d_10x10": {},
     "crowd_modelling_2d_four_rooms": {
@@ -61,17 +64,26 @@ GAME_SETTINGS = {
         "time_step_length": 0.5,
     },
     # Predator and prey game.
-    "predator_prey_5x5x3": {},
+    "predator_prey_5x5x3": {
+        **predator_prey.THREE_POPULATIONS,
+    },
+    "predator_prey_5x5x4": {
+        **predator_prey.FOUR_POPULATIONS,
+    },
     # Linear-quadratic game.
-    "linear_quadratic": {}
+    "linear_quadratic": {},
+    # Periodic aversion game.
+    "periodic_aversion": {},
 }
 
 # Default settings for the games.
 GAME_SETTINGS.update({
+    "python_mfg_crowd_avoidance": GAME_SETTINGS["crowd_avoidance"],
     "mean_field_lin_quad": GAME_SETTINGS["linear_quadratic"],
     "mfg_crowd_modelling_2d": GAME_SETTINGS["crowd_modelling_2d_10x10"],
     "mfg_dynamic_routing": GAME_SETTINGS["dynamic_routing_line"],
     "python_mfg_dynamic_routing": GAME_SETTINGS["dynamic_routing_line"],
+    "python_mfg_periodic_aversion": GAME_SETTINGS["periodic_aversion"],
     "python_mfg_predator_prey": GAME_SETTINGS["predator_prey_5x5x3"],
 })
 

@@ -63,18 +63,14 @@ INFO_STATE_OBS_TYPE = pyspiel.IIGObservationType(perfect_recall=True)
 class _Observation:
   """Contains an observation from a game."""
 
-  def __init__(self, game, imperfect_information_observation_type, params):
-    if imperfect_information_observation_type is not None:
-      obs = game.make_observer(imperfect_information_observation_type, params)
-    else:
-      obs = game.make_observer(params)
-    self._observation = pyspiel._Observation(game, obs)
+  def __init__(self, game, observer):
+    self._observation = pyspiel._Observation(game, observer)
     self.dict = {}
     if self._observation.has_tensor():
       self.tensor = np.frombuffer(self._observation, np.float32)
       offset = 0
       for tensor_info in self._observation.tensors_info():
-        size = np.product(tensor_info.shape, dtype=np.int64)
+        size = np.prod(tensor_info.shape, dtype=np.int64)
         values = self.tensor[offset:offset + size].reshape(tensor_info.shape)
         self.dict[tensor_info.name] = values
         offset += size
@@ -95,14 +91,25 @@ class _Observation:
     self._observation.decompress(compressed_observation)
 
 
-def make_observation(game,
-                     imperfect_information_observation_type=None,
-                     params=None):
+def make_observation(
+    game,
+    imperfect_information_observation_type=None,
+    params=None,
+):
+  """Returns an _Observation instance if the imperfect_information_observation_type is supported, otherwise None."""
+  params = params or {}
   if hasattr(game, 'make_py_observer'):
     return game.make_py_observer(imperfect_information_observation_type, params)
   else:
-    return _Observation(game, imperfect_information_observation_type, params or
-                        {})
+    if imperfect_information_observation_type is not None:
+      observer = game.make_observer(
+          imperfect_information_observation_type, params
+      )
+    else:
+      observer = game.make_observer(params)
+    if observer is None:
+      return None
+    return _Observation(game, observer)
 
 
 class IIGObserverForPublicInfoGame:

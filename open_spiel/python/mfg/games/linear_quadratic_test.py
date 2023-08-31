@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Python Crowd Modelling game."""
+"""Tests for Python Linear Quadratic game."""
 
 from absl.testing import absltest
 import numpy as np

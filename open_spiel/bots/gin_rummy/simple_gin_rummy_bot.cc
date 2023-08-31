@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
+
 #include <algorithm>
+#include <utility>
 #include <vector>
 
+#include "open_spiel/games/gin_rummy/gin_rummy.h"
+#include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/spiel_bots.h"
 
-#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
-#include "open_spiel/games/gin_rummy.h"
-#include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
+namespace open_spiel::gin_rummy {
 
-namespace open_spiel {
-namespace gin_rummy {
+SimpleGinRummyBot::SimpleGinRummyBot(GameParameters params,
+                                     const Player player_id)
+    : params_(std::move(params)),
+      player_id_(player_id),
+      hand_size_(params_["hand_size"].int_value()),
+      utils_(params_["num_ranks"].int_value(), params_["num_suits"].int_value(),
+             params_["hand_size"].int_value()) {}
 
 void SimpleGinRummyBot::Restart() {
   knocked_ = false;
@@ -38,6 +45,16 @@ ActionsAndProbs SimpleGinRummyBot::GetPolicy(const State& state) {
   for (auto action : legal_actions)
     policy.emplace_back(action, action == chosen_action ? 1.0 : 0.0);
   return policy;
+}
+
+std::pair<ActionsAndProbs, Action> SimpleGinRummyBot::StepWithPolicy(
+    const State& state) {
+  ActionsAndProbs policy;
+  auto legal_actions = state.LegalActions(player_id_);
+  auto chosen_action = Step(state);
+  for (auto action : legal_actions)
+    policy.emplace_back(action, action == chosen_action ? 1.0 : 0.0);
+  return {policy, chosen_action};
 }
 
 Action SimpleGinRummyBot::Step(const State& state) {
@@ -224,6 +241,4 @@ std::vector<int> SimpleGinRummyBot::GetMelds(std::vector<int> hand) const {
   return rv;
 }
 
-}  // namespace gin_rummy
-}  // namespace open_spiel
-
+}  // namespace open_spiel::gin_rummy

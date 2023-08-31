@@ -23,7 +23,7 @@
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
-#include "open_spiel/games/colored_trails.h"
+#include "open_spiel/games/colored_trails/colored_trails.h"
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/init.h"
 

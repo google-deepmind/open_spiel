@@ -38,6 +38,10 @@ SPIEL_GAMES_LIST = pyspiel.registered_games()
 # All games loadable without parameter values.
 SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 
+# A list of games to exclude from the general simulation tests. This should
+# remain empty, but it is helpful to use while a game is under construction.
+SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = ["yacht"]
+
 # TODO(b/141950198): Stop hard-coding the number of loadable games.
 assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
 
@@ -197,6 +201,9 @@ class GamesSimTest(parameterized.TestCase):
   @parameterized.named_parameters((game_info.short_name, game_info)
                                   for game_info in SPIEL_LOADABLE_GAMES_LIST)
   def test_game_sim(self, game_info):
+    if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
+      print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
+      return
     game = pyspiel.load_game(game_info.short_name)
     self.assertLessEqual(game_info.min_num_players, game.num_players())
     self.assertLessEqual(game.num_players(), game_info.max_num_players)
@@ -214,9 +221,29 @@ class GamesSimTest(parameterized.TestCase):
   def test_multiplayer_game(self, game_info, num_players):
     if game_info.short_name == "python_mfg_predator_prey":
       reward_matrix = np.ones((num_players, num_players))
+      # Construct an initial distribution matrix of suitable dimensions.
+      zero_mat = np.zeros((5, 5))
+      pop_1 = zero_mat.copy()
+      pop_1[0, 0] = 1.0
+      pop_1 = pop_1.tolist()
+      pop_2 = zero_mat.copy()
+      pop_2[0, -1] = 1.0
+      pop_2 = pop_2.tolist()
+      pop_3 = zero_mat.copy()
+      pop_3[-1, 0] = 1.0
+      pop_3 = pop_3.tolist()
+      pop_4 = zero_mat.copy()
+      pop_4[-1, -1] = 1.0
+      pop_4 = pop_4.tolist()
+      pops = [pop_1, pop_2, pop_3, pop_4]
+      init_distrib = []
+      for p in range(num_players):
+        init_distrib += pops[p%4]
+      init_distrib = np.array(init_distrib)
       dict_args = {
           "players": num_players,
-          "reward_matrix": " ".join(str(v) for v in reward_matrix.flatten())
+          "reward_matrix": " ".join(str(v) for v in reward_matrix.flatten()),
+          "init_distrib": " ".join(str(v) for v in init_distrib.flatten()),
       }
     else:
       dict_args = {"players": num_players}
@@ -250,13 +277,13 @@ class GamesSimTest(parameterized.TestCase):
           check_pickle_serialization=False)
     # EFG games loaded by file should serialize properly:
     filename = file_utils.find_file(
-        "open_spiel/games/efg/sample.efg", 2)
+        "third_party/open_spiel/games/efg/sample.efg", 2)
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
         self.sim_game(game)
     filename = file_utils.find_file(
-        "open_spiel/games/efg/sample.efg", 2)
+        "third_party/open_spiel/games/efg/sample.efg", 2)
     if filename is not None:
       game = pyspiel.load_game("efg_game(filename=" + filename + ")")
       for _ in range(0, 100):
@@ -323,6 +350,15 @@ class GamesSimTest(parameterized.TestCase):
     private_cards = state.get_private_cards()
     self.assertEqual(private_cards, [2, 3])
 
+  def test_dots_and_boxes_with_notation(self):
+    game = pyspiel.load_game("dots_and_boxes")
+    state = game.new_initial_state()
+    state.apply_action(0)  # horizontal 0, 0
+    state.apply_action(1)  # horizontal 0, 1
+    # check that we can retrieve the notiation
+    dbn = state.dbn_string()
+    self.assertEqual(dbn, "110000000000")
+
   @parameterized.parameters(
       {"game_name": "blotto"},
       {"game_name": "goofspiel"},
@@ -339,8 +375,8 @@ class GamesSimTest(parameterized.TestCase):
       self.sim_game(rnr_game, check_pyspiel_serialization=False,
                     check_pickle_serialization=False)
 
-# TODO(author18): find the list of games where it is reasonable to call
-# get_all_states
+  # TODO(author18): find the list of games where it is reasonable to call
+  # get_all_states
   @parameterized.parameters(
       {"game_name": "python_mfg_crowd_modelling"},
       {"game_name": "mfg_crowd_modelling"},

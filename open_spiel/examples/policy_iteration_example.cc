@@ -16,7 +16,7 @@
 #include <string>
 
 #include "open_spiel/algorithms/policy_iteration.h"
-#include "open_spiel/games/tic_tac_toe.h"
+#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

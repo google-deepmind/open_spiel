@@ -18,6 +18,7 @@
 #include <memory>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "ortools/linear_solver/linear_solver.h"
@@ -230,7 +231,7 @@ BijectiveContainer<const InfostateNode*> ConnectTerminals(
   BijectiveContainer<const InfostateNode*> out;
 
   using History = absl::Span<const Action>;
-  std::map<History, const InfostateNode*> history_map;
+  absl::btree_map<History, const InfostateNode*> history_map;
   for (InfostateNode* node_b : tree_b.leaf_nodes()) {
     history_map[node_b->TerminalHistory()] = node_b;
   }

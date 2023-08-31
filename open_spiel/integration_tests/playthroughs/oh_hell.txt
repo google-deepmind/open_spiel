@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Oh Hell!"
 GameType.max_num_players = 7
 GameType.min_num_players = 3
-GameType.parameter_specification = ["num_cards_per_suit", "num_suits", "num_tricks_fixed", "players"]
+GameType.parameter_specification = ["num_cards_per_suit", "num_suits", "num_tricks_fixed", "off_bid_penalty", "players", "points_per_trick"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = False
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 70
 PolicyTensorShape() = [70]
 MaxChanceOutcomes() = 52
-GetParameters() = {num_cards_per_suit=13,num_suits=4,num_tricks_fixed=-1,players=3}
+GetParameters() = {num_cards_per_suit=13,num_suits=4,num_tricks_fixed=-1,off_bid_penalty=False,players=3,points_per_trick=1}
 NumPlayers() = 3
 MinUtility() = 0.0
 MaxUtility() = 27.0
@@ -68,7 +68,7 @@ InformationStateString(2) = ""
 InformationStateTensor(0): zeros(4704)
 InformationStateTensor(1): zeros(4704)
 InformationStateTensor(2): zeros(4704)
-ChanceOutcomes() = [(1, 0.058823529411764705), (2, 0.058823529411764705), (3, 0.058823529411764705), (4, 0.058823529411764705), (5, 0.058823529411764705), (6, 0.058823529411764705), (7, 0.058823529411764705), (8, 0.058823529411764705), (9, 0.058823529411764705), (10, 0.058823529411764705), (11, 0.058823529411764705), (12, 0.058823529411764705), (13, 0.058823529411764705), (14, 0.058823529411764705), (15, 0.058823529411764705), (16, 0.058823529411764705), (17, 0.058823529411764705)]
+ChanceOutcomes() = [(1,0.0588235), (2,0.0588235), (3,0.0588235), (4,0.0588235), (5,0.0588235), (6,0.0588235), (7,0.0588235), (8,0.0588235), (9,0.0588235), (10,0.0588235), (11,0.0588235), (12,0.0588235), (13,0.0588235), (14,0.0588235), (15,0.0588235), (16,0.0588235), (17,0.0588235)]
 LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 StringLegalActions() = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"]
 
@@ -113,7 +113,7 @@ InformationStateString(2) = "Num Total Tricks: 2\n"
 InformationStateTensor(0): zeros(4704)
 InformationStateTensor(1): zeros(4704)
 InformationStateTensor(2): zeros(4704)
-ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
+ChanceOutcomes() = [(0,0.333333), (1,0.333333), (2,0.333333)]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["0", "1", "2"]
 

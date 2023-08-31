@@ -31,17 +31,18 @@ jobs:
         - os: ubuntu-20.04
           OS_TYPE: "Linux"
           CI_PYBIN: python3
-          CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
-          CIBW_BUILD: cp37-manylinux_x86_64 cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64
+          CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64
         - os: macOS-12
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
-          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON'"
-          CIBW_BUILD: cp37-macosx_x86_64 cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
+      OPEN_SPIEL_BUILD_WITH_ROSHAMBO: ON
       OS_TYPE: ${{ matrix.OS_TYPE }}
       OS_PYTHON_VERSION: "3.9"
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
@@ -54,7 +55,7 @@ jobs:
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install
         run: |
@@ -74,7 +75,10 @@ jobs:
           ${CI_PYBIN} -m pip install --upgrade setuptools
           ${CI_PYBIN} -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh
-          ${CI_PYBIN} -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS $OPEN_SPIEL_PYTHON_PYTORCH_DEPS $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS $OPEN_SPIEL_PYTHON_MISC_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           ${CI_PYBIN} -m pip install twine
           ${CI_PYBIN} -m pip install cibuildwheel==2.11.1
       - name: Build sdist
@@ -95,7 +99,7 @@ jobs:
       - name: Install bdist_wheel and full tests
         run: ./open_spiel/scripts/test_wheel.sh full `pwd` ${CI_PYBIN}
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: |
             dist/*.tar.gz

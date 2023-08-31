@@ -14,6 +14,7 @@
 
 """Tests for open_spiel.python.algorithms.dqn."""
 
+from absl.testing import absltest
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_environment
@@ -87,6 +88,7 @@ class DQNTest(tf.test.TestCase):
       for agent in agents:
         agent.step(time_step)
 
+  @absltest.skip("Causing a segmentation fault on wheel tests")
   def test_run_hanabi(self):
     # Hanabi is an optional game, so check we have it before running the test.
     game = "hanabi"

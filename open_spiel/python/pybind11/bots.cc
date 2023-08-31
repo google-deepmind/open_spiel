@@ -17,13 +17,13 @@
 #include <stdint.h>
 
 #include <memory>
-#include <new>
 #include <string>
-#include <utility>
 
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
+#include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
+#include "open_spiel/bots/uci/uci_bot.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
@@ -50,6 +50,7 @@ class PyBot : public Bot {
   ~PyBot() override = default;
 
   using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
+  using BotUniquePtr = std::unique_ptr<Bot>;
 
   // Choose and execute an action in a game. The bot should return its
   // distribution over actions and also its selected action.
@@ -99,8 +100,7 @@ class PyBot : public Bot {
         "inform_action",  // Name of function in Python
         InformAction,     // Name of function in C++
         state,            // Arguments
-        player_id,
-        action);
+        player_id, action);
   }
   void InformActions(const State& state,
                      const std::vector<Action>& actions) override {
@@ -149,11 +149,29 @@ class PyBot : public Bot {
         state                // Arguments
     );
   }
+
+  bool IsClonable() const override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,           // Return type (must be a simple token for macro parser)
+        Bot,            // Parent class
+        "is_clonable",  // Name of function in Python
+        IsClonable,     // Name of function in C++
+    );
+  }
+
+  std::unique_ptr<Bot> Clone() override {
+    PYBIND11_OVERLOAD_NAME(
+        BotUniquePtr,  // Return type (must be a simple token for macro parser)
+        Bot,           // Parent class
+        "clone",       // Name of function in Python
+        Clone,         // Name of function in C++
+    );
+  }
 };
 }  // namespace
 
 void init_pyspiel_bots(py::module& m) {
-  py::class_<Bot, PyBot> bot(m, "Bot");
+  py::classh<Bot, PyBot> bot(m, "Bot");
   bot.def(py::init<>())
       .def("step", &Bot::Step)
       .def("restart", &Bot::Restart)
@@ -164,7 +182,9 @@ void init_pyspiel_bots(py::module& m) {
       .def("inform_actions", &Bot::InformActions)
       .def("provides_policy", &Bot::ProvidesPolicy)
       .def("get_policy", &Bot::GetPolicy)
-      .def("step_with_policy", &Bot::StepWithPolicy);
+      .def("step_with_policy", &Bot::StepWithPolicy)
+      .def("is_clonable", &Bot::IsClonable)
+      .def("clone", &Bot::Clone);
 
   m.def(
       "load_bot",
@@ -227,7 +247,7 @@ void init_pyspiel_bots(py::module& m) {
       .def("to_string", &SearchNode::ToString)
       .def("children_str", &SearchNode::ChildrenStr);
 
-  py::class_<algorithms::MCTSBot, Bot>(m, "MCTSBot")
+  py::classh<algorithms::MCTSBot, Bot>(m, "MCTSBot")
       .def(
           py::init([](std::shared_ptr<const Game> game,
                       std::shared_ptr<Evaluator> evaluator, double uct_c,
@@ -253,7 +273,7 @@ void init_pyspiel_bots(py::module& m) {
              algorithms::ISMCTSFinalPolicyType::kMaxVisitCount)
       .value("MAX_VALUE", algorithms::ISMCTSFinalPolicyType::kMaxValue);
 
-  py::class_<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
+  py::classh<algorithms::ISMCTSBot, Bot>(m, "ISMCTSBot")
       .def(py::init<int, std::shared_ptr<Evaluator>, double, int, int,
                     algorithms::ISMCTSFinalPolicyType, bool, bool>(),
            py::arg("seed"), py::arg("evaluator"), py::arg("uct_c"),
@@ -290,6 +310,13 @@ void init_pyspiel_bots(py::module& m) {
       },
       "A bot that samples from a policy.");
 
+#ifndef _WIN32
+  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
+      py::arg("move_time"), py::arg("ponder"), py::arg("options"),
+      "Bot that can play chess using UCI chess engine.");
+#endif
+
+
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
   m.attr("ROSHAMBO_NUM_THROWS") = py::int_(open_spiel::roshambo::kNumThrows);
   m.attr("ROSHAMBO_NUM_BOTS") = py::int_(open_spiel::roshambo::kNumBots);
@@ -300,5 +327,14 @@ void init_pyspiel_bots(py::module& m) {
         py::arg("player_id"), py::arg("bot_name"),
         py::arg("num_throws") = open_spiel::roshambo::kNumThrows);
 #endif
+
+  m.def(
+      "make_simple_gin_rummy_bot",
+      [](const GameParameters& params,
+         int player_id) -> std::unique_ptr<open_spiel::Bot> {
+        return std::make_unique<gin_rummy::SimpleGinRummyBot>(params,
+                                                              player_id);
+      },
+      py::arg("params"), py::arg("player_id"));
 }
 }  // namespace open_spiel

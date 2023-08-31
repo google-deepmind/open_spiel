@@ -29,6 +29,9 @@ namespace algorithms {
 // prob_cut_threshold > 0 will cut the tree search if the reach probability
 // goes below this value resulting in an approximate return.
 //
+// Policies need not be complete; any missing legal actions will be assumed to
+// have zero probability.
+//
 // The second overloaded function acts the same way, except assumes that all of
 // the players' policies are encapsulated in one joint policy.
 //
@@ -45,6 +48,31 @@ std::vector<double> ExpectedReturns(const State& state,
                                     const Policy& joint_policy, int depth_limit,
                                     bool use_infostate_get_policy = true,
                                     float prob_cut_threshold = 0.0);
+
+// Computes the (undiscounted) expected returns from random deterministic
+// policies which are specified using a seed. There should be a policy_seed per
+// player. Optionally any number of policies can be provided which override
+// the random deterministic policies.
+//
+// A deterministic policy is one that places all probability mass on a single
+// action at each information state. We randomly generate a deterministic
+// policy from a seed as follows:
+// * Specify a policy seed for each player.
+// * For each information state visited:
+//   - Calculate an integer hash of the information state string.
+//   - Add the move number.
+//   - Add the global seed of the corresponding player.
+//   - This results in a new seed per information state.
+//   - Using this seed, sample an action from a uniform integer distribution.
+//
+// This means that an entire policy can be represented cheaply with a single
+// integer and allows computing expected returns of games whose tabular policies
+// may not fit in memory.
+std::vector<double> ExpectedReturnsOfDeterministicPoliciesFromSeeds(
+  const State& state, const std::vector<int> & policy_seeds);
+std::vector<double> ExpectedReturnsOfDeterministicPoliciesFromSeeds(
+  const State& state, const std::vector<int> & policy_seeds,
+  const std::vector<const Policy*>& policies);
 
 }  // namespace algorithms
 }  // namespace open_spiel

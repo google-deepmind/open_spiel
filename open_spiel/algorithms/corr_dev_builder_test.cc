@@ -25,7 +25,7 @@
 #include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
-#include "open_spiel/games/efg_game.h"
+#include "open_spiel/games/efg_game/efg_game.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

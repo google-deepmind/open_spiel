@@ -105,8 +105,8 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
                              {"max_num_time_step": 5})
     self.assertEqual(game.max_game_length(), 5)
 
-  # TODO(cabannes): enable ficticious_play with game where the dynamics depend
-  # on the distribution.
+  # Enable ficticious_play with game where the dynamics depend on the
+  # distribution.
   # def test_ficticious_play(self):
   #   """Test that ficticious play can be used on this game."""
   #   mfg_game = pyspiel.load_game("python_mfg_dynamic_routing")
@@ -181,9 +181,8 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
 
   def test_game_evolution_uniform_policy(self):
     """Check game evolution under uniform policy."""
-    # TODO(cabannes): test evolution of the game as expected (test value of the
-    # state).
-    # TODO(cabannes): test legal_actions().
+    # Test evolution of the game as expected (test value of the state).
+    # Test legal_actions().
 
   def test_observer_correct(self):
     """Checks that the observer is correctly updated."""
@@ -215,15 +214,15 @@ class MeanFieldRoutingGameTest(absltest.TestCase):
 
   def test_apply_actions_error_no_movement_with_negative_waiting_time(self):
     """Check that a vehicle cannot choose to not move if it has to move."""
-    # TODO(cabannes): test apply_actions().
+    # Test apply_actions().
 
   def test_apply_actions_error_wrong_movement_with_negative_waiting_time(self):
     """Check that a vehicle cannot choose to move to a not successor link."""
-    # TODO(cabannes): test apply_actions().
+    # Test apply_actions().
 
   def test_apply_actions_error_movement_with_positive_waiting_time(self):
     """Check that a vehicle cannot choose to move if it cannot move yet."""
-    # TODO(cabannes): test apply_actions().
+    # Test apply_actions().
 
   @absltest.skip(
       "Test of OMD on Sioux Falls is disabled as it takes a long time to run.")

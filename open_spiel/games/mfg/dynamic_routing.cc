@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_set.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
@@ -68,6 +69,8 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 }
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
+
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 }  // namespace
 
@@ -392,7 +395,7 @@ std::vector<std::string> MeanFieldRoutingGameState::DistributionSupport() {
       dist.push_back(value);
     }
   }
-  std::set<std::string> dist_set(dist.begin(), dist.end());
+  absl::btree_set<std::string> dist_set(dist.begin(), dist.end());
   SPIEL_CHECK_EQ(dist_set.size(), dist.size());
   return dist;
 }

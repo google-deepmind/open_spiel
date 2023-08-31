@@ -18,7 +18,6 @@ from typing import Sequence
 
 from absl import flags
 import jax
-from jax.config import config
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -34,42 +33,66 @@ from open_spiel.python.utils import metrics
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string("game_name", "mfg_crowd_modelling_2d", "Name of the game.")
-flags.DEFINE_string(
-    "env_setting", "crowd_modelling_2d_four_rooms",
-    "Name of the game settings. If None, the game name will be used.")
+_ENV_SETTING = flags.DEFINE_string(
+    "env_setting",
+    "crowd_modelling_2d_four_rooms",
+    "Name of the game settings. If None, the game name will be used.",
+)
 
 # Training options.
-flags.DEFINE_integer("batch_size", 128,
-                     "Number of transitions to sample at each learning step.")
-flags.DEFINE_integer("learn_every", 64,
-                     "Number of steps between learning updates.")
-flags.DEFINE_integer("num_episodes_per_iteration", 1000,
-                     "Number of training eepisodes for each iteration.")
+_BATCH_SIZE = flags.DEFINE_integer(
+    "batch_size", 128, "Number of transitions to sample at each learning step."
+)
+_LEARN_EVERY = flags.DEFINE_integer(
+    "learn_every", 64, "Number of steps between learning updates."
+)
+_NUM_EPISODES_PER_ITERATION = flags.DEFINE_integer(
+    "num_episodes_per_iteration",
+    1000,
+    "Number of training eepisodes for each iteration.",
+)
 flags.DEFINE_integer("num_iterations", 100, "Number of iterations.")
-flags.DEFINE_integer("epsilon_decay_duration", 100000,
-                     "Number of game steps over which epsilon is decayed.")
+_EPSILON_DECAY_DURATION = flags.DEFINE_integer(
+    "epsilon_decay_duration",
+    100000,
+    "Number of game steps over which epsilon is decayed.",
+)
 flags.DEFINE_float("epsilon_power", 1, "Power for the epsilon decay.")
 flags.DEFINE_float("epsilon_start", 0.1, "Starting exploration parameter.")
 flags.DEFINE_float("epsilon_end", 0.1, "Final exploration parameter.")
-flags.DEFINE_float("discount_factor", 1.0,
-                   "Discount factor for future rewards.")
-flags.DEFINE_bool(
-    "reset_replay_buffer_on_update", False,
-    "Reset the replay buffer when the softmax policy is updated.")
+_DISCOUNT_FACTOR = flags.DEFINE_float(
+    "discount_factor", 1.0, "Discount factor for future rewards."
+)
+_RESET_REPLAY_BUFFER_ON_UPDATE = flags.DEFINE_bool(
+    "reset_replay_buffer_on_update",
+    False,
+    "Reset the replay buffer when the softmax policy is updated.",
+)
 flags.DEFINE_integer("seed", 42, "Training seed.")
 # Evaluation options.
-flags.DEFINE_integer("eval_every", 200,
-                     "Episode frequency at which the agents are evaluated.")
+_EVAL_EVERY = flags.DEFINE_integer(
+    "eval_every", 200, "Episode frequency at which the agents are evaluated."
+)
 # Network options.
-flags.DEFINE_list("hidden_layers_sizes", ["128", "128"],
-                  "Number of hidden units in the avg-net and Q-net.")
-flags.DEFINE_integer("update_target_network_every", 200,
-                     "Number of steps between DQN target network updates.")
+_HIDDEN_LAYERS_SIZES = flags.DEFINE_list(
+    "hidden_layers_sizes",
+    ["128", "128"],
+    "Number of hidden units in the avg-net and Q-net.",
+)
+_UPDATE_TARGET_NETWORK_EVERY = flags.DEFINE_integer(
+    "update_target_network_every",
+    200,
+    "Number of steps between DQN target network updates.",
+)
 # Replay buffer options.
-flags.DEFINE_integer("replay_buffer_capacity", 40000,
-                     "Size of the replay buffer.")
-flags.DEFINE_integer("min_buffer_size_to_learn", 1000,
-                     "Number of samples in buffer before learning begins.")
+_REPLAY_BUFFER_CAPACITY = flags.DEFINE_integer(
+    "replay_buffer_capacity", 40000, "Size of the replay buffer."
+)
+_MIN_BUFFER_SIZE_TO_LEARN = flags.DEFINE_integer(
+    "min_buffer_size_to_learn",
+    1000,
+    "Number of samples in buffer before learning begins.",
+)
 # Loss and optimizer options.
 flags.DEFINE_enum("optimizer", "adam", ["sgd", "adam"], "Optimizer.")
 flags.DEFINE_float("learning_rate", 0.01, "Learning rate for inner rl agent.")
@@ -79,25 +102,30 @@ flags.DEFINE_float("gradient_clipping", None, "Value to clip the gradient to.")
 # Munchausen options.
 flags.DEFINE_float("tau", 10, "Temperature parameter in Munchausen target.")
 flags.DEFINE_float("alpha", 0.99, "Alpha parameter in Munchausen target.")
-flags.DEFINE_bool("with_munchausen", True,
-                  "If true, target uses Munchausen penalty terms.")
+_WITH_MUNCHAUSEN = flags.DEFINE_bool(
+    "with_munchausen", True, "If true, target uses Munchausen penalty terms."
+)
 # Logging options.
 flags.DEFINE_bool("use_checkpoints", False, "Save/load neural network weights.")
-flags.DEFINE_string("checkpoint_dir", "/tmp/dqn_test",
-                    "Directory to save/load the agent.")
-flags.DEFINE_string(
-    "logdir", None,
+_CHECKPOINT_DIR = flags.DEFINE_string(
+    "checkpoint_dir", "/tmp/dqn_test", "Directory to save/load the agent."
+)
+_LOGDIR = flags.DEFINE_string(
+    "logdir",
+    None,
     "Logging dir to use for TF summary files. If None, the metrics will only "
-    "be logged to stderr.")
-flags.DEFINE_bool("log_distribution", False,
-                  "Enables logging of the distribution.")
+    "be logged to stderr.",
+)
+_LOG_DISTRIBUTION = flags.DEFINE_bool(
+    "log_distribution", False, "Enables logging of the distribution."
+)
 
 
 def main(argv: Sequence[str]) -> None:
   if len(argv) > 1:
     raise app.UsageError("Too many command-line arguments.")
 
-  game = factory.create_game_with_setting(FLAGS.game_name, FLAGS.env_setting)
+  game = factory.create_game_with_setting(FLAGS.game_name, _ENV_SETTING.value)
 
   num_players = game.num_players()
 
@@ -110,7 +138,8 @@ def main(argv: Sequence[str]) -> None:
           game,
           mfg_distribution=uniform_dist,
           mfg_population=p,
-          observation_type=rl_environment.ObservationType.OBSERVATION)
+          observation_type=rl_environment.ObservationType.OBSERVATION,
+      )
       for p in range(num_players)
   ]
 
@@ -121,37 +150,39 @@ def main(argv: Sequence[str]) -> None:
   # Create the agents.
   kwargs = {
       "alpha": FLAGS.alpha,
-      "batch_size": FLAGS.batch_size,
-      "discount_factor": FLAGS.discount_factor,
-      "epsilon_decay_duration": FLAGS.epsilon_decay_duration,
+      "batch_size": _BATCH_SIZE.value,
+      "discount_factor": _DISCOUNT_FACTOR.value,
+      "epsilon_decay_duration": _EPSILON_DECAY_DURATION.value,
       "epsilon_end": FLAGS.epsilon_end,
       "epsilon_power": FLAGS.epsilon_power,
       "epsilon_start": FLAGS.epsilon_start,
       "gradient_clipping": FLAGS.gradient_clipping,
-      "hidden_layers_sizes": [int(l) for l in FLAGS.hidden_layers_sizes],
+      "hidden_layers_sizes": [int(l) for l in _HIDDEN_LAYERS_SIZES.value],
       "huber_loss_parameter": FLAGS.huber_loss_parameter,
-      "learn_every": FLAGS.learn_every,
+      "learn_every": _LEARN_EVERY.value,
       "learning_rate": FLAGS.learning_rate,
       "loss": FLAGS.loss,
-      "min_buffer_size_to_learn": FLAGS.min_buffer_size_to_learn,
+      "min_buffer_size_to_learn": _MIN_BUFFER_SIZE_TO_LEARN.value,
       "optimizer": FLAGS.optimizer,
-      "replay_buffer_capacity": FLAGS.replay_buffer_capacity,
-      "reset_replay_buffer_on_update": FLAGS.reset_replay_buffer_on_update,
+      "replay_buffer_capacity": _REPLAY_BUFFER_CAPACITY.value,
+      "reset_replay_buffer_on_update": _RESET_REPLAY_BUFFER_ON_UPDATE.value,
       "seed": FLAGS.seed,
       "tau": FLAGS.tau,
-      "update_target_network_every": FLAGS.update_target_network_every,
-      "with_munchausen": FLAGS.with_munchausen
+      "update_target_network_every": _UPDATE_TARGET_NETWORK_EVERY.value,
+      "with_munchausen": _WITH_MUNCHAUSEN.value,
   }
   agents = [
-      munchausen_deep_mirror_descent.MunchausenDQN(p, info_state_size,
-                                                   num_actions, **kwargs)
+      munchausen_deep_mirror_descent.MunchausenDQN(
+          p, info_state_size, num_actions, **kwargs
+      )
       for p in range(num_players)
   ]
 
   # Metrics writer will also log the metrics to stderr.
-  just_logging = FLAGS.logdir is None or jax.host_id() > 0
+  just_logging = _LOGDIR.value is None or jax.host_id() > 0
   writer = metrics.create_default_writer(
-      logdir=FLAGS.logdir, just_logging=just_logging)
+      logdir=_LOGDIR.value, just_logging=just_logging
+  )
 
   # # Save the parameters.
   writer.write_hparams(kwargs)
@@ -159,14 +190,15 @@ def main(argv: Sequence[str]) -> None:
   def logging_fn(it, episode, vals):
     writer.write_scalars(it * num_episodes_per_iteration + episode, vals)
 
-  num_episodes_per_iteration = FLAGS.num_episodes_per_iteration
+  num_episodes_per_iteration = _NUM_EPISODES_PER_ITERATION.value
   md = munchausen_deep_mirror_descent.DeepOnlineMirrorDescent(
       game,
       envs,
       agents,
-      eval_every=FLAGS.eval_every,
+      eval_every=_EVAL_EVERY.value,
       num_episodes_per_iteration=num_episodes_per_iteration,
-      logging_fn=logging_fn)
+      logging_fn=logging_fn,
+  )
 
   def log_metrics(it):
     """Logs the training metrics for each iteration."""
@@ -178,10 +210,10 @@ def main(argv: Sequence[str]) -> None:
     }
     nash_conv_md = nash_conv.NashConv(game, md.policy).nash_conv()
     m["nash_conv_md"] = nash_conv_md
-    if FLAGS.log_distribution and FLAGS.logdir:
+    if _LOG_DISTRIBUTION.value and _LOGDIR.value:
       # We log distribution directly to a Pickle file as it may be large for
       # logging as a metric.
-      filename = os.path.join(FLAGS.logdir, f"distribution_{it}.pkl")
+      filename = os.path.join(_LOGDIR.value, f"distribution_{it}.pkl")
       utils.save_parametric_distribution(md.distribution, filename)
     logging_fn(it, 0, m)
 
@@ -195,5 +227,5 @@ def main(argv: Sequence[str]) -> None:
 
 
 if __name__ == "__main__":
-  config.parse_flags_with_absl()
+  jax.config.parse_flags_with_absl()
   app.run(main)

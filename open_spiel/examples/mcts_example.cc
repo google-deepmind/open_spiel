@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -162,7 +163,7 @@ int main(int argc, char** argv) {
     initial_actions.push_back(positional_args[i]);
   }
 
-  std::map<std::string, int> histories;
+  absl::btree_map<std::string, int> histories;
   std::vector<double> overall_returns(2, 0);
   std::vector<int> overall_wins(2, 0);
   int num_games = absl::GetFlag(FLAGS_num_games);

@@ -23,6 +23,7 @@ from open_spiel.python import policy
 from open_spiel.python.algorithms import get_all_states
 import pyspiel
 
+
 SEED = 187461917
 
 _TIC_TAC_TOE_STATES = [
@@ -50,7 +51,94 @@ _TIC_TAC_TOE_STATES = [
 ]
 
 
-def test_policy_on_game(self, game, policy_object):
+class DerivedPolicyTest(absltest.TestCase):
+
+  def test_derive_from_policy(self):
+    class DerivedPolicy(pyspiel.Policy):
+
+      def action_probabilities(self, state):
+        return {0: 0.1, 1: 0.9}
+
+      def get_state_policy(self, infostate):
+        return {10: 0.9, 11: 0.1}
+
+    policy_obj = DerivedPolicy()
+    self.assertEqual(DerivedPolicy.__bases__, (pyspiel.Policy,))
+    self.assertIsInstance(policy_obj, pyspiel.Policy)
+    self.assertEqual(
+        {0: 0.1, 1: 0.9},
+        policy_obj.action_probabilities(
+            pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        {0: 0.1, 1: 0.9}, policy_obj.action_probabilities("some infostate")
+    )
+    self.assertEqual(
+        {10: 0.9, 11: 0.1}, policy_obj.get_state_policy("some infostate")
+    )
+    with self.assertRaises(RuntimeError):
+      policy_obj.serialize()
+
+  def test_cpp_policy_from_py(self):
+    class DerivedPolicy(pyspiel.Policy):
+
+      def action_probabilities(self, state):
+        return {0: 0.0, 1: 0.0}
+
+      def get_state_policy(self, infostate):
+        return [(2, 0.0), (3, 0.0)]
+
+      def get_state_policy_as_parallel_vectors(self, state):
+        if isinstance(state, str):
+          return [4, 5], [0, 0]
+        else:
+          return [6, 7], [0, 0]
+
+      def serialize(self, precision, delim):
+        return f"Serialized string, {precision=}, {delim=}"
+
+    policy_obj = DerivedPolicy()
+    self.assertEqual(
+        {0: 0.0, 1: 0.0},
+        pyspiel._policy_trampoline_testing.call_action_probabilities(
+            policy_obj, pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        {0: 0.0, 1: 0.0},
+        pyspiel._policy_trampoline_testing.call_action_probabilities(
+            policy_obj, "some infostate"),
+    )
+    self.assertEqual(
+        [(2, 0.0), (3, 0.0)],
+        pyspiel._policy_trampoline_testing.call_get_state_policy(
+            policy_obj, pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        [(2, 0.0), (3, 0.0)],
+        pyspiel._policy_trampoline_testing.call_get_state_policy(
+            policy_obj, "some infostate"),
+    )
+    self.assertEqual(
+        ([4, 5], [0, 0]),
+        pyspiel._policy_trampoline_testing.call_get_state_policy_as_parallel_vectors(
+            policy_obj, "some infostate"),
+    )
+    self.assertEqual(
+        ([6, 7], [0, 0]),
+        pyspiel._policy_trampoline_testing.call_get_state_policy_as_parallel_vectors(
+            policy_obj, pyspiel.load_game("kuhn_poker").new_initial_state()
+        ),
+    )
+    self.assertEqual(
+        pyspiel._policy_trampoline_testing.call_serialize(policy_obj, 3, "!?"),
+        "Serialized string, precision=3, delim='!?'",
+    )
+
+
+def test_policy_on_game(self, game, policy_object, player=-1):
   """Checks the policy conforms to the conventions.
 
   Checks the Policy.action_probabilities contains only legal actions (but not
@@ -62,6 +150,7 @@ def test_policy_on_game(self, game, policy_object):
       function to test policies.
     game: A `pyspiel.Game`, same as the one used in the policy.
     policy_object: A `policy.Policy` object on `game`. to test.
+    player: Restrict testing policy to a player.
   """
 
   all_states = get_all_states.get_all_states(
@@ -92,7 +181,10 @@ def test_policy_on_game(self, game, policy_object):
     for prob in action_probabilities.values():
       sum_ += prob
       self.assertGreaterEqual(prob, 0)
-    self.assertAlmostEqual(1, sum_)
+    if player < 0 or state.current_player() == player:
+      self.assertAlmostEqual(1, sum_)
+    else:
+      self.assertAlmostEqual(0, sum_)
 
 
 _LEDUC_POKER = pyspiel.load_game("leduc_poker")
@@ -115,9 +207,22 @@ class CommonTest(parameterized.TestCase):
        pyspiel.GetRandomPolicy(_LEDUC_POKER, 1)),
       ("pyspiel.GetFlatDirichletPolicy",
        pyspiel.GetFlatDirichletPolicy(_LEDUC_POKER, 1)),
+      ("pyspiel.GetRandomDeterministicPolicy",
+       pyspiel.GetRandomDeterministicPolicy(_LEDUC_POKER, 1)),
   ])
   def test_cpp_policies_on_leduc(self, policy_object):
     test_policy_on_game(self, _LEDUC_POKER, policy_object)
+
+  @parameterized.named_parameters([
+      ("pyspiel.GetRandomPolicy0",
+       pyspiel.GetRandomPolicy(_LEDUC_POKER, 1, 0), 0),
+      ("pyspiel.GetFlatDirichletPolicy1",
+       pyspiel.GetFlatDirichletPolicy(_LEDUC_POKER, 1, 1), 1),
+      ("pyspiel.GetRandomDeterministicPolicym1",
+       pyspiel.GetRandomDeterministicPolicy(_LEDUC_POKER, 1, -1), -1),
+  ])
+  def test_cpp_player_policies_on_leduc(self, policy_object, player):
+    test_policy_on_game(self, _LEDUC_POKER, policy_object, player)
 
 
 class TabularTicTacToePolicyTest(parameterized.TestCase):

@@ -69,7 +69,7 @@ HistoryString() = "0, 1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-ChanceOutcomes() = [(0, 0.875), (1, 0.125)]
+ChanceOutcomes() = [(0,0.875), (1,0.125)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["CONTINUE", "STOP"]
 
@@ -118,7 +118,7 @@ HistoryString() = "0, 1, 0, 0, 0"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-ChanceOutcomes() = [(0, 0.875), (1, 0.125)]
+ChanceOutcomes() = [(0,0.875), (1,0.125)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["CONTINUE", "STOP"]
 

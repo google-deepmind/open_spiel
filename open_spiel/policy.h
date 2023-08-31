@@ -77,7 +77,7 @@ class Policy {
 
   // A convenience method for callers that want to use arrays.
   virtual std::pair<std::vector<Action>, std::vector<double>>
-  GetStatePolicyAsParallelVectors(const std::string info_state) const {
+  GetStatePolicyAsParallelVectors(const std::string& info_state) const {
     std::pair<std::vector<Action>, std::vector<double>> parray;
     for (const auto& action_and_prob : GetStatePolicy(info_state)) {
       parray.first.push_back(action_and_prob.first);
@@ -114,8 +114,8 @@ class Policy {
   // Returns a list of (action, prob) pairs for the policy for the specified
   // player at this state. If the policy is not available at the state, returns
   // an empty list.
-  virtual ActionsAndProbs GetStatePolicy(
-      const State& state, Player player) const {
+  virtual ActionsAndProbs GetStatePolicy(const State& state,
+                                         Player player) const {
     return GetStatePolicy(state.InformationStateString(player));
   }
 
@@ -294,10 +294,9 @@ class PartialTabularPolicy : public TabularPolicy {
   // if the key is in the table. If so, they return the state policy from the
   // table. Otherwise, they forward the call to the fallback policy.
   ActionsAndProbs GetStatePolicy(const State& state) const override;
-  ActionsAndProbs GetStatePolicy(const State& state, Player player)
-      const override;
-  ActionsAndProbs GetStatePolicy(const std::string& info_state)
-      const override;
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override;
+  ActionsAndProbs GetStatePolicy(const std::string& info_state) const override;
 
  private:
   std::shared_ptr<Policy> fallback_policy_;
@@ -310,8 +309,8 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
 // tabular version, except that this works for large games.
 class UniformPolicy : public Policy {
  public:
-  ActionsAndProbs GetStatePolicy(
-      const State& state, Player player) const override {
+  ActionsAndProbs GetStatePolicy(const State& state,
+                                 Player player) const override {
     if (state.IsSimultaneousNode()) {
       return UniformStatePolicy(state, player);
     } else {
@@ -326,8 +325,7 @@ class UniformPolicy : public Policy {
   }
 };
 
-// Chooses all legal actions with equal probability. This is equivalent to the
-// tabular version, except that this works for large games.
+// Among all legal actions, choose the first action deterministically.
 class FirstActionPolicy : public Policy {
  public:
   ActionsAndProbs GetStatePolicy(const State& state,
@@ -376,16 +374,23 @@ class PreferredActionPolicy : public Policy {
 TabularPolicy ToTabularPolicy(const Game& game, const Policy* policy);
 
 // Helper functions that generate policies for testing.
+// The player parameter can be used to only generate policies for a single
+// player. By default -1 will generate policies for all players.
 TabularPolicy GetEmptyTabularPolicy(const Game& game,
-                                    bool initialize_to_uniform = false);
+                                    bool initialize_to_uniform = false,
+                                    Player player = -1);
 TabularPolicy GetUniformPolicy(const Game& game);
-TabularPolicy GetRandomPolicy(const Game& game, int seed = 0);
-TabularPolicy GetFlatDirichletPolicy(const Game& game, int seed = 0);
+TabularPolicy GetRandomPolicy(
+    const Game& game, int seed = 0, Player player = -1);
+TabularPolicy GetFlatDirichletPolicy(
+    const Game& game, int seed = 0, Player player = -1);
+TabularPolicy GetRandomDeterministicPolicy(
+    const Game& game, int seed = 0, Player player = -1);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
 // Returns a preferred action policy as a tabular policy.
-TabularPolicy GetPrefActionPolicy(
-    const Game& game, const std::vector<Action>& pref_action);
+TabularPolicy GetPrefActionPolicy(const Game& game,
+                                  const std::vector<Action>& pref_action);
 
 std::string PrintPolicy(const ActionsAndProbs& policy);
 

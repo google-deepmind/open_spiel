@@ -936,6 +936,9 @@ class Game : public std::enable_shared_from_this<Game> {
   }
 
   // Returns an Observer, used to obtain observations of the game state.
+  // If the requested iig_obs_type is not supported by the game, the
+  // implementation must return a nullptr. If params are provided and
+  // unsupported this can result in an error.
   // The observations are created according to requested observation type.
   // Games can include additional observation fields when requested by
   // `params`.
@@ -955,7 +958,8 @@ class Game : public std::enable_shared_from_this<Game> {
       absl::optional<IIGObservationType> iig_obs_type,
       const GameParameters& params) const;
   // Returns an observer that uses the observation or informationstate tensor
-  // or string as defined directly on the state.
+  // or string as defined directly on the state. Returns a nullptr if the
+  // requested iig_obs_type is not supported.
   std::shared_ptr<Observer> MakeBuiltInObserver(
       absl::optional<IIGObservationType> iig_obs_type) const;
 
@@ -1164,6 +1168,18 @@ std::string ActionsToString(const State& state,
 void SpielFatalErrorWithStateInfo(const std::string& error_msg,
                                   const Game& game,
                                   const State& state);
+
+
+// Builds the state from a history string. Checks legalities of every action
+// on the way. The history string is a comma-separated actions with whitespace
+// allowed, and can include square brackets on either side:
+//    E.g. "[1, 3, 4, 5, 6]"  and "57,12,72,85" are both valid.
+// Proceeds up to a maximum of max_steps, unless max_steps is negative, in
+// which case it proceeds until the end of the sequence.
+std::pair<std::shared_ptr<const Game>,
+          std::unique_ptr<State>> BuildStateFromHistoryString(
+    const std::string& game_string, const std::string& history,
+    int max_steps = -1);
 
 }  // namespace open_spiel
 

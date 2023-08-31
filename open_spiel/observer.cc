@@ -136,7 +136,13 @@ std::shared_ptr<Observer> Game::MakeRegisteredObserver(
 
 std::shared_ptr<Observer> Game::MakeBuiltInObserver(
     absl::optional<IIGObservationType> iig_obs_type) const {
-  if (!iig_obs_type) return absl::make_unique<DefaultObserver>(*this);
+  if (!iig_obs_type) {
+    if (game_type_.provides_observation()) {
+      return absl::make_unique<DefaultObserver>(*this);
+    } else {
+      return nullptr;
+    }
+  }
 
   const bool perfect_info_game =
       game_type_.information == GameType::Information::kPerfectInformation;
@@ -165,14 +171,13 @@ std::shared_ptr<Observer> Game::MakeBuiltInObserver(
     if (game_type_.provides_information_state())
       return absl::make_unique<InformationStateObserver>(*this);
   }
-  SpielFatalError(absl::StrCat("Requested Observer type not available: ",
-                               IIGObservationTypeToString(*iig_obs_type)));
+  return nullptr;
 }
 
 std::shared_ptr<Observer> Game::MakeObserver(
     absl::optional<IIGObservationType> iig_obs_type,
     const ObservationParams& params) const {
-  // This implementation falls back to the orginal information state and
+  // This implementation falls back to the original information state and
   // observation methods in case of empty parameters and otherwise creates
   // a registered observer based on its name.
   // New games can register observers which can be selected by name, or override

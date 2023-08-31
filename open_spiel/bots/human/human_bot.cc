@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 
 namespace open_spiel {
@@ -64,7 +65,7 @@ Action HumanBot::Step(const State &state) {
     return kInvalidAction;
   }
 
-  std::unordered_map<std::string, Action> action_map;
+  absl::flat_hash_map<std::string, Action> action_map;
   for (Action legal_action : legal_actions) {
     action_map[state.ActionToString(legal_action)] = legal_action;
   }

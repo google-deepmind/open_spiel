@@ -108,7 +108,7 @@ def get_joint_strategy_from_marginals(probabilities):
     probas_shapes = [1] * len(probabilities)
     probas_shapes[i] = -1
     probas.append(probabilities[i].reshape(*probas_shapes))
-  result = np.product(probas)
+  result = np.prod(probas)
   return result.reshape(-1)
 
 

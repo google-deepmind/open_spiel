@@ -14,7 +14,7 @@
 
 #include "open_spiel/python/pybind11/games_backgammon.h"
 
-#include "open_spiel/games/backgammon.h"
+#include "open_spiel/games/backgammon/backgammon.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 

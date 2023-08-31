@@ -28,7 +28,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_can_create_game_and_state(self):
     """Checks we can create the game and a state."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
     # Ensure no moves have been made.
     expected_hands = [[] for _ in range(game.num_players())]
@@ -52,7 +52,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_draw_hands(self):
     """Tests hand drawing functions."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
     expected_hands = [[] for _ in range(game.num_players())]
     for i in range(game.num_players() * game.hand_length):
@@ -84,7 +84,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_basic_bid(self):
     """Tests a single bid."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
     expected_bid_history = np.zeros(
         (state.total_possible_bids, state.num_players())
@@ -121,7 +121,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_single_random_round(self):
     """Runs a single round of bidding followed by a challenge."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
     expected_challenge_history = np.zeros(
         (state.total_possible_bids, state.num_players())
@@ -160,7 +160,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_single_deterministic_round(self):
     """Runs a single round where cards are dealt deterministically."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
 
     # Deal player 0 all "1" cards and player 1 all "2" cards.
@@ -187,7 +187,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_single_rebid(self):
     """Runs a 2 player game where a rebid is enacted."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
 
     # Fill players hands.
@@ -210,7 +210,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_rebid_then_new_bid(self):
     """Runs a 2 player game where a rebid is enacted."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
 
     # Fill players hands.
@@ -264,7 +264,7 @@ class LiarsPokerTest(absltest.TestCase):
 
   def test_cloned_state_matches_original_state(self):
     """Check we can clone states successfully."""
-    game = liars_poker.LiarsPoker()
+    game = liars_poker.LiarsPoker({"hand_length": 3, "num_digits": 3})
     state = game.new_initial_state()
     state.apply_action(1)
     state.apply_action(2)

@@ -58,7 +58,7 @@ ObservationTensor(0): ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
                       ◯◯◯◯◯
-ChanceOutcomes() = [(0, 0.2), (1, 0.2), (2, 0.2), (3, 0.2), (4, 0.2)]
+ChanceOutcomes() = [(0,0.2), (1,0.2), (2,0.2), (3,0.2), (4,0.2)]
 LegalActions() = [0, 1, 2, 3, 4]
 StringLegalActions() = ["Initialized ball to 0", "Initialized ball to 1", "Initialized ball to 2", "Initialized ball to 3", "Initialized ball to 4"]
 

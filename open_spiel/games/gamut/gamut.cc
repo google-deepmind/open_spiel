@@ -14,11 +14,6 @@
 
 #include "open_spiel/games/gamut/gamut.h"
 
-#include <algorithm>
-#include <cstring>
-#include <ctime>
-#include <fstream>
-#include <iostream>
 #include <memory>
 #include <random>
 #include <string>
@@ -26,7 +21,6 @@
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/games/nfg_game.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
 
@@ -47,7 +41,7 @@ GamutGenerator::GamutGenerator(const std::string& java_path,
                                const std::string& jar_path, int tmpfile_seed)
     : java_path_(java_path),
       jar_path_(jar_path),
-      rng_(tmpfile_seed == 0 ? time(nullptr) : tmpfile_seed),
+      rng_(tmpfile_seed == 0 ? std::random_device{}() : tmpfile_seed),
       rand_string_(kAlphaChars) {}
 
 std::shared_ptr<const Game> GamutGenerator::GenerateGame(

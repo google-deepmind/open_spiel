@@ -14,7 +14,7 @@
 
 #include "open_spiel/algorithms/get_all_states.h"
 
-#include "open_spiel/games/tic_tac_toe.h"
+#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace algorithms = open_spiel::algorithms;

@@ -23,7 +23,7 @@
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
-#include "open_spiel/games/gin_rummy.h"
+#include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

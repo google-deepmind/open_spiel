@@ -47,7 +47,8 @@ void RandomSimTest(const Game& game, int num_sims, bool serialize = true,
                    bool verbose = true, bool mask_test = true,
                    const std::function<void(const State&)>& state_checker_fn =
                        &DefaultStateChecker,
-                   int mean_field_population = -1);
+                   int mean_field_population = -1,
+                   std::shared_ptr<Observer> observer = nullptr);
 
 // Perform num_sims random simulations of the specified game. Also tests the
 // Undo function. Note: for every step in the simulation, the entire simulation

@@ -129,7 +129,7 @@ def main(argv):
       params: Params,
       inputs: np.ndarray,
       targets: np.ndarray,
-  ) -> jnp.DeviceArray:
+  ) -> jax.Array:
     """Cross-entropy loss."""
     assert targets.dtype == np.int32
     log_probs = net.apply(params, inputs)
@@ -140,7 +140,7 @@ def main(argv):
       params: Params,
       inputs: np.ndarray,
       targets: np.ndarray,
-  ) -> jnp.DeviceArray:
+  ) -> jax.Array:
     """Classification accuracy."""
     predictions = net.apply(params, inputs)
     return jnp.mean(jnp.argmax(predictions, axis=-1) == targets)

@@ -135,5 +135,5 @@ InformationStateString(2) = "Observing player: 2. Terminal. History string: 0, 0
 InformationStateTensor(0): ◉
 InformationStateTensor(1): ◉
 InformationStateTensor(2): ◉
-Rewards() = [0.444444444444444, 0.444444444444444, 1]
-Returns() = [0.444444444444444, 0.444444444444444, 1]
+Rewards() = [0.444444, 0.444444, 1]
+Returns() = [0.444444, 0.444444, 1]

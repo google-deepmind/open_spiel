@@ -76,6 +76,8 @@ std::string StateToString(int x, int t, Player player_id, bool is_chance_init) {
 
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
+RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
 }  // namespace
 
 CrowdModellingState::CrowdModellingState(std::shared_ptr<const Game> game,

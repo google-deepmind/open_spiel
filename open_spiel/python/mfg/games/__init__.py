@@ -25,7 +25,9 @@ Registration looks like this:
 pyspiel.register_game(_GAME_TYPE, KuhnPokerGame)
 ```
 """
+from open_spiel.python.mfg.games import crowd_avoidance
 from open_spiel.python.mfg.games import crowd_modelling
 from open_spiel.python.mfg.games import dynamic_routing
 from open_spiel.python.mfg.games import linear_quadratic
+from open_spiel.python.mfg.games import periodic_aversion
 from open_spiel.python.mfg.games import predator_prey

@@ -52,7 +52,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
 ObservationString(1) = "0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
-ChanceOutcomes() = [(0, 0.3333333333333333), (1, 0.3333333333333333), (2, 0.3333333333333333)]
+ChanceOutcomes() = [(0,0.333333), (1,0.333333), (2,0.333333)]
 LegalActions() = [0, 1, 2]
 StringLegalActions() = ["0", "1", "2"]
 
@@ -84,7 +84,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "1\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
 ObservationString(1) = "0\n        a b c \nplayer0 0 0 0 \nplayer1 0 0 0 \n+--------+\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n|        |\n+--------+\n"
-ChanceOutcomes() = [(0, 0.5), (2, 0.5)]
+ChanceOutcomes() = [(0,0.5), (2,0.5)]
 LegalActions() = [0, 2]
 StringLegalActions() = ["0", "2"]
 

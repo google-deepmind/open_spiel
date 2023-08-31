@@ -172,6 +172,14 @@ add_executable(tabular_exploitability_test tabular_exploitability_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(tabular_exploitability_test tabular_exploitability_test)
 
+add_executable(tabular_sarsa_test tabular_sarsa_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(tabular_sarsa_test tabular_sarsa_test)
+
+add_executable(tabular_q_learning_test tabular_q_learning_test.cc
+    $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
+add_test(tabular_q_learning_test tabular_q_learning_test)
+
 add_executable(tensor_game_utils_test tensor_game_utils_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(tensor_game_utils_test tensor_game_utils_test)
