@@ -118,11 +118,8 @@ class OutcomeSamplingSolver(mccfr.MCCFRSolverBase):
     for aidx in range(num_legal_actions):
       value_estimate += policy[aidx] * child_values[aidx]
 
+    # Update regrets and avg strategies
     if cur_player == update_player:
-      # Now the regret and avg strategy updates.
-      policy = self._regret_matching(infostate_info[mccfr.REGRET_INDEX],
-                                     num_legal_actions)
-
       # Estimate for the counterfactual value of the policy.
       cf_value = value_estimate * opp_reach / sample_reach
 
@@ -139,6 +136,10 @@ class OutcomeSamplingSolver(mccfr.MCCFRSolverBase):
         cf_action_value = child_values[aidx] * opp_reach / sample_reach
         self._add_regret(info_state_key, aidx, cf_action_value - cf_value)
 
+      # Update average policy using the updated policy
+      policy = self._regret_matching(infostate_info[mccfr.REGRET_INDEX],
+                                     num_legal_actions)
+      
       # update the average policy
       for aidx in range(num_legal_actions):
         increment = my_reach * policy[aidx] / sample_reach
