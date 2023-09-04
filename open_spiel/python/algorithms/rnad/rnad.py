@@ -124,7 +124,9 @@ class EntropySchedule:
     iteration_size = (last_size * beyond + size * (1 - beyond))
 
     update_target_net = jnp.logical_and(
-        learner_step > 0, jnp.sum(learner_step == iteration_start))
+        learner_step > 0,
+        jnp.sum(learner_step == iteration_start + iteration_size - 1),
+    )
     alpha = jnp.minimum(
         (2.0 * (learner_step - iteration_start)) / iteration_size, 1.0)
 
