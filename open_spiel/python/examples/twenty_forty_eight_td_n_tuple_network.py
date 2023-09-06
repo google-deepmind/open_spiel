@@ -138,5 +138,6 @@ def main(_):
       largest_tile = 0
       max_score = 0
 
+
 if __name__ == "__main__":
   app.run(main)
