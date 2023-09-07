@@ -17,17 +17,28 @@
 
 // Common definitions and includes for pybind code.
 
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
+#include "pybind11/include/pybind11/cast.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/functional.h"
-#include "pybind11/include/pybind11/numpy.h"
-#include "pybind11/include/pybind11/operators.h"
+#include "pybind11/include/pybind11/detail/smart_holder_type_casters.h"
+#include "pybind11/include/pybind11/functional.h"  // IWYU pragma: keep
+#include "pybind11/include/pybind11/numpy.h"  // IWYU pragma: keep
+#include "pybind11/include/pybind11/operators.h"  // IWYU pragma: keep
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/pytypes.h"
-#include "pybind11/include/pybind11/smart_holder.h"
-#include "pybind11/include/pybind11/stl.h"
+#include "pybind11/include/pybind11/smart_holder.h"  // IWYU pragma: keep
+#include "pybind11/include/pybind11/stl.h"  // IWYU pragma: keep
 
 // Runtime errors happen if we're inconsistent about whether or not a type has
 // PYBIND11_SMART_HOLDER_TYPE_CASTERS applied to it or not. So we do it mostly
@@ -72,6 +83,136 @@ PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::tensor_game::TensorGame);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Bot);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::algorithms::MCTSBot);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::algorithms::ISMCTSBot);
+
+namespace open_spiel {
+// Trampoline helper class to allow implementing Bots in Python. See
+// https://pybind11.readthedocs.io/en/stable/advanced/classes.html#overriding-virtual-functions-in-python
+template <class BotBase = Bot>
+class PyBot : public BotBase {
+ public:
+  // We need the bot constructor
+  using BotBase::BotBase;
+  ~PyBot() override = default;
+
+  // Choose and execute an action in a game. The bot should return its
+  // distribution over actions and also its selected action.
+  open_spiel::Action Step(const State& state) override {
+    PYBIND11_OVERLOAD_PURE_NAME(
+        open_spiel::Action,  // Return type (must be simple token)
+        BotBase,             // Parent class
+        "step",              // Name of function in Python
+        Step,                // Name of function in C++
+        state                // Arguments
+    );
+  }
+
+  // Restart at the specified state.
+  void Restart() override {
+    PYBIND11_OVERLOAD_NAME(
+        void,       // Return type (must be a simple token for macro parser)
+        BotBase,    // Parent class
+        "restart",  // Name of function in Python
+        Restart,    // Name of function in C++
+        // The trailing coma after Restart is necessary to say "No argument"
+    );
+  }
+  bool ProvidesForceAction() override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,     // Return type (must be a simple token for macro parser)
+        BotBase,  // Parent class
+        "provides_force_action",  // Name of function in Python
+        ProvidesForceAction,      // Name of function in C++
+                                  // Arguments
+    );
+  }
+  void ForceAction(const State& state, Action action) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,     // Return type (must be a simple token for macro parser)
+        BotBase,  // Parent class
+        "force_action",  // Name of function in Python
+        ForceAction,     // Name of function in C++
+        state,           // Arguments
+        action);
+  }
+  void InformAction(const State& state, Player player_id,
+                    Action action) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,     // Return type (must be a simple token for macro parser)
+        BotBase,  // Parent class
+        "inform_action",  // Name of function in Python
+        InformAction,     // Name of function in C++
+        state,            // Arguments
+        player_id, action);
+  }
+  void InformActions(const State& state,
+                     const std::vector<Action>& actions) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,     // Return type (must be a simple token for macro parser)
+        BotBase,  // Parent class
+        "inform_actions",  // Name of function in Python
+        InformActions,     // Name of function in C++
+        state,             // Arguments
+        actions);
+  }
+
+  void RestartAt(const State& state) override {
+    PYBIND11_OVERLOAD_NAME(
+        void,          // Return type (must be a simple token for macro parser)
+        BotBase,       // Parent class
+        "restart_at",  // Name of function in Python
+        RestartAt,     // Name of function in C++
+        state          // Arguments
+    );
+  }
+  bool ProvidesPolicy() override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,     // Return type (must be a simple token for macro parser)
+        BotBase,  // Parent class
+        "provides_policy",  // Name of function in Python
+        ProvidesPolicy,     // Name of function in C++
+                            // Arguments
+    );
+  }
+  ActionsAndProbs GetPolicy(const State& state) override {
+    PYBIND11_OVERLOAD_NAME(ActionsAndProbs,  // Return type (must be a simple
+                                             // token for macro parser)
+                           BotBase,          // Parent class
+                           "get_policy",     // Name of function in Python
+                           GetPolicy,        // Name of function in C++
+                           state);
+  }
+  std::pair<ActionsAndProbs, Action> StepWithPolicy(
+      const State& state) override {
+    using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
+    PYBIND11_OVERLOAD_NAME(
+        step_retval_t,  // Return type (must be a simple token for macro parser)
+        BotBase,        // Parent class
+        "step_with_policy",  // Name of function in Python
+        StepWithPolicy,      // Name of function in C++
+        state                // Arguments
+    );
+  }
+
+  bool IsClonable() const override {
+    PYBIND11_OVERLOAD_NAME(
+        bool,           // Return type (must be a simple token for macro parser)
+        BotBase,        // Parent class
+        "is_clonable",  // Name of function in Python
+        IsClonable,     // Name of function in C++
+    );
+  }
+
+  std::unique_ptr<Bot> Clone() override {
+    using BotUniquePtr = std::unique_ptr<Bot>;
+    PYBIND11_OVERLOAD_NAME(
+        BotUniquePtr,  // Return type (must be a simple token for macro parser)
+        BotBase,       // Parent class
+        "clone",       // Name of function in Python
+        Clone,         // Name of function in C++
+    );
+  }
+};
+}  // namespace open_spiel
 
 // Custom caster for GameParameter (essentially a variant).
 namespace pybind11 {

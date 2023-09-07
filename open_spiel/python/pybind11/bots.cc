@@ -18,15 +18,23 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/algorithms/is_mcts.h"
 #include "open_spiel/algorithms/mcts.h"
 #include "open_spiel/bots/gin_rummy/simple_gin_rummy_bot.h"
 #include "open_spiel/bots/uci/uci_bot.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
+#include "pybind11/include/pybind11/cast.h"
+#include "pybind11/include/pybind11/detail/common.h"
+#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/include/pybind11/pytypes.h"
+#include "pybind11/include/pybind11/smart_holder.h"
 
 // Optional headers.
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
@@ -41,137 +49,10 @@ using ::open_spiel::algorithms::SearchNode;
 
 namespace py = ::pybind11;
 
-// Trampoline helper class to allow implementing Bots in Python. See
-// https://pybind11.readthedocs.io/en/stable/advanced/classes.html#overriding-virtual-functions-in-python
-class PyBot : public Bot {
- public:
-  // We need the bot constructor
-  using Bot::Bot;
-  ~PyBot() override = default;
-
-  using step_retval_t = std::pair<ActionsAndProbs, open_spiel::Action>;
-  using BotUniquePtr = std::unique_ptr<Bot>;
-
-  // Choose and execute an action in a game. The bot should return its
-  // distribution over actions and also its selected action.
-  open_spiel::Action Step(const State& state) override {
-    PYBIND11_OVERLOAD_PURE_NAME(
-        open_spiel::Action,  // Return type (must be simple token)
-        Bot,                 // Parent class
-        "step",              // Name of function in Python
-        Step,                // Name of function in C++
-        state                // Arguments
-    );
-  }
-
-  // Restart at the specified state.
-  void Restart() override {
-    PYBIND11_OVERLOAD_NAME(
-        void,       // Return type (must be a simple token for macro parser)
-        Bot,        // Parent class
-        "restart",  // Name of function in Python
-        Restart,    // Name of function in C++
-        // The trailing coma after Restart is necessary to say "No argument"
-    );
-  }
-  bool ProvidesForceAction() override {
-    PYBIND11_OVERLOAD_NAME(
-        bool,  // Return type (must be a simple token for macro parser)
-        Bot,   // Parent class
-        "provides_force_action",  // Name of function in Python
-        ProvidesForceAction,      // Name of function in C++
-                                  // Arguments
-    );
-  }
-  void ForceAction(const State& state, Action action) override {
-    PYBIND11_OVERLOAD_NAME(
-        void,  // Return type (must be a simple token for macro parser)
-        Bot,   // Parent class
-        "force_action",  // Name of function in Python
-        ForceAction,     // Name of function in C++
-        state,           // Arguments
-        action);
-  }
-  void InformAction(const State& state, Player player_id,
-                    Action action) override {
-    PYBIND11_OVERLOAD_NAME(
-        void,  // Return type (must be a simple token for macro parser)
-        Bot,   // Parent class
-        "inform_action",  // Name of function in Python
-        InformAction,     // Name of function in C++
-        state,            // Arguments
-        player_id, action);
-  }
-  void InformActions(const State& state,
-                     const std::vector<Action>& actions) override {
-    PYBIND11_OVERLOAD_NAME(
-        void,  // Return type (must be a simple token for macro parser)
-        Bot,   // Parent class
-        "inform_actions",  // Name of function in Python
-        InformActions,     // Name of function in C++
-        state,             // Arguments
-        actions);
-  }
-
-  void RestartAt(const State& state) override {
-    PYBIND11_OVERLOAD_NAME(
-        void,          // Return type (must be a simple token for macro parser)
-        Bot,           // Parent class
-        "restart_at",  // Name of function in Python
-        RestartAt,     // Name of function in C++
-        state          // Arguments
-    );
-  }
-  bool ProvidesPolicy() override {
-    PYBIND11_OVERLOAD_NAME(
-        bool,  // Return type (must be a simple token for macro parser)
-        Bot,   // Parent class
-        "provides_policy",  // Name of function in Python
-        ProvidesPolicy,     // Name of function in C++
-                            // Arguments
-    );
-  }
-  ActionsAndProbs GetPolicy(const State& state) override {
-    PYBIND11_OVERLOAD_NAME(ActionsAndProbs,  // Return type (must be a simple
-                                             // token for macro parser)
-                           Bot,              // Parent class
-                           "get_policy",     // Name of function in Python
-                           GetPolicy,        // Name of function in C++
-                           state);
-  }
-  std::pair<ActionsAndProbs, Action> StepWithPolicy(
-      const State& state) override {
-    PYBIND11_OVERLOAD_NAME(
-        step_retval_t,  // Return type (must be a simple token for macro parser)
-        Bot,            // Parent class
-        "step_with_policy",  // Name of function in Python
-        StepWithPolicy,      // Name of function in C++
-        state                // Arguments
-    );
-  }
-
-  bool IsClonable() const override {
-    PYBIND11_OVERLOAD_NAME(
-        bool,           // Return type (must be a simple token for macro parser)
-        Bot,            // Parent class
-        "is_clonable",  // Name of function in Python
-        IsClonable,     // Name of function in C++
-    );
-  }
-
-  std::unique_ptr<Bot> Clone() override {
-    PYBIND11_OVERLOAD_NAME(
-        BotUniquePtr,  // Return type (must be a simple token for macro parser)
-        Bot,           // Parent class
-        "clone",       // Name of function in Python
-        Clone,         // Name of function in C++
-    );
-  }
-};
 }  // namespace
 
 void init_pyspiel_bots(py::module& m) {
-  py::classh<Bot, PyBot> bot(m, "Bot");
+  py::classh<Bot, PyBot<Bot>> bot(m, "Bot");
   bot.def(py::init<>())
       .def("step", &Bot::Step)
       .def("restart", &Bot::Restart)
