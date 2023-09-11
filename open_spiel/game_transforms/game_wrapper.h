@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 
 // Wraps a game, forwarding everything to the original implementation.
 // Transforms can inherit from this, overriding only what they need.
@@ -131,6 +132,15 @@ class WrappedGame : public Game {
     return game_->ObservationTensorShape();
   }
 
+  TensorLayout InformationStateTensorLayout() const override {
+    return game_->InformationStateTensorLayout();
+  }
+  TensorLayout ObservationTensorLayout() const override {
+    return game_->ObservationTensorLayout();
+  }
+  std::vector<int> PolicyTensorShape() const override {
+    return game_->PolicyTensorShape();
+  }
   int MaxGameLength() const override { return game_->MaxGameLength(); }
   int MaxChanceNodesInHistory() const override {
     return game_->MaxChanceNodesInHistory();
