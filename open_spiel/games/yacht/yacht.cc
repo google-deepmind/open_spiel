@@ -32,33 +32,15 @@ namespace yacht {
 namespace {
 
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
-    std::pair<Action, double>(0, 1.0 / 18),
-    std::pair<Action, double>(1, 1.0 / 18),
-    std::pair<Action, double>(2, 1.0 / 18),
-    std::pair<Action, double>(3, 1.0 / 18),
-    std::pair<Action, double>(4, 1.0 / 18),
-    std::pair<Action, double>(5, 1.0 / 18),
-    std::pair<Action, double>(6, 1.0 / 18),
-    std::pair<Action, double>(7, 1.0 / 18),
-    std::pair<Action, double>(8, 1.0 / 18),
-    std::pair<Action, double>(9, 1.0 / 18),
-    std::pair<Action, double>(10, 1.0 / 18),
-    std::pair<Action, double>(11, 1.0 / 18),
-    std::pair<Action, double>(12, 1.0 / 18),
-    std::pair<Action, double>(13, 1.0 / 18),
-    std::pair<Action, double>(14, 1.0 / 18),
-    std::pair<Action, double>(15, 1.0 / 36),
-    std::pair<Action, double>(16, 1.0 / 36),
-    std::pair<Action, double>(17, 1.0 / 36),
-    std::pair<Action, double>(18, 1.0 / 36),
-    std::pair<Action, double>(19, 1.0 / 36),
-    std::pair<Action, double>(20, 1.0 / 36),
+    std::pair<Action, double>(1, 1.0 / 6),
+    std::pair<Action, double>(2, 1.0 / 6),
+    std::pair<Action, double>(3, 1.0 / 6),
+    std::pair<Action, double>(4, 1.0 / 6),
+    std::pair<Action, double>(5, 1.0 / 6),
+    std::pair<Action, double>(6, 1.0 / 6),
 };
 
-const std::vector<std::vector<int>> kChanceOutcomeValues = {
-    {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}, {2, 3}, {2, 4},
-    {2, 5}, {2, 6}, {3, 4}, {3, 5}, {3, 6}, {4, 5}, {4, 6},
-    {5, 6}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}};
+const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
 
 // Facts about the game
 const GameType kGameType{/*short_name=*/"yacht",
@@ -156,9 +138,8 @@ Player YachtState::CurrentPlayer() const {
 
 int YachtState::Opponent(int player) const { return 1 - player; }
 
-void YachtState::RollDice(int outcome) {
-  dice_.push_back(kChanceOutcomeValues[outcome][0]);
-  dice_.push_back(kChanceOutcomeValues[outcome][1]);
+void YachtState::RollDie(int outcome) {
+  dice_.push_back(kChanceOutcomeValues[outcome - 1]);
 }
 
 int YachtState::DiceValue(int i) const {

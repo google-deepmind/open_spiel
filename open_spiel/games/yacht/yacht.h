@@ -82,7 +82,7 @@ class YachtState : public State {
 
  private:
   void SetupInitialBoard();
-  void RollDice(int outcome);
+  void RollDie(int outcome);
   bool IsPosInHome(int player, int pos) const;
   bool UsableDiceOutcome(int outcome) const;
   int NumOppCheckers(int player, int pos) const;
