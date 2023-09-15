@@ -15,13 +15,16 @@
 #ifndef OPEN_SPIEL_GAMES_YACHT_H_
 #define OPEN_SPIEL_GAMES_YACHT_H_
 
-#include <array>
 #include <memory>
-#include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace yacht {
@@ -30,20 +33,10 @@ inline constexpr const int kNumPlayers = 2;
 inline constexpr const int kNumChanceOutcomes = 21;
 inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
-inline constexpr const int kPassPos = -1;
-
-// TODO: look into whether these can be set to 25 and -2 to avoid having a
-// separate helper function (PositionToStringHumanReadable) to convert moves
-// to strings.
-inline constexpr const int kBarPos = 100;
-inline constexpr const int kScorePos = 101;
+inline constexpr const int kMinUtility = -1;
+inline constexpr const int kMaxUtility = 1;
 
 inline constexpr const int kNumDistinctActions = 1;
-
-// See ObservationTensorShape for details.
-inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
-inline constexpr const int kStateEncodingSize =
-    3 * kNumPlayers + kBoardEncodingSize + 2;
 
 class YachtGame;
 
@@ -102,8 +95,6 @@ class YachtState : public State {
   Player cur_player_;
   Player prev_player_;
   int turns_;
-  int x_turns_;
-  int o_turns_;
   std::vector<int> dice_;    // Current dice.
   std::vector<int> scores_;  // Checkers returned home by each player.
   std::vector<std::vector<int>> board_;  // Checkers for each player on points.
@@ -131,9 +122,9 @@ class YachtGame : public Game {
   int MaxChanceNodesInHistory() const override { return MaxGameLength() + 1; }
 
   int NumPlayers() const override { return 2; }
-  double MinUtility() const override { return -MaxUtility(); }
+  double MinUtility() const override { return kMinUtility; }
   absl::optional<double> UtilitySum() const override { return 0; }
-  double MaxUtility() const override;
+  double MaxUtility() const override { return kMaxUtility; };
 };
 
 }  // namespace yacht

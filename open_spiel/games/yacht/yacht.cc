@@ -14,28 +14,22 @@
 
 #include "open_spiel/games/yacht/yacht.h"
 
-#include <algorithm>
-#include <cstdlib>
 #include <memory>
-#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace yacht {
 namespace {
-
-// A few constants to help with the conversion to human-readable string formats.
-// TODO: remove these once we've changed kBarPos and kScorePos (see TODO in
-// header).
-constexpr int kNumBarPosHumanReadable = 25;
-constexpr int kNumOffPosHumanReadable = -2;
 
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
     std::pair<Action, double>(0, 1.0 / 18),
@@ -90,39 +84,9 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
-std::string PositionToString(int pos) {
-  switch (pos) {
-    case kBarPos:
-      return "Bar";
-    case kScorePos:
-      return "Score";
-    case -1:
-      return "Pass";
-    default:
-      return absl::StrCat(pos);
-  }
-}
+std::string CurPlayerToString(Player cur_player) { return "Some dice"; }
 
-std::string CurPlayerToString(Player cur_player) {
-  switch (cur_player) {
-    case kChancePlayerId:
-      return "*";
-    case kTerminalPlayerId:
-      return "T";
-    default:
-      SpielFatalError(absl::StrCat("Unrecognized player id: ", cur_player));
-  }
-}
-
-std::string PositionToStringHumanReadable(int pos) {
-  if (pos == kNumBarPosHumanReadable) {
-    return "Bar";
-  } else if (pos == kNumOffPosHumanReadable) {
-    return "Off";
-  } else {
-    return PositionToString(pos);
-  }
-}
+std::string PositionToStringHumanReadable(int pos) { return "Pos"; }
 
 std::string YachtState::ActionToString(Player player, Action move_id) const {
   return "actionToString";
@@ -140,7 +104,6 @@ void YachtState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   int opponent = Opponent(player);
-  SPIEL_CHECK_EQ(values.size(), kStateEncodingSize);
   auto value_it = values.begin();
   // The format of this vector is described in Section 3.4 of "G. Tesauro,
   // Practical issues in temporal-difference learning, 1994."
@@ -175,8 +138,6 @@ YachtState::YachtState(std::shared_ptr<const Game> game)
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
       turns_(-1),
-      x_turns_(0),
-      o_turns_(0),
       dice_({}),
       scores_({0, 0}),
       board_(
@@ -303,8 +264,7 @@ std::unique_ptr<State> YachtState::Clone() const {
   return std::unique_ptr<State>(new YachtState(*this));
 }
 
-void YachtState::SetState(int cur_player,
-                          const std::vector<int>& dice,
+void YachtState::SetState(int cur_player, const std::vector<int>& dice,
                           const std::vector<int>& scores,
                           const std::vector<std::vector<int>>& board) {
   cur_player_ = cur_player;
@@ -314,8 +274,6 @@ void YachtState::SetState(int cur_player,
 }
 
 YachtGame::YachtGame(const GameParameters& params) : Game(kGameType, params) {}
-
-double YachtGame::MaxUtility() const { return 1; }
 
 }  // namespace yacht
 }  // namespace open_spiel
