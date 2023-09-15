@@ -30,7 +30,7 @@ namespace open_spiel {
 namespace yacht {
 
 inline constexpr const int kNumPlayers = 2;
-inline constexpr const int kNumChanceOutcomes = 21;
+inline constexpr const int kNumChanceOutcomes = 6;
 inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
 inline constexpr const int kMinUtility = -1;
@@ -110,9 +110,9 @@ class YachtGame : public Game {
     return std::unique_ptr<State>(new YachtState(shared_from_this()));
   }
 
-  // On the first turn there are 30 outcomes: 15 for each player (rolls without
-  // the doubles).
-  int MaxChanceOutcomes() const override { return 30; }
+  // Model multiple dice rolls as a sequence of chance outcomes, so max
+  // chance outcomes is ways 6.
+  int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
