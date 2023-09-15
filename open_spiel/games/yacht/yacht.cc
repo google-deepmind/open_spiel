@@ -146,11 +146,7 @@ bool YachtState::UsableDiceOutcome(int outcome) const {
 }
 
 std::string YachtState::DiceToString(int outcome) const {
-  if (outcome > 6) {
-    return std::to_string(outcome - 6) + "u";
-  } else {
-    return std::to_string(outcome);
-  }
+  return std::to_string(outcome);
 }
 
 std::vector<Action> YachtState::LegalActions() const {
