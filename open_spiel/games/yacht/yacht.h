@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -72,8 +71,6 @@ class YachtState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
-  void ObservationTensor(Player player,
-                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // Setter function used for debugging and tests. Note: this does not set the
@@ -81,14 +78,10 @@ class YachtState : public State {
   // set this way!
   void SetState(int cur_player, const std::vector<int>& dice,
                 const std::vector<int>& scores,
-                const std::vector<std::vector<int>>& board);
+                const std::vector<ScoringSheet>& scoring_sheets);
 
   // Returns the opponent of the specified player.
   int Opponent(int player) const;
-
-  // Count the total number of checkers for this player (on the board, in the
-  // bar, and have borne off). Should be 15 for the standard game.
-  int CountTotalCheckers(int player) const;
 
   // Accessor functions for some of the specific data.
   int player_turns() const { return turns_; }
@@ -99,11 +92,9 @@ class YachtState : public State {
   void DoApplyAction(Action move_id) override;
 
  private:
-  void SetupInitialBoard();
   void RollDie(int outcome);
   bool IsPosInHome(int player, int pos) const;
   bool UsableDiceOutcome(int outcome) const;
-  int NumOppCheckers(int player, int pos) const;
   std::string DiceToString(int outcome) const;
   int DiceValue(int i) const;
   int HighestUsableDiceOutcome() const;
@@ -115,7 +106,7 @@ class YachtState : public State {
   int turns_;
   std::vector<int> dice_;    // Current dice.
   std::vector<int> scores_;  // Checkers returned home by each player.
-  std::vector<std::vector<int>> board_;  // Checkers for each player on points.
+  std::vector<ScoringSheet> scoring_sheets_;  // Scoring sheet for each player.
 };
 
 class YachtGame : public Game {

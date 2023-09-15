@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
@@ -80,41 +79,6 @@ std::string YachtState::ObservationString(Player player) const {
   return ToString();
 }
 
-void YachtState::ObservationTensor(Player player,
-                                   absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  int opponent = Opponent(player);
-  auto value_it = values.begin();
-  // The format of this vector is described in Section 3.4 of "G. Tesauro,
-  // Practical issues in temporal-difference learning, 1994."
-  // https://link.springer.com/article/10.1007/BF00992697
-  // The values of the dice are added in the last two positions of the vector.
-  for (int count : board_[player]) {
-    *value_it++ = ((count == 1) ? 1 : 0);
-    *value_it++ = ((count == 2) ? 1 : 0);
-    *value_it++ = ((count == 3) ? 1 : 0);
-    *value_it++ = ((count > 3) ? (count - 3) : 0);
-  }
-  for (int count : board_[opponent]) {
-    *value_it++ = ((count == 1) ? 1 : 0);
-    *value_it++ = ((count == 2) ? 1 : 0);
-    *value_it++ = ((count == 3) ? 1 : 0);
-    *value_it++ = ((count > 3) ? (count - 3) : 0);
-  }
-  *value_it++ = (scores_[player]);
-  *value_it++ = ((cur_player_ == player) ? 1 : 0);
-
-  *value_it++ = (scores_[opponent]);
-  *value_it++ = ((cur_player_ == opponent) ? 1 : 0);
-
-  *value_it++ = ((!dice_.empty()) ? dice_[0] : 0);
-  *value_it++ = ((dice_.size() > 1) ? dice_[1] : 0);
-
-  SPIEL_CHECK_EQ(value_it, values.end());
-}
-
 YachtState::YachtState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
@@ -122,15 +86,7 @@ YachtState::YachtState(std::shared_ptr<const Game> game)
       turns_(-1),
       dice_({}),
       scores_({0, 0}),
-      board_(
-          {std::vector<int>(kNumPoints, 0), std::vector<int>(kNumPoints, 0)}) {
-  SetupInitialBoard();
-}
-
-void YachtState::SetupInitialBoard() {
-  int i = 0;
-  i++;
-}
+      scoring_sheets_({ScoringSheet(), ScoringSheet()}) {}
 
 Player YachtState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
@@ -189,27 +145,12 @@ bool YachtState::UsableDiceOutcome(int outcome) const {
   return (outcome >= 1 && outcome <= 6);
 }
 
-int YachtState::NumOppCheckers(int player, int pos) const {
-  return board_[Opponent(player)][pos];
-}
-
 std::string YachtState::DiceToString(int outcome) const {
   if (outcome > 6) {
     return std::to_string(outcome - 6) + "u";
   } else {
     return std::to_string(outcome);
   }
-}
-
-int YachtState::CountTotalCheckers(int player) const {
-  int total = 0;
-  for (int i = 0; i < 24; ++i) {
-    SPIEL_CHECK_GE(board_[player][i], 0);
-    total += board_[player][i];
-  }
-  SPIEL_CHECK_GE(scores_[player], 0);
-  total += scores_[player];
-  return total;
 }
 
 std::vector<Action> YachtState::LegalActions() const {
@@ -247,11 +188,11 @@ std::unique_ptr<State> YachtState::Clone() const {
 
 void YachtState::SetState(int cur_player, const std::vector<int>& dice,
                           const std::vector<int>& scores,
-                          const std::vector<std::vector<int>>& board) {
+                          const std::vector<ScoringSheet>& scoring_sheets) {
   cur_player_ = cur_player;
   dice_ = dice;
   scores_ = scores;
-  board_ = board;
+  scoring_sheets_ = scoring_sheets;
 }
 
 YachtGame::YachtGame(const GameParameters& params) : Game(kGameType, params) {}
