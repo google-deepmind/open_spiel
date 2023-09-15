@@ -14,23 +14,20 @@
 
 #include "open_spiel/games/yacht/yacht.h"
 
-#include <algorithm>
-#include <random>
-
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
-namespace backgammon {
+namespace yacht {
 namespace {
 
 void TrivialTest() { SPIEL_CHECK_TRUE(true); }
 
 }  // namespace
-}  // namespace backgammon
+}  // namespace yacht
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::testing::LoadGameTest("yacht");
-  open_spiel::backgammon::TrivialTest();
+  open_spiel::yacht::TrivialTest();
 }
