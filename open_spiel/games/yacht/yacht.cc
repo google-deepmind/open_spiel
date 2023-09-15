@@ -157,19 +157,7 @@ std::vector<Action> YachtState::LegalActions() const {
 
 std::vector<std::pair<Action, double>> YachtState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  if (turns_ == -1) {
-    // Doubles not allowed for the initial roll to determine who goes first.
-    // Range 0-14: X goes first, range 15-29: O goes first.
-    std::vector<std::pair<Action, double>> outcomes;
-    outcomes.reserve(30);
-    const double uniform_prob = 1.0 / 30.0;
-    for (Action action = 0; action < 30; ++action) {
-      outcomes.push_back({action, uniform_prob});
-    }
-    return outcomes;
-  } else {
-    return kChanceOutcomes;
-  }
+  return kChanceOutcomes;
 }
 
 std::string YachtState::ToString() const { return "haha dice: 1 2 3 4 5"; }
