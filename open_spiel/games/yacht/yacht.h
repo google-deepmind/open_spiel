@@ -40,6 +40,24 @@ inline constexpr const int kNumDistinctActions = 1;
 
 class YachtGame;
 
+enum CategoryValue { empty, scratched, filled };
+
+class ScoringSheet {
+ public:
+  CategoryValue ones = empty;
+  CategoryValue twos = empty;
+  CategoryValue threes = empty;
+  CategoryValue fours = empty;
+  CategoryValue fives = empty;
+  CategoryValue sixes = empty;
+  CategoryValue full_house = empty;
+  CategoryValue four_of_a_kind = empty;
+  CategoryValue little_straight = empty;
+  CategoryValue big_straight = empty;
+  CategoryValue choice = empty;
+  CategoryValue yacht = empty;
+};
+
 class YachtState : public State {
  public:
   YachtState(const YachtState&) = default;
