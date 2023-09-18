@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Contract Bridge"
 GameType.max_num_players = 4
 GameType.min_num_players = 4
-GameType.parameter_specification = ["dealer_vul", "non_dealer_vul", "use_double_dummy_result"]
+GameType.parameter_specification = ["dealer_vul", "non_dealer_vul", "num_tricks", "use_double_dummy_result"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 90
 PolicyTensorShape() = [90]
 MaxChanceOutcomes() = 52
-GetParameters() = {dealer_vul=False,non_dealer_vul=False,use_double_dummy_result=False}
+GetParameters() = {dealer_vul=False,non_dealer_vul=False,num_tricks=2,use_double_dummy_result=False}
 NumPlayers() = 4
 MinUtility() = -7600.0
 MaxUtility() = 7600.0

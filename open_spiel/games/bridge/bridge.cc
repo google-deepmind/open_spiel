@@ -67,6 +67,8 @@ const GameType kGameType{/*short_name=*/"bridge",
                              {"dealer_vul", GameParameter(false)},
                              // If true, the non-dealer's side is vulnerable.
                              {"non_dealer_vul", GameParameter(false)},
+                             // Number of played tricks in observation tensor
+                             {"num_tricks", GameParameter(true)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -130,10 +132,12 @@ BridgeGame::BridgeGame(const GameParameters& params)
 BridgeState::BridgeState(std::shared_ptr<const Game> game,
                          bool use_double_dummy_result,
                          bool is_dealer_vulnerable,
-                         bool is_non_dealer_vulnerable)
+                         bool is_non_dealer_vulnerable,
+                         int num_tricks)
     : State(game),
       use_double_dummy_result_(use_double_dummy_result),
-      is_vulnerable_{is_dealer_vulnerable, is_non_dealer_vulnerable} {
+      is_vulnerable_{is_dealer_vulnerable, is_non_dealer_vulnerable},
+      num_tricks_(num_tricks) {
   possible_contracts_.fill(true);
 }
 
@@ -337,17 +341,6 @@ void BridgeState::WriteObservationTensor(Player player,
     int this_trick_cards_played = num_cards_played_ % kNumPlayers;
     int this_trick_start = history_.size() - this_trick_cards_played;
 
-    // Previous trick.
-    if (current_trick > 0) {
-      int leader = tricks_[current_trick - 1].Leader();
-      for (int i = 0; i < kNumPlayers; ++i) {
-        int card = history_[this_trick_start - kNumPlayers + i].action;
-        int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
-        ptr[relative_player * kNumCards + card] = 1;
-      }
-    }
-    ptr += kNumPlayers * kNumCards;
-
     // Current trick
     if (phase_ != Phase::kGameOver) {
       int leader = tricks_[current_trick].Leader();
@@ -357,13 +350,42 @@ void BridgeState::WriteObservationTensor(Player player,
         ptr[relative_player * kNumCards + card] = 1;
       }
     }
+
     ptr += kNumPlayers * kNumCards;
+
+    // Previous tricks
+    for (int j = current_trick - 1; j >= std::max(0, current_trick - num_tricks_ + 1); --j) {
+      int leader = tricks_[j].Leader();
+      for (int i = 0; i < kNumPlayers; ++i) {
+        int card = history_[this_trick_start - kNumPlayers * (current_trick - j) + i].action;
+        int relative_player = (i + leader + kNumPlayers - player) % kNumPlayers;
+        ptr[relative_player * kNumCards + card] = 1;
+      }
+      ptr += kNumPlayers * kNumCards;
+    }
+
+    // Move pointer for future tricks to have a fixed size tensor
+    if (num_tricks_ > current_trick + 1) {
+      ptr += kNumPlayers * kNumCards * (num_tricks_ - current_trick - 1);
+    }
 
     // Number of tricks taken by each side.
     ptr[num_declarer_tricks_] = 1;
     ptr += kNumTricks;
     ptr[num_cards_played_ / 4 - num_declarer_tricks_] = 1;
     ptr += kNumTricks;
+
+    int kPlayTensorSize =
+        kNumBidLevels                           // What the contract is
+        + kNumDenominations                     // What trumps are
+        + kNumOtherCalls                        // Undoubled / doubled / redoubled
+        + kNumPlayers                           // Who declarer is
+        + kNumVulnerabilities                   // Vulnerability of the declaring side
+        + kNumCards                             // Our remaining cards
+        + kNumCards                             // Dummy's remaining cards
+        + num_tricks_ * kNumPlayers * kNumCards // Number of played tricks
+        + kNumTricks                            // Number of tricks we have won
+        + kNumTricks;                           // Number of tricks they have won
     SPIEL_CHECK_EQ(std::distance(values.begin(), ptr),
                    kPlayTensorSize + kNumObservationTypes);
     SPIEL_CHECK_LE(std::distance(values.begin(), ptr), values.size());
@@ -888,7 +910,7 @@ std::unique_ptr<State> BridgeGame::DeserializeState(
   if (!UseDoubleDummyResult()) return Game::DeserializeState(str);
   auto state = absl::make_unique<BridgeState>(
       shared_from_this(), UseDoubleDummyResult(), IsDealerVulnerable(),
-      IsNonDealerVulnerable());
+      IsNonDealerVulnerable(), NumTricks());
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   const auto separator = absl::c_find(lines, "Double Dummy Results");
   // Double-dummy results.
