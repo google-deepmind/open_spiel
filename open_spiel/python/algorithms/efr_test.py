@@ -21,7 +21,7 @@ from absl.testing import parameterized
 import numpy as np
 
 from open_spiel.python import policy
-import efr
+from open_spiel.python.algorithms import efr
 from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
 import pyspiel
