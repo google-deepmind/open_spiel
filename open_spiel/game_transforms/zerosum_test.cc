@@ -14,7 +14,7 @@
 
 #include "open_spiel/game_transforms/zerosum.h"
 
-#include "open_spiel/games/oh_hell.h"
+#include "open_spiel/games/oh_hell/oh_hell.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/tests/basic_tests.h"
 

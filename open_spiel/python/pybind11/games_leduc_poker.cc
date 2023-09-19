@@ -14,7 +14,7 @@
 
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
 
-#include "open_spiel/games/leduc_poker.h"
+#include "open_spiel/games/leduc_poker/leduc_poker.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 

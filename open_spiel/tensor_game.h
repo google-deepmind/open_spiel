@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -124,6 +125,15 @@ class TensorGame : public NormalFormGame {
   double GetUtility(Player player, const std::vector<Action>& joint_action)
       const override {
     return PlayerUtility(player, joint_action);
+  }
+
+  std::shared_ptr<const matrix_game::MatrixGame> AsMatrixGame() const {
+    SPIEL_CHECK_EQ(NumPlayers(), 2);
+    const GameType& game_type = GetType();
+    return matrix_game::CreateMatrixGame(
+        game_type.short_name, game_type.long_name,
+        action_names_[0], action_names_[1],
+        utilities_[0], utilities_[1]);
   }
 
  private:

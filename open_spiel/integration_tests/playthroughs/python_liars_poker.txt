@@ -864,7 +864,7 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_hand: ◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
-ChanceOutcomes() = [(1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1), (0, 0.1)]
+ChanceOutcomes() = [(1,0.1), (2,0.1), (3,0.1), (4,0.1), (5,0.1), (6,0.1), (7,0.1), (8,0.1), (9,0.1), (0,0.1)]
 LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 StringLegalActions() = ["Deal: 1", "Deal: 2", "Deal: 3", "Deal: 4", "Deal: 5", "Deal: 6", "Deal: 7", "Deal: 8", "Deal: 9", "Deal: 0"]
 
@@ -1702,7 +1702,7 @@ ObservationTensor(1).player: ◯◉
 ObservationTensor(1).private_hand: ◯◯◯◯◯◯◯◯◯◯
 ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
-ChanceOutcomes() = [(1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1), (0, 0.1)]
+ChanceOutcomes() = [(1,0.1), (2,0.1), (3,0.1), (4,0.1), (5,0.1), (6,0.1), (7,0.1), (8,0.1), (9,0.1), (0,0.1)]
 LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 StringLegalActions() = ["Deal: 1", "Deal: 2", "Deal: 3", "Deal: 4", "Deal: 5", "Deal: 6", "Deal: 7", "Deal: 8", "Deal: 9", "Deal: 0"]
 

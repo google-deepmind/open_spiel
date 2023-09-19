@@ -21,9 +21,9 @@
 #include "open_spiel/algorithms/tensor_game_utils.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
-#include "open_spiel/games/efg_game.h"
-#include "open_spiel/games/efg_game_data.h"
-#include "open_spiel/games/nfg_game.h"
+#include "open_spiel/games/efg_game/efg_game.h"
+#include "open_spiel/games/efg_game/efg_game_data.h"
+#include "open_spiel/games/nfg_game/nfg_game.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
@@ -36,6 +36,7 @@
 #include "open_spiel/python/pybind11/games_bridge.h"
 #include "open_spiel/python/pybind11/games_chess.h"
 #include "open_spiel/python/pybind11/games_colored_trails.h"
+#include "open_spiel/python/pybind11/games_dots_and_boxes.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
@@ -480,6 +481,7 @@ PYBIND11_MODULE(pyspiel, m) {
              return py::array_t<double>(game.Shape(), &utilities[0]);
            })
       .def("action_name", &TensorGame::ActionName)
+      .def("as_matrix_game", &TensorGame::AsMatrixGame)
       .def(py::pickle(                                  // Pickle support
           [](std::shared_ptr<const TensorGame> game) {  // __getstate__
             return game->ToString();
@@ -642,6 +644,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
   init_pyspiel_games_chess(m);   // Chess game.
   init_pyspiel_games_colored_trails(m);   // Colored Trails game.
+  init_pyspiel_games_dots_and_boxes(m);   // Dots-and-Boxes game.
   init_pyspiel_games_euchre(m);  // Game-specific functions for euchre.
   init_pyspiel_games_gin_rummy(m);  // Game-specific functions for gin_rummy.
   init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
@@ -664,7 +667,7 @@ PYBIND11_MODULE(pyspiel, m) {
 #if OPEN_SPIEL_BUILD_WITH_HIGC
   init_pyspiel_referee(m);
 #endif
-}
+}  // NOLINT
 
 }  // namespace
 }  // namespace open_spiel

@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/games/gin_rummy.h"
+#include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

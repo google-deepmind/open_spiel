@@ -53,7 +53,7 @@ ObservationString(2) = "@@@@\n@@@@\n@@@@\n@@@@\n\nPlayer: 2\nPos: -1 -1 -1 -1\nP
 ObservationTensor(0): zeros(463)
 ObservationTensor(1): zeros(463)
 ObservationTensor(2): zeros(463)
-ChanceOutcomes() = [(0, 0.1), (1, 0.1), (2, 0.1), (3, 0.1), (4, 0.1), (5, 0.1), (6, 0.1), (7, 0.1), (8, 0.1), (9, 0.1)]
+ChanceOutcomes() = [(0,0.1), (1,0.1), (2,0.1), (3,0.1), (4,0.1), (5,0.1), (6,0.1), (7,0.1), (8,0.1), (9,0.1)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 StringLegalActions() = ["Chance outcome 0", "Chance outcome 1", "Chance outcome 2", "Chance outcome 3", "Chance outcome 4", "Chance outcome 5", "Chance outcome 6", "Chance outcome 7", "Chance outcome 8", "Chance outcome 9"]
 

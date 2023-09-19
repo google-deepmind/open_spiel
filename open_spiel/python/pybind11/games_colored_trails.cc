@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "open_spiel/games/colored_trails.h"
+#include "open_spiel/games/colored_trails/colored_trails.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 

@@ -16,8 +16,8 @@
 
 #include <cmath>
 
-#include "open_spiel/games/pig.h"
-#include "open_spiel/games/tic_tac_toe.h"
+#include "open_spiel/games/pig/pig.h"
+#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

@@ -42,7 +42,7 @@ class EntropySchedule:
 
   Example
     EntropySchedule([3, 5, 10], [2, 4, 1])
-    =>   [0, 3, 6, 11, 16, 21, 26, 10]
+    =>   [0, 3, 6, 11, 16, 21, 26, 36]
           | 3 x2 |      5 x4     | 10 x1
   """
 
@@ -124,7 +124,9 @@ class EntropySchedule:
     iteration_size = (last_size * beyond + size * (1 - beyond))
 
     update_target_net = jnp.logical_and(
-        learner_step > 0, jnp.sum(learner_step == iteration_start))
+        learner_step > 0,
+        jnp.sum(learner_step == iteration_start + iteration_size - 1),
+    )
     alpha = jnp.minimum(
         (2.0 * (learner_step - iteration_start)) / iteration_size, 1.0)
 
@@ -1001,9 +1003,13 @@ class RNaDSolver(policy_lib.Policy):
     pi = self.config.finetune.post_process_policy(pi, env_step.legal)
     return pi
 
-  # TODO(author16): jit actor_step.
+  @functools.partial(jax.jit, static_argnums=(0,))
+  def _network_jit_apply(self, params: Params, env_step: EnvStep) -> chex.Array:
+    pi, _, _, _ = self.network.apply(params, env_step)
+    return pi
+
   def actor_step(self, env_step: EnvStep):
-    pi, _, _, _ = self.network.apply(self.params, env_step)
+    pi = self._network_jit_apply(self.params, env_step)
     pi = np.asarray(pi).astype("float64")
     # TODO(author18): is this policy normalization really needed?
     pi = pi / np.sum(pi, axis=-1, keepdims=True)

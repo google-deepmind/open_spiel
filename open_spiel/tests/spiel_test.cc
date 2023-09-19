@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
-#include "open_spiel/games/kuhn_poker.h"
-#include "open_spiel/games/leduc_poker.h"
-#include "open_spiel/games/liars_dice.h"
-#include "open_spiel/games/tic_tac_toe.h"
+#include "open_spiel/games/kuhn_poker/kuhn_poker.h"
+#include "open_spiel/games/leduc_poker/leduc_poker.h"
+#include "open_spiel/games/liars_dice/liars_dice.h"
+#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel_utils.h"

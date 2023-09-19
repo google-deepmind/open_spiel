@@ -22,7 +22,7 @@ To generate these plots we used the following parameters:
 | b2_adam | 0.999 |
 | epsilon_adam | 10e-8 |
 | target_network_avg | 10e-3 |
-| rho_vtrace | 1.0 |
+| rho_vtrace | np.inf |
 | c_vtrace | 1.0 |
 | trajectory_max | 10 |
 | batch_size | 512 |

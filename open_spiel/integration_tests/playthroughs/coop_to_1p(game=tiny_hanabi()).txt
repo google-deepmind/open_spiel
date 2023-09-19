@@ -40,7 +40,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\n"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [(0, 0.5), (1, 0.5)]
+ChanceOutcomes() = [(0,0.5), (1,0.5)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["d0", "d1"]
 
@@ -58,7 +58,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 ObservationString(0) = "Player 0\nNew Game\nPlayer 0 possible: d0 d1\n"
 ObservationTensor(0): ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
-ChanceOutcomes() = [(0, 0.5), (1, 0.5)]
+ChanceOutcomes() = [(0,0.5), (1,0.5)]
 LegalActions() = [0, 1]
 StringLegalActions() = ["d0", "d1"]
 

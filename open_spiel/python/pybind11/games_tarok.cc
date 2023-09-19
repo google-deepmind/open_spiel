@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/tarok.h"
+#include "open_spiel/games/tarok/tarok.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::tarok::TarokState);

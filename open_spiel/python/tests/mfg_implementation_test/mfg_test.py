@@ -100,14 +100,15 @@ class FiniteHorizonTest(parameterized.TestCase):
       {'game_name': 'mfg_crowd_modelling'},
       {'game_name': 'mfg_garnet'},
       {'game_name': 'mfg_crowd_modelling_2d'},
+      {'game_name': 'python_mfg_periodic_aversion'},
       {'game_name': 'python_mfg_predator_prey'},
   )
   def test_is_finite_horizon(self, game_name):
     """Check that the game has no loop."""
     game = pyspiel.load_game(game_name)
     states = set(game.new_initial_states())
-    to_string = lambda s: s.observation_string(pyspiel.PlayerId.
-                                               DEFAULT_PLAYER_ID)
+    def to_string(s):
+      return s.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
     all_states_key = set(to_string(state) for state in states)
     while type_from_states(states) != pyspiel.StateType.TERMINAL:
       new_states_key, states = _next_states(states, to_string)
@@ -119,13 +120,14 @@ class FiniteHorizonTest(parameterized.TestCase):
       {'game_name': 'mfg_crowd_modelling'},
       {'game_name': 'mfg_garnet'},
       {'game_name': 'mfg_crowd_modelling_2d'},
+      {'game_name': 'python_mfg_periodic_aversion'},
       {'game_name': 'python_mfg_predator_prey'},
   )
   def test_has_at_least_an_action(self, game_name):
     """Check that all population's state have at least one action."""
     game = pyspiel.load_game(game_name)
-    to_string = lambda s: s.observation_string(pyspiel.PlayerId.
-                                               DEFAULT_PLAYER_ID)
+    def to_string(s):
+      return s.observation_string(pyspiel.PlayerId.DEFAULT_PLAYER_ID)
     states = get_all_states.get_all_states(
         game,
         depth_limit=FLAGS.get_all_states_depth_limit,
@@ -141,6 +143,7 @@ class FiniteHorizonTest(parameterized.TestCase):
       {'game_name': 'mfg_crowd_modelling'},
       {'game_name': 'mfg_garnet'},
       {'game_name': 'mfg_crowd_modelling_2d'},
+      {'game_name': 'python_mfg_periodic_aversion'},
       {'game_name': 'python_mfg_predator_prey'},
   )
   def test_rl_environment(self, game_name):

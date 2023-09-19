@@ -17,7 +17,7 @@
 #include <memory>
 #include <vector>
 
-#include "open_spiel/games/gin_rummy.h"
+#include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"

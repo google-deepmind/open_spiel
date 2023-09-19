@@ -15,8 +15,8 @@
 #include <memory>
 
 #include "open_spiel/algorithms/minimax.h"
-#include "open_spiel/games/breakthrough.h"
-#include "open_spiel/games/pig.h"
+#include "open_spiel/games/breakthrough/breakthrough.h"
+#include "open_spiel/games/pig/pig.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

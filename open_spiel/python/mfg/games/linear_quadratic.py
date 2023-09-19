@@ -27,7 +27,7 @@ from typing import Any, List, Mapping
 import numpy as np
 import scipy.stats
 
-from open_spiel.python.observation import IIGObserverForPublicInfoGame
+from open_spiel.python import observation
 import pyspiel
 
 _NUM_PLAYERS = 1
@@ -120,7 +120,7 @@ class MFGLinearQuadraticGame(pyspiel.Game):
         iig_obs_type.public_info and not iig_obs_type.perfect_recall
     ):
       return Observer(params, self)
-    return IIGObserverForPublicInfoGame(iig_obs_type, params)
+    return observation.IIGObserverForPublicInfoGame(iig_obs_type, params)
 
   def max_chance_nodes_in_history(self):
     """Maximun chance nodes in game history."""
@@ -154,7 +154,7 @@ class MFGLinearQuadraticState(pyspiel.State):
 
     # Represents the current probability distribution over game states.
     # Initialized with a uniform distribution.
-    self._distribution = [1.0 / self.size for i in range(self.size)]
+    self._distribution = [1.0 / self.size for _ in range(self.size)]
 
   def to_string(self):
     return self.state_to_str(self.x, self.tick)

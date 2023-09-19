@@ -20,8 +20,8 @@
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/algorithms/corr_dev_builder.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
-#include "open_spiel/games/efg_game.h"
-#include "open_spiel/games/efg_game_data.h"
+#include "open_spiel/games/efg_game/efg_game.h"
+#include "open_spiel/games/efg_game/efg_game_data.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
@@ -35,9 +35,9 @@ namespace {
 inline constexpr double kFloatTolerance = 1e-12;
 
 inline constexpr const char* kGreenwaldSarfatiEg1File =
-    "open_spiel/games/efg/greenwald_sarfati_example1.efg";
+    "third_party/open_spiel/games/efg/greenwald_sarfati_example1.efg";
 inline constexpr const char* kGreenwaldSarfatiEg2File =
-    "open_spiel/games/efg/greenwald_sarfati_example2.efg";
+    "third_party/open_spiel/games/efg/greenwald_sarfati_example2.efg";
 
 void TestGibson13MatrixGameExample() {
   // Tests that the example from Sec 2.2 of Gibson 2013, Regret Minimization in

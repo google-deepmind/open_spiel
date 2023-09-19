@@ -37,7 +37,7 @@ IsSimultaneousNode() = False
 CurrentPlayer() = -1
 InformationStateString(0) = ""
 ObservationString(0) = "Before initial chance node."
-ChanceOutcomes() = [(0, 1.0)]
+ChanceOutcomes() = [(0,1)]
 LegalActions() = [0]
 StringLegalActions() = ["Vehicle is assigned to population 0"]
 
