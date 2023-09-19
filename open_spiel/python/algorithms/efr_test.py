@@ -44,8 +44,6 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
         game=game,
         deviations_name=deviations_name
         )
-    print(cfr_solver.current_policy().action_probability_array)
-    print(_LEDUC_UNIFORM_POLICY.action_probability_array)
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
         cfr_solver.current_policy().action_probability_array)
@@ -68,7 +66,7 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
         game.new_initial_state(), [average_policy] * 2)
     # 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
     np.testing.assert_allclose(
-        average_policy_values, [-1 / 18, 1 / 18,0], atol=1e-3)
+        average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
 if __name__ == "__main__":
   absltest.main()
