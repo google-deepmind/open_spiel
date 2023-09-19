@@ -69,7 +69,7 @@ class _EFRSolverBase(object):
 
         self._info_state_nodes = {}
         hist = {player: [] for player in range(self._num_players)}
-        unif_probs = [[] for _ in range(self._num_players)],
+        unif_probs = [[] for _ in range(self._num_players)]
         empty_path_indices = [[] for _ in range(self._num_players)]
         self._initialize_info_state_nodes(
             self._root_node, hist, unif_probs, empty_path_indices)
@@ -121,8 +121,7 @@ class _EFRSolverBase(object):
 
         legal_actions = state.legal_actions(current_player)
         new_uniform_probs_to_state = copy.deepcopy(uniform_probs_to_state)
-        assert len(new_uniform_probs_to_state[current_player]) == len(
-            history[current_player])
+        assert len(new_uniform_probs_to_state[current_player]) == len(history[current_player])
 
         new_uniform_probs_to_state[current_player].append(
             {legal_actions[i]: 1/len(legal_actions) for i in range(len(legal_actions))})
@@ -719,11 +718,11 @@ class LocalDeviationWithTimeSelection(object):
         return self.local_swap_transform.matrix_transform
 
     def player_deviation_reach_probability(self, prior_possible_action_probabilities):
-      if self.prior_actions_weight is None or self.prior_memory_actions is None or prior_possible_action_probabilities is None:
-                return 1.0
+        if self.prior_actions_weight is None or self.prior_memory_actions is None or prior_possible_action_probabilities is None:
+            return 1.0
 
         memory_action_probabilities = np.ones(len(self.prior_actions_weight))
-        # Reconstruct memory probabilities from history provided to the deviation to reach info set and the current memory probs
+      # Reconstruct memory probabilities from history provided to the deviation to reach info set and the current memory probs
         memory_weightings = self.prior_actions_weight.copy()
         if self.use_unmodified_history:
             for state in range(len(self.prior_memory_actions)):
