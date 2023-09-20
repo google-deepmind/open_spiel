@@ -55,8 +55,31 @@ class _InfoStateNode(object):
 
 
 class _EFRSolverBase(object):
-    def __init__(self, game, _deviation_gen):
-        assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, ()
+    """The base EFR solver class 
+    
+    The main iteration loop is implemented in `evaluate_and_update_policy`:
+    ```python
+      game = pyspiel.load_game("game_name")
+      initial_state = game.new_initial_state()
+      solver = Solver(game)
+      for i in range(num_iterations):
+        solver.evaluate_and_update_policy()
+        solver.current_policy()  # Access the current policy
+        solver.average_policy()  # Access the average policy
+    ```
+    """   
+    def __init__(self, game, deviation_gen):
+        """Initializer.
+        Args:
+        game: The `pyspiel.Game` to run on.
+        deviation_gen: a function that accepts (num_actions : int, history : , prior_legal_actions) and returns a list containing `LocalDeviationWithTimeSelection` objects of the 
+        the realisable deviations of a described type (e.g blind causal deviations) and given the information state described by the function parameters.
+        """
+        # pyformat: enable
+        assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, (
+            "EFR requires sequential games. If you're trying to run it " +
+        "on a simultaneous (or normal-form) game, please first transform it " +
+        "using turn_based_simultaneous_game.")
 
         self._game = game
         self._num_players = game.num_players()
@@ -65,7 +88,7 @@ class _EFRSolverBase(object):
         # This is for returning the current policy and average policy to a caller
         self._current_policy = policy.TabularPolicy(game)
         self._average_policy = self._current_policy.__copy__()
-        self._deviation_gen = _deviation_gen
+        self._deviation_gen = deviation_gen
 
         self._info_state_nodes = {}
         hist = {player: [] for player in range(self._num_players)}
@@ -77,16 +100,52 @@ class _EFRSolverBase(object):
         self._iteration = 1  # For possible linear-averaging.
 
     def return_cumulative_regret(self):
-        return {list(self._info_state_nodes.keys())[i]: list(self._info_state_nodes.values())[i].cumulative_regret for i in range(len(self._info_state_nodes.keys()))}
+        """Returns a dictionary mapping every information state to its associated regret (accumulated over all iterations).
+        """
+        return {list(self._info_state_nodes.keys())[i]: list(self._info_state_nodes.values())[i].cumulative_regret 
+                for i in range(len(self._info_state_nodes.keys()))}
 
     def current_policy(self):
+        """Returns the current policy as a TabularPolicy.
+
+        WARNING: The same object, updated in-place will be returned! You can copy
+        it (or its `action_probability_array` field).
+
+        For EFR, this policy does not necessarily have to converge.
+        """
         return self._current_policy
 
     def average_policy(self):
+        """Returns the average of all policies iterated.
+        WARNING: The same object, updated in-place will be returned! You can copy
+        it (or its `action_probability_array` field).
+        
+        This average policy converges to a equilibrium policy as the number of iterations
+        increases (equilibrium type depends on learning deviations used).
+        
+        The policy is computed using the accumulated policy probabilities computed
+        using `evaluate_and_update_policy`.
+
+        Returns:
+        A `policy.TabularPolicy` object (shared between calls) giving the (linear)
+        time averaged policy (weighted by player reach probabilities) for all
+        players.
+        """
         _update_average_policy(self._average_policy, self._info_state_nodes)
         return self._average_policy
 
     def _initialize_info_state_nodes(self, state, history, uniform_probs_to_state, path_indices):
+        """Initializes info_state_nodes.
+        Create one _InfoStateNode per infoset. We could also initialize the node 
+        when we try to access it and it does not exist. [todo]
+        
+        Args:
+        state: The current state in the tree walk. This should be the root node
+        when we call this function from the EFR solver.
+        history: [todo]
+        uniform_probs_to_state: [todo]
+        path_indices: [todo]
+        """
         if state.is_terminal():
             return
 
@@ -126,11 +185,9 @@ class _EFRSolverBase(object):
         new_uniform_probs_to_state[current_player].append(
             {legal_actions[i]: 1/len(legal_actions) for i in range(len(legal_actions))})
         for action in info_state_node.legal_actions:
-            # Speedup
             new_path_indices = copy.deepcopy(path_indices)
             new_path_indices[current_player].append(
                 [legal_actions, info_state_node.index_in_tabular_policy])
-            # Speedup
             new_history = copy.deepcopy(history)
             new_history[current_player].append(action)
             assert len(new_history[current_player]) == len(
@@ -141,6 +198,10 @@ class _EFRSolverBase(object):
 
     def _update_current_policy(self, state, current_policy):
         """Updated in order so that memory reach probs are defined wrt to the new strategy
+
+        Args:
+        state: [todo]
+        current_policy: [todo]
         """
 
         if state.is_terminal():
@@ -177,6 +238,24 @@ class _EFRSolverBase(object):
 
     def _compute_cumulative_immediate_regret_for_player(self, state, policies,
                                                         reach_probabilities, player):
+        """Increments the cumulative regrets and policy for `player`. [todo]
+        Args:
+        state: The initial game state to analyze from.
+        policies: A list of `num_players` callables taking as input an
+        `info_state_node` and returning a {action: prob} dictionary. For CFR,
+          this is simply returning the current policy, but this can be used in
+          the CFR-BR solver, to prevent code duplication. If None,
+          `_get_infostate_policy` is used.
+        reach_probabilities: The probability for each player of reaching `state`
+        as a numpy array [prob for player 0, for player 1,..., for chance]. [todo]
+        `player_reach_probabilities[player]` will work in all cases.
+        player: The 0-indexed player to update the values for. If `None`, the
+        update for all players will be performed. 
+
+        Returns:
+        The utility of `state` for all players, assuming all players follow the
+        current policy defined by `self.Policy`.
+        """
         if state.is_terminal():
             return np.asarray(state.returns())
 
@@ -240,7 +319,6 @@ class _EFRSolverBase(object):
         state_value_for_player = state_value[current_player]
         deviations = info_state_node.relizable_deviations
         for deviation_index in range(len(deviations)):
-            # FIX ADD DICT TO ARRAY CONVERSION FUNCTION
             deviation = deviations[deviation_index]
             deviation_strategy = deviation.deviate(
                 strat_dict_to_array(self._get_infostate_policy(info_state)))
@@ -295,8 +373,20 @@ class _EFRSolver(_EFRSolverBase):
 
 class EFRSolver(_EFRSolver):
     def __init__(self, game, deviations_name):
+        """Initializer.
+        Args:
+        game: The `pyspiel.Game` to run on.
+        deviation_name: the name of the deviation type to use for accumulating regrets and calculating the strategy at the next timestep. 
 
-        # Takes the deviation sets used for learning from Deviation_Sets
+        Deviation types implemented are "blind action", "informed action", "blind cf", 
+        "informed counterfactual", "blind partial sequence", "counterfactual partial sequence", 
+        "casual partial sequence", "twice informed partial sequence", "single target behavioural".
+        See "Efficient Deviation Types and Learning for Hindsight Rationality in Extensive-Form Games" by D. Morrill et al. 2021b
+        for the full definition of each type.
+
+        """
+
+        #external_only = True leads to a shortcut in the 
         external_only = False
         deviation_sets = None
 
@@ -324,8 +414,7 @@ class EFRSolver(_EFRSolver):
             or deviations_name == "behavioural":
             deviation_sets = return_behavourial
         else:
-            print("Unsupported Deviation Set")
-            return None
+            raise(ValueError("Unsupported Deviation Set Passed As Constructor Argument"))
         super(EFRSolver, self).__init__(game, _deviation_gen=deviation_sets)
         self._external_only = external_only
 
@@ -854,7 +943,7 @@ class LocalSwapTransform(object):
             self.matrix_transform[source][source] = 0
 
     def __repr__(self) -> str:
-        return "Shifting probabilty from Action: "+str(self.source_action) + " to Action: "+str(self.target_action)
+        return "Diverting from Action: "+str(self.source_action) + " to Action: "+str(self.target_action)
 
     def __eq__(self, __o: object) -> bool:
         if self.source_action == __o.source_action and self.target_action == __o.target_action and self.actions_num == __o.actions_num:
