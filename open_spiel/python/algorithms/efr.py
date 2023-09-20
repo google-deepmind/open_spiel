@@ -13,14 +13,19 @@
 # limitations under the License.
 # Modified: 2023 James Flynn
 # Original: https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/algorithms/cfr.py
+
 """Python implementation of the extensive-form regret minimization algorithm.
+
+See: "Efficient Deviation Types and Learning for Hindsight Rationality in Extensive-Form Games",
+Morrill et al. 2021b, 
+https://arxiv.org/abs/2102.06973
 
 One iteration of EFR consists of:
 1) Compute current strategy from regrets (e.g. using Regret Matching).
 2) Compute values using the current strategy
 3) Compute regrets from these values
 
-The average policy converges to a Nash Equilibrium rather than the current policy as in CFR.
+The average policy converges to a Nash Equilibrium rather than the current policy.
 """
 import copy
 from collections import defaultdict
@@ -785,13 +790,19 @@ class LocalDeviationWithTimeSelection(object):
     def __init__(self, target, source, num_actions, prior_actions_weight, prior_memory_actions,
                   is_external, use_unmodified_history=True):
         """"
+        Represents a swap transformation (both external and internal) for a given memory state.
         Args:
-        target: the action that will be played when the deviation is triggered
-        source: the action that will trigger the target action if (used only by internal deviations, i.e is_external = False)  
-        num_actions: the integer of actions
-        prior_actions_weight:
-        is_external: a boolean use to determine whether to create an internal or external type deviation
-        use_unmodified_history: 
+        target: the action that will be played when the deviation is triggered.
+        source: the action that will trigger the target action if (used only by internal deviations, i.e is_external = False).
+        num_actions: the integer of actions that can be played for this information state
+        prior_actions_weight: an array the length of the history of the information state 
+            actions have been forgotten (0) or remembered (1) according to the memory state. 
+            This is represented numerically for possible experimentation with partially forgotten
+            actions (i.e in the range (0,1)).
+        prior_memory_actions: the preceeding actions upto the the information state 
+            (which the LocalDeviationWithTimeSelection is defined with respect to).
+        is_external: a boolean use to determine whether this is an internal or external type deviation.
+        use_unmodified_history: a boolean used to 
         """
         self.local_swap_transform = LocalSwapTransform(
             target, source, num_actions, is_external=is_external)
@@ -801,9 +812,16 @@ class LocalDeviationWithTimeSelection(object):
 
     # If a pure strategy, a pure strategy will be returned (aka function works for both actions and strategies as input)
     def deviate(self, strategy):
+        """
+        Args:
+
+        """
         return self.local_swap_transform.deviate(strategy)
 
     def return_transform_matrix(self):
+        """
+        Returns the matrix_transform of the associated `LocalSwapTransform` object.
+        """
         return self.local_swap_transform.matrix_transform
 
     def player_deviation_reach_probability(self, prior_possible_action_probabilities):
@@ -821,6 +839,8 @@ class LocalDeviationWithTimeSelection(object):
                 else:
                     memory_action_probabilities[state] = 1
                     memory_weightings[state] = 1
+                
+        
         path_probability = np.multiply(
             memory_weightings, memory_action_probabilities)
         memory_reach_probability = np.prod(path_probability)
@@ -835,9 +855,6 @@ class LocalDeviationWithTimeSelection(object):
     def __hash__(self):
         return hash(self.local_swap_transform)
 
-# Methods to return all
-
-
 def return_all_non_identity_internal_deviations(num_actions, possible_prior_weights, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
@@ -847,9 +864,6 @@ def return_all_non_identity_internal_deviations(num_actions, possible_prior_weig
                     deviations.append(LocalDeviationWithTimeSelection(
                         target, source, num_actions, prior_actions_weight, prior_memory_actions, False))
     return deviations
-
-# EXCLUDES IDENTITY
-
 
 def return_all_internal_modified_deviations(num_actions,  possible_prior_weights, possible_prior_memory_actions, prior_memory_actions, _):
     deviations = []
@@ -886,8 +900,6 @@ def return_all_external_deviations(num_actions,  possible_prior_weights, prior_m
     return deviations
 
 # Modify last action as required
-
-
 def return_all_external_modified_deviations(num_actions,  possible_prior_weights, possible_prior_memory_actions, prior_memory_actions, _):
     deviations = []
     for prior_actions_weight in possible_prior_weights:
@@ -921,7 +933,7 @@ def return_identity_deviation(num_actions,  possible_prior_weights, prior_memory
 # A swap transformation given by the matrix_transform for an information state of
 class LocalSwapTransform(object):
     """
-    TODO
+    Represents a swap transformation (both external and internal) for an information state for a certain number of actions.
     """
     source_action = attr.ib()
     target_action = attr.ib()
@@ -930,6 +942,14 @@ class LocalSwapTransform(object):
     is_external = attr.ib()
 
     def __init__(self, target, source, actions_num, is_external=True):
+        """"
+        Creates the matrix transformation that describes the transformation and initalises the other variables.
+        Args:
+        target: the action that will be played when the deviation is triggered
+        source: the action that will trigger the target action if (used only by internal deviations, i.e is_external = False)  
+        num_actions: the integer of actions that can be played for this information state
+        is_external: a boolean used to determine whether to create an internal or external type deviation.        
+        """
         self.source_action = source
         self.target_action = target
         self.actions_num = actions_num
@@ -955,13 +975,12 @@ class LocalSwapTransform(object):
         separator = " "
         return hash(str(self.source_action)+separator+str(self.target_action)+separator+str(self.actions_num) + separator + str(self.is_external))
 
-    # If a pure strategy, a pure strategy will be returned (aka function works for both actions and strategies as input)
     def deviate(self, strategy):
         """
-        Returns the deviation strategy
+        Returns the strategy array given by deviating according to 'self.matrix_transform' matrix.
         Args:
-          strategy: the strategy array to multiply the deviation matrix by.
+          strategy: the strategy array to deviate from.
         Returns:
-
+          the matrix product of the the matrix_transform and the provided strategy. 
         """
         return np.matmul(self.matrix_transform, strategy)
