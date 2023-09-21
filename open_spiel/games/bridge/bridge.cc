@@ -375,17 +375,7 @@ void BridgeState::WriteObservationTensor(Player player,
     ptr[num_cards_played_ / 4 - num_declarer_tricks_] = 1;
     ptr += kNumTricks;
 
-    int kPlayTensorSize =
-        kNumBidLevels                           // What the contract is
-        + kNumDenominations                     // What trumps are
-        + kNumOtherCalls                        // Undoubled / doubled / redoubled
-        + kNumPlayers                           // Who declarer is
-        + kNumVulnerabilities                   // Vulnerability of the declaring side
-        + kNumCards                             // Our remaining cards
-        + kNumCards                             // Dummy's remaining cards
-        + num_tricks_ * kNumPlayers * kNumCards // Number of played tricks
-        + kNumTricks                            // Number of tricks we have won
-        + kNumTricks;                           // Number of tricks they have won
+    int kPlayTensorSize = BridgeGame::GetPlayTensorSize(num_tricks_);
     SPIEL_CHECK_EQ(std::distance(values.begin(), ptr),
                    kPlayTensorSize + kNumObservationTypes);
     SPIEL_CHECK_LE(std::distance(values.begin(), ptr), values.size());

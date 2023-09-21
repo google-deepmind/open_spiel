@@ -215,9 +215,8 @@ class BridgeGame : public Game {
   double MaxUtility() const override { return kMaxScore; }
   absl::optional<double> UtilitySum() const override { return 0; }
 
-  int GetObservationTensorSize(int num_tricks) const {
-    int kPlayTensorSize =
-        kNumBidLevels                           // What the contract is
+  static int GetPlayTensorSize(int num_tricks) {
+    return kNumBidLevels                        // What the contract is
         + kNumDenominations                     // What trumps are
         + kNumOtherCalls                        // Undoubled / doubled / redoubled
         + kNumPlayers                           // Who declarer is
@@ -227,13 +226,12 @@ class BridgeGame : public Game {
         + num_tricks * kNumPlayers * kNumCards  // Number of played tricks
         + kNumTricks                            // Number of tricks we have won
         + kNumTricks;                           // Number of tricks they have won
-    int kObservationTensorSize = kNumObservationTypes + std::max(kPlayTensorSize, kAuctionTensorSize);
-    return kObservationTensorSize;
   }
 
   std::vector<int> ObservationTensorShape() const override {
-    return {GetObservationTensorSize(NumTricks())};
+    return {kNumObservationTypes + std::max(GetPlayTensorSize(NumTricks()), kAuctionTensorSize)};
   }
+
   int MaxGameLength() const override {
     return UseDoubleDummyResult() ? kMaxAuctionLength
                                   : kMaxAuctionLength + kNumCards;
