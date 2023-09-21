@@ -14,8 +14,6 @@
 
 """Tests for open_spiel.python.algorithms.efr."""
 
-import itertools
-
 from absl.testing import absltest
 from absl.testing import parameterized
 import numpy as np
@@ -23,7 +21,6 @@ import numpy as np
 from open_spiel.python import policy
 from open_spiel.python.algorithms import efr
 from open_spiel.python.algorithms import expected_game_score
-from open_spiel.python.algorithms import exploitability
 import pyspiel
 
 _KUHN_GAME = pyspiel.load_game("kuhn_poker")
@@ -50,7 +47,7 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
     np.testing.assert_array_equal(
         _LEDUC_UNIFORM_POLICY.action_probability_array,
         cfr_solver.average_policy().action_probability_array)
-    
+
   @parameterized.parameters(
       ["blind cf", "informed cf", "bps", "cfps", "csps", "tips", "bhv"])
   def test_cfr_kuhn_poker(self, deviations_name):
@@ -58,7 +55,7 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
     efr_solver = efr.EFRSolver(
         game=game,
         deviations_name=deviations_name
-        )    
+        )
     for _ in range(300):
       efr_solver.evaluate_and_update_policy()
     average_policy = efr_solver.average_policy()
