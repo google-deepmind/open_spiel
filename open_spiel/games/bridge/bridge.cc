@@ -68,7 +68,7 @@ const GameType kGameType{/*short_name=*/"bridge",
                              // If true, the non-dealer's side is vulnerable.
                              {"non_dealer_vul", GameParameter(false)},
                              // Number of played tricks in observation tensor
-                             {"num_tricks", GameParameter(true)},
+                             {"num_tricks", GameParameter(2)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
