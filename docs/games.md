@@ -1,7 +1,3 @@
-
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 # Available games
 
 ![](_static/green_circ10.png "green circle"): thoroughly-tested. In many cases,
