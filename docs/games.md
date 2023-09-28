@@ -1,3 +1,7 @@
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 # Available games
 
 ![](_static/green_circ10.png "green circle"): thoroughly-tested. In many cases,
@@ -84,6 +88,7 @@ Status                                       | Game
 ![](_static/green_circ10.png "green circle") | [Tiny Bridge](#tiny-bridge)
 ![](_static/green_circ10.png "green circle") | [Tiny Hanabi](#tiny-hanabi)
 ![](_static/green_circ10.png "green circle") | [Trade Comm](#trade-comm)
+<font color="orange"><b>~</b></font>         | [TwixT](#twixt)
 <font color="orange"><b>~</b></font>         | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Y](#y)
 
@@ -875,6 +880,16 @@ Status                                       | Game
 *   Imperfect information.
 *   2 players.
 *   A simple emergent communication game based on trading.
+
+### TwixT
+
+*   Players place pegs and links on a 24x24 square to connect a line between opposite sides.
+*   pegs and links on a grid.
+*   Modern game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/TwixT)
 
 ### Ultimate Tic-Tac-Toe
 

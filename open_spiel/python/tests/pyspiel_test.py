@@ -132,6 +132,7 @@ EXPECTED_GAMES = frozenset([
     "tiny_hanabi",
     "trade_comm",
     "turn_based_simultaneous_game",
+    "twixt",
     "ultimate_tic_tac_toe",
     "y",
     "zerosum",
