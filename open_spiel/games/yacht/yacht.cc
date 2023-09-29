@@ -204,7 +204,42 @@ std::string YachtState::ToString() const {
   return state;
 }
 
-bool YachtState::IsTerminal() const { return true; }
+bool YachtState::IsTerminal() const {
+  // A game is over when all players have have filled their scoring sheets.
+  const ScoringSheet& player1_scoring_sheet = scoring_sheets_[0];
+  if (player1_scoring_sheet.ones == empty ||
+      player1_scoring_sheet.twos == empty ||
+      player1_scoring_sheet.threes == empty ||
+      player1_scoring_sheet.fours == empty ||
+      player1_scoring_sheet.fives == empty ||
+      player1_scoring_sheet.sixes == empty ||
+      player1_scoring_sheet.full_house == empty ||
+      player1_scoring_sheet.four_of_a_kind == empty ||
+      player1_scoring_sheet.little_straight == empty ||
+      player1_scoring_sheet.big_straight == empty ||
+      player1_scoring_sheet.choice == empty ||
+      player1_scoring_sheet.yacht == empty) {
+    return false;
+  }
+
+  const ScoringSheet& player2_scoring_sheet = scoring_sheets_[1];
+  if (player2_scoring_sheet.ones == empty ||
+      player2_scoring_sheet.twos == empty ||
+      player2_scoring_sheet.threes == empty ||
+      player2_scoring_sheet.fours == empty ||
+      player2_scoring_sheet.fives == empty ||
+      player2_scoring_sheet.sixes == empty ||
+      player2_scoring_sheet.full_house == empty ||
+      player2_scoring_sheet.four_of_a_kind == empty ||
+      player2_scoring_sheet.little_straight == empty ||
+      player2_scoring_sheet.big_straight == empty ||
+      player2_scoring_sheet.choice == empty ||
+      player2_scoring_sheet.yacht == empty) {
+    return false;
+  }
+
+  return true;
+}
 
 std::vector<double> YachtState::Returns() const { return {1, 0}; }
 
