@@ -97,7 +97,6 @@ class YachtState : public State {
   bool UsableDiceOutcome(int outcome) const;
   std::string DiceToString(int outcome) const;
   int DiceValue(int i) const;
-  int HighestUsableDiceOutcome() const;
   Action EncodedPassMove() const;
   Action EncodedBarMove() const;
 

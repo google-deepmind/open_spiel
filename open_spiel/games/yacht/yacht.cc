@@ -131,16 +131,6 @@ Action YachtState::EncodedPassMove() const { return 25; }
 
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
 
-int YachtState::HighestUsableDiceOutcome() const {
-  if (UsableDiceOutcome(dice_[1])) {
-    return dice_[1];
-  } else if (UsableDiceOutcome(dice_[0])) {
-    return dice_[0];
-  } else {
-    return -1;
-  }
-}
-
 bool YachtState::UsableDiceOutcome(int outcome) const {
   return (outcome >= 1 && outcome <= 6);
 }
