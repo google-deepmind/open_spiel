@@ -98,8 +98,6 @@ class YachtState : public State {
   std::string ScoringSheetToString(const ScoringSheet& scoring_sheet) const;
   std::string DiceToString(int outcome) const;
   int DiceValue(int i) const;
-  Action EncodedPassMove() const;
-  Action EncodedBarMove() const;
 
   Player cur_player_;
   Player prev_player_;

@@ -125,10 +125,6 @@ void YachtState::UndoAction(int player, Action action) {
   i++;
 }
 
-Action YachtState::EncodedBarMove() const { return 24; }
-
-Action YachtState::EncodedPassMove() const { return 25; }
-
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
 
 bool YachtState::UsableDiceOutcome(int outcome) const {
