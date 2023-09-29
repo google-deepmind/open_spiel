@@ -29,8 +29,8 @@
 #include <unistd.h>
 #endif
 
-#include <cstdio>
 #include <cstdint>
+#include <cstdio>
 
 #include "open_spiel/spiel_utils.h"
 
