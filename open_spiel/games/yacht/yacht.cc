@@ -65,7 +65,20 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
-std::string CurPlayerToString(Player cur_player) { return "Some dice"; }
+std::string CurPlayerToString(Player cur_player) {
+  switch (cur_player) {
+    case 1:
+      return "Player 1";
+    case 2:
+      return "Player 2";
+    case kChancePlayerId:
+      return "*";
+    case kTerminalPlayerId:
+      return "T";
+    default:
+      SpielFatalError(absl::StrCat("Unrecognized player id: ", cur_player));
+  }
+}
 
 std::string PositionToStringHumanReadable(int pos) { return "Pos"; }
 
