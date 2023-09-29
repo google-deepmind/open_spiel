@@ -155,15 +155,15 @@ class Board {
 // * the y axis (rows) points up
 // * coords [col,row] start at the lower left corner [0,0]
 // * coord labels c3, f4, d2, etc. start at the upper left corner (a1)
-// * player 0 = x, top/bottom, red
-// * player 1 = o, left/right, blue
+// * player 0 == 'x', red color, plays top/bottom
+// * player 1 == 'o', blue color, plays left/right
 // * move is labeled player + coord label, e.g. xd4
-// * empty cell = 2
-// * corner cell = 3
+// * empty cell == 2
+// * corner cell == 3
 //
-// example 8 x 8 board: red peg at [2,3]: label=c5, red action=26
-//                      red peg at [3,5]: label=d3, red action=21
-//                     blue peg at [5,3]: label=f5, red action=29
+// example 8 x 8 board: red peg at [2,3] == xc5 == action=26
+//                      red peg at [3,5] == xd3 == action=21
+//                     blue peg at [5,3] == of5 == action=29
 //
 //     a   b   c   d   e   f   g   h
 //    ------------------------------
@@ -191,7 +191,7 @@ class Board {
 // Actions are indexed from 0 to boardSize * (boardSize-2) from the player's
 // perspective:
 
-// red player's actions
+// player 0 actions:
 //     a   b   c   d   e   f   g   h
 //    ------------------------------
 // 1 |     7  15  23  31  39  47     |
@@ -211,7 +211,7 @@ class Board {
 // 8 |     0   8  16  24  32  40     |
 //     ------------------------------
 
-// blue player's actions
+// player 1 actions:
 //     a   b   c   d   e   f   g   h
 //    ------------------------------
 // 1 |                               |
@@ -231,12 +231,15 @@ class Board {
 // 8 |                               |
 //     ------------------------------
 
-//  map move to red player action:  [c,r] => (c-1) * size + r,       ex.: xd6 =
-//  [3,2] => (3-1) * 8 + 2 = 18
-//                                  xd6 corresponds to action 18 of red player
-//  map move to blue player action: [c,r] => (size-r-2) * size + c,  ex.: od6 =
-//  [3,2] => (8-2-2) * 8 + 3 = 35
-//                                  od6 corresponds to action 35 of blue player
+//  mapping move to player 0 action:
+//  [c,r] => (c-1) * size + r,
+//  e.g.: xd6 == [3,2] => (3-1) * 8 + 2 == 18
+//  xd6 == action 18 of player 0
+//
+//  mapping move to player 1 action:
+//  [c,r] => (size-r-2) * size + c,
+//  e.g.: od6 == [3,2] => (8-2-2) * 8 + 3 == 35
+//  od6 == action 35 of player 1
 
 }  // namespace twixt
 }  // namespace open_spiel
