@@ -19,13 +19,10 @@
 
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
 namespace yacht {
 namespace {
-
-void TrivialTest() { SPIEL_CHECK_TRUE(true); }
 
 void AllActionsLegalTest() {
   std::shared_ptr<const Game> game = LoadGame("yacht");
@@ -83,8 +80,6 @@ void NoReRollActionsLegalTest() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::testing::LoadGameTest("yacht");
-  open_spiel::yacht::TrivialTest();
   open_spiel::yacht::AllActionsLegalTest();
   open_spiel::yacht::SomeActionsLegalTest();
   open_spiel::yacht::NoReRollActionsLegalTest();
