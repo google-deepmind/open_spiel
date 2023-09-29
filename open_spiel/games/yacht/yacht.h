@@ -102,8 +102,9 @@ class YachtState : public State {
   Player cur_player_;
   Player prev_player_;
   int turns_;
-  std::vector<int> dice_;    // Current dice.
-  std::vector<int> scores_;  // Checkers returned home by each player.
+  std::vector<int> dice_;            // Current dice.
+  std::vector<int> dice_to_reroll_;  // Dice chosen to reroll.
+  std::vector<int> scores_;          // Checkers returned home by each player.
   std::vector<ScoringSheet> scoring_sheets_;  // Scoring sheet for each player.
 };
 

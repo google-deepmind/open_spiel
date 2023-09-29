@@ -41,6 +41,10 @@ const std::vector<std::pair<Action, double>> kChanceOutcomes = {
 
 const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
 
+constexpr int kLowestDieRoll = 1;
+constexpr int kHighestDieRoll = 6;
+constexpr int kPass = 0;
+
 // Facts about the game
 const GameType kGameType{/*short_name=*/"yacht",
                          /*long_name=*/"Yacht",
@@ -83,7 +87,31 @@ std::string CurPlayerToString(Player cur_player) {
 std::string PositionToStringHumanReadable(int pos) { return "Pos"; }
 
 std::string YachtState::ActionToString(Player player, Action move_id) const {
-  return "actionToString";
+  if (player == kChancePlayerId) {
+    return absl::StrCat("chance outcome ", move_id,
+                        " (roll: ", kChanceOutcomeValues[move_id - 1], ")");
+  } else {
+    if (move_id >= kLowestDieRoll && move_id <= kHighestDieRoll) {
+      return absl::StrCat("Player ", player, ": chose to re-roll die ",
+                          move_id);
+    } else if (move_id == kPass) {
+      if (dice_to_reroll_.empty()) {
+        return absl::StrCat("Player ", player, ": chose to reroll no dice.");
+      } else {
+        std::string reroll_dice = "";
+        for (int i = 0; i < dice_to_reroll_.size() - 1; ++i) {
+          reroll_dice += DiceToString(dice_to_reroll_[i]) + ", ";
+        }
+        reroll_dice +=
+            DiceToString(dice_to_reroll_[dice_to_reroll_.size() - 1]);
+        return absl::StrCat("Player ", player, ": chose to roll dice ",
+                            reroll_dice);
+      }
+    } else {
+      return absl::StrCat("Unrecognized action: ", move_id,
+                          " for player: ", player);
+    }
+  }
 }
 
 std::string YachtState::ObservationString(Player player) const {
