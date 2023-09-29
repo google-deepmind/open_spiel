@@ -30,6 +30,7 @@
 #endif
 
 #include <cstdio>
+#include <cstdint>
 
 #include "open_spiel/spiel_utils.h"
 
