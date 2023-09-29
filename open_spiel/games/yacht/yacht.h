@@ -95,6 +95,7 @@ class YachtState : public State {
   void RollDie(int outcome);
   bool IsPosInHome(int player, int pos) const;
   bool UsableDiceOutcome(int outcome) const;
+  std::string ScoringSheetToString(const ScoringSheet& scoring_sheet) const;
   std::string DiceToString(int outcome) const;
   int DiceValue(int i) const;
   Action EncodedPassMove() const;

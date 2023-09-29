@@ -150,7 +150,59 @@ std::vector<std::pair<Action, double>> YachtState::ChanceOutcomes() const {
   return kChanceOutcomes;
 }
 
-std::string YachtState::ToString() const { return "haha dice: 1 2 3 4 5"; }
+std::string YachtState::ScoringSheetToString(
+    const ScoringSheet& scoring_sheet) const {
+  std::string result = "";
+  absl::StrAppend(&result, "Ones: ");
+  absl::StrAppend(&result, scoring_sheet.ones);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Twos: ");
+  absl::StrAppend(&result, scoring_sheet.twos);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Threes: ");
+  absl::StrAppend(&result, scoring_sheet.threes);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Fours: ");
+  absl::StrAppend(&result, scoring_sheet.fours);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Five: ");
+  absl::StrAppend(&result, scoring_sheet.fives);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Sixes: ");
+  absl::StrAppend(&result, scoring_sheet.sixes);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Full House: ");
+  absl::StrAppend(&result, scoring_sheet.full_house);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Four of a Kind: ");
+  absl::StrAppend(&result, scoring_sheet.four_of_a_kind);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Little Straight: ");
+  absl::StrAppend(&result, scoring_sheet.little_straight);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Big Straight: ");
+  absl::StrAppend(&result, scoring_sheet.big_straight);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Choice: ");
+  absl::StrAppend(&result, scoring_sheet.choice);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Yacht: ");
+  absl::StrAppend(&result, scoring_sheet.yacht);
+  absl::StrAppend(&result, "\n\n");
+  return result;
+}
+
+std::string YachtState::ToString() const {
+  std::string state = "";
+
+  absl::StrAppend(&state, "Player 1:\n\n");
+  absl::StrAppend(&state, ScoringSheetToString(scoring_sheets_[0]));
+
+  absl::StrAppend(&state, "Player 2:\n\n");
+  absl::StrAppend(&state, ScoringSheetToString(scoring_sheets_[1]));
+
+  return state;
+}
 
 bool YachtState::IsTerminal() const { return true; }
 
