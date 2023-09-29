@@ -77,6 +77,7 @@ class YachtState : public State {
   // historical information properly, so Undo likely will not work on states
   // set this way!
   void SetState(int cur_player, const std::vector<int>& dice,
+                const std::vector<bool>& dice_to_reroll,
                 const std::vector<int>& scores,
                 const std::vector<ScoringSheet>& scoring_sheets);
 
@@ -102,9 +103,14 @@ class YachtState : public State {
   Player cur_player_;
   Player prev_player_;
   int turns_;
-  std::vector<int> dice_;            // Current dice.
-  std::vector<int> dice_to_reroll_;  // Dice chosen to reroll.
-  std::vector<int> scores_;          // Score for each player.
+  std::vector<int> dice_;  // Current dice.
+
+  // Dice chosen to reroll. Where index i represents if that die will be
+  // rerolled, false not rerolled, true will be rerolled.
+  std::vector<bool> dice_to_reroll_ = {false, false, false,
+                                       false, false, false};
+
+  std::vector<int> scores_;                   // Score for each player.
   std::vector<ScoringSheet> scoring_sheets_;  // Scoring sheet for each player.
 };
 

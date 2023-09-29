@@ -179,7 +179,31 @@ std::string YachtState::DiceToString(int outcome) const {
 std::vector<Action> YachtState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
-  return {};
+
+  // Actions:
+  // 0: done choosing dice to reroll
+  // 1: choose die 1 to be rerolled
+  // 2: choose die 2 to be rerolled
+  // 3: choose die 3 to be rerolled
+  // 4: choose die 4 to be rerolled
+  // 5: choose die 5 to be rerolled
+  // 6: choose die 6 to be rerolled
+  std::vector<Action> legal_actions = {};
+
+  for (int i = 0; i < dice_to_reroll_.size(); i++) {
+    bool will_reroll = dice_to_reroll_[i];
+
+    // A player cannot choose a die that has already been chosen to be
+    // re-rolled.
+    if (!will_reroll) {
+      legal_actions.push_back(i + 1);
+    }
+  }
+
+  // Can choose to be done picking die to re-roll at anytime.
+  legal_actions.push_back(kPass);
+
+  return legal_actions;
 }
 
 std::vector<std::pair<Action, double>> YachtState::ChanceOutcomes() const {
@@ -285,10 +309,12 @@ std::unique_ptr<State> YachtState::Clone() const {
 }
 
 void YachtState::SetState(int cur_player, const std::vector<int>& dice,
+                          const std::vector<bool>& dice_to_reroll,
                           const std::vector<int>& scores,
                           const std::vector<ScoringSheet>& scoring_sheets) {
   cur_player_ = cur_player;
   dice_ = dice;
+  dice_to_reroll_ = dice_to_reroll;
   scores_ = scores;
   scoring_sheets_ = scoring_sheets;
 }
