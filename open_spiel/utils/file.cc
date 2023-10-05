@@ -29,6 +29,7 @@
 #include <unistd.h>
 #endif
 
+#include <cstdint>
 #include <cstdio>
 
 #include "open_spiel/spiel_utils.h"
