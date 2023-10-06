@@ -34,6 +34,8 @@ inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
 inline constexpr const int kMinUtility = -1;
 inline constexpr const int kMaxUtility = 1;
+inline constexpr const int kPlayerId1 = 1;
+inline constexpr const int kPlayerId2 = 2;
 
 inline constexpr const int kNumDistinctActions = 1;
 
@@ -102,6 +104,8 @@ class YachtState : public State {
   Player cur_player_;
   Player prev_player_;
   int turns_;
+  int player1_turns_;
+  int player2_turns_;
   std::vector<int> dice_;  // Current dice.
 
   // Dice chosen to reroll. Where index i represents if that die will be

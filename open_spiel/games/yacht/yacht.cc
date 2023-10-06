@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/yacht/yacht.h"
 
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>
@@ -43,6 +44,8 @@ const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
 
 constexpr int kLowestDieRoll = 1;
 constexpr int kHighestDieRoll = 6;
+
+// Possible Actions:
 constexpr int kPass = 0;
 
 // Facts about the game
@@ -125,6 +128,8 @@ YachtState::YachtState(std::shared_ptr<const Game> game)
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
       turns_(-1),
+      player1_turns_(0),
+      player2_turns_(0),
       dice_({}),
       scores_({0, 0}),
       scoring_sheets_({ScoringSheet(), ScoringSheet()}) {}
@@ -133,7 +138,11 @@ Player YachtState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
 }
 
-int YachtState::Opponent(int player) const { return 1 - player; }
+int YachtState::Opponent(int player) const {
+  if (player == kPlayerId1) return kPlayerId2;
+  if (player == kPlayerId2) return kPlayerId1;
+  SpielFatalError("Invalid player.");
+}
 
 void YachtState::RollDie(int outcome) {
   dice_.push_back(kChanceOutcomeValues[outcome - 1]);
@@ -155,9 +164,48 @@ int YachtState::DiceValue(int i) const {
 }
 
 void YachtState::DoApplyAction(Action move) {
-  // Apply Action
-  int i = 0;
-  i++;
+  if (IsChanceNode()) {
+    if (turns_ == -1) {
+      // First turn.
+      SPIEL_CHECK_TRUE(dice_.empty());
+      int starting_player = std::rand() % kNumPlayers;
+      if (starting_player == 0) {
+        // Player1 starts.
+        cur_player_ = prev_player_ = kPlayerId1;
+      } else if (starting_player == 1) {
+        // Player2 Starts
+        cur_player_ = prev_player_ = kPlayerId2;
+      } else {
+        SpielFatalError(
+            absl::StrCat("Invalid starting player: ", starting_player));
+      }
+      RollDie(move);
+      turns_ = 0;
+      return;
+    } else {
+      // Normal chance node.
+      SPIEL_CHECK_TRUE(dice_.empty());
+      RollDie(move);
+      cur_player_ = Opponent(prev_player_);
+      return;
+    }
+  }
+
+  // Normal action.
+  SPIEL_CHECK_TRUE(dice_.size() == 5);
+  // TODO(aaronrice): Fill out DoApplyAction for each move.
+
+  turns_++;
+  if (cur_player_ == kPlayerId1) {
+    player1_turns_++;
+  } else if (cur_player_ == kPlayerId2) {
+    player2_turns_++;
+  }
+
+  prev_player_ = cur_player_;
+
+  cur_player_ = kChancePlayerId;
+  dice_.clear();
 }
 
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
