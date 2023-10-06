@@ -63,7 +63,6 @@ class YachtState : public State {
   YachtState(std::shared_ptr<const Game>);
 
   Player CurrentPlayer() const override;
-  void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
   std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;

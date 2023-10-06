@@ -160,12 +160,6 @@ void YachtState::DoApplyAction(Action move) {
   i++;
 }
 
-void YachtState::UndoAction(int player, Action action) {
-  // Probably delete this. No undo's in yacht.
-  int i = 0;
-  i++;
-}
-
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
 
 bool YachtState::UsableDiceOutcome(int outcome) const {
