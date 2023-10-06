@@ -47,6 +47,7 @@ constexpr int kHighestDieRoll = 6;
 
 // Possible Actions:
 constexpr int kPass = 0;
+constexpr int kInitialTurn = -1;
 
 // Facts about the game
 const GameType kGameType{/*short_name=*/"yacht",
@@ -127,7 +128,7 @@ YachtState::YachtState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
-      turns_(-1),
+      turns_(kInitialTurn),
       player1_turns_(0),
       player2_turns_(0),
       dice_({}),
@@ -165,7 +166,7 @@ int YachtState::DiceValue(int i) const {
 
 void YachtState::DoApplyAction(Action move) {
   if (IsChanceNode()) {
-    if (turns_ == -1) {
+    if (turns_ == kInitialTurn) {
       // First turn.
       SPIEL_CHECK_TRUE(dice_.empty());
       int starting_player = std::rand() % kNumPlayers;
