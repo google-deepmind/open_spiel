@@ -14,57 +14,36 @@
 
 #include "open_spiel/games/yacht/yacht.h"
 
-#include <algorithm>
-#include <cstdlib>
 #include <memory>
-#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace yacht {
 namespace {
 
-// A few constants to help with the conversion to human-readable string formats.
-// TODO: remove these once we've changed kBarPos and kScorePos (see TODO in
-// header).
-constexpr int kNumBarPosHumanReadable = 25;
-constexpr int kNumOffPosHumanReadable = -2;
-
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
-    std::pair<Action, double>(0, 1.0 / 18),
-    std::pair<Action, double>(1, 1.0 / 18),
-    std::pair<Action, double>(2, 1.0 / 18),
-    std::pair<Action, double>(3, 1.0 / 18),
-    std::pair<Action, double>(4, 1.0 / 18),
-    std::pair<Action, double>(5, 1.0 / 18),
-    std::pair<Action, double>(6, 1.0 / 18),
-    std::pair<Action, double>(7, 1.0 / 18),
-    std::pair<Action, double>(8, 1.0 / 18),
-    std::pair<Action, double>(9, 1.0 / 18),
-    std::pair<Action, double>(10, 1.0 / 18),
-    std::pair<Action, double>(11, 1.0 / 18),
-    std::pair<Action, double>(12, 1.0 / 18),
-    std::pair<Action, double>(13, 1.0 / 18),
-    std::pair<Action, double>(14, 1.0 / 18),
-    std::pair<Action, double>(15, 1.0 / 36),
-    std::pair<Action, double>(16, 1.0 / 36),
-    std::pair<Action, double>(17, 1.0 / 36),
-    std::pair<Action, double>(18, 1.0 / 36),
-    std::pair<Action, double>(19, 1.0 / 36),
-    std::pair<Action, double>(20, 1.0 / 36),
+    std::pair<Action, double>(1, 1.0 / 6),
+    std::pair<Action, double>(2, 1.0 / 6),
+    std::pair<Action, double>(3, 1.0 / 6),
+    std::pair<Action, double>(4, 1.0 / 6),
+    std::pair<Action, double>(5, 1.0 / 6),
+    std::pair<Action, double>(6, 1.0 / 6),
 };
 
-const std::vector<std::vector<int>> kChanceOutcomeValues = {
-    {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}, {2, 3}, {2, 4},
-    {2, 5}, {2, 6}, {3, 4}, {3, 5}, {3, 6}, {4, 5}, {4, 6},
-    {5, 6}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}};
+const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
+
+constexpr int kLowestDieRoll = 1;
+constexpr int kHighestDieRoll = 6;
+constexpr int kPass = 0;
 
 // Facts about the game
 const GameType kGameType{/*short_name=*/"yacht",
@@ -90,21 +69,12 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
-std::string PositionToString(int pos) {
-  switch (pos) {
-    case kBarPos:
-      return "Bar";
-    case kScorePos:
-      return "Score";
-    case -1:
-      return "Pass";
-    default:
-      return absl::StrCat(pos);
-  }
-}
-
 std::string CurPlayerToString(Player cur_player) {
   switch (cur_player) {
+    case 1:
+      return "Player 1";
+    case 2:
+      return "Player 2";
     case kChancePlayerId:
       return "*";
     case kTerminalPlayerId:
@@ -114,18 +84,34 @@ std::string CurPlayerToString(Player cur_player) {
   }
 }
 
-std::string PositionToStringHumanReadable(int pos) {
-  if (pos == kNumBarPosHumanReadable) {
-    return "Bar";
-  } else if (pos == kNumOffPosHumanReadable) {
-    return "Off";
-  } else {
-    return PositionToString(pos);
-  }
-}
+std::string PositionToStringHumanReadable(int pos) { return "Pos"; }
 
 std::string YachtState::ActionToString(Player player, Action move_id) const {
-  return "actionToString";
+  if (player == kChancePlayerId) {
+    return absl::StrCat("chance outcome ", move_id,
+                        " (roll: ", kChanceOutcomeValues[move_id - 1], ")");
+  } else {
+    if (move_id >= kLowestDieRoll && move_id <= kHighestDieRoll) {
+      return absl::StrCat("Player ", player, ": chose to re-roll die ",
+                          move_id);
+    } else if (move_id == kPass) {
+      if (dice_to_reroll_.empty()) {
+        return absl::StrCat("Player ", player, ": chose to reroll no dice.");
+      } else {
+        std::string reroll_dice = "";
+        for (int i = 0; i < dice_to_reroll_.size() - 1; ++i) {
+          reroll_dice += DiceToString(dice_to_reroll_[i]) + ", ";
+        }
+        reroll_dice +=
+            DiceToString(dice_to_reroll_[dice_to_reroll_.size() - 1]);
+        return absl::StrCat("Player ", player, ": chose to roll dice ",
+                            reroll_dice);
+      }
+    } else {
+      return absl::StrCat("Unrecognized action: ", move_id,
+                          " for player: ", player);
+    }
+  }
 }
 
 std::string YachtState::ObservationString(Player player) const {
@@ -134,60 +120,14 @@ std::string YachtState::ObservationString(Player player) const {
   return ToString();
 }
 
-void YachtState::ObservationTensor(Player player,
-                                   absl::Span<float> values) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-
-  int opponent = Opponent(player);
-  SPIEL_CHECK_EQ(values.size(), kStateEncodingSize);
-  auto value_it = values.begin();
-  // The format of this vector is described in Section 3.4 of "G. Tesauro,
-  // Practical issues in temporal-difference learning, 1994."
-  // https://link.springer.com/article/10.1007/BF00992697
-  // The values of the dice are added in the last two positions of the vector.
-  for (int count : board_[player]) {
-    *value_it++ = ((count == 1) ? 1 : 0);
-    *value_it++ = ((count == 2) ? 1 : 0);
-    *value_it++ = ((count == 3) ? 1 : 0);
-    *value_it++ = ((count > 3) ? (count - 3) : 0);
-  }
-  for (int count : board_[opponent]) {
-    *value_it++ = ((count == 1) ? 1 : 0);
-    *value_it++ = ((count == 2) ? 1 : 0);
-    *value_it++ = ((count == 3) ? 1 : 0);
-    *value_it++ = ((count > 3) ? (count - 3) : 0);
-  }
-  *value_it++ = (scores_[player]);
-  *value_it++ = ((cur_player_ == player) ? 1 : 0);
-
-  *value_it++ = (scores_[opponent]);
-  *value_it++ = ((cur_player_ == opponent) ? 1 : 0);
-
-  *value_it++ = ((!dice_.empty()) ? dice_[0] : 0);
-  *value_it++ = ((dice_.size() > 1) ? dice_[1] : 0);
-
-  SPIEL_CHECK_EQ(value_it, values.end());
-}
-
 YachtState::YachtState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
       turns_(-1),
-      x_turns_(0),
-      o_turns_(0),
       dice_({}),
       scores_({0, 0}),
-      board_(
-          {std::vector<int>(kNumPoints, 0), std::vector<int>(kNumPoints, 0)}) {
-  SetupInitialBoard();
-}
-
-void YachtState::SetupInitialBoard() {
-  int i = 0;
-  i++;
-}
+      scoring_sheets_({ScoringSheet(), ScoringSheet()}) {}
 
 Player YachtState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
@@ -195,9 +135,8 @@ Player YachtState::CurrentPlayer() const {
 
 int YachtState::Opponent(int player) const { return 1 - player; }
 
-void YachtState::RollDice(int outcome) {
-  dice_.push_back(kChanceOutcomeValues[outcome][0]);
-  dice_.push_back(kChanceOutcomeValues[outcome][1]);
+void YachtState::RollDie(int outcome) {
+  dice_.push_back(kChanceOutcomeValues[outcome - 1]);
 }
 
 int YachtState::DiceValue(int i) const {
@@ -227,75 +166,141 @@ void YachtState::UndoAction(int player, Action action) {
   i++;
 }
 
-Action YachtState::EncodedBarMove() const { return 24; }
-
-Action YachtState::EncodedPassMove() const { return 25; }
-
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
-
-int YachtState::HighestUsableDiceOutcome() const {
-  if (UsableDiceOutcome(dice_[1])) {
-    return dice_[1];
-  } else if (UsableDiceOutcome(dice_[0])) {
-    return dice_[0];
-  } else {
-    return -1;
-  }
-}
 
 bool YachtState::UsableDiceOutcome(int outcome) const {
   return (outcome >= 1 && outcome <= 6);
 }
 
-int YachtState::NumOppCheckers(int player, int pos) const {
-  return board_[Opponent(player)][pos];
-}
-
 std::string YachtState::DiceToString(int outcome) const {
-  if (outcome > 6) {
-    return std::to_string(outcome - 6) + "u";
-  } else {
-    return std::to_string(outcome);
-  }
-}
-
-int YachtState::CountTotalCheckers(int player) const {
-  int total = 0;
-  for (int i = 0; i < 24; ++i) {
-    SPIEL_CHECK_GE(board_[player][i], 0);
-    total += board_[player][i];
-  }
-  SPIEL_CHECK_GE(scores_[player], 0);
-  total += scores_[player];
-  return total;
+  return std::to_string(outcome);
 }
 
 std::vector<Action> YachtState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
-  return {};
+
+  // Actions:
+  // 0: done choosing dice to reroll
+  // 1: choose die 1 to be rerolled
+  // 2: choose die 2 to be rerolled
+  // 3: choose die 3 to be rerolled
+  // 4: choose die 4 to be rerolled
+  // 5: choose die 5 to be rerolled
+  // 6: choose die 6 to be rerolled
+  std::vector<Action> legal_actions = {};
+
+  for (int i = 0; i < dice_to_reroll_.size(); i++) {
+    bool will_reroll = dice_to_reroll_[i];
+
+    // A player cannot choose a die that has already been chosen to be
+    // re-rolled.
+    if (!will_reroll) {
+      legal_actions.push_back(i + 1);
+    }
+  }
+
+  // Can choose to be done picking die to re-roll at anytime.
+  legal_actions.push_back(kPass);
+
+  return legal_actions;
 }
 
 std::vector<std::pair<Action, double>> YachtState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-  if (turns_ == -1) {
-    // Doubles not allowed for the initial roll to determine who goes first.
-    // Range 0-14: X goes first, range 15-29: O goes first.
-    std::vector<std::pair<Action, double>> outcomes;
-    outcomes.reserve(30);
-    const double uniform_prob = 1.0 / 30.0;
-    for (Action action = 0; action < 30; ++action) {
-      outcomes.push_back({action, uniform_prob});
-    }
-    return outcomes;
-  } else {
-    return kChanceOutcomes;
-  }
+  return kChanceOutcomes;
 }
 
-std::string YachtState::ToString() const { return "haha dice: 1 2 3 4 5"; }
+std::string YachtState::ScoringSheetToString(
+    const ScoringSheet& scoring_sheet) const {
+  std::string result = "";
+  absl::StrAppend(&result, "Ones: ");
+  absl::StrAppend(&result, scoring_sheet.ones);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Twos: ");
+  absl::StrAppend(&result, scoring_sheet.twos);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Threes: ");
+  absl::StrAppend(&result, scoring_sheet.threes);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Fours: ");
+  absl::StrAppend(&result, scoring_sheet.fours);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Five: ");
+  absl::StrAppend(&result, scoring_sheet.fives);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Sixes: ");
+  absl::StrAppend(&result, scoring_sheet.sixes);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Full House: ");
+  absl::StrAppend(&result, scoring_sheet.full_house);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Four of a Kind: ");
+  absl::StrAppend(&result, scoring_sheet.four_of_a_kind);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Little Straight: ");
+  absl::StrAppend(&result, scoring_sheet.little_straight);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Big Straight: ");
+  absl::StrAppend(&result, scoring_sheet.big_straight);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Choice: ");
+  absl::StrAppend(&result, scoring_sheet.choice);
+  absl::StrAppend(&result, "\n");
+  absl::StrAppend(&result, "Yacht: ");
+  absl::StrAppend(&result, scoring_sheet.yacht);
+  absl::StrAppend(&result, "\n\n");
+  return result;
+}
 
-bool YachtState::IsTerminal() const { return true; }
+std::string YachtState::ToString() const {
+  std::string state = "";
+
+  absl::StrAppend(&state, "Player 1:\n\n");
+  absl::StrAppend(&state, ScoringSheetToString(scoring_sheets_[0]));
+
+  absl::StrAppend(&state, "Player 2:\n\n");
+  absl::StrAppend(&state, ScoringSheetToString(scoring_sheets_[1]));
+
+  return state;
+}
+
+bool YachtState::IsTerminal() const {
+  // A game is over when all players have have filled their scoring sheets.
+  const ScoringSheet& player1_scoring_sheet = scoring_sheets_[0];
+  if (player1_scoring_sheet.ones == empty ||
+      player1_scoring_sheet.twos == empty ||
+      player1_scoring_sheet.threes == empty ||
+      player1_scoring_sheet.fours == empty ||
+      player1_scoring_sheet.fives == empty ||
+      player1_scoring_sheet.sixes == empty ||
+      player1_scoring_sheet.full_house == empty ||
+      player1_scoring_sheet.four_of_a_kind == empty ||
+      player1_scoring_sheet.little_straight == empty ||
+      player1_scoring_sheet.big_straight == empty ||
+      player1_scoring_sheet.choice == empty ||
+      player1_scoring_sheet.yacht == empty) {
+    return false;
+  }
+
+  const ScoringSheet& player2_scoring_sheet = scoring_sheets_[1];
+  if (player2_scoring_sheet.ones == empty ||
+      player2_scoring_sheet.twos == empty ||
+      player2_scoring_sheet.threes == empty ||
+      player2_scoring_sheet.fours == empty ||
+      player2_scoring_sheet.fives == empty ||
+      player2_scoring_sheet.sixes == empty ||
+      player2_scoring_sheet.full_house == empty ||
+      player2_scoring_sheet.four_of_a_kind == empty ||
+      player2_scoring_sheet.little_straight == empty ||
+      player2_scoring_sheet.big_straight == empty ||
+      player2_scoring_sheet.choice == empty ||
+      player2_scoring_sheet.yacht == empty) {
+    return false;
+  }
+
+  return true;
+}
 
 std::vector<double> YachtState::Returns() const { return {1, 0}; }
 
@@ -303,19 +308,18 @@ std::unique_ptr<State> YachtState::Clone() const {
   return std::unique_ptr<State>(new YachtState(*this));
 }
 
-void YachtState::SetState(int cur_player,
-                          const std::vector<int>& dice,
+void YachtState::SetState(int cur_player, const std::vector<int>& dice,
+                          const std::vector<bool>& dice_to_reroll,
                           const std::vector<int>& scores,
-                          const std::vector<std::vector<int>>& board) {
+                          const std::vector<ScoringSheet>& scoring_sheets) {
   cur_player_ = cur_player;
   dice_ = dice;
+  dice_to_reroll_ = dice_to_reroll;
   scores_ = scores;
-  board_ = board;
+  scoring_sheets_ = scoring_sheets;
 }
 
 YachtGame::YachtGame(const GameParameters& params) : Game(kGameType, params) {}
-
-double YachtGame::MaxUtility() const { return 1; }
 
 }  // namespace yacht
 }  // namespace open_spiel

@@ -14,23 +14,73 @@
 
 #include "open_spiel/games/yacht/yacht.h"
 
-#include <algorithm>
-#include <random>
+#include <memory>
+#include <vector>
 
 #include "open_spiel/spiel.h"
-#include "open_spiel/tests/basic_tests.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
-namespace backgammon {
+namespace yacht {
 namespace {
 
-void TrivialTest() { SPIEL_CHECK_TRUE(true); }
+void AllActionsLegalTest() {
+  std::shared_ptr<const Game> game = LoadGame("yacht");
+  std::unique_ptr<State> state = game->NewInitialState();
+  YachtState* yacht_state = static_cast<YachtState*>(state.get());
+
+  std::vector<bool> dice_to_reroll = {false, false, false, false, false, false};
+  std::vector<ScoringSheet> empty_scoring_sheets = {ScoringSheet(),
+                                                    ScoringSheet()};
+  yacht_state->SetState(0, {}, dice_to_reroll, {}, empty_scoring_sheets);
+
+  std::vector<Action> actions = yacht_state->LegalActions();
+  std::vector<Action> expected_actions = {1, 2, 3, 4, 5, 6, 0};
+
+  SPIEL_CHECK_EQ(actions, expected_actions);
+}
+
+void SomeActionsLegalTest() {
+  std::shared_ptr<const Game> game = LoadGame("yacht");
+  std::unique_ptr<State> state = game->NewInitialState();
+  YachtState* yacht_state = static_cast<YachtState*>(state.get());
+
+  // Have some dice already selected to be re-rolled
+  std::vector<bool> dice_to_reroll = {false, true, false, true, false, false};
+  std::vector<ScoringSheet> empty_scoring_sheets = {ScoringSheet(),
+                                                    ScoringSheet()};
+  yacht_state->SetState(0, {}, dice_to_reroll, {}, empty_scoring_sheets);
+
+  std::vector<Action> actions = yacht_state->LegalActions();
+  std::vector<Action> expected_actions = {1, 3, 5, 6, 0};
+
+  SPIEL_CHECK_EQ(actions, expected_actions);
+}
+
+void NoReRollActionsLegalTest() {
+  std::shared_ptr<const Game> game = LoadGame("yacht");
+  std::unique_ptr<State> state = game->NewInitialState();
+  YachtState* yacht_state = static_cast<YachtState*>(state.get());
+
+  // Have some dice already selected to be re-rolled
+  std::vector<bool> dice_to_reroll = {true, true, true, true, true, true};
+  std::vector<ScoringSheet> empty_scoring_sheets = {ScoringSheet(),
+                                                    ScoringSheet()};
+  yacht_state->SetState(0, {}, dice_to_reroll, {}, empty_scoring_sheets);
+
+  std::vector<Action> actions = yacht_state->LegalActions();
+  // Can choose to be done re-rolled at anytime.
+  std::vector<Action> expected_actions = {0};
+
+  SPIEL_CHECK_EQ(actions, expected_actions);
+}
 
 }  // namespace
-}  // namespace backgammon
+}  // namespace yacht
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
-  open_spiel::testing::LoadGameTest("yacht");
-  open_spiel::backgammon::TrivialTest();
+  open_spiel::yacht::AllActionsLegalTest();
+  open_spiel::yacht::SomeActionsLegalTest();
+  open_spiel::yacht::NoReRollActionsLegalTest();
 }

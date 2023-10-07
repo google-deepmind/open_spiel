@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_UTILS_FILE_H_
 #define OPEN_SPIEL_UTILS_FILE_H_
 
+#include <cstdint>
 #include <string>
 #include <memory>
 
