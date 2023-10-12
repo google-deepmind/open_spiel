@@ -32,12 +32,19 @@ game1 = pyspiel.create_matrix_game([[2, 0, 0], [1, 0, 0]],
 commit_strategy1 = np.array([1 / 3, 2 / 3])
 commit_value1 = 4 / 3
 
+# a game with dominated strategy
+game2 = pyspiel.create_matrix_game([[3, 9], [9, 1],
+                                    [0, 0], [1, 8]])
+commit_strategy2 = np.array([1.0, 0.0])
+commit_value2 = 9.0
+
 
 class StackelbergLPTest(parameterized.TestCase):
 
   @parameterized.named_parameters(
       ("game0", game0, commit_strategy0, commit_value0),
       ("game1", game1, commit_strategy1, commit_value1),
+      ("game2", game2, commit_strategy2, commit_value2)
   )
   def test_simple_games(self, game, commit_strategy, commit_value):
     leader_eq_strategy, _, leader_eq_value, _ = solve_stackelberg(game)
