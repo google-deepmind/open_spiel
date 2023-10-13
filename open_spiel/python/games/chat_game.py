@@ -19,13 +19,13 @@ from absl import logging
 import numpy as np
 
 from open_spiel.python.games.chat_games import chat_game_base
-from open_spiel.python.games.chat_games import test_utils as chat_test_utils
 from open_spiel.python.games.chat_games.configs import config_fixed_mock
 from open_spiel.python.games.chat_games.configs import config_rnd_mock
 from open_spiel.python.games.chat_games.envs.observations import utils as observation_utils
 from open_spiel.python.games.chat_games.envs.payoffs import utils as payoff_utils
 from open_spiel.python.games.chat_games.envs.termination import utils as term_utils
 from open_spiel.python.games.chat_games.envs.utils import header as header_utils
+from open_spiel.python.games.chat_games.utils import test_utils as chat_test_utils
 
 import pyspiel
 

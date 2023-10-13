@@ -18,10 +18,11 @@ from absl.testing import absltest
 from absl.testing import parameterized
 
 from open_spiel.python.games import chat_game  # pylint: disable=unused-import
-from open_spiel.python.games.chat_games import test_utils as chat_test_utils
 
 from open_spiel.python.games.chat_games.configs import config_fixed_mock
 from open_spiel.python.games.chat_games.configs import config_rnd_mock
+
+from open_spiel.python.games.chat_games.utils import test_utils as chat_test_utils
 
 import pyspiel
 
