@@ -33,8 +33,8 @@ commit_strategy1 = np.array([1 / 3, 2 / 3])
 commit_value1 = 4 / 3
 
 # a game with dominated strategy
-game2 = pyspiel.create_matrix_game([[3, 9], [9, 1],
-                                    [0, 0], [1, 8]])
+game2 = pyspiel.create_matrix_game([[3, 9], [9, 1]],
+                                   [[0, 0], [1, 8]])
 commit_strategy2 = np.array([1.0, 0.0])
 commit_value2 = 9.0
 
