@@ -21,6 +21,7 @@
 #include <vector>
 #include <utility>
 #include <set>
+#include <unordered_map>
 
 #include "open_spiel/games/twixt/twixtcell.h"
 #include "open_spiel/spiel.h"
@@ -34,212 +35,182 @@ const int kDefaultBoardSize = 8;
 
 const bool kDefaultAnsiColorOutput = true;
 
-const double kMinDiscount = 0.0;
-const double kMaxDiscount = 1.0;
-const double kDefaultDiscount = kMaxDiscount;
-
 // 8 link descriptors store the properties of a link direction
 struct {
-  Move offsets;  // offset of the target peg, e.g. (2, -1) for ENE
-  std::vector<std::pair<Move, int>> blockingLinks;
+  Position offsets;  // offset of the target peg, e.g. (2, -1) for ENE
+  std::vector<Link> blocking_links;
 } typedef LinkDescriptor;
 
-// Tensor has 2 * 3 planes of size bordSize * (boardSize-2)
+// Tensor has 2 * 6 planes of size bordSize * (boardSize-2)
 // see ObservationTensor
-const int kNumPlanes = 6;
+const int kNumPlanes = 12;
 
 enum Result { kOpen, kRedWin, kBlueWin, kDraw };
 
 enum Color { kRedColor, kBlueColor, kEmpty, kOffBoard };
 
-// blockerMap stores set of blocking links for each link
-static std::map<Link, std::set<Link>> blockerMap;
-
-inline std::set<Link> *getBlockers(Link link) { return &blockerMap[link]; }
-
-inline void pushBlocker(Link link, Link blockedLink) {
-  blockerMap[link].insert(blockedLink);
-}
-
-inline void deleteBlocker(Link link, Link blockedLink) {
-  blockerMap[link].erase(blockedLink);
-}
-
-inline void clearBlocker() { blockerMap.clear(); }
-
 class Board {
- private:
-  int mMoveCounter = 0;
-  bool mSwapped = false;
-  Move mMoveOne;
-  int mResult = kOpen;
-  std::vector<std::vector<Cell>> mCell;
-  int mSize;  // length of a side of the board
-  bool mAnsiColorOutput;
-  std::vector<Action> mLegalActions[kNumPlayers];
-
-  void setSize(int size) { mSize = size; }
-
-  bool getAnsiColorOutput() const { return mAnsiColorOutput; }
-  void setAnsiColorOutput(bool ansiColorOutput) {
-    mAnsiColorOutput = ansiColorOutput;
-  }
-
-  void setResult(int result) { mResult = result; }
-
-  bool getSwapped() const { return mSwapped; }
-  void setSwapped(bool swapped) { mSwapped = swapped; }
-
-  Move getMoveOne() const { return mMoveOne; }
-  void setMoveOne(Move move) { mMoveOne = move; }
-
-  void incMoveCounter() { mMoveCounter++; }
-
-  bool hasLegalActions(Player player) const {
-    return mLegalActions[player].size() > 0;
-  }
-
-  void removeLegalAction(Player, Move);
-
-  void updateResult(Player, Move);
-  void undoFirstMove();
-
-  void initializeCells(bool);
-  void initializeCandidates(Move, Cell *, bool);
-  void initializeBlockerMap(Move, int, LinkDescriptor *);
-
-  void initializeLegalActions();
-
-  void setPegAndLinks(Player, Move);
-  void exploreLocalGraph(Player, Cell *, enum Border);
-
-  void appendLinkChar(std::string *, Move, enum Compass, std::string) const;
-  void appendColorString(std::string *, std::string, std::string) const;
-  void appendPegChar(std::string *, Move) const;
-
-  void appendBeforeRow(std::string *, Move) const;
-  void appendPegRow(std::string *, Move) const;
-  void appendAfterRow(std::string *, Move) const;
-
-  bool moveIsOnBorder(Player, Move) const;
-  bool moveIsOffBoard(Move) const;
-
-  Action stringToAction(std::string s) const;
-
  public:
   ~Board() {}
   Board() {}
   Board(int, bool);
 
-  // std::string actionToString(Action) const;
-  int getSize() const { return mSize; }
-  std::string toString() const;
-  int getResult() const { return mResult; }
-  int getMoveCounter() const { return mMoveCounter; }
-  std::vector<Action> getLegalActions(Player player) const {
-    return mLegalActions[player];
+  int size() const { return size_; }
+  std::string ToString() const;
+  int result() const { return result_; }
+  int move_counter() const { return move_counter_; }
+  std::vector<Action> GetLegalActions(Player player) const {
+    return legal_actions_[player];
   }
-  void applyAction(Player, Action);
-  Cell *getCell(Move move) { return &mCell[move.first][move.second]; }
-  const Cell *getConstCell(Move move) const {
-    return &mCell[move.first][move.second];
+  void ApplyAction(Player, Action);
+  Cell& GetCell(Position position) { return cell_[position.x][position.y]; }
+  const Cell& GetConstCell(Position position) const {
+    return cell_[position.x][position.y];
   }
-  Move actionToMove(open_spiel::Player player, Action action) const;
-  Action moveToAction(Player player, Move move) const;
-  Move getTensorMove(Move move, int turn) const;
+  Position ActionToPosition(Action action) const;
+  Action PositionToAction(Position position) const;
+  Position GetTensorPosition(Position position, bool turn) const;
+
+ private:
+  int move_counter_ = 0;
+  bool swapped_ = false;
+  Position move_one_;
+  int result_ = kOpen;
+  std::vector<std::vector<Cell>> cell_;
+  int size_;  // length of a side of the board
+  bool ansi_color_output_;
+  std::vector<Action> legal_actions_[kNumPlayers];
+
+  void set_size(int size) { size_ = size; }
+
+  bool ansi_color_output() const { return ansi_color_output_; }
+  void set_ansi_color_output(bool ansi_color_output) {
+    ansi_color_output_ = ansi_color_output;
+  }
+
+  void set_result(int result) { result_ = result; }
+
+  bool swapped() const { return swapped_; }
+  void set_swapped(bool swapped) { swapped_ = swapped; }
+
+  Position move_one() const { return move_one_; }
+  void set_move_one(Position move) { move_one_ = move; }
+
+  void IncMoveCounter() { move_counter_++; }
+
+  bool HasLegalActions(Player player) const {
+    return legal_actions_[player].size() > 0;
+  }
+
+  void RemoveLegalAction(Player, Position);
+
+  void UpdateResult(Player, Position);
+  void UndoFirstMove();
+
+  void InitializeCells(bool);
+  void InitializeNeighbors(Position, Cell&, bool);
+  void InitializeBlockerMap(Position, int, const LinkDescriptor&);
+
+  void InitializeLegalActions();
+
+  void SetPegAndLinks(Player, Position);
+  void ExploreLocalGraph(Player, Cell&, enum Border,  std::set<Cell*>);
+
+  void AppendLinkChar(std::string&, Position, enum Compass, std::string) const;
+  void AppendColorString(std::string&, std::string, std::string) const;
+  void AppendPegChar(std::string&, Position) const;
+
+  void AppendBeforeRow(std::string&, Position) const;
+  void AppendPegRow(std::string&, Position) const;
+  void AppendAfterRow(std::string&, Position) const;
+
+  bool PositionIsOnBorder(Player, Position) const;
+  bool PositionIsOffBoard(Position) const;
+
+  Action StringToAction(std::string s) const;
+};
+
+// used to construct new entries in BlockerMap
+class LinkHashFunction {
+ public:
+    size_t operator()(const Link& link) const {
+      return link.position.x * 10000 + link.position.y * 100 + link.direction;
+    }
+};
+
+// stores for each link the set of links that could block it (i.e. cross it)
+class BlockerMap {
+ public:
+    static const std::set<Link>& GetBlockers(Link link);
+    static void PushBlocker(Link link, Link blocked_link);
+    static void DeleteBlocker(Link link, Link blocked_link);
+    static void ClearBlocker();
+
+ private:
+    static std::unordered_map<Link, std::set<Link>, LinkHashFunction> map_;
 };
 
 // twixt board:
-// * the board has mBoardSize x mBoardSize cells
+// * the board has board_size_ * board_size_ cells
 // * the x-axis (cols) points right,
 // * the y axis (rows) points up
-// * coords [col,row] start at the lower left corner [0,0]
 // * coord labels c3, f4, d2, etc. start at the upper left corner (a1)
-// * player 0 == 'x', red color, plays top/bottom
-// * player 1 == 'o', blue color, plays left/right
-// * move is labeled player + coord label, e.g. xd4
-// * empty cell == 2
-// * corner cell == 3
+// * player 0, 'x', red color, plays top/bottom
+// * player 1, 'o', blue color, plays left/right
+// * positions are labeled: col letter + row number, e.g. d4
+// * moves are labeled: player label + col letter + row number, e.g. xd4
+// * empty cell code = 2
+// * corner cell code = 3
 //
-// example 8 x 8 board: red peg at [2,3] == xc5 == action=26
-//                      red peg at [3,5] == xd3 == action=21
-//                     blue peg at [5,3] == of5 == action=29
+// example 8 x 8 board:
+//   move: xc5, player 0 action: 19, red peg at [2,3]
+//   move: of5, player 1 action: 43, blue peg at [5,3]
+//   move: xd3, player 0 action: 29, red peg at [3,5]
+//         link from [2,3] to [3,5]
+//         cell[2][3].links = 00000001  (bit 1 set for NNE direction)
+//         cell[3][5].links = 00010000  (bit 5 set for SSW direction)
 //
 //     a   b   c   d   e   f   g   h
-//    ------------------------------
-// 1 | 3   2   2   2   2   2   2   3 |
-//   |                               |
-// 2 | 2   2   2   2   2   2   2   2 |
-//   |                               |
-// 3 | 2   2   2   0   2   2   2   2 |
-//   |                               |
-// 4 | 2   2   2   2   2   2   2   2 |
-//   |                               |
-// 5 | 2   2   0   2   2   1   2   2 |
-//   |                               |
-// 6 | 2   2   2   2   2   2   2   2 |
-//   |                               |
-// 7 | 2   2   2   2   2   2   2   2 |
-//   |                               |
-// 8 | 3   2   2   2   2   2   2   3 |
-//     ------------------------------
-
-// there's a red link from c5 to d3:
-// cell[2][3].links = 00000001  (bit 1 set for NNE direction)
-// cell[3][5].links = 00010000  (bit 5 set for SSW direction)
-
-// Actions are indexed from 0 to boardSize * (boardSize-2) from the player's
-// perspective:
-
-// player 0 actions:
-//     a   b   c   d   e   f   g   h
-//    ------------------------------
-// 1 |     7  15  23  31  39  47     |
-//   |                               |
-// 2 |     6  14  22  30  38  46     |
-//   |                               |
-// 3 |     5  13  21  29  37  45     |
-//   |                               |
-// 4 |     4  12  20  28  36  44     |
-//   |                               |
-// 5 |     3  11  19  27  35  43     |
-//   |                               |
-// 6 |     2  10  18  26  34  42     |
-//   |                               |
-// 7 |     1   9  17  25  33  41     |
-//   |                               |
-// 8 |     0   8  16  24  32  40     |
-//     ------------------------------
-
-// player 1 actions:
-//     a   b   c   d   e   f   g   h
-//    ------------------------------
-// 1 |                               |
-//   |                               |
-// 2 | 0   1   2   3   4   5   6   7 |
-//   |                               |
-// 3 | 8   9  10  11  12  13  14  15 |
-//   |                               |
-// 4 |16  17  18  19  20  21  22  23 |
-//   |                               |
-// 5 |24  25  26  27  28  29  30  31 |
-//   |                               |
-// 6 |32  33  34  35  36  37  38  39 |
-//   |                               |
-// 7 |40  41  42  43  44  45  46  47 |
-//   |                               |
-// 8 |                               |
-//     ------------------------------
-
-//  mapping move to player 0 action:
-//  [c,r] => (c-1) * size + r,
-//  e.g.: xd6 == [3,2] => (3-1) * 8 + 2 == 18
-//  xd6 == action 18 of player 0
+//  7  3|  2   2   2   2   2   2 | 3  1
+//    --|------------------------|--
+//  6  2|  2   2   2   2   2   2 | 2  2
+//      |                        |
+//  5  2|  2   2  [0]  2   2   2 | 2  3
+//      |                        |
+//  4  2|  2   2   2   2   2   2 | 2  4
+//      |                        |
+//  3  2|  2  [0]  2   2  [1]  1 | 2  5
+//      |                        |
+//  2  2|  2   2   2   2   2   2 | 2  6
+//      |                        |
+//  1  2|  2   2   2   2   2   2 | 2  7
+//    --|------------------------|--
+//  0   |  2   2   2   2   2   2 |    8
+//     0   1   2   3   4   5   6   7
 //
-//  mapping move to player 1 action:
-//  [c,r] => (size-r-2) * size + c,
-//  e.g.: od6 == [3,2] => (8-2-2) * 8 + 3 == 35
-//  od6 == action 35 of player 1
+// Actions are indexed from 0 to board_size_ * board_size_
+// the corners are not legal actions.
+//
+//     a   b   c   d   e   f   g   h
+//  7   | 15  23  31  39  47  55 |    1
+//    --|------------------------|--
+//  6  6| 14  22  30  38  46  54 |62  2
+//      |                        |
+//  5  5| 13  21 [29] 37  45  53 |61  3
+//      |                        |
+//  4  4| 12  20  28  36  44  52 |60  4
+//      |                        |
+//  3  3| 11 [19] 27  35 [43] 51 |59  5
+//      |                        |
+//  2  2| 10  18  26  34  42  50 |58  6
+//      |                        |
+//  1  1|  9  17  25  33  41  49 |57  7
+//    --|------------------------|--
+//  0   |  8  16  24  32  40  48 |    8
+//     0   1   2   3   4   5   6   7
+//
+//  mapping move to action: [c,r] => c * size + r
+//  xd6 == [2,3] => 2 * 8 + 3 == 19
 
 }  // namespace twixt
 }  // namespace open_spiel
