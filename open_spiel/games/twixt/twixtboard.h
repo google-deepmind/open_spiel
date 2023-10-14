@@ -23,8 +23,8 @@
 #include <set>
 #include <unordered_map>
 
-#include "open_spiel/games/twixt/twixtcell.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/games/twixt/twixtcell.h"
 
 namespace open_spiel {
 namespace twixt {

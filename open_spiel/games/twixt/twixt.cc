@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "open_spiel/games/twixt/twixt.h"
+
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -22,10 +24,9 @@
 #include <vector>
 
 #include "open_spiel/spiel_utils.h"
-#include "open_spiel/games/twixt/twixt.h"
+#include "open_spiel/utils/tensor_view.h"
 #include "open_spiel/games/twixt/twixtcell.h"
 #include "open_spiel/games/twixt/twixtboard.h"
-#include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
 namespace twixt {

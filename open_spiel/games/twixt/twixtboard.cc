@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "open_spiel/games/twixt/twixtboard.h"
+
 #include "open_spiel/games/twixt/twixtcell.h"
 
 namespace open_spiel {
