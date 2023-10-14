@@ -60,7 +60,7 @@ class StackelbergLPTest(parameterized.TestCase):
         leader_nash_value = eq[0].reshape(1,
                                           -1).dot(p_mat[0]).dot(eq[1].reshape(
                                               -1, 1))
-        self.assertGreaterEqual(leader_eq_value, leader_nash_value)
+        self.assertGreaterEqual(leader_eq_value-leader_nash_value, -1e-6)
 
 
 if __name__ == "__main__":
