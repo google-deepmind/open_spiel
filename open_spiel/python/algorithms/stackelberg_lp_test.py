@@ -22,6 +22,8 @@ from open_spiel.python.algorithms.stackelberg_lp import solve_stackelberg
 from open_spiel.python.egt.utils import game_payoffs_array
 import pyspiel
 
+EPS = 1e-6
+
 # game instances based on Conitzer & Sandholm'06 paper
 game0 = pyspiel.create_matrix_game([[2, 4], [1, 3]], [[1, 0], [0, 1]])
 commit_strategy0 = np.array([0.5, 0.5])
@@ -60,7 +62,7 @@ class StackelbergLPTest(parameterized.TestCase):
         leader_nash_value = eq[0].reshape(1,
                                           -1).dot(p_mat[0]).dot(eq[1].reshape(
                                               -1, 1))
-        self.assertGreaterEqual(leader_eq_value-leader_nash_value, -1e-6)
+        self.assertGreaterEqual(leader_eq_value-leader_nash_value, -EPS)
 
 
 if __name__ == "__main__":
