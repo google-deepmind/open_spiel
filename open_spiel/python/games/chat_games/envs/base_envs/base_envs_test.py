@@ -17,7 +17,7 @@
 from absl.testing import absltest
 from absl.testing import parameterized
 
-from open_spiel.python.games.chat_games.envs.base_envs import email
+from open_spiel.python.games.chat_games.envs.base_envs import email_plain
 from open_spiel.python.games.chat_games.envs.base_envs import email_with_tone
 from open_spiel.python.games.chat_games.envs.base_envs import email_with_tone_info
 from open_spiel.python.games.chat_games.envs.base_envs import schedule_meeting_with_info
@@ -28,7 +28,7 @@ from open_spiel.python.games.chat_games.envs.utils import header
 class BaseEnvsTest(parameterized.TestCase):
 
   @parameterized.parameters([
-      dict(base_env=email),
+      dict(base_env=email_plain),
       dict(base_env=email_with_tone),
       dict(base_env=email_with_tone_info),
       dict(base_env=schedule_meeting_with_info),
