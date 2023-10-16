@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for google3.third_party.open_spiel.python.games.chat_games.envs.base_envs."""
+"""Tests for base environments."""
 
-from google3.testing.pybase import googletest
-from google3.testing.pybase import parameterized
+from absl.testing import absltest
+from absl.testing import parameterized
 
 from open_spiel.python.games.chat_games.envs.base_envs import email
 from open_spiel.python.games.chat_games.envs.base_envs import email_with_tone
@@ -39,4 +39,4 @@ class BaseEnvsTest(parameterized.TestCase):
 
 
 if __name__ == '__main__':
-  googletest.main()
+  absltest.main()
