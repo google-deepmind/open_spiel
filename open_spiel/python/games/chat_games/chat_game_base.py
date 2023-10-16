@@ -364,7 +364,7 @@ class ChatGameState(pyspiel.State):
       rewards: np.ndarray, len-num_players vector of floats
     """
     logging.set_color(logging_utils.GREEN)
-    # TODO(imgemp): No-Op reward
+
     rewards = np.zeros(self.get_game().num_players(), dtype=float)
 
     if (not self.is_terminal() and
@@ -425,8 +425,7 @@ class ChatGameState(pyspiel.State):
             )
         logging.info('LLM response:\n%s', response)
 
-        # what to do if score is null (use 0, throw away game, ...)
-        player_payoff = 0  # TODO(imgemp): No-Op reward
+        player_payoff = 0  # payoff defaults to 0 if LLM parsing fails
         if text.retrieve_numeric_block(response):
           player_payoff = int(text.retrieve_numeric_block(response))
           player_payoff = min(max(player_payoff, payoff.min), payoff.max)
@@ -647,6 +646,7 @@ class ChatGameObserverBase:
               action_str, LLM_LENGTH_MESSAGE_CHARS)
           self.dict['messages'][i] = self._info_state(state.dialogue[i + 1],
                                                       LLM_LENGTH_MESSAGE_CHARS)
+
         self.dict['messages'][i] = self._info_state(state.dialogue[i + 1],
                                                     LLM_LENGTH_MESSAGE_CHARS)
 
