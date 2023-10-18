@@ -49,6 +49,22 @@ struct Square {
 
   bool operator!=(const Square& other) const { return !(*this == other); }
 
+  // Required by std::set.
+  bool operator<(const Square& other) const {
+    if (x != other.x) {
+      return x < other.x;
+    } else {
+      return y < other.y;
+    }
+  }
+
+  std::string ToString() const {
+    std::string s;
+    s.push_back('a' + x);
+    s.push_back('1' + y);
+    return s;
+  }
+
   int8_t x;
   int8_t y;
 };
