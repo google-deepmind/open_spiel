@@ -14,8 +14,11 @@
 
 #include "open_spiel/games/chess/chess_board.h"
 
+#include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <set>
 #include <string>
@@ -1798,7 +1801,7 @@ Square ChessBoard::FindRookForCastling(Color color,
   Square my_king = find(Piece{color, PieceType::kKing});
   Piece rook_to_find{color, PieceType::kRook};
   int canonical_x = dir == CastlingDirection::kLeft ? 0 : (board_size_ - 1);
-  Square canonical_sq = Square(canonical_x, my_king.y);
+  Square canonical_sq = Square{static_cast<int8_t>(canonical_x), my_king.y};
   if (board_[SquareToIndex_(canonical_sq)] == rook_to_find) {
     return canonical_sq;
   } else {
@@ -1807,7 +1810,7 @@ Square ChessBoard::FindRookForCastling(Color color,
     int x = my_king.x + x_offset;
     std::set<Square> rooks;
     while (x < board_size_ && x >= 0) {
-      auto sq = Square(x, my_king.y);
+      auto sq = Square{static_cast<int8_t>(x), my_king.y};
       auto index = SquareToIndex_(sq);
       if (board_[index] == rook_to_find) {
         rooks.insert(sq);
