@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <functional>
 #include <ostream>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -279,9 +280,17 @@ class ChessBoard {
   int32_t IrreversibleMoveCounter() const { return irreversible_move_counter_; }
   int32_t Movenumber() const { return move_number_; }
 
-  bool CastlingRight(Color side, CastlingDirection direction) const;
+  absl::optional<Square> MaybeCastlingRookSquare(
+      Color side, CastlingDirection direction) const;
+
+  bool CastlingRight(Color color, CastlingDirection dir) const {
+    return MaybeCastlingRookSquare(color, dir).has_value();
+  }
+
   void SetCastlingRight(Color side, CastlingDirection direction,
-                        bool can_castle);
+                        absl::optional<Square> maybe_rook_square);
+
+  Square FindRookForCastling(Color color, CastlingDirection dir) const;
 
   // Find the location of any one piece of the given type, or kInvalidSquare.
   Square find(const Piece& piece) const;
@@ -538,9 +547,11 @@ class ChessBoard {
   // chess is a "half move" by white followed by a "half move" by black).
   int32_t move_number_;
 
+  // Set to the square of the rook if castling is still possible in that
+  // direction, otherwise nullopt.
   struct {
-    bool left_castle;   // -x direction, AKA long castle
-    bool right_castle;  // +x direction, AKA short castle
+    absl::optional<Square> left_castle;   // -x direction, AKA long castle
+    absl::optional<Square> right_castle;  // +x direction, AKA short castle
   } castling_rights_[2];
 
   uint64_t zobrist_hash_;
