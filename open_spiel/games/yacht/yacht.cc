@@ -200,10 +200,12 @@ void YachtState::DoApplyAction(Action move) {
       int starting_player = std::rand() % kNumPlayers;
       if (starting_player == 0) {
         // Player1 starts.
-        cur_player_ = prev_player_ = kPlayerId1;
+        cur_player_ = kChancePlayerId;
+        prev_player_ = kPlayerId2;
       } else if (starting_player == 1) {
         // Player2 Starts
-        cur_player_ = prev_player_ = kPlayerId2;
+        cur_player_ = kChancePlayerId;
+        prev_player_ = kPlayerId1;
       } else {
         SpielFatalError(
             absl::StrCat("Invalid starting player: ", starting_player));
@@ -215,7 +217,11 @@ void YachtState::DoApplyAction(Action move) {
       // Normal chance node.
       SPIEL_CHECK_TRUE(dice_.size() < 5);
       RollDie(move);
-      cur_player_ = Opponent(prev_player_);
+
+      // Once die are done rolling. Set player to non-chance node.
+      if (dice_.size() == 5) {
+        cur_player_ = Opponent(prev_player_);
+      }
       return;
     }
   }
