@@ -185,7 +185,7 @@ void YachtState::DoApplyAction(Action move) {
       return;
     } else {
       // Normal chance node.
-      SPIEL_CHECK_TRUE(dice_.empty());
+      SPIEL_CHECK_TRUE(dice_.size() < 5);
       RollDie(move);
       cur_player_ = Opponent(prev_player_);
       return;
