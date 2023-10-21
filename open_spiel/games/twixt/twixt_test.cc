@@ -129,7 +129,7 @@ void DrawTest() {
   while (!state->IsTerminal()) {
     // this pattern will produce a draw on a 5x5 board
     state->ApplyAction(state->LegalActions().at(0));
-    state->ApplyAction(state->LegalActions().at(1));i
+    state->ApplyAction(state->LegalActions().at(1));
   }
   SPIEL_CHECK_EQ(0.0, state->PlayerReturn(0));
   SPIEL_CHECK_EQ(0.0, state->PlayerReturn(1));
