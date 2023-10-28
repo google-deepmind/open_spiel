@@ -84,7 +84,7 @@ void TwixTState::SetPegAndLinksOnTensor(absl::Span<float> values,
   if (cell.HasLinks()) {
     for (int dir = 0; dir < 4; dir++) {
       if (cell.HasLink(dir)) {
-        // peg has link in direction dir: set 1.0 on plane 1..4 / 8..11
+        // peg has link in direction dir: set 1.0 on plane 1..4 / 7..10
         view[{offset + 1 + dir, tensorPosition.x, tensorPosition.y}] = 1.0;
       }
     }

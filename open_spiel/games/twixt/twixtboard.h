@@ -185,11 +185,11 @@ class BlockerMap {
 //      |                        |
 //  1  2|  2   2   2   2   2   2 | 2  7
 //    --|------------------------|--
-//  0   |  2   2   2   2   2   2 |    8
+//  0  3|  2   2   2   2   2   2 | 3  8
 //     0   1   2   3   4   5   6   7
 //
-// Actions are indexed from 0 to board_size_ * board_size_
-// the corners are not legal actions.
+// Actions are indexed from 0 to (board_size_ ** 2) - 1
+// except the corners (0, 7, 56, 63) which are not legal actions.
 //
 //     a   b   c   d   e   f   g   h
 //  7   | 15  23  31  39  47  55 |    1
