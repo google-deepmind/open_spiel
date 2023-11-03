@@ -644,8 +644,6 @@ class ChatGameObserverBase:
           action_str = '\n'.join([f'{k}: {v}' for k, v in pa.items()])
           self.dict['prompt_actions'][i] = self._info_state(
               action_str, LLM_LENGTH_MESSAGE_CHARS)
-          self.dict['messages'][i] = self._info_state(state.dialogue[i + 1],
-                                                      LLM_LENGTH_MESSAGE_CHARS)
 
         self.dict['messages'][i] = self._info_state(state.dialogue[i + 1],
                                                     LLM_LENGTH_MESSAGE_CHARS)
@@ -968,6 +966,7 @@ class BaseChatGame(pyspiel.Game):
                                                        prompt_action_lists))
     if isinstance(self._num_prompt_actions, list):
       self._num_prompt_actions = tuple(self._num_prompt_actions)
+
     if (self._initial_scenario
         and self._given_private_info
         and tuple(self._given_private_info.keys()) != self._header.info_keys):
@@ -983,16 +982,16 @@ class BaseChatGame(pyspiel.Game):
         if self._initial_scenario:
           if len(info_list) < self._num_players:
             raise ValueError('Must define at least a single private info for ' +
-                             'each player if setting an initial scenario.' +
+                             'each player if setting an initial scenario. ' +
                              f'Num_players={self._num_players} but only given' +
-                             f' len(info_list)={len(info_list)} for info_key=' +
-                             f'{info_key}.')
+                             f' len-{len(info_list)} private info list for ' +
+                             f'info_key={info_key}.')
           else:
             info_list = info_list[:self._num_players]
         if len(info_list) != self._num_private_info[i]:
           logging.info(f'Overwriting num_private_info[{i}]=' +
                        f'{self._num_private_info[i]} to reflect ' +
-                       f'given len-{len(info_list)} private info list.' +
+                       f'given len-{len(info_list)} private info list ' +
                        f'for info_key={info_key}.',
                        color=logging_utils.YELLOW)
           if isinstance(self._num_private_info, tuple):
