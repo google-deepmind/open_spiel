@@ -1142,6 +1142,97 @@ class BaseChatGame(pyspiel.Game):
 
     return list(answers)
 
+  def generate_scenario(self) -> Tuple[List[str],
+                                       OrderedDict[str, List[str]],
+                                       Any]:
+    """Generates a new game config from examples.
+    
+    Returns:
+      given_names: list of str
+      given_private_info: OrderedDict(str: list of str)
+      initial_scenario(msg, sender, receiver, **private_info, **prompt_actions)
+    """
+    player_names = self._rnd.choice(self._names,
+                                    size=self._num_players,
+                                    replace=False)
+    sender, receiver = player_names[:2]
+    if self._num_players > 2:
+      others = ', '.join(player_names[2:])
+    else:
+      others = ''
+
+    pa_lists = self._prompt_actions.values()
+    prompt_action_vals = [self._rnd.choice(pa_list) for pa_list in pa_lists]
+    prompt_actions_header = collections.OrderedDict(zip(
+        self._header.action_keys, prompt_action_vals))
+
+    pi_lists = self._private_info.values()
+    private_info_vals = [
+        self._rnd.choice(pi_list, size=self._num_players)
+        for pi_list in pi_lists
+    ]
+    private_info = collections.OrderedDict(zip(self._header.info_keys,
+                                               private_info_vals))
+    private_info_vals_player_0 = [piv[0] for piv in private_info_vals]
+    private_info_header = collections.OrderedDict(zip(
+        self._header.info_keys, private_info_vals_player_0))
+
+    opts = prompt_actions_header
+    opts.update(private_info_header)
+
+    # scenarios are generated drawing from a fixed set of personalities
+    header = self._header.w_opts.format(sender=sender,
+                                        receiver=receiver,
+                                        others=others,
+                                        **opts)
+
+    # generate a random scenario
+    # need to generate new scenario with specific players (i.e. names). Can
+    # 1) try to generate multiple scenarios at once and parse output
+    # 2) generate a single scenario by varying the LLM seed
+    # 3) can rely on the randomness in names and private info to induce new
+    #    scenarios
+    # we are currently going with option 3)
+    logging.info('Generating initial scenario...')
+    logging.info('Scenario prompt:\n%s', self._meta_query + header)
+    response = self.generate_response(
+        prompt=self._meta_query + header,
+        seed=DEFAULT_LLM_SEED,
+        num_output_tokens=LLM_LENGTH_MESSAGE_TOKENS
+        )
+    response = response[:LLM_LENGTH_MESSAGE_CHARS]
+    logging.info('LLM response:\n%s', response)
+    examples = []
+    ptr = 0
+    i = 0
+    augmented_response = header + response
+    while ptr < len(augmented_response):
+      generated_example = self._header.strip_msg(augmented_response[ptr:],
+                                                 sender)
+      if not generated_example:
+        break
+      ptr += len(generated_example)
+      generated_example = generated_example.strip('\n')
+      logging.info('*Generated Example %d:\n%s', i, generated_example)
+      i += 1
+      examples.append(generated_example)
+    # grab first generated scenario
+    scenario_prompt = examples[0]
+    logging.info('Example 0 selected')
+    actions = collections.OrderedDict(zip(['player_names'],
+                                          [player_names]))
+    actions.update(self._prompt_actions)
+
+    given_names = player_names
+    given_private_info = private_info
+    scenario_class = self._examples_scenarios[0].__class__
+    initial_scenario = scenario_class(msg=scenario_prompt,
+                                      sender=sender,
+                                      receiver=receiver,
+                                      **opts)
+
+    return (given_names, given_private_info, initial_scenario)
+
   def new_initial_state_specs(self) -> Tuple[OrderedDict[str, List[str]],
                                              List[int],
                                              str,
@@ -1151,89 +1242,20 @@ class BaseChatGame(pyspiel.Game):
     Returns:
       ChatGameState (see ChatGameState class)
     """
-
     if self._initial_scenario:
-      scenario_prompt_unformatted = (self._header.plain +
-                                     self._initial_scenario.msg)
-      scenario_prompt = scenario_prompt_unformatted.format(
-          sender=self._initial_scenario.sender,
-          receiver=self._initial_scenario.receiver,
-          others=ALL_PLAYERS)
-      actions = collections.OrderedDict(zip(['player_names'],
-                                            [self._names]))
-      actions.update(self._prompt_actions)
+      names = self._names
       private_info = self._private_info
+      scenario = self._initial_scenario
     else:
-      player_names = self._rnd.choice(self._names,
-                                      size=self._num_players,
-                                      replace=False)
-      sender, receiver = player_names[:2]
-      if self._num_players > 2:
-        others = ', '.join(player_names[2:])
-      else:
-        others = ''
+      names, private_info, scenario = self.generate_scenario()
 
-      pa_lists = self._prompt_actions.values()
-      prompt_action_vals = [self._rnd.choice(pa_list) for pa_list in pa_lists]
-      prompt_actions_header = collections.OrderedDict(zip(
-          self._header.action_keys, prompt_action_vals))
-
-      pi_lists = self._private_info.values()
-      private_info_vals = [
-          self._rnd.choice(pi_list, size=self._num_players)
-          for pi_list in pi_lists
-      ]
-      private_info = collections.OrderedDict(zip(self._header.info_keys,
-                                                 private_info_vals))
-      private_info_vals_player_0 = [piv[0] for piv in private_info_vals]
-      private_info_header = collections.OrderedDict(zip(
-          self._header.info_keys, private_info_vals_player_0))
-
-      opts = prompt_actions_header
-      opts.update(private_info_header)
-
-      # scenarios are generated drawing from a fixed set of personalities
-      header = self._header.w_opts.format(sender=sender,
-                                          receiver=receiver,
-                                          others=others,
-                                          **opts)
-
-      # generate a random scenario
-      # need to generate new scenario with specific players (i.e. names). Can
-      # 1) try to generate multiple scenarios at once and parse output
-      # 2) generate a single scenario by varying the LLM seed
-      # 3) can rely on the randomness in names and private info to induce new
-      #    scenarios
-      # we are currently going with option 3)
-      logging.info('Generating initial scenario...')
-      logging.info('Scenario prompt:\n%s', self._meta_query + header)
-      response = self.generate_response(
-          prompt=self._meta_query + header,
-          seed=DEFAULT_LLM_SEED,
-          num_output_tokens=LLM_LENGTH_MESSAGE_TOKENS
-          )
-      response = response[:LLM_LENGTH_MESSAGE_CHARS]
-      logging.info('LLM response:\n%s', response)
-      examples = []
-      ptr = 0
-      i = 0
-      augmented_response = header + response
-      while ptr < len(augmented_response):
-        generated_example = self._header.strip_msg(augmented_response[ptr:],
-                                                   sender)
-        if not generated_example:
-          break
-        ptr += len(generated_example)
-        generated_example = generated_example.strip('\n')
-        logging.info('*Generated Example %d:\n%s', i, generated_example)
-        i += 1
-        examples.append(generated_example)
-      # grab first generated scenario
-      scenario_prompt = examples[0]
-      logging.info('Example 0 selected')
-      actions = collections.OrderedDict(zip(['player_names'],
-                                            [player_names]))
-      actions.update(self._prompt_actions)
+    scenario_prompt_unformatted = self._header.plain + scenario.msg
+    scenario_prompt = scenario_prompt_unformatted.format(
+        sender=scenario.sender,
+        receiver=scenario.receiver,
+        others=ALL_PLAYERS)
+    actions = collections.OrderedDict(zip(['player_names'], [names]))
+    actions.update(self._prompt_actions)
 
     return (actions, self._llm_seeds, scenario_prompt, private_info)
 
