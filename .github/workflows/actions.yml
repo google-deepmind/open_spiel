@@ -49,23 +49,6 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Build and run tests with all optional dependencies, including building a
-        # shared library with linkable third party dependencies in place.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: "3.9"
-          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          TRAVIS_USE_NOX: 0
-          BUILD_SHARED_LIB: "ON"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # One older platform with oldest Python version on that platform.
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: "3.8"
-          TRAVIS_USE_NOX: 0
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
 
     runs-on: ${{ matrix.os }}
     env:
