@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utils for logging (in color)."""
-
-from absl import logging
+"""Utils for constructing strings in color."""
 
 RESET = '\033[0m'         # Reset
 BLACK = '\033[30m'        # Black
@@ -28,8 +26,8 @@ WHITE = '\033[37m'        # White
 BLACK2 = '\033[39m'       # Black?
 
 
-class ColorLogger:
-  """Color logging."""
+class ColorText:
+  """Color text class."""
 
   def __init__(self, reset_color=RESET):
     self.reset_color = reset_color
@@ -44,17 +42,7 @@ class ColorLogger:
   def reset(self):
     self.current_color = self.reset_color
 
-  def info(self, log_str: str, *args, color: str = ''):
+  def color(self, log_str: str, color: str = ''):
     c = color if color else self.current_color
-    log_str = '%s' + log_str + '%s'
-    logging.info(log_str, c, *args, self.reset_color)
-
-  def warning(self, log_str: str, *args, color: str = ''):
-    c = color if color else self.current_color
-    log_str = '%s' + log_str + '%s'
-    logging.warning(log_str, c, *args, self.reset_color)
-
-  def error(self, log_str: str, *args, color: str = ''):
-    c = color if color else self.current_color
-    log_str = '%s' + log_str + '%s'
-    logging.error(log_str, c, *args, self.reset_color)
+    log_str = c + log_str + self.reset_color
+    return log_str
