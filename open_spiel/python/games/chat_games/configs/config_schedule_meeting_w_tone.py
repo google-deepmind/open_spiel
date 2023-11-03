@@ -45,8 +45,8 @@ def get_config():
   examples_names = names_schedule_meeting.NAMES
 
   given_prompt_actions = collections.OrderedDict()
-  tones = ['Happy',
-           'Aggreable']
+  tones = ['calm',
+           'assertive']
   given_prompt_actions[header.action_keys[0]] = tones
   num_tones = len(tones)
 
