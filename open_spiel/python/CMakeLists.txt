@@ -19,9 +19,9 @@ message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 message(NOTICE "Python library dirs: ${Python3_LIBRARY_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
-if(Python3_VERSION VERSION_LESS "3.6.0")
+if(Python3_VERSION VERSION_LESS "3.8.0")
   message(FATAL_ERROR
-    "Python found ${Python3_VERSION} < 3.6.0")
+    "Python found ${Python3_VERSION} < 3.8.0")
 endif()
 
 # Detect the Python ML frameworks.
@@ -264,7 +264,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
-  # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
     # Disable JAX tests temporarily
     #jax/deep_cfr_jax_test.py
