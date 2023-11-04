@@ -46,7 +46,7 @@ source venv/bin/activate
 
 # Finally, install OpenSpiel and its dependencies:
 python3 -m pip install --upgrade setuptools pip
-python3 -m pip install --no-binary open_spiel
+python3 -m pip install --no-binary=:open_spiel: open_spiel
 
 # To exit the virtual env
 deactivate
