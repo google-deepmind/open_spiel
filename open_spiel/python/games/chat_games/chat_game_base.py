@@ -33,7 +33,7 @@ from open_spiel.python.games.chat_games.utils import logging_utils
 import pyspiel
 
 
-logging = logging_utils.ColorLogger()
+ct = logging_utils.ColorText()
 
 REWARD_MODEL = pyspiel.GameType.RewardModel.TERMINAL
 
@@ -180,20 +180,21 @@ class ChatGameState(pyspiel.State):
     return payoff_query.format(**payoff_dict)
 
   def _llm_is_terminal(self) -> bool:
-    logging.set_color(logging_utils.RED)
+    ct.set_color(logging_utils.RED)
     prefix = self.get_game().llm_termination_prompt.obs_trans_prefix
     postfix = self.get_game().llm_termination_prompt.obs_trans_postfix
     if prefix or postfix:
       prompt = prefix + self.dialogue_str + postfix
       term_obs = self.get_game().generate_response(prompt,
                                                    seed=DEFAULT_LLM_SEED)
-      logging.info('LLM summary:\n%s', term_obs)
+      logging.info(ct.color('LLM summary:\n%s'), term_obs)
     else:
       term_obs = self.dialogue_str
     llm_termination = self.get_game().generate_bool(
         self.get_game().llm_termination_prompt.query.format(msg=term_obs),
         seed=DEFAULT_LLM_SEED)
-    logging.info('LLM termination condition met? %s', str(llm_termination))
+    logging.info(ct.color('LLM termination condition met? %s'),
+                 str(llm_termination))
     return llm_termination
 
   def _names_from_validated_receiver(self, receiver: int, speaker: int
@@ -363,7 +364,7 @@ class ChatGameState(pyspiel.State):
     Returns:
       rewards: np.ndarray, len-num_players vector of floats
     """
-    logging.set_color(logging_utils.GREEN)
+    ct.set_color(logging_utils.GREEN)
 
     rewards = np.zeros(self.get_game().num_players(), dtype=float)
 
@@ -391,8 +392,9 @@ class ChatGameState(pyspiel.State):
           payoff_obs_prompt = (payoff.obs_trans_prefix +
                                dialogue +
                                payoff.obs_trans_postfix)
-          logging.info('Scoring payoff (speaker=%d:%s)...', player, name)
-          logging.info('LLM prompt:\n%s', payoff_obs_prompt)
+          logging.info(ct.color('Scoring payoff (speaker=%d:%s)...'),
+                       player, name)
+          logging.info(ct.color('LLM prompt:\n%s'), payoff_obs_prompt)
           response = self.get_game().generate_response(
               prompt=payoff_obs_prompt,
               seed=DEFAULT_LLM_SEED,
@@ -403,40 +405,44 @@ class ChatGameState(pyspiel.State):
           payoff_obs = dialogue
         payoff_obs = info_prefix + '\n\n' + payoff_obs
         query = self._build_payoff_query(payoff.query, payoff_obs, name)
-        logging.info('Calculating payoff %d (player=%d:%s)...', p, player, name)
-        logging.info('LLM prompt:\n%s', query)
+        logging.info(ct.color('Calculating payoff %d (player=%d:%s)...'),
+                     p, player, name)
+        logging.info(ct.color('LLM prompt:\n%s'), query)
         response = self.get_game().generate_response(
             prompt=query,
             seed=DEFAULT_LLM_SEED,
             num_output_tokens=LLM_LENGTH_SCORE_TOKENS
             )
-        logging.info('LLM response:\n%s', response)
+        logging.info(ct.color('LLM response:\n%s'), response)
 
-        logging.info('Extracting payoff %d (player=%d:%s)...', p, player, name)
+        logging.info(ct.color('Extracting payoff %d (player=%d:%s)...'),
+                     p, player, name)
         query = (f'Extract out the final value for {name} as a single ' +
                  'numeric value from the following payoff valuation. Do ' +
                  'NOT show your work:\n\n' +
                  f'{response}\n\nResult: ')
-        logging.info('LLM prompt:\n%s', query)
+        logging.info(ct.color('LLM prompt:\n%s'), query)
         response = self.get_game().generate_response(
             prompt=query,
             seed=DEFAULT_LLM_SEED,
             num_output_tokens=LLM_LENGTH_SCORE_TOKENS
             )
-        logging.info('LLM response:\n%s', response)
+        logging.info(ct.color('LLM response:\n%s'), response)
 
         player_payoff = 0  # payoff defaults to 0 if LLM parsing fails
         if text.retrieve_numeric_block(response):
           player_payoff = int(text.retrieve_numeric_block(response))
           player_payoff = min(max(player_payoff, payoff.min), payoff.max)
         else:
-          logging.warning('Payoff extraction from response failed:\n\n%s.',
-                          response)
-        logging.info('Extracted integer payoff (%s): %d', name, player_payoff)
+          logging.warning(
+              ct.color('Payoff extraction from response failed:\n\n%s.'),
+              response)
+        logging.info(ct.color('Extracted integer payoff (%s): %d'),
+                     name, player_payoff)
         player_payoffs.append(player_payoff)
       rewards[player] = self.get_game().aggregate_payoffs(player_payoffs)
 
-    logging.reset()
+    ct.reset()
 
     return rewards.astype(float)
 
@@ -613,7 +619,7 @@ class ChatGameObserverBase:
 
   def set_from(self, state: ChatGameState, player: int):
     """Updates `tensor` and `dict` to reflect `state` from PoV of `player`."""
-    logging.set_color(logging_utils.PURPLE)
+    ct.set_color(logging_utils.PURPLE)
 
     self.tensor.fill(0)
     self.dict['player_id'][player] = 1
@@ -644,8 +650,6 @@ class ChatGameObserverBase:
           action_str = '\n'.join([f'{k}: {v}' for k, v in pa.items()])
           self.dict['prompt_actions'][i] = self._info_state(
               action_str, LLM_LENGTH_MESSAGE_CHARS)
-          self.dict['messages'][i] = self._info_state(state.dialogue[i + 1],
-                                                      LLM_LENGTH_MESSAGE_CHARS)
 
         self.dict['messages'][i] = self._info_state(state.dialogue[i + 1],
                                                     LLM_LENGTH_MESSAGE_CHARS)
@@ -654,37 +658,37 @@ class ChatGameObserverBase:
       obs_prompt = (state.obs[player].obs_trans_prefix +
                     state.dialogue_str +
                     state.obs[player].obs_trans_postfix)
-      logging.info('Generating observation (speaker=%d:%s)...',
+      logging.info(ct.color('Generating observation (speaker=%d:%s)...'),
                    player,
                    state.names[player])
-      logging.info('LLM prompt:\n%s', obs_prompt)
+      logging.info(ct.color('LLM prompt:\n%s'), obs_prompt)
       response = state.get_game().generate_response(
           prompt=obs_prompt,
           seed=DEFAULT_LLM_SEED,
           num_output_tokens=LLM_LENGTH_OBS_TOKENS
           )
-      logging.info('LLM response:\n%s', response)
+      logging.info(ct.color('LLM response:\n%s'), response)
       obs = response[:LLM_LENGTH_OBS_CHARS]
 
       obs = info_prefix + '\n' + obs
 
-      logging.info('Observation (speaker=%d:%s):\n%s',
+      logging.info(ct.color('Observation (speaker=%d:%s):\n%s'),
                    player,
                    state.names[player],
                    obs)
-      logging.info('Vectorizing observation...')
+      logging.info(ct.color('Vectorizing observation...'))
       observation = state.vectorize(obs, VEC_SIZE)
-      logging.info('Vectorized observation (speaker=%d:%s):\n%s',
+      logging.info(ct.color('Vectorized observation (speaker=%d:%s):\n%s'),
                    player,
                    state.names[player],
                    observation)
       self.dict['dialogue'] = observation
 
-      logging.reset()
+      ct.reset()
 
   def string_from(self, state: ChatGameState, player: int) -> str:
     """Observation of `state` from the PoV of `player`, as a string."""
-    logging.set_color(logging_utils.PURPLE)
+    ct.set_color(logging_utils.PURPLE)
 
     extra_info_strs = [pi[player] for pi in state.private_info.values()]
     info_prefix = [
@@ -698,16 +702,16 @@ class ChatGameObserverBase:
       obs_prompt = (state.obs[player].obs_trans_prefix +
                     state.dialogue_str +
                     state.obs[player].obs_trans_postfix)
-      logging.info('Generating observation (speaker=%d:%s)...',
+      logging.info(ct.color('Generating observation (speaker=%d:%s)...'),
                    player,
                    state.names[player])
-      logging.info('LLM prompt:\n%s', obs_prompt)
+      logging.info(ct.color('LLM prompt:\n%s'), obs_prompt)
       response = state.get_game().generate_response(
           prompt=obs_prompt,
           seed=DEFAULT_LLM_SEED,
           num_output_tokens=LLM_LENGTH_OBS_TOKENS
           )
-      logging.info('LLM response:\n%s', response)
+      logging.info(ct.color('LLM response:\n%s'), response)
       obs = response[:LLM_LENGTH_OBS_CHARS]
 
       obs = info_prefix + '\n' + obs
@@ -715,7 +719,7 @@ class ChatGameObserverBase:
       obs_str = 'Observation (speaker={:d}:{:s}):\n{:s}'.format(
           player, state.names[player], obs)
 
-      logging.reset()
+      ct.reset()
 
       return obs_str
 
@@ -905,8 +909,8 @@ class BaseChatGame(pyspiel.Game):
                                           self._examples_names,
                                           self._num_names,
                                           retrieve_name)
-      logging.info('Generated names:\n%s', '\n'.join(self._names),  # pylint:disable=logging-too-many-args
-                   color=logging_utils.YELLOW)
+      logging.info(ct.color('Generated names:\n%s', logging_utils.YELLOW),
+                   '\n'.join(self._names))  # pylint:disable=logging-too-many-args
       if len(self._names) < self._num_players:
         raise ValueError(f'Generated too few names! {len(self._names)} < ' +
                          f'{self._num_players}.')
@@ -921,8 +925,8 @@ class BaseChatGame(pyspiel.Game):
     else:
       self._llm_seeds = list(self._rnd.randint(MIN_RND_SEED, MAX_RND_SEED,
                                                size=self._num_llm_seeds))
-      logging.info('Generated action seeds:%s', self._llm_seeds,  # pylint:disable=logging-too-many-args
-                   color=logging_utils.YELLOW)
+      logging.info(ct.color('Generated action seeds:%s', logging_utils.YELLOW),
+                   self._llm_seeds)  # pylint:disable=logging-too-many-args
       self._llm_seeds_gen = True
 
     # loop over every action key in header action keys
@@ -946,11 +950,11 @@ class BaseChatGame(pyspiel.Game):
           action_key in self._given_prompt_actions):
         action_list = self._given_prompt_actions[action_key]
         if len(action_list) != self._num_prompt_actions[i]:
-          logging.info(f'Overwriting num_prompt_actions[{i}]=' +
-                       f'{self._num_prompt_actions[i]} to reflect ' +
-                       f'given len-{len(action_list)} prompt action list.' +
-                       f'for action_key={action_key}.',
-                       color=logging_utils.YELLOW)
+          logging.info(ct.color(f'Overwriting num_prompt_actions[{i}]=' +
+                                f'{self._num_prompt_actions[i]} to reflect ' +
+                                f'given len-{len(action_list)} prompt ' +
+                                f'action list for action_key={action_key}.',
+                                color=logging_utils.YELLOW))
           if isinstance(self._num_prompt_actions, tuple):
             self._num_prompt_actions = list(self._num_prompt_actions)
           self._num_prompt_actions[i] = len(action_list)
@@ -960,14 +964,16 @@ class BaseChatGame(pyspiel.Game):
                                             examples,
                                             self._num_prompt_actions[i],
                                             retrieve_prompt)
-        logging.info('Generated prompt actions for action key = %s:\n%s',  # pylint:disable=logging-too-many-args
-                     action_key, '\n-----\n'.join(action_list),
-                     color=logging_utils.YELLOW)
+        logging.info(ct.color(
+            'Generated prompt actions for action key = %s:\n%s',
+            color=logging_utils.YELLOW),
+                     action_key, '\n-----\n'.join(action_list))
       prompt_action_lists.append(action_list)
     self._prompt_actions = collections.OrderedDict(zip(self._header.action_keys,
                                                        prompt_action_lists))
     if isinstance(self._num_prompt_actions, list):
       self._num_prompt_actions = tuple(self._num_prompt_actions)
+
     if (self._initial_scenario
         and self._given_private_info
         and tuple(self._given_private_info.keys()) != self._header.info_keys):
@@ -983,18 +989,18 @@ class BaseChatGame(pyspiel.Game):
         if self._initial_scenario:
           if len(info_list) < self._num_players:
             raise ValueError('Must define at least a single private info for ' +
-                             'each player if setting an initial scenario.' +
+                             'each player if setting an initial scenario. ' +
                              f'Num_players={self._num_players} but only given' +
-                             f' len(info_list)={len(info_list)} for info_key=' +
-                             f'{info_key}.')
+                             f' len-{len(info_list)} private info list for ' +
+                             f'info_key={info_key}.')
           else:
             info_list = info_list[:self._num_players]
         if len(info_list) != self._num_private_info[i]:
-          logging.info(f'Overwriting num_private_info[{i}]=' +
-                       f'{self._num_private_info[i]} to reflect ' +
-                       f'given len-{len(info_list)} private info list.' +
-                       f'for info_key={info_key}.',
-                       color=logging_utils.YELLOW)
+          logging.info(ct.color(f'Overwriting num_private_info[{i}]=' +
+                                f'{self._num_private_info[i]} to reflect ' +
+                                f'given len-{len(info_list)} private info ' +
+                                f'list for info_key={info_key}.',
+                                color=logging_utils.YELLOW))
           if isinstance(self._num_private_info, tuple):
             self._num_private_info = list(self._num_private_info)
           self._num_private_info[i] = len(info_list)
@@ -1004,9 +1010,9 @@ class BaseChatGame(pyspiel.Game):
                                           examples,
                                           self._num_private_info[i],
                                           retrieve_prompt)
-        logging.info('Generated private info for info key = %s:\n%s',  # pylint:disable=logging-too-many-args
-                     info_key, '\n-----\n'.join(info_list),
-                     color=logging_utils.YELLOW)
+        logging.info(ct.color('Generated private info for info key = %s:\n%s',
+                              color=logging_utils.YELLOW),
+                     info_key, '\n-----\n'.join(info_list))
       private_info_lists.append(info_list)
     self._private_info = collections.OrderedDict(zip(self._header.info_keys,
                                                      private_info_lists))
@@ -1106,7 +1112,7 @@ class BaseChatGame(pyspiel.Game):
     Returns:
       prompts: list of strings
     """
-    logging.set_color(logging_utils.CYAN)
+    ct.set_color(logging_utils.CYAN)
 
     answers = set()
     num_gen = LLM_LIST_GEN_ATTEMPTS
@@ -1119,16 +1125,16 @@ class BaseChatGame(pyspiel.Game):
     prompt += ('Input:\n' + ITEM_PREFIX +
                ('\n' + ITEM_PREFIX).join(examples) + '\n' +
                self._llm_list_suffix)
-    logging.info('Generating list of distinct prompts...')
-    logging.info('Example prompt:\n%s', prompt)
+    logging.info(ct.color('Generating list of distinct prompts...'))
+    logging.info(ct.color('Example prompt:\n%s'), prompt)
     for seed in self._rnd.randint(MIN_RND_SEED, MAX_RND_SEED, size=num_gen):
-      logging.info('Generating %s (seed=%s)', key, seed)
+      logging.info(ct.color('Generating %s (seed=%s)'), key, seed)
       response = self.generate_response(
           prompt=prompt,
           seed=seed,
           num_output_tokens=LLM_LENGTH_LIST_OF_WORDS_TOKENS
           )
-      logging.info('LLM response\n%s', response)
+      logging.info(ct.color('LLM response\n%s'), response)
       answer = retrieve_prompt(response)
       if answer and answer not in answers:
         answers.add(answer)
@@ -1136,12 +1142,104 @@ class BaseChatGame(pyspiel.Game):
         return list(answers)
     num_distinct = len(answers)
     if len(answers) < num_prompts:
-      logging.warning('Only %d distinct prompts generated for %d desired:\n%s.',
+      logging.warning(ct.color(
+          'Only %d distinct prompts generated for %d desired:\n%s.'),
                       num_distinct, num_prompts, answers)
 
-    logging.reset()
+    ct.reset()
 
     return list(answers)
+
+  def generate_scenario(self) -> Tuple[List[str],
+                                       OrderedDict[str, List[str]],
+                                       Any]:
+    """Generates a new game config from examples.
+    
+    Returns:
+      given_names: list of str
+      given_private_info: OrderedDict(str: list of str)
+      initial_scenario(msg, sender, receiver, **private_info, **prompt_actions)
+    """
+    player_names = self._rnd.choice(self._names,
+                                    size=self._num_players,
+                                    replace=False)
+    sender, receiver = player_names[:2]
+    if self._num_players > 2:
+      others = ', '.join(player_names[2:])
+    else:
+      others = ''
+
+    pa_lists = self._prompt_actions.values()
+    prompt_action_vals = [self._rnd.choice(pa_list) for pa_list in pa_lists]
+    prompt_actions_header = collections.OrderedDict(zip(
+        self._header.action_keys, prompt_action_vals))
+
+    pi_lists = self._private_info.values()
+    private_info_vals = [
+        self._rnd.choice(pi_list, size=self._num_players)
+        for pi_list in pi_lists
+    ]
+    private_info = collections.OrderedDict(zip(self._header.info_keys,
+                                               private_info_vals))
+    private_info_vals_player_0 = [piv[0] for piv in private_info_vals]
+    private_info_header = collections.OrderedDict(zip(
+        self._header.info_keys, private_info_vals_player_0))
+
+    opts = prompt_actions_header
+    opts.update(private_info_header)
+
+    # scenarios are generated drawing from a fixed set of personalities
+    header = self._header.w_opts.format(sender=sender,
+                                        receiver=receiver,
+                                        others=others,
+                                        **opts)
+
+    # generate a random scenario
+    # need to generate new scenario with specific players (i.e. names). Can
+    # 1) try to generate multiple scenarios at once and parse output
+    # 2) generate a single scenario by varying the LLM seed
+    # 3) can rely on the randomness in names and private info to induce new
+    #    scenarios
+    # we are currently going with option 3)
+    logging.info('Generating initial scenario...')
+    logging.info('Scenario prompt:\n%s', self._meta_query + header)
+    response = self.generate_response(
+        prompt=self._meta_query + header,
+        seed=DEFAULT_LLM_SEED,
+        num_output_tokens=LLM_LENGTH_MESSAGE_TOKENS
+        )
+    response = response[:LLM_LENGTH_MESSAGE_CHARS]
+    logging.info('LLM response:\n%s', response)
+    examples = []
+    ptr = 0
+    i = 0
+    augmented_response = header + response
+    while ptr < len(augmented_response):
+      generated_example = self._header.strip_msg(augmented_response[ptr:],
+                                                 sender)
+      if not generated_example:
+        break
+      ptr += len(generated_example)
+      generated_example = generated_example.strip('\n')
+      logging.info('*Generated Example %d:\n%s', i, generated_example)
+      i += 1
+      examples.append(generated_example)
+    # grab first generated scenario
+    scenario_prompt = examples[0]
+    logging.info('Example 0 selected')
+    actions = collections.OrderedDict(zip(['player_names'],
+                                          [player_names]))
+    actions.update(self._prompt_actions)
+
+    given_names = player_names
+    given_private_info = private_info
+    scenario_class = self._examples_scenarios[0].__class__
+    initial_scenario = scenario_class(msg=scenario_prompt,
+                                      sender=sender,
+                                      receiver=receiver,
+                                      **opts)
+
+    return (given_names, given_private_info, initial_scenario)
 
   def new_initial_state_specs(self) -> Tuple[OrderedDict[str, List[str]],
                                              List[int],
@@ -1152,89 +1250,20 @@ class BaseChatGame(pyspiel.Game):
     Returns:
       ChatGameState (see ChatGameState class)
     """
-
     if self._initial_scenario:
-      scenario_prompt_unformatted = (self._header.plain +
-                                     self._initial_scenario.msg)
-      scenario_prompt = scenario_prompt_unformatted.format(
-          sender=self._initial_scenario.sender,
-          receiver=self._initial_scenario.receiver,
-          others=ALL_PLAYERS)
-      actions = collections.OrderedDict(zip(['player_names'],
-                                            [self._names]))
-      actions.update(self._prompt_actions)
+      names = self._names
       private_info = self._private_info
+      scenario = self._initial_scenario
     else:
-      player_names = self._rnd.choice(self._names,
-                                      size=self._num_players,
-                                      replace=False)
-      sender, receiver = player_names[:2]
-      if self._num_players > 2:
-        others = ', '.join(player_names[2:])
-      else:
-        others = ''
+      names, private_info, scenario = self.generate_scenario()
 
-      pa_lists = self._prompt_actions.values()
-      prompt_action_vals = [self._rnd.choice(pa_list) for pa_list in pa_lists]
-      prompt_actions_header = collections.OrderedDict(zip(
-          self._header.action_keys, prompt_action_vals))
-
-      pi_lists = self._private_info.values()
-      private_info_vals = [
-          self._rnd.choice(pi_list, size=self._num_players)
-          for pi_list in pi_lists
-      ]
-      private_info = collections.OrderedDict(zip(self._header.info_keys,
-                                                 private_info_vals))
-      private_info_vals_player_0 = [piv[0] for piv in private_info_vals]
-      private_info_header = collections.OrderedDict(zip(
-          self._header.info_keys, private_info_vals_player_0))
-
-      opts = prompt_actions_header
-      opts.update(private_info_header)
-
-      # scenarios are generated drawing from a fixed set of personalities
-      header = self._header.w_opts.format(sender=sender,
-                                          receiver=receiver,
-                                          others=others,
-                                          **opts)
-
-      # generate a random scenario
-      # need to generate new scenario with specific players (i.e. names). Can
-      # 1) try to generate multiple scenarios at once and parse output
-      # 2) generate a single scenario by varying the LLM seed
-      # 3) can rely on the randomness in names and private info to induce new
-      #    scenarios
-      # we are currently going with option 3)
-      logging.info('Generating initial scenario...')
-      logging.info('Scenario prompt:\n%s', self._meta_query + header)
-      response = self.generate_response(
-          prompt=self._meta_query + header,
-          seed=DEFAULT_LLM_SEED,
-          num_output_tokens=LLM_LENGTH_MESSAGE_TOKENS
-          )
-      response = response[:LLM_LENGTH_MESSAGE_CHARS]
-      logging.info('LLM response:\n%s', response)
-      examples = []
-      ptr = 0
-      i = 0
-      augmented_response = header + response
-      while ptr < len(augmented_response):
-        generated_example = self._header.strip_msg(augmented_response[ptr:],
-                                                   sender)
-        if not generated_example:
-          break
-        ptr += len(generated_example)
-        generated_example = generated_example.strip('\n')
-        logging.info('*Generated Example %d:\n%s', i, generated_example)
-        i += 1
-        examples.append(generated_example)
-      # grab first generated scenario
-      scenario_prompt = examples[0]
-      logging.info('Example 0 selected')
-      actions = collections.OrderedDict(zip(['player_names'],
-                                            [player_names]))
-      actions.update(self._prompt_actions)
+    scenario_prompt_unformatted = self._header.plain + scenario.msg
+    scenario_prompt = scenario_prompt_unformatted.format(
+        sender=scenario.sender,
+        receiver=scenario.receiver,
+        others=ALL_PLAYERS)
+    actions = collections.OrderedDict(zip(['player_names'], [names]))
+    actions.update(self._prompt_actions)
 
     return (actions, self._llm_seeds, scenario_prompt, private_info)
 

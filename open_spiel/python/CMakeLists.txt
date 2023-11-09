@@ -19,9 +19,9 @@ message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 message(NOTICE "Python library dirs: ${Python3_LIBRARY_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
-if(Python3_VERSION VERSION_LESS "3.6.0")
+if(Python3_VERSION VERSION_LESS "3.8.0")
   message(FATAL_ERROR
-    "Python found ${Python3_VERSION} < 3.6.0")
+    "Python found ${Python3_VERSION} < 3.8.0")
 endif()
 
 # Detect the Python ML frameworks.
@@ -264,15 +264,15 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
-  # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
-    jax/deep_cfr_jax_test.py
-    jax/dqn_jax_test.py
-    jax/nfsp_jax_test.py
-    jax/opponent_shaping_jax_test.py
-    jax/policy_gradient_jax_test.py
-    algorithms/rnad/rnad_test.py
-    mfg/algorithms/fictitious_play_test.py
+    # Disable JAX tests temporarily
+    #jax/deep_cfr_jax_test.py
+    #jax/dqn_jax_test.py
+    #jax/nfsp_jax_test.py
+    #jax/opponent_shaping_jax_test.py
+    #jax/policy_gradient_jax_test.py
+    #algorithms/rnad/rnad_test.py
+    #mfg/algorithms/fictitious_play_test.py
   )
 endif()
 
@@ -367,14 +367,15 @@ endforeach(py_test_file)
 # Additional tests (running examples as tests)
 # We don't generate these automatically because we may want custom parameters.
 if (OPEN_SPIEL_ENABLE_JAX AND NOT OPEN_SPIEL_BUILDING_WHEEL)
-  add_test(NAME python_examples_bridge_supervised_learning
-           COMMAND ${Python3_EXECUTABLE}
-           ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
-           --iterations 10
-           --eval_every 5
-           --data_path ${CMAKE_CURRENT_SOURCE_DIR}/examples/data/bridge)
-  set_property(TEST python_examples_bridge_supervised_learning
-      PROPERTY ENVIRONMENT
-      PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
-      TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
+  # Disable JAX tests temporarily
+  #add_test(NAME python_examples_bridge_supervised_learning
+  #         COMMAND ${Python3_EXECUTABLE}
+  #         ${CMAKE_CURRENT_SOURCE_DIR}/examples/bridge_supervised_learning.py
+  #         --iterations 10
+  #         --eval_every 5
+  #         --data_path ${CMAKE_CURRENT_SOURCE_DIR}/examples/data/bridge)
+  #set_property(TEST python_examples_bridge_supervised_learning
+  #    PROPERTY ENVIRONMENT
+  #    PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
+  #    TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
 endif()

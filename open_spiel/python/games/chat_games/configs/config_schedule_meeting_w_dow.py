@@ -19,7 +19,7 @@ import collections
 
 from ml_collections import config_dict
 
-from open_spiel.python.games.chat_games.envs.base_envs import schedule_meeting_with_tone_info as env_schedule_meeting_with_tone_info
+from open_spiel.python.games.chat_games.envs.base_envs import schedule_meeting_with_dow_info as env_schedule_meeting_with_dow_info
 from open_spiel.python.games.chat_games.envs.observations import summary
 from open_spiel.python.games.chat_games.envs.observations import utils as obs_utils
 from open_spiel.python.games.chat_games.envs.payoffs import schedule_meeting as payoffs_schedule_meeting
@@ -38,17 +38,22 @@ def get_config():
       for _ in range(num_players)
   ]
 
-  header = env_schedule_meeting_with_tone_info.HEADER
+  header = env_schedule_meeting_with_dow_info.HEADER
 
   payoffs = [payoffs_schedule_meeting.PAYOFF]
 
   examples_names = names_schedule_meeting.NAMES
 
   given_prompt_actions = collections.OrderedDict()
-  tones = ['calm',
-           'assertive']
-  given_prompt_actions[header.action_keys[0]] = tones
-  num_tones = len(tones)
+  days = ['Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday']
+  given_prompt_actions[header.action_keys[0]] = days
+  num_days = len(days)
 
   examples_private_info = collections.OrderedDict()
   examples_private_info['ooo_days'] = [scenario_schedule_meeting.OOO_A,
@@ -56,26 +61,26 @@ def get_config():
   examples_private_info['day_prefs'] = [scenario_schedule_meeting.DAY_PREFS_A,
                                         scenario_schedule_meeting.DAY_PREFS_B]
 
-  scenario_a = env_schedule_meeting_with_tone_info.Scenario(
+  scenario_a = env_schedule_meeting_with_dow_info.Scenario(
       scenario_schedule_meeting.SCENARIO_A,
       'Bob',
       'Suzy',
       scenario_schedule_meeting.OOO_A,
       scenario_schedule_meeting.DAY_PREFS_A,
-      'calm')
-  scenario_b = env_schedule_meeting_with_tone_info.Scenario(
+      'Thursday')
+  scenario_b = env_schedule_meeting_with_dow_info.Scenario(
       scenario_schedule_meeting.SCENARIO_B,
       'Jill',
       'George',
       scenario_schedule_meeting.OOO_B,
       scenario_schedule_meeting.DAY_PREFS_B,
-      'assertive')
+      'Friday')
 
   examples_scenarios = [scenario_a, scenario_b]
 
   llm_termination_prompt = scenario_schedule_meeting.LLM_TERMINATION_PROMPT
 
-  params = {'num_distinct_actions': num_players * num_tones,
+  params = {'num_distinct_actions': num_players * num_days,
             'num_llm_seeds': 1,
             'num_players': num_players,
             'min_utility': min([float(p.min) for p in payoffs]),
@@ -90,7 +95,7 @@ def get_config():
   config.game.payoffs = payoffs
   config.game.given_prompt_actions = given_prompt_actions
   config.game.num_names = 10
-  config.game.num_prompt_actions = (num_tones,)
+  config.game.num_prompt_actions = (num_days,)
   config.game.num_private_info = (3, 3)
   config.game.examples_names = examples_names
   config.game.examples_private_info = examples_private_info
