@@ -63,7 +63,7 @@ if verlt $PY_VER 3.10; then
   export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.23.5 tensorflow==2.13.1 tensorflow-probability==0.19.0 tensorflow_datasets==4.9.2 keras==2.13.1"
 else
   echo "Python >= 3.10 detected"
-  export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.20 jaxlib==0.4.20 dm-haiku==0.0.10 optax==0.1.7 chex==0.1.784 rlax==0.1.6 distrax==0.1.4"
+  export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.20 jaxlib==0.4.20 dm-haiku==0.0.10 optax==0.1.7 chex==0.1.84 rlax==0.1.6 distrax==0.1.4"
   export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.26.1 tensorflow==2.14.0 tensorflow-probability==0.22.1 tensorflow_datasets==4.9.2 keras==2.14.0"
 fi
 
