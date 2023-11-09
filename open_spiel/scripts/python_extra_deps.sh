@@ -49,7 +49,6 @@ verlt() {
 # Python extra deps that work across all supported versions
 #
 export OPEN_SPIEL_PYTHON_PYTORCH_DEPS="torch==1.13.1"
-export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxopt==1.3.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"
 
 
 #
@@ -61,10 +60,12 @@ if verlt $PY_VER 3.10; then
   echo "Python < 3.10 detected"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.6 jaxlib==0.4.6 dm-haiku==0.0.10 optax==0.1.7 chex==0.1.7 rlax==0.1.5 distrax==0.1.3"
   export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.23.5 tensorflow==2.13.1 tensorflow-probability==0.19.0 tensorflow_datasets==4.9.2 keras==2.13.1"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxopt==1.3.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"
 else
   echo "Python >= 3.10 detected"
   export OPEN_SPIEL_PYTHON_JAX_DEPS="jax==0.4.20 jaxlib==0.4.20 dm-haiku==0.0.10 optax==0.1.7 chex==0.1.84 rlax==0.1.6 distrax==0.1.4"
   export OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS="numpy==1.26.1 tensorflow==2.14.0 tensorflow-probability==0.22.1 tensorflow_datasets==4.9.2 keras==2.14.0"
+  export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==3.2 matplotlib==3.5.2 mock==4.0.2 nashpy==0.0.19 scipy==1.10.1 testresources==2.0.1 cvxopt==1.3.1 cvxpy==1.2.0 ecos==2.0.10 osqp==0.6.2.post5 clu==0.0.6 flax==0.5.3"
 fi
 
 
