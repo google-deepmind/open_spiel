@@ -56,8 +56,8 @@ export OPEN_SPIEL_PYTHON_MISC_DEPS="IPython==5.8.0 networkx==2.4 matplotlib==3.5
 # Python-version dependent versions
 #
 
-echo $PY_VER
-verlt $PY_VER 3.11
+echo "Set Python version: $PY_VER"
+output=`verlt $PY_VER 3.12`
 if [ "$?" == 0 ]
 then
   echo "Python < 3.11 detected"
