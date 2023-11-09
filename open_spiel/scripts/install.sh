@@ -238,6 +238,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   PYTHON_PKGS="python3-dev python3-pip python3-setuptools python3-wheel python3-tk python3-venv"
   if [[ "$OS_PYTHON_VERSION" == "3.11" ]]; then
     # Need to special-case this until it's installed by default.
+    # https://vegastack.com/tutorials/how-to-install-python-3-11-on-ubuntu-22-04/
+    echo "Adding Python 3.11 ppa repos"
+    sudo add-apt-repository ppa:deadsnakes/ppa
     PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk python3.11-venv"
   fi
   EXT_DEPS="virtualenv clang cmake curl $PYTHON_PKGS"
