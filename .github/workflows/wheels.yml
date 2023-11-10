@@ -80,7 +80,7 @@ jobs:
           ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
           ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           ${CI_PYBIN} -m pip install twine
-          ${CI_PYBIN} -m pip install cibuildwheel==2.11.1
+          ${CI_PYBIN} -m pip install cibuildwheel==2.16.2
       - name: Build sdist
         run: |
           pipx run build --sdist
