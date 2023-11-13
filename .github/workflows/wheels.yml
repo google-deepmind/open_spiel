@@ -37,7 +37,7 @@ jobs:
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp38-macosx_universal2 cp39-macosx_universal2 cp310-macosx_universal2 cp310-macosx_universal2 cp311-macosx_universal2 cp312-macosx_universal2
+          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_universal2 cp310-macosx_universal2 cp310-macosx_universal2 cp311-macosx_universal2 cp312-macosx_universal2
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -47,12 +47,13 @@ jobs:
       OS_PYTHON_VERSION: "3.9"
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-      CIBW_ARCHS_MACOS: universal2
+      CIBW_ARCHS_MACOS: x86_64 arm64 universal2
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
+      CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
