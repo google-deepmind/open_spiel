@@ -2614,14 +2614,14 @@ ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199]
-StringLegalActions() = ["Bid: 1 of 1", "Bid: 2 of 1", "Bid: 3 of 1", "Bid: 4 of 1", "Bid: 5 of 1", "Bid: 6 of 1", "Bid: 7 of 1", "Bid: 8 of 1", "Bid: 9 of 1", "Bid: 10 of 1", "Bid: 11 of 1", "Bid: 12 of 1", "Bid: 13 of 1", "Bid: 14 of 1", "Bid: 15 of 1", "Bid: 16 of 1", "Bid: 17 of 1", "Bid: 18 of 1", "Bid: 19 of 1", "Bid: 20 of 1", "Bid: 1 of 2", "Bid: 2 of 2", "Bid: 3 of 2", "Bid: 4 of 2", "Bid: 5 of 2", "Bid: 6 of 2", "Bid: 7 of 2", "Bid: 8 of 2", "Bid: 9 of 2", "Bid: 10 of 2", "Bid: 11 of 2", "Bid: 12 of 2", "Bid: 13 of 2", "Bid: 14 of 2", "Bid: 15 of 2", "Bid: 16 of 2", "Bid: 17 of 2", "Bid: 18 of 2", "Bid: 19 of 2", "Bid: 20 of 2", "Bid: 1 of 3", "Bid: 2 of 3", "Bid: 3 of 3", "Bid: 4 of 3", "Bid: 5 of 3", "Bid: 6 of 3", "Bid: 7 of 3", "Bid: 8 of 3", "Bid: 9 of 3", "Bid: 10 of 3", "Bid: 11 of 3", "Bid: 12 of 3", "Bid: 13 of 3", "Bid: 14 of 3", "Bid: 15 of 3", "Bid: 16 of 3", "Bid: 17 of 3", "Bid: 18 of 3", "Bid: 19 of 3", "Bid: 20 of 3", "Bid: 1 of 4", "Bid: 2 of 4", "Bid: 3 of 4", "Bid: 4 of 4", "Bid: 5 of 4", "Bid: 6 of 4", "Bid: 7 of 4", "Bid: 8 of 4", "Bid: 9 of 4", "Bid: 10 of 4", "Bid: 11 of 4", "Bid: 12 of 4", "Bid: 13 of 4", "Bid: 14 of 4", "Bid: 15 of 4", "Bid: 16 of 4", "Bid: 17 of 4", "Bid: 18 of 4", "Bid: 19 of 4", "Bid: 20 of 4", "Bid: 1 of 5", "Bid: 2 of 5", "Bid: 3 of 5", "Bid: 4 of 5", "Bid: 5 of 5", "Bid: 6 of 5", "Bid: 7 of 5", "Bid: 8 of 5", "Bid: 9 of 5", "Bid: 10 of 5", "Bid: 11 of 5", "Bid: 12 of 5", "Bid: 13 of 5", "Bid: 14 of 5", "Bid: 15 of 5", "Bid: 16 of 5", "Bid: 17 of 5", "Bid: 18 of 5", "Bid: 19 of 5", "Bid: 20 of 5", "Bid: 1 of 6", "Bid: 2 of 6", "Bid: 3 of 6", "Bid: 4 of 6", "Bid: 5 of 6", "Bid: 6 of 6", "Bid: 7 of 6", "Bid: 8 of 6", "Bid: 9 of 6", "Bid: 10 of 6", "Bid: 11 of 6", "Bid: 12 of 6", "Bid: 13 of 6", "Bid: 14 of 6", "Bid: 15 of 6", "Bid: 16 of 6", "Bid: 17 of 6", "Bid: 18 of 6", "Bid: 19 of 6", "Bid: 20 of 6", "Bid: 1 of 7", "Bid: 2 of 7", "Bid: 3 of 7", "Bid: 4 of 7", "Bid: 5 of 7", "Bid: 6 of 7", "Bid: 7 of 7", "Bid: 8 of 7", "Bid: 9 of 7", "Bid: 10 of 7", "Bid: 11 of 7", "Bid: 12 of 7", "Bid: 13 of 7", "Bid: 14 of 7", "Bid: 15 of 7", "Bid: 16 of 7", "Bid: 17 of 7", "Bid: 18 of 7", "Bid: 19 of 7", "Bid: 20 of 7", "Bid: 1 of 8", "Bid: 2 of 8", "Bid: 3 of 8", "Bid: 4 of 8", "Bid: 5 of 8", "Bid: 6 of 8", "Bid: 7 of 8", "Bid: 8 of 8", "Bid: 9 of 8", "Bid: 10 of 8", "Bid: 11 of 8", "Bid: 12 of 8", "Bid: 13 of 8", "Bid: 14 of 8", "Bid: 15 of 8", "Bid: 16 of 8", "Bid: 17 of 8", "Bid: 18 of 8", "Bid: 19 of 8", "Bid: 20 of 8", "Bid: 1 of 9", "Bid: 2 of 9", "Bid: 3 of 9", "Bid: 4 of 9", "Bid: 5 of 9", "Bid: 6 of 9", "Bid: 7 of 9", "Bid: 8 of 9", "Bid: 9 of 9", "Bid: 10 of 9", "Bid: 11 of 9", "Bid: 12 of 9", "Bid: 13 of 9", "Bid: 14 of 9", "Bid: 15 of 9", "Bid: 16 of 9", "Bid: 17 of 9", "Bid: 18 of 9", "Bid: 19 of 9", "Bid: 20 of 9", "Bid: 1 of 0", "Bid: 2 of 0", "Bid: 3 of 0", "Bid: 4 of 0", "Bid: 5 of 0", "Bid: 6 of 0", "Bid: 7 of 0", "Bid: 8 of 0", "Bid: 9 of 0", "Bid: 10 of 0", "Bid: 11 of 0", "Bid: 12 of 0", "Bid: 13 of 0", "Bid: 14 of 0", "Bid: 15 of 0", "Bid: 16 of 0", "Bid: 17 of 0", "Bid: 18 of 0", "Bid: 19 of 0"]
+LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200]
+StringLegalActions() = ["Bid: 1 of 1", "Bid: 1 of 2", "Bid: 1 of 3", "Bid: 1 of 4", "Bid: 1 of 5", "Bid: 1 of 6", "Bid: 1 of 7", "Bid: 1 of 8", "Bid: 1 of 9", "Bid: 1 of 10", "Bid: 2 of 1", "Bid: 2 of 2", "Bid: 2 of 3", "Bid: 2 of 4", "Bid: 2 of 5", "Bid: 2 of 6", "Bid: 2 of 7", "Bid: 2 of 8", "Bid: 2 of 9", "Bid: 2 of 10", "Bid: 3 of 1", "Bid: 3 of 2", "Bid: 3 of 3", "Bid: 3 of 4", "Bid: 3 of 5", "Bid: 3 of 6", "Bid: 3 of 7", "Bid: 3 of 8", "Bid: 3 of 9", "Bid: 3 of 10", "Bid: 4 of 1", "Bid: 4 of 2", "Bid: 4 of 3", "Bid: 4 of 4", "Bid: 4 of 5", "Bid: 4 of 6", "Bid: 4 of 7", "Bid: 4 of 8", "Bid: 4 of 9", "Bid: 4 of 10", "Bid: 5 of 1", "Bid: 5 of 2", "Bid: 5 of 3", "Bid: 5 of 4", "Bid: 5 of 5", "Bid: 5 of 6", "Bid: 5 of 7", "Bid: 5 of 8", "Bid: 5 of 9", "Bid: 5 of 10", "Bid: 6 of 1", "Bid: 6 of 2", "Bid: 6 of 3", "Bid: 6 of 4", "Bid: 6 of 5", "Bid: 6 of 6", "Bid: 6 of 7", "Bid: 6 of 8", "Bid: 6 of 9", "Bid: 6 of 10", "Bid: 7 of 1", "Bid: 7 of 2", "Bid: 7 of 3", "Bid: 7 of 4", "Bid: 7 of 5", "Bid: 7 of 6", "Bid: 7 of 7", "Bid: 7 of 8", "Bid: 7 of 9", "Bid: 7 of 10", "Bid: 8 of 1", "Bid: 8 of 2", "Bid: 8 of 3", "Bid: 8 of 4", "Bid: 8 of 5", "Bid: 8 of 6", "Bid: 8 of 7", "Bid: 8 of 8", "Bid: 8 of 9", "Bid: 8 of 10", "Bid: 9 of 1", "Bid: 9 of 2", "Bid: 9 of 3", "Bid: 9 of 4", "Bid: 9 of 5", "Bid: 9 of 6", "Bid: 9 of 7", "Bid: 9 of 8", "Bid: 9 of 9", "Bid: 9 of 10", "Bid: 10 of 1", "Bid: 10 of 2", "Bid: 10 of 3", "Bid: 10 of 4", "Bid: 10 of 5", "Bid: 10 of 6", "Bid: 10 of 7", "Bid: 10 of 8", "Bid: 10 of 9", "Bid: 10 of 10", "Bid: 11 of 1", "Bid: 11 of 2", "Bid: 11 of 3", "Bid: 11 of 4", "Bid: 11 of 5", "Bid: 11 of 6", "Bid: 11 of 7", "Bid: 11 of 8", "Bid: 11 of 9", "Bid: 11 of 10", "Bid: 12 of 1", "Bid: 12 of 2", "Bid: 12 of 3", "Bid: 12 of 4", "Bid: 12 of 5", "Bid: 12 of 6", "Bid: 12 of 7", "Bid: 12 of 8", "Bid: 12 of 9", "Bid: 12 of 10", "Bid: 13 of 1", "Bid: 13 of 2", "Bid: 13 of 3", "Bid: 13 of 4", "Bid: 13 of 5", "Bid: 13 of 6", "Bid: 13 of 7", "Bid: 13 of 8", "Bid: 13 of 9", "Bid: 13 of 10", "Bid: 14 of 1", "Bid: 14 of 2", "Bid: 14 of 3", "Bid: 14 of 4", "Bid: 14 of 5", "Bid: 14 of 6", "Bid: 14 of 7", "Bid: 14 of 8", "Bid: 14 of 9", "Bid: 14 of 10", "Bid: 15 of 1", "Bid: 15 of 2", "Bid: 15 of 3", "Bid: 15 of 4", "Bid: 15 of 5", "Bid: 15 of 6", "Bid: 15 of 7", "Bid: 15 of 8", "Bid: 15 of 9", "Bid: 15 of 10", "Bid: 16 of 1", "Bid: 16 of 2", "Bid: 16 of 3", "Bid: 16 of 4", "Bid: 16 of 5", "Bid: 16 of 6", "Bid: 16 of 7", "Bid: 16 of 8", "Bid: 16 of 9", "Bid: 16 of 10", "Bid: 17 of 1", "Bid: 17 of 2", "Bid: 17 of 3", "Bid: 17 of 4", "Bid: 17 of 5", "Bid: 17 of 6", "Bid: 17 of 7", "Bid: 17 of 8", "Bid: 17 of 9", "Bid: 17 of 10", "Bid: 18 of 1", "Bid: 18 of 2", "Bid: 18 of 3", "Bid: 18 of 4", "Bid: 18 of 5", "Bid: 18 of 6", "Bid: 18 of 7", "Bid: 18 of 8", "Bid: 18 of 9", "Bid: 18 of 10", "Bid: 19 of 1", "Bid: 19 of 2", "Bid: 19 of 3", "Bid: 19 of 4", "Bid: 19 of 5", "Bid: 19 of 6", "Bid: 19 of 7", "Bid: 19 of 8", "Bid: 19 of 9", "Bid: 19 of 10", "Bid: 20 of 1", "Bid: 20 of 2", "Bid: 20 of 3", "Bid: 20 of 4", "Bid: 20 of 5", "Bid: 20 of 6", "Bid: 20 of 7", "Bid: 20 of 8", "Bid: 20 of 9", "Bid: 20 of 10"]
 
-# Apply action "Bid: 19 of 9"
+# Apply action "Bid: 18 of 9"
 action: 179
 
 # State 21
-# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: 1, Current Bid: 19 of 9, Rebid: False
+# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: 1, Current Bid: 18 of 9, Rebid: False
 IsTerminal() = False
 History() = [2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179]
 HistoryString() = "2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179"
@@ -3453,14 +3453,14 @@ ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199]
-StringLegalActions() = ["Challenge", "Bid: 20 of 9", "Bid: 1 of 0", "Bid: 2 of 0", "Bid: 3 of 0", "Bid: 4 of 0", "Bid: 5 of 0", "Bid: 6 of 0", "Bid: 7 of 0", "Bid: 8 of 0", "Bid: 9 of 0", "Bid: 10 of 0", "Bid: 11 of 0", "Bid: 12 of 0", "Bid: 13 of 0", "Bid: 14 of 0", "Bid: 15 of 0", "Bid: 16 of 0", "Bid: 17 of 0", "Bid: 18 of 0", "Bid: 19 of 0"]
+LegalActions() = [0, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200]
+StringLegalActions() = ["Challenge", "Bid: 18 of 10", "Bid: 19 of 1", "Bid: 19 of 2", "Bid: 19 of 3", "Bid: 19 of 4", "Bid: 19 of 5", "Bid: 19 of 6", "Bid: 19 of 7", "Bid: 19 of 8", "Bid: 19 of 9", "Bid: 19 of 10", "Bid: 20 of 1", "Bid: 20 of 2", "Bid: 20 of 3", "Bid: 20 of 4", "Bid: 20 of 5", "Bid: 20 of 6", "Bid: 20 of 7", "Bid: 20 of 8", "Bid: 20 of 9", "Bid: 20 of 10"]
 
-# Apply action "Bid: 5 of 0"
+# Apply action "Bid: 19 of 5"
 action: 185
 
 # State 22
-# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 1, Current Player: 0, Current Bid: 5 of 0, Rebid: False
+# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 1, Current Player: 0, Current Bid: 19 of 5, Rebid: False
 IsTerminal() = False
 History() = [2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185]
 HistoryString() = "2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185"
@@ -4292,14 +4292,14 @@ ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199]
-StringLegalActions() = ["Challenge", "Bid: 6 of 0", "Bid: 7 of 0", "Bid: 8 of 0", "Bid: 9 of 0", "Bid: 10 of 0", "Bid: 11 of 0", "Bid: 12 of 0", "Bid: 13 of 0", "Bid: 14 of 0", "Bid: 15 of 0", "Bid: 16 of 0", "Bid: 17 of 0", "Bid: 18 of 0", "Bid: 19 of 0"]
+LegalActions() = [0, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200]
+StringLegalActions() = ["Challenge", "Bid: 19 of 6", "Bid: 19 of 7", "Bid: 19 of 8", "Bid: 19 of 9", "Bid: 19 of 10", "Bid: 20 of 1", "Bid: 20 of 2", "Bid: 20 of 3", "Bid: 20 of 4", "Bid: 20 of 5", "Bid: 20 of 6", "Bid: 20 of 7", "Bid: 20 of 8", "Bid: 20 of 9", "Bid: 20 of 10"]
 
-# Apply action "Bid: 15 of 0"
+# Apply action "Bid: 20 of 5"
 action: 195
 
 # State 23
-# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: 1, Current Bid: 15 of 0, Rebid: False
+# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: 1, Current Bid: 20 of 5, Rebid: False
 IsTerminal() = False
 History() = [2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195]
 HistoryString() = "2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195"
@@ -5131,14 +5131,14 @@ ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 196, 197, 198, 199]
-StringLegalActions() = ["Challenge", "Bid: 16 of 0", "Bid: 17 of 0", "Bid: 18 of 0", "Bid: 19 of 0"]
+LegalActions() = [0, 196, 197, 198, 199, 200]
+StringLegalActions() = ["Challenge", "Bid: 20 of 6", "Bid: 20 of 7", "Bid: 20 of 8", "Bid: 20 of 9", "Bid: 20 of 10"]
 
-# Apply action "Bid: 17 of 0"
+# Apply action "Bid: 20 of 7"
 action: 197
 
 # State 24
-# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 1, Current Player: 0, Current Bid: 17 of 0, Rebid: False
+# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 1, Current Player: 0, Current Bid: 20 of 7, Rebid: False
 IsTerminal() = False
 History() = [2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195, 197]
 HistoryString() = "2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195, 197"
@@ -5970,14 +5970,14 @@ ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 198, 199]
-StringLegalActions() = ["Challenge", "Bid: 18 of 0", "Bid: 19 of 0"]
+LegalActions() = [0, 198, 199, 200]
+StringLegalActions() = ["Challenge", "Bid: 20 of 8", "Bid: 20 of 9", "Bid: 20 of 10"]
 
-# Apply action "Bid: 18 of 0"
+# Apply action "Bid: 20 of 8"
 action: 198
 
 # State 25
-# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: 1, Current Bid: 18 of 0, Rebid: False
+# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: 1, Current Bid: 20 of 8, Rebid: False
 IsTerminal() = False
 History() = [2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195, 197, 198]
 HistoryString() = "2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195, 197, 198"
@@ -6809,8 +6809,8 @@ ObservationTensor(1).rebid_state: ◯
 ObservationTensor(1).counts_state: ◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 199]
-StringLegalActions() = ["Challenge", "Bid: 19 of 0"]
+LegalActions() = [0, 199, 200]
+StringLegalActions() = ["Challenge", "Bid: 20 of 9", "Bid: 20 of 10"]
 
 # Apply action "Challenge"
 action: 0
@@ -6820,7 +6820,7 @@ action: 0
 action: 0
 
 # State 27
-# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: PlayerId.TERMINAL, Current Bid: 18 of 0, Rebid: False
+# Hands: [[2, 4, 9, 2, 8, 2, 0, 9, 7, 6], [2, 7, 8, 0, 9, 6, 3, 9, 0, 5]], Bidder: 0, Current Player: PlayerId.TERMINAL, Current Bid: 20 of 8, Rebid: False
 IsTerminal() = True
 History() = [2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195, 197, 198, 0, 0]
 HistoryString() = "2, 2, 4, 7, 9, 8, 2, 0, 8, 9, 2, 6, 0, 3, 9, 9, 7, 0, 6, 5, 179, 185, 195, 197, 198, 0, 0"

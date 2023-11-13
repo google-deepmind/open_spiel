@@ -32,12 +32,12 @@ jobs:
           OS_TYPE: "Linux"
           CI_PYBIN: python3
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64
+          CIBW_BUILD: cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64
         - os: macOS-12
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64
+          CIBW_BUILD: cp38-macosx_universal2 cp39-macosx_universal2 cp310-macosx_universal2 cp310-macosx_universal2 cp311-macosx_universal2 cp312-macosx_universal2
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -47,6 +47,7 @@ jobs:
       OS_PYTHON_VERSION: "3.9"
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+      CIBW_ARCHS_MACOS: universal2
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
@@ -74,13 +75,13 @@ jobs:
           ${CI_PYBIN} -m pip --version
           ${CI_PYBIN} -m pip install --upgrade setuptools
           ${CI_PYBIN} -m pip install --upgrade -r requirements.txt -q
-          source ./open_spiel/scripts/python_extra_deps.sh
+          source ./open_spiel/scripts/python_extra_deps.sh ${CI_PYBIN}
           ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
           ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
           ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
           ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           ${CI_PYBIN} -m pip install twine
-          ${CI_PYBIN} -m pip install cibuildwheel==2.11.1
+          ${CI_PYBIN} -m pip install cibuildwheel==2.16.2
       - name: Build sdist
         run: |
           pipx run build --sdist

@@ -218,6 +218,11 @@ class CFRSolverBase {
     return std::make_shared<CFRCurrentPolicy>(info_states_, nullptr);
   }
 
+  TabularPolicy TabularCurrentPolicy() const {
+    CFRCurrentPolicy policy(info_states_, nullptr);
+    return policy.AsTabular();
+  }
+
   CFRInfoStateValuesTable& InfoStateValuesTable() { return info_states_; }
 
   // See comments above CFRInfoStateValues::Serialize(double_precision) for

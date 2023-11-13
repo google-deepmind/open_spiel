@@ -228,6 +228,8 @@ void init_pyspiel_policy(py::module& m) {
       .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy)
       .def("tabular_average_policy",
            &open_spiel::algorithms::CFRSolver::TabularAveragePolicy)
+      .def("tabular_current_policy",
+           &open_spiel::algorithms::CFRSolver::TabularCurrentPolicy)
       .def(py::pickle(
           [](const open_spiel::algorithms::CFRSolver& solver) {  // __getstate__
             return solver.Serialize();

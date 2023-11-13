@@ -22,8 +22,8 @@
 
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/games/efg_game.h"
-#include "open_spiel/games/efg_game_data.h"
+#include "open_spiel/games/efg_game/efg_game.h"
+#include "open_spiel/games/efg_game/efg_game_data.h"
 
 
 namespace open_spiel {

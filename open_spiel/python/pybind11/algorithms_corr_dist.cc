@@ -14,15 +14,18 @@
 
 #include "open_spiel/python/pybind11/algorithms_corr_dist.h"
 
-// Python bindings for trajectories.h
+#include <memory>
 
 #include "open_spiel/algorithms/corr_dev_builder.h"
 #include "open_spiel/algorithms/corr_dist.h"
-#include "open_spiel/python/pybind11/pybind11.h"
+#include "open_spiel/spiel.h"
+#include "pybind11/include/pybind11/cast.h"
+#include "pybind11/include/pybind11/pybind11.h"
 
 namespace open_spiel {
 namespace py = ::pybind11;
 
+using open_spiel::algorithms::CorrDevBuilder;
 using open_spiel::algorithms::CorrDistInfo;
 using open_spiel::algorithms::CorrelationDevice;
 
@@ -49,6 +52,20 @@ void init_pyspiel_algorithms_corr_dist(py::module& m) {
                     &CorrDistInfo::best_response_policies)
       .def_readonly("conditional_best_response_policies",
                     &CorrDistInfo::conditional_best_response_policies);
+
+  py::class_<CorrDevBuilder> corr_dev_builder(m, "CorrDevBuilder");
+  corr_dev_builder.def(py::init<int>(), py::arg("seed") = 0)
+      .def("add_deterministic_joint_policy",
+           &CorrDevBuilder::AddDeterminsticJointPolicy,
+           py::arg("policy"), py::arg("weight") = 1.0)
+      .def("add_sampled_joint_policy",
+           &CorrDevBuilder::AddSampledJointPolicy,
+           py::arg("policy"), py::arg("num_samples"), py::arg("weight") = 1.0)
+      .def("add_mixed_joint_policy",
+            &CorrDevBuilder::AddMixedJointPolicy,
+            py::arg("policy"),
+            py::arg("weight") = 1.0)
+      .def("get_correlation_device", &CorrDevBuilder::GetCorrelationDevice);
 
   m.def(
       "cce_dist",

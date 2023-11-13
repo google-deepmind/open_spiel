@@ -34,6 +34,7 @@ namespace {
 // header).
 constexpr int kNumBarPosHumanReadable = 25;
 constexpr int kNumOffPosHumanReadable = -2;
+constexpr int kNumNonDoubleOutcomes = 15;
 
 const std::vector<std::pair<Action, double>> kChanceOutcomes = {
     std::pair<Action, double>(0, 1.0 / 18),
@@ -174,9 +175,10 @@ std::string BackgammonState::ActionToString(Player player,
                           kChanceOutcomeValues[move_id][1], ")");
     } else {
       // Initial roll to determine who starts.
-      const char* starter = (move_id < 15 ? "X starts" : "O starts");
-      if (move_id >= 15) {
-        move_id -= 15;
+      const char* starter = (move_id < kNumNonDoubleOutcomes ?
+                             "X starts" : "O starts");
+      if (move_id >= kNumNonDoubleOutcomes) {
+        move_id -= kNumNonDoubleOutcomes;
       }
       return absl::StrCat("chance outcome ", move_id, " ", starter, ", ",
                           "(roll: ", kChanceOutcomeValues[move_id][0],
@@ -418,14 +420,20 @@ void BackgammonState::DoApplyAction(Action move) {
                                                  false, false));
 
     if (turns_ == -1) {
+      // The first chance node determines who goes first: X or O.
+      // The move is between 0 and 29 and the range determines whether X starts
+      // or O starts. The value is then converted to a number between 0 and 15,
+      // which represents the non-double chance outcome that the first player
+      // starts with (see RollDice(move) below). These 30 possibilities are
+      // constructed in GetChanceOutcomes().
       SPIEL_CHECK_TRUE(dice_.empty());
-      if (move < 15) {
+      if (move < kNumNonDoubleOutcomes) {
         // X starts.
         cur_player_ = prev_player_ = kXPlayerId;
       } else {
         // O Starts
         cur_player_ = prev_player_ = kOPlayerId;
-        move -= 15;
+        move -= kNumNonDoubleOutcomes;
       }
       RollDice(move);
       turns_ = 0;
@@ -1149,9 +1157,10 @@ std::vector<std::pair<Action, double>> BackgammonState::ChanceOutcomes() const {
     // Doubles not allowed for the initial roll to determine who goes first.
     // Range 0-14: X goes first, range 15-29: O goes first.
     std::vector<std::pair<Action, double>> outcomes;
-    outcomes.reserve(30);
-    const double uniform_prob = 1.0 / 30.0;
-    for (Action action = 0; action < 30; ++action) {
+    int num_outcomes = kNumNonDoubleOutcomes * 2;
+    outcomes.reserve(num_outcomes);
+    const double uniform_prob = 1.0 / num_outcomes;
+    for (Action action = 0; action < num_outcomes; ++action) {
       outcomes.push_back({action, uniform_prob});
     }
     return outcomes;

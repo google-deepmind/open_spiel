@@ -17,9 +17,9 @@ Based on [1] "Computing the Optimal Strategy to Commit to", Conitzer & Sandholm,
 EC'06
 """
 
+import cvxpy as cp
 import numpy as np
 
-from open_spiel.python.algorithms import lp_solver
 from open_spiel.python.algorithms.projected_replicator_dynamics import _simplex_projection
 from open_spiel.python.egt.utils import game_payoffs_array
 
@@ -51,39 +51,35 @@ def solve_stackelberg(game, is_first_leader=True):
   follower_eq_strategy = None
 
   for t in range(num_follower_strategies):
-    lp = lp_solver.LinearProgram(objective=lp_solver.OBJ_MAX)
-    for s in range(num_leader_strategies):
-      lp.add_or_reuse_variable("s_{}".format(s))
-      lp.set_obj_coeff("s_{}".format(s), leader_payoff[s, t])
-
+    p_s = cp.Variable(num_leader_strategies, nonneg=True)
+    constraints = [p_s <= 1, cp.sum(p_s) == 1]
     for t_ in range(num_follower_strategies):
       if t_ == t:
         continue
-      lp.add_or_reuse_constraint("t_{}".format(t_), lp_solver.CONS_TYPE_GEQ)
-      for s in range(num_leader_strategies):
-        lp.set_cons_coeff("t_{}".format(t_), "s_{}".format(s),
-                          follower_payoff[s, t] - follower_payoff[s, t_])
-      lp.set_cons_rhs("t_{}".format(t_), 0.0)
-    lp.add_or_reuse_constraint("sum_to_one", lp_solver.CONS_TYPE_EQ)
-    for s in range(num_leader_strategies):
-      lp.set_cons_coeff("sum_to_one", "s_{}".format(s), 1.0)
-    lp.set_cons_rhs("sum_to_one", 1.0)
-    try:
-      leader_strategy = np.array(lp.solve())
-      leader_strategy = _simplex_projection(
-          leader_strategy.reshape(-1)).reshape(-1, 1)
-      leader_value = leader_strategy.T.dot(leader_payoff)[0, t]
-      if leader_value > leader_eq_value:
-        leader_eq_strategy = leader_strategy
-        follower_eq_strategy = t
-        leader_eq_value = leader_value
-        follower_eq_value = leader_strategy.T.dot(follower_payoff)[0, t]
-    except:  # pylint: disable=bare-except
+      constraints.append(
+          p_s @ follower_payoff[:, t_] <= p_s @ follower_payoff[:, t]
+      )
+    prob = cp.Problem(cp.Maximize(p_s @ leader_payoff[:, t]), constraints)
+    prob.solve()
+    p_s_value = p_s.value
+    if p_s_value is None:
       continue
+    leader_strategy = _simplex_projection(p_s.value.reshape(-1)).reshape(-1, 1)
+    leader_value = leader_strategy.T.dot(leader_payoff)[0, t]
+    if leader_value > leader_eq_value:
+      leader_eq_strategy = leader_strategy
+      follower_eq_strategy = t
+      leader_eq_value = leader_value
+      follower_eq_value = leader_strategy.T.dot(follower_payoff)[0, t]
+
+  assert leader_eq_strategy is not None, p_mat
   if is_first_leader:
-    return (leader_eq_strategy.reshape(-1), np.identity(
-        num_follower_strategies)[follower_eq_strategy],
-            leader_eq_value, follower_eq_value)
+    return (
+        leader_eq_strategy.reshape(-1),
+        np.identity(num_follower_strategies)[follower_eq_strategy],
+        leader_eq_value,
+        follower_eq_value,
+    )
   else:
     return (np.identity(num_follower_strategies)[follower_eq_strategy],
             leader_eq_strategy.reshape(-1), follower_eq_value, leader_eq_value)

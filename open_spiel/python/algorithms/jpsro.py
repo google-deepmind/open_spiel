@@ -209,8 +209,11 @@ def _eliminate_dominated_decorator(func):
     if not eliminate_dominated:
       return func(payoff, *args, **kwargs)
     num_actions = payoff.shape[1:]
-    eliminated_payoff, action_labels, eliminated_action_repeats = _eliminate_dominated_payoff(
-        payoff, epsilon, action_repeats=per_player_repeats)
+    (eliminated_payoff, action_labels, eliminated_action_repeats) = (
+        _eliminate_dominated_payoff(
+            payoff, epsilon, action_repeats=per_player_repeats
+        )
+    )
     eliminated_dist, meta = func(
         eliminated_payoff, eliminated_action_repeats, *args, **kwargs)
     meta["eliminated_dominated_dist"] = eliminated_dist
@@ -996,7 +999,7 @@ def _rvcce(meta_game, per_player_repeats, ignore_repeats=False):
 
 
 # Flags to functions.
-_FLAG_TO_FUNC = dict(
+FLAG_TO_FUNC = dict(
     uni=_uni,
     undominated_uni=_undominated_uni,
     rj=_rj,
@@ -1023,7 +1026,7 @@ _FLAG_TO_FUNC = dict(
 ## PSRO Functions.
 
 
-def intilize_policy(game, player, policy_init):
+def initialize_policy(game, player, policy_init):
   """Returns initial policy."""
   if policy_init == "uniform":
     new_policy = policy.TabularPolicy(game, players=(player,))
@@ -1130,10 +1133,8 @@ def add_new_policies(
     logging.debug("Evaluating novel joint policy: %s.", pids)
     policies = [
         policies[pid] for pid, policies in zip(pids, per_player_policies)]
-    python_tabular_policy = policy.merge_tabular_policies(
-        policies, game)
-    pyspiel_tabular_policy = policy.python_policy_to_pyspiel_policy(
-        python_tabular_policy)
+    policies = tuple(map(policy.python_policy_to_pyspiel_policy, policies))
+    pyspiel_tabular_policy = pyspiel.to_joint_tabular_policy(policies, True)
     joint_policies[pids] = pyspiel_tabular_policy
     joint_returns[pids] = [
         0.0 if abs(er) < RETURN_TOL else er
@@ -1164,7 +1165,7 @@ def add_meta_dist(
     ignore_repeats):
   """Returns meta_dist."""
   num_players = meta_game.shape[0]
-  meta_solver_func = _FLAG_TO_FUNC[meta_solver]
+  meta_solver_func = FLAG_TO_FUNC[meta_solver]
   meta_dist, _ = meta_solver_func(
       meta_game, per_player_repeats, ignore_repeats=ignore_repeats)
   # Clean dist.
@@ -1327,9 +1328,9 @@ def initialize(game, train_meta_solver, eval_meta_solver, policy_init,
 
   # Initialize policies.
   per_player_new_policies = [
-      [intilize_policy(game, player, policy_init)]
+      [initialize_policy(game, player, policy_init)]
       for player in range(num_players)]
-  per_player_gaps_train = [[1.0] for player in range(num_players)]
+  per_player_gaps_train = [[1.0] for _ in range(num_players)]
   per_player_num_novel_policies = add_new_policies(
       per_player_new_policies, per_player_gaps_train, per_player_repeats,
       per_player_policies, joint_policies, joint_returns, game, br_selection)

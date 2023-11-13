@@ -34,6 +34,8 @@ inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
 inline constexpr const int kMinUtility = -1;
 inline constexpr const int kMaxUtility = 1;
+inline constexpr const int kPlayerId1 = 1;
+inline constexpr const int kPlayerId2 = 2;
 
 inline constexpr const int kNumDistinctActions = 1;
 
@@ -57,13 +59,49 @@ class ScoringSheet {
   CategoryValue yacht = empty;
 };
 
+// Possible Actions:
+
+// 0: done choosing dice to reroll
+constexpr int kPass = 0;
+
+// 1: choose die 1 to be rerolled
+// 2: choose die 2 to be rerolled
+// 3: choose die 3 to be rerolled
+// 4: choose die 4 to be rerolled
+// 5: choose die 5 to be rerolled
+
+constexpr int kFillOnes = 6;
+constexpr int kFillTwos = 7;
+constexpr int kFillThrees = 8;
+constexpr int kFillFours = 9;
+constexpr int kFillFives = 10;
+constexpr int kFillSixes = 11;
+constexpr int kFillFullHouse = 12;
+constexpr int kFillFourOfAKind = 13;
+constexpr int kFillLittleStraight = 14;
+constexpr int kFillBigStraight = 15;
+constexpr int kFillChoice = 16;
+constexpr int kFillYacht = 17;
+
+constexpr int kScratchOnes = 18;
+constexpr int kScratchTwos = 19;
+constexpr int kScratchThrees = 20;
+constexpr int kScratchFours = 21;
+constexpr int kScratchFives = 22;
+constexpr int kScratchSixes = 23;
+constexpr int kScratchFullHouse = 24;
+constexpr int kScratchFourOfAKind = 25;
+constexpr int kScratchLittleStraight = 26;
+constexpr int kScratchBigStraight = 27;
+constexpr int kScratchChoice = 28;
+constexpr int kScratchYacht = 29;
+
 class YachtState : public State {
  public:
   YachtState(const YachtState&) = default;
   YachtState(std::shared_ptr<const Game>);
 
   Player CurrentPlayer() const override;
-  void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
   std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -87,13 +125,19 @@ class YachtState : public State {
   // Accessor functions for some of the specific data.
   int player_turns() const { return turns_; }
   int score(int player) const { return scores_[player]; }
+  ScoringSheet scoring_sheet(int player) const {
+    return scoring_sheets_[player];
+  }
   int dice(int i) const { return dice_[i]; }
+
+  void ApplyNormalAction(Action move, int player);
 
  protected:
   void DoApplyAction(Action move_id) override;
 
  private:
   void RollDie(int outcome);
+  void IncrementTurn();
   bool IsPosInHome(int player, int pos) const;
   bool UsableDiceOutcome(int outcome) const;
   std::string ScoringSheetToString(const ScoringSheet& scoring_sheet) const;
@@ -103,6 +147,8 @@ class YachtState : public State {
   Player cur_player_;
   Player prev_player_;
   int turns_;
+  int player1_turns_;
+  int player2_turns_;
   std::vector<int> dice_;  // Current dice.
 
   // Dice chosen to reroll. Where index i represents if that die will be

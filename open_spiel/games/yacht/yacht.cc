@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/yacht/yacht.h"
 
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>
@@ -43,7 +44,7 @@ const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
 
 constexpr int kLowestDieRoll = 1;
 constexpr int kHighestDieRoll = 6;
-constexpr int kPass = 0;
+constexpr int kInitialTurn = -1;
 
 // Facts about the game
 const GameType kGameType{/*short_name=*/"yacht",
@@ -124,7 +125,9 @@ YachtState::YachtState(std::shared_ptr<const Game> game)
     : State(game),
       cur_player_(kChancePlayerId),
       prev_player_(kChancePlayerId),
-      turns_(-1),
+      turns_(kInitialTurn),
+      player1_turns_(0),
+      player2_turns_(0),
       dice_({}),
       scores_({0, 0}),
       scoring_sheets_({ScoringSheet(), ScoringSheet()}) {}
@@ -133,7 +136,11 @@ Player YachtState::CurrentPlayer() const {
   return IsTerminal() ? kTerminalPlayerId : Player{cur_player_};
 }
 
-int YachtState::Opponent(int player) const { return 1 - player; }
+int YachtState::Opponent(int player) const {
+  if (player == kPlayerId1) return kPlayerId2;
+  if (player == kPlayerId2) return kPlayerId1;
+  SpielFatalError("Invalid player.");
+}
 
 void YachtState::RollDie(int outcome) {
   dice_.push_back(kChanceOutcomeValues[outcome - 1]);
@@ -154,16 +161,78 @@ int YachtState::DiceValue(int i) const {
   }
 }
 
-void YachtState::DoApplyAction(Action move) {
-  // Apply Action
-  int i = 0;
-  i++;
+void YachtState::ApplyNormalAction(Action move, int player) {
+  if (move == kFillOnes) {
+    scoring_sheets_[player].ones = filled;
+
+    int score = 0;
+    for (int i = 0; i < dice_.size(); ++i) {
+      int die = dice_[i];
+      if (die == 1) {
+        score += die;
+      }
+    }
+
+    scores_[player] += score;
+  }
+  // TODO(aaronrice): Score remaining categories here
 }
 
-void YachtState::UndoAction(int player, Action action) {
-  // Probably delete this. No undo's in yacht.
-  int i = 0;
-  i++;
+void YachtState::IncrementTurn() {
+  turns_++;
+  if (cur_player_ == kPlayerId1) {
+    player1_turns_++;
+  } else if (cur_player_ == kPlayerId2) {
+    player2_turns_++;
+  }
+
+  prev_player_ = cur_player_;
+  cur_player_ = kChancePlayerId;
+
+  dice_.clear();
+}
+
+void YachtState::DoApplyAction(Action move) {
+  if (IsChanceNode()) {
+    if (turns_ == kInitialTurn) {
+      // First turn.
+      SPIEL_CHECK_TRUE(dice_.empty());
+      int starting_player = std::rand() % kNumPlayers;
+      if (starting_player == 0) {
+        // Player1 starts.
+        cur_player_ = kChancePlayerId;
+        prev_player_ = kPlayerId2;
+      } else if (starting_player == 1) {
+        // Player2 Starts
+        cur_player_ = kChancePlayerId;
+        prev_player_ = kPlayerId1;
+      } else {
+        SpielFatalError(
+            absl::StrCat("Invalid starting player: ", starting_player));
+      }
+      RollDie(move);
+      turns_ = 0;
+      return;
+    } else {
+      // Normal chance node.
+      SPIEL_CHECK_TRUE(dice_.size() < 5);
+      RollDie(move);
+
+      // Once die are done rolling. Set player to non-chance node.
+      if (dice_.size() == 5) {
+        cur_player_ = Opponent(prev_player_);
+      }
+      return;
+    }
+  }
+
+  // Normal action.
+  SPIEL_CHECK_TRUE(dice_.size() == 5);
+
+  int player_index = cur_player_ - 1;
+  ApplyNormalAction(move, player_index);
+
+  IncrementTurn();
 }
 
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
@@ -180,14 +249,7 @@ std::vector<Action> YachtState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
 
-  // Actions:
-  // 0: done choosing dice to reroll
-  // 1: choose die 1 to be rerolled
-  // 2: choose die 2 to be rerolled
-  // 3: choose die 3 to be rerolled
-  // 4: choose die 4 to be rerolled
-  // 5: choose die 5 to be rerolled
-  // 6: choose die 6 to be rerolled
+  // TODO(aaronrice): update legal moves for scoring categories and scratches.
   std::vector<Action> legal_actions = {};
 
   for (int i = 0; i < dice_to_reroll_.size(); i++) {
