@@ -37,7 +37,7 @@ jobs:
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_universal2 cp310-macosx_universal2 cp310-macosx_universal2 cp311-macosx_universal2 cp312-macosx_universal2
+          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_x86_64 cp39-macosx_arm64 cp310-macosx_x86_64 cp310-macosx_arm64 cp311-macosx_x86_64 cp311-macosx_arm64 cp312-macosx_x86_64 cp312-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
@@ -47,7 +47,6 @@ jobs:
       OS_PYTHON_VERSION: "3.9"
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-      CIBW_ARCHS_MACOS: x86_64 arm64 universal2
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: pp*
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
