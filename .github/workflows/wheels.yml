@@ -95,6 +95,7 @@ jobs:
       # Basic tests are run via the CIBW_TEST_COMMAND environment variable.
       - name: Build bdist_wheel and run tests
         run: |
+          xcodebuild -version
           ${CI_PYBIN} -m cibuildwheel --archs ${ARCHS} --output-dir wheelhouse
           ls -l wheelhouse
 
