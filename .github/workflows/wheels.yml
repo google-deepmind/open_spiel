@@ -42,7 +42,7 @@ jobs:
         # Setting to the new M1 runners to build the _arm64 wheels
         # https://github.blog/2023-10-02-introducing-the-new-apple-silicon-powered-m1-macos-larger-runner-for-github-actions/
         # TODO(lanctot): Set this to macos-13 once these runnings are no longer in beta        
-        - os: macos-13-arm64
+        - os: macos-13-xlarge
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.11
           OS_PYTHON_VERSION: 3.11
