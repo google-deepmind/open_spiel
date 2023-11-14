@@ -93,6 +93,7 @@ jobs:
           ${CI_PYBIN} -m pip install cibuildwheel==2.16.2
       - name: Build sdist
         run: |
+          [[ "{OS_TYPE}" = "Darwin" ]] && brew install pipx
           pipx run build --sdist
           twine check dist/*.tar.gz
 
