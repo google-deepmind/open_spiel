@@ -19,9 +19,11 @@ from absl.testing import parameterized
 import numpy as np
 
 from open_spiel.python import policy
-from open_spiel.python.algorithms import efr
 from open_spiel.python.algorithms import expected_game_score
+from open_spiel.python.algorithms import cfr
 import pyspiel
+import efr
+
 
 _KUHN_GAME = pyspiel.load_game("kuhn_poker")
 _LEDUC_GAME = pyspiel.load_game("leduc_poker")
@@ -50,7 +52,7 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
       ["blind cf", "informed cf", "bps", "cfps", "csps", "tips", "bhv"])
-  def test_cfr_kuhn_poker(self, deviations_name):
+  def test_efr_kuhn_poker(self, deviations_name):
     game = pyspiel.load_game("kuhn_poker")
     efr_solver = efr.EFRSolver(
         game=game,
@@ -65,5 +67,45 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
     np.testing.assert_allclose(
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
+  @parameterized.parameters(
+      ["blind cf", "informed cf", "bps", "cfps", "csps", "tips", "bhv"])
+  def test_efr_kuhn_poker_3p(self, deviations_name):
+    game = pyspiel.load_game("kuhn_poker(players=3)")
+    efr_solver = efr.EFRSolver(
+        game=game,
+        deviations_name=deviations_name
+    )
+    strategies = []
+    corr_dist_values = []
+    for _ in range(10):
+      efr_solver.evaluate_and_update_policy()
+      # Convert the policy to a pyspiel.TabularPolicy, needed by the CorrDist
+      # functions on the C++ side.
+      strategies.append(policy.python_policy_to_pyspiel_policy(
+          efr_solver.current_policy()))
+      corr_dev = pyspiel.uniform_correlation_device(strategies)
+      cce_dist_info = pyspiel.cce_dist(game, corr_dev)
+      corr_dist_values.append(cce_dist_info.dist_value)
+    self.assertLess(corr_dist_values[-1], corr_dist_values[0])
+  
+
+  @parameterized.parameters(
+      ["blind cf", "informed cf", "bps", "cfps", "csps"])
+  def test_efr_cce_dist_sheriff(self, deviations_name):
+    game = pyspiel.load_game("sheriff")
+    efr_solver = efr.EFRSolver(
+        game=game,
+        deviations_name=deviations_name
+    )    
+    strategies = []
+    corr_dist_values = []
+    for _ in range(3):
+      efr_solver.evaluate_and_update_policy()
+      strategies.append(policy.python_policy_to_pyspiel_policy(
+          efr_solver.current_policy()))      
+      corr_dev = pyspiel.uniform_correlation_device(strategies)
+      cce_dist_info = pyspiel.cce_dist(game, corr_dev)
+      corr_dist_values.append(cce_dist_info.dist_value)
+    self.assertLess(corr_dist_values[-1], corr_dist_values[0])
 if __name__ == "__main__":
   absltest.main()
