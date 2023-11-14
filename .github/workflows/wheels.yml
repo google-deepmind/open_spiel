@@ -44,8 +44,8 @@ jobs:
         # TODO(lanctot): Set this to macos-13 once these runnings are no longer in beta        
         - os: macos-13-xlarge
           OS_TYPE: "Darwin"
-          CI_PYBIN: python3.11
-          OS_PYTHON_VERSION: 3.11
+          CI_PYBIN: python3.12
+          OS_PYTHON_VERSION: 3.12
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp39-macosx_arm64 cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64
     env:
