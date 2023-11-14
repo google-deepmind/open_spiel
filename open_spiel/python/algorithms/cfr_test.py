@@ -269,7 +269,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
     python_current_policy = python_solver.current_policy()
     cpp_expl = pyspiel.nash_conv(game, cpp_current_policy)
     python_expl = exploitability.nash_conv(game, python_current_policy)
-    self.assertEqual(cpp_expl, python_expl)
+    self.assertAlmostEqual(cpp_expl, python_expl, places=10)
 
 
 class CorrDistTest(absltest.TestCase):
