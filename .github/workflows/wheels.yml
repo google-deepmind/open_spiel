@@ -71,9 +71,9 @@ jobs:
         run: |
           pwd
           uname -a
-          [[ "${OS_TYPE}" = "Darwin" ]] && brew install pipx
           [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
           [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
+          [[ "${OS_TYPE}" = "Darwin" ]] && ${CI_BIN} -m pip install pipx
           which g++
           g++ --version
           chmod +x install.sh
@@ -94,7 +94,7 @@ jobs:
           ${CI_PYBIN} -m pip install cibuildwheel==2.16.2
       - name: Build sdist
         run: |
-          pipx run build --sdist --python python${OS_PYTHON_VERSION}
+          pipx run build --sdist
           twine check dist/*.tar.gz
 
       # Build all the wheels and run the basic tests (within the docker images)
