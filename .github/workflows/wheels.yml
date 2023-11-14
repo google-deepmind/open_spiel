@@ -73,7 +73,6 @@ jobs:
           uname -a
           [[ "${OS_TYPE}" = "Darwin" ]] && brew install python@${OS_PYTHON_VERSION}
           [[ "${OS_TYPE}" = "Darwin" ]] && brew link --force python@${OS_PYTHON_VERSION}
-          [[ "${OS_TYPE}" = "Darwin" ]] && ${CI_BIN} -m pip install pipx
           which g++
           g++ --version
           chmod +x install.sh
@@ -83,6 +82,7 @@ jobs:
           # These are necessary to install what is necessary for the build and for the full tests below.
           ${CI_PYBIN} -m pip install --upgrade pip
           ${CI_PYBIN} -m pip --version
+          [[ "${OS_TYPE}" = "Darwin" ]] && ${CI_PYBIN} -m pip install pipx
           ${CI_PYBIN} -m pip install --upgrade setuptools
           ${CI_PYBIN} -m pip install --upgrade -r requirements.txt -q
           source ./open_spiel/scripts/python_extra_deps.sh ${CI_PYBIN}
