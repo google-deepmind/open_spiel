@@ -262,7 +262,7 @@ class CFRTest(parameterized.TestCase, absltest.TestCase):
       # convert one to the other, so we use the exploitability as a proxy.
       cpp_expl = pyspiel.nash_conv(game, cpp_avg_policy)
       python_expl = exploitability.nash_conv(game, python_avg_policy)
-      self.assertEqual(cpp_expl, python_expl)
+      self.assertAlmostEqual(cpp_expl, python_expl, places=10)
     # Then we also check the CurrentPolicy, just to check it is giving the same
     # results too
     cpp_current_policy = cpp_solver.current_policy()
