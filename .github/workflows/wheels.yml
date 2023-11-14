@@ -31,32 +31,37 @@ jobs:
         - os: ubuntu-20.04
           OS_TYPE: "Linux"
           CI_PYBIN: python3
-          ARCHS: x86_64
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp38-manylinux_x86_64 cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64
         - os: macOS-12
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
-          ARCHS: "x86_64,arm64"
+          OS_PYTHON_VERSION: 3.9
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_x86_64 cp39-macosx_arm64 cp310-macosx_x86_64 cp310-macosx_arm64 cp311-macosx_x86_64 cp311-macosx_arm64 cp312-macosx_x86_64 cp312-macosx_arm64
+          CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64 cp312-macosx_x86_64
+        # Setting to the new M1 runners to build the _arm64 wheels
+        # https://github.blog/2023-10-02-introducing-the-new-apple-silicon-powered-m1-macos-larger-runner-for-github-actions/
+        # TODO(lanctot): Set this to macos-13 once these runnings are no longer in beta        
+        - os: macos-13-arm64
+          OS_TYPE: "Darwin"
+          CI_PYBIN: python3.11
+          OS_PYTHON_VERSION: 3.11
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp39-macosx_arm64 cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
       OPEN_SPIEL_BUILD_WITH_ROSHAMBO: ON
       OS_TYPE: ${{ matrix.OS_TYPE }}
-      OS_PYTHON_VERSION: "3.9"
+      OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
-      ARCHS: ${{ matrix.ARCHS }}
       CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
       CIBW_BUILD: ${{ matrix.CIBW_BUILD }}
       CIBW_SKIP: pp*
-      CIBW_ARCHS_MACOS: x86_64 arm64
       CIBW_BEFORE_BUILD: python -m pip install --upgrade cmake
       CIBW_BEFORE_TEST: python -m pip install --upgrade pip
       CIBW_TEST_COMMAND: /bin/bash {project}/open_spiel/scripts/test_wheel.sh basic {project}
-      CIBW_TEST_SKIP: "*_arm64 *_universal2:arm64"
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
@@ -96,7 +101,7 @@ jobs:
       - name: Build bdist_wheel and run tests
         run: |
           [[ "${OS_TYPE}" = "Darwin" ]] && xcodebuild -version
-          ${CI_PYBIN} -m cibuildwheel --archs ${ARCHS} --output-dir wheelhouse
+          ${CI_PYBIN} -m cibuildwheel --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
