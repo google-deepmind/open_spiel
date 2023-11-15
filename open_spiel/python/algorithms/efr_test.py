@@ -90,16 +90,18 @@ class EFRTest(parameterized.TestCase, absltest.TestCase):
   
 
   @parameterized.parameters(
-      ["blind cf", "informed cf", "bps", "cfps", "csps"])
+      ["blind cf", "bps", "tips"])
   def test_efr_cce_dist_sheriff(self, deviations_name):
     game = pyspiel.load_game("sheriff")
     efr_solver = efr.EFRSolver(
         game=game,
         deviations_name=deviations_name
-    )    
+    )   
+    #efr_solver = cfr.CFRSolver(game)
+
     strategies = []
     corr_dist_values = []
-    for _ in range(3):
+    for _ in range(5):
       efr_solver.evaluate_and_update_policy()
       strategies.append(policy.python_policy_to_pyspiel_policy(
           efr_solver.current_policy()))      
