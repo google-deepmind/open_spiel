@@ -42,13 +42,15 @@ jobs:
           CIBW_BUILD: cp38-macosx_x86_64 cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64 cp312-macosx_x86_64
         # Setting to the new M1 runners to build the _arm64 wheels
         # https://github.blog/2023-10-02-introducing-the-new-apple-silicon-powered-m1-macos-larger-runner-for-github-actions/
-        # TODO(author5): Set this to macos-13 once these runnings are no longer in beta        
-        - os: macos-13-xlarge
-          OS_TYPE: "Darwin"
-          CI_PYBIN: python3.11
-          OS_PYTHON_VERSION: 3.11
-          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp39-macosx_arm64 cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64
+        # Disabling now that the OpenSpiel 1.4 wheels are on PyPI because these xlarge machines are
+        # quite costly... we don't want to run these on every PR.
+        # TODO(author5): Set this to macos-13 once these runners are no longer in beta
+        #- os: macos-13-xlarge
+        #  OS_TYPE: "Darwin"
+        #  CI_PYBIN: python3.11
+        #  OS_PYTHON_VERSION: 3.11
+        #  CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+        #  CIBW_BUILD: cp39-macosx_arm64 cp310-macosx_arm64 cp311-macosx_arm64 cp312-macosx_arm64
     env:
       OPEN_SPIEL_BUILDING_WHEEL: ON
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
