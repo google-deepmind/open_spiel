@@ -146,6 +146,8 @@ class HeartsState : public State {
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
 
+  int Points(Player player) const { return points_[player]; }
+
  protected:
   void DoApplyAction(Action action) override;
 
