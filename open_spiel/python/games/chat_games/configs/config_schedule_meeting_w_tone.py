@@ -46,7 +46,9 @@ def get_config():
 
   given_prompt_actions = collections.OrderedDict()
   tones = ['calm',
-           'assertive']
+           'assertive',
+           'submissive',
+           'any']
   given_prompt_actions[header.action_keys[0]] = tones
   num_tones = len(tones)
 
