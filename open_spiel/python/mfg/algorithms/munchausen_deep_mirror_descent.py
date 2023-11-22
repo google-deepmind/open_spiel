@@ -311,7 +311,7 @@ class MunchausenDQN(rl_agent.AbstractAgent):
           target_q_values + (1 - legal_one_hots) * ILLEGAL_ACTION_PENALTY,
           axis=-1)
       max_next_q = jax.numpy.where(
-          1 - are_final_steps, x=max_next_q, y=jnp.zeros_like(max_next_q))
+          1 - are_final_steps, max_next_q, jnp.zeros_like(max_next_q))
       q_term = max_next_q
 
     target = (r_term + (1 - are_final_steps) * self._discount_factor * q_term)
