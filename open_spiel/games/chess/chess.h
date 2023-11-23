@@ -17,12 +17,12 @@
 
 #include <array>
 #include <cstring>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

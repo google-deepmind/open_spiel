@@ -27,6 +27,7 @@ class GamesChessTest(absltest.TestCase):
   def test_bindings_sim(self):
     game = pyspiel.load_game("chess")
     state = game.new_initial_state()
+    board = None
     while not state.is_terminal():
       print(state)
       player = state.current_player()
@@ -49,6 +50,12 @@ class GamesChessTest(absltest.TestCase):
     print("Moves history:")
     print(" ".join([move.to_lan() for move in state.moves_history()]))
     self.assertTrue(state.is_terminal())
+
+  def test_state_from_fen(self):
+    game = pyspiel.load_game("chess")
+    fen_string = "8/k1P5/8/1K6/8/8/8/8 w - - 0 1"
+    state = game.new_initial_state(fen_string)
+    self.assertEqual(state.board().to_fen(), fen_string)
 
 
 if __name__ == "__main__":

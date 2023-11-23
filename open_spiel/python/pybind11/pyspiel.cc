@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <memory>
-#include <unordered_map>
+#include <string>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
@@ -352,11 +352,12 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("num_distinct_actions", &Game::NumDistinctActions)
       .def("new_initial_states", &Game::NewInitialStates)
       .def("new_initial_state",
-           [](const Game* self) { return self->NewInitialState(); })
+           (std::unique_ptr<State>(open_spiel::Game::*)() const)
+           &Game::NewInitialState)
       .def("new_initial_state",
-           [](const Game* self, const std::string& s) {
-             return self->NewInitialState(s);
-           })
+           (std::unique_ptr<State>(open_spiel::Game::*)(
+                                   const std::string&) const)
+           &Game::NewInitialState)
       .def("new_initial_state_for_population",
            &Game::NewInitialStateForPopulation)
       .def("max_chance_outcomes", &Game::MaxChanceOutcomes)

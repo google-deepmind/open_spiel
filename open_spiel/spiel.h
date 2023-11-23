@@ -763,6 +763,9 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
+
+  // Return a new state from a string description. This is an unspecified and
+  // unrestricted function to construct a new state from a string.
   virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
