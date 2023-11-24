@@ -160,7 +160,7 @@ DouDizhuState::OriginalDeal() const {
   std::array<std::array<int, kNumRanks>, kNumPlayers> deal{};
   for (int i = 1; i < kNumCards - kNumCardsLeftOver + 1; ++i)
     deal[((i - 1 + first_player_) % kNumPlayers)]
-        [CardToRank(history_[i].action)]++;
+        [CardToRank(history_[i].action-kDealingActionBase)]++;
 
   for (int i = 0; i < kNumCardsLeftOver; ++i)
     deal[dizhu_][cards_left_over_[i]]++;
