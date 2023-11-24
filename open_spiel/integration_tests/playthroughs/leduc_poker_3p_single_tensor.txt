@@ -19,19 +19,19 @@ GameType.utility = Utility.ZERO_SUM
 
 NumDistinctActions() = 3
 PolicyTensorShape() = [3]
-MaxChanceOutcomes() = 8
+MaxChanceOutcomes() = 15
 GetParameters() = {action_mapping=False,players=3,suit_isomorphism=False}
 NumPlayers() = 3
 MinUtility() = -13.0
 MaxUtility() = 26.0
 UtilitySum() = 0.0
-InformationStateTensorShape() = player: [3], private_card: [8], community_card: [8], betting: [2, 7, 2]
+InformationStateTensorShape() = player: [3], private_card: [15], community_card: [15], betting: [2, 7, 2]
 InformationStateTensorLayout() = TensorLayout.CHW
-InformationStateTensorSize() = 47
-ObservationTensorShape() = [22]
+InformationStateTensorSize() = 61
+ObservationTensorShape() = [36]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 22
-MaxGameLength() = 14
+ObservationTensorSize() = 36
+MaxGameLength() = 18
 ToString() = "leduc_poker(players=3)"
 
 # State 0
@@ -52,8 +52,8 @@ InformationStateString(0) = "[Observer: 0][Private: -10000][Round 1][Player: -1]
 InformationStateString(1) = "[Observer: 1][Private: -10000][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
 InformationStateString(2) = "[Observer: 2][Private: -10000][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -63,8 +63,8 @@ InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -74,8 +74,8 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -91,12 +91,12 @@ PublicObservationString() = "[Round 1][Player: -1][Pot: 3][Money: 99 99 99][Ante
 PrivateObservationString(0) = "[Observer: 0][Private: -10000]"
 PrivateObservationString(1) = "[Observer: 1][Private: -10000]"
 PrivateObservationString(2) = "[Observer: 2][Private: -10000]"
-ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ChanceOutcomes() = [(0,0.125), (1,0.125), (2,0.125), (3,0.125), (4,0.125), (5,0.125), (6,0.125), (7,0.125)]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7]
-StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
+ObservationTensor(0): ◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ChanceOutcomes() = [(0,0.0666667), (1,0.0666667), (2,0.0666667), (3,0.0666667), (4,0.0666667), (5,0.0666667), (6,0.0666667), (7,0.0666667), (8,0.0666667), (9,0.0666667), (10,0.0666667), (11,0.0666667), (12,0.0666667), (13,0.0666667), (14,0.0666667)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:4", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7", "Chance outcome:8", "Chance outcome:9", "Chance outcome:10", "Chance outcome:11", "Chance outcome:12", "Chance outcome:13", "Chance outcome:14"]
 
 # Apply action "Chance outcome:4"
 action: 4
@@ -119,8 +119,8 @@ InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: -1][Pot:
 InformationStateString(1) = "[Observer: 1][Private: -10000][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
 InformationStateString(2) = "[Observer: 2][Private: -10000][Round 1][Player: -1][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -130,8 +130,8 @@ InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -141,8 +141,8 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◯◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -158,12 +158,12 @@ PublicObservationString() = "[Round 1][Player: -1][Pot: 3][Money: 99 99 99][Ante
 PrivateObservationString(0) = "[Observer: 0][Private: 4]"
 PrivateObservationString(1) = "[Observer: 1][Private: -10000]"
 PrivateObservationString(2) = "[Observer: 2][Private: -10000]"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ChanceOutcomes() = [(0,0.142857), (1,0.142857), (2,0.142857), (3,0.142857), (5,0.142857), (6,0.142857), (7,0.142857)]
-LegalActions() = [0, 1, 2, 3, 5, 6, 7]
-StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7"]
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ChanceOutcomes() = [(0,0.0714286), (1,0.0714286), (2,0.0714286), (3,0.0714286), (5,0.0714286), (6,0.0714286), (7,0.0714286), (8,0.0714286), (9,0.0714286), (10,0.0714286), (11,0.0714286), (12,0.0714286), (13,0.0714286), (14,0.0714286)]
+LegalActions() = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+StringLegalActions() = ["Chance outcome:0", "Chance outcome:1", "Chance outcome:2", "Chance outcome:3", "Chance outcome:5", "Chance outcome:6", "Chance outcome:7", "Chance outcome:8", "Chance outcome:9", "Chance outcome:10", "Chance outcome:11", "Chance outcome:12", "Chance outcome:13", "Chance outcome:14"]
 
 # Apply action "Chance outcome:2"
 action: 2
@@ -190,8 +190,8 @@ InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: 0][Pot: 
 InformationStateString(1) = "[Observer: 1][Private: 2][Round 1][Player: 0][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
 InformationStateString(2) = "[Observer: 2][Private: 3][Round 1][Player: 0][Pot: 3][Money: 99 99 99][Round1: ][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -201,8 +201,8 @@ InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -212,8 +212,8 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
@@ -229,9 +229,9 @@ PublicObservationString() = "[Round 1][Player: 0][Pot: 3][Money: 99 99 99][Ante:
 PrivateObservationString(0) = "[Observer: 0][Private: 4]"
 PrivateObservationString(1) = "[Observer: 1][Private: 2]"
 PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 Rewards() = [0, 0, 0]
 Returns() = [0, 0, 0]
 LegalActions() = [1, 2]
@@ -258,8 +258,8 @@ InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: 1][Pot: 
 InformationStateString(1) = "[Observer: 1][Private: 2][Round 1][Player: 1][Pot: 3][Money: 99 99 99][Round1: 1][Round2: ]"
 InformationStateString(2) = "[Observer: 2][Private: 3][Round 1][Player: 1][Pot: 3][Money: 99 99 99][Round1: 1][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
 ◉◯  ◯◯
 ◯◯  ◯◯
@@ -269,8 +269,8 @@ InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
 ◉◯  ◯◯
 ◯◯  ◯◯
@@ -280,8 +280,8 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
 ◉◯  ◯◯
 ◯◯  ◯◯
@@ -297,9 +297,9 @@ PublicObservationString() = "[Round 1][Player: 1][Pot: 3][Money: 99 99 99][Ante:
 PrivateObservationString(0) = "[Observer: 0][Private: 4]"
 PrivateObservationString(1) = "[Observer: 1][Private: 2]"
 PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
-ObservationTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(0): ◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(1): ◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
+ObservationTensor(2): ◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◉◉
 Rewards() = [0, 0, 0]
 Returns() = [0, 0, 0]
 LegalActions() = [1, 2]
@@ -326,8 +326,8 @@ InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: 2][Pot: 
 InformationStateString(1) = "[Observer: 1][Private: 2][Round 1][Player: 2][Pot: 5][Money: 99 97 99][Round1: 1 2][Round2: ]"
 InformationStateString(2) = "[Observer: 2][Private: 3][Round 1][Player: 2][Pot: 5][Money: 99 97 99][Round1: 1 2][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
 ◉◯  ◯◯
 ◯◉  ◯◯
@@ -337,8 +337,8 @@ InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
 ◉◯  ◯◯
 ◯◉  ◯◯
@@ -348,8 +348,8 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
 ◉◯  ◯◯
 ◯◉  ◯◯
@@ -365,9 +365,9 @@ PublicObservationString() = "[Round 1][Player: 2][Pot: 5][Money: 99 97 99][Ante:
 PrivateObservationString(0) = "[Observer: 0][Private: 4]"
 PrivateObservationString(1) = "[Observer: 1][Private: 2]"
 PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0]
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0]
 Rewards() = [0, 0, 0]
 Returns() = [0, 0, 0]
 LegalActions() = [0, 1, 2]
@@ -394,8 +394,8 @@ InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: 0][Pot: 
 InformationStateString(1) = "[Observer: 1][Private: 2][Round 1][Player: 0][Pot: 7][Money: 99 97 97][Round1: 1 2 1][Round2: ]"
 InformationStateString(2) = "[Observer: 2][Private: 3][Round 1][Player: 0][Pot: 7][Money: 99 97 97][Round1: 1 2 1][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
 ◉◯  ◯◯
 ◯◉  ◯◯
@@ -405,8 +405,8 @@ InformationStateTensor(0).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
 ◉◯  ◯◯
 ◯◉  ◯◯
@@ -416,8 +416,8 @@ InformationStateTensor(1).betting:
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
 ◉◯  ◯◯
 ◯◉  ◯◯
@@ -433,9 +433,9 @@ PublicObservationString() = "[Round 1][Player: 0][Pot: 7][Money: 99 97 97][Ante:
 PrivateObservationString(0) = "[Observer: 0][Private: 4]"
 PrivateObservationString(1) = "[Observer: 1][Private: 2]"
 PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
 Rewards() = [0, 0, 0]
 Returns() = [0, 0, 0]
 LegalActions() = [0, 1, 2]
@@ -445,204 +445,64 @@ StringLegalActions() = ["Fold", "Call", "Raise"]
 action: 0
 
 # State 7
-# Apply action "Chance outcome:1"
-action: 1
-
-# State 8
-# Round: 2
-# Player: 1
+# Round: 1
+# Player: 0
 # Pot: 7
-# Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): 1 4 2 3
+# Money (p1 p2 ...): 99 100.5 100.5
+# Cards (public p1 p2 ...): -10000 4 2 3
 # Round 1 sequence: Call, Raise, Call, Fold
 # Round 2 sequence:
-IsTerminal() = False
-History() = [4, 2, 3, 1, 2, 1, 0, 1]
-HistoryString() = "4, 2, 3, 1, 2, 1, 0, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "[Observer: 0][Private: 4][Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Round1: 1 2 1 0][Round2: ]"
-InformationStateString(1) = "[Observer: 1][Private: 2][Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Round1: 1 2 1 0][Round2: ]"
-InformationStateString(2) = "[Observer: 2][Private: 3][Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Round1: 1 2 1 0][Round2: ]"
-InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◉◯◯◯◯◯◯
-InformationStateTensor(0).betting:
-◉◯  ◯◯
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◉◯◯◯◯◯◯
-InformationStateTensor(1).betting:
-◉◯  ◯◯
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◉◯◯◯◯◯◯
-InformationStateTensor(2).betting:
-◉◯  ◯◯
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-ObservationString(0) = "[Observer: 0][Private: 4][Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Ante: 1 3 3]"
-ObservationString(1) = "[Observer: 1][Private: 2][Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Ante: 1 3 3]"
-ObservationString(2) = "[Observer: 2][Private: 3][Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Ante: 1 3 3]"
-PublicObservationString() = "[Round 2][Player: 1][Pot: 7][Money: 99 97 97][Public: 1][Ante: 1 3 3]"
-PrivateObservationString(0) = "[Observer: 0][Private: 4]"
-PrivateObservationString(1) = "[Observer: 1][Private: 2]"
-PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [1, 2]
-StringLegalActions() = ["Call", "Raise"]
-
-# Apply action "Raise"
-action: 2
-
-# State 9
-# Round: 2
-# Player: 2
-# Pot: 11
-# Money (p1 p2 ...): 99 93 97
-# Cards (public p1 p2 ...): 1 4 2 3
-# Round 1 sequence: Call, Raise, Call, Fold
-# Round 2 sequence: Raise
-IsTerminal() = False
-History() = [4, 2, 3, 1, 2, 1, 0, 1, 2]
-HistoryString() = "4, 2, 3, 1, 2, 1, 0, 1, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 2
-InformationStateString(0) = "[Observer: 0][Private: 4][Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Round1: 1 2 1 0][Round2: 2]"
-InformationStateString(1) = "[Observer: 1][Private: 2][Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Round1: 1 2 1 0][Round2: 2]"
-InformationStateString(2) = "[Observer: 2][Private: 3][Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Round1: 1 2 1 0][Round2: 2]"
-InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◉◯◯◯◯◯◯
-InformationStateTensor(0).betting:
-◉◯  ◯◉
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◉◯◯◯◯◯◯
-InformationStateTensor(1).betting:
-◉◯  ◯◉
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◉◯◯◯◯◯◯
-InformationStateTensor(2).betting:
-◉◯  ◯◉
-◯◉  ◯◯
-◉◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-◯◯  ◯◯
-ObservationString(0) = "[Observer: 0][Private: 4][Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Ante: 1 7 3]"
-ObservationString(1) = "[Observer: 1][Private: 2][Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Ante: 1 7 3]"
-ObservationString(2) = "[Observer: 2][Private: 3][Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Ante: 1 7 3]"
-PublicObservationString() = "[Round 2][Player: 2][Pot: 11][Money: 99 93 97][Public: 1][Ante: 1 7 3]"
-PrivateObservationString(0) = "[Observer: 0][Private: 4]"
-PrivateObservationString(1) = "[Observer: 1][Private: 2]"
-PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 3.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 3.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 3.0]
-Rewards() = [0, 0, 0]
-Returns() = [0, 0, 0]
-LegalActions() = [0, 1, 2]
-StringLegalActions() = ["Fold", "Call", "Raise"]
-
-# Apply action "Call"
-action: 1
-
-# State 10
-# Round: 2
-# Player: 2
-# Pot: 0
-# Money (p1 p2 ...): 99 100.5 100.5
-# Cards (public p1 p2 ...): 1 4 2 3
-# Round 1 sequence: Call, Raise, Call, Fold
-# Round 2 sequence: Raise, Call
 IsTerminal() = True
-History() = [4, 2, 3, 1, 2, 1, 0, 1, 2, 1]
-HistoryString() = "4, 2, 3, 1, 2, 1, 0, 1, 2, 1"
+History() = [4, 2, 3, 1, 2, 1, 0]
+HistoryString() = "4, 2, 3, 1, 2, 1, 0"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "[Observer: 0][Private: 4][Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Round1: 1 2 1 0][Round2: 2 1]"
-InformationStateString(1) = "[Observer: 1][Private: 2][Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Round1: 1 2 1 0][Round2: 2 1]"
-InformationStateString(2) = "[Observer: 2][Private: 3][Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Round1: 1 2 1 0][Round2: 2 1]"
+InformationStateString(0) = "[Observer: 0][Private: 4][Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Round1: 1 2 1 0][Round2: ]"
+InformationStateString(1) = "[Observer: 1][Private: 2][Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Round1: 1 2 1 0][Round2: ]"
+InformationStateString(2) = "[Observer: 2][Private: 3][Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Round1: 1 2 1 0][Round2: ]"
 InformationStateTensor(0).player: ◉◯◯
-InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯
-InformationStateTensor(0).community_card: ◯◉◯◯◯◯◯◯
+InformationStateTensor(0).private_card: ◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(0).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(0).betting:
-◉◯  ◯◉
-◯◉  ◉◯
+◉◯  ◯◯
+◯◉  ◯◯
 ◉◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(1).player: ◯◉◯
-InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯
-InformationStateTensor(1).community_card: ◯◉◯◯◯◯◯◯
+InformationStateTensor(1).private_card: ◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(1).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(1).betting:
-◉◯  ◯◉
-◯◉  ◉◯
+◉◯  ◯◯
+◯◉  ◯◯
 ◉◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 InformationStateTensor(2).player: ◯◯◉
-InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯
-InformationStateTensor(2).community_card: ◯◉◯◯◯◯◯◯
+InformationStateTensor(2).private_card: ◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯
+InformationStateTensor(2).community_card: ◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 InformationStateTensor(2).betting:
-◉◯  ◯◉
-◯◉  ◉◯
+◉◯  ◯◯
+◯◉  ◯◯
 ◉◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
 ◯◯  ◯◯
-ObservationString(0) = "[Observer: 0][Private: 4][Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Ante: 1 7 7]"
-ObservationString(1) = "[Observer: 1][Private: 2][Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Ante: 1 7 7]"
-ObservationString(2) = "[Observer: 2][Private: 3][Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Ante: 1 7 7]"
-PublicObservationString() = "[Round 2][Player: 2][Pot: 0][Money: 99 100.5 100.5][Public: 1][Ante: 1 7 7]"
+ObservationString(0) = "[Observer: 0][Private: 4][Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Ante: 1 3 3]"
+ObservationString(1) = "[Observer: 1][Private: 2][Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Ante: 1 3 3]"
+ObservationString(2) = "[Observer: 2][Private: 3][Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Ante: 1 3 3]"
+PublicObservationString() = "[Round 1][Player: 0][Pot: 7][Money: 99 100.5 100.5][Ante: 1 3 3]"
 PrivateObservationString(0) = "[Observer: 0][Private: 4]"
 PrivateObservationString(1) = "[Observer: 1][Private: 2]"
 PrivateObservationString(2) = "[Observer: 2][Private: 3]"
-ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 7.0]
-ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 7.0]
-ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 7.0, 7.0]
+ObservationTensor(0) = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
+ObservationTensor(1) = [0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
+ObservationTensor(2) = [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 3.0]
 Rewards() = [-1, 0.5, 0.5]
 Returns() = [-1, 0.5, 0.5]
