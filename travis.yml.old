@@ -46,7 +46,6 @@ matrix:
       - TRAVIS_USE_NOX=0
       - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
-      - BUILD_SHARED_LIB="ON"
       - OPEN_SPIEL_BUILD_WITH_ORTOOLS="ON"
       - OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="https://github.com/google/or-tools/releases/download/v8.0/or-tools_ubuntu-20.04_v8.0.8283.tar.gz"
   # Build and test on MacOS. We use a single target, with all dependencies.
