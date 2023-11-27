@@ -106,4 +106,8 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
 
   // action_to_move(action: int, board: ChessBoard)
   chess.def("action_to_move", &chess::ActionToMove);
+
+  // move_to_action(move: Move, board_size: int = default_size)
+  chess.def("move_to_action", &chess::MoveToAction,
+            py::arg("move"), py::arg("board_size") = chess::kDefaultBoardSize);
 }

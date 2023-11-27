@@ -43,6 +43,12 @@ class GamesChessTest(absltest.TestCase):
         print(f"Legal action: {action_str} decoded from to {decoded_from_to}")
         print(f"Move representations: {move.to_string()} | " +
               f"{move.to_lan()} | {move.to_san(board)}")
+        # Now do the reverse mapping from both string representations to check
+        # that they correspond to this action.
+        action_from_lan = state.parse_move_to_action(move.to_lan())
+        action_from_san = state.parse_move_to_action(move.to_san(board))
+        self.assertEqual(action, action_from_lan)
+        self.assertEqual(action, action_from_san)
       action = np.random.choice(legal_actions)
       state.apply_action(action)
     print(board.to_unicode_string())
