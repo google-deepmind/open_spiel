@@ -450,7 +450,7 @@ class ChatGameState(pyspiel.State):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     if self.is_terminal():
       return pyspiel.PlayerId.TERMINAL
-    elif self._player_action:  # if not None, an LLM msg is to be sampled
+    elif self._player_action is not None:  # if int, an LLM msg is to be sampled
       return pyspiel.PlayerId.CHANCE
     else:
       return self._current_player
@@ -475,7 +475,9 @@ class ChatGameState(pyspiel.State):
     if player == pyspiel.PlayerId.CHANCE:
       return f'Sampled LLM seed: {action}'
     else:
-      return f'Message: {action}'
+      action_unraveled = self.unravel_flat_action_to_dict(player, action)
+      action_dict = action_unraveled['action']
+      return f'Action:\nint: {action}\ndict: {action_dict}'
 
   def returns(self) -> np.ndarray:
     """Total reward for each player over the course of the game so far."""
