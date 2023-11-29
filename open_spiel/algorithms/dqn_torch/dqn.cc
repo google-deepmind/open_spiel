@@ -37,7 +37,7 @@ constexpr const float kIllegalActionLogitsPenalty =
 
 Action RandomAgent::Step(const State& state, bool is_evaluation) {
   if (state.IsTerminal()) {
-    return;
+    return kInvalidAction;
   }
   std::vector<Action> legal_actions = state.LegalActions(player_);
   int aidx = absl::Uniform<int>(rng_, 0, legal_actions.size());
