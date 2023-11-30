@@ -15,6 +15,7 @@
 """Helper functions for loading Atari data."""
 
 import logging
+from typing import Dict, List
 import numpy as np
 
 
@@ -29,15 +30,15 @@ class DataSet:
 
   def __init__(
       self,
-      agent_names: list[str],
-      game_names: list[str],
-      table_data: dict[str, list[float]],
+      agent_names: List[str],
+      game_names: List[str],
+      table_data: Dict[str, List[float]],
   ):
     self.agent_names = agent_names
     self.game_names = game_names
     self.table_data = table_data
 
-  def get_column(self, agent_name: str) -> dict[str, float]:
+  def get_column(self, agent_name: str) -> Dict[str, float]:
     column_dict = {}
     agent_idx = self.agent_names.index(agent_name)
     assert 0 <= agent_idx < len(self.agent_names)
@@ -95,7 +96,7 @@ def parse_value(val_str: str) -> float:
   return float(val_str)
 
 
-def parse_values(string_values_list: list[str]) -> list[float]:
+def parse_values(string_values_list: List[str]) -> List[float]:
   """Turn a list of strings into a list of floats."""
   return [parse_value(val) for val in string_values_list]
 
@@ -108,7 +109,7 @@ def delete_agent(dataset: DataSet, agent: str):
     del dataset.table_data[key][idx]
 
 
-def make_subset(dataset: DataSet, agent_subset: list[str]):
+def make_subset(dataset: DataSet, agent_subset: List[str]):
   for agent in dataset.agent_names:
     if agent not in agent_subset:
       delete_agent(dataset, agent)

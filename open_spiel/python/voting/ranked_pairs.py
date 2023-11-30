@@ -16,6 +16,7 @@
 Based on https://en.wikipedia.org/wiki/Ranked_pairs.
 """
 
+from typing import List, Tuple
 import numpy as np
 from open_spiel.python.voting import base
 
@@ -30,10 +31,12 @@ class RankedPairsRankOutcome(base.RankOutcome):
   Provides an extra method to get the graph.
   """
 
-  def __init__(self,
-               rankings: list[base.AlternativeId],
-               scores: list[float],
-               graph: np.ndarray):
+  def __init__(
+      self,
+      rankings: List[base.AlternativeId],
+      scores: List[float],
+      graph: np.ndarray,
+  ):
     super().__init__(rankings, scores)
     self._graph = graph
 
@@ -53,7 +56,7 @@ class RankedPairsVoting(base.AbstractVotingMethod):
 
   def _would_create_cycle(
       self,
-      alternatives: list[base.AlternativeId],
+      alternatives: List[base.AlternativeId],
       graph: np.ndarray,
       from_idx: int,
       to_idx: int,
@@ -135,17 +138,15 @@ class RankedPairsVoting(base.AbstractVotingMethod):
     return score
 
   def _get_ranked_pairs(
-      self,
-      alternatives: list[base.AlternativeId],
-      margin_matrix: np.ndarray
-    ) -> list[tuple[tuple[base.AlternativeId, base.AlternativeId], int]]:
+      self, alternatives: List[base.AlternativeId], margin_matrix: np.ndarray
+  ) -> List[Tuple[Tuple[base.AlternativeId, base.AlternativeId], int]]:
     """Returns the positively-valued ranked pairs coupled with their values.
-    
+ 
     Arguments:
       alternatives: the list of alternatives ids.
       margin_matrix: the margin matrix we use to get the values for each ranked
         pair.
-        
+
     Returns:
       A list of tuples of the form ((x, y), value) indicating x beating y by
       the specified value.

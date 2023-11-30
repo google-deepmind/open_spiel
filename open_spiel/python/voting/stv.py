@@ -16,13 +16,13 @@
 Based on https://en.wikipedia.org/wiki/Single_transferable_vote.
 """
 
-from typing import Union
+from typing import Dict, List, Union
 from open_spiel.python.voting import base
 
 
 class MutableVote(object):
   """A mutable vote annotated with the current preferred alternative.
-  
+ 
   This is used to keep track of votes and which index (into the preference list)
   is currently active, i.e. the most preferred. When votes get used to determine
   winners or elimintations, some of these votes get "transfered" down to the
@@ -31,10 +31,7 @@ class MutableVote(object):
   alternative.
   """
 
-  def __init__(self,
-               idx: int,
-               weight: int,
-               vote: list[base.AlternativeId]):
+  def __init__(self, idx: int, weight: int, vote: List[base.AlternativeId]):
     self.idx = idx
     self.weight = weight
     self.vote = vote
@@ -43,9 +40,9 @@ class MutableVote(object):
 class STVVoting(base.AbstractVotingMethod):
   """Implements STV method."""
 
-  def __init__(self,
-               num_winners: Union[int, None] = None,
-               verbose: bool = False):
+  def __init__(
+      self, num_winners: Union[int, None] = None, verbose: bool = False
+  ):
     """Construct an instance of STV with the specified number of winners.
 
     Args:
@@ -59,17 +56,21 @@ class STVVoting(base.AbstractVotingMethod):
   def name(self) -> str:
     return f"single_transferable_vote(num_winners={self._num_winners})"
 
-  def _is_still_active(self,
-                       alternative: base.AlternativeId,
-                       winners: list[base.AlternativeId],
-                       losers: list[base.AlternativeId]) -> bool:
+  def _is_still_active(
+      self,
+      alternative: base.AlternativeId,
+      winners: List[base.AlternativeId],
+      losers: List[base.AlternativeId],
+  ) -> bool:
     """Returns whether the alternative is still in the running."""
     return alternative not in winners and alternative not in losers
 
-  def _next_idx_in_the_running(self,
-                               mutable_vote: MutableVote,
-                               winners: list[base.AlternativeId],
-                               losers: list[base.AlternativeId]) -> int:
+  def _next_idx_in_the_running(
+      self,
+      mutable_vote: MutableVote,
+      winners: List[base.AlternativeId],
+      losers: List[base.AlternativeId],
+  ) -> int:
     """"Returns the next index in the list that is still in the running."""
     new_idx = mutable_vote.idx + 1
     while (new_idx < len(mutable_vote.vote) and
@@ -81,9 +82,9 @@ class STVVoting(base.AbstractVotingMethod):
   def _initial_scores_for_round(
       self,
       profile: base.PreferenceProfile,
-      winners: list[base.AlternativeId],
-      losers: list[base.AlternativeId]
-  ) -> dict[base.AlternativeId, float]:
+      winners: List[base.AlternativeId],
+      losers: List[base.AlternativeId],
+  ) -> Dict[base.AlternativeId, float]:
     """Returns round's initial scores for alternatives still in the running."""
     alt_scores = {}
     for alt in profile.alternatives:
@@ -91,10 +92,12 @@ class STVVoting(base.AbstractVotingMethod):
         alt_scores[alt] = 0
     return alt_scores
 
-  def _remove_winning_votes(self,
-                            winning_alt: base.AlternativeId,
-                            num_to_remove: int,
-                            all_votes: list[MutableVote]):
+  def _remove_winning_votes(
+      self,
+      winning_alt: base.AlternativeId,
+      num_to_remove: int,
+      all_votes: List[MutableVote],
+  ):
     while num_to_remove > 0:
       for mutable_vote in all_votes:
         if (mutable_vote.idx < len(mutable_vote.vote) and
@@ -126,7 +129,7 @@ class STVVoting(base.AbstractVotingMethod):
     # the current alternative that this vote is representing. They all start at
     # 0 at the start, corresponding to their highest preference, and they get
     # incremented as they become used up.
-    all_votes: list[MutableVote] = []
+    all_votes: List[MutableVote] = []
     for vote in votes:
       all_votes.append(MutableVote(idx=0, weight=vote.weight, vote=vote.vote))
     while len(winners) + len(losers) < m:
