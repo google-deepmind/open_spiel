@@ -260,6 +260,15 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  voting/approval_test.py
+  voting/base_test.py
+  voting/borda_test.py
+  voting/copeland_test.py
+  voting/kemeny_young_test.py
+  voting/plurality_test.py
+  voting/ranked_pairs_test.py
+  voting/schulze_test.py
+  voting/stv_test.py
 )
 
 # Add Jax tests if it is enabled.
@@ -335,6 +344,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
       games/kuhn_poker_test.py
+      voting/maximal_lotteries_test.py
       tests/matrix_game_utils_test.py
   )
 endif()
