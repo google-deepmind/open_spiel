@@ -18,6 +18,8 @@ Based on https://en.wikipedia.org/wiki/Kemeny%E2%80%93Young_method.
 
 import itertools
 import numpy as np
+from typing import List
+from typing import Tuple
 from open_spiel.python.voting import base
 
 
@@ -31,9 +33,9 @@ class KemenyYoungVoting(base.AbstractVotingMethod):
     return "kemeny_young"
 
   def _score(self,
-             alternatives: list[base.AlternativeId],
+             alternatives: List[base.AlternativeId],
              pref_mat: np.ndarray,
-             perm: tuple[int, ...]) -> tuple[list[base.AlternativeId], int,
+             perm: Tuple[int, ...]) -> Tuple[List[base.AlternativeId], int,
                                              np.ndarray]:
     # The score of alternative a_i in a ranking R is defined to be:
     #      KemenyScore(a_i) = sum_{a_j s.t. R(a_i) >= R(a_j)} N(a_i, a_j)

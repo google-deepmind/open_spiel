@@ -18,6 +18,7 @@ Based on https://en.wikipedia.org/wiki/Maximal_lotteries.
 
 import numpy as np
 from open_spiel.python.algorithms import lp_solver
+from typing import List
 import pyspiel
 from open_spiel.python.voting import base
 
@@ -72,7 +73,7 @@ class MaximalLotteriesVoting(base.AbstractVotingMethod):
       return self._iterate(alternatives, margin_matrix, p0_sol)
 
   def _iterate(self,
-               alternatives: list[base.AlternativeId],
+               alternatives: List[base.AlternativeId],
                margin_matrix: np.ndarray,
                p0_sol: np.ndarray):
     remaining_alternatives = alternatives[:]

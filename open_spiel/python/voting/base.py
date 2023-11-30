@@ -15,8 +15,11 @@
 """Base classes for voting methods."""
 
 import abc
+from typing import Dict
+from typing import List
 from typing import NamedTuple
 from typing import Union
+from typing import Tuple
 import numpy as np
 
 
@@ -24,7 +27,7 @@ import numpy as np
 AlternativeId = Union[str, int]
 
 # List of alternative ids.
-PreferenceList = list[AlternativeId]
+PreferenceList = List[AlternativeId]
 
 # Basic type to represent a vote.
 #    - The weight is an integer representing the number of voters
@@ -37,14 +40,14 @@ class WeightedVote(NamedTuple):
 
 class PreferenceProfile(object):
   """Base class for preference profiles."""
-  _votes: list[WeightedVote]  # Tracks cast votes along with their count
-  _alternatives_dict: dict[AlternativeId, int]  # Maps ID to index
+  _votes: List[WeightedVote]  # Tracks cast votes along with their count
+  _alternatives_dict: Dict[AlternativeId, int]  # Maps ID to index
   # Identifiers for all possible alternatives
-  _alternatives_ids: list[AlternativeId]
+  _alternatives_ids: List[AlternativeId]
 
   def __init__(self,
-               votes: Union[list[PreferenceList], list[WeightedVote], None] = None,
-               alternatives: Union[list[AlternativeId], None] = None):
+               votes: Union[List[PreferenceList], List[WeightedVote], None] = None,
+               alternatives: Union[List[AlternativeId], None] = None):
     """Initialize the preference profile.
 
     Args:
@@ -54,12 +57,12 @@ class PreferenceProfile(object):
       alternatives: a list of alternatives ids.
     """
     # List of Vote named tuples from above.
-    self._votes: list[WeightedVote] = []
+    self._votes: List[WeightedVote] = []
     # alternative id -> index (used for registering alternatives)
-    self._alternatives_dict: dict[AlternativeId, int] = {}
+    self._alternatives_dict: Dict[AlternativeId, int] = {}
     # IDs (labels) of each alternative (usually strings). The alternative's
     # index is then the index of this array.
-    self._alternatives_ids: list[AlternativeId] = []
+    self._alternatives_ids: List[AlternativeId] = []
 
     # Register the alternatives and add the votes, if any are provided.
     if alternatives is not None:
@@ -116,7 +119,7 @@ class PreferenceProfile(object):
         self._register_alternative(alternative)
 
   def add_vote_from_values(self,
-                           values: Union[list[float], list[int]],
+                           values: Union[List[float], List[int]],
                            tie_tolerance: float = 1e-10,
                            weight: int = 1):
     """Adds a vote from a list of values.
@@ -167,17 +170,17 @@ class PreferenceProfile(object):
     self.add_vote(named_vote, weight=weight)
 
   @property
-  def votes(self) -> list[WeightedVote]:
+  def votes(self) -> List[WeightedVote]:
     """Returns a list of votes."""
     return self._votes
 
   @property
-  def alternatives(self) -> list[AlternativeId]:
+  def alternatives(self) -> List[AlternativeId]:
     """Returns a list of alternatives."""
     return self._alternatives_ids
 
   @property
-  def alternatives_dict(self) -> dict[AlternativeId, int]:
+  def alternatives_dict(self) -> Dict[AlternativeId, int]:
     """Returns a dict of alternative id -> index for each alternative."""
     return self._alternatives_dict
 
@@ -314,15 +317,15 @@ class RankOutcome(object):
   """Basic object for outcomes of the voting methods."""
 
   def __init__(self, rankings=None, scores=None):
-    self._rankings: list[AlternativeId] = rankings
-    self._scores: list[float] = scores
-    self._rank_dict: dict[AlternativeId, int] = None
+    self._rankings: List[AlternativeId] = rankings
+    self._scores: List[float] = scores
+    self._rank_dict: Dict[AlternativeId, int] = None
     if self._rankings is not None:
       self.make_rank_dict()
 
   def unpack_from(self,
                   ranked_alternatives_and_scores:
-                  list[tuple[AlternativeId, float]]):
+                  List[Tuple[AlternativeId, float]]):
     """A rank outcome that comes packed as (alternative id, score) tuples."""
     self._rankings, self._scores = zip(*ranked_alternatives_and_scores)
     self._rankings = list(self._rankings)
@@ -330,17 +333,17 @@ class RankOutcome(object):
     self.make_rank_dict()
 
   @property
-  def ranking(self) -> list[AlternativeId]:
+  def ranking(self) -> List[AlternativeId]:
     """Returns an ordered list W of alternatives' ids (winner is first)."""
     return self._rankings
 
   @property
-  def scores(self) -> list[float]:
+  def scores(self) -> List[float]:
     """Returns a alternative's scores S (in the same order as the ranking)."""
     return self._scores
 
-  def ranking_with_scores(self) -> tuple[list[AlternativeId],
-                                         list[float]]:
+  def ranking_with_scores(self) -> Tuple[List[AlternativeId],
+                                         List[float]]:
     """Returns an ordered list of alternative ids and dict of scores W, S."""
     return self._rankings, self._scores
 

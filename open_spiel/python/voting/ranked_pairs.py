@@ -17,6 +17,8 @@ Based on https://en.wikipedia.org/wiki/Ranked_pairs.
 """
 
 import numpy as np
+from typing import List
+from typing import Tuple
 from open_spiel.python.voting import base
 
 # TODO(author5): either one of the following: (i) change graph representation to
@@ -31,8 +33,8 @@ class RankedPairsRankOutcome(base.RankOutcome):
   """
 
   def __init__(self,
-               rankings: list[base.AlternativeId],
-               scores: list[float],
+               rankings: List[base.AlternativeId],
+               scores: List[float],
                graph: np.ndarray):
     super().__init__(rankings, scores)
     self._graph = graph
@@ -53,7 +55,7 @@ class RankedPairsVoting(base.AbstractVotingMethod):
 
   def _would_create_cycle(
       self,
-      alternatives: list[base.AlternativeId],
+      alternatives: List[base.AlternativeId],
       graph: np.ndarray,
       from_idx: int,
       to_idx: int,
@@ -136,9 +138,9 @@ class RankedPairsVoting(base.AbstractVotingMethod):
 
   def _get_ranked_pairs(
       self,
-      alternatives: list[base.AlternativeId],
+      alternatives: List[base.AlternativeId],
       margin_matrix: np.ndarray
-    ) -> list[tuple[tuple[base.AlternativeId, base.AlternativeId], int]]:
+    ) -> List[Tuple[Tuple[base.AlternativeId, base.AlternativeId], int]]:
     """Returns the positively-valued ranked pairs coupled with their values.
     
     Arguments:
