@@ -26,7 +26,6 @@ AlternativeId = Union[str, int]
 # List of alternative ids.
 PreferenceList = list[AlternativeId]
 
-
 # Basic type to represent a vote.
 #    - The weight is an integer representing the number of voters
 #    - The vote is a list of alternative ids, e.g. ["a", "b", "c"],
