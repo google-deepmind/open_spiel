@@ -16,6 +16,7 @@
 Based on https://en.wikipedia.org/wiki/Single_transferable_vote.
 """
 
+from typing import Union
 from open_spiel.python.voting import base
 
 
@@ -43,7 +44,7 @@ class STVVoting(base.AbstractVotingMethod):
   """Implements STV method."""
 
   def __init__(self,
-               num_winners: int | None = None,
+               num_winners: Union[int, None] = None,
                verbose: bool = False):
     """Construct an instance of STV with the specified number of winners.
 

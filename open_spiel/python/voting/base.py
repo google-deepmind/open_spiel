@@ -16,11 +16,12 @@
 
 import abc
 from typing import NamedTuple
+from typing import Union
 import numpy as np
 
 
 # The id of an alternative can be a string or an integer.
-AlternativeId = str | int
+AlternativeId = Union[str, int]
 
 # List of alternative ids.
 PreferenceList = list[AlternativeId]
@@ -43,8 +44,8 @@ class PreferenceProfile(object):
   _alternatives_ids: list[AlternativeId]
 
   def __init__(self,
-               votes: list[PreferenceList] | list[WeightedVote] | None = None,
-               alternatives: list[AlternativeId] | None = None):
+               votes: Union[list[PreferenceList], list[WeightedVote], None] = None,
+               alternatives: Union[list[AlternativeId], None] = None):
     """Initialize the preference profile.
 
     Args:
@@ -90,7 +91,7 @@ class PreferenceProfile(object):
       for alternative in vote:
         self._register_alternative(alternative)
 
-  def add_vote(self, vote: PreferenceList | WeightedVote, weight: int = 1):
+  def add_vote(self, vote: Union[PreferenceList, WeightedVote], weight: int = 1):
     """Add a vote to this preference profile.
 
     Args:
@@ -116,7 +117,7 @@ class PreferenceProfile(object):
         self._register_alternative(alternative)
 
   def add_vote_from_values(self,
-                           values: list[float] | list[int],
+                           values: Union[list[float], list[int]],
                            tie_tolerance: float = 1e-10,
                            weight: int = 1):
     """Adds a vote from a list of values.
@@ -223,7 +224,7 @@ class PreferenceProfile(object):
 
   def condorcet_winner(self,
                        strong: bool = True,
-                       margin_matrix: np.ndarray | None = None):
+                       margin_matrix: Union[np.ndarray, None] = None):
     """Returns the Condorcet winner(s).
 
     Args:
@@ -368,7 +369,7 @@ class RankOutcome(object):
       str_rep += "Scores: " + str(self._scores)
     return str_rep
 
-  def pretty_table_string(self, top: int | None = None):
+  def pretty_table_string(self, top: Union[int, None] = None):
     """Return an easier-to-read table for the rankings and scores.
 
     Args:
@@ -400,8 +401,8 @@ class RankOutcome(object):
     return table_string
 
   def pretty_latex_table(self,
-                         header: str | None = None,
-                         top: int | None = None):
+                         header: Union[str, None] = None,
+                         top: Union[int, None] = None):
     """Return an easier-to-read table string for the rankings and scores.
 
     The string returned include LaTeX formatting for putting the tables into
