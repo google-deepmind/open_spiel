@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A pyspiel config for meta-generated meeting schedule negotiation games.
+"""A pyspiel config for meta-generated fruit trading games.
 """
 
 import collections
 
 from ml_collections import config_dict
 
-from open_spiel.python.games.chat_games.envs.base_envs import schedule_meeting_with_tone_info as env_schedule_meeting_with_tone_info
+from open_spiel.python.games.chat_games.envs.base_envs import trade_fruit_with_tone_info as env_trade_fruit_with_tone_info
 from open_spiel.python.games.chat_games.envs.observations import summary
 from open_spiel.python.games.chat_games.envs.observations import utils as obs_utils
-from open_spiel.python.games.chat_games.envs.payoffs import schedule_meeting as payoffs_schedule_meeting
-from open_spiel.python.games.chat_games.envs.scenarios.domains import schedule_meeting as scenario_schedule_meeting
+from open_spiel.python.games.chat_games.envs.payoffs import trade_fruit as payoffs_trade_fruit
+from open_spiel.python.games.chat_games.envs.scenarios.domains import trade_fruit as scenario_trade_fruit
+from open_spiel.python.games.chat_games.envs.scenarios.players import names as names_trade_fruit
 
 
 def get_config():
@@ -37,9 +38,11 @@ def get_config():
       for _ in range(num_players)
   ]
 
-  header = env_schedule_meeting_with_tone_info.HEADER
+  header = env_trade_fruit_with_tone_info.HEADER
 
-  payoffs = [payoffs_schedule_meeting.PAYOFF]
+  payoffs = [payoffs_trade_fruit.PAYOFF]
+
+  examples_names = names_trade_fruit.NAMES
 
   given_prompt_actions = collections.OrderedDict()
   tones = ['calm',
@@ -49,21 +52,30 @@ def get_config():
   given_prompt_actions[header.action_keys[0]] = tones
   num_tones = len(tones)
 
-  given_private_info = collections.OrderedDict()
-  given_private_info['day_prefs'] = [scenario_schedule_meeting.DAY_PREFS_A,
-                                     scenario_schedule_meeting.DAY_PREFS_B]
-  given_private_info['ooo_days'] = [scenario_schedule_meeting.OOO_A,
-                                    scenario_schedule_meeting.OOO_B]
+  examples_private_info = collections.OrderedDict()
+  examples_private_info['fruit_endowment'] = [scenario_trade_fruit.ENDOWMENT_A,
+                                              scenario_trade_fruit.ENDOWMENT_B]
+  examples_private_info['fruit_valuations'] = [scenario_trade_fruit.VALUATION_A,
+                                               scenario_trade_fruit.VALUATION_B]
 
-  scenario_a = env_schedule_meeting_with_tone_info.Scenario(
-      scenario_schedule_meeting.SCENARIO_A,
+  scenario_a = env_trade_fruit_with_tone_info.Scenario(
+      scenario_trade_fruit.SCENARIO_A,
       'Bob',
       'Suzy',
-      scenario_schedule_meeting.OOO_A,
-      scenario_schedule_meeting.DAY_PREFS_A,
+      scenario_trade_fruit.ENDOWMENT_A,
+      scenario_trade_fruit.VALUATION_A,
+      'calm')
+  scenario_b = env_trade_fruit_with_tone_info.Scenario(
+      scenario_trade_fruit.SCENARIO_B,
+      'Jill',
+      'George',
+      scenario_trade_fruit.ENDOWMENT_B,
+      scenario_trade_fruit.VALUATION_B,
       'calm')
 
-  llm_termination_prompt = scenario_schedule_meeting.LLM_TERMINATION_PROMPT
+  examples_scenarios = [scenario_a, scenario_b]
+
+  llm_termination_prompt = scenario_trade_fruit.LLM_TERMINATION_PROMPT
 
   params = {'num_distinct_actions': num_players * num_tones,
             'num_llm_seeds': 2,
@@ -79,10 +91,12 @@ def get_config():
   config.game.header = header
   config.game.payoffs = payoffs
   config.game.given_prompt_actions = given_prompt_actions
-  config.game.num_private_info = (2, 2)
-  config.game.given_names = ['Bob', 'Suzy']
-  config.game.given_private_info = given_private_info
-  config.game.initial_scenario = scenario_a
+  config.game.num_names = 10
+  config.game.num_prompt_actions = (num_tones,)
+  config.game.num_private_info = (3, 3)
+  config.game.examples_names = examples_names
+  config.game.examples_private_info = examples_private_info
+  config.game.examples_scenarios = examples_scenarios
   config.game.llm_list_suffix = 'Output: '
   config.game.llm_termination_prompt = llm_termination_prompt
 
