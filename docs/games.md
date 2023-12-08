@@ -72,6 +72,7 @@ Status                                       | Game
 <font color="orange"><b>~</b></font>         | [Phantom Go](#phantom-go)
 <font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
 ![](_static/green_circ10.png "green circle") | [Pig](#pig)
+![](_static/green_circ10.png "green circle") | [Prisoner's Dilemma](#prisoner's-dilemma)
 <font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
 ![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
 <font color="orange"><b>~</b></font>         | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
@@ -736,6 +737,17 @@ Status                                       | Game
 *   Perfect information.
 *   2-10 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))
+
+### Prisoner's Dilemma
+
+*   Players decide on whether to cooperate or defect given a situation with
+    different payoffs.
+*   Simultaneous.
+*   Traditional game.
+*   Deterministic.
+*   Perfect Information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Prisoner%27s_dilemma)
 
 ### Poker (Hold 'em)
 
