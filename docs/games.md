@@ -1,11 +1,10 @@
 # Available games
 
-![](_static/green_circ10.png "green circle"): thoroughly-tested. In many cases,
-we verified against known values and/or reproduced results from papers.
+🟢:  thoroughly-tested. In many cases, we verified against known values and/or reproduced results from papers.
 
-<font color="orange"><b>~</b></font>: implemented but lightly tested.
+🔶: implemented but lightly tested.
 
-<font color="red"><b>X</b></font>: known issues (see code for details).
+❌: known issues (see notes below and code for details).
 
 Status                                       | Game
 -------------------------------------------- | ----
