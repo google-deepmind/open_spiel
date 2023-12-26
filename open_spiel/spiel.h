@@ -1056,10 +1056,12 @@ class GameRegisterer {
   static std::shared_ptr<const Game> CreateByName(const std::string& short_name,
                                                   const GameParameters& params);
 
+  static const std::vector<std::string> GamesWithKnownIssues();
   static std::vector<std::string> RegisteredNames();
   static std::vector<GameType> RegisteredGames();
   static bool IsValidName(const std::string& short_name);
   static void RegisterGame(const GameType& game_type, CreateFunc creator);
+
 
  private:
   // Returns a "global" map of registrations (i.e. an object that lives from

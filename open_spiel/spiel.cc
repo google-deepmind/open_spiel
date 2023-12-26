@@ -140,6 +140,15 @@ GameRegisterer::GameRegisterer(const GameType& game_type, CreateFunc creator) {
 
 std::shared_ptr<const Game> GameRegisterer::CreateByName(
     const std::string& short_name, const GameParameters& params) {
+  // Check if it's a game with a known issue. If so, output a warning.
+  auto known_issues_iter = absl::c_find(GamesWithKnownIssues(), short_name);
+  if (known_issues_iter != GamesWithKnownIssues().end()) {
+    std::cerr << "Warning! This game has known issues. Please see the games "
+              << "list on github or the code for details."
+              << std::endl;
+  }
+
+  // Find the factory for this game and load it.
   auto iter = factories().find(short_name);
   if (iter == factories().end()) {
     SpielFatalError(absl::StrCat("Unknown game '", short_name,
@@ -158,6 +167,10 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
     names.push_back(key_val.first);
   }
   return names;
+}
+  
+const std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
+  return {"quoridor", "rbc", "universal_poker"};
 }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {
