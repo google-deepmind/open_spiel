@@ -219,6 +219,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/sequence_form_utils_test.py
   algorithms/wolf_phc_test.py
   algorithms/mmd_dilated_test.py
+  coalitional_games/shapley_values_test.py
   bots/bluechip_bridge_test.py
   bots/bluechip_bridge_uncontested_bidding_test.py
   bots/is_mcts_test.py
@@ -340,6 +341,8 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/stackelberg_lp_test.py
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
+      coalitional_games/least_core_lp_test.py
+      coalitional_games/wvg_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py

@@ -85,6 +85,7 @@ Status           | Game
 🟢               | [Tiny Hanabi](#tiny-hanabi)
 🟢               | [Trade Comm](#trade-comm)
 🔶               | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
+🔶               | [Weighted Voting Games](#weighted-voting-games)
 🟢               | [Y](#y)
 
 ## Details
@@ -898,6 +899,15 @@ Status           | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
+
+### Weighted Voting Games
+
+*   Classic coalitional game.
+*   Players each have a weight w_i, and there is a quota q.
+*   Denote p the binary vector representing a coalition over n players. The
+    utility is 1 is p dot w >= q, 0 otherwise.
+*   n players.
+*   [Chalkiadakis, Elkind, &amp; Wooldridge '12](https://link.springer.com/book/10.1007/978-3-031-01558-8)
 
 ### Y
 
