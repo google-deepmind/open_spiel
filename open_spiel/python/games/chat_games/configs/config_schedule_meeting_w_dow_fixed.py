@@ -24,7 +24,6 @@ from open_spiel.python.games.chat_games.envs.observations import summary
 from open_spiel.python.games.chat_games.envs.observations import utils as obs_utils
 from open_spiel.python.games.chat_games.envs.payoffs import schedule_meeting as payoffs_schedule_meeting
 from open_spiel.python.games.chat_games.envs.scenarios.domains import schedule_meeting as scenario_schedule_meeting
-from open_spiel.python.games.chat_games.envs.scenarios.players import names as names_schedule_meeting
 
 
 def get_config():
@@ -42,8 +41,6 @@ def get_config():
 
   payoffs = [payoffs_schedule_meeting.PAYOFF]
 
-  examples_names = names_schedule_meeting.NAMES
-
   given_prompt_actions = collections.OrderedDict()
   days = ['Monday',
           'Tuesday',
@@ -55,11 +52,11 @@ def get_config():
   given_prompt_actions[header.action_keys[0]] = days + ['any']
   num_days = len(days) + 1
 
-  examples_private_info = collections.OrderedDict()
-  examples_private_info['ooo_days'] = [scenario_schedule_meeting.OOO_A,
-                                       scenario_schedule_meeting.OOO_B]
-  examples_private_info['day_prefs'] = [scenario_schedule_meeting.DAY_PREFS_A,
-                                        scenario_schedule_meeting.DAY_PREFS_B]
+  given_private_info = collections.OrderedDict()
+  given_private_info['day_prefs'] = [scenario_schedule_meeting.DAY_PREFS_A,
+                                     scenario_schedule_meeting.DAY_PREFS_B]
+  given_private_info['ooo_days'] = [scenario_schedule_meeting.OOO_A,
+                                    scenario_schedule_meeting.OOO_B]
 
   scenario_a = env_schedule_meeting_with_dow_info.Scenario(
       scenario_schedule_meeting.SCENARIO_A,
@@ -68,15 +65,6 @@ def get_config():
       scenario_schedule_meeting.OOO_A,
       scenario_schedule_meeting.DAY_PREFS_A,
       'Thursday')
-  scenario_b = env_schedule_meeting_with_dow_info.Scenario(
-      scenario_schedule_meeting.SCENARIO_B,
-      'Jill',
-      'George',
-      scenario_schedule_meeting.OOO_B,
-      scenario_schedule_meeting.DAY_PREFS_B,
-      'Friday')
-
-  examples_scenarios = [scenario_a, scenario_b]
 
   llm_termination_prompt = scenario_schedule_meeting.LLM_TERMINATION_PROMPT
 
@@ -94,12 +82,10 @@ def get_config():
   config.game.header = header
   config.game.payoffs = payoffs
   config.game.given_prompt_actions = given_prompt_actions
-  config.game.num_names = 10
-  config.game.num_prompt_actions = (num_days,)
-  config.game.num_private_info = (3, 3)
-  config.game.examples_names = examples_names
-  config.game.examples_private_info = examples_private_info
-  config.game.examples_scenarios = examples_scenarios
+  config.game.num_private_info = (2, 2)
+  config.game.given_names = ['Bob', 'Suzy']
+  config.game.given_private_info = given_private_info
+  config.game.initial_scenario = scenario_a
   config.game.llm_list_suffix = 'Output: '
   config.game.llm_termination_prompt = llm_termination_prompt
 

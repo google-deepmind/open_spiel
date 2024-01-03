@@ -110,11 +110,6 @@ email_3c = '\n\n'.join(text.wrap(email_3c))
 example_c = email_1c + email_2c
 example_c = example_c.strip('\n')
 
-w_opts = (trades.W_OPTS_PREFIX +
-          'Fruit Endowment:\n{fruit_endowment}\n\n' +
-          'Fruit Valuations:\n{fruit_valuations}' +
-          trades.PLAIN)
-
 instr_a = ['You are an assistant who is playing a game where you trade fruit.' +
            ' You want to make a trade that is best for you. You will read a ' +
            'dialogue that contains a conversation where you have been ' +

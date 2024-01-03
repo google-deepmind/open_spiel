@@ -111,11 +111,6 @@ email_3c = '\n\n'.join(text.wrap(email_3c))
 example_c = email_1c + email_2c
 example_c = example_c.strip('\n')
 
-w_opts = (trades.W_OPTS_PREFIX +
-          'Fruit Endowment:\n{fruit_endowment}\n\n' +
-          'Fruit Valuations:\n{fruit_valuations}' +
-          trades.PLAIN)
-
 instr_a = ['You are an assistant who is playing a game where you trade fruit.' +
            ' You want to make a trade that is best for you. You will read a ' +
            'dialogue that contains a conversation where you have been ' +
@@ -147,7 +142,8 @@ instr_d = ['&' * 50,
            '&' * 50]
 info = w_opts.format(sender='Bob', receiver='Suzy',
                      fruit_endowment=trade_fruit.ENDOWMENT_A,
-                     fruit_valuations=trade_fruit.VALUATION_A).strip('\n')
+                     fruit_valuations=trade_fruit.VALUATION_A,
+                     tone='calm').strip('\n')
 instr_e = ['&' * 50,
            'A reasonable way to respond would be as follows:',
            '&' * 50]
