@@ -24,7 +24,6 @@
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/base/no_destructor.h"
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/btree_map.h"
 #include "open_spiel/abseil-cpp/absl/random/bit_gen_ref.h"
@@ -170,10 +169,8 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
   return names;
 }
 
-const std::vector<std::string>& GameRegisterer::GamesWithKnownIssues() {
-  static const absl::NoDestructor<std::vector<std::string>>
-      games_with_known_issues({"quoridor", "rbc", "universal_poker"});
-  return *games_with_known_issues;
+std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
+  return {"quoridor", "rbc", "universal_poker"};
 }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {
