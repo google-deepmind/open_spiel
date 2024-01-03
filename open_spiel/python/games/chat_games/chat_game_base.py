@@ -109,8 +109,6 @@ class ChatGameState(pyspiel.State):
       game: see ChatGame class (should inherit from BaseChatGame)
       actions: dict, {'player_names': list of str,
                       <prompt_action_i>: list of str,
-                      ...,
-                      <info_i>: len-num_players list of str,
                       ...}
       seeds: list of ints, llm seeds (chance nodes)
       scenario_prompt: str, initial message with header (no tone)
@@ -294,14 +292,20 @@ class ChatGameState(pyspiel.State):
     self._played_actions.append(-1)  # assign -1 for human messages
     self._apply_msg(speaker_msg)
 
-  def action_to_msg(self, action: int, seed: int) -> str:
-    """Unravel action int to multidimensional action tuple and construct msg.
+  def action_to_prompt(self,
+                       action: int,
+                       seed: int,
+                       header: header_utils.Header
+                       ) -> Tuple[str, str]:
+    """Unravel action int to multidimensional action tuple and construct prompt.
     
     Args:
-      action: int
+      action: int, the action taken in the game
       seed: int, llm seed
+      header: header_utils.Header, used to format a prompt
     Returns:
-      speaker_msg: str
+      prompt: str, formatted prompt to feed the LLM to generate a new message
+      header_plain: str, the formatted header without any private info / actions
     """
     speaker = int(self._current_speaker)
     action_dict = self.unravel_flat_action_to_dict(speaker, action)
@@ -310,21 +314,36 @@ class ChatGameState(pyspiel.State):
 
     names, _ = self._names_from_validated_receiver(receiver, speaker)
     speaker_name, receiver_name, others_names = names
-    header = self.get_game().header.plain.format(sender=speaker_name,
-                                                 receiver=receiver_name,
-                                                 others=others_names)
+    header_plain = header.plain.format(sender=speaker_name,
+                                       receiver=receiver_name,
+                                       others=others_names)
 
-    header_w_opts = self.get_game().header.w_opts.format(sender=speaker_name,
-                                                         receiver=receiver_name,
-                                                         others=others_names,
-                                                         **opts)
+    header_w_opts = header.w_opts.format(sender=speaker_name,
+                                         receiver=receiver_name,
+                                         others=others_names,
+                                         **opts)
     # provide header with opts to llm for response
     logging.info('Generating message (speaker=%d:%s)...',
                  speaker,
                  speaker_name)
-    prompt = (self.get_game().header.context +
-              '\n\n' + self.dialogue_str + header_w_opts)
+
+    prompt = header.context + '\n\n' + self.dialogue_str + header_w_opts
+
+    return prompt, header_plain
+
+  def action_to_msg(self, action: int, seed: int) -> str:
+    """Unravel action int to multidimensional action tuple and construct msg.
+    
+    Args:
+      action: int, the action taken in the game
+      seed: int, llm seed
+    Returns:
+      speaker_msg: str
+    """
+    header = self.get_game().header
+    prompt, header_plain = self.action_to_prompt(action, seed, header)
     logging.info('LLM prompt:\n%s', prompt)
+
     response = self.get_game().generate_response(
         prompt=prompt,
         seed=seed,
@@ -332,9 +351,10 @@ class ChatGameState(pyspiel.State):
     )
     response = response[:LLM_LENGTH_MESSAGE_CHARS]
     logging.info('LLM response:\n%s', response)
+
     first_special_char = text.first_special_char(
         response, len(response), self.get_game().header.special_chars)
-    speaker_msg = header + response[:first_special_char]
+    speaker_msg = header_plain + response[:first_special_char]
 
     return speaker_msg
 
@@ -645,8 +665,8 @@ class ChatGameObserverBase:
                                                        state.played_actions)):
         self.dict['senders'][i][speaker] = 1
         if played_action >= 0:  # played_action = -1 indicates human player
-          action_dict = state.unravel_flat_action_to_dict(played_action,
-                                                          speaker)
+          action_dict = state.unravel_flat_action_to_dict(speaker,
+                                                          played_action)
           self.dict['receivers'][i][action_dict['receiver']] = 1
           pa = action_dict['action']
           action_str = '\n'.join([f'{k}: {v}' for k, v in pa.items()])
@@ -1304,6 +1324,10 @@ class BaseChatGame(pyspiel.Game):
   @property
   def llm_termination_prompt(self) -> Union[term_utils.Termination, None]:
     return self._llm_termination_prompt
+
+  @property
+  def llm_seeds(self) -> List[int]:
+    return self._llm_seeds
 
   @property
   def num_llm_seeds(self) -> int:
