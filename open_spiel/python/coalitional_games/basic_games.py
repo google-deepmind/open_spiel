@@ -19,7 +19,7 @@ Cooperative Game Theory" text book by Georgios Chalkiadakis, Edith Elkind, and
 Michael Wooldridge.
 """
 
-from typing import Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 
@@ -55,7 +55,7 @@ class IceCreamGame(coalitional_game.CoalitionalGame):
 class TabularGame(coalitional_game.CoalitionalGame):
   """A game represented by a table of values."""
 
-  def __init__(self, table: dict[Tuple[int, ...], float]):
+  def __init__(self, table: Dict[Tuple[int, ...], float]):
     super().__init__(num_players=-1)  # set num players to -1 for now
     for key in table:
       if self._num_players < 0:
