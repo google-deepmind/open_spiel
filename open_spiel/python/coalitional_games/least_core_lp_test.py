@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for Shapley value calculations."""
+"""Tests for least-core LP calculations."""
 
 
 from absl.testing import absltest

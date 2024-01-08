@@ -281,6 +281,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     algorithms/rnad/rnad_test.py
+    coalitional_games/least_core_lagrangian_test.py
     mfg/algorithms/fictitious_play_test.py
   )
 endif()
