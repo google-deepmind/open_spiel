@@ -30,6 +30,7 @@ One iteration of EFR consists of:
 The average policy converges to a Nash Equilibrium
 rather than the current policy.
 """
+
 import copy
 from collections import defaultdict
 import attr
@@ -53,7 +54,7 @@ class _InfoStateNode(object):
   current_history_probs = attr.ib()
 
   # An array representing the preceeding actions played
-  # upto this information state
+  # upto this information state.
   history = attr.ib()
 
   cumulative_regret = attr.ib(factory=lambda: defaultdict(float))
@@ -61,7 +62,7 @@ class _InfoStateNode(object):
   cumulative_policy = attr.ib(factory=lambda: defaultdict(float))
 
   # A dictionary mapping each deviation to their "y values"
-  # for the current iteration
+  # for the current iteration.
   y_values = attr.ib(factory=lambda: defaultdict(float))
 
 
@@ -78,6 +79,7 @@ class _EFRSolverBase(object):
       solver.average_policy()  # Access the average policy
   ```
   """
+
   def __init__(self, game, deviation_gen):
     """Initializer.
     Args:
@@ -92,8 +94,8 @@ class _EFRSolverBase(object):
     # pyformat: enable
     assert game.get_type().dynamics == pyspiel.GameType.Dynamics.SEQUENTIAL, (
         "EFR requires sequential games. If you're trying to run it " +
-    "on a simultaneous (or normal-form) game, please first transform it " +
-    "using turn_based_simultaneous_game.")
+        "on a simultaneous (or normal-form) game, please first transform it " +
+        "using turn_based_simultaneous_game.")
 
     self._game = game
     self._num_players = game.num_players()
@@ -136,11 +138,11 @@ class _EFRSolverBase(object):
     """Returns the average of all policies iterated.
     WARNING: The same object, updated in-place will be returned! You can copy
     it (or its `action_probability_array` field).
-    
+
     This average policy converges to a equilibrium policy as the number
     of iterations increases (equilibrium type depends on learning
     deviations used).
-    
+
     The policy is computed using the accumulated policy probabilities computed
     using `evaluate_and_update_policy`.
 
@@ -160,7 +162,7 @@ class _EFRSolverBase(object):
     Generates all deviations that are realisable at this state and stores
     the history and preceeding state policy information to create memory states
     and calculate the memory reach probability for each deviation.
-    
+
     Args:
     state: The current state in the tree traversal. This should be the
     root node when we call this function from the EFR solver.
@@ -241,14 +243,15 @@ class _EFRSolverBase(object):
       for devation in range(len(deviations)):
         mem_reach_probs = create_probs_from_index(
             info_state_node.current_history_probs, current_policy)
-        #TODO
         deviation_reach_prob =\
         deviations[devation].\
           player_deviation_reach_probability(mem_reach_probs)
+        y_increment = max(0, info_state_node.cumulative_regret[devation])*\
+          deviation_reach_prob
         info_state_node.y_values[deviations[devation]] =\
-        info_state_node.y_values[deviations[devation]] +\
-        max(0, info_state_node.cumulative_regret[devation])*\
-        deviation_reach_prob
+          info_state_node.y_values[deviations[devation]] +\
+            y_increment
+
 
       state_policy = current_policy.policy_for_key(info_state)
       for action, value in self._regret_matching(info_state_node.legal_actions,
@@ -278,7 +281,7 @@ class _EFRSolverBase(object):
     as a numpy array [prob for player 0, for player 1,..., for chance].
     `reach_probabilities[player]` will work in all cases.
     player: The 0-indexed player to update the values for. If `None`, the
-    update for all players will be performed. 
+    update for all players will be performed.
 
     Returns:
     The utility of `state` for all players, assuming all players follow the
@@ -394,11 +397,11 @@ class _EFRSolver(_EFRSolverBase):
 
 
 class EFRSolver(_EFRSolver):
-  """
-  Implements the EFR algorithm.
+  """Implements the EFR algorithm with several deviation types.
 
   See: https://arxiv.org/abs/2102.06973
   """
+
   def __init__(self, game, deviations_name):
     """Initializer.
     Args:
@@ -410,45 +413,41 @@ class EFRSolver(_EFRSolver):
     "blind cf", "informed counterfactual", "blind partial sequence",
     "counterfactual partial sequence", "casual partial sequence",
     "twice informed partial sequence", "single target behavioural".
+
     See "Efficient Deviation Types and Learning for Hindsight Rationality in
     Extensive-Form Games" by D. Morrill et al. 2021b
     for the full definition of each type.
     """
 
-    #external_only = True leads to a shortcut in the computation of the next
+    # external_only = True leads to a shortcut in the computation of the next
     # timesteps strategy from the regrets
     external_only = False
     deviation_sets = None
 
-    if deviations_name == "blind action":
+    if deviations_name in {"blind action"}:
       deviation_sets = return_blind_action
       external_only = True
-    elif deviations_name == "informed action":
+    elif deviations_name in {"informed action"}:
       deviation_sets = return_informed_action
-    elif (deviations_name == "blind cf" or
-          deviations_name == "blind counterfactual"):
+    elif (deviations_name in {"blind cf",
+                              "blind counterfactual"}):
       deviation_sets = return_blind_cf
       external_only = True
-    elif (deviations_name == "informed cf" or
-          deviations_name == "informed counterfactual"):
+    elif (deviations_name in {"informed cf",
+                              "informed counterfactual"}):
       deviation_sets = return_informed_cf
-    elif (deviations_name == "bps" or
-          deviations_name == "blind partial sequence"):
+    elif (deviations_name in {"bps", "blind partial sequence"}):
       deviation_sets = return_blind_partial_sequence
       external_only = True
-    elif (deviations_name == "cfps" or
-          deviations_name == "cf partial sequence" or
-          deviations_name == "counterfactual partial sequence"):
+    elif (deviations_name in {"cfps", "cf partial sequence",
+                              "counterfactual partial sequence"}):
       deviation_sets = return_cf_partial_sequence
-    elif (deviations_name == "csps" or
-          deviations_name == "casual partial sequence"):
+    elif (deviations_name in {"csps", "casual partial sequence"}):
       deviation_sets = return_cs_partial_sequence
-    elif (deviations_name == "tips" or
-          deviations_name == "twice informed partial sequence"):
+    elif (deviations_name in {"tips", "twice informed partial sequence"}):
       deviation_sets = return_twice_informed_partial_sequence
-    elif (deviations_name == "bhv" or
-          deviations_name == "single target behavioural" or
-          deviations_name == "behavioural"):
+    elif (deviations_name in {"bhv", "single target behavioural",
+                              "behavioural"}):
       deviation_sets = return_behavourial
     else:
       raise ValueError("Unsupported Deviation Set Passed As\
@@ -460,7 +459,6 @@ class EFRSolver(_EFRSolver):
     """Returns an info state policy by applying regret-matching function
         over all deviations and time selection functions.
     Args:
-
       legal_actions: the list of legal actions at this state.
 
     Returns:
@@ -502,7 +500,7 @@ class EFRSolver(_EFRSolver):
 
       strategy = lstsq(weighted_deviation_matrix, b)[0]
 
-      # Adopt same clipping strategy as paper author's code
+      # Adopt same clipping strategy as paper author's code.
       strategy[np.where(strategy < 0)] = 0
       strategy[np.where(strategy > 1)] = 1
 
@@ -510,7 +508,7 @@ class EFRSolver(_EFRSolver):
       for index in range(len(strategy)):
         info_state_policy[info_set_node.legal_actions[index]
                           ] = strategy[index]
-    # Use a uniform strategy as sum of all regrets is negative
+    # Use a uniform strategy as sum of all regrets is negative.
     else:
       for index in range(len(legal_actions)):
         info_state_policy[legal_actions[index]]\
@@ -542,8 +540,7 @@ def _update_average_policy(average_policy, info_state_nodes):
 
 
 def strat_dict_to_array(strategy_dictionary):
-  """
-  A helper function to convert the strategy dictionary mapping
+  """A helper function to convert the strategy dictionary mapping
   action -> prob value to an array.
   Args:
     strategy_dictionary: a dictionary action -> prob value.
@@ -558,8 +555,7 @@ def strat_dict_to_array(strategy_dictionary):
 
 
 def array_to_strat_dict(strategy_array, legal_actions):
-  """
-  A helper function to convert a strategy array to an
+  """A helper function to convert a strategy array to an
   action -> prob value dictionary.
   Args:
     strategy_array: an array with the ith action's value at the i-1th index.
@@ -586,8 +582,7 @@ def create_probs_from_index(indices, current_policy):
 
 # Deviation set definitions
 def return_blind_action(num_actions, history, _):
-  """
-  Returns an array of all Blind Action deviations with respect to an
+  """Returns an array of all Blind Action deviations with respect to an
   information set.
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -605,8 +600,7 @@ def return_blind_action(num_actions, history, _):
 
 
 def return_informed_action(num_actions, history, _):
-  """
-  Returns an array of all Informed Action deviations with respect to an
+  """Returns an array of all Informed Action deviations with respect to an
   information set.
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -625,8 +619,7 @@ def return_informed_action(num_actions, history, _):
 
 
 def return_blind_cf(num_actions, history, _):
-  """
-  Returns an array of all Blind Counterfactual deviations with respect to an
+  """Returns an array of all Blind Counterfactual deviations with respect to an
   information set.
   Note: EFR using only Blind Counterfactual deviations is equivalent
   to vanilla Counterfactual Regret Minimisation (CFR).
@@ -646,8 +639,7 @@ def return_blind_cf(num_actions, history, _):
 
 
 def return_informed_cf(num_actions, history, _):
-  """
-    Returns an array of all Informed Counterfactual deviations with respect
+  """Returns an array of all Informed Counterfactual deviations with respect
     to an information set.
     Args:
       num_actions: the integer of all actions that can be taken at that
@@ -666,8 +658,7 @@ def return_informed_cf(num_actions, history, _):
 
 
 def return_blind_partial_sequence(num_actions, history, _):
-  """
-  Returns an array of all Blind Partial Sequence deviations (BPS)
+  """Returns an array of all Blind Partial Sequence deviations (BPS)
   with respect to an information set.
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -691,8 +682,7 @@ def return_blind_partial_sequence(num_actions, history, _):
 
 
 def return_cf_partial_sequence(num_actions, history, _):
-  """
-  Returns an array of all Counterfactual Partial Sequence deviations (CFPS)
+  """Returns an array of all Counterfactual Partial Sequence deviations (CFPS)
   with respect to an information set
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -717,8 +707,7 @@ def return_cf_partial_sequence(num_actions, history, _):
 
 
 def return_cs_partial_sequence(num_actions, history, prior_legal_actions):
-  """
-  Returns an array of all Casual Partial Sequence deviations with respect to
+  """Returns an array of all Casual Partial Sequence deviations with respect to
   an information set.
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -753,8 +742,7 @@ def return_cs_partial_sequence(num_actions, history, prior_legal_actions):
 
 def return_cs_partial_sequence_orginal(num_actions, history,
                                        prior_legal_actions):
-  """
-  Returns an array of all Casual Partial Sequence deviations with respect to
+  """Returns an array of all Casual Partial Sequence deviations with respect to
   an information set.
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -787,8 +775,7 @@ def return_cs_partial_sequence_orginal(num_actions, history,
 
 def return_twice_informed_partial_sequence(num_actions, history,
                                            prior_legal_actions):
-  """
-  Returns an array of all Twice Informed Partial Sequence (TIPS) deviations
+  """Returns an array of all Twice Informed Partial Sequence (TIPS) deviations
   with respect to an information set.
   Args:
     num_actions: the integer of all actions that can be taken at that
@@ -818,7 +805,10 @@ def return_twice_informed_partial_sequence(num_actions, history,
 
 
 def generate_all_action_permutations(current_stem, remaining_actions):
-  """
+  """ Return a List of all possible game continuations playing on from the
+  current stem and with playing from the set of remaining actions.
+  `current_stem` = "" generates all possible playthroughs from the current
+  information state.
   Args:
      current_stem: the prior sequence of actions to be completed by the
      remaining actions
@@ -841,13 +831,23 @@ def generate_all_action_permutations(current_stem, remaining_actions):
       for i in prev_permutations:
         permutations.append(i)
     return permutations
-# Includes identity
 
 
 def return_behavourial(num_actions, history, prior_legal_actions):
-  """
-  [TODO]
-  """
+  """Returns an array of all single target behavioural deviations
+  with respect to an information set. 
+  Args:
+    num_actions: the integer of all actions that can be taken at that
+    information set
+    history: an array containing the prior actions played by the `player`
+    to reach the information set.
+    prior_legal_actions: a 2d array containing the legal actions for each
+    preceeding state.
+  Returns:
+    an array of LocalDeviationWithTimeSelection objects that represent
+    all (single target) behaviourial deviations that are realizable at the
+    information set.
+    """
   deviations = []
   if len(history) == 0:
     internal = return_all_non_identity_internal_deviations(
@@ -875,15 +875,15 @@ def return_behavourial(num_actions, history, prior_legal_actions):
   return deviations
 
 
-class LocalDeviationWithTimeSelection(object):
-  """"
-  Comprised of a swap transformation that will be applied at the
+class LocalDeviationWithTimeSelection:
+  """" Comprised of a swap transformation that will be applied at the
   current information state, a memory weighting which describes
   the actions that are remembered and the memory action history
   (prior_memory_actions) that is remembered.
   Note that the "memory action history" might not equal the history in
   the case of some deviation types (e.g tips deviations).
   """
+
   # The swap transformation that will be compared to the unmodified strategy.
   # The transformation is applied at the memory state.
   local_swap_transform = attr.ib()
@@ -899,8 +899,7 @@ class LocalDeviationWithTimeSelection(object):
 
   def __init__(self, target, source, num_actions, prior_actions_weight,
                prior_memory_actions, is_external, use_unmodified_history=True):
-    """"
-    Represents a swap transformation (either external and internal)
+    """" Represents a swap transformation (either external and internal)
     for a given memory state.
     Args:
     target: the action that will be played when the deviation is triggered.
@@ -929,28 +928,27 @@ class LocalDeviationWithTimeSelection(object):
   # If a pure strategy, a pure strategy will be returned (aka function works
   # for both actions and strategies as input).
   def deviate(self, strategy):
-    """
-    Returns the strategy array given by deviating according to the
+    """Returns the strategy array given by deviating according to the
     'self.local_swap_transform.matrix_transform' matrix.
     Args:
       strategy: the strategy array to deviate from.
     Returns:
-      the matrix product of the the matrix_transform and the provided strategy. 
+      the matrix product of the the matrix_transform and the provided strategy.
     """
     return self.local_swap_transform.deviate(strategy)
 
   def return_transform_matrix(self):
-    """
-    Returns the matrix_transform of the associated `LocalSwapTransform` object.
+    """Returns the matrix_transform of the associated `LocalSwapTransform`
+    object.
     """
     return self.local_swap_transform.matrix_transform
 
   def player_deviation_reach_probability(self,
                                          prior_possible_action_probabilities):
-    """
-    Calculate the probability of reaching the current memory state provided the
-    player played from the start of the game to this state. This is assuming
-    that they play with their current strategy with the deviation applied.
+    """Calculate the probability of reaching the current memory state
+    provided the player played from the start of the game to this state.
+    This is assuming that they play with their current strategy with the
+    deviation applied.
     Args:
        prior_possible_action_probabilities: a 2d array of length
           [player's history]x[number of actions at that state].
@@ -983,10 +981,7 @@ class LocalDeviationWithTimeSelection(object):
     return memory_reach_probability
 
   def __eq__(self, other):
-    if self.local_swap_transform == other.local_swap_transform:
-      return True
-    else:
-      return False
+    return self.local_swap_transform == other.local_swap_transform
 
   def __hash__(self):
     return hash(self.local_swap_transform)
@@ -1084,11 +1079,11 @@ def return_identity_deviation(num_actions, possible_prior_weights,
 
 # A swap transformation given by the matrix_transform for an information state.
 # Of actions_num size.
-class LocalSwapTransform(object):
-  """
-  Represents a swap transformation (both external and internal)
+class LocalSwapTransform:
+  """ Represents a swap transformation (both external and internal)
   for an information state for a certain number of actions.
   """
+
   source_action = attr.ib()
   target_action = attr.ib()
   matrix_transform = attr.ib()
@@ -1096,8 +1091,7 @@ class LocalSwapTransform(object):
   is_external = attr.ib()
 
   def __init__(self, target, source, actions_num, is_external=True):
-    """"
-    Creates the matrix transformation that describes the swap transformation
+    """"Creates the matrix transformation describing the swap transformation
     and initalises variables.
     Args:
     target: the action that will be played when the deviation is triggered.
@@ -1120,24 +1114,20 @@ class LocalSwapTransform(object):
       self.matrix_transform[source][source] = 0
 
   def __repr__(self) -> str:
-    return ("Diverting from Action: "+str(self.source_action) +
+    return ("Swapping from Action: "+str(self.source_action) +
             " to Action: "+str(self.target_action))
 
   def __eq__(self, other: object) -> bool:
-    if (self.source_action == other.source_action and
-        self.target_action == other.target_action and
-        self.actions_num == other.actions_num):
-      return True
-    else:
-      return False
+    return (self.source_action == other.source_action and
+            self.target_action == other.target_action and
+            self.actions_num == other.actions_num)
 
   def __hash__(self):
     return hash(f"{str(self.source_action)} {str(self.target_action)} \
                 {str(self.actions_num)} {str(self.is_external)}")
 
   def deviate(self, strategy):
-    """
-    Returns the strategy array given by deviating according to
+    """Returns the strategy array given by deviating according to
     'self.matrix_transform' matrix.
     Args:
       strategy: the strategy array to deviate from.
