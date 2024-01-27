@@ -34,7 +34,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 # Set default build type.
 set (BUILD_TYPE $ENV{BUILD_TYPE})
 if(NOT BUILD_TYPE)
-   set(BUILD_TYPE Testing
+   set(BUILD_TYPE Release
        CACHE STRING "Choose the type of build: Debug Release Testing."
        FORCE)
 endif()
@@ -50,14 +50,14 @@ if(${BUILD_TYPE} STREQUAL "Testing")
   # A build used for running tests: keep all runtime checks (assert,
   # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
   # otherwise tests run for too long.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -march=x86-64-v3")
 endif()
 
 if(${BUILD_TYPE} STREQUAL "Release")
   # Optimized release build: turn off debug runtime checks (assert,
   # SPIEL_DCHECK_*) and turn on highest speed optimizations.
   # The difference in perfomance can be up to 10x higher.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -march=x86-64-v3")
 endif()
 
 if(APPLE)
@@ -135,6 +135,8 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_RUST           OFF
   "Build with support for Rust API.")
+openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_BMI2           ON
+  "Build with support for BMI2 instructions.")
 
 if (WIN32)
   if (OPEN_SPIEL_BUILD_WITH_HIGC)
@@ -295,6 +297,7 @@ if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   find_package(TensorflowCC REQUIRED)
 endif()
 
+
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named
 # open_spiel).
@@ -313,6 +316,10 @@ endif()
 
 if (OPEN_SPIEL_BUILD_WITH_RUST)
   add_subdirectory(rust)
+endif()
+
+if(OPEN_SPIEL_BUILD_WITH_BMI2)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2")
 endif()
 
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)

@@ -74,6 +74,8 @@ set(GAME_SOURCES
   euchre/euchre.h
   first_sealed_auction/first_sealed_auction.cc
   first_sealed_auction/first_sealed_auction.h
+  german_whist_foregame/german_whist_foregame.cc
+  german_whist_foregame/german_whist_foregame.h
   gin_rummy/gin_rummy.cc
   gin_rummy/gin_rummy.h
   gin_rummy/gin_rummy_utils.cc
@@ -191,6 +193,7 @@ endif()
 if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   set(GAME_SOURCES ${GAME_SOURCES} universal_poker/universal_poker.cc universal_poker/universal_poker.h)
 endif()
+
 
 add_library (games OBJECT ${GAME_SOURCES})
 
@@ -427,6 +430,12 @@ add_test(first_sealed_auction_test first_sealed_auction_test)
 add_executable(garnet_test mfg/garnet_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(garnet_test garnet_test)
+
+add_executable(german_whist_foregame_test german_whist_foregame/german_whist_foregame_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(german_whist_foregame_test german_whist_foregame_test)  
+add_executable(german_whist_endgame german_whist_foregame/german_whist_endgame.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
 
 add_executable(gin_rummy_test gin_rummy/gin_rummy_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

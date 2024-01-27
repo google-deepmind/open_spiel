@@ -448,7 +448,7 @@ class State {
   //
   // Games that do not have imperfect information do not need to implement
   // these methods, but most algorithms intended for imperfect information
-  // games will work on perfect information games provided the InformationState
+  // games will work on perfect information games provided the Information
   // is returned in a form they support. For example, InformationState()
   // could simply return the history for a perfect information game.
   //

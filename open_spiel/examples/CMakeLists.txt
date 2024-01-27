@@ -17,6 +17,8 @@ add_executable(fsicfr_liars_dice fsicfr_liars_dice.cc ${OPEN_SPIEL_OBJECTS})
 
 add_executable(gtp gtp.cc ${OPEN_SPIEL_OBJECTS})
 
+add_executable(is_mcts_gwhist is_mcts_gwhist.cc ${OPEN_SPIEL_OBJECTS})
+
 add_executable(matrix_example matrix_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(matrix_example_test matrix_example)
 

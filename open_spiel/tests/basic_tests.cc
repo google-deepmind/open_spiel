@@ -356,7 +356,9 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
     CheckActionStringsAreUnique(game, *state);
 
     // Test cloning the state.
+    //std::cout<<"pre clone"<<std::endl;
     std::unique_ptr<open_spiel::State> state_copy = state->Clone();
+    //std::cout<<"post clone"<<std::endl;
     SPIEL_CHECK_EQ(state->ToString(), state_copy->ToString());
     SPIEL_CHECK_EQ(state->History(), state_copy->History());
 
@@ -373,8 +375,11 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
       if (mask_test) LegalActionsMaskTest(game, *state, kChancePlayerId,
                                           state->LegalActions());
       // Chance node; sample one according to underlying distribution
+      //std::cout<<"pre chance outcomes"<<std::endl;
       std::vector<std::pair<Action, double>> outcomes = state->ChanceOutcomes();
+      //std::cout<<"post chance outcomes"<<std::endl;
       auto [action, prob] = open_spiel::SampleAction(outcomes, *rng);
+      //std::cout<<"post sampling"<<std::endl;
 
       if (verbose) {
         std::cout << "sampled outcome: "
