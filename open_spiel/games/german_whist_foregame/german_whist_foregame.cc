@@ -1,4 +1,4 @@
-#include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
+
 #include <filesystem>
 //to do
 //InfostateTensor implementation

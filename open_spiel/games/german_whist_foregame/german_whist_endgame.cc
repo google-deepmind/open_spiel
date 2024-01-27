@@ -540,7 +540,6 @@ std::vector<Node> GWhistGenerator(int num,unsigned int seed){
 
 void ThreadSolver(int size_endgames, std::vector<vectorNa>* outTTable, std::vector<vectorNa>* TTable, std::vector<std::vector<uint32_t>>& bin_coeffs, std::vector<uint32_t>& suit_splits, std::unordered_map<uint32_t, uint32_t>& SuitRanks, size_t start_id, size_t end_id) {
     //takes endgames solved to depth d-1 and returns endgames solved to depth d //
-    std::cout<<"in threadsolver"<<"\n";
     std::vector<int> combination;
     combination.reserve(size_endgames);
     for (int i = 0; i < size_endgames; ++i) {
@@ -581,7 +580,6 @@ void ThreadSolver(int size_endgames, std::vector<vectorNa>* outTTable, std::vect
 }
 std::vector<vectorNa> RetroSolver(int size_endgames, std::vector<vectorNa>* TTable, std::vector<std::vector<uint32_t>>& bin_coeffs) {
     //takes endgames solved to depth d-1 and returns endgames solved to depth d //
-    std::cout<<"In retrosolver"<<"\n";
     std::vector<vectorNa> outTTable = InitialiseTTable(size_endgames, bin_coeffs);
     std::vector<uint32_t> suit_splits = GenQuads(size_endgames);
     std::unordered_map<uint32_t, uint32_t> SuitRanks;
@@ -652,8 +650,9 @@ std::vector<vectorNa> BuildTablebase(std::vector<std::vector<uint32_t>>& bin_coe
     std::cout<<"Building Tablebase"<<"\n";
     for (int i = 1; i <= kNumRanks; ++i) {
         v = RetroSolver(i, &v, bin_coeffs);
-        std::cout<<"Done "<<i<<std::endl;
+        std::cout<<"Done "<<i<<"\n";
     }
+    std::cout<<"Built Tablebase"<<"\n";
     return v;
 }
 bool TestTablebase(int samples,uint32_t seed,std::vector<vectorNa>& table_base, std::vector<std::vector<uint32_t>>& bin_coeffs) {

@@ -45,7 +45,7 @@ struct Triple{
 };
 std::vector<uint32_t> GenQuads(int size_endgames);
 std::vector<std::vector<uint32_t>> BinCoeffs(uint32_t max_n);
-uint32_t HalfColexer(uint32_t cards,std::vector<std::vector<uint32_t>>* bin_coeffs);
+uint32_t HalfColexer(uint32_t cards,const std::vector<std::vector<uint32_t>>* bin_coeffs);
 void GenSuitRankingsRel(uint32_t size, std::unordered_map<uint32_t,uint32_t>* Ranks);
 class vectorNa{
 private:
