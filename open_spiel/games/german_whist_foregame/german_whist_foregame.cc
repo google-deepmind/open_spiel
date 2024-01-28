@@ -620,8 +620,6 @@ void GWhistFState::DoApplyAction(Action move) {
     std::cout << ActionToString(player_start, move) << std::endl;
     std::cout << move << std::endl;
 #endif
-   //history_.push_back(PlayerAction{ player_start,move });
-   //move_number_++;
 }
 
 }  // namespace german_whist_foregame

@@ -38,8 +38,6 @@ void PlayGWhist(int human_player, std::mt19937* rng) {
         algorithms::ISMCTSFinalPolicyType::kMaxVisitCount,true, false);
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
-    //std::cout << "State:" << std::endl;
-    //std::cout << state->ToString() << std::endl;
 
     Action chosen_action = kInvalidAction;
     if (state->IsChanceNode()) {
@@ -75,9 +73,7 @@ void PlayGWhist(int human_player, std::mt19937* rng) {
 }  // namespace open_spiel
 
 
-//current issues:
-//infostate display for player is inaccurate and unreadable//
-//endgame parsing/RETURNS SEEMS to be inaccurate as i got destroyed everytime despite strong play?
+
 int main(int argc, char** argv) {
     std::random_device rd;
     std::mt19937 rng(rd());

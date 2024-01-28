@@ -1,5 +1,5 @@
 //Source Code for an Executable Generating an Endgame Tablebase for German Whist
-//
+
 
 #include <cassert>
 #include <thread>
