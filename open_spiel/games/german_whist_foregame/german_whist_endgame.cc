@@ -417,7 +417,7 @@ bool NextColex(std::vector<int>& v, int k) {
 
 
 
-char IncrementalAlphaBetaMemoryIso(Node* node, char alpha, char beta,int depth, std::vector<vectorNa>* TTable,std::unordered_map<uint32_t,uint32_t>* SuitRanks, std::vector<std::vector<uint32_t>>& bin_coeffs) {
+char IncrementalAlphaBetaMemoryIso(Node* node, char alpha, char beta,int depth, vectorNa* TTable,std::unordered_map<uint32_t,uint32_t>* SuitRanks, std::vector<std::vector<uint32_t>>& bin_coeffs) {
     //fail soft ab search
     char val = 0;
     uint64_t key = 0;
@@ -432,7 +432,7 @@ char IncrementalAlphaBetaMemoryIso(Node* node, char alpha, char beta,int depth, 
         uint32_t colex = HalfColexer(cards, &bin_coeffs);
         uint32_t suits = (key & (~0 ^ _bzhi_u64(~0, 32))) >> 32;
         uint32_t suit_rank = SuitRanks->at(suits);
-        char value = (player) ? node->RemainingTricks() - TTable->at(colex).Get(suit_rank) :TTable->at(colex).Get(suit_rank);
+        char value = (player) ? node->RemainingTricks() - TTable->Get(colex,suit_rank) :TTable->Get(colex,suit_rank);
         return value+node->Score();
     }
     else if (node->Player() == 0) {
@@ -465,7 +465,7 @@ char IncrementalAlphaBetaMemoryIso(Node* node, char alpha, char beta,int depth, 
 };
 
 
-char IncrementalMTD(Node* node, char guess,int depth, std::vector<vectorNa>* TTable,std::unordered_map<uint32_t,uint32_t>* SuitRanks,std::vector<std::vector<uint32_t>>& bin_coeffs) {
+char IncrementalMTD(Node* node, char guess,int depth, vectorNa* TTable,std::unordered_map<uint32_t,uint32_t>* SuitRanks,std::vector<std::vector<uint32_t>>& bin_coeffs) {
     char g = guess;
     char upperbound = node->TotalTricks();
     char lowerbound = 0;
@@ -538,7 +538,7 @@ std::vector<Node> GWhistGenerator(int num,unsigned int seed){
 }
 
 
-void ThreadSolver(int size_endgames, std::vector<vectorNa>* outTTable, std::vector<vectorNa>* TTable, std::vector<std::vector<uint32_t>>& bin_coeffs, std::vector<uint32_t>& suit_splits, std::unordered_map<uint32_t, uint32_t>& SuitRanks, size_t start_id, size_t end_id) {
+void ThreadSolver(int size_endgames, vectorNa* outTTable, vectorNa* TTable, std::vector<std::vector<uint32_t>>& bin_coeffs, std::vector<uint32_t>& suit_splits, std::unordered_map<uint32_t, uint32_t>& SuitRanks, size_t start_id, size_t end_id) {
     //takes endgames solved to depth d-1 and returns endgames solved to depth d //
     std::vector<int> combination;
     combination.reserve(size_endgames);
@@ -572,15 +572,15 @@ void ThreadSolver(int size_endgames, std::vector<vectorNa>* outTTable, std::vect
             }
             Node node(cards, suit_arr, 0, false);
             char result = IncrementalMTD(&node, (size_endgames >> 1), 2, TTable, &SuitRanks, bin_coeffs);
-            outTTable->at(count).Set(i, result);
+            outTTable->Set(count,i, result);
         }
         control = NextColex(combination, 2 * size_endgames);
         count++;
     }
 }
-std::vector<vectorNa> RetroSolver(int size_endgames, std::vector<vectorNa>* TTable, std::vector<std::vector<uint32_t>>& bin_coeffs) {
+vectorNa RetroSolver(int size_endgames, vectorNa* TTable, std::vector<std::vector<uint32_t>>& bin_coeffs) {
     //takes endgames solved to depth d-1 and returns endgames solved to depth d //
-    std::vector<vectorNa> outTTable = InitialiseTTable(size_endgames, bin_coeffs);
+    vectorNa outTTable = InitialiseTTable(size_endgames, bin_coeffs);
     std::vector<uint32_t> suit_splits = GenQuads(size_endgames);
     std::unordered_map<uint32_t, uint32_t> SuitRanks;
     GenSuitRankingsRel(size_endgames - 1, &SuitRanks);
@@ -593,7 +593,7 @@ std::vector<vectorNa> RetroSolver(int size_endgames, std::vector<vectorNa>* TTab
     uint32_t min_block_size = 256;
     uint32_t hard_threads = std::thread::hardware_concurrency();
     uint32_t num_threads = 1;
-    uint32_t num_outers =outTTable.size();
+    uint32_t num_outers =outTTable.GetOuterSize();
     //a haphazard attempt to mitigate false sharing//
     for (uint32_t i = hard_threads; i >= 1; i--) {
         if ((num_outers * v_length / i) >= min_block_size) {
@@ -630,7 +630,7 @@ std::vector<vectorNa> RetroSolver(int size_endgames, std::vector<vectorNa>* TTab
 bool TestRetroSolve(int samples, int depth, uint32_t seed, std::vector<std::vector<uint32_t>>& bin_coeffs) {
     //Tests endgame solution with TTable vs raw seach
     std::vector<Node> nodes = GWhistGenerator(samples, seed);
-    std::vector<vectorNa> v;
+    vectorNa v;
     for (int i = 1; i <= depth; ++i) {
         v = RetroSolver(i, &v, bin_coeffs);
     }
@@ -645,8 +645,8 @@ bool TestRetroSolve(int samples, int depth, uint32_t seed, std::vector<std::vect
     }
     return true;
 }
-std::vector<vectorNa> BuildTablebase(std::vector<std::vector<uint32_t>>& bin_coeffs) {
-    std::vector<vectorNa> v;
+vectorNa BuildTablebase(std::vector<std::vector<uint32_t>>& bin_coeffs) {
+    vectorNa v;
     std::cout<<"Building Tablebase"<<"\n";
     for (int i = 1; i <= kNumRanks; ++i) {
         v = RetroSolver(i, &v, bin_coeffs);
@@ -655,7 +655,7 @@ std::vector<vectorNa> BuildTablebase(std::vector<std::vector<uint32_t>>& bin_coe
     std::cout<<"Built Tablebase"<<"\n";
     return v;
 }
-bool TestTablebase(int samples,uint32_t seed,std::vector<vectorNa>& table_base, std::vector<std::vector<uint32_t>>& bin_coeffs) {
+bool TestTablebase(int samples,uint32_t seed,vectorNa& table_base, std::vector<std::vector<uint32_t>>& bin_coeffs) {
     std::vector<Node> nodes = GWhistGenerator(samples, seed);
     std::unordered_map<uint32_t, uint32_t> SuitRanks;
     GenSuitRankingsRel(kNumRanks, &SuitRanks);
@@ -668,24 +668,24 @@ bool TestTablebase(int samples,uint32_t seed,std::vector<vectorNa>& table_base, 
     }
     return true;
 }
-void StoreTTable(const std::string filename, const std::vector<vectorNa>& solution){
+void StoreTTable(const std::string filename, const vectorNa& solution){
     //stores solution into a text file//
     std::ofstream file(filename);
-    for(int i =0;i<solution.size();++i){
-        for(int j=0;j<solution[i].size();++j){
-            file.put(solution[i][j]);
+    for(int i =0;i<solution.GetOuterSize();++i){
+        for(int j=0;j<solution.GetInnerSize();++j){
+            file.put(solution.GetChar(i,j));
         }
     }
     file.close();
 }
 
-bool TestTTableStorage(std::string filename, std::vector<vectorNa>& v,int depth,std::vector<std::vector<uint32_t>>& bin_coeffs){
+bool TestTTableStorage(std::string filename, vectorNa& v,int depth,std::vector<std::vector<uint32_t>>& bin_coeffs){
     //Tests storage fidelity//
     StoreTTable(filename,v);
-    std::vector<vectorNa> new_v = LoadTTable(filename,depth,bin_coeffs);
-    for(int i =0;i<v.size();++i){
-        for(int j =0;j<v[i].size();++j){
-            if(v[i][j]!=new_v[i][j]){
+    vectorNa new_v = LoadTTable(filename,depth,bin_coeffs);
+    for(int i =0;i<v.GetOuterSize();++i){
+        for(int j =0;j<v.GetInnerSize();++j){
+            if(v.GetChar(i,j)!=new_v.GetChar(i,j)){
                 return false;
             }
         }
@@ -698,8 +698,7 @@ bool TestTTableStorage(std::string filename, std::vector<vectorNa>& v,int depth,
 
 int main(){
     std::vector<std::vector<uint32_t>> bin_coeffs = open_spiel::german_whist_foregame::BinCoeffs(2*open_spiel::german_whist_foregame::kNumRanks);
-    std::cout<<"Hello"<<"\n";
-    std::vector<open_spiel::german_whist_foregame::vectorNa> tablebase = open_spiel::german_whist_foregame::BuildTablebase(bin_coeffs);
+    open_spiel::german_whist_foregame::vectorNa tablebase = open_spiel::german_whist_foregame::BuildTablebase(bin_coeffs);
     std::random_device rd;
     int num_samples = 100;
     if(open_spiel::german_whist_foregame::TestTablebase(num_samples,rd(),tablebase,bin_coeffs)){

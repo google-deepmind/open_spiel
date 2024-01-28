@@ -102,56 +102,71 @@ void GenSuitRankingsRel(uint32_t size, std::unordered_map<uint32_t, uint32_t>* R
     }
 }
 
-vectorNa::vectorNa(size_t num,char val){
-    data=std::vector<char>((num>>1)+1,val);
+vectorNa::vectorNa(size_t card_combs,size_t suit_splits,char val){
+    data=std::vector<char>(card_combs*((suit_splits>>1)+1),val);
+    inner_size =(suit_splits>>1)+1;
+    outer_size = card_combs;
+}
+vectorNa::vectorNa(){
+    data={};
+    inner_size=0;
+    outer_size=0;
 }
 size_t vectorNa::size() const{
     return data.size();
 }
+size_t vectorNa::GetInnerSize()const{
+    return inner_size;
+}
+size_t vectorNa::GetOuterSize()const{
+    return outer_size;
+}
 char const& vectorNa::operator[](size_t index) const{
     return data[index];
 }
-void vectorNa::SetChar(size_t index,char value){
-    data[index]=value;
+char vectorNa::GetChar(size_t i,size_t j)const{
+    return data[i*inner_size+j];
 }
-char vectorNa::Get(size_t index) const{
-    int remainder = index&0b1;
+void vectorNa::SetChar(size_t i,size_t j,char value){
+    data[i*inner_size+j]=value;
+}
+char vectorNa::Get(size_t i,size_t j) const{
+    int remainder = j&0b1;
     if(remainder==0){
-        return 0b1111&data[index>>1];
+        return 0b1111&data[i*inner_size+(j>>1)];
     }
     else{
-        return ((0b11110000&data[index>>1])>>4);
+        return ((0b11110000&data[i*inner_size+(j>>1)])>>4);
     }
 }
-void vectorNa::Set(size_t index,char value){
-    int remainder = index & 0b1;
+void vectorNa::Set(size_t i,size_t j,char value){
+    int remainder = j & 0b1;
     if (remainder == 0) {
-        char datastore = 0b11110000 & data[index>>1];
-        data[index>>1] = datastore|value;
+        char datastore = 0b11110000 & data[i*inner_size+(j>>1)];
+        data[i*inner_size+(j>>1)] = datastore|value;
     }
     else {
-        char datastore = (0b1111 & data[index >> 1]);
-        data[index >> 1] = datastore|(value << 4);
+        char datastore = (0b1111 & data[i*inner_size+(j>>1)]);
+        data[i*inner_size+(j>>1)] = datastore|(value << 4);
     }
 }
-std::vector<vectorNa> InitialiseTTable(int size,std::vector<std::vector<uint32_t>>& bin_coeffs) {
+vectorNa InitialiseTTable(int size,std::vector<std::vector<uint32_t>>& bin_coeffs) {
     //initialises TTable for a certain depth//
     size_t suit_size = GenQuads(size).size();
-    return std::vector<vectorNa>(bin_coeffs[2 * size][size], vectorNa(suit_size, 0));
+    return vectorNa(bin_coeffs[2 * size][size],suit_size, 0);
 }
-std::vector<vectorNa> LoadTTable(const std::string filename, int depth,std::vector<std::vector<uint32_t>>& bin_coeffs){
+vectorNa LoadTTable(const std::string filename, int depth,std::vector<std::vector<uint32_t>>& bin_coeffs){
     //loads solution from a text file into a vector for use//
     std::cout<<"Loading Tablebase"<<std::endl;
-    std::vector<vectorNa> v = InitialiseTTable(depth,bin_coeffs);
+    vectorNa v = InitialiseTTable(depth,bin_coeffs);
     std::ifstream file(filename,std::ios::binary);
     //std::cout<<file.is_open()<<std::endl;
     //std::cout<<"Current working directory "<<std::filesystem::current_path()<<std::endl;
-    size_t length = v[0].size();
     char c;
-    for(int i =0;i<v.size();++i){
-        for(int j =0;j<length;++j){
+    for(int i =0;i<v.GetOuterSize();++i){
+        for(int j =0;j<v.GetInnerSize();++j){
             file.get(c);
-            v[i].SetChar(j,c);
+            v.SetChar(i,j,c);
         }
     }
     file.close();
@@ -270,7 +285,7 @@ std::vector<double> GWhistFState::Returns() const{
         uint32_t colex = HalfColexer(cards,bin_coeffs_);
         uint32_t suits = (key&(~0^_bzhi_u64(~0,32)))>>32;
         uint32_t suit_rank = suit_ranks_->at(suits);
-        char value =ttable_->at(colex).Get(suit_rank);
+        char value =ttable_->Get(colex,suit_rank);
         out[player_to_move] = 2*value-kNumRanks;
         out[opp]=-out[player_to_move];
         return out;
