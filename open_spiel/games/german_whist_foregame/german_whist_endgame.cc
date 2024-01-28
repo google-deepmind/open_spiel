@@ -523,7 +523,6 @@ std::vector<Node> GWhistGenerator(int num,unsigned int seed){
             }
             else {
                 suits[j] = (_bzhi_u32(~0, suit_lengths[j]+cum_sum)) ^ _bzhi_u32(~0,cum_sum);
-                //assert((suits[j] & suits[j - 1])== 0);
             }
             cum_sum+= suit_lengths[j];
         }

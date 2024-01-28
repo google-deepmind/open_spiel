@@ -564,7 +564,6 @@ std::vector<Action> GWhistFState::LegalActions() const{
 }
 
 void GWhistFState::DoApplyAction(Action move) {
-    // Additional book-keeping
     //initial deal//
     int player_start = player_;
     if (move_number_ < (kNumSuits * kNumRanks) / 2) {
