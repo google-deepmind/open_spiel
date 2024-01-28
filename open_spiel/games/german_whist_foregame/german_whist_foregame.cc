@@ -17,7 +17,7 @@ namespace open_spiel {
 namespace german_whist_foregame {
 
 
-std::string kTTablePath="./Documents/Github/open_spiel/open_spiel/games/german_whist_foregame/TTables/TTable13.txt";
+std::string kTTablePath="";
 bool Triple::operator<(const Triple& triple)const{
     return (length < triple.length)|| (length == triple.length && sig < triple.sig);
 }
