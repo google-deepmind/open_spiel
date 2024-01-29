@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <random>
-#include <x86intrin.h>
 #include <unordered_map>
 #include <fstream>
 #include <iostream>
@@ -18,10 +17,6 @@
 
 //The imperfect information part of 2 player whist variant
 //https://en.wikipedia.org/wiki/German_Whist
-//
-//
-
-//
 
 namespace open_spiel {
 namespace german_whist_foregame {
@@ -35,8 +30,23 @@ inline constexpr int kNumRanks = 13;
 inline constexpr int kNumSuits = 4;
 inline constexpr char kRankChar[] = "AKQJT98765432";
 inline constexpr char kSuitChar[] = "CDHS";
-inline const std::array<uint64_t, 4> kSuitMasks = { _bzhi_u64(~0,kNumRanks),_bzhi_u64(~0,2 * kNumRanks) ^ _bzhi_u64(~0,kNumRanks),_bzhi_u64(~0,3 * kNumRanks) ^ _bzhi_u64(~0,2 * kNumRanks),_bzhi_u64(~0,4 * kNumRanks) ^ _bzhi_u64(~0,3 * kNumRanks) };
+
 extern std::string kTTablePath ;
+
+//Reimplementing bmi2 intrinsics with bit operations that will work on all platforms//
+uint32_t tzcnt_u32(uint32_t a);
+uint64_t tzcnt_u64(uint64_t a);
+uint32_t bzhi_u32(uint32_t a,uint32_t b);
+uint64_t bzhi_u64(uint64_t a,uint64_t b);
+uint32_t blsr_u32(uint32_t a);
+uint64_t blsr_u64(uint64_t a);
+uint32_t popcnt_u32(uint32_t a);
+uint64_t popcnt_u64(uint64_t a);
+uint64_t pext_u64(uint64_t a,uint64_t b);
+
+inline const std::array<uint64_t, 4> kSuitMasks = { bzhi_u64(~0,kNumRanks),bzhi_u64(~0,2 * kNumRanks) ^ bzhi_u64(~0,kNumRanks),bzhi_u64(~0,3 * kNumRanks) ^ bzhi_u64(~0,2 * kNumRanks),bzhi_u64(~0,4 * kNumRanks) ^ bzhi_u64(~0,3 * kNumRanks) };
+
+
 struct Triple{
     char index;
     char length;

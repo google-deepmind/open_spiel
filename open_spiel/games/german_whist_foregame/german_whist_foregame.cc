@@ -1,10 +1,5 @@
 
 #include <filesystem>
-//to do
-//InfostateTensor implementation
-// PR!!!!!
-
-
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
@@ -18,6 +13,45 @@ namespace german_whist_foregame {
 
 
 std::string kTTablePath="";
+
+uint32_t tzcnt_u32(uint32_t a){
+    return __builtin_ctz(a);
+}
+uint64_t tzcnt_u64(uint64_t a){
+    return __builtin_ctzll(a);
+}
+uint32_t bzhi_u32(uint32_t a,uint32_t b){
+    return (b==0)?0:((a<<(32-b))>>(32-b));
+}
+uint64_t bzhi_u64(uint64_t a,uint64_t b){
+    return (b==0)?0:((a<<(64-b))>>(64-b));
+}
+uint32_t blsr_u32(uint32_t a){
+    return(a-1)&a;
+}
+uint64_t blsr_u64(uint64_t a){
+    return (a-1)&a;
+}
+uint32_t popcnt_u32(uint32_t a){
+    return __builtin_popcount(a);
+}
+uint64_t popcnt_u64(uint64_t a){
+    return __builtin_popcountll(a);
+}
+uint64_t pext_u64(uint64_t x,uint64_t m){
+    uint64_t r = 0;
+    uint64_t s = 0;
+    uint64_t b = 0;
+    do{
+        b =m&1;
+        r = r|((x&b)<<s);
+        s = s+b;
+        x = x>>1;
+        m = m>>1;
+    }while(m!=0);
+    return r;
+}
+
 bool Triple::operator<(const Triple& triple)const{
     return (length < triple.length)|| (length == triple.length && sig < triple.sig);
 }
@@ -25,12 +59,12 @@ bool Triple::operator<(const Triple& triple)const{
 inline int CardRank(int card, int suit) {
     uint64_t card_mask = ((uint64_t)1 << card);
     card_mask = (card_mask >> (suit * kNumRanks));
-    return _tzcnt_u64(card_mask);
+    return tzcnt_u64(card_mask);
 }
 inline int CardSuit(int card) {
     uint64_t card_mask = ((uint64_t)1 << card);
     for (int i = 0; i < kNumSuits; ++i) {
-        if (_mm_popcnt_u64(card_mask & kSuitMasks[i]) == 1) {
+        if (popcnt_u64(card_mask & kSuitMasks[i]) == 1) {
             return i;
         }
     }
@@ -86,10 +120,10 @@ uint32_t HalfColexer(uint32_t cards,const std::vector<std::vector<uint32_t>>* bi
     uint32_t out = 0;
     uint32_t count = 0;
     while (cards != 0) {
-        uint32_t ind = _tzcnt_u32(cards);
+        uint32_t ind = tzcnt_u32(cards);
         uint32_t val = bin_coeffs->at(ind)[count+1];
         out += val;
-        cards = _blsr_u32(cards);
+        cards = blsr_u32(cards);
         count++;
     }
     return out;
@@ -217,7 +251,7 @@ GWhistFState::GWhistFState(std::shared_ptr<const GWhistFGame> game):State(game) 
     player_ = kChancePlayerId;
     move_number_ = 0;
     trump_ = -1;
-    deck_ = _bzhi_u64(~0,kNumRanks*kNumSuits);
+    deck_ = bzhi_u64(~0,kNumRanks*kNumSuits);
     discard_ = 0;
     hands_ = { 0,0 };
     history_.reserve(78);
@@ -233,7 +267,7 @@ bool GWhistFState::Trick(int lead, int follow) const {
     return (lead_suit == follow_suit && lead_rank < follow_rank) || (lead_suit != follow_suit && follow_suit != trump_);
 }
 bool GWhistFState::IsTerminal() const {
-    return(_mm_popcnt_u64(deck_) == 0);
+    return(popcnt_u64(deck_) == 0);
 }
 uint64_t GWhistFState::EndgameKey(int player_to_move) const{
     //generates a 64 bit unsigned int where the first 32 are the suit ownerships from the perspective of the opponent using canonical rankings//
@@ -245,18 +279,18 @@ uint64_t GWhistFState::EndgameKey(int player_to_move) const{
     //sort trump suits by length,then sig//
     for(int i =0;i<kNumSuits;++i){
         if(i!=trump_){
-            uint64_t sig = _pext_u64(hands_[opp]&kSuitMasks[i],cards_in_play&kSuitMasks[i]);
-            suit_lengths.push_back(Triple{i,_mm_popcnt_u64(kSuitMasks[i]&cards_in_play),sig});
+            uint64_t sig = pext_u64(hands_[opp]&kSuitMasks[i],cards_in_play&kSuitMasks[i]);
+            suit_lengths.push_back(Triple{i,popcnt_u64(kSuitMasks[i]&cards_in_play),sig});
         }
     }
     std::sort(suit_lengths.begin(),suit_lengths.end());
     std::array<uint64_t,kNumSuits> hand0;
     std::array<uint64_t,kNumSuits> hand1;
-    hand0[0]=_pext_u64(hands_[0],kSuitMasks[trump_]);
-    hand1[0]=_pext_u64(hands_[1],kSuitMasks[trump_]);
+    hand0[0]=pext_u64(hands_[0],kSuitMasks[trump_]);
+    hand1[0]=pext_u64(hands_[1],kSuitMasks[trump_]);
     for(int i =0;i<kNumSuits-1;++i){
-        hand0[i+1]=_pext_u64(hands_[0],kSuitMasks[suit_lengths[i].index]);
-        hand1[i+1]=_pext_u64(hands_[1],kSuitMasks[suit_lengths[i].index]);
+        hand0[i+1]=pext_u64(hands_[0],kSuitMasks[suit_lengths[i].index]);
+        hand1[i+1]=pext_u64(hands_[1],kSuitMasks[suit_lengths[i].index]);
     }
     std::array<uint64_t,2>hands_shuffled = {0,0};
     for(int i =0;i<kNumSuits;++i){
@@ -264,13 +298,13 @@ uint64_t GWhistFState::EndgameKey(int player_to_move) const{
         hands_shuffled[1]=hands_shuffled[1]|(hand1[i]<<(kNumRanks*i));
     }
     uint64_t suit_sig =0;
-    suit_sig = _mm_popcnt_u64(kSuitMasks[trump_]&cards_in_play);
+    suit_sig = popcnt_u64(kSuitMasks[trump_]&cards_in_play);
     for(int i =0;i<kNumSuits-1;++i){
         suit_sig = suit_sig|((uint64_t)suit_lengths[i].length << (4*(i+1)));
     }
     suit_sig = (suit_sig<<32);
     cards_in_play = hands_shuffled[0]|hands_shuffled[1];
-    uint64_t cards = _pext_u64(hands_shuffled[opp],cards_in_play);
+    uint64_t cards = pext_u64(hands_shuffled[opp],cards_in_play);
     uint64_t key = cards|suit_sig;
     return key;
 }
@@ -281,9 +315,9 @@ std::vector<double> GWhistFState::Returns() const{
         int player_to_move=(lead_win)?history_[move_number_-3].player:history_[move_number_-2].player;
         int opp = (player_to_move==0)?1:0;
         uint64_t key = EndgameKey(player_to_move);
-        uint32_t cards = (key&_bzhi_u64(~0,32));
+        uint32_t cards = (key&bzhi_u64(~0,32));
         uint32_t colex = HalfColexer(cards,bin_coeffs_);
-        uint32_t suits = (key&(~0^_bzhi_u64(~0,32)))>>32;
+        uint32_t suits = (key&(~0^bzhi_u64(~0,32)))>>32;
         uint32_t suit_rank = suit_ranks_->at(suits);
         char value =ttable_->Get(colex,suit_rank);
         out[player_to_move] = 2*value-kNumRanks;
@@ -336,21 +370,21 @@ std::string GWhistFState::StateToString() const {
     std::vector<int> player1_cards;
     std::vector<int> discard;
     while (copy_deck != 0) {
-        deck_cards.push_back(_tzcnt_u64(copy_deck));
-        copy_deck = _blsr_u64(copy_deck);
+        deck_cards.push_back(tzcnt_u64(copy_deck));
+        copy_deck = blsr_u64(copy_deck);
     }
     while (copy_discard != 0) {
-        discard.push_back(_tzcnt_u64(copy_discard));
-        copy_discard = _blsr_u64(copy_discard);
+        discard.push_back(tzcnt_u64(copy_discard));
+        copy_discard = blsr_u64(copy_discard);
     }
 
     while (copy_hands[0] != 0) {
-        player0_cards.push_back(_tzcnt_u64(copy_hands[0]));
-        copy_hands[0] = _blsr_u64(copy_hands[0]);
+        player0_cards.push_back(tzcnt_u64(copy_hands[0]));
+        copy_hands[0] = blsr_u64(copy_hands[0]);
     }
     while (copy_hands[1] != 0) {
-        player1_cards.push_back(_tzcnt_u64(copy_hands[1]));
-        copy_hands[1] = _blsr_u64(copy_hands[1]);
+        player1_cards.push_back(tzcnt_u64(copy_hands[1]));
+        copy_hands[1] = blsr_u64(copy_hands[1]);
     }
     out += "Deck \n";
     for (int i = 0; i < deck_cards.size(); ++i) {
@@ -384,8 +418,8 @@ std::string GWhistFState::InformationStateString(Player player) const{
     std::vector<int> v_hand = {};
     uint64_t p_hand = hands_[player];
     while(p_hand!=0){
-        v_hand.push_back(_tzcnt_u64(p_hand));
-        p_hand = _blsr_u64(p_hand);
+        v_hand.push_back(tzcnt_u64(p_hand));
+        p_hand = blsr_u64(p_hand);
     }
     std::sort(v_hand.begin(),v_hand.end());
     for(int i =0;i<v_hand.size();++i){
@@ -438,7 +472,7 @@ std::unique_ptr<State> GWhistFState::ResampleFromInfostate(int player_id,std::fu
         // if a face up card from the deck is not in players hand or discard it must be in opps unless it is the most recent face up//
         necessary_cards = (necessary_cards & (~(hands_[player_id] | discard_|recent_faceup_card)));
         //sufficient cards are all cards not in players hand,the discard, or the recent face up//
-        uint64_t sufficient_cards = (_bzhi_u64(~0, kNumRanks * kNumSuits) ^(hands_[player_id] | discard_|recent_faceup_card));
+        uint64_t sufficient_cards = (bzhi_u64(~0, kNumRanks * kNumSuits) ^(hands_[player_id] | discard_|recent_faceup_card));
         //sufficient_cards are not necessary //
         sufficient_cards = (sufficient_cards & (~(necessary_cards)));
         //we must now take into account the observation of voids//
@@ -469,14 +503,14 @@ std::unique_ptr<State> GWhistFState::ResampleFromInfostate(int player_id,std::fu
             }
         }
         //we now perform a sequence of shuffles to generate a possible opponent hand, and make no attempt to reconcile the history with this new deal//
-        int nec = _mm_popcnt_u64(necessary_cards);
+        int nec = popcnt_u64(necessary_cards);
         for (int i = 0; i < kNumSuits; ++i) {
-            if (voids[i] != -1&&_mm_popcnt_u64(sufficient_cards&kSuitMasks[i])>voids[i]) {
+            if (voids[i] != -1&&popcnt_u64(sufficient_cards&kSuitMasks[i])>voids[i]) {
                 uint64_t suit_subset = (sufficient_cards & kSuitMasks[i]);
                 std::vector<int> temp;
                 while (suit_subset != 0) {
-                    temp.push_back(_tzcnt_u64(suit_subset));
-                    suit_subset = _blsr_u64(suit_subset);
+                    temp.push_back(tzcnt_u64(suit_subset));
+                    suit_subset = blsr_u64(suit_subset);
                 }
                 std::shuffle(temp.begin(), temp.end(), gen);
                 sufficient_cards = (sufficient_cards &~(kSuitMasks[i]));
@@ -488,18 +522,18 @@ std::unique_ptr<State> GWhistFState::ResampleFromInfostate(int player_id,std::fu
         //finally generating a possible hand for opponent//
         std::vector<int> hand_vec;
         while (sufficient_cards != 0) {
-            hand_vec.push_back(_tzcnt_u64(sufficient_cards));
-            sufficient_cards = _blsr_u64(sufficient_cards);
+            hand_vec.push_back(tzcnt_u64(sufficient_cards));
+            sufficient_cards = blsr_u64(sufficient_cards);
         }
         std::shuffle(hand_vec.begin(), hand_vec.end(), gen);
         uint64_t suff_hand = 0;
         uint64_t opp_hand=0;
-        for (int i = 0; i < _mm_popcnt_u64(hands_[opp])-nec; ++i) {
+        for (int i = 0; i < popcnt_u64(hands_[opp])-nec; ++i) {
             suff_hand = suff_hand | (uint64_t(1) << hand_vec[i]);
         }
         opp_hand = suff_hand | necessary_cards;
         resampled_state->hands_[opp] = opp_hand;
-        resampled_state->deck_ = _bzhi_u64(~0, kNumRanks * kNumSuits) ^ (discard_ | opp_hand | hands_[player_id]|recent_faceup_card);
+        resampled_state->deck_ = bzhi_u64(~0, kNumRanks * kNumSuits) ^ (discard_ | opp_hand | hands_[player_id]|recent_faceup_card);
         return resampled_state;
     }
 std::string GWhistFState::ObservationString(Player player) const {
@@ -510,8 +544,8 @@ std::string GWhistFState::ObservationString(Player player) const {
     uint64_t p_hand = hands_[player];
     std::vector<int> v_hand = {};
     while(p_hand!=0){
-        v_hand.push_back(_tzcnt_u64(p_hand));
-        p_hand = _blsr_u64(p_hand);
+        v_hand.push_back(tzcnt_u64(p_hand));
+        p_hand = blsr_u64(p_hand);
     }
     std::sort(v_hand.begin(),v_hand.end());
     for(int i =0;i<v_hand.size();++i){
@@ -530,11 +564,11 @@ std::vector<Action> GWhistFState::LegalActions() const{
     std::vector<Action> actions;
     if (IsTerminal()) return {};
     if (IsChanceNode()) {
-        actions.reserve(_mm_popcnt_u64(deck_));
+        actions.reserve(popcnt_u64(deck_));
         uint64_t copy_deck = deck_;
         while (copy_deck != 0) {
-            actions.push_back(_tzcnt_u64(copy_deck));
-            copy_deck = _blsr_u64(copy_deck);
+            actions.push_back(tzcnt_u64(copy_deck));
+            copy_deck = blsr_u64(copy_deck);
         }
     }
     else {
@@ -543,8 +577,8 @@ std::vector<Action> GWhistFState::LegalActions() const{
         if (history_.back().player == kChancePlayerId) {
             uint64_t copy_hand = hands_[player_];
             while (copy_hand != 0) {
-                actions.push_back(_tzcnt_u64(copy_hand));
-                copy_hand = _blsr_u64(copy_hand);
+                actions.push_back(tzcnt_u64(copy_hand));
+                copy_hand = blsr_u64(copy_hand);
             }
         }
 
@@ -555,8 +589,8 @@ std::vector<Action> GWhistFState::LegalActions() const{
                 copy_hand = hands_[player_];
             }
             while (copy_hand != 0) {
-                actions.push_back(_tzcnt_u64(copy_hand));
-                copy_hand = _blsr_u64(copy_hand);
+                actions.push_back(tzcnt_u64(copy_hand));
+                copy_hand = blsr_u64(copy_hand);
             }
         }
     }

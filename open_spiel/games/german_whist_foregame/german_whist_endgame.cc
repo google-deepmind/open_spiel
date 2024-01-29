@@ -53,7 +53,7 @@ public:
     Node(uint32_t cards, std::array<uint32_t, kNumSuits> suit_masks, char trump,bool player) {
         cards_ = cards;
         suit_masks_ = suit_masks;
-        total_tricks_ = __builtin_popcount(cards);
+        total_tricks_ = popcnt_u32(cards);
         trump_ = trump;
         moves_ = 0;
         player_ = player;
@@ -83,15 +83,15 @@ public:
     void RemoveCard(ActionStruct action) {
         //Removes card from cards_//
         uint32_t mask_b = ~0;
-        mask_b =_bzhi_u32(mask_b, action.index);
+        mask_b =bzhi_u32(mask_b, action.index);
         uint32_t mask_a = ~mask_b;
-        mask_a = _blsr_u32(mask_a);
+        mask_a = blsr_u32(mask_a);
         uint32_t copy_a = cards_ & mask_a;
         uint32_t copy_b = cards_ & mask_b;
         copy_a = copy_a >> 1;
         cards_ = copy_a | copy_b;
         //decrements appropriate suits//
-        suit_masks_[action.suit] = _blsr_u32(suit_masks_[action.suit])>>1;
+        suit_masks_[action.suit] = blsr_u32(suit_masks_[action.suit])>>1;
         char suit = action.suit;
         suit++;
         while (suit < kNumSuits) {
@@ -102,7 +102,7 @@ public:
     void InsertCard(ActionStruct action) {
         //inserts card into cards_//
         uint32_t mask_b = ~0;
-        mask_b = _bzhi_u32(mask_b, action.index);
+        mask_b = bzhi_u32(mask_b, action.index);
         uint32_t mask_a = ~mask_b;
         uint32_t copy_b = cards_ & mask_b;
         uint32_t copy_a = cards_ & mask_a;
@@ -128,17 +128,17 @@ public:
         //this implies player 1 achieves the minimax value of the original game ie the value is remaining tricks - value of the original game for this transformed game//
         //also does not take advantage of single suit isomorphism. Namely all single suit games with the same card distribution are isomorphic. Currently this considers all trump, all no trump games as distinct//
         uint64_t suit_sig = 0;
-        char trump_length = __builtin_popcount(suit_masks_[trump_]);
+        char trump_length = popcnt_u32(suit_masks_[trump_]);
         if (trump_length > kNumRanks) {
             throw;
         }
         std::vector<Triple> non_trump_lengths;
         for (char i = 0; i < kNumSuits; ++i) {
             if (i != trump_) {
-                char length = __builtin_popcount(suit_masks_[i]);
+                char length = popcnt_u32(suit_masks_[i]);
                 uint32_t sig = suit_masks_[i]&cards_;
                 if (suit_masks_[i] != 0) {
-                    sig = (sig >> (_tzcnt_u32(suit_masks_[i])));
+                    sig = (sig >> (tzcnt_u32(suit_masks_[i])));
                 }
                 if (length > kNumRanks) {
                     throw 1;
@@ -157,19 +157,19 @@ public:
         std::array<uint32_t, kNumSuits> suit_cards;
         suit_cards[0] = cards_ & suit_masks_[trump_];
         if (suit_masks_[trump_] != 0) {
-            suit_cards[0] = suit_cards[0] >> _tzcnt_u32(suit_masks_[trump_]);
+            suit_cards[0] = suit_cards[0] >> tzcnt_u32(suit_masks_[trump_]);
         }
-        uint32_t sum = __builtin_popcount(suit_masks_[trump_]);
+        uint32_t sum = popcnt_u32(suit_masks_[trump_]);
         uint32_t cards = 0|suit_cards[0];
         for (size_t i = 0; i < non_trump_lengths.size(); ++i) {
             suit_cards[i] = cards_ & suit_masks_[non_trump_lengths[i].index];
             uint32_t val = 0;
             if (suit_masks_[non_trump_lengths[i].index] != 0) {
-                val = _tzcnt_u32(suit_masks_[non_trump_lengths[i].index]);
+                val = tzcnt_u32(suit_masks_[non_trump_lengths[i].index]);
             }
             suit_cards[i]= suit_cards[i] >>val;
             suit_cards[i] = suit_cards[i] << sum;
-            sum += __builtin_popcount(suit_masks_[non_trump_lengths[i].index]);
+            sum += popcnt_u32(suit_masks_[non_trump_lengths[i].index]);
             cards = cards | suit_cards[i];
         }
         //cards = cards | (player_ << 31);
@@ -186,7 +186,7 @@ public:
 #endif
     }
     uint64_t AltKey() {
-        uint32_t mask = _bzhi_u32(~0, 2 * RemainingTricks());
+        uint32_t mask = bzhi_u32(~0, 2 * RemainingTricks());
         return key_ ^ (uint64_t)mask;
     }
     //Move Ordering Heuristics//
@@ -200,7 +200,7 @@ public:
         uint32_t suit_cards = copy_cards & suit_masks_[suit];
         uint32_t mask = suit_cards & ~(suit_cards >> 1);
         //represents out of the stategically inequivalent cards in a suit that a player holds, what rank is it, rank 0 is highest rank etc//
-        int suit_rank = __builtin_popcount(_bzhi_u32(mask, action.index));
+        int suit_rank = popcnt_u32(bzhi_u32(mask, action.index));
         ApplyAction(action);
         std::vector<ActionStruct> moves = LegalActions();
         UndoAction(action);
@@ -230,7 +230,7 @@ public:
         uint32_t suit_cards = copy_cards & suit_masks_[suit];
         uint32_t mask = suit_cards & ~(suit_cards >> 1);
         //represents out of the stategically inequivalent cards in a suit that a player holds, what rank is it, rank 0 is highest rank etc//
-        int suit_rank = __builtin_popcount(_bzhi_u32(mask, action.index));
+        int suit_rank = popcnt_u32(bzhi_u32(mask, action.index));
         if (!Trick(lead, action)) {
             return -kNumRanks - suit_rank;
         }
@@ -274,14 +274,14 @@ public:
             }
             if ((lead || (follow && (correct_suit || void_in_suit)))) {
                 while (suit_mask != 0) {
-                    uint32_t best = _tzcnt_u32(suit_mask);
+                    uint32_t best = tzcnt_u32(suit_mask);
                     if (moves_ % 2 == 0) {
                         temp.push_back({ ActionStruct(best, i, player_),LeadOrdering(ActionStruct(best, i, player_)) });
                     }
                     else {
                         temp.push_back({ ActionStruct(best, i, player_),FollowOrdering(ActionStruct(best, i, player_)) });
                     }
-                    suit_mask = _blsr_u32(suit_mask);
+                    suit_mask = blsr_u32(suit_mask);
                 }
             }
         }
@@ -428,9 +428,9 @@ char IncrementalAlphaBetaMemoryIso(Node* node, char alpha, char beta,int depth, 
     if (node->Moves() % 2 == 0&& depth==0) {
         node->UpdateNodeKey();
         key = (player) ? node->AltKey() : node->GetNodeKey();
-        uint32_t cards = key & _bzhi_u64(~0, 32);
+        uint32_t cards = key & bzhi_u64(~0, 32);
         uint32_t colex = HalfColexer(cards, &bin_coeffs);
-        uint32_t suits = (key & (~0 ^ _bzhi_u64(~0, 32))) >> 32;
+        uint32_t suits = (key & (~0 ^ bzhi_u64(~0, 32))) >> 32;
         uint32_t suit_rank = SuitRanks->at(suits);
         char value = (player) ? node->RemainingTricks() - TTable->Get(colex,suit_rank) :TTable->Get(colex,suit_rank);
         return value+node->Score();
@@ -519,16 +519,16 @@ std::vector<Node> GWhistGenerator(int num,unsigned int seed){
         int cum_sum =0;
         for (int j = 0; j < kNumSuits; ++j) {
             if (j == 0) {
-                suits[j] = _bzhi_u32(~0, suit_lengths[j]);
+                suits[j] = bzhi_u32(~0, suit_lengths[j]);
             }
             else {
-                suits[j] = (_bzhi_u32(~0, suit_lengths[j]+cum_sum)) ^ _bzhi_u32(~0,cum_sum);
+                suits[j] = (bzhi_u32(~0, suit_lengths[j]+cum_sum)) ^ bzhi_u32(~0,cum_sum);
             }
             cum_sum+= suit_lengths[j];
         }
         out.push_back(Node(cards, suits, 0,false));
 #ifdef DEBUG
-        std::cout << __builtin_popcount(cards) << " " << __builtin_popcount(suits[0]) + __builtin_popcount(suits[1]) + __builtin_popcount(suits[2]) + __builtin_popcount(suits[3]) << std::endl;
+        std::cout << popcnt_u32(cards) << " " << popcnt_u32(suits[0]) + popcnt_u32(suits[1]) + popcnt_u32(suits[2]) + popcnt_u32(suits[3]) << std::endl;
         std::cout << cards << " " << suits[0] << " " << suits[1] << " " << suits[2] << " " << suits[3] << std::endl;
 #endif
         
@@ -561,12 +561,12 @@ void ThreadSolver(int size_endgames, vectorNa* outTTable, vectorNa* TTable, std:
         }
         for (int i = 0; i < suit_splits.size(); ++i) {
             std::array<uint32_t, kNumSuits> suit_arr;
-            suit_arr[0] = _bzhi_u32(~0, suit_splits[i] & 0b1111);
-            int sum = suit_splits[i] & 0b1111;
+            suit_arr[0] = bzhi_u32(~0, suit_splits[i] & 0b1111);
+            uint32_t sum = suit_splits[i] & 0b1111;
             for (int j = 1; j < kNumSuits; ++j) {
-                uint32_t mask = _bzhi_u32(~0, sum);
+                uint32_t mask = bzhi_u32(~0, sum);
                 sum += (suit_splits[i] & (0b1111 << (4 * j))) >> 4 * j;
-                suit_arr[j] = _bzhi_u32(~0, sum);
+                suit_arr[j] = bzhi_u32(~0, sum);
                 suit_arr[j] = suit_arr[j] ^ mask;
             }
             Node node(cards, suit_arr, 0, false);
