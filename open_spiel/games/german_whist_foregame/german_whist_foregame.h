@@ -124,14 +124,6 @@ private:
     int player_;
     int trump_;
     bool Trick(int lead,int follow) const;
-    
-    
-    // The move history and number of players are sufficient information to
-    // specify the state of the game. We keep track of more information to make
-    // extracting legal actions and utilities easier.
-    // The cost of the additional book-keeping is more complex ApplyAction() and
-    // UndoAction() functions
-    
 };
 }//g_whist_foregame
 }//open_spiel
