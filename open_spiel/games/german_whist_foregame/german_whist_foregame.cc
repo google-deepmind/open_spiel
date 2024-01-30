@@ -8,10 +8,15 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
 
+//define BMI2 only if your system supports BMI2 intrinsics, modify compiler flags so that bmi2 instructions are compiled//
+//#define __BMI2__
+#ifdef __BMI2__
+#include <x86intrin.h>
+#endif
 namespace open_spiel {
 namespace german_whist_foregame {
 
-
+//set this to the path you expect TTable to be once you have made it so recompilation is not necessary//
 std::string kTTablePath="";
 
 uint32_t tzcnt_u32(uint32_t a){
@@ -21,10 +26,10 @@ uint64_t tzcnt_u64(uint64_t a){
     return __builtin_ctzll(a);
 }
 uint32_t bzhi_u32(uint32_t a,uint32_t b){
-    return (b==0)?0:((a<<(32-b))>>(32-b));
+    return a&((1u<<b)-1);
 }
 uint64_t bzhi_u64(uint64_t a,uint64_t b){
-    return (b==0)?0:((a<<(64-b))>>(64-b));
+    return a&((1ULL<<b)-1);
 }
 uint32_t blsr_u32(uint32_t a){
     return(a-1)&a;
@@ -38,7 +43,12 @@ uint32_t popcnt_u32(uint32_t a){
 uint64_t popcnt_u64(uint64_t a){
     return __builtin_popcountll(a);
 }
+//the pext bithack is a lot slower than the bmi2 intrinsic, and even with bmi2 support enabled this will not compile down to a pext instruction//
 uint64_t pext_u64(uint64_t x,uint64_t m){
+#ifdef __BMI2__
+    return _pext_u64(x,m);
+#endif
+#ifndef __BMI2__
     uint64_t r = 0;
     uint64_t s = 0;
     uint64_t b = 0;
@@ -50,6 +60,7 @@ uint64_t pext_u64(uint64_t x,uint64_t m){
         m = m>>1;
     }while(m!=0);
     return r;
+#endif
 }
 
 bool Triple::operator<(const Triple& triple)const{
@@ -191,21 +202,27 @@ vectorNa InitialiseTTable(int size,std::vector<std::vector<uint32_t>>& bin_coeff
 }
 vectorNa LoadTTable(const std::string filename, int depth,std::vector<std::vector<uint32_t>>& bin_coeffs){
     //loads solution from a text file into a vector for use//
-    std::cout<<"Loading Tablebase"<<std::endl;
+    std::cout<<"Loading Tablebase"<<"\n";
     vectorNa v = InitialiseTTable(depth,bin_coeffs);
     std::ifstream file(filename,std::ios::binary);
-    //std::cout<<file.is_open()<<std::endl;
-    //std::cout<<"Current working directory "<<std::filesystem::current_path()<<std::endl;
-    char c;
-    for(int i =0;i<v.GetOuterSize();++i){
-        for(int j =0;j<v.GetInnerSize();++j){
-            file.get(c);
-            v.SetChar(i,j,c);
-        }
+    if(!file.is_open()){
+        std::cout<<"Failed to load Tablebase"<<"\n";
+        std::cout<<"Tablebase will be set to all 0"<<"\n";
+        file.close();
+        return v;
     }
-    file.close();
-    std::cout<<"Tablebase Loaded"<<std::endl;
-    return v;
+    else{
+        char c;
+        for(int i =0;i<v.GetOuterSize();++i){
+            for(int j =0;j<v.GetInnerSize();++j){
+                file.get(c);
+                v.SetChar(i,j,c);
+            }
+        }
+        file.close();
+        std::cout<<"Tablebase Loaded"<<"\n";
+        return v;
+    }
 }
 
 // Default parameters.

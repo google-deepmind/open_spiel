@@ -34,7 +34,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 # Set default build type.
 set (BUILD_TYPE $ENV{BUILD_TYPE})
 if(NOT BUILD_TYPE)
-   set(BUILD_TYPE Release
+   set(BUILD_TYPE Testing
        CACHE STRING "Choose the type of build: Debug Release Testing."
        FORCE)
 endif()
@@ -50,14 +50,14 @@ if(${BUILD_TYPE} STREQUAL "Testing")
   # A build used for running tests: keep all runtime checks (assert,
   # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
   # otherwise tests run for too long.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ")
 endif()
 
 if(${BUILD_TYPE} STREQUAL "Release")
   # Optimized release build: turn off debug runtime checks (assert,
   # SPIEL_DCHECK_*) and turn on highest speed optimizations.
   # The difference in perfomance can be up to 10x higher.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -O3")
 endif()
 
 if(APPLE)
