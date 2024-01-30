@@ -243,7 +243,7 @@ public:
     
     std::vector<ActionStruct> LegalActions() {
         //Features//
-        //Move fusion and move ordering//
+        //Move fusion//
         std::vector<ActionStruct> out;
         out.reserve(kNumRanks);
         uint32_t copy_cards = cards_;
@@ -260,8 +260,6 @@ public:
             std::cout << "Player " << player_ << " suit mask " << (int)i << " " << player_suit_masks[i] << std::endl;
 #endif
         }
-        std::vector<ActionValue> temp;
-        temp.reserve(kNumRanks);
         for (char i = 0; i < kNumSuits; ++i) {
             uint32_t suit_mask = player_suit_masks[i];
             bool lead = (moves_ % 2 == 0);
@@ -275,21 +273,11 @@ public:
             if ((lead || (follow && (correct_suit || void_in_suit)))) {
                 while (suit_mask != 0) {
                     uint32_t best = tzcnt_u32(suit_mask);
-                    if (moves_ % 2 == 0) {
-                        temp.push_back({ ActionStruct(best, i, player_),LeadOrdering(ActionStruct(best, i, player_)) });
-                    }
-                    else {
-                        temp.push_back({ ActionStruct(best, i, player_),FollowOrdering(ActionStruct(best, i, player_)) });
-                    }
+                    out.push_back(ActionStruct(best,i,player_));
                     suit_mask = blsr_u32(suit_mask);
                 }
             }
         }
-        std::sort(temp.begin(), temp.end());
-        for (size_t i = 0; i < temp.size(); ++i) {
-            out.push_back(temp[i].action);
-        }
-        
 #ifdef DEBUG
         std::cout << "Player " << player_ << " MoveGen " << std::endl;
         for (size_t i = 0; i < out.size(); ++i) {
@@ -347,13 +335,30 @@ public:
 
 //solvers below
 int AlphaBeta(Node* node, int alpha, int beta) {
-    //fail soft ab search
+    //fail soft ab search//
+    //uses move ordering to speed up search//
     if (node->IsTerminal()) {
         return node->Score();
     }
-    else if (node->Player() == 0) {
+    //move ordering code//
+    std::vector<ActionStruct> actions = node->LegalActions();
+    std::vector<ActionValue> temp;
+    temp.reserve(kNumRanks);
+    for(int i =0;i<actions.size();++i){
+        if(node->Moves()%2==0){
+            temp.push_back({actions[i],node->LeadOrdering(actions[i])});
+        }
+        else{
+            temp.push_back({actions[i],node->FollowOrdering(actions[i])});
+        }
+    }
+    std::sort(temp.begin(),temp.end());
+    for(int i=0;i<temp.size();++i){
+        actions[i]=temp[i].action;
+    }
+    //alpha beta search//
+    if (node->Player() == 0) {
         int val = 0;
-        std::vector<ActionStruct> actions = node->LegalActions();
         for (int i = 0; i < actions.size(); ++i) {
             node->ApplyAction(actions[i]);
             val = std::max(val, AlphaBeta(node, alpha, beta));
@@ -367,7 +372,6 @@ int AlphaBeta(Node* node, int alpha, int beta) {
     }
     else if (node->Player() == 1) {
         int val =node->TotalTricks();
-        std::vector<ActionStruct> actions = node->LegalActions();
         for (int i = 0; i < actions.size(); ++i) {
             node->ApplyAction(actions[i]);
             val = std::min(val, AlphaBeta(node, alpha, beta));
@@ -464,19 +468,6 @@ char IncrementalAlphaBetaMemoryIso(Node* node, char alpha, char beta,int depth, 
     return val;
 };
 
-
-char IncrementalMTD(Node* node, char guess,int depth, vectorNa* TTable,std::unordered_map<uint32_t,uint32_t>* SuitRanks,std::vector<std::vector<uint32_t>>& bin_coeffs) {
-    char g = guess;
-    char upperbound = node->TotalTricks();
-    char lowerbound = 0;
-    while (lowerbound < upperbound) {
-        char beta;
-        (g == lowerbound) ? beta = g + 1 : beta = g;
-        g = IncrementalAlphaBetaMemoryIso(node, beta - 1, beta,depth,TTable,SuitRanks, bin_coeffs);
-        (g < beta) ? upperbound = g : lowerbound = g;
-    }
-    return g;
-}
 std::vector<Node> GWhistGenerator(int num,unsigned int seed){
     //generates pseudorandom endgames//
     std::vector<Node> out;
@@ -570,7 +561,7 @@ void ThreadSolver(int size_endgames, vectorNa* outTTable, vectorNa* TTable, std:
                 suit_arr[j] = suit_arr[j] ^ mask;
             }
             Node node(cards, suit_arr, 0, false);
-            char result = IncrementalMTD(&node, (size_endgames >> 1), 2, TTable, &SuitRanks, bin_coeffs);
+            char result = IncrementalAlphaBetaMemoryIso(&node,0,size_endgames,2,TTable,&SuitRanks,bin_coeffs);
             outTTable->Set(count,i, result);
         }
         control = NextColex(combination, 2 * size_endgames);
@@ -636,7 +627,7 @@ bool TestRetroSolve(int samples, int depth, uint32_t seed, std::vector<std::vect
     std::unordered_map<uint32_t, uint32_t> SuitRanks;
     GenSuitRankingsRel(depth, &SuitRanks);
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-        char abm_unsafe = IncrementalMTD(&*it, 6, 2 * (kNumRanks - depth), &v, &SuitRanks, bin_coeffs);
+        char abm_unsafe = IncrementalAlphaBetaMemoryIso(&*it, 0,kNumRanks, 2 * (kNumRanks - depth), &v, &SuitRanks, bin_coeffs);
         char abm_safe = AlphaBeta(&*it, 0, kNumRanks);
         if (abm_unsafe != abm_safe) {
             return false;
@@ -654,12 +645,12 @@ vectorNa BuildTablebase(std::vector<std::vector<uint32_t>>& bin_coeffs) {
     std::cout<<"Built Tablebase"<<"\n";
     return v;
 }
-bool TestTablebase(int samples,uint32_t seed,vectorNa& table_base, std::vector<std::vector<uint32_t>>& bin_coeffs) {
+bool TestTablebase(int samples,uint32_t seed,vectorNa& table_base,std::vector<std::vector<uint32_t>>& bin_coeffs){
     std::vector<Node> nodes = GWhistGenerator(samples, seed);
     std::unordered_map<uint32_t, uint32_t> SuitRanks;
     GenSuitRankingsRel(kNumRanks, &SuitRanks);
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-        char abm_unsafe = IncrementalMTD(&*it, 6, 0, &table_base, &SuitRanks, bin_coeffs);
+        char abm_unsafe = IncrementalAlphaBetaMemoryIso(&*it, 0,kNumRanks, 0, &table_base, &SuitRanks, bin_coeffs);
         char abm_safe = AlphaBeta(&*it, 0, kNumRanks);
         if (abm_unsafe != abm_safe) {
             return false;
