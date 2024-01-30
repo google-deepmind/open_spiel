@@ -135,8 +135,6 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ORTOOLS        OFF
   "Build with C++ optimization library OR-Tools.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_RUST           OFF
   "Build with support for Rust API.")
-openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_BMI2           ON
-  "Build with support for BMI2 instructions.")
 
 if (WIN32)
   if (OPEN_SPIEL_BUILD_WITH_HIGC)
@@ -316,10 +314,6 @@ endif()
 
 if (OPEN_SPIEL_BUILD_WITH_RUST)
   add_subdirectory(rust)
-endif()
-
-if(OPEN_SPIEL_BUILD_WITH_BMI2)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2")
 endif()
 
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
