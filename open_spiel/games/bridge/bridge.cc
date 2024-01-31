@@ -314,7 +314,8 @@ void BridgeState::WriteObservationTensor(Player player,
   auto ptr = values.begin();
   if (num_cards_played_ > 0) {
     // Observation for play phase
-    if (phase_ == Phase::kPlay) ptr[2] = 1;
+    const bool defending = (partnership != Partnership(contract_.declarer));
+    if (phase_ == Phase::kPlay) ptr[2 + defending] = 1;
     ptr += kNumObservationTypes;
 
     // Contract
