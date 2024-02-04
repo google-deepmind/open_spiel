@@ -41,6 +41,7 @@ struct AlphaZeroConfig {
   int evaluation_window;
 
   double uct_c;
+  int min_simulations;
   int max_simulations;
   double policy_alpha;
   double policy_epsilon;
@@ -74,6 +75,7 @@ struct AlphaZeroConfig {
         {"checkpoint_freq", checkpoint_freq},
         {"evaluation_window", evaluation_window},
         {"uct_c", uct_c},
+        {"min_simulations", min_simulations},
         {"max_simulations", max_simulations},
         {"policy_alpha", policy_alpha},
         {"policy_epsilon", policy_epsilon},

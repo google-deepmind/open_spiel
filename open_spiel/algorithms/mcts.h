@@ -160,7 +160,7 @@ class MCTSBot : public Bot {
   // failing. We don't know why right now, but intend to fix this.
   MCTSBot(
       const Game& game, std::shared_ptr<Evaluator> evaluator, double uct_c,
-      int max_simulations,
+      int min_simulations, int max_simulations,
       int64_t max_memory_mb,  // Max memory use in megabytes.
       bool solve,             // Whether to back up solved states.
       int seed, bool verbose,
@@ -203,6 +203,7 @@ class MCTSBot : public Bot {
   void GarbageCollect(SearchNode* node);
 
   double uct_c_;
+  int min_simulations_;
   int max_simulations_;
   int max_nodes_;  // Max nodes allowed in the tree
   int nodes_;  // Nodes used in the tree.

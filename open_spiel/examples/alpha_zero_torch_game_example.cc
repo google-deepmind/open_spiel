@@ -41,7 +41,8 @@ ABSL_FLAG(std::string, az_graph_def, "vpnet.pb",
           "AZ graph definition file name.");
 ABSL_FLAG(double, uct_c, 2, "UCT exploration constant.");
 ABSL_FLAG(int, rollout_count, 10, "How many rollouts per evaluation.");
-ABSL_FLAG(int, max_simulations, 10000, "How many simulations to run.");
+ABSL_FLAG(int, min_simulations, 0, "How many simulations to run (min).");
+ABSL_FLAG(int, max_simulations, 10000, "How many simulations to run (max).");
 ABSL_FLAG(int, num_games, 1, "How many games to play.");
 ABSL_FLAG(int, max_memory_mb, 1000,
           "The maximum memory used before cutting the search short.");
@@ -69,6 +70,7 @@ InitBot(std::string type, const open_spiel::Game &game,
   if (type == "az") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
         game, std::move(az_evaluator), absl::GetFlag(FLAGS_uct_c),
+        absl::GetFlag(FLAGS_min_simulations),
         absl::GetFlag(FLAGS_max_simulations),
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose),
@@ -81,6 +83,7 @@ InitBot(std::string type, const open_spiel::Game &game,
   if (type == "mcts") {
     return std::make_unique<open_spiel::algorithms::MCTSBot>(
         game, std::move(evaluator), absl::GetFlag(FLAGS_uct_c),
+        absl::GetFlag(FLAGS_min_simulations),
         absl::GetFlag(FLAGS_max_simulations),
         absl::GetFlag(FLAGS_max_memory_mb), absl::GetFlag(FLAGS_solve), Seed(),
         absl::GetFlag(FLAGS_verbose));
@@ -160,8 +163,9 @@ PlayGame(const open_spiel::Game &game,
     history.push_back(state->ActionToString(player, action));
     state->ApplyAction(action);
 
-    if (!quiet)
+    if (!quiet) {
       std::cerr << "Next state:\n" << state->ToString() << std::endl;
+    }
   }
 
   std::cerr << "Returns: " << absl::StrJoin(state->Returns(), ", ")

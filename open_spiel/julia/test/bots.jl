@@ -3,7 +3,7 @@
 @testset "MCTSBot" begin
     UCT_C = 2.
 
-    init_bot(game, max_simulations, evaluator) = MCTSBot(game, evaluator, UCT_C, max_simulations, 5, true, 42, false, UCT, 0., 0.)
+    init_bot(game, max_simulations, evaluator) = MCTSBot(game, evaluator, UCT_C, 0, max_simulations, 5, true, 42, false, UCT, 0., 0.)
 
     @testset "can play tic_tac_toe" begin
         game = load_game("tic_tac_toe")
@@ -51,7 +51,7 @@
             apply_action(state, get_action_by_str(state, action_str))
         end
         evaluator = random_rollout_evaluator_factory(20, 42)
-        bot = MCTSBot(game, evaluator, UCT_C, 10000, 10, true, 42, false, UCT, 0., 0.)
+        bot = MCTSBot(game, evaluator, UCT_C, 0, 10000, 10, true, 42, false, UCT, 0., 0.)
         mcts_search(bot, state), state
     end
 

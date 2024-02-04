@@ -55,7 +55,7 @@ class BotTest(absltest.TestCase):
     game = pyspiel.load_game("tic_tac_toe")
     bots = [
         pyspiel.MCTSBot(game, pyspiel.RandomRolloutEvaluator(1, 0), 2.0,
-                        100, 100, False, 42, False)
+                        0, 100, 100, False, 42, False)
     ] * 2
     _ = np.array([
         pyspiel.evaluate_bots(game.new_initial_state(), bots, iteration)
