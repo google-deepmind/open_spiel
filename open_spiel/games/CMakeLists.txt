@@ -272,355 +272,171 @@ add_library(bridge_double_dummy_solver OBJECT
 target_include_directories (bridge_double_dummy_solver PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(bridge_double_dummy_solver PUBLIC DDS_NO_STATIC_INIT)
 
-add_executable(2048_test twenty_forty_eight/2048_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(2048_test 2048_test)
-
-add_executable(amazons_test amazons/amazons_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(amazons_test amazons_test)
-
-add_executable(backgammon_test backgammon/backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(backgammon_test backgammon_test)
-
-add_executable(bargaining_instance_generator bargaining/bargaining_instance_generator.cc
-               ${OPEN_SPIEL_OBJECTS})
-add_executable(bargaining_test bargaining/bargaining_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(bargaining_test bargaining_test)
-
-add_executable(battleship_test battleship/battleship_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(battleship_test battleship_test)
-
-add_executable(blackjack_test blackjack/blackjack_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(blackjack_test blackjack_test)
-
-add_executable(blotto_test blotto/blotto_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(blotto_test blotto_test)
-
-add_executable(breakthrough_test breakthrough/breakthrough_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(breakthrough_test breakthrough_test)
-
-add_executable(bridge_test bridge/bridge_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(bridge_test bridge_test)
-
-add_executable(catch_test catch/catch_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(catch_test catch_test)
-
-add_executable(checkers_test checkers/checkers_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(checkers_test checkers_test)
-
-add_executable(chess_test chess/chess_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(chess_test chess_test)
-
-add_executable(cliff_walking_test cliff_walking/cliff_walking_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(cliff_walking_test cliff_walking_test)
-
-add_executable(clobber_test clobber/clobber_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(clobber_test clobber_test)
-
-add_executable(coin_game_test coin_game/coin_game_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(coin_game_test coin_game_test)
-
-add_executable(colored_trails_board_generator
-               colored_trails/colored_trails_board_generator.cc
-               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
-
-add_executable(colored_trails_test colored_trails/colored_trails_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(colored_trails_test colored_trails_test)
-
-add_executable(connect_four_test connect_four/connect_four_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(connect_four_test connect_four_test)
-
-add_executable(coop_box_pushing_test coop_box_pushing/coop_box_pushing_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(coop_box_pushing_test coop_box_pushing_test)
-
-add_executable(coordinated_mp_test coordinated_mp/coordinated_mp_test.cc ${OPEN_SPIEL_OBJECTS}
-        $<TARGET_OBJECTS:tests>
-        $<TARGET_OBJECTS:algorithms>)
-add_test(coordinated_mp_test coordinated_mp_test)
-
-add_executable(crazy_eights_test crazy_eights/crazy_eights_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(crazy_eights_test crazy_eights_test)
-
-add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(crowd_modelling_test crowd_modelling_test)
-
-add_executable(crowd_modelling_2d_test mfg/crowd_modelling_2d_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(crowd_modelling_2d_test crowd_modelling_2d_test)
-
-add_executable(cursor_go_test cursor_go/cursor_go_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(cursor_go_test cursor_go_test)
-
-add_executable(dark_chess_test dark_chess/dark_chess_test.cc ${OPEN_SPIEL_OBJECTS}
-        $<TARGET_OBJECTS:tests>)
-add_test(dark_chess_test dark_chess_test)
-
-add_executable(dark_hex_test dark_hex/dark_hex_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dark_hex_test dark_hex_test)
-
-add_executable(deep_sea_test deep_sea/deep_sea_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(deep_sea_test deep_sea_test)
-
-add_executable(dots_and_boxes_test dots_and_boxes/dots_and_boxes_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dots_and_boxes_test dots_and_boxes_test)
-
-add_executable(dynamic_routing_data_test dynamic_routing/dynamic_routing_data_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dynamic_routing_data_test dynamic_routing_data_test)
-
-add_executable(dynamic_routing_test mfg/dynamic_routing_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dynamic_routing_test dynamic_routing_test)
-
-add_executable(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dynamic_routing_utils_test dynamic_routing_utils_test)
-
-add_executable(dou_dizhu_test dou_dizhu/dou_dizhu_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dou_dizhu_test dou_dizhu_test)
-
-add_executable(dou_dizhu_utils_test dou_dizhu/dou_dizhu_utils_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(dou_dizhu_utils_test dou_dizhu_utils_test)
-
-add_executable(efg_game_test efg_game/efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(efg_game_test efg_game_test)
-
-add_executable(euchre_test euchre/euchre_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(euchre_test euchre_test)
-
-add_executable(first_sealed_auction_test first_sealed_auction/first_sealed_auction_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(first_sealed_auction_test first_sealed_auction_test)
-
-add_executable(garnet_test mfg/garnet_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(garnet_test garnet_test)
-
-add_executable(gin_rummy_test gin_rummy/gin_rummy_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(gin_rummy_test gin_rummy_test)
-
-add_executable(go_test go/go_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(go_test go_test)
-
-add_executable(phantom_go_test phantom_go/phantom_go_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(phantom_go_test phantom_go_test)
-
-add_executable(goofspiel_test goofspiel/goofspiel_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(goofspiel_test goofspiel_test)
-
-add_executable(havannah_test havannah/havannah_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(havannah_test havannah_test)
-
-add_executable(hearts_test hearts/hearts_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(hearts_test hearts_test)
-
-add_executable(hex_test hex/hex_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(hex_test hex_test)
-
-add_executable(kriegspiel_test kriegspiel/kriegspiel_test.cc ${OPEN_SPIEL_OBJECTS}
-        $<TARGET_OBJECTS:tests>)
-add_test(kriegspiel_test kriegspiel_test)
-
-add_executable(kuhn_poker_test kuhn_poker/kuhn_poker_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(kuhn_poker_test kuhn_poker_test)
-
-add_executable(leduc_poker_test leduc_poker/leduc_poker_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(leduc_poker_test leduc_poker_test)
-
-add_executable(lewis_signaling_test lewis_signaling/lewis_signaling_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(lewis_signaling_test lewis_signaling_test)
-
-add_executable(liars_dice_test liars_dice/liars_dice_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(liars_dice_test liars_dice_test)
-
-add_executable(maedn_test maedn/maedn_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(maedn_test maedn_test)
-
-add_executable(mancala_test mancala/mancala_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(mancala_test mancala_test)
-
-add_executable(markov_soccer_test markov_soccer/markov_soccer_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(markov_soccer_test markov_soccer_test)
-
-add_executable(matching_pennies_3p_test matching_pennies_3p/matching_pennies_3p_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(matching_pennies_3p_test matching_pennies_3p_test)
-
-add_executable(matrix_games_test matrix_games/matrix_games_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(matrix_games_test matrix_games_test)
-
-add_executable(morpion_solitaire_test morpion_solitaire/morpion_solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
-        $<TARGET_OBJECTS:tests>)
-add_test(morpion_solitaire_test morpion_solitaire_test)
-
-add_executable(negotiation_test negotiation/negotiation_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(negotiation_test negotiation_test)
-
-add_executable(nfg_game_test nfg_game/nfg_game_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(nfg_game_test nfg_game_test)
-
-add_executable(nim_test nim/nim_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(nim_test nim_test)
-
-add_executable(nine_mens_morris_test nine_mens_morris/nine_mens_morris_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(nine_mens_morris_test nine_mens_morris_test)
-
-add_executable(oh_hell_test oh_hell/oh_hell_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(oh_hell_test oh_hell_test)
-
-add_executable(oshi_zumo_test oshi_zumo/oshi_zumo_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(oshi_zumo_test oshi_zumo_test)
-
-add_executable(othello_test othello/othello_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(othello_test othello_test)
-
-add_executable(oware_test oware/oware_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(oware_test oware_test)
-
-add_executable(pathfinding_test pathfinding/pathfinding_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(pathfinding_test pathfinding_test)
-
-add_executable(pentago_test pentago/pentago_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(pentago_test pentago_test)
-
-add_executable(phantom_ttt_test phantom_ttt/phantom_ttt_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(phantom_ttt_test phantom_ttt_test)
-
-add_executable(pig_test pig/pig_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(pig_test pig_test)
-
-add_executable(quoridor_test quoridor/quoridor_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(quoridor_test quoridor_test)
-
-add_executable(rbc_test rbc/rbc_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(rbc_test rbc_test)
-
-add_executable(sheriff_test sheriff/sheriff_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(sheriff_test sheriff_test)
-
-add_executable(skat_test skat/skat_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(skat_test skat_test)
-
-add_executable(solitaire_test solitaire/solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(solitaire_test solitaire_test)
-
-add_executable(stones_and_gems_test stones_and_gems/stones_and_gems_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(stones_and_gems_test stones_and_gems_test)
-
-add_executable(tarok_test tarok/tarok_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(tarok_test tarok_test)
-
-add_executable(tic_tac_toe_test tic_tac_toe/tic_tac_toe_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(tic_tac_toe_test tic_tac_toe_test)
-
-add_executable(laser_tag_test laser_tag/laser_tag_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(laser_tag_test laser_tag_test)
-
-add_executable(tiny_bridge_test tiny_bridge/tiny_bridge_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(tiny_bridge_test tiny_bridge_test)
-
-add_executable(tiny_hanabi_test tiny_hanabi/tiny_hanabi_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>
-               $<TARGET_OBJECTS:algorithms>)
-add_test(tiny_hanabi_test tiny_hanabi_test)
-
-add_executable(trade_comm_test trade_comm/trade_comm_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(trade_comm_test trade_comm_test)
-
-add_executable(ultimate_tic_tac_toe_test ultimate_tic_tac_toe/ultimate_tic_tac_toe_test.cc
-               ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
-add_test(ultimate_tic_tac_toe_test ultimate_tic_tac_toe_test)
+add_open_spiel_test(2048_test twenty_forty_eight/2048_test.cc)
+
+add_open_spiel_test(amazons_test amazons/amazons_test.cc)
+
+add_open_spiel_test(backgammon_test backgammon/backgammon_test.cc)
+
+add_open_spiel_executable(bargaining_instance_generator bargaining/bargaining_instance_generator.cc)
+add_open_spiel_test(bargaining_test bargaining/bargaining_test.cc)
+
+add_open_spiel_test(battleship_test battleship/battleship_test.cc)
+
+add_open_spiel_test(blackjack_test blackjack/blackjack_test.cc)
+
+add_open_spiel_test(blotto_test blotto/blotto_test.cc)
+
+add_open_spiel_test(breakthrough_test breakthrough/breakthrough_test.cc)
+
+add_open_spiel_test(bridge_test bridge/bridge_test.cc)
+
+add_open_spiel_test(catch_test catch/catch_test.cc)
+
+add_open_spiel_test(checkers_test checkers/checkers_test.cc)
+
+add_open_spiel_test(chess_test chess/chess_test.cc)
+
+add_open_spiel_test(cliff_walking_test cliff_walking/cliff_walking_test.cc)
+
+add_open_spiel_test(clobber_test clobber/clobber_test.cc)
+
+add_open_spiel_test(coin_game_test coin_game/coin_game_test.cc)
+
+add_open_spiel_executable(colored_trails_board_generator colored_trails/colored_trails_board_generator.cc)
+
+add_open_spiel_test(colored_trails_test colored_trails/colored_trails_test.cc)
+
+add_open_spiel_test(connect_four_test connect_four/connect_four_test.cc)
+
+add_open_spiel_test(coop_box_pushing_test coop_box_pushing/coop_box_pushing_test.cc)
+
+add_open_spiel_test(coordinated_mp_test coordinated_mp/coordinated_mp_test.cc)
+
+add_open_spiel_test(crazy_eights_test crazy_eights/crazy_eights_test.cc)
+
+add_open_spiel_test(crowd_modelling_test mfg/crowd_modelling_test.cc)
+
+add_open_spiel_test(crowd_modelling_2d_test mfg/crowd_modelling_2d_test.cc)
+
+add_open_spiel_test(cursor_go_test cursor_go/cursor_go_test.cc)
+
+add_open_spiel_test(dark_chess_test dark_chess/dark_chess_test.cc)
+
+add_open_spiel_test(dark_hex_test dark_hex/dark_hex_test.cc)
+
+add_open_spiel_test(deep_sea_test deep_sea/deep_sea_test.cc)
+
+add_open_spiel_test(dots_and_boxes_test dots_and_boxes/dots_and_boxes_test.cc)
+
+add_open_spiel_test(dynamic_routing_data_test dynamic_routing/dynamic_routing_data_test.cc)
+
+add_open_spiel_test(dynamic_routing_test mfg/dynamic_routing_test.cc)
+
+add_open_spiel_test(dynamic_routing_utils_test dynamic_routing/dynamic_routing_utils_test.cc)
+
+add_open_spiel_test(dou_dizhu_test dou_dizhu/dou_dizhu_test.cc)
+
+add_open_spiel_test(dou_dizhu_utils_test dou_dizhu/dou_dizhu_utils_test.cc)
+
+add_open_spiel_test(efg_game_test efg_game/efg_game_test.cc)
+
+add_open_spiel_test(euchre_test euchre/euchre_test.cc)
+
+add_open_spiel_test(first_sealed_auction_test first_sealed_auction/first_sealed_auction_test.cc)
+
+add_open_spiel_test(garnet_test mfg/garnet_test.cc)
+
+add_open_spiel_test(gin_rummy_test gin_rummy/gin_rummy_test.cc)
+
+add_open_spiel_test(go_test go/go_test.cc)
+
+add_open_spiel_test(phantom_go_test phantom_go/phantom_go_test.cc)
+
+add_open_spiel_test(goofspiel_test goofspiel/goofspiel_test.cc)
+
+add_open_spiel_test(havannah_test havannah/havannah_test.cc)
+
+add_open_spiel_test(hearts_test hearts/hearts_test.cc)
+
+add_open_spiel_test(hex_test hex/hex_test.cc)
+
+add_open_spiel_test(kriegspiel_test kriegspiel/kriegspiel_test.cc)
+
+add_open_spiel_test(kuhn_poker_test kuhn_poker/kuhn_poker_test.cc)
+
+add_open_spiel_test(leduc_poker_test leduc_poker/leduc_poker_test.cc)
+
+add_open_spiel_test(lewis_signaling_test lewis_signaling/lewis_signaling_test.cc)
+
+add_open_spiel_test(liars_dice_test liars_dice/liars_dice_test.cc)
+
+add_open_spiel_test(maedn_test maedn/maedn_test.cc)
+
+add_open_spiel_test(mancala_test mancala/mancala_test.cc)
+
+add_open_spiel_test(markov_soccer_test markov_soccer/markov_soccer_test.cc)
+
+add_open_spiel_test(matching_pennies_3p_test matching_pennies_3p/matching_pennies_3p_test.cc)
+
+add_open_spiel_test(matrix_games_test matrix_games/matrix_games_test.cc)
+
+add_open_spiel_test(morpion_solitaire_test morpion_solitaire/morpion_solitaire_test.cc)
+
+add_open_spiel_test(negotiation_test negotiation/negotiation_test.cc)
+
+add_open_spiel_test(nfg_game_test nfg_game/nfg_game_test.cc)
+
+add_open_spiel_test(nim_test nim/nim_test.cc)
+
+add_open_spiel_test(nine_mens_morris_test nine_mens_morris/nine_mens_morris_test.cc)
+
+add_open_spiel_test(oh_hell_test oh_hell/oh_hell_test.cc)
+
+add_open_spiel_test(oshi_zumo_test oshi_zumo/oshi_zumo_test.cc)
+
+add_open_spiel_test(othello_test othello/othello_test.cc)
+
+add_open_spiel_test(oware_test oware/oware_test.cc)
+
+add_open_spiel_test(pathfinding_test pathfinding/pathfinding_test.cc)
+
+add_open_spiel_test(pentago_test pentago/pentago_test.cc)
+
+add_open_spiel_test(phantom_ttt_test phantom_ttt/phantom_ttt_test.cc)
+
+add_open_spiel_test(pig_test pig/pig_test.cc)
+
+add_open_spiel_test(quoridor_test quoridor/quoridor_test.cc)
+
+add_open_spiel_test(rbc_test rbc/rbc_test.cc)
+
+add_open_spiel_test(sheriff_test sheriff/sheriff_test.cc)
+
+add_open_spiel_test(skat_test skat/skat_test.cc)
+
+add_open_spiel_test(solitaire_test solitaire/solitaire_test.cc)
+
+add_open_spiel_test(stones_and_gems_test stones_and_gems/stones_and_gems_test.cc)
+
+add_open_spiel_test(tarok_test tarok/tarok_test.cc)
+
+add_open_spiel_test(tic_tac_toe_test tic_tac_toe/tic_tac_toe_test.cc)
+
+add_open_spiel_test(laser_tag_test laser_tag/laser_tag_test.cc)
+
+add_open_spiel_test(tiny_bridge_test tiny_bridge/tiny_bridge_test.cc)
+
+add_open_spiel_test(tiny_hanabi_test tiny_hanabi/tiny_hanabi_test.cc)
+
+add_open_spiel_test(trade_comm_test trade_comm/trade_comm_test.cc)
+
+add_open_spiel_test(ultimate_tic_tac_toe_test ultimate_tic_tac_toe/ultimate_tic_tac_toe_test.cc)
 
 if (${OPEN_SPIEL_BUILD_WITH_ACPC})
-  add_executable(universal_poker_test universal_poker/universal_poker_test.cc ${OPEN_SPIEL_OBJECTS}
-          $<TARGET_OBJECTS:tests>
-          $<TARGET_OBJECTS:algorithms>)
+  add_open_spiel_executable(universal_poker_test universal_poker/universal_poker_test.cc)
   add_test(universal_poker_test universal_poker_test
            --subgames_data_dir=${CMAKE_CURRENT_SOURCE_DIR}/universal_poker/endgames)
 endif()
 
-add_executable(y_test y/y_test.cc ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(y_test y_test)
+add_open_spiel_test(y_test y/y_test.cc)

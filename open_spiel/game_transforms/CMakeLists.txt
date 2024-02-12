@@ -22,62 +22,22 @@ add_library (game_transforms OBJECT
 )
 target_include_directories (game_transforms PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(restricted_nash_response_test
-        restricted_nash_response_test.cc
-        ${OPEN_SPIEL_OBJECTS}
-        $<TARGET_OBJECTS:tests>)
-add_test(restricted_nash_response_test restricted_nash_response_test)
+add_open_spiel_test(restricted_nash_response_test restricted_nash_response_test.cc)
 
-add_executable(turn_based_simultaneous_game_test
-               turn_based_simultaneous_game_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(turn_based_simultaneous_game_test turn_based_simultaneous_game_test)
+add_open_spiel_test(turn_based_simultaneous_game_test turn_based_simultaneous_game_test.cc)
 
-add_executable(misere_test
-               misere_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(misere_test misere_test)
+add_open_spiel_test(misere_test misere_test.cc)
 
-add_executable(add_noise_test
-               add_noise_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(add_noise_test add_noise_test)
+add_open_spiel_test(add_noise_test add_noise_test.cc)
 
-add_executable(coop_to_1p_test
-               coop_to_1p_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(coop_to_1p_test coop_to_1p_test)
+add_open_spiel_test(coop_to_1p_test coop_to_1p_test.cc)
 
-add_executable(efg_writer_test
-               efg_writer_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(efg_writer_test efg_writer_test)
+add_open_spiel_test(efg_writer_test efg_writer_test.cc)
 
-add_executable(normal_form_extensive_game_test
-               normal_form_extensive_game_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(normal_form_extensive_game_test normal_form_extensive_game_test)
+add_open_spiel_test(normal_form_extensive_game_test normal_form_extensive_game_test.cc)
 
-add_executable(repeated_game_test
-               repeated_game_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(repeated_game_test repeated_game_test)
+add_open_spiel_test(repeated_game_test repeated_game_test.cc)
 
-add_executable(start_at_test
-  start_at_test.cc
-  ${OPEN_SPIEL_OBJECTS}
-  $<TARGET_OBJECTS:tests>)
-add_test(start_at_test start_at_test)
+add_open_spiel_test(start_at_test start_at_test.cc)
 
-add_executable(zerosum_test
-               zerosum_test.cc
-               ${OPEN_SPIEL_OBJECTS}
-               $<TARGET_OBJECTS:tests>)
-add_test(zerosum_test zerosum_test)
+add_open_spiel_test(zerosum_test zerosum_test.cc)
