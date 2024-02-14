@@ -63,146 +63,148 @@ flags.DEFINE_float("alpha",  default=0.5, help="Set alpha to controll the iterat
 flags.DEFINE_float("eps_eps",  default=0.2, help="eps to update the episode learned policy")
 flags.DEFINE_float("itr_eps",  default=0.05, help="eps to update the episode learned policy")
 
+
 def set_seed(seed):
-    """Set the random seed for reproducibility"""
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    os.environ["PYTHONHASHSEED"] = str(seed)
-    print(f"Random seed set as {seed}")
+  """Set the random seed for reproducibility"""
+  np.random.seed(seed)
+  torch.manual_seed(seed)
+  torch.cuda.manual_seed(seed)
+  os.environ["PYTHONHASHSEED"] = str(seed)
+  print(f"Random seed set as {seed}")
+
 
 def main(unused_argv):
-    """Main function to run the experiment"""
+  """Main function to run the experiment"""
 
-    # Set the random seed for reproducibility
-    set_seed(FLAGS.seed)
+  # Set the random seed for reproducibility
+  set_seed(FLAGS.seed)
 
-    # Set the device (in our experiments CPU vs GPU does not improve time at all) we recommend CPU
-    device = torch.device("cuda" if torch.cuda.is_available() and FLAGS.cuda else "cpu")
+  # Set the device (in our experiments CPU vs GPU does not improve time at all) we recommend CPU
+  device = torch.device("cuda" if torch.cuda.is_available() and FLAGS.cuda else "cpu")
 
-    # Set the name of the experiment's folder
-    fname = "./mfppo_experiments/"
+  # Set the name of the experiment's folder
+  fname = "./mfppo_experiments/"
 
-    # Log the experiments
-    run_name = f"{FLAGS.exp_name}_{FLAGS.game_setting}_{FLAGS.optimizer}_num_update_epochs_\
-        {FLAGS.update_epochs}_num_episodes_per_rollout_{FLAGS.num_episodes}_number_of_mini_batches_\
-        {FLAGS.num_minibatches}_{time.asctime(time.localtime(time.time()))}"
-    log_name = os.path.join(fname, run_name)
-    tb_writer = SummaryWriter(log_name)
-    logging.basicConfig(filename=log_name + "_log.txt" , filemode="a", 
-                        level=logging.DEBUG, force=True)
+  # Log the experiments
+  run_name = f"{FLAGS.exp_name}_{FLAGS.game_setting}_{FLAGS.optimizer}_num_update_epochs_\
+      {FLAGS.update_epochs}_num_episodes_per_rollout_{FLAGS.num_episodes}_number_of_mini_batches_\
+      {FLAGS.num_minibatches}_{time.asctime(time.localtime(time.time()))}"
+  log_name = os.path.join(fname, run_name)
+  tb_writer = SummaryWriter(log_name)
+  logging.basicConfig(filename=log_name + "_log.txt" , filemode="a", 
+                      level=logging.DEBUG, force=True)
 
-    # Console handler
-    console = logging.StreamHandler()
-    console.setLevel(logging.ERROR)
-    logging.getLogger("").addHandler(console)
+  # Console handler
+  console = logging.StreamHandler()
+  console.setLevel(logging.ERROR)
+  logging.getLogger("").addHandler(console)
 
-    logger = logging.getLogger()
-    logger.debug("Initialization")
+  logger = logging.getLogger()
+  logger.debug("Initialization")
 
-    tb_writer.add_text(
-        "hyperparameters",
-        "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}" for key,value
-                                                 in vars(FLAGS).items()])),
-    )
-    # Create the game instance 
-    game = factory.create_game_with_setting("mfg_crowd_modelling_2d", FLAGS.game_setting)
+  tb_writer.add_text(
+      "hyperparameters",
+      "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}" for key,value
+                                                in vars(FLAGS).items()])),
+  )
+  # Create the game instance 
+  game = factory.create_game_with_setting("mfg_crowd_modelling_2d", FLAGS.game_setting)
 
-    # Set the initial policy to uniform and generate the distribution
-    uniform_policy = policy_std.UniformRandomPolicy(game)
-    mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
-    env = rl_environment.Environment(game, mfg_distribution=mfg_dist, mfg_population=0)
+  # Set the initial policy to uniform and generate the distribution
+  uniform_policy = policy_std.UniformRandomPolicy(game)
+  mfg_dist = distribution.DistributionPolicy(game, uniform_policy)
+  env = rl_environment.Environment(game, mfg_distribution=mfg_dist, mfg_population=0)
 
-    # Set the environment seed for reproduciblility
-    env.seed(FLAGS.seed)
+  # Set the environment seed for reproduciblility
+  env.seed(FLAGS.seed)
 
-    # Creat the agent and population policies
-    info_state_size = env.observation_spec()["info_state"][0]
-    num_actions = env.action_spec()["num_actions"]
-    agent = mfg_ppo_agent(info_state_size,num_actions).to(device)
-    ppo_policy = mfg_ppo_policy(game, agent, None, device)
-    pop_agent = mfg_ppo_agent(info_state_size,num_actions).to(device)
+  # Creat the agent and population policies
+  info_state_size = env.observation_spec()["info_state"][0]
+  num_actions = env.action_spec()["num_actions"]
+  agent = mfg_ppo_agent(info_state_size,num_actions).to(device)
+  ppo_policy = mfg_ppo_policy(game, agent, None, device)
+  pop_agent = mfg_ppo_agent(info_state_size,num_actions).to(device)
 
-    if FLAGS.optimizer == "Adam":
-        optimizer_actor = optim.Adam(agent.actor.parameters(), lr=FLAGS.lr,eps=1e-5)
-        optimizer_critic = optim.Adam(agent.critic.parameters(), lr=FLAGS.lr,eps=1e-5)
-    else:
-        optimizer_actor = optim.SGD(agent.actor.parameters(), lr=FLAGS.lr, momentum=0.9)
-        optimizer_critic = optim.SGD(agent.critic.parameters(), lr=FLAGS.lr, momentum=0.9)
+  if FLAGS.optimizer == "Adam":
+    optimizer_actor = optim.Adam(agent.actor.parameters(), lr=FLAGS.lr,eps=1e-5)
+    optimizer_critic = optim.Adam(agent.critic.parameters(), lr=FLAGS.lr,eps=1e-5)
+  else:
+    optimizer_actor = optim.SGD(agent.actor.parameters(), lr=FLAGS.lr, momentum=0.9)
+    optimizer_critic = optim.SGD(agent.critic.parameters(), lr=FLAGS.lr, momentum=0.9)
 
-    # Used to log data for debugging
-    steps = FLAGS.num_episodes * env.max_game_length
-    episode_entropy = []
-    total_entropy = []
-    nash_con_vect = []
-    eps_reward = []
-    total_reward = []
+  # Used to log data for debugging
+  steps = FLAGS.num_episodes * env.max_game_length
+  episode_entropy = []
+  total_entropy = []
+  nash_con_vect = []
+  eps_reward = []
+  total_reward = []
 
-    for k in range(FLAGS.update_iterations):
-        for _ in range(FLAGS.update_episodes):
-            # collect rollout data
-            history = rollout(env, pop_agent, agent, FLAGS.num_episodes, steps, device)
-            #store rewards and entropy for debugging
-            episode_entropy.append(history["entropies"].mean().item())
-            eps_reward.append(history["rewards"].sum().item()/FLAGS.num_episodes)
-            # Calculate the advantage function
-            adv, returns = calculate_advantage(FLAGS.gamma, True, history["rewards"],
-                                               history["values"], history["dones"], device)
-            history["advantages"] = adv
-            history["returns"] = returns
-            # Update the learned policy and report loss for debugging
-            v_loss = learn(history, optimizer_actor, optimizer_critic, agent,
-                            num_minibatches=FLAGS.num_minibatches,
-                            update_epochs=FLAGS.update_epochs,
-                            itr_eps=FLAGS.itr_eps,
-                            eps_eps=FLAGS.eps_eps,
-                            alpha=FLAGS.alpha,
-                            ent_coef=FLAGS.ent_coef,
-                            max_grad_norm=FLAGS.max_grad_norm)
+  for k in range(FLAGS.update_iterations):
+    for _ in range(FLAGS.update_episodes):
+      # collect rollout data
+      history = rollout(env, pop_agent, agent, FLAGS.num_episodes, steps, device)
+      #store rewards and entropy for debugging
+      episode_entropy.append(history["entropies"].mean().item())
+      eps_reward.append(history["rewards"].sum().item()/FLAGS.num_episodes)
+      # Calculate the advantage function
+      adv, returns = calculate_advantage(FLAGS.gamma, True, history["rewards"],
+                                          history["values"], history["dones"], device)
+      history["advantages"] = adv
+      history["returns"] = returns
+      # Update the learned policy and report loss for debugging
+      v_loss = learn(history, optimizer_actor, optimizer_critic, agent,
+                      num_minibatches=FLAGS.num_minibatches,
+                      update_epochs=FLAGS.update_epochs,
+                      itr_eps=FLAGS.itr_eps,
+                      eps_eps=FLAGS.eps_eps,
+                      alpha=FLAGS.alpha,
+                      ent_coef=FLAGS.ent_coef,
+                      max_grad_norm=FLAGS.max_grad_norm)
 
-        # Collect and print the metrics
-        total_reward.append(np.mean(eps_reward))
-        total_entropy.append(np.mean(episode_entropy))
+    # Collect and print the metrics
+    total_reward.append(np.mean(eps_reward))
+    total_entropy.append(np.mean(episode_entropy))
 
-        print("Value_loss", v_loss.item())
-        print("iteration num:", k+1)
-        print('Mean reward', total_reward[-1])
+    print("Value_loss", v_loss.item())
+    print("iteration num:", k+1)
+    print("Mean reward", total_reward[-1])
 
-        # Update the iteration policy with the new policy
-        pop_agent.load_state_dict(agent.state_dict())
+    # Update the iteration policy with the new policy
+    pop_agent.load_state_dict(agent.state_dict())
 
-        # Update the distribution
-        distrib = distribution.DistributionPolicy(game, ppo_policy)
+    # Update the distribution
+    distrib = distribution.DistributionPolicy(game, ppo_policy)
 
-        # calculate the exploitability
-        m = calculate_explotability(game, distrib, ppo_policy)
-        nashc = m["nash_conv_ppo"]
-        nash_con_vect.append(nashc)
+    # calculate the exploitability
+    m = calculate_explotability(game, distrib, ppo_policy)
+    nashc = m["nash_conv_ppo"]
+    nash_con_vect.append(nashc)
 
-        # log the results to tensor board
-        tb_writer.add_scalar("initial_state_value", m['ppo_br/initial'], k+1)
-        tb_writer.add_scalar("rewards", total_reward[-1], k+1)
-        tb_writer.add_scalar("entorpy", total_entropy[-1], k+1)
-        tb_writer.add_scalar("nash_conv_ppo", nashc, k+1)
-        logger.debug("ppo_br: %s, and nash_conv: %s, reward: %s, entropy: %s",
-             m['ppo_br/initial'], nashc, total_reward[-1], total_entropy[-1])
-        print(f"ppo_br: {m['ppo_br/initial']}, and nash_conv: {nashc},\
-               reward: {total_reward[-1]}, entropy: { total_entropy[-1]}")
+    # log the results to tensor board
+    tb_writer.add_scalar("initial_state_value", m["ppo_br/initial"], k+1)
+    tb_writer.add_scalar("rewards", total_reward[-1], k+1)
+    tb_writer.add_scalar("entorpy", total_entropy[-1], k+1)
+    tb_writer.add_scalar("nash_conv_ppo", nashc, k+1)
+    logger.debug("ppo_br: %s, and nash_conv: %s, reward: %s, entropy: %s",
+      m["ppo_br/initial"], nashc, total_reward[-1], total_entropy[-1])
+    print("ppo_br: %s, and nash_conv: %s, reward: %s, entropy: %s" % 
+          (m["ppo_br/initial"], nashc, total_reward[-1], total_entropy[-1]))
+    
+    # Update the environment distribution
+    env.update_mfg_distribution(distrib)
 
-        # Update the environment distribution
-        env.update_mfg_distribution(distrib)
-
-    # if lower than upper_nash we save the weights and distribution
-    upper_nash = 300
-    if nash_con_vect[-1] < upper_nash:
-        # Save the distribution and weights for further analysis
-        filename = os.path.join(fname, f"distribution_{run_name}.pkl")
-        utils.save_parametric_distribution(distrib, filename)   
-        torch.save(agent.actor.state_dict(),fname + f"alpha_{FLAGS.alpha},\
-                    itr_eps_{FLAGS.itr_eps}, eps_eps_{FLAGS.eps_eps}_agent_actor_weights.pth")
-        torch.save(agent.critic.state_dict(),fname + f"alpha_{FLAGS.alpha},\
-                    itr_eps_{FLAGS.itr_eps}, eps_eps_{FLAGS.eps_eps}_agent_critic_weights.pth")
+  # if lower than upper_nash we save the weights and distribution
+  upper_nash = 300
+  if nash_con_vect[-1] < upper_nash:
+    # Save the distribution and weights for further analysis
+    filename = os.path.join(fname, f"distribution_{run_name}.pkl")
+    utils.save_parametric_distribution(distrib, filename)   
+    torch.save(agent.actor.state_dict(),fname + f"alpha_{FLAGS.alpha},\
+                itr_eps_{FLAGS.itr_eps}, eps_eps_{FLAGS.eps_eps}_agent_actor_weights.pth")
+    torch.save(agent.critic.state_dict(),fname + f"alpha_{FLAGS.alpha},\
+                itr_eps_{FLAGS.itr_eps}, eps_eps_{FLAGS.eps_eps}_agent_critic_weights.pth")
 
 
 if __name__ == "__main__":
-    app.run(main)
+  app.run(main)
