@@ -237,6 +237,9 @@ class RangeIterator {
   bool operator!=(const RangeIterator& other) const {
     return id_ != other.id_ || tree_ != other.tree_;
   }
+  bool operator==(const RangeIterator& other) const {
+    return !(this->operator!=(other));
+  }
   Id operator*() { return Id(id_, tree_); }
 };
 template <class Id>
@@ -285,7 +288,7 @@ std::shared_ptr<InfostateTree> MakeInfostateTree(
     const std::vector<InfostateNode*>& start_nodes,
     int max_move_ahead_limit = 1000);
 
-class InfostateTree final {
+class InfostateTree final : public std::enable_shared_from_this<InfostateTree> {
   // Note that only MakeInfostateTree is allowed to call the constructor
   // to ensure the trees are always allocated on heap. We do this so that all
   // the collected pointers are valid throughout the tree's lifetime even if
@@ -305,6 +308,10 @@ class InfostateTree final {
       const std::vector<const InfostateNode*>&, int);
 
  public:
+  // -- gain shared ownership of the allocated infostate object
+  std::shared_ptr< InfostateTree > shared_ptr() { return shared_from_this(); }
+  std::shared_ptr< const InfostateTree > shared_ptr() const { return shared_from_this(); }
+
   // -- Root accessors ---------------------------------------------------------
   const InfostateNode& root() const { return *root_; }
   InfostateNode* mutable_root() { return root_.get(); }
@@ -344,7 +351,7 @@ class InfostateTree final {
   // Returns `None` if the sequence is the empty sequence.
   absl::optional<DecisionId> DecisionIdForSequence(const SequenceId&) const;
   // Returns `None` if the sequence is the empty sequence.
-  absl::optional<InfostateNode*> DecisionForSequence(const SequenceId&);
+  absl::optional<InfostateNode*> DecisionForSequence(const SequenceId& sequence_id) const;
   // Returns whether the sequence ends with the last action the player can make.
   bool IsLeafSequence(const SequenceId&) const;
 
@@ -385,13 +392,13 @@ class InfostateTree final {
   // Compute best response and value based on gradient from opponents.
   // This consumes the gradient vector, as it is used to compute the value.
   std::pair<double, SfStrategy> BestResponse(
-      TreeplexVector<double>&& gradient) const;
+      TreeplexVector<double> gradient) const;
   // Compute best response value based on gradient from opponents over leaves.
   // This consumes the gradient vector, as it is used to compute the value.
-  double BestResponseValue(LeafVector<double>&& gradient) const;
+  double BestResponseValue(LeafVector<double> gradient) const;
 
   // -- For debugging ----------------------------------------------------------
-  std::ostream& operator<<(std::ostream& os) const;
+  friend std::ostream& operator<<(std::ostream& os, const InfostateTree& tree);
 
  private:
   const Player acting_player_;
@@ -550,6 +557,7 @@ class InfostateNode final {
   const InfostateNodeType& type() const { return type_; }
   size_t depth() const { return depth_; }
   bool is_root_node() const { return !parent_; }
+  bool is_filler_node() const { return infostate_string_ == kFillerInfostate; }
   bool has_infostate_string() const {
     return infostate_string_ != kFillerInfostate &&
            infostate_string_ != kDummyRootNodeInfostate;

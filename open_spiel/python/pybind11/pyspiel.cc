@@ -29,6 +29,7 @@
 #include "open_spiel/observer.h"
 #include "open_spiel/python/pybind11/algorithms_corr_dist.h"
 #include "open_spiel/python/pybind11/algorithms_trajectories.h"
+#include "open_spiel/python/pybind11/algorithms_infostate_tree.h"
 #include "open_spiel/python/pybind11/bots.h"
 #include "open_spiel/python/pybind11/game_transforms.h"
 #include "open_spiel/python/pybind11/games_backgammon.h"
@@ -633,6 +634,7 @@ PYBIND11_MODULE(pyspiel, m) {
     throw SpielException(string);
   });
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
+  py::register_exception<ForbiddenException>(m, "ForbiddenError", PyExc_RuntimeError);
 
   // Register other bits of the API.
   init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
@@ -657,6 +659,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_trade_comm(m);  // Game-specific functions for trade_comm.
   init_pyspiel_observer(m);      // Observers and observations.
   init_pyspiel_utils(m);         // Utilities.
+  init_pyspiel_infostate_tree(m);  // Infostate-Tree and associated classes (Id etc.)
 
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
