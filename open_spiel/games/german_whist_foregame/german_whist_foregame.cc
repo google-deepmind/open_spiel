@@ -429,6 +429,7 @@ std::string GWhistFState::StateToString() const {
 }
 std::string GWhistFState::InformationStateString(Player player) const{
     //THIS IS WHAT A PLAYER IS SHOWN WHEN PLAYING//
+    SPIEL_CHECK_GE(player,0);
     std::string p = std::to_string(player)+",";
     std::string cur_hand = "";
     std::string observations="";
