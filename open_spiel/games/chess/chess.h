@@ -171,6 +171,8 @@ class ChessState : public State {
   // the parsing fails.
   Action ParseMoveToAction(const std::string& move_str) const;
 
+  std::string Serialize() const override;
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -233,6 +235,9 @@ class ChessGame : public Game {
     return chess::ObservationTensorShape();
   }
   int MaxGameLength() const override { return chess::MaxGameLength(); }
+
+  std::unique_ptr<State> DeserializeState(
+      const std::string& str) const override;
 };
 
 }  // namespace chess
