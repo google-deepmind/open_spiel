@@ -296,6 +296,10 @@ void SerializaitionTests() {
       game->DeserializeState(state->Serialize());
   SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
 
+  // Empty string.
+  deserialized_state = game->DeserializeState("");
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+
   // FEN starting position.
   state = game->NewInitialState(
       "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");

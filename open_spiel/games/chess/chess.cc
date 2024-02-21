@@ -16,6 +16,7 @@
 #include <string>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -425,7 +426,7 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
 
 std::string ChessState::Serialize() const {
   std::string state_str = "";
-  absl::StrAppend(&state_str, start_board_.ToFEN(), "\n");
+  absl::StrAppend(&state_str, "FEN: ", start_board_.ToFEN(), "\n");
   absl::StrAppend(&state_str, absl::StrJoin(History(), "\n"), "\n");
   return state_str;
 }
@@ -434,9 +435,15 @@ ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}
 
 std::unique_ptr<State> ChessGame::DeserializeState(
     const std::string& str) const {
+  const std::string prefix("FEN: ");
+  if (!absl::StartsWith(str, prefix)) {
+    // Backward compatibility.
+    return Game::DeserializeState(str);
+  }
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   // Create initial state from FEN (first line of serialized state).
-  std::unique_ptr<State> state = NewInitialState(lines[0]);
+  std::unique_ptr<State> state = NewInitialState(
+      lines[0].substr(prefix.length()));
   for (int i = 1; i < lines.size(); ++i) {
     if (lines[i].empty()) {
       break;
