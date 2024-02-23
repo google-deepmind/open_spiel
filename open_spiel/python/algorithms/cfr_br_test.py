@@ -94,7 +94,9 @@ class CFRBRTest(parameterized.TestCase, absltest.TestCase):
       else:
         exploitability_ = exploitability.nash_conv(game, avg_policy)
 
-      self.assertEqual(expected_exploitability[step], exploitability_)
+      self.assertAlmostEqual(
+          expected_exploitability[step], exploitability_, places=10
+      )
 
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 std::pair<int, int> DecodeAllocation(Action chance_action, int num_items) {
-  return { chance_action / num_items, chance_action % num_items };
+  return {chance_action / num_items, chance_action % num_items};
 }
 
 std::pair<int, int> DecodeTrade(Action trade_action, int num_items) {
@@ -142,10 +142,10 @@ std::string TradeCommState::ObservationString(Player player) const {
 
   // Players can see the other trade offers after the round.
   if (IsTerminal()) {
-    SPIEL_CHECK_LT(1-player, trade_history_.size());
+    SPIEL_CHECK_LT(1 - player, trade_history_.size());
     absl::StrAppend(&str, "Other players's trade offer: ");
-    std::pair<int, int> trade = DecodeTrade(trade_history_[1-player],
-                                            num_items_);
+    std::pair<int, int> trade =
+        DecodeTrade(trade_history_[1 - player], num_items_);
     absl::StrAppend(&str, " ", trade.first, ":", trade.second, "\n");
   }
 
@@ -207,6 +207,14 @@ void TradeCommState::ObservationTensor(Player player,
   values[offset + trade_history_.size()] = 1;
   offset += 3;
 
+  // one-hot vector for observing player's trade history if it has been made.
+  if (player < trade_history_.size()) {
+    const auto& trade = DecodeTrade(trade_history_[player], num_items_);
+    values[offset + trade.first] = 1;
+    values[offset + num_items_ + trade.second] = 1;
+  }
+  offset += 2 * num_items_;
+
   SPIEL_CHECK_EQ(offset, values.size());
 }
 
@@ -217,7 +225,6 @@ void TradeCommState::InformationStateTensor(Player player,
   // multi-step game in the future.
   ObservationTensor(player, values);
 }
-
 
 TradeCommState::TradeCommState(std::shared_ptr<const Game> game, int num_items)
     : State(game),
@@ -320,16 +327,16 @@ int TradeCommGame::NumDistinctActions() const {
          num_items_ * num_items_;  // 1:1 trades
 }
 
-
 std::vector<int> TradeCommGame::ObservationTensorShape() const {
   return {
-      2 +           // one hot vector for whose turn it is
-      1 +           // one bit to indicate whether the state is terminal
-      1 +           // a single bit indicating the phase (comm or trade)
-      num_items_ +  // one-hot vector for the item the player got
-      num_items_ +  // one-hot vector for the utterance the player made
-      num_items_ +  // one-hot vector for the utterance the player observed
-      3             // trade history size
+      2 +             // one hot vector for whose turn it is
+      1 +             // one bit to indicate whether the state is terminal
+      1 +             // a single bit indicating the phase (comm or trade)
+      num_items_ +    // one-hot vector for the item the player got
+      num_items_ +    // one-hot vector for the utterance the player made
+      num_items_ +    // one-hot vector for the utterance the player observed
+      3 +             // trade history size
+      2 * num_items_  // observer's trade if made.
   };
 }
 

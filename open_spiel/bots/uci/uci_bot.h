@@ -16,6 +16,7 @@
 #ifndef OPEN_SPIEL_BOTS_UCI_BOT_H_
 #define OPEN_SPIEL_BOTS_UCI_BOT_H_
 
+#include <vector>
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/spiel_bots.h"
@@ -42,23 +43,24 @@ class UCIBot : public Bot {
   void InformAction(const State& state, Player player_id,
                     Action action) override;
 
+  void Write(const std::string& msg) const;
+  std::string Read(bool wait) const;
+
+  void Position(const std::string& fen,
+                const std::vector<std::string>& moves = {});
+
  private:
   void StartProcess(const std::string& bot_binary_path);
   void Uci();
   void SetOption(const std::string& name, const std::string& value);
   void UciNewGame();
   void IsReady();
-  void Position(const std::string& fen,
-                const std::vector<std::string>& moves = {});
   std::pair<std::string, absl::optional<std::string>> Go();
   void GoPonder();
   void PonderHit();
   std::pair<std::string, absl::optional<std::string>> Stop();
   void Quit();
   std::pair<std::string, absl::optional<std::string>> ReadBestMove();
-
-  void Write(const std::string& msg) const;
-  std::string Read(bool wait) const;
 
   pid_t pid_ = -1;
   int input_fd_ = -1;

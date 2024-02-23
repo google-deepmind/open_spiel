@@ -49,8 +49,7 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Build and run tests with all optional dependencies, including building a
-        # shared library with linkable third party dependencies in place.
+        # Older Python version on Ubuntu 20.04
         - os: ubuntu-20.04
           OS_PYTHON_VERSION: "3.9"
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"

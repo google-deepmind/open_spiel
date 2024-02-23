@@ -177,7 +177,7 @@ class LiarsPokerState(pyspiel.State):
       # Bids start at BID_ACTION_OFFSET (1) as 0 represents the challenge
       # action.
       for bid in range(
-          max(BID_ACTION_OFFSET, self._current_action + 1), self._max_bid
+          max(BID_ACTION_OFFSET, self._current_action + 1), self._max_bid + 1
       ):
         actions.append(bid)
 
@@ -207,8 +207,8 @@ class LiarsPokerState(pyspiel.State):
     Returns:
       A tuple of (count, number). For example, (1, 2) represents one 2's.
     """
-    count = bid % (self._hand_length * self._num_players) + 1
-    number = self._deck[bid // (self._hand_length * self._num_players)]
+    number = bid % self._num_digits + 1
+    count = bid // self._num_digits + 1
     return (count, number)
 
   def encode_bid(self, count, number):
@@ -230,7 +230,7 @@ class LiarsPokerState(pyspiel.State):
     Returns:
       A single bid ID.
     """
-    return ((number - 1) * self._hand_length * self._num_players) + count - 1
+    return (count - 1) * self._num_digits + number - 1
 
   def _counts(self):
     """Determines if the bid originator wins or loses."""

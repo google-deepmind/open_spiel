@@ -174,5 +174,16 @@ class BestResponseTest(parameterized.TestCase, absltest.TestCase):
     self.assertAlmostEqual(br.value(game.new_initial_state()), 21.4320068359375)
 
 
+class TabularBestResponseMDPTest(absltest.TestCase):
+
+  def test_tabular_best_response_mdp(self):
+    # See pybind11/policy.cc for these functions.
+    game = pyspiel.load_game("kuhn_poker")
+    uniform_random_policy = pyspiel.UniformRandomPolicy(game)
+    tbr_mdp = pyspiel.TabularBestResponseMDP(game, uniform_random_policy)
+    tbr_info = tbr_mdp.nash_conv()
+    self.assertGreater(tbr_info.nash_conv, 0)
+
+
 if __name__ == "__main__":
   absltest.main()

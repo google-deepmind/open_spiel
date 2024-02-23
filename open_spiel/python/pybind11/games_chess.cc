@@ -14,14 +14,22 @@
 
 #include "open_spiel/python/pybind11/games_chess.h"
 
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel.h"
-#include "open_spiel/python/pybind11/pybind11.h"
+#include "pybind11/include/pybind11/cast.h"
+#include "pybind11/include/pybind11/pybind11.h"
+#include "pybind11/include/pybind11/smart_holder.h"
 
 namespace py = ::pybind11;
+using open_spiel::Game;
 using open_spiel::State;
+using open_spiel::chess::ChessGame;
 using open_spiel::chess::ChessState;
 using open_spiel::chess::ChessBoard;
 using open_spiel::chess::Color;
@@ -32,6 +40,7 @@ using open_spiel::chess::Move;
 
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessBoard);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessState);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessGame);
 
 void open_spiel::init_pyspiel_games_chess(py::module& m) {
   py::module_ chess = m.def_submodule("chess");
@@ -76,6 +85,7 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
   py::classh<ChessBoard>(chess, "ChessBoard")
       .def("has_legal_moves", &ChessBoard::HasLegalMoves)
       .def("debug_string", &ChessBoard::DebugString)
+      .def("to_fen", &ChessBoard::ToFEN)
       .def("to_unicode_string", &ChessBoard::ToUnicodeString);
 
   py::classh<ChessState, State>(m, "ChessState")
@@ -96,4 +106,8 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
 
   // action_to_move(action: int, board: ChessBoard)
   chess.def("action_to_move", &chess::ActionToMove);
+
+  // move_to_action(move: Move, board_size: int = default_size)
+  chess.def("move_to_action", &chess::MoveToAction,
+            py::arg("move"), py::arg("board_size") = chess::kDefaultBoardSize);
 }

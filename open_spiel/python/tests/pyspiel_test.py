@@ -35,6 +35,7 @@ EXPECTED_GAMES = frozenset([
     "bridge",
     "bridge_uncontested_bidding",
     "catch",
+    "chat_game",  # python game locating in python/games/chat_games/
     "checkers",
     "chess",
     "cliff_walking",

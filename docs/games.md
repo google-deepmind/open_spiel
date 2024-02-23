@@ -1,92 +1,93 @@
 # Available games
 
-![](_static/green_circ10.png "green circle"): thoroughly-tested. In many cases,
-we verified against known values and/or reproduced results from papers.
+🟢:  thoroughly-tested. In many cases, we verified against known values and/or reproduced results from papers.
 
-<font color="orange"><b>~</b></font>: implemented but lightly tested.
+🔶: implemented but lightly tested.
 
-<font color="red"><b>X</b></font>: known issues (see code for details).
+❌: known issues (see notes below and code for details).
 
-Status                                       | Game
--------------------------------------------- | ----
-<font color="orange"><b>~</b></font>         | [2048](#2048)
-<font color="orange"><b>~</b></font>         | [Amazons](#amazons)
-<font color="orange"><b>~</b></font>         | [Atari](#atari)
-![](_static/green_circ10.png "green circle") | [Backgammon](#backgammon)
-<font color="orange"><b>~</b></font>         | [Bargaining](#bargaining)
-<font color="orange"><b>~</b></font>         | [Battleship](#battleship)
-<font color="orange"><b>~</b></font>         | [Blackjack](#blackjack)
-<font color="orange"><b>~</b></font>         | [Block Dominoes](#block-dominoes)
-![](_static/green_circ10.png "green circle") | [Breakthrough](#breakthrough)
-![](_static/green_circ10.png "green circle") | [Bridge](#bridge)
-![](_static/green_circ10.png "green circle") | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
-<font color="orange"><b>~</b></font>         | [Catch](#catch)
-<font color="orange"><b>~</b></font>         | [Checkers](#checkers)
-<font color="orange"><b>~</b></font>         | [Cliff Walking](#cliff-walking)
-<font color="orange"><b>~</b></font>         | [Clobber](#clobber)
-<font color="orange"><b>~</b></font>         | [Coin Game](#coin-game)
-<font color="orange"><b>~</b></font>         | [Colored Trails](#colored-trails)
-![](_static/green_circ10.png "green circle") | [Connect Four](#connect-four)
-<font color="orange"><b>~</b></font>         | [Cooperative Box-Pushing](#cooperative-box-pushing)
-![](_static/green_circ10.png "green circle") | [Chess](#chess)
-<font color="orange"><b>~</b></font>         | [Crazy Eights](#crazy-eights)
-<font color="orange"><b>~</b></font>         | [Dark Hex](#dark-hex)
-<font color="orange"><b>~</b></font>         | [Deep Sea](#deep-sea)
-![](_static/green_circ10.png "green circle") | [Dots and Boxes](#dots-and-boxes)
-<font color="orange"><b>~</b></font>         | [Dou Dizhu](#dou-dizhu)
-<font color="orange"><b>~</b></font>         | [Euchre](#euchre)
-![](_static/green_circ10.png "green circle") | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
-![](_static/green_circ10.png "green circle") | [Gin Rummy](#gin-rummy)
-![](_static/green_circ10.png "green circle") | [Go](#go)
-![](_static/green_circ10.png "green circle") | [Goofspiel](#goofspiel)
-![](_static/green_circ10.png "green circle") | [Hanabi](#hanabi)
-![](_static/green_circ10.png "green circle") | [Havannah](#havannah)
-![](_static/green_circ10.png "green circle") | [Hearts](#hearts)
-<font color="orange"><b>~</b></font>         | [Hex](#hex)
-<font color="orange"><b>~</b></font>         | [Kriegspiel](#Kriegspiel)
-![](_static/green_circ10.png "green circle") | [Kuhn poker](#kuhn-poker)
-<font color="orange"><b>~</b></font>         | [Laser Tag](#laser-tag)
-![](_static/green_circ10.png "green circle") | [Leduc poker](#leduc-poker)
-<font color="orange"><b>~</b></font>         | [Lewis Signaling](#lewis-signaling)
-![](_static/green_circ10.png "green circle") | [Liar's Dice](#liars-dice)
-<font color="orange"><b>~</b></font>         | [Liar's Poker](#liars-poker)
-<font color="orange"><b>~</b></font>         | [Mensch ärgere Dich nicht](#mensch-aergere-dich-nicht)
-<font color="orange"><b>~</b></font>         | [Mancala](#mancala)
-<font color="orange"><b>~</b></font>         | [Markov Soccer](#markov-soccer)
-![](_static/green_circ10.png "green circle") | [Matching Pennies (Three-player)](#matching-pennies-three-player)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : garnet](#mean_field_game_garnet)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling](#mean_field_game_crowd_modelling)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : crowd modelling 2d](#mean_field_game_crowd_modelling_2d)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : linear quadratic](#mean-field-game--linear-quadratic)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : predator prey](#mean_field_game_predator_prey)
-![](_static/green_circ10.png "green circle") | [Mean Field Game : routing](#mean-field-game--routing)
-<font color="orange"><b>~</b></font>         | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
-![](_static/green_circ10.png "green circle") | [Negotiation](#negotiation)
-<font color="orange"><b>~</b></font>         | [Nim](#nim)
-<font color="orange"><b>~</b></font>         | [Nine men's morris](#nine_mens_morris)
-<font color="orange"><b>~</b></font>         | [Oh Hell](#oh-hell)
-![](_static/green_circ10.png "green circle") | [Oshi-Zumo](#oshi-zumo)
-![](_static/green_circ10.png "green circle") | [Oware](#oware)
-<font color="orange"><b>~</b></font>         | [Pathfinding](#pathfinding)
-![](_static/green_circ10.png "green circle") | [Pentago](#pentago)
-<font color="orange"><b>~</b></font>         | [Phantom Go](#phantom-go)
-<font color="orange"><b>~</b></font>         | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
-![](_static/green_circ10.png "green circle") | [Pig](#pig)
-<font color="orange"><b>~</b></font>         | [Poker (Hold 'em)](#poker-hold-em)
-![](_static/green_circ10.png "green circle") | [Quoridor](#quoridor)
-<font color="orange"><b>~</b></font>         | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
-![](_static/green_circ10.png "green circle") | [Routing game](#routing-game)
-<font color="orange"><b>~</b></font>         | [Sheriff](#sheriff)
-<font color="orange"><b>~</b></font>         | [Slovenian Tarok](#slovenian-tarok)
-<font color="orange"><b>~</b></font>         | [Skat (simplified bidding)](#skat-simplified-bidding)
-<font color="orange"><b>~</b></font>         | [Solitaire (K+)](#solitaire-k)
-![](_static/green_circ10.png "green circle") | [Tic-Tac-Toe](#tic-tac-toe)
-![](_static/green_circ10.png "green circle") | [Tiny Bridge](#tiny-bridge)
-![](_static/green_circ10.png "green circle") | [Tiny Hanabi](#tiny-hanabi)
-![](_static/green_circ10.png "green circle") | [Trade Comm](#trade-comm)
-<font color="orange"><b>~</b></font>         | [TwixT](#twixt)
-<font color="orange"><b>~</b></font>         | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
-![](_static/green_circ10.png "green circle") | [Y](#y)
+Status           | Game
+---------------- | ----------------------------
+🔶               | [2048](#2048)
+🔶               | [Amazons](#amazons)
+🔶               | [Atari](#atari)
+🟢               | [Backgammon](#backgammon)
+🔶               | [Bargaining](#bargaining)
+🔶               | [Battleship](#battleship)
+🔶               | [Blackjack](#blackjack)
+🔶               | [Block Dominoes](#block-dominoes)
+🟢               | [Breakthrough](#breakthrough)
+🟢               | [Bridge](#bridge)
+🟢               | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
+🔶               | [Catch](#catch)
+🔶               | [Checkers](#checkers)
+🔶               | [Cliff Walking](#cliff-walking)
+🔶               | [Clobber](#clobber)
+🔶               | [Coin Game](#coin-game)
+🔶               | [Colored Trails](#colored-trails)
+🟢               | [Connect Four](#connect-four)
+🔶               | [Cooperative Box-Pushing](#cooperative-box-pushing)
+🟢               | [Chess](#chess)
+🔶               | [Crazy Eights](#crazy-eights)
+🔶               | [Dark Hex](#dark-hex)
+🔶               | [Deep Sea](#deep-sea)
+🟢               | [Dots and Boxes](#dots-and-boxes)
+🔶               | [Dou Dizhu](#dou-dizhu)
+🔶               | [Euchre](#euchre)
+🟢               | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
+🟢               | [Gin Rummy](#gin-rummy)
+🟢               | [Go](#go)
+🟢               | [Goofspiel](#goofspiel)
+🟢               | [Hanabi](#hanabi)
+🟢               | [Havannah](#havannah)
+🟢               | [Hearts](#hearts)
+🔶               | [Hex](#hex)
+🔶               | [Kriegspiel](#Kriegspiel)
+🟢               | [Kuhn poker](#kuhn-poker)
+🔶               | [Laser Tag](#laser-tag)
+🟢               | [Leduc poker](#leduc-poker)
+🔶               | [Lewis Signaling](#lewis-signaling)
+🟢               | [Liar's Dice](#liars-dice)
+🔶               | [Liar's Poker](#liars-poker)
+🔶               | [Mensch ärgere Dich nicht](#mensch-aergere-dich-nicht)
+🔶               | [Mancala](#mancala)
+🔶               | [Markov Soccer](#markov-soccer)
+🟢               | [Matching Pennies (Three-player)](#matching-pennies-three-player)
+🟢               | [Mean Field Game : garnet](#mean_field_game_garnet)
+🟢               | [Mean Field Game : crowd modelling](#mean_field_game_crowd_modelling)
+🟢               | [Mean Field Game : crowd modelling 2d](#mean_field_game_crowd_modelling_2d)
+🟢               | [Mean Field Game : linear quadratic](#mean-field-game--linear-quadratic)
+🟢               | [Mean Field Game : predator prey](#mean_field_game_predator_prey)
+🟢               | [Mean Field Game : routing](#mean-field-game--routing)
+🔶               | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
+🟢               | [Negotiation](#negotiation)
+🔶               | [Nim](#nim)
+🔶               | [Nine men's morris](#nine_mens_morris)
+🔶               | [Oh Hell](#oh-hell)
+🟢               | [Oshi-Zumo](#oshi-zumo)
+🟢               | [Oware](#oware)
+🔶               | [Pathfinding](#pathfinding)
+🟢               | [Pentago](#pentago)
+🔶               | [Phantom Go](#phantom-go)
+🔶               | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
+🟢               | [Pig](#pig)
+🟢               | [Prisoner's Dilemma](#prisoner's-dilemma)
+❌               | [Poker (Hold 'em)](#poker-hold-em)
+❌               | [Quoridor](#quoridor)
+❌               | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
+🟢               | [Routing game](#routing-game)
+🔶               | [Sheriff](#sheriff)
+🔶               | [Slovenian Tarok](#slovenian-tarok)
+🔶               | [Skat (simplified bidding)](#skat-simplified-bidding)
+🔶               | [Solitaire (K+)](#solitaire-k)
+🟢               | [Tic-Tac-Toe](#tic-tac-toe)
+🟢               | [Tiny Bridge](#tiny-bridge)
+🟢               | [Tiny Hanabi](#tiny-hanabi)
+🟢               | [Trade Comm](#trade-comm)
+🔶               | [TwixT](#twixt)
+🔶               | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
+🔶               | [Weighted Voting Games](#weighted-voting-games)
+🟢               | [Y](#y)
 
 ## Details
 
@@ -738,6 +739,17 @@ Status                                       | Game
 *   2-10 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Pig_\(dice_game\))
 
+### Prisoner's Dilemma
+
+*   Players decide on whether to cooperate or defect given a situation with
+    different payoffs.
+*   Simultaneous.
+*   Traditional game.
+*   Deterministic.
+*   Perfect Information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Prisoner%27s_dilemma)
+
 ### Poker (Hold 'em)
 
 *   Players bet on whether their hand of cards plus some communal cards will
@@ -749,6 +761,7 @@ Status                                       | Game
 *   2-10 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
 *   Implemented via [ACPC](http://www.computerpokercompetition.org/).
+*   ❌ Known issues: see issues [#778](https://github.com/google-deepmind/open_spiel/issues/778), [#1033](https://github.com/google-deepmind/open_spiel/issues/1033), and [#1042](https://github.com/google-deepmind/open_spiel/issues/1042).
 
 ### Quoridor
 
@@ -762,6 +775,7 @@ Status                                       | Game
     it's advised against. Since the 3rd player doesn't have player on the
     opposite side, they have an advantage.")
 *   [Wikipedia](https://en.wikipedia.org/wiki/Quoridor)
+*   ❌ Known issues: see [#1158](https://github.com/google-deepmind/open_spiel/issues/1158).
 
 ### Reconnaissance Blind Chess
 
@@ -776,6 +790,7 @@ Status                                       | Game
 *   [Newman et al. '16, Reconnaissance blind multi-chess: an experimentation
     platform for ISR sensor fusion and resource
     management](https://www.spiedigitallibrary.org/conference-proceedings-of-spie/9842/984209/Reconnaissance-blind-multi-chess--an-experimentation-platform-for-ISR/10.1117/12.2228127.short?SSO=1)
+*   ❌ Known issues: see [#811](https://github.com/google-deepmind/open_spiel/issues/811).
 
 ### Routing game
 
@@ -895,6 +910,15 @@ Status                                       | Game
 *   Perfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
+
+### Weighted Voting Games
+
+*   Classic coalitional game.
+*   Players each have a weight w_i, and there is a quota q.
+*   Denote p the binary vector representing a coalition over n players. The
+    utility is 1 is p dot w >= q, 0 otherwise.
+*   n players.
+*   [Chalkiadakis, Elkind, &amp; Wooldridge '12](https://link.springer.com/book/10.1007/978-3-031-01558-8)
 
 ### Y
 

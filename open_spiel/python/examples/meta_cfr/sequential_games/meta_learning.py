@@ -173,7 +173,7 @@ def compute_next_policy(infostates: typing.InfostateMapping,
 
     batched_input_jnp = jnp.array(
         np.expand_dims(np.array(batched_input), axis=1))
-    batched_net_output = utils.get_network_output_batched(
+    batched_net_output = utils.get_network_output_batched(  # pytype: disable=wrong-arg-types  # jnp-type
         net_apply, net_params,
         batched_input_jnp,
         relevant_illegal_action, key)

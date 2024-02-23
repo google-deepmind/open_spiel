@@ -262,6 +262,8 @@ class TabularPolicy : public Policy {
     return policy_table_;
   }
 
+  int size() const { return policy_table_.size(); }
+
   const std::string ToString() const;
 
   // A ToString where the keys are sorted.

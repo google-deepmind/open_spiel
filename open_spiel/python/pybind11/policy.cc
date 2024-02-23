@@ -37,6 +37,8 @@ namespace open_spiel {
 namespace {
 
 using ::open_spiel::ActionsAndProbs;
+using ::open_spiel::Policy;
+using ::open_spiel::TabularPolicy;
 using ::open_spiel::algorithms::Exploitability;
 using ::open_spiel::algorithms::NashConv;
 using ::open_spiel::algorithms::TabularBestResponse;
@@ -164,11 +166,16 @@ void init_pyspiel_policy(py::module& m) {
   // [num_states, num_actions], while this is implemented as a map. It is
   // non-trivial to convert between the two, but we have a function that does so
   // in the open_spiel/python/policy.py file.
-  py::classh<open_spiel::TabularPolicy, open_spiel::Policy>(m, "TabularPolicy")
+  py::classh<TabularPolicy, Policy>(m, "TabularPolicy")
       .def(py::init<const std::unordered_map<std::string, ActionsAndProbs>&>())
-      .def("get_state_policy", &open_spiel::TabularPolicy::GetStatePolicy)
+      .def("__str__", &TabularPolicy::ToString)
+      .def("__repr__", &TabularPolicy::ToString)
+      .def("__len__", &TabularPolicy::size)
+      .def("get_state_policy", &TabularPolicy::GetStatePolicy)
       .def("policy_table",
-           py::overload_cast<>(&open_spiel::TabularPolicy::PolicyTable));
+           py::overload_cast<>(&TabularPolicy::PolicyTable))
+      .def("size", &TabularPolicy::size)
+      .def("to_string", &TabularPolicy::ToString);
 
   py::classh<open_spiel::PartialTabularPolicy, open_spiel::Policy>(
       m, "PartialTabularPolicy")
@@ -221,6 +228,8 @@ void init_pyspiel_policy(py::module& m) {
       .def("average_policy", &open_spiel::algorithms::CFRSolver::AveragePolicy)
       .def("tabular_average_policy",
            &open_spiel::algorithms::CFRSolver::TabularAveragePolicy)
+      .def("tabular_current_policy",
+           &open_spiel::algorithms::CFRSolver::TabularCurrentPolicy)
       .def(py::pickle(
           [](const open_spiel::algorithms::CFRSolver& solver) {  // __getstate__
             return solver.Serialize();

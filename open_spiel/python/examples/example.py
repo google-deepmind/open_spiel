@@ -24,10 +24,9 @@ import pyspiel
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string("game", "tic_tac_toe", "Name of the game")
-flags.DEFINE_integer("players", None, "Number of players")
-flags.DEFINE_string("load_state", None,
-                    "A file containing a string to load a specific state")
+# Game strings can just contain the name or the name followed by parameters
+# and arguments, e.g. "breakthrough(rows=6,columns=6)"
+flags.DEFINE_string("game_string", "tic_tac_toe", "Game string")
 
 
 def main(_):
@@ -37,26 +36,11 @@ def main(_):
 
   action_string = None
 
-  print("Creating game: " + FLAGS.game)
-  if FLAGS.players is not None:
-    game = pyspiel.load_game(FLAGS.game, {"players": FLAGS.players})
-  else:
-    game = pyspiel.load_game(FLAGS.game)
+  print("Creating game: " + FLAGS.game_string)
+  game = pyspiel.load_game(FLAGS.game_string)
 
-  # Get a new state
-  if FLAGS.load_state is not None:
-    # Load a specific state
-    state_string = ""
-    with open(FLAGS.load_state, encoding="utf-8") as input_file:
-      for line in input_file:
-        state_string += line
-    state_string = state_string.rstrip()
-    print("Loading state:")
-    print(state_string)
-    print("")
-    state = game.deserialize_state(state_string)
-  else:
-    state = game.new_initial_state()
+  # Create the initial state
+  state = game.new_initial_state()
 
   # Print the initial state
   print(str(state))
@@ -74,7 +58,6 @@ def main(_):
       print("Sampled outcome: ",
             state.action_to_string(state.current_player(), action))
       state.apply_action(action)
-
     elif state.is_simultaneous_node():
       # Simultaneous node: sample actions for all players.
       random_choice = lambda a: np.random.choice(a) if a else [0]
@@ -87,7 +70,6 @@ def main(_):
           for pid, action in enumerate(chosen_actions)
       ])
       state.apply_actions(chosen_actions)
-
     else:
       # Decision node: sample action for the single current player
       action = random.choice(state.legal_actions(state.current_player()))
@@ -95,7 +77,6 @@ def main(_):
       print("Player ", state.current_player(), ", randomly sampled action: ",
             action_string)
       state.apply_action(action)
-
     print(str(state))
 
   # Game is now done. Print utilities for each player

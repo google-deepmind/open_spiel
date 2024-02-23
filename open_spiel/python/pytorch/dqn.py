@@ -326,7 +326,8 @@ class DQN(rl_agent.AbstractAgent):
 
     illegal_actions_mask = 1 - legal_actions_mask
     legal_target_q_values = self._target_q_values.masked_fill(
-        illegal_actions_mask, ILLEGAL_ACTION_LOGITS_PENALTY)
+        illegal_actions_mask.bool(), ILLEGAL_ACTION_LOGITS_PENALTY
+    )
     max_next_q = torch.max(legal_target_q_values, dim=1)[0]
 
     target = (

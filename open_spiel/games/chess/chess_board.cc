@@ -14,14 +14,23 @@
 
 #include "open_spiel/games/chess/chess_board.h"
 
+#include <algorithm>
 #include <cctype>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -342,7 +351,6 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
       ep_square_(kInvalidSquare),
       irreversible_move_counter_(0),
       move_number_(1),
-      castling_rights_{{true, true}, {true, true}},
       zobrist_hash_(0) {
   board_.fill(kEmptyPiece);
 }
@@ -362,12 +370,6 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
    * Many FEN strings don't have the last two fields.
    */
   ChessBoard board(board_size, king_in_check_allowed, allow_pass_move);
-
-  for (auto color : {Color::kBlack, Color::kWhite}) {
-    for (auto dir : {CastlingDirection::kLeft, CastlingDirection::kRight}) {
-      board.SetCastlingRight(color, dir, false);
-    }
-  }
 
   std::vector<std::string> fen_parts = absl::StrSplit(fen, ' ');
 
@@ -429,20 +431,36 @@ ChessBoard::ChessBoard(int board_size, bool king_in_check_allowed,
     return absl::nullopt;
   }
 
+  // If we have a castling right, we look for a rook in that position. In
+  // chess960 there must be a rook on either side of the king, but all 3 can
+  // otherwise be in any square. If we find one rook on that side, that is used
+  // as the castling square. If we find a rook on the end squares (as in
+  // standard chess), we assume it's standard chess, and use that as the rook,
+  // even if there are multiple rooks.
+  // Note that this can create ambiguous chess960 positions, but we don't have
+  // support for 960-specific FEN for yet.
   if (castling_rights.find('K') != std::string::npos) {  // NOLINT
-    board.SetCastlingRight(Color::kWhite, CastlingDirection::kRight, true);
+    Square rook_sq =
+        board.FindRookForCastling(Color::kWhite, CastlingDirection::kRight);
+    board.SetCastlingRight(Color::kWhite, CastlingDirection::kRight, rook_sq);
   }
 
   if (castling_rights.find('Q') != std::string::npos) {  // NOLINT
-    board.SetCastlingRight(Color::kWhite, CastlingDirection::kLeft, true);
+    Square rook_sq =
+        board.FindRookForCastling(Color::kWhite, CastlingDirection::kLeft);
+    board.SetCastlingRight(Color::kWhite, CastlingDirection::kLeft, rook_sq);
   }
 
   if (castling_rights.find('k') != std::string::npos) {  // NOLINT
-    board.SetCastlingRight(Color::kBlack, CastlingDirection::kRight, true);
+    Square rook_sq =
+        board.FindRookForCastling(Color::kBlack, CastlingDirection::kRight);
+    board.SetCastlingRight(Color::kBlack, CastlingDirection::kRight, rook_sq);
   }
 
   if (castling_rights.find('q') != std::string::npos) {  // NOLINT
-    board.SetCastlingRight(Color::kBlack, CastlingDirection::kLeft, true);
+    Square rook_sq =
+        board.FindRookForCastling(Color::kBlack, CastlingDirection::kLeft);
+    board.SetCastlingRight(Color::kBlack, CastlingDirection::kLeft, rook_sq);
   }
 
   if (ep_square != "-") {
@@ -1049,31 +1067,30 @@ void ChessBoard::ApplyMove(const Move &move) {
   }
 
   // Castling rights can be lost in a few different ways -
-  // 1. The king moves (loses both rights), including castling.
+  // 1. The king moves (loses both rights), including castling. We do this later
+  //    since we still need the rook locations in case this is a castle.
   // 2. A rook moves (loses the right on that side).
   // 3. Captures an opponent rook (OPPONENT loses the right on that side).
-  if (moving_piece.type == PieceType::kKing) {
-    SetCastlingRight(to_play_, CastlingDirection::kLeft, false);
-    SetCastlingRight(to_play_, CastlingDirection::kRight, false);
-  }
   if (moving_piece.type == PieceType::kRook) {
-    // TODO(author12): Fix this for Chess960, which requires storing initial
-    // positions of rooks.
-    if ((to_play_ == Color::kWhite && move.from == Square{0, 0}) ||
-        (to_play_ == Color::kBlack && move.from == Square{0, 7})) {
-      SetCastlingRight(to_play_, CastlingDirection::kLeft, false);
-    } else if ((to_play_ == Color::kWhite && move.from == Square{7, 0}) ||
-               (to_play_ == Color::kBlack && move.from == Square{7, 7})) {
-      SetCastlingRight(to_play_, CastlingDirection::kRight, false);
+    if (castling_rights_[ToInt(to_play_)].left_castle.has_value() &&
+        *castling_rights_[ToInt(to_play_)].left_castle == move.from) {
+      SetCastlingRight(to_play_, CastlingDirection::kLeft, absl::nullopt);
+    } else if (castling_rights_[ToInt(to_play_)].right_castle.has_value() &&
+               *castling_rights_[ToInt(to_play_)].right_castle == move.from) {
+      SetCastlingRight(to_play_, CastlingDirection::kRight, absl::nullopt);
     }
   }
   if (destination_piece.type == PieceType::kRook) {
-    if ((to_play_ == Color::kWhite && move.to == Square{0, 7}) ||
-        (to_play_ == Color::kBlack && move.to == Square{0, 0})) {
-      SetCastlingRight(OppColor(to_play_), CastlingDirection::kLeft, false);
-    } else if ((to_play_ == Color::kWhite && move.to == Square{7, 7}) ||
-               (to_play_ == Color::kBlack && move.to == Square{7, 0})) {
-      SetCastlingRight(OppColor(to_play_), CastlingDirection::kRight, false);
+    if (castling_rights_[ToInt(OppColor(to_play_))].left_castle.has_value() &&
+        *castling_rights_[ToInt(OppColor(to_play_))].left_castle == move.to) {
+      SetCastlingRight(OppColor(to_play_), CastlingDirection::kLeft,
+                       absl::nullopt);
+    } else if (castling_rights_[ToInt(OppColor(to_play_))]
+                   .right_castle.has_value() &&
+               *castling_rights_[ToInt(OppColor(to_play_))].right_castle ==
+                   move.to) {
+      SetCastlingRight(OppColor(to_play_), CastlingDirection::kRight,
+                       absl::nullopt);
     }
   }
 
@@ -1081,39 +1098,35 @@ void ChessBoard::ApplyMove(const Move &move) {
   // 1. Castling
   if (move.is_castling) {
     SPIEL_CHECK_EQ(moving_piece.type, PieceType::kKing);
-    // We can tell which side we are castling to using "to" square.
-    if (to_play_ == Color::kWhite) {
-      if (move.to == Square{2, 0}) {
-        // left castle
-        // TODO(author12): In Chess960, rooks can be anywhere, so delete the
-        // correct squares.
-        set_square(Square{0, 0}, kEmptyPiece);
-        set_square(Square{2, 0}, Piece{Color::kWhite, PieceType::kKing});
-        set_square(Square{3, 0}, Piece{Color::kWhite, PieceType::kRook});
-      } else if (move.to == Square{6, 0}) {
-        // right castle
-        set_square(Square{7, 0}, kEmptyPiece);
-        set_square(Square{6, 0}, Piece{Color::kWhite, PieceType::kKing});
-        set_square(Square{5, 0}, Piece{Color::kWhite, PieceType::kRook});
-      } else {
-        std::cerr << "Trying to castle but destination is not valid."
-                  << std::endl;
-      }
+    // We can tell which side we are castling to using "to" square. This is true
+    // even in chess960 (destination squares are same as in normal chess).
+    // However, we have to be careful of the edge case where the king actually
+    // doesn't move.
+    int8_t y = to_play_ == Color::kWhite ? 0 : 7;
+    if (move.to == Square{2, y}) {
+      // left castle
+      const auto &maybe_rook_sq = castling_rights_[ToInt(to_play_)].left_castle;
+      SPIEL_CHECK_TRUE(maybe_rook_sq.has_value());
+      set_square(*maybe_rook_sq, kEmptyPiece);
+      set_square(Square{2, y}, Piece{to_play_, PieceType::kKing});
+      set_square(Square{3, y}, Piece{to_play_, PieceType::kRook});
+    } else if (move.to == Square{6, y}) {
+      // right castle
+      const auto &maybe_rook_sq =
+          castling_rights_[ToInt(to_play_)].right_castle;
+      SPIEL_CHECK_TRUE(maybe_rook_sq.has_value());
+      set_square(*maybe_rook_sq, kEmptyPiece);
+      set_square(Square{6, y}, Piece{to_play_, PieceType::kKing});
+      set_square(Square{5, y}, Piece{to_play_, PieceType::kRook});
     } else {
-      if (move.to == Square{2, 7}) {
-        // left castle
-        set_square(Square{0, 7}, kEmptyPiece);
-        set_square(Square{2, 7}, Piece{Color::kBlack, PieceType::kKing});
-        set_square(Square{3, 7}, Piece{Color::kBlack, PieceType::kRook});
-      } else if (move.to == Square{6, 7}) {
-        // right castle
-        set_square(Square{7, 7}, kEmptyPiece);
-        set_square(Square{6, 7}, Piece{Color::kBlack, PieceType::kKing});
-        set_square(Square{5, 7}, Piece{Color::kBlack, PieceType::kRook});
-      } else {
-        std::cerr << "Trying to castle but destination is not valid.";
-      }
+      std::cerr << "Trying to castle but destination " << move.to.ToString()
+                << " is not valid." << std::endl;
     }
+  }
+
+  if (moving_piece.type == PieceType::kKing) {
+    SetCastlingRight(to_play_, CastlingDirection::kLeft, absl::nullopt);
+    SetCastlingRight(to_play_, CastlingDirection::kRight, absl::nullopt);
   }
 
   // 2. En-passant
@@ -1272,14 +1285,46 @@ std::string ChessBoard::DebugString() const {
   absl::StrAppend(&s, "Castling rights:\n");
   absl::StrAppend(&s, "White left (queen-side): ",
                   CastlingRight(Color::kWhite, CastlingDirection::kLeft), "\n");
+  if (CastlingRight(Color::kWhite, CastlingDirection::kLeft)) {
+    absl::StrAppend(
+        &s, "White left (queen-side) rook: ",
+        MaybeCastlingRookSquare(Color::kWhite, CastlingDirection::kLeft)
+            .value()
+            .ToString(),
+        "\n");
+  }
   absl::StrAppend(&s, "White right (king-side): ",
                   CastlingRight(Color::kWhite, CastlingDirection::kRight),
                   "\n");
+  if (CastlingRight(Color::kWhite, CastlingDirection::kRight)) {
+    absl::StrAppend(
+        &s, "White right (king-side) rook: ",
+        MaybeCastlingRookSquare(Color::kWhite, CastlingDirection::kRight)
+            .value()
+            .ToString(),
+        "\n");
+  }
   absl::StrAppend(&s, "Black left (queen-side): ",
                   CastlingRight(Color::kBlack, CastlingDirection::kLeft), "\n");
+  if (CastlingRight(Color::kBlack, CastlingDirection::kLeft)) {
+    absl::StrAppend(
+        &s, "Black left (queen-side) rook: ",
+        MaybeCastlingRookSquare(Color::kBlack, CastlingDirection::kLeft)
+            .value()
+            .ToString(),
+        "\n");
+  }
   absl::StrAppend(&s, "Black right (king-side): ",
                   CastlingRight(Color::kBlack, CastlingDirection::kRight),
                   "\n");
+  if (CastlingRight(Color::kBlack, CastlingDirection::kRight)) {
+    absl::StrAppend(
+        &s, "Black right (king-side) rook: ",
+        MaybeCastlingRookSquare(Color::kBlack, CastlingDirection::kRight)
+            .value()
+            .ToString(),
+        "\n");
+  }
   absl::StrAppend(&s, "\n");
 
   return s;
@@ -1360,29 +1405,17 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
   }
 
   const auto check_castling_conditions =
-      [this, &sq, &color, &settings](int8_t x_direction) -> bool {
-    // First we need to find the rook.
-    Square rook_sq = sq + Offset{x_direction, 0};
-    bool rook_found = false;
+      [this, &sq, &color, &settings](CastlingDirection dir) -> bool {
+    const auto &rights = castling_rights_[ToInt(color)];
+    Square rook_sq = dir == CastlingDirection::kLeft
+                         ? rights.left_castle.value()
+                         : rights.right_castle.value();
 
-    // Yes, we do actually have to check colour -
-    // https://github.com/official-stockfish/Stockfish/issues/356
-    for (; InBoardArea(rook_sq); rook_sq.x += x_direction) {
-      if (at(rook_sq) == Piece{color, PieceType::kRook}) {
-        rook_found = true;
-        break;
-      }
-    }
-
-    if (!rook_found) {
-      std::cerr << "Where did our rook go?" << *this << "\n"
-                << "Square: " << SquareToString(sq) << std::endl;
-      SpielFatalError("Rook not found");
-    }
-
-    int8_t rook_final_x = x_direction == -1 ? 3 /* d-file */ : 5 /* f-file */;
+    int8_t rook_final_x =
+        dir == CastlingDirection::kLeft ? 3 /* d-file */ : 5 /* f-file */;
     Square rook_final_sq = Square{rook_final_x, sq.y};
-    int8_t king_final_x = x_direction == -1 ? 2 /* c-file */ : 6 /* g-file */;
+    int8_t king_final_x =
+        dir == CastlingDirection::kLeft ? 2 /* c-file */ : 6 /* g-file */;
     Square king_final_sq = Square{king_final_x, sq.y};
 
     // 4. 5. 6. All squares the king and rook jump over, including the final
@@ -1402,9 +1435,9 @@ void ChessBoard::GenerateCastlingDestinations_(Square sq, Color color,
   // 1. 2. 3. Moving the king, moving the rook, or the rook getting captured
   // will reset the flag.
   bool can_left_castle = CastlingRight(color, CastlingDirection::kLeft) &&
-                         check_castling_conditions(-1);
+                         check_castling_conditions(CastlingDirection::kLeft);
   bool can_right_castle = CastlingRight(color, CastlingDirection::kRight) &&
-                          check_castling_conditions(1);
+                          check_castling_conditions(CastlingDirection::kRight);
 
   if (can_left_castle || can_right_castle) {
     // 7. No castling to escape from check.
@@ -1713,7 +1746,8 @@ void ChessBoard::set_square(Square sq, Piece piece) {
   board_[position] = piece;
 }
 
-bool ChessBoard::CastlingRight(Color side, CastlingDirection direction) const {
+absl::optional<Square> ChessBoard::MaybeCastlingRookSquare(
+    Color side, CastlingDirection direction) const {
   switch (direction) {
     case CastlingDirection::kLeft:
       return castling_rights_[ToInt(side)].left_castle;
@@ -1721,7 +1755,7 @@ bool ChessBoard::CastlingRight(Color side, CastlingDirection direction) const {
       return castling_rights_[ToInt(side)].right_castle;
     default:
       SpielFatalError("Unknown direction.");
-      return -1;
+      return Square{0, 0};
   }
 }
 
@@ -1733,27 +1767,66 @@ int ToInt(CastlingDirection direction) {
       return 1;
     default:
       SpielFatalError("Unknown direction.");
-      return -1;
+      return 0;
   }
 }
 
 void ChessBoard::SetCastlingRight(Color side, CastlingDirection direction,
-                                  bool can_castle) {
+                                  absl::optional<Square> maybe_rook_square) {
   static const ZobristTableU64<2, 2, 2> kZobristValues(/*seed=*/876387212);
 
-  // Remove old value from hash.
-  zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)]
-                                 [CastlingRight(side, direction)];
+  // Remove old value from hash (note that we only use bool for castling rights,
+  // since all states derived from the same game will have the same initial rook
+  // squares).
+  bool can_castle_before = MaybeCastlingRookSquare(side, direction).has_value();
+  zobrist_hash_ ^=
+      kZobristValues[ToInt(side)][ToInt(direction)][can_castle_before];
 
   // Then add the new value.
-  zobrist_hash_ ^= kZobristValues[ToInt(side)][ToInt(direction)][can_castle];
+  bool can_castle_now = maybe_rook_square.has_value();
+  zobrist_hash_ ^=
+      kZobristValues[ToInt(side)][ToInt(direction)][can_castle_now];
   switch (direction) {
     case CastlingDirection::kLeft:
-      castling_rights_[ToInt(side)].left_castle = can_castle;
+      castling_rights_[ToInt(side)].left_castle = maybe_rook_square;
       break;
     case CastlingDirection::kRight:
-      castling_rights_[ToInt(side)].right_castle = can_castle;
+      castling_rights_[ToInt(side)].right_castle = maybe_rook_square;
       break;
+  }
+}
+
+Square ChessBoard::FindRookForCastling(Color color,
+                                       CastlingDirection dir) const {
+  Square my_king = find(Piece{color, PieceType::kKing});
+  Piece rook_to_find{color, PieceType::kRook};
+  int canonical_x = dir == CastlingDirection::kLeft ? 0 : (board_size_ - 1);
+  Square canonical_sq = Square{static_cast<int8_t>(canonical_x), my_king.y};
+  if (board_[SquareToIndex_(canonical_sq)] == rook_to_find) {
+    return canonical_sq;
+  } else {
+    // Find all rooks.
+    int x_offset = dir == CastlingDirection::kLeft ? -1 : 1;
+    int x = my_king.x + x_offset;
+    std::set<Square> rooks;
+    while (x < board_size_ && x >= 0) {
+      auto sq = Square{static_cast<int8_t>(x), my_king.y};
+      auto index = SquareToIndex_(sq);
+      if (board_[index] == rook_to_find) {
+        rooks.insert(sq);
+      }
+      x += x_offset;
+    }
+    // Failing here means the FEN is either from chess960 or malformed (the FEN
+    // says we have castling rights, but there is no rook on the canonical
+    // square, and more than one rook in the castling direction). This provides
+    // partial support for chess960, but not for loading a mid-game chess960
+    // position where two rooks ended up on the same side, while there's still
+    // castling right on that side (we can't determine which rook to castle
+    // with then). Solving this will require implementing a chess960-specific
+    // FEN format.
+    SPIEL_CHECK_EQ(rooks.size(), 1);
+    return *rooks.begin();
   }
 }
 

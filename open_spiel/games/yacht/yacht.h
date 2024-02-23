@@ -15,37 +15,86 @@
 #ifndef OPEN_SPIEL_GAMES_YACHT_H_
 #define OPEN_SPIEL_GAMES_YACHT_H_
 
-#include <array>
 #include <memory>
-#include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace yacht {
 
 inline constexpr const int kNumPlayers = 2;
-inline constexpr const int kNumChanceOutcomes = 21;
+inline constexpr const int kNumChanceOutcomes = 6;
 inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
-inline constexpr const int kPassPos = -1;
-
-// TODO: look into whether these can be set to 25 and -2 to avoid having a
-// separate helper function (PositionToStringHumanReadable) to convert moves
-// to strings.
-inline constexpr const int kBarPos = 100;
-inline constexpr const int kScorePos = 101;
+inline constexpr const int kMinUtility = -1;
+inline constexpr const int kMaxUtility = 1;
+inline constexpr const int kPlayerId1 = 1;
+inline constexpr const int kPlayerId2 = 2;
 
 inline constexpr const int kNumDistinctActions = 1;
 
-// See ObservationTensorShape for details.
-inline constexpr const int kBoardEncodingSize = 4 * kNumPoints * kNumPlayers;
-inline constexpr const int kStateEncodingSize =
-    3 * kNumPlayers + kBoardEncodingSize + 2;
-
 class YachtGame;
+
+enum CategoryValue { empty, scratched, filled };
+
+class ScoringSheet {
+ public:
+  CategoryValue ones = empty;
+  CategoryValue twos = empty;
+  CategoryValue threes = empty;
+  CategoryValue fours = empty;
+  CategoryValue fives = empty;
+  CategoryValue sixes = empty;
+  CategoryValue full_house = empty;
+  CategoryValue four_of_a_kind = empty;
+  CategoryValue little_straight = empty;
+  CategoryValue big_straight = empty;
+  CategoryValue choice = empty;
+  CategoryValue yacht = empty;
+};
+
+// Possible Actions:
+
+// 0: done choosing dice to reroll
+constexpr int kPass = 0;
+
+// 1: choose die 1 to be rerolled
+// 2: choose die 2 to be rerolled
+// 3: choose die 3 to be rerolled
+// 4: choose die 4 to be rerolled
+// 5: choose die 5 to be rerolled
+
+constexpr int kFillOnes = 6;
+constexpr int kFillTwos = 7;
+constexpr int kFillThrees = 8;
+constexpr int kFillFours = 9;
+constexpr int kFillFives = 10;
+constexpr int kFillSixes = 11;
+constexpr int kFillFullHouse = 12;
+constexpr int kFillFourOfAKind = 13;
+constexpr int kFillLittleStraight = 14;
+constexpr int kFillBigStraight = 15;
+constexpr int kFillChoice = 16;
+constexpr int kFillYacht = 17;
+
+constexpr int kScratchOnes = 18;
+constexpr int kScratchTwos = 19;
+constexpr int kScratchThrees = 20;
+constexpr int kScratchFours = 21;
+constexpr int kScratchFives = 22;
+constexpr int kScratchSixes = 23;
+constexpr int kScratchFullHouse = 24;
+constexpr int kScratchFourOfAKind = 25;
+constexpr int kScratchLittleStraight = 26;
+constexpr int kScratchBigStraight = 27;
+constexpr int kScratchChoice = 28;
+constexpr int kScratchYacht = 29;
 
 class YachtState : public State {
  public:
@@ -53,7 +102,6 @@ class YachtState : public State {
   YachtState(std::shared_ptr<const Game>);
 
   Player CurrentPlayer() const override;
-  void UndoAction(Player player, Action action) override;
   std::vector<Action> LegalActions() const override;
   std::string ActionToString(Player player, Action move_id) const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
@@ -61,52 +109,55 @@ class YachtState : public State {
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string ObservationString(Player player) const override;
-  void ObservationTensor(Player player,
-                         absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override;
 
   // Setter function used for debugging and tests. Note: this does not set the
   // historical information properly, so Undo likely will not work on states
   // set this way!
   void SetState(int cur_player, const std::vector<int>& dice,
+                const std::vector<bool>& dice_to_reroll,
                 const std::vector<int>& scores,
-                const std::vector<std::vector<int>>& board);
+                const std::vector<ScoringSheet>& scoring_sheets);
 
   // Returns the opponent of the specified player.
   int Opponent(int player) const;
 
-  // Count the total number of checkers for this player (on the board, in the
-  // bar, and have borne off). Should be 15 for the standard game.
-  int CountTotalCheckers(int player) const;
-
   // Accessor functions for some of the specific data.
   int player_turns() const { return turns_; }
   int score(int player) const { return scores_[player]; }
+  ScoringSheet scoring_sheet(int player) const {
+    return scoring_sheets_[player];
+  }
   int dice(int i) const { return dice_[i]; }
+
+  void ApplyNormalAction(Action move, int player);
 
  protected:
   void DoApplyAction(Action move_id) override;
 
  private:
-  void SetupInitialBoard();
-  void RollDice(int outcome);
+  void RollDie(int outcome);
+  void IncrementTurn();
   bool IsPosInHome(int player, int pos) const;
   bool UsableDiceOutcome(int outcome) const;
-  int NumOppCheckers(int player, int pos) const;
+  std::string ScoringSheetToString(const ScoringSheet& scoring_sheet) const;
   std::string DiceToString(int outcome) const;
   int DiceValue(int i) const;
-  int HighestUsableDiceOutcome() const;
-  Action EncodedPassMove() const;
-  Action EncodedBarMove() const;
 
   Player cur_player_;
   Player prev_player_;
   int turns_;
-  int x_turns_;
-  int o_turns_;
-  std::vector<int> dice_;    // Current dice.
-  std::vector<int> scores_;  // Checkers returned home by each player.
-  std::vector<std::vector<int>> board_;  // Checkers for each player on points.
+  int player1_turns_;
+  int player2_turns_;
+  std::vector<int> dice_;  // Current dice.
+
+  // Dice chosen to reroll. Where index i represents if that die will be
+  // rerolled, false not rerolled, true will be rerolled.
+  std::vector<bool> dice_to_reroll_ = {false, false, false,
+                                       false, false, false};
+
+  std::vector<int> scores_;                   // Score for each player.
+  std::vector<ScoringSheet> scoring_sheets_;  // Scoring sheet for each player.
 };
 
 class YachtGame : public Game {
@@ -119,9 +170,9 @@ class YachtGame : public Game {
     return std::unique_ptr<State>(new YachtState(shared_from_this()));
   }
 
-  // On the first turn there are 30 outcomes: 15 for each player (rolls without
-  // the doubles).
-  int MaxChanceOutcomes() const override { return 30; }
+  // Model multiple dice rolls as a sequence of chance outcomes, so max
+  // chance outcomes is ways 6.
+  int MaxChanceOutcomes() const override { return kNumChanceOutcomes; }
 
   // There is arbitrarily chosen number to ensure the game is finite.
   int MaxGameLength() const override { return 1000; }
@@ -131,9 +182,9 @@ class YachtGame : public Game {
   int MaxChanceNodesInHistory() const override { return MaxGameLength() + 1; }
 
   int NumPlayers() const override { return 2; }
-  double MinUtility() const override { return -MaxUtility(); }
+  double MinUtility() const override { return kMinUtility; }
   absl::optional<double> UtilitySum() const override { return 0; }
-  double MaxUtility() const override;
+  double MaxUtility() const override { return kMaxUtility; };
 };
 
 }  // namespace yacht

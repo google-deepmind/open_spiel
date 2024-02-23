@@ -73,20 +73,6 @@ inline constexpr int kPublicInfoTensorSize =
     kAuctionTensorSize  // The auction
     - kNumCards         // But not any player's cards
     + kNumPlayers;      // Plus trailing passes
-inline constexpr int kPlayTensorSize =
-    kNumBidLevels              // What the contract is
-    + kNumDenominations        // What trumps are
-    + kNumOtherCalls           // Undoubled / doubled / redoubled
-    + kNumPlayers              // Who declarer is
-    + kNumVulnerabilities      // Vulnerability of the declaring side
-    + kNumCards                // Our remaining cards
-    + kNumCards                // Dummy's remaining cards
-    + kNumPlayers * kNumCards  // Cards played to the previous trick
-    + kNumPlayers * kNumCards  // Cards played to the current trick
-    + kNumTricks               // Number of tricks we have won
-    + kNumTricks;              // Number of tricks they have won
-inline constexpr int kObservationTensorSize =
-    kNumObservationTypes + std::max(kPlayTensorSize, kAuctionTensorSize);
 inline constexpr int kMaxAuctionLength =
     kNumBids * (1 + kNumPlayers * 2) + kNumPlayers;
 inline constexpr Player kFirstPlayer = 0;
@@ -115,7 +101,8 @@ class Trick {
 class BridgeState : public State {
  public:
   BridgeState(std::shared_ptr<const Game> game, bool use_double_dummy_result,
-              bool is_dealer_vulnerable, bool is_non_dealer_vulnerable);
+              bool is_dealer_vulnerable, bool is_non_dealer_vulnerable,
+              int num_tricks);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -193,6 +180,7 @@ class BridgeState : public State {
 
   const bool use_double_dummy_result_;
   const bool is_vulnerable_[kNumPartnerships];
+  const int num_tricks_;
 
   int num_passes_ = 0;  // Number of consecutive passes since the last non-pass.
   int num_declarer_tricks_ = 0;
@@ -219,17 +207,33 @@ class BridgeGame : public Game {
   }
   int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new BridgeState(shared_from_this(), UseDoubleDummyResult(),
-                        IsDealerVulnerable(), IsNonDealerVulnerable()));
+    return std::unique_ptr<State>(new BridgeState(
+        shared_from_this(), UseDoubleDummyResult(), IsDealerVulnerable(),
+        IsNonDealerVulnerable(), NumTricks()));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -kMaxScore; }
   double MaxUtility() const override { return kMaxScore; }
   absl::optional<double> UtilitySum() const override { return 0; }
-  std::vector<int> ObservationTensorShape() const override {
-    return {kObservationTensorSize};
+
+  static int GetPlayTensorSize(int num_tricks) {
+    return kNumBidLevels          // What the contract is
+           + kNumDenominations    // What trumps are
+           + kNumOtherCalls       // Undoubled / doubled / redoubled
+           + kNumPlayers          // Who declarer is
+           + kNumVulnerabilities  // Vulnerability of the declaring side
+           + kNumCards            // Our remaining cards
+           + kNumCards            // Dummy's remaining cards
+           + num_tricks * kNumPlayers * kNumCards  // Number of played tricks
+           + kNumTricks   // Number of tricks we have won
+           + kNumTricks;  // Number of tricks they have won
   }
+
+  std::vector<int> ObservationTensorShape() const override {
+    return {kNumObservationTypes +
+            std::max(GetPlayTensorSize(NumTricks()), kAuctionTensorSize)};
+  }
+
   int MaxGameLength() const override {
     return UseDoubleDummyResult() ? kMaxAuctionLength
                                   : kMaxAuctionLength + kNumCards;
@@ -259,6 +263,7 @@ class BridgeGame : public Game {
   bool IsNonDealerVulnerable() const {
     return ParameterValue<bool>("non_dealer_vul", false);
   }
+  int NumTricks() const { return ParameterValue<int>("num_tricks", 2); }
 };
 
 }  // namespace bridge
