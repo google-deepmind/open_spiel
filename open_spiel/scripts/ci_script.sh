@@ -26,6 +26,13 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
   # Still needed to support using venv on Ubuntu 20.04:
   sudo apt-get install python3.9-venv
+elif [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
+  echo "Linux detected and Python 3.12 requested. Installing Python 3.12 and setting as default."
+  sudo apt-get install python3.12 python3.12-dev
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1
+  sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+  # Still needed to support using venv on Ubuntu 20.04:
+  sudo apt-get install python3.12-venv
 elif [[ "$OS" = "Darwin" ]]; then
   # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
   # install the specific versions we've requested on MacOS.
@@ -44,7 +51,7 @@ source ./open_spiel/scripts/python_extra_deps.sh $PYBIN
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools
 
-if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
+if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" || "$OS_PYTHON_VERSION" = "3.12" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
 else
