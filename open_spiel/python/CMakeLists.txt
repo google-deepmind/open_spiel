@@ -275,7 +275,8 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
-    jax/deep_cfr_jax_test.py
+    # Temporarily disabled: depends on TF and TF doesn't run on Python 3.12.
+    # jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
     jax/opponent_shaping_jax_test.py
@@ -294,7 +295,8 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/deep_cfr_pytorch_test.py
       pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
-      pytorch/policy_gradient_pytorch_test.py
+      # Temporarily disabled: depends on TF and TF doesn't run on Python 3.12.
+      # pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py
       pytorch/neurd_pytorch_test.py
   )

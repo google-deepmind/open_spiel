@@ -12,6 +12,18 @@ jobs:
       matrix:
         include:
         # Most current platform.
+        - os: ubuntu-latest
+          OS_PYTHON_VERSION: "3.12"   # Not 100% supported yet, but seems to work. See below.
+          TRAVIS_USE_NOX: 0
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+          # Disable due to not yet available for Python 3.12
+          # Missing deps: tensorflow, qdldl (needed by cvxpy and osqp) 
+          # Note also some tests in python/CMakeLists.txt disabled for this reason.
+          OPEN_SPIEL_BUILD_WITH_TENSORFLOW: "OFF"
+          OPEN_SPIEL_BUILD_WITH_MISC: "OFF"
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.11"
           TRAVIS_USE_NOX: 0
