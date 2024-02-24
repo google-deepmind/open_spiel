@@ -20,7 +20,8 @@ jobs:
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
           # Disable due to not yet available for Python 3.12
-          # Missing deps: tensorflow, qdldl (needed by cvxpy and osqp) 
+          # Still must change versions everything in python_extra_deps.sh
+          # Missing deps: qdldl (needed by cvxpy and osqp) 
           # Note also some tests in python/CMakeLists.txt disabled for this reason.
           OPEN_SPIEL_BUILD_WITH_TENSORFLOW: "OFF"
           OPEN_SPIEL_BUILD_WITH_MISC: "OFF"
