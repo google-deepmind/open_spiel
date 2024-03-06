@@ -109,6 +109,9 @@ void LoadKuhnLimitWithAndWithoutGameDef() {
                  kuhn_limit_3p.GetACPCGame()->ToString());
   SPIEL_CHECK_TRUE((*(kuhn_limit_3p_gamedef.GetACPCGame())) ==
                    (*(kuhn_limit_3p.GetACPCGame())));
+
+  // (Note: later we'll be removing the prior/above way of using ACPC gamedef)
+  LoadUniversalPokerGameFromACPCGamedef(std::string(kKuhnLimit3P));
 }
 
 void LoadHoldemNoLimit6PWithAndWithoutGameDef() {
@@ -120,6 +123,9 @@ void LoadHoldemNoLimit6PWithAndWithoutGameDef() {
                  holdem_no_limit_6p.GetACPCGame()->ToString());
   SPIEL_CHECK_TRUE((*(holdem_no_limit_6p_gamedef.GetACPCGame())) ==
                    (*(holdem_no_limit_6p.GetACPCGame())));
+
+  // (Note: later we'll be removing the prior/above way of using ACPC gamedef)
+  LoadUniversalPokerGameFromACPCGamedef(std::string(kHoldemNoLimit6P));
 }
 void LoadGameFromDefaultConfig() { LoadGame("universal_poker"); }
 

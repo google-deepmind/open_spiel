@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <random>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
@@ -26,6 +27,7 @@
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
+#include "open_spiel/games/universal_poker/logic/gamedef.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_globals.h"
@@ -101,78 +103,84 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
 
-    {// The ACPC code uses a specific configuration file to describe the game.
-     // The following has been copied from ACPC documentation:
-     //
-     // Empty lines or lines with '#' as the very first character will be
-     // ignored
-     //
-     // The Game definitions should start with "gamedef" and end with
-     // "end gamedef" and can have the fields documented bellow (case is
-     // ignored)
-     //
-     // If you are creating your own game definitions, please note that game.h
-     // defines some constants for maximums in games (e.g., number of rounds).
-     // These may need to be changed for games outside of the what is being run
-     // for the Annual Computer Poker Competition.
+    {
+        // The ACPC code uses a specific configuration file to describe the
+        // game. We support using them via the
+        // LoadUniversalPokerGameFromACPCGamedef wrapper. The following has been
+        // copied from ACPC documentation:
+        //
+        // Empty lines or lines with '#' as the very first character will be
+        // ignored
+        //
+        // The Game definitions should start with "gamedef" and end with
+        // "end gamedef" and can have the fields documented bellow (case is
+        // ignored)
+        //
+        // If you are creating your own game definitions, please note that
+        // game.h defines some constants for maximums in games (e.g., number of
+        // rounds). These may need to be changed for games outside of the what
+        // is being run for the Annual Computer Poker Competition.
 
-     // The ACPC gamedef string.  When present, it will take precedence over
-     // everything and no other argument should be provided.
-     {"gamedef", GameParameter(std::string(""))},
-     // Instead of a single gamedef, specifying each line is also possible.
-     // The documentation is adapted from project_acpc_server/game.cc.
-     //
-     // Number of Players (up to 10)
-     {"numPlayers", GameParameter(2)},
-     // Betting Type "limit" "nolimit"
-     {"betting", GameParameter(std::string("nolimit"))},
-     // The stack size for each player at the start of each hand (for
-     // no-limit). It will be ignored on "limit".
-     // TODO(author2): It's unclear what happens on limit. It defaults to
-     // INT32_MAX for all players when not provided.
-     {"stack", GameParameter(std::string("1200 1200"))},
-     // The size of the blinds for each player (relative to the dealer)
-     {"blind", GameParameter(std::string("100 100"))},
-     // The size of raises on each round (for limit games only) as numrounds
-     // integers. It will be ignored for nolimit games.
-     {"raiseSize", GameParameter(std::string("100 100"))},
-     // Number of betting rounds per hand of the game
-     {"numRounds", GameParameter(2)},
-     // The player that acts first (relative to the dealer) on each round
-     {"firstPlayer", GameParameter(std::string("1 1"))},
-     // maxraises - the maximum number of raises on each round. If not
-     // specified, it will default to UINT8_MAX.
-     {"maxRaises", GameParameter(std::string(""))},
-     // The number of different suits in the deck
-     {"numSuits", GameParameter(4)},
-     // The number of different ranks in the deck
-     {"numRanks", GameParameter(6)},
-     // The number of private cards to  deal to each player
-     {"numHoleCards", GameParameter(1)},
-     // The number of cards revealed on each round
-     {"numBoardCards", GameParameter(std::string("0 1"))},
-     // Specify which actions are available to the player, in both limit and
-     // nolimit games. Available options are: "fc" for fold and check/call.
-     // "fcpa" for fold, check/call, bet pot and all in (default).
-     // Use "fullgame" for the unabstracted game.
-     {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+        // TODO: remove / use LoadUniversalPokerGameFromACPCGamedef
+        {"gamedef", GameParameter(std::string(""))},
 
-     // ------------------------------------------------------------------------
-     // Following parameters are used to specify specific subgame.
-     {"potSize", GameParameter(0)},
-     // Board cards that have been revealed. Must be in the format
-     // of logic::CardSet -- kSuitChars, kRankChars
-     {"boardCards", GameParameter("")},
-     // A space separated list of reach probabilities for each player in a
-     // subgame. When there are in total N cards in the deck, two players,
-     // and each player gets 2 cards, there should be:
-     //
-     //   N*(N-1) / 2                     * 2                 = N*(N-1)
-     //           ^ ignore card order     ^ number of players
-     //
-     // N*(N-1) reach probabilities.
-     // Currently supported only for the setting of 2 players, 4 suits, 13 cards
-     {"handReaches", GameParameter("")},
+        // Note: you may either use the LoadUniversalPokerGameFromACPCGamedef
+        // wrapper or just specify each game state input directly yourself.
+        //
+        // The documentation below is adapted from project_acpc_server/game.cc.
+        //
+        // Number of Players (up to 10)
+        {"numPlayers", GameParameter(2)},
+        // Betting Type "limit" "nolimit"
+        {"betting", GameParameter(std::string("nolimit"))},
+        // The stack size for each player at the start of each hand (for
+        // no-limit). It will be ignored on "limit".
+        // TODO(author2): It's unclear what happens on limit. It defaults to
+        // INT32_MAX for all players when not provided.
+        {"stack", GameParameter(std::string("1200 1200"))},
+        // The size of the blinds for each player (relative to the dealer)
+        {"blind", GameParameter(std::string("100 100"))},
+        // The size of raises on each round (for limit games only) as numrounds
+        // integers. It will be ignored for nolimit games.
+        {"raiseSize", GameParameter(std::string("100 100"))},
+        // Number of betting rounds per hand of the game
+        {"numRounds", GameParameter(2)},
+        // The player that acts first (relative to the dealer) on each round
+        {"firstPlayer", GameParameter(std::string("1 1"))},
+        // maxraises - the maximum number of raises on each round. If not
+        // specified, it will default to UINT8_MAX.
+        {"maxRaises", GameParameter(std::string(""))},
+        // The number of different suits in the deck
+        {"numSuits", GameParameter(4)},
+        // The number of different ranks in the deck
+        {"numRanks", GameParameter(6)},
+        // The number of private cards to  deal to each player
+        {"numHoleCards", GameParameter(1)},
+        // The number of cards revealed on each round
+        {"numBoardCards", GameParameter(std::string("0 1"))},
+        // Specify which actions are available to the player, in both limit and
+        // nolimit games. Available options are: "fc" for fold and check/call.
+        // "fcpa" for fold, check/call, bet pot and all in (default).
+        // Use "fullgame" for the unabstracted game.
+        {"bettingAbstraction", GameParameter(std::string("fcpa"))},
+
+        // ------------------------------------------------------------------------
+        // Following parameters are used to specify specific subgame.
+        {"potSize", GameParameter(0)},
+        // Board cards that have been revealed. Must be in the format
+        // of logic::CardSet -- kSuitChars, kRankChars
+        {"boardCards", GameParameter("")},
+        // A space separated list of reach probabilities for each player in a
+        // subgame. When there are in total N cards in the deck, two players,
+        // and each player gets 2 cards, there should be:
+        //
+        //   N*(N-1) / 2                     * 2                 = N*(N-1)
+        //           ^ ignore card order     ^ number of players
+        //
+        // N*(N-1) reach probabilities.
+        // Currently supported only for the setting of 2 players, 4 suits, 13
+        // cards
+        {"handReaches", GameParameter("")},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters &params) {
@@ -1358,8 +1366,12 @@ open_spiel::Action ACPCActionToOpenSpielAction(
   return kInvalidAction;
 }
 
-std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937& rng,
-                                              int pot_size,
+std::shared_ptr<const Game> LoadUniversalPokerGameFromACPCGamedef(
+    const std::string &acpc_gamedef) {
+  return LoadGame(logic::GamedefToOpenSpielParameters(acpc_gamedef));
+}
+
+std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937 &rng, int pot_size,
                                               std::string board_cards,
                                               std::vector<double> hand_reach) {
   constexpr const char* base_game =
@@ -1421,7 +1433,6 @@ std::shared_ptr<const Game> MakeRandomSubgame(std::mt19937& rng,
   std::string reach = absl::StrJoin(hand_reach.begin(), hand_reach.end(), " ");
   return LoadGame(absl::StrFormat(base_game, pot_size, board_cards, reach));
 }
-
 
 std::ostream &operator<<(std::ostream &os, const BettingAbstraction &betting) {
   os << BettingAbstractionToString(betting);
