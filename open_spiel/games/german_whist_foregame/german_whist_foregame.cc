@@ -428,7 +428,8 @@ std::string GWhistFState::StateToString() const {
     return out;
 }
 std::string GWhistFState::InformationStateString(Player player) const{
-    //THIS IS WHAT A PLAYER IS SHOWN WHEN PLAYING//
+    // THIS IS WHAT A PLAYER IS SHOWN WHEN PLAYING//
+    SPIEL_CHECK_TRUE(player >= 0 && player < 2);
     std::string p = std::to_string(player)+",";
     std::string cur_hand = "";
     std::string observations="";
@@ -555,6 +556,7 @@ std::unique_ptr<State> GWhistFState::ResampleFromInfostate(int player_id,std::fu
     }
 std::string GWhistFState::ObservationString(Player player) const {
     //note this is a lie, this is not the observation state string but it is used for ISMCTS to label nodes//
+    SPIEL_CHECK_TRUE(player >= 0 && player < 2);
     std::string p = "p"+std::to_string(player)+",";
     std::string cur_hand="";
     std::string public_info = "";

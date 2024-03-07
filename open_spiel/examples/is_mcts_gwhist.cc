@@ -27,14 +27,14 @@ namespace {
 
 constexpr const int kSeed = 9492110;//93879211;
 
-void PlayGWhist(int human_player, std::mt19937* rng) {
+void PlayGWhist(int human_player, std::mt19937* rng,int num_rollouts) {
   std::shared_ptr<const Game> game = LoadGame("german_whist_foregame");
   std::random_device rd;
   int eval_seed = rd();
   int bot_seed = rd();
   auto evaluator = std::make_shared<algorithms::RandomRolloutEvaluator>(1, eval_seed);
   auto bot = std::make_unique<algorithms::ISMCTSBot>(
-        bot_seed, evaluator, 0.7, 500000, algorithms::kUnlimitedNumWorldSamples,
+        bot_seed, evaluator, 0.7*13, num_rollouts, algorithms::kUnlimitedNumWorldSamples,
         algorithms::ISMCTSFinalPolicyType::kMaxVisitCount,true, false);
   std::unique_ptr<State> state = game->NewInitialState();
   while (!state->IsTerminal()) {
@@ -77,5 +77,13 @@ void PlayGWhist(int human_player, std::mt19937* rng) {
 int main(int argc, char** argv) {
     std::random_device rd;
     std::mt19937 rng(rd());
-    open_spiel::PlayGWhist(0,&rng);
+    int human_player;
+    int num_rollouts;
+    std::cout<<"human_player:";
+    std::cin>>human_player;
+    std::cout<<"\n";
+    std::cout<<"num_rollouts:";
+    std::cin>>num_rollouts;
+    std::cout<<"\n";
+    open_spiel::PlayGWhist(human_player,&rng,num_rollouts);
 }

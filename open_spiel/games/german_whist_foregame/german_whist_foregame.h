@@ -15,8 +15,8 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-//The imperfect information part of 2 player whist variant
-//https://en.wikipedia.org/wiki/German_Whist
+// The imperfect information part of 2 player whist variant
+// https://en.wikipedia.org/wiki/German_Whist
 
 namespace open_spiel {
 namespace german_whist_foregame {
@@ -31,9 +31,9 @@ inline constexpr int kNumSuits = 4;
 inline constexpr char kRankChar[] = "AKQJT98765432";
 inline constexpr char kSuitChar[] = "CDHS";
 
-extern std::string kTTablePath ;
+extern std::string kTTablePath;
 
-//Reimplementing bmi2 intrinsics with bit operations that will work on all platforms//
+// Reimplementing bmi2 intrinsics with bit operations that will work on all platforms//
 uint32_t tzcnt_u32(uint32_t a);
 uint64_t tzcnt_u64(uint64_t a);
 uint32_t bzhi_u32(uint32_t a,uint32_t b);
@@ -44,6 +44,8 @@ uint32_t popcnt_u32(uint32_t a);
 uint64_t popcnt_u64(uint64_t a);
 uint64_t pext_u64(uint64_t a,uint64_t b);
 
+//containers of cards are 64 bits,with the least significant 52bits being the suits CDHS,with the least sig bit of each suit being the highest rank card//
+//this container of masks is used to extract only the cards from a suit//
 inline const std::array<uint64_t, 4> kSuitMasks = { bzhi_u64(~0,kNumRanks),bzhi_u64(~0,2 * kNumRanks) ^ bzhi_u64(~0,kNumRanks),bzhi_u64(~0,3 * kNumRanks) ^ bzhi_u64(~0,2 * kNumRanks),bzhi_u64(~0,4 * kNumRanks) ^ bzhi_u64(~0,3 * kNumRanks) };
 
 
@@ -56,7 +58,7 @@ struct Triple{
 std::vector<uint32_t> GenQuads(int size_endgames);
 std::vector<std::vector<uint32_t>> BinCoeffs(uint32_t max_n);
 uint32_t HalfColexer(uint32_t cards,const std::vector<std::vector<uint32_t>>* bin_coeffs);
-void GenSuitRankingsRel(uint32_t size, std::unordered_map<uint32_t,uint32_t>* Ranks);
+void GenSuitRankingsRel(uint32_t size,std::unordered_map<uint32_t,uint32_t>* Ranks);
 class vectorNa{
 private:
     std::vector<char> data;
@@ -93,7 +95,7 @@ public:
     std::vector<std::vector<uint32_t>>bin_coeffs_;
 private:
     // Number of players.
-    int num_players_=2;
+    int num_players_ = 2;
 };
 class GWhistFState : public State {
 public:
@@ -110,7 +112,7 @@ public:
     std::string InformationStateString(Player player) const override;
     std::string ObservationString(Player player) const override;
     std::unique_ptr<State> ResampleFromInfostate(int player_id,std::function<double()> rng) const override;
-    std::string StateToString() const ;
+    std::string StateToString() const;
     uint64_t EndgameKey(int player_to_move) const;
 protected:
     void DoApplyAction(Action move) override;
@@ -125,8 +127,8 @@ private:
     int trump_;
     bool Trick(int lead,int follow) const;
 };
-}//g_whist_foregame
-}//open_spiel
+}// namespace german_whist_foregame
+}// namespace open_spiel
 
 
 #endif OPEN_SPIEL_GAMES_GERMAN_WHIST_FOREGAME_H
