@@ -76,8 +76,8 @@ public:
     char Get(size_t i,size_t j) const;
     void Set(size_t i,size_t j,char value);
 };
-vectorNa InitialiseTTable(int size,std::vector<std::vector<uint32_t>>& bin_coeffs);
-vectorNa LoadTTable(const std::string filename,int depth,std::vector<std::vector<uint32_t>>& bin_coeffs);
+vectorNa InitialiseTTable(int size,const std::vector<std::vector<uint32_t>>& bin_coeffs);
+vectorNa LoadTTable(const std::string filename,int depth,const std::vector<std::vector<uint32_t>>& bin_coeffs);
 class GWhistFGame : public Game {
 public:
     explicit GWhistFGame(const GameParameters& params);
