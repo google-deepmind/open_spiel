@@ -421,8 +421,8 @@ bool NextColex(std::vector<int>& v, int k) {
 }
 
 char IncrementalAlphaBetaMemoryIso(
-    Node* node, char alpha, char beta, int depth, vectorNa* TTable,
-    std::unordered_map<uint32_t, uint32_t>* SuitRanks,
+    Node* node, char alpha, char beta, int depth, const vectorNa* TTable,
+    const std::unordered_map<uint32_t, uint32_t>* SuitRanks,
     const std::vector<std::vector<uint32_t>>& bin_coeffs) {
   // fail soft ab search
   char val = 0;
@@ -536,7 +536,7 @@ std::vector<Node> GWhistGenerator(int num, unsigned int seed) {
   return out;
 }
 
-void ThreadSolver(int size_endgames, vectorNa* outTTable, vectorNa* TTable,
+void ThreadSolver(int size_endgames, vectorNa* outTTable, const vectorNa* TTable,
                   const std::vector<std::vector<uint32_t>>& bin_coeffs,
                   const std::vector<uint32_t>& suit_splits,
                   const std::unordered_map<uint32_t, uint32_t>& SuitRanks,
