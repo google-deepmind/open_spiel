@@ -8,43 +8,43 @@
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
 
-//define BMI2 only if your system supports BMI2 intrinsics, modify compiler flags so that bmi2 instructions are compiled//
-//#define __BMI2__
+// define BMI2 only if your system supports BMI2 intrinsics, modify compiler flags so that bmi2 instructions are compiled//
+// #define __BMI2__
 #ifdef __BMI2__
 #include <x86intrin.h>
 #endif
 namespace open_spiel {
 namespace german_whist_foregame {
 
-//set this to the path you expect TTable to be once you have made it so recompilation is not necessary//
+// set this to the path you expect TTable to be once you have made it so recompilation is not necessary//
 std::string kTTablePath="";
 
-uint32_t tzcnt_u32(uint32_t a){
+uint32_t tzcnt_u32(uint32_t a) {
     return __builtin_ctz(a);
 }
-uint64_t tzcnt_u64(uint64_t a){
+uint64_t tzcnt_u64(uint64_t a) {
     return __builtin_ctzll(a);
 }
-uint32_t bzhi_u32(uint32_t a,uint32_t b){
+uint32_t bzhi_u32(uint32_t a,uint32_t b) {
     return a&((1u<<b)-1);
 }
-uint64_t bzhi_u64(uint64_t a,uint64_t b){
+uint64_t bzhi_u64(uint64_t a,uint64_t b) {
     return a&((1ULL<<b)-1);
 }
-uint32_t blsr_u32(uint32_t a){
+uint32_t blsr_u32(uint32_t a) {
     return(a-1)&a;
 }
-uint64_t blsr_u64(uint64_t a){
+uint64_t blsr_u64(uint64_t a) {
     return (a-1)&a;
 }
-uint32_t popcnt_u32(uint32_t a){
+uint32_t popcnt_u32(uint32_t a) {
     return __builtin_popcount(a);
 }
-uint64_t popcnt_u64(uint64_t a){
+uint64_t popcnt_u64(uint64_t a) {
     return __builtin_popcountll(a);
 }
 //the pext bithack is a lot slower than the bmi2 intrinsic, and even with bmi2 support enabled this will not compile down to a pext instruction//
-uint64_t pext_u64(uint64_t x,uint64_t m){
+uint64_t pext_u64(uint64_t x,uint64_t m) {
 #ifdef __BMI2__
     return _pext_u64(x,m);
 #endif
@@ -52,7 +52,7 @@ uint64_t pext_u64(uint64_t x,uint64_t m){
     uint64_t r = 0;
     uint64_t s = 0;
     uint64_t b = 0;
-    do{
+    do {
         b =m&1;
         r = r|((x&b)<<s);
         s = s+b;
@@ -63,7 +63,7 @@ uint64_t pext_u64(uint64_t x,uint64_t m){
 #endif
 }
 
-bool Triple::operator<(const Triple& triple)const{
+bool Triple::operator<(const Triple& triple)const {
     return (length < triple.length)|| (length == triple.length && sig < triple.sig);
 }
 
@@ -87,7 +87,7 @@ std::string CardString(int card) {
 }
 
 std::vector<uint32_t> GenQuads(int size_endgames) {
-    //Generates Suit splittings for endgames of a certain size//
+    // Generates Suit splittings for endgames of a certain size//
     std::vector<uint32_t> v;
     for (char i = 0; i <= std::min(size_endgames * 2, kNumRanks); ++i) {
         int sum = size_endgames * 2 - i;
@@ -147,35 +147,35 @@ void GenSuitRankingsRel(uint32_t size, std::unordered_map<uint32_t, uint32_t>* R
     }
 }
 
-vectorNa::vectorNa(size_t card_combs,size_t suit_splits,char val){
+vectorNa::vectorNa(size_t card_combs,size_t suit_splits,char val) {
     data=std::vector<char>(card_combs*((suit_splits>>1)+1),val);
     inner_size =(suit_splits>>1)+1;
     outer_size = card_combs;
 }
-vectorNa::vectorNa(){
+vectorNa::vectorNa() {
     data={};
     inner_size=0;
     outer_size=0;
 }
-size_t vectorNa::size() const{
+size_t vectorNa::size() const {
     return data.size();
 }
-size_t vectorNa::GetInnerSize()const{
+size_t vectorNa::GetInnerSize() const {
     return inner_size;
 }
-size_t vectorNa::GetOuterSize()const{
+size_t vectorNa::GetOuterSize() const {
     return outer_size;
 }
-char const& vectorNa::operator[](size_t index) const{
+char const& vectorNa::operator[](size_t index) const {
     return data[index];
 }
-char vectorNa::GetChar(size_t i,size_t j)const{
+char vectorNa::GetChar(size_t i,size_t j) const {
     return data[i*inner_size+j];
 }
 void vectorNa::SetChar(size_t i,size_t j,char value){
     data[i*inner_size+j]=value;
 }
-char vectorNa::Get(size_t i,size_t j) const{
+char vectorNa::Get(size_t i,size_t j) const {
     int remainder = j&0b1;
     if(remainder==0){
         return 0b1111&data[i*inner_size+(j>>1)];
@@ -184,7 +184,7 @@ char vectorNa::Get(size_t i,size_t j) const{
         return ((0b11110000&data[i*inner_size+(j>>1)])>>4);
     }
 }
-void vectorNa::Set(size_t i,size_t j,char value){
+void vectorNa::Set(size_t i,size_t j,char value) {
     int remainder = j & 0b1;
     if (remainder == 0) {
         char datastore = 0b11110000 & data[i*inner_size+(j>>1)];
@@ -200,21 +200,21 @@ vectorNa InitialiseTTable(int size,std::vector<std::vector<uint32_t>>& bin_coeff
     size_t suit_size = GenQuads(size).size();
     return vectorNa(bin_coeffs[2 * size][size],suit_size, 0);
 }
-vectorNa LoadTTable(const std::string filename, int depth,std::vector<std::vector<uint32_t>>& bin_coeffs){
+vectorNa LoadTTable(const std::string filename, int depth,std::vector<std::vector<uint32_t>>& bin_coeffs) {
     //loads solution from a text file into a vector for use//
     std::cout<<"Loading Tablebase"<<"\n";
     vectorNa v = InitialiseTTable(depth,bin_coeffs);
     std::ifstream file(filename,std::ios::binary);
-    if(!file.is_open()){
+    if (!file.is_open()) {
         std::cout<<"Failed to load Tablebase"<<"\n";
         std::cout<<"Tablebase will be set to all 0"<<"\n";
         file.close();
         return v;
     }
-    else{
+    else {
         char c;
-        for(int i =0;i<v.GetOuterSize();++i){
-            for(int j =0;j<v.GetInnerSize();++j){
+        for (int i =0;i<v.GetOuterSize();++i) {
+            for (int j =0;j<v.GetInnerSize();++j) {
                 file.get(c);
                 v.SetChar(i,j,c);
             }
@@ -251,7 +251,7 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 }//namespace
 
-GWhistFGame::GWhistFGame(const GameParameters& params):Game(kGameType, params){
+GWhistFGame::GWhistFGame(const GameParameters& params):Game(kGameType, params) {
     bin_coeffs_=BinCoeffs(2*kNumRanks);
     std::unordered_map<uint32_t,uint32_t> temp;
     GenSuitRankingsRel(13,&temp);
@@ -286,7 +286,7 @@ bool GWhistFState::Trick(int lead, int follow) const {
 bool GWhistFState::IsTerminal() const {
     return(popcnt_u64(deck_) == 0);
 }
-uint64_t GWhistFState::EndgameKey(int player_to_move) const{
+uint64_t GWhistFState::EndgameKey(int player_to_move) const {
     //generates a 64 bit unsigned int where the first 32 are the suit ownerships from the perspective of the opponent using canonical rankings//
     //example: if Spade suit is to_move = A3, opp =2, suit = 0b100
     //least significant part of first 32 bits is the trump suit, then the remaining suits ascending length order.
@@ -294,8 +294,8 @@ uint64_t GWhistFState::EndgameKey(int player_to_move) const{
     std::vector<Triple> suit_lengths = {};
     int opp = (player_to_move==0)?1:0;
     //sort trump suits by length,then sig//
-    for(int i =0;i<kNumSuits;++i){
-        if(i!=trump_){
+    for (int i =0;i<kNumSuits;++i) {
+        if (i!=trump_) {
             uint64_t sig = pext_u64(hands_[opp]&kSuitMasks[i],cards_in_play&kSuitMasks[i]);
             suit_lengths.push_back(Triple{i,popcnt_u64(kSuitMasks[i]&cards_in_play),sig});
         }
@@ -305,18 +305,18 @@ uint64_t GWhistFState::EndgameKey(int player_to_move) const{
     std::array<uint64_t,kNumSuits> hand1;
     hand0[0]=pext_u64(hands_[0],kSuitMasks[trump_]);
     hand1[0]=pext_u64(hands_[1],kSuitMasks[trump_]);
-    for(int i =0;i<kNumSuits-1;++i){
+    for (int i =0;i<kNumSuits-1;++i) {
         hand0[i+1]=pext_u64(hands_[0],kSuitMasks[suit_lengths[i].index]);
         hand1[i+1]=pext_u64(hands_[1],kSuitMasks[suit_lengths[i].index]);
     }
     std::array<uint64_t,2>hands_shuffled = {0,0};
-    for(int i =0;i<kNumSuits;++i){
+    for (int i =0;i<kNumSuits;++i) {
         hands_shuffled[0]=hands_shuffled[0]|(hand0[i]<<(kNumRanks*i));
         hands_shuffled[1]=hands_shuffled[1]|(hand1[i]<<(kNumRanks*i));
     }
     uint64_t suit_sig =0;
     suit_sig = popcnt_u64(kSuitMasks[trump_]&cards_in_play);
-    for(int i =0;i<kNumSuits-1;++i){
+    for (int i =0;i<kNumSuits-1;++i) {
         suit_sig = suit_sig|((uint64_t)suit_lengths[i].length << (4*(i+1)));
     }
     suit_sig = (suit_sig<<32);
@@ -325,8 +325,8 @@ uint64_t GWhistFState::EndgameKey(int player_to_move) const{
     uint64_t key = cards|suit_sig;
     return key;
 }
-std::vector<double> GWhistFState::Returns() const{
-    if(IsTerminal()){
+std::vector<double> GWhistFState::Returns() const {
+    if (IsTerminal()) {
         std::vector<double> out = {0,0};
         int lead_win = Trick(history_[move_number_ - 3].action, history_[move_number_ - 2].action);
         int player_to_move=(lead_win)?history_[move_number_-3].player:history_[move_number_-2].player;
@@ -341,7 +341,7 @@ std::vector<double> GWhistFState::Returns() const{
         out[opp]=-out[player_to_move];
         return out;
     }
-    else{
+    else {
         std::vector<double> out = {0,0};
         return out;
     }
@@ -353,10 +353,10 @@ int GWhistFState::CurrentPlayer() const { return player_; }
 std::vector<std::pair<Action, double>> GWhistFState::ChanceOutcomes() const {
     std::vector<std::pair<Action, double>> outcomes;
     std::vector<Action> legal_actions = LegalActions();
-    for(int i =0;i<legal_actions.size();++i){
+    for (int i =0;i<legal_actions.size();++i){
         std::pair<Action,double> pair;
         pair.first =legal_actions[i];
-        pair.second = 1/double(legal_actions.size());
+        pair.second = 1.0/legal_actions.size();
         outcomes.push_back(pair);
     }
     return outcomes;
@@ -364,7 +364,7 @@ std::vector<std::pair<Action, double>> GWhistFState::ChanceOutcomes() const {
 std::string GWhistFState::ActionToString(Player player,Action move) const {
     return CardString(move);
 }
-std::string GWhistFState::ToString() const{
+std::string GWhistFState::ToString() const {
     std::string out;
     for (int i = 0; i < history_.size(); ++i) {
         out += ActionToString(history_[i].player, history_[i].action);
@@ -372,7 +372,7 @@ std::string GWhistFState::ToString() const{
     }
     return out;
 }
-std::unique_ptr<State> GWhistFState::Clone() const{
+std::unique_ptr<State> GWhistFState::Clone() const {
     return std::unique_ptr<State>(new GWhistFState(*this));
 }
 
@@ -427,7 +427,7 @@ std::string GWhistFState::StateToString() const {
     }
     return out;
 }
-std::string GWhistFState::InformationStateString(Player player) const{
+std::string GWhistFState::InformationStateString(Player player) const {
     // THIS IS WHAT A PLAYER IS SHOWN WHEN PLAYING//
     SPIEL_CHECK_TRUE(player >= 0 && player < 2);
     std::string p = std::to_string(player)+",";
@@ -435,19 +435,19 @@ std::string GWhistFState::InformationStateString(Player player) const{
     std::string observations="";
     std::vector<int> v_hand = {};
     uint64_t p_hand = hands_[player];
-    while(p_hand!=0){
+    while (p_hand!=0) {
         v_hand.push_back(tzcnt_u64(p_hand));
         p_hand = blsr_u64(p_hand);
     }
     std::sort(v_hand.begin(),v_hand.end());
-    for(int i =0;i<v_hand.size();++i){
+    for (int i =0;i<v_hand.size();++i) {
         cur_hand=cur_hand+CardString(v_hand[i]);
         cur_hand=cur_hand+",";
     }
     cur_hand+="\n";
-    for(int i =2*kNumRanks;i<history_.size();++i){
+    for (int i =2*kNumRanks;i<history_.size();++i) {
         int index =(i-2*kNumRanks)%4;
-        switch(index){
+        switch(index) {
             case 0:
                 observations=observations + "c_public:"+CardString(history_[i].action)+",";
                 break;
@@ -460,10 +460,10 @@ std::string GWhistFState::InformationStateString(Player player) const{
             case 3:
                 int lead_win = Trick(history_[i - 2].action, history_[i - 1].action);
                 int loser = ((lead_win) ^ (history_[i - 2].player == 0)) ? 0 : 1;
-                if(loser==player){
+                if (loser==player) {
                     observations=observations+"c_observed:"+CardString(history_[i].action)+"\n";
                 }
-                else{
+                else {
                     observations=observations+"c_unobserved:"+"\n";
                 }
                 break;
@@ -471,7 +471,7 @@ std::string GWhistFState::InformationStateString(Player player) const{
     }
     return p+cur_hand+observations;
 }
-std::unique_ptr<State> GWhistFState::ResampleFromInfostate(int player_id,std::function<double()> rng) const{
+std::unique_ptr<State> GWhistFState::ResampleFromInfostate(int player_id,std::function<double()> rng) const {
         //only valid when called from a position where a player can act//
         auto resampled_state = std::unique_ptr<GWhistFState>(new GWhistFState(*this));
         //seeding mt19937//
@@ -562,15 +562,15 @@ std::string GWhistFState::ObservationString(Player player) const {
     std::string public_info = "";
     uint64_t p_hand = hands_[player];
     std::vector<int> v_hand = {};
-    while(p_hand!=0){
+    while (p_hand!=0) {
         v_hand.push_back(tzcnt_u64(p_hand));
         p_hand = blsr_u64(p_hand);
     }
     std::sort(v_hand.begin(),v_hand.end());
-    for(int i =0;i<v_hand.size();++i){
+    for (int i =0;i<v_hand.size();++i){
         cur_hand=cur_hand+CardString(v_hand[i])+",";
     }
-    for(int i =2*kNumRanks;i<history_.size();++i){
+    for (int i =2*kNumRanks;i<history_.size();++i){
         int index =(i-2*kNumRanks)%4;
         if(index!=3){
             public_info=public_info + std::to_string(history_[i].player)+":"+CardString(history_[i].action)+",";
@@ -663,7 +663,7 @@ void GWhistFState::DoApplyAction(Action move) {
             lead_win = Trick(history_[move_number_ - 2].action, history_[move_number_ - 1].action);
             loser = ((lead_win) ^ (history_[move_number_ - 2].player == 0)) ? 0 : 1;
             hands_[loser] = (hands_[loser] | ((uint64_t)1 << move));
-            if(IsTerminal()){
+            if (IsTerminal()) {
                 player_=kTerminalPlayerId;
             }
             break;

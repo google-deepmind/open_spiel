@@ -44,8 +44,8 @@ uint32_t popcnt_u32(uint32_t a);
 uint64_t popcnt_u64(uint64_t a);
 uint64_t pext_u64(uint64_t a,uint64_t b);
 
-//containers of cards are 64 bits,with the least significant 52bits being the suits CDHS,with the least sig bit of each suit being the highest rank card//
-//this container of masks is used to extract only the cards from a suit//
+// containers of cards are 64 bits,with the least significant 52bits being the suits CDHS,with the least sig bit of each suit being the highest rank card//
+// this container of masks is used to extract only the cards from a suit//
 inline const std::array<uint64_t, 4> kSuitMasks = { bzhi_u64(~0,kNumRanks),bzhi_u64(~0,2 * kNumRanks) ^ bzhi_u64(~0,kNumRanks),bzhi_u64(~0,3 * kNumRanks) ^ bzhi_u64(~0,2 * kNumRanks),bzhi_u64(~0,4 * kNumRanks) ^ bzhi_u64(~0,3 * kNumRanks) };
 
 
@@ -88,7 +88,7 @@ public:
     double MinUtility() const override {return -kNumRanks;};
     double MaxUtility() const override {return kNumRanks;};
     absl::optional<double> UtilitySum() const override { return 0; };
-    int MaxGameLength() const override{kNumRanks*(kNumSuits+2);};
+    int MaxGameLength() const override{return kNumRanks*(kNumSuits+2);};
     int MaxChanceNodesInHistory() const override{return kNumRanks*kNumSuits;};
     vectorNa ttable_;
     std::unordered_map<uint32_t,uint32_t> suit_ranks_;

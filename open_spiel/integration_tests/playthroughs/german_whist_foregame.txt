@@ -24,7 +24,7 @@ NumPlayers() = 2
 MinUtility() = -13.0
 MaxUtility() = 13.0
 UtilitySum() = 0.0
-MaxGameLength() = 2129677584
+MaxGameLength() = 78
 ToString() = "german_whist_foregame()"
 
 # State 0
@@ -42,864 +42,864 @@ ChanceOutcomes() = [(0,0.0192308), (1,0.0192308), (2,0.0192308), (3,0.0192308), 
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
 StringLegalActions() = ["CA", "CK", "CQ", "CJ", "CT", "C9", "C8", "C7", "C6", "C5", "C4", "C3", "C2", "DA", "DK", "DQ", "DJ", "DT", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "HA", "HK", "HQ", "HJ", "HT", "H9", "H8", "H7", "H6", "H5", "H4", "H3", "H2", "SA", "SK", "SQ", "SJ", "ST", "S9", "S8", "S7", "S6", "S5", "S4", "S3", "S2"]
 
-# Apply action "C2"
-action: 12
-
-# State 1
-# C2
-IsTerminal() = False
-History() = [12]
-HistoryString() = "12"
-IsChanceNode() = True
-IsSimultaneousNode() = False
-CurrentPlayer() = -1
-InformationStateString(0) = "0,C2,\n"
-InformationStateString(1) = "1,\n"
-ObservationString(0) = "p0,C2,"
-ObservationString(1) = "p1,"
-ChanceOutcomes() = [(0,0.0196078), (1,0.0196078), (2,0.0196078), (3,0.0196078), (4,0.0196078), (5,0.0196078), (6,0.0196078), (7,0.0196078), (8,0.0196078), (9,0.0196078), (10,0.0196078), (11,0.0196078), (13,0.0196078), (14,0.0196078), (15,0.0196078), (16,0.0196078), (17,0.0196078), (18,0.0196078), (19,0.0196078), (20,0.0196078), (21,0.0196078), (22,0.0196078), (23,0.0196078), (24,0.0196078), (25,0.0196078), (26,0.0196078), (27,0.0196078), (28,0.0196078), (29,0.0196078), (30,0.0196078), (31,0.0196078), (32,0.0196078), (33,0.0196078), (34,0.0196078), (35,0.0196078), (36,0.0196078), (37,0.0196078), (38,0.0196078), (39,0.0196078), (40,0.0196078), (41,0.0196078), (42,0.0196078), (43,0.0196078), (44,0.0196078), (45,0.0196078), (46,0.0196078), (47,0.0196078), (48,0.0196078), (49,0.0196078), (50,0.0196078), (51,0.0196078)]
-LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
-StringLegalActions() = ["CA", "CK", "CQ", "CJ", "CT", "C9", "C8", "C7", "C6", "C5", "C4", "C3", "DA", "DK", "DQ", "DJ", "DT", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "HA", "HK", "HQ", "HJ", "HT", "H9", "H8", "H7", "H6", "H5", "H4", "H3", "H2", "SA", "SK", "SQ", "SJ", "ST", "S9", "S8", "S7", "S6", "S5", "S4", "S3", "S2"]
-
-# Apply action "HJ"
-action: 29
-
-# State 2
-# Apply action "CQ"
-action: 2
-
-# State 3
-# Apply action "H9"
-action: 31
-
-# State 4
-# Apply action "C9"
-action: 5
-
-# State 5
-# Apply action "HT"
-action: 30
-
-# State 6
-# Apply action "DQ"
-action: 15
-
-# State 7
 # Apply action "SA"
 action: 39
 
-# State 8
-# Apply action "S3"
-action: 50
-
-# State 9
-# Apply action "CT"
-action: 4
-
-# State 10
-# Apply action "HK"
-action: 27
-
-# State 11
-# Apply action "C5"
-action: 9
-
-# State 12
-# Apply action "HQ"
-action: 28
-
-# State 13
-# Apply action "SK"
-action: 40
-
-# State 14
-# Apply action "D3"
-action: 24
-
-# State 15
-# Apply action "DK"
-action: 14
-
-# State 16
-# Apply action "S8"
-action: 45
-
-# State 17
-# Apply action "D7"
-action: 20
-
-# State 18
-# Apply action "SQ"
-action: 41
-
-# State 19
-# Apply action "DJ"
-action: 16
-
-# State 20
-# Apply action "D9"
-action: 18
-
-# State 21
-# Apply action "D5"
-action: 22
-
-# State 22
-# Apply action "S9"
-action: 44
-
-# State 23
-# Apply action "C7"
-action: 7
-
-# State 24
-# Apply action "CK"
-action: 1
-
-# State 25
-# Apply action "H3"
-action: 37
-
-# State 26
-# Apply action "HA"
-action: 26
-
-# State 27
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
+# State 1
 # SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
 IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26"
-IsChanceNode() = False
+History() = [39]
+HistoryString() = "39"
+IsChanceNode() = True
 IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0,CK,CQ,C9,C2,DQ,D9,D3,HK,HQ,SQ,S9,S8,S3,\nc_public:HA,"
-InformationStateString(1) = "1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H9,H3,SA,SK,\nc_public:HA,"
-ObservationString(0) = "p0,CK,CQ,C9,C2,DQ,D9,D3,HK,HQ,SQ,S9,S8,S3,-1:HA,"
-ObservationString(1) = "p1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H9,H3,SA,SK,-1:HA,"
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [1, 2, 5, 12, 15, 18, 24, 27, 28, 41, 44, 45, 50]
-StringLegalActions() = ["CK", "CQ", "C9", "C2", "DQ", "D9", "D3", "HK", "HQ", "SQ", "S9", "S8", "S3"]
+CurrentPlayer() = -1
+InformationStateString(0) = "0,SA,\n"
+InformationStateString(1) = "1,\n"
+ObservationString(0) = "p0,SA,"
+ObservationString(1) = "p1,"
+ChanceOutcomes() = [(0,0.0196078), (1,0.0196078), (2,0.0196078), (3,0.0196078), (4,0.0196078), (5,0.0196078), (6,0.0196078), (7,0.0196078), (8,0.0196078), (9,0.0196078), (10,0.0196078), (11,0.0196078), (12,0.0196078), (13,0.0196078), (14,0.0196078), (15,0.0196078), (16,0.0196078), (17,0.0196078), (18,0.0196078), (19,0.0196078), (20,0.0196078), (21,0.0196078), (22,0.0196078), (23,0.0196078), (24,0.0196078), (25,0.0196078), (26,0.0196078), (27,0.0196078), (28,0.0196078), (29,0.0196078), (30,0.0196078), (31,0.0196078), (32,0.0196078), (33,0.0196078), (34,0.0196078), (35,0.0196078), (36,0.0196078), (37,0.0196078), (38,0.0196078), (40,0.0196078), (41,0.0196078), (42,0.0196078), (43,0.0196078), (44,0.0196078), (45,0.0196078), (46,0.0196078), (47,0.0196078), (48,0.0196078), (49,0.0196078), (50,0.0196078), (51,0.0196078)]
+LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+StringLegalActions() = ["CA", "CK", "CQ", "CJ", "CT", "C9", "C8", "C7", "C6", "C5", "C4", "C3", "C2", "DA", "DK", "DQ", "DJ", "DT", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "HA", "HK", "HQ", "HJ", "HT", "H9", "H8", "H7", "H6", "H5", "H4", "H3", "H2", "SK", "SQ", "SJ", "ST", "S9", "S8", "S7", "S6", "S5", "S4", "S3", "S2"]
 
-# Apply action "HK"
-action: 27
+# Apply action "CJ"
+action: 3
 
-# State 28
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
-# SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0,CK,CQ,C9,C2,DQ,D9,D3,HQ,SQ,S9,S8,S3,\nc_public:HA,p0:HK,"
-InformationStateString(1) = "1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H9,H3,SA,SK,\nc_public:HA,p0:HK,"
-ObservationString(0) = "p0,CK,CQ,C9,C2,DQ,D9,D3,HQ,SQ,S9,S8,S3,-1:HA,0:HK,"
-ObservationString(1) = "p1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H9,H3,SA,SK,-1:HA,0:HK,"
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [29, 30, 31, 37]
-StringLegalActions() = ["HJ", "HT", "H9", "H3"]
+# State 2
+# Apply action "C3"
+action: 11
 
+# State 3
+# Apply action "H7"
+action: 33
+
+# State 4
 # Apply action "H9"
 action: 31
 
-# State 29
-# Apply action "S4"
-action: 49
-
-# State 30
-# Apply action "H6"
-action: 34
-
-# State 31
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
-# SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-# H9
-# S4
-# H6
-IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0,CK,CQ,C9,C2,DQ,D9,D3,HA,HQ,SQ,S9,S8,S3,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,"
-InformationStateString(1) = "1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H3,SA,SK,S4,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,"
-ObservationString(0) = "p0,CK,CQ,C9,C2,DQ,D9,D3,HA,HQ,SQ,S9,S8,S3,-1:HA,0:HK,1:H9,-1:H6,"
-ObservationString(1) = "p1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H3,SA,SK,S4,-1:HA,0:HK,1:H9,-1:H6,"
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [1, 2, 5, 12, 15, 18, 24, 26, 28, 41, 44, 45, 50]
-StringLegalActions() = ["CK", "CQ", "C9", "C2", "DQ", "D9", "D3", "HA", "HQ", "SQ", "S9", "S8", "S3"]
-
-# Apply action "DQ"
-action: 15
-
-# State 32
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
-# SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-# H9
-# S4
-# H6
-# DQ
-IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0,CK,CQ,C9,C2,D9,D3,HA,HQ,SQ,S9,S8,S3,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,p0:DQ,"
-InformationStateString(1) = "1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H3,SA,SK,S4,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,p0:DQ,"
-ObservationString(0) = "p0,CK,CQ,C9,C2,D9,D3,HA,HQ,SQ,S9,S8,S3,-1:HA,0:HK,1:H9,-1:H6,0:DQ,"
-ObservationString(1) = "p1,CT,C7,C5,DK,DJ,D7,D5,HJ,HT,H3,SA,SK,S4,-1:HA,0:HK,1:H9,-1:H6,0:DQ,"
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [14, 16, 20, 22]
-StringLegalActions() = ["DK", "DJ", "D7", "D5"]
-
-# Apply action "D5"
-action: 22
-
-# State 33
-# Apply action "DA"
-action: 13
-
-# State 34
-# Apply action "D4"
-action: 23
-
-# State 35
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
-# SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-# H9
-# S4
-# H6
-# DQ
-# D5
-# DA
-# D4
-IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-InformationStateString(0) = "0,CK,CQ,C9,C2,D9,D3,HA,HQ,H6,SQ,S9,S8,S3,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,p0:DQ,p1:D5,c_unobserved:\nc_public:D4,"
-InformationStateString(1) = "1,CT,C7,C5,DA,DK,DJ,D7,HJ,HT,H3,SA,SK,S4,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,p0:DQ,p1:D5,c_observed:DA\nc_public:D4,"
-ObservationString(0) = "p0,CK,CQ,C9,C2,D9,D3,HA,HQ,H6,SQ,S9,S8,S3,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,"
-ObservationString(1) = "p1,CT,C7,C5,DA,DK,DJ,D7,HJ,HT,H3,SA,SK,S4,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,"
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [1, 2, 5, 12, 18, 24, 26, 28, 34, 41, 44, 45, 50]
-StringLegalActions() = ["CK", "CQ", "C9", "C2", "D9", "D3", "HA", "HQ", "H6", "SQ", "S9", "S8", "S3"]
-
-# Apply action "SQ"
-action: 41
-
-# State 36
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
-# SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-# H9
-# S4
-# H6
-# DQ
-# D5
-# DA
-# D4
-# SQ
-IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0,CK,CQ,C9,C2,D9,D3,HA,HQ,H6,S9,S8,S3,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,p0:DQ,p1:D5,c_unobserved:\nc_public:D4,p0:SQ,"
-InformationStateString(1) = "1,CT,C7,C5,DA,DK,DJ,D7,HJ,HT,H3,SA,SK,S4,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,p0:DQ,p1:D5,c_observed:DA\nc_public:D4,p0:SQ,"
-ObservationString(0) = "p0,CK,CQ,C9,C2,D9,D3,HA,HQ,H6,S9,S8,S3,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,"
-ObservationString(1) = "p1,CT,C7,C5,DA,DK,DJ,D7,HJ,HT,H3,SA,SK,S4,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,"
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [39, 40, 49]
-StringLegalActions() = ["SA", "SK", "S4"]
-
-# Apply action "S4"
-action: 49
-
-# State 37
-# Apply action "C3"
-action: 11
-
-# State 38
+# State 5
 # Apply action "SJ"
 action: 42
 
-# State 39
-# Apply action "H6"
-action: 34
+# State 6
+# Apply action "H3"
+action: 37
 
-# State 40
-# Apply action "HT"
-action: 30
-
-# State 41
-# Apply action "S2"
-action: 51
-
-# State 42
-# Apply action "H7"
-action: 33
-
-# State 43
-# Apply action "C7"
-action: 7
-
-# State 44
+# State 7
 # Apply action "CK"
 action: 1
 
-# State 45
-# Apply action "D8"
-action: 19
-
-# State 46
-# Apply action "S5"
-action: 48
-
-# State 47
-# Apply action "CQ"
-action: 2
-
-# State 48
-# Apply action "C3"
-action: 11
-
-# State 49
-# Apply action "S7"
-action: 46
-
-# State 50
-# Apply action "H2"
-action: 38
-
-# State 51
-# Apply action "S8"
-action: 45
-
-# State 52
-# Apply action "S7"
-action: 46
-
-# State 53
-# Apply action "S6"
-action: 47
-
-# State 54
-# Apply action "C6"
-action: 8
-
-# State 55
-# Apply action "D3"
-action: 24
-
-# State 56
-# Apply action "D7"
-action: 20
-
-# State 57
-# Apply action "CJ"
-action: 3
-
-# State 58
-# Apply action "ST"
-action: 43
-
-# State 59
-# Apply action "DK"
-action: 14
-
-# State 60
-# Apply action "D4"
-action: 23
-
-# State 61
+# State 8
 # Apply action "H5"
 action: 35
 
-# State 62
-# Apply action "CA"
-action: 0
+# State 9
+# Apply action "D7"
+action: 20
 
-# State 63
-# Apply action "CT"
-action: 4
+# State 10
+# Apply action "D5"
+action: 22
 
-# State 64
-# Apply action "CJ"
-action: 3
+# State 11
+# Apply action "DT"
+action: 17
 
-# State 65
+# State 12
+# Apply action "D8"
+action: 19
+
+# State 13
 # Apply action "H4"
 action: 36
 
-# State 66
-# Apply action "D6"
-action: 21
+# State 14
+# Apply action "SQ"
+action: 41
 
-# State 67
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
+# State 15
+# Apply action "C9"
+action: 5
+
+# State 16
+# Apply action "DQ"
+action: 15
+
+# State 17
+# Apply action "HT"
+action: 30
+
+# State 18
+# Apply action "D3"
+action: 24
+
+# State 19
+# Apply action "HQ"
+action: 28
+
+# State 20
+# Apply action "S5"
+action: 48
+
+# State 21
+# Apply action "SK"
+action: 40
+
+# State 22
+# Apply action "HJ"
+action: 29
+
+# State 23
+# Apply action "ST"
+action: 43
+
+# State 24
+# Apply action "H2"
+action: 38
+
+# State 25
+# Apply action "C4"
+action: 10
+
+# State 26
+# Apply action "S8"
+action: 45
+
+# State 27
 # SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-# H9
-# S4
-# H6
-# DQ
-# D5
-# DA
-# D4
-# SQ
-# S4
+# CJ
 # C3
-# SJ
-# H6
-# HT
-# S2
 # H7
-# C7
+# H9
+# SJ
+# H3
 # CK
-# D8
-# S5
-# CQ
-# C3
-# S7
-# H2
-# S8
-# S7
-# S6
-# C6
-# D3
-# D7
-# CJ
-# ST
-# DK
-# D4
 # H5
-# CA
-# CT
-# CJ
+# D7
+# D5
+# DT
+# D8
 # H4
-# D6
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
 IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41, 49, 11, 42, 34, 30, 51, 33, 7, 1, 19, 48, 2, 11, 46, 38, 45, 46, 47, 8, 24, 20, 3, 43, 14, 23, 35, 0, 4, 3, 36, 21]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41, 49, 11, 42, 34, 30, 51, 33, 7, 1, 19, 48, 2, 11, 46, 38, 45, 46, 47, 8, 24, 20, 3, 43, 14, 23, 35, 0, 4, 3, 36, 21"
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-InformationStateString(0) = "0,CA,C9,C2,D9,HA,HQ,H7,H5,H2,S9,S5,S3,S2,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,p0:DQ,p1:D5,c_unobserved:\nc_public:D4,p0:SQ,p1:S4,c_unobserved:\nc_public:SJ,p0:H6,p1:HT,c_observed:S2\nc_public:H7,p1:C7,p0:CK,c_unobserved:\nc_public:S5,p0:CQ,p1:C3,c_unobserved:\nc_public:H2,p0:S8,p1:S7,c_unobserved:\nc_public:C6,p0:D3,p1:D7,c_observed:CJ\nc_public:ST,p1:DK,p0:D4,c_observed:H5\nc_public:CA,p1:CT,p0:CJ,c_unobserved:\nc_public:D6,"
-InformationStateString(1) = "1,C6,C5,DA,DJ,D8,HJ,H4,H3,SA,SK,SJ,ST,S6,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,p0:DQ,p1:D5,c_observed:DA\nc_public:D4,p0:SQ,p1:S4,c_observed:C3\nc_public:SJ,p0:H6,p1:HT,c_unobserved:\nc_public:H7,p1:C7,p0:CK,c_observed:D8\nc_public:S5,p0:CQ,p1:C3,c_observed:S7\nc_public:H2,p0:S8,p1:S7,c_observed:S6\nc_public:C6,p0:D3,p1:D7,c_unobserved:\nc_public:ST,p1:DK,p0:D4,c_unobserved:\nc_public:CA,p1:CT,p0:CJ,c_observed:H4\nc_public:D6,"
-ObservationString(0) = "p0,CA,C9,C2,D9,HA,HQ,H7,H5,H2,S9,S5,S3,S2,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,1:S4,-1:SJ,0:H6,1:HT,-1:H7,1:C7,0:CK,-1:S5,0:CQ,1:C3,-1:H2,0:S8,1:S7,-1:C6,0:D3,1:D7,-1:ST,1:DK,0:D4,-1:CA,1:CT,0:CJ,-1:D6,"
-ObservationString(1) = "p1,C6,C5,DA,DJ,D8,HJ,H4,H3,SA,SK,SJ,ST,S6,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,1:S4,-1:SJ,0:H6,1:HT,-1:H7,1:C7,0:CK,-1:S5,0:CQ,1:C3,-1:H2,0:S8,1:S7,-1:C6,0:D3,1:D7,-1:ST,1:DK,0:D4,-1:CA,1:CT,0:CJ,-1:D6,"
+InformationStateString(0) = "0,C3,DQ,D8,D5,D3,HJ,H9,H5,H3,H2,SA,SQ,S5,\nc_public:S8,"
+InformationStateString(1) = "1,CK,CJ,C9,C4,DT,D7,HQ,HT,H7,H4,SK,SJ,ST,\nc_public:S8,"
+ObservationString(0) = "p0,C3,DQ,D8,D5,D3,HJ,H9,H5,H3,H2,SA,SQ,S5,-1:S8,"
+ObservationString(1) = "p1,CK,CJ,C9,C4,DT,D7,HQ,HT,H7,H4,SK,SJ,ST,-1:S8,"
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [0, 5, 12, 18, 26, 28, 33, 35, 38, 44, 48, 50, 51]
-StringLegalActions() = ["CA", "C9", "C2", "D9", "HA", "HQ", "H7", "H5", "H2", "S9", "S5", "S3", "S2"]
+LegalActions() = [11, 15, 19, 22, 24, 29, 31, 35, 37, 38, 39, 41, 48]
+StringLegalActions() = ["C3", "DQ", "D8", "D5", "D3", "HJ", "H9", "H5", "H3", "H2", "SA", "SQ", "S5"]
+
+# Apply action "H3"
+action: 37
+
+# State 28
+# SA
+# CJ
+# C3
+# H7
+# H9
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+IsTerminal() = False
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "0,C3,DQ,D8,D5,D3,HJ,H9,H5,H2,SA,SQ,S5,\nc_public:S8,p0:H3,"
+InformationStateString(1) = "1,CK,CJ,C9,C4,DT,D7,HQ,HT,H7,H4,SK,SJ,ST,\nc_public:S8,p0:H3,"
+ObservationString(0) = "p0,C3,DQ,D8,D5,D3,HJ,H9,H5,H2,SA,SQ,S5,-1:S8,0:H3,"
+ObservationString(1) = "p1,CK,CJ,C9,C4,DT,D7,HQ,HT,H7,H4,SK,SJ,ST,-1:S8,0:H3,"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [28, 30, 33, 36]
+StringLegalActions() = ["HQ", "HT", "H7", "H4"]
+
+# Apply action "HQ"
+action: 28
+
+# State 29
+# Apply action "D4"
+action: 23
+
+# State 30
+# Apply action "C2"
+action: 12
+
+# State 31
+# SA
+# CJ
+# C3
+# H7
+# H9
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+# HQ
+# D4
+# C2
+IsTerminal() = False
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "0,C3,DQ,D8,D5,D4,D3,HJ,H9,H5,H2,SA,SQ,S5,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,"
+InformationStateString(1) = "1,CK,CJ,C9,C4,DT,D7,HT,H7,H4,SK,SJ,ST,S8,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,"
+ObservationString(0) = "p0,C3,DQ,D8,D5,D4,D3,HJ,H9,H5,H2,SA,SQ,S5,-1:S8,0:H3,1:HQ,-1:C2,"
+ObservationString(1) = "p1,CK,CJ,C9,C4,DT,D7,HT,H7,H4,SK,SJ,ST,S8,-1:S8,0:H3,1:HQ,-1:C2,"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 5, 10, 17, 20, 30, 33, 36, 40, 42, 43, 45]
+StringLegalActions() = ["CK", "CJ", "C9", "C4", "DT", "D7", "HT", "H7", "H4", "SK", "SJ", "ST", "S8"]
+
+# Apply action "C4"
+action: 10
+
+# State 32
+# SA
+# CJ
+# C3
+# H7
+# H9
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+# HQ
+# D4
+# C2
+# C4
+IsTerminal() = False
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "0,C3,DQ,D8,D5,D4,D3,HJ,H9,H5,H2,SA,SQ,S5,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,p1:C4,"
+InformationStateString(1) = "1,CK,CJ,C9,DT,D7,HT,H7,H4,SK,SJ,ST,S8,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,p1:C4,"
+ObservationString(0) = "p0,C3,DQ,D8,D5,D4,D3,HJ,H9,H5,H2,SA,SQ,S5,-1:S8,0:H3,1:HQ,-1:C2,1:C4,"
+ObservationString(1) = "p1,CK,CJ,C9,DT,D7,HT,H7,H4,SK,SJ,ST,S8,-1:S8,0:H3,1:HQ,-1:C2,1:C4,"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [11]
+StringLegalActions() = ["C3"]
+
+# Apply action "C3"
+action: 11
+
+# State 33
+# Apply action "HA"
+action: 26
+
+# State 34
+# Apply action "DJ"
+action: 16
+
+# State 35
+# SA
+# CJ
+# C3
+# H7
+# H9
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+# HQ
+# D4
+# C2
+# C4
+# C3
+# HA
+# DJ
+IsTerminal() = False
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "0,DQ,D8,D5,D4,D3,HA,HJ,H9,H5,H2,SA,SQ,S5,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,p1:C4,p0:C3,c_observed:HA\nc_public:DJ,"
+InformationStateString(1) = "1,CK,CJ,C9,C2,DT,D7,HT,H7,H4,SK,SJ,ST,S8,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,p1:C4,p0:C3,c_unobserved:\nc_public:DJ,"
+ObservationString(0) = "p0,DQ,D8,D5,D4,D3,HA,HJ,H9,H5,H2,SA,SQ,S5,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,"
+ObservationString(1) = "p1,CK,CJ,C9,C2,DT,D7,HT,H7,H4,SK,SJ,ST,S8,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [1, 3, 5, 12, 17, 20, 30, 33, 36, 40, 42, 43, 45]
+StringLegalActions() = ["CK", "CJ", "C9", "C2", "DT", "D7", "HT", "H7", "H4", "SK", "SJ", "ST", "S8"]
 
 # Apply action "H7"
 action: 33
 
-# State 68
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
+# State 36
 # SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
-# H9
-# S4
-# H6
-# DQ
-# D5
-# DA
-# D4
-# SQ
-# S4
+# CJ
 # C3
-# SJ
-# H6
-# HT
-# S2
 # H7
-# C7
+# H9
+# SJ
+# H3
 # CK
-# D8
-# S5
-# CQ
-# C3
-# S7
-# H2
-# S8
-# S7
-# S6
-# C6
-# D3
-# D7
-# CJ
-# ST
-# DK
-# D4
 # H5
-# CA
-# CT
-# CJ
+# D7
+# D5
+# DT
+# D8
 # H4
-# D6
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+# HQ
+# D4
+# C2
+# C4
+# C3
+# HA
+# DJ
 # H7
 IsTerminal() = False
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41, 49, 11, 42, 34, 30, 51, 33, 7, 1, 19, 48, 2, 11, 46, 38, 45, 46, 47, 8, 24, 20, 3, 43, 14, 23, 35, 0, 4, 3, 36, 21, 33]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41, 49, 11, 42, 34, 30, 51, 33, 7, 1, 19, 48, 2, 11, 46, 38, 45, 46, 47, 8, 24, 20, 3, 43, 14, 23, 35, 0, 4, 3, 36, 21, 33"
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33"
 IsChanceNode() = False
 IsSimultaneousNode() = False
-CurrentPlayer() = 1
-InformationStateString(0) = "0,CA,C9,C2,D9,HA,HQ,H5,H2,S9,S5,S3,S2,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,p0:DQ,p1:D5,c_unobserved:\nc_public:D4,p0:SQ,p1:S4,c_unobserved:\nc_public:SJ,p0:H6,p1:HT,c_observed:S2\nc_public:H7,p1:C7,p0:CK,c_unobserved:\nc_public:S5,p0:CQ,p1:C3,c_unobserved:\nc_public:H2,p0:S8,p1:S7,c_unobserved:\nc_public:C6,p0:D3,p1:D7,c_observed:CJ\nc_public:ST,p1:DK,p0:D4,c_observed:H5\nc_public:CA,p1:CT,p0:CJ,c_unobserved:\nc_public:D6,p0:H7,"
-InformationStateString(1) = "1,C6,C5,DA,DJ,D8,HJ,H4,H3,SA,SK,SJ,ST,S6,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,p0:DQ,p1:D5,c_observed:DA\nc_public:D4,p0:SQ,p1:S4,c_observed:C3\nc_public:SJ,p0:H6,p1:HT,c_unobserved:\nc_public:H7,p1:C7,p0:CK,c_observed:D8\nc_public:S5,p0:CQ,p1:C3,c_observed:S7\nc_public:H2,p0:S8,p1:S7,c_observed:S6\nc_public:C6,p0:D3,p1:D7,c_unobserved:\nc_public:ST,p1:DK,p0:D4,c_unobserved:\nc_public:CA,p1:CT,p0:CJ,c_observed:H4\nc_public:D6,p0:H7,"
-ObservationString(0) = "p0,CA,C9,C2,D9,HA,HQ,H5,H2,S9,S5,S3,S2,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,1:S4,-1:SJ,0:H6,1:HT,-1:H7,1:C7,0:CK,-1:S5,0:CQ,1:C3,-1:H2,0:S8,1:S7,-1:C6,0:D3,1:D7,-1:ST,1:DK,0:D4,-1:CA,1:CT,0:CJ,-1:D6,0:H7,"
-ObservationString(1) = "p1,C6,C5,DA,DJ,D8,HJ,H4,H3,SA,SK,SJ,ST,S6,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,1:S4,-1:SJ,0:H6,1:HT,-1:H7,1:C7,0:CK,-1:S5,0:CQ,1:C3,-1:H2,0:S8,1:S7,-1:C6,0:D3,1:D7,-1:ST,1:DK,0:D4,-1:CA,1:CT,0:CJ,-1:D6,0:H7,"
+CurrentPlayer() = 0
+InformationStateString(0) = "0,DQ,D8,D5,D4,D3,HA,HJ,H9,H5,H2,SA,SQ,S5,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,p1:C4,p0:C3,c_observed:HA\nc_public:DJ,p1:H7,"
+InformationStateString(1) = "1,CK,CJ,C9,C2,DT,D7,HT,H4,SK,SJ,ST,S8,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,p1:C4,p0:C3,c_unobserved:\nc_public:DJ,p1:H7,"
+ObservationString(0) = "p0,DQ,D8,D5,D4,D3,HA,HJ,H9,H5,H2,SA,SQ,S5,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,"
+ObservationString(1) = "p1,CK,CJ,C9,C2,DT,D7,HT,H4,SK,SJ,ST,S8,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,"
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [29, 36, 37]
-StringLegalActions() = ["HJ", "H4", "H3"]
+LegalActions() = [26, 29, 31, 35, 38]
+StringLegalActions() = ["HA", "HJ", "H9", "H5", "H2"]
 
 # Apply action "HJ"
 action: 29
 
-# State 69
-# Apply action "D2"
-action: 25
+# State 37
+# Apply action "S3"
+action: 50
 
-# State 70
+# State 38
 # Apply action "H8"
 action: 32
 
-# State 71
+# State 39
+# Apply action "S5"
+action: 48
+
+# State 40
+# Apply action "S8"
+action: 45
+
+# State 41
+# Apply action "DK"
+action: 14
+
+# State 42
+# Apply action "C6"
+action: 8
+
+# State 43
+# Apply action "ST"
+action: 43
+
+# State 44
+# Apply action "SQ"
+action: 41
+
+# State 45
 # Apply action "DA"
 action: 13
 
-# State 72
-# Apply action "D2"
-action: 25
-
-# State 73
-# Apply action "C4"
-action: 10
-
-# State 74
-# Apply action "C8"
-action: 6
-
-# State 75
+# State 46
 # Apply action "D6"
 action: 21
 
-# State 76
-# Apply action "D9"
-action: 18
+# State 47
+# Apply action "D5"
+action: 22
 
-# State 77
+# State 48
+# Apply action "DA"
+action: 13
+
+# State 49
+# Apply action "S9"
+action: 44
+
+# State 50
+# Apply action "C8"
+action: 6
+
+# State 51
 # Apply action "DT"
 action: 17
 
-# State 78
-# C2
-# HJ
-# CQ
-# H9
-# C9
-# HT
-# DQ
+# State 52
+# Apply action "D4"
+action: 23
+
+# State 53
+# Apply action "CQ"
+action: 2
+
+# State 54
+# Apply action "C5"
+action: 9
+
+# State 55
+# Apply action "H4"
+action: 36
+
+# State 56
+# Apply action "H5"
+action: 35
+
+# State 57
+# Apply action "CT"
+action: 4
+
+# State 58
+# Apply action "S4"
+action: 49
+
+# State 59
+# Apply action "C6"
+action: 8
+
+# State 60
+# Apply action "CK"
+action: 1
+
+# State 61
+# Apply action "C7"
+action: 7
+
+# State 62
+# Apply action "D9"
+action: 18
+
+# State 63
+# Apply action "C8"
+action: 6
+
+# State 64
+# Apply action "C5"
+action: 9
+
+# State 65
+# Apply action "CA"
+action: 0
+
+# State 66
+# Apply action "HK"
+action: 27
+
+# State 67
 # SA
-# S3
-# CT
-# HK
-# C5
-# HQ
-# SK
-# D3
-# DK
-# S8
-# D7
-# SQ
-# DJ
-# D9
-# D5
-# S9
-# C7
-# CK
-# H3
-# HA
-# HK
+# CJ
+# C3
+# H7
 # H9
-# S4
-# H6
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
 # DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+# HQ
+# D4
+# C2
+# C4
+# C3
+# HA
+# DJ
+# H7
+# HJ
+# S3
+# H8
+# S5
+# S8
+# DK
+# C6
+# ST
+# SQ
+# DA
+# D6
 # D5
 # DA
+# S9
+# C8
+# DT
 # D4
-# SQ
-# S4
-# C3
-# SJ
-# H6
-# HT
-# S2
-# H7
-# C7
-# CK
-# D8
-# S5
 # CQ
+# C5
+# H4
+# H5
+# CT
+# S4
+# C6
+# CK
+# C7
+# D9
+# C8
+# C5
+# CA
+# HK
+IsTerminal() = False
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33, 29, 50, 32, 48, 45, 14, 8, 43, 41, 13, 21, 22, 13, 44, 6, 17, 23, 2, 9, 36, 35, 4, 49, 8, 1, 7, 18, 6, 9, 0, 27]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33, 29, 50, 32, 48, 45, 14, 8, 43, 41, 13, 21, 22, 13, 44, 6, 17, 23, 2, 9, 36, 35, 4, 49, 8, 1, 7, 18, 6, 9, 0, 27"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+InformationStateString(0) = "0,CA,CQ,C7,DK,DQ,DJ,D8,D3,HA,H9,H2,SA,S9,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,p1:C4,p0:C3,c_observed:HA\nc_public:DJ,p1:H7,p0:HJ,c_unobserved:\nc_public:H8,p0:S5,p1:S8,c_observed:DK\nc_public:C6,p1:ST,p0:SQ,c_unobserved:\nc_public:D6,p0:D5,p1:DA,c_observed:S9\nc_public:C8,p1:DT,p0:D4,c_observed:CQ\nc_public:C5,p1:H4,p0:H5,c_unobserved:\nc_public:S4,p0:C6,p1:CK,c_observed:C7\nc_public:D9,p1:C8,p0:C5,c_observed:CA\nc_public:HK,"
+InformationStateString(1) = "1,CJ,CT,C9,C2,D9,D7,D6,HT,H8,SK,SJ,S4,S3,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,p1:C4,p0:C3,c_unobserved:\nc_public:DJ,p1:H7,p0:HJ,c_observed:S3\nc_public:H8,p0:S5,p1:S8,c_unobserved:\nc_public:C6,p1:ST,p0:SQ,c_observed:DA\nc_public:D6,p0:D5,p1:DA,c_unobserved:\nc_public:C8,p1:DT,p0:D4,c_unobserved:\nc_public:C5,p1:H4,p0:H5,c_observed:CT\nc_public:S4,p0:C6,p1:CK,c_unobserved:\nc_public:D9,p1:C8,p0:C5,c_unobserved:\nc_public:HK,"
+ObservationString(0) = "p0,CA,CQ,C7,DK,DQ,DJ,D8,D3,HA,H9,H2,SA,S9,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,0:HJ,-1:H8,0:S5,1:S8,-1:C6,1:ST,0:SQ,-1:D6,0:D5,1:DA,-1:C8,1:DT,0:D4,-1:C5,1:H4,0:H5,-1:S4,0:C6,1:CK,-1:D9,1:C8,0:C5,-1:HK,"
+ObservationString(1) = "p1,CJ,CT,C9,C2,D9,D7,D6,HT,H8,SK,SJ,S4,S3,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,0:HJ,-1:H8,0:S5,1:S8,-1:C6,1:ST,0:SQ,-1:D6,0:D5,1:DA,-1:C8,1:DT,0:D4,-1:C5,1:H4,0:H5,-1:S4,0:C6,1:CK,-1:D9,1:C8,0:C5,-1:HK,"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [3, 4, 5, 12, 18, 20, 21, 30, 32, 40, 42, 49, 50]
+StringLegalActions() = ["CJ", "CT", "C9", "C2", "D9", "D7", "D6", "HT", "H8", "SK", "SJ", "S4", "S3"]
+
+# Apply action "CJ"
+action: 3
+
+# State 68
+# SA
+# CJ
 # C3
-# S7
+# H7
+# H9
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
 # H2
+# C4
 # S8
+# H3
+# HQ
+# D4
+# C2
+# C4
+# C3
+# HA
+# DJ
+# H7
+# HJ
+# S3
+# H8
+# S5
+# S8
+# DK
+# C6
+# ST
+# SQ
+# DA
+# D6
+# D5
+# DA
+# S9
+# C8
+# DT
+# D4
+# CQ
+# C5
+# H4
+# H5
+# CT
+# S4
+# C6
+# CK
+# C7
+# D9
+# C8
+# C5
+# CA
+# HK
+# CJ
+IsTerminal() = False
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33, 29, 50, 32, 48, 45, 14, 8, 43, 41, 13, 21, 22, 13, 44, 6, 17, 23, 2, 9, 36, 35, 4, 49, 8, 1, 7, 18, 6, 9, 0, 27, 3]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33, 29, 50, 32, 48, 45, 14, 8, 43, 41, 13, 21, 22, 13, 44, 6, 17, 23, 2, 9, 36, 35, 4, 49, 8, 1, 7, 18, 6, 9, 0, 27, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+InformationStateString(0) = "0,CA,CQ,C7,DK,DQ,DJ,D8,D3,HA,H9,H2,SA,S9,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,p1:C4,p0:C3,c_observed:HA\nc_public:DJ,p1:H7,p0:HJ,c_unobserved:\nc_public:H8,p0:S5,p1:S8,c_observed:DK\nc_public:C6,p1:ST,p0:SQ,c_unobserved:\nc_public:D6,p0:D5,p1:DA,c_observed:S9\nc_public:C8,p1:DT,p0:D4,c_observed:CQ\nc_public:C5,p1:H4,p0:H5,c_unobserved:\nc_public:S4,p0:C6,p1:CK,c_observed:C7\nc_public:D9,p1:C8,p0:C5,c_observed:CA\nc_public:HK,p1:CJ,"
+InformationStateString(1) = "1,CT,C9,C2,D9,D7,D6,HT,H8,SK,SJ,S4,S3,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,p1:C4,p0:C3,c_unobserved:\nc_public:DJ,p1:H7,p0:HJ,c_observed:S3\nc_public:H8,p0:S5,p1:S8,c_unobserved:\nc_public:C6,p1:ST,p0:SQ,c_observed:DA\nc_public:D6,p0:D5,p1:DA,c_unobserved:\nc_public:C8,p1:DT,p0:D4,c_unobserved:\nc_public:C5,p1:H4,p0:H5,c_observed:CT\nc_public:S4,p0:C6,p1:CK,c_unobserved:\nc_public:D9,p1:C8,p0:C5,c_unobserved:\nc_public:HK,p1:CJ,"
+ObservationString(0) = "p0,CA,CQ,C7,DK,DQ,DJ,D8,D3,HA,H9,H2,SA,S9,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,0:HJ,-1:H8,0:S5,1:S8,-1:C6,1:ST,0:SQ,-1:D6,0:D5,1:DA,-1:C8,1:DT,0:D4,-1:C5,1:H4,0:H5,-1:S4,0:C6,1:CK,-1:D9,1:C8,0:C5,-1:HK,1:CJ,"
+ObservationString(1) = "p1,CT,C9,C2,D9,D7,D6,HT,H8,SK,SJ,S4,S3,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,0:HJ,-1:H8,0:S5,1:S8,-1:C6,1:ST,0:SQ,-1:D6,0:D5,1:DA,-1:C8,1:DT,0:D4,-1:C5,1:H4,0:H5,-1:S4,0:C6,1:CK,-1:D9,1:C8,0:C5,-1:HK,1:CJ,"
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [0, 2, 7]
+StringLegalActions() = ["CA", "CQ", "C7"]
+
+# Apply action "C7"
+action: 7
+
+# State 69
+# Apply action "S7"
+action: 46
+
+# State 70
+# Apply action "S6"
+action: 47
+
+# State 71
+# Apply action "HK"
+action: 27
+
+# State 72
+# Apply action "H9"
+action: 31
+
+# State 73
+# Apply action "S2"
+action: 51
+
+# State 74
+# Apply action "D2"
+action: 25
+
+# State 75
+# Apply action "SK"
+action: 40
+
+# State 76
+# Apply action "S9"
+action: 44
+
+# State 77
+# Apply action "H6"
+action: 34
+
+# State 78
+# SA
+# CJ
+# C3
+# H7
+# H9
+# SJ
+# H3
+# CK
+# H5
+# D7
+# D5
+# DT
+# D8
+# H4
+# SQ
+# C9
+# DQ
+# HT
+# D3
+# HQ
+# S5
+# SK
+# HJ
+# ST
+# H2
+# C4
+# S8
+# H3
+# HQ
+# D4
+# C2
+# C4
+# C3
+# HA
+# DJ
+# H7
+# HJ
+# S3
+# H8
+# S5
+# S8
+# DK
+# C6
+# ST
+# SQ
+# DA
+# D6
+# D5
+# DA
+# S9
+# C8
+# DT
+# D4
+# CQ
+# C5
+# H4
+# H5
+# CT
+# S4
+# C6
+# CK
+# C7
+# D9
+# C8
+# C5
+# CA
+# HK
+# CJ
+# C7
 # S7
 # S6
-# C6
-# D3
-# D7
-# CJ
-# ST
-# DK
-# D4
-# H5
-# CA
-# CT
-# CJ
-# H4
-# D6
-# H7
-# HJ
+# HK
+# H9
+# S2
 # D2
-# H8
-# DA
-# D2
-# C4
-# C8
-# D6
-# D9
-# DT
+# SK
+# S9
+# H6
 IsTerminal() = True
-History() = [12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41, 49, 11, 42, 34, 30, 51, 33, 7, 1, 19, 48, 2, 11, 46, 38, 45, 46, 47, 8, 24, 20, 3, 43, 14, 23, 35, 0, 4, 3, 36, 21, 33, 29, 25, 32, 13, 25, 10, 6, 21, 18, 17]
-HistoryString() = "12, 29, 2, 31, 5, 30, 15, 39, 50, 4, 27, 9, 28, 40, 24, 14, 45, 20, 41, 16, 18, 22, 44, 7, 1, 37, 26, 27, 31, 49, 34, 15, 22, 13, 23, 41, 49, 11, 42, 34, 30, 51, 33, 7, 1, 19, 48, 2, 11, 46, 38, 45, 46, 47, 8, 24, 20, 3, 43, 14, 23, 35, 0, 4, 3, 36, 21, 33, 29, 25, 32, 13, 25, 10, 6, 21, 18, 17"
+History() = [39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33, 29, 50, 32, 48, 45, 14, 8, 43, 41, 13, 21, 22, 13, 44, 6, 17, 23, 2, 9, 36, 35, 4, 49, 8, 1, 7, 18, 6, 9, 0, 27, 3, 7, 46, 47, 27, 31, 51, 25, 40, 44, 34]
+HistoryString() = "39, 3, 11, 33, 31, 42, 37, 1, 35, 20, 22, 17, 19, 36, 41, 5, 15, 30, 24, 28, 48, 40, 29, 43, 38, 10, 45, 37, 28, 23, 12, 10, 11, 26, 16, 33, 29, 50, 32, 48, 45, 14, 8, 43, 41, 13, 21, 22, 13, 44, 6, 17, 23, 2, 9, 36, 35, 4, 49, 8, 1, 7, 18, 6, 9, 0, 27, 3, 7, 46, 47, 27, 31, 51, 25, 40, 44, 34"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "0,CA,C9,C8,C4,C2,HA,HQ,H5,H2,S9,S5,S3,S2,\nc_public:HA,p0:HK,p1:H9,c_unobserved:\nc_public:H6,p0:DQ,p1:D5,c_unobserved:\nc_public:D4,p0:SQ,p1:S4,c_unobserved:\nc_public:SJ,p0:H6,p1:HT,c_observed:S2\nc_public:H7,p1:C7,p0:CK,c_unobserved:\nc_public:S5,p0:CQ,p1:C3,c_unobserved:\nc_public:H2,p0:S8,p1:S7,c_unobserved:\nc_public:C6,p0:D3,p1:D7,c_observed:CJ\nc_public:ST,p1:DK,p0:D4,c_observed:H5\nc_public:CA,p1:CT,p0:CJ,c_unobserved:\nc_public:D6,p0:H7,p1:HJ,c_observed:D2\nc_public:H8,p1:DA,p0:D2,c_observed:C4\nc_public:C8,p1:D6,p0:D9,c_unobserved:\n"
-InformationStateString(1) = "1,C6,C5,DJ,DT,D8,H8,H4,H3,SA,SK,SJ,ST,S6,\nc_public:HA,p0:HK,p1:H9,c_observed:S4\nc_public:H6,p0:DQ,p1:D5,c_observed:DA\nc_public:D4,p0:SQ,p1:S4,c_observed:C3\nc_public:SJ,p0:H6,p1:HT,c_unobserved:\nc_public:H7,p1:C7,p0:CK,c_observed:D8\nc_public:S5,p0:CQ,p1:C3,c_observed:S7\nc_public:H2,p0:S8,p1:S7,c_observed:S6\nc_public:C6,p0:D3,p1:D7,c_unobserved:\nc_public:ST,p1:DK,p0:D4,c_unobserved:\nc_public:CA,p1:CT,p0:CJ,c_observed:H4\nc_public:D6,p0:H7,p1:HJ,c_unobserved:\nc_public:H8,p1:DA,p0:D2,c_unobserved:\nc_public:C8,p1:D6,p0:D9,c_observed:DT\n"
-ObservationString(0) = "p0,CA,C9,C8,C4,C2,HA,HQ,H5,H2,S9,S5,S3,S2,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,1:S4,-1:SJ,0:H6,1:HT,-1:H7,1:C7,0:CK,-1:S5,0:CQ,1:C3,-1:H2,0:S8,1:S7,-1:C6,0:D3,1:D7,-1:ST,1:DK,0:D4,-1:CA,1:CT,0:CJ,-1:D6,0:H7,1:HJ,-1:H8,1:DA,0:D2,-1:C8,1:D6,0:D9,"
-ObservationString(1) = "p1,C6,C5,DJ,DT,D8,H8,H4,H3,SA,SK,SJ,ST,S6,-1:HA,0:HK,1:H9,-1:H6,0:DQ,1:D5,-1:D4,0:SQ,1:S4,-1:SJ,0:H6,1:HT,-1:H7,1:C7,0:CK,-1:S5,0:CQ,1:C3,-1:H2,0:S8,1:S7,-1:C6,0:D3,1:D7,-1:ST,1:DK,0:D4,-1:CA,1:CT,0:CJ,-1:D6,0:H7,1:HJ,-1:H8,1:DA,0:D2,-1:C8,1:D6,0:D9,"
-Rewards() = [-13, 13]
-Returns() = [-13, 13]
+InformationStateString(0) = "0,CA,CQ,DK,DQ,DJ,D8,D3,HA,H6,H2,SA,S7,S2,\nc_public:S8,p0:H3,p1:HQ,c_observed:D4\nc_public:C2,p1:C4,p0:C3,c_observed:HA\nc_public:DJ,p1:H7,p0:HJ,c_unobserved:\nc_public:H8,p0:S5,p1:S8,c_observed:DK\nc_public:C6,p1:ST,p0:SQ,c_unobserved:\nc_public:D6,p0:D5,p1:DA,c_observed:S9\nc_public:C8,p1:DT,p0:D4,c_observed:CQ\nc_public:C5,p1:H4,p0:H5,c_unobserved:\nc_public:S4,p0:C6,p1:CK,c_observed:C7\nc_public:D9,p1:C8,p0:C5,c_observed:CA\nc_public:HK,p1:CJ,p0:C7,c_observed:S7\nc_public:S6,p1:HK,p0:H9,c_observed:S2\nc_public:D2,p1:SK,p0:S9,c_observed:H6\n"
+InformationStateString(1) = "1,CT,C9,C2,D9,D7,D6,D2,HT,H8,SJ,S6,S4,S3,\nc_public:S8,p0:H3,p1:HQ,c_unobserved:\nc_public:C2,p1:C4,p0:C3,c_unobserved:\nc_public:DJ,p1:H7,p0:HJ,c_observed:S3\nc_public:H8,p0:S5,p1:S8,c_unobserved:\nc_public:C6,p1:ST,p0:SQ,c_observed:DA\nc_public:D6,p0:D5,p1:DA,c_unobserved:\nc_public:C8,p1:DT,p0:D4,c_unobserved:\nc_public:C5,p1:H4,p0:H5,c_observed:CT\nc_public:S4,p0:C6,p1:CK,c_unobserved:\nc_public:D9,p1:C8,p0:C5,c_unobserved:\nc_public:HK,p1:CJ,p0:C7,c_unobserved:\nc_public:S6,p1:HK,p0:H9,c_unobserved:\nc_public:D2,p1:SK,p0:S9,c_unobserved:\n"
+ObservationString(0) = "p0,CA,CQ,DK,DQ,DJ,D8,D3,HA,H6,H2,SA,S7,S2,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,0:HJ,-1:H8,0:S5,1:S8,-1:C6,1:ST,0:SQ,-1:D6,0:D5,1:DA,-1:C8,1:DT,0:D4,-1:C5,1:H4,0:H5,-1:S4,0:C6,1:CK,-1:D9,1:C8,0:C5,-1:HK,1:CJ,0:C7,-1:S6,1:HK,0:H9,-1:D2,1:SK,0:S9,"
+ObservationString(1) = "p1,CT,C9,C2,D9,D7,D6,D2,HT,H8,SJ,S6,S4,S3,-1:S8,0:H3,1:HQ,-1:C2,1:C4,0:C3,-1:DJ,1:H7,0:HJ,-1:H8,0:S5,1:S8,-1:C6,1:ST,0:SQ,-1:D6,0:D5,1:DA,-1:C8,1:DT,0:D4,-1:C5,1:H4,0:H5,-1:S4,0:C6,1:CK,-1:D9,1:C8,0:C5,-1:HK,1:CJ,0:C7,-1:S6,1:HK,0:H9,-1:D2,1:SK,0:S9,"
+Rewards() = [13, -13]
+Returns() = [13, -13]
