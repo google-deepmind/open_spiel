@@ -41,12 +41,41 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
   }
 
   if (!absl::StrContainsIgnoreCase(acpc_gamedef, kGamedef)) {
-    SpielFatalError(absl::StrCat(
-        "ACPC gamedef does not have a 'gamedef' line: ", acpc_gamedef));
+    SpielFatalError(absl::StrCat("ACPC gamedef does not contain 'GAMEDEF': ",
+                                 acpc_gamedef));
   }
+
+  // Check the GAMEDEF/END GAMEDEF statements are valid and not something like
+  // e.g. 'GAMEDEFfoo' or 'SPEND GAMEDEF'.
+  //
+  // GAMEDEF either is the very first line, in which case it should be followed
+  // by an "\n", or it is not, in which case it should be both followed by an
+  // "\n" AND also prefixed by another "\n".
+  if (!absl::StartsWithIgnoreCase(acpc_gamedef, absl::StrCat(kGamedef, "\n")) &&
+      !absl::StrContainsIgnoreCase(acpc_gamedef,
+                                   absl::StrCat("\n", kGamedef, "\n"))) {
+    SpielFatalError(
+        absl::StrCat("ACPC gamedef does not have 'GAMEDEF' on its own line "
+                     "(please remove any trailing or prefixed characters, "
+                     "including whitespace):",
+                     acpc_gamedef));
+  }
+  // END GAMEDEF either is the very last line, in which case it should be
+  // prefixed by an "\n", or it is not, in which case it should be both prefixed
+  // by an "\n" AND also followed by another "\n".
   if (!absl::StrContainsIgnoreCase(acpc_gamedef, kEndGamedef)) {
     SpielFatalError(absl::StrCat(
-        "ACPC gamedef does not have an 'end gamedef' line: ", acpc_gamedef));
+        "ACPC gamedef does not contain 'END GAMEDEF': ", acpc_gamedef));
+  }
+  if (!absl::EndsWithIgnoreCase(acpc_gamedef,
+                                absl::StrCat("\n", kEndGamedef)) &&
+      !absl::StrContainsIgnoreCase(acpc_gamedef,
+                                   absl::StrCat("\n", kEndGamedef, "\n"))) {
+    SpielFatalError(
+        absl::StrCat("ACPC gamedef does not have an 'END GAMEDEF' on its own "
+                     "line (please remove any trailing or prefixed characters, "
+                     "including whitespace):",
+                     acpc_gamedef));
   }
 
   // As per definition of gamedef -> "case is ignored". So we will normalize to

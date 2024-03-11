@@ -101,31 +101,31 @@ GameParameters HoldemNoLimit6PParameters() {
 }
 
 void LoadKuhnLimitWithAndWithoutGameDef() {
-  UniversalPokerGame kuhn_limit_3p_gamedef(
-      {{"gamedef", GameParameter(std::string(kKuhnLimit3P))}});
+  std::shared_ptr<const Game> game_generic =
+      LoadUniversalPokerGameFromACPCGamedef(std::string(kKuhnLimit3P));
+  const UniversalPokerGame& kuhn_limit_3p_from_gamedef =
+      open_spiel::down_cast<const UniversalPokerGame&>(*game_generic);
+
   UniversalPokerGame kuhn_limit_3p(KuhnLimit3PParameters());
 
-  SPIEL_CHECK_EQ(kuhn_limit_3p_gamedef.GetACPCGame()->ToString(),
+  SPIEL_CHECK_EQ(kuhn_limit_3p_from_gamedef.GetACPCGame()->ToString(),
                  kuhn_limit_3p.GetACPCGame()->ToString());
-  SPIEL_CHECK_TRUE((*(kuhn_limit_3p_gamedef.GetACPCGame())) ==
+  SPIEL_CHECK_TRUE((*(kuhn_limit_3p_from_gamedef.GetACPCGame())) ==
                    (*(kuhn_limit_3p.GetACPCGame())));
-
-  // (Note: later we'll be removing the prior/above way of using ACPC gamedef)
-  LoadUniversalPokerGameFromACPCGamedef(std::string(kKuhnLimit3P));
 }
 
 void LoadHoldemNoLimit6PWithAndWithoutGameDef() {
-  UniversalPokerGame holdem_no_limit_6p_gamedef(
-      {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
+  std::shared_ptr<const Game> game_generic =
+      LoadUniversalPokerGameFromACPCGamedef(std::string(kHoldemNoLimit6P));
+  const UniversalPokerGame& holdem_no_limit_6p_from_gamedef =
+      open_spiel::down_cast<const UniversalPokerGame&>(*game_generic);
+
   UniversalPokerGame holdem_no_limit_6p(HoldemNoLimit6PParameters());
 
-  SPIEL_CHECK_EQ(holdem_no_limit_6p_gamedef.GetACPCGame()->ToString(),
+  SPIEL_CHECK_EQ(holdem_no_limit_6p_from_gamedef.GetACPCGame()->ToString(),
                  holdem_no_limit_6p.GetACPCGame()->ToString());
-  SPIEL_CHECK_TRUE((*(holdem_no_limit_6p_gamedef.GetACPCGame())) ==
+  SPIEL_CHECK_TRUE((*(holdem_no_limit_6p_from_gamedef.GetACPCGame())) ==
                    (*(holdem_no_limit_6p.GetACPCGame())));
-
-  // (Note: later we'll be removing the prior/above way of using ACPC gamedef)
-  LoadUniversalPokerGameFromACPCGamedef(std::string(kHoldemNoLimit6P));
 }
 void LoadGameFromDefaultConfig() { LoadGame("universal_poker"); }
 
@@ -150,12 +150,16 @@ void LoadAndRunGamesFullParameters() {
 }
 
 void LoadAndRunGameFromGameDef() {
-  std::shared_ptr<const Game> holdem_nolimit_6p =
-      LoadGame("universal_poker",
-               {{"gamedef", GameParameter(std::string(kHoldemNoLimit6P))}});
-  testing::RandomSimTestNoSerialize(*holdem_nolimit_6p, 1);
-  // TODO(b/145688976): The serialization is also broken
-  // testing::RandomSimTest(*holdem_nolimit_6p, 1);
+  std::shared_ptr<const Game> game_generic =
+      LoadUniversalPokerGameFromACPCGamedef(std::string(kHoldemNoLimit6P));
+  const UniversalPokerGame& holdem_no_limit_6p_from_gamedef =
+      open_spiel::down_cast<const UniversalPokerGame&>(*game_generic);
+
+  testing::RandomSimTestNoSerialize(holdem_no_limit_6p_from_gamedef, 1);
+  // Note: there's currently some bugs with serialization. This would probably
+  // fail if not for some hacky workarounds in the ACPC Gamedef -> OpenSpiel
+  // game state conversion code.
+  testing::RandomSimTest(holdem_no_limit_6p_from_gamedef, 1);
 }
 
 void HUNLRegressionTests() {

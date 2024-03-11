@@ -105,9 +105,18 @@ const GameType kGameType{
 
     {
         // The ACPC code uses a specific configuration file to describe the
-        // game. We support using them via the
-        // LoadUniversalPokerGameFromACPCGamedef wrapper. The following has been
-        // copied from ACPC documentation:
+        // game. For more details, see
+        // https://github.com/ethansbrown/acpc/blob/master/project_acpc_server/READMthird_party/open_spiel/integration_tests/playthrough_test.pyE
+
+        // If you wish to construct a universal_poker game directly from one of
+        // these ACPC gamedefs see the LoadUniversalPokerGameFromACPCGamedef()
+        // wrapper function below.
+        // (Note that this is just for convenience; we also support defining the
+        // configuration as a typical OpenSpiel game state input. E.g. doing
+        //   LoadGame("universal_poker(betting=limit,raiseSize=10 10 20,...)")
+        // as per usual).
+
+        // The following has been copied from ACPC documentation:
         //
         // Empty lines or lines with '#' as the very first character will be
         // ignored
@@ -121,12 +130,6 @@ const GameType kGameType{
         // rounds). These may need to be changed for games outside of the what
         // is being run for the Annual Computer Poker Competition.
 
-        // TODO: remove / use LoadUniversalPokerGameFromACPCGamedef
-        {"gamedef", GameParameter(std::string(""))},
-
-        // Note: you may either use the LoadUniversalPokerGameFromACPCGamedef
-        // wrapper or just specify each game state input directly yourself.
-        //
         // The documentation below is adapted from project_acpc_server/game.cc.
         //
         // Number of Players (up to 10)
@@ -1141,23 +1144,6 @@ int UniversalPokerGame::MaxGameLength() const {
  * @return
  */
 std::string UniversalPokerGame::parseParameters(const GameParameters &map) {
-  if (map.find("gamedef") != map.end()) {
-    // We check for sanity that all parameters are empty
-    if (map.size() != 1) {
-      std::vector<std::string> game_parameter_keys;
-      game_parameter_keys.reserve(map.size());
-      for (auto const &imap : map) {
-        game_parameter_keys.push_back(imap.first);
-      }
-      SpielFatalError(
-          absl::StrCat("When loading a 'universal_poker' game, the 'gamedef' "
-                       "field was present, but other fields were present too: ",
-                       absl::StrJoin(game_parameter_keys, ", "),
-                       "gamedef is exclusive with other parameters."));
-    }
-    return ParameterValue<std::string>("gamedef");
-  }
-
   std::string generated_gamedef = "GAMEDEF\n";
 
   absl::StrAppend(
