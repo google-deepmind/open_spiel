@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/universal_poker/logic/gamedef.h"
 
+#include <cctype>
 #include <set>
 #include <string>
 #include <utility>
@@ -33,12 +34,28 @@ namespace open_spiel::universal_poker::logic {
 constexpr char kGamedef[] = "gamedef";
 constexpr char kEndGamedef[] = "end gamedef";
 
+namespace {
+// TODO(author5): remove this when the abseil version is upgraded.
+bool StrContainsIgnoreCase(const std::string& haystack,
+                           const std::string& needle) {
+  std::string haystack_copy = haystack;
+  std::string needle_copy = needle;
+  for (int i = 0; i < haystack_copy.size(); ++i) {
+    haystack_copy[i] = std::tolower(haystack_copy[i]);
+  }
+  for (int i = 0; i < needle_copy.size(); ++i) {
+    needle_copy[i] = std::tolower(needle_copy[i]);
+  }
+  return (haystack_copy.find(needle_copy) != std::string::npos);
+}
+}  // namespace
+
 std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
   if (acpc_gamedef.empty()) {
     SpielFatalError("Input ACPC gamedef was empty.");
   }
 
-  if (!absl::StrContainsIgnoreCase(acpc_gamedef, kGamedef)) {
+  if (!StrContainsIgnoreCase(acpc_gamedef, kGamedef)) {
     SpielFatalError(absl::StrCat("ACPC gamedef does not contain 'GAMEDEF': ",
                                  acpc_gamedef));
   }
@@ -50,7 +67,7 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
   // by an "\n", or it is not, in which case it should be both followed by an
   // "\n" AND also prefixed by another "\n".
   if (!absl::StartsWithIgnoreCase(acpc_gamedef, absl::StrCat(kGamedef, "\n")) &&
-      !absl::StrContainsIgnoreCase(acpc_gamedef,
+      !StrContainsIgnoreCase(acpc_gamedef,
                                    absl::StrCat("\n", kGamedef, "\n"))) {
     SpielFatalError(
         absl::StrCat("ACPC gamedef does not have 'GAMEDEF' on its own line "
@@ -61,14 +78,14 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
   // END GAMEDEF either is the very last line, in which case it should be
   // prefixed by an "\n", or it is not, in which case it should be both prefixed
   // by an "\n" AND also followed by another "\n".
-  if (!absl::StrContainsIgnoreCase(acpc_gamedef, kEndGamedef)) {
+  if (!StrContainsIgnoreCase(acpc_gamedef, kEndGamedef)) {
     SpielFatalError(absl::StrCat(
         "ACPC gamedef does not contain 'END GAMEDEF': ", acpc_gamedef));
   }
   if (!absl::EndsWithIgnoreCase(acpc_gamedef,
                                 absl::StrCat("\n", kEndGamedef)) &&
-      !absl::StrContainsIgnoreCase(acpc_gamedef,
-                                   absl::StrCat("\n", kEndGamedef, "\n"))) {
+      !StrContainsIgnoreCase(acpc_gamedef,
+                             absl::StrCat("\n", kEndGamedef, "\n"))) {
     SpielFatalError(
         absl::StrCat("ACPC gamedef does not have an 'END GAMEDEF' on its own "
                      "line (please remove any trailing or prefixed characters, "
@@ -94,7 +111,7 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
   // 'end gamedef' lines (now that we've verified they appear in it somewhere)
   // because they're not needed for the Open Spiel game state.
   const auto is_useful_line = [](absl::string_view line) {
-    return !line.starts_with("#") && !line.empty() && line != kGamedef &&
+    return line[0] != '#' && !line.empty() && line != kGamedef &&
            line != kEndGamedef;
   };
   std::vector<std::string> lines = absl::StrSplit(gamedef_normalized, '\n');
@@ -142,7 +159,8 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
     // we can go fix the downstream issue :)
     const std::set<std::string> optionally_multi_round_parameters = {
         "firstplayer", "raisesize", "maxraises", "numboardcards", "stack"};
-    if (optionally_multi_round_parameters.contains(key) && !values.empty() &&
+    if (optionally_multi_round_parameters.find(key) !=
+        optionally_multi_round_parameters.end() && !values.empty() &&
         !absl::StrContains(values, " ")) {
       // Note: "values" is a single integer if in this section (hence why we're
       // having this problem to begin with; see above for more details).
