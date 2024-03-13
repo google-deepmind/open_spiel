@@ -26,7 +26,7 @@ jobs:
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "ON"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.6/or-tools_amd64_ubuntu-22.04_cpp_v9.6.2534.tar.gz"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.9/or-tools_amd64_ubuntu-23.10_cpp_v9.9.3963.tar.gz"
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.10"
           TRAVIS_USE_NOX: 0
