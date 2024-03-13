@@ -14,10 +14,11 @@
 
 #include "open_spiel/games/universal_poker/universal_poker.h"
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <set>
+#include <string>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -636,6 +637,52 @@ void TestFCHPA() {
   }
 }
 
+// Regression test checking we do not allow half pot bets in incorrect spots.
+void TestFCHPALegalActions() {
+  std::vector<Action> fold_call_allin = {kFold, kCall, kAllIn};
+  std::vector<Action> fold_call = {kFold, kCall};
+  constexpr const char* heads_up_nolimit_fchpa =
+      "universal_poker("
+      "betting=nolimit,"
+      "numPlayers=2,"
+      "numRounds=2,"
+      "stack=1200 1200,"
+      "blind=100 100,"
+      "numSuits=4,"
+      "numRanks=6,"
+      "numHoleCards=1,"
+      "numBoardCards=0 1,"
+      "bettingAbstraction=fchpa,"
+      ")";
+  std::shared_ptr<const Game> game = LoadGame(heads_up_nolimit_fchpa);
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  for (Action action : {3, 7, 2, 2}) {
+    state->ApplyAction(action);
+  }
+
+  // 1. Verify that we did not accidentally add halfPot betting action in a
+  // situation where a player has too few chips to do so.
+  std::vector<Action> legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(std::find(legal_actions.begin(), legal_actions.end(),
+                              ActionType::kHalfPot) != legal_actions.end());
+  SPIEL_CHECK_EQ(legal_actions, fold_call_allin);
+  state->ApplyAction(kAllIn);
+
+  // 2. Verify that we do not accidentally add halfPot betting action in a
+  // heads-up situation where the other player already shoved all-in.
+  legal_actions = state->LegalActions();
+  SPIEL_CHECK_FALSE(std::find(legal_actions.begin(), legal_actions.end(),
+                              ActionType::kHalfPot) != legal_actions.end());
+  SPIEL_CHECK_EQ(legal_actions, fold_call);
+
+  // 3. Verify that we do not accidentally add halfPot betting action in a
+  // terminal state (i.e. where there should not be *any* possible legal actions
+  // remaining).
+  state->ApplyAction(kFold);
+  SPIEL_CHECK_EQ(state->LegalActions().size(), 0);
+}
+
 void TestHoleIndexCalculation() {
   auto check_index = [](std::string card_a, std::string card_b,
                         int expected_index) {
@@ -788,6 +835,7 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
   open_spiel::universal_poker::CanConvertActionsCorrectly();
   open_spiel::universal_poker::TestFCHPA();
+  open_spiel::universal_poker::TestFCHPALegalActions();
   open_spiel::universal_poker::TestHoleIndexCalculation();
   open_spiel::universal_poker::TestSubgameCreation();
   open_spiel::universal_poker::TestRandomSubgameCreation();

@@ -761,9 +761,10 @@ std::vector<Action> UniversalPokerState::LegalActions() const {
     // action representation).
     // Note that FCHPA only tells the players about HalfPot + FCPA, but it will
     // accept most of the other ones.
-    if (betting_abstraction_ == kFCHPA) {
+    if (ACTION_BET & possibleActions_ && betting_abstraction_ == kFCHPA) {
       legal_actions.push_back(kHalfPot);
     }
+
     return legal_actions;
   } else {
     if (acpc_state_.IsFinished()) {
