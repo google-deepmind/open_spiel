@@ -19,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/logging.h"
 #include "open_spiel/abseil-cpp/absl/strings/ascii.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
@@ -27,7 +26,6 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "third_party/cppitertools/filter.hpp"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel::universal_poker::logic {
@@ -99,8 +97,11 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
     return !line.starts_with("#") && !line.empty() && line != kGamedef &&
            line != kEndGamedef;
   };
-  for (const auto& line :
-       iter::filter(is_useful_line, absl::StrSplit(gamedef_normalized, '\n'))) {
+  std::vector<std::string> lines = absl::StrSplit(gamedef_normalized, '\n');
+  for (const auto& line : lines) {
+    // Skip lines that are not useful.
+    if (!is_useful_line(line)) { continue; }
+
     // EDGE CASE: we should only see exactly one of either 'limit' or 'nolimit',
     // and it should be on its own line. TLDR it's like 'END GAMEDEF' in that
     // it's atypical / has no '=' in it, which would interfere with our
@@ -145,16 +146,14 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
         !absl::StrContains(values, " ")) {
       // Note: "values" is a single integer if in this section (hence why we're
       // having this problem to begin with; see above for more details).
-      LOG(INFO) << line
-                << " has a potentially multi-round value defined in terms of a "
-                   "single round. Transforming the value into another that is "
-                   "equivalent, but defined multi-round, to prevent downstream "
-                   "deserializer errors.";
+
+      // Note: this line has a potentially multi-round value defined in terms of
+      // single round. Transforming the value into another that is equivalent,
+      // but defined multi-round, to prevent downstream deserializer errors.;
 
       values = absl::StrCat(values, " ", values);
-      LOG(INFO) << "Transformed value into another that is equivalent, but "
-                   "defined as multi-round: "
-                << values;
+      // Transformed value into another that is equivalent, but defined as
+      // multi-round
     }
 
     open_spiel_state_args.push_back(absl::StrCat(key, "=", values));
