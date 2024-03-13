@@ -221,7 +221,7 @@ Once the proper Python paths are set, from the main directory (one above
 
 ```bash
 # Similar to the C++ example:
-python3 open_spiel/python/examples/example.py --game=breakthrough
+python3 open_spiel/python/examples/example.py --game_string=breakthrough
 
 # Play a game against a random or MCTS bot:
 python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=random
