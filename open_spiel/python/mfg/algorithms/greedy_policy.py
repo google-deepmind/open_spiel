@@ -42,3 +42,10 @@ class GreedyPolicy(policy_std.Policy):
     amax_q = [0.0 for _ in state.legal_actions()]
     amax_q[np.argmax(q)] = 1.0
     return dict(zip(state.legal_actions(), amax_q))
+
+  def action(self, state, player_id=None):
+    q = [
+        self._state_action_value(state, action)
+        for action in state.legal_actions()
+    ]
+    return state.legal_actions()[np.argmax(q)]
