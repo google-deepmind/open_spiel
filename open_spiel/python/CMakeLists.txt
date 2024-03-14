@@ -111,8 +111,6 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_tiny_bridge.h
   pybind11/games_trade_comm.cc
   pybind11/games_trade_comm.h
-  pybind11/games_universal_poker.cc
-  pybind11/games_universal_poker.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
   pybind11/observer.cc
@@ -133,6 +131,13 @@ if (OPEN_SPIEL_BUILD_WITH_HIGC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
       pybind11/referee.cc
       pybind11/referee.h
+  )
+endif()
+
+if (OPEN_SPIEL_BUILD_WITH_ACPC)
+  set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
+      pybind11/games_universal_poker.cc
+      pybind11/games_universal_poker.h
   )
 endif()
 

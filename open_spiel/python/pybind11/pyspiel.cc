@@ -45,7 +45,6 @@
 #include "open_spiel/python/pybind11/games_tarok.h"
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 #include "open_spiel/python/pybind11/games_trade_comm.h"
-#include "open_spiel/python/pybind11/games_universal_poker.h"
 #include "open_spiel/python/pybind11/observer.h"
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -67,6 +66,9 @@
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
 #include "open_spiel/bots/xinxin/xinxin_pybind11.h"
+#endif
+#if OPEN_SPIEL_BUILD_WITH_ACPC
+#include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
 // Flags governing Open Spiel behaviour
@@ -651,7 +653,6 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_gin_rummy(m);  // Game-specific functions for gin_rummy.
   init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
   init_pyspiel_games_leduc_poker(m);  // Leduc poker game.
-  init_pyspiel_games_universal_poker(m);  // Universal poker game.
   init_pyspiel_games_negotiation(m);  // Negotiation game.
   init_pyspiel_games_tarok(m);   // Game-specific functions for tarok.
   init_pyspiel_games_tiny_bridge(
@@ -669,6 +670,9 @@ PYBIND11_MODULE(pyspiel, m) {
 #endif
 #if OPEN_SPIEL_BUILD_WITH_HIGC
   init_pyspiel_referee(m);
+#endif
+#if OPEN_SPIEL_BUILD_WITH_ACPC
+  init_pyspiel_games_universal_poker(m);  // Universal poker game.
 #endif
 }  // NOLINT
 
