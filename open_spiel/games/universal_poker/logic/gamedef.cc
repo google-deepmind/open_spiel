@@ -94,7 +94,7 @@ std::string GamedefToOpenSpielParameters(const std::string& acpc_gamedef) {
   // 'end gamedef' lines (now that we've verified they appear in it somewhere)
   // because they're not needed for the Open Spiel game state.
   const auto is_useful_line = [](absl::string_view line) {
-    return line[0] != '#' && !line.empty() && line != kGamedef &&
+    return !line.empty() && line[0] != '#' && line != kGamedef &&
            line != kEndGamedef;
   };
   std::vector<std::string> lines = absl::StrSplit(gamedef_normalized, '\n');
