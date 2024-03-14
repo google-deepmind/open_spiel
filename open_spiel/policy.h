@@ -264,10 +264,10 @@ class TabularPolicy : public Policy {
 
   int size() const { return policy_table_.size(); }
 
-  const std::string ToString() const;
+  std::string ToString() const;
 
   // A ToString where the keys are sorted.
-  const std::string ToStringSorted() const;
+  std::string ToStringSorted() const;
 
  protected:
   std::unordered_map<std::string, ActionsAndProbs> policy_table_;

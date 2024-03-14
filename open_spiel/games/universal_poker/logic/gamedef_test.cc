@@ -59,11 +59,11 @@ void TestGamedefToOpenSpielParametersNormalizesKeyOnlyLines() {
 
   SPIEL_CHECK_TRUE(absl::StrContains(open_spiel_game_state, "betting=limit,"));
   SPIEL_CHECK_FALSE(
-      absl::StrContainsIgnoreCase(open_spiel_game_state, "end gamedef"));
+      StrContainsIgnoreCase(open_spiel_game_state, "end gamedef"));
   SPIEL_CHECK_FALSE(
-      absl::StrContainsIgnoreCase(open_spiel_game_state, "gamedef"));
+      StrContainsIgnoreCase(open_spiel_game_state, "gamedef"));
   SPIEL_CHECK_FALSE(
-      absl::StrContainsIgnoreCase(open_spiel_game_state, "nolimit"));
+      StrContainsIgnoreCase(open_spiel_game_state, "nolimit"));
 }
 
 // There's a bug downstream causing a runtime error if we provide it with a
@@ -129,9 +129,9 @@ end GameDef
   SPIEL_CHECK_FALSE(absl::StrContains(open_spiel_game_state, "#"));
   SPIEL_CHECK_FALSE(absl::StrContains(open_spiel_game_state, "\n"));
   SPIEL_CHECK_FALSE(
-      absl::StrContainsIgnoreCase(open_spiel_game_state, "end gamedef"));
+      StrContainsIgnoreCase(open_spiel_game_state, "end gamedef"));
   SPIEL_CHECK_FALSE(
-      absl::StrContainsIgnoreCase(open_spiel_game_state, "gamedef"));
+      StrContainsIgnoreCase(open_spiel_game_state, "gamedef"));
 }
 
 void TestGamedefToOpenSpielParametersNormalizesCapitalization() {

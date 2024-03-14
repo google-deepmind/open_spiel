@@ -19,6 +19,7 @@
 #include <random>
 
 #include "open_spiel/abseil-cpp/absl/random/discrete_distribution.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
