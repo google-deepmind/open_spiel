@@ -111,6 +111,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_tiny_bridge.h
   pybind11/games_trade_comm.cc
   pybind11/games_trade_comm.h
+  pybind11/games_universal_poker.cc
+  pybind11/games_universal_poker.h
   pybind11/game_transforms.cc
   pybind11/game_transforms.h
   pybind11/observer.cc
