@@ -15,6 +15,7 @@
 #include <charconv>
 
 #include "absl/strings/escaping.h"
+#include "absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
 
 // Example implementation of the random bot for HIG competition.
