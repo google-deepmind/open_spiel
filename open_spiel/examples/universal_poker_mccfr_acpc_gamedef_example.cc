@@ -24,20 +24,20 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-constexpr char kCustom4PlayerAcpcGamedef[] = R"""(
+constexpr char kCustom3PlayerAcpcGamedef[] = R"""(
 # (Empty lines and lines starting with an '#' are all ignored)
 
 GAMEDEF
 nolimit
-numPlayers = 4
+numPlayers = 3
 numRounds = 1
 numSuits = 2
 numRanks = 4
 numHoleCards = 1
 
-# Set per player, so 4 total
-stack = 15 15 15 15
-blind = 0 1 0 0
+# Set per player, so 3 total
+stack = 15 15 15
+blind = 0 1 0
 
 # Set per round
 firstPlayer = 3
@@ -46,11 +46,11 @@ numBoardCards = 0
 END GAMEDEF
 )""";
 
-ABSL_FLAG(std::string, acpc_gamedef, kCustom4PlayerAcpcGamedef,
+ABSL_FLAG(std::string, acpc_gamedef, kCustom3PlayerAcpcGamedef,
           "ACPC gamedef.");
-ABSL_FLAG(int, num_iters, 45'000, "How many iters to run for.");
-// Note: reporting exploitability can be expensive!
-ABSL_FLAG(int, report_every, 15'000, "How often to report exploitability.");
+ABSL_FLAG(int, num_iters, 2000, "How many iters to run for.");
+// Note: reporting exploitability too frequently can be expensive!
+ABSL_FLAG(int, report_every, 500, "How often to report exploitability.");
 
 // Example code for using MCCFR on a univeral_poker game loaded from an ACPC
 // gamedef (via the wrapper function).
