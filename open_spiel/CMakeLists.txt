@@ -50,7 +50,7 @@ if(${BUILD_TYPE} STREQUAL "Testing")
   # A build used for running tests: keep all runtime checks (assert,
   # SPIEL_CHECK_*, SPIEL_DCHECK_*), but turn on some speed optimizations,
   # otherwise tests run for too long.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 ")
 endif()
 
 if(${BUILD_TYPE} STREQUAL "Release")
@@ -294,6 +294,7 @@ if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   add_compile_definitions(OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
   find_package(TensorflowCC REQUIRED)
 endif()
+
 
 # We have the parent of this directory in the include path, so that we can
 # include for example "open_spiel/spiel.h" (assuming this directory is named
