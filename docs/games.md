@@ -84,6 +84,7 @@ Status           | Game
 🟢               | [Tiny Bridge](#tiny-bridge)
 🟢               | [Tiny Hanabi](#tiny-hanabi)
 🟢               | [Trade Comm](#trade-comm)
+🔶               | [TwixT](#twixt)
 🔶               | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
 🔶               | [Weighted Voting Games](#weighted-voting-games)
 🟢               | [Y](#y)
@@ -890,6 +891,16 @@ Status           | Game
 *   Imperfect information.
 *   2 players.
 *   A simple emergent communication game based on trading.
+
+### TwixT
+
+*   Players place pegs and links on a 24x24 square to connect a line between opposite sides.
+*   pegs and links on a grid.
+*   Modern game.
+*   Deterministic.
+*   Perfect information.
+*   2 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/TwixT)
 
 ### Ultimate Tic-Tac-Toe
 
