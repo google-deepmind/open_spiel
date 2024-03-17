@@ -103,10 +103,10 @@ export OPEN_SPIEL_BUILD_WITH_GAMUT="${OPEN_SPIEL_BUILD_WITH_GAMUT:-"OFF"}"
 # See algorithms/ortools/CMakeLists.txt for specific instructions.
 export OPEN_SPIEL_BUILD_WITH_ORTOOLS="${OPEN_SPIEL_BUILD_WITH_ORTOOLS:-"OFF"}"
 # You may want to replace this URL according to your system.
-# Use version 9.6 at minimum, due to compatibility between absl library versions
+# Use version 9.9 at minimum, due to compatibility between absl library versions
 # used in OpenSpiel and in OrTools.
 # Other links to archives found here: https://developers.google.com/optimization/install/cpp/linux
-export OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v9.6/or-tools_amd64_ubuntu-22.04_cpp_v9.6.2534.tar.gz"}"
+export OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:-"https://github.com/google/or-tools/releases/download/v9.9/or-tools_amd64_ubuntu-23.10_cpp_v9.9.3963.tar.gz"}"
 # Used to determine whether to include the Python ML frameworks in the tests.
 # A value of AUTO runs the appropriate find_X script in open_spiel/scripts to check what is installed.
 # To override automatic detection, set to either ON or OFF.
