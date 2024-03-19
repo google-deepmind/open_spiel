@@ -20,14 +20,15 @@ from absl.testing import parameterized
 import numpy as np
 # Note: this import needs to come before Tensorflow to fix a malloc error.
 import pyspiel  # pylint: disable=g-bad-import-order
-import tensorflow.compat.v1 as tf
+# import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 from open_spiel.python.algorithms import rcfr
 
 # Temporarily disable TF2 behavior while the code is not updated.
-tf.disable_v2_behavior()
+#tf.disable_v2_behavior()
 
-tf.enable_eager_execution()
+#tf.enable_eager_execution()
 
 _GAME = pyspiel.load_game('kuhn_poker')
 _BOOLEANS = [False, True]
@@ -46,7 +47,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
 
   def setUp(self):
     super(RcfrTest, self).setUp()
-    tf.random.set_random_seed(42)
+    tf.random.set_seed(42)
 
   def test_with_one_hot_action_features_single_state_vector(self):
     information_state_features = [1., 2., 3.]
@@ -476,7 +477,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
       data = data.batch(12)
       data = data.repeat(num_epochs)
 
-      optimizer = tf.keras.optimizers.Adam(lr=0.005, amsgrad=True)
+      optimizer = tf.optimizers.Adam(learning_rate=0.005, amsgrad=True)
 
       for x, y in data:
         optimizer.minimize(
@@ -504,7 +505,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
       data = data.batch(12)
       data = data.repeat(num_epochs)
 
-      optimizer = tf.keras.optimizers.Adam(lr=0.005, amsgrad=True)
+      optimizer = tf.optimizers.Adam(learning_rate=0.005, amsgrad=True)
 
       for x, y in data:
         optimizer.minimize(
@@ -565,7 +566,7 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
       data = data.batch(12)
       data = data.repeat(num_epochs)
 
-      optimizer = tf.keras.optimizers.Adam(lr=0.005, amsgrad=True)
+      optimizer = tf.optimizers.Adam(learning_rate=0.005, amsgrad=True)
 
       for x, y in data:
         optimizer.minimize(

@@ -16,7 +16,6 @@
 
 read -r -d '' TESTSCRIPT << EOT
 import tensorflow as tf
-import tensorflow_probability
 print(tf.__version__)
 EOT
 
