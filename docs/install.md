@@ -74,7 +74,7 @@ issue.
 Currently there are three installation methods:
 
 1.  building from the source code and editing `PYTHONPATH`.
-2.  using `pip install` to build and testing using
+2.  using `pip install`.
     [nox](https://nox.thea.codes/en/stable/).
 3.  installing via [Docker](https://www.docker.com).
 
