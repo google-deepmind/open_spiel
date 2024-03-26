@@ -74,8 +74,7 @@ issue.
 Currently there are three installation methods:
 
 1.  building from the source code and editing `PYTHONPATH`.
-2.  using `pip install` to build and testing using
-    [nox](https://nox.thea.codes/en/stable/).
+2.  using `pip install`.
 3.  installing via [Docker](https://www.docker.com).
 
 ## Summary
@@ -130,14 +129,6 @@ In a nutshell:
     ```bash
     python3 -m pip install -r requirements.txt
     ./open_spiel/scripts/build_and_run_tests.sh
-    ```
-
-    **Building and testing using PIP**
-
-    ```bash
-    python3 -m pip install .
-    python3 -m pip install nox
-    nox -s tests
     ```
 
     Optionally, use `pip install -e` to install in
