@@ -127,13 +127,6 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/utils.h
   )
 
-if (OPEN_SPIEL_BUILD_WITH_HIGC)
-  set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      pybind11/referee.cc
-      pybind11/referee.h
-  )
-endif()
-
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
       pybind11/games_universal_poker.cc
