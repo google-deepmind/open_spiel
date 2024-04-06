@@ -49,7 +49,6 @@
 #include "open_spiel/python/pybind11/policy.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/python/pybind11/python_games.h"
-#include "open_spiel/python/pybind11/referee.h"
 #include "open_spiel/python/pybind11/utils.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
@@ -667,9 +666,6 @@ PYBIND11_MODULE(pyspiel, m) {
 #endif
 #if OPEN_SPIEL_BUILD_WITH_XINXIN
   init_pyspiel_xinxin(m);
-#endif
-#if OPEN_SPIEL_BUILD_WITH_HIGC
-  init_pyspiel_referee(m);
 #endif
 #if OPEN_SPIEL_BUILD_WITH_ACPC
   init_pyspiel_games_universal_poker(m);  // Universal poker game.
