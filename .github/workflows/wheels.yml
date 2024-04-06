@@ -68,7 +68,7 @@ jobs:
       CIBW_ENVIRONMENT: ${{ matrix.CIBW_ENVIRONMENT }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install
         run: |
@@ -114,7 +114,7 @@ jobs:
       - name: Install bdist_wheel and full tests
         run: ./open_spiel/scripts/test_wheel.sh full `pwd` ${CI_PYBIN}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: |
             dist/*.tar.gz
