@@ -299,7 +299,6 @@ add_subdirectory (bots)
 add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
-add_subdirectory (contrib)
 
 if (OPEN_SPIEL_BUILD_WITH_GO)
   add_subdirectory(go)
