@@ -144,13 +144,6 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   cached_clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
-# Add EIGEN template library for linear algebra.
-# http://eigen.tuxfamily.org/index.php?title=Main_Page
-DIR="open_spiel/eigen/libeigen"
-if [[ ${OPEN_SPIEL_BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  cached_clone -b '3.3.7' --single-branch --depth 1  https://gitlab.com/libeigen/eigen.git ${DIR}
-fi
-
 # This GitHub repository contains Nathan Sturtevant's state of the art
 # Hearts program xinxin.
 DIR="open_spiel/bots/xinxin/hearts"
