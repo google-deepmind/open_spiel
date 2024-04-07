@@ -306,9 +306,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
       cargo install bindgen-cli
     fi
   fi
-
-  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-  ${PYBIN} get-pip.py
+  # brew install virtualenv   # May be the required way to do this as of Python 3.12?
   ${PYBIN} -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
