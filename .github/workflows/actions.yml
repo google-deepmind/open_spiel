@@ -34,7 +34,7 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: macos-14
+        - os: macos-13
           OS_PYTHON_VERSION: "3.11"
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
