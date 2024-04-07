@@ -312,9 +312,11 @@ endif()
 if (OPEN_SPIEL_ENABLE_TENSORFLOW)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/alpha_zero/evaluator_test.py
-      algorithms/alpha_zero/model_test.py
+      # Broken. Must port to Keras 3.
+      # algorithms/alpha_zero/model_test.py
       algorithms/deep_cfr_test.py
-      algorithms/deep_cfr_tf2_test.py
+      # Broken. Must port to Keras 3.
+      # algorithms/deep_cfr_tf2_test.py
       algorithms/discounted_cfr_test.py
       algorithms/dqn_test.py
       algorithms/eva_test.py
@@ -326,7 +328,8 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/nfsp_test.py
       algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
-      algorithms/rcfr_test.py
+      # Broken. Must port to Keras 3.
+      # algorithms/rcfr_test.py
   )
   if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
     set(PYTHON_TESTS ${PYTHON_TESTS}
