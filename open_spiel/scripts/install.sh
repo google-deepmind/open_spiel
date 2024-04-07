@@ -306,6 +306,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
       cargo install bindgen-cli
     fi
   fi
+  # Removed getting pip via git-pip.py. See #1200.
   # brew install virtualenv   # May be the required way to do this as of Python 3.12?
   ${PYBIN} -m pip install virtualenv
 else
