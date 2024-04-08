@@ -131,6 +131,12 @@ In a nutshell:
     ./open_spiel/scripts/build_and_run_tests.sh
     ```
 
+    **Building and testing using PIP**
+
+    ```bash
+    python3 -m pip install .
+    ```
+
     Optionally, use `pip install -e` to install in
     [editable mode](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs),
     which will allow you to skip this `pip install` step if you edit any Python
