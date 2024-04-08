@@ -113,8 +113,6 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GO             OFF
   "Build with support for Golang API.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HANABI         OFF
   "Build against the Hanabi game.")
-openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HIGC           OFF
-  "Build with Hidden Information Game Competition tournament support.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_JULIA          OFF
   "Build binary for Julia.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_LIBNOP         OFF
@@ -137,9 +135,6 @@ openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_RUST           OFF
   "Build with support for Rust API.")
 
 if (WIN32)
-  if (OPEN_SPIEL_BUILD_WITH_HIGC)
-    message(FATAL_ERROR "HIGC not supported in Windows, please disable it.")
-  endif()
   openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX              OFF
     "Enable JAX.")
   openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH          OFF
@@ -230,10 +225,6 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:utils>
   $<TARGET_OBJECTS:tests>
 )
-if (OPEN_SPIEL_BUILD_WITH_HIGC)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
-     $<TARGET_OBJECTS:higc>)
-endif()
 if (OPEN_SPIEL_BUILD_WITH_HANABI)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
       $<TARGET_OBJECTS:hanabi_learning_environment>)
@@ -317,11 +308,6 @@ endif()
 
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
   add_subdirectory (python)
-  # HIGC needs pyspiel.so and corresponding PYTHONPATH to be set
-  # in order to run its tests.
-  if (OPEN_SPIEL_BUILD_WITH_HIGC)
-    add_subdirectory (higc)
-  endif()
 endif()
 
 add_subdirectory (utils)
