@@ -54,8 +54,8 @@ fi
 
 source ./venv/bin/activate
 
-${PYBIN} -m pip install --upgrade pip
-${PYBIN} -m pip install --upgrade setuptools
+pip install --upgrade pip
+pip install --upgrade setuptools
 
 # Can use python and pip directly after here because we're in the virtual env
 
