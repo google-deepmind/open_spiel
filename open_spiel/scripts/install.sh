@@ -307,8 +307,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     fi
   fi
   # Removed getting pip via git-pip.py. See #1200.
-  # brew install virtualenv   # May be the required way to do this as of Python 3.12?
-  ${PYBIN} -m pip install virtualenv
+  brew install virtualenv   # May be the required way to do this as of Python 3.12?
+  # ${PYBIN} -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."
