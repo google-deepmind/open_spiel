@@ -41,9 +41,6 @@ PYBIN=`which $PYBIN`
 
 source ./open_spiel/scripts/python_extra_deps.sh $PYBIN
 
-${PYBIN} -m pip install --upgrade pip
-${PYBIN} -m pip install --upgrade setuptools
-
 if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
@@ -54,7 +51,11 @@ else
   ${PYBIN} -m pip install virtualenv
   virtualenv -p ${PYBIN} ./venv
 fi
+
 source ./venv/bin/activate
+
+${PYBIN} -m pip install --upgrade pip
+${PYBIN} -m pip install --upgrade setuptools
 
 # Can use python and pip directly after here because we're in the virtual env
 
