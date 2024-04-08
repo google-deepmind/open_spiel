@@ -91,8 +91,8 @@ class BuildExt(build_ext):
         ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
         env=env)
 
-      # Build only pyspiel (for pip package)
-      subprocess.check_call(["make", "pyspiel", f"-j{os.cpu_count()}"],
+    # Build only pyspiel (for pip package)
+    subprocess.check_call(["make", "pyspiel", f"-j{os.cpu_count()}"],
                             cwd=self.build_temp,
                             env=env)
 
