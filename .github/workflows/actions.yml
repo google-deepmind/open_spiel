@@ -14,7 +14,6 @@ jobs:
         # Most current platform.
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.11"
-          TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
@@ -22,14 +21,12 @@ jobs:
         # Standard (most current) platforms and versions.
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.10"
-          TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "ON"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.6/or-tools_amd64_ubuntu-22.04_cpp_v9.6.2534.tar.gz"
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.10"
-          TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
@@ -45,7 +42,6 @@ jobs:
         # Older Python version on Ubuntu 20.04
         - os: macos-12
           OS_PYTHON_VERSION: "3.9"
-          TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
@@ -54,7 +50,6 @@ jobs:
         - os: ubuntu-20.04
           OS_PYTHON_VERSION: "3.9"
           DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          TRAVIS_USE_NOX: 0
           BUILD_SHARED_LIB: "ON"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
@@ -66,7 +61,6 @@ jobs:
       OPEN_SPIEL_ENABLE_TENSORFLOW: ON
       OPEN_SPIEL_ENABLE_PYTHON_MISC: ON
       OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
-      TRAVIS_USE_NOX:  ${{ matrix.TRAVIS_USE_NOX }}
       DEFAULT_OPTIONAL_DEPENDENCY: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY }}
       OPEN_SPIEL_BUILD_WITH_JULIA: ${{ matrix.OPEN_SPIEL_BUILD_WITH_JULIA }}
       BUILD_SHARED_LIB:  ${{ matrix.BUILD_SHARED_LIB }}
