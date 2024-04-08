@@ -26,14 +26,12 @@ matrix:
     dist: bionic # Ubuntu 18.04.2 LTS released on 26 April 2018
     env:
       - OS_PYTHON_VERSION=3.6
-      - TRAVIS_USE_NOX=0
       - CC=/usr/local/clang-7.0.0/bin/clang
       - CXX=/usr/local/clang-7.0.0/bin/clang++
   - os: linux
     dist: focal # Ubuntu 20.04 LTS
     env:
       - OS_PYTHON_VERSION=3.8
-      - TRAVIS_USE_NOX=0
       - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
   # Build and run tests with all optional dependencies, including building a
@@ -43,7 +41,6 @@ matrix:
     env:
       - OS_PYTHON_VERSION=3.8
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
-      - TRAVIS_USE_NOX=0
       - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
       - BUILD_SHARED_LIB="ON"
@@ -54,16 +51,13 @@ matrix:
     osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
     env:
       - DEFAULT_OPTIONAL_DEPENDENCY="ON"
-      - TRAVIS_USE_NOX=0
 
   ## Tests using PIP
   # Build and run tests without all optional dependencies (default behavior) and
-  # use nox
   - os: linux
     dist: focal # Ubuntu 20.04 LTS
     env:
       - OS_PYTHON_VERSION=3.8
-      - TRAVIS_USE_NOX=1
       - CC=/usr/bin/clang
       - CXX=/usr/bin/clang++
   # Ubuntu 18.04
@@ -71,15 +65,12 @@ matrix:
     dist: bionic # Ubuntu 18.04
     env:
       - OS_PYTHON_VERSION=3.6
-      - TRAVIS_USE_NOX=1
       - CC=/usr/local/clang-7.0.0/bin/clang
       - CXX=/usr/local/clang-7.0.0/bin/clang++
   # Build and test on MacOS. We use a single target, with all dependencies and
-  # use nox.
   - os: osx
     osx_image: xcode10.3  # macOS 10.14 (Mojave), release on March 25, 2019.
     env:
-      - TRAVIS_USE_NOX=1
 
 script:
   - pwd
