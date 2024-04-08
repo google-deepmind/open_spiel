@@ -90,12 +90,7 @@ class BuildExt(build_ext):
     subprocess.check_call(
         ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp,
         env=env)
-    if os.environ.get("OPEN_SPIEL_BUILD_ALL") is not None:
-      # Build everything (necessary for nox tests)
-      subprocess.check_call(["make", f"-j{os.cpu_count()}"],
-                            cwd=self.build_temp,
-                            env=env)
-    else:
+
       # Build only pyspiel (for pip package)
       subprocess.check_call(["make", "pyspiel", f"-j{os.cpu_count()}"],
                             cwd=self.build_temp,
@@ -119,8 +114,8 @@ def _parse_line(s):
   return requirement.strip()
 
 
-# Get the requirements from file. During nox tests, this is in the current
-# directory, but when installing from pip it is in the parent directory
+# Get the requirements from file.
+# When installing from pip it is in the parent directory
 req_file = ""
 if os.path.exists("requirements.txt"):
   req_file = "requirements.txt"
