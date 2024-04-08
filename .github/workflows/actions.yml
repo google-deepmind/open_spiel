@@ -34,6 +34,15 @@ jobs:
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+        - os: macos-13
+          OS_PYTHON_VERSION: "3.11"
+          TRAVIS_USE_NOX: 0
+          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
+        # Standard or older platforms with older Python versions.
+        # Older Python version on Ubuntu 20.04
         - os: macos-12
           OS_PYTHON_VERSION: "3.9"
           TRAVIS_USE_NOX: 0
@@ -65,8 +74,8 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL:  ${{ matrix.OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL }}
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: julia-actions/setup-julia@v1
+    - uses: actions/checkout@v4
+    - uses: julia-actions/setup-julia@v2
       with:
         version: 1.8
     - name: Ad-hoc fix
