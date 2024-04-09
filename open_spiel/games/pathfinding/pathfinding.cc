@@ -542,7 +542,7 @@ int PathfindingGame::MaxChanceOutcomes() const {
 
 double PathfindingGame::MinUtility() const {
   // Add a small constant here due to numeral issues.
-  return horizon_ * step_reward_ - FloatingPointDefaultThresholdRatio();
+  return horizon_ * step_reward_ - FloatingPointDefaultTolerance();
 }
 
 double PathfindingGame::MaxUtility() const {
