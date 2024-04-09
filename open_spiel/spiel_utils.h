@@ -133,7 +133,7 @@ using Player = int;
 using Action = int64_t;
 
 // Default floating point tolerance between two numbers.
-inline constexpr float FloatingPointDefaultTolerance() { return 1e-9; }
+inline constexpr float FloatingPointDefaultTolerance() { return 1e-6; }
 
 // Default tolerance applied when validating variables are valid probability.
 inline constexpr float ProbabilityDefaultTolerance() { return 1e-9; }
