@@ -41,7 +41,7 @@ PYBIN=`which $PYBIN`
 
 source ./open_spiel/scripts/python_extra_deps.sh $PYBIN
 
-if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" ) ]]; then
+if [[ "$OS" = "Linux" && ( "$OS_PYTHON_VERSION" = "3.9" || "$OS_PYTHON_VERSION" = "3.10" || "$OS_PYTHON_VERSION" = "3.11" || "$OS_PYTHON_VERSION" = "3.12" ) ]]; then
   # Ubuntu 22.04 must execute the virtual env this way:
   ${PYBIN} -m venv ./venv
 elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
