@@ -12,6 +12,7 @@ jobs:
       matrix:
         include:
         # Most current platforms and Python versions.
+        # TODO: change this first one to Ubuntu 24.04 when ready
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.12"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
