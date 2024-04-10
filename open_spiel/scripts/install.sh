@@ -242,6 +242,12 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo "Adding Python 3.11 ppa repos"
     sudo add-apt-repository ppa:deadsnakes/ppa
     PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk python3.11-venv"
+  elif [[ "$OS_PYTHON_VERSION" == "3.12" ]]; then
+    # Need to special-case this until it's installed by default.
+    # https://ubuntuhandbook.org/index.php/2023/05/install-python-3-12-ubuntu/
+    echo "Adding Python 3.12 ppa repos"
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    PYTHON_PKGS="python3.12 python3.12-dev python3-pip python3-setuptools python3-wheel python3-tk python3.12-venv"
   fi
   EXT_DEPS="virtualenv clang cmake curl $PYTHON_PKGS"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
