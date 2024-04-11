@@ -62,7 +62,6 @@ _ACTIONS_STR = [str(action) for action in _ACTIONS]
 _HAND_SIZE = 7
 
 _MAX_GAME_LENGTH = 28
-
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_block_dominoes",
     long_name="Python block dominoes",
@@ -118,7 +117,7 @@ class BlockDominoesState(pyspiel.State):
     super().__init__(game)
     self.actions_history = []
     self.open_edges = []
-    self.hands = [[], []]
+    self.hands = [[] for _ in range(_NUM_PLAYERS)]
     self.deck = copy.deepcopy(_DECK)
     self._game_over = False
     self._next_player = pyspiel.PlayerId.CHANCE
@@ -130,7 +129,7 @@ class BlockDominoesState(pyspiel.State):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     if self._game_over:
       return pyspiel.PlayerId.TERMINAL
-    if len(self.deck) > 14:
+    if len(self.deck) > 0: # MODIFIED
       return pyspiel.PlayerId.CHANCE
     return self._next_player
 
@@ -196,7 +195,7 @@ class BlockDominoesState(pyspiel.State):
       if not my_hand:
         self._game_over = True  # player played his last tile
         return
-
+      # TODO : modify this so that it accomodates 4 players
       opp_idx = 1 - my_idx
       opp_legal_actions = self.get_legal_actions(opp_idx)
 
