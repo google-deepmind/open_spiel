@@ -18,6 +18,7 @@
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
 

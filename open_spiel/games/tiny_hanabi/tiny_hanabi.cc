@@ -17,6 +17,7 @@
 #include <numeric>
 
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {

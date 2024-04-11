@@ -44,9 +44,6 @@ const std::vector<int> kChanceOutcomeValues = {1, 2, 3, 4, 5, 6};
 
 constexpr int kLowestDieRoll = 1;
 constexpr int kHighestDieRoll = 6;
-
-// Possible Actions:
-constexpr int kPass = 0;
 constexpr int kInitialTurn = -1;
 
 // Facts about the game
@@ -164,6 +161,37 @@ int YachtState::DiceValue(int i) const {
   }
 }
 
+void YachtState::ApplyNormalAction(Action move, int player) {
+  if (move == kFillOnes) {
+    scoring_sheets_[player].ones = filled;
+
+    int score = 0;
+    for (int i = 0; i < dice_.size(); ++i) {
+      int die = dice_[i];
+      if (die == 1) {
+        score += die;
+      }
+    }
+
+    scores_[player] += score;
+  }
+  // TODO(aaronrice): Score remaining categories here
+}
+
+void YachtState::IncrementTurn() {
+  turns_++;
+  if (cur_player_ == kPlayerId1) {
+    player1_turns_++;
+  } else if (cur_player_ == kPlayerId2) {
+    player2_turns_++;
+  }
+
+  prev_player_ = cur_player_;
+  cur_player_ = kChancePlayerId;
+
+  dice_.clear();
+}
+
 void YachtState::DoApplyAction(Action move) {
   if (IsChanceNode()) {
     if (turns_ == kInitialTurn) {
@@ -172,10 +200,12 @@ void YachtState::DoApplyAction(Action move) {
       int starting_player = std::rand() % kNumPlayers;
       if (starting_player == 0) {
         // Player1 starts.
-        cur_player_ = prev_player_ = kPlayerId1;
+        cur_player_ = kChancePlayerId;
+        prev_player_ = kPlayerId2;
       } else if (starting_player == 1) {
         // Player2 Starts
-        cur_player_ = prev_player_ = kPlayerId2;
+        cur_player_ = kChancePlayerId;
+        prev_player_ = kPlayerId1;
       } else {
         SpielFatalError(
             absl::StrCat("Invalid starting player: ", starting_player));
@@ -185,28 +215,24 @@ void YachtState::DoApplyAction(Action move) {
       return;
     } else {
       // Normal chance node.
-      SPIEL_CHECK_TRUE(dice_.empty());
+      SPIEL_CHECK_TRUE(dice_.size() < 5);
       RollDie(move);
-      cur_player_ = Opponent(prev_player_);
+
+      // Once die are done rolling. Set player to non-chance node.
+      if (dice_.size() == 5) {
+        cur_player_ = Opponent(prev_player_);
+      }
       return;
     }
   }
 
   // Normal action.
   SPIEL_CHECK_TRUE(dice_.size() == 5);
-  // TODO(aaronrice): Fill out DoApplyAction for each move.
 
-  turns_++;
-  if (cur_player_ == kPlayerId1) {
-    player1_turns_++;
-  } else if (cur_player_ == kPlayerId2) {
-    player2_turns_++;
-  }
+  int player_index = cur_player_ - 1;
+  ApplyNormalAction(move, player_index);
 
-  prev_player_ = cur_player_;
-
-  cur_player_ = kChancePlayerId;
-  dice_.clear();
+  IncrementTurn();
 }
 
 bool YachtState::IsPosInHome(int player, int pos) const { return true; }
@@ -223,14 +249,7 @@ std::vector<Action> YachtState::LegalActions() const {
   if (IsChanceNode()) return LegalChanceOutcomes();
   if (IsTerminal()) return {};
 
-  // Actions:
-  // 0: done choosing dice to reroll
-  // 1: choose die 1 to be rerolled
-  // 2: choose die 2 to be rerolled
-  // 3: choose die 3 to be rerolled
-  // 4: choose die 4 to be rerolled
-  // 5: choose die 5 to be rerolled
-  // 6: choose die 6 to be rerolled
+  // TODO(aaronrice): update legal moves for scoring categories and scratches.
   std::vector<Action> legal_actions = {};
 
   for (int i = 0; i < dice_to_reroll_.size(); i++) {

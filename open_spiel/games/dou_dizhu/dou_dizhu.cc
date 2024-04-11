@@ -14,12 +14,10 @@
 
 #include "open_spiel/games/dou_dizhu/dou_dizhu.h"
 
-#include <cstring>
-
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/games/dou_dizhu/dou_dizhu_utils.h"
 
 namespace open_spiel {
 namespace dou_dizhu {
@@ -160,7 +158,7 @@ DouDizhuState::OriginalDeal() const {
   std::array<std::array<int, kNumRanks>, kNumPlayers> deal{};
   for (int i = 1; i < kNumCards - kNumCardsLeftOver + 1; ++i)
     deal[((i - 1 + first_player_) % kNumPlayers)]
-        [CardToRank(history_[i].action)]++;
+        [CardToRank(history_[i].action - kDealingActionBase)]++;
 
   for (int i = 0; i < kNumCardsLeftOver; ++i)
     deal[dizhu_][cards_left_over_[i]]++;

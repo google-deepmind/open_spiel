@@ -45,8 +45,10 @@ def get_config():
   examples_names = names_schedule_meeting.NAMES
 
   given_prompt_actions = collections.OrderedDict()
-  tones = ['Happy',
-           'Aggreable']
+  tones = ['calm',
+           'assertive',
+           'submissive',
+           'any']
   given_prompt_actions[header.action_keys[0]] = tones
   num_tones = len(tones)
 
@@ -80,7 +82,7 @@ def get_config():
             'num_players': num_players,
             'min_utility': min([float(p.min) for p in payoffs]),
             'max_utility': max([float(p.max) for p in payoffs]),
-            'num_max_replies': 3}
+            'num_max_replies': 1}
 
   config.params = params
 

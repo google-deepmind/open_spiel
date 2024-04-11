@@ -14,9 +14,12 @@
 
 #include "open_spiel/games/chess/chess.h"
 
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -28,13 +31,27 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
-int CountNumLegalMoves(const ChessBoard& board) {
-  int num_legal_moves = 0;
-  board.GenerateLegalMoves([&num_legal_moves](const Move&) -> bool {
-    ++num_legal_moves;
+uint64_t Perft(const ChessBoard& board, int depth) {
+  std::vector<Move> legal_moves;
+  board.GenerateLegalMoves([&legal_moves](const Move& move) -> bool {
+    legal_moves.push_back(move);
     return true;
   });
-  return num_legal_moves;
+  if (depth == 1) {
+    return legal_moves.size();
+  } else {
+    uint64_t ret = 0;
+    for (const auto& move : legal_moves) {
+      ChessBoard board_copy = board;
+      board_copy.ApplyMove(move);
+      ret += Perft(board_copy, depth - 1);
+    }
+    return ret;
+  }
+}
+
+uint64_t Perft(const char* fen, int depth) {
+  return Perft(ChessBoard::BoardFromFEN(fen).value(), depth);
 }
 
 void CheckUndo(const char* fen, const char* move_san, const char* fen_after) {
@@ -64,8 +81,34 @@ void BasicChessTests() {
 }
 
 void MoveGenerationTests() {
-  ChessBoard start_pos = MakeDefaultBoard();
-  SPIEL_CHECK_EQ(CountNumLegalMoves(start_pos), 20);
+  // These perft positions and results are from here:
+  // https://www.chessprogramming.org/Perft_Results
+  // They are specifically designed to catch move generator bugs.
+  // Depth chosen for maximum a few seconds run time in debug build.
+  SPIEL_CHECK_EQ(Perft(MakeDefaultBoard(), 5), 4865609);
+  SPIEL_CHECK_EQ(
+      Perft("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+            4),
+      4085603);
+  SPIEL_CHECK_EQ(Perft("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -", 5), 674624);
+  SPIEL_CHECK_EQ(
+      Perft("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
+            4),
+      422333);
+  SPIEL_CHECK_EQ(
+      Perft("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8", 4),
+      2103487);
+  SPIEL_CHECK_EQ(
+      Perft(
+          "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - -",
+          4),
+      3894594);
+
+  // Rook disambiguation:
+  // https://github.com/google-deepmind/open_spiel/issues/1125
+  SPIEL_CHECK_EQ(
+      Perft("4k1rr/1b1p3p/nn1p4/P3Np2/3P1bp1/6PP/P5R1/1B1K2N1 b k - 1 37", 1),
+      35);
 }
 
 void TerminalReturnTests() {
@@ -244,6 +287,26 @@ void MoveConversionTests() {
   }
 }
 
+void SerializaitionTests() {
+  auto game = LoadGame("chess");
+
+  // Default board position.
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::shared_ptr<State> deserialized_state =
+      game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+
+  // Empty string.
+  deserialized_state = game->DeserializeState("");
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+
+  // FEN starting position.
+  state = game->NewInitialState(
+      "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+  deserialized_state = game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+}
+
 }  // namespace
 }  // namespace chess
 }  // namespace open_spiel
@@ -255,4 +318,5 @@ int main(int argc, char** argv) {
   open_spiel::chess::TerminalReturnTests();
   open_spiel::chess::ObservationTensorTests();
   open_spiel::chess::MoveConversionTests();
+  open_spiel::chess::SerializaitionTests();
 }

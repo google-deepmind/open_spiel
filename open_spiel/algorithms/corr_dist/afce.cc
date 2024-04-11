@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 
 namespace open_spiel {
 namespace algorithms {

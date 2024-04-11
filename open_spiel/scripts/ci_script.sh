@@ -39,7 +39,7 @@ PYBIN=${PYBIN:-"python"}
 PYBIN=${PYBIN:-"python3"}
 PYBIN=`which $PYBIN`
 
-source ./open_spiel/scripts/python_extra_deps.sh
+source ./open_spiel/scripts/python_extra_deps.sh $PYBIN
 
 ${PYBIN} -m pip install --upgrade pip
 ${PYBIN} -m pip install --upgrade setuptools

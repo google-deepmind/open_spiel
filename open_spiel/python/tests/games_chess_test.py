@@ -27,6 +27,7 @@ class GamesChessTest(absltest.TestCase):
   def test_bindings_sim(self):
     game = pyspiel.load_game("chess")
     state = game.new_initial_state()
+    board = None
     while not state.is_terminal():
       print(state)
       player = state.current_player()
@@ -42,6 +43,12 @@ class GamesChessTest(absltest.TestCase):
         print(f"Legal action: {action_str} decoded from to {decoded_from_to}")
         print(f"Move representations: {move.to_string()} | " +
               f"{move.to_lan()} | {move.to_san(board)}")
+        # Now do the reverse mapping from both string representations to check
+        # that they correspond to this action.
+        action_from_lan = state.parse_move_to_action(move.to_lan())
+        action_from_san = state.parse_move_to_action(move.to_san(board))
+        self.assertEqual(action, action_from_lan)
+        self.assertEqual(action, action_from_san)
       action = np.random.choice(legal_actions)
       state.apply_action(action)
     print(board.to_unicode_string())
@@ -49,6 +56,12 @@ class GamesChessTest(absltest.TestCase):
     print("Moves history:")
     print(" ".join([move.to_lan() for move in state.moves_history()]))
     self.assertTrue(state.is_terminal())
+
+  def test_state_from_fen(self):
+    game = pyspiel.load_game("chess")
+    fen_string = "8/k1P5/8/1K6/8/8/8/8 w - - 0 1"
+    state = game.new_initial_state(fen_string)
+    self.assertEqual(state.board().to_fen(), fen_string)
 
 
 if __name__ == "__main__":

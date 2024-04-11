@@ -43,7 +43,9 @@ def get_config():
 
   given_prompt_actions = collections.OrderedDict()
   tones = ['calm',
-           'assertive']
+           'assertive',
+           'submissive',
+           'any']
   given_prompt_actions[header.action_keys[0]] = tones
   num_tones = len(tones)
 
@@ -60,6 +62,8 @@ def get_config():
       scenario_schedule_meeting.OOO_A,
       scenario_schedule_meeting.DAY_PREFS_A,
       'calm')
+
+  llm_termination_prompt = scenario_schedule_meeting.LLM_TERMINATION_PROMPT
 
   params = {'num_distinct_actions': num_players * num_tones,
             'num_llm_seeds': 2,
@@ -80,5 +84,6 @@ def get_config():
   config.game.given_private_info = given_private_info
   config.game.initial_scenario = scenario_a
   config.game.llm_list_suffix = 'Output: '
+  config.game.llm_termination_prompt = llm_termination_prompt
 
   return config

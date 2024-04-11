@@ -76,31 +76,38 @@ class Solver(object):
     """
     return exploitability.unreg_exploitability(params, payoff_matrices)
 
-  def euc_descent_step(self, params, grads, t):
+  def euc_descent_step(self, params, grads, t, eps=0.):
     """Projected gradient descent on exploitability using Euclidean projection.
 
     Args:
       params: tuple of variables to be updated (dist,)
       grads: tuple of variable gradients (grad_dist,)
       t: int, solver iteration
+      eps: float > 0, force all probabilities >= eps / dim(dist)
     Returns:
       new_params: tuple of update params (new_dist,)
     """
     del t
-    new_params = params[0] - self.lrs[0] * grads[0]
-    new_params = simplex.euclidean_projection_onto_simplex(new_params)
-    return (new_params,)
+    new_dist = params[0] - self.lrs[0] * grads[0]
+    new_dist = simplex.euclidean_projection_onto_simplex(new_dist)
+    if eps > 0:
+      new_dist = simplex.project_to_interior(new_dist, eps)
+    return (new_dist,)
 
-  def mirror_descent_step(self, params, grads, t):
+  def mirror_descent_step(self, params, grads, t, eps=0.):
     """Entropic mirror descent on exploitability.
 
     Args:
       params: tuple of variables to be updated (dist)
       grads: tuple of variable gradients (grad_dist)
       t: int, solver iteration
+      eps: float > 0, force all probabilities >= eps / dim(dist)
     Returns:
       new_params: tuple of update params (new_dist)
     """
     del t
     dist = np.clip(params[0], 0, np.inf)
-    return (special.softmax(np.log(dist) - self.lrs[0] * grads[0]),)
+    new_dist = special.softmax(np.log(dist) - self.lrs[0] * grads[0])
+    if eps > 0:
+      new_dist = simplex.project_to_interior(new_dist, eps)
+    return (new_dist,)

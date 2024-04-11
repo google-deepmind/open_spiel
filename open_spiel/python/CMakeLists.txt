@@ -19,9 +19,9 @@ message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 message(NOTICE "Python library dirs: ${Python3_LIBRARY_DIRS}")
 include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
 
-if(Python3_VERSION VERSION_LESS "3.6.0")
+if(Python3_VERSION VERSION_LESS "3.8.0")
   message(FATAL_ERROR
-    "Python found ${Python3_VERSION} < 3.6.0")
+    "Python found ${Python3_VERSION} < 3.8.0")
 endif()
 
 # Detect the Python ML frameworks.
@@ -127,10 +127,10 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/utils.h
   )
 
-if (OPEN_SPIEL_BUILD_WITH_HIGC)
+if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      pybind11/referee.cc
-      pybind11/referee.h
+      pybind11/games_universal_poker.cc
+      pybind11/games_universal_poker.h
   )
 endif()
 
@@ -219,6 +219,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/sequence_form_utils_test.py
   algorithms/wolf_phc_test.py
   algorithms/mmd_dilated_test.py
+  coalitional_games/shapley_values_test.py
   bots/bluechip_bridge_test.py
   bots/bluechip_bridge_uncontested_bidding_test.py
   bots/is_mcts_test.py
@@ -244,6 +245,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
   mfg/games/dynamic_routing_test.py
+  mfg/games/normal_form_game_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/game_transforms_test.py
@@ -260,11 +262,19 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  voting/approval_test.py
+  voting/base_test.py
+  voting/borda_test.py
+  voting/copeland_test.py
+  voting/kemeny_young_test.py
+  voting/plurality_test.py
+  voting/ranked_pairs_test.py
+  voting/schulze_test.py
+  voting/stv_test.py
 )
 
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
-  # Only current JAX test is the bridge supervised learning example below.
   set (PYTHON_TESTS ${PYTHON_TESTS}
     jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
@@ -272,6 +282,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
     algorithms/rnad/rnad_test.py
+    coalitional_games/least_core_lagrangian_test.py
     mfg/algorithms/fictitious_play_test.py
   )
 endif()
@@ -281,7 +292,6 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       pytorch/rcfr_pytorch_test.py
       pytorch/dqn_pytorch_test.py
-      pytorch/nfsp_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
       pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
@@ -333,10 +343,13 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/stackelberg_lp_test.py
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
+      coalitional_games/least_core_lp_test.py
+      coalitional_games/wvg_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
       games/kuhn_poker_test.py
+      voting/maximal_lotteries_test.py
       tests/matrix_game_utils_test.py
   )
 endif()

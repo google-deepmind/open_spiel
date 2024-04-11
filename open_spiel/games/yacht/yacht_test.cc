@@ -75,6 +75,30 @@ void NoReRollActionsLegalTest() {
   SPIEL_CHECK_EQ(actions, expected_actions);
 }
 
+void ScoreOnesTest() {
+  std::shared_ptr<const Game> game = LoadGame("yacht");
+  std::unique_ptr<State> state = game->NewInitialState();
+  YachtState* yacht_state = static_cast<YachtState*>(state.get());
+
+  std::vector<bool> dice_to_reroll = {false, false, false, false, false, false};
+  std::vector<ScoringSheet> empty_scoring_sheets = {ScoringSheet(),
+                                                    ScoringSheet()};
+  std::vector<int> dice = {1, 1, 2, 3, 4};
+  std::vector<int> scores = {0, 0};
+  yacht_state->SetState(kPlayerId1, dice, dice_to_reroll, scores,
+                        empty_scoring_sheets);
+
+  int player1_index = kPlayerId1 - 1;
+  yacht_state->ApplyNormalAction(kFillOnes, player1_index);
+
+  int expected_score = 2;
+  SPIEL_CHECK_EQ(yacht_state->score(player1_index), expected_score);
+
+  CategoryValue expected_ones_filled = filled;
+  SPIEL_CHECK_EQ(yacht_state->scoring_sheet(player1_index).ones,
+                 expected_ones_filled);
+}
+
 }  // namespace
 }  // namespace yacht
 }  // namespace open_spiel
@@ -83,4 +107,5 @@ int main(int argc, char** argv) {
   open_spiel::yacht::AllActionsLegalTest();
   open_spiel::yacht::SomeActionsLegalTest();
   open_spiel::yacht::NoReRollActionsLegalTest();
+  open_spiel::yacht::ScoreOnesTest();
 }

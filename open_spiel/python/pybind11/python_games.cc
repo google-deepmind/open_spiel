@@ -21,6 +21,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/escaping.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"

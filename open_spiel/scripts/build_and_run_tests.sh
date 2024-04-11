@@ -181,14 +181,11 @@ function execute_export_graph {
 
 # Build / install everything and run tests (C++, Python, optionally Julia).
 if [[ $ARG_build_with_pip == "true" ]]; then
-  # TODO(author2): We probably want to use `python3 -m pip install .` directly
-  # and skip the usage of nox.
-  ${PYBIN} -m pip install nox
-
-  if nox -s tests; then
-    echo -e "\033[32mAll tests passed. Nicely done!\e[0m"
+  ${PYBIN} -m pip install .
+  if ctest -j$TEST_NUM_PROCS --output-on-failure ../open_spiel; then
+    print_tests_passed
   else
-    echo -e "\033[31mAt least one test failed.\e[0m"
+    print_tests_failed
     exit 1
   fi
 else
