@@ -183,6 +183,8 @@ set(GAME_SOURCES
   ultimate_tic_tac_toe/ultimate_tic_tac_toe.cc
   y/y.cc
   y/y.h
+  vaqueritos/vaqueritos.h
+  vaqueritos/vaqueritos.cc
 )
 
 if (${OPEN_SPIEL_BUILD_WITH_HANABI})
@@ -620,3 +622,7 @@ endif()
 add_executable(y_test y/y_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(y_test y_test)
+
+add_executable(vaqueritos_test vaqueritos/vaqueritos_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(vaqueritos_test vaqueritos_test)

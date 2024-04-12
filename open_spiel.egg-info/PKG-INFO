@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: open_spiel
-Version: 1.3
+Version: 1.5
 Summary: A Framework for Reinforcement Learning in Games
 Home-page: https://github.com/deepmind/open_spiel
 Author: The OpenSpiel authors
 Author-email: open_spiel@google.com
 License: Apache 2.0
-Requires-Python: >=3.7
+Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: pip>=20.0.2
@@ -14,6 +14,7 @@ Requires-Dist: attrs>=19.3.0
 Requires-Dist: absl-py>=0.10.0
 Requires-Dist: numpy>=1.21.5
 Requires-Dist: scipy>=1.10.1
+Requires-Dist: ml-collections>=0.1.1
 
 
 # OpenSpiel: A Framework for Reinforcement Learning in Games
