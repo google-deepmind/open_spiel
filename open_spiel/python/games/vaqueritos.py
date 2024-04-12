@@ -24,17 +24,17 @@ import numpy as np
 import pyspiel
 
 _NUM_PLAYERS = 2
-_DEFAULT_PARAMS = {"termination_probability": 0.125, "max_game_length": 9999}
-_PAYOFF = [[5, 0], [10, 1]]
+_DEFAULT_PARAMS = {"max_game_length": 9999} # {"termination_probability": 0.125, "max_game_length": 9999}
+# _PAYOFF = [[5, 0], [10, 1]]
 
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_vaqueritos",
     long_name="Python Iterated Vaqueritos",
     dynamics=pyspiel.GameType.Dynamics.SIMULTANEOUS,
-    chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
+    chance_mode=pyspiel.GameType.ChanceMode.DETERMINISTIC, # TODO : CHANGE TO DETERMINISTIC
     information=pyspiel.GameType.Information.PERFECT_INFORMATION,
-    utility=pyspiel.GameType.Utility.GENERAL_SUM,
-    reward_model=pyspiel.GameType.RewardModel.REWARDS,
+    utility=pyspiel.GameType.Utility.ZERO_SUM, # TODO : CHANGE TO ZERO_SUM
+    reward_model=pyspiel.GameType.RewardModel.TERMINAL, # as in block_dominoes
     max_num_players=_NUM_PLAYERS,
     min_num_players=_NUM_PLAYERS,
     provides_information_state_string=False,
@@ -46,13 +46,14 @@ _GAME_TYPE = pyspiel.GameType(
 
 
 class Action(enum.IntEnum):
-  COOPERATE = 0
-  DEFECT = 1
+  DEFEND = 0 
+  LOAD = 1
+  SHOOT = 2
 
 
-class Chance(enum.IntEnum):
-  CONTINUE = 0
-  STOP = 1
+# class Chance(enum.IntEnum):
+#   CONTINUE = 0
+#   STOP = 1
 
 
 class VaqueritosGame(pyspiel.Game):
@@ -64,25 +65,25 @@ class VaqueritosGame(pyspiel.Game):
     super().__init__(
         _GAME_TYPE,
         pyspiel.GameInfo(
-            num_distinct_actions=2,
-            max_chance_outcomes=2,
+            num_distinct_actions= 3,
+            max_chance_outcomes=0, # CORRECT ??
             num_players=2,
-            min_utility=np.min(_PAYOFF) * max_game_length,
-            max_utility=np.max(_PAYOFF) * max_game_length,
+            min_utility=1,
+            max_utility=-1,
             utility_sum=None,
             max_game_length=max_game_length,
         ),
         params,
     )
-    self._termination_probability = params["termination_probability"]
+    # self._termination_probability = params["termination_probability"]
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
-    return VaqueritosState(self, self._termination_probability)
+    return VaqueritosState(self)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns an object used for observing game state."""
-    return IteratedPrisonersDilemmaObserver(
+    return VaqueritosObserver( # TODO: understand observer
         iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False),
         params)
 
@@ -90,75 +91,85 @@ class VaqueritosGame(pyspiel.Game):
 class VaqueritosState(pyspiel.State):
   """Current state of the game."""
 
-  def __init__(self, game, termination_probability):
+  def __init__(self, game): # self._player_won == 0
     """Constructor; should only be called by Game.new_initial_state."""
     super().__init__(game)
     self._current_iteration = 1
-    self._termination_probability = termination_probability
-    self._is_chance = False
-    self._game_over = False
-    self._rewards = np.zeros(_NUM_PLAYERS)
-    self._returns = np.zeros(_NUM_PLAYERS)
+    # self._termination_probability = termination_probability
+    # self._is_chance = False
+    self._player_won = None
+    # self._rewards = np.zeros(_NUM_PLAYERS)
+    # self._returns = np.zeros(_NUM_PLAYERS)
+    self._bullets = np.zeros(_NUM_PLAYERS) # both players start with zero bullets
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every simultaneous-move game with chance.
 
   def current_player(self):
     """Returns id of the next player to move, or TERMINAL if game is over."""
-    if self._game_over:
+    if self._player_won != None:
       return pyspiel.PlayerId.TERMINAL
-    elif self._is_chance:
-      return pyspiel.PlayerId.CHANCE
+    # elif self._is_chance:
+    #   return pyspiel.PlayerId.CHANCE
     else:
       return pyspiel.PlayerId.SIMULTANEOUS
 
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
-    assert player >= 0
-    return [Action.COOPERATE, Action.DEFECT]
+    print(player)
+    assert player >= 0 
+    # can only shoot if player has bullets loaded loaded
+    return [Action.DEFEND, Action.LOAD, Action.SHOOT] if self._bullets[player] > 0 else [Action.DEFEND, Action.LOAD]
 
-  def chance_outcomes(self):
-    """Returns the possible chance outcomes and their probabilities."""
-    assert self._is_chance
-    return [(Chance.CONTINUE, 1 - self._termination_probability),
-            (Chance.STOP, self._termination_probability)]
+  # def chance_outcomes(self):
+  #   """Returns the possible chance outcomes and their probabilities."""
+  #   assert self._is_chance
+  #   return [(Chance.CONTINUE, 1 - self._termination_probability),
+  #           (Chance.STOP, self._termination_probability)]
 
-  def _apply_action(self, action):
+  def _apply_action(self, action): # TODO: check if I can completely delete this as it is a simultaneous game
     """Applies the specified action to the state."""
-    # This is not called at simultaneous-move states.
-    assert self._is_chance and not self._game_over
-    self._current_iteration += 1
-    self._is_chance = False
-    self._game_over = (action == Chance.STOP)
-    if self._current_iteration > self.get_game().max_game_length():
-      self._game_over = True
+    # This is not called at simultaneous-move states!!! 
+    # assert self._is_chance and not self._game_over
+    # self._current_iteration += 1
+    # # self._is_chance = False
+    # self._game_over = (action == Chance.STOP)
+    # if self._current_iteration > self.get_game().max_game_length():
+    #   self._game_over = True
+    pass
 
   def _apply_actions(self, actions):
     """Applies the specified actions (per player) to the state."""
-    assert not self._is_chance and not self._game_over
-    self._is_chance = True
-    self._rewards[0] = _PAYOFF[actions[0]][actions[1]]
-    self._rewards[1] = _PAYOFF[actions[1]][actions[0]]
-    self._returns += self._rewards
+    assert not self.is_terminal()
+
+    # check kill conditions
+    if actions[0] == 2 and actions[1] == 1: # player 0 won
+      self._player_won = 1
+      return
+    if actions[1] == 2 and actions[0] == 1: # player 1 won
+      self._player_won = 0
+      return 
+    
+    action_effects = np.array(actions)
+    action_effects[action_effects == Action.SHOOT] = -1
+    action_effects[action_effects == Action.LOAD] = 1
+    action_effects[action_effects == Action.DEFEND] = 0
+    self._bullets += action_effects # bullets are added/subtracted according to the action
 
   def _action_to_string(self, player, action):
     """Action -> string."""
-    if player == pyspiel.PlayerId.CHANCE:
-      return Chance(action).name
-    else:
-      return Action(action).name
+    return Action(action).name
 
   def is_terminal(self):
     """Returns True if the game is over."""
-    return self._game_over
-
-  def rewards(self):
-    """Reward at the previous step."""
-    return self._rewards
+    return self._player_won != None
 
   def returns(self):
-    """Total reward for each player over the course of the game so far."""
-    return self._returns
+    """Total reward for each player. """
+    if not self.is_terminal():
+      return [0, 0]
+    
+    return [-1,1] if self._player_won == 0 else [1,-1]
 
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
@@ -172,7 +183,7 @@ class VaqueritosState(pyspiel.State):
         if pa.player == player)
 
 
-class IteratedPrisonersDilemmaObserver:
+class VaqueritosObserver:
   """Observer, conforming to the PyObserver interface (see observation.py)."""
 
   def __init__(self, iig_obs_type, params):

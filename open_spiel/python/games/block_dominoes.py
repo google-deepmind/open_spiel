@@ -235,7 +235,6 @@ class BlockDominoesState(pyspiel.State):
 
   def returns(self):
     """Total reward for each player over the course of the game so far."""
-
     if not self.is_terminal():
       return [0, 0]
 

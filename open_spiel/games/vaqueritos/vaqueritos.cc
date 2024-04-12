@@ -69,11 +69,11 @@ CellState PlayerToState(Player player) {
 std::string StateToString(CellState state) {
   switch (state) {
     case CellState::kEmpty:
-      return ".";
+      return "..";
     case CellState::kNought:
-      return "o";
+      return "OO";
     case CellState::kCross:
-      return "x";
+      return "XN";
     default:
       SpielFatalError("Unknown state.");
   }

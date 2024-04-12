@@ -25,7 +25,7 @@ import numpy as np
 
 import pyspiel
 
-_NUM_PLAYERS = 2
+_NUM_PLAYERS = 4
 _PIPS = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 _DECK = list(itertools.combinations_with_replacement(_PIPS, 2))
 _EDGES = [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -60,6 +60,11 @@ _ACTIONS = create_possible_actions()
 _ACTIONS_STR = [str(action) for action in _ACTIONS]
 
 _HAND_SIZE = 7
+
+# my testing
+print(len(_ACTIONS_STR), "Possible actions: ")
+# print(_ACTIONS_STR[-80:])
+
 
 _MAX_GAME_LENGTH = 28
 _GAME_TYPE = pyspiel.GameType(
@@ -108,6 +113,12 @@ class BlockDominoesGame(pyspiel.Game):
         iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False), params
     )
 
+#%% MY testing - ERORRS
+
+# game = BlockDominoesGame((_GAME_TYPE, _GAME_INFO))
+# state = game.new_initial_state()
+# print(game)
+# print(state)
 
 class BlockDominoesState(pyspiel.State):
   """A python version of the Block Dominoes state."""
