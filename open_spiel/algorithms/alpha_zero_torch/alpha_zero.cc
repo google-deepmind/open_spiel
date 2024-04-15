@@ -125,30 +125,43 @@ Trajectory PlayGame(Logger* logger, int game_num, const open_spiel::Game& game,
                             std::pow(c.explore_count, 1.0 / temperature));
       }
       NormalizePolicy(&policy);
-      open_spiel::Action action;
+      const SearchNode* action_node;
       if (history.size() >= temperature_drop) {
-        action = root->BestChild().action;
+        action_node = &root->BestChild();
       } else {
+        open_spiel::Action action;
         action = open_spiel::SampleAction(policy, *rng).first;
+        for (const SearchNode& child : root->children) {
+          if (child.action == action) {
+            action_node = &child;
+            break;
+          }
+        }
       }
 
-      double root_value = root->total_reward / root->explore_count;
+      double action_value =
+          action_node->outcome.empty()
+              ? (action_node->total_reward / action_node->explore_count)
+                  * (action_node->player == player ? 1 : -1)
+              : action_node->outcome[player];
       trajectory.states.push_back(Trajectory::State{
-          state->ObservationTensor(), player, state->LegalActions(), action,
-          std::move(policy), root_value});
-      std::string action_str = state->ActionToString(player, action);
+          state->ObservationTensor(), player, state->LegalActions(),
+          action_node->action, std::move(policy), action_value});
+      std::string action_str =
+          state->ActionToString(player, action_node->action);
       history.push_back(action_str);
-      state->ApplyAction(action);
+      state->ApplyAction(action_node->action);
       if (verbose) {
-        logger->Print("Player: %d, action: %s", player, action_str);
+        logger->Print("Player: %d, action: %s, value: %6.3f",
+            player, action_str, action_value);
       }
       if (state->IsTerminal()) {
         trajectory.returns = state->Returns();
         break;
-      } else if (std::abs(root_value) > cutoff_value) {
+      } else if (std::abs(action_value) > cutoff_value) {
         trajectory.returns.resize(2);
-        trajectory.returns[player] = root_value;
-        trajectory.returns[1 - player] = -root_value;
+        trajectory.returns[player] = action_value;
+        trajectory.returns[1 - player] = -action_value;
         break;
       }
     }
@@ -165,7 +178,8 @@ std::unique_ptr<MCTSBot> InitAZBot(const AlphaZeroConfig& config,
                                    std::shared_ptr<Evaluator> evaluator,
                                    bool evaluation) {
   return std::make_unique<MCTSBot>(
-      game, std::move(evaluator), config.uct_c, config.max_simulations,
+      game, std::move(evaluator), config.uct_c,
+      config.min_simulations, config.max_simulations,
       /*max_memory_mb=*/10,
       /*solve=*/false,
       /*seed=*/0,
@@ -269,7 +283,8 @@ void evaluator(const open_spiel::Game& game, const AlphaZeroConfig& config,
     bots.reserve(2);
     bots.push_back(InitAZBot(config, game, vp_eval, true));
     bots.push_back(std::make_unique<MCTSBot>(
-        game, rand_evaluator, config.uct_c, rand_max_simulations,
+        game, rand_evaluator, config.uct_c,
+        /*min_simulations=*/0, rand_max_simulations,
         /*max_memory_mb=*/1000,
         /*solve=*/true,
         /*seed=*/num * 1000 + game_num,
@@ -295,12 +310,54 @@ void evaluator(const open_spiel::Game& game, const AlphaZeroConfig& config,
   logger.Print("Got a quit.");
 }
 
+// Returns the 'lambda' discounted value of all future values of 'trajectory',
+// including its outcome, beginning at 'state_idx'.  The calculation is
+// truncated after 'td_n_steps' if that parameter is greater than zero.
+double TdLambdaReturns(const Trajectory& trajectory, int state_idx,
+                       double td_lambda, int td_n_steps) {
+  double outcome = trajectory.returns[0];
+  if (td_lambda >= 1.0 || Near(td_lambda, 1.0)) {
+    // lambda == 1.0 simplifies to returning the outcome (or value at nth-step)
+    if (td_n_steps <= 0) {
+      return outcome;
+    }
+    int idx = state_idx + td_n_steps;
+    if (idx >= trajectory.states.size()) {
+      return outcome;
+    }
+    const Trajectory::State& n_state = trajectory.states[idx];
+    return n_state.value * (n_state.current_player == 0 ? 1 : -1);
+  }
+  const Trajectory::State& s_state = trajectory.states[state_idx];
+  double retval = s_state.value * (s_state.current_player == 0 ? 1 : -1);
+  if (td_lambda <= 0.0 || Near(td_lambda, 0.0)) {
+    // lambda == 0 simplifies to returning the start state's value
+    return retval;
+  }
+  double lambda_inv = (1.0 - td_lambda);
+  double lambda_pow = td_lambda;
+  retval *= lambda_inv;
+  for (int i = state_idx + 1; i < trajectory.states.size(); ++i) {
+    const Trajectory::State& i_state = trajectory.states[i];
+    double value = i_state.value * (i_state.current_player == 0 ? 1 : -1);
+    if (td_n_steps > 0 && i == state_idx + td_n_steps) {
+      retval += lambda_pow * value;
+      return retval;
+    }
+    retval += lambda_inv * lambda_pow * value;
+    lambda_pow *= td_lambda;
+  }
+  retval += lambda_pow * outcome;
+  return retval;
+}
+
 void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
              DeviceManager* device_manager,
              std::shared_ptr<VPNetEvaluator> eval,
              ThreadedQueue<Trajectory>* trajectory_queue,
              EvalResults* eval_results, StopToken* stop,
-             const StartInfo& start_info) {
+             const StartInfo& start_info,
+             bool verbose = false) {
   FileLogger logger(config.path, "learner", "a");
   DataLoggerJsonLines data_logger(
       config.path, "learner", true, "a", start_info.start_time);
@@ -357,10 +414,19 @@ void learner(const open_spiel::Game& game, const AlphaZeroConfig& config,
         double p1_outcome = trajectory->returns[0];
         outcomes.Add(p1_outcome > 0 ? 0 : (p1_outcome < 0 ? 1 : 2));
 
-        for (const Trajectory::State& state : trajectory->states) {
+        for (int i = 0; i < trajectory->states.size(); ++i ) {
+          const Trajectory::State& state = trajectory->states[i];
+          double value = TdLambdaReturns(*trajectory, i,
+                                         config.td_lambda, config.td_n_steps);
           replay_buffer.Add(VPNetModel::TrainInputs{state.legal_actions,
                                                     state.observation,
-                                                    state.policy, p1_outcome});
+                                                    state.policy,
+                                                    value});
+          if (verbose && num_trajectories == 1) {
+            double v = state.value * (state.current_player == 0 ? 1 : -1);
+            logger.Print("StateIdx: %d  Value: %0.3f  TrainTo: %0.3f",
+                i, v, value);
+          }
           num_states += 1;
         }
 
