@@ -1,10 +1,9 @@
 # AlphaZero
 
-OpenSpiel includes three implementations of AlphaZero, two based on Tensorflow
-(one in Python and one in C++ using Tensorflow C++ API), with a shared model
-written in TensorFlow. The other based on C++ Libtorch-base. This document
-covers mostly the TF-based implementation and common components. For the
-Libtorch-based implementation,
+OpenSpiel includes two implementations of AlphaZero, one based on Tensorflow (in
+Python). The other based on C++ LibTorch. This document covers mostly the
+TF-based implementation and common components. For the Libtorch-based
+implementation,
 [see here](https://github.com/deepmind/open_spiel/tree/master/open_spiel/algorithms/alpha_zero_torch).
 
 **Disclaimer**: this is not the code that was used for the Go challenge matches
@@ -50,10 +49,7 @@ significantly faster.
 
 The model defined in
 [open_spiel/python/algorithms/alpha_zero/model.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/algorithms/alpha_zero/model.py) is used by
-both the python and C++ implementations. The C++ version wraps the exported
-tensorflow graph in
-[open_spiel/algorithms/alpha_zero/vpnet.h](https://github.com/deepmind/open_spiel/blob/master/open_spiel/algorithms/alpha_zero/vpnet.h), and supports both
-inference and training.
+both the python and C++ implementations. 
 
 The model defines three architectures in decreasing complexity:
 
@@ -167,26 +163,6 @@ Alternatively you can train on an arbitrary game with many more options:
 ```bash
 python3 open_spiel/python/examples/alpha_zero.py --game connect_four --nn_model mlp --actors 10
 ```
-
-### C++
-
-The code lives at [open_spiel/algorithms/alpha_zero/](https://github.com/deepmind/open_spiel/blob/master/open_spiel/algorithms/alpha_zero/)
-with an example executable at
-[open_spiel/examples/alpha_zero_example.cc](https://github.com/deepmind/open_spiel/blob/master/open_spiel/examples/alpha_zero_example.cc).
-
-Compiling it is now possible with the help of the
-[tensorflow_cc](https://github.com/FloopCZ/tensorflow_cc) project. TensorflowCC
-allows the usage of the TensorFlow C++ API from outside the Tensorflow source
-directory.
-
-For build instructions, please see
-[open_spiel/algorithms/alpha_zero/README.md](https://github.com/deepmind/open_spiel/blob/master/open_spiel/algorithms/alpha_zero/README.md).
-
-Although targets are built successfully, there are still some runtime issues.
-[OpenSpiel Issue #172](https://github.com/deepmind/open_spiel/issues/172) has
-some information that may help figure out how to fix them. Contributions are
-welcome.
-
 
 ### Analysis
 
