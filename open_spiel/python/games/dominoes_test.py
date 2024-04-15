@@ -13,23 +13,24 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Python Block Dominoes."""
+"""Tests for Python Dominoes (4-player game)."""
+# TESTS MUST BE UPDATED FOR 4 PLAYERS
 
 from absl.testing import absltest
 from open_spiel.python.games import dominoes
 import pyspiel
 
 
-class DominoesBlockTest(absltest.TestCase):
+class DominoesTest(absltest.TestCase):
 
   def test_game_from_cc(self):
     """Runs our standard game tests, checking API consistency."""
-    game = pyspiel.load_game("python_block_dominoes")
+    game = pyspiel.load_game("python_dominoes")
     pyspiel.random_sim_test(game, num_sims=100, serialize=False, verbose=True)
 
   def test_single_deterministic_game_1(self):
     """Runs a single game where tiles and actions chose deterministically."""
-    game = pyspiel.load_game("python_block_dominoes")
+    game = pyspiel.load_game("python_dominoes")
     state = game.new_initial_state()
     hand0 = [
         (6.0, 6.0),
@@ -73,7 +74,7 @@ class DominoesBlockTest(absltest.TestCase):
 
   def test_single_deterministic_game_2(self):
     """Runs a single game where tiles and actions chose deterministically."""
-    game = pyspiel.load_game("python_block_dominoes")
+    game = pyspiel.load_game("python_dominoes")
     state = game.new_initial_state()
     hand0 = [
         (6.0, 6.0),

@@ -26,7 +26,7 @@ FLAGS = flags.FLAGS
 
 # Game strings can just contain the name or the name followed by parameters
 # and arguments, e.g. "breakthrough(rows=6,columns=6)"
-flags.DEFINE_string("game_string", "python_vaqueritos", "Game string")
+flags.DEFINE_string("game_string", "python_dominoes", "Game string")
 
 
 def main(_):
@@ -55,6 +55,7 @@ def main(_):
       print("Chance node, got " + str(num_actions) + " outcomes")
       action_list, prob_list = zip(*outcomes)
       action = np.random.choice(action_list, p=prob_list)
+      print('')
       print("Sampled outcome: ",
             state.action_to_string(state.current_player(), action))
       state.apply_action(action)
@@ -65,6 +66,7 @@ def main(_):
           random_choice(state.legal_actions(pid))
           for pid in range(game.num_players())
       ]
+      print()
       print("Chosen actions: ", [
           state.action_to_string(pid, action)
           for pid, action in enumerate(chosen_actions)
@@ -74,12 +76,14 @@ def main(_):
       # Decision node: sample action for the single current player
       action = random.choice(state.legal_actions(state.current_player()))
       action_string = state.action_to_string(state.current_player(), action)
+      print()
       print("Player ", state.current_player(), ", randomly sampled action: ",
             action_string)
       state.apply_action(action)
     print(str(state))
 
   # Game is now done. Print utilities for each player
+  print("\nGame over.")
   returns = state.returns()
   for pid in range(game.num_players()):
     print("Utility for player {} is {}".format(pid, returns[pid]))

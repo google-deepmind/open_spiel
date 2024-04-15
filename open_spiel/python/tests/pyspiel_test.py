@@ -138,6 +138,7 @@ EXPECTED_GAMES = frozenset([
     "zerosum",
     "python_vaqueritos",
     "vaqueritos",
+    "python_dominoes"
 ])
 
 

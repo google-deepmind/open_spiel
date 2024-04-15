@@ -81,11 +81,11 @@ class VaqueritosGame(pyspiel.Game):
     """Returns a state corresponding to the start of a game."""
     return VaqueritosState(self)
 
-  def make_py_observer(self, iig_obs_type=None, params=None):
-    """Returns an object used for observing game state."""
-    return VaqueritosObserver( # TODO: understand observer
-        iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False),
-        params)
+  # def make_py_observer(self, iig_obs_type=None, params=None):
+  #   """Returns an object used for observing game state."""
+  #   return VaqueritosObserver( # TODO: understand observer
+  #       iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False),
+  #       params)
 
 
 class VaqueritosState(pyspiel.State):
@@ -183,26 +183,26 @@ class VaqueritosState(pyspiel.State):
         if pa.player == player)
 
 
-class VaqueritosObserver:
-  """Observer, conforming to the PyObserver interface (see observation.py)."""
+# class VaqueritosObserver:
+#   """Observer, conforming to the PyObserver interface (see observation.py)."""
 
-  def __init__(self, iig_obs_type, params):
-    """Initializes an empty observation tensor."""
-    assert not bool(params)
-    self.iig_obs_type = iig_obs_type
-    self.tensor = None
-    self.dict = {}
+#   def __init__(self, iig_obs_type, params):
+#     """Initializes an empty observation tensor."""
+#     assert not bool(params)
+#     self.iig_obs_type = iig_obs_type
+#     self.tensor = None
+#     self.dict = {}
 
-  def set_from(self, state, player):
-    pass
+#   def set_from(self, state, player):
+#     pass
 
-  def string_from(self, state, player):
-    """Observation of `state` from the PoV of `player`, as a string."""
-    if self.iig_obs_type.public_info:
-      return (f"us:{state.action_history_string(player)} "
-              f"op:{state.action_history_string(1 - player)}")
-    else:
-      return None
+#   def string_from(self, state, player):
+#     """Observation of `state` from the PoV of `player`, as a string."""
+#     if self.iig_obs_type.public_info:
+#       return (f"us:{state.action_history_string(player)} "
+#               f"op:{state.action_history_string(1 - player)}")
+#     else:
+#       return None
 
 
 # Register the game with the OpenSpiel library
