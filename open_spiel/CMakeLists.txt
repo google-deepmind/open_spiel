@@ -107,8 +107,6 @@ endmacro()
 # List of all optional dependencies:
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_ACPC           OFF
   "Build against the Universal Poker library.")
-openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_EIGEN          OFF
-  "Build with support for Eigen in C++.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_GO             OFF
   "Build with support for Golang API.")
 openspiel_optional_dependency(OPEN_SPIEL_BUILD_WITH_HANABI         OFF
@@ -233,15 +231,6 @@ if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS}
       $<TARGET_OBJECTS:universal_poker_clib>
       $<TARGET_OBJECTS:universal_poker_lib>)
-endif()
-if (OPEN_SPIEL_BUILD_WITH_EIGEN)
-  add_compile_definitions(OPEN_SPIEL_BUILD_WITH_EIGEN)
-  # Add Eigen dependency.
-  add_subdirectory(eigen/)
-  # Now we can use #include "Eigen/Dense"
-  # This is needed so that pybind11/eigen.h locates <Eigen/Core>
-  include_directories(eigen/libeigen)
-  set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:eigen>)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(OPEN_SPIEL_OBJECTS ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:xinxin>)
