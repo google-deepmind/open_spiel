@@ -36,7 +36,10 @@ class WeightedVote(NamedTuple):
 
 
 class PreferenceProfile(object):
-  """Base class for preference profiles."""
+  """Base class for preference profiles.
+
+  IMPORTANT NOTE: see the assumptions below about indexing of alternatives.
+  """
   _votes: List[WeightedVote]  # Tracks cast votes along with their count
   _alternatives_dict: Dict[AlternativeId, int]  # Maps ID to index
   # Identifiers for all possible alternatives
@@ -54,6 +57,19 @@ class PreferenceProfile(object):
         e.g. ["a", "b", "c"] signifiying a > b > c, or None for no votes, or
         (ii) a list of Vote tuples containing the weight and vote.
       alternatives: a list of alternatives ids.
+
+    Note regarding how alternatives are indexed: if the second argument is
+    passed, then the index of each alternative (e.g. when calling functions
+    like margin_matrix etc.) will be assigned 0 up to the (number of
+    alternatives) - 1 in the order of the list. If this argument is omitted,
+    then alternatives will be indexed depending on when they are first seen
+    (i.e. via a add_vote method) and so (only) in the latter case the indexing
+    could depend on the order votes are added. Hence it is advised to pass in
+    the list of alternatives to this function whenever they are known ahead of
+    time.
+
+    The alternatives_dict property below will return a dictionary of alternative
+    IDs to index.
     """
     # List of Vote named tuples from above.
     self._votes: List[WeightedVote] = []

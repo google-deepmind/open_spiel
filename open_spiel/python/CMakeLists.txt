@@ -127,10 +127,10 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/utils.h
   )
 
-if (OPEN_SPIEL_BUILD_WITH_HIGC)
+if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      pybind11/referee.cc
-      pybind11/referee.h
+      pybind11/games_universal_poker.cc
+      pybind11/games_universal_poker.h
   )
 endif()
 
@@ -245,6 +245,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
   mfg/games/dynamic_routing_test.py
+  mfg/games/normal_form_game_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/game_transforms_test.py

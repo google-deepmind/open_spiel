@@ -14,6 +14,7 @@
 
 #include "open_spiel/game_transforms/start_at.h"
 
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_transforms/game_wrapper.h"
 #include "open_spiel/spiel_utils.h"
 

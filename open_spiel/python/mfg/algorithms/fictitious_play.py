@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Implementation of Fictitious Play from Perrin & al.
 
 Reference: https://arxiv.org/abs/2007.03458.
@@ -36,7 +37,6 @@ policy = fp.get_policy()
 """
 
 import math
-
 from typing import List, Optional
 
 from open_spiel.python import policy as policy_std
@@ -126,10 +126,21 @@ class FictitiousPlay(object):
     self._lr = lr
     self._temperature = temperature
     self._policy = policy_std.UniformRandomPolicy(self._game)
+
+    self._correlating_policy = self._policy
+    self._distribution = distribution.DistributionPolicy(
+        self._game, self._correlating_policy
+    )
     self._fp_step = 0
 
   def get_policy(self):
     return self._policy
+
+  def get_correlating_policy(self):
+    return self._policy
+
+  def get_correlating_distribution(self):
+    return distribution.DistributionPolicy(self._game, self._policy)
 
   def iteration(self, br_policy=None, learning_rate=None):
     """Returns a new `TabularPolicy` equivalent to this policy.
@@ -165,6 +176,9 @@ class FictitiousPlay(object):
       weight = learning_rate
     else:
       weight = self._lr if self._lr else 1.0 / (self._fp_step + 1)
+
+    self._correlating_policy = pi
+    self._distribution = distrib_pi
 
     if math.isclose(weight, 1.0):
       self._policy = pi

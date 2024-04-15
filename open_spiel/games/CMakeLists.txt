@@ -206,10 +206,6 @@ if (${OPEN_SPIEL_BUILD_WITH_GAMUT})
   add_subdirectory(gamut)
 endif()
 
-
-# Uncomment to build the Ludii demo
-# add_subdirectory (ludii)
-
 add_library(bridge_double_dummy_solver OBJECT
   bridge/double_dummy_solver/include/dll.h
   bridge/double_dummy_solver/include/portab.h

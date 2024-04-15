@@ -16,6 +16,8 @@
 #include <cstdlib>
 #include <string>
 
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
 #include "open_spiel/utils/logger.h"

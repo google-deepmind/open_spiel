@@ -21,6 +21,7 @@
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
