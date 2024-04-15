@@ -20,6 +20,7 @@ https://en.wikipedia.org/wiki/Dominoes#Blocking_game
 
 import copy
 import itertools
+import collections
 
 import numpy as np
 
@@ -186,8 +187,8 @@ class DominoesState(pyspiel.State):
       for hand in self.hands:
         hand.sort()
 
-      self._next_player = 0 # TODO : KEEP THIS?
-    else: # TODO : adapt for four players
+      self._next_player = 0
+    else:
       action = _ACTIONS[action]
       self.actions_history.append(action)
       my_idx = self.current_player()
@@ -207,11 +208,11 @@ class DominoesState(pyspiel.State):
           self._next_player = next_idx
           return
         
-        # Check if a team has played all their tiles. NECESSARY ??
+        # Check if a team has played all their tiles.
         if not (self.hands[0] or self.hands[2]) or not (self.hands[1] or self.hands[3]):
           self._game_over = True
           return
-
+      print("Game is stuck!")
       self._game_over = True  # all players are blocked
 
   def update_open_edges(self, action): # NO NEED TO CHANGE 
@@ -258,13 +259,40 @@ class DominoesState(pyspiel.State):
     hand2 = [str(c) for c in self.hands[2]]
     hand3 = [str(c) for c in self.hands[3]]
     history = [str(a) for a in self.actions_history]
+    board = self.draw_board()
     return (
-              f"hand0:{hand0} "
-              f"hand1:{hand1} "
-              f"hand2:{hand2} "
-              f"hand3:{hand3} "
-              f"history:{history}"
+              f"hand0:{hand0}\n"
+              f"hand1:{hand1}\n"
+              f"hand2:{hand2}\n"
+              f"hand3:{hand3}\n\n"
+              # f"history:{history}\n"
+              f"board: {board}"
     )
+  
+  def draw_board(self):
+    '''Draw the board' in a human readable format'''
+    board = collections.deque()
+    current_open_edges = None
+    for action in self.actions_history:
+      # check if action is played on an empty board
+      if action.edge is None:
+        board.append(action.tile)
+        current_open_edges = list(action.tile)
+      # check if action edge matches last played edge in the left or right
+      elif action.edge == current_open_edges[0]:
+        # invert the tile if the edge is on the right:
+        tile = (action.tile[1], action.tile[0]) if action.tile[0] == current_open_edges[0] else action.tile
+        board.appendleft(tile)
+
+      elif action.edge == current_open_edges[1]:
+        # invert the tile if the edge is on the left:
+        tile = (action.tile[1], action.tile[0]) if action.tile[1] == current_open_edges[1] else action.tile
+        board.append(tile)
+
+      current_open_edges = board[0][0], board[-1][1]
+    
+    assert len(board) == len(self.actions_history) # TODO: move this to a test
+    return list(board)
 
 
 class DominoesObserver:
