@@ -760,7 +760,7 @@ Status           | Game
 *   2-10 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
 *   Implemented via [ACPC](http://www.computerpokercompetition.org/).
-*   ❌ Known issues: see issues [#778](https://github.com/google-deepmind/open_spiel/issues/778), [#1033](https://github.com/google-deepmind/open_spiel/issues/1033), and [#1042](https://github.com/google-deepmind/open_spiel/issues/1042).
+*   ❌ Known issues: see issue [#1033](https://github.com/google-deepmind/open_spiel/issues/1033).
 
 ### Quoridor
 
