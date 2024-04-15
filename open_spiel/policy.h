@@ -58,6 +58,12 @@ ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
 ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
                                        Action action);
 
+// Check that two state policies are equal (within a float tolerance). Does an
+// exact check, so the actions must be in the same order.
+bool StatePoliciesEqual(const ActionsAndProbs& state_policy1,
+                        const ActionsAndProbs& state_policy2,
+                        double float_tolerance);
+
 // A general policy object. A policy is a mapping from states to list of
 // (action, prob) pairs for all the legal actions at the state.
 class Policy {
