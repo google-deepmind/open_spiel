@@ -32,76 +32,102 @@ class DominoesTest(absltest.TestCase):
     """Runs a single game where tiles and actions chose deterministically."""
     game = pyspiel.load_game("python_dominoes")
     state = game.new_initial_state()
-    hand0 = [
-        (6.0, 6.0),
-        (0.0, 2.0),
-        (4.0, 4.0),
-        (3.0, 3.0),
-        (2.0, 2.0),
-        (1.0, 1.0),
-        (0.0, 0.0),
-    ]
-    hand1 = [
-        (5.0, 6.0),
-        (4.0, 5.0),
-        (3.0, 4.0),
-        (2.0, 3.0),
-        (1.0, 2.0),
-        (0.0, 1.0),
-        (4.0, 6.0),
-    ]
-    self.deal_hands(state, [hand0, hand1])
+    hand0 = [(1.0, 3.0), (0.0, 5.0), (1.0, 1.0), (2.0, 3.0), (4.0, 5.0), (3.0, 5.0), (0.0, 1.0)]
+    hand1=  [(2.0, 5.0), (3.0, 4.0), (2.0, 2.0), (0.0, 4.0), (3.0, 3.0), (2.0, 6.0), (1.0, 6.0)]
+    hand2 = [(5.0, 6.0), (6.0, 6.0), (1.0, 4.0), (2.0, 4.0), (4.0, 4.0), (0.0, 0.0), (1.0, 5.0)]
+    hand3 = [(4.0, 6.0), (0.0, 2.0), (0.0, 3.0), (3.0, 6.0), (5.0, 5.0), (1.0, 2.0), (0.0, 6.0)]
 
-    self.apply_action(state, dominoes.Action(0, (6.0, 6.0), None))
-    self.apply_action(state, dominoes.Action(1, (5.0, 6.0), 6.0))
-    # player 0 don't hold any tile with 6 or 5, player 1 turn again
-    self.apply_action(state, dominoes.Action(1, (4.0, 5.0), 5.0))
-    self.apply_action(state, dominoes.Action(0, (4.0, 4.0), 4.0))
-    self.apply_action(state, dominoes.Action(1, (3.0, 4.0), 4.0))
-    self.apply_action(state, dominoes.Action(0, (3.0, 3.0), 3.0))
-    self.apply_action(state, dominoes.Action(1, (2.0, 3.0), 3.0))
-    self.apply_action(state, dominoes.Action(0, (2.0, 2.0), 2.0))
-    self.apply_action(state, dominoes.Action(1, (1.0, 2.0), 2.0))
-    self.apply_action(state, dominoes.Action(0, (1.0, 1.0), 1.0))
-    self.apply_action(state, dominoes.Action(1, (0.0, 1.0), 1.0))
-    self.apply_action(state, dominoes.Action(0, (0.0, 0.0), 0.0))
-    self.apply_action(state, dominoes.Action(1, (4.0, 6.0), 6.0))
 
-    # player 1 played all is tile and player 0 hold the tile (0, 2)
+    self.deal_hands(state, [hand0, hand1, hand2, hand3])
+
+    self.apply_action(state, dominoes.Action(0, (3.0, 4.0), None))
+    self.apply_action(state, dominoes.Action(1, (2.0, 4.0), 4.0))
+    self.apply_action(state, dominoes.Action(2, (1.0, 2.0), 2.0))
+    self.apply_action(state, dominoes.Action(3, (0.0, 3.0), 3.0))
+
+    self.apply_action(state, dominoes.Action(0, (1.0, 3.0), 1.0))
+    self.apply_action(state, dominoes.Action(1, (3.0, 5.0), 3.0))
+    self.apply_action(state, dominoes.Action(2, (0.0, 2.0), 0.0))
+    self.apply_action(state, dominoes.Action(3, (2.0, 5.0), 2.0))
+
+    self.apply_action(state, dominoes.Action(0, (1.0, 5.0), 5.0))
+    self.apply_action(state, dominoes.Action(1, (0.0, 5.0), 5.0))
+    self.apply_action(state, dominoes.Action(2, (1.0, 1.0), 1.0))
+    self.apply_action(state, dominoes.Action(3, (0.0, 6.0), 0.0))
+
+    self.apply_action(state, dominoes.Action(0, (3.0, 6.0), 6.0))
+    self.apply_action(state, dominoes.Action(1, (1.0, 6.0), 1.0))
+    self.apply_action(state, dominoes.Action(2, (5.0, 6.0), 6.0))
+    self.apply_action(state, dominoes.Action(3, (3.0, 3.0), 3.0))
+
+    self.apply_action(state, dominoes.Action(0, (4.0, 5.0), 5.0))
+    self.apply_action(state, dominoes.Action(1, (4.0, 6.0), 4.0))
+    self.apply_action(state, dominoes.Action(3, (6.0, 6.0), 6.0))
+
+    self.apply_action(state, dominoes.Action(0, (2.0, 6.0), 6.0))
+    self.apply_action(state, dominoes.Action(1, (2.0, 2.0), 2.0))
+    self.apply_action(state, dominoes.Action(3, (2.0, 3.0), 3.0))
+    # Game is stuck! No player can play any tile as all 2.0s are played
+
+
     self.assertTrue(state.is_terminal())
-    self.assertEqual(state.returns()[0], -2)
-    self.assertEqual(state.returns()[1], 2)
+    self.assertEqual(state.returns()[0], -18)
+    self.assertEqual(state.returns()[1], 18)
+    self.assertEqual(state.returns()[2], -18)
+    self.assertEqual(state.returns()[3], 18)
 
   def test_single_deterministic_game_2(self):
     """Runs a single game where tiles and actions chose deterministically."""
     game = pyspiel.load_game("python_dominoes")
     state = game.new_initial_state()
-    hand0 = [
-        (6.0, 6.0),
-        (0.0, 5.0),
-        (1.0, 5.0),
-        (2.0, 5.0),
-        (3.0, 5.0),
-        (4.0, 5.0),
-        (5.0, 5.0),
-    ]
-    hand1 = [
-        (0.0, 4.0),
-        (1.0, 4.0),
-        (2.0, 4.0),
-        (3.0, 4.0),
-        (4.0, 4.0),
-        (0.0, 3.0),
-        (1.0, 3.0),
-    ]
-    self.deal_hands(state, [hand0, hand1])
+    hand0 = [(0.0, 6.0), (3.0, 6.0), (1.0, 3.0), (1.0, 4.0), (5.0, 5.0), (0.0, 0.0), (2.0, 6.0)]
+    hand1=  [(1.0, 5.0), (2.0, 2.0), (0.0, 2.0), (0.0, 3.0), (4.0, 5.0), (6.0, 6.0), (5.0, 6.0)]
+    hand2 = [(2.0, 4.0), (3.0, 4.0), (3.0, 3.0), (0.0, 4.0), (1.0, 1.0), (1.0, 6.0), (3.0, 5.0)]
+    hand3 = [(0.0, 5.0), (0.0, 1.0), (4.0, 4.0), (2.0, 3.0), (1.0, 2.0), (2.0, 5.0), (4.0, 6.0)]
 
-    self.apply_action(state, dominoes.Action(0, (6.0, 6.0), None))
-    # Both players don't hold tile with 6, therefore both blocked and the
-    # game end
+    self.deal_hands(state, [hand0, hand1, hand2, hand3])
+
+    self.apply_action(state, dominoes.Action(0, (0.0, 6.0), None))
+    self.apply_action(state, dominoes.Action(1, (0.0, 5.0), 0.0))
+    self.apply_action(state, dominoes.Action(2, (2.0, 6.0), 6.0))
+    self.apply_action(state, dominoes.Action(3, (1.0, 5.0), 5.0))
+
+    self.apply_action(state, dominoes.Action(0, (2.0, 3.0), 2.0))
+    self.apply_action(state, dominoes.Action(1, (3.0, 6.0), 3.0))
+    self.apply_action(state, dominoes.Action(2, (1.0, 3.0), 1.0))
+    self.apply_action(state, dominoes.Action(3, (1.0, 6.0), 6.0))
+
+    self.apply_action(state, dominoes.Action(0, (3.0, 5.0),3.0))
+    self.apply_action(state, dominoes.Action(1, (5.0, 6.0), 5.0))
+    self.apply_action(state, dominoes.Action(2, (1.0, 1.0), 1.0))
+    self.apply_action(state, dominoes.Action(3, (4.0, 6.0), 6.0))
+
+    # skipped player 0 (has no 4.0 or 1.0 to play)
+    self.apply_action(state, dominoes.Action(1, (0.0, 4.0), 4.0))
+    self.apply_action(state, dominoes.Action(2, (0.0, 1.0), 1.0))
+    # skipped player 3 (has no 0.0s to play)
+    
+    # skipped over player 0 (has no 0.0s to play)
+    self.apply_action(state, dominoes.Action(1, (0.0, 0.0), 0.0))
+    self.apply_action(state, dominoes.Action(2, (0.0, 3.0), 0.0))
+    self.apply_action(state, dominoes.Action(3, (3.0, 4.0), 3.0))
+
+    # skipped over player 0 (has no 0.0s nor 4.0s to play)
+    self.apply_action(state, dominoes.Action(1, (0.0, 2.0), 0.0))
+    self.apply_action(state, dominoes.Action(2, (2.0, 4.0), 2.0))
+    self.apply_action(state, dominoes.Action(3, (1.0, 4.0), 4.0))
+
+    # skipped over player 0 (has no 1.0s nor 4.0s to play)
+    self.apply_action(state, dominoes.Action(1, (1.0, 2.0), 1.0))
+    # player 1 won (no more tiles to play)
+
+
+
     self.assertTrue(state.is_terminal())
-    self.assertEqual(state.returns()[0], -45)
-    self.assertEqual(state.returns()[1], 45)
+    self.assertEqual(state.returns()[0], -39)
+    self.assertEqual(state.returns()[1], 39)
+    self.assertEqual(state.returns()[2], -39)
+    self.assertEqual(state.returns()[3], 39)
 
   @staticmethod
   def apply_action(state, action):

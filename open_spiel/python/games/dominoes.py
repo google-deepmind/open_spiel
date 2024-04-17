@@ -15,7 +15,8 @@
 # Lint as python3
 """ Dominoes (4 players) implemented in Python.
 
-https://en.wikipedia.org/wiki/Dominoes#Blocking_game
+https://en.wikipedia.org/wiki/Dominoes#Middle_Eastern_Version
+
 """
 
 import copy
@@ -26,7 +27,7 @@ import numpy as np
 
 import pyspiel
 
-_NUM_PLAYERS = 4 # CHANGED
+_NUM_PLAYERS = 4 
 _PIPS = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 _DECK = list(itertools.combinations_with_replacement(_PIPS, 2))
 _EDGES = [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -52,7 +53,7 @@ def create_possible_actions():
   for player in range(_NUM_PLAYERS):
     for tile in _DECK:
       for edge in _EDGES:
-        if edge in tile or edge is None:  # can we play tile on edge?
+        if edge in tile or edge is None: 
           actions.append(Action(player, tile, edge))
   return actions
 
@@ -83,12 +84,10 @@ _GAME_TYPE = pyspiel.GameType(
 _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=len(_ACTIONS),
     max_chance_outcomes=len(_DECK),
-    # first player hand: (6,6) (6,5) (5,5) (6,4) (4,5) (6,3) (4,4)
-    # second player hand is empty. can be reduced.
-    min_utility=-69, # TODO: change
-    max_utility=69,
+    min_utility=-100,
+    max_utility=100, 
     num_players=_NUM_PLAYERS,
-    # deal: 14 chance nodes + play: 14 player nodes
+    # deal: 28 chance nodes + play: 28 player nodes
     max_game_length=_MAX_GAME_LENGTH,
     utility_sum=0.0,
 )
@@ -132,17 +131,17 @@ class DominoesState(pyspiel.State):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     if self._game_over:
       return pyspiel.PlayerId.TERMINAL
-    if len(self.deck) > 0: #  CHANGED 
+    if len(self.deck) > 0: # deal phase 
       return pyspiel.PlayerId.CHANCE
     return self._next_player
 
-  def _legal_actions(self, player): # NO NEED TO CHANGE
+  def _legal_actions(self, player): 
     """Returns a list of legal actions, sorted in ascending order."""
     assert player >= 0
     assert player == self._next_player
     return self.get_legal_actions(player)
 
-  def get_legal_actions(self, player): # NO NEED TO CHANGE 
+  def get_legal_actions(self, player): 
     """Returns a list of legal actions."""
     assert player >= 0
 
@@ -164,7 +163,7 @@ class DominoesState(pyspiel.State):
     actions_idx.sort()
     return actions_idx
 
-  def chance_outcomes(self): # NO NEED TO CHANGE
+  def chance_outcomes(self): 
     """Returns the possible chance outcomes and their probabilities."""
     assert self.is_chance_node()
     p = 1.0 / len(self.deck)
@@ -173,7 +172,7 @@ class DominoesState(pyspiel.State):
   def _apply_action(self, action):
     """Applies the specified action to the state."""
     if self.is_chance_node():
-      # Deal tiles to players in order 0, 1, 2, 3
+      # Deal tiles to players in order (0, 1, 2, 3)
       hand_to_add_tile = self.hands[self._current_deal_player]
       tile = _DECK[action]
       self.deck.remove(tile)
@@ -215,7 +214,7 @@ class DominoesState(pyspiel.State):
       print("Game is stuck!")
       self._game_over = True  # all players are blocked
 
-  def update_open_edges(self, action): # NO NEED TO CHANGE 
+  def update_open_edges(self, action):
     if not self.open_edges:
       self.open_edges = list(action.tile)
     else:
@@ -252,7 +251,7 @@ class DominoesState(pyspiel.State):
       return [sum_of_pips1, -sum_of_pips1, sum_of_pips1, -sum_of_pips1]
     return [-sum_of_pips0, sum_of_pips0, -sum_of_pips0, sum_of_pips0]
 
-  def __str__(self): # CHANGED: could imrpove
+  def __str__(self):
     """String for debug purposes. No particular semantics are required."""
     hand0 = [str(c) for c in self.hands[0]]
     hand1 = [str(c) for c in self.hands[1]]
@@ -304,28 +303,29 @@ class DominoesObserver:
       raise ValueError(f"Observation parameters not supported; passed {params}")
 
     # Determine which observation pieces we want to include.
-    pieces = [("player", 2, (2,))]
+    pieces = [("player", 4, (4,))]
 
     if iig_obs_type.private_info == pyspiel.PrivateInfoType.SINGLE_PLAYER:
       # each tile is represented using 3 integers:
       # 2 for the pips, and 1 to distinguish between (0,0) to empty slot for
       # a tile.
-      pieces.append(("hand", 21, (7, 3)))
+      pieces.append(("hand", 21, (7, 3))) # TODO: what does the 21 mean?
 
     if iig_obs_type.public_info:
       if iig_obs_type.perfect_recall:
         # list of all played actions, each action is represented using 5
         # integers:
-        # 2 for the played tile (0-6), 1 for the covered edge (0-6),
-        # 1 for which player (0/1), 1 to distinguish between actual move and
-        # empty slot for a move (0/1).
+        # 2 for the played tile (0-6), 
+        # 1 for the covered edge (0-6),
+        # 1 for which player (0,1,3,4), 
+        # 1 to distinguish between actual move and empty slot for a move (0/1).
         # the None (play on an empty board) edge represented using 0.
-        pieces.append(("actions_history", 70, (14, 5)))
+        pieces.append(("actions_history", 125, (25, 5)))
       else:
         # last action, represented in the same way as in "actions_history"
         # but without the last integer.
         pieces.append(("last_action", 4, (4,)))
-        pieces.append(("hand_sizes", 2, (2,)))
+        pieces.append(("hand_sizes", 4, (4,)))
 
     # Build the single flat tensor.
     total_size = sum(size for name, size, shape in pieces)
