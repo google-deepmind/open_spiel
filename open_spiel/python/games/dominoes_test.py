@@ -13,8 +13,8 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Python Dominoes (4-player game)."""
-# TESTS MUST BE UPDATED FOR 4 PLAYERS
+"""Tests for Middle Eastern Python Dominoes."""
+
 
 from absl.testing import absltest
 from open_spiel.python.games import dominoes
