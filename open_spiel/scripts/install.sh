@@ -144,13 +144,6 @@ if [[ ${OPEN_SPIEL_BUILD_WITH_ACPC:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
   cached_clone -b 'master' --single-branch --depth 1  https://github.com/jblespiau/project_acpc_server.git ${DIR}
 fi
 
-# Add EIGEN template library for linear algebra.
-# http://eigen.tuxfamily.org/index.php?title=Main_Page
-DIR="open_spiel/eigen/libeigen"
-if [[ ${OPEN_SPIEL_BUILD_WITH_EIGEN:-"ON"} == "ON" ]] && [[ ! -d ${DIR} ]]; then
-  cached_clone -b '3.3.7' --single-branch --depth 1  https://gitlab.com/libeigen/eigen.git ${DIR}
-fi
-
 # This GitHub repository contains Nathan Sturtevant's state of the art
 # Hearts program xinxin.
 DIR="open_spiel/bots/xinxin/hearts"
@@ -242,6 +235,12 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo "Adding Python 3.11 ppa repos"
     sudo add-apt-repository ppa:deadsnakes/ppa
     PYTHON_PKGS="python3.11 python3.11-dev python3-pip python3-setuptools python3-wheel python3-tk python3.11-venv"
+  elif [[ "$OS_PYTHON_VERSION" == "3.12" ]]; then
+    # Need to special-case this until it's installed by default.
+    # https://ubuntuhandbook.org/index.php/2023/05/install-python-3-12-ubuntu/
+    echo "Adding Python 3.12 ppa repos"
+    sudo add-apt-repository ppa:deadsnakes/ppa
+    PYTHON_PKGS="python3.12 python3.12-dev python3-pip python3-setuptools python3-wheel python3-tk python3.12-venv"
   fi
   EXT_DEPS="virtualenv clang cmake curl $PYTHON_PKGS"
   if [[ ${OPEN_SPIEL_BUILD_WITH_GO:-"OFF"} == "ON" ]]; then
@@ -307,8 +306,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
     fi
   fi
   # Removed getting pip via git-pip.py. See #1200.
-  # brew install virtualenv   # May be the required way to do this as of Python 3.12?
-  ${PYBIN} -m pip install virtualenv
+  brew install virtualenv   # May be the required way to do this as of Python 3.12?
+  # ${PYBIN} -m pip install virtualenv
 else
   echo "The OS '$OSTYPE' is not supported (Only Linux and MacOS is). " \
        "Feel free to contribute the install for a new OS."

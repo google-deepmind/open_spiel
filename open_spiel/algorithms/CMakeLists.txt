@@ -188,6 +188,5 @@ add_executable(trajectories_test trajectories_test.cc
     $<TARGET_OBJECTS:algorithms> ${OPEN_SPIEL_OBJECTS})
 add_test(trajectories_test trajectories_test)
 
-add_subdirectory (alpha_zero)
 add_subdirectory (alpha_zero_torch)
 add_subdirectory (dqn_torch)

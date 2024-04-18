@@ -76,6 +76,27 @@ ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
   return new_policy;
 }
 
+bool StatePoliciesEqual(const ActionsAndProbs& state_policy1,
+                        const ActionsAndProbs& state_policy2,
+                        double float_tolerance) {
+  if (state_policy1.size() != state_policy2.size()) {
+    return false;
+  }
+
+  for (int i = 0; i < state_policy1.size(); ++i) {
+    if (state_policy1[i].first != state_policy2[i].first) {
+      return false;
+    }
+
+    if (!Near(state_policy1[i].second, state_policy2[i].second,
+              float_tolerance)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
                                        Action action) {
   ActionsAndProbs new_policy;

@@ -158,20 +158,6 @@ if (WIN32)
   set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
 endif()
 
-# Optional pyspiel-related modules, which can specify their own python tests.
-if (OPEN_SPIEL_BUILD_WITH_EIGEN)
-  add_library(pyspiel_eigen_test MODULE
-    ../eigen/eigen_test_support.h
-    ../eigen/pyeig.h
-    ../eigen/pyspiel_eigen_test.cc
-    ${OPEN_SPIEL_OBJECTS})
-
-  # Without this, the binary is called `libpyspiel_eigen_test.so`
-  set_target_properties(pyspiel_eigen_test PROPERTIES PREFIX "")
-
-  set(PYTHON_TESTS ${PYTHON_TESTS}
-    ../eigen/eigen_binding_test.py)
-endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
 endif()
@@ -306,9 +292,11 @@ endif()
 if (OPEN_SPIEL_ENABLE_TENSORFLOW)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/alpha_zero/evaluator_test.py
-      algorithms/alpha_zero/model_test.py
+      # Broken in Python 3.12. Must port to Keras 3. See https://github.com/google-deepmind/open_spiel/issues/1206.
+      # algorithms/alpha_zero/model_test.py
       algorithms/deep_cfr_test.py
-      algorithms/deep_cfr_tf2_test.py
+      # Broken in Python 3.12. Must port to Keras 3. See https://github.com/google-deepmind/open_spiel/issues/1208.
+      # algorithms/deep_cfr_tf2_test.py
       algorithms/discounted_cfr_test.py
       algorithms/dqn_test.py
       algorithms/eva_test.py
@@ -320,7 +308,8 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/nfsp_test.py
       algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
-      algorithms/rcfr_test.py
+      # Broken in Python 3.12. Must port to Keras 3. https://github.com/google-deepmind/open_spiel/issues/1207.
+      # algorithms/rcfr_test.py
   )
   if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
     set(PYTHON_TESTS ${PYTHON_TESTS}
