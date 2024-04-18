@@ -16,7 +16,7 @@
 """Tests for Python Block Dominoes."""
 
 from absl.testing import absltest
-from open_spiel.python.games import dominoes
+from open_spiel.python.games import block_dominoes
 import pyspiel
 
 
@@ -51,22 +51,22 @@ class DominoesBlockTest(absltest.TestCase):
     ]
     self.deal_hands(state, [hand0, hand1])
 
-    self.apply_action(state, dominoes.Action(0, (6.0, 6.0), None))
-    self.apply_action(state, dominoes.Action(1, (5.0, 6.0), 6.0))
-    # player 0 don't hold any tile with 6 or 5, player 1 turn again
-    self.apply_action(state, dominoes.Action(1, (4.0, 5.0), 5.0))
-    self.apply_action(state, dominoes.Action(0, (4.0, 4.0), 4.0))
-    self.apply_action(state, dominoes.Action(1, (3.0, 4.0), 4.0))
-    self.apply_action(state, dominoes.Action(0, (3.0, 3.0), 3.0))
-    self.apply_action(state, dominoes.Action(1, (2.0, 3.0), 3.0))
-    self.apply_action(state, dominoes.Action(0, (2.0, 2.0), 2.0))
-    self.apply_action(state, dominoes.Action(1, (1.0, 2.0), 2.0))
-    self.apply_action(state, dominoes.Action(0, (1.0, 1.0), 1.0))
-    self.apply_action(state, dominoes.Action(1, (0.0, 1.0), 1.0))
-    self.apply_action(state, dominoes.Action(0, (0.0, 0.0), 0.0))
-    self.apply_action(state, dominoes.Action(1, (4.0, 6.0), 6.0))
+    self.apply_action(state, block_dominoes.Action(0, (6.0, 6.0), None))
+    self.apply_action(state, block_dominoes.Action(1, (5.0, 6.0), 6.0))
+    # player 0 dosn't hold any tile with 6 or 5; player 1's turn again
+    self.apply_action(state, block_dominoes.Action(1, (4.0, 5.0), 5.0))
+    self.apply_action(state, block_dominoes.Action(0, (4.0, 4.0), 4.0))
+    self.apply_action(state, block_dominoes.Action(1, (3.0, 4.0), 4.0))
+    self.apply_action(state, block_dominoes.Action(0, (3.0, 3.0), 3.0))
+    self.apply_action(state, block_dominoes.Action(1, (2.0, 3.0), 3.0))
+    self.apply_action(state, block_dominoes.Action(0, (2.0, 2.0), 2.0))
+    self.apply_action(state, block_dominoes.Action(1, (1.0, 2.0), 2.0))
+    self.apply_action(state, block_dominoes.Action(0, (1.0, 1.0), 1.0))
+    self.apply_action(state, block_dominoes.Action(1, (0.0, 1.0), 1.0))
+    self.apply_action(state, block_dominoes.Action(0, (0.0, 0.0), 0.0))
+    self.apply_action(state, block_dominoes.Action(1, (4.0, 6.0), 6.0))
 
-    # player 1 played all is tile and player 0 hold the tile (0, 2)
+    # player 1 played all tiles and player 0 is left with (0, 2)
     self.assertTrue(state.is_terminal())
     self.assertEqual(state.returns()[0], -2)
     self.assertEqual(state.returns()[1], 2)
@@ -96,8 +96,8 @@ class DominoesBlockTest(absltest.TestCase):
     self.deal_hands(state, [hand0, hand1])
 
     self.apply_action(state, dominoes.Action(0, (6.0, 6.0), None))
-    # Both players don't hold tile with 6, therefore both blocked and the
-    # game end
+    # Neither of the players hold tile with 6
+    # therefore both blocked and the game ends
     self.assertTrue(state.is_terminal())
     self.assertEqual(state.returns()[0], -45)
     self.assertEqual(state.returns()[1], 45)
