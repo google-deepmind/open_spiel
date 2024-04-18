@@ -230,11 +230,10 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   environments/catch_test.py
   environments/cliff_walking_test.py
   games/block_dominoes_test.py
-  games/dominoes_test.py
-  games/vaqueritos_test.py # TODO : added this myself!! 
   games/chat_game_test.py
   games/chat_games/envs/base_envs/base_envs_test.py
   games/data_test.py
+  games/dominoes_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
   games/liars_poker_test.py
