@@ -26,7 +26,7 @@ FLAGS = flags.FLAGS
 
 # Game strings can just contain the name or the name followed by parameters
 # and arguments, e.g. "breakthrough(rows=6,columns=6)"
-flags.DEFINE_string("game_string", "python_dominoes", "Game string")
+flags.DEFINE_string("game_string", "tic_tac_toe", "Game string")
 
 
 def main(_):
@@ -83,7 +83,7 @@ def main(_):
     print(str(state))
 
   # Game is now done. Print utilities for each player
-  print("\nGame over.")
+
   returns = state.returns()
   for pid in range(game.num_players()):
     print("Utility for player {} is {}".format(pid, returns[pid]))

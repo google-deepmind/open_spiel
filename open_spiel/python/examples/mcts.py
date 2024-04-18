@@ -50,7 +50,7 @@ _KNOWN_PLAYERS = [
     "az"
 ]
 
-flags.DEFINE_string("game", "python_block_dominoes", "Name of the game.")
+flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
 flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.") # CHANGED TO HUMAN
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.") # CHANGED TO HUMAN
 flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
