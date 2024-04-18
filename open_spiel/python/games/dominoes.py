@@ -211,8 +211,9 @@ class DominoesState(pyspiel.State):
         if not (self.hands[0] or self.hands[2]) or not (self.hands[1] or self.hands[3]):
           self._game_over = True
           return
-      print("Game is stuck!")
-      self._game_over = True  # all players are blocked
+        
+      # all players are blocked. Game is stuck.
+      self._game_over = True  
 
   def update_open_edges(self, action):
     if not self.open_edges:
