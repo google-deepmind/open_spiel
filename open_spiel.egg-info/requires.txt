@@ -1,0 +1,6 @@
+pip>=20.0.2
+attrs>=19.3.0
+absl-py>=0.10.0
+numpy>=1.21.5
+scipy>=1.10.1
+ml-collections>=0.1.1

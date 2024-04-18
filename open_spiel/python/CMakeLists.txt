@@ -219,6 +219,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/chat_game_test.py
   games/chat_games/envs/base_envs/base_envs_test.py
   games/data_test.py
+  games/dominoes_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
   games/liars_poker_test.py
@@ -380,3 +381,15 @@ if (OPEN_SPIEL_ENABLE_JAX AND NOT OPEN_SPIEL_BUILDING_WHEEL)
       PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
       TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
 endif()
+
+
+# # additional test for vaqueritos
+# if (OPEN_SPIEL_ENABLE_JAX AND NOT OPEN_SPIEL_BUILDING_WHEEL)
+#   add_test(NAME python_vaqueritos_test
+#            COMMAND ${Python3_EXECUTABLE}
+#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/vaqueritos_test.py)
+#   set_property(TEST python_vaqueritos_test
+#       PROPERTY ENVIRONMENT
+#       PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;
+#       TEST_SRCDIR=${CMAKE_CURRENT_SOURCE_DIR}/../..)
+# endif()

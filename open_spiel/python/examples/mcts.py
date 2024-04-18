@@ -28,6 +28,7 @@ from open_spiel.python.algorithms.alpha_zero import model as az_model
 from open_spiel.python.bots import gtp
 from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
+import open_spiel.python.games
 import pyspiel
 
 _KNOWN_PLAYERS = [
@@ -50,7 +51,7 @@ _KNOWN_PLAYERS = [
 ]
 
 flags.DEFINE_string("game", "tic_tac_toe", "Name of the game.")
-flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.")
+flags.DEFINE_enum("player1", "mcts", _KNOWN_PLAYERS, "Who controls player 1.") 
 flags.DEFINE_enum("player2", "random", _KNOWN_PLAYERS, "Who controls player 2.")
 flags.DEFINE_string("gtp_path", None, "Where to find a binary for gtp.")
 flags.DEFINE_multi_string("gtp_cmd", [], "GTP commands to run at init.")

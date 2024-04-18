@@ -13,19 +13,21 @@
 # limitations under the License.
 
 # Lint as python3
-"""Block Dominoes implemented in Python.
+""" Dominoes (4 players) implemented in Python.
 
-https://en.wikipedia.org/wiki/Dominoes#Blocking_game
+https://en.wikipedia.org/wiki/Dominoes#Middle_Eastern_Version
+
 """
 
 import copy
 import itertools
+import collections
 
 import numpy as np
 
 import pyspiel
 
-_NUM_PLAYERS = 2
+_NUM_PLAYERS = 4 
 _PIPS = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 _DECK = list(itertools.combinations_with_replacement(_PIPS, 2))
 _EDGES = [None, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -51,7 +53,7 @@ def create_possible_actions():
   for player in range(_NUM_PLAYERS):
     for tile in _DECK:
       for edge in _EDGES:
-        if edge in tile or edge is None:  # can we play tile on edge?
+        if edge in tile or edge is None: 
           actions.append(Action(player, tile, edge))
   return actions
 
@@ -64,8 +66,8 @@ _HAND_SIZE = 7
 _MAX_GAME_LENGTH = 28
 
 _GAME_TYPE = pyspiel.GameType(
-    short_name="python_block_dominoes",
-    long_name="Python block dominoes",
+    short_name="python_dominoes",
+    long_name="Python Dominoes (4 players)",
     dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
     chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
     information=pyspiel.GameType.Information.IMPERFECT_INFORMATION,
@@ -82,18 +84,16 @@ _GAME_TYPE = pyspiel.GameType(
 _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=len(_ACTIONS),
     max_chance_outcomes=len(_DECK),
-    # first player hand: (6,6) (6,5) (5,5) (6,4) (4,5) (6,3) (4,4)
-    # second player hand is empty. can be reduced.
-    min_utility=-69,
-    max_utility=69,
+    min_utility=-100,
+    max_utility=100, 
     num_players=_NUM_PLAYERS,
-    # deal: 14 chance nodes + play: 14 player nodes
+    # deal: 28 chance nodes + play: 28 player nodes
     max_game_length=_MAX_GAME_LENGTH,
     utility_sum=0.0,
 )
 
 
-class BlockDominoesGame(pyspiel.Game):
+class DominoesGame(pyspiel.Game):
   """A Python version of Block Dominoes."""
 
   def __init__(self, params=None):
@@ -101,16 +101,16 @@ class BlockDominoesGame(pyspiel.Game):
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
-    return BlockDominoesState(self)
+    return DominoesState(self)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
     """Returns an object used for observing game state."""
-    return BlockDominoesObserver(
+    return DominoesObserver(
         iig_obs_type or pyspiel.IIGObservationType(perfect_recall=False), params
     )
 
 
-class BlockDominoesState(pyspiel.State):
+class DominoesState(pyspiel.State):
   """A python version of the Block Dominoes state."""
 
   def __init__(self, game):
@@ -118,10 +118,11 @@ class BlockDominoesState(pyspiel.State):
     super().__init__(game)
     self.actions_history = []
     self.open_edges = []
-    self.hands = [[], []]
+    self.hands = [[] for _ in range(_NUM_PLAYERS)]
     self.deck = copy.deepcopy(_DECK)
     self._game_over = False
     self._next_player = pyspiel.PlayerId.CHANCE
+    self._current_deal_player = 0 # NEW ATTRIBUTE
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every sequential-move game with chance.
@@ -130,17 +131,17 @@ class BlockDominoesState(pyspiel.State):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     if self._game_over:
       return pyspiel.PlayerId.TERMINAL
-    if len(self.deck) > 14:
+    if len(self.deck) > 0: # deal phase 
       return pyspiel.PlayerId.CHANCE
     return self._next_player
 
-  def _legal_actions(self, player):
+  def _legal_actions(self, player): 
     """Returns a list of legal actions, sorted in ascending order."""
     assert player >= 0
     assert player == self._next_player
     return self.get_legal_actions(player)
 
-  def get_legal_actions(self, player):
+  def get_legal_actions(self, player): 
     """Returns a list of legal actions."""
     assert player >= 0
 
@@ -162,7 +163,7 @@ class BlockDominoesState(pyspiel.State):
     actions_idx.sort()
     return actions_idx
 
-  def chance_outcomes(self):
+  def chance_outcomes(self): 
     """Returns the possible chance outcomes and their probabilities."""
     assert self.is_chance_node()
     p = 1.0 / len(self.deck)
@@ -171,15 +172,16 @@ class BlockDominoesState(pyspiel.State):
   def _apply_action(self, action):
     """Applies the specified action to the state."""
     if self.is_chance_node():
-      hand_to_add_tile = (
-          self.hands[0] if len(self.hands[0]) != _HAND_SIZE else self.hands[1]
-      )
+      # Deal tiles to players in order (0, 1, 2, 3)
+      hand_to_add_tile = self.hands[self._current_deal_player]
       tile = _DECK[action]
       self.deck.remove(tile)
       hand_to_add_tile.append(tile)
+      self._current_deal_player = (self._current_deal_player + 1) % 4
 
-      if not len(self.hands[0]) == len(self.hands[1]) == _HAND_SIZE:
-        return  # another tiles to deal
+      # Check if all hands are of _HAND_SIZE
+      if not all(len(hand) == _HAND_SIZE for hand in self.hands):
+        return  # more tiles to deal
 
       for hand in self.hands:
         hand.sort()
@@ -197,19 +199,21 @@ class BlockDominoesState(pyspiel.State):
         self._game_over = True  # player played his last tile
         return
 
-      opp_idx = 1 - my_idx
-      opp_legal_actions = self.get_legal_actions(opp_idx)
+      for i in range(1,5):
+        next_idx = (my_idx + i) % 4
+        next_legal_actions = self.get_legal_actions(next_idx)
 
-      if opp_legal_actions:
-        self._next_player = opp_idx
-        return
-
-      my_legal_actions = self.get_legal_actions(my_idx)
-      if my_legal_actions:
-        self._next_player = my_idx
-        return
-
-      self._game_over = True  # both players are blocked
+        if next_legal_actions:
+          self._next_player = next_idx
+          return
+        
+        # Check if a team has played all their tiles.
+        if not (self.hands[0] or self.hands[2]) or not (self.hands[1] or self.hands[3]):
+          self._game_over = True
+          return
+        
+      # all players are blocked. Game is stuck.
+      self._game_over = True  
 
   def update_open_edges(self, action):
     if not self.open_edges:
@@ -236,27 +240,62 @@ class BlockDominoesState(pyspiel.State):
   def returns(self):
     """Total reward for each player over the course of the game so far."""
     if not self.is_terminal():
-      return [0, 0]
+      return [0 for _ in range(_NUM_PLAYERS)]
 
-    sum_of_pips0 = sum(t[0] + t[1] for t in self.hands[0])
-    sum_of_pips1 = sum(t[0] + t[1] for t in self.hands[1])
+    sum_of_pips0 = sum(t[0] + t[1] for t in (self.hands[0] + self.hands[2]))
+    sum_of_pips1 = sum(t[0] + t[1] for t in (self.hands[1] + self.hands[3]))
 
     if sum_of_pips1 == sum_of_pips0:
-      return [0, 0]
+      return [0 for _ in range(_NUM_PLAYERS)]
 
     if sum_of_pips1 > sum_of_pips0:
-      return [sum_of_pips1, -sum_of_pips1]
-    return [-sum_of_pips0, sum_of_pips0]
+      return [sum_of_pips1, -sum_of_pips1, sum_of_pips1, -sum_of_pips1]
+    return [-sum_of_pips0, sum_of_pips0, -sum_of_pips0, sum_of_pips0]
 
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
     hand0 = [str(c) for c in self.hands[0]]
     hand1 = [str(c) for c in self.hands[1]]
+    hand2 = [str(c) for c in self.hands[2]]
+    hand3 = [str(c) for c in self.hands[3]]
     history = [str(a) for a in self.actions_history]
-    return f"hand0:{hand0} hand1:{hand1} history:{history}"
+    board = self.draw_board()
+    return (
+              f"hand0:{hand0}\n"
+              f"hand1:{hand1}\n"
+              f"hand2:{hand2}\n"
+              f"hand3:{hand3}\n\n"
+              # f"history:{history}\n"
+              f"board: {board}"
+    )
+  
+  def draw_board(self):
+    '''Draw the board' in a human readable format'''
+    board = collections.deque()
+    current_open_edges = None
+    for action in self.actions_history:
+      # check if action is played on an empty board
+      if action.edge is None:
+        board.append(action.tile)
+        current_open_edges = list(action.tile)
+      # check if action edge matches last played edge in the left or right
+      elif action.edge == current_open_edges[0]:
+        # invert the tile if the edge is on the right:
+        tile = (action.tile[1], action.tile[0]) if action.tile[0] == current_open_edges[0] else action.tile
+        board.appendleft(tile)
+
+      elif action.edge == current_open_edges[1]:
+        # invert the tile if the edge is on the left:
+        tile = (action.tile[1], action.tile[0]) if action.tile[1] == current_open_edges[1] else action.tile
+        board.append(tile)
+
+      current_open_edges = board[0][0], board[-1][1]
+    
+    assert len(board) == len(self.actions_history) # TODO: move this to a test
+    return list(board)
 
 
-class BlockDominoesObserver:
+class DominoesObserver:
   """Observer, conforming to the PyObserver interface (see observation.py)."""
 
   def __init__(self, iig_obs_type, params):
@@ -265,28 +304,29 @@ class BlockDominoesObserver:
       raise ValueError(f"Observation parameters not supported; passed {params}")
 
     # Determine which observation pieces we want to include.
-    pieces = [("player", 2, (2,))]
+    pieces = [("player", 4, (4,))]
 
     if iig_obs_type.private_info == pyspiel.PrivateInfoType.SINGLE_PLAYER:
       # each tile is represented using 3 integers:
       # 2 for the pips, and 1 to distinguish between (0,0) to empty slot for
       # a tile.
-      pieces.append(("hand", 21, (7, 3)))
+      pieces.append(("hand", 21, (7, 3))) # TODO: what does the 21 mean?
 
     if iig_obs_type.public_info:
       if iig_obs_type.perfect_recall:
         # list of all played actions, each action is represented using 5
         # integers:
-        # 2 for the played tile (0-6), 1 for the covered edge (0-6),
-        # 1 for which player (0/1), 1 to distinguish between actual move and
-        # empty slot for a move (0/1).
+        # 2 for the played tile (0-6), 
+        # 1 for the covered edge (0-6),
+        # 1 for which player (0,1,3,4), 
+        # 1 to distinguish between actual move and empty slot for a move (0/1).
         # the None (play on an empty board) edge represented using 0.
-        pieces.append(("actions_history", 70, (14, 5)))
+        pieces.append(("actions_history", 125, (25, 5)))
       else:
         # last action, represented in the same way as in "actions_history"
         # but without the last integer.
         pieces.append(("last_action", 4, (4,)))
-        pieces.append(("hand_sizes", 2, (2,)))
+        pieces.append(("hand_sizes", 4, (4,)))
 
     # Build the single flat tensor.
     total_size = sum(size for name, size, shape in pieces)
@@ -364,4 +404,4 @@ class BlockDominoesObserver:
 
 # Register the game with the OpenSpiel library
 
-pyspiel.register_game(_GAME_TYPE, BlockDominoesGame)
+pyspiel.register_game(_GAME_TYPE, DominoesGame)

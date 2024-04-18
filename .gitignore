@@ -10,6 +10,7 @@ __pycache__/
 .ipynb_checkpoints
 
  # virtualenv
+.spielvenv/
 .venv
 venv/
 ENV/
