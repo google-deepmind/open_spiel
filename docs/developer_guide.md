@@ -35,7 +35,9 @@ that both the C++ and the Python implementation behave the same.
 ## Adding a game
 
 We describe here only the simplest and fastest way to add a new game. It is
-ideal to first be aware of the general API (see `open_spiel/spiel.h`).
+ideal to first be aware of the general API (see `open_spiel/spiel.h`). These
+guidelines primarily assume C++ games; the process is analogous for Python
+games and any special considerations are noted in the steps.
 
 1.  Choose a game to copy from in `open_spiel/games/` (or
     `open_spiel/python/games/`). Suggested
@@ -69,7 +71,9 @@ ideal to first be aware of the general API (see `open_spiel/spiel.h`).
         `open_spiel/python/tests/pyspiel_test.py`.
 6.  You should now have a duplicate game of Tic-Tac-Toe under a different name.
     It should build and the test should run, and can be verified by rebuilding
-    and running the example `build/examples/example --game=new_game`.
+    and running the example `build/examples/example --game=new_game`. Note:
+    Python games cannot be run using this example; use
+    `open_spiel/python/examples/example.py` instead. 
 7.  Now, change the implementations of the functions in `NewGameGame` and
     `NewGameState` to reflect your new game’s logic. Most API functions should
     be clear from the game you copied from. If not, each API function that is
@@ -78,7 +82,9 @@ ideal to first be aware of the general API (see `open_spiel/spiel.h`).
     interactively using `ConsolePlayTest` in
     `open_spiel/tests/console_play_test.h`. At the very least, the test should
     include some random simulation tests (see other game's tests for an
-    example).
+    example). Note: Python games cannot be tested using `ConsolePlayTest`,
+    however both C++ and Python games can also be tested on the console using
+    `open_spiel/python/examples/mcts_example` with human players.
 9.  Run your code through a linter so it conforms to Google's
     [style guides](https://google.github.io/styleguide/). For C++ use
     [cpplint](https://pypi.org/project/cpplint/). For Python, use
