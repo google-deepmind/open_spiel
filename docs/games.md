@@ -44,6 +44,7 @@ Status           | Game
 🔶               | [Hex](#hex)
 🔶               | [Kriegspiel](#Kriegspiel)
 🟢               | [Kuhn poker](#kuhn-poker)
+🔶               | [Latin American Dominoes](#latin-american-dominoes)
 🔶               | [Laser Tag](#laser-tag)
 🟢               | [Leduc poker](#leduc-poker)
 🔶               | [Lewis Signaling](#lewis-signaling)
@@ -479,6 +480,17 @@ Status           | Game
 *   Imperfect information.
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
+
+### Latin American Dominoes
+
+*   Team version of dominoes.
+*   Consists of 28 tiles, featuring all combinations of spot counts (also called
+    pips or dots) between zero and six.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+* [Wikipedia](https://en.wikipedia.org/wiki/Dominoes#Latin_American_Version)
 
 ### Laser Tag
 

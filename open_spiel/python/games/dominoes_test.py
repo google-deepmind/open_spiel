@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tests for Middle Eastern Python Dominoes."""
+"""Tests for Latin American Python Dominoes."""
 
 
 from absl.testing import absltest

@@ -15,7 +15,7 @@
 # Lint as python3
 """ Dominoes (4 players) implemented in Python.
 
-https://en.wikipedia.org/wiki/Dominoes#Middle_Eastern_Version
+https://en.wikipedia.org/wiki/Dominoes#Latin_American_Version
 
 """
 
