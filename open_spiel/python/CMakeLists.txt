@@ -268,6 +268,7 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/nfsp_jax_test.py
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
+    jax/cfr/jax_cfr_test.py
     algorithms/rnad/rnad_test.py
     coalitional_games/least_core_lagrangian_test.py
     mfg/algorithms/fictitious_play_test.py
@@ -285,6 +286,7 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
       pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py
       pytorch/neurd_pytorch_test.py
+      mfg/algorithms/pytorch/mfg_proximal_policy_optimization_pytorch_test.py
   )
 endif()
 
