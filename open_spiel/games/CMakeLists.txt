@@ -179,6 +179,11 @@ set(GAME_SOURCES
   trade_comm/trade_comm.h
   twenty_forty_eight/2048.cc
   twenty_forty_eight/2048.h
+  twixt/twixt.cc
+  twixt/twixt.h
+  twixt/twixtboard.cc
+  twixt/twixtboard.h
+  twixt/twixtcell.h
   ultimate_tic_tac_toe/ultimate_tic_tac_toe.h
   ultimate_tic_tac_toe/ultimate_tic_tac_toe.cc
   y/y.cc
@@ -604,6 +609,10 @@ add_test(tiny_hanabi_test tiny_hanabi_test)
 add_executable(trade_comm_test trade_comm/trade_comm_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(trade_comm_test trade_comm_test)
+
+add_executable(twixt_test twixt/twixt_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(twixt_test twixt_test)
 
 add_executable(ultimate_tic_tac_toe_test ultimate_tic_tac_toe/ultimate_tic_tac_toe_test.cc
                ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:tests>)
