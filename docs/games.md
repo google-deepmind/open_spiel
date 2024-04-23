@@ -6,87 +6,102 @@
 
 ❌: known issues (see notes below and code for details).
 
-Status           | Game
----------------- | ----------------------------
-🔶               | [2048](#2048)
-🔶               | [Amazons](#amazons)
-🔶               | [Atari](#atari)
-🟢               | [Backgammon](#backgammon)
-🔶               | [Bargaining](#bargaining)
-🔶               | [Battleship](#battleship)
-🔶               | [Blackjack](#blackjack)
-🔶               | [Block Dominoes](#block-dominoes)
-🟢               | [Breakthrough](#breakthrough)
-🟢               | [Bridge](#bridge)
-🟢               | [(Uncontested) Bridge bidding](#uncontested-bridge-bidding)
-🔶               | [Catch](#catch)
-🔶               | [Checkers](#checkers)
-🔶               | [Cliff Walking](#cliff-walking)
-🔶               | [Clobber](#clobber)
-🔶               | [Coin Game](#coin-game)
-🔶               | [Colored Trails](#colored-trails)
-🟢               | [Connect Four](#connect-four)
-🔶               | [Cooperative Box-Pushing](#cooperative-box-pushing)
-🟢               | [Chess](#chess)
-🔶               | [Crazy Eights](#crazy-eights)
-🔶               | [Dark Hex](#dark-hex)
-🔶               | [Deep Sea](#deep-sea)
-🟢               | [Dots and Boxes](#dots-and-boxes)
-🔶               | [Dou Dizhu](#dou-dizhu)
-🔶               | [Euchre](#euchre)
-🟢               | [First-price Sealed-Bid Auction](#first-price-sealed-bid-auction)
-🟢               | [Gin Rummy](#gin-rummy)
-🟢               | [Go](#go)
-🟢               | [Goofspiel](#goofspiel)
-🟢               | [Hanabi](#hanabi)
-🟢               | [Havannah](#havannah)
-🟢               | [Hearts](#hearts)
-🔶               | [Hex](#hex)
-🔶               | [Kriegspiel](#Kriegspiel)
-🟢               | [Kuhn poker](#kuhn-poker)
-🔶               | [Laser Tag](#laser-tag)
-🟢               | [Leduc poker](#leduc-poker)
-🔶               | [Lewis Signaling](#lewis-signaling)
-🟢               | [Liar's Dice](#liars-dice)
-🔶               | [Liar's Poker](#liars-poker)
-🔶               | [Mensch ärgere Dich nicht](#mensch-aergere-dich-nicht)
-🔶               | [Mancala](#mancala)
-🔶               | [Markov Soccer](#markov-soccer)
-🟢               | [Matching Pennies (Three-player)](#matching-pennies-three-player)
-🟢               | [Mean Field Game : garnet](#mean_field_game_garnet)
-🟢               | [Mean Field Game : crowd modelling](#mean_field_game_crowd_modelling)
-🟢               | [Mean Field Game : crowd modelling 2d](#mean_field_game_crowd_modelling_2d)
-🟢               | [Mean Field Game : linear quadratic](#mean-field-game--linear-quadratic)
-🟢               | [Mean Field Game : predator prey](#mean_field_game_predator_prey)
-🟢               | [Mean Field Game : routing](#mean-field-game--routing)
-🔶               | [Morpion Solitaire (4D)](#morpion-solitaire-4d)
-🟢               | [Negotiation](#negotiation)
-🔶               | [Nim](#nim)
-🔶               | [Nine men's morris](#nine_mens_morris)
-🔶               | [Oh Hell](#oh-hell)
-🟢               | [Oshi-Zumo](#oshi-zumo)
-🟢               | [Oware](#oware)
-🔶               | [Pathfinding](#pathfinding)
-🟢               | [Pentago](#pentago)
-🔶               | [Phantom Go](#phantom-go)
-🔶               | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)
-🟢               | [Pig](#pig)
-🟢               | [Prisoner's Dilemma](#prisoner's-dilemma)
-❌               | [Poker (Hold 'em)](#poker-hold-em)
-❌               | [Quoridor](#quoridor)
-❌               | [Reconnaissance Blind Chess](#reconnaissance-blind-chess)
-🟢               | [Routing game](#routing-game)
-🔶               | [Sheriff](#sheriff)
-🔶               | [Slovenian Tarok](#slovenian-tarok)
-🔶               | [Skat (simplified bidding)](#skat-simplified-bidding)
-🔶               | [Solitaire (K+)](#solitaire-k)
-🟢               | [Tic-Tac-Toe](#tic-tac-toe)
-🟢               | [Tiny Bridge](#tiny-bridge)
-🟢               | [Tiny Hanabi](#tiny-hanabi)
-🟢               | [Trade Comm](#trade-comm)
-🔶               | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)
-🔶               | [Weighted Voting Games](#weighted-voting-games)
-🟢               | [Y](#y)
+| Status | Game                                            |
+| ------ | ----------------------------------------------- |
+| 🔶      | [2048](#2048)                                   |
+| 🔶      | [Amazons](#amazons)                             |
+| 🔶      | [Atari](#atari)                                 |
+| 🟢      | [Backgammon](#backgammon)                       |
+| 🔶      | [Bargaining](#bargaining)                       |
+| 🔶      | [Battleship](#battleship)                       |
+| 🔶      | [Blackjack](#blackjack)                         |
+| 🔶      | [Block Dominoes](#block-dominoes)               |
+| 🟢      | [Breakthrough](#breakthrough)                   |
+| 🟢      | [Bridge](#bridge)                               |
+| 🟢      | [(Uncontested) Bridge                           |
+:        : bidding](#uncontested-bridge-bidding)           :
+| 🔶      | [Catch](#catch)                                 |
+| 🔶      | [Checkers](#checkers)                           |
+| 🔶      | [Cliff Walking](#cliff-walking)                 |
+| 🔶      | [Clobber](#clobber)                             |
+| 🔶      | [Coin Game](#coin-game)                         |
+| 🔶      | [Colored Trails](#colored-trails)               |
+| 🟢      | [Connect Four](#connect-four)                   |
+| 🔶      | [Cooperative                                    |
+:        : Box-Pushing](#cooperative-box-pushing)          :
+| 🟢      | [Chess](#chess)                                 |
+| 🔶      | [Crazy Eights](#crazy-eights)                   |
+| 🔶      | [Dark Hex](#dark-hex)                           |
+| 🔶      | [Deep Sea](#deep-sea)                           |
+| 🟢      | [Dots and Boxes](#dots-and-boxes)               |
+| 🔶      | [Dou Dizhu](#dou-dizhu)                         |
+| 🔶      | [Euchre](#euchre)                               |
+| 🟢      | [First-price Sealed-Bid                         |
+:        : Auction](#first-price-sealed-bid-auction)       :
+| 🟢      | [Gin Rummy](#gin-rummy)                         |
+| 🟢      | [Go](#go)                                       |
+| 🟢      | [Goofspiel](#goofspiel)                         |
+| 🟢      | [Hanabi](#hanabi)                               |
+| 🟢      | [Havannah](#havannah)                           |
+| 🟢      | [Hearts](#hearts)                               |
+| 🔶      | [Hex](#hex)                                     |
+| 🔶      | [Kriegspiel](#Kriegspiel)                       |
+| 🟢      | [Kuhn poker](#kuhn-poker)                       |
+| 🔶      | [Latin American Dominoes](#latin-american-dominoes)|
+| 🔶      | [Laser Tag](#laser-tag)                         |
+| 🟢      | [Leduc poker](#leduc-poker)                     |
+| 🔶      | [Lewis Signaling](#lewis-signaling)             |
+| 🟢      | [Liar's Dice](#liars-dice)                      |
+| 🔶      | [Liar's Poker](#liars-poker)                    |
+| 🔶      | [Mensch ärgere Dich                             |
+:        : nicht](#mensch-aergere-dich-nicht)              :
+| 🔶      | [Mancala](#mancala)                             |
+| 🔶      | [Markov Soccer](#markov-soccer)                 |
+| 🟢      | [Matching Pennies                               |
+:        : (Three-player)](#matching-pennies-three-player) :
+| 🟢      | [Mean Field Game :                              |
+:        : garnet](#mean_field_game_garnet)                :
+| 🟢      | [Mean Field Game : crowd                        |
+:        : modelling](#mean_field_game_crowd_modelling)    :
+| 🟢      | [Mean Field Game : crowd modelling              |
+:        : 2d](#mean_field_game_crowd_modelling_2d)        :
+| 🟢      | [Mean Field Game : linear                       |
+:        : quadratic](#mean-field-game--linear-quadratic)  :
+| 🟢      | [Mean Field Game : predator                     |
+:        : prey](#mean_field_game_predator_prey)           :
+| 🟢      | [Mean Field Game :                              |
+:        : routing](#mean-field-game--routing)             :
+| 🔶      | [Morpion Solitaire (4D)](#morpion-solitaire-4d) |
+| 🟢      | [Negotiation](#negotiation)                     |
+| 🔶      | [Nim](#nim)                                     |
+| 🔶      | [Nine men's morris](#nine_mens_morris)          |
+| 🔶      | [Oh Hell](#oh-hell)                             |
+| 🟢      | [Oshi-Zumo](#oshi-zumo)                         |
+| 🟢      | [Oware](#oware)                                 |
+| 🔶      | [Pathfinding](#pathfinding)                     |
+| 🟢      | [Pentago](#pentago)                             |
+| 🔶      | [Phantom Go](#phantom-go)                       |
+| 🔶      | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)     |
+| 🟢      | [Pig](#pig)                                     |
+| 🟢      | [Prisoner's Dilemma](#prisoner's-dilemma)       |
+| ❌      | [Poker (Hold 'em)](#poker-hold-em)              |
+| ❌      | [Quoridor](#quoridor)                           |
+| ❌      | [Reconnaissance Blind                           |
+:        : Chess](#reconnaissance-blind-chess)             :
+| 🟢      | [Routing game](#routing-game)                   |
+| 🔶      | [Sheriff](#sheriff)                             |
+| 🔶      | [Slovenian Tarok](#slovenian-tarok)             |
+| 🔶      | [Skat (simplified                               |
+:        : bidding)](#skat-simplified-bidding)             :
+| 🔶      | [Solitaire (K+)](#solitaire-k)                  |
+| 🟢      | [Tic-Tac-Toe](#tic-tac-toe)                     |
+| 🟢      | [Tiny Bridge](#tiny-bridge)                     |
+| 🟢      | [Tiny Hanabi](#tiny-hanabi)                     |
+| 🟢      | [Trade Comm](#trade-comm)                       |
+| 🔶      | [TwixT](#twixt)                                 |
+| 🔶      | [Ultimate Tic-Tac-Toe](#ultimate-tic-tac-toe)   |
+| 🔶      | [Weighted Voting Games](#weighted-voting-games) |
+| 🟢      | [Y](#y)                                         |
 
 ## Details
 
