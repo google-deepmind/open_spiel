@@ -66,8 +66,8 @@ _HAND_SIZE = 7
 _MAX_GAME_LENGTH = 28
 
 _GAME_TYPE = pyspiel.GameType(
-    short_name="python_dominoes",
-    long_name="Python Dominoes (4 players)",
+    short_name="python_team_dominoes",
+    long_name="Python Team Dominoes (4 players)",
     dynamics=pyspiel.GameType.Dynamics.SEQUENTIAL,
     chance_mode=pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC,
     information=pyspiel.GameType.Information.IMPERFECT_INFORMATION,
@@ -310,8 +310,7 @@ class DominoesObserver:
       # each tile is represented using 3 integers:
       # 2 for the pips, and 1 to distinguish between (0,0) to empty slot for
       # a tile.
-      pieces.append(("hand", 21, (7, 3))) # TODO: what does the 21 mean?
-
+      pieces.append(("hand", 21, (7, 3))) # 7 tiles per hand
     if iig_obs_type.public_info:
       if iig_obs_type.perfect_recall:
         # list of all played actions, each action is represented using 5
