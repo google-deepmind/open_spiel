@@ -219,10 +219,10 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/chat_game_test.py
   games/chat_games/envs/base_envs/base_envs_test.py
   games/data_test.py
-  games/team_dominoes_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
   games/liars_poker_test.py
+  games/team_dominoes_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/mirror_descent_test.py

@@ -25,12 +25,12 @@ class DominoesTest(absltest.TestCase):
 
   def test_game_from_cc(self):
     """Runs our standard game tests, checking API consistency."""
-    game = pyspiel.load_game("python_dominoes")
+    game = pyspiel.load_game("python_team_dominoes")
     pyspiel.random_sim_test(game, num_sims=100, serialize=False, verbose=True)
 
   def test_single_deterministic_game_1(self):
     """Runs a single game where tiles and actions chose deterministically."""
-    game = pyspiel.load_game("python_dominoes")
+    game = pyspiel.load_game("python_team_dominoes")
     state = game.new_initial_state()
     hand0 = [(1.0, 3.0), (0.0, 5.0), (1.0, 1.0), (2.0, 3.0), (4.0, 5.0), (3.0, 5.0), (0.0, 1.0)]
     hand1=  [(2.0, 5.0), (3.0, 4.0), (2.0, 2.0), (0.0, 4.0), (3.0, 3.0), (2.0, 6.0), (1.0, 6.0)]
@@ -78,7 +78,7 @@ class DominoesTest(absltest.TestCase):
 
   def test_single_deterministic_game_2(self):
     """Runs a single game where tiles and actions chose deterministically."""
-    game = pyspiel.load_game("python_dominoes")
+    game = pyspiel.load_game("python_team_dominoes")
     state = game.new_initial_state()
     hand0 = [(0.0, 6.0), (3.0, 6.0), (1.0, 3.0), (1.0, 4.0), (5.0, 5.0), (0.0, 0.0), (2.0, 6.0)]
     hand1=  [(1.0, 5.0), (2.0, 2.0), (0.0, 2.0), (0.0, 3.0), (4.0, 5.0), (6.0, 6.0), (5.0, 6.0)]
