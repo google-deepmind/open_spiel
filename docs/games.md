@@ -47,7 +47,6 @@
 | 🔶      | [Hex](#hex)                                     |
 | 🔶      | [Kriegspiel](#Kriegspiel)                       |
 | 🟢      | [Kuhn poker](#kuhn-poker)                       |
-| 🔶      | [Latin American Dominoes](#latin-american-dominoes)|
 | 🔶      | [Laser Tag](#laser-tag)                         |
 | 🟢      | [Leduc poker](#leduc-poker)                     |
 | 🔶      | [Lewis Signaling](#lewis-signaling)             |
@@ -94,6 +93,7 @@
 | 🔶      | [Skat (simplified                               |
 :        : bidding)](#skat-simplified-bidding)             :
 | 🔶      | [Solitaire (K+)](#solitaire-k)                  |
+| 🔶      | [Team Dominoes](#team-dominoes)       |
 | 🟢      | [Tic-Tac-Toe](#tic-tac-toe)                     |
 | 🟢      | [Tiny Bridge](#tiny-bridge)                     |
 | 🟢      | [Tiny Hanabi](#tiny-hanabi)                     |
@@ -495,7 +495,7 @@
 *   2 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
 
-### Latin American Dominoes
+### Team Dominoes
 
 *   Team version of dominoes.
 *   Consists of 28 tiles, featuring all combinations of spot counts (also called
