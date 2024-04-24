@@ -34,9 +34,16 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
+import warnings
 
 from open_spiel.python import policy
 import pyspiel
+
+warnings.warn(
+    "Deep CFR TF2 has known issues when using Keras 3 and may be removed "
+    "in a future version unless fixed. See OpenSpiel github issue #1208 "
+    "for details."
+)
 
 
 # The size of the shuffle buffer used to reshuffle part of the data each

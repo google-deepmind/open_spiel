@@ -39,9 +39,16 @@ Martin Zinkevich, Michael Johanson, Michael Bowling, and Carmelo Piccione.
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+import warnings
 
 # Temporarily disable TF2 behavior while the code is not updated.
 tf.disable_v2_behavior()
+
+warnings.warn(
+    "RCFR has known issues when using Keras 3 and may be removed in a "
+    "future version unless fixed. See OpenSpiel github issue #1207 for "
+    "details."
+)
 
 
 def tensor_to_matrix(tensor):
