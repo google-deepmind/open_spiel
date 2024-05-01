@@ -207,7 +207,7 @@ Move QuoridorState::ActionToMove(Action action_id) const {
 std::vector<Action> QuoridorState::LegalActions() const {
   std::vector<Action> moves;
   if (IsTerminal()) return moves;
-  int max_moves = 5;  // Max pawn moves, including jumps.
+  int max_moves = 6;  // Max pawn moves, including jumps.
   if (wall_count_[current_player_] > 0) {
     max_moves += 2 * (board_size_ - 1) * (board_size_ - 1);  // Max wall moves.
   }
