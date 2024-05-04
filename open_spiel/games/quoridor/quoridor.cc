@@ -52,6 +52,7 @@ const GameType kGameType{
          GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/false)},
         {"ansi_color_output", GameParameter(false)},
         {"players", GameParameter(kMinNumPlayers, false)},
+        {"relative_moves", GameParameter(GameParameter::Type::kBool, false)},
     }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -142,11 +143,14 @@ std::string Move::ToString() const {
 }
 
 QuoridorState::QuoridorState(std::shared_ptr<const Game> game, int board_size,
-                             int wall_count, bool ansi_color_output)
+                             int wall_count, bool ansi_color_output, bool relative_moves)
     : State(game),
       board_size_(board_size),
       board_diameter_(board_size * 2 - 1),
-      ansi_color_output_(ansi_color_output) {
+      ansi_color_output_(ansi_color_output),
+      relative_moves_(relative_moves),
+      // See ActionToMove for explanation of the below
+      base_for_relative_(2, board_diameter_+3, board_diameter_) {
   board_.resize(board_diameter_ * board_diameter_, kPlayerNone);
   players_.resize(num_players_);
   // Account for order of turns (order of play is clockwise)
@@ -200,8 +204,27 @@ void QuoridorState::InitializePlayer(QuoridorPlayer p) {
   }
 }
 
+/*
+ * The original implementation mapped action IDs to absolute board positions.
+ * This meant that moving "north" had a different ID for every pawn position.
+ * When the option to make move actions IDs indicate the relative pawn 
+ * movement, the relative moves were mapped "off board" to illegal move
+ * locations that were at y values beyond the board_diameter. So when we
+ * get those action IDs in, we need to convert them back into the absolute
+ * position into which we need to place the pawn.
+ */
 Move QuoridorState::ActionToMove(Action action_id) const {
-  return GetMove(action_id % board_diameter_, action_id / board_diameter_);
+  Move move = GetMove(action_id % board_diameter_, action_id / board_diameter_);
+  if (!move.IsWall() && relative_moves_) {
+    Move target = player_loc_[current_player_] + (move - base_for_relative_);
+    if (GetPlayer(target) == kPlayerNone) {
+      return target;
+    } else {
+      // Jumping over a player is inferred - it has the same action ID as just stepping
+      return player_loc_[current_player_] + ((move - base_for_relative_) * 2);
+    }
+  }
+  return move;
 }
 
 std::vector<Action> QuoridorState::LegalActions() const {
@@ -261,7 +284,11 @@ void QuoridorState::AddActions(Move cur, Offset offset,
   Move forward = cur + offset * 2;
   if (GetPlayer(forward) == kPlayerNone) {
     // Normal single step in this direction.
-    moves->push_back(forward.xy);
+    if (relative_moves_) {
+      moves->push_back((base_for_relative_ + offset * 2).xy);
+    } else {
+      moves->push_back(forward.xy);
+    }
     return;
   }
 
@@ -271,7 +298,12 @@ void QuoridorState::AddActions(Move cur, Offset offset,
     // In two-players: A normal jump is allowed. We know that spot is empty.
     // In >2 players, must check.
     if (GetPlayer(cur + offset * 4) == kPlayerNone) {
-      moves->push_back((cur + offset * 4).xy);
+      if (relative_moves_) {
+        // The relative action ID for jumping directly over is the same as moving
+        moves->push_back((base_for_relative_ + offset * 2).xy);
+      } else {
+        moves->push_back((cur + offset * 4).xy);
+      }
       return;
     } else {
       return;
@@ -283,13 +315,21 @@ void QuoridorState::AddActions(Move cur, Offset offset,
   Offset left = offset.rotate_left();
   if (!IsWall(forward + left)) {
     if (GetPlayer(forward + left * 2) == kPlayerNone) {
-      moves->push_back((forward + left * 2).xy);
+      if (relative_moves_) {
+        moves->push_back((base_for_relative_ + offset * 2 + left * 2).xy);
+      } else {
+        moves->push_back((forward + left * 2).xy);
+      }
     }
   }
   Offset right = offset.rotate_right();
   if (!IsWall(forward + right)) {
     if (GetPlayer(forward + right * 2) == kPlayerNone) {
-      moves->push_back((forward + right * 2).xy);
+      if (relative_moves_) {
+        moves->push_back((base_for_relative_ + offset * 2 + right * 2).xy);
+      } else {
+        moves->push_back((forward + right * 2).xy);
+      }
     }
   }
 }
@@ -582,14 +622,14 @@ void QuoridorState::ObservationTensor(Player player,
 }
 
 void QuoridorState::DoApplyAction(Action action) {
+  Move move = ActionToMove(action);
   // If players is forced to pass it is valid to stay in place, on a field where
   // there is already a player
-  if (board_[action] != current_player_) {
-    SPIEL_CHECK_EQ(board_[action], kPlayerNone);
+  if (board_[move.xy] != current_player_) {
+    SPIEL_CHECK_EQ(board_[move.xy], kPlayerNone);
   }
   SPIEL_CHECK_EQ(outcome_, kPlayerNone);
 
-  Move move = ActionToMove(action);
   SPIEL_CHECK_TRUE(move.IsValid());
 
   if (move.IsWall()) {
@@ -636,7 +676,9 @@ QuoridorGame::QuoridorGame(const GameParameters& params)
       wall_count_(
           ParameterValue<int>("wall_count", board_size_ * board_size_ / 8)),
       ansi_color_output_(ParameterValue<bool>("ansi_color_output")),
-      num_players_(ParameterValue<int>("players")) {}
+      num_players_(ParameterValue<int>("players")),
+      relative_moves_(ParameterValue<bool>("relative_moves"))
+      {}
 
 }  // namespace quoridor
 }  // namespace open_spiel

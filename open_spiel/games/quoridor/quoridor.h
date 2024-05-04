@@ -29,6 +29,10 @@
 //   "wall_count"        int     How many walls per side (default = size^2/8)
 //   "ansi_color_output" bool    Whether to color the output for a terminal.
 //   "players"           int     Number of players (default = 2)
+//   "relative_moves"    bool    Whether move action IDs should be relative to the
+//                                 current pawn position or absolute based on target cell.
+//                                 The default is false/absolute as that was what was originally
+//                                 coded, though relative is probably better for learning.
 
 namespace open_spiel {
 namespace quoridor {
@@ -85,13 +89,14 @@ struct Move {
 
   Move operator+(const Offset& o) const { return Move(x + o.x, y + o.y, size); }
   Move operator-(const Offset& o) const { return Move(x - o.x, y - o.y, size); }
+  Offset operator-(const Move& o) const { return Offset(x - o.x, y - o.y); }
 };
 
 // State of an in-play game.
 class QuoridorState : public State {
  public:
   QuoridorState(std::shared_ptr<const Game> game, int board_size,
-                int wall_count, bool ansi_color_output = false);
+                int wall_count, bool ansi_color_output = false, bool relative_moves = false);
 
   QuoridorState(const QuoridorState&) = default;
   void InitializePlayer(QuoridorPlayer);
@@ -155,6 +160,8 @@ class QuoridorState : public State {
   const int board_size_;
   const int board_diameter_;
   const bool ansi_color_output_;
+  const bool relative_moves_;
+  const Move base_for_relative_;
 };
 
 // Game object.
@@ -165,7 +172,7 @@ class QuoridorGame : public Game {
   int NumDistinctActions() const override { return Diameter() * Diameter(); }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new QuoridorState(
-        shared_from_this(), board_size_, wall_count_, ansi_color_output_));
+        shared_from_this(), board_size_, wall_count_, ansi_color_output_, relative_moves_));
   }
   int NumPlayers() const override { return num_players_; }
   int NumCellStates() const { return num_players_ + 1; }
@@ -188,6 +195,7 @@ class QuoridorGame : public Game {
   const int wall_count_;
   const bool ansi_color_output_ = false;
   const int num_players_;
+  const bool relative_moves_ = false;
 };
 
 }  // namespace quoridor
