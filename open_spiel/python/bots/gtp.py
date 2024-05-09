@@ -96,7 +96,7 @@ class GTPBot(pyspiel.Bot):
           continue  # Ignore leading newlines, possibly left from prev response.
       response += line
     if response.startswith("="):
-      return response[1:].strip()
+      return response[1:].strip().lower()
     else:
       raise CommandError(response[1:].strip())
 
