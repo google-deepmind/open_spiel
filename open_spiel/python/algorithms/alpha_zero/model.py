@@ -18,9 +18,17 @@ import collections
 import functools
 import os
 from typing import Sequence
+import warnings
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+
+
+warnings.warn(
+    "Python AlphaZero has known issues when using Keras 3 and may be "
+    "removed in a future version unless fixed. See OpenSpiel github "
+    "issue #1206 for details."
+)
 
 
 def cascade(x, fns):
