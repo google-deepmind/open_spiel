@@ -14,9 +14,12 @@
 
 #include "open_spiel/algorithms/oos.h"
 
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/algorithms/tabular_exploitability.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -40,6 +43,8 @@ constexpr auto ZipActionsProbs = Zip<open_spiel::Action, double>;
 namespace open_spiel {
 namespace algorithms {
 namespace {
+
+constexpr double kFloatTolerance = 1e-10;
 
 void EpsExploreSamplingPolicyTest() {
   std::shared_ptr<const Game> game = LoadGame("kuhn_poker");
@@ -78,10 +83,14 @@ void EpsExploreSamplingPolicyTest() {
   table[pl1_info_state].current_policy = current_policy;
 
   auto p = ExplorativeSamplingPolicy(table, 0.4);
-  SPIEL_CHECK_EQ(p.GetStatePolicy(*card_to_player0), chn_3cards_dist);
-  SPIEL_CHECK_EQ(p.GetStatePolicy(*card_to_player1), chn_2cards_dist);
-  SPIEL_CHECK_EQ(p.GetStatePolicy(*player0_plays), expected_mix);
-  SPIEL_CHECK_EQ(p.GetStatePolicy(*player1_plays), expected_mix);
+  SPIEL_CHECK_TRUE(StatePoliciesEqual(p.GetStatePolicy(*card_to_player0),
+                                      chn_3cards_dist, kFloatTolerance));
+  SPIEL_CHECK_TRUE(StatePoliciesEqual(p.GetStatePolicy(*card_to_player1),
+                                      chn_2cards_dist, kFloatTolerance));
+  SPIEL_CHECK_TRUE(StatePoliciesEqual(p.GetStatePolicy(*player0_plays),
+                                      expected_mix, kFloatTolerance));
+  SPIEL_CHECK_TRUE(StatePoliciesEqual(p.GetStatePolicy(*player1_plays),
+                                      expected_mix, kFloatTolerance));
 }
 
 std::vector<std::unique_ptr<State>> CollectStatesInGame(

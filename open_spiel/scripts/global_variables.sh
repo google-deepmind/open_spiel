@@ -39,11 +39,7 @@ export OPEN_SPIEL_BUILD_WITH_JULIA=${OPEN_SPIEL_BUILD_WITH_JULIA:-$DEFAULT_OPTIO
 export OPEN_SPIEL_BUILD_WITH_XINXIN=${OPEN_SPIEL_BUILD_WITH_XINXIN:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export OPEN_SPIEL_BUILD_WITH_ROSHAMBO=${OPEN_SPIEL_BUILD_WITH_ROSHAMBO:-$DEFAULT_OPTIONAL_DEPENDENCY}
 export OPEN_SPIEL_BUILD_WITH_GO=${OPEN_SPIEL_BUILD_WITH_GO:-$DEFAULT_OPTIONAL_DEPENDENCY}
-export OPEN_SPIEL_BUILD_WITH_HIGC="${OPEN_SPIEL_BUILD_WITH_HIGC:-$DEFAULT_OPTIONAL_DEPENDENCY}"
 export OPEN_SPIEL_BUILD_WITH_RUST=${OPEN_SPIEL_BUILD_WITH_RUST:-$DEFAULT_OPTIONAL_DEPENDENCY}
-
-# Eigen repos is currently down. Setting to OFF by default temporarily.
-export OPEN_SPIEL_BUILD_WITH_EIGEN="${OPEN_SPIEL_BUILD_WITH_EIGEN:-"OFF"}"
 
 # Download the header-only library, libnop (https://github.com/google/libnop),
 # to support the serialization and deserialization of C++ data types.
@@ -89,10 +85,6 @@ export OPEN_SPIEL_BUILD_WITH_LIBTORCH="${OPEN_SPIEL_BUILD_WITH_LIBTORCH:-"OFF"}"
 # with pybind11 versions. Until it is properly fixed, there is a workaround:
 # https://github.com/deepmind/open_spiel/issues/966#issuecomment-1322982393
 export OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL:-"https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.1%2Bcpu.zip"}"
-
-# TensorflowCC is a CMake interface to the Tensorflow C++ API. It is used in
-# C++ AlphaZero. See: https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md
-export OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC="${OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC:-"OFF"}"
 
 # Enable integration with GAMUT game generator (see games/gamut).
 # Requires java and GAMUT, so disabled by default.

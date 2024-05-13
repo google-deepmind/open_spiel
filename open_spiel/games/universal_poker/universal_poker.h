@@ -292,6 +292,12 @@ int GetHoleCardsReachIndex(int card_a, int card_b,
 std::shared_ptr<const Game> MakeRandomSubgame(
     std::mt19937 &rng, int pot_size = -1, std::string board_cards = "",
     std::vector<double> hand_reach = {});
+
+// Converts an ACPC gamedef into the corresponding OpenSpiel universal_poker
+// game-state string and uses that string to load + return the game.
+std::shared_ptr<const Game> LoadUniversalPokerGameFromACPCGamedef(
+    const std::string &acpc_gamedef);
+
 // Number of unique hands in no-limit poker.
 constexpr int kSubgameUniqueHands = 1326;  // = (52*51) / 2
 

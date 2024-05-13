@@ -15,7 +15,6 @@
 #include "open_spiel/policy.h"
 
 #include <algorithm>
-#include <iterator>
 #include <list>
 #include <memory>
 #include <random>
@@ -28,10 +27,13 @@
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/container/node_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/strings/charconv.h"
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -72,6 +74,27 @@ ActionsAndProbs ToDeterministicPolicy(const ActionsAndProbs& actions_and_probs,
     new_policy.push_back({iter.first, iter.first == action ? 1.0 : 0.0});
   }
   return new_policy;
+}
+
+bool StatePoliciesEqual(const ActionsAndProbs& state_policy1,
+                        const ActionsAndProbs& state_policy2,
+                        double float_tolerance) {
+  if (state_policy1.size() != state_policy2.size()) {
+    return false;
+  }
+
+  for (int i = 0; i < state_policy1.size(); ++i) {
+    if (state_policy1[i].first != state_policy2[i].first) {
+      return false;
+    }
+
+    if (!Near(state_policy1[i].second, state_policy2[i].second,
+              float_tolerance)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 ActionsAndProbs GetDeterministicPolicy(const std::vector<Action>& legal_actions,
@@ -172,7 +195,7 @@ std::unique_ptr<TabularPolicy> DeserializeTabularPolicy(
   return res;
 }
 
-const std::string TabularPolicy::ToString() const {
+std::string TabularPolicy::ToString() const {
   std::string str = "";
   for (const auto& infostate_and_policy : policy_table_) {
     absl::StrAppend(&str, infostate_and_policy.first, ": ");
@@ -184,7 +207,7 @@ const std::string TabularPolicy::ToString() const {
   return str;
 }
 
-const std::string TabularPolicy::ToStringSorted() const {
+std::string TabularPolicy::ToStringSorted() const {
   std::vector<std::string> keys;
   keys.reserve(policy_table_.size());
 

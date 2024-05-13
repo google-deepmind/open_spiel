@@ -127,10 +127,10 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/utils.h
   )
 
-if (OPEN_SPIEL_BUILD_WITH_HIGC)
+if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
-      pybind11/referee.cc
-      pybind11/referee.h
+      pybind11/games_universal_poker.cc
+      pybind11/games_universal_poker.h
   )
 endif()
 
@@ -158,20 +158,6 @@ if (WIN32)
   set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
 endif()
 
-# Optional pyspiel-related modules, which can specify their own python tests.
-if (OPEN_SPIEL_BUILD_WITH_EIGEN)
-  add_library(pyspiel_eigen_test MODULE
-    ../eigen/eigen_test_support.h
-    ../eigen/pyeig.h
-    ../eigen/pyspiel_eigen_test.cc
-    ${OPEN_SPIEL_OBJECTS})
-
-  # Without this, the binary is called `libpyspiel_eigen_test.so`
-  set_target_properties(pyspiel_eigen_test PROPERTIES PREFIX "")
-
-  set(PYTHON_TESTS ${PYTHON_TESTS}
-    ../eigen/eigen_binding_test.py)
-endif()
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
 endif()
@@ -219,6 +205,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/sequence_form_utils_test.py
   algorithms/wolf_phc_test.py
   algorithms/mmd_dilated_test.py
+  coalitional_games/shapley_values_test.py
   bots/bluechip_bridge_test.py
   bots/bluechip_bridge_uncontested_bidding_test.py
   bots/is_mcts_test.py
@@ -244,6 +231,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   mfg/games/crowd_modelling_test.py
   mfg/games/predator_prey_test.py
   mfg/games/dynamic_routing_test.py
+  mfg/games/normal_form_game_test.py
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/game_transforms_test.py
@@ -260,6 +248,15 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   utils/file_logger_test.py
   utils/lru_cache_test.py
   utils/spawn_test.py
+  voting/approval_test.py
+  voting/base_test.py
+  voting/borda_test.py
+  voting/copeland_test.py
+  voting/kemeny_young_test.py
+  voting/plurality_test.py
+  voting/ranked_pairs_test.py
+  voting/schulze_test.py
+  voting/stv_test.py
 )
 
 # Add Jax tests if it is enabled.
@@ -270,7 +267,9 @@ if (OPEN_SPIEL_ENABLE_JAX)
     jax/nfsp_jax_test.py
     jax/opponent_shaping_jax_test.py
     jax/policy_gradient_jax_test.py
+    jax/cfr/jax_cfr_test.py
     algorithms/rnad/rnad_test.py
+    coalitional_games/least_core_lagrangian_test.py
     mfg/algorithms/fictitious_play_test.py
   )
 endif()
@@ -280,13 +279,13 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       pytorch/rcfr_pytorch_test.py
       pytorch/dqn_pytorch_test.py
-      pytorch/nfsp_pytorch_test.py
       pytorch/deep_cfr_pytorch_test.py
       pytorch/eva_pytorch_test.py
       pytorch/losses/rl_losses_pytorch_test.py
       pytorch/policy_gradient_pytorch_test.py
       pytorch/ppo_pytorch_test.py
       pytorch/neurd_pytorch_test.py
+      mfg/algorithms/pytorch/mfg_proximal_policy_optimization_pytorch_test.py
   )
 endif()
 
@@ -294,9 +293,11 @@ endif()
 if (OPEN_SPIEL_ENABLE_TENSORFLOW)
   set(PYTHON_TESTS ${PYTHON_TESTS}
       algorithms/alpha_zero/evaluator_test.py
-      algorithms/alpha_zero/model_test.py
+      # Broken in Python 3.12. Must port to Keras 3. See https://github.com/google-deepmind/open_spiel/issues/1206.
+      # algorithms/alpha_zero/model_test.py
       algorithms/deep_cfr_test.py
-      algorithms/deep_cfr_tf2_test.py
+      # Broken in Python 3.12. Must port to Keras 3. See https://github.com/google-deepmind/open_spiel/issues/1208.
+      # algorithms/deep_cfr_tf2_test.py
       algorithms/discounted_cfr_test.py
       algorithms/dqn_test.py
       algorithms/eva_test.py
@@ -308,7 +309,8 @@ if (OPEN_SPIEL_ENABLE_TENSORFLOW)
       algorithms/nfsp_test.py
       algorithms/policy_gradient_test.py
       algorithms/psro_v2/strategy_selectors_test.py
-      algorithms/rcfr_test.py
+      # Broken in Python 3.12. Must port to Keras 3. https://github.com/google-deepmind/open_spiel/issues/1207.
+      # algorithms/rcfr_test.py
   )
   if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
     set(PYTHON_TESTS ${PYTHON_TESTS}
@@ -332,10 +334,13 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/stackelberg_lp_test.py
       algorithms/tabular_multiagent_qlearner.py
       algorithms/value_iteration_test.py
+      coalitional_games/least_core_lp_test.py
+      coalitional_games/wvg_test.py
       egt/alpharank_test.py
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
       games/kuhn_poker_test.py
+      voting/maximal_lotteries_test.py
       tests/matrix_game_utils_test.py
   )
 endif()

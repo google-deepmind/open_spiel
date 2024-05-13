@@ -287,6 +287,26 @@ void MoveConversionTests() {
   }
 }
 
+void SerializaitionTests() {
+  auto game = LoadGame("chess");
+
+  // Default board position.
+  std::unique_ptr<State> state = game->NewInitialState();
+  std::shared_ptr<State> deserialized_state =
+      game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+
+  // Empty string.
+  deserialized_state = game->DeserializeState("");
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+
+  // FEN starting position.
+  state = game->NewInitialState(
+      "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+  deserialized_state = game->DeserializeState(state->Serialize());
+  SPIEL_CHECK_EQ(state->ToString(), deserialized_state->ToString());
+}
+
 }  // namespace
 }  // namespace chess
 }  // namespace open_spiel
@@ -298,4 +318,5 @@ int main(int argc, char** argv) {
   open_spiel::chess::TerminalReturnTests();
   open_spiel::chess::ObservationTensorTests();
   open_spiel::chess::MoveConversionTests();
+  open_spiel::chess::SerializaitionTests();
 }

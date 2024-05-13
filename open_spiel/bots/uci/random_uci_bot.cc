@@ -20,6 +20,7 @@
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/games/chess/chess.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"

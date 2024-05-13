@@ -4,6 +4,11 @@ add_test(benchmark_game_test benchmark_game --game=tic_tac_toe --sims=100 --atte
 add_executable(cfr_example cfr_example.cc ${OPEN_SPIEL_OBJECTS})
 add_test(cfr_example_test cfr_example)
 
+if (OPEN_SPIEL_BUILD_WITH_ACPC)
+add_executable(universal_poker_mccfr_acpc_gamedef_example universal_poker_mccfr_acpc_gamedef_example.cc ${OPEN_SPIEL_OBJECTS})
+add_test(universal_poker_mccfr_acpc_gamedef_example_test universal_poker_mccfr_acpc_gamedef_example)
+endif()
+
 add_executable(cfr_multi_equilibria_example cfr_multi_equilibria_example.cc
                ${OPEN_SPIEL_OBJECTS})
 
@@ -37,12 +42,6 @@ add_executable(tabular_sarsa_example tabular_sarsa_example.cc ${OPEN_SPIEL_OBJEC
 add_executable(tabular_q_learning_example tabular_q_learning_example.cc ${OPEN_SPIEL_OBJECTS})
 
 add_executable(count_all_states count_all_states.cc ${OPEN_SPIEL_OBJECTS})
-
-if (OPEN_SPIEL_BUILD_WITH_TENSORFLOW_CC)
-  add_executable(alpha_zero_example alpha_zero_example.cc ${OPEN_SPIEL_OBJECTS} $<TARGET_OBJECTS:alpha_zero>)
-  add_test(alpha_zero_example_test alpha_zero_example)
-  target_link_libraries(alpha_zero_example TensorflowCC::TensorflowCC)
-endif ()
 
 if (OPEN_SPIEL_BUILD_WITH_LIBTORCH)
   add_executable(alpha_zero_torch_example alpha_zero_torch_example.cc

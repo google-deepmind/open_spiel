@@ -763,6 +763,9 @@ class Game : public std::enable_shared_from_this<Game> {
 
   // Returns a newly allocated initial state.
   virtual std::unique_ptr<State> NewInitialState() const = 0;
+
+  // Return a new state from a string description. This is an unspecified and
+  // unrestricted function to construct a new state from a string.
   virtual std::unique_ptr<State> NewInitialState(const std::string& str) const {
     SpielFatalError("NewInitialState from string is not implemented.");
   }
@@ -1053,6 +1056,7 @@ class GameRegisterer {
   static std::shared_ptr<const Game> CreateByName(const std::string& short_name,
                                                   const GameParameters& params);
 
+  static std::vector<std::string> GamesWithKnownIssues();
   static std::vector<std::string> RegisteredNames();
   static std::vector<GameType> RegisteredGames();
   static bool IsValidName(const std::string& short_name);

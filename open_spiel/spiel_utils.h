@@ -20,8 +20,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <limits>
-#include <locale>
+#include <functional>
 #include <random>
 #include <sstream>
 #include <string>
@@ -30,11 +29,7 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/random/uniform_real_distribution.h"
-#include "open_spiel/abseil-cpp/absl/strings/ascii.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/time/clock.h"
 #include "open_spiel/abseil-cpp/absl/time/time.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -137,9 +132,8 @@ std::string SpielStrCat(Args&&... args) {
 using Player = int;
 using Action = int64_t;
 
-// Floating point comparisons use this as a multiplier on the larger of the two
-// numbers as the threshold.
-inline constexpr float FloatingPointDefaultThresholdRatio() { return 1e-5; }
+// Default floating point tolerance between two numbers.
+inline constexpr float FloatingPointDefaultTolerance() { return 1e-6; }
 
 // Default tolerance applied when validating variables are valid probability.
 inline constexpr float ProbabilityDefaultTolerance() { return 1e-9; }
@@ -186,13 +180,12 @@ std::string VectorOfPairsToString(const std::vector<std::pair<A, B>>& vec,
                                   const std::string& pair_delimiter);
 
 // Returns whether the absolute difference between floating point values a and
-// b is less than or equal to FloatingPointThresholdRatio() * max(|a|, |b|).
+// b is less than or equal to.
 template <typename T>
 bool Near(T a, T b) {
   static_assert(std::is_floating_point<T>::value,
                 "Near() is only for floating point args.");
-  return fabs(a - b) <=
-         (std::max(fabs(a), fabs(b)) * FloatingPointDefaultThresholdRatio());
+  return fabs(a - b) <= FloatingPointDefaultTolerance();
 }
 
 // Returns whether |a - b| <= epsilon.
@@ -216,6 +209,11 @@ bool AllNear(const std::vector<T>& vector1, const std::vector<T>& vector2,
   }
   return true;
 }
+
+// Some string helpers. We should remove some of these as we upgrade abseil
+// versions.
+bool StrContainsIgnoreCase(const std::string& haystack,
+                           const std::string& needle);
 
 // Macros to check for error conditions.
 // These trigger SpielFatalError if the condition is violated.

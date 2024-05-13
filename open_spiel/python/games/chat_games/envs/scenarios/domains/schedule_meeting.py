@@ -78,7 +78,8 @@ query = ('Read the following summary of a dialgoue between two parties ' +
          'cannot come to an agreement, respond Yes. Otherwise, if the ' +
          'players are still discussing terms, respond No.' +
          'Here is the dialogue:\n\n{msg}\n\n' + '&' *50 +
-         'Response: ')
+         '\n\nHave all parties agreed on a meeting time?'
+         '\nResponse: ')
 
 LLM_TERMINATION_PROMPT = term_utils.Termination(query,
                                                 summary.PREFIX,

@@ -18,6 +18,7 @@
 #include <numeric>
 #include <random>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/algorithms/cfr.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"

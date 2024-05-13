@@ -74,8 +74,7 @@ issue.
 Currently there are three installation methods:
 
 1.  building from the source code and editing `PYTHONPATH`.
-2.  using `pip install` to build and testing using
-    [nox](https://nox.thea.codes/en/stable/).
+2.  using `pip install`.
 3.  installing via [Docker](https://www.docker.com).
 
 ## Summary
@@ -136,8 +135,6 @@ In a nutshell:
 
     ```bash
     python3 -m pip install .
-    python3 -m pip install nox
-    nox -s tests
     ```
 
     Optionally, use `pip install -e` to install in
@@ -221,7 +218,7 @@ Once the proper Python paths are set, from the main directory (one above
 
 ```bash
 # Similar to the C++ example:
-python3 open_spiel/python/examples/example.py --game=breakthrough
+python3 open_spiel/python/examples/example.py --game_string=breakthrough
 
 # Play a game against a random or MCTS bot:
 python3 open_spiel/python/examples/mcts.py --game=tic_tac_toe --player1=human --player2=random

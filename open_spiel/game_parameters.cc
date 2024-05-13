@@ -14,16 +14,15 @@
 
 #include "open_spiel/game_parameters.h"
 
-#include <iomanip>
 #include <list>
 #include <map>
-#include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/spiel_utils.h"

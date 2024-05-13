@@ -14,6 +14,7 @@
 
 #include "open_spiel/spiel_utils.h"
 
+#include <cctype>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -21,7 +22,6 @@
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
-#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
@@ -164,6 +164,20 @@ std::string VectorOfPairsToString(std::vector<std::pair<A, B>>& vec,
     }
   }
   return str;
+}
+
+// TODO(author5): remove this when the abseil version is upgraded.
+bool StrContainsIgnoreCase(const std::string& haystack,
+                           const std::string& needle) {
+  std::string haystack_copy = haystack;
+  std::string needle_copy = needle;
+  for (int i = 0; i < haystack_copy.size(); ++i) {
+    haystack_copy[i] = std::tolower(haystack_copy[i]);
+  }
+  for (int i = 0; i < needle_copy.size(); ++i) {
+    needle_copy[i] = std::tolower(needle_copy[i]);
+  }
+  return (haystack_copy.find(needle_copy) != std::string::npos);
 }
 
 int SamplerFromRng::operator()(absl::Span<const double> probs) {

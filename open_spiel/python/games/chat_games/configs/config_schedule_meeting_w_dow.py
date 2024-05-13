@@ -52,8 +52,8 @@ def get_config():
           'Friday',
           'Saturday',
           'Sunday']
-  given_prompt_actions[header.action_keys[0]] = days
-  num_days = len(days)
+  given_prompt_actions[header.action_keys[0]] = days + ['any']
+  num_days = len(days) + 1
 
   examples_private_info = collections.OrderedDict()
   examples_private_info['ooo_days'] = [scenario_schedule_meeting.OOO_A,
@@ -81,11 +81,11 @@ def get_config():
   llm_termination_prompt = scenario_schedule_meeting.LLM_TERMINATION_PROMPT
 
   params = {'num_distinct_actions': num_players * num_days,
-            'num_llm_seeds': 1,
+            'num_llm_seeds': 2,
             'num_players': num_players,
             'min_utility': min([float(p.min) for p in payoffs]),
             'max_utility': max([float(p.max) for p in payoffs]),
-            'num_max_replies': 3}
+            'num_max_replies': 1}
 
   config.params = params
 

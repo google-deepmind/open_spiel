@@ -1,6 +1,7 @@
 set(HEADER_FILES
   acpc_cpp/acpc_game.h
   logic/card_set.h
+  logic/gamedef.h
 )
 
 set(CLIB_FILES
@@ -13,6 +14,7 @@ set(CLIB_FILES
 set(SOURCE_FILES
   acpc_cpp/acpc_game.cc
   logic/card_set.cc
+  logic/gamedef.cc
 )
 
 add_library(universal_poker_clib OBJECT ${CLIB_FILES} )
@@ -36,3 +38,9 @@ target_link_libraries(universal_poker_card_set_test universal_poker_clib)
 
 add_test(universal_poker_card_set_test universal_poker_card_set_test)
 
+
+add_executable(universal_poker_gamedef_test logic/gamedef_test.cc
+               ${SOURCE_FILES} $<TARGET_OBJECTS:utils> $<TARGET_OBJECTS:tests>)
+target_link_libraries(universal_poker_gamedef_test universal_poker_clib)
+
+add_test(universal_poker_gamedef_test universal_poker_gamedef_test)

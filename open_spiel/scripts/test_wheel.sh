@@ -63,9 +63,11 @@ fi
 
 if [[ "$MODE" = "full" ]]; then
   if [[ "$OS" = "Linux" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+  elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-macosx_10_9_x86_64.whl
   else
-    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp39-cp39-macosx_10_9_universal2.whl
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp311-cp311-macosx_11_0_arm64.whl
   fi
 fi
 
@@ -77,7 +79,7 @@ rm -rf build && mkdir build && cd build
 cmake -DPython3_EXECUTABLE=${PYBIN} $PROJDIR/open_spiel
 
 NPROC="nproc"
-if [[ "$OS" == "darwin"* ]]; then
+if [[ "$OS" == "darwin"* || "$OS" == "Darwin"* ]]; then
   NPROC="sysctl -n hw.physicalcpu"
 fi
 
