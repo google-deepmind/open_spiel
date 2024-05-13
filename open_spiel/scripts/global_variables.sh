@@ -61,30 +61,27 @@ export OPEN_SPIEL_BUILD_WITH_LIBNOP="${OPEN_SPIEL_BUILD_WITH_LIBNOP:-"OFF"}"
 # You can find an example usage in open_spiel/libtorch/torch_integration_test.cc
 export OPEN_SPIEL_BUILD_WITH_LIBTORCH="${OPEN_SPIEL_BUILD_WITH_LIBTORCH:-"OFF"}"
 
-# You may want to replace this URL according to your system.
-# You can find all of these (and more) URLs at https://pytorch.org/
-# Select LibTorch from the PyTorch build menu.
+# Libtorch download URL - you may need to change this depending on your system
 #
-# Nvidia GPU card setup: You will need to install
+# Optional prerequesites:
 # 1) CUDA drivers via toolkit https://developer.nvidia.com/cuda-toolkit-archive
 #    Local runfile installer is quite friendly. If your system already comes
 #    with drivers you may want to skip over that option in the installer.
 # 2) CUDNN https://developer.nvidia.com/cudnn
 #    (Nvidia developer program membership required)
 #
-# Then use one of the following with appropriate CUDA version (or use the
-# website build menu):
-# CUDA 9.2   https://download.pytorch.org/libtorch/cu92/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu92.zip
-# CUDA 10.1  https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip
-# CUDA 10.2  https://download.pytorch.org/libtorch/cu102/libtorch-cxx11-abi-shared-with-deps-1.5.1.zip
+# The download URL may need to be changed for your system. You can construct the
+# correct URL for you system from https://pytorch.org/get-started/locally/
 #
-# For C++ Libtorch AlphaZero on macOS we recommend this URL:
-# https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.10.1.zip
+# Some examples
+# For Linux/CUDA 12.1: https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcu121.zip
+# For Linux/no CUDA:   https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcpu.zip
+# For macOS/no CUDA:   https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-2.3.0.zip
 #
 # Note: there are currently known problems with the C++ PyTorch: inteferences
 # with pybind11 versions. Until it is properly fixed, there is a workaround:
 # https://github.com/deepmind/open_spiel/issues/966#issuecomment-1322982393
-export OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL:-"https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.1%2Bcpu.zip"}"
+export OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL="${OPEN_SPIEL_BUILD_WITH_LIBTORCH_DOWNLOAD_URL:-"https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcu121.zip"}"
 
 # Enable integration with GAMUT game generator (see games/gamut).
 # Requires java and GAMUT, so disabled by default.
