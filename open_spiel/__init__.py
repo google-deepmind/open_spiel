@@ -14,4 +14,4 @@
 
 # The existence of this file allows us to have PYTHONPATH pointing to
 # the parent of this directory and then use:
-#    from open_spiel.python import rl_environment
+# from open_spiel.python import rl_environment
