@@ -182,6 +182,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/boltzmann_tabular_qlearner_test.py
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
+  algorithms/efr_test.py
   algorithms/evaluate_bots_test.py
   algorithms/expected_game_score_test.py
   algorithms/external_sampling_mccfr_test.py
