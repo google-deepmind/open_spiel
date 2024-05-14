@@ -83,7 +83,7 @@
 | 🔶      | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)     |
 | 🟢      | [Pig](#pig)                                     |
 | 🟢      | [Prisoner's Dilemma](#prisoner's-dilemma)       |
-| ❌      | [Poker (Hold 'em)](#poker-hold-em)              |
+| 🔶      | [Poker (Hold 'em)](#poker-hold-em)              |
 | ❌      | [Quoridor](#quoridor)                           |
 | ❌      | [Reconnaissance Blind                           |
 :        : Chess](#reconnaissance-blind-chess)             :
@@ -774,7 +774,6 @@
 *   2-10 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
 *   Implemented via [ACPC](http://www.computerpokercompetition.org/).
-*   ❌ Known issues: see issue [#1033](https://github.com/google-deepmind/open_spiel/issues/1033).
 
 ### Quoridor
 
