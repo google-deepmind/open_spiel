@@ -158,7 +158,6 @@ def gradients(dist, y, payoff_matrices, num_players, temperature=0.,
     tsallis regularized exploitability (stochastic estimate)
   """
   nabla = payoff_matrices[0].dot(dist)
-  y = nabla
   if temperature > 0:
     br = special.softmax(y / temperature)
     br_policy_gradient = nabla - temperature * (np.log(br) + 1)
