@@ -170,7 +170,7 @@ std::vector<std::string> GameRegisterer::RegisteredNames() {
 }
 
 std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
-  return {"quoridor", "rbc", "universal_poker"};
+  return {"rbc", "universal_poker"};
 }
 
 std::vector<GameType> GameRegisterer::RegisteredGames() {
