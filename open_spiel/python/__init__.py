@@ -12,3 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Open Spiel Python API."""
+
+from typing import Dict, Union
+
+# A type provided for PyType hints. Added after the discussion in
+# https://github.com/google-deepmind/open_spiel/issues/1224.
+GameParameter = Union[int, float, str, bool, Dict[str, 'GameParameter']]
+

@@ -280,7 +280,7 @@ class DQN(rl_agent.AbstractAgent):
         (1 - legal_actions_mask) * ILLEGAL_ACTION_LOGITS_PENALTY,
         axis=-1)
     max_next_q = jax.numpy.where(
-        1 - are_final_steps, x=max_next_q, y=jnp.zeros_like(max_next_q))
+        1 - are_final_steps, max_next_q, jnp.zeros_like(max_next_q))
     target = (
         rewards + (1 - are_final_steps) * self._discount_factor * max_next_q)
     target = jax.lax.stop_gradient(target)
