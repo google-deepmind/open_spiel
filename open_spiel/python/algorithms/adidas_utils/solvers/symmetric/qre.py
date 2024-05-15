@@ -161,7 +161,6 @@ def gradients(dist, y, payoff_matrices, num_players, temperature=0.,
   y = nabla
   if temperature > 0:
     br = special.softmax(y / temperature)
-    br_mat = (np.diag(br) - np.outer(br, br)) / temperature
     br_policy_gradient = nabla - temperature * (np.log(br) + 1)
   else:
     power = np.inf
@@ -169,7 +168,6 @@ def gradients(dist, y, payoff_matrices, num_players, temperature=0.,
     br = np.zeros_like(dist)
     maxima = (y == s)
     br[maxima] = 1. / maxima.sum()
-    br_mat = np.zeros((br.size, br.size))
     br_policy_gradient = np.zeros_like(br)
 
   unreg_exp = np.max(y) - y.dot(dist)
@@ -180,7 +178,13 @@ def gradients(dist, y, payoff_matrices, num_players, temperature=0.,
   policy_gradient = nabla
   if temperature > 0:
     policy_gradient -= temperature * (np.log(dist) + 1)
-  other_player_fx = (br - dist) + br_mat.dot(br_policy_gradient)
+  other_player_fx = (br - dist)
+  if temperature > 0:
+    # much faster to avoid constructing br_mat and then computing
+    # br_mat.dot(br_policy_gradient) -- instead, expand out and only compute
+    # inner products
+    temp = (br_policy_gradient - br.dot(br_policy_gradient))
+    other_player_fx += br / temperature * temp
 
   other_player_fx_translated = payoff_matrices[1].dot(other_player_fx)
   grad_dist = -policy_gradient + (num_players - 1) * other_player_fx_translated
@@ -216,7 +220,6 @@ def cheap_gradients(random, dist, y, payoff_matrices, num_players,
   nabla = payoff_matrices[0][:, action_1]
   if temperature > 0:
     br = special.softmax(y / temperature)
-    br_mat = (np.diag(br) - np.outer(br, br)) / temperature
     br_policy_gradient = nabla - temperature * (np.log(br) + 1)
   else:
     power = np.inf
@@ -224,7 +227,6 @@ def cheap_gradients(random, dist, y, payoff_matrices, num_players,
     br = np.zeros_like(dist)
     maxima = (y == s)
     br[maxima] = 1. / maxima.sum()
-    br_mat = np.zeros((br.size, br.size))
     br_policy_gradient = np.zeros_like(br)
 
   unreg_exp = np.max(y) - y.dot(dist)
@@ -235,7 +237,13 @@ def cheap_gradients(random, dist, y, payoff_matrices, num_players,
   policy_gradient = nabla
   if temperature > 0:
     policy_gradient -= temperature * (np.log(dist) + 1)
-  other_player_fx = (br - dist) + br_mat.dot(br_policy_gradient)
+  other_player_fx = (br - dist)
+  if temperature > 0:
+    # much faster to avoid constructing br_mat and then computing
+    # br_mat.dot(br_policy_gradient) -- instead, expand out and only compute
+    # inner products
+    temp = (br_policy_gradient - br.dot(br_policy_gradient))
+    other_player_fx += br / temperature * temp
 
   action_u = random.choice(dist.size)  # uniform, ~importance sampling
   other_player_fx = dist.size * other_player_fx[action_u]
@@ -280,7 +288,6 @@ def cheap_gradients_vr(random, dist, y, payoff_matrices, num_players, pm_vr,
   nabla = payoff_matrices[0][:, action_1]
   if temperature > 0:
     br = special.softmax(y / temperature)
-    br_mat = (np.diag(br) - np.outer(br, br)) / temperature
     br_policy_gradient = nabla - temperature * (np.log(br) + 1)
   else:
     power = np.inf
@@ -288,7 +295,6 @@ def cheap_gradients_vr(random, dist, y, payoff_matrices, num_players, pm_vr,
     br = np.zeros_like(dist)
     maxima = (y == s)
     br[maxima] = 1. / maxima.sum()
-    br_mat = np.zeros((br.size, br.size))
     br_policy_gradient = np.zeros_like(br)
 
   unreg_exp = np.max(y) - y.dot(dist)
@@ -299,7 +305,13 @@ def cheap_gradients_vr(random, dist, y, payoff_matrices, num_players, pm_vr,
   policy_gradient = nabla
   if temperature > 0:
     policy_gradient -= temperature * (np.log(dist) + 1)
-  other_player_fx = (br - dist) + br_mat.dot(br_policy_gradient)
+  other_player_fx = (br - dist)
+  if temperature > 0:
+    # much faster to avoid constructing br_mat and then computing
+    # br_mat.dot(br_policy_gradient) -- instead, expand out and only compute
+    # inner products
+    temp = (br_policy_gradient - br.dot(br_policy_gradient))
+    other_player_fx += br / temperature * temp
 
   if version == 0:
     other_player_fx_translated = pm_vr.dot(other_player_fx)

@@ -205,7 +205,6 @@ class Solver(object):
 
       if temperature >= 1e-3:
         br_i = special.softmax(y[i] / temperature)
-        br_i_mat = (np.diag(br_i) - np.outer(br_i, br_i)) / temperature
         br_i_policy_gradient = nabla_i - temperature * (np.log(br_i) + 1)
       else:
         power = np.inf
@@ -213,7 +212,6 @@ class Solver(object):
         br_i = np.zeros_like(dist[i])
         maxima_i = (y[i] == s_i)
         br_i[maxima_i] = 1. / maxima_i.sum()
-        br_i_mat = np.zeros((br_i.size, br_i.size))
         br_i_policy_gradient = np.zeros_like(br_i)
 
       policy_gradient_i = nabla_i - temperature * (np.log(dist[i]) + 1)
@@ -226,7 +224,13 @@ class Solver(object):
 
       reg_exp.append(y[i].dot(br_i - dist[i]) + entr_br_i - entr_dist_i)
 
-      other_player_fx_i = (br_i - dist[i]) + br_i_mat.dot(br_i_policy_gradient)
+      other_player_fx_i = (br_i - dist[i])
+      if temperature >= 1e-3:
+        # much faster to avoid constructing br_i_mat and then computing
+        # br_i_mat.dot(br_policy_gradient) -- instead, expand out and only
+        # compute  inner products
+        temp = (br_i_policy_gradient - br_i.dot(br_i_policy_gradient))
+        other_player_fx_i += br_i / temperature * temp
       other_player_fx.append(other_player_fx_i)
 
     # then construct exploitability gradient
@@ -309,7 +313,6 @@ class Solver(object):
 
       if temperature >= 1e-3:
         br_i = special.softmax(y[i] / temperature)
-        br_i_mat = (np.diag(br_i) - np.outer(br_i, br_i)) / temperature
         br_i_policy_gradient = nabla_i - temperature * (np.log(br_i) + 1)
       else:
         power = np.inf
@@ -317,7 +320,6 @@ class Solver(object):
         br_i = np.zeros_like(dist[i])
         maxima_i = (y[i] == s_i)
         br_i[maxima_i] = 1. / maxima_i.sum()
-        br_i_mat = np.zeros((br_i.size, br_i.size))
         br_i_policy_gradient = np.zeros_like(br_i)
 
       policy_gradient_i = nabla_i - temperature * (np.log(dist[i]) + 1)
@@ -330,7 +332,13 @@ class Solver(object):
 
       reg_exp.append(y[i].dot(br_i - dist[i]) + entr_br_i - entr_dist_i)
 
-      other_player_fx_i = (br_i - dist[i]) + br_i_mat.dot(br_i_policy_gradient)
+      other_player_fx_i = (br_i - dist[i])
+      if temperature >= 1e-3:
+        # much faster to avoid constructing br_i_mat and then computing
+        # br_i_mat.dot(br_policy_gradient) -- instead, expand out and only
+        # compute inner products
+        temp = (br_i_policy_gradient - br_i.dot(br_i_policy_gradient))
+        other_player_fx_i += br_i / temperature * temp
       other_player_fx.append(other_player_fx_i)
 
     # then construct exploitability gradient
