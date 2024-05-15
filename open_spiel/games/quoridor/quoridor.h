@@ -85,6 +85,7 @@ struct Move {
 
   Move operator+(const Offset& o) const { return Move(x + o.x, y + o.y, size); }
   Move operator-(const Offset& o) const { return Move(x - o.x, y - o.y, size); }
+  Offset operator-(const Move& o) const { return Offset(x - o.x, y - o.y); }
 };
 
 // State of an in-play game.
@@ -155,6 +156,7 @@ class QuoridorState : public State {
   const int board_size_;
   const int board_diameter_;
   const bool ansi_color_output_;
+  const Move base_for_relative_;
 };
 
 // Game object.
