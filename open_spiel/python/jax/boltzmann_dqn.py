@@ -95,5 +95,5 @@ class BoltzmannDQN(dqn.DQN):
 
   def update_prev_q_network(self):
     """Updates the parameters of the previous Q-network."""
-    self.params_prev_q_network = jax.tree_map(lambda x: x.copy(),
-                                                   self.params_q_network)
+    self.params_prev_q_network = jax.tree_util.tree_map(lambda x: x.copy(),
+                                                        self.params_q_network)

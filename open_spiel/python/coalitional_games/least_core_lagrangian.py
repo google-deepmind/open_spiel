@@ -522,7 +522,7 @@ class CoreLagrangian(CoreSolver):
     clip = (
         lambda x, k: jnp.clip(x, 0, np.inf) if k in self.nonnegative_keys else x
     )
-    params = jax.tree_map(clip, params, self.keys)
+    params = jax.tree_util.tree_map(clip, params, self.keys)
 
     return params, opt_state
 

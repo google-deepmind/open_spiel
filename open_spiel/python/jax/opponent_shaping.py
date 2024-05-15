@@ -1005,7 +1005,7 @@ class OpponentShapingAgent(rl_agent.AbstractAgent):
       if transition.terminal.any():
         max_episode_length = max(max_episode_length, len(episode))
         # pylint: disable=no-value-for-parameter
-        batch = jax.tree_map(lambda *xs: jnp.stack(xs), *episode)
+        batch = jax.tree_util.tree_map(lambda *xs: jnp.stack(xs), *episode)
         batch = batch.replace(
             info_state=batch.info_state.transpose(1, 2, 0, 3),
             action=batch.action.transpose(1, 2, 0),
@@ -1071,5 +1071,5 @@ class OpponentShapingAgent(rl_agent.AbstractAgent):
         values=self._prev_time_step.observations['values'],
     )
     if len(rewards.shape) < 2:  # if not a batch, add a batch dimension
-      transition = jax.tree_map(lambda x: x[None], transition)
+      transition = jax.tree_util.tree_map(lambda x: x[None], transition)
     return transition
