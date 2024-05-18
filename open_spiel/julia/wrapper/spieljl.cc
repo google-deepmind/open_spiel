@@ -105,6 +105,9 @@ template <>
 struct jlcxx::IsMirroredType<std::pair<open_spiel::Action, double>>
     : std::true_type {};
 
+template <>
+struct jlcxx::IsMirroredType<open_spiel::State::PlayerAction> : std::true_type {};
+
 template <typename K, typename V>
 struct jlcxx::julia_type_factory<std::pair<K, V>> {
   static jl_datatype_t* julia_type() {
