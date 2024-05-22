@@ -161,6 +161,10 @@ set(GAME_SOURCES
   skat/skat.h
   solitaire/solitaire.cc
   solitaire/solitaire.h
+  spades/spades.cc
+  spades/spades.h
+  spades/spades_scoring.cc
+  spades/spades_scoring.h
   stones_and_gems/stones_and_gems.cc
   stones_and_gems/stones_and_gems.h
   tarok/tarok.cc
@@ -578,6 +582,10 @@ add_test(skat_test skat_test)
 add_executable(solitaire_test solitaire/solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(solitaire_test solitaire_test)
+
+add_executable(spades_test spades/spades_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(spades_test spades_test)
 
 add_executable(stones_and_gems_test stones_and_gems/stones_and_gems_test.cc
                ${OPEN_SPIEL_OBJECTS}
