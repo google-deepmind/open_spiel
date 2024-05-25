@@ -69,7 +69,8 @@ DEFAULT_PARAMS = {'num_distinct_actions': 2,
                   'players': 0,  # open_spiel tests use this for `num_players`
                   'min_utility': -10.0,
                   'max_utility': 10.0,
-                  'num_max_replies': 1}
+                  'num_max_replies': 1,
+                  'silence_logging': True}
 
 GAME_TYPE_KWARGS = {
     'dynamics': pyspiel.GameType.Dynamics.SEQUENTIAL,
@@ -771,6 +772,8 @@ class BaseChatGame(pyspiel.Game):
         num_max_replies- int, total # of messages each player can send in an
           episode
     """
+    if 'silence_logging' in params and params['silence_logging']:
+      logging.set_verbosity(logging.ERROR)  # silence internal game logging
     self._num_distinct_actions = params['num_distinct_actions']
     if params['players'] > 0:
       logging.warning('Only meant for open_spiel testing!')
