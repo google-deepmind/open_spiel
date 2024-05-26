@@ -105,9 +105,6 @@ template <>
 struct jlcxx::IsMirroredType<std::pair<open_spiel::Action, double>>
     : std::true_type {};
 
-template <>
-struct jlcxx::IsMirroredType<open_spiel::State::PlayerAction> : std::true_type {};
-
 template <typename K, typename V>
 struct jlcxx::julia_type_factory<std::pair<K, V>> {
   static jl_datatype_t* julia_type() {
@@ -126,6 +123,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
   jlcxx::stl::apply_stl<std::vector<int>>(mod);
   jlcxx::stl::apply_stl<std::vector<std::vector<int>>>(mod);
   jlcxx::stl::apply_stl<std::vector<open_spiel::Action>>(mod);
+  
+  mod.map_type<open_spiel::State::PlayerAction>("PlayerAction");
+  jlcxx::stl::apply_stl<std::vector<open_spiel::State::PlayerAction>>(mod);
 
   mod.add_bits<open_spiel::GameParameter::Type>("GameParameterStateType",
                                                 jlcxx::julia_type("CppEnum"));
