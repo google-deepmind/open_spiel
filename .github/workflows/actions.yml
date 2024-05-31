@@ -11,9 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-        # Most current platforms and Python versions.
-        # TODO: change this first one to Ubuntu 24.04 when ready
-        - os: ubuntu-22.04
+        - os: ubuntu-24.04
           OS_PYTHON_VERSION: "3.12"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
@@ -49,19 +47,6 @@ jobs:
           TRAVIS_USE_NOX: 0
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        # Standard or older platforms with older Python versions.
-        - os: macos-12
-          OS_PYTHON_VERSION: "3.9"
-          DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
-          BUILD_SHARED_LIB: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
-          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
-        - os: ubuntu-20.04
-          OS_PYTHON_VERSION: "3.9"
-          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
-          BUILD_SHARED_LIB: "ON"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: ""
 
