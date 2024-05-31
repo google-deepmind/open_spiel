@@ -16,10 +16,16 @@
 #ifndef OPEN_SPIEL_BOTS_UCI_BOT_H_
 #define OPEN_SPIEL_BOTS_UCI_BOT_H_
 
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 #include <vector>
+
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
-#include "open_spiel/games/chess/chess.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
 
 // **IMPORTANT NOTE** The basic test currently hangs, so consider this bot
 // currently experimental. The original authors claimed to have verified it with
@@ -30,10 +36,20 @@ namespace uci {
 
 using Options = std::map<std::string, std::string>;
 
+enum class SearchLimitType {
+  kMoveTime,
+  kNodes,
+  kDepth,
+  kMate,
+};
+
 class UCIBot : public Bot {
  public:
-  UCIBot(const std::string& bot_binary_path, int move_time,
-         bool ponder, const Options& options);
+  // Search limit value is the argument sent to either "go movetime",
+  // "go depth", or "go nodes".
+  UCIBot(const std::string& bot_binary_path, int search_limit_value,
+         bool ponder, const Options& options,
+         SearchLimitType search_limit_type = SearchLimitType::kMoveTime);
   ~UCIBot() override;
 
   Action Step(const State& state) override;
@@ -65,7 +81,9 @@ class UCIBot : public Bot {
   pid_t pid_ = -1;
   int input_fd_ = -1;
   int output_fd_ = -1;
-  int move_time_;
+  SearchLimitType search_limit_type_;
+  int search_limit_value_;
+  std::string search_limit_string_;
   absl::optional<std::string> ponder_move_ = absl::nullopt;
   bool was_ponder_hit_ = false;
 
@@ -87,9 +105,12 @@ class UCIBot : public Bot {
  * different options available for each engine.
  * @return unique_ptr to a UCIBot
  */
-std::unique_ptr<Bot> MakeUCIBot(const std::string& bot_binary_path,
-                                int move_time, bool ponder = false,
-                                const Options& options = {});
+std::unique_ptr<Bot> MakeUCIBot(
+    const std::string& bot_binary_path,
+    int search_limit_value,
+    bool ponder = false,
+    const Options& options = {},
+    SearchLimitType search_limit_type = SearchLimitType::kMoveTime);
 
 }  // namespace uci
 }  // namespace open_spiel

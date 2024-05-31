@@ -18,20 +18,46 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <cerrno>
+#include <cstdlib>
 #include <iostream>
+#include <memory>
+#include <sstream>
 #include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/games/chess/chess.h"
+#include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace uci {
 
-UCIBot::UCIBot(const std::string& bot_binary_path, int move_time, bool ponder,
-               const Options& options)
+UCIBot::UCIBot(const std::string& bot_binary_path, int search_limit_value,
+               bool ponder, const Options& options,
+               SearchLimitType search_limit_type)
     : ponder_(ponder) {
-  SPIEL_CHECK_GT(move_time, 0);
+  SPIEL_CHECK_GT(search_limit_value, 0);
   SPIEL_CHECK_GT(bot_binary_path.size(), 0);
-  move_time_ = move_time;
+  search_limit_type_ = search_limit_type;
+  search_limit_value_ = search_limit_value;
+  if (search_limit_type_ == SearchLimitType::kMoveTime) {
+    search_limit_string_ = "movetime " + std::to_string(search_limit_value_);
+  } else if (search_limit_type_ == SearchLimitType::kNodes) {
+    search_limit_string_ = "nodes " + std::to_string(search_limit_value_);
+  } else if (search_limit_type_ == SearchLimitType::kDepth) {
+    search_limit_string_ = "depth " + std::to_string(search_limit_value_);
+  } else {
+    SpielFatalError("Unsupported search limit type");
+  }
 
   StartProcess(bot_binary_path);
   Uci();
@@ -193,13 +219,11 @@ void UCIBot::Position(const std::string& fen,
 }
 
 std::pair<std::string, absl::optional<std::string>> UCIBot::Go() {
-  Write("go movetime " + std::to_string(move_time_));
+  Write("go " + search_limit_string_);
   return ReadBestMove();
 }
 
-void UCIBot::GoPonder() {
-  Write("go ponder movetime " + std::to_string(move_time_));
-}
+void UCIBot::GoPonder() { Write("go ponder " + search_limit_string_); }
 
 void UCIBot::PonderHit() { Write("ponderhit"); }
 
@@ -279,9 +303,11 @@ std::string UCIBot::Read(bool wait) const {
 }
 
 std::unique_ptr<Bot> MakeUCIBot(const std::string& bot_binary_path,
-                                int move_time, bool ponder,
-                                const Options& options) {
-  return std::make_unique<UCIBot>(bot_binary_path, move_time, ponder, options);
+                                int search_limit_value, bool ponder,
+                                const Options& options,
+                                SearchLimitType search_limit_type) {
+  return std::make_unique<UCIBot>(bot_binary_path, search_limit_value, ponder,
+                                  options, search_limit_type);
 }
 
 }  // namespace uci

@@ -191,10 +191,19 @@ void init_pyspiel_bots(py::module& m) {
       },
       "A bot that samples from a policy.");
 
+  py::enum_<open_spiel::uci::SearchLimitType>(m, "SearchLimitType")
+      .value("MOVETIME", open_spiel::uci::SearchLimitType::kMoveTime)
+      .value("NODES", open_spiel::uci::SearchLimitType::kNodes)
+      .value("DEPTH", open_spiel::uci::SearchLimitType::kDepth)
+      .export_values();
+
 #ifndef _WIN32
-  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
-      py::arg("move_time"), py::arg("ponder"), py::arg("options"),
-      "Bot that can play chess using UCI chess engine.");
+  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot,
+        py::arg("bot_binary_path"), py::arg("search_limit_value"),
+        py::arg("ponder"), py::arg("options"),
+        py::arg("search_limit_type") =
+            open_spiel::uci::SearchLimitType::kMoveTime,
+        "Bot that can play chess using UCI chess engine.");
 #endif
 
 
