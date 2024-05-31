@@ -20,15 +20,20 @@ end
     game = load_game("kuhn_poker")
     state = new_initial_state(game)
     @test is_chance_node(state) == true
+    @test is_initial_state(state) == true
     @test chance_outcomes(state) == [0 => 1/3, 1 => 1/3, 2 => 1/3]
 
     apply_action(state, 1)
     @test is_chance_node(state) == true
+    @test is_initial_state(state) == false
     @test chance_outcomes(state) == [0 => 1/2, 2 => 1/2]
 
     apply_action(state, 2)
     @test is_chance_node(state) == false
+    @test is_initial_state(state) == false
     @test legal_actions(state) == [0, 1]
+
+    @test length(full_history(state)) == 2
 end
 
 @testset "tic_tac_toe" begin
@@ -36,6 +41,7 @@ end
     state = new_initial_state(game)
     @test is_chance_node(state) == false
     @test is_terminal(state) == false
+    @test is_initial_state(state) == true
     @test legal_actions(state) == 0:8
 end
 

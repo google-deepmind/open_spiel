@@ -6,6 +6,11 @@ using CxxWrap
 import CxxWrap:argument_overloads
 import Base: step, first, last
 
+struct PlayerAction
+    player::Int32
+    action::Int64
+end
+
 @wrapmodule(LIB_OPEN_SPIEL)
 
 include("patch.jl")
