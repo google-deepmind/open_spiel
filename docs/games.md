@@ -93,6 +93,7 @@
 | 🔶      | [Skat (simplified                               |
 :        : bidding)](#skat-simplified-bidding)             :
 | 🔶      | [Solitaire (K+)](#solitaire-k)                  |
+| 🔶      | [Team Dominoes](#team-dominoes)                 |
 | 🟢      | [Tic-Tac-Toe](#tic-tac-toe)                     |
 | 🟢      | [Tiny Bridge](#tiny-bridge)                     |
 | 🟢      | [Tiny Hanabi](#tiny-hanabi)                     |
@@ -862,6 +863,17 @@
 *   1 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and
     [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
+
+### Team Dominoes
+
+*   Team version of dominoes.
+*   Consists of 28 tiles, featuring all combinations of spot counts (also called
+    pips or dots) between zero and six.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Dominoes#Latin_American_Version)
 
 ### Tic-Tac-Toe
 
