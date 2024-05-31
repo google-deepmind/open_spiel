@@ -93,6 +93,7 @@
 | 🔶      | [Skat (simplified                               |
 :        : bidding)](#skat-simplified-bidding)             :
 | 🔶      | [Solitaire (K+)](#solitaire-k)                  |
+| 🔶      | [Spades](#spades)                               |
 | 🔶      | [Team Dominoes](#team-dominoes)                 |
 | 🟢      | [Tic-Tac-Toe](#tic-tac-toe)                     |
 | 🟢      | [Tiny Bridge](#tiny-bridge)                     |
@@ -863,6 +864,16 @@
 *   1 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and
     [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
+
+### Spades
+
+*   A four-player card game.
+*   Card game.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Spades_\(card_game\))
 
 ### Team Dominoes
 
