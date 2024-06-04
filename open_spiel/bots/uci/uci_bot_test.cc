@@ -39,10 +39,10 @@ void RandomUciBotTest() {
   std::string binary = absl::GetFlag(FLAGS_binary);
   std::shared_ptr<const Game> game = LoadGame("chess");
   Options options = {};
-  auto bot1 = std::make_unique<UCIBot>(
-      binary, /*move_time*/100, /*ponder*/false, /*options*/options);
-  auto bot2 = std::make_unique<UCIBot>(
-      binary, /*move_time*/100, /*ponder*/false, /*options*/options);
+  auto bot1 = std::make_unique<UCIBot>(binary, /*move_time*/ 10,
+                                       /*ponder*/ false, /*options*/ options);
+  auto bot2 = std::make_unique<UCIBot>(binary, /*move_time*/ 10,
+                                       /*ponder*/ false, /*options*/ options);
   std::vector<Bot*> bots = {bot1.get(), bot2.get()};
   for (int i = 0; i < kNumGames; ++i) {
     std::unique_ptr<State> state = game->NewInitialState();

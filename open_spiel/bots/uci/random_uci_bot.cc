@@ -74,7 +74,11 @@ void RandomUciBot() {
           ++pos;
         }
       }
-    } else if (absl::StartsWith(line, "go movetime ")) {
+      // Bot should return a move given all types of go commands
+    } else if (absl::StartsWith(line, "go movetime") ||
+               absl::StartsWith(line, "go depth") ||
+               absl::StartsWith(line, "go nodes") ||
+               absl::StartsWith(line, "go mate")) {
       std::vector<Action> legal_actions = state->LegalActions();
       int index = absl::Uniform<int>(rng, 0, legal_actions.size());
       Action action = legal_actions[index];
@@ -91,7 +95,7 @@ void RandomUciBot() {
 }  // namespace uci
 }  // namespace open_spiel
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   open_spiel::Init("", &argc, &argv, false);
   absl::ParseCommandLine(argc, argv);
   open_spiel::uci::RandomUciBot();
