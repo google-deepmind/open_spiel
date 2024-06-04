@@ -50,6 +50,8 @@ void TestFile() {
 
   SPIEL_CHECK_TRUE(Exists(filename));
   SPIEL_CHECK_FALSE(IsDirectory(filename));
+  // Ensure that realpath returns a string.
+  SPIEL_CHECK_FALSE(RealPath(filename).empty());
 
   {
     File f(filename, "r");
