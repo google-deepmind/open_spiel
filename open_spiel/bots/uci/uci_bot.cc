@@ -37,6 +37,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace uci {
@@ -61,7 +62,7 @@ UCIBot::UCIBot(const std::string& bot_binary_path, int search_limit_value,
 
   StartProcess(bot_binary_path);
   Uci();
-  for (auto const &[name, value] : options) {
+  for (auto const& [name, value] : options) {
     SetOption(name, value);
   }
   IsReady();
@@ -118,12 +119,12 @@ void UCIBot::Restart() {
 void UCIBot::RestartAt(const State& state) {
   ponder_move_ = absl::nullopt;
   was_ponder_hit_ = false;
-  auto chess_state = down_cast<const chess::ChessState &>(state);
+  auto chess_state = down_cast<const chess::ChessState&>(state);
   Position(chess_state.Board().ToFEN());
 }
 
 void UCIBot::InformAction(const State& state, Player player_id, Action action) {
-  auto chess_state = down_cast<const chess::ChessState &>(state);
+  auto chess_state = down_cast<const chess::ChessState&>(state);
   chess::Move move = chess::ActionToMove(action, chess_state.Board());
   std::string move_str = move.ToLAN();
   if (ponder_ && move_str == ponder_move_) {
@@ -159,13 +160,14 @@ void UCIBot::StartProcess(const std::string& bot_binary_path) {
     close(output_pipe[1]);
     close(input_pipe[0]);
 
-    execlp(bot_binary_path.c_str(), bot_binary_path.c_str(), (char *)nullptr);
+    std::string real_binary_path = open_spiel::file::RealPath(bot_binary_path);
+    execlp(real_binary_path.c_str(), real_binary_path.c_str(), (char*)nullptr);
     // See /usr/include/asm-generic/errno-base.h for error codes.
     switch (errno) {
       case ENOENT:
         SpielFatalError(
             absl::StrCat("Executing uci bot sub-process failed: file '",
-                         bot_binary_path, "' not found."));
+                         real_binary_path, "' not found."));
       default:
         SpielFatalError(absl::StrCat(
             "Executing uci bot sub-process failed: Error ", errno));
@@ -268,7 +270,7 @@ void UCIBot::Write(const std::string& msg) const {
 }
 
 std::string UCIBot::Read(bool wait) const {
-  char *buff;
+  char* buff;
   int count = 0;
   std::string response;
 
