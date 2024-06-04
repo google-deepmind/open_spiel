@@ -23,18 +23,41 @@ namespace open_spiel {
 std::string HunlGameString(const std::string &betting_abstraction) {
   return absl::StrFormat(
       "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=100 50,"
-      "firstPlayer=2 1 1 "
-      "1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 "
-      "1 1,stack=20000 20000,bettingAbstraction=%s)",
+      "firstPlayer=2 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
+      "numBoardCards=0 3 1 1,stack=20000 20000,bettingAbstraction=%s)",
       betting_abstraction);
 }
 
+// Note: Limit games do not support the 'stack' input.
 std::string HulhGameString(const std::string &betting_abstraction) {
   return absl::StrFormat(
       "universal_poker(betting=limit,numPlayers=2,numRounds=4,blind=10 5,"
-      "firstPlayer=2 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 "
-      "1 1,raiseSize=10 10 20 20,maxRaises=3 4 4 4,bettingAbstraction=%s)",
+      "firstPlayer=2 1,numSuits=4,numRanks=13,numHoleCards=2,"
+      "numBoardCards=0 3 1 1,raiseSize=10 10 20 20,"
+      "maxRaises=3 4 4 4,bettingAbstraction=%s)",
       betting_abstraction);
+}
+
+std::string Multiway3max_1_2GameString(const std::string &betting_abstraction,
+                                       int sb_stack, int bb_stack,
+                                       int dealer_stack) {
+  return absl::StrFormat(
+      "universal_poker(betting=nolimit,numPlayers=3,numRounds=4,blind=2 1 0,"
+      // Standard turn order: D->SB->BB, then SB->BB->D
+      "firstPlayer=3 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
+      "numBoardCards=0 3 1 1,stack=%i %i %i,bettingAbstraction=%s)",
+      sb_stack, bb_stack, dealer_stack, betting_abstraction);
+}
+
+std::string Multiway6max_1_2GameString(const std::string &betting_abstraction,
+                                       int buy_in) {
+  return absl::StrFormat(
+      "universal_poker(betting=nolimit,numPlayers=6,numRounds=4,"
+      "blind=2 1 0 0 0 0,"
+      // Standard turn order: UTG->...->D->SB->BB, then SB->BB->UTG->...->D
+      "firstPlayer=3 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
+      "numBoardCards=0 3 1 1,stack=%i %i %i %i %i %i,bettingAbstraction=%s)",
+      buy_in, buy_in, buy_in, buy_in, buy_in, buy_in, betting_abstraction);
 }
 
 std::string TurnBasedGoofspielGameString(int num_cards) {

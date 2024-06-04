@@ -386,7 +386,7 @@ void FullNLBettingTest3() {
       "numPlayers=3,"
       "numRounds=4,"
       "blind=100 50 0,"
-      "firstPlayer=2 1 1 1,"  // Atypical turn order! SB->D->BB,
+      "firstPlayer=2 1 1 1,"  // WARNING: Atypical turn order! SB->D->BB,
                               // then BB->SB->D.
       "numSuits=4,"
       "numRanks=13,"
@@ -515,7 +515,8 @@ void ChanceDealRegressionTest() {
       "numPlayers=3,"
       "numRounds=4,"
       "blind=100 50 0,"
-      "firstPlayer=2 1 1 1,"  // Atypical turn order! SB->D->BB, then BB->SB->D
+      "firstPlayer=2 1 1 1,"  // WARNING: Atypical turn order! SB->D->BB, then
+                              // BB->SB->D
       "numSuits=4,"
       "numRanks=13,"
       "numHoleCards=2,"
@@ -546,7 +547,7 @@ void ChanceDealRegressionTest() {
       "Action Sequence: ddddddcccdddccppppcdd");
 }
 
-void HulhMaxUtilityIsCorrect() {
+void HulhMinAndMaxUtilityIsCorrect() {
   // More generic version of the previous code.
   std::shared_ptr<const Game> game =
       LoadGame(HulhGameString(/*betting_abstraction=*/"fullgame"));
@@ -556,9 +557,126 @@ void HulhMaxUtilityIsCorrect() {
   for (int i = 0; i < up_game->GetACPCGame()->NumRounds(); ++i) {
     max_utility += acpc_game.maxRaises[i] * acpc_game.raiseSize[i];
   }
+  // Since 1. heads up and 2. stacks aren't relevant (since limit game) the most
+  // a player can in win or lose equals the maximum amount they could in theory
+  // put into the pot.
   SPIEL_CHECK_EQ(max_utility, 240);
   SPIEL_CHECK_EQ(game->MaxUtility(), max_utility);
   SPIEL_CHECK_EQ(game->MinUtility(), -max_utility);
+}
+
+void MaxUtilityLimitMultiway() {
+  std::shared_ptr<const Game> game_1 = LoadGame(
+      "universal_poker(betting=limit,"
+      "numPlayers=3,"
+      "numRounds=4,"
+      "blind=1 2 0,"
+      "firstPlayer=3 1 1 1,"
+      "numSuits=4,"
+      "numRanks=13,"
+      "numHoleCards=2,"
+      "numBoardCards=0 3 1 1,"
+      "stack=5 5 5,"  // Stack sizes are ignored for limit games
+      "raiseSize=900 900 900 900,"
+      "maxRaises=2 2 2 2,"
+      "bettingAbstraction=fullgame)");
+  // 4 betting rounds with two raises each - note that for limit games the stack
+  // size input is completely ignored by the ACPC game. So that should NOT be a
+  // consideration here.
+  // 2 (big blind) + 4 * 2 * 900 = 7202 per caller
+  SPIEL_CHECK_EQ(game_1->MaxUtility(), 14404);
+}
+
+void MaxUtilityEqualStacksMultiway() {
+  std::shared_ptr<const Game> game_3max =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 200, 200, 200));
+  // Max utility is max number ending chips minus starting stack. With 3 players
+  // each with stack of 200 stack the utility should be (3-1)*200=400
+  SPIEL_CHECK_EQ(game_3max->MaxUtility(), 400);
+
+  std::shared_ptr<const Game> game_6max_short =
+      LoadGame(Multiway6max_1_2GameString("fullgame", 6));
+  // Now with 3 more players but ultra-short stacks (6 each, i.e. 3 BBs) the max
+  // utility go down significantly: (6-1)*6=30
+  SPIEL_CHECK_EQ(game_6max_short->MaxUtility(), 30);
+
+  std::shared_ptr<const Game> game_6max_deep =
+      LoadGame(Multiway6max_1_2GameString("fullgame", 10000));
+  // And conversely, with ultra-deep stacks the max utility should go WAY up:
+  // (6-1)*10000=50000
+  SPIEL_CHECK_EQ(game_6max_deep->MaxUtility(), 50000);
+}
+
+void MaxUtilityOneDeepStackMultiway() {
+  std::shared_ptr<const Game> game_1 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 10000, 20, 10));
+  // Stacks differ drastically meaning that we have to consider which stacks
+  // cannot lost their entire stack in a single round (even though the game
+  // is no-limit).
+  // In the best case over all player numbers the deepest or second-deepest
+  // stack will win in an all-in situation against all other players
+  // simultaneously; therefore the max utility bound here equals the sum of the
+  // BB's stack + the Dealer's stack: 20+10 = 30.
+  SPIEL_CHECK_EQ(game_1->MaxUtility(), 30);
+
+  std::shared_ptr<const Game> game_2 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 20, 60, 6000));
+  // 20 + 60 = 80.
+  SPIEL_CHECK_EQ(game_2->MaxUtility(), 80);
+
+  std::shared_ptr<const Game> game_3 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 20, 60, 11));
+  // 20 + 11 = 31.
+  SPIEL_CHECK_EQ(game_3->MaxUtility(), 31);
+}
+
+void MinUtilityEqualStacksMultiway() {
+  // Min utility when all players have equal stacks should simply be the value
+  // of said starting stack (i.e. losing an all-in).
+  std::shared_ptr<const Game> game_3max =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 200, 200, 200));
+  SPIEL_CHECK_EQ(game_3max->MinUtility(), -200);
+
+  std::shared_ptr<const Game> game_6max_short =
+      LoadGame(Multiway6max_1_2GameString("fullgame", 6));
+  SPIEL_CHECK_EQ(game_6max_short->MinUtility(), -6);
+
+  std::shared_ptr<const Game> game_6max_deep =
+      LoadGame(Multiway6max_1_2GameString("fullgame", 10000));
+  SPIEL_CHECK_EQ(game_6max_deep->MinUtility(), -10000);
+
+  // Edge case: two players tie for deepest but there's another shorter stack.
+  // In which case the two deeper players are still able to lose their entire
+  // stacks - so min utility shouldn't go down.
+  std::shared_ptr<const Game> game_tie_4 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 6, 6, 4));
+  SPIEL_CHECK_EQ(game_tie_4->MinUtility(), -6);
+
+  std::shared_ptr<const Game> game_tie_5 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 20, 60, 60));
+  SPIEL_CHECK_EQ(game_tie_5->MinUtility(), -60);
+
+  std::shared_ptr<const Game> game_tie_6 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 200, 100, 200));
+  SPIEL_CHECK_EQ(game_tie_6->MinUtility(), -200);
+}
+
+void MinUtilityOneDeepStackMultiway() {
+  // When stacks differ drastically meaning that we have to consider which
+  // stacks cannot lose their entire stack in a single game (i.e. even though
+  // no-limit); even in the absolute worst case, the deepest stack cannot lose
+  // more than the second highest stack.
+  std::shared_ptr<const Game> game_1 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 10000, 20, 10));
+  SPIEL_CHECK_EQ(game_1->MinUtility(), -20);
+
+  std::shared_ptr<const Game> game_2 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 20, 60, 6000));
+  SPIEL_CHECK_EQ(game_2->MinUtility(), -60);
+
+  std::shared_ptr<const Game> game_3 =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 20, 60, 11));
+  SPIEL_CHECK_EQ(game_3->MinUtility(), -20);
 }
 
 void CanConvertActionsCorrectly() {
@@ -868,19 +986,11 @@ void TestTensorsRecordsSizings() {
   SPIEL_CHECK_EQ(observation_tensor[ob_tensor_size - 1], 100);  // Button
 }
 
-void Bet4HalfPotActionStringRegressionTest() {
-  std::shared_ptr<const Game> game = LoadGame(
-      "universal_poker(betting=nolimit,"
-      "numPlayers=3,"
-      "numRounds=4,"
-      "blind=1 2 0,"          // p1=SB, p2=BB, p3=Button
-      "firstPlayer=3 1 1 1,"  // Standard turn order: D->SB->BB, then SB->BB->D
-      "numSuits=4,"
-      "numRanks=13,"
-      "numHoleCards=2,"
-      "numBoardCards=0 3 1 1,"
-      "stack=100 100 100,"
-      "bettingAbstraction=fullgame)");
+void Bet4ConfusedForHalfPotRegressionTest() {
+  // 100 chip buy-in for all players, 50BB stacks (SB=1, BB=2)
+  std::shared_ptr<const Game> game =
+      LoadGame(Multiway3max_1_2GameString("fullgame", 100, 100, 100));
+
   std::unique_ptr<State> state = game->NewInitialState();
   for (Action action : {0, 1, 2, 3, 4, 5, 1, 1, 1, 6, 7, 8, 1, 1}) {
     std::cout << "action " << action << "state: " << state << "\n" << std::endl;
@@ -911,7 +1021,12 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::FullNLBettingTest2();
   open_spiel::universal_poker::FullNLBettingTest3();
   open_spiel::universal_poker::FullNLBettingTest4();
-  open_spiel::universal_poker::HulhMaxUtilityIsCorrect();
+  open_spiel::universal_poker::HulhMinAndMaxUtilityIsCorrect();
+  open_spiel::universal_poker::MaxUtilityLimitMultiway();
+  open_spiel::universal_poker::MaxUtilityEqualStacksMultiway();
+  open_spiel::universal_poker::MaxUtilityOneDeepStackMultiway();
+  open_spiel::universal_poker::MinUtilityEqualStacksMultiway();
+  open_spiel::universal_poker::MinUtilityOneDeepStackMultiway();
   open_spiel::universal_poker::CanConvertActionsCorrectly();
   open_spiel::universal_poker::TestFCHPA();
   open_spiel::universal_poker::TestFCHPALegalActions();
@@ -921,5 +1036,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::TestHalfCallHalfRaise();
   open_spiel::universal_poker::TestFixedPreferenceBots();
   open_spiel::universal_poker::TestTensorsRecordsSizings();
-  open_spiel::universal_poker::Bet4HalfPotActionStringRegressionTest();
+  open_spiel::universal_poker::Bet4ConfusedForHalfPotRegressionTest();
 }
