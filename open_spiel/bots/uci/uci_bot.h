@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef OPEN_SPIEL_BOTS_UCI_BOT_H_
 #define OPEN_SPIEL_BOTS_UCI_BOT_H_
 
@@ -29,8 +28,9 @@
 
 // **IMPORTANT NOTE** The basic test currently hangs, so consider this bot
 // currently experimental. The original authors claimed to have verified it with
-// external engines: https://github.com/deepmind/open_spiel/pull/496#issuecomment-791578615
-// See https://github.com/deepmind/open_spiel/issues/681 for details.
+// external engines:
+// https://github.com/deepmind/open_spiel/pull/496#issuecomment-791578615 See
+// https://github.com/deepmind/open_spiel/issues/681 for details.
 namespace open_spiel {
 namespace uci {
 
@@ -106,10 +106,8 @@ class UCIBot : public Bot {
  * @return unique_ptr to a UCIBot
  */
 std::unique_ptr<Bot> MakeUCIBot(
-    const std::string& bot_binary_path,
-    int search_limit_value,
-    bool ponder = false,
-    const Options& options = {},
+    const std::string& bot_binary_path, int search_limit_value,
+    bool ponder = false, const Options& options = {},
     SearchLimitType search_limit_type = SearchLimitType::kMoveTime);
 
 }  // namespace uci
