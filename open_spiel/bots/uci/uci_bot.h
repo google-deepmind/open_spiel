@@ -60,7 +60,8 @@ class UCIBot : public Bot {
                     Action action) override;
 
   void Write(const std::string& msg) const;
-  std::string Read(bool wait) const;
+  // Always blocks until a line is read.
+  std::string ReadLine();
 
   void Position(const std::string& fen,
                 const std::vector<std::string>& moves = {});
@@ -79,7 +80,6 @@ class UCIBot : public Bot {
   std::pair<std::string, absl::optional<std::string>> ReadBestMove();
 
   pid_t pid_ = -1;
-  int input_fd_ = -1;
   int output_fd_ = -1;
   SearchLimitType search_limit_type_;
   int search_limit_value_;
@@ -88,6 +88,11 @@ class UCIBot : public Bot {
   bool was_ponder_hit_ = false;
 
   bool ponder_;
+
+  // Input stream member variables for the bot.
+  FILE* input_stream_ = nullptr;
+  char* input_stream_buffer_ = nullptr;
+  uint64_t input_stream_buffer_size_ = 0;
 };
 
 /**
