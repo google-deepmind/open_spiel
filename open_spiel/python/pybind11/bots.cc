@@ -55,6 +55,7 @@ void init_pyspiel_bots(py::module& m) {
   py::classh<Bot, PyBot<Bot>> bot(m, "Bot");
   bot.def(py::init<>())
       .def("step", &Bot::Step)
+      .def("step_verbose", &Bot::StepVerbose)
       .def("restart", &Bot::Restart)
       .def("restart_at", &Bot::RestartAt)
       .def("provides_force_action", &Bot::ProvidesForceAction)
@@ -103,13 +104,11 @@ void init_pyspiel_bots(py::module& m) {
       "Returns a list of bot names that can play specified game for any "
       "player.");
 
-  py::class_<algorithms::Evaluator,
-             std::shared_ptr<algorithms::Evaluator>> mcts_evaluator(
-                 m, "Evaluator");
-  py::class_<algorithms::RandomRolloutEvaluator,
-             algorithms::Evaluator,
+  py::class_<algorithms::Evaluator, std::shared_ptr<algorithms::Evaluator>>
+      mcts_evaluator(m, "Evaluator");
+  py::class_<algorithms::RandomRolloutEvaluator, algorithms::Evaluator,
              std::shared_ptr<algorithms::RandomRolloutEvaluator>>(
-                 m, "RandomRolloutEvaluator")
+      m, "RandomRolloutEvaluator")
       .def(py::init<int, int>(), py::arg("n_rollouts"), py::arg("seed"));
 
   py::enum_<algorithms::ChildSelectionPolicy>(m, "ChildSelectionPolicy")
@@ -198,14 +197,12 @@ void init_pyspiel_bots(py::module& m) {
       .export_values();
 
 #ifndef _WIN32
-  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot,
-        py::arg("bot_binary_path"), py::arg("search_limit_value"),
-        py::arg("ponder"), py::arg("options"),
+  m.def("make_uci_bot", open_spiel::uci::MakeUCIBot, py::arg("bot_binary_path"),
+        py::arg("search_limit_value"), py::arg("ponder"), py::arg("options"),
         py::arg("search_limit_type") =
             open_spiel::uci::SearchLimitType::kMoveTime,
         "Bot that can play chess using UCI chess engine.");
 #endif
-
 
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO
   m.attr("ROSHAMBO_NUM_THROWS") = py::int_(open_spiel::roshambo::kNumThrows);

@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_SPIEL_BOTS_H_
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -77,6 +78,13 @@ class Bot {
   // Asks the bot to decide on an action to play. The bot should be able to
   // safely assumes the action was played.
   virtual Action Step(const State& state) = 0;
+
+  // Same as Action except the bot is given the opportunity to return verbose
+  // output.  This will allow callers of `StepVerbose` to log information about
+  // the action for bots that support this function.
+  virtual std::pair<Action, std::string> StepVerbose(const State& state) {
+    return {Step(state), ""};
+  }
 
   // Let the bot know that a different player made an action at a given state.
   //
