@@ -53,6 +53,9 @@ class UCIBot : public Bot {
   ~UCIBot() override;
 
   Action Step(const State& state) override;
+
+  std::pair<Action, std::string> StepVerbose(const State& state) override;
+
   void Restart() override;
   void RestartAt(const State& state) override;
 
@@ -72,12 +75,14 @@ class UCIBot : public Bot {
   void SetOption(const std::string& name, const std::string& value);
   void UciNewGame();
   void IsReady();
-  std::pair<std::string, absl::optional<std::string>> Go();
+  std::pair<std::string, absl::optional<std::string>> Go(
+      absl::optional<std::string*> info_string = absl::nullopt);
   void GoPonder();
   void PonderHit();
   std::pair<std::string, absl::optional<std::string>> Stop();
   void Quit();
-  std::pair<std::string, absl::optional<std::string>> ReadBestMove();
+  std::pair<std::string, absl::optional<std::string>> ReadBestMove(
+      absl::optional<std::string*> info_string = absl::nullopt);
 
   pid_t pid_ = -1;
   int output_fd_ = -1;

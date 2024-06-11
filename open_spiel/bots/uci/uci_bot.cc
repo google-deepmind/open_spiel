@@ -91,20 +91,23 @@ UCIBot::~UCIBot() {
   close(output_fd_);
 }
 
-Action UCIBot::Step(const State& state) {
+Action UCIBot::Step(const State& state) { return StepVerbose(state).first; }
+
+std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
   std::string move_str;
+  std::string info_str;  // Contains the last info string from the bot.
   auto chess_state = down_cast<const chess::ChessState&>(state);
   if (ponder_ && ponder_move_) {
     if (!was_ponder_hit_) {
       Stop();
       Position(chess_state.Board().ToFEN());
-      tie(move_str, ponder_move_) = Go();
+      tie(move_str, ponder_move_) = Go(&info_str);
     } else {
-      tie(move_str, ponder_move_) = ReadBestMove();
+      tie(move_str, ponder_move_) = ReadBestMove(&info_str);
     }
   } else {
     Position(chess_state.Board().ToFEN());
-    tie(move_str, ponder_move_) = Go();
+    tie(move_str, ponder_move_) = Go(&info_str);
   }
   was_ponder_hit_ = false;
   auto move = chess_state.Board().ParseLANMove(move_str);
@@ -118,7 +121,7 @@ Action UCIBot::Step(const State& state) {
   }
 
   Action action = chess::MoveToAction(*move);
-  return action;
+  return {action, info_str};
 }
 
 void UCIBot::Restart() {
@@ -239,9 +242,10 @@ void UCIBot::Position(const std::string& fen,
   Write(msg);
 }
 
-std::pair<std::string, absl::optional<std::string>> UCIBot::Go() {
+std::pair<std::string, absl::optional<std::string>> UCIBot::Go(
+    absl::optional<std::string*> info_string) {
   Write("go " + search_limit_string_);
-  return ReadBestMove();
+  return ReadBestMove(info_string);
 }
 
 void UCIBot::GoPonder() { Write("go ponder " + search_limit_string_); }
@@ -255,10 +259,19 @@ std::pair<std::string, absl::optional<std::string>> UCIBot::Stop() {
 
 void UCIBot::Quit() { Write("quit"); }
 
-std::pair<std::string, absl::optional<std::string>> UCIBot::ReadBestMove() {
+std::pair<std::string, absl::optional<std::string>> UCIBot::ReadBestMove(
+    absl::optional<std::string*> info_string) {
   while (true) {
     // istringstream can't use a string_view so we need to copy to a string.
     std::string response = ReadLine();
+    // Save the most recent info string if requested. Specifying that the string
+    // contains the number of nodes makes sure that we don't save strings of the
+    // form "info depth 30 currmove c2c1 currmovenumber 22", we want the ones
+    // with metadata about the search.
+    if (info_string.has_value() && absl::StartsWith(response, "info") &&
+        absl::StrContains(response, "nodes")) {
+      *info_string.value() = response;
+    }
     std::istringstream response_line(response);
     std::string token;
     std::string move_str;

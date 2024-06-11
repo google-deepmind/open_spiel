@@ -21,9 +21,11 @@
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/init.h"
 
 ABSL_FLAG(std::string, binary, "random_uci_bot", "Name of the binary to run.");
@@ -43,12 +45,24 @@ void RandomUciBotTest() {
                                        /*ponder*/ false, /*options*/ options);
   auto bot2 = std::make_unique<UCIBot>(binary, /*move_time*/ 10,
                                        /*ponder*/ false, /*options*/ options);
-  std::vector<Bot*> bots = {bot1.get(), bot2.get()};
+  std::vector<Bot *> bots = {bot1.get(), bot2.get()};
   for (int i = 0; i < kNumGames; ++i) {
     std::unique_ptr<State> state = game->NewInitialState();
     EvaluateBots(state.get(), bots, kSeed);
     std::cout << "Game over: " << state->HistoryString() << std::endl;
   }
+}
+
+void CheckVerboseOutput() {
+  std::string binary = absl::GetFlag(FLAGS_binary);
+  std::shared_ptr<const Game> game = LoadGame("chess");
+  auto bot = UCIBot(binary, /*move_time*/ 10,
+                    /*ponder*/ false, /*options*/ {});
+  std::unique_ptr<State> state = game->NewInitialState();
+  auto [action, info] = bot.StepVerbose(*state);
+
+  SPIEL_CHECK_TRUE(absl::StrContains(info, "info"));
+  std::cout << "Verbose output: " << info << std::endl;
 }
 
 }  // namespace
@@ -58,5 +72,6 @@ void RandomUciBotTest() {
 int main(int argc, char **argv) {
   open_spiel::Init("", &argc, &argv, false);
   absl::ParseCommandLine(argc, argv);
+  open_spiel::uci::CheckVerboseOutput();
   open_spiel::uci::RandomUciBotTest();
 }
