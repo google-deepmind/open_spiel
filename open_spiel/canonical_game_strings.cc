@@ -42,7 +42,7 @@ std::string Multiway3max_1_2GameString(const std::string &betting_abstraction,
                                        int sb_stack, int bb_stack,
                                        int dealer_stack) {
   return absl::StrFormat(
-      "universal_poker(betting=nolimit,numPlayers=3,numRounds=4,blind=2 1 0,"
+      "universal_poker(betting=nolimit,numPlayers=3,numRounds=4,blind=1 2 0,"
       // Standard turn order: D->SB->BB, then SB->BB->D
       "firstPlayer=3 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
       "numBoardCards=0 3 1 1,stack=%i %i %i,bettingAbstraction=%s)",
@@ -53,7 +53,7 @@ std::string Multiway6max_1_2GameString(const std::string &betting_abstraction,
                                        int buy_in) {
   return absl::StrFormat(
       "universal_poker(betting=nolimit,numPlayers=6,numRounds=4,"
-      "blind=2 1 0 0 0 0,"
+      "blind=1 2 0 0 0 0,"
       // Standard turn order: UTG->...->D->SB->BB, then SB->BB->UTG->...->D
       "firstPlayer=3 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,"
       "numBoardCards=0 3 1 1,stack=%i %i %i %i %i %i,bettingAbstraction=%s)",
