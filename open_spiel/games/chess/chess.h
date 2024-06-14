@@ -173,14 +173,14 @@ class ChessState : public State {
 
   std::string Serialize() const override;
 
- protected:
-  void DoApplyAction(Action action) override;
-
- private:
   // Draw can be claimed under the FIDE 3-fold repetition rule (the current
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
 
+ protected:
+  void DoApplyAction(Action action) override;
+
+ private:
   // Calculates legal actions and caches them. This is separate from
   // LegalActions() as there are a number of other methods that need the value
   // of LegalActions. This is a separate method as it's called from
