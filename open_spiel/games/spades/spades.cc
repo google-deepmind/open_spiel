@@ -40,14 +40,6 @@
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
-// Our preferred version of the double_dummy_solver defines a DDS_EXTERNAL
-// macro to add a prefix to the exported symbols to avoid name clashes.
-// In order to compile with versions of the double_dummy_solver which do not
-// do this, we define DDS_EXTERNAL as an identity if it isn't already defined.
-#ifndef DDS_EXTERNAL
-#define DDS_EXTERNAL(x) x
-#endif
-
 namespace open_spiel {
 namespace spades {
 namespace {
@@ -75,10 +67,9 @@ const GameType kGameType{/*short_name=*/"spades",
                              {"mercy_threshold", GameParameter(-350)},
                              // Amount of points needed to win the game
                              {"win_threshold", GameParameter(500)},
-                             // Parnership's current scores
-                             // (can infer bags from last digit)
-                             {"score_partnership_0", GameParameter(0)},
-                             {"score_partnership_1", GameParameter(0)},
+                             // The amount to add to reward return for winning
+                             // (Will subtract for losing by mercy rule)
+                             {"win_or_loss_bonus", GameParameter(200)},
                              // Number of played tricks in observation tensor
                              {"num_tricks", GameParameter(2)},
                          }};
@@ -133,14 +124,13 @@ SpadesState::SpadesState(std::shared_ptr<const Game> game,
                          bool use_mercy_rule,
                          int mercy_threshold,
                          int win_threshold,
-                         int score_partnership_0,
-                         int score_partnership_1,
+                         int win_or_loss_bonus,
                          int num_tricks)
     : State(game),
       use_mercy_rule_(use_mercy_rule),
       mercy_threshold_(mercy_threshold),
       win_threshold_(win_threshold),
-      current_scores_{score_partnership_0, score_partnership_1},
+      win_or_loss_bonus_(win_or_loss_bonus),
       num_tricks_(num_tricks) {
   possible_contracts_.fill(true);
 }
@@ -578,6 +568,21 @@ Player SpadesState::CurrentPlayer() const {
 
 void SpadesState::ScoreUp() {
   std::array<int, kNumPartnerships> scores = Score(contracts_, num_player_tricks_, current_scores_);
+  // Check for if bonus reward should be applied for winning (or losing by mercy rule)
+  for (int pship = 0; pship < kNumPartnerships; ++pship){
+    // Update overall scores
+    current_scores_[pship] += scores[pship];
+    // Check for bonus/penalty to returns and if overall game is over 
+    if (scores[pship] >= win_threshold_ && scores[pship] > scores[pship^1]){
+      scores[pship] += win_or_loss_bonus_; // Add bonus reward for winning
+      is_game_over_ = true;
+    }
+    else if (mercy_threshold_ && scores[pship] <= mercy_threshold_ && scores[pship] < scores[pship^1]){
+      scores[pship] -= win_or_loss_bonus_; // Subtract penalty reward for losing by mercy rule
+      is_game_over_ = true;
+    }
+  }
+  // Apply the partnership scores (with bonus/penalty applied) to corresponding players' returns
   for (int pl = 0; pl < kNumPlayers; ++pl) {
     returns_[pl] = scores[Partnership(pl)];
   }

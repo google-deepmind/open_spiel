@@ -34,7 +34,7 @@ void ScoringTests() {
 void BasicGameTests() {
   testing::LoadGameTest("spades");
   testing::RandomSimTest(*LoadGame("spades"), 3);
-  testing::RandomSimTest(*LoadGame("spades(score_partnership_0=59,score_partnership_1=99)"), 3);
+  testing::RandomSimTest(*LoadGame("spades(use_mercy_rule=false,win_threshold=250,win_or_loss_bonus=1000)"), 3);
 }
 
 
