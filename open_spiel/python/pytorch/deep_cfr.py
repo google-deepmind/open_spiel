@@ -416,7 +416,7 @@ class DeepCFRSolver(policy.Policy):
       matched_regrets[max(legal_actions, key=lambda a: raw_advantages[a])] = 1
     return advantages, matched_regrets
 
-  def action_probabilities(self, state):
+  def action_probabilities(self, state, player_id=None):
     """Computes action probabilities for the current player in state.
 
     Args:
