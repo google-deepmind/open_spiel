@@ -1,15 +1,11 @@
 
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
-
-#include <filesystem>
-
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
-
 // define BMI2 only if your system supports BMI2 intrinsics, modify compiler
 // flags so that bmi2 instructions are compiled// #define __BMI2__
 #ifdef __BMI2__

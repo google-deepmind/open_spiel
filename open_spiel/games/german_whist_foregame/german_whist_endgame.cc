@@ -2,9 +2,10 @@
 // Whist
 
 #include <cassert>
-#include <thread>
 
 #include "open_spiel/games/german_whist_foregame/german_whist_foregame.h"
+#include "open_spiel/utils/file.h"
+#include "open_spiel/utils/thread.h"
 
 // #define DEBUG
 namespace open_spiel {
@@ -536,7 +537,8 @@ std::vector<Node> GWhistGenerator(int num, unsigned int seed) {
   return out;
 }
 
-void ThreadSolver(int size_endgames, vectorNa* outTTable, const vectorNa* TTable,
+void ThreadSolver(int size_endgames, vectorNa* outTTable,
+                  const vectorNa* TTable,
                   const std::vector<std::vector<uint32_t>>& bin_coeffs,
                   const std::vector<uint32_t>& suit_splits,
                   const std::unordered_map<uint32_t, uint32_t>& SuitRanks,
@@ -607,7 +609,7 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
       break;
     }
   }
-  std::vector<std::thread> threads = {};
+  std::vector<Thread> threads = {};
   for (int i = 0; i < num_threads; ++i) {
     uint32_t block_size = num_outers / num_threads;
     uint32_t start_id;
@@ -622,9 +624,11 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
       start_id = block_size * i;
       end_id = block_size * (i + 1);
     }
-    threads.push_back(std::thread(
-        ThreadSolver, size_endgames, &outTTable, TTable, std::ref(bin_coeffs),
-        std::ref(suit_splits), std::ref(SuitRanks), start_id, end_id));
+    threads.emplace_back([&, start_id, end_id]() {
+      ThreadSolver(size_endgames, &outTTable, TTable, std::ref(bin_coeffs),
+                   std::ref(suit_splits), std::ref(SuitRanks), start_id,
+                   end_id);
+    });
   }
   for (int i = 0; i < num_threads; ++i) {
     threads[i].join();
