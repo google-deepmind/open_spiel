@@ -83,7 +83,7 @@
 | 🔶      | [Phantom Tic-Tac-Toe](#phantom-tic-tac-toe)     |
 | 🟢      | [Pig](#pig)                                     |
 | 🟢      | [Prisoner's Dilemma](#prisoner's-dilemma)       |
-| ❌      | [Poker (Hold 'em)](#poker-hold-em)              |
+| 🔶      | [Poker (Hold 'em)](#poker-hold-em)              |
 | ❌      | [Quoridor](#quoridor)                           |
 | ❌      | [Reconnaissance Blind                           |
 :        : Chess](#reconnaissance-blind-chess)             :
@@ -93,6 +93,8 @@
 | 🔶      | [Skat (simplified                               |
 :        : bidding)](#skat-simplified-bidding)             :
 | 🔶      | [Solitaire (K+)](#solitaire-k)                  |
+| 🔶      | [Spades](#spades)                               |
+| 🔶      | [Team Dominoes](#team-dominoes)                 |
 | 🟢      | [Tic-Tac-Toe](#tic-tac-toe)                     |
 | 🟢      | [Tiny Bridge](#tiny-bridge)                     |
 | 🟢      | [Tiny Hanabi](#tiny-hanabi)                     |
@@ -774,7 +776,6 @@
 *   2-10 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Texas_hold_%27em)
 *   Implemented via [ACPC](http://www.computerpokercompetition.org/).
-*   ❌ Known issues: see issue [#1033](https://github.com/google-deepmind/open_spiel/issues/1033).
 
 ### Quoridor
 
@@ -863,6 +864,27 @@
 *   1 players.
 *   [Wikipedia](https://en.wikipedia.org/wiki/Klondike_\(solitaire\)) and
     [Bjarnason et al. '07, Searching solitaire in real time](http://web.engr.oregonstate.edu/~afern/papers/solitaire.pdf)
+
+### Spades
+
+*   A four-player card game.
+*   Card game.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Spades_\(card_game\))
+
+### Team Dominoes
+
+*   Team version of dominoes.
+*   Consists of 28 tiles, featuring all combinations of spot counts (also called
+    pips or dots) between zero and six.
+*   Traditional game.
+*   Non-deterministic.
+*   Imperfect information.
+*   4 players.
+*   [Wikipedia](https://en.wikipedia.org/wiki/Dominoes#Latin_American_Version)
 
 ### Tic-Tac-Toe
 

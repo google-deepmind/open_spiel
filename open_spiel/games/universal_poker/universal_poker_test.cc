@@ -19,6 +19,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -382,16 +383,17 @@ void FullNLBettingTest2() {
 void FullNLBettingTest3() {
   std::shared_ptr<const Game> game = LoadGame(
       "universal_poker(betting=nolimit,"
-                      "numPlayers=3,"
-                      "numRounds=4,"
-                      "blind=100 50 0,"
-                      "firstPlayer=2 1 1 1,"
-                      "numSuits=4,"
-                      "numRanks=13,"
-                      "numHoleCards=2,"
-                      "numBoardCards=0 3 1 1,"
-                      "stack=500 1000 2000,"
-                      "bettingAbstraction=fullgame)");
+      "numPlayers=3,"
+      "numRounds=4,"
+      "blind=100 50 0,"
+      "firstPlayer=2 1 1 1,"  // Atypical turn order! SB->D->BB,
+                              // then BB->SB->D.
+      "numSuits=4,"
+      "numRanks=13,"
+      "numHoleCards=2,"
+      "numBoardCards=0 3 1 1,"
+      "stack=500 1000 2000,"
+      "bettingAbstraction=fullgame)");
   std::unique_ptr<State> state = game->NewInitialState();
   SPIEL_CHECK_EQ(game->NumDistinctActions(), 2001);
   while (state->IsChanceNode()) state->ApplyAction(state->LegalActions()[0]);
@@ -513,7 +515,7 @@ void ChanceDealRegressionTest() {
       "numPlayers=3,"
       "numRounds=4,"
       "blind=100 50 0,"
-      "firstPlayer=2 1 1 1,"
+      "firstPlayer=2 1 1 1,"  // Atypical turn order! SB->D->BB, then BB->SB->D
       "numSuits=4,"
       "numRanks=13,"
       "numHoleCards=2,"
@@ -811,6 +813,83 @@ void TestFixedPreferenceBots() {
   }
 }
 
+void TestTensorsRecordsSizings() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+      "numPlayers=3,"
+      "numRounds=4,"
+      "blind=1 2 0,"          // p1=SB, p2=BB, p3=Button
+      "firstPlayer=3 1 1 1,"  // Standard turn order: D->SB->BB, then SB->BB->D
+      "numSuits=4,"
+      "numRanks=13,"
+      "numHoleCards=2,"
+      "numBoardCards=0 3 1 1,"
+      "stack=50 100 100,"  // SB has smaller stack to allow side-pot
+      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (Action action :
+       {0, 1, 2, 3, 4, 5, 1, 1, 1, 6, 7, 8, 1, 1, 20, 40, 1, 100, 1, 1}) {
+    std::cout << "action " << action << "state: " << state << "\n" << std::endl;
+    state->ApplyAction(action);
+  }
+  // We have to choose a player since the no-arg default would result in an
+  // error due to the game being 'over'... but the choice is arbitrary since the
+  // information we're checking is all public knowledge.
+  std::vector<float> tensor = state->InformationStateTensor(1);
+  int tensor_size = tensor.size();
+
+  SPIEL_CHECK_TRUE(tensor_size == game->InformationStateTensorShape()[0]);
+  int offset = tensor_size - game->MaxGameLength();
+
+  // Pre-Turn: All actions are deal or check
+  SPIEL_CHECK_EQ(tensor[offset + 10], 0);
+
+  SPIEL_CHECK_EQ(tensor[offset + 11], 0);    // Deal Turn
+  SPIEL_CHECK_EQ(tensor[offset + 12], 0);    // SB Check
+  SPIEL_CHECK_EQ(tensor[offset + 13], 0);    // BB Check
+  SPIEL_CHECK_EQ(tensor[offset + 14], 20);   // Button raise 20
+  SPIEL_CHECK_EQ(tensor[offset + 15], 40);   // SB reraise 40
+  SPIEL_CHECK_EQ(tensor[offset + 16], 0);    // BB call 40
+  SPIEL_CHECK_EQ(tensor[offset + 17], 100);  // Button all-in 100
+  SPIEL_CHECK_EQ(tensor[offset + 18], 0);    // SB call for 50 (side-pot)
+  SPIEL_CHECK_EQ(tensor[offset + 19], 0);    // BB call 100
+
+  // No action taken yet, so should default 0
+  SPIEL_CHECK_EQ(tensor[offset + 20], 0);
+
+  // Verify the final call sizes can instead be obtained from the Observation
+  // Tensor (especially the SB's, since it's a side-pot!)
+  std::vector<float> observation_tensor = state->ObservationTensor(1);
+  int ob_tensor_size = observation_tensor.size();
+
+  SPIEL_CHECK_TRUE(ob_tensor_size == game->ObservationTensorShape()[0]);
+  SPIEL_CHECK_EQ(observation_tensor[ob_tensor_size - 3], 50);   // SB (side-pot)
+  SPIEL_CHECK_EQ(observation_tensor[ob_tensor_size - 2], 100);  // BB
+  SPIEL_CHECK_EQ(observation_tensor[ob_tensor_size - 1], 100);  // Button
+}
+
+void Bet4HalfPotActionStringRegressionTest() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "universal_poker(betting=nolimit,"
+      "numPlayers=3,"
+      "numRounds=4,"
+      "blind=1 2 0,"          // p1=SB, p2=BB, p3=Button
+      "firstPlayer=3 1 1 1,"  // Standard turn order: D->SB->BB, then SB->BB->D
+      "numSuits=4,"
+      "numRanks=13,"
+      "numHoleCards=2,"
+      "numBoardCards=0 3 1 1,"
+      "stack=100 100 100,"
+      "bettingAbstraction=fullgame)");
+  std::unique_ptr<State> state = game->NewInitialState();
+  for (Action action : {0, 1, 2, 3, 4, 5, 1, 1, 1, 6, 7, 8, 1, 1}) {
+    std::cout << "action " << action << "state: " << state << "\n" << std::endl;
+    state->ApplyAction(action);
+  }
+  // Should *not* be 'half pot bet' since this is a fullgame / not abstracted.
+  SPIEL_CHECK_EQ(state->ActionToString(4), "player=2 move=Bet4");
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -841,4 +920,6 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::TestRandomSubgameCreation();
   open_spiel::universal_poker::TestHalfCallHalfRaise();
   open_spiel::universal_poker::TestFixedPreferenceBots();
+  open_spiel::universal_poker::TestTensorsRecordsSizings();
+  open_spiel::universal_poker::Bet4HalfPotActionStringRegressionTest();
 }

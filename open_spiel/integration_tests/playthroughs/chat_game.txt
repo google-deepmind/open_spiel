@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Chat Game"
 GameType.max_num_players = 10
 GameType.min_num_players = 2
-GameType.parameter_specification = ["max_utility", "min_utility", "num_distinct_actions", "num_llm_seeds", "num_max_replies", "num_players", "players"]
+GameType.parameter_specification = ["max_utility", "min_utility", "num_distinct_actions", "num_llm_seeds", "num_max_replies", "num_players", "players", "silence_logging"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.GENERAL_SUM
 NumDistinctActions() = 2
 PolicyTensorShape() = [2]
 MaxChanceOutcomes() = 1
-GetParameters() = {max_utility=10.0,min_utility=-10.0,num_distinct_actions=2,num_llm_seeds=1,num_max_replies=1,num_players=2,players=0}
+GetParameters() = {max_utility=10.0,min_utility=-10.0,num_distinct_actions=2,num_llm_seeds=1,num_max_replies=1,num_players=2,players=0,silence_logging=True}
 NumPlayers() = 2
 MinUtility() = -10.0
 MaxUtility() = 10.0
@@ -31,7 +31,7 @@ ObservationTensorShape() = player_id: [10], private_info: [100], dialogue: [100]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 210
 MaxGameLength() = 2
-ToString() = "chat_game(max_utility=10.0,min_utility=-10.0,num_distinct_actions=2,num_llm_seeds=1,num_max_replies=1,num_players=2,players=0)"
+ToString() = "chat_game(max_utility=10.0,min_utility=-10.0,num_distinct_actions=2,num_llm_seeds=1,num_max_replies=1,num_players=2,players=0,silence_logging=True)"
 
 # State 0
 #

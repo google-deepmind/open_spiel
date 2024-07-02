@@ -238,8 +238,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
   elif [[ "$OS_PYTHON_VERSION" == "3.12" ]]; then
     # Need to special-case this until it's installed by default.
     # https://ubuntuhandbook.org/index.php/2023/05/install-python-3-12-ubuntu/
-    echo "Adding Python 3.12 ppa repos"
-    sudo add-apt-repository ppa:deadsnakes/ppa
+    # No longer need to add the ppa repos on Ubuntu 24.04 runner
+    # echo "Adding Python 3.12 ppa repos"
+    # sudo add-apt-repository ppa:deadsnakes/ppa
     PYTHON_PKGS="python3.12 python3.12-dev python3-pip python3-setuptools python3-wheel python3-tk python3.12-venv"
   fi
   EXT_DEPS="virtualenv clang cmake curl $PYTHON_PKGS"

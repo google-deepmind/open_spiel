@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "open_spiel/games/spades/spades.h"
-
-#include "open_spiel/abseil-cpp/absl/strings/str_replace.h"
 #include "open_spiel/games/spades/spades_scoring.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -34,9 +32,9 @@ void ScoringTests() {
 void BasicGameTests() {
   testing::LoadGameTest("spades");
   testing::RandomSimTest(*LoadGame("spades"), 3);
-  testing::RandomSimTest(*LoadGame("spades(use_mercy_rule=false,win_threshold=250,win_or_loss_bonus=1000)"), 3);
+  testing::RandomSimTest(
+      *LoadGame("spades(use_mercy_rule=false,win_threshold=250,win_or_loss_bonus=1000)"), 3);
 }
-
 
 }  // namespace
 }  // namespace spades

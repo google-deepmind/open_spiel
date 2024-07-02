@@ -18,19 +18,12 @@
 #include <array>
 #include <iterator>
 #include <memory>
-#include <set>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/base/attributes.h"
-#include "open_spiel/abseil-cpp/absl/base/const_init.h"
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
-#include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
@@ -46,33 +39,34 @@ namespace {
 
 enum Seat { kNorth, kEast, kSouth, kWest };
 
-const GameType kGameType{/*short_name=*/"spades",
-                         /*long_name=*/"Partnership Spades",
-                         GameType::Dynamics::kSequential,
-                         GameType::ChanceMode::kExplicitStochastic,
-                         GameType::Information::kImperfectInformation,
-                         GameType::Utility::kGeneralSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/kNumPlayers,
-                         /*min_num_players=*/kNumPlayers,
-                         /*provides_information_state_string=*/false,
-                         /*provides_information_state_tensor=*/false,
-                         /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {
-                             // Whether to end the game early if score gets too low
-                             {"use_mercy_rule", GameParameter(true)},
-                             // If using mercy rule, the threshold of negative points
-                             {"mercy_threshold", GameParameter(-350)},
-                             // Amount of points needed to win the game
-                             {"win_threshold", GameParameter(500)},
-                             // The amount to add to reward return for winning
-                             // (Will subtract for losing by mercy rule)
-                             {"win_or_loss_bonus", GameParameter(200)},
-                             // Number of played tricks in observation tensor
-                             {"num_tricks", GameParameter(2)},
-                         }};
+const GameType kGameType{
+  /*short_name=*/"spades",
+  /*long_name=*/"Partnership Spades",
+  GameType::Dynamics::kSequential,
+  GameType::ChanceMode::kExplicitStochastic,
+  GameType::Information::kImperfectInformation,
+  GameType::Utility::kGeneralSum,
+  GameType::RewardModel::kTerminal,
+  /*max_num_players=*/kNumPlayers,
+  /*min_num_players=*/kNumPlayers,
+  /*provides_information_state_string=*/false,
+  /*provides_information_state_tensor=*/false,
+  /*provides_observation_string=*/true,
+  /*provides_observation_tensor=*/true,
+  /*parameter_specification=*/
+  {
+     // Whether to end the game early if score gets too low
+     {"use_mercy_rule", GameParameter(true)},
+     // If using mercy rule, the threshold of negative points
+     {"mercy_threshold", GameParameter(-350)},
+     // Amount of points needed to win the game
+     {"win_threshold", GameParameter(500)},
+     // The amount to add to reward return for winning
+     // (Will subtract for losing by mercy rule)
+     {"win_or_loss_bonus", GameParameter(200)},
+     // Number of played tricks in observation tensor
+     {"num_tricks", GameParameter(2)},
+  }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new SpadesGame(params));
@@ -81,11 +75,6 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
-
-inline constexpr int kFirstBid = 0;
-int Bid(int bid) {
-  return (bid + kFirstBid);
-}
 
 // Cards are represented suit * number of cards per suit + rank
 Suit CardSuit(int card) { return Suit(card / 13); }
@@ -96,10 +85,6 @@ int Card(Suit suit, int rank) {
 
 constexpr char kRankChar[] = "23456789TJQKA";
 constexpr char kSuitChar[] = "CDHS";
-
-// Ours, Left hand opponent, Partner, Right hand opponent
-constexpr std::array<absl::string_view, kNumPlayers> kRelativePlayer{  // NOLINT
-    "Us", "LH", "Pd", "RH"};
 
 std::string CardString(int card) {
   return {kSuitChar[static_cast<int>(CardSuit(card))],
@@ -120,12 +105,9 @@ int Partner(Player player) { return (player + 2) % 4; }
 SpadesGame::SpadesGame(const GameParameters& params)
     : Game(kGameType, params) {}
 
-SpadesState::SpadesState(std::shared_ptr<const Game> game,
-                         bool use_mercy_rule,
-                         int mercy_threshold,
-                         int win_threshold,
-                         int win_or_loss_bonus,
-                         int num_tricks)
+SpadesState::SpadesState(std::shared_ptr<const Game> game, bool use_mercy_rule,
+                         int mercy_threshold, int win_threshold,
+                         int win_or_loss_bonus, int num_tricks)
     : State(game),
       use_mercy_rule_(use_mercy_rule),
       mercy_threshold_(mercy_threshold),
@@ -256,13 +238,11 @@ std::string SpadesState::FormatPlay() const {
     }
     absl::StrAppend(&rv, CardString(card), " ");
   }
-  absl::StrAppend(&rv, "\n\nTricks taken:\n\n",
-                       "North East  South  West\n",
-                       absl::StrFormat("%-6d", num_player_tricks_[0]),
-                       absl::StrFormat("%-6d", num_player_tricks_[1]),
-                       absl::StrFormat("%-6d", num_player_tricks_[2]),
-                       absl::StrFormat("%-6d", num_player_tricks_[3]),
-                       "\n");
+  absl::StrAppend(&rv, "\n\nTricks taken:\n\n", "North East  South  West\n",
+                  absl::StrFormat("%-6d", num_player_tricks_[0]),
+                  absl::StrFormat("%-6d", num_player_tricks_[1]),
+                  absl::StrFormat("%-6d", num_player_tricks_[2]),
+                  absl::StrFormat("%-6d", num_player_tricks_[3]), "\n");
   return rv;
 }
 
@@ -287,7 +267,6 @@ void SpadesState::WriteObservationTensor(Player player,
 
   std::fill(values.begin(), values.end(), 0.0);
   if (phase_ == Phase::kDeal) return;
-  int partnership = Partnership(player);
   auto ptr = values.begin();
 
   // Mark bidding or playing phase
@@ -351,7 +330,8 @@ void SpadesState::WriteObservationTensor(Player player,
     }
 
     int kPlayTensorSize = SpadesGame::GetPlayTensorSize(num_tricks_);
-    SPIEL_CHECK_EQ(std::distance(values.begin(), ptr), kPlayTensorSize + kPhaseInfoSize);
+    SPIEL_CHECK_EQ(std::distance(values.begin(), ptr),
+                   kPlayTensorSize + kPhaseInfoSize);
     SPIEL_CHECK_LE(std::distance(values.begin(), ptr), values.size());
   } else {
     // Observation for auction
@@ -363,13 +343,14 @@ void SpadesState::WriteObservationTensor(Player player,
         ptr[contracts_[i]] = 1;
       }
       ptr += kNumBids;
-    }    
+    }
 
     // Our cards.
     for (int i = 0; i < kNumCards; ++i)
       if (holder_[i] == player) ptr[i] = 1;
     ptr += kNumCards;
-    SPIEL_CHECK_EQ(std::distance(values.begin(), ptr), kAuctionTensorSize + kPhaseInfoSize);
+    SPIEL_CHECK_EQ(std::distance(values.begin(), ptr),
+                   kAuctionTensorSize + kPhaseInfoSize);
     SPIEL_CHECK_LE(std::distance(values.begin(), ptr), values.size());
   }
 }
@@ -420,21 +401,20 @@ std::vector<Action> SpadesState::DealLegalActions() const {
 
 std::vector<Action> SpadesState::BiddingLegalActions() const {
   std::vector<Action> legal_actions;
-  legal_actions.reserve(kNumBids); 
+  legal_actions.reserve(kNumBids);
   int partner_bid = contracts_[Partner(current_player_)];
-  
+
   if (partner_bid >= 0) {
-    // Combined bid between partners cannot be more than 13 
+    // Combined bid between partners cannot be more than 13
     for (int bid = 0; bid < kNumBids - partner_bid; ++bid) {
       legal_actions.push_back(kBiddingActionBase + bid);
     }
-  }
-  else {
+  } else {
     for (int bid = 0; bid < kNumBids; ++bid) {
       legal_actions.push_back(kBiddingActionBase + bid);
     }
   }
-  
+
   return legal_actions;
 }
 
@@ -450,10 +430,10 @@ std::vector<Action> SpadesState::PlayLegalActions() const {
         legal_actions.push_back(Card(suit, rank));
       }
     }
-  }
-  // If leading, and spades have not been broken, play any other suit if possible
-  else  if (num_cards_played_ % kNumPlayers == 0 && !is_spades_broken_) {
-    for (int suit = 0/*kClubs*/; suit < 3/*kSpades*/; ++suit) {
+  } else if (num_cards_played_ % kNumPlayers == 0 && !is_spades_broken_) {
+    // If leading, and spades have not been broken, play any other suit if
+    // possible.
+    for (int suit = 0 /*kClubs*/; suit < 3 /*kSpades*/; ++suit) {
       for (int rank = 0; rank < kNumCardsPerSuit; ++rank) {
         if (holder_[Card(Suit(suit), rank)] == current_player_) {
           legal_actions.push_back(Card(Suit(suit), rank));
@@ -503,33 +483,33 @@ void SpadesState::ApplyDealAction(int card) {
 }
 
 void SpadesState::ApplyBiddingAction(int bid) {
-  auto partnership = Partnership(current_player_);
-  
   // A bid was made.
   const int partner = Partner(current_player_);
   SPIEL_CHECK_TRUE(contracts_[partner] == -1 ||
-                    bid + contracts_[partner] <= 13);
+                   bid + contracts_[partner] <= 13);
   contracts_[current_player_] = bid;
 
   // Mark off possible_contracts for this player's other bids
-  std::fill(possible_contracts_.begin()+(current_player_*kNumBids),
-            possible_contracts_.begin()+(current_player_*kNumBids)+kNumBids,
-            false);
-  // If partner hasn't bid, mark off partner's possible bids that would go past 13
+  std::fill(
+      possible_contracts_.begin() + (current_player_ * kNumBids),
+      possible_contracts_.begin() + (current_player_ * kNumBids) + kNumBids,
+      false);
+  // If partner hasn't bid, mark off partner's possible bids that would go past
+  // 13
   if (contracts_[partner] == -1 && bid > 0) {
-    std::fill(possible_contracts_.begin()+(partner*kNumBids)+kNumBids-bid,
-              possible_contracts_.begin()+(partner*kNumBids)+kNumBids,
-              false);
+    std::fill(
+        possible_contracts_.begin() + (partner * kNumBids) + kNumBids - bid,
+        possible_contracts_.begin() + (partner * kNumBids) + kNumBids, false);
   }
 
   // And now mark this bid as the player's contract
-  possible_contracts_[current_player_*kNumBids+bid] = true;
-
+  possible_contracts_[current_player_ * kNumBids + bid] = true;
 
   current_player_ = (current_player_ + 1) % kNumPlayers;
 
-    // After 4 bids, end the auction.
-  if (std::all_of(contracts_.begin(), contracts_.end(), [](int x){return x != -1;})) {
+  // After 4 bids, end the auction.
+  if (std::all_of(contracts_.begin(), contracts_.end(),
+                  [](int x) { return x != -1; })) {
     phase_ = Phase::kPlay;
   }
 }
@@ -567,12 +547,13 @@ Player SpadesState::CurrentPlayer() const {
 }
 
 void SpadesState::ScoreUp() {
-  std::array<int, kNumPartnerships> scores = Score(contracts_, num_player_tricks_, current_scores_);
+  std::array<int, kNumPartnerships> scores =
+      Score(contracts_, num_player_tricks_, current_scores_);
   // Check for if bonus reward should be applied for winning (or losing by mercy rule)
   for (int pship = 0; pship < kNumPartnerships; ++pship){
     // Update overall scores
     current_scores_[pship] += scores[pship];
-    // Check for bonus/penalty to returns and if overall game is over 
+    // Check for bonus/penalty to returns and if overall game is over
     if (scores[pship] >= win_threshold_ && scores[pship] > scores[pship^1]){
       scores[pship] += win_or_loss_bonus_; // Add bonus reward for winning
       is_game_over_ = true;
@@ -601,8 +582,8 @@ void Trick::Play(Player player, int card) {
       winning_rank_ = CardRank(card);
       winning_player_ = player;
     }
-  } else if (CardSuit(card) == Suit(3)/*kSpades*/) {
-    winning_suit_ = Suit(3)/*kSpades*/;
+  } else if (CardSuit(card) == Suit(3) /*kSpades*/) {
+    winning_suit_ = Suit(3) /*kSpades*/;
     winning_rank_ = CardRank(card);
     winning_player_ = player;
   }
@@ -613,7 +594,8 @@ std::string SpadesState::Serialize() const {
   return serialized;
 }
 
-std::unique_ptr<State> SpadesGame::DeserializeState(const std::string& str) const {
+std::unique_ptr<State> SpadesGame::DeserializeState(
+    const std::string& str) const {
   return Game::DeserializeState(str);
 }
 

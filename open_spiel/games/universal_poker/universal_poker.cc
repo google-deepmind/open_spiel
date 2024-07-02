@@ -311,7 +311,11 @@ std::string UniversalPokerState::ActionToString(Player player,
     move_str = "Fold";
   } else if (static_cast<ActionType>(move) == ActionType::kCall) {
     move_str = "Call";
-  } else if (static_cast<ActionType>(move) == ActionType::kHalfPot) {
+  } else if (static_cast<ActionType>(move) == ActionType::kHalfPot &&
+             // Avoids an edge case where we interpret a bet size that's
+             // literally meant to be '4' as a half pot bet (since that's the
+             // actual value of ActionTye::kHalfPot).
+             betting_abstraction_ != BettingAbstraction::kFULLGAME) {
     move_str = "HalfPot";
   } else if (betting_abstraction_ == BettingAbstraction::kFULLGAME) {
     SPIEL_CHECK_GE(move, 2);
@@ -372,12 +376,14 @@ void UniversalPokerState::InformationStateTensor(
   SPIEL_CHECK_EQ(values.size(), game_->InformationStateTensorShape()[0]);
   std::fill(values.begin(), values.end(), 0.);
 
-  // Layout of observation:
+  // Layout:
   //   my player number: num_players bits
   //   my cards: Initial deck size bits (1 means you have the card), i.e.
   //             MaxChanceOutcomes() = NumSuits * NumRanks
   //   public cards: Same as above, but for the public cards.
-  //   NumRounds() round sequence: (max round seq length)*2 bits
+  //   action sequence: (max game length)*2 bits (fold/raise/call/all-in)
+  //   action sequence sizings: (max game length) integers with value >= 0,
+  //                             0 when corresponding to 'deal' or 'check'.
   int offset = 0;
 
   // Mark who I am.
@@ -390,14 +396,16 @@ void UniversalPokerState::InformationStateTensor(
   logic::CardSet holeCards = HoleCards(player);
   logic::CardSet boardCards = BoardCards();
 
-  // TODO(author2): it should be way more efficient to iterate over the cards
-  // of the player, rather than iterating over all the cards.
+  // Mark my private cards
+  // (Note: it should be way more efficient to iterate over the cards of the
+  // player, rather than iterating over all the cards. We may want to change
+  // this in the future.)
   for (uint32_t i = 0; i < full_deck.NumCards(); i++) {
     values[i + offset] = holeCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
   offset += full_deck.NumCards();
 
-  // Public cards
+  // Mark the public cards
   for (int i = 0; i < full_deck.NumCards(); ++i) {
     values[i + offset] = boardCards.ContainsCards(deckCards[i]) ? 1.0 : 0.0;
   }
@@ -407,6 +415,7 @@ void UniversalPokerState::InformationStateTensor(
   const int length = actionSeq.length();
   SPIEL_CHECK_LT(length, game_->MaxGameLength());
 
+  // Mark the action sequence (abstracted).
   for (int i = 0; i < length; ++i) {
     SPIEL_CHECK_LT(offset + i + 1, values.size());
     if (actionSeq[i] == 'c') {
@@ -433,9 +442,19 @@ void UniversalPokerState::InformationStateTensor(
       SPIEL_CHECK_EQ(actionSeq[i], 'd');
     }
   }
-
-  // Move offset up to the next round: 2 bits per move.
+  // Move offset to the end of the abstracted betting sequence (since 2 entries
+  // per move).
   offset += game_->MaxGameLength() * 2;
+
+  // Mark the action sequence sizings.
+  const std::vector<int> action_sequence_sizings = GetActionSequenceSizings();
+  SPIEL_CHECK_EQ(length, action_sequence_sizings.size());
+  for (int i = 0; i < length; ++i) {
+    values[offset + i] = action_sequence_sizings[i];
+  }
+  // Move offset to the end of the un-abstracted betting sequence.
+  offset += game_->MaxGameLength();
+
   SPIEL_CHECK_EQ(offset, game_->InformationStateTensorShape()[0]);
 }
 
@@ -520,6 +539,7 @@ std::string UniversalPokerState::ObservationString(Player player) const {
   for (auto p = Player{0}; p < acpc_game_->GetNbPlayers(); p++) {
     absl::StrAppend(&result, " ", acpc_state_.Money(p));
   }
+  absl::StrAppend(&result, "]");
   // Add the player's private cards
   if (player != kChancePlayerId) {
     absl::StrAppend(&result, "[Private: ", HoleCards(player).ToString(), "]");
@@ -822,6 +842,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
               .ToCardArray()[action_id];
       deck_.RemoveCard(card);
       actionSequence_ += 'd';
+      actionSequenceSizings_.push_back(0);
 
       // Check where to add this card
       if (hole_cards_dealt_ <
@@ -1011,14 +1032,19 @@ std::unique_ptr<State> UniversalPokerGame::NewInitialState() const {
 }
 
 std::vector<int> UniversalPokerGame::InformationStateTensorShape() const {
-  // One-hot encoding for player number (who is to play).
-  // 2 slots of cards (total_num_cards bits each): private card, public card
-  // Followed by maximum game length * 2 bits each (call / raise)
+  // Layout:
+  //   my player number: num_players bits
+  //   my cards: Initial deck size bits (1 means you have the card), i.e.
+  //             MaxChanceOutcomes() = NumSuits * NumRanks
+  //   public cards: Same as above, but for the public cards.
+  //   action sequence: (max game length)*2 bits (fold/raise/call/all-in)
+  //   action sequence sizings: (max game length) integers with value >= 0,
+  //                             0 when corresponding to 'deal' or 'check'.
   const int num_players = acpc_game_.GetNbPlayers();
   const int gameLength = MaxGameLength();
   const int total_num_cards = MaxChanceOutcomes();
 
-  return {num_players + 2 * total_num_cards + 2 * gameLength};
+  return {num_players + 2 * total_num_cards + (2 + 1) * gameLength};
 }
 
 std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
@@ -1220,6 +1246,11 @@ void UniversalPokerState::ApplyChoiceAction(StateActionType action_type,
   }
 
   actionSequence_ += (char)actions[action_type];
+
+  // Note: call actions all have size '0', which means that the
+  // actionSequenceSizing value will be identical regardless of what size stack
+  // the caller has in all-in situations.
+  actionSequenceSizings_.push_back(size);
   if (action_type == ACTION_DEAL) SpielFatalError("Cannot apply deal action.");
   acpc_state_.DoAction(UniversalPokerActionTypeToACPCActionType(action_type),
                        size);

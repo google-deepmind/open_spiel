@@ -124,6 +124,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
   jlcxx::stl::apply_stl<std::vector<std::vector<int>>>(mod);
   jlcxx::stl::apply_stl<std::vector<open_spiel::Action>>(mod);
 
+  mod.map_type<open_spiel::State::PlayerAction>("PlayerAction");
+  jlcxx::stl::apply_stl<std::vector<open_spiel::State::PlayerAction>>(mod);
+
   mod.add_bits<open_spiel::GameParameter::Type>("GameParameterStateType",
                                                 jlcxx::julia_type("CppEnum"));
   mod.set_const("UNSET", open_spiel::GameParameter::Type::kUnset);
@@ -306,6 +309,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
               })
       .method("to_string", &open_spiel::State::ToString)
       .method("is_terminal", &open_spiel::State::IsTerminal)
+      .method("is_initial_state", &open_spiel::State::IsInitialState)
       .method("rewards", &open_spiel::State::Rewards)
       .method("returns", &open_spiel::State::Returns)
       .method("player_reward", &open_spiel::State::PlayerReward)
@@ -316,6 +320,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
       .method("is_player_node", &open_spiel::State::IsPlayerNode)
       .method("history", &open_spiel::State::History)
       .method("history_str", &open_spiel::State::HistoryString)
+      .method("full_history", &open_spiel::State::FullHistory)
       .method("information_state_string",
               [](open_spiel::State& s, open_spiel::Player p) {
                 return s.InformationStateString(p);
@@ -789,3 +794,4 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod) {
                    include_full_observations, seed, max_unroll_length);
              });
 }  // NOLINT(readability/fn_size)
+

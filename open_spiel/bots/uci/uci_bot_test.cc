@@ -14,7 +14,10 @@
 
 #include "open_spiel/bots/uci/uci_bot.h"
 
+#include <iostream>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
@@ -36,9 +39,9 @@ void RandomUciBotTest() {
   std::string binary = absl::GetFlag(FLAGS_binary);
   std::shared_ptr<const Game> game = LoadGame("chess");
   Options options = {};
-  std::unique_ptr<UCIBot> bot1 = std::make_unique<UCIBot>(
+  auto bot1 = std::make_unique<UCIBot>(
       binary, /*move_time*/100, /*ponder*/false, /*options*/options);
-  std::unique_ptr<UCIBot> bot2 = std::make_unique<UCIBot>(
+  auto bot2 = std::make_unique<UCIBot>(
       binary, /*move_time*/100, /*ponder*/false, /*options*/options);
   std::vector<Bot*> bots = {bot1.get(), bot2.get()};
   for (int i = 0; i < kNumGames; ++i) {

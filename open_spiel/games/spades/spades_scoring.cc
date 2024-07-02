@@ -14,16 +14,14 @@
 
 #include "open_spiel/games/spades/spades_scoring.h"
 
-#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
-
+#include <array>
 namespace open_spiel {
 namespace spades {
 namespace {
 
-// Score from contract is 10 times the bid (make contract arg negative if failed)
-int ScoreContract(int contract) {
-  return contract * 10;
-}
+// Score from contract is 10 times the bid (make contract arg negative if
+// failed)
+int ScoreContract(int contract) { return contract * 10; }
 
 // Penalty for accumulating 10 bags (-100 per instance)
 int ScoreBagPenalties(int current_score, int overtricks) {
@@ -33,20 +31,19 @@ int ScoreBagPenalties(int current_score, int overtricks) {
 }
 
 // Bonus/penalty for succeeding/failing a Nil bid
-int ScoreNil(int tricks) {
-  return (tricks > 0) ? -100 : 100;
-
-}
+int ScoreNil(int tricks) { return (tricks > 0) ? -100 : 100; }
 }  // namespace
 
-std::array<int, kNumPartnerships> Score(const std::array<int, kNumPlayers> contracts,
-                                        const std::array<int, kNumPlayers> taken_tricks,
-                                        const std::array<int, kNumPartnerships> current_scores) {
+std::array<int, kNumPartnerships> Score(
+    const std::array<int, kNumPlayers> contracts,
+    const std::array<int, kNumPlayers> taken_tricks,
+    const std::array<int, kNumPartnerships> current_scores) {
   std::array<int, kNumPartnerships> round_scores = {0, 0};
 
   for (int pship = 0; pship < kNumPartnerships; ++pship) {
-    int contract = contracts[pship] + contracts[pship+2];
-    int contract_result = (taken_tricks[pship] + taken_tricks[pship+2]) - contract;
+    int contract = contracts[pship] + contracts[pship + 2];
+    int contract_result =
+        (taken_tricks[pship] + taken_tricks[pship + 2]) - contract;
     int bonuses = 0;
     int contract_score = 0;
 
@@ -54,8 +51,8 @@ std::array<int, kNumPartnerships> Score(const std::array<int, kNumPlayers> contr
     if (contracts[pship] == 0) {
       bonuses += ScoreNil(taken_tricks[pship]);
     }
-    if (contracts[pship+2] == 0) {
-      bonuses += ScoreNil(taken_tricks[pship+2]);
+    if (contracts[pship + 2] == 0) {
+      bonuses += ScoreNil(taken_tricks[pship + 2]);
     }
 
     // Score contracts and check for bag penalties
@@ -63,12 +60,11 @@ std::array<int, kNumPartnerships> Score(const std::array<int, kNumPlayers> contr
       contract_score = ScoreContract(-contract);
     } else {
       contract_score = ScoreContract(contract);
-      
-      bonuses += contract_result + // Each overtrick (bag) is worth 1 point
+
+      bonuses += contract_result +  // Each overtrick (bag) is worth 1 point
                  ScoreBagPenalties(current_scores[pship], contract_result);
-      
     }
-    
+
     round_scores[pship] = contract_score + bonuses;
   }
 

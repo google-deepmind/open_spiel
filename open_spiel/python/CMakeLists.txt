@@ -184,6 +184,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/boltzmann_tabular_qlearner_test.py
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
+  algorithms/efr_test.py
   algorithms/evaluate_bots_test.py
   algorithms/expected_game_score_test.py
   algorithms/external_sampling_mccfr_test.py
@@ -224,6 +225,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
   games/liars_poker_test.py
+  games/team_dominoes_test.py
   games/tic_tac_toe_test.py
   mfg/algorithms/best_response_value_test.py
   mfg/algorithms/mirror_descent_test.py

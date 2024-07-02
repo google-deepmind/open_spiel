@@ -18,25 +18,27 @@
 // The full game of partnership spades.
 // See https://dkmgames.com/CardSharp/Spades/SpadesHelp.php
 // This is played by four players in two partnerships; it consists of a bidding
-// phase followed by a play phase. The bidding phase determines the contracts for
-// the play phase. The contract consists of:
+// phase followed by a play phase. The bidding phase determines the contracts
+// for the play phase. The contract consists of:
 //    - Each player bidding how many tricks they can take.
-//    - If a player bids 'Nil' (meaning '0'), then they have a special condition for points
+//    - If a player bids 'Nil' (meaning '0'), then they have a special condition
+//    for points
 //      based on whether they can avoid taking any tricks.
 //
 // There is then a play phase, in which 13 tricks are allocated between the
-// two partnerships. Each partnership gains 10 times their combined contract 
-// if the partners are able to collectively take at least as many tricks as that combined
-// contract, otherwise the partnership loses 10 times their combined contract.
+// two partnerships. Each partnership gains 10 times their combined contract
+// if the partners are able to collectively take at least as many tricks as that
+// combined contract, otherwise the partnership loses 10 times their combined
+// contract.
 //
-// Any tricks taken in excess of a partnerhip's combined contract are worth 1 point
-// and considered a 'bag' - for every 10 bags collected over the course of the game,
-// the partnership is penalized 100 points.
+// Any tricks taken in excess of a partnership's combined contract are worth 1
+// point and considered a 'bag' - for every 10 bags collected over the course of
+// the game, the partnership is penalized 100 points.
 //
-// In the case of a Nil bid, if that partner avoids taking any tricks during the round,
-// the partnership gains a 100 point bonus. Conversely, if that partner takes any tricks,
-// the partnership will lose 100 points (but these tricks still count toward the other
-// partner's contract).
+// In the case of a Nil bid, if that partner avoids taking any tricks during the
+// round, the partnership gains a 100 point bonus. Conversely, if that partner
+// takes any tricks, the partnership will lose 100 points (but these tricks
+// still count toward the other partner's contract).
 //
 // The action space is as follows:
 //   0..51   Cards, used for both dealing (chance events) and play;
@@ -45,20 +47,30 @@
 // During the bidding phase, every player will have 1 turn for making a bid.
 // During the play phase, every play will have 13 turns for playing a card.
 
-#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include <algorithm>
+#include <array>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "open_spiel/games/spades/spades_scoring.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace spades {
 
 inline constexpr int kBiddingActionBase = kNumCards;  // First bidding action.
-inline constexpr int kAuctionTensorSize = kNumPlayers * kNumBids
-                                          + kNumCards;  // Our hand
-inline constexpr int kPhaseInfoSize = 2; // Bidding (auction) and Playing
+inline constexpr int kAuctionTensorSize =
+    kNumPlayers * kNumBids + kNumCards;   // Our hand
+inline constexpr int kPhaseInfoSize = 2;  // Bidding (auction) and Playing
 inline constexpr int kPublicInfoTensorSize =
     kAuctionTensorSize  // The auction
-    - kNumCards;         // But not any player's cards
+    - kNumCards;        // But not any player's cards
 inline constexpr int kMaxAuctionLength = 4;
 inline constexpr Player kFirstPlayer = 0;
 enum class Suit { kClubs = 0, kDiamonds = 1, kHearts = 2, kSpades = 3 };
@@ -106,8 +118,8 @@ class SpadesState : public State {
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string Serialize() const override;
 
-  // If the state is terminal, returns the indexes of the final contracts, into the
-  // arrays returned by PossibleFinalContracts and ScoreByContract.
+  // If the state is terminal, returns the indexes of the final contracts, into
+  // the arrays returned by PossibleFinalContracts and ScoreByContract.
   std::array<int, kNumPlayers> ContractIndexes() const;
 
   // Returns a mask indicating which final contracts are possible.
@@ -128,7 +140,7 @@ class SpadesState : public State {
   std::array<int, kNumPartnerships> GetCurrentScores() const { return current_scores_; }
 
   // Set partnership scores
-  void SetCurrentScores(const std::array<int, kNumPartnerships>& new_scores) { 
+  void SetCurrentScores(const std::array<int, kNumPartnerships>& new_scores) {
     current_scores_ = new_scores;
   }
 
@@ -148,7 +160,7 @@ class SpadesState : public State {
   std::vector<Action> BiddingLegalActions() const;
   std::vector<Action> PlayLegalActions() const;
   void ApplyDealAction(int card);
-  void ApplyBiddingAction(int call);
+  void ApplyBiddingAction(int bid);
   void ApplyPlayAction(int card);
 
   void ScoreUp();
@@ -168,18 +180,18 @@ class SpadesState : public State {
   const int win_or_loss_bonus_;
   const int num_tricks_;
 
-  std::array<int, kNumPartnerships> current_scores_ = {0,0};
+  std::array<int, kNumPartnerships> current_scores_ = {0, 0};
   bool is_game_over_ = false;
-
-  std::array<int, kNumPlayers> num_player_tricks_ = {0,0,0,0};
+  std::array<int, kNumPlayers> num_player_tricks_ = {0, 0, 0, 0};
   int num_cards_played_ = 0;
   Player current_player_ = 0;  // During the play phase, the hand to play.
   Phase phase_ = Phase::kDeal;
-  std::array<int, kNumPlayers> contracts_ = {-1,-1,-1,-1};
+  std::array<int, kNumPlayers> contracts_ = {-1, -1, -1, -1};
   std::array<Trick, kNumTricks> tricks_{};
   std::vector<double> returns_ = std::vector<double>(kNumPlayers);
   std::array<absl::optional<Player>, kNumCards> holder_{};
-  std::array<bool, kNumContracts> possible_contracts_; // Array of bids 0-13 for each player (so 4x14 size)
+  std::array<bool, kNumContracts>
+      possible_contracts_;  // Array of bids 0-13 for each player (so 4x14 size)
   bool is_spades_broken_ = false;
 };
 
@@ -192,31 +204,26 @@ class SpadesGame : public Game {
   int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new SpadesState(
-                                    shared_from_this(),
-                                    UseMercyRule(),
-                                    MercyThreshold(),
-                                    WinThreshold(),
-                                    WinOrLossBonus(),
-                                    NumTricks()));
+        shared_from_this(), UseMercyRule(), MercyThreshold(),
+        WinThreshold(), WinOrLossBonus(), NumTricks()));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -(kMaxScore + WinOrLossBonus()); }
   double MaxUtility() const override { return kMaxScore + WinOrLossBonus(); }
 
   static int GetPlayTensorSize(int num_tricks) {
-    return kNumBids * kNumPlayers                   // What each player's contract is
-           + kNumCards                              // Our remaining cards
-           + num_tricks * kNumPlayers * kNumCards   // Number of played tricks
-           + kNumTricks * kNumPlayers;              // Number of tricks each player has won
+    return kNumBids * kNumPlayers  // What each player's contract is
+           + kNumCards             // Our remaining cards
+           + num_tricks * kNumPlayers * kNumCards  // Number of played tricks
+           + kNumTricks * kNumPlayers;  // Number of tricks each player has won
   }
 
   std::vector<int> ObservationTensorShape() const override {
-    return {kPhaseInfoSize + std::max(GetPlayTensorSize(NumTricks()), kAuctionTensorSize)};
+    return {kPhaseInfoSize +
+            std::max(GetPlayTensorSize(NumTricks()), kAuctionTensorSize)};
   }
 
-  int MaxGameLength() const override {
-    return kMaxAuctionLength + kNumCards;
-  }
+  int MaxGameLength() const override { return kMaxAuctionLength + kNumCards; }
   int MaxChanceNodesInHistory() const override { return kNumCards; }
 
   std::unique_ptr<State> DeserializeState(
@@ -233,12 +240,13 @@ class SpadesGame : public Game {
   int PublicObservationTensorSize() const { return kPublicInfoTensorSize; }
 
  private:
-
   bool UseMercyRule() const {
     return ParameterValue<bool>("use_mercy_rule", true);
   }
 
-  int MercyThreshold() const { return ParameterValue<int>("mercy_threshold", -350); }
+  int MercyThreshold() const {
+    return ParameterValue<int>("mercy_threshold", -350);
+  }
 
   int WinThreshold() const { return ParameterValue<int>("win_threshold", 500); }
 

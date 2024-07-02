@@ -80,7 +80,7 @@ Otherwise, happy hacking!
     to fix. To see these items, look for issues with the "help wanted" tag on the
     [Issues page](https://github.com/google-deepmind/open_spiel/issues).
 
--   **New Features and Algorithmsx**. There are regular requests for new features
+-   **New Features and Algorithms**. There are regular requests for new features
     and algorithms that we just don't have time to provide. Look for issues with the
     "contribution welcome" tag on the
     [Issues page](https://github.com/google-deepmind/open_spiel/issues).

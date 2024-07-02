@@ -30,16 +30,16 @@ constexpr char kPlayerChar[] = "NESW";
 inline constexpr int kNumSuits = 4;
 inline constexpr int kNumCardsPerSuit = 13;
 inline constexpr int kNumPartnerships = 2;
-inline constexpr int kNumBids = 14; // Bids can be from 0 to 13 tricks
+inline constexpr int kNumBids = 14;  // Bids can be from 0 to 13 tricks
 inline constexpr int kNumCards = kNumSuits * kNumCardsPerSuit;
 inline constexpr int kNumCardsPerHand = kNumCards / kNumPlayers;
 inline constexpr int kNumTricks = kNumCardsPerHand;
-inline constexpr int kMaxScore = 230; // Bid 13 (130) + Nil (100)
+inline constexpr int kMaxScore = 230;  // Bid 13 (130) + Nil (100)
 
-std::array<int, kNumPartnerships> Score(const std::array<int, kNumPlayers> contracts,
-                                        const std::array<int, kNumPlayers> taken_tricks,
-                                        const std::array<int, kNumPartnerships> current_scores);
-
+std::array<int, kNumPartnerships> Score(
+    const std::array<int, kNumPlayers> contracts,
+    const std::array<int, kNumPlayers> taken_tricks,
+    const std::array<int, kNumPartnerships> current_scores);
 
 // All possible contracts.
 inline constexpr int kNumContracts = kNumBids * kNumPlayers;
@@ -47,7 +47,7 @@ inline constexpr int kNumContracts = kNumBids * kNumPlayers;
 constexpr std::array<int, kNumContracts> AllContracts() {
   std::array<int, kNumContracts> contracts = {};
   int bid = 0;
-  for (int i = 0; i < kNumContracts; ++i){
+  for (int i = 0; i < kNumContracts; ++i) {
     contracts[i] = bid++;
     if (bid > kNumBids) {
       bid = 0;
@@ -56,8 +56,7 @@ constexpr std::array<int, kNumContracts> AllContracts() {
 
   return contracts;
 }
-inline constexpr std::array<int, kNumContracts> kAllContracts =
-    AllContracts();
+inline constexpr std::array<int, kNumContracts> kAllContracts = AllContracts();
 
 }  // namespace spades
 }  // namespace open_spiel

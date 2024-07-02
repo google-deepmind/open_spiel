@@ -77,6 +77,10 @@ class UniversalPokerState : public State {
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
+  // Warning: all 'call' actions will have encoded sizing of 0. This could be
+  // potentially misleading in certain all-in situations if the caller has a
+  // stack that is smaller than the size of the bet! (See ObservationTensor if
+  // you need any player's exact contribution to the pot).
   void InformationStateTensor(Player player,
                               absl::Span<float> values) const override;
   void ObservationTensor(Player player,
@@ -120,7 +124,13 @@ class UniversalPokerState : public State {
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
   const int GetPossibleActionCount() const;
 
+  // Note: might want to update the action sequence in the future to track
+  // everything per-round.
   const std::string &GetActionSequence() const { return actionSequence_; }
+  // Unabstracted sizings for each entry in the Action Sequence.
+  const std::vector<int> &GetActionSequenceSizings() const {
+    return actionSequenceSizings_;
+  }
 
   void AddHoleCard(uint8_t card) {
     Player p = hole_cards_dealt_ / acpc_game_->GetNbHoleCardsRequired();
@@ -181,6 +191,7 @@ class UniversalPokerState : public State {
   Player cur_player_;
   uint32_t possibleActions_;
   std::string actionSequence_;
+  std::vector<int> actionSequenceSizings_;
 
   BettingAbstraction betting_abstraction_;
 
