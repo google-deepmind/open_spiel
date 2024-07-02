@@ -96,12 +96,9 @@ class Trick {
 // State of an in-play game. Can be any phase of the game.
 class SpadesState : public State {
  public:
-  SpadesState(std::shared_ptr<const Game> game,
-                         bool use_mercy_rule,
-                         int mercy_threshold,
-                         int win_threshold,
-                         int win_or_loss_bonus,
-                         int num_tricks);
+  SpadesState(std::shared_ptr<const Game> game, bool use_mercy_rule,
+              int mercy_threshold, int win_threshold,
+              int win_or_loss_bonus, int num_tricks);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
