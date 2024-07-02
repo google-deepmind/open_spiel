@@ -359,6 +359,17 @@ class GamesSimTest(parameterized.TestCase):
     dbn = state.dbn_string()
     self.assertEqual(dbn, "110000000000")
 
+  def test_spades_get_and_set_scores(self):
+    game = pyspiel.load_game("spades")
+    state = game.new_initial_state()
+    # check that we can retrieve those cards
+    current_scores = state.get_current_scores()
+    self.assertEqual(current_scores, [0, 0])
+    # now set scores to something else and check again
+    state.set_current_scores([59, 131])
+    current_scores = state.get_current_scores()
+    self.assertEqual(current_scores, [59, 131])
+
   @parameterized.parameters(
       {"game_name": "blotto"},
       {"game_name": "goofspiel"},
