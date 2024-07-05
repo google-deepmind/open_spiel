@@ -16,6 +16,7 @@
 
 import abc
 import collections
+import math
 
 import numpy as np
 
@@ -501,7 +502,7 @@ def _multinomial_coefficients(distributions):
   Args:
     distributions: The distributions table [num_rows, num_strategies].
   """
-  v_factorial = np.vectorize(np.math.factorial)
+  v_factorial = np.vectorize(math.factorial)
   # Multinomial coefficients (one per distribution Ni).
   # (         P         )
   # ( Ni1, Ni1, ... Nik )
