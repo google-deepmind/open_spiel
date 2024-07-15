@@ -262,15 +262,18 @@ class _PayoffTableInterface(metaclass=abc.ABCMeta):
   def __call__(self):
     """Returns a view of the table as a np.array."""
 
-  @abc.abstractproperty
+  @property
+  @abc.abstractmethod
   def num_strategies(self):
     pass
 
-  @abc.abstractproperty
+  @property
+  @abc.abstractmethod
   def num_players(self):
     pass
 
-  @abc.abstractproperty
+  @property
+  @abc.abstractmethod
   def num_rows(self):
     pass
 
