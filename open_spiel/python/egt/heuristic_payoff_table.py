@@ -16,6 +16,7 @@
 
 import abc
 import collections
+import math
 
 import numpy as np
 
@@ -261,15 +262,18 @@ class _PayoffTableInterface(metaclass=abc.ABCMeta):
   def __call__(self):
     """Returns a view of the table as a np.array."""
 
-  @abc.abstractproperty
+  @property
+  @abc.abstractmethod
   def num_strategies(self):
     pass
 
-  @abc.abstractproperty
+  @property
+  @abc.abstractmethod
   def num_players(self):
     pass
 
-  @abc.abstractproperty
+  @property
+  @abc.abstractmethod
   def num_rows(self):
     pass
 
@@ -501,7 +505,7 @@ def _multinomial_coefficients(distributions):
   Args:
     distributions: The distributions table [num_rows, num_strategies].
   """
-  v_factorial = np.vectorize(np.math.factorial)
+  v_factorial = np.vectorize(math.factorial)
   # Multinomial coefficients (one per distribution Ni).
   # (         P         )
   # ( Ni1, Ni1, ... Nik )
