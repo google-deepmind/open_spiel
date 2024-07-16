@@ -288,7 +288,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" && "${OS_PYTHON_VERSION}" != "3.9" ]]; then
-    brew install "python@${OS_PYTHON_VERSION}"
+    # Auto-update is causing failures on Github Actions, so disable them.
+    HOMEBREW_NO_AUTO_UPDATE=1 brew install "python@${OS_PYTHON_VERSION}"
     # Uninstall Python 3.9 if we need to.
     brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
