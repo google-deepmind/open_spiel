@@ -27,10 +27,7 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   # Still needed to support using venv on Ubuntu 20.04:
   sudo apt-get install python3.9-venv
 elif [[ "$OS" = "Darwin" ]]; then
-  # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
-  # install the specific versions we've requested on MacOS.
-  # The auto-update runs into a problem with symlinking on Python 3.11.
-  HOMEBREW_NO_AUTO_UPDATE=1 brew install python@${OS_PYTHON_VERSION}
+  # Python is already intalled via brew in install.sh from actions.yml
   brew link --force python@${OS_PYTHON_VERSION}
 fi
 
