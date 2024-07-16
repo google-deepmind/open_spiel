@@ -29,6 +29,8 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
 elif [[ "$OS" = "Darwin" ]]; then
   # MacOS uses Python 3.11 and PyTorch does not yet support Python 3.11. For now,
   # install the specific versions we've requested on MacOS.
+  # There is an error when trying to upgrade 3.11 that it cannot create this symlink because it already exists. Remove for now.
+  rm -f /usr/local/bin/2to3-${OS_PYTHON_VERSION}
   brew install python@${OS_PYTHON_VERSION}
   brew link --force python@${OS_PYTHON_VERSION}
 fi
