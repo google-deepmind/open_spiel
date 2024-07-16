@@ -287,10 +287,12 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   [[ -x `which python3` ]] || brew install python3 || echo "** Warning: failed 'brew install python3' -- continuing"
   # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
-  if [[ "$CI" && "${OS_PYTHON_VERSION}" != "3.9" ]]; then
-    brew install "python@${OS_PYTHON_VERSION}"
+  if [[ "$CI" ]]; then
+    # Only install the python version if it's not present. There are issues otherwise.
+    if [[ `brew list python@${OS_PYTHON_VERSION}; echo $?` == 0 ]]; then
+      brew install "python@${OS_PYTHON_VERSION}"
+    fi
     # Uninstall Python 3.9 if we need to.
-    brew list python@3.9 && brew unlink python@3.9
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"

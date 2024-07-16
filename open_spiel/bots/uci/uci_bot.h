@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_BOTS_UCI_BOT_H_
 #define OPEN_SPIEL_BOTS_UCI_BOT_H_
 
+#include <cstdio>   // for size_t, needed by ::getline
 #include <map>
 #include <memory>
 #include <string>
@@ -97,7 +98,7 @@ class UCIBot : public Bot {
   // Input stream member variables for the bot.
   FILE* input_stream_ = nullptr;
   char* input_stream_buffer_ = nullptr;
-  uint64_t input_stream_buffer_size_ = 0;
+  size_t input_stream_buffer_size_ = 0;
 };
 
 /**
