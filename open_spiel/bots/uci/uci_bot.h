@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef OPEN_SPIEL_BOTS_UCI_BOT_H_
 #define OPEN_SPIEL_BOTS_UCI_BOT_H_
 
+#include <cstdio>   // for size_t, needed by ::getline
 #include <map>
 #include <memory>
 #include <string>
@@ -29,8 +29,9 @@
 
 // **IMPORTANT NOTE** The basic test currently hangs, so consider this bot
 // currently experimental. The original authors claimed to have verified it with
-// external engines: https://github.com/deepmind/open_spiel/pull/496#issuecomment-791578615
-// See https://github.com/deepmind/open_spiel/issues/681 for details.
+// external engines:
+// https://github.com/deepmind/open_spiel/pull/496#issuecomment-791578615 See
+// https://github.com/deepmind/open_spiel/issues/681 for details.
 namespace open_spiel {
 namespace uci {
 
@@ -53,6 +54,9 @@ class UCIBot : public Bot {
   ~UCIBot() override;
 
   Action Step(const State& state) override;
+
+  std::pair<Action, std::string> StepVerbose(const State& state) override;
+
   void Restart() override;
   void RestartAt(const State& state) override;
 
@@ -60,7 +64,8 @@ class UCIBot : public Bot {
                     Action action) override;
 
   void Write(const std::string& msg) const;
-  std::string Read(bool wait) const;
+  // Always blocks until a line is read.
+  std::string ReadLine();
 
   void Position(const std::string& fen,
                 const std::vector<std::string>& moves = {});
@@ -71,15 +76,16 @@ class UCIBot : public Bot {
   void SetOption(const std::string& name, const std::string& value);
   void UciNewGame();
   void IsReady();
-  std::pair<std::string, absl::optional<std::string>> Go();
+  std::pair<std::string, absl::optional<std::string>> Go(
+      absl::optional<std::string*> info_string = absl::nullopt);
   void GoPonder();
   void PonderHit();
   std::pair<std::string, absl::optional<std::string>> Stop();
   void Quit();
-  std::pair<std::string, absl::optional<std::string>> ReadBestMove();
+  std::pair<std::string, absl::optional<std::string>> ReadBestMove(
+      absl::optional<std::string*> info_string = absl::nullopt);
 
   pid_t pid_ = -1;
-  int input_fd_ = -1;
   int output_fd_ = -1;
   SearchLimitType search_limit_type_;
   int search_limit_value_;
@@ -88,6 +94,11 @@ class UCIBot : public Bot {
   bool was_ponder_hit_ = false;
 
   bool ponder_;
+
+  // Input stream member variables for the bot.
+  FILE* input_stream_ = nullptr;
+  char* input_stream_buffer_ = nullptr;
+  size_t input_stream_buffer_size_ = 0;
 };
 
 /**
@@ -106,10 +117,8 @@ class UCIBot : public Bot {
  * @return unique_ptr to a UCIBot
  */
 std::unique_ptr<Bot> MakeUCIBot(
-    const std::string& bot_binary_path,
-    int search_limit_value,
-    bool ponder = false,
-    const Options& options = {},
+    const std::string& bot_binary_path, int search_limit_value,
+    bool ponder = false, const Options& options = {},
     SearchLimitType search_limit_type = SearchLimitType::kMoveTime);
 
 }  // namespace uci

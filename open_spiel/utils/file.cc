@@ -14,14 +14,16 @@
 
 #include "open_spiel/utils/file.h"
 
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+
+#include <cstdlib>
 
 #ifdef _WIN32
 // https://stackoverflow.com/a/42906151
-#include <windows.h>
 #include <direct.h>
 #include <stdio.h>
+#include <windows.h>
 #define mkdir(dir, mode) _mkdir(dir)
 #define unlink(file) _unlink(file)
 #define rmdir(dir) _rmdir(dir)
@@ -31,6 +33,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <string>
 
 #include "open_spiel/spiel_utils.h"
 
@@ -100,6 +103,16 @@ void WriteContentsToFile(const std::string& filename, const std::string& mode,
 bool Exists(const std::string& path) {
   struct stat info;
   return stat(path.c_str(), &info) == 0;
+}
+
+std::string RealPath(const std::string& path) {
+  char real_path[PATH_MAX];
+  if (realpath(path.c_str(), real_path) == nullptr) {
+    // If there was an error return an empty path
+    return "";
+  }
+
+  return std::string(real_path);
 }
 
 bool IsDirectory(const std::string& path) {

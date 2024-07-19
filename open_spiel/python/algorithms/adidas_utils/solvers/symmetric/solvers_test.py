@@ -22,6 +22,7 @@ import numpy as np
 
 from scipy.spatial import distance
 
+from open_spiel.python.algorithms.adidas_utils.solvers.symmetric import adam
 from open_spiel.python.algorithms.adidas_utils.solvers.symmetric import ate
 from open_spiel.python.algorithms.adidas_utils.solvers.symmetric import ped
 from open_spiel.python.algorithms.adidas_utils.solvers.symmetric import qre
@@ -59,6 +60,8 @@ class ExploitabilityDescentTest(parameterized.TestCase):
       ("QRE_t=0.1", (qre, 0.1, False)),
       ("SGD_t=0.0", (sgd, 0.0, False)),
       ("SGD_t=0.1", (sgd, 0.1, False)),
+      ("ADAM_t=0.0", (adam, 0.0, False)),
+      ("ADAM_t=0.1", (adam, 0.1, False)),
       )
   def test_exploitability_gradient_on_symmetric_two_player_matrix_games(
       self, solver_tuple, trials=100, max_num_strats=2, atol=1e-1, rtol=1e-1,

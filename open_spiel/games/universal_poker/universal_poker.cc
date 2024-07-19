@@ -14,6 +14,8 @@
 
 #include "open_spiel/games/universal_poker/universal_poker.h"
 
+#include <sys/types.h>
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -139,8 +141,10 @@ const GameType kGameType{
         {"betting", GameParameter(std::string("nolimit"))},
         // The stack size for each player at the start of each hand (for
         // no-limit). It will be ignored on "limit".
-        // TODO(author2): It's unclear what happens on limit. It defaults to
-        // INT32_MAX for all players when not provided.
+        // Note: it's somewhat unclear what happens behind the scenes with the
+        // stack sizes in limit games. Although it _appears_ to default to
+        // INT32_MAX for all players (regardless of whether stack was or was
+        // not provided).
         {"stack", GameParameter(std::string("1200 1200"))},
         // The size of the blinds for each player (relative to the dealer)
         {"blind", GameParameter(std::string("100 100"))},
@@ -1057,38 +1061,100 @@ std::vector<int> UniversalPokerGame::ObservationTensorShape() const {
 }
 
 double UniversalPokerGame::MaxCommitment() const {
-  int max_commit = 0;
-  if (acpc_game_.IsLimitGame()) {
-    // The most a player can put into the pot is the raise amounts on each round
-    // times the maximum number of raises, plus the original chips they put in
-    // to play, which has the big blind as an upper bound.
-    const auto &acpc_game = acpc_game_.Game();
-    max_commit = big_blind();
-    for (int i = 0; i < acpc_game_.NumRounds(); ++i) {
-      max_commit += acpc_game.maxRaises[i] * acpc_game.raiseSize[i];
+  const auto &acpc_game = acpc_game_.Game();
+  if (!acpc_game_.IsLimitGame()) {
+    // In nolimit games a player can shove all-in at any point in any betting
+    // round. Therefore the global max commitment is simply the deepest stack at
+    // the table.
+    // (Technically we could bound this to the max *meaningful* commitment by
+    // also looking at the second largest stack, but by convention the deepest
+    // stack is allowed to bet more than this amount as a valid action. So for
+    // sake of simplicity we allow this larger amount as a valid commitment.)
+    double deepest_stack = 0;
+    for (int i = 0; i < acpc_game_.GetNbPlayers(); ++i) {
+      deepest_stack = std::max<double>(deepest_stack, acpc_game_.StackSize(i));
     }
-  } else {
-    // In No-Limit games, this isn't true, as there is no maximum raise value,
-    // so the limit is the number of chips that the player has.
-    max_commit = acpc_game_.StackSize(0);
+    return deepest_stack;
   }
-  return static_cast<double>(max_commit);
+
+  // Otherwise we're in a limit game - meaning StackSize is meaningless (as ACPC
+  // leaves them as an INT32 MAX_INT).
+
+  // Therefore: here the most a player could put into the pot is the raise
+  // amounts on each round times the maximum number of raises, plus the original
+  // chips they put in to play, which has the big blind as an upper bound.
+  double limit_max_commit = big_blind();
+  for (int i = 0; i < acpc_game_.NumRounds(); ++i) {
+    limit_max_commit += acpc_game.maxRaises[i] * acpc_game.raiseSize[i];
+  }
+  return limit_max_commit;
 }
 
 double UniversalPokerGame::MaxUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
   // the game minus then money the player had before starting the game.
-  // The most a player can win *per opponent* is the most each player can put
-  // into the pot,
-  // The maximum amount of money a player can win is the maximum bet any player
-  // can make, times the number of players (excluding the original player).
+
+  if (!acpc_game_.IsLimitGame()) {
+    // In no-limit games, because poker is zero-sum and therefore this money can
+    // only come from other players, the theoretical global max utility at a
+    // table can only be earned either of the two (or more) deepest stacks at
+    // the table. This occurs when all players are all-in simultaneously (with
+    // the possible exception of the deepest stack if it is a 'singular' deepest
+    // stack; in which case it simply has to match the all-in amount of all
+    // other players). This means we can compute the theoretical maximum global
+    // utility possible across all players by assuming we are playing as (one
+    // of) the deepest-stacked player(s) and summing up the stacks of all other
+    // players.
+    uint32_t max_stack = 0;
+    for (int i = 0; i < acpc_game_.GetNbPlayers(); ++i) {
+      max_stack = std::max<uint32_t>(max_stack, acpc_game_.StackSize(i));
+    }
+    return static_cast<double>(acpc_game_.TotalMoney() - max_stack);
+  }
+
+  // In 'real' limit games the above bound would normally still apply, but ACPC
+  // actually doesn't support stack sizes for limit games (it ignores the input
+  // and appears to leave everything as an INT32 MAX_INTEGER). So here we can
+  // instead simply look at the max commitment and number of players - e.g. what
+  // the value would be assuming there are as many bets as possible and that
+  // there were as many callers as possible for each bet.
   return MaxCommitment() * (acpc_game_.GetNbPlayers() - 1);
 }
 
 double UniversalPokerGame::MinUtility() const {
   // In poker, the utility is defined as the money a player has at the end of
-  // the game minus then money the player had before starting the game. As such,
-  // the most a player can lose is the maximum amount they can bet.
+  // the game minus the money the player had before starting the game. As such,
+  // the most a player can lose in a hand is the max amount they can lose when
+  // betting the maximum. (By convention this is not *necesarily* the actual
+  // amount they bet in certain cases as it is allowed to bet more than the
+  // maximum "meaningful" amount. E.g. any time a player goes all-in with a
+  // stack that is larger than all other players' stacks.)
+
+  if (!acpc_game_.IsLimitGame()) {
+    // In no-limit games with more than one stack tied for deepest, the minimum
+    // utility bound is is simply the negative of one of said deepest stacks.
+    // But in situations where there is a singular deepest stack, this value is
+    // instead the negative of of (one of) the *second-deepest* stacks at the
+    // table - representing a situation where the deepest stack shoved, was
+    // called by second-deepest stack, and lost (or vice versa).
+    double max_stack = 0;
+    // Note: should equal max_stack in case of a tie for deepest
+    double second_max_stack = 0;
+    for (int i = 0; i < acpc_game_.GetNbPlayers(); ++i) {
+      double ith_stack = acpc_game_.StackSize(i);
+      if (ith_stack > max_stack) {
+        second_max_stack = max_stack;
+        max_stack = ith_stack;
+      } else {
+        second_max_stack = std::max<double>(second_max_stack, ith_stack);
+      }
+    }
+    return -1 * second_max_stack;
+  }
+
+  // On the other hand, ACPC game doesn't support stack sizes in limit games (it
+  // leaves them all set to INT32 MAX_INTEGER). So all we can consider is the
+  // maximum commitment.
   return -1 * MaxCommitment();
 }
 
@@ -1353,8 +1419,14 @@ open_spiel::Action ACPCActionToOpenSpielAction(
       return ActionType::kCall;
     case project_acpc_server::ActionType::a_raise:
       SPIEL_CHECK_NE(state.betting(), BettingAbstraction::kFC);
+      // Note: the following code is being kept for legacy reasons. Previous
+      // comment kept here for posterity:
+      // """
       // The maximum utility is exactly equal to the all-in amount for both
       // players.
+      // """
+      // (Said comment however A. assumes a heads-up game and B. is technically
+      // incorrect anyways; see MaxUtility for more details.)
       if (action.size == up_game.MaxCommitment() * up_game.NumPlayers()) {
         return ActionType::kCall;
       }

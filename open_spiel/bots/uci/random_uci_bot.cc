@@ -74,11 +74,20 @@ void RandomUciBot() {
           ++pos;
         }
       }
-    } else if (absl::StartsWith(line, "go movetime ")) {
+      // Bot should return a move given all types of go commands
+    } else if (absl::StartsWith(line, "go movetime") ||
+               absl::StartsWith(line, "go depth") ||
+               absl::StartsWith(line, "go nodes") ||
+               absl::StartsWith(line, "go mate")) {
+      std::cout << "info string Random uci bot uci info statistics may not be "
+                   "accurate.\n";
       std::vector<Action> legal_actions = state->LegalActions();
       int index = absl::Uniform<int>(rng, 0, legal_actions.size());
       Action action = legal_actions[index];
       chess::Move move = ActionToMove(action, chess_state->Board());
+      std::cout << "info depth 1 seldepth 1 multipv 1 nodes 1 nps 1000 "
+                   "hashfull 0 tbhits 0 time 1 pv "
+                << move.ToLAN() << "\n";
       std::cout << "bestmove " << move.ToLAN() << std::endl;
     } else if (line == "quit") {
       return;
@@ -91,7 +100,7 @@ void RandomUciBot() {
 }  // namespace uci
 }  // namespace open_spiel
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   open_spiel::Init("", &argc, &argv, false);
   absl::ParseCommandLine(argc, argv);
   open_spiel::uci::RandomUciBot();
