@@ -142,7 +142,7 @@ class SpadesState : public State {
   }
 
   // Indicates if overall game is over (did a partnership meet win/lose condition)
-  void IsGameOver() const { return is_game_over_; }
+  bool IsGameOver() const { return is_game_over_; }
 
   // Manually set the current player (used to specify starting player)
   void SetCurrentPlayer(const int current_player) { current_player_ = current_player; }
