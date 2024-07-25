@@ -87,7 +87,10 @@ def lrs_solve(row_payoffs, col_payoffs, lrsnash_max_denom, lrsnash_path):
     for line in lrs.stdout:
       if len(line) <= 1 or line[:1] == b"*":
         continue
-      line = np.asfarray([fractions.Fraction(x) for x in line.decode().split()])
+      line = np.asarray(
+          [fractions.Fraction(x) for x in line.decode().split()],
+          dtype=np.float64,
+      )
       if line[0] == 2:  # col-player
         col_mixtures.append(line[1:-1])
       else:  # row-player
