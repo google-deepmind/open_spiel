@@ -16,8 +16,8 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "rbc"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 4672
-PolicyTensorShape() = [4672]
+NumDistinctActions() = 4674
+PolicyTensorShape() = [4674]
 MaxChanceOutcomes() = 0
 GetParameters() = {board_size=4,fen=r1kr/pppp/PPPP/R1KR w - - 0 1,sense_size=3}
 NumPlayers() = 2

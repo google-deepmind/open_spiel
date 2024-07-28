@@ -16,10 +16,13 @@
 
 #include <cstdint>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/random/uniform_int_distribution.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/chess/chess_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -78,6 +81,13 @@ void BasicChessTests() {
   testing::NoChanceOutcomesTest(*LoadGame("chess"));
   testing::RandomSimTest(*LoadGame("chess"), 10);
   testing::RandomSimTestWithUndo(*LoadGame("chess"), 10);
+}
+
+void BasicChess960Tests() {
+  testing::LoadGameTest("chess(chess960=true)");
+  testing::RandomSimTest(*LoadGame("chess(chess960=true)"), 10);
+  // Undo only works after the chance node in chess960.
+  // testing::RandomSimTestWithUndo(*LoadGame(chess960_game_string), 10);
 }
 
 void MoveGenerationTests() {
@@ -319,4 +329,5 @@ int main(int argc, char** argv) {
   open_spiel::chess::ObservationTensorTests();
   open_spiel::chess::MoveConversionTests();
   open_spiel::chess::SerializaitionTests();
+  open_spiel::chess::BasicChess960Tests();
 }

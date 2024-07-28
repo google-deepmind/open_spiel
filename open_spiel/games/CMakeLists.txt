@@ -31,6 +31,7 @@ set(GAME_SOURCES
   chess/chess_board.h
   chess/chess_common.cc
   chess/chess_common.h
+  chess/chess960_starting_positions.cc
   cliff_walking/cliff_walking.cc
   cliff_walking/cliff_walking.h
   clobber/clobber.cc

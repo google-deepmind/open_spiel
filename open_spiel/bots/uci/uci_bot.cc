@@ -120,7 +120,7 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
     GoPonder();
   }
 
-  Action action = chess::MoveToAction(*move);
+  Action action = chess::MoveToAction(*move, chess_state.BoardSize());
   return {action, info_str};
 }
 
