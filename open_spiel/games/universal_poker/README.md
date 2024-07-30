@@ -2,9 +2,8 @@
 
 This has been contributed by dennisjay in November 2019 (See
 https://github.com/deepmind/open_spiel/pull/97), and is available as an optional
-dependency. See the
-[https://github.com/deepmind/open_spiel/blob/master/docs/install.md](install.md)
-for documentation and `open_spiel/scripts/global_variables.sh` to enable this.
+dependency. See the [install.md](/docs/install.md) for documentation
+and `open_spiel/scripts/global_variables.sh` to enable this.
 
 This is a wrapper around the Annual Computer Poker Competition bot (ACPC)
 environment. See http://www.computerpokercompetition.org/. The code is initially
