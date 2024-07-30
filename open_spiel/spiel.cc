@@ -127,6 +127,16 @@ StateType State::GetType() const {
   }
 }
 
+std::unique_ptr<State> State::ResampleFromInfostate(
+    int player_id,
+    std::function<double()> rng) const {
+  if (GetGame()->GetType().information ==
+      GameType::Information::kPerfectInformation) {
+    return Clone();
+  }
+  SpielFatalError("ResampleFromInfostate() not implemented.");
+}
+
 bool GameType::ContainsRequiredParameters() const {
   for (const auto& key_val : parameter_specification) {
     if (key_val.second.is_mandatory()) {
