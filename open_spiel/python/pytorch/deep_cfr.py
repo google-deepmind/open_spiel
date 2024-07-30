@@ -416,15 +416,17 @@ class DeepCFRSolver(policy.Policy):
       matched_regrets[max(legal_actions, key=lambda a: raw_advantages[a])] = 1
     return advantages, matched_regrets
 
-  def action_probabilities(self, state):
+  def action_probabilities(self, state, player_id=None):
     """Computes action probabilities for the current player in state.
 
     Args:
       state: (pyspiel.State) The state to compute probabilities for.
+      player_id: unused, but needed to implement the Policy API.
 
     Returns:
       (dict) action probabilities for a single batch.
     """
+    del player_id
     cur_player = state.current_player()
     legal_actions = state.legal_actions(cur_player)
     info_state_vector = np.array(state.information_state_tensor())
