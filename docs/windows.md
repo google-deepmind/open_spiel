@@ -56,7 +56,13 @@ CMake, and choose `C:\Users\MyUser\open_spiel\open_spiel\CMakeLists.txt`. CMake
 will then run; once you see `CMake generation finished`, choose Build -> Build
 All. The files will be available in
 `C:\Users\MyUser\open_spiel\open_spiel\out\build\x64-Debug`, when the build
-completes with "Build All succeeded."
+completes with "Build All succeeded." 
+Extra compilation options may be necessary if errors occur.  
+MSVC options to deal with required C++ standard, file encoding (for chess characters) and large object files include `/std:c++17`,  `/utf-8`, `/bigobj`.
+To use them together with default MSVC arguments, you can use the follwing CMake command line arguments:
+```
+-DCMAKE_CXX_FLAGS="/std:c++17 /utf-8 /bigobj /DWIN32 /D_WINDOWS /GR /EHsc"
+```
 
 To be able to import the Python code (both the C++ binding `pyspiel` and the
 rest) from any location, you will need to add to your PYTHONPATH the root

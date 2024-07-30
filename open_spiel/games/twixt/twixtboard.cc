@@ -386,9 +386,9 @@ void Board::AppendPegChar(std::string& s, Position position) const {
 void Board::AppendBeforeRow(std::string& s, Position position) const {
   // -1, +1
   int len = s.length();
-  AppendLinkChar(s, position + (Position){-1, 0}, kENE, "/");
-  AppendLinkChar(s, position + (Position){-1, -1}, kNNE, "/");
-  AppendLinkChar(s, position + (Position){0, 0}, kWNW, "_");
+  AppendLinkChar(s, position + Position{-1, 0}, kENE, "/");
+  AppendLinkChar(s, position + Position{-1, -1}, kNNE, "/");
+  AppendLinkChar(s, position + Position{0, 0}, kWNW, "_");
   if (len == s.length()) s.append(" ");
 
   //  0, +1
@@ -399,17 +399,17 @@ void Board::AppendBeforeRow(std::string& s, Position position) const {
 
   // +1, +1
   len = s.length();
-  AppendLinkChar(s, position + (Position){+1, 0}, kWNW, "\\");
-  AppendLinkChar(s, position + (Position){+1, -1}, kNNW, "\\");
-  AppendLinkChar(s, position + (Position){0, 0}, kENE, "_");
+  AppendLinkChar(s, position + Position{+1, 0}, kWNW, "\\");
+  AppendLinkChar(s, position + Position{+1, -1}, kNNW, "\\");
+  AppendLinkChar(s, position + Position{0, 0}, kENE, "_");
   if (len == s.length()) s.append(" ");
 }
 
 void Board::AppendPegRow(std::string& s, Position position) const {
   // -1, 0
   int len = s.length();
-  AppendLinkChar(s, position + (Position){-1, -1}, kNNE, "|");
-  AppendLinkChar(s, position + (Position){0, 0}, kWSW, "_");
+  AppendLinkChar(s, position + Position{-1, -1}, kNNE, "|");
+  AppendLinkChar(s, position + Position{0, 0}, kWSW, "_");
   if (len == s.length()) s.append(" ");
 
   //  0,  0
@@ -417,30 +417,30 @@ void Board::AppendPegRow(std::string& s, Position position) const {
 
   // +1, 0
   len = s.length();
-  AppendLinkChar(s, position + (Position){+1, -1}, kNNW, "|");
-  AppendLinkChar(s, position + (Position){0, 0}, kESE, "_");
+  AppendLinkChar(s, position + Position{+1, -1}, kNNW, "|");
+  AppendLinkChar(s, position + Position{0, 0}, kESE, "_");
   if (len == s.length()) s.append(" ");
 }
 
 void Board::AppendAfterRow(std::string& s, Position position) const {
   // -1, -1
   int len = s.length();
-  AppendLinkChar(s, position + (Position){+1, -1}, kWNW, "\\");
-  AppendLinkChar(s, position + (Position){0, -1}, kNNW, "\\");
+  AppendLinkChar(s, position + Position{+1, -1}, kWNW, "\\");
+  AppendLinkChar(s, position + Position{0, -1}, kNNW, "\\");
   if (len == s.length()) s.append(" ");
 
   //  0, -1
   len = s.length();
-  AppendLinkChar(s, position + (Position){-1, -1}, kENE, "_");
-  AppendLinkChar(s, position + (Position){+1, -1}, kWNW, "_");
+  AppendLinkChar(s, position + Position{-1, -1}, kENE, "_");
+  AppendLinkChar(s, position + Position{+1, -1}, kWNW, "_");
   AppendLinkChar(s, position, kSSW, "|");
   if (len == s.length()) AppendLinkChar(s, position, kSSE, "|");
   if (len == s.length()) s.append(" ");
 
   // -1, -1
   len = s.length();
-  AppendLinkChar(s, position + (Position){-1, -1}, kENE, "/");
-  AppendLinkChar(s, position + (Position){0, -1}, kNNE, "/");
+  AppendLinkChar(s, position + Position{-1, -1}, kENE, "/");
+  AppendLinkChar(s, position + Position{0, -1}, kNNE, "/");
   if (len == s.length()) s.append(" ");
 }
 
@@ -514,7 +514,7 @@ void Board::SetPegAndLinks(Player player, Position position) {
       if (target_cell.color() == cell.color()) {
         // check if there are blocking links before setting link
         const std::set<Link>& blockers =
-            BlockerMap::GetBlockers((Link){position, dir});
+            BlockerMap::GetBlockers(Link{position, dir});
         bool blocked = false;
         for (auto& bl : blockers) {
           if (GetCell(bl.position).HasLink(bl.direction)) {

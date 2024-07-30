@@ -106,10 +106,15 @@ bool Exists(const std::string& path) {
 }
 
 std::string RealPath(const std::string& path) {
+#ifdef _WIN32
+  char real_path[MAX_PATH];
+  if (_fullpath(real_path, path.c_str(), MAX_PATH) == nullptr) {
+#else
   char real_path[PATH_MAX];
   if (realpath(path.c_str(), real_path) == nullptr) {
     // If there was an error return an empty path
-    return "";
+#endif
+      return "";
   }
 
   return std::string(real_path);
