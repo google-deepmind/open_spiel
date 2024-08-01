@@ -368,8 +368,7 @@ std::string ChessState::ActionToString(Player player, Action action) const {
     // Chess960 has an initial chance node.
     SPIEL_CHECK_GE(action, 0);
     SPIEL_CHECK_LT(action, 960);
-    return absl::StrCat("Chance node outcome ", action, ": ",
-                        ParentGame()->Chess960LookupFEN(action));
+    return absl::StrCat("ChanceNodeOutcome_", action);
   }
   Move move = ActionToMove(action, Board());
   return move.ToSAN(Board());
