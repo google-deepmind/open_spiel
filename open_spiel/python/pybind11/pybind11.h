@@ -31,7 +31,6 @@
 #include "pybind11/include/pybind11/cast.h"
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11/include/pybind11/detail/descr.h"
-#include "pybind11/include/pybind11/detail/smart_holder_type_casters.h"
 #include "pybind11/include/pybind11/functional.h"  // IWYU pragma: keep
 #include "pybind11/include/pybind11/numpy.h"  // IWYU pragma: keep
 #include "pybind11/include/pybind11/operators.h"  // IWYU pragma: keep

@@ -22,7 +22,6 @@
 #include "open_spiel/spiel.h"
 #include "pybind11/include/pybind11/smart_holder.h"
 #include "pybind11/include/pybind11/pybind11.h"
-#include "pybind11/include/pybind11/detail/smart_holder_type_casters.h"
 
 
 namespace py = ::pybind11;
