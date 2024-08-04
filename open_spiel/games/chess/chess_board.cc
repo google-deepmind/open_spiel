@@ -32,6 +32,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/games/chess/chess_common.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -203,12 +204,25 @@ std::string Move::ToString() const {
                       SquareToString(to), extra);
 }
 
-std::string Move::ToLAN() const {
-  std::string promotion;
-  if (promotion_type != PieceType::kEmpty) {
-    promotion = PieceTypeToString(promotion_type, false);
+std::string Move::ToLAN(bool chess960,
+                        const ChessBoard *board_ptr) const {
+  if (chess960 && is_castling()) {
+    // In chess960, when castling, the LAN format is different. It includes the
+    // <king position> <rook position> it is castling with.
+    SPIEL_CHECK_TRUE(board_ptr != nullptr);
+    Color to_play = board_ptr->ToPlay();
+    absl::optional<Square> maybe_rook_sq = board_ptr->MaybeCastlingRookSquare(
+      to_play, castle_dir);
+    SPIEL_CHECK_TRUE(maybe_rook_sq.has_value());
+    return absl::StrCat(SquareToString(from),
+                        SquareToString(maybe_rook_sq.value()));
+  } else {
+    std::string promotion;
+    if (promotion_type != PieceType::kEmpty) {
+      promotion = PieceTypeToString(promotion_type, false);
+    }
+    return absl::StrCat(SquareToString(from), SquareToString(to), promotion);
   }
-  return absl::StrCat(SquareToString(from), SquareToString(to), promotion);
 }
 
 std::string Move::ToSAN(const ChessBoard &board) const {
@@ -1007,7 +1021,8 @@ absl::optional<Move> ChessBoard::ParseSANMove(
   return absl::optional<Move>();
 }
 
-absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move) const {
+absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move,
+                                              bool chess960) const {
   if (move.empty()) { return absl::nullopt; }
 
   // Long algebraic notation moves (of the variant we care about) are in one of
@@ -1038,6 +1053,36 @@ absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move) const {
         }
       }
 
+      // Castling in chess960 is a special case, expressed in LAN as
+      // <king position> <rook position it is castling with>.
+      if (chess960 && at(*from).color == at(*to).color &&
+          at(*from).type == PieceType::kKing &&
+          at(*to).type == PieceType::kRook) {
+        std::vector<Move> candidates;
+        GenerateLegalMoves(
+            [&from, &candidates](const Move &move) {
+              if (move.from == *from && move.is_castling()) {
+                candidates.push_back(move);
+              }
+              return true;
+            });
+
+        Color moving_color = at(*from).color;
+        for (const Move& move : candidates) {
+          auto maybe_castle_rook_sq = MaybeCastlingRookSquare(
+              moving_color, move.castle_dir);
+          if (maybe_castle_rook_sq.has_value() &&
+              *maybe_castle_rook_sq == *to) {
+            return move;
+          }
+        }
+        std::cerr << "Could not match chess960 castling move with a legal move "
+                  << move << std::endl;
+        std::cerr << *this << std::endl;
+        return Move();
+      }
+
+      // Other regular moves.
       std::vector<Move> candidates;
       GenerateLegalMoves(
           [&to, &from, &promotion_type, &candidates](const Move &move) {
@@ -1047,6 +1092,16 @@ absl::optional<Move> ChessBoard::ParseLANMove(const std::string &move) const {
             }
             return true;
           });
+
+      if (chess960) {
+        // Chess960: Remove the castling moves as we checked for them in the
+        // special case above.
+        candidates.erase(std::remove_if(candidates.begin(), candidates.end(),
+                                       [](const Move &move) {
+                                         return move.is_castling();
+                                       }),
+                         candidates.end());
+      }
 
       if (candidates.empty()) {
         std::cerr << "Illegal move - " << move << " on " << ToUnicodeString()
@@ -1096,8 +1151,13 @@ void ChessBoard::ApplyMove(const Move &move) {
   // it is counted as reversible here.
   // Irreversible moves are pawn moves and captures. We don't have to make a
   // special case for en passant, since they are pawn moves anyways.
-  bool irreversible = (moving_piece.type == PieceType::kPawn) ||
-                      (destination_piece.type != PieceType::kEmpty);
+  // Note that the capture case has to check that the piece is of the opposite
+  // color, since in chess960 the king can castle with the rook in the
+  // destination square.
+  bool irreversible =
+      (moving_piece.type == PieceType::kPawn) ||        // pawn move
+      (destination_piece.type != PieceType::kEmpty &&
+       destination_piece.color != moving_piece.color);  // capture
 
   if (irreversible) {
     SetIrreversibleMoveCounter(0);
@@ -1388,19 +1448,30 @@ void ChessBoard::GenerateKingDestinations_(Square sq, Color color,
 // Whether all squares between sq1 and sq2 exclusive are empty, and
 // optionally safe (not under attack).
 //
-// The exception_square only set to something in between sq1 and sq2 in
-// Chess960. In that case, it excepts the Rook or the King that would be jumping
-// over it.
-bool ChessBoard::CanCastleBetween(Square sq1, Square sq2,
+// The exception_square only set to something in between from_sq and to_sq in
+// Chess960 (because it can contain the rook the king is jumping over or the
+// king the rook is jumping over). In that case, it does not check for that
+// space being occupied to prevent the king from castling.
+bool ChessBoard::CanCastleBetween(Square from_sq, Square to_sq,
                                   bool check_safe_from_opponent,
                                   PseudoLegalMoveSettings settings,
                                   Square exception_square) const {
-  SPIEL_DCHECK_EQ(sq1.y, sq2.y);
-  const int y = sq1.y;
-  const Color &our_color = at(sq1).color;
+  SPIEL_DCHECK_EQ(from_sq.y, to_sq.y);
+  const int y = from_sq.y;
+  const Color &our_color = at(from_sq).color;
 
-  const int x_start = std::min(sq1.x, sq2.x);
-  const int x_end = std::max(sq1.x, sq2.x);
+  const int x_start = std::min(from_sq.x, to_sq.x);
+  const int x_end = std::max(from_sq.x, to_sq.x);
+
+  // Need to explicitly check the final squares are empty in Chess960. The final
+  // square must be empty (unless it's the piece being jumped over or it's the
+  // king moving into the same square).
+  if (to_sq != exception_square && to_sq != from_sq) {
+    if ((settings == PseudoLegalMoveSettings::kAcknowledgeEnemyPieces &&
+         IsEnemy(to_sq, our_color)) || IsFriendly(to_sq, our_color)) {
+      return false;
+    }
+  }
 
   for (int x = x_start; x <= x_end; ++x) {
     Square test_square{static_cast<int8_t>(x),
@@ -1412,8 +1483,9 @@ bool ChessBoard::CanCastleBetween(Square sq1, Square sq2,
       return false;
     const bool x_in_between = x > x_start && x < x_end;
     if (x_in_between && test_square != exception_square &&
-        IsFriendly(test_square, our_color))
+        IsFriendly(test_square, our_color)) {
       return false;
+    }
   }
   return true;
 }

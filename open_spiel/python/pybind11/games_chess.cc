@@ -80,7 +80,8 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
       .def("is_castling", &Move::is_castling)
       .def("to_string", &Move::ToString)
       .def("to_san", &Move::ToSAN)
-      .def("to_lan", &Move::ToLAN);
+      .def("to_lan", &Move::ToLAN, py::arg("chess960") = false,
+           py::arg("board") = nullptr);
 
   py::classh<ChessBoard>(chess, "ChessBoard")
       .def("has_legal_moves", &ChessBoard::HasLegalMoves)

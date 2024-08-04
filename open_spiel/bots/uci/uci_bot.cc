@@ -97,6 +97,7 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
   std::string move_str;
   std::string info_str;  // Contains the last info string from the bot.
   auto chess_state = down_cast<const chess::ChessState&>(state);
+  auto chess_game = down_cast<const chess::ChessGame*>(state.GetGame().get());
   if (ponder_ && ponder_move_) {
     if (!was_ponder_hit_) {
       Stop();
@@ -110,7 +111,8 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
     tie(move_str, ponder_move_) = Go(&info_str);
   }
   was_ponder_hit_ = false;
-  auto move = chess_state.Board().ParseLANMove(move_str);
+  auto move = chess_state.Board().ParseLANMove(move_str,
+                                               chess_game->IsChess960());
   if (!move) {
     SpielFatalError("Uci sub-process returned an illegal or invalid move");
   }
@@ -139,8 +141,10 @@ void UCIBot::RestartAt(const State& state) {
 
 void UCIBot::InformAction(const State& state, Player player_id, Action action) {
   auto chess_state = down_cast<const chess::ChessState&>(state);
+  auto chess_game = down_cast<const chess::ChessGame*>(state.GetGame().get());
   chess::Move move = chess::ActionToMove(action, chess_state.Board());
-  std::string move_str = move.ToLAN();
+  std::string move_str = move.ToLAN(chess_game->IsChess960(),
+                                    &chess_state.Board());
   if (ponder_ && move_str == ponder_move_) {
     PonderHit();
     was_ponder_hit_ = true;

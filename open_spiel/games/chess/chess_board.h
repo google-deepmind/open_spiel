@@ -156,7 +156,10 @@ struct Move {
   std::string ToString() const;
 
   // Converts to long algebraic notation, as required by the UCI protocol.
-  std::string ToLAN() const;
+  // In the case of chess960, the castling move is converted to the format
+  // <king position> <rook position> it is castling with so it needs the board.
+  std::string ToLAN(bool chess960 = false,
+                    const ChessBoard* board_ptr = nullptr) const;
 
   // Converts to standard algebraic notation, as required by portable game
   // notation (PGN). It is a chess move notation that is designed to be
@@ -368,7 +371,8 @@ class ChessBoard {
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
   // Returns absl::nullopt on failure.
-  absl::optional<Move> ParseLANMove(const std::string& move) const;
+  absl::optional<Move> ParseLANMove(const std::string& move,
+                                    bool chess960 = false) const;
 
   void ApplyMove(const Move& move);
 
@@ -490,7 +494,8 @@ class ChessBoard {
                                      const YieldFn& yield) const;
   bool CanCastle(Square king_sq, Color color,
                  PseudoLegalMoveSettings settings) const;
-  bool CanCastleBetween(Square sq1, Square sq2, bool check_safe_from_opponent,
+  bool CanCastleBetween(Square from_sq, Square to_sq,
+                        bool check_safe_from_opponent,
                         PseudoLegalMoveSettings settings,
                         Square exception_sq = kInvalidSquare) const;
 
