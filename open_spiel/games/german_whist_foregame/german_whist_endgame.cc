@@ -585,7 +585,7 @@ void ThreadSolver(int size_endgames, vectorNa* outTTable,
   }
 }
 vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
-                     const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+                     const std::vector<std::vector<uint32_t>>& bin_coeffs,const uint32_t hard_threads) {
   // takes endgames solved to depth d-1 and returns endgames solved to depth d
   // //
   vectorNa outTTable = InitialiseTTable(size_endgames, bin_coeffs);
@@ -599,7 +599,6 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
   }
   uint32_t v_length = (suit_splits.size() >> 1) + 1;
   uint32_t min_block_size = 256;
-  uint32_t hard_threads = std::thread::hardware_concurrency();
   uint32_t num_threads = 1;
   uint32_t num_outers = outTTable.GetOuterSize();
   // a haphazard attempt to mitigate false sharing//
@@ -637,12 +636,12 @@ vectorNa RetroSolver(int size_endgames, vectorNa* TTable,
 }
 
 bool TestRetroSolve(int samples, int depth, uint32_t seed,
-                    const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+                    const std::vector<std::vector<uint32_t>>& bin_coeffs,const uint32_t hard_threads) {
   // Tests endgame solution with TTable vs raw seach
   std::vector<Node> nodes = GWhistGenerator(samples, seed);
   vectorNa v;
   for (int i = 1; i <= depth; ++i) {
-    v = RetroSolver(i, &v, bin_coeffs);
+    v = RetroSolver(i, &v, bin_coeffs,hard_threads);
   }
   std::unordered_map<uint32_t, uint32_t> SuitRanks;
   GenSuitRankingsRel(depth, &SuitRanks);
@@ -657,12 +656,12 @@ bool TestRetroSolve(int samples, int depth, uint32_t seed,
   }
   return true;
 }
-vectorNa BuildTablebase(const std::vector<std::vector<uint32_t>>& bin_coeffs) {
+vectorNa BuildTablebase(const std::vector<std::vector<uint32_t>>& bin_coeffs,const uint32_t hard_threads) {
   vectorNa v;
   std::cout << "Building Tablebase"
             << "\n";
   for (int i = 1; i <= kNumRanks; ++i) {
-    v = RetroSolver(i, &v, bin_coeffs);
+    v = RetroSolver(i, &v, bin_coeffs,hard_threads);
     std::cout << "Done " << i << "\n";
   }
   std::cout << "Built Tablebase"
@@ -717,8 +716,9 @@ int main() {
   std::vector<std::vector<uint32_t>> bin_coeffs =
       open_spiel::german_whist_foregame::BinCoeffs(
           2 * open_spiel::german_whist_foregame::kNumRanks);
+  const uint32_t hard_threads = 8//set this to take advantage of more cores on your machine//
   open_spiel::german_whist_foregame::vectorNa tablebase =
-      open_spiel::german_whist_foregame::BuildTablebase(bin_coeffs);
+      open_spiel::german_whist_foregame::BuildTablebase(bin_coeffs,hard_threads);
   std::random_device rd;
   int num_samples = 100;
   if (open_spiel::german_whist_foregame::TestTablebase(num_samples, rd(),
