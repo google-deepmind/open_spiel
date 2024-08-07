@@ -716,7 +716,7 @@ int main() {
   std::vector<std::vector<uint32_t>> bin_coeffs =
       open_spiel::german_whist_foregame::BinCoeffs(
           2 * open_spiel::german_whist_foregame::kNumRanks);
-  const uint32_t hard_threads = 8//set this to take advantage of more cores on your machine//
+    const uint32_t hard_threads = 8;//set this to take advantage of more cores on your machine//
   open_spiel::german_whist_foregame::vectorNa tablebase =
       open_spiel::german_whist_foregame::BuildTablebase(bin_coeffs,hard_threads);
   std::random_device rd;
