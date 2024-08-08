@@ -14,19 +14,29 @@
 
 #include "open_spiel/python/pybind11/python_games.h"
 
+#include <algorithm>
+#include <string>
 #include <memory>
+#include <vector>
 
 // Interface code for using Python Games and States from C++.
 
+#include "open_spiel/abseil-cpp/absl/container/inlined_vector.h"
 #include "open_spiel/abseil-cpp/absl/strings/escaping.h"
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/python/pybind11/pybind11.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+
 
 namespace open_spiel {
 
@@ -39,6 +49,11 @@ PyGame::PyGame(GameType game_type, GameInfo game_info,
 std::unique_ptr<State> PyGame::NewInitialState() const {
   PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game, "new_initial_state",
                               NewInitialState);
+}
+
+std::unique_ptr<State> PyGame::NewInitialState(const std::string& str) const {
+  PYBIND11_OVERLOAD_PURE_NAME(std::unique_ptr<State>, Game, "new_initial_state",
+                              NewInitialState, str);
 }
 
 std::unique_ptr<State> PyGame::NewInitialStateForPopulation(

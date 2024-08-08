@@ -18,8 +18,16 @@
 // Interface and supporting functions for defining games in Python and using
 // them from C++.
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "open_spiel/python/pybind11/pybind11.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
@@ -33,6 +41,7 @@ class PyGame : public Game {
 
   // Implementation of the Game API.
   std::unique_ptr<State> NewInitialState() const override;
+  std::unique_ptr<State> NewInitialState(const std::string& str) const override;
   std::unique_ptr<State> NewInitialStateForPopulation(
       int population) const override;
   int MaxChanceNodesInHistory() const override;
