@@ -359,7 +359,8 @@ class ChessBoard {
 
   // Parses a move in standard algebraic notation or long algebraic notation
   // (see below). Returns absl::nullopt on failure.
-  absl::optional<Move> ParseMove(const std::string& move) const;
+  absl::optional<Move> ParseMove(const std::string& move,
+                                 bool chess960 = false) const;
 
   // Parses a move in standard algebraic notation as defined by FIDE.
   // https://en.wikipedia.org/wiki/Algebraic_notation_(chess).

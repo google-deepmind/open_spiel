@@ -877,13 +877,14 @@ bool ChessBoard::HasSufficientMaterial() const {
   return dark_bishop_exists && light_bishop_exists;
 }
 
-absl::optional<Move> ChessBoard::ParseMove(const std::string &move) const {
+absl::optional<Move> ChessBoard::ParseMove(const std::string &move,
+                                           bool chess960) const {
   // First see if they are in the long form -
   // "anan" (eg. "e2e4") or "anana" (eg. "f7f8q")
   // SAN moves will never have this form because an SAN move that starts with
   // a lowercase letter must be a pawn move, and pawn moves will never require
   // rank disambiguation (meaning the second character will never be a number).
-  auto lan_move = ParseLANMove(move);
+  auto lan_move = ParseLANMove(move, chess960);
   if (lan_move) {
     return lan_move;
   }
