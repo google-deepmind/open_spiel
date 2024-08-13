@@ -55,6 +55,10 @@ every two weeks (for bug fixes, it will likely be faster to be integrated). So
 you may need to wait a little after it has been approved to actually see it
 merged.
 
+# OpenSpiel visual Graph
+
+To help you understand better the framework as a whole you can go to [openspielgraph](https://openspielgraph.netlify.app) and use an interactive graph that shows the OpenSpiel repository in a wide and easy to undestand way.
+
 # Roadmap and Call for Contributions
 
 Contributions to this project must be accompanied by a Contributor License
