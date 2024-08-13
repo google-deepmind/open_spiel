@@ -16,17 +16,17 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "kriegspiel"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 4672
-PolicyTensorShape() = [4672]
+NumDistinctActions() = 4674
+PolicyTensorShape() = [4674]
 MaxChanceOutcomes() = 0
 GetParameters() = {50_move_rule=True,board_size=4,fen=r1kr/pppp/PPPP/R1KR w - - 0 1,threefold_repetition=True}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
 UtilitySum() = 0.0
-ObservationTensorShape() = public_repetitions: [3], public_side_to_play: [2], public_irreversible_move_counter: [1], public_illegal: [2], public_capture_type: [3], public_captured_square: [4, 4], public_check_one: [6], public_check_two: [6], public_to_move: [3], public_pawn_tries: [17], private_K_pieces: [4, 4], private_k_pieces: [4, 4], private_Q_pieces: [4, 4], private_q_pieces: [4, 4], private_R_pieces: [4, 4], private_r_pieces: [4, 4], private_B_pieces: [4, 4], private_b_pieces: [4, 4], private_N_pieces: [4, 4], private_n_pieces: [4, 4], private_P_pieces: [4, 4], private_p_pieces: [4, 4], private_empty_pieces: [4, 4], private_unknown_squares: [4, 4], private_left_castling: [2], private_right_castling: [2], private_last_move_from: [4, 4], private_last_move_to: [4, 4], private_last_move_promotion: [6]
+ObservationTensorShape() = public_repetitions: [3], public_side_to_play: [2], public_irreversible_move_counter: [1], public_illegal: [2], public_capture_type: [3], public_captured_square: [4, 4], public_check_one: [6], public_check_two: [6], public_to_move: [3], public_pawn_tries: [17], private_K_pieces: [4, 4], private_k_pieces: [4, 4], private_Q_pieces: [4, 4], private_q_pieces: [4, 4], private_R_pieces: [4, 4], private_r_pieces: [4, 4], private_B_pieces: [4, 4], private_b_pieces: [4, 4], private_N_pieces: [4, 4], private_n_pieces: [4, 4], private_P_pieces: [4, 4], private_p_pieces: [4, 4], private_empty_pieces: [4, 4], private_unknown_squares: [4, 4], private_left_castling: [2], private_right_castling: [2], private_last_move_from: [4, 4], private_last_move_to: [4, 4], private_last_move_promotion: [6], private_last_move_castle_dir: [3]
 ObservationTensorLayout() = TensorLayout.CHW
-ObservationTensorSize() = 325
+ObservationTensorSize() = 328
 MaxGameLength() = 17695
 ToString() = "kriegspiel(board_size=4)"
 
@@ -120,6 +120,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◯◉
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -200,6 +201,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1841, 1882]
@@ -298,6 +300,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◯◉
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -378,6 +381,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◉◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 673, 701, 714, 1197, 1257, 1285, 1298, 1882]
@@ -476,6 +480,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◉◯
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -556,6 +561,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1285, 1298, 1841, 1882]
@@ -654,6 +660,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◉◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◉◯
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -734,6 +741,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1841, 1882]
@@ -832,6 +840,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◉◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◉◯
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -912,6 +921,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [30, 89, 117, 1197, 1225, 1257, 1298, 1882]
@@ -1010,6 +1020,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◯◉
 ObservationTensor(1).public_irreversible_move_counter = [0.01]
@@ -1090,6 +1101,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [16, 17, 18, 30, 701, 714, 730, 731, 732, 733, 734, 735, 736, 737, 738, 746, 774, 787, 1197, 1257, 1285, 1841, 1882]
@@ -1216,6 +1228,7 @@ ObservationTensor(0).private_last_move_to: ◯◉◯◯
                                            ◯◯◯◯
                                            ◯◯◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◉◯
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -1296,6 +1309,7 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◉◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [0, 0]
 Returns() = [0, 0]
 LegalActions() = [117, 1781, 1841]
@@ -1410,6 +1424,7 @@ ObservationTensor(0).private_last_move_to: ◯◯◯◯
                                            ◯◯◯◯
                                            ◯◉◯◯
 ObservationTensor(0).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(0).private_last_move_castle_dir: ◯◯◉
 ObservationTensor(1).public_repetitions: ◉◯◯
 ObservationTensor(1).public_side_to_play: ◉◯
 ObservationTensor(1).public_irreversible_move_counter: ◯
@@ -1490,5 +1505,6 @@ ObservationTensor(1).private_last_move_to: ◯◯◯◯
                                            ◯◯◉◯
                                            ◯◯◯◯
 ObservationTensor(1).private_last_move_promotion: ◉◯◯◯◯◯
+ObservationTensor(1).private_last_move_castle_dir: ◯◯◉
 Rewards() = [-1, 1]
 Returns() = [-1, 1]

@@ -16,13 +16,12 @@
 #define OPEN_SPIEL_GAMES_IMPL_CHESS_CHESS_BOARD_H_
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <ostream>
-#include <set>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/chess/chess_common.h"
@@ -53,7 +52,7 @@ inline std::ostream& operator<<(std::ostream& stream, Color c) {
   return stream << ColorToString(c);
 }
 
-enum class CastlingDirection { kLeft, kRight };
+enum class CastlingDirection { kLeft, kRight, kNone };
 
 int ToInt(CastlingDirection dir);
 
@@ -142,24 +141,25 @@ struct Move {
   Square to;
   Piece piece;
   PieceType promotion_type;
+  CastlingDirection castle_dir = CastlingDirection::kNone;
 
-  // We have to record castling here, because in Chess960 we may not be able to
-  // tell just from "from" and "to" squares.
-  bool is_castling = false;
-
-  Move() : is_castling(false) {}
+  Move() : castle_dir(CastlingDirection::kNone) {}
   Move(const Square& from, const Square& to, const Piece& piece,
-       PieceType promotion_type = PieceType::kEmpty, bool is_castling = false)
+       PieceType promotion_type = PieceType::kEmpty,
+       CastlingDirection castle_dir = CastlingDirection::kNone)
       : from(from),
         to(to),
         piece(piece),
         promotion_type(promotion_type),
-        is_castling(is_castling) {}
+        castle_dir(castle_dir) {}
 
   std::string ToString() const;
 
   // Converts to long algebraic notation, as required by the UCI protocol.
-  std::string ToLAN() const;
+  // In the case of chess960, the castling move is converted to the format
+  // <king position> <rook position> it is castling with so it needs the board.
+  std::string ToLAN(bool chess960 = false,
+                    const ChessBoard* board_ptr = nullptr) const;
 
   // Converts to standard algebraic notation, as required by portable game
   // notation (PGN). It is a chess move notation that is designed to be
@@ -209,10 +209,12 @@ struct Move {
   //                novelty that gives white a clear but not winning advantage)
   std::string ToSAN(const ChessBoard& board) const;
 
+  bool is_castling() const { return castle_dir != CastlingDirection::kNone; }
+
   bool operator==(const Move& other) const {
     return from == other.from && to == other.to && piece == other.piece &&
            promotion_type == other.promotion_type &&
-           is_castling == other.is_castling;
+           castle_dir == other.castle_dir;
   }
 };
 
@@ -286,6 +288,8 @@ class ChessBoard {
   bool CastlingRight(Color color, CastlingDirection dir) const {
     return MaybeCastlingRookSquare(color, dir).has_value();
   }
+
+  char ShredderCastlingRightChar(Color color, CastlingDirection dir) const;
 
   void SetCastlingRight(Color side, CastlingDirection direction,
                         absl::optional<Square> maybe_rook_square);
@@ -367,7 +371,8 @@ class ChessBoard {
   // but the one we care about is of the form "e2e4" and "f7f8q". This is the
   // form used by chess engine text protocols that are of interest to us.
   // Returns absl::nullopt on failure.
-  absl::optional<Move> ParseLANMove(const std::string& move) const;
+  absl::optional<Move> ParseLANMove(const std::string& move,
+                                    bool chess960 = false) const;
 
   void ApplyMove(const Move& move);
 
@@ -427,13 +432,13 @@ class ChessBoard {
 
   uint64_t HashValue() const { return zobrist_hash_; }
 
-  std::string DebugString() const;
+  std::string DebugString(bool shredder_fen = false) const;
 
   std::string ToUnicodeString() const;
 
   // Constructs a string describing the chess board position in Forsyth-Edwards
   // Notation. https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-  std::string ToFEN() const;
+  std::string ToFEN(bool shredder = false) const;
 
   /* Constructs a string describing the dark chess board position in a notation
    * similar to Forsyth-Edwards Notation.
@@ -489,9 +494,10 @@ class ChessBoard {
                                      const YieldFn& yield) const;
   bool CanCastle(Square king_sq, Color color,
                  PseudoLegalMoveSettings settings) const;
-  bool CanCastleBetween(Square sq1, Square sq2,
+  bool CanCastleBetween(Square from_sq, Square to_sq,
                         bool check_safe_from_opponent,
-                        PseudoLegalMoveSettings settings) const;
+                        PseudoLegalMoveSettings settings,
+                        Square exception_sq = kInvalidSquare) const;
 
   template <typename YieldFn>
   void GenerateQueenDestinations_(Square sq, Color color,

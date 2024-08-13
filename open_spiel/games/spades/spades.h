@@ -97,8 +97,8 @@ class Trick {
 class SpadesState : public State {
  public:
   SpadesState(std::shared_ptr<const Game> game, bool use_mercy_rule,
-              int mercy_threshold, int win_threshold, int score_partnership_0,
-              int score_partnership_1, int num_tricks);
+              int mercy_threshold, int win_threshold, int win_or_loss_bonus,
+              int num_tricks);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -133,6 +133,25 @@ class SpadesState : public State {
   // Current phase.
   int CurrentPhase() const { return static_cast<int>(phase_); }
 
+  // Current overall partnership scores
+  std::array<int, kNumPartnerships> GetCurrentScores() const {
+    return current_scores_;
+  }
+
+  // Set partnership scores
+  void SetCurrentScores(const std::array<int, kNumPartnerships>& new_scores) {
+    current_scores_ = new_scores;
+  }
+
+  // Indicates if overall game is over (did a partnership meet win/lose
+  // condition)
+  bool IsGameOver() const { return is_game_over_; }
+
+  // Manually set the current player (used to specify starting player)
+  void SetCurrentPlayer(const int current_player) {
+    current_player_ = current_player;
+  }
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -146,7 +165,6 @@ class SpadesState : public State {
   void ApplyBiddingAction(int bid);
   void ApplyPlayAction(int card);
 
-  void ComputeScoreByContract() const;
   void ScoreUp();
   Trick& CurrentTrick() { return tricks_[num_cards_played_ / kNumPlayers]; }
   const Trick& CurrentTrick() const {
@@ -161,9 +179,11 @@ class SpadesState : public State {
   const bool use_mercy_rule_;
   const int mercy_threshold_;
   const int win_threshold_;
-  const std::array<int, kNumPartnerships> current_scores_;
+  const int win_or_loss_bonus_;
   const int num_tricks_;
 
+  std::array<int, kNumPartnerships> current_scores_ = {0, 0};
+  bool is_game_over_ = false;
   std::array<int, kNumPlayers> num_player_tricks_ = {0, 0, 0, 0};
   int num_cards_played_ = 0;
   Player current_player_ = 0;  // During the play phase, the hand to play.
@@ -185,13 +205,13 @@ class SpadesGame : public Game {
   }
   int MaxChanceOutcomes() const override { return kNumCards; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new SpadesState(
-        shared_from_this(), UseMercyRule(), MercyThreshold(), WinThreshold(),
-        PartnershipScore(0), PartnershipScore(1), NumTricks()));
+    return std::unique_ptr<State>(
+        new SpadesState(shared_from_this(), UseMercyRule(), MercyThreshold(),
+                        WinThreshold(), WinOrLossBonus(), NumTricks()));
   }
   int NumPlayers() const override { return kNumPlayers; }
-  double MinUtility() const override { return -kMaxScore; }
-  double MaxUtility() const override { return kMaxScore; }
+  double MinUtility() const override { return -(kMaxScore + WinOrLossBonus()); }
+  double MaxUtility() const override { return kMaxScore + WinOrLossBonus(); }
 
   static int GetPlayTensorSize(int num_tricks) {
     return kNumBids * kNumPlayers  // What each player's contract is
@@ -232,9 +252,8 @@ class SpadesGame : public Game {
 
   int WinThreshold() const { return ParameterValue<int>("win_threshold", 500); }
 
-  int PartnershipScore(int partnership) const {
-    return partnership ? ParameterValue<int>("score_partnership_1", 0)
-                       : ParameterValue<int>("score_partnership_0", 0);
+  int WinOrLossBonus() const {
+    return ParameterValue<int>("win_or_loss_bonus", 200);
   }
 
   int NumTricks() const { return ParameterValue<int>("num_tricks", 2); }

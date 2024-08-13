@@ -87,7 +87,7 @@ class Solver(object):
     """
     del params
     del payoff_matrices
-    return np.NaN
+    return np.nan
 
   def update(self, params, grads, t):
     """Update cumulative regret and strategy (dist).
@@ -159,7 +159,7 @@ def gradients(dist, regret, payoff_matrices, num_players):
       nabla_ij = hess_i_ij.dot(dist[j])
       nabla_i += nabla_ij / float(num_players - 1)
 
-    grad_dist_i = np.NaN * np.ones_like(nabla_i)
+    grad_dist_i = np.nan * np.ones_like(nabla_i)
     grad_dist.append(grad_dist_i)
 
     utility_i = nabla_i.dot(dist[i])
@@ -168,4 +168,4 @@ def gradients(dist, regret, payoff_matrices, num_players):
 
     unreg_exp.append(np.max(nabla_i) - nabla_i.dot(dist[i]))
 
-  return (grad_dist, grad_regret), np.mean(unreg_exp), np.NaN
+  return (grad_dist, grad_regret), np.mean(unreg_exp), np.nan

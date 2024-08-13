@@ -16,8 +16,8 @@ GameType.reward_model = RewardModel.TERMINAL
 GameType.short_name = "dark_chess"
 GameType.utility = Utility.ZERO_SUM
 
-NumDistinctActions() = 4672
-PolicyTensorShape() = [4672]
+NumDistinctActions() = 4674
+PolicyTensorShape() = [4674]
 MaxChanceOutcomes() = 0
 GetParameters() = {board_size=8,fen=rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1}
 NumPlayers() = 2
@@ -3760,8 +3760,8 @@ ObservationTensor(1).private_left_castling: ◉◯
 ObservationTensor(1).private_right_castling: ◉◯
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [30, 31, 32, 89, 90, 1380, 1381, 1382, 1384, 1385, 1386, 1840, 1868, 1914, 1955, 2364, 2365, 2380, 2526, 2527, 2528, 2536, 2537, 2538, 2539, 2540, 2541, 2964, 2965, 3666, 4117, 4177, 4178, 4591, 4592, 4593]
-StringLegalActions() = ["Rb8", "Rc8", "Rd8", "a6", "a5", "Na5", "Nb8", "Nb4", "Ne5", "Nd8", "Nd4", "Qd8", "Qc8", "d5", "dxc5", "O-O-O", "Kd8", "Kf7", "Bf5", "Bg4", "Bxh3", "Bxa2", "Bb3", "Bc4", "Bd5", "Bf7", "Bg8", "Bg7", "Bh6", "g5", "Rg8", "h6", "h5", "Nxf3", "Nf1", "Ng4"]
+LegalActions() = [30, 31, 32, 89, 90, 1380, 1381, 1382, 1384, 1385, 1386, 1840, 1868, 1914, 1955, 2365, 2380, 2526, 2527, 2528, 2536, 2537, 2538, 2539, 2540, 2541, 2964, 2965, 3666, 4117, 4177, 4178, 4591, 4592, 4593, 4672]
+StringLegalActions() = ["Rb8", "Rc8", "Rd8", "a6", "a5", "Na5", "Nb8", "Nb4", "Ne5", "Nd8", "Nd4", "Qd8", "Qc8", "d5", "dxc5", "Kd8", "Kf7", "Bf5", "Bg4", "Bxh3", "Bxa2", "Bb3", "Bc4", "Bd5", "Bf7", "Bg8", "Bg7", "Bh6", "g5", "Rg8", "h6", "h5", "Nxf3", "Nf1", "Ng4", "O-O-O"]
 
 # Apply action "d5"
 action: 1914

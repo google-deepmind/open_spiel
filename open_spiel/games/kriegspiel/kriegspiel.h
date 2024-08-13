@@ -64,7 +64,7 @@ inline constexpr double kDrawUtility = 0;
 inline constexpr double kWinUtility = 1;
 
 // See action encoding below.
-inline constexpr int kNumDistinctActions = 4672;
+inline constexpr int kNumDistinctActions = 4674;
 
 // This is max length of a FIDE chess game. Kriegspiel can be longer. It can
 // last forever when the three fold repetition and 50-move rule are turned off.

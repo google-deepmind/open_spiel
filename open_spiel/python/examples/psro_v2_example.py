@@ -214,7 +214,7 @@ def print_policy_analysis(policies, game, verbose=False):
   Returns:
     List of list of unique policies (One list per player)
   """
-  states_dict = get_all_states.get_all_states(game, np.infty, False, False)
+  states_dict = get_all_states.get_all_states(game, np.inf, False, False)
   unique_policies = []
   for player in range(len(policies)):
     cur_policies = policies[player]

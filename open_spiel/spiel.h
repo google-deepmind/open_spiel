@@ -654,10 +654,11 @@ class State {
   // be interpreted as a cumulative distribution function, and will be used to
   // sample from the legal chance actions. A good choice would be
   // absl/std::uniform_real_distribution<double>(0., 1.).
+  //
+  // Default implementation checks if the game is a perfect information game.
+  // If so, it returns a clone, otherwise an error is thrown.
   virtual std::unique_ptr<State> ResampleFromInfostate(
-      int player_id, std::function<double()> rng) const {
-    SpielFatalError("ResampleFromInfostate() not implemented.");
-  }
+      int player_id, std::function<double()> rng) const;
 
   // Returns a vector of states & probabilities that are consistent with the
   // infostate from the view of the current player. By default, this is not

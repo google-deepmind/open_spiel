@@ -38,9 +38,9 @@ using open_spiel::chess::Piece;
 using open_spiel::chess::PieceType;
 using open_spiel::chess::Move;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessBoard);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessState);
 PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessGame);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessState);
+PYBIND11_SMART_HOLDER_TYPE_CASTERS(ChessBoard);
 
 void open_spiel::init_pyspiel_games_chess(py::module& m) {
   py::module_ chess = m.def_submodule("chess");
@@ -73,19 +73,21 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
 
   py::class_<Move>(chess, "Move")
       .def(py::init<>())
-      .def_readonly("from_square", &Move::from)   // "from" is a python keyword
+      .def_readonly("from_square", &Move::from)  // "from" is a python keyword
       .def_readonly("to_square", &Move::to)
       .def_readonly("piece", &Move::piece)
       .def_readonly("promotion_type", &Move::promotion_type)
-      .def_readonly("is_castling", &Move::is_castling)
+      .def("is_castling", &Move::is_castling)
       .def("to_string", &Move::ToString)
       .def("to_san", &Move::ToSAN)
-      .def("to_lan", &Move::ToLAN);
+      .def("to_lan", &Move::ToLAN, py::arg("chess960") = false,
+           py::arg("board") = nullptr);
 
   py::classh<ChessBoard>(chess, "ChessBoard")
       .def("has_legal_moves", &ChessBoard::HasLegalMoves)
-      .def("debug_string", &ChessBoard::DebugString)
-      .def("to_fen", &ChessBoard::ToFEN)
+      .def("debug_string", &ChessBoard::DebugString,
+           py::arg("shredder_fen") = false)
+      .def("to_fen", &ChessBoard::ToFEN, py::arg("shredder") = false)
       .def("to_unicode_string", &ChessBoard::ToUnicodeString);
 
   py::classh<ChessState, State>(m, "ChessState")
@@ -105,10 +107,24 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
             return dynamic_cast<ChessState*>(game_and_state.second.release());
           }));
 
-  // action_to_move(action: int, board: ChessBoard)
-  chess.def("action_to_move", &chess::ActionToMove);
+  py::classh<ChessGame, Game>(m, "ChessGame")
+      .def("is_chess960", &ChessGame::IsChess960)
+      // Pickle support
+      .def(py::pickle(
+          [](std::shared_ptr<const ChessGame> game) {  // __getstate__
+            return game->ToString();
+          },
+          [](const std::string& data) {  // __setstate__
+            return std::dynamic_pointer_cast<ChessGame>(
+                std::const_pointer_cast<Game>(LoadGame(data)));
+          }));
 
-  // move_to_action(move: Move, board_size: int = default_size)
+  // action_to_move(action: int, board: ChessBoard, chess960: bool = false)
+  chess.def("action_to_move", &chess::ActionToMove, py::arg("action"),
+            py::arg("board"));
+
+  // move_to_action(move: Move, board_size: int = default_size,
+  //                chess960: bool = false)
   chess.def("move_to_action", &chess::MoveToAction,
             py::arg("move"), py::arg("board_size") = chess::kDefaultBoardSize);
 }

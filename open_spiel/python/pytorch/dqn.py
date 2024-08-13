@@ -16,7 +16,6 @@
 
 import collections
 import math
-import sys
 import numpy as np
 from scipy import stats
 import torch
@@ -30,7 +29,7 @@ Transition = collections.namedtuple(
     "Transition",
     "info_state action reward next_info_state is_final_step legal_actions_mask")
 
-ILLEGAL_ACTION_LOGITS_PENALTY = sys.float_info.min
+ILLEGAL_ACTION_LOGITS_PENALTY = torch.finfo(torch.float).min
 
 
 class SonnetLinear(nn.Module):

@@ -54,7 +54,7 @@ class Solver(updates.Solver):
     Returns:
       np.NaN
     """
-    return np.NaN
+    return np.nan
 
 
 def gradients(dist, payoff_matrices, proj_grad=True):

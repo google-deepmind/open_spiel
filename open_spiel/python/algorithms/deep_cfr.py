@@ -360,8 +360,9 @@ class DeepCFRSolver(policy.Policy):
 
     return advantages, matched_regrets
 
-  def action_probabilities(self, state):
+  def action_probabilities(self, state, player_id=None):
     """Returns action probabilities dict for a single batch."""
+    del player_id  # unused
     cur_player = state.current_player()
     legal_actions = state.legal_actions(cur_player)
     info_state_vector = np.array(state.information_state_tensor())

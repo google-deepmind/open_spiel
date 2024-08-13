@@ -13,7 +13,13 @@
 // limitations under the License.
 
 #include "open_spiel/games/chess/chess.h"
+
+#include <cstdint>
+#include <iterator>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
@@ -21,7 +27,11 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/games/chess/chess_common.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -34,22 +44,21 @@ constexpr int kNumReversibleMovesToDraw = 100;
 constexpr int kNumRepetitionsToDraw = 3;
 
 // Facts about the game
-const GameType kGameType{
-    /*short_name=*/"chess",
-    /*long_name=*/"Chess",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kDeterministic,
-    GameType::Information::kPerfectInformation,
-    GameType::Utility::kZeroSum,
-    GameType::RewardModel::kTerminal,
-    /*max_num_players=*/2,
-    /*min_num_players=*/2,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/false,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
-};
+const GameType kGameType{/*short_name=*/"chess",
+                         /*long_name=*/"Chess",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kDeterministic,
+                         GameType::Information::kPerfectInformation,
+                         GameType::Utility::kZeroSum,
+                         GameType::RewardModel::kTerminal,
+                         /*max_num_players=*/2,
+                         /*min_num_players=*/2,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/false,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         /*parameter_specification=*/
+                         {{"chess960", GameParameter(kDefaultChess960)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new ChessGame(params));
@@ -94,6 +103,9 @@ ChessState::ChessState(std::shared_ptr<const Game> game)
       start_board_(MakeDefaultBoard()),
       current_board_(start_board_) {
   repetitions_[current_board_.HashValue()] = 1;
+  if (ParentGame()->IsChess960()) {
+    chess960_random_start_fen_ = "UNINITIALIZED";
+  }
 }
 
 ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
@@ -105,6 +117,25 @@ ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
   repetitions_[current_board_.HashValue()] = 1;
 }
 
+Player ChessState::CurrentPlayer() const {
+  if (ParentGame()->IsChess960() &&
+      chess960_random_start_fen_ == "UNINITIALIZED") {
+    return kChancePlayerId;
+  }
+  return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(Board().ToPlay());
+}
+
+ActionsAndProbs ChessState::ChanceOutcomes() const {
+  SPIEL_CHECK_TRUE(ParentGame()->IsChess960());
+  // One chance outcome for each initial position in chess960.
+  ActionsAndProbs outcomes;
+  outcomes.reserve(960);
+  for (int i = 0; i < 960; ++i) {
+    outcomes.push_back({i, 1.0 / 960});
+  }
+  return outcomes;
+}
+
 Action ChessState::ParseMoveToAction(const std::string& move_str) const {
   absl::optional<Move> move = Board().ParseMove(move_str);
   if (!move.has_value()) {
@@ -114,6 +145,24 @@ Action ChessState::ParseMoveToAction(const std::string& move_str) const {
 }
 
 void ChessState::DoApplyAction(Action action) {
+  if (IsChanceNode()) {
+    SPIEL_CHECK_TRUE(ParentGame()->IsChess960());
+    // In chess960, there could be a chance node at the top of the game if the
+    // initial FEN is not passed in. So here we apply the initial position.
+    // First, reset the repetitions table.
+    repetitions_ = RepetitionTable();
+
+    // Then get the initial fen and set the board.
+    chess960_random_start_fen_ = ParentGame()->Chess960LookupFEN(action);
+    auto maybe_board = ChessBoard::BoardFromFEN(chess960_random_start_fen_);
+    SPIEL_CHECK_TRUE(maybe_board);
+    start_board_ = *maybe_board;
+    current_board_ = start_board_;
+    repetitions_[current_board_.HashValue()] = 1;
+    cached_legal_actions_.reset();
+    return;
+  }
+
   Move move = ActionToMove(action, Board());
   moves_history_.push_back(move);
   Board().ApplyMove(move);
@@ -133,6 +182,9 @@ void ChessState::MaybeGenerateLegalActions() const {
 }
 
 std::vector<Action> ChessState::LegalActions() const {
+  if (IsChanceNode()) {
+    return LegalChanceOutcomes();
+  }  // chess960.
   MaybeGenerateLegalActions();
   if (IsTerminal()) return {};
   return *cached_legal_actions_;
@@ -157,6 +209,16 @@ Color PlayerToColor(Player p) {
 Action MoveToAction(const Move& move, int board_size) {
   // Special-case for pass move.
   if (move == kPassMove) return kPassAction;
+
+  if (move.is_castling()) {
+    if (move.castle_dir == CastlingDirection::kLeft) {
+      return kLeftCastlingAction;
+    } else if (move.castle_dir == CastlingDirection::kRight) {
+      return kRightCastlingAction;
+    } else {
+      SpielFatalError("Invalid castling move.");
+    }
+  }
 
   Color color = move.piece.color;
   // We rotate the move to be from player p's perspective.
@@ -244,11 +306,28 @@ Move ActionToMove(const Action& action, const ChessBoard& board) {
     return kPassMove;
   }
 
+  // Castle actions.
+  if (action == kLeftCastlingAction || action == kRightCastlingAction) {
+    Square king_square = board.find(Piece{board.ToPlay(), PieceType::kKing});
+    if (action == kLeftCastlingAction) {
+      return Move(king_square, Square{2, king_square.y},
+                  Piece{board.ToPlay(), PieceType::kKing}, PieceType::kEmpty,
+                  CastlingDirection::kLeft);
+    } else if (action == kRightCastlingAction) {
+      return Move(king_square, Square{6, king_square.y},
+                  Piece{board.ToPlay(), PieceType::kKing}, PieceType::kEmpty,
+                  CastlingDirection::kRight);
+    } else {
+      SpielFatalError("Invalid castling move.");
+    }
+  }
+
   // The encoded action represents an action encoded from color's perspective.
   Color color = board.ToPlay();
   int board_size = board.BoardSize();
   PieceType promotion_type = PieceType::kEmpty;
-  bool is_castling = false;
+  CastlingDirection castle_dir = CastlingDirection::kNone;
+
   auto [from_square, destination_index] =
       ActionToDestination(action, kMaxBoardSize, kNumActionDestinations);
   SPIEL_CHECK_LT(destination_index, kNumActionDestinations);
@@ -280,23 +359,28 @@ Move ActionToMove(const Action& action, const ChessBoard& board) {
     promotion_type = PieceType::kQueen;
   }
 
-  // Check for castling which is defined here just as king moves horizontally
-  // by 2 spaces.
-  // TODO(b/149092677): Chess no longer supports chess960. Distinguish between
-  // left/right castle.
-  if (piece.type == PieceType::kKing && std::abs(offset.x_offset) == 2) {
-    is_castling = true;
-  }
-  Move move(from_square, to_square, piece, promotion_type, is_castling);
+  Move move(from_square, to_square, piece, promotion_type, castle_dir);
   return move;
 }
 
 std::string ChessState::ActionToString(Player player, Action action) const {
+  if (player == kChancePlayerId) {
+    // Chess960 has an initial chance node.
+    SPIEL_CHECK_GE(action, 0);
+    SPIEL_CHECK_LT(action, 960);
+    return absl::StrCat("ChanceNodeOutcome_", action);
+  }
   Move move = ActionToMove(action, Board());
   return move.ToSAN(Board());
 }
 
-std::string ChessState::ToString() const { return Board().ToFEN(); }
+std::string ChessState::DebugString() const {
+    return current_board_.DebugString(ParentGame()->IsChess960());
+}
+
+std::string ChessState::ToString() const {
+  return Board().ToFEN(ParentGame()->IsChess960());
+}
 
 std::vector<double> ChessState::Returns() const {
   auto maybe_final_returns = MaybeFinalReturns();
@@ -371,6 +455,7 @@ std::unique_ptr<State> ChessState::Clone() const {
 
 void ChessState::UndoAction(Player player, Action action) {
   // TODO: Make this fast by storing undo info in another stack.
+  // Note: only supported after the chance node in Chess960.
   SPIEL_CHECK_GE(moves_history_.size(), 1);
   --repetitions_[current_board_.HashValue()];
   moves_history_.pop_back();
@@ -426,12 +511,24 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
 
 std::string ChessState::Serialize() const {
   std::string state_str = "";
-  absl::StrAppend(&state_str, "FEN: ", start_board_.ToFEN(), "\n");
+  absl::StrAppend(&state_str, "FEN: ",
+                  start_board_.ToFEN(ParentGame()->IsChess960()), "\n");
+  if (ParentGame()->IsChess960()) {
+    absl::StrAppend(&state_str,
+                    "CHESS960_RANDOM_START_FEN: ", chess960_random_start_fen_,
+                    "\n");
+  }
   absl::StrAppend(&state_str, absl::StrJoin(History(), "\n"), "\n");
   return state_str;
 }
 
-ChessGame::ChessGame(const GameParameters& params) : Game(kGameType, params) {}
+ChessGame::ChessGame(const GameParameters& params)
+    : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")) {
+  if (chess960_) {
+    initial_fens_ = Chess960StartingPositions();
+    SPIEL_CHECK_EQ(initial_fens_.size(), 960);
+  }
+}
 
 std::unique_ptr<State> ChessGame::DeserializeState(
     const std::string& str) const {
@@ -440,11 +537,28 @@ std::unique_ptr<State> ChessGame::DeserializeState(
     // Backward compatibility.
     return Game::DeserializeState(str);
   }
+  int line_num = 0;
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   // Create initial state from FEN (first line of serialized state).
-  std::unique_ptr<State> state = NewInitialState(
-      lines[0].substr(prefix.length()));
-  for (int i = 1; i < lines.size(); ++i) {
+  std::unique_ptr<State> state =
+      NewInitialState(lines[line_num].substr(prefix.length()));
+  line_num += 1;
+  ChessState* chess_state = down_cast<ChessState*>(state.get());
+  if (IsChess960()) {
+    const std::string chess960_prefix("CHESS960_RANDOM_START_FEN: ");
+    std::string chess960_random_start_fen =
+        lines[line_num].substr(chess960_prefix.length());
+    chess_state->SetChess960RandomStartFEN(chess960_random_start_fen);
+    line_num += 1;
+    if (!chess960_random_start_fen.empty()) {
+      // If the random start fen is not empty, it means that it was randomly
+      // generated at the start of the game, so the history contains a chance
+      // node outcome for the first move. We need to skip it because we
+      // initialize the state directly using NewInitialState(fen).
+      line_num += 1;
+    }
+  }
+  for (int i = line_num; i < lines.size(); ++i) {
     if (lines[i].empty()) {
       break;
     }
@@ -452,6 +566,14 @@ std::unique_ptr<State> ChessGame::DeserializeState(
     state->ApplyAction(action);
   }
   return state;
+}
+
+int ChessGame::MaxChanceOutcomes() const {
+  if (IsChess960()) {
+    return 960;
+  } else {
+    return 0;
+  }
 }
 
 }  // namespace chess

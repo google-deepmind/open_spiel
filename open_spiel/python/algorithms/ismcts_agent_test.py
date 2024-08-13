@@ -14,16 +14,21 @@
 """Test the IS-MCTS Agent."""
 
 from absl.testing import absltest
+from absl.testing import parameterized
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import ismcts
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms import mcts_agent
 
 
-class MCTSAgentTest(absltest.TestCase):
+class MCTSAgentTest(parameterized.TestCase):
 
-  def test_tic_tac_toe_episode(self):
-    env = rl_environment.Environment("kuhn_poker", include_full_state=True)
+  @parameterized.named_parameters(
+      dict(testcase_name="tic_tac_toe", game_string="kuhn_poker"),
+      dict(testcase_name="leduc_poker", game_string="leduc_poker"),
+  )
+  def test_self_play_episode(self, game_string: str):
+    env = rl_environment.Environment(game_string, include_full_state=True)
     num_players = env.num_players
     num_actions = env.action_spec()["num_actions"]
 

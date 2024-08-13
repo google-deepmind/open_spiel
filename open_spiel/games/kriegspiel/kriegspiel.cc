@@ -14,11 +14,21 @@
 
 #include "open_spiel/games/kriegspiel/kriegspiel.h"
 
-#include <algorithm>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/games/chess/chess.h"
+#include "open_spiel/games/chess/chess_board.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -203,6 +213,8 @@ class KriegspielObserver : public Observer {
     // 5 is maximum because we can't promote to a pawn.
     WriteScalar(static_cast<int>(move.promotion_type), 0, 5,
                 prefix + "_promotion", allocator);
+    WriteScalar(static_cast<int>(move.castle_dir), 0, 2,
+                prefix + "_castle_dir", allocator);
   }
 
   void WriteUmpireMessage(const KriegspielUmpireMessage &msg,
@@ -268,7 +280,9 @@ class KriegspielObserver : public Observer {
 
     // Write observer's last move
     chess::Move last_move = {chess::kInvalidSquare, chess::kInvalidSquare,
-                             chess::kEmptyPiece};
+                             chess::kEmptyPiece,
+                             chess::PieceType::kEmpty,
+                             chess::CastlingDirection::kNone};
 
     for (auto move_msg = state.MoveMsgHistory().rbegin();
          move_msg != state.MoveMsgHistory().rend(); ++move_msg) {

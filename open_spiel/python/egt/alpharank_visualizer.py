@@ -431,7 +431,7 @@ def plot_pi_vs_alpha(pi_list,
       if add_legend_entries:
         if num_strats_printed >= num_strats_to_label:
           # Placeholder blank series for remaining entries
-          series = plt.semilogx(np.NaN, np.NaN, "-", color="none")
+          series = plt.semilogx(np.nan, np.nan, "-", color="none")
           label = "..."
           add_legend_entries = False
         else:
