@@ -55,6 +55,13 @@ every two weeks (for bug fixes, it will likely be faster to be integrated). So
 you may need to wait a little after it has been approved to actually see it
 merged.
 
+# OpenSpiel visual Graph
+
+
+To help you understand better the framework as a whole you can go to [openspielgraph](https://openspielgraph.netlify.app) and use an interactive graph that shows OpenSpiel in a wide and easy to undestand way.
+The OpenSpiel Visual Graph enhances the developer's ability to interact with and understand complex game structures within the OpenSpiel framework. By providing intuitive visual representations, it simplifies the debugging process, aids in the optimization of algorithms, and fosters a more efficient workflow.
+For a practical example, see how OpenSpiel graph was used to make web based games with WebAssembly...
+
 # Roadmap and Call for Contributions
 
 Contributions to this project must be accompanied by a Contributor License
