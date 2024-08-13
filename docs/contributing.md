@@ -58,6 +58,7 @@ merged.
 # OpenSpiel visual Graph
 
 To help you understand better the framework as a whole you can go to [openspielgraph](https://openspielgraph.netlify.app) and use an interactive graph that shows OpenSpiel in a wide and easy to undestand way.
+The OpenSpiel Visual Graph was developed with the objective of improving the developer's experience by enabling a clear and dynamic visualization of the graphs and data structures associated with games modeled in the framework.
 
 # Roadmap and Call for Contributions
 
