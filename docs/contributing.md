@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/58bf7efa-4dcd-45d2-9ffa-a38c486b3037)# Guidelines
+# Guidelines
 
 Above all, OpenSpiel is designed to be easy to install and use, easy to
 understand, easy to extend (“hackable”), and general/broad. OpenSpiel is built
