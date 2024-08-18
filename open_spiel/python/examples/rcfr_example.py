@@ -87,14 +87,17 @@ def main(_):
     data = data.batch(FLAGS.batch_size)
     data = data.repeat(FLAGS.num_epochs)
 
-    optimizer = tf.keras.optimizers.Adam(lr=FLAGS.step_size, amsgrad=True)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=FLAGS.step_size, amsgrad=True)
 
     @tf.function
     def _train():
       for x, y in data:
-        optimizer.minimize(
-            lambda: tf.losses.huber_loss(y, model(x), delta=0.01),  # pylint: disable=cell-var-from-loop
-            model.trainable_variables)
+        with tf.GradientTape() as tape:
+          loss = tf.losses.huber_loss(y, model(x), delta=0.01)
+        optimizer.apply_gradients(
+          zip(
+            tape.gradient(loss, model.trainable_variables),
+            model.trainable_variables))
 
     _train()
 
