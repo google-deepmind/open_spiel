@@ -808,7 +808,7 @@ def return_cs_partial_sequence(num_actions, history, prior_legal_actions):
     information set.
   """
   prior_actions_in_memory = history
-  external_memory_weights = [None]
+  external_memory_weights = []
 
   for i in range(len(history)):
     possible_memory_weight = np.zeros(len(history))
@@ -851,7 +851,7 @@ def return_cs_partial_sequence_orginal(
     information set.
   """
   prior_actions_in_memory = history
-  external_memory_weights = [None]
+  external_memory_weights = []
 
   for i in range(len(history)):
     possible_memory_weight = np.zeros(len(history))
@@ -891,7 +891,7 @@ def return_twice_informed_partial_sequence(
     all TIPS deviations that are realizable at theinformation set.
   """
   prior_actions_in_memory = history
-  memory_weights = [None]
+  memory_weights = []
 
   for i in range(len(history)):
     possible_memory_weight = np.zeros(len(history))
