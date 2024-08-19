@@ -37,8 +37,7 @@ def _new_model():
   return rcfr.DeepRcfrModel(
       _GAME,
       num_hidden_layers=1,
-      num_hidden_units=26,
-      num_hidden_factors=1,
+      num_hidden_units=13,
       use_skip_connections=True)
 
 
