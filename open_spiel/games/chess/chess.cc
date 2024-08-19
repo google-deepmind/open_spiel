@@ -137,7 +137,8 @@ ActionsAndProbs ChessState::ChanceOutcomes() const {
 }
 
 Action ChessState::ParseMoveToAction(const std::string& move_str) const {
-  absl::optional<Move> move = Board().ParseMove(move_str);
+  bool chess960 = ParentGame()->IsChess960();
+  absl::optional<Move> move = Board().ParseMove(move_str, chess960);
   if (!move.has_value()) {
     return kInvalidAction;
   }
