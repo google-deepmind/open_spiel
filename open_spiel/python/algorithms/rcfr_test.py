@@ -38,7 +38,6 @@ def _new_model():
       _GAME,
       num_hidden_layers=1,
       num_hidden_units=13,
-      num_hidden_factors=1,
       use_skip_connections=True)
 
 
@@ -476,12 +475,18 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
       data = data.batch(12)
       data = data.repeat(num_epochs)
 
-      optimizer = tf.keras.optimizers.Adam(lr=0.005, amsgrad=True)
+      optimizer = tf.keras.optimizers.Adam(learning_rate=0.005, amsgrad=True)
 
+      model = models[regret_player]
       for x, y in data:
-        optimizer.minimize(
-            lambda: tf.losses.huber_loss(y, models[regret_player](x)),  # pylint: disable=cell-var-from-loop
-            models[regret_player].trainable_variables)
+        with tf.GradientTape() as tape:
+          loss = tf.losses.huber_loss(y, model(x))
+        optimizer.apply_gradients(
+            zip(
+                tape.gradient(loss, model.trainable_variables),
+                model.trainable_variables,
+            )
+        )
 
       regret_player = reach_weights_player
 
@@ -504,12 +509,17 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
       data = data.batch(12)
       data = data.repeat(num_epochs)
 
-      optimizer = tf.keras.optimizers.Adam(lr=0.005, amsgrad=True)
+      optimizer = tf.keras.optimizers.Adam(learning_rate=0.005, amsgrad=True)
 
       for x, y in data:
-        optimizer.minimize(
-            lambda: tf.losses.huber_loss(y, model(x)),  # pylint: disable=cell-var-from-loop
-            model.trainable_variables)
+        with tf.GradientTape() as tape:
+          loss = tf.losses.huber_loss(y, model(x))
+        optimizer.apply_gradients(
+            zip(
+                tape.gradient(loss, model.trainable_variables),
+                model.trainable_variables,
+            )
+        )
 
     average_policy = patient.average_policy()
     self.assertGreater(pyspiel.nash_conv(_GAME, average_policy), 0.91)
@@ -565,12 +575,17 @@ class RcfrTest(parameterized.TestCase, tf.test.TestCase):
       data = data.batch(12)
       data = data.repeat(num_epochs)
 
-      optimizer = tf.keras.optimizers.Adam(lr=0.005, amsgrad=True)
+      optimizer = tf.keras.optimizers.Adam(learning_rate=0.005, amsgrad=True)
 
       for x, y in data:
-        optimizer.minimize(
-            lambda: tf.losses.huber_loss(y, model(x)),  # pylint: disable=cell-var-from-loop
-            model.trainable_variables)
+        with tf.GradientTape() as tape:
+          loss = tf.losses.huber_loss(y, model(x))
+        optimizer.apply_gradients(
+            zip(
+                tape.gradient(loss, model.trainable_variables),
+                model.trainable_variables,
+            )
+        )
 
     average_policy = patient.average_policy()
     self.assertGreater(pyspiel.nash_conv(_GAME, average_policy), 0.91)
