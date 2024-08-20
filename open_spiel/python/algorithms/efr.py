@@ -275,7 +275,7 @@ class _EFRSolverBase(object):
 
       state_policy = current_policy.policy_for_key(info_state)
       for action, value in self._regret_matching(
-          info_state_node.legal_actions, info_state_node
+          info_state_node
       ).items():
         state_policy[action] = value
 
@@ -497,19 +497,19 @@ class EFRSolver(_EFRSolver):
     super(EFRSolver, self).__init__(game, deviation_sets)
     self._external_only = external_only
 
-  def _regret_matching(self, legal_actions, info_set_node):
+  def _regret_matching(self, info_set_node):
     """Returns an info state policy.
 
     The info state policy returned is the one obtained by applying
     regret-matching function over all deviations and time selection functions.
 
     Args:
-      legal_actions: the list of legal actions at this state.
       info_set_node: the info state node to compute the policy for.
 
     Returns:
-      A dict of action -> prob for all legal actions.
+      A dict of action -> prob for all legal actions of the info_set_node.
     """
+    legal_actions = info_set_node.legal_actions
     z = sum(info_set_node.y_values.values())
     info_state_policy = {}
 
@@ -532,7 +532,7 @@ class EFRSolver(_EFRSolver):
     # Last row of matrix and the column entry minimises the solution
     # towards a strategy.
     elif z > 0:
-      num_actions = len(info_set_node.legal_actions)
+      num_actions = len(legal_actions)
       weighted_deviation_matrix = -np.eye(num_actions)
 
       for dev in list(info_set_node.y_values.keys()):
@@ -551,12 +551,11 @@ class EFRSolver(_EFRSolver):
       strategy = linalg.lstsq(weighted_deviation_matrix, b)[0]
 
       # Adopt same clipping strategy as paper author's code.
-      strategy[np.where(strategy < 0)] = 0
-      strategy[np.where(strategy > 1)] = 1
+      np.clip(strategy, a_min=0, a_max=1, out=strategy)
 
-      strategy = strategy / sum(strategy)
+      strategy = strategy / np.sum(strategy)
       for index in range(len(strategy)):
-        info_state_policy[info_set_node.legal_actions[index]] = strategy[index]
+        info_state_policy[legal_actions[index]] = strategy[index, 0]
     # Use a uniform strategy as sum of all regrets is negative.
     else:
       for index in range(len(legal_actions)):
