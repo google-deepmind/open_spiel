@@ -107,11 +107,18 @@ DarkHexState::DarkHexState(std::shared_ptr<const Game> game, int num_cols,
       game_version_(game_version),
       num_cols_(num_cols),
       num_rows_(num_rows),
-      num_cells_(num_cols * num_rows),
-      bits_per_action_(num_cells_ + 1),
-      longest_sequence_(num_cells_ * 2 - 1) {
+      num_cells_(num_cols * num_rows) {
   black_view_.resize(num_cols * num_rows, CellState::kEmpty);
   white_view_.resize(num_cols * num_rows, CellState::kEmpty);
+  if (obs_type == ObservationType::kRevealNothing) {
+    bits_per_action_ = num_cells_;
+    longest_sequence_ = num_cells_;
+  } else {
+    SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNumTurns);
+    // Reserve 0 for the player and 10 as "I don't know."
+    bits_per_action_ = num_cells_ + 2;
+    longest_sequence_ = num_cells_ * 2 - 1;
+  }
 }
 
 void DarkHexState::DoApplyAction(Action move) {
@@ -218,7 +225,7 @@ void DarkHexState::InformationStateTensor(Player player,
   const auto& player_view = (player == 0 ? black_view_ : white_view_);
 
   SPIEL_CHECK_EQ(values.size(), num_cells_ * kCellStates +
-                                    longest_sequence_ * (1 + bits_per_action_));
+                                    longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < num_cells_; ++cell) {
     values[cell * kCellStates +
@@ -230,18 +237,25 @@ void DarkHexState::InformationStateTensor(Player player,
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
-      values[offset] = player_with_action.first;
-      values[offset + 1 + player_with_action.second] = 1.0;
+      if (obs_type_ == ObservationType::kRevealNumTurns) {
+        values[offset] = player_with_action.first;  // Player 0 or 1
+        values[offset + 1 + player_with_action.second] = 1.0;
+      } else {
+        // Here we don't need to encode the player since we won't see opponent moves.
+        SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
+        values[offset + player_with_action.second] = 1.0;
+      }
+      offset += bits_per_action_;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns. Here, num_cells_ is used to
       // encode "unknown".
       values[offset] = player_with_action.first;
       values[offset + 1 + num_cells_] = 1.0;
+      offset += bits_per_action_;
     } else {
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
     }
-    offset += (1 + bits_per_action_);
   }
 }
 
@@ -290,14 +304,17 @@ DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
           ParameterValue<int>("num_cols", ParameterValue<int>("board_size"))),
       num_rows_(
           ParameterValue<int>("num_rows", ParameterValue<int>("board_size"))),
-      num_cells_(num_cols_ * num_rows_),
-      bits_per_action_(num_cells_ + 1),
-      longest_sequence_(num_cells_ * 2 - 1) {
+      num_cells_(num_cols_ * num_rows_) {
   std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
+    bits_per_action_ = num_cells_;
+    longest_sequence_ = num_cells_;
   } else if (obs_type == "reveal-numturns") {
     obs_type_ = ObservationType::kRevealNumTurns;
+    // Reserve 0 for the player and 10 as "I don't know."
+    bits_per_action_ = num_cells_ + 2;
+    longest_sequence_ = num_cells_ * 2 - 1;
   } else {
     SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
   }
@@ -314,7 +331,7 @@ DarkHexGame::DarkHexGame(const GameParameters& params, GameType game_type)
 
 std::vector<int> DarkHexGame::InformationStateTensorShape() const {
   return {num_cells_ * kCellStates +
-          longest_sequence_ * (1 + bits_per_action_)};
+          longest_sequence_ * bits_per_action_};
 }
 
 std::vector<int> DarkHexGame::ObservationTensorShape() const {
