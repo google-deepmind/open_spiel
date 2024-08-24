@@ -231,7 +231,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
       values[offset] = player_with_action.first;
-      values[offset + 1 + 9] = 1.0;  // I don't know.
+      values[offset + 1 + kNumCells] = 1.0;  // I don't know.
       offset += bits_per_action_;
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
