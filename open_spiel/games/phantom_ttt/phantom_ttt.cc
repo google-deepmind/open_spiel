@@ -94,9 +94,21 @@ ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  ObservationType obs_type)
-    : State(game), state_(game), obs_type_(obs_type) {
+    : State(game),
+      state_(game),
+      obs_type_(obs_type) {
   std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
   std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
+  if (obs_type_ == ObservationType::kRevealNumTurns) {
+    // Reserve 0 for the player and 10 as "I don't know."
+    bits_per_action_ = 11;
+    // Longest sequence is 17 moves, e.g. 0011223344556677889
+    longest_sequence_ = 2 * kNumCells - 1;
+  } else {
+    SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
+    bits_per_action_ = 9;
+    longest_sequence_ = kNumCells;
+  }
 }
 
 void PhantomTTTState::DoApplyAction(Action move) {
@@ -193,7 +205,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
   // which may contain action value 10 to represent "I don't know."
   const auto& player_view = player == 0 ? x_view_ : o_view_;
   SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
-                                    kLongestSequence * (1 + kBitsPerAction));
+                                    longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < kNumCells; ++cell) {
     values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
@@ -206,19 +218,25 @@ void PhantomTTTState::InformationStateTensor(Player player,
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
-      values[offset] = player_with_action.first;  // Player 0 or 1
-      values[offset + 1 + player_with_action.second] = 1.0;
+      if (obs_type_ == ObservationType::kRevealNumTurns) {
+        values[offset] = player_with_action.first;  // Player 0 or 1
+        values[offset + 1 + player_with_action.second] = 1.0;
+      } else {
+        // Here we don't need to encode the player since we won't see opponent moves.
+        SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
+        values[offset + player_with_action.second] = 1.0;
+      }
+      offset += bits_per_action_;
     } else if (obs_type_ == ObservationType::kRevealNumTurns) {
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
       values[offset] = player_with_action.first;
-      values[offset + 1 + 10] = 1.0;  // I don't know.
+      values[offset + 1 + 9] = 1.0;  // I don't know.
+      offset += bits_per_action_;
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
       SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
     }
-
-    offset += (1 + kBitsPerAction);
   }
 }
 
@@ -283,8 +301,14 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
   std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
+    bits_per_action_ = 9;
+    longest_sequence_ = kNumCells;
   } else if (obs_type == "reveal-numturns") {
     obs_type_ = ObservationType::kRevealNumTurns;
+    // Reserve 0 for the player and 10 as "I don't know."
+    bits_per_action_ = 11;
+    // Longest sequence is 17 moves, e.g. 0011223344556677889
+    longest_sequence_ = 2 * kNumCells - 1;
   } else {
     SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
   }
@@ -292,16 +316,16 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
 
 std::vector<int> PhantomTTTGame::InformationStateTensorShape() const {
   // Enc
-  return {1, kNumCells * kCellStates + kLongestSequence * (1 + kBitsPerAction)};
+  return {1, kNumCells * kCellStates + longest_sequence_ * bits_per_action_};
 }
 
 std::vector<int> PhantomTTTGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
     return {kNumCells * kCellStates};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {kNumCells * kCellStates + kLongestSequence};
+    return {kNumCells * kCellStates + longest_sequence_};
   } else {
-    SpielFatalError("Uknown observation type");
+    SpielFatalError("Unknown observation type");
   }
 }
 
