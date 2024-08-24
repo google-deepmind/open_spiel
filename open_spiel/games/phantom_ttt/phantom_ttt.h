@@ -84,8 +84,8 @@ class PhantomTTTState : public State {
 
   tic_tac_toe::TicTacToeState state_;
   ObservationType obs_type_;
-  const int bits_per_action_;
-  const int longest_sequence_;
+  int bits_per_action_;
+  int longest_sequence_;
 
   // TODO(author2): Use the base class history_ instead.
   std::vector<std::pair<int, Action>> action_sequence_;
@@ -118,15 +118,17 @@ class PhantomTTTGame : public Game {
   // These will depend on the obstype parameter.
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
-  int MaxGameLength() const override { return kLongestSequence; }
+  int MaxGameLength() const override { 
+    return tic_tac_toe::kNumCells * 2 - 1;
+  }
 
   ObservationType obs_type() const { return obs_type_; }
 
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
   ObservationType obs_type_;
-  const int bits_per_action_;
-  const int longest_sequence_;
+  int bits_per_action_;
+  int longest_sequence_;
 };
 
 // Implements the FOE abstraction from Lanctot et al. '12
