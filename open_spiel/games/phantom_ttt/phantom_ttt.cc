@@ -101,12 +101,12 @@ PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
   std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
   if (obs_type_ == ObservationType::kRevealNumTurns) {
     // Reserve 0 for the player and 10 as "I don't know."
-    bits_per_action_ = 11;
+    bits_per_action_ = kNumCells + 2;
     // Longest sequence is 17 moves, e.g. 0011223344556677889
     longest_sequence_ = 2 * kNumCells - 1;
   } else {
     SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
-    bits_per_action_ = 9;
+    bits_per_action_ = kNumCells;
     longest_sequence_ = kNumCells;
   }
 }
@@ -301,12 +301,12 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
   std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
-    bits_per_action_ = 9;
+    bits_per_action_ = kNumCells;
     longest_sequence_ = kNumCells;
   } else if (obs_type == "reveal-numturns") {
     obs_type_ = ObservationType::kRevealNumTurns;
     // Reserve 0 for the player and 10 as "I don't know."
-    bits_per_action_ = 11;
+    bits_per_action_ = kNumCells + 2;
     // Longest sequence is 17 moves, e.g. 0011223344556677889
     longest_sequence_ = 2 * kNumCells - 1;
   } else {
