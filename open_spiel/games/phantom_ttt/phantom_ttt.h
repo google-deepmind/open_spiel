@@ -45,10 +45,6 @@ namespace phantom_ttt {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing";
 
-// Longest sequence is 17 moves, e.g. 0011223344556677889
-inline constexpr int kLongestSequence = 2 * tic_tac_toe::kNumCells - 1;
-inline constexpr int kBitsPerAction = 10;  // Reserve 9 as "I don't know."
-
 enum class ObservationType {
   kRevealNothing,
   kRevealNumTurns,
@@ -88,6 +84,9 @@ class PhantomTTTState : public State {
 
   tic_tac_toe::TicTacToeState state_;
   ObservationType obs_type_;
+  int bits_per_action_;
+  int longest_sequence_;
+
   // TODO(author2): Use the base class history_ instead.
   std::vector<std::pair<int, Action>> action_sequence_;
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> x_view_;
@@ -119,13 +118,15 @@ class PhantomTTTGame : public Game {
   // These will depend on the obstype parameter.
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
-  int MaxGameLength() const override { return kLongestSequence; }
+  int MaxGameLength() const override { return tic_tac_toe::kNumCells * 2 - 1; }
 
   ObservationType obs_type() const { return obs_type_; }
 
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
   ObservationType obs_type_;
+  int bits_per_action_;
+  int longest_sequence_;
 };
 
 // Implements the FOE abstraction from Lanctot et al. '12

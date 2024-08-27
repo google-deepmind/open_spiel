@@ -125,8 +125,8 @@ class DarkHexState : public State {
   const int num_cols_;  // x
   const int num_rows_;  // y
   const int num_cells_;
-  const int bits_per_action_;
-  const int longest_sequence_;
+  int bits_per_action_;
+  int longest_sequence_;
 
   // Change this to _history on base class
   std::vector<std::pair<int, Action>> action_sequence_;
@@ -166,8 +166,8 @@ class DarkHexGame : public Game {
   const int num_cols_;
   const int num_rows_;
   const int num_cells_;
-  const int bits_per_action_;
-  const int longest_sequence_;
+  int bits_per_action_;
+  int longest_sequence_;
 };
 
 class ImperfectRecallDarkHexState : public DarkHexState {
