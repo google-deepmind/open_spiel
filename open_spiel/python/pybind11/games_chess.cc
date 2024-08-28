@@ -95,6 +95,8 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
       .def("debug_string", &ChessState::DebugString)
       .def("is_repetition_draw", &ChessState::IsRepetitionDraw)
       .def("moves_history", py::overload_cast<>(&ChessState::MovesHistory))
+      // num_repetitions(state: ChessState) -> int
+      .def("num_repetitions", &ChessState::NumRepetitions)
       .def("parse_move_to_action", &ChessState::ParseMoveToAction)
       // Pickle support
       .def(py::pickle(

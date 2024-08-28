@@ -189,6 +189,10 @@ class ChessState : public State {
   // board position has already appeared twice in the history).
   bool IsRepetitionDraw() const;
 
+  // Returns the number of times the specified state has appeared in the
+  // history.
+  int NumRepetitions(const ChessState& state) const;
+
   const ChessGame* ParentGame() const {
     return down_cast<const ChessGame*>(GetGame().get());
   }

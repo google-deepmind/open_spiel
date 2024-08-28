@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "open_spiel/games/chess/chess.h"
+#include <sys/types.h>
 
 #include <cstdint>
 #include <iterator>
@@ -472,6 +473,16 @@ bool ChessState::IsRepetitionDraw() const {
   const auto entry = repetitions_.find(Board().HashValue());
   SPIEL_CHECK_FALSE(entry == repetitions_.end());
   return entry->second >= kNumRepetitionsToDraw;
+}
+
+int ChessState::NumRepetitions(const ChessState& state) const {
+  uint64_t state_hash_value = state.Board().HashValue();
+  const auto entry = repetitions_.find(state_hash_value);
+  if (entry == repetitions_.end()) {
+    return 0;
+  } else {
+    return entry->second;
+  }
 }
 
 absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {

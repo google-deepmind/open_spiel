@@ -77,6 +77,7 @@ class GamesChessTest(parameterized.TestCase):
     fen_string = "8/k1P5/8/1K6/8/8/8/8 w - - 0 1"
     state = game.new_initial_state(fen_string)
     self.assertEqual(state.board().to_fen(), fen_string)
+    self.assertEqual(state.num_repetitions(state), 1)
 
   @parameterized.parameters(
       "bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1",
