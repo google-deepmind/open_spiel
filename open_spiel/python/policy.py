@@ -520,6 +520,8 @@ def pyspiel_policy_to_python_policy(game, pyspiel_tabular_policy, players=None):
     if players is not None and info_state_str not in policy.state_lookup:
       continue
     state_policy = policy.policy_for_key(info_state_str)
+    if actions_probs:
+      state_policy[:] = 0.0  # Ensure policy is zero by default.
     for action, prob in actions_probs:
       state_policy[action] = prob
   return policy
