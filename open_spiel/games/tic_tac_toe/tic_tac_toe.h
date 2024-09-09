@@ -76,6 +76,7 @@ class TicTacToeState : public State {
     return board_[row * kNumCols + column];
   }
   Player outcome() const { return outcome_; }
+  void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
 
   // Only used by Ultimate Tic-Tac-Toe.
   void SetCurrentPlayer(Player player) { current_player_ = player; }

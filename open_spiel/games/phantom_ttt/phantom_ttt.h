@@ -39,21 +39,28 @@
 //
 // Parameters:
 ///    "obstype", string, "reveal-nothing" (default) or "reveal-numturns"
+///    "gameversion", string, "classical" (default) or "abrupt"
 
 namespace open_spiel {
 namespace phantom_ttt {
 
 inline constexpr const char* kDefaultObsType = "reveal-nothing";
+inline constexpr const char* kDefaultGameVersion = "classical";
 
 enum class ObservationType {
   kRevealNothing,
   kRevealNumTurns,
 };
 
+enum class GameVersion {
+  kAbruptPhantomTicTacToe,
+  kClassicalPhantomTicTacToe,
+};
+
 // State of an in-play game.
 class PhantomTTTState : public State {
  public:
-  PhantomTTTState(std::shared_ptr<const Game> game, ObservationType obs_type);
+  PhantomTTTState(std::shared_ptr<const Game> game, GameVersion game_version, ObservationType obs_type);
 
   // Forward to underlying game state
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
@@ -84,6 +91,7 @@ class PhantomTTTState : public State {
 
   tic_tac_toe::TicTacToeState state_;
   ObservationType obs_type_;
+  GameVersion game_version_;
   int bits_per_action_;
   int longest_sequence_;
 
@@ -99,7 +107,7 @@ class PhantomTTTGame : public Game {
   PhantomTTTGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new PhantomTTTState(shared_from_this(), obs_type_));
+        new PhantomTTTState(shared_from_this(), game_version_, obs_type_));
   }
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
@@ -121,10 +129,12 @@ class PhantomTTTGame : public Game {
   int MaxGameLength() const override { return tic_tac_toe::kNumCells * 2 - 1; }
 
   ObservationType obs_type() const { return obs_type_; }
+  GameVersion game_version() const { return game_version_; }
 
  private:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
   ObservationType obs_type_;
+  GameVersion game_version_;
   int bits_per_action_;
   int longest_sequence_;
 };
@@ -133,9 +143,8 @@ class PhantomTTTGame : public Game {
 // http://mlanctot.info/files/papers/12icml-ir.pdf
 class ImperfectRecallPTTTState : public PhantomTTTState {
  public:
-  ImperfectRecallPTTTState(std::shared_ptr<const Game> game,
-                           ObservationType obs_type)
-      : PhantomTTTState(game, obs_type) {}
+  ImperfectRecallPTTTState(std::shared_ptr<const Game> game, GameVersion game_version, ObservationType obs_type)
+      : PhantomTTTState(game, game_version, obs_type) {}
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
@@ -151,7 +160,7 @@ class ImperfectRecallPTTTGame : public PhantomTTTGame {
   explicit ImperfectRecallPTTTGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new ImperfectRecallPTTTState(shared_from_this(), obs_type()));
+        new ImperfectRecallPTTTState(shared_from_this(), game_version(), obs_type()));
   }
 };
 
@@ -164,6 +173,18 @@ inline std::ostream& operator<<(std::ostream& stream,
       return stream << "Reveal Num Turns";
     default:
       SpielFatalError("Unknown observation type");
+  }
+}
+
+inline std::ostream& operator<<(std::ostream& stream,
+                                const GameVersion& game_version) {
+  switch (game_version) {
+    case GameVersion::kClassicalPhantomTicTacToe:
+      return stream << "Classical Phantom Tic Tac Toe";
+    case GameVersion::kAbruptPhantomTicTacToe:
+      return stream << "Abrupt Phantom Tic Tac Toe";
+    default:
+      SpielFatalError("Unknown game version");
   }
 }
 
