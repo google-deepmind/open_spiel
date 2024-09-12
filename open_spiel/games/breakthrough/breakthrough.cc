@@ -437,8 +437,8 @@ std::unique_ptr<State> BreakthroughGame::DeserializeState(
     }
   }
 
-  # -'0' to get the int value.
-  bstate->cur_player_ = str.at(i) - '0';
+  // -'0' to get the int value.
+  bstate->Set_cur_player(str.at(i) - '0');
   return state;
 }
 

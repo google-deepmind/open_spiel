@@ -66,6 +66,7 @@ class BreakthroughState : public State {
   bool InBounds(int r, int c) const;
   void SetBoard(int r, int c, CellState cs) { board_[r * cols_ + c] = cs; }
   void SetPieces(int idx, int value) { pieces_[idx] = value; }
+  void Set_cur_player(int player) { cur_player_ = player; }
   CellState board(int row, int col) const { return board_[row * cols_ + col]; }
   int pieces(int idx) const { return pieces_[idx]; }
   int rows() const { return rows_; }
