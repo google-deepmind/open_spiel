@@ -391,11 +391,14 @@ int BreakthroughGame::NumDistinctActions() const {
 
 std::string BreakthroughState::Serialize() const {
   std::string str = "";
+  // Serialize the board state.
   for (int r = 0; r < rows_; r++) {
     for (int c = 0; c < cols_; c++) {
       absl::StrAppend(&str, CellToString(board(r, c)));
     }
   }
+  // Append current player information.
+  absl::StrAppend(&str, std::to_string(cur_player_));
   return str;
 }
 
@@ -403,7 +406,7 @@ std::unique_ptr<State> BreakthroughGame::DeserializeState(
     const std::string& str) const {
   std::unique_ptr<State> state = NewInitialState();
 
-  if (str.length() != rows_ * cols_) {
+  if (str.length() != rows_ * cols_ + 1) {
     SpielFatalError("Incorrect number of characters in string.");
     return std::unique_ptr<State>();
   }
@@ -434,6 +437,8 @@ std::unique_ptr<State> BreakthroughGame::DeserializeState(
     }
   }
 
+  // -'0' to get the int value.
+  bstate->Set_cur_player(str.at(i) - '0');
   return state;
 }
 
