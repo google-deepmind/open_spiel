@@ -374,6 +374,62 @@ TabularPolicy GetFlatDirichletPolicy(
 }
 
 TabularPolicy GetRandomDeterministicPolicy(
+  const Game& game, int seed, Player player) {
+  std::mt19937 gen(seed);
+  absl::node_hash_map<int, std::uniform_int_distribution<int>> dists;
+  TabularPolicy policy = GetEmptyTabularPolicy(game, false, player);
+  std::unordered_map<std::string, ActionsAndProbs>& policy_table =
+      policy.PolicyTable();
+  for (auto& kv : policy_table) {
+    ActionsAndProbs state_policy;
+
+    // Need to calculate how many legal actions there are. Illegal actions
+    // can appear in kv.
+    int num_legal_actions = 0;
+    for (const auto& action_and_prob : kv.second) {
+      if (action_and_prob.second > 0) {
+        num_legal_actions += 1;
+      }
+    }
+    if (num_legal_actions == 0) {
+      SpielFatalError("State has zero legal actions.");
+    }
+    state_policy.reserve(num_legal_actions);
+
+    // The distribution functions have are calculated over a fixed domain. If
+    // the number of legal a ctions has not been encountered before, we need to
+    // create a new distribution function.
+    if (dists.count(num_legal_actions) == 0) {
+      std::uniform_int_distribution<int> dist(0, num_legal_actions - 1);
+      dists.insert({num_legal_actions, std::move(dist)});
+    }
+
+    const int action = dists[num_legal_actions](gen);
+    int legal_action_index = 0;
+    double prob = 0.0;
+    for (const auto& action_and_prob : kv.second) {
+      prob = 0.0;
+      if (action_and_prob.second > 0) {
+        if (legal_action_index == action) {
+          prob = 1.0;
+        }
+        legal_action_index += 1;
+      }
+      state_policy.push_back({action_and_prob.first, prob});
+    }
+
+    // This is included as a sanity check.
+    double normalized_sum = 0;
+    for (auto& action_and_prob : state_policy) {
+      normalized_sum += action_and_prob.second;
+    }
+    SPIEL_CHECK_FLOAT_EQ(normalized_sum, 1.0);
+    kv.second = state_policy;
+  }
+  return policy;
+}
+
+TabularPolicy GetRandomDeterministicVisitPolicy(
     const Game& game, int seed, Player player) {
   std::mt19937 gen(seed);
   absl::node_hash_map<int, std::uniform_int_distribution<int>> dists;

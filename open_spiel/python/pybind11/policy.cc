@@ -206,6 +206,9 @@ void init_pyspiel_policy(py::module& m) {
   m.def("GetRandomDeterministicPolicy",
       &open_spiel::GetRandomDeterministicPolicy,
       py::arg("game"), py::arg("seed"), py::arg("player") = -1);
+  m.def("GetRandomDeterministicVisitPolicy",
+      &open_spiel::GetRandomDeterministicVisitPolicy,
+      py::arg("game"), py::arg("seed"), py::arg("player") = -1);
   m.def("UniformRandomPolicy", &open_spiel::GetUniformPolicy);
 
   py::classh<open_spiel::UniformPolicy, open_spiel::Policy>(m, "UniformPolicy")

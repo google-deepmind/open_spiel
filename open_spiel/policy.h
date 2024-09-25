@@ -396,6 +396,11 @@ TabularPolicy GetRandomDeterministicPolicy(
     const Game& game, int seed = 0, Player player = -1);
 TabularPolicy GetFirstActionPolicy(const Game& game);
 
+// Returns a policy with only valid actions on states that are reachable.
+// Actions with zero probability or states that are unreachable are not present.
+TabularPolicy GetRandomDeterministicVisitPolicy(
+    const Game& game, int seed = 0, Player player = -1);
+
 // Returns a preferred action policy as a tabular policy.
 TabularPolicy GetPrefActionPolicy(const Game& game,
                                   const std::vector<Action>& pref_action);
