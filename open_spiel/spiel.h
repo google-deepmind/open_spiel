@@ -211,6 +211,17 @@ class State {
  public:
   virtual ~State() = default;
 
+  // convert from current state to a dictionary of array-likes
+  virtual std::unordered_map<std::string, std::vector<float>> ToDict() const {
+    SpielFatalError("ToDict is not implemented for this game state.");
+  }
+
+  // method to restore the state from a dictionary of array-likes.
+  virtual void FromDict(const std::unordered_map<std::string, std::vector<float>>& dict) {
+    SpielFatalError("FromDict is not implemented for this game state.");
+  }
+
+
   // Derived classes must call one of these constructors. Note that a state must
   // be passed a pointer to the game which created it. Some methods in some
   // games rely on this and so it must correspond to a valid game object.
