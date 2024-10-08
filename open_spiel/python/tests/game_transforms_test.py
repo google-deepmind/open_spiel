@@ -57,16 +57,17 @@ class RepeatedGameTest(absltest.TestCase):
 
   def test_cached_tree_sim(self):
     """Test both create_cached_tree function signatures."""
-    cached_tree_game = pyspiel.convert_to_cached_tree(
-        pyspiel.load_game("kuhn_poker"))
-    assert cached_tree_game.num_players() == 2
-    for _ in range(10):
-      state = cached_tree_game.new_initial_state()
-      while not state.is_terminal():
-        legal_actions = state.legal_actions()
-        action = np.random.choice(legal_actions)
-        state.apply_action(action)
-      self.assertTrue(state.is_terminal())
+    for game_name in ["kuhn_poker", "python_tic_tac_toe"]:
+      cached_tree_game = pyspiel.convert_to_cached_tree(
+          pyspiel.load_game(game_name))
+      assert cached_tree_game.num_players() == 2
+      for _ in range(10):
+        state = cached_tree_game.new_initial_state()
+        while not state.is_terminal():
+          legal_actions = state.legal_actions()
+          action = np.random.choice(legal_actions)
+          state.apply_action(action)
+        self.assertTrue(state.is_terminal())
 
   def test_cached_tree_cfr_kuhn(self):
     game = pyspiel.load_game("cached_tree(game=kuhn_poker())")
