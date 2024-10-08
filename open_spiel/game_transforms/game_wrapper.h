@@ -15,7 +15,16 @@
 #ifndef OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
 #define OPEN_SPIEL_GAME_TRANSFORMS_GAME_WRAPPER_H_
 
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel_globals.h"
 
 // Wraps a game, forwarding everything to the original implementation.
@@ -85,7 +94,7 @@ class WrappedState : public State {
     return state_->LegalChanceOutcomes();
   }
 
-  const State& GetWrappedState() const { return *state_; }
+  virtual const State& GetWrappedState() const { return *state_; }
 
   std::vector<Action> ActionsConsistentWithInformationFrom(
       Action action) const override {
@@ -93,6 +102,11 @@ class WrappedState : public State {
   }
 
  protected:
+  // Another copy constructor usable by subclasses. Currently used by the cached
+  // tree game wrapper.
+  WrappedState(const WrappedState& other, std::unique_ptr<State> state)
+      : State(other), state_(std::move(state)) {}
+
   void DoApplyAction(Action action_id) override {
     state_->ApplyAction(action_id);
   }

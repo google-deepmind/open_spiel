@@ -16,10 +16,21 @@
 
 from absl.testing import absltest
 
+import numpy as np
+
+from open_spiel.python.algorithms import cfr
+from open_spiel.python.algorithms import expected_game_score
 import pyspiel
 
 
+SEED = 1098097
+
+
 class RepeatedGameTest(absltest.TestCase):
+
+  def setUp(self):
+    super().setUp()
+    np.random.seed(SEED)
 
   def test_create_repeated_game(self):
     """Test both create_repeated_game function signatures."""
@@ -43,6 +54,31 @@ class RepeatedGameTest(absltest.TestCase):
     repeated_game = pyspiel.create_repeated_game(stage_game,
                                                  {"num_repetitions": 5})
     assert repeated_game.utility_sum() is None
+
+  def test_cached_tree_sim(self):
+    """Test both create_cached_tree function signatures."""
+    cached_tree_game = pyspiel.convert_to_cached_tree(
+        pyspiel.load_game("kuhn_poker"))
+    assert cached_tree_game.num_players() == 2
+    for _ in range(10):
+      state = cached_tree_game.new_initial_state()
+      while not state.is_terminal():
+        legal_actions = state.legal_actions()
+        action = np.random.choice(legal_actions)
+        state.apply_action(action)
+      self.assertTrue(state.is_terminal())
+
+  def test_cached_tree_cfr_kuhn(self):
+    game = pyspiel.load_game("cached_tree(game=kuhn_poker())")
+    cfr_solver = cfr.CFRSolver(game)
+    for _ in range(300):
+      cfr_solver.evaluate_and_update_policy()
+    average_policy = cfr_solver.average_policy()
+    average_policy_values = expected_game_score.policy_value(
+        game.new_initial_state(), [average_policy] * 2)
+    # 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
+    np.testing.assert_allclose(
+        average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
 
 
 if __name__ == "__main__":

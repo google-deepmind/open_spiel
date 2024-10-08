@@ -16,12 +16,16 @@
 
 // Python bindings for policies and algorithms handling them.
 
+#include <memory>
 #include <string>
 
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/game_transforms/cached_tree.h"
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
 #include "open_spiel/game_transforms/repeated_game.h"
 #include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
-#include "open_spiel/python/pybind11/pybind11.h"
+#include "open_spiel/python/pybind11/pybind11.h"  // NOLINT
 
 namespace open_spiel {
 namespace py = ::pybind11;
@@ -58,5 +62,21 @@ void init_pyspiel_game_transforms(py::module& m) {
         py::overload_cast<const std::string&, const GameParameters&>(
             &CreateRepeatedGame),
         "Creates a repeated game from a stage game.");
+
+  m.def("convert_to_cached_tree",
+        [](std::shared_ptr<const Game> game) {
+          return cached_tree::ConvertToCachedTree(*game);
+        },
+        "Returns a cached tree version of the given game.");
+
+  m.def("load_game_as_cached_tree",
+        py::overload_cast<const std::string&>(
+            &cached_tree::LoadGameAsCachedTree),
+        "Loads a game as cached tree wrapped game.");
+
+  m.def("load_game_as_cached_tree",
+        py::overload_cast<const std::string&, const GameParameters&>(
+            &cached_tree::LoadGameAsCachedTree),
+        "Loads a game as cached tree wrapped game.");
 }
 }  // namespace open_spiel

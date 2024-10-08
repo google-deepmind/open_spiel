@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for open_spiel.python.pybind11.pyspiel."""
+"""General tests for pyspiel python bindings."""
 
 import os
 from absl.testing import absltest
@@ -34,6 +34,7 @@ EXPECTED_GAMES = frozenset([
     "breakthrough",
     "bridge",
     "bridge_uncontested_bidding",
+    "cached_tree",
     "catch",
     "chat_game",  # python game locating in python/games/chat_games/
     "checkers",
@@ -157,7 +158,7 @@ class PyspielTest(absltest.TestCase):
     expected = sorted(expected)
     self.assertCountEqual(game_names, expected)
 
-  def teste_default_loadable(self):
+  def test_default_loadable(self):
     # Games which cannmot be loaded with default parameters will be skipped by
     # several standard tests. We make a list of such games here in order to make
     # implementors think twice about making new games non-default-loadable
@@ -170,6 +171,7 @@ class PyspielTest(absltest.TestCase):
         # Being non-default-loadable prevents various automated tests.
         # Only add games here if there is no sensible default for a parameter.
         "add_noise",
+        "cached_tree",
         "efg_game",
         "nfg_game",
         "misere",
