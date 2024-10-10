@@ -75,6 +75,7 @@ set(GAME_SOURCES
   euchre/euchre.h
   first_sealed_auction/first_sealed_auction.cc
   first_sealed_auction/first_sealed_auction.h
+  german_whist_foregame/german_whist_endgame.cc
   german_whist_foregame/german_whist_foregame.cc
   german_whist_foregame/german_whist_foregame.h
   gin_rummy/gin_rummy.cc
@@ -439,8 +440,8 @@ add_test(garnet_test garnet_test)
 
 add_executable(german_whist_foregame_test german_whist_foregame/german_whist_foregame_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
-add_test(german_whist_foregame_test german_whist_foregame_test)  
-add_executable(german_whist_endgame german_whist_foregame/german_whist_endgame.cc ${OPEN_SPIEL_OBJECTS})
+add_test(german_whist_foregame_test german_whist_foregame_test)
+add_executable(german_whist_build_ttable german_whist_foregame/german_whist_build_ttable.cc ${OPEN_SPIEL_OBJECTS})
 
 add_executable(gin_rummy_test gin_rummy/gin_rummy_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
