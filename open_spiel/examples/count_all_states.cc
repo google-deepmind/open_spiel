@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   std::string game_name = absl::GetFlag(FLAGS_game_string);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame(absl::GetFlag(game_name));
+      open_spiel::LoadGame(game_name);
   std::vector<std::unique_ptr<open_spiel::State>> all_histories =
       GetAllHistories(*game, /*depth_limit=*/-1, /*include_terminals=*/true,
                       /*include_chance_states=*/true);
