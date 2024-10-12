@@ -75,9 +75,6 @@ set(GAME_SOURCES
   euchre/euchre.h
   first_sealed_auction/first_sealed_auction.cc
   first_sealed_auction/first_sealed_auction.h
-  german_whist_foregame/german_whist_endgame.cc
-  german_whist_foregame/german_whist_foregame.cc
-  german_whist_foregame/german_whist_foregame.h
   gin_rummy/gin_rummy.cc
   gin_rummy/gin_rummy.h
   gin_rummy/gin_rummy_utils.cc
