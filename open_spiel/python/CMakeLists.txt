@@ -224,6 +224,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   games/data_test.py
   games/dynamic_routing_test.py
   games/dynamic_routing_utils_test.py
+  games/gt3_test.py
   games/liars_poker_test.py
   games/team_dominoes_test.py
   games/tic_tac_toe_test.py
@@ -350,6 +351,7 @@ endif()
 # Some bundle data not shipped with the wheel (e.g. playthroughs)
 set(WHEEL_EXCLUDED_PYTHON_TESTS
   algorithms/response_graph_ucb_test.py
+  games/gt3_test.py
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
 
