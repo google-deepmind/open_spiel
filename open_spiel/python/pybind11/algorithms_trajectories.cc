@@ -54,7 +54,7 @@ void init_pyspiel_algorithms_trajectories(py::module& m) {
 
   m.def(
       "record_batched_trajectories",
-      [](std::shared_ptr<const Game> game,
+      [](const std::shared_ptr<const Game>& game,
          const std::vector<TabularPolicy>& policies,
          const std::unordered_map<std::string, int>& state_to_index,
          int batch_size, bool include_full_observations, int seed,
@@ -68,7 +68,7 @@ void init_pyspiel_algorithms_trajectories(py::module& m) {
   py::class_<open_spiel::algorithms::TrajectoryRecorder>(m,
                                                          "TrajectoryRecorder")
       .def(py::init(
-          [](std::shared_ptr<const Game> game,
+          [](const std::shared_ptr<const Game>& game,
              const std::unordered_map<std::string, int>& state_to_index,
              int seed) {
             return new algorithms::TrajectoryRecorder(*game, state_to_index,
