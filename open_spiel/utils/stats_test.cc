@@ -85,6 +85,19 @@ void TestHistogramNumbered() {
   SPIEL_CHECK_EQ(hist.ToJson(), json::Array({0, 0, 0}));
 }
 
+void TestHistogramTooLarge() {
+  HistogramNumbered hist(3);
+  hist.Add(-2);
+  hist.Add(-1);
+  hist.Add(0);
+  hist.Add(1);
+  hist.Add(2);
+  hist.Add(3);
+  hist.Add(4);
+
+  SPIEL_CHECK_EQ(hist.ToJson(), json::Array({3, 1, 3}));
+}
+
 void TestHistogramNamed() {
   HistogramNamed hist({"win", "loss", "draw"});
   hist.Add(0);
@@ -112,5 +125,6 @@ void TestHistogramNamed() {
 int main(int argc, char** argv) {
   open_spiel::TestBasicStats();
   open_spiel::TestHistogramNumbered();
+  open_spiel::TestHistogramTooLarge();
   open_spiel::TestHistogramNamed();
 }

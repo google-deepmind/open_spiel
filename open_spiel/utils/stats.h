@@ -17,6 +17,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <limits>
+#include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/utils/json.h"
@@ -84,13 +88,16 @@ class BasicStats {
   double sum_sq_;
 };
 
-// Track the occurences for `count` buckets. You need to decide how to map your
+// Track the occurrences for `count` buckets. You need to decide how to map your
 // data into the buckets. Mainly useful for scalar values.
 class HistogramNumbered {
  public:
   explicit HistogramNumbered(int num_buckets) : counts_(num_buckets, 0) {}
   void Reset() { absl::c_fill(counts_, 0); }
-  void Add(int bucket_id) { counts_[bucket_id] += 1; }
+  void Add(int bucket_id) {
+    bucket_id = std::clamp<int>(bucket_id, 0, counts_.size() - 1);
+    counts_[bucket_id] += 1;
+  }
   json::Array ToJson() const { return json::CastToArray(counts_); }
 
  private:
