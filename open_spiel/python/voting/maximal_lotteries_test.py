@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.voting.maximal_lotteries."""
-
 from absl.testing import absltest
 from absl.testing import parameterized
 
@@ -35,7 +33,7 @@ class MaximalLotteriesTest(parameterized.TestCase):
     # probablity 1.
     votes = [["a", "b", "c"], ["a", "c", "b"], ["b", "a", "c"]]
     profile = base.PreferenceProfile(votes=votes)
-    method = maximal_lotteries.MaximalLotteriesVoting()
+    method = maximal_lotteries.MaximalLotteriesVoting(iterative=False)
     outcome = method.run_election(profile)
     with self.subTest("Top-rank the condorcet winner"):
       self.assertEqual(outcome.ranking[0], "a")

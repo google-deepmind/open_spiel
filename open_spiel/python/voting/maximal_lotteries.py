@@ -27,7 +27,7 @@ class MaximalLotteriesVoting(base.AbstractVotingMethod):
   """Implements Copeland's method."""
 
   def __init__(self,
-               iterative: bool = False,
+               iterative: bool = True,
                verbose: bool = False,
                zero_tolerance: float = 1e-6):
     self._iterative = iterative
