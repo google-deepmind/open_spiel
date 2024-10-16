@@ -14,6 +14,7 @@
 
 #include "open_spiel/algorithms/dqn_torch/dqn.h"
 
+#include <torch/optim/sgd.h>
 #include <torch/torch.h>
 
 #include <algorithm>
@@ -27,6 +28,7 @@
 #include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -48,10 +50,8 @@ DQN::DQN(const DQNSettings& settings)
     : seed_(settings.seed),
       use_observation_(settings.use_observation),
       player_id_(settings.player_id),
-      input_size_(settings.state_representation_size),
       num_actions_(settings.num_actions),
       hidden_layers_sizes_(settings.hidden_layers_sizes),
-      batch_size_(settings.batch_size),
       update_target_network_every_(settings.update_target_network_every),
       learn_every_(settings.learn_every),
       min_buffer_size_to_learn_(settings.min_buffer_size_to_learn),
@@ -60,15 +60,17 @@ DQN::DQN(const DQNSettings& settings)
       epsilon_end_(settings.epsilon_end),
       epsilon_decay_duration_(settings.epsilon_decay_duration),
       replay_buffer_(settings.replay_buffer_capacity),
+      batch_size_(settings.batch_size),
+      step_counter_(0),
+      exists_prev_(false),
+      prev_state_(nullptr),
+      prev_action_(0),
+      input_size_(settings.state_representation_size),
+      loss_str_(settings.loss_str),
       q_network_(input_size_, hidden_layers_sizes_, num_actions_),
       target_q_network_(input_size_, hidden_layers_sizes_, num_actions_),
       optimizer_(q_network_->parameters(),
                  torch::optim::SGDOptions(settings.learning_rate)),
-      loss_str_(settings.loss_str),
-      exists_prev_(false),
-      prev_state_(nullptr),
-      prev_action_(0),
-      step_counter_(0),
       rng_(settings.seed) {}
 
 std::vector<float> DQN::GetInfoState(const State& state,
@@ -161,7 +163,8 @@ Action DQN::EpsilonGreedy(std::vector<float> info_state,
     action = SampleAction(actions_probs, rng_).first;
   } else {
     torch::Tensor info_state_tensor =
-        torch::from_blob(info_state.data(), {info_state.size()},
+        torch::from_blob(info_state.data(),
+                         {static_cast<long>(info_state.size())},
                          torch::dtype(torch::kFloat32))
             .view({1, -1});
     q_network_->eval();
@@ -204,18 +207,18 @@ void DQN::Learn() {
   std::vector<int> are_final_steps;
   for (auto t : transition) {
     info_states.push_back(
-        torch::from_blob(
-            t.info_state.data(),
-            {1, t.info_state.size()},
-            torch::TensorOptions().dtype(torch::kFloat32)).clone());
+        torch::from_blob(t.info_state.data(),
+                         {1, static_cast<long>(t.info_state.size())},
+                         torch::TensorOptions().dtype(torch::kFloat32))
+            .clone());
     next_info_states.push_back(
-        torch::from_blob(
-            t.next_info_state.data(),
-            {1, t.next_info_state.size()},
-            torch::TensorOptions().dtype(torch::kFloat32)).clone());
+        torch::from_blob(t.next_info_state.data(),
+                         {1, static_cast<long>(t.next_info_state.size())},
+                         torch::TensorOptions().dtype(torch::kFloat32))
+            .clone());
     legal_actions_mask.push_back(
         torch::from_blob(t.legal_actions_mask.data(),
-                         {1, t.legal_actions_mask.size()},
+                         {1, static_cast<long>(t.legal_actions_mask.size())},
                          torch::TensorOptions().dtype(torch::kBool))
             .clone());
     actions.push_back(t.action);

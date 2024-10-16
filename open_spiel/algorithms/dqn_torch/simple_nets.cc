@@ -19,6 +19,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace open_spiel {
 namespace algorithms {
@@ -28,9 +29,9 @@ constexpr double kSqrt2 = 1.4142135623730950488;
 
 SimpleLinearImpl::SimpleLinearImpl(int input_size, int output_size,
                                    bool activate_relu)
-    : simple_linear_(torch::nn::LinearOptions(/*in_features*/ input_size,
-                                              /*out_features*/ output_size)),
-      activate_relu_(activate_relu) {
+    : activate_relu_(activate_relu),
+      simple_linear_(torch::nn::LinearOptions(/*in_features*/ input_size,
+                                              /*out_features*/ output_size)) {
   double stddev = 1.0 / std::sqrt(input_size);
   double lower = -2.0 * stddev;
   double upper = 2.0 * stddev;
@@ -55,7 +56,7 @@ torch::Tensor SimpleLinearImpl::forward(torch::Tensor x) {
   if (activate_relu_) {
     return torch::relu(simple_linear_->forward(x));
   } else {
-    return simple_linear_->forward(x);;
+    return simple_linear_->forward(x);
   }
 }
 
