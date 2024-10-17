@@ -17,8 +17,11 @@
 #include <torch/torch.h>
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
+
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -356,7 +359,7 @@ std::vector<torch::Tensor> ModelImpl::losses(torch::Tensor inputs,
     std::string parameter_name = named_parameter.key();
 
     // Do not include bias' in the loss.
-    if (parameter_name.find("bias") != std::string::npos) {
+    if (absl::StrContains(parameter_name, "bias")) {
       continue;
     }
 
@@ -384,7 +387,7 @@ std::vector<torch::Tensor> ModelImpl::forward_(torch::Tensor x,
     }
   } else if (this->nn_model_ == "mlp") {
     for (int i = 0; i < num_torso_blocks_ + 1; i++) {
-        x = layers_[i]->as<MLPBlock>()->forward(x);
+      x = layers_[i]->as<MLPBlock>()->forward(x);
     }
     output = layers_[num_torso_blocks_ + 1]->as<MLPOutputBlockImpl>()
         ->forward(x, mask);

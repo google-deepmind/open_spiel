@@ -18,11 +18,12 @@
 
 #include <random>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace {
@@ -95,6 +96,7 @@ void TestSerializableCircularBuffer() {
 }
 
 void TestSimpleSerializableCircularBufferSerialization() {
+  std::string filename = file::GetTmpDir() + "/" + kSimpleSerializationFilename;
   SerializableCircularBuffer<int> original_buffer(6);
   original_buffer.Add(1);
   original_buffer.Add(2);
@@ -102,17 +104,20 @@ void TestSimpleSerializableCircularBufferSerialization() {
   original_buffer.Add(4);
   original_buffer.Add(5);
   original_buffer.Add(6);
-  original_buffer.SaveBuffer(kSimpleSerializationFilename);
+  original_buffer.SaveBuffer(filename);
 
   SerializableCircularBuffer<int> new_buffer(6);
-  new_buffer.LoadBuffer(kSimpleSerializationFilename);
+  new_buffer.LoadBuffer(filename);
 
   SPIEL_CHECK_EQ(original_buffer.Size(), new_buffer.Size());
   SPIEL_CHECK_EQ(original_buffer.TotalAdded(), new_buffer.TotalAdded());
   SPIEL_CHECK_TRUE(original_buffer.Data() == new_buffer.Data());
+  SPIEL_CHECK_TRUE(file::Remove(filename));
 }
 
 void TestComplexSerializableCircularBufferSerialization() {
+  std::string filename =
+      file::GetTmpDir() + "/" + kComplexSerializationFilename;
   TestStruct struct1 = {.action_vector = {1, 2, 3},
                         .float_vector = {1.0f, 2.0f, 3.0f},
                         .actions_and_probs = {{1, 1.0}, {2, 2.0}, {3, 3.0}},
@@ -130,28 +135,23 @@ void TestComplexSerializableCircularBufferSerialization() {
   original_buffer.Add(struct1);
   original_buffer.Add(struct2);
   original_buffer.Add(struct3);
-  original_buffer.SaveBuffer(kComplexSerializationFilename);
+  original_buffer.SaveBuffer(filename);
 
   SerializableCircularBuffer<TestStruct> new_buffer(3);
-  new_buffer.LoadBuffer(kComplexSerializationFilename);
+  new_buffer.LoadBuffer(filename);
 
   SPIEL_CHECK_EQ(original_buffer.Size(), new_buffer.Size());
   SPIEL_CHECK_EQ(original_buffer.TotalAdded(), new_buffer.TotalAdded());
   SPIEL_CHECK_TRUE(original_buffer.Data() == new_buffer.Data());
-}
-
-void EndCircularBufferTest() {
-  // Remove the files created in the serialization tests.
-  file::Remove(kSimpleSerializationFilename);
-  file::Remove(kComplexSerializationFilename);
+  SPIEL_CHECK_TRUE(file::Remove(filename));
 }
 
 }  // namespace
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
   open_spiel::TestSerializableCircularBuffer();
   open_spiel::TestSimpleSerializableCircularBufferSerialization();
   open_spiel::TestComplexSerializableCircularBufferSerialization();
-  open_spiel::EndCircularBufferTest();
 }

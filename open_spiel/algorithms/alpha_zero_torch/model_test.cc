@@ -17,10 +17,11 @@
 #include <torch/torch.h>
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 

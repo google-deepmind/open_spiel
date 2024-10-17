@@ -18,9 +18,12 @@
 #include <torch/torch.h>
 
 #include <nop/structure.h>
+#include <string>
+#include <vector>
 
 #include "open_spiel/algorithms/alpha_zero_torch/model.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -124,7 +127,7 @@ class VPNetModel {
   void LoadCheckpoint(int step);
   void LoadCheckpoint(const std::string& path);
 
-  const std::string Device() const { return device_; }
+  std::string Device() const { return device_; }
 
  private:
   std::string device_;

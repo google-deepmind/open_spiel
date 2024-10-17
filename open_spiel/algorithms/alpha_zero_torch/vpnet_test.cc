@@ -14,17 +14,19 @@
 
 #include "open_spiel/algorithms/alpha_zero_torch/vpnet.h"
 
-#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
+#include "open_spiel/utils/init.h"
 
 namespace open_spiel {
 namespace algorithms {
@@ -200,6 +202,7 @@ void TestModelLearnsOptimal(
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
   open_spiel::algorithms::torch_az::TestModelCreation("resnet");
 
   // Tests below here reuse the graphs created above. Graph creation is slow
