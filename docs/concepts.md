@@ -39,7 +39,7 @@ There are mainly 2 concepts to know about (defined in
 *   A `Game` object contains the high level description for a game (e.g. whether
     it is simultaneous or sequential, the number of players, the maximum and
     minimum scores).
-*   A `State`, which describe a specifics point (e.g. a specific board position
+*   A `State`, which describes a specific point (e.g. a specific board position
     in chess, a specific set of player cards, public cards and past bets in
     Poker) within a trajectory.
 
