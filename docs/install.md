@@ -116,11 +116,11 @@ In a nutshell:
     pip3 install --upgrade setuptools testresources
     ```
 
-    Additionally, if you intend to use one of the
-    optional Python dependencies (see [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)), you
-    must manually install and/or upgrade them, e.g.: `bash pip install --upgrade
-    torch==x.xx.x jax==x.x.x` where `x.xx.x` should be the desired version
-    numbers (which can be found at the link above).
+    Additionally, if you intend to use one of the optional Python dependencies
+    (see [open_spiel/scripts/install.sh](https://github.com/deepmind/open_spiel/blob/master/open_spiel/scripts/install.sh)), you must manually
+    install and/or upgrade them, e.g.: `bash pip install --upgrade torch==x.xx.x
+    jax==x.x.x` where `x.xx.x` should be the desired version numbers (which can
+    be found at the link above).
 
 4.  This sections differs depending on the installation procedure:
 
@@ -152,8 +152,8 @@ In a nutshell:
     export PYTHONPATH=$PYTHONPATH:/<path_to_open_spiel>/build/python
     ```
 
-    to `./venv/bin/activate` or your `~/.bashrc` to be able to import OpenSpiel
-    from anywhere.
+    add it to `./venv/bin/activate` or your `~/.bashrc` to be able to import
+    OpenSpiel from anywhere.
 
 To make sure OpenSpiel works on the default configurations, we do use the
 `python3` command and not `python` (which still defaults to Python 2 on modern
@@ -320,7 +320,7 @@ rest) from any location, you will need to add to your PYTHONPATH the root
 directory and the `open_spiel` directory.
 
 When using a virtualenv, the following should be added to
-`<virtualenv>/bin/activate`. For a system-wide install, ddd it in your `.bashrc`
+`<virtualenv>/bin/activate`. For a system-wide install, add it in your `.bashrc`
 or `.profile`.
 
 ```bash
