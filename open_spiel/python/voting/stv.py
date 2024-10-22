@@ -15,8 +15,7 @@
 
 Based on https://en.wikipedia.org/wiki/Single_transferable_vote.
 """
-
-from typing import Dict, List, Union
+from collections.abc import Sequence
 from open_spiel.python.voting import base
 
 
@@ -31,7 +30,7 @@ class MutableVote(object):
   alternative.
   """
 
-  def __init__(self, idx: int, weight: int, vote: List[base.AlternativeId]):
+  def __init__(self, idx: int, weight: int, vote: Sequence[base.AlternativeId]):
     self.idx = idx
     self.weight = weight
     self.vote = vote
@@ -41,7 +40,7 @@ class STVVoting(base.AbstractVotingMethod):
   """Implements STV method."""
 
   def __init__(
-      self, num_winners: Union[int, None] = None, verbose: bool = False
+      self, num_winners: int | None = None, verbose: bool = False
   ):
     """Construct an instance of STV with the specified number of winners.
 
@@ -59,8 +58,8 @@ class STVVoting(base.AbstractVotingMethod):
   def _is_still_active(
       self,
       alternative: base.AlternativeId,
-      winners: List[base.AlternativeId],
-      losers: List[base.AlternativeId],
+      winners: Sequence[base.AlternativeId],
+      losers: Sequence[base.AlternativeId],
   ) -> bool:
     """Returns whether the alternative is still in the running."""
     return alternative not in winners and alternative not in losers
@@ -68,8 +67,8 @@ class STVVoting(base.AbstractVotingMethod):
   def _next_idx_in_the_running(
       self,
       mutable_vote: MutableVote,
-      winners: List[base.AlternativeId],
-      losers: List[base.AlternativeId],
+      winners: Sequence[base.AlternativeId],
+      losers: Sequence[base.AlternativeId],
   ) -> int:
     """"Returns the next index in the list that is still in the running."""
     new_idx = mutable_vote.idx + 1
@@ -82,9 +81,9 @@ class STVVoting(base.AbstractVotingMethod):
   def _initial_scores_for_round(
       self,
       profile: base.PreferenceProfile,
-      winners: List[base.AlternativeId],
-      losers: List[base.AlternativeId],
-  ) -> Dict[base.AlternativeId, float]:
+      winners: Sequence[base.AlternativeId],
+      losers: Sequence[base.AlternativeId],
+  ) -> dict[base.AlternativeId, float]:
     """Returns round's initial scores for alternatives still in the running."""
     alt_scores = {}
     for alt in profile.alternatives:
@@ -96,7 +95,7 @@ class STVVoting(base.AbstractVotingMethod):
       self,
       winning_alt: base.AlternativeId,
       num_to_remove: int,
-      all_votes: List[MutableVote],
+      all_votes: Sequence[MutableVote],
   ):
     while num_to_remove > 0:
       for mutable_vote in all_votes:
@@ -129,7 +128,7 @@ class STVVoting(base.AbstractVotingMethod):
     # the current alternative that this vote is representing. They all start at
     # 0 at the start, corresponding to their highest preference, and they get
     # incremented as they become used up.
-    all_votes: List[MutableVote] = []
+    all_votes: list[MutableVote] = []
     for vote in votes:
       all_votes.append(MutableVote(idx=0, weight=vote.weight, vote=vote.vote))
     while len(winners) + len(losers) < m:

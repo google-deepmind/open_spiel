@@ -15,15 +15,17 @@
 """Base classes for voting methods."""
 
 import abc
-from typing import Dict, List, NamedTuple, Tuple, Union
+from collections.abc import Sequence
+from typing import NamedTuple, TypeAlias
+
 import numpy as np
 
 
 # The id of an alternative can be a string or an integer.
-AlternativeId = Union[str, int]
+AlternativeId = str | int
 
-# List of alternative ids.
-PreferenceList = List[AlternativeId]
+# list of alternative ids.
+PreferenceList = Sequence[AlternativeId]
 
 
 # Basic type to represent a vote.
@@ -34,21 +36,23 @@ class WeightedVote(NamedTuple):
   weight: int
   vote: PreferenceList
 
+VoteType: TypeAlias = PreferenceList | WeightedVote
+
 
 class PreferenceProfile(object):
   """Base class for preference profiles.
 
   IMPORTANT NOTE: see the assumptions below about indexing of alternatives.
   """
-  _votes: List[WeightedVote]  # Tracks cast votes along with their count
-  _alternatives_dict: Dict[AlternativeId, int]  # Maps ID to index
+  _votes: list[WeightedVote]  # Tracks cast votes along with their count
+  _alternatives_dict: dict[AlternativeId, int]  # Maps ID to index
   # Identifiers for all possible alternatives
-  _alternatives_ids: List[AlternativeId]
+  _alternatives_ids: list[AlternativeId]
 
   def __init__(
       self,
-      votes: Union[List[PreferenceList], List[WeightedVote], None] = None,
-      alternatives: Union[List[AlternativeId], None] = None,
+      votes: Sequence[VoteType] | None = None,
+      alternatives: Sequence[AlternativeId] | None = None
   ):
     """Initialize the preference profile.
 
@@ -71,13 +75,13 @@ class PreferenceProfile(object):
     The alternatives_dict property below will return a dictionary of alternative
     IDs to index.
     """
-    # List of Vote named tuples from above.
-    self._votes: List[WeightedVote] = []
+    # list of Vote named tuples from above.
+    self._votes: list[WeightedVote] = []
     # alternative id -> index (used for registering alternatives)
-    self._alternatives_dict: Dict[AlternativeId, int] = {}
+    self._alternatives_dict: dict[AlternativeId, int] = {}
     # IDs (labels) of each alternative (usually strings). The alternative's
     # index is then the index of this array.
-    self._alternatives_ids: List[AlternativeId] = []
+    self._alternatives_ids: list[AlternativeId] = []
 
     # Register the alternatives and add the votes, if any are provided.
     if alternatives is not None:
@@ -109,7 +113,7 @@ class PreferenceProfile(object):
         self._register_alternative(alternative)
 
   def add_vote(
-      self, vote: Union[PreferenceList, WeightedVote], weight: int = 1
+      self, vote: VoteType, weight: int = 1
   ):
     """Add a vote to this preference profile.
 
@@ -137,7 +141,7 @@ class PreferenceProfile(object):
 
   def add_vote_from_values(
       self,
-      values: Union[List[float], List[int]],
+      values: Sequence[float],
       tie_tolerance: float = 1e-10,
       weight: int = 1,
   ):
@@ -189,17 +193,17 @@ class PreferenceProfile(object):
     self.add_vote(named_vote, weight=weight)
 
   @property
-  def votes(self) -> List[WeightedVote]:
+  def votes(self) -> list[WeightedVote]:
     """Returns a list of votes."""
     return self._votes
 
   @property
-  def alternatives(self) -> List[AlternativeId]:
+  def alternatives(self) -> list[AlternativeId]:
     """Returns a list of alternatives."""
     return self._alternatives_ids
 
   @property
-  def alternatives_dict(self) -> Dict[AlternativeId, int]:
+  def alternatives_dict(self) -> dict[AlternativeId, int]:
     """Returns a dict of alternative id -> index for each alternative."""
     return self._alternatives_dict
 
@@ -244,7 +248,7 @@ class PreferenceProfile(object):
     return pref_matrix - pref_matrix.T
 
   def condorcet_winner(
-      self, strong: bool = True, margin_matrix: Union[np.ndarray, None] = None
+      self, strong: bool = True, margin_matrix: np.ndarray | None = None
   ):
     """Returns the Condorcet winner(s).
 
@@ -336,14 +340,15 @@ class RankOutcome(object):
   """Basic object for outcomes of the voting methods."""
 
   def __init__(self, rankings=None, scores=None):
-    self._rankings: List[AlternativeId] = rankings
-    self._scores: List[float] = scores
-    self._rank_dict: Dict[AlternativeId, int] = None
+    self._rankings: list[AlternativeId] = rankings
+    self._scores: list[float] = scores
+    self._rank_dict: dict[AlternativeId, int] = None
     if self._rankings is not None:
       self.make_rank_dict()
 
   def unpack_from(
-      self, ranked_alternatives_and_scores: List[Tuple[AlternativeId, float]]
+      self,
+      ranked_alternatives_and_scores: Sequence[tuple[AlternativeId, float]],
   ):
     """A rank outcome that comes packed as (alternative id, score) tuples."""
     self._rankings, self._scores = zip(*ranked_alternatives_and_scores)
@@ -352,16 +357,16 @@ class RankOutcome(object):
     self.make_rank_dict()
 
   @property
-  def ranking(self) -> List[AlternativeId]:
+  def ranking(self) -> list[AlternativeId]:
     """Returns an ordered list W of alternatives' ids (winner is first)."""
     return self._rankings
 
   @property
-  def scores(self) -> List[float]:
+  def scores(self) -> list[float]:
     """Returns a alternative's scores S (in the same order as the ranking)."""
     return self._scores
 
-  def ranking_with_scores(self) -> Tuple[List[AlternativeId], List[float]]:
+  def ranking_with_scores(self) -> tuple[list[AlternativeId], list[float]]:
     """Returns an ordered list of alternative ids and dict of scores W, S."""
     return self._rankings, self._scores
 
@@ -389,7 +394,7 @@ class RankOutcome(object):
       str_rep += "Scores: " + str(self._scores)
     return str_rep
 
-  def pretty_table_string(self, top: Union[int, None] = None):
+  def pretty_table_string(self, top: int | None = None):
     """Return an easier-to-read table for the rankings and scores.
 
     Args:
@@ -421,7 +426,7 @@ class RankOutcome(object):
     return table_string
 
   def pretty_latex_table(
-      self, header: Union[str, None] = None, top: Union[int, None] = None
+      self, header: str | None = None, top: int | None = None
   ):
     """Return an easier-to-read table string for the rankings and scores.
 
