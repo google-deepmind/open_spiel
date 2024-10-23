@@ -396,9 +396,9 @@ class DQN(rl_agent.AbstractAgent):
     if copy_weights:
       with torch.no_grad():
         for q_model in q_network.model:
-          q_model.weight *= (1 + sigma * torch.randn(q_model.weight.shape))
+          q_model._weight *= (1 + sigma * torch.randn(q_model._weight.shape))
         for tq_model in target_q_network.model:
-          tq_model.weight *= (1 + sigma * torch.randn(tq_model.weight.shape))
+          tq_model._weight *= (1 + sigma * torch.randn(tq_model._weight.shape))
     return copied_object
 
   def save(self, data_path, optimizer_data_path=None):
