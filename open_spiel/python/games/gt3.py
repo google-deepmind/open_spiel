@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Lint as python3
-"""Tic tac toe (noughts and crosses), implemented in Python.
+"""Generalized version of Tic tac toe (noughts and crosses), implemented in Python.
 
 This is a demonstration of implementing a deterministic perfect-information
 game in Python.
@@ -62,7 +62,7 @@ _GAME_INFO = pyspiel.GameInfo(
 
 
 class GT3Game(pyspiel.Game):
-  """A Python version of the Tic-Tac-Toe game."""
+  """A Python version of a Generalized Tic-Tac-Toe game."""
 
   def __init__(self, params=None):
     super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
@@ -81,7 +81,7 @@ class GT3Game(pyspiel.Game):
 
 
 class GT3State(pyspiel.State):
-  """A python version of the Tic-Tac-Toe state."""
+  """A python version of the Generalized Tic-Tac-Toe state."""
 
   def __init__(self, game):
     """Constructor; should only be called by Game.new_initial_state."""
