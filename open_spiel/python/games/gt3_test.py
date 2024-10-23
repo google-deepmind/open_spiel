@@ -32,7 +32,7 @@ import pyspiel
 _DATA_DIR = "open_spiel/integration_tests/playthroughs/"
 
 
-class TicTacToeTest(absltest.TestCase):
+class GT3Test(absltest.TestCase):
 
   def test_can_create_game_and_state(self):
     """Checks we can create the game and a state."""
