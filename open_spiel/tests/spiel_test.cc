@@ -339,6 +339,28 @@ void PolicySerializationTest() {
 }  // namespace testing
 }  // namespace open_spiel
 
+void TestStateToDictAndFromDict() {
+  // Load Tic-Tac-Toe
+  std::shared_ptr<const Game> game = LoadGame("tic_tac_toe");
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  // apply some moves to change the state 
+  state->ApplyAction(0);  // Player 1 places an 'X' in the top-left corner
+  state->ApplyAction(4);  // Player 2 places an 'O' in the center
+
+  // convert the state to a dictionary using ToDict()
+  std::unordered_map<std::string, std::vector<float>> state_dict = state->ToDict();
+
+  // create a new initial state and restore it using FromDict()
+  std::unique_ptr<State> new_state = game->NewInitialState();
+  new_state->FromDict(state_dict);
+
+  // check that the original state and the restored state are equivalent
+  SPIEL_CHECK_EQ(state->ToString(), new_state->ToString());
+
+}
+
+
 int main(int argc, char** argv) {
   open_spiel::testing::GeneralTests();
   open_spiel::testing::KuhnTests();
@@ -349,4 +371,6 @@ int main(int argc, char** argv) {
   open_spiel::testing::LeducPokerDeserializeTest();
   open_spiel::testing::GameParametersTest();
   open_spiel::testing::PolicySerializationTest();
+  // new test function
+  open_spiel::testing::TestStateToDictAndFromDict();
 }
