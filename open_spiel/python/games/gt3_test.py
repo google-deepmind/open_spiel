@@ -36,7 +36,12 @@ class GT3Test(absltest.TestCase):
 
   def test_can_create_game_and_state(self):
     """Checks we can create the game and a state."""
-    game = gt3.GT3Game()
+    game = gt3.GT3Game(
+      {
+        "board_size": 3,
+        "win_condition": 3
+      }
+    )
     state = game.new_initial_state()
     self.assertEqual(str(state), "...\n...\n...")
 
@@ -46,7 +51,12 @@ class GT3Test(absltest.TestCase):
     # More serious simulation tests are done in python/tests/games_sim_test.py
     # and in test_game_from_cc (below), both of which test the conformance to
     # the API thoroughly.
-    game = gt3.GT3Game()
+    game = gt3.GT3Game(
+      {
+        "board_size": 3,
+        "win_condition": 3
+      }
+   )
     state = game.new_initial_state()
     while not state.is_terminal():
       print(state)
@@ -82,7 +92,12 @@ class GT3Test(absltest.TestCase):
 
 def test_cloned_state_matches_original_state(self):
     """Check we can clone states successfully."""
-    game = gt3.GT3Game()
+    game = gt3.GT3Game(
+      {
+        "board_size": 3,
+        "win_condition": 3
+      }
+   )
     state = game.new_initial_state()
     state.apply_action(1)
     state.apply_action(2)

@@ -57,14 +57,6 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_string=True,
     provides_observation_tensor=True,
     parameter_specification=_DEFAULT_PARAMS)
-_GAME_INFO = pyspiel.GameInfo(
-    num_distinct_actions=_NUM_CELLS,
-    max_chance_outcomes=0,
-    num_players=2,
-    min_utility=-1.0,
-    max_utility=1.0,
-    utility_sum=0.0,
-    max_game_length=_NUM_CELLS)
 
 
 class GT3Game(pyspiel.Game):
@@ -72,10 +64,22 @@ class GT3Game(pyspiel.Game):
 
   def __init__(
       self,
-      params: Mapping[str, Any]):
+      params: Mapping[str, Any]
+  ):
     board_size = params["board_size"]
+    num_cells = board_size * board_size
     win_condition = params["win_condition"]
-    super().__init__(_GAME_TYPE, _GAME_INFO, params if params else {})
+    self.win_condition = win_condition
+    game_info = pyspiel.GameInfo(
+      num_distinct_actions=num_cells,
+      max_chance_outcomes=0,
+      num_players=2,
+      min_utility=-1.0,
+      max_utility=1.0,
+      utility_sum=0.0,
+      max_game_length=num_cells
+    )
+    super().__init__(_GAME_TYPE, game_info, params if params else {})
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
