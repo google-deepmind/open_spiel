@@ -27,6 +27,8 @@ works with that (e.g. CFR algorithms). It is likely to be poor if the algorithm
 relies on processing and updating states as it goes, e.g., MCTS.
 """
 
+from typing import Any, Mapping
+
 import numpy as np
 
 from open_spiel.python.observation import IIGObserverForPublicInfoGame
@@ -36,6 +38,10 @@ _NUM_PLAYERS = 2
 _NUM_ROWS = 3
 _NUM_COLS = 3
 _NUM_CELLS = _NUM_ROWS * _NUM_COLS
+_DEFAULT_PARAMS = {
+  "board_size": 3,
+  "win_condition": 3
+}
 _GAME_TYPE = pyspiel.GameType(
     short_name="python_gt3",
     long_name="Python GT3",
@@ -50,7 +56,7 @@ _GAME_TYPE = pyspiel.GameType(
     provides_information_state_tensor=False,
     provides_observation_string=True,
     provides_observation_tensor=True,
-    parameter_specification={})
+    parameter_specification=_DEFAULT_PARAMS)
 _GAME_INFO = pyspiel.GameInfo(
     num_distinct_actions=_NUM_CELLS,
     max_chance_outcomes=0,
@@ -64,8 +70,12 @@ _GAME_INFO = pyspiel.GameInfo(
 class GT3Game(pyspiel.Game):
   """A Python version of a Generalized Tic-Tac-Toe game."""
 
-  def __init__(self, params=None):
-    super().__init__(_GAME_TYPE, _GAME_INFO, params or dict())
+  def __init__(
+      self,
+      params: Mapping[str, Any]):
+    board_size = params["board_size"]
+    win_condition = params["win_condition"]
+    super().__init__(_GAME_TYPE, _GAME_INFO, params if params else {})
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
