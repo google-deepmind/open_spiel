@@ -42,10 +42,12 @@ std::istream& operator>>(std::istream& stream, ModelConfig& config) {
 }
 
 std::ostream& operator<<(std::ostream& stream, const ModelConfig& config) {
-  stream << config.observation_tensor_shape[0] << " "
-         << config.observation_tensor_shape[1] << " "
-         << config.observation_tensor_shape[2] << " "
-         << config.number_of_actions << " " << config.nn_depth << " "
+  int shape_dim = config.observation_tensor_shape.size();
+  int height = shape_dim > 1 ? config.observation_tensor_shape[1] : 1;
+  int width = shape_dim > 2 ? config.observation_tensor_shape[2] : 1;
+
+  stream << config.observation_tensor_shape[0] << " " << height << " " << width
+         << " " << config.number_of_actions << " " << config.nn_depth << " "
          << config.nn_width << " " << config.learning_rate << " "
          << config.weight_decay << " " << config.nn_model;
   return stream;
@@ -275,9 +277,10 @@ ModelImpl::ModelImpl(const ModelConfig& config, const std::string& device)
   }
   // Decide if resnet or MLP
   if (config.nn_model == "resnet") {
+    int obs_dims = config.observation_tensor_shape.size();
     int channels = config.observation_tensor_shape[0];
-    int height = config.observation_tensor_shape[1];
-    int width = config.observation_tensor_shape[2];
+    int height = obs_dims > 1 ? config.observation_tensor_shape[1] : 1;
+    int width = obs_dims > 2 ? config.observation_tensor_shape[2] : 1;
 
     ResInputBlockConfig input_config = {/*input_channels=*/channels,
                                         /*input_height=*/height,

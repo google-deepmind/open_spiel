@@ -173,6 +173,8 @@ class Model(object):
     if model_type not in cls.valid_model_types:
       raise ValueError(f"Invalid model type: {model_type}, "
                        f"expected one of: {cls.valid_model_types}")
+    while len(input_shape) < 3:
+      input_shape.append(1)
 
     # The order of creating the graph, init, saver, and session is important!
     # https://stackoverflow.com/a/40788998

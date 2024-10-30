@@ -78,9 +78,9 @@ class BasicStats(object):
   def as_dict(self):
     return {
         "num": self.num,
-        "min": self.min,
-        "max": self.max,
-        "avg": self.avg,
+        "min": float(self.min),
+        "max": float(self.max),
+        "avg": float(self.avg),
         "std_dev": self.std_dev,
     }
 
@@ -88,7 +88,7 @@ class BasicStats(object):
     if self.num == 0:
       return "num=0"
     return "sum: %.4f, avg: %.4f, dev: %.4f, min: %.4f, max: %.4f, num: %d" % (
-        self.sum, self.avg, self.dev, self.min, self.max, self.num)
+        self._sum, self.avg, self.std_dev, self.min, self.max, self.num)
 
 
 class HistogramNumbered:
