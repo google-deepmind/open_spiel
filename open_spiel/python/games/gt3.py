@@ -27,7 +27,7 @@ works with that (e.g. CFR algorithms). It is likely to be poor if the algorithm
 relies on processing and updating states as it goes, e.g., MCTS.
 """
 
-from typing import Any, Mapping
+from typing import Mapping, Optional
 
 import numpy as np
 
@@ -35,9 +35,6 @@ from open_spiel.python.observation import IIGObserverForPublicInfoGame
 import pyspiel
 
 _NUM_PLAYERS = 2
-_NUM_ROWS = 3
-_NUM_COLS = 3
-_NUM_CELLS = _NUM_ROWS * _NUM_COLS
 _DEFAULT_PARAMS = {
   "board_size": 3,
   "win_condition": 3
@@ -58,28 +55,31 @@ _GAME_TYPE = pyspiel.GameType(
     provides_observation_tensor=True,
     parameter_specification=_DEFAULT_PARAMS)
 
-
+# TODO down from here, need to rework
 class GT3Game(pyspiel.Game):
   """A Python version of a Generalized Tic-Tac-Toe game."""
 
   def __init__(
       self,
-      params: Mapping[str, Any]
+      params: Optional[Mapping[str, int]] = None
   ):
-    board_size = params["board_size"]
-    num_cells = board_size * board_size
-    win_condition = params["win_condition"]
-    self.win_condition = win_condition
+    self.board_size = (
+      params["board_size"]
+      if params else _DEFAULT_PARAMS["board_size"])
+    self.num_cells = self.board_size * self.board_size
+    self.win_condition = (
+      params["win_condition"]
+      if params else _DEFAULT_PARAMS["win_condition"])
     game_info = pyspiel.GameInfo(
-      num_distinct_actions=num_cells,
+      num_distinct_actions=self.num_cells,
       max_chance_outcomes=0,
       num_players=2,
       min_utility=-1.0,
       max_utility=1.0,
       utility_sum=0.0,
-      max_game_length=num_cells
+      max_game_length=self.num_cells
     )
-    super().__init__(_GAME_TYPE, game_info, params if params else {})
+    super().__init__(_GAME_TYPE, game_info, params if params else _DEFAULT_PARAMS)
 
   def new_initial_state(self):
     """Returns a state corresponding to the start of a game."""
@@ -89,7 +89,7 @@ class GT3Game(pyspiel.Game):
     """Returns an object used for observing game state."""
     if ((iig_obs_type is None) or
         (iig_obs_type.public_info and not iig_obs_type.perfect_recall)):
-      return BoardObserver(params)
+      return BoardObserver(self, params)
     else:
       return IIGObserverForPublicInfoGame(iig_obs_type, params)
 
@@ -103,7 +103,9 @@ class GT3State(pyspiel.State):
     self._cur_player = 0
     self._player0_score = 0.0
     self._is_terminal = False
-    self.board = np.full((_NUM_ROWS, _NUM_COLS), ".")
+    self.board_size = game.board_size
+    self.board = np.full((self.board_size, self.board_size), ".")
+    self.win_condition = game.win_condition
 
   # OpenSpiel (PySpiel) API functions are below. This is the standard set that
   # should be implemented by every perfect-information sequential-move game.
@@ -114,12 +116,12 @@ class GT3State(pyspiel.State):
 
   def _legal_actions(self, player):
     """Returns a list of legal actions, sorted in ascending order."""
-    return [a for a in range(_NUM_CELLS) if self.board[_coord(a)] == "."]
+    return [a for a in range(self.board_size * self.board_size) if self.board[_coord(self.board_size, a)] == "."]
 
   def _apply_action(self, action):
     """Applies the specified action to the state."""
-    self.board[_coord(action)] = "x" if self._cur_player == 0 else "o"
-    if _line_exists(self.board):
+    self.board[_coord(self.board_size, action)] = "x" if self._cur_player == 0 else "o"
+    if _win_exists(self):
       self._is_terminal = True
       self._player0_score = 1.0 if self._cur_player == 0 else -1.0
     elif all(self.board.ravel() != "."):
@@ -129,7 +131,7 @@ class GT3State(pyspiel.State):
 
   def _action_to_string(self, player, action):
     """Action -> string."""
-    row, col = _coord(action)
+    row, col = _coord(self.board_size, action)
     return "{}({},{})".format("x" if player == 0 else "o", row, col)
 
   def is_terminal(self):
@@ -148,14 +150,14 @@ class GT3State(pyspiel.State):
 class BoardObserver:
   """Observer, conforming to the PyObserver interface (see observation.py)."""
 
-  def __init__(self, params):
+  def __init__(self, game, params):
     """Initializes an empty observation tensor."""
     if params:
       raise ValueError(f"Observation parameters not supported; passed {params}")
     # The observation should contain a 1-D tensor in `self.tensor` and a
     # dictionary of views onto the tensor, which may be of any shape.
     # Here the observation is indexed `(cell state, row, column)`.
-    shape = (1 + _NUM_PLAYERS, _NUM_ROWS, _NUM_COLS)
+    shape = (1 + _NUM_PLAYERS, game.board_size, game.board_size)
     self.tensor = np.zeros(np.prod(shape), np.float32)
     self.dict = {"observation": np.reshape(self.tensor, shape)}
 
@@ -166,8 +168,8 @@ class BoardObserver:
     # convenient than with the 1-D tensor. Both are views onto the same memory.
     obs = self.dict["observation"]
     obs.fill(0)
-    for row in range(_NUM_ROWS):
-      for col in range(_NUM_COLS):
+    for row in range(state.board_size):
+      for col in range(state.board_size):
         cell_state = ".ox".index(state.board[row, col])
         obs[cell_state, row, col] = 1
 
@@ -180,24 +182,68 @@ class BoardObserver:
 # Helper functions for game details.
 
 
-def _line_value(line):
-  """Checks a possible line, returning the winning symbol if any."""
-  if all(line == "x") or all(line == "o"):
-    return line[0]
+def _win_exists(state):
+  """Checks if win condition exists, returns "x" or "o" if so, and None otherwise."""
+  # recall 'win_condition' is num in a row to connect
+  player = 'o' if state.current_player() else 'x'
+  # Check rows
+  for row in range(state.board_size):
+      for col in range(state.board_size - state.win_condition + 1):
+          win_check = 0
+          if state.board[row][col] == player:
+              current_col = col
+              while current_col < state.board_size and state.board[row][current_col] == player:
+                  win_check += 1
+                  current_col += 1
+              if win_check >= state.win_condition:
+                  return player
+
+  # Check columns
+  for col in range(state.board_size):
+      for row in range(state.board_size - state.win_condition + 1):
+          win_check = 0
+          if state.board[row][col] == player:
+              current_row = row
+              while current_row < state.board_size and state.board[current_row][col] == player:
+                  win_check += 1
+                  current_row += 1
+              if win_check >= state.win_condition:
+                  return player
+
+  # Check L-R diagonal
+  for row in range(state.board_size - state.win_condition + 1):
+      for col in range(state.board_size - state.win_condition + 1):
+          win_check = 0
+          if state.board[row][col] == player:
+              current_row = row
+              current_col = col
+              while current_row < state.board_size and current_col < state.board_size \
+                      and state.board[current_row][current_col] == player:
+                  win_check += 1
+                  current_row += 1
+                  current_col += 1
+          if win_check >= state.win_condition:
+              return player
+
+  # Check R-L diagonal
+  for row in range(state.board_size - state.win_condition + 1):
+      for col in range(state.board_size - 1, state.win_condition - 2, -1):
+          win_check = 0
+          if state.board[row][col] == player:
+              current_row = row
+              current_col = col
+              while current_row < state.board_size and current_col > 0 \
+                      and state.board[current_row][current_col] == player:
+                  win_check += 1
+                  current_row += 1
+                  current_col -= 1
+          if win_check >= state.win_condition:
+              return player
 
 
-def _line_exists(board):
-  """Checks if a line exists, returns "x" or "o" if so, and None otherwise."""
-  return (_line_value(board[0]) or _line_value(board[1]) or
-          _line_value(board[2]) or _line_value(board[:, 0]) or
-          _line_value(board[:, 1]) or _line_value(board[:, 2]) or
-          _line_value(board.diagonal()) or
-          _line_value(np.fliplr(board).diagonal()))
-
-
-def _coord(move):
+def _coord(board_size, move):
   """Returns (row, col) from an action id."""
-  return (move // _NUM_COLS, move % _NUM_COLS)
+  return (move // board_size, move % board_size)
 
 
 def _board_to_string(board):
