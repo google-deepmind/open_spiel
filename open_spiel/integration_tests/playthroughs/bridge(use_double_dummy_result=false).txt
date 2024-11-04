@@ -7,8 +7,8 @@ GameType.long_name = "Contract Bridge"
 GameType.max_num_players = 4
 GameType.min_num_players = 4
 GameType.parameter_specification = ["dealer_vul", "non_dealer_vul", "num_tricks", "use_double_dummy_result"]
-GameType.provides_information_state_string = False
-GameType.provides_information_state_tensor = False
+GameType.provides_information_state_string = True
+GameType.provides_information_state_tensor = True
 GameType.provides_observation_string = True
 GameType.provides_observation_tensor = True
 GameType.provides_factored_observation_string = False
@@ -24,6 +24,9 @@ NumPlayers() = 4
 MinUtility() = -7600.0
 MaxUtility() = 7600.0
 UtilitySum() = 0.0
+InformationStateTensorShape() = [571]
+InformationStateTensorLayout() = TensorLayout.CHW
+InformationStateTensorSize() = 571
 ObservationTensorShape() = [571]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 571
@@ -50,6 +53,14 @@ HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
+InformationStateString(0) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateString(1) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateString(2) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateString(3) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateTensor(0): zeros(571)
+InformationStateTensor(1): zeros(571)
+InformationStateTensor(2): zeros(571)
+InformationStateTensor(3): zeros(571)
 ObservationString(0) = "Vul: None\nS none\nH none\nD none\nC none\n"
 ObservationString(1) = "Vul: None\nS none\nH none\nD none\nC none\n"
 ObservationString(2) = "Vul: None\nS none\nH none\nD none\nC none\n"
@@ -85,6 +96,14 @@ HistoryString() = "12"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
+InformationStateString(0) = "Vul: None\nS none\nH none\nD none\nC 5\n"
+InformationStateString(1) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateString(2) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateString(3) = "Vul: None\nS none\nH none\nD none\nC none\n"
+InformationStateTensor(0): zeros(571)
+InformationStateTensor(1): zeros(571)
+InformationStateTensor(2): zeros(571)
+InformationStateTensor(3): zeros(571)
 ObservationString(0) = "Vul: None\nS none\nH none\nD none\nC 5\n"
 ObservationString(1) = "Vul: None\nS none\nH none\nD none\nC none\n"
 ObservationString(2) = "Vul: None\nS none\nH none\nD none\nC none\n"
@@ -320,6 +339,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n"
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n"
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n"
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n"
+InformationStateTensor(0): binvec(571, 0x450000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n"
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n"
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n"
@@ -359,6 +386,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    ?"
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    "
+InformationStateTensor(0): binvec(571, 0x450000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    ?"
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    "
@@ -398,6 +433,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    "
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    ?"
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    "
+InformationStateTensor(0): binvec(571, 0x450000000000400000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    "
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    ?"
@@ -437,6 +480,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    "
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n?"
+InformationStateTensor(0): binvec(571, 0x450000000000400000000000000000000000000200000000000000000100000000000000000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000000000000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000000000000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000000000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    "
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    "
@@ -477,6 +528,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    ?"
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    "
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    "
+InformationStateTensor(0): binvec(571, 0x450000000000400000000000000000000000000200000000000000000100000000000080000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000010000000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000002000000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000040000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    ?"
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    "
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    "
@@ -517,6 +576,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   ?"
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   "
+InformationStateTensor(0): binvec(571, 0x4500000000004000000000000000000000000002000000000000000001000000000000c0000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000010800000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000002100000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000042000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   ?"
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   "
@@ -557,6 +624,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 2
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  "
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  ?"
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  "
+InformationStateTensor(0): binvec(571, 0x4500000000004000000000000000000000000002000000000000000001000000000000c0000000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000010800000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000002100000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000042000000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  "
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  ?"
@@ -597,6 +672,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    "
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \n?"
+InformationStateTensor(0): binvec(571, 0x4500000000004000000000000000000000000002000000000000000001000000000000c0100000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000010820000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000002104000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000042008000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    "
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    "
@@ -638,6 +721,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  ?"
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  "
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  "
+InformationStateTensor(0): binvec(571, 0x4500000000004000000000000000000000000002000000000000000001000000000000c0100000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000010820000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000002104000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000042008000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  ?"
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  "
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  "
@@ -679,6 +770,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  "
+InformationStateString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  ?"
+InformationStateString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  "
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  "
+InformationStateTensor(0): binvec(571, 0x4500000000004000000000000000000000000002000000000000000001000000000000c0100000000000000000000000000000000000009c8009460058000000000000000000000)
+InformationStateTensor(1): binvec(571, 0x45000000000008000000000000000000000000040000000000000000020000000000010820000000000000000000000000000000000041021254901120000000000000000000000)
+InformationStateTensor(2): binvec(571, 0x4500000000001000000000000000000000000000800000000000000004000000000002104000000000000000000000000000000000003c40442008c880000000000000000000000)
+InformationStateTensor(3): binvec(571, 0x45000000000020000000000000000000000000010000000000000000008000000000042008000000000000000000000000000000000002212982212600000000000000000000000)
 ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  "
 ObservationString(1) = "Vul: None\nS 9\nH KQT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  ?"
 ObservationString(2) = "Vul: None\nS KQJT2\nH 2\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  "
@@ -733,10 +832,18 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
-ObservationString(1) = "Vul: None\nS 9\nH QT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
-ObservationString(2) = "Vul: None\nS KQJT2\nH none\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
-ObservationString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
+InformationStateString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
+InformationStateString(1) = "Vul: None\nS 9\nH QT863\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
+InformationStateString(2) = "Vul: None\nS KQJT2\nH none\nD 82\nC Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
+InformationStateString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 \n\nDeclarer tricks: 0"
+InformationStateTensor(0): binvec(571, 0x104148804e4004a3002d620221004644000000000000000000000000080800000000000000000000000000000000000000000000000000000000000000000000000000002001000)
+InformationStateTensor(1): binvec(571, 0x84141a081092a480811620221004644000000000000808000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002001000)
+InformationStateTensor(2): binvec(571, 0x10414296202210046441620221004644080000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000002001000)
+InformationStateTensor(3): binvec(571, 0x84144811094c1109301620221004644000000000000000000000000000000000000008080000000000000000000000000000000000000000000000000000000000000002001000)
+ObservationString(0) = "Vul: None\nS A8543\nH A94\nD J\nC AJT5\nContract: 5S N\nCurrent trick: HK H2 "
+ObservationString(1) = "Vul: None\nS 9\nH QT863\nD A75\nC 982\nContract: 5S N\nCurrent trick: HK H2 "
+ObservationString(2) = "Vul: None\nS KQJT2\nH none\nD 82\nC Q7643\nContract: 5S N\nCurrent trick: HK H2 "
+ObservationString(3) = "Vul: None\nS 76\nH J75\nD KQT9643\nC K\nContract: 5S N\nCurrent trick: HK H2 ?"
 ObservationTensor(0): binvec(571, 0x104148804e4004a3002d620221004644000000000000000000000000080800000000000000000000000000000000000000000000000000000000000000000000000000002001000)
 ObservationTensor(1): binvec(571, 0x84141a081092a480811620221004644000000000000808000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002001000)
 ObservationTensor(2): binvec(571, 0x10414296202210046441620221004644080000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000002001000)
@@ -826,10 +933,18 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "Vul: None\nS A84\nH 94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
-ObservationString(1) = "Vul: None\nS none\nH QT86\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
-ObservationString(2) = "Vul: None\nS QJ2\nH none\nD 82\nC Q764\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
-ObservationString(3) = "Vul: None\nS none\nH J7\nD KQT9643\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
+InformationStateString(0) = "Vul: None\nS A84\nH 94\nD J\nC AJT5\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
+InformationStateString(1) = "Vul: None\nS none\nH QT86\nD A75\nC 982\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
+InformationStateString(2) = "Vul: None\nS QJ2\nH none\nD 82\nC Q764\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
+InformationStateString(3) = "Vul: None\nS none\nH J7\nD KQT9643\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK \n\nDeclarer tricks: 3"
+InformationStateTensor(0): binvec(571, 0x104148800e0004a30025420221000640000000000000000000000000000200000000000000000000002000004000000000080000000000000000000000400000400000000401000)
+InformationStateTensor(1): binvec(571, 0x84141a001092a080811420221000640000000000000002000000000000000000000020000000000000000800000000000000000000004000004000000000004000000000401000)
+InformationStateTensor(2): binvec(571, 0x10414294202210006401420221000640020000000000000000000000200000000000000000000000000000000000000040000040000000000040000000000800000000000401000)
+InformationStateTensor(3): binvec(571, 0x8414481101081109101420221000640000000000002000000000000000000000000000020000000000000000400000000000400000000008000000000000000000000040401000)
+ObservationString(0) = "Vul: None\nS A84\nH 94\nD J\nC AJT5\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: C3 CK ?"
+ObservationString(1) = "Vul: None\nS none\nH QT86\nD A75\nC 982\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: C3 CK "
+ObservationString(2) = "Vul: None\nS QJ2\nH none\nD 82\nC Q764\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: C3 CK "
+ObservationString(3) = "Vul: None\nS none\nH J7\nD KQT9643\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: C3 CK "
 ObservationTensor(0): binvec(571, 0x104148800e0004a30025420221000640000000000000000000000000000200000000000000000000002000004000000000080000000000000000000000400000400000000401000)
 ObservationTensor(1): binvec(571, 0x84141a001092a080811420221000640000000000000002000000000000000000000020000000000000000800000000000000000000004000004000000000004000000000401000)
 ObservationTensor(2): binvec(571, 0x10414294202210006401420221000640020000000000000000000000200000000000000000000000000000000000000040000040000000000040000000000800000000000401000)
@@ -935,10 +1050,18 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
-ObservationString(1) = "Vul: None\nS none\nH QT8\nD A75\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
-ObservationString(2) = "Vul: None\nS QJ2\nH none\nD 82\nC 7\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
-ObservationString(3) = "Vul: None\nS none\nH J7\nD KQT9\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
+InformationStateString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
+InformationStateString(1) = "Vul: None\nS none\nH QT8\nD A75\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
+InformationStateString(2) = "Vul: None\nS QJ2\nH none\nD 82\nC 7\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
+InformationStateString(3) = "Vul: None\nS none\nH J7\nD KQT9\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 \n\nDeclarer tricks: 7"
+InformationStateTensor(0): binvec(571, 0x10414880040004810005400021000440000800000000000000000000000000000000000000000000000000000000200000000080000000000020000000000001000000000041000)
+InformationStateTensor(1): binvec(571, 0x8414180010108080811400021000440000000000000000000000000000000000000000000800000000000000800000000000200000000000010000000000000000200000041000)
+InformationStateTensor(2): binvec(571, 0x10414294000210004401400021000440000000000000000000000000000008000000000000000000000000002000000000000100000000000000002000000000800000000041000)
+InformationStateTensor(3): binvec(571, 0x8414480000081109101400021000440000000000000000080000000000000000000000000000000000000001000000000000000020000000008000000000002000000000041000)
+ObservationString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: H4 "
+ObservationString(1) = "Vul: None\nS none\nH QT8\nD A75\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: H4 ?"
+ObservationString(2) = "Vul: None\nS QJ2\nH none\nD 82\nC 7\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: H4 "
+ObservationString(3) = "Vul: None\nS none\nH J7\nD KQT9\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nCurrent trick: H4 "
 ObservationTensor(0): binvec(571, 0x10414880040004810005400021000440000800000000000000000000000000000000000000000000000000000000200000000080000000000020000000000001000000000041000)
 ObservationTensor(1): binvec(571, 0x8414180010108080811400021000440000000000000000000000000000000000000000000800000000000000800000000000200000000000010000000000000000200000041000)
 ObservationTensor(2): binvec(571, 0x10414294000210004401400021000440000000000000000000000000000008000000000000000000000000002000000000000100000000000000002000000000800000000041000)
@@ -1001,10 +1124,18 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 3
-ObservationString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
-ObservationString(1) = "Vul: None\nS none\nH QT\nD A75\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
-ObservationString(2) = "Vul: None\nS QJ\nH none\nD 82\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
-ObservationString(3) = "Vul: None\nS none\nH J\nD KQT9\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
+InformationStateString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
+InformationStateString(1) = "Vul: None\nS none\nH QT\nD A75\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
+InformationStateString(2) = "Vul: None\nS QJ\nH none\nD 82\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
+InformationStateString(3) = "Vul: None\nS none\nH J\nD KQT9\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 \n\nDeclarer tricks: 8"
+InformationStateTensor(0): binvec(571, 0x10414880040004810005000001000440000000000000000000000000000000020000000000000000000000080000000000000000800000040000000000000000080000000021000)
+InformationStateTensor(1): binvec(571, 0x8414180010100080811000001000440000000000000000000200000000000000000000000000000000000000008000000400000000000000000800000000080000000000021000)
+InformationStateTensor(2): binvec(571, 0x10414290000010004401000001000440000002000000000000000000000000000000000000000000000004000000000000000008000000000800000000000000008000000021000)
+InformationStateTensor(3): binvec(571, 0x8414480000001109101000001000440000000000000000000000000000000000000000000002000000000000080000000008000000000000000080000004000000000000021000)
+ObservationString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 "
+ObservationString(1) = "Vul: None\nS none\nH QT\nD A75\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 "
+ObservationString(2) = "Vul: None\nS QJ\nH none\nD 82\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 "
+ObservationString(3) = "Vul: None\nS none\nH J\nD KQT9\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 ?"
 ObservationTensor(0): binvec(571, 0x10414880040004810005000001000440000000000000000000000000000000020000000000000000000000080000000000000000800000040000000000000000080000000021000)
 ObservationTensor(1): binvec(571, 0x8414180010100080811000001000440000000000000000000200000000000000000000000000000000000000008000000400000000000000000800000000080000000000021000)
 ObservationTensor(2): binvec(571, 0x10414290000010004401000001000440000002000000000000000000000000000000000000000000000004000000000000000008000000000800000000000000008000000021000)
@@ -1055,10 +1186,18 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
-ObservationString(1) = "Vul: None\nS none\nH QT\nD A75\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
-ObservationString(2) = "Vul: None\nS QJ\nH none\nD 82\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
-ObservationString(3) = "Vul: None\nS none\nH J\nD KQT\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
+InformationStateString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
+InformationStateString(1) = "Vul: None\nS none\nH QT\nD A75\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
+InformationStateString(2) = "Vul: None\nS QJ\nH none\nD 82\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
+InformationStateString(3) = "Vul: None\nS none\nH J\nD KQT\nC none\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 \n\nDeclarer tricks: 8"
+InformationStateTensor(0): binvec(571, 0x10414880040004810005000001000440000000000000000000000000000000020000000000000010000000080000000000000000800000040000000000000000080000000021000)
+InformationStateTensor(1): binvec(571, 0x8414180010100080811000001000440000000000000000000200000000000000100000000000000000000000008000000400000000000000000800000000080000000000021000)
+InformationStateTensor(2): binvec(571, 0x10414290000010004401000001000440000002000000000000001000000000000000000000000000000004000000000000000008000000000800000000000000008000000021000)
+InformationStateTensor(3): binvec(571, 0x8414480000000109101000001000440000000010000000000000000000000000000000000002000000000000080000000008000000000000000080000004000000000000021000)
+ObservationString(0) = "Vul: None\nS A84\nH 9\nD J\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 D9 ?"
+ObservationString(1) = "Vul: None\nS none\nH QT\nD A75\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 D9 "
+ObservationString(2) = "Vul: None\nS QJ\nH none\nD 82\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 D9 "
+ObservationString(3) = "Vul: None\nS none\nH J\nD KQT\nC none\nContract: 5S N\ndefence\ndefence\ndefence\ndeclarer\nTrick 1 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 2 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 3 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 4 won by declarer\ndefence\ndeclarer\ndeclarer\nTrick 5 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 6 won by declarer\ndeclarer\ndeclarer\ndeclarer\nTrick 7 won by declarer\ndefence\ndeclarer\ndeclarer\nCurrent trick: C7 D9 "
 ObservationTensor(0): binvec(571, 0x10414880040004810005000001000440000000000000000000000000000000020000000000000010000000080000000000000000800000040000000000000000080000000021000)
 ObservationTensor(1): binvec(571, 0x8414180010100080811000001000440000000000000000000200000000000000100000000000000000000000008000000400000000000000000800000000080000000000021000)
 ObservationTensor(2): binvec(571, 0x10414290000010004401000001000440000002000000000000001000000000000000000000000000000004000000000000000008000000000800000000000000008000000021000)
@@ -1182,6 +1321,14 @@ HistoryString() = "12, 31, 39, 45, 11, 6, 35, 41, 51, 0, 4, 17, 27, 34, 8, 19, 5
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
+InformationStateString(0) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"
+InformationStateString(1) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"
+InformationStateString(2) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"
+InformationStateString(3) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"
+InformationStateTensor(0): binvec(571, 0x414880000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000001000000000004000000000000100001000)
+InformationStateTensor(1): binvec(571, 0x414180000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000040000000000001000000000000004001000)
+InformationStateTensor(2): binvec(571, 0x414280000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000010000000000000040000000000010001000)
+InformationStateTensor(3): binvec(571, 0x414480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000400000000000100000000000400001000)
 ObservationString(0) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"
 ObservationString(1) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"
 ObservationString(2) = "Vul: None\n        S A8543\n        H A94\n        D J\n        C AJT5\nS 76            S 9\nH J75           H KQT863\nD KQT9643        D A75\nC K             C 982\n        S KQJT2\n        H 2\n        D 82\n        C Q7643\n\nWest  North East  South\n      1S    3H    4S    \n5H    Dbl   Pass  5S    \nPass  Pass  Pass  \n\nN  E  S  W  N  E  S\n   HK H2 H5 HA \nS3 S9 ST S7 \n      SK S6 S5 H3 \n      C3 CK CA C2 \nC5 C8 CQ D3 \n      C4 D4 CJ C9 \nCT H6 C6 D6 \nH4 H8 S2 H7 \n      C7 D9 DJ HT \n      D2 DT S8 D5 \nH9 HQ SJ HJ \n      D8 DQ S4 D7 \nSA DA SQ DK \n\nDeclarer tricks: 13\nScore: N/S 510 E/W -510"

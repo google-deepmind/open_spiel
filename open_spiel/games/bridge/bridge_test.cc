@@ -39,6 +39,7 @@ void BasicGameTests() {
   testing::LoadGameTest("bridge");
   testing::RandomSimTest(*LoadGame("bridge"), 3);
   testing::RandomSimTest(*LoadGame("bridge(use_double_dummy_result=false)"), 3);
+  testing::ResampleInfostateTest(*LoadGame("bridge"), 10);
 }
 
 void DeserializeStateTest() {
