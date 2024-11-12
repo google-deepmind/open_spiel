@@ -540,6 +540,7 @@ class ChessBoard {
 
   void SetIrreversibleMoveCounter(int c);
   void SetMovenumber(int move_number);
+  bool EpSquareThreatened(Square ep_square) const;
 
   int board_size_;
   bool king_in_check_allowed_;

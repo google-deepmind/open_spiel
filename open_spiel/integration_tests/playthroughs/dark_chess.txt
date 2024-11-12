@@ -2331,7 +2331,7 @@ StringLegalActions() = ["a3", "a4", "Na3", "Nc3", "b3", "b4", "c3", "c4", "d3", 
 action: 2426
 
 # State 5
-# rn1qkbnr/ppp1pppp/3pb3/8/4P3/7N/PPPP1PPP/RNBQKBR1 b Qkq e3 0 3
+# rn1qkbnr/ppp1pppp/3pb3/8/4P3/7N/PPPP1PPP/RNBQKBR1 b Qkq - 0 3
 IsTerminal() = False
 History() = [3576, 1841, 4117, 1213, 2426]
 HistoryString() = "3576, 1841, 4117, 1213, 2426"
@@ -2339,7 +2339,7 @@ IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
 ObservationString(0) = "rn1qkbnr/ppp1pppp/3pb3/4?3/??1???1?/?1?????N/P???????/???????? b kq - 0 3"
-ObservationString(1) = "????????/????????/1???????/?1??1?2/4P2?/7N/PPPP1PPP/RNBQKBR1 b Q e3 0 3"
+ObservationString(1) = "????????/????????/1???????/?1??1?2/4P2?/4?2N/PPPP1PPP/RNBQKBR1 b Q - 0 3"
 ObservationTensor(0).public_K_pieces: ◯◯◯◯◯◯◯◯
                                       ◯◯◯◯◯◯◯◯
                                       ◯◯◯◯◯◯◯◯
@@ -2768,7 +2768,7 @@ ObservationTensor(1).private_empty_pieces: ◯◯◉◉◯◉◯◯
                                            ◯◯◉◉◉◯◯◯
                                            ◯◯◉◉◯◯◯◯
                                            ◯◯◉◉◯◯◯◯
-                                           ◯◉◉◯◉◯◯◯
+                                           ◯◉◯◯◉◯◯◯
                                            ◯◯◉◉◯◯◯◯
                                            ◯◯◉◉◉◯◯◯
                                            ◉◯◯◯◉◯◯◯
@@ -2776,7 +2776,7 @@ ObservationTensor(1).private_unknown_squares: ◯◯◯◯◉◯◉◉
                                               ◯◯◯◯◯◉◉◉
                                               ◯◯◯◯◉◉◉◉
                                               ◯◯◯◯◉◉◉◉
-                                              ◯◯◯◯◯◉◉◉
+                                              ◯◯◉◯◯◉◉◉
                                               ◯◯◯◯◉◉◉◉
                                               ◯◯◯◯◯◉◉◉
                                               ◯◯◯◉◯◉◉◉

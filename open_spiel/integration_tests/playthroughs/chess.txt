@@ -165,7 +165,7 @@ StringLegalActions() = ["a3", "a4", "Na3", "Nc3", "b3", "b4", "c3", "c4", "d3", 
 action: 3010
 
 # State 3
-# rnbqkbnr/ppppp1pp/5p2/8/5P2/7N/PPPPP1PP/RNBQKB1R b KQkq f3 0 2
+# rnbqkbnr/ppppp1pp/5p2/8/5P2/7N/PPPPP1PP/RNBQKB1R b KQkq - 0 2
 IsTerminal() = False
 History() = [3576, 3009, 3010]
 HistoryString() = "3576, 3009, 3010"
@@ -174,8 +174,8 @@ IsSimultaneousNode() = False
 CurrentPlayer() = 0
 InformationStateString(0) = "3576, 3009, 3010"
 InformationStateString(1) = "3576, 3009, 3010"
-ObservationString(0) = "rnbqkbnr/ppppp1pp/5p2/8/5P2/7N/PPPPP1PP/RNBQKB1R b KQkq f3 0 2"
-ObservationString(1) = "rnbqkbnr/ppppp1pp/5p2/8/5P2/7N/PPPPP1PP/RNBQKB1R b KQkq f3 0 2"
+ObservationString(0) = "rnbqkbnr/ppppp1pp/5p2/8/5P2/7N/PPPPP1PP/RNBQKB1R b KQkq - 0 2"
+ObservationString(1) = "rnbqkbnr/ppppp1pp/5p2/8/5P2/7N/PPPPP1PP/RNBQKB1R b KQkq - 0 2"
 ObservationTensor(0):
 ◯◯◯◯◉◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◉◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◯◯◯◯◯◯◉  ◯◯◯◯◯◯◯◯  ◯◯◉◯◯◉◯◯  ◯◯◯◯◯◯◯◯  ◯◉◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯
 ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◯◯◯◯◯◯◯◯  ◉◉◉◉◉◯◉◉  ◯◯◯◯◯◯◯◯
