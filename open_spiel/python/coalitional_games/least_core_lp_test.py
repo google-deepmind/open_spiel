@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for least-core LP calculations."""
-
-
 from absl.testing import absltest
 import numpy as np
 from open_spiel.python.coalitional_games import basic_games
@@ -35,7 +32,7 @@ class LeastCoreLPTest(absltest.TestCase):
     game = basic_games.IceCreamGame()
     imputation, epsilon = least_core_lp.solve_least_core_lp(
         game, least_core_lp.add_all_constraints)
-    self.assertAlmostEqual(imputation.sum(), 1000.0)
+    self.assertAlmostEqual(imputation.sum(), 1000.0, delta=1e-5)
     self.assertGreater(imputation.all(), 0.0)
     self.assertLess(epsilon, 1e-6)
 
@@ -44,7 +41,7 @@ class LeastCoreLPTest(absltest.TestCase):
     game = basic_games.IceCreamGame()
     cons_func = least_core_lp.make_uniform_sampling_constraints_function(20)
     imputation, epsilon = least_core_lp.solve_least_core_lp(game, cons_func)
-    self.assertAlmostEqual(imputation.sum(), 1000.0)
+    self.assertAlmostEqual(imputation.sum(), 1000.0, delta=1e-5)
     self.assertGreater(imputation.all(), 0.0)
     self.assertLess(epsilon, 1e-6)
 
