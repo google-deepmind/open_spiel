@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "einstein_wurfelt_nicht"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["columns", "rows", "seed"]
+GameType.parameter_specification = ["seed"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 300
 PolicyTensorShape() = [300]
 MaxChanceOutcomes() = 6
-GetParameters() = {columns=5,rows=5,seed=-1}
+GetParameters() = {seed=42}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -27,25 +27,25 @@ UtilitySum() = 0.0
 ObservationTensorShape() = [300]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 300
-MaxGameLength() = 71
+MaxGameLength() = 112
 ToString() = "einstein_wurfelt_nicht()"
 
 # State 0
-# |b2||b1||b6||__||__|
-# |b4||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||__||w1||w6|
-# |__||__||w4||w5||w3|
+# |b3||b6||b4||__||__|
+# |b1||b2||__||__||__|
+# |b5||__||__||__||w5|
+# |__||__||__||w3||w6|
+# |__||__||w2||w1||w4|
 IsTerminal() = False
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-ObservationString(0) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w5||w3|\n"
-ObservationString(1) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w5||w3|\n"
-ObservationTensor(0): binvec(300, 0x40000000010200000000000420000000000050000000004000200000000080008000000002)
-ObservationTensor(1): binvec(300, 0x40000000010200000000000420000000000050000000004000200000000080008000000002)
+ObservationString(0) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||__||w5|\n|__||__||__||w3||w6|\n|__||__||w2||w1||w4|\n"
+ObservationString(1) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||__||w5|\n|__||__||__||w3||w6|\n|__||__||w2||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000040080000000001000080000000012000000000010100000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000040080000000001000080000000012000000000010100000000002)
 ChanceOutcomes() = [(0,0.166667), (1,0.166667), (2,0.166667), (3,0.166667), (4,0.166667), (5,0.166667)]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["roll 1", "roll 2", "roll 3", "roll 4", "roll 5", "roll 6"]
@@ -54,275 +54,275 @@ StringLegalActions() = ["roll 1", "roll 2", "roll 3", "roll 4", "roll 5", "roll 
 action: 2
 
 # State 1
-# |b2||b1||b6||__||__|
-# |b4||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||__||w1||w6|
-# |__||__||w4||w5||w3|
+# |b3||b6||b4||__||__|
+# |b1||b2||__||__||__|
+# |b5||__||__||__||w5|
+# |__||__||__||w3||w6|
+# |__||__||w2||w1||w4|
 IsTerminal() = False
 History() = [2]
 HistoryString() = "2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w5||w3|\n"
-ObservationString(1) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w5||w3|\n"
-ObservationTensor(0): binvec(300, 0x40000000010200000000000420000000000050000000004000200000000080008000000002)
-ObservationTensor(1): binvec(300, 0x40000000010200000000000420000000000050000000004000200000000080008000000002)
+ObservationString(0) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||__||w5|\n|__||__||__||w3||w6|\n|__||__||w2||w1||w4|\n"
+ObservationString(1) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||__||w5|\n|__||__||__||w3||w6|\n|__||__||w2||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000040080000000001000080000000012000000000010100000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000040080000000001000080000000012000000000010100000000002)
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [295, 297, 299]
-StringLegalActions() = ["W3-up*", "W3-diag*", "W3-left*"]
+LegalActions() = [222, 224, 226]
+StringLegalActions() = ["W3-up", "W3-diag", "W3-left"]
 
-# Apply action "W3-left*"
-action: 299
+# Apply action "W3-up"
+action: 222
 
 # State 2
-# |b2||b1||b6||__||__|
-# |b4||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||__||w1||w6|
-# |__||__||w4||w3||__|
+# |b3||b6||b4||__||__|
+# |b1||b2||__||__||__|
+# |b5||__||__||w3||w5|
+# |__||__||__||__||w6|
+# |__||__||w2||w1||w4|
 IsTerminal() = False
-History() = [2, 299]
-HistoryString() = "2, 299"
+History() = [2, 222]
+HistoryString() = "2, 222"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-ObservationString(0) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w3||__|\n"
-ObservationString(1) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w3||__|\n"
-ObservationTensor(0): binvec(300, 0x40000000010200000000000420000000000810000000004000200000000000008000000002)
-ObservationTensor(1): binvec(300, 0x40000000010200000000000420000000000810000000004000200000000000008000000002)
+ObservationString(0) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||w3||w5|\n|__||__||__||__||w6|\n|__||__||w2||w1||w4|\n"
+ObservationString(1) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||w3||w5|\n|__||__||__||__||w6|\n|__||__||w2||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000040080000000002000080000000012000000000010100000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000040080000000002000080000000012000000000010100000000002)
 ChanceOutcomes() = [(0,0.166667), (1,0.166667), (2,0.166667), (3,0.166667), (4,0.166667), (5,0.166667)]
 LegalActions() = [0, 1, 2, 3, 4, 5]
 StringLegalActions() = ["roll 1", "roll 2", "roll 3", "roll 4", "roll 5", "roll 6"]
 
-# Apply action "roll 2"
-action: 1
-
-# State 3
-# |b2||b1||b6||__||__|
-# |b4||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||__||w1||w6|
-# |__||__||w4||w3||__|
-IsTerminal() = False
-History() = [2, 299, 1]
-HistoryString() = "2, 299, 1"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w3||__|\n"
-ObservationString(1) = "|b2||b1||b6||__||__|\n|b4||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w3||__|\n"
-ObservationTensor(0): binvec(300, 0x40000000010200000000000420000000000810000000004000200000000000008000000002)
-ObservationTensor(1): binvec(300, 0x40000000010200000000000420000000000810000000004000200000000000008000000002)
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [1, 3, 5]
-StringLegalActions() = ["B2-diag*", "B2-down*", "B2-right*"]
-
-# Apply action "B2-down*"
-action: 3
-
-# State 4
-# Apply action "roll 5"
-action: 4
-
-# State 5
-# |__||b1||b6||__||__|
-# |b2||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||__||w1||w6|
-# |__||__||w4||w3||__|
-IsTerminal() = False
-History() = [2, 299, 1, 3, 4]
-HistoryString() = "2, 299, 1, 3, 4"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "|__||b1||b6||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w3||__|\n"
-ObservationString(1) = "|__||b1||b6||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||__||w1||w6|\n|__||__||w4||w3||__|\n"
-ObservationTensor(0): binvec(300, 0x40000000010100000000000420000000000800000000004000200000000000008000000002)
-ObservationTensor(1): binvec(300, 0x40000000010100000000000420000000000800000000004000200000000000008000000002)
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [270, 272, 274, 235, 236, 239]
-StringLegalActions() = ["W4-up", "W4-diag", "W4-left", "W6-up*", "W6-diag", "W6-left*"]
-
-# Apply action "W4-up"
-action: 270
-
-# State 6
-# Apply action "roll 1"
-action: 0
-
-# State 7
-# |__||b1||b6||__||__|
-# |b2||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||w4||w1||w6|
-# |__||__||__||w3||__|
-IsTerminal() = False
-History() = [2, 299, 1, 3, 4, 270, 0]
-HistoryString() = "2, 299, 1, 3, 4, 270, 0"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "|__||b1||b6||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||w4||w1||w6|\n|__||__||__||w3||__|\n"
-ObservationString(1) = "|__||b1||b6||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||w4||w1||w6|\n|__||__||__||w3||__|\n"
-ObservationTensor(0): binvec(300, 0x40000000010100000000000420000000000800000000008000200000000000008000000002)
-ObservationTensor(1): binvec(300, 0x40000000010100000000000420000000000800000000008000200000000000008000000002)
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [12, 15, 17]
-StringLegalActions() = ["B1-diag", "B1-down*", "B1-right*"]
-
-# Apply action "B1-right*"
-action: 17
-
-# State 8
-# Apply action "roll 3"
-action: 2
-
-# State 9
-# |__||__||b1||__||__|
-# |b2||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||w4||w1||w6|
-# |__||__||__||w3||__|
-IsTerminal() = False
-History() = [2, 299, 1, 3, 4, 270, 0, 17, 2]
-HistoryString() = "2, 299, 1, 3, 4, 270, 0, 17, 2"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 1
-ObservationString(0) = "|__||__||b1||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||w4||w1||w6|\n|__||__||__||w3||__|\n"
-ObservationString(1) = "|__||__||b1||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||w4||w1||w6|\n|__||__||__||w3||__|\n"
-ObservationTensor(0): binvec(300, 0x2000000010100000000000420000000000800000000008000200000000000000000000002)
-ObservationTensor(1): binvec(300, 0x2000000010100000000000420000000000800000000008000200000000000000000000002)
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [283, 285, 286]
-StringLegalActions() = ["W3-up*", "W3-diag*", "W3-left"]
-
-# Apply action "W3-left"
-action: 286
-
-# State 10
-# Apply action "roll 4"
-action: 3
-
-# State 11
-# |__||__||b1||__||__|
-# |b2||b5||__||__||__|
-# |b3||__||__||__||w2|
-# |__||__||w4||w1||w6|
-# |__||__||w3||__||__|
-IsTerminal() = False
-History() = [2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3]
-HistoryString() = "2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3"
-IsChanceNode() = False
-IsSimultaneousNode() = False
-CurrentPlayer() = 0
-ObservationString(0) = "|__||__||b1||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||w4||w1||w6|\n|__||__||w3||__||__|\n"
-ObservationString(1) = "|__||__||b1||__||__|\n|b2||b5||__||__||__|\n|b3||__||__||__||w2|\n|__||__||w4||w1||w6|\n|__||__||w3||__||__|\n"
-ObservationTensor(0): binvec(300, 0x2000000010100000000000420000000010000000000008000200000000000000000000002)
-ObservationTensor(1): binvec(300, 0x2000000010100000000000420000000010000000000008000200000000000000000000002)
-Rewards() = [0, 0]
-Returns() = [0, 0]
-LegalActions() = [120, 122, 124, 72, 74, 76]
-StringLegalActions() = ["B3-diag", "B3-down", "B3-right", "B5-diag", "B5-down", "B5-right"]
-
-# Apply action "B5-right"
-action: 76
-
-# State 12
-# Apply action "roll 2"
-action: 1
-
-# State 13
-# Apply action "W2-left"
-action: 178
-
-# State 14
-# Apply action "roll 3"
-action: 2
-
-# State 15
-# Apply action "B3-diag"
-action: 120
-
-# State 16
 # Apply action "roll 6"
 action: 5
 
-# State 17
-# Apply action "W6-diag*"
-action: 237
+# State 3
+# |b3||b6||b4||__||__|
+# |b1||b2||__||__||__|
+# |b5||__||__||w3||w5|
+# |__||__||__||__||w6|
+# |__||__||w2||w1||w4|
+IsTerminal() = False
+History() = [2, 222, 5]
+HistoryString() = "2, 222, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||w3||w5|\n|__||__||__||__||w6|\n|__||__||w2||w1||w4|\n"
+ObservationString(1) = "|b3||b6||b4||__||__|\n|b1||b2||__||__||__|\n|b5||__||__||w3||w5|\n|__||__||__||__||w6|\n|__||__||w2||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000040080000000002000080000000012000000000010100000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000040080000000002000080000000012000000000010100000000002)
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [12, 15, 17]
+StringLegalActions() = ["B6-diag", "B6-down*", "B6-right*"]
 
-# State 18
+# Apply action "B6-diag"
+action: 12
+
+# State 4
 # Apply action "roll 2"
 action: 1
 
+# State 5
+# |b3||__||b4||__||__|
+# |b1||b2||b6||__||__|
+# |b5||__||__||w3||w5|
+# |__||__||__||__||w6|
+# |__||__||w2||w1||w4|
+IsTerminal() = False
+History() = [2, 222, 5, 12, 1]
+HistoryString() = "2, 222, 5, 12, 1"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "|b3||__||b4||__||__|\n|b1||b2||b6||__||__|\n|b5||__||__||w3||w5|\n|__||__||__||__||w6|\n|__||__||w2||w1||w4|\n"
+ObservationString(1) = "|b3||__||b4||__||__|\n|b1||b2||b6||__||__|\n|b5||__||__||w3||w5|\n|__||__||__||__||w6|\n|__||__||w2||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000040080000000002000080000000012000000000010004000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000040080000000002000080000000012000000000010004000000002)
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [270, 272, 274]
+StringLegalActions() = ["W2-up", "W2-diag", "W2-left"]
+
+# Apply action "W2-up"
+action: 270
+
+# State 6
+# Apply action "roll 4"
+action: 3
+
+# State 7
+# |b3||__||b4||__||__|
+# |b1||b2||b6||__||__|
+# |b5||__||__||w3||w5|
+# |__||__||w2||__||w6|
+# |__||__||__||w1||w4|
+IsTerminal() = False
+History() = [2, 222, 5, 12, 1, 270, 3]
+HistoryString() = "2, 222, 5, 12, 1, 270, 3"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "|b3||__||b4||__||__|\n|b1||b2||b6||__||__|\n|b5||__||__||w3||w5|\n|__||__||w2||__||w6|\n|__||__||__||w1||w4|\n"
+ObservationString(1) = "|b3||__||b4||__||__|\n|b1||b2||b6||__||__|\n|b5||__||__||w3||w5|\n|__||__||w2||__||w6|\n|__||__||__||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000080080000000002000080000000012000000000010004000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000080080000000002000080000000012000000000010004000000002)
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [24, 27, 28]
+StringLegalActions() = ["B4-diag", "B4-down*", "B4-right"]
+
+# Apply action "B4-down*"
+action: 27
+
+# State 8
+# Apply action "roll 6"
+action: 5
+
+# State 9
+# |b3||__||__||__||__|
+# |b1||b2||b4||__||__|
+# |b5||__||__||w3||w5|
+# |__||__||w2||__||w6|
+# |__||__||__||w1||w4|
+IsTerminal() = False
+History() = [2, 222, 5, 12, 1, 270, 3, 27, 5]
+HistoryString() = "2, 222, 5, 12, 1, 270, 3, 27, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 1
+ObservationString(0) = "|b3||__||__||__||__|\n|b1||b2||b4||__||__|\n|b5||__||__||w3||w5|\n|__||__||w2||__||w6|\n|__||__||__||w1||w4|\n"
+ObservationString(1) = "|b3||__||__||__||__|\n|b1||b2||b4||__||__|\n|b5||__||__||w3||w5|\n|__||__||w2||__||w6|\n|__||__||__||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000080080000000002000040000000012000000000010000000000002)
+ObservationTensor(1): binvec(300, 0x400000000008008000000080080000000002000040000000012000000000010000000000002)
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [235, 237, 238]
+StringLegalActions() = ["W6-up*", "W6-diag*", "W6-left"]
+
+# Apply action "W6-up*"
+action: 235
+
+# State 10
+# Apply action "roll 6"
+action: 5
+
+# State 11
+# |b3||__||__||__||__|
+# |b1||b2||b4||__||__|
+# |b5||__||__||w3||w6|
+# |__||__||w2||__||__|
+# |__||__||__||w1||w4|
+IsTerminal() = False
+History() = [2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5]
+HistoryString() = "2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5"
+IsChanceNode() = False
+IsSimultaneousNode() = False
+CurrentPlayer() = 0
+ObservationString(0) = "|b3||__||__||__||__|\n|b1||b2||b4||__||__|\n|b5||__||__||w3||w6|\n|__||__||w2||__||__|\n|__||__||__||w1||w4|\n"
+ObservationString(1) = "|b3||__||__||__||__|\n|b1||b2||b4||__||__|\n|b5||__||__||w3||w6|\n|__||__||w2||__||__|\n|__||__||__||w1||w4|\n"
+ObservationTensor(0): binvec(300, 0x400000000008008000000080080000000002000040000000012000000000000000000000004)
+ObservationTensor(1): binvec(300, 0x400000000008008000000080080000000002000040000000012000000000000000000000004)
+Rewards() = [0, 0]
+Returns() = [0, 0]
+LegalActions() = [120, 122, 124]
+StringLegalActions() = ["B5-diag", "B5-down", "B5-right"]
+
+# Apply action "B5-right"
+action: 124
+
+# State 12
+# Apply action "roll 6"
+action: 5
+
+# State 13
+# Apply action "W6-up"
+action: 174
+
+# State 14
+# Apply action "roll 5"
+action: 4
+
+# State 15
+# Apply action "B5-right"
+action: 136
+
+# State 16
+# Apply action "roll 5"
+action: 4
+
+# State 17
+# Apply action "W4-left*"
+action: 299
+
+# State 18
+# Apply action "roll 5"
+action: 4
+
 # State 19
-# Apply action "B2-down"
-action: 62
+# Apply action "B5-right*"
+action: 149
 
 # State 20
-# Apply action "roll 3"
-action: 2
+# Apply action "roll 1"
+action: 0
 
 # State 21
-# Apply action "W3-left"
-action: 274
+# Apply action "W2-diag"
+action: 212
 
 # State 22
 # Apply action "roll 3"
 action: 2
 
 # State 23
-# Apply action "B3-diag"
-action: 192
+# Apply action "B3-right"
+action: 4
 
 # State 24
-# Apply action "roll 6"
-action: 5
+# Apply action "roll 4"
+action: 3
 
 # State 25
-# Apply action "W6-diag*"
-action: 165
+# Apply action "W4-left"
+action: 286
 
 # State 26
-# Apply action "roll 6"
-action: 5
-
-# State 27
-# Apply action "B3-right"
-action: 268
-
-# State 28
-# Apply action "roll 2"
-action: 1
-
-# State 29
-# Apply action "W1-diag"
-action: 224
-
-# State 30
 # Apply action "roll 1"
 action: 0
 
-# State 31
-# Apply action "B1-diag"
-action: 24
+# State 27
+# Apply action "B1-down"
+action: 62
 
-# State 32
+# State 28
+# Apply action "roll 4"
+action: 3
+
+# State 29
+# Apply action "W4-diag"
+action: 272
+
+# State 30
 # Apply action "roll 5"
 action: 4
 
+# State 31
+# Apply action "B5-right"
+action: 160
+
+# State 32
+# Apply action "roll 1"
+action: 0
+
 # State 33
-# Apply action "W4-diag"
-action: 212
+# Apply action "W2-left*"
+action: 143
 
 # State 34
 # Apply action "roll 2"
@@ -330,95 +330,119 @@ action: 1
 
 # State 35
 # Apply action "B2-down"
-action: 122
+action: 74
 
 # State 36
-# Apply action "roll 4"
-action: 3
+# Apply action "roll 5"
+action: 4
 
 # State 37
-# Apply action "W4-left"
-action: 142
+# Apply action "W6-up"
+action: 114
 
 # State 38
-# Apply action "roll 2"
-action: 1
+# Apply action "roll 3"
+action: 2
 
 # State 39
-# Apply action "B2-right"
-action: 184
+# Apply action "B3-right"
+action: 16
 
 # State 40
-# Apply action "roll 1"
-action: 0
+# Apply action "roll 3"
+action: 2
 
 # State 41
+# |__||__||b3||__||w6|
+# |__||__||b4||__||__|
+# |w2||b2||__||__||b5|
+# |__||w4||__||__||__|
 # |__||__||__||__||__|
-# |__||__||w6||b1||__|
-# |w4||__||w1||__||__|
-# |__||b2||__||__||__|
-# |__||w3||__||b3||__|
 IsTerminal() = False
-History() = [2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3, 76, 1, 178, 2, 120, 5, 237, 1, 62, 2, 274, 2, 192, 5, 165, 5, 268, 1, 224, 0, 24, 4, 212, 1, 122, 3, 142, 1, 184, 0]
-HistoryString() = "2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3, 76, 1, 178, 2, 120, 5, 237, 1, 62, 2, 274, 2, 192, 5, 165, 5, 268, 1, 224, 0, 24, 4, 212, 1, 122, 3, 142, 1, 184, 0"
+History() = [2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5, 124, 5, 174, 4, 136, 4, 299, 4, 149, 0, 212, 2, 4, 3, 286, 0, 62, 3, 272, 4, 160, 0, 143, 1, 74, 4, 114, 2, 16, 2]
+HistoryString() = "2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5, 124, 5, 174, 4, 136, 4, 299, 4, 149, 0, 212, 2, 4, 3, 286, 0, 62, 3, 272, 4, 160, 0, 143, 1, 74, 4, 114, 2, 16, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 1
-ObservationString(0) = "|__||__||__||__||__|\n|__||__||w6||b1||__|\n|w4||__||w1||__||__|\n|__||b2||__||__||__|\n|__||w3||__||b3||__|\n"
-ObservationString(1) = "|__||__||__||__||__|\n|__||__||w6||b1||__|\n|w4||__||w1||__||__|\n|__||b2||__||__||__|\n|__||w3||__||b3||__|\n"
-ObservationTensor(0): binvec(300, 0x80000400002000000000000001000200000000004000000000000000000000000002000)
-ObservationTensor(1): binvec(300, 0x80000400002000000000000001000200000000004000000000000000000000000002000)
+ObservationString(0) = "|__||__||b3||__||w6|\n|__||__||b4||__||__|\n|w2||b2||__||__||b5|\n|__||w4||__||__||__|\n|__||__||__||__||__|\n"
+ObservationString(1) = "|__||__||b3||__||w6|\n|__||__||b4||__||__|\n|w2||b2||__||__||b5|\n|__||w4||__||__||__|\n|__||__||__||__||__|\n"
+ObservationTensor(0): binvec(300, 0x4000040000000200000000000040000100000000020000000000000000010)
+ObservationTensor(1): binvec(300, 0x4000040000000200000000000040000100000000020000000000000000010)
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [151, 152, 154]
-StringLegalActions() = ["W1-up*", "W1-diag", "W1-left"]
+LegalActions() = [126, 199, 201, 202]
+StringLegalActions() = ["W2-up", "W4-up*", "W4-diag*", "W4-left"]
 
-# Apply action "W1-up*"
-action: 151
+# Apply action "W4-up*"
+action: 199
 
 # State 42
-# Apply action "roll 6"
-action: 5
+# Apply action "roll 3"
+action: 2
 
 # State 43
+# |__||__||b3||__||w6|
+# |__||__||b4||__||__|
+# |w2||w4||__||__||b5|
 # |__||__||__||__||__|
-# |__||__||w1||b1||__|
-# |w4||__||__||__||__|
-# |__||b2||__||__||__|
-# |__||w3||__||b3||__|
+# |__||__||__||__||__|
 IsTerminal() = False
-History() = [2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3, 76, 1, 178, 2, 120, 5, 237, 1, 62, 2, 274, 2, 192, 5, 165, 5, 268, 1, 224, 0, 24, 4, 212, 1, 122, 3, 142, 1, 184, 0, 151, 5]
-HistoryString() = "2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3, 76, 1, 178, 2, 120, 5, 237, 1, 62, 2, 274, 2, 192, 5, 165, 5, 268, 1, 224, 0, 24, 4, 212, 1, 122, 3, 142, 1, 184, 0, 151, 5"
+History() = [2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5, 124, 5, 174, 4, 136, 4, 299, 4, 149, 0, 212, 2, 4, 3, 286, 0, 62, 3, 272, 4, 160, 0, 143, 1, 74, 4, 114, 2, 16, 2, 199, 2]
+HistoryString() = "2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5, 124, 5, 174, 4, 136, 4, 299, 4, 149, 0, 212, 2, 4, 3, 286, 0, 62, 3, 272, 4, 160, 0, 143, 1, 74, 4, 114, 2, 16, 2, 199, 2"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "|__||__||__||__||__|\n|__||__||w1||b1||__|\n|w4||__||__||__||__|\n|__||b2||__||__||__|\n|__||w3||__||b3||__|\n"
-ObservationString(1) = "|__||__||__||__||__|\n|__||__||w1||b1||__|\n|w4||__||__||__||__|\n|__||b2||__||__||__|\n|__||w3||__||b3||__|\n"
-ObservationTensor(0): binvec(300, 0x80000800002000000000000001000200000000004000000000000000000000000000000)
-ObservationTensor(1): binvec(300, 0x80000800002000000000000001000200000000004000000000000000000000000000000)
+ObservationString(0) = "|__||__||b3||__||w6|\n|__||__||b4||__||__|\n|w2||w4||__||__||b5|\n|__||__||__||__||__|\n|__||__||__||__||__|\n"
+ObservationString(1) = "|__||__||b3||__||w6|\n|__||__||b4||__||__|\n|w2||w4||__||__||b5|\n|__||__||__||__||__|\n|__||__||__||__||__|\n"
+ObservationTensor(0): binvec(300, 0x40000000200000000000040000200000000020000000000000000010)
+ObservationTensor(1): binvec(300, 0x40000000200000000000040000200000000020000000000000000010)
 Rewards() = [0, 0]
 Returns() = [0, 0]
-LegalActions() = [280]
-StringLegalActions() = ["B3-right"]
+LegalActions() = [24, 27, 28]
+StringLegalActions() = ["B3-diag", "B3-down*", "B3-right"]
 
-# Apply action "B3-right"
-action: 280
+# Apply action "B3-down*"
+action: 27
 
 # State 44
+# Apply action "roll 2"
+action: 1
+
+# State 45
+# Apply action "W2-up"
+action: 126
+
+# State 46
+# Apply action "roll 5"
+action: 4
+
+# State 47
+# Apply action "B5-down"
+action: 170
+
+# State 48
+# Apply action "roll 1"
+action: 0
+
+# State 49
+# Apply action "W2-up"
+action: 66
+
+# State 50
+# |w2||__||__||__||w6|
+# |__||__||b3||__||__|
+# |__||w4||__||__||__|
+# |__||__||__||__||b5|
 # |__||__||__||__||__|
-# |__||__||w1||b1||__|
-# |w4||__||__||__||__|
-# |__||b2||__||__||__|
-# |__||w3||__||__||b3|
 IsTerminal() = True
-History() = [2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3, 76, 1, 178, 2, 120, 5, 237, 1, 62, 2, 274, 2, 192, 5, 165, 5, 268, 1, 224, 0, 24, 4, 212, 1, 122, 3, 142, 1, 184, 0, 151, 5, 280]
-HistoryString() = "2, 299, 1, 3, 4, 270, 0, 17, 2, 286, 3, 76, 1, 178, 2, 120, 5, 237, 1, 62, 2, 274, 2, 192, 5, 165, 5, 268, 1, 224, 0, 24, 4, 212, 1, 122, 3, 142, 1, 184, 0, 151, 5, 280"
+History() = [2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5, 124, 5, 174, 4, 136, 4, 299, 4, 149, 0, 212, 2, 4, 3, 286, 0, 62, 3, 272, 4, 160, 0, 143, 1, 74, 4, 114, 2, 16, 2, 199, 2, 27, 1, 126, 4, 170, 0, 66]
+HistoryString() = "2, 222, 5, 12, 1, 270, 3, 27, 5, 235, 5, 124, 5, 174, 4, 136, 4, 299, 4, 149, 0, 212, 2, 4, 3, 286, 0, 62, 3, 272, 4, 160, 0, 143, 1, 74, 4, 114, 2, 16, 2, 199, 2, 27, 1, 126, 4, 170, 0, 66"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "|__||__||__||__||__|\n|__||__||w1||b1||__|\n|w4||__||__||__||__|\n|__||b2||__||__||__|\n|__||w3||__||__||b3|\n"
-ObservationString(1) = "|__||__||__||__||__|\n|__||__||w1||b1||__|\n|w4||__||__||__||__|\n|__||b2||__||__||__|\n|__||w3||__||__||b3|\n"
-ObservationTensor(0): binvec(300, 0x80000800002000000000000000080200000000004000000000000000000000000000000)
-ObservationTensor(1): binvec(300, 0x80000800002000000000000000080200000000004000000000000000000000000000000)
-Rewards() = [1, -1]
-Returns() = [1, -1]
+ObservationString(0) = "|w2||__||__||__||w6|\n|__||__||b3||__||__|\n|__||w4||__||__||__|\n|__||__||__||__||b5|\n|__||__||__||__||__|\n"
+ObservationString(1) = "|w2||__||__||__||w6|\n|__||__||b3||__||__|\n|__||w4||__||__||__|\n|__||__||__||__||b5|\n|__||__||__||__||__|\n"
+ObservationTensor(0): binvec(300, 0x100000000100000000000000000200000000010000000000000000010)
+ObservationTensor(1): binvec(300, 0x100000000100000000000000000200000000010000000000000000010)
+Rewards() = [-1, 1]
+Returns() = [-1, 1]

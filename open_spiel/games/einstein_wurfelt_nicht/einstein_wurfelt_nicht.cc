@@ -60,7 +60,7 @@ const GameType kGameType{/*short_name=*/"einstein_wurfelt_nicht",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"seed", GameParameter(-1)}}};
+                         {{"seed", GameParameter(42)}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new EinsteinWurfeltNichtGame(params));
