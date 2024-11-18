@@ -31,7 +31,7 @@
 // https://en.wikipedia.org/wiki/EinStein_w%C3%BCrfelt_nicht!
 //
 // Parameters:
-//  "seed" int random seed for placement of cubes on the board [1] (default=-1)
+//  "seed" int random seed for placement of cubes on the board [1] (default=42)
 //
 // [1] When the seed is -1, the current time is used as the seed, so that the
 // assignment of cubes is random each time the game is played.
