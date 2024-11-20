@@ -201,6 +201,7 @@ void init_pyspiel_bots(py::module& m) {
         py::arg("search_limit_value"), py::arg("ponder"), py::arg("options"),
         py::arg("search_limit_type") =
             open_spiel::uci::SearchLimitType::kMoveTime,
+        py::arg("use_game_history_for_position") = false,
         "Bot that can play chess using UCI chess engine.");
 #endif
 

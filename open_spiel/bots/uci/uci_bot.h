@@ -26,6 +26,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/games/chess/chess.h"
 
 // **IMPORTANT NOTE** The basic test currently hangs, so consider this bot
 // currently experimental. The original authors claimed to have verified it with
@@ -50,7 +51,8 @@ class UCIBot : public Bot {
   // "go depth", or "go nodes".
   UCIBot(const std::string& bot_binary_path, int search_limit_value,
          bool ponder, const Options& options,
-         SearchLimitType search_limit_type = SearchLimitType::kMoveTime);
+         SearchLimitType search_limit_type = SearchLimitType::kMoveTime,
+         bool use_game_history_for_position = false);
   ~UCIBot() override;
 
   Action Step(const State& state) override;
@@ -84,6 +86,8 @@ class UCIBot : public Bot {
   void Quit();
   std::pair<std::string, absl::optional<std::string>> ReadBestMove(
       absl::optional<std::string*> info_string = absl::nullopt);
+  void PositionFromState(const chess::ChessState& state,
+                         const std::vector<std::string>& extra_moves = {});
 
   pid_t pid_ = -1;
   int output_fd_ = -1;
@@ -94,6 +98,7 @@ class UCIBot : public Bot {
   bool was_ponder_hit_ = false;
 
   bool ponder_;
+  bool use_game_history_for_position_ = false;
 
   // Input stream member variables for the bot.
   FILE* input_stream_ = nullptr;
@@ -119,7 +124,8 @@ class UCIBot : public Bot {
 std::unique_ptr<Bot> MakeUCIBot(
     const std::string& bot_binary_path, int search_limit_value,
     bool ponder = false, const Options& options = {},
-    SearchLimitType search_limit_type = SearchLimitType::kMoveTime);
+    SearchLimitType search_limit_type = SearchLimitType::kMoveTime,
+    bool use_game_history_for_position = false);
 
 }  // namespace uci
 }  // namespace open_spiel

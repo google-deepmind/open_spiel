@@ -48,8 +48,10 @@ namespace uci {
 
 UCIBot::UCIBot(const std::string& bot_binary_path, int search_limit_value,
                bool ponder, const Options& options,
-               SearchLimitType search_limit_type)
-    : ponder_(ponder) {
+               SearchLimitType search_limit_type,
+               bool use_game_history_for_position)
+    : ponder_(ponder),
+      use_game_history_for_position_(use_game_history_for_position) {
   SPIEL_CHECK_GT(search_limit_value, 0);
   SPIEL_CHECK_GT(bot_binary_path.size(), 0);
   search_limit_type_ = search_limit_type;
@@ -91,6 +93,19 @@ UCIBot::~UCIBot() {
   close(output_fd_);
 }
 
+void UCIBot::PositionFromState(const chess::ChessState& state,
+                               const std::vector<std::string>& extra_moves) {
+  if (use_game_history_for_position_) {
+    std::pair<std::string, std::vector<std::string>> fen_and_moves =
+        state.ExtractFenAndMaybeMoves();
+    fen_and_moves.second.insert(fen_and_moves.second.end(),
+                                extra_moves.begin(), extra_moves.end());
+    Position(fen_and_moves.first, fen_and_moves.second);
+  } else {
+    Position(state.Board().ToFEN(), extra_moves);
+  }
+}
+
 Action UCIBot::Step(const State& state) { return StepVerbose(state).first; }
 
 std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
@@ -101,13 +116,13 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
   if (ponder_ && ponder_move_) {
     if (!was_ponder_hit_) {
       Stop();
-      Position(chess_state.Board().ToFEN());
+      PositionFromState(chess_state);
       tie(move_str, ponder_move_) = Go(&info_str);
     } else {
       tie(move_str, ponder_move_) = ReadBestMove(&info_str);
     }
   } else {
-    Position(chess_state.Board().ToFEN());
+    PositionFromState(chess_state);
     tie(move_str, ponder_move_) = Go(&info_str);
   }
   was_ponder_hit_ = false;
@@ -118,7 +133,7 @@ std::pair<Action, std::string> UCIBot::StepVerbose(const State& state) {
   }
 
   if (ponder_ && ponder_move_) {
-    Position(chess_state.Board().ToFEN(), {move_str, *ponder_move_});
+    PositionFromState(chess_state, {move_str, *ponder_move_});
     GoPonder();
   }
 
@@ -136,7 +151,7 @@ void UCIBot::RestartAt(const State& state) {
   ponder_move_ = absl::nullopt;
   was_ponder_hit_ = false;
   auto chess_state = down_cast<const chess::ChessState&>(state);
-  Position(chess_state.Board().ToFEN());
+  PositionFromState(chess_state);
 }
 
 void UCIBot::InformAction(const State& state, Player player_id, Action action) {
@@ -320,9 +335,11 @@ std::string UCIBot::ReadLine() {
 std::unique_ptr<Bot> MakeUCIBot(const std::string& bot_binary_path,
                                 int search_limit_value, bool ponder,
                                 const Options& options,
-                                SearchLimitType search_limit_type) {
+                                SearchLimitType search_limit_type,
+                                bool use_game_history_for_position) {
   return std::make_unique<UCIBot>(bot_binary_path, search_limit_value, ponder,
-                                  options, search_limit_type);
+                                  options, search_limit_type,
+                                  use_game_history_for_position);
 }
 
 }  // namespace uci
