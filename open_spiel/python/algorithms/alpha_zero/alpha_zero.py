@@ -214,6 +214,8 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       outcomes = state.chance_outcomes()
       action_list, prob_list = zip(*outcomes)
       action = random_state.choice(action_list, p=prob_list)
+      action_str = state.action_to_string(state.current_player(), action)
+      actions.append(action_str)
       state.apply_action(action)
     else:
       root = bots[state.current_player()].mcts_search(state)
@@ -470,10 +472,10 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         "batch_size": batch_size_stats.as_dict,
         "batch_size_hist": [0, 1],
         "loss": {
-            "policy": losses.policy,
-            "value": losses.value,
-            "l2reg": losses.l2,
-            "sum": losses.total,
+            "policy": float(losses.policy),
+            "value": float(losses.value),
+            "l2reg": float(losses.l2),
+            "sum": float(losses.total),
         },
         "cache": {  # Null stats because it's hard to report between processes.
             "size": 0,
@@ -510,8 +512,6 @@ def alpha_zero(config: Config):
     raise ValueError("Game must have terminal rewards.")
   if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
     raise ValueError("Game must have sequential turns.")
-  if game_type.chance_mode != pyspiel.GameType.ChanceMode.DETERMINISTIC:
-    raise ValueError("Game must be deterministic.")
 
   path = config.path
   if not path:

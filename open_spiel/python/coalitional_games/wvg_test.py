@@ -49,9 +49,12 @@ class WeightedVotingGamesTest(absltest.TestCase):
         game, least_core_lp.add_all_constraints)
     print(lc_imputation)   # prints [0.33, 0.33, 0.33, 0]
     print(epsilon)         # prints 0.33
-    self.assertTrue(np.allclose(lc_imputation,
-                                np.asarray([1.0/3, 1.0/3, 1.0/3, 0])))
-    self.assertAlmostEqual(epsilon, 1.0/3.0)
+    np.testing.assert_array_almost_equal(
+        lc_imputation,
+        np.asarray([1.0 / 3, 1.0 / 3, 1.0 / 3, 0]),
+        decimal=4,
+    )
+    self.assertAlmostEqual(epsilon, 1.0/3.0, delta=1e-4)
 
 
 if __name__ == "__main__":

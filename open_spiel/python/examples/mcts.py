@@ -98,7 +98,8 @@ def _init_bot(bot_type, game, player_id):
         random_state=rng,
         child_selection_fn=mcts.SearchNode.puct_value,
         solve=FLAGS.solve,
-        verbose=FLAGS.verbose)
+        verbose=FLAGS.verbose,
+        dont_return_chance_node=True)
   if bot_type == "random":
     return uniform_random.UniformRandomBot(player_id, rng)
   if bot_type == "human":

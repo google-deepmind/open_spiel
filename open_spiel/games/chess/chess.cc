@@ -485,6 +485,20 @@ int ChessState::NumRepetitions(const ChessState& state) const {
   }
 }
 
+std::pair<std::string, std::vector<std::string>>
+ChessState::ExtractFenAndMaybeMoves() const {
+  SPIEL_CHECK_FALSE(IsChanceNode());
+  std::string initial_fen = start_board_.ToFEN(ParentGame()->IsChess960());
+  std::vector<std::string> move_lans;
+  std::unique_ptr<State> state = ParentGame()->NewInitialState(initial_fen);
+  ChessBoard board = down_cast<const ChessState&>(*state).Board();
+  for (const Move& move : moves_history_) {
+    move_lans.push_back(move.ToLAN(ParentGame()->IsChess960(), &board));
+    board.ApplyMove(move);
+  }
+  return std::make_pair(initial_fen, move_lans);
+}
+
 absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
   if (!Board().HasSufficientMaterial()) {
     return std::vector<double>{DrawUtility(), DrawUtility()};

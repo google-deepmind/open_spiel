@@ -483,7 +483,7 @@ StringLegalActions() = ["pass", "a2a3", "a2a4", "a2b3", "b1a3", "b1c3", "b2b3", 
 action: 674
 
 # State 2
-# rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq b3 0 1
+# rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 0 1
 IsTerminal() = False
 History() = [0, 674]
 HistoryString() = "0, 674"
@@ -709,7 +709,7 @@ StringLegalActions() = ["Sense a1", "Sense b1", "Sense c1", "Sense d1", "Sense e
 action: 1
 
 # State 3
-# rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq b3 0 1
+# rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 0 1
 IsTerminal() = False
 History() = [0, 674, 1]
 HistoryString() = "0, 674, 1"
@@ -1967,7 +1967,7 @@ action: 28
 action: 3010
 
 # State 40
-# rnb1kb1r/1p2n1p1/p1ppp3/5p1p/3B4/3P2PN/P1PQPP1P/RN2KB1R w KQkq f6 0 11
+# rnb1kb1r/1p2n1p1/p1ppp3/5p1p/3B4/3P2PN/P1PQPP1P/RN2KB1R w KQkq - 0 11
 IsTerminal() = False
 History() = [0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010]
 HistoryString() = "0, 674, 1, 1257, 22, 117, 9, 1807, 18, 1224, 4, 263, 16, 1841, 18, 2425, 32, 117, 21, 3570, 28, 3576, 5, 4178, 27, 3593, 17, 1841, 24, 1768, 34, 89, 35, 204, 25, 907, 32, 704, 28, 3010"

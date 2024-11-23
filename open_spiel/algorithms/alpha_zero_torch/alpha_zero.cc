@@ -119,6 +119,7 @@ Trajectory PlayGame(Logger* logger, int game_num, const open_spiel::Game& game,
       open_spiel::ActionsAndProbs outcomes = state->ChanceOutcomes();
       open_spiel::Action action =
           open_spiel::SampleAction(outcomes, *rng).first;
+      history.push_back(state->ActionToString(state->CurrentPlayer(), action));
       state->ApplyAction(action);
     } else {
       open_spiel::Player player = state->CurrentPlayer();

@@ -97,7 +97,7 @@ def solve_least_core_lp(
   constraint_function(game, x, e, constraints)
 
   prob = cp.Problem(objective, constraints)
-  _ = prob.solve()
+  _ = prob.solve(solver=cp.SCS, eps=1e-6)
   # The optimal value for x is stored in `x.value`.
 
   return x.value, e.value

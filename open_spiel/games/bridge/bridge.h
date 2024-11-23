@@ -108,9 +108,12 @@ class BridgeState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override { return phase_ == Phase::kGameOver; }
   std::vector<double> Returns() const override { return returns_; }
+  std::string InformationStateString(Player player) const override;
   std::string ObservationString(Player player) const override;
   void WriteObservationTensor(Player player, absl::Span<float> values) const;
   void ObservationTensor(Player player,
+                         absl::Span<float> values) const override;
+  void InformationStateTensor(Player player,
                          absl::Span<float> values) const override;
   std::unique_ptr<State> Clone() const override {
     return std::unique_ptr<State>(new BridgeState(*this));
@@ -119,6 +122,8 @@ class BridgeState : public State {
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
   std::string Serialize() const override;
   void SetDoubleDummyResults(ddTableResults double_dummy_results);
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
 
   // If the state is terminal, returns the index of the final contract, into the
   // arrays returned by PossibleFinalContracts and ScoreByContract.
@@ -176,6 +181,7 @@ class BridgeState : public State {
   std::string FormatVulnerability() const;
   std::string FormatAuction(bool trailing_query) const;
   std::string FormatPlay() const;
+  std::string FormatPlayObservation(bool trailing_query) const;
   std::string FormatResult() const;
 
   const bool use_double_dummy_result_;
@@ -230,6 +236,11 @@ class BridgeGame : public Game {
   }
 
   std::vector<int> ObservationTensorShape() const override {
+    return {kNumObservationTypes +
+            std::max(GetPlayTensorSize(NumTricks()), kAuctionTensorSize)};
+  }
+
+    std::vector<int> InformationStateTensorShape() const override {
     return {kNumObservationTypes +
             std::max(GetPlayTensorSize(NumTricks()), kAuctionTensorSize)};
   }

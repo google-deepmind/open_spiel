@@ -13,11 +13,16 @@
 // limitations under the License.
 
 #include <signal.h>
+#include <cstdlib>
+#include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/algorithms/alpha_zero_torch/alpha_zero.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
+#include "open_spiel/utils/init.h"
 #include "open_spiel/utils/json.h"
 #include "open_spiel/utils/thread.h"
 
@@ -97,6 +102,8 @@ void signal_installer() {
 }
 
 int main(int argc, char** argv) {
+  open_spiel::Init("", &argc, &argv, true);
+
   std::vector<char*> positional_args = absl::ParseCommandLine(argc, argv);
   signal_installer();
 

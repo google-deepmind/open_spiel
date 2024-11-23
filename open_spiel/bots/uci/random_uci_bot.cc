@@ -15,6 +15,9 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
@@ -57,6 +60,7 @@ void RandomUciBot() {
       while (pos < tokens.size()) {
         if (tokens[pos] == "moves") {
           has_moves = true;
+          ++pos;
           break;
         }
         if (pos > 2) fen << ' ';

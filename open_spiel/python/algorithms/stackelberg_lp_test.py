@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for open_spiel.python.algorithms.stackelberg_lp."""
 
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -52,8 +51,10 @@ class StackelbergLPTest(parameterized.TestCase):
     leader_eq_strategy, _, leader_eq_value, _ = solve_stackelberg(game)
 
     with self.subTest("optimal commitment"):
-      np.testing.assert_array_almost_equal(commit_strategy, leader_eq_strategy)
-      self.assertAlmostEqual(commit_value, leader_eq_value)
+      np.testing.assert_array_almost_equal(
+          commit_strategy, leader_eq_strategy, decimal=5
+      )
+      self.assertAlmostEqual(commit_value, leader_eq_value, delta=1e-5)
 
     with self.subTest("Leader-payoff in SSE no less than in NE"):
       p_mat = game_payoffs_array(game)

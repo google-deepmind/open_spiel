@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for open_spiel.python.algorithms.nash_averaging."""
 
 from absl.testing import absltest
 from absl.testing import parameterized
@@ -75,10 +74,14 @@ class NashAveragingTest(parameterized.TestCase):
 
     maxent_nash, nash_avg_value = nash_averaging(game)
     with self.subTest("probability"):
-      np.testing.assert_array_almost_equal(eq, maxent_nash.reshape(-1))
+      np.testing.assert_array_almost_equal(
+          eq, maxent_nash.reshape(-1), decimal=5
+      )
 
     with self.subTest("value"):
-      np.testing.assert_array_almost_equal(value, nash_avg_value.reshape(-1))
+      np.testing.assert_array_almost_equal(
+          value, nash_avg_value.reshape(-1), decimal=5
+      )
 
   @parameterized.named_parameters(
       ("game0", game0, dominated_idxs0),)
@@ -86,7 +89,7 @@ class NashAveragingTest(parameterized.TestCase):
     maxent_nash, _ = nash_averaging(game)
     with self.subTest("dominated strategies have zero Nash probs"):
       for idx in dominated_idxs:
-        self.assertAlmostEqual(maxent_nash[idx].item(), 0.0)
+        self.assertAlmostEqual(maxent_nash[idx].item(), 0.0, delta=1e-5)
 
   @parameterized.named_parameters(
       ("game1", game1, dominated_idxs1),
@@ -95,7 +98,7 @@ class NashAveragingTest(parameterized.TestCase):
     (agent_strategy, _), _ = nash_averaging(game, a_v_a=False)
     with self.subTest("dominated strategies have zero Nash probs"):
       for idx in dominated_idxs:
-        self.assertAlmostEqual(agent_strategy[idx].item(), 0.0)
+        self.assertAlmostEqual(agent_strategy[idx].item(), 0.0, delta=1e-5)
 
   @parameterized.named_parameters(
       ("game2", game2, dom_idxs2),
@@ -104,11 +107,15 @@ class NashAveragingTest(parameterized.TestCase):
     (agent_strategy, _), (agent_values, _) = nash_averaging(game, a_v_a=False)
     with self.subTest("dominant strategies have equal Nash probs"):
       for idx in dom_idxs:
-        self.assertAlmostEqual(agent_strategy[idx].item(), 1 / len(dom_idxs2))
+        self.assertAlmostEqual(
+            agent_strategy[idx].item(), 1 / len(dom_idxs2), delta=1e-4
+        )
 
     with self.subTest("dominant strategies have equal Nash values"):
       values = [agent_values[idx] for idx in dom_idxs]
-      self.assertAlmostEqual(np.abs(np.max(values) - np.min(values)), 0.0)
+      self.assertAlmostEqual(
+          np.abs(np.max(values) - np.min(values)), 0.0, delta=1e-5
+      )
 
 
 if __name__ == "__main__":

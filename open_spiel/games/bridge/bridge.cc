@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <iterator>
 #include <memory>
 #include <set>
@@ -68,8 +69,8 @@ const GameType kGameType{/*short_name=*/"bridge",
                          GameType::RewardModel::kTerminal,
                          /*max_num_players=*/kNumPlayers,
                          /*min_num_players=*/kNumPlayers,
-                         /*provides_information_state_string=*/false,
-                         /*provides_information_state_tensor=*/false,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
@@ -187,7 +188,35 @@ std::array<std::string, kNumSuits> FormatHand(
   return cards;
 }
 
-std::string BridgeState::ObservationString(Player player) const {
+std::unique_ptr<State> BridgeState::ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const {
+  // Only works in the auction phase for now.
+  SPIEL_CHECK_TRUE(phase_ == Phase::kAuction);
+  std::vector<int> our_cards;
+  std::vector<int> other_cards;
+  for (int i = 0; i < kNumCards; ++i) {
+    if (holder_[i] == player_id) our_cards.push_back(i);
+    else if (holder_[i].has_value()) other_cards.push_back(i);
+  }
+  std::unique_ptr<State> new_state = GetGame()->NewInitialState();
+  for (int i = 0; i < kNumCards; ++i) {
+    if (i % kNumPlayers == player_id) {
+      new_state->ApplyAction(our_cards.back());
+      our_cards.pop_back();
+    } else {
+      const int k = static_cast<int>(rng() * other_cards.size());
+      new_state->ApplyAction(other_cards[k]);
+      other_cards[k] = other_cards.back();
+      other_cards.pop_back();
+    }
+  }
+  for (int i = kNumCards; i < history_.size(); ++i) {
+    new_state->ApplyAction(history_[i].action);
+  }
+  return new_state;
+}
+
+std::string BridgeState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (IsTerminal()) return ToString();
@@ -200,6 +229,27 @@ std::string BridgeState::ObservationString(Player player) const {
         &rv, FormatAuction(/*trailing_query=*/phase_ == Phase::kAuction &&
                            player == CurrentPlayer()));
   if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay());
+  return rv;
+}
+
+std::string BridgeState::ObservationString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  if (IsTerminal()) return ToString();
+  std::string rv = FormatVulnerability();
+  auto cards = FormatHand(player, /*mark_voids=*/true, holder_);
+  for (int suit = kNumSuits - 1; suit >= 0; --suit)
+    absl::StrAppend(&rv, cards[suit], "\n");
+  if (phase_ == Phase::kPlay) {
+    absl::StrAppend(&rv, "Contract: ", contract_.ToString(), "\n");
+  } else if (phase_ == Phase::kAuction && history_.size() > kNumCards) {
+    absl::StrAppend(
+        &rv, FormatAuction(/*trailing_query=*/player == CurrentPlayer()));
+  }
+  if (num_cards_played_ > 0) {
+    absl::StrAppend(&rv, FormatPlayObservation(/*trailing_query=*/player ==
+                                               CurrentPlayer()));
+  }
   return rv;
 }
 
@@ -286,6 +336,42 @@ std::string BridgeState::FormatPlay() const {
   return rv;
 }
 
+std::string BridgeState::FormatPlayObservation(bool trailing_query) const {
+  SPIEL_CHECK_GT(num_cards_played_, 0);
+  std::string rv;
+  Trick trick{kInvalidPlayer, kNoTrump, 0};
+  Player player = (1 + contract_.declarer) % kNumPlayers;
+  // Previous tricks
+  const int completed_tricks = num_cards_played_ / kNumPlayers;
+  for (int i = 0; i < completed_tricks * kNumPlayers; ++i) {
+    if (i % kNumPlayers == 0) {
+      if (i > 0) player = trick.Winner();
+    } else {
+      player = (1 + player) % kNumPlayers;
+    }
+    const int card = history_[history_.size() - num_cards_played_ + i].action;
+    if (i % kNumPlayers == 0) {
+      trick = Trick(player, contract_.trumps, card);
+    } else {
+      trick.Play(player, card);
+    }
+    if (i % kNumPlayers == 0 && i > 0)
+      absl::StrAppend(&rv, "Trick ", (i / kNumPlayers), " won by ");
+    if (Partnership(trick.Winner()) == Partnership(contract_.declarer))
+      absl::StrAppend(&rv, "declarer\n");
+    else
+      absl::StrAppend(&rv, "defence\n");
+  }
+  // Current trick
+  absl::StrAppend(&rv, "Current trick: ");
+  for (int i = completed_tricks * kNumPlayers; i < num_cards_played_; ++i) {
+    const int card = history_[history_.size() - num_cards_played_ + i].action;
+    absl::StrAppend(&rv, CardString(card), " ");
+  }
+  if (trailing_query) absl::StrAppend(&rv, "?");
+  return rv;
+}
+
 std::string BridgeState::FormatResult() const {
   SPIEL_CHECK_TRUE(IsTerminal());
   std::string rv;
@@ -298,6 +384,12 @@ std::string BridgeState::FormatResult() const {
 }
 
 void BridgeState::ObservationTensor(Player player,
+                                    absl::Span<float> values) const {
+  SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
+  WriteObservationTensor(player, values);
+}
+
+void BridgeState::InformationStateTensor(Player player,
                                     absl::Span<float> values) const {
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   WriteObservationTensor(player, values);
