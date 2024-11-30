@@ -29,15 +29,6 @@
 // This is the implementation of the basic game with a 5x5 board and 6 cubes
 // per player.
 // https://en.wikipedia.org/wiki/EinStein_w%C3%BCrfelt_nicht!
-<<<<<<< HEAD
-//
-// Parameters:
-//  "seed" int random seed for placement of cubes on the board [1] (default=42)
-//
-// [1] When the seed is -1, the current time is used as the seed, so that the
-// assignment of cubes is random each time the game is played.
-=======
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 
 namespace open_spiel {
 namespace einstein_wurfelt_nicht {
@@ -53,11 +44,8 @@ inline constexpr int kNumPlayers = 2;
 inline constexpr int kBlackPlayerId = 0;
 inline constexpr int kWhitePlayerId = 1;
 inline constexpr int kNumPlayerCubes = 6;
-<<<<<<< HEAD
-=======
 // 720 possible permutations of 6 cubes on the board
 inline constexpr int kNumCubesPermutations = 720;
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 inline constexpr int kDefaultRows = 5;
 inline constexpr int kDefaultColumns = 5;
 inline constexpr int k2dMaxBoardSize = kDefaultRows * kDefaultColumns;
@@ -84,11 +72,7 @@ struct TurnHistoryInfo {
 class EinsteinWurfeltNichtState : public State {
  public:
   explicit EinsteinWurfeltNichtState(std::shared_ptr<const Game> game, int rows,
-<<<<<<< HEAD
-                             int cols, int seed);
-=======
                              int cols);
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   Player CurrentPlayer() const override;
   // Returns the opponent of the specified player.
   int Opponent(int player) const;
@@ -116,26 +100,16 @@ class EinsteinWurfeltNichtState : public State {
   void DoApplyAction(Action action) override;
 
  private:
-<<<<<<< HEAD
-=======
   void SetupInitialBoard(Player player, Action action);
 
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   Player cur_player_ = kInvalidPlayer;
   Player prev_player_ = kInvalidPlayer;
   int winner_ = kInvalidPlayer;
   int total_moves_ = -1;
-<<<<<<< HEAD
-  std::array<int, 2> cubes_;
-  int rows_ = -1;
-  int cols_ = -1;
-  int seed_ = -1;
-=======
   int turns_ = -1;
   std::array<int, 2> cubes_;
   int rows_ = -1;
   int cols_ = -1;
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   int die_roll_ = 0;
   std::array<Cube,
             k2dMaxBoardSize> board_;  // for (row,col) we use row*cols_+col
@@ -148,17 +122,10 @@ class EinsteinWurfeltNichtGame : public Game {
   int NumDistinctActions() const override;
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-<<<<<<< HEAD
-        new EinsteinWurfeltNichtState(shared_from_this(), rows_, cols_, seed_));
-  }
-
-  int MaxChanceOutcomes() const override { return 6; }
-=======
         new EinsteinWurfeltNichtState(shared_from_this(), rows_, cols_));
   }
 
   int MaxChanceOutcomes() const override { return kNumCubesPermutations; }
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -182,10 +149,6 @@ class EinsteinWurfeltNichtGame : public Game {
  private:
   int rows_ = -1;
   int cols_ = -1;
-<<<<<<< HEAD
-  int seed_ = -1;
-=======
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 };
 
 }  // namespace einstein_wurfelt_nicht

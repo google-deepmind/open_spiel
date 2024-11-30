@@ -59,13 +59,8 @@ const GameType kGameType{/*short_name=*/"einstein_wurfelt_nicht",
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
-<<<<<<< HEAD
-                         /*parameter_specification=*/
-                         {{"seed", GameParameter(42)}}};
-=======
                          /*parameter_specification=*/{}  // no parameters
                          };
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new EinsteinWurfeltNichtGame(params));
@@ -102,8 +97,6 @@ Color OpponentColor(Player player) {
   }
 }
 
-<<<<<<< HEAD
-=======
 std::vector<std::vector<int>> GetAllPermutations() {
   std::vector<std::vector<int>> all_permutations;
   std::vector<int> nums = {1, 2, 3, 4, 5, 6};
@@ -115,7 +108,6 @@ std::vector<std::vector<int>> GetAllPermutations() {
   return all_permutations;
 }
 
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 std::string CoordinatesToDirection(int row, int col) {
   std::string direction;
   if (row == col) {
@@ -138,66 +130,21 @@ std::string CoordinatesToDirection(int row, int col) {
 }  // namespace
 
 EinsteinWurfeltNichtState::EinsteinWurfeltNichtState(
-<<<<<<< HEAD
-    std::shared_ptr<const Game> game, int rows, int cols, int seed)
-    : State(game),
-      rows_(rows),
-      cols_(cols),
-      seed_(seed),
-=======
     std::shared_ptr<const Game> game, int rows, int cols)
     : State(game),
       rows_(rows),
       cols_(cols),
       turns_(-1),
->>>>>>> einstein_wurfelt_nicht_without_randomicity
       cur_player_(kChancePlayerId),
       prev_player_(kBlackPlayerId) {
   SPIEL_CHECK_GT(rows_, 1);
   SPIEL_CHECK_GT(cols_, 1);
-<<<<<<< HEAD
-
-  std::vector<std::vector<int>> players_cubes{{1, 2, 3, 4, 5, 6},
-                                            {1, 2, 3, 4, 5, 6}};
-  int player_cube_seed = seed_;
-  for (int i = 0; i < 2; ++i) {
-    if (seed_ == -1) {
-      player_cube_seed =
-      std::chrono::system_clock::now().time_since_epoch().count();
-    }
-    player_cube_seed += 1;  // make sure to have different seeds for each player
-    std::default_random_engine rng(player_cube_seed);
-    std::shuffle(players_cubes[i].begin(), players_cubes[i].end(), rng);
-  }
-
-  // Values in the upper-left corner (black cubes) have a postion identified
-  // as rows+cols <= 2. Values in the lower-right corner (white cubes) have a
-  // position identified as rows+cols >= 6. The rest of the board is empty.
-  for (int r = 0; r < kDefaultRows; r++) {
-    for (int c = 0; c < kDefaultColumns; c++) {
-      if (r+c <= 2) {
-        board_[r*kDefaultColumns+c] =
-          Cube{Color::kBlack, players_cubes[0].back()};
-        players_cubes[0].pop_back();
-      } else if (r+c >= 6) {
-        board_[r*kDefaultColumns+c] =
-          Cube{Color::kWhite, players_cubes[1].back()};
-        players_cubes[1].pop_back();
-      } else {
-        board_[r*kDefaultColumns+c] = Cube{Color::kEmpty, -1};
-      }
-    }
-  }
-=======
   board_.fill(Cube{Color::kEmpty, -1});
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 
   winner_ = kInvalidPlayer;
   cubes_[0] = cubes_[1] = kNumPlayerCubes;
 }
 
-<<<<<<< HEAD
-=======
 void EinsteinWurfeltNichtState::SetupInitialBoard(
     Player player, Action action) {
     auto perms = GetAllPermutations();
@@ -221,7 +168,6 @@ void EinsteinWurfeltNichtState::SetupInitialBoard(
     }
 }
 
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 int EinsteinWurfeltNichtState::CurrentPlayer() const {
   if (IsTerminal()) {
     return kTerminalPlayerId;
@@ -290,22 +236,12 @@ EinsteinWurfeltNichtState::AvailableCubesPosition(Color player_color) const {
 void EinsteinWurfeltNichtState::DoApplyAction(Action action) {
   if (IsChanceNode()) {
     SPIEL_CHECK_GE(action, 0);
-<<<<<<< HEAD
-    SPIEL_CHECK_LE(action, 5);
-=======
     SPIEL_CHECK_LE(action, kNumCubesPermutations -1);
->>>>>>> einstein_wurfelt_nicht_without_randomicity
     turn_history_info_.push_back(TurnHistoryInfo(kChancePlayerId,
                                                   prev_player_,
                                                   die_roll_,
                                                   action,
                                                   Cube{Color::kEmpty, -1}));
-<<<<<<< HEAD
-    cur_player_ = Opponent(prev_player_);
-    prev_player_ = cur_player_;
-    die_roll_ = action + 1;
-    return;
-=======
     if (turns_ == -1) {
       SetupInitialBoard(kBlackPlayerId, action);
       turns_ = 0;
@@ -321,7 +257,6 @@ void EinsteinWurfeltNichtState::DoApplyAction(Action action) {
       turns_++;
       return;
     }
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   }
 
   // The die should have been rolled at least once at this point
@@ -369,16 +304,11 @@ void EinsteinWurfeltNichtState::DoApplyAction(Action action) {
 
   cur_player_ = NextPlayerRoundRobin(cur_player_, kNumPlayers);
   cur_player_ = kChancePlayerId;
-<<<<<<< HEAD
-=======
   turns_++;
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 }
 
 std::string EinsteinWurfeltNichtState::ActionToString(Player player,
                                               Action action) const {
-<<<<<<< HEAD
-=======
   std::string action_string = "";
 
   if (IsChanceNode()) {
@@ -396,7 +326,6 @@ std::string EinsteinWurfeltNichtState::ActionToString(Player player,
     }
   }
 
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   std::vector<int> values =
       UnrankActionMixedBase(action, {rows_, cols_, kNumDirections, 2});
   int r1 = values[0];
@@ -406,16 +335,6 @@ std::string EinsteinWurfeltNichtState::ActionToString(Player player,
   int r2 = kDirRowOffsets[dir];
   int c2 = kDirColOffsets[dir];
 
-<<<<<<< HEAD
-  std::string action_string = "";
-
-  if (IsChanceNode()) {
-     absl::StrAppend(&action_string, "roll ", action+1);
-     return action_string;
-  }
-
-=======
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   Cube cube = board(r1, c1);
   std::string color = (cube.color == Color::kBlack) ? "B" : "W";
 
@@ -473,9 +392,6 @@ std::vector<Action> EinsteinWurfeltNichtState::LegalActions() const {
 std::vector<std::pair<Action, double>>
 EinsteinWurfeltNichtState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
-<<<<<<< HEAD
-  return kChanceOutcomes;
-=======
   if (turns_ <= 0) {
     // First 2 moves corresponds to the initial board setup.
     // There are 6! = 720 possible permutations of the cubes.
@@ -490,7 +406,6 @@ EinsteinWurfeltNichtState::ChanceOutcomes() const {
   } else {
     return kChanceOutcomes;
   }
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 }
 
 bool EinsteinWurfeltNichtState::InBounds(int r, int c) const {
@@ -588,9 +503,6 @@ void EinsteinWurfeltNichtState::UndoAction(Player player, Action action) {
     } else {
       SetBoard(r2, c2, Cube{Color::kEmpty, -1});
     }
-<<<<<<< HEAD
-  }
-=======
   } else {
     for (int r = 0; r < kDefaultRows; r++) {
       for (int c = 0; c < kDefaultColumns; c++) {
@@ -603,16 +515,12 @@ void EinsteinWurfeltNichtState::UndoAction(Player player, Action action) {
     }
   }
 
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   // Undo win status.
   winner_ = kInvalidPlayer;
 
   turn_history_info_.pop_back();
   history_.pop_back();
-<<<<<<< HEAD
-=======
   --turns_;
->>>>>>> einstein_wurfelt_nicht_without_randomicity
   --move_number_;
 }
 
@@ -639,12 +547,7 @@ void EinsteinWurfeltNichtState::SetState(int cur_player,
 EinsteinWurfeltNichtGame::EinsteinWurfeltNichtGame(const GameParameters& params)
     : Game(kGameType, params),
       rows_(kDefaultRows),
-<<<<<<< HEAD
-      cols_(kDefaultColumns),
-      seed_(ParameterValue<int>("seed")) {}
-=======
       cols_(kDefaultColumns) {}
->>>>>>> einstein_wurfelt_nicht_without_randomicity
 
 int EinsteinWurfeltNichtGame::NumDistinctActions() const {
   return rows_ * cols_ * kNumDirections * 2;
