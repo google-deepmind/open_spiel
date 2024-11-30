@@ -24,19 +24,15 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void BasicEinsteinWurfeltNitchTests() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   testing::RandomSimTest(*game, 100, true, true);
   testing::RandomSimTestWithUndo(*game, 1);
 }
 
 void BlackPlayerSimpleWinTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   EinsteinWurfeltNichtState* bstate =
     static_cast<EinsteinWurfeltNichtState*>(state.get());
@@ -87,10 +83,8 @@ void BlackPlayerSimpleWinTest() {
 }
 
 void WhitePlayerSimpleWinTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   EinsteinWurfeltNichtState* bstate =
     static_cast<EinsteinWurfeltNichtState*>(state.get());
@@ -140,10 +134,8 @@ void WhitePlayerSimpleWinTest() {
 }
 
 void WinByCapturingAllOpponentCubesTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   EinsteinWurfeltNichtState* bstate =
     static_cast<EinsteinWurfeltNichtState*>(state.get());
@@ -193,10 +185,8 @@ void WinByCapturingAllOpponentCubesTest() {
 }
 
 void CheckAlternateChancePlayerAndNormalPlayerTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
 
   int previous_player = state->CurrentPlayer();
@@ -217,20 +207,16 @@ void CheckAlternateChancePlayerAndNormalPlayerTest() {
 }
 
 void InitialStateTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
   SPIEL_CHECK_EQ(state->CurrentPlayer(), open_spiel::kChancePlayerId);
   SPIEL_CHECK_FALSE(state->IsTerminal());
 }
 
 void LegalActionsTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(42);
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
 
   while (!state->IsTerminal()) {
@@ -244,18 +230,53 @@ void LegalActionsTest() {
   SPIEL_CHECK_TRUE(returns[0] == 1.0 || returns[1] == 1.0);
 }
 
-void RandomBoardSetupTest() {
-  open_spiel::GameParameters params;
-  params["seed"] = open_spiel::GameParameter(-1);
+void InitialBoardSetupTest() {
+  // Test the initial setup with empty board
+  std::string empty_board_state =
+    "|__||__||__||__||__|\n"
+    "|__||__||__||__||__|\n"
+    "|__||__||__||__||__|\n"
+    "|__||__||__||__||__|\n"
+    "|__||__||__||__||__|\n";
   std::shared_ptr<const open_spiel::Game> game =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state = game->NewInitialState();
+  SPIEL_CHECK_EQ(state->ToString(), empty_board_state);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  SPIEL_CHECK_EQ(state->ChanceOutcomes().size(), kNumCubesPermutations);
 
+  //  Test allocation of black cubes on the board
+  state->ApplyAction(0);
+  std::string black_board_state =
+    "|b1||b2||b3||__||__|\n"
+    "|b4||b5||__||__||__|\n"
+    "|b6||__||__||__||__|\n"
+    "|__||__||__||__||__|\n"
+    "|__||__||__||__||__|\n";
+  SPIEL_CHECK_EQ(state->ToString(), black_board_state);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  SPIEL_CHECK_EQ(state->ChanceOutcomes().size(), kNumCubesPermutations);
+
+  //  Allocation of cubes on the board changes if a different action is applied
   std::shared_ptr<const open_spiel::Game> game2 =
-      open_spiel::LoadGame("einstein_wurfelt_nicht", params);
+      open_spiel::LoadGame("einstein_wurfelt_nicht");
   std::unique_ptr<open_spiel::State> state2 = game->NewInitialState();
-
+  SPIEL_CHECK_EQ(state2->ToString(), empty_board_state);
+  state2->ApplyAction(1);
+  SPIEL_CHECK_NE(state2->ToString(), empty_board_state);
   SPIEL_CHECK_NE(state->ToString(), state2->ToString());
+
+  //  Test allocation of white cubes on the board
+  state->ApplyAction(0);
+  std::string white_board_state =
+    "|b1||b2||b3||__||__|\n"
+    "|b4||b5||__||__||__|\n"
+    "|b6||__||__||__||w1|\n"
+    "|__||__||__||w2||w3|\n"
+    "|__||__||w4||w5||w6|\n";
+  SPIEL_CHECK_EQ(state->ToString(), white_board_state);
+  SPIEL_CHECK_EQ(state->CurrentPlayer(), kChancePlayerId);
+  SPIEL_CHECK_EQ(state->ChanceOutcomes().size(), kNumPlayerCubes);
 }
 
 }  // namespace
@@ -273,5 +294,5 @@ int main(int argc, char** argv) {
   open_spiel::einstein_wurfelt_nicht::BlackPlayerSimpleWinTest();
   open_spiel::einstein_wurfelt_nicht::WhitePlayerSimpleWinTest();
   open_spiel::einstein_wurfelt_nicht::WinByCapturingAllOpponentCubesTest();
-  open_spiel::einstein_wurfelt_nicht::RandomBoardSetupTest();
+  open_spiel::einstein_wurfelt_nicht::InitialBoardSetupTest();
 }
