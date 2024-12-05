@@ -37,13 +37,11 @@ MYDIR="$(dirname "$(realpath "$0")")"
 function check_install_python() {
   # Need the trap here to make sure the return value of grep being 1 doesn't cause set -e to fail
   # https://stackoverflow.com/questions/77047127/bash-capture-stderr-of-a-function-while-using-trap
-  rm -f /usr/local/bin/2to3-${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/idle${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/pydoc${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}*
   trap 'ret=0; output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}") || ret="$?"; trap - RETURN' RETURN
   if [[ "$output" = "" ]]; then
-    brew install "python@${OS_PYTHON_VERSION}"
+    # The --force is needed because there seems to be a phantom installation in /usr/local/
+    # and errors show up for files that already exist
+    brew install --force "python@${OS_PYTHON_VERSION}"
   fi
   return 0
 }
