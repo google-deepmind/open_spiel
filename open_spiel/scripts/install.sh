@@ -33,6 +33,14 @@ ${PYBIN} --version
 
 MYDIR="$(dirname "$(realpath "$0")")"
 
+function check_install_python() {
+  output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}")
+  if [[ "$output" = "" ]]; then
+    brew install "python@${OS_PYTHON_VERSION}"
+  fi
+  return 0
+}
+
 # Calling this file from the project root is not allowed,
 # as all the paths here are hard-coded to be relative to it.
 #
@@ -288,10 +296,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
-    # Only install the python version if it's not present. There are issues otherwise.
-    if [[ `brew list python@${OS_PYTHON_VERSION}; echo $?` == 0 ]]; then
-      brew install "python@${OS_PYTHON_VERSION}"
-    fi
+    check_install_python
     # Uninstall Python 3.9 if we need to.
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
