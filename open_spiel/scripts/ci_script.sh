@@ -29,12 +29,6 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
 elif [[ "$OS" = "Darwin" ]]; then
   # Python is already intalled via brew in install.sh from actions.yml
   brew link --force python@${OS_PYTHON_VERSION}
-  # Need this for the brew install command to succeed later
-  rm -f /usr/local/bin/2to3-${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/idle${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/pydoc${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}*   
 fi
 
 PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
