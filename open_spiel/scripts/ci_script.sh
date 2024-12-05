@@ -26,11 +26,7 @@ if [[ "$OS" = "Linux" && "$OS_PYTHON_VERSION" = "3.9" ]]; then
   sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
   # Still needed to support using venv on Ubuntu 20.04:
   sudo apt-get install python3.9-venv
-elif [[ "$OS" = "Darwin" ]]; then
-  # Python is already intalled via brew in install.sh from actions.yml
-  brew link --force python@${OS_PYTHON_VERSION}
 fi
-
 
 PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
 PYBIN=${PYBIN:-"python"}
