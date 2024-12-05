@@ -34,9 +34,19 @@ ${PYBIN} --version
 MYDIR="$(dirname "$(realpath "$0")")"
 
 # This function is only run on Github Actions!
-function check_install_python() {
+function ci_check_install_python() {
+  if [[ ! "$CI" ]]; then
+    echo "Only run this function on Github Actions!"
+    exit 1
+  fi
+  
   # Need the trap here to make sure the return value of grep being 1 doesn't cause set -e to fail
   # https://stackoverflow.com/questions/77047127/bash-capture-stderr-of-a-function-while-using-trap
+  rm -f /usr/local/bin/2to3-${OS_PYTHON_VERSION}
+  rm -f /usr/local/bin/idle${OS_PYTHON_VERSION}
+  rm -f /usr/local/bin/pydoc${OS_PYTHON_VERSION}
+  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}
+  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}*  
   trap 'ret=0; output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}") || ret="$?"; trap - RETURN' RETURN
   if [[ "$output" = "" ]]; then
     # The --force is needed because there seems to be a phantom installation in /usr/local/
@@ -302,7 +312,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
     # Set brew to use the specific python version
-    check_install_python
+    ci_check_install_python
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
