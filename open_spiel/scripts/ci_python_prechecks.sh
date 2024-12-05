@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Only use for Github Actions CI!
 OS=`uname -a | awk '{print $1}'`
 if [[ "$OS" = "Darwin" ]]; then
   # This seems to be necessary to install python via brew in Github Actions
