@@ -31,7 +31,6 @@ elif [[ "$OS" = "Darwin" ]]; then
   brew link --force python@${OS_PYTHON_VERSION}
 fi
 
-
 PYBIN=${PYBIN:-"python${OS_PYTHON_VERSION}"}
 PYBIN=${PYBIN:-"python"}
 PYBIN=${PYBIN:-"python3"}
