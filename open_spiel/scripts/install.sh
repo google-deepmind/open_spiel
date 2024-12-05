@@ -37,6 +37,7 @@ function check_install_python() {
   # Need the trap here to make sure the return value of grep being 1 doesn't cause set -e to fail
   # https://stackoverflow.com/questions/77047127/bash-capture-stderr-of-a-function-while-using-trap
   rm -f /usr/local/bin/2to3-3.11
+  rm -f /usr/local/bin/idle3.11
   trap 'ret=0; output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}") || ret="$?"; trap - RETURN' RETURN
   if [[ "$output" = "" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
