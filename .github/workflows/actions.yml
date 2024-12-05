@@ -76,6 +76,7 @@ jobs:
     - name: Install
       run: |
         pwd
+        ./open_spiel/scripts/ci_python_prechecks.sh
         chmod +x install.sh
         ./install.sh
     - name: Build and test

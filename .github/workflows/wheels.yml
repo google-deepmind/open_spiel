@@ -34,7 +34,7 @@ jobs:
           OS_PYTHON_VERSION: 3.10
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64
-        - os: macOS-12
+        - os: macOS-13
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           OS_PYTHON_VERSION: 3.9

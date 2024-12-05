@@ -33,6 +33,24 @@ ${PYBIN} --version
 
 MYDIR="$(dirname "$(realpath "$0")")"
 
+# This function is only run on Github Actions!
+function ci_check_install_python() {
+  if [[ ! "$CI" ]]; then
+    echo "Only run this function on Github Actions!"
+    exit 1
+  fi
+
+  # Need the trap here to make sure the return value of grep being 1 doesn't cause set -e to fail
+  # https://stackoverflow.com/questions/77047127/bash-capture-stderr-of-a-function-while-using-trap
+  trap 'ret=0; output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}") || ret="$?"; trap - RETURN' RETURN
+  if [[ "$output" = "" ]]; then
+    # The --force is needed because there seems to be a phantom installation in /usr/local/
+    # and errors show up for files that already exist
+    brew install --force "python@${OS_PYTHON_VERSION}"
+  fi
+  return 0
+}
+
 # Calling this file from the project root is not allowed,
 # as all the paths here are hard-coded to be relative to it.
 #
@@ -288,11 +306,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
-    # Only install the python version if it's not present. There are issues otherwise.
-    if [[ `brew list python@${OS_PYTHON_VERSION}; echo $?` == 0 ]]; then
-      brew install "python@${OS_PYTHON_VERSION}"
-    fi
-    # Uninstall Python 3.9 if we need to.
+    # Set brew to use the specific python version
+    ci_check_install_python
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
