@@ -38,6 +38,7 @@ function check_install_python() {
   # https://stackoverflow.com/questions/77047127/bash-capture-stderr-of-a-function-while-using-trap
   rm -f /usr/local/bin/2to3-3.11
   rm -f /usr/local/bin/idle3.11
+  rm -f /usr/local/bin/pydoc3.11
   trap 'ret=0; output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}") || ret="$?"; trap - RETURN' RETURN
   if [[ "$output" = "" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
@@ -301,6 +302,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
     # Set brew to use the specific python version
+    check_install_python
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
