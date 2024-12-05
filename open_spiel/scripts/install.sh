@@ -40,8 +40,7 @@ function check_install_python() {
   rm -f /usr/local/bin/2to3-${OS_PYTHON_VERSION}
   rm -f /usr/local/bin/idle${OS_PYTHON_VERSION}
   rm -f /usr/local/bin/pydoc${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}
-  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}-config
+  rm -f /usr/local/bin/python${OS_PYTHON_VERSION}*
   trap 'ret=0; output=$(brew list --versions | grep "python ${OS_PYTHON_VERSION}") || ret="$?"; trap - RETURN' RETURN
   if [[ "$output" = "" ]]; then
     brew install "python@${OS_PYTHON_VERSION}"
