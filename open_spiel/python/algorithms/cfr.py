@@ -394,7 +394,7 @@ class _CFRSolver(_CFRSolverBase):
   Once the policy has converged, the average policy (which converges to the Nash
   policy) can be computed:
   ```python
-        average_policy = cfr_solver.ComputeAveragePolicy()
+        average_policy = cfr_solver.average_policy()
   ```
 
   # Policy and average policy
@@ -471,7 +471,7 @@ class CFRPlusSolver(_CFRSolver):
   Once the policy has converged, the average policy (which converges to the Nash
   policy) can be computed:
   ```python
-        average_policy = cfr_solver.ComputeAveragePolicy()
+        average_policy = cfr_solver.average_policy()
   ```
   """
 
