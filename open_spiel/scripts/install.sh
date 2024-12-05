@@ -300,8 +300,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then  # Mac OSX
   # On Github Actions, macOS comes with Python 3.9.
   # We want to test multiple Python versions determined by OS_PYTHON_VERSION.
   if [[ "$CI" ]]; then
-    check_install_python
-    # Uninstall Python 3.9 if we need to.
+    # Set brew to use the specific python version
     brew link --force --overwrite "python@${OS_PYTHON_VERSION}"
   fi
   `python3 -c "import tkinter" > /dev/null 2>&1` || brew install tcl-tk || echo "** Warning: failed 'brew install tcl-tk' -- continuing"
