@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SPIEL_GAMES_MNK_H_
-#define OPEN_SPIEL_GAMES_MNK_H_
+#ifndef OPEN_SPIEL_GAMES_MNK_MNK_H_
+#define OPEN_SPIEL_GAMES_MNK_MNK_H_
 
 #include <array>
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "open_spiel/spiel.h"
@@ -51,7 +52,7 @@ enum class CellState {
 // State of an in-play game.
 class MNKState : public State {
  public:
-  MNKState(std::shared_ptr<const Game> game);
+  MNKState(std::shared_ptr<const Game> game);  // NOLINT
 
   MNKState(const MNKState&) = default;
   MNKState& operator=(const MNKState&) = default;
@@ -115,10 +116,10 @@ class MNKGame : public Game {
   }
   int MaxGameLength() const override { return NumCells(); }
   std::string ActionToString(Player player, Action action_id) const override;
-  int NumRows() const { return ParameterValue<int>("n"); };
-  int NumCols() const { return ParameterValue<int>("m"); };
-  int NumCells() const { return NumRows() * NumCols(); };
-  int NumInARow() const { return ParameterValue<int>("k"); };
+  int NumRows() const { return ParameterValue<int>("n"); }
+  int NumCols() const { return ParameterValue<int>("m"); }
+  int NumCells() const { return NumRows() * NumCols(); }
+  int NumInARow() const { return ParameterValue<int>("k"); }
 };
 
 CellState PlayerToState(Player player);
@@ -144,4 +145,4 @@ inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
 }  // namespace mnk
 }  // namespace open_spiel
 
-#endif  // OPEN_SPIEL_GAMES_MNK_H_
+#endif  // OPEN_SPIEL_GAMES_MNK_MNK_H_

@@ -135,19 +135,19 @@ int MNKState::CoordinatesToAction(int row, int column) const {
 
 int MNKState::NumRows() const {
   return std::static_pointer_cast<const MNKGame>(game_)->NumRows();
-};
+}
 
 int MNKState::NumCols() const {
   return std::static_pointer_cast<const MNKGame>(game_)->NumCols();
-};
+}
 
 int MNKState::NumCells() const {
   return std::static_pointer_cast<const MNKGame>(game_)->NumCells();
-};
+}
 
 int MNKState::NumInARow() const {
   return std::static_pointer_cast<const MNKGame>(game_)->NumInARow();
-};
+}
 
 std::vector<Action> MNKState::LegalActions() const {
   if (IsTerminal())
