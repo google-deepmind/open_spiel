@@ -91,6 +91,7 @@ EXPECTED_GAMES = frozenset([
     "mfg_dynamic_routing",
     "mfg_garnet",
     "misere",
+    "mnk",
     "morpion_solitaire",
     "negotiation",
     "nfg_game",
