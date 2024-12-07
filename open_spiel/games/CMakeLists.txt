@@ -120,6 +120,8 @@ set(GAME_SOURCES
   mfg/dynamic_routing.h
   mfg/garnet.cc
   mfg/garnet.h
+  mnk/mnk.cc
+  mnk/mnk.h
   morpion_solitaire/morpion_solitaire.cc
   morpion_solitaire/morpion_solitaire.h
   negotiation/negotiation.cc
@@ -508,6 +510,10 @@ add_test(matching_pennies_3p_test matching_pennies_3p_test)
 add_executable(matrix_games_test matrix_games/matrix_games_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(matrix_games_test matrix_games_test)
+
+add_executable(mnk_test mnk/mnk_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(mnk_test mnk_test)
 
 add_executable(morpion_solitaire_test morpion_solitaire/morpion_solitaire_test.cc ${OPEN_SPIEL_OBJECTS}
         $<TARGET_OBJECTS:tests>)
