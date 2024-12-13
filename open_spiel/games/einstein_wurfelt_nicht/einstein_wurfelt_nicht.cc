@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/utils/combinatorics.h"
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
@@ -97,17 +98,6 @@ Color OpponentColor(Player player) {
   }
 }
 
-std::vector<std::vector<int>> GetAllPermutations() {
-  std::vector<std::vector<int>> all_permutations;
-  std::vector<int> nums = {1, 2, 3, 4, 5, 6};
-
-  do {
-    all_permutations.push_back(nums);
-  } while (std::next_permutation(nums.begin(), nums.end()));
-
-  return all_permutations;
-}
-
 std::string CoordinatesToDirection(int row, int col) {
   std::string direction;
   if (row == col) {
@@ -147,7 +137,9 @@ EinsteinWurfeltNichtState::EinsteinWurfeltNichtState(
 
 void EinsteinWurfeltNichtState::SetupInitialBoard(
     Player player, Action action) {
-    auto perms = GetAllPermutations();
+    std::vector<int> indices(kNumPlayerCubes);
+    std::iota(indices.begin(), indices.end(), 1);
+    std::vector<int> cubes_position_order = UnrankPermutation(indices, action);
     int perm_idx = 0;
 
     // Values in the upper-left corner (black cubes) have a postion identified
@@ -157,11 +149,11 @@ void EinsteinWurfeltNichtState::SetupInitialBoard(
       for (int c = 0; c < kDefaultColumns; c++) {
         if (r+c <= 2 && player == kBlackPlayerId) {
           board_[r*kDefaultColumns+c] =
-            Cube{Color::kBlack, perms[action][perm_idx]};
+            Cube{Color::kBlack, cubes_position_order[perm_idx]};
             perm_idx++;
         } else if (r+c >= 6 && player == kWhitePlayerId) {
           board_[r*kDefaultColumns+c] =
-            Cube{Color::kWhite, perms[action][perm_idx]};
+            Cube{Color::kWhite, cubes_position_order[perm_idx]};
             perm_idx++;
         }
       }
