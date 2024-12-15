@@ -79,8 +79,7 @@ std::string StateToString(CellState state) {
   }
 }
 
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player) {
+bool BoardHasLine(const GridBoard& board, const Player player) {
   CellState c = PlayerToState(player);
   return (board[0] == c && board[1] == c && board[2] == c) ||
          (board[3] == c && board[4] == c && board[5] == c) ||

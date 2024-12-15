@@ -15,7 +15,6 @@
 #ifndef OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
 #define OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
 
-#include <array>
 #include <map>
 #include <memory>
 #include <string>
@@ -89,8 +88,8 @@ class PhantomTTTState : public State {
 
   // TODO(author2): Use the base class history_ instead.
   std::vector<std::pair<int, Action>> action_sequence_;
-  std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> x_view_;
-  std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> o_view_;
+  tic_tac_toe::GridBoard x_view_;
+  tic_tac_toe::GridBoard o_view_;
 };
 
 // Game object.
