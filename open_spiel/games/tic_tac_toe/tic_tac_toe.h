@@ -48,6 +48,9 @@ enum class CellState {
   kCross,   // X
 };
 
+// The game board is composed of a grid of cells
+typedef std::array<CellState, kNumCells> GridBoard;
+
 // State of an in-play game.
 class TicTacToeState : public State {
  public:
@@ -82,7 +85,7 @@ class TicTacToeState : public State {
   void SetCurrentPlayer(Player player) { current_player_ = player; }
 
  protected:
-  std::array<CellState, kNumCells> board_;
+  GridBoard board_;
   void DoApplyAction(Action move) override;
 
  private:
@@ -116,8 +119,7 @@ CellState PlayerToState(Player player);
 std::string StateToString(CellState state);
 
 // Does this player have a line?
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player);
+bool BoardHasLine(const GridBoard& board, const Player player);
 
 inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
   return stream << StateToString(state);
