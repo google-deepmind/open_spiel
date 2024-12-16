@@ -373,6 +373,7 @@ class PSROReporting(object):
     self.base_candidates = base_candidates
 
     config_dict_params = {}
+    config_dict_params["experiment_name"] = self.experiment_name
     config_dict_params["game_string"] = self.game_string
     config_dict_params["seed"] = self.seed
     config_dict_params["num_iters"] = self.num_iters

@@ -34,7 +34,7 @@ GAME_TYPE = pyspiel.GameType(
         short_name='chat_game',
         long_name='Chat Game',
         utility=pyspiel.GameType.Utility.GENERAL_SUM,
-        provides_information_state_string=False,
+        provides_information_state_string=True,
         provides_information_state_tensor=False,
         **chat_game_base.GAME_TYPE_KWARGS)
 
@@ -130,7 +130,7 @@ class ChatGame(chat_game_base.BaseChatGame):
       payoffs: list of Payoff items used for constructing queries and scoring
         dialogue for each agent
       aggregate_payoffs: function that maps from vector to nonnegative scalar
-      
+
       given_names: list of strings representing names of players
       given_llm_seeds: list of ints to seed llm with to generate each message
       given_prompt_actions: ordered dict mapping action_keys
@@ -148,7 +148,7 @@ class ChatGame(chat_game_base.BaseChatGame):
         action_key (i.e., size of action space for each prompt action)
       num_private_info: tuple of int, # of private info states to consider for
         each info_key
-      
+
       examples_names: list of strings representing examples of names of players
       examples_prompt_actions: ordered dict mapping action_keys
         (see envs/utils/header) to list of strings representing examples of
@@ -159,7 +159,7 @@ class ChatGame(chat_game_base.BaseChatGame):
         of fruits). Overrides examples_private_info.
       examples_scenarios: list of Scenario items used for meta-generating new
         scenarios
-      
+
       llm_list_suffix: str, gets appended to a prompt to induce an llm to
         generate a list of items (different llms like different prompts).
         chinchilla likes ``, llmit likes `Continue the list from here.`
