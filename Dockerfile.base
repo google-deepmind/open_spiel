@@ -21,6 +21,8 @@ COPY . .
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
 RUN ./install.sh
 RUN pip3 install --upgrade setuptools testresources
+# Line below is a workaround for the issue https://github.com/google-deepmind/open_spiel/issues/1293
+RUN pip install importlib_metadata --force-reinstall
 RUN pip3 install --upgrade -r requirements.txt
 RUN pip3 install --upgrade cmake
 
