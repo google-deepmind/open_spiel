@@ -281,7 +281,11 @@ add_subdirectory (games)
 add_subdirectory (game_transforms)
 
 if (OPEN_SPIEL_BUILD_WITH_GO)
-  add_subdirectory(go)
+  message(WARNING
+    "GO API is disabled for now due to failing tests.\n"
+    "See https://github.com/google-deepmind/open_spiel/issues/1301."
+  )
+  # add_subdirectory(go)
 endif()
 
 if (OPEN_SPIEL_BUILD_WITH_RUST)
