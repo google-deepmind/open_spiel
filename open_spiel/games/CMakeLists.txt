@@ -71,6 +71,8 @@ set(GAME_SOURCES
   efg_game/efg_game.h
   efg_game/efg_game_data.cc
   efg_game/efg_game_data.h
+  einstein_wurfelt_nicht/einstein_wurfelt_nicht.cc
+  einstein_wurfelt_nicht/einstein_wurfelt_nicht.h
   euchre/euchre.cc
   euchre/euchre.h
   first_sealed_auction/first_sealed_auction.cc
@@ -423,6 +425,10 @@ add_test(dou_dizhu_utils_test dou_dizhu_utils_test)
 add_executable(efg_game_test efg_game/efg_game_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(efg_game_test efg_game_test)
+
+add_executable(einstein_wurfelt_nicht_test einstein_wurfelt_nicht/einstein_wurfelt_nicht_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(einstein_wurfelt_nicht_test einstein_wurfelt_nicht_test)
 
 add_executable(euchre_test euchre/euchre_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
