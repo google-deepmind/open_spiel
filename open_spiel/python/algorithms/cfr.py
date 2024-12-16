@@ -267,8 +267,10 @@ class _CFRSolverBase(object):
         new_state = state.child(action)
         new_reach_probabilities = reach_probabilities.copy()
         new_reach_probabilities[-1] *= action_prob
-        state_value += action_prob * self._compute_counterfactual_regret_for_player(
-            new_state, policies, new_reach_probabilities, player)
+        state_value += (action_prob *
+                        self._compute_counterfactual_regret_for_player(
+                            new_state, policies, new_reach_probabilities,
+                            player))
       return state_value
 
     current_player = state.current_player()
@@ -394,7 +396,7 @@ class _CFRSolver(_CFRSolverBase):
   Once the policy has converged, the average policy (which converges to the Nash
   policy) can be computed:
   ```python
-        average_policy = cfr_solver.ComputeAveragePolicy()
+        average_policy = cfr_solver.average_policy()
   ```
 
   # Policy and average policy
@@ -471,7 +473,7 @@ class CFRPlusSolver(_CFRSolver):
   Once the policy has converged, the average policy (which converges to the Nash
   policy) can be computed:
   ```python
-        average_policy = cfr_solver.ComputeAveragePolicy()
+        average_policy = cfr_solver.average_policy()
   ```
   """
 
