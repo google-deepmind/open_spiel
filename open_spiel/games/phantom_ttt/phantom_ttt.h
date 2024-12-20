@@ -118,7 +118,7 @@ class PhantomTTTGame : public Game {
   // These will depend on the obstype parameter.
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
-  int MaxGameLength() const override { return tic_tac_toe::kNumCells * 2 - 1; }
+  int MaxGameLength() const override { return game_->MaxGameLength() * 2 - 1; }
 
   ObservationType obs_type() const { return obs_type_; }
 
