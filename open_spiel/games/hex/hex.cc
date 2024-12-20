@@ -14,11 +14,15 @@
 
 #include "open_spiel/games/hex/hex.h"
 
-#include <algorithm>
 #include <memory>
-#include <utility>
+#include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
@@ -44,6 +48,7 @@ const GameType kGameType{/*short_name=*/"hex",
                              {"board_size", GameParameter(kDefaultBoardSize)},
                              {"num_cols", GameParameter(kDefaultBoardSize)},
                              {"num_rows", GameParameter(kDefaultBoardSize)},
+                             {"string_rep", GameParameter(kDefaultStringRep)},
                          }};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -53,6 +58,16 @@ std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
+StringRep StringRepStrToEnum(const std::string& string_rep) {
+  if (string_rep == "standard") {
+    return StringRep::kStandard;
+  } else if (string_rep == "explicit") {
+    return StringRep::kExplicit;
+  } else {
+    SpielFatalError(absl::StrCat("Invalid string_rep ", string_rep));
+  }
+}
 
 }  // namespace
 
@@ -133,7 +148,27 @@ CellState HexState::PlayerAndActionToState(Player player, Action move) const {
   }
 }
 
-std::string StateToString(CellState state) {
+std::string StateToStringStandard(CellState state) {
+  switch (state) {
+    case CellState::kEmpty:
+      return ".";
+    case CellState::kWhite:
+    case CellState::kWhiteWin:
+    case CellState::kWhiteWest:
+    case CellState::kWhiteEast:
+      return "o";
+    case CellState::kBlack:
+    case CellState::kBlackWin:
+    case CellState::kBlackNorth:
+    case CellState::kBlackSouth:
+      return "x";
+    default:
+      SpielFatalError("Unknown state.");
+      return "This will never return.";
+  }
+}
+
+std::string StateToStringExplicit(CellState state) {
   switch (state) {
     case CellState::kEmpty:
       return ".";
@@ -159,8 +194,18 @@ std::string StateToString(CellState state) {
   }
 }
 
+std::string StateToString(CellState state, StringRep string_rep) {
+  if (string_rep == StringRep::kExplicit) {
+    return StateToStringExplicit(state);
+  } else if (string_rep == StringRep::kStandard) {
+    return StateToStringStandard(state);
+  } else {
+    SpielFatalError("Unknown string_rep.");
+  }
+}
+
 void HexState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
+  SPIEL_CHECK_TRUE(board_[move] == CellState::kEmpty);
   CellState move_cell_state = PlayerAndActionToState(CurrentPlayer(), move);
   board_[move] = move_cell_state;
   if (move_cell_state == CellState::kBlackWin) {
@@ -208,11 +253,21 @@ std::vector<Action> HexState::LegalActions() const {
 }
 
 std::string HexState::ActionToString(Player player, Action action_id) const {
-  // This does not comply with the Hex Text Protocol
-  // TODO(author8): Make compliant with HTP
-  return absl::StrCat(StateToString(PlayerAndActionToState(player, action_id)),
-                      "(", action_id % num_cols_, ",", action_id / num_cols_,
-                      ")");
+  int row = action_id % num_cols_;
+  int col = action_id / num_cols_;
+  if (StringRep() == StringRep::kStandard) {
+    char row_char = static_cast<char>(static_cast<int>('a') + row);
+    std::string row_str;
+    row_str += row_char;
+    std::string ret = absl::StrCat(row_str, col + 1);
+    return ret;
+  } else if (StringRep() == StringRep::kExplicit) {
+    return absl::StrCat(
+        StateToString(PlayerAndActionToState(player, action_id), StringRep()),
+        "(", row, ",", col, ")");
+  } else {
+    SpielFatalError("Unknown string_rep.");
+  }
 }
 
 std::vector<int> HexState::AdjacentCells(int cell) const {
@@ -230,8 +285,12 @@ std::vector<int> HexState::AdjacentCells(int cell) const {
   return neighbours;
 }
 
-HexState::HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows)
-    : State(game), num_cols_(num_cols), num_rows_(num_rows) {
+HexState::HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows,
+                   enum StringRep string_rep)
+    : State(game),
+      num_cols_(num_cols),
+      num_rows_(num_rows),
+      string_rep_(string_rep) {
   // for all num_colss & num_rowss -> num_colss_ >= num_rowss_
   board_.resize(num_cols * num_rows, CellState::kEmpty);
 }
@@ -249,7 +308,7 @@ std::string HexState::ToString() const {
       line_num++;
       absl::StrAppend(&str, std::string(line_num, ' '));
     }
-    absl::StrAppend(&str, StateToString(board_[cell]));
+    absl::StrAppend(&str, StateToString(board_[cell], string_rep_));
     absl::StrAppend(&str, " ");
   }
   return str;
@@ -296,7 +355,9 @@ HexGame::HexGame(const GameParameters& params)
       num_cols_(
           ParameterValue<int>("num_cols", ParameterValue<int>("board_size"))),
       num_rows_(
-          ParameterValue<int>("num_rows", ParameterValue<int>("board_size"))) {}
+          ParameterValue<int>("num_rows", ParameterValue<int>("board_size"))),
+      string_rep_(StringRepStrToEnum(
+          ParameterValue<std::string>("string_rep", kDefaultStringRep))) {}
 
 }  // namespace hex
 }  // namespace open_spiel

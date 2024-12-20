@@ -15,13 +15,16 @@
 #ifndef OPEN_SPIEL_GAMES_HEX_H_
 #define OPEN_SPIEL_GAMES_HEX_H_
 
-#include <array>
-#include <map>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 // The classic game of Hex: https://en.wikipedia.org/wiki/Hex_(board_game)
 // Does not implement pie rule to balance the game
@@ -30,6 +33,9 @@
 //       "board_size"    int     size of the board   (default = 11)
 //       "num_cols"      int     number of columns (optional)
 //       "num_rows"      int     number of rows (optional)
+//       "string_rep"    string  representation of the action and board strings
+//                               ("standard" (default) | "explicit"). See below
+//                               for details.
 
 namespace open_spiel {
 namespace hex {
@@ -41,6 +47,8 @@ inline constexpr int kMaxNeighbours =
     6;  // Maximum number of neighbours for a cell
 inline constexpr int kCellStates = 1 + 4 * kNumPlayers;
 inline constexpr int kMinValueCellState = -4;
+inline constexpr const char* kDefaultStringRep = "standard";
+
 // State of a cell.
 // Describes if a cell is
 //   - empty, black or white
@@ -62,10 +70,19 @@ enum class CellState {
   kBlack = 1,  // Black and not edge connected
 };
 
+// The string representations of the game. Standard uses normal stones and
+// chess-like action coordinates ('a1'). Explicit uses different stones
+// depending on the state of each stone and uses the full cell coordinates.
+enum class StringRep {
+  kStandard = 0,
+  kExplicit = 1,
+};
+
 // State of an in-play game.
 class HexState : public State {
  public:
-  HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows);
+  HexState(std::shared_ptr<const Game> game, int num_cols, int num_rows,
+           StringRep string_rep);
 
   HexState(const HexState&) = default;
 
@@ -85,6 +102,7 @@ class HexState : public State {
 
   CellState BoardAt(int cell) const { return board_[cell]; }
   void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
+  StringRep StringRep() const { return string_rep_; }
 
  protected:
   std::vector<CellState> board_;
@@ -92,12 +110,14 @@ class HexState : public State {
 
  private:
   CellState PlayerAndActionToState(Player player, Action move) const;
+
   Player current_player_ = 0;                      // Player zero goes first
   double result_black_perspective_ = 0;            // 1 if Black (player 0) wins
   std::vector<int> AdjacentCells(int cell) const;  // Cells adjacent to cell
 
   const int num_cols_;  // x
   const int num_rows_;  // y
+  const enum StringRep string_rep_;
 };
 
 // Game object.
@@ -107,7 +127,7 @@ class HexGame : public Game {
   int NumDistinctActions() const override { return num_cols_ * num_rows_; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new HexState(shared_from_this(), num_cols_, num_rows_));
+        new HexState(shared_from_this(), num_cols_, num_rows_, string_rep_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
@@ -117,18 +137,16 @@ class HexGame : public Game {
     return {kCellStates, num_cols_, num_rows_};
   }
   int MaxGameLength() const override { return num_cols_ * num_rows_; }
+  StringRep string_rep() const { return string_rep_; }
 
  private:
   const int num_cols_;
   const int num_rows_;
+  const enum StringRep string_rep_;
 };
 
 CellState PlayerToState(Player player);
-std::string StateToString(CellState state);
-
-inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  return stream << StateToString(state);
-}
+std::string StateToString(CellState state, StringRep string_rep);
 
 }  // namespace hex
 }  // namespace open_spiel

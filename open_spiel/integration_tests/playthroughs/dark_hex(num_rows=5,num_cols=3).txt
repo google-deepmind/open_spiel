@@ -56,13 +56,13 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-StringLegalActions() = ["y(0,0)", "y(1,0)", "y(2,0)", "x(0,1)", "x(1,1)", "x(2,1)", "x(0,2)", "x(1,2)", "x(2,2)", "x(0,3)", "x(1,3)", "x(2,3)", "z(0,4)", "z(1,4)", "z(2,4)"]
+StringLegalActions() = ["a1", "b1", "c1", "a2", "b2", "c2", "a3", "b3", "c3", "a4", "b4", "c4", "a5", "b5", "c5"]
 
-# Apply action "y(0,0)"
+# Apply action "a1"
 action: 0
 
 # State 1
-# y . .
+# x . .
 #  . . .
 #   . . .
 #    . . .
@@ -84,17 +84,17 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-StringLegalActions() = ["p(0,0)", "o(1,0)", "q(2,0)", "p(0,1)", "o(1,1)", "q(2,1)", "p(0,2)", "o(1,2)", "q(2,2)", "p(0,3)", "o(1,3)", "q(2,3)", "p(0,4)", "o(1,4)", "q(2,4)"]
+StringLegalActions() = ["a1", "b1", "c1", "a2", "b2", "c2", "a3", "b3", "c3", "a4", "b4", "c4", "a5", "b5", "c5"]
 
-# Apply action "q(2,4)"
+# Apply action "c5"
 action: 14
 
 # State 2
-# y . .
+# x . .
 #  . . .
 #   . . .
 #    . . .
-#     . . q
+#     . . o
 IsTerminal() = False
 History() = [0, 14]
 HistoryString() = "0, 14"
@@ -112,17 +112,17 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-StringLegalActions() = ["y(1,0)", "y(2,0)", "y(0,1)", "x(1,1)", "x(2,1)", "x(0,2)", "x(1,2)", "x(2,2)", "x(0,3)", "x(1,3)", "x(2,3)", "z(0,4)", "z(1,4)", "z(2,4)"]
+StringLegalActions() = ["b1", "c1", "a2", "b2", "c2", "a3", "b3", "c3", "a4", "b4", "c4", "a5", "b5", "c5"]
 
-# Apply action "x(2,1)"
+# Apply action "c2"
 action: 5
 
 # State 3
-# y . .
+# x . .
 #  . . x
 #   . . .
 #    . . .
-#     . . q
+#     . . o
 IsTerminal() = False
 History() = [0, 14, 5]
 HistoryString() = "0, 14, 5"
@@ -140,17 +140,17 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-StringLegalActions() = ["p(0,0)", "o(1,0)", "q(2,0)", "p(0,1)", "o(1,1)", "q(2,1)", "p(0,2)", "o(1,2)", "q(2,2)", "p(0,3)", "o(1,3)", "q(2,3)", "p(0,4)", "q(1,4)"]
+StringLegalActions() = ["a1", "b1", "c1", "a2", "b2", "c2", "a3", "b3", "c3", "a4", "b4", "c4", "a5", "b5"]
 
-# Apply action "q(2,3)"
+# Apply action "c4"
 action: 11
 
 # State 4
-# y . .
+# x . .
 #  . . x
 #   . . .
-#    . . q
-#     . . q
+#    . . o
+#     . . o
 IsTerminal() = False
 History() = [0, 14, 5, 11]
 HistoryString() = "0, 14, 5, 11"
@@ -168,25 +168,25 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-StringLegalActions() = ["y(1,0)", "y(2,0)", "y(0,1)", "x(1,1)", "x(0,2)", "x(1,2)", "x(2,2)", "x(0,3)", "x(1,3)", "x(2,3)", "z(0,4)", "z(1,4)", "z(2,4)"]
+StringLegalActions() = ["b1", "c1", "a2", "b2", "a3", "b3", "c3", "a4", "b4", "c4", "a5", "b5", "c5"]
 
-# Apply action "z(2,4)"
+# Apply action "c5"
 action: 14
 
 # State 5
-# Apply action "x(2,3)"
+# Apply action "c4"
 action: 11
 
 # State 6
-# Apply action "x(1,1)"
+# Apply action "b2"
 action: 4
 
 # State 7
-# y . .
+# x . .
 #  . x x
 #   . . .
-#    . . q
-#     . . q
+#    . . o
+#     . . o
 IsTerminal() = False
 History() = [0, 14, 5, 11, 14, 11, 4]
 HistoryString() = "0, 14, 5, 11, 14, 11, 4"
@@ -204,57 +204,57 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13]
-StringLegalActions() = ["p(0,0)", "o(1,0)", "q(2,0)", "p(0,1)", "o(1,1)", "q(2,1)", "p(0,2)", "o(1,2)", "q(2,2)", "p(0,3)", "q(1,3)", "p(0,4)", "q(1,4)"]
+StringLegalActions() = ["a1", "b1", "c1", "a2", "b2", "c2", "a3", "b3", "c3", "a4", "b4", "a5", "b5"]
 
-# Apply action "q(2,2)"
+# Apply action "c3"
 action: 8
 
 # State 8
-# Apply action "z(1,4)"
+# Apply action "b5"
 action: 13
 
 # State 9
-# Apply action "p(0,2)"
+# Apply action "a3"
 action: 6
 
 # State 10
-# Apply action "z(0,4)"
+# Apply action "a5"
 action: 12
 
 # State 11
-# Apply action "o(1,0)"
+# Apply action "b1"
 action: 1
 
 # State 12
-# Apply action "x(1,2)"
+# Apply action "b3"
 action: 7
 
 # State 13
-# Apply action "p(1,1)"
+# Apply action "b2"
 action: 4
 
 # State 14
-# Apply action "O(1,2)"
+# Apply action "b3"
 action: 7
 
 # State 15
-# Apply action "p(0,3)"
+# Apply action "a4"
 action: 9
 
 # State 16
-# Apply action "y(1,0)"
+# Apply action "b1"
 action: 1
 
 # State 17
-# Apply action "z(0,3)"
+# Apply action "a4"
 action: 9
 
 # State 18
-# y o .
+# x o .
 #  . x x
-#   p x q
-#    p . q
-#     z z q
+#   o x o
+#    o . o
+#     x x o
 IsTerminal() = False
 History() = [0, 14, 5, 11, 14, 11, 4, 8, 13, 6, 12, 1, 7, 4, 7, 9, 1, 9]
 HistoryString() = "0, 14, 5, 11, 14, 11, 4, 8, 13, 6, 12, 1, 7, 4, 7, 9, 1, 9"
@@ -272,25 +272,25 @@ ObservationTensor(1): ◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [2, 3, 6, 8, 10]
-StringLegalActions() = ["y(2,0)", "y(0,1)", "x(0,2)", "x(2,2)", "z(1,3)"]
+StringLegalActions() = ["c1", "a2", "a3", "c3", "b4"]
 
-# Apply action "z(1,3)"
+# Apply action "b4"
 action: 10
 
 # State 19
-# Apply action "O(1,3)"
+# Apply action "b4"
 action: 10
 
 # State 20
-# Apply action "p(0,0)"
+# Apply action "a1"
 action: 0
 
 # State 21
-# y o .
-#  . z z
-#   p z q
-#    p z q
-#     z z q
+# x o .
+#  . x x
+#   o x o
+#    o x o
+#     x x o
 IsTerminal() = False
 History() = [0, 14, 5, 11, 14, 11, 4, 8, 13, 6, 12, 1, 7, 4, 7, 9, 1, 9, 10, 10, 0]
 HistoryString() = "0, 14, 5, 11, 14, 11, 4, 8, 13, 6, 12, 1, 7, 4, 7, 9, 1, 9, 10, 10, 0"
@@ -308,40 +308,40 @@ ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯�
 Rewards() = [0, 0]
 Returns() = [0, -0]
 LegalActions() = [2, 3, 5, 12, 13]
-StringLegalActions() = ["q(2,0)", "p(0,1)", "q(2,1)", "p(0,4)", "q(1,4)"]
+StringLegalActions() = ["c1", "a2", "c2", "a5", "b5"]
 
-# Apply action "q(2,0)"
+# Apply action "c1"
 action: 2
 
 # State 22
-# Apply action "X(2,0)"
+# Apply action "c1"
 action: 2
 
 # State 23
-# Apply action "z(2,2)"
+# Apply action "c3"
 action: 8
 
 # State 24
-# Apply action "X(0,1)"
+# Apply action "a2"
 action: 3
 
 # State 25
-# y q q
-#  X z z
-#   p z q
-#    p z q
-#     z z q
+# x o o
+#  x x x
+#   o x o
+#    o x o
+#     x x o
 IsTerminal() = True
 History() = [0, 14, 5, 11, 14, 11, 4, 8, 13, 6, 12, 1, 7, 4, 7, 9, 1, 9, 10, 10, 0, 2, 2, 8, 3]
 HistoryString() = "0, 14, 5, 11, 14, 11, 4, 8, 13, 6, 12, 1, 7, 4, 7, 9, 1, 9, 10, 10, 0, 2, 2, 8, 3"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-InformationStateString(0) = "xoo\nXxx\n.xo\noxo\nxxo\n25\n0,0 0,5 0,14 0,11 0,4 0,13 0,12 0,7 0,1 0,9 0,10 0,2 0,8 0,3 "
+InformationStateString(0) = "xoo\nxxx\n.xo\noxo\nxxo\n25\n0,0 0,5 0,14 0,11 0,4 0,13 0,12 0,7 0,1 0,9 0,10 0,2 0,8 0,3 "
 InformationStateString(1) = "xoo\n.x.\noxo\noxo\n..o\n25\n1,14 1,11 1,8 1,6 1,1 1,4 1,7 1,9 1,10 1,0 1,2 "
 InformationStateTensor(0): binvec(360, 0x40804001040202008100801020040204100001000001001010000010004010080000100010200001004000000)
 InformationStateTensor(1): binvec(360, 0x40804010040404008100801020080404000040040040020080002000080004000420001000000000000000000)
-ObservationString(0) = "xoo\nXxx\n.xo\noxo\nxxo"
+ObservationString(0) = "xoo\nxxx\n.xo\noxo\nxxo"
 ObservationString(1) = "xoo\n.x.\noxo\noxo\n..o"
 ObservationTensor(0): ◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯
 ObservationTensor(1): ◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◉◯◯◯◯◯
