@@ -79,21 +79,40 @@ std::string StateToString(CellState state) {
   }
 }
 
+GridBoard::GridBoard() {
+  // All cells on the board start empty
+  std::fill(begin(board_), end(board_), CellState::kEmpty);
+}
+
+const CellState& GridBoard::At(size_t index) const { return board_.at(index); }
+
+CellState& GridBoard::At(size_t index) {
+  return const_cast<CellState &>(std::as_const(*this).At(index));
+}
+
+const CellState& GridBoard::At(size_t row, size_t col) const {
+  return board_.at(row * kNumCols + col);
+}
+
+CellState& GridBoard::At(size_t row, size_t col) {
+  return const_cast<CellState &>(std::as_const(*this).At(row, col));
+}
+
 bool BoardHasLine(const GridBoard& board, const Player player) {
   CellState c = PlayerToState(player);
-  return (board[0] == c && board[1] == c && board[2] == c) ||
-         (board[3] == c && board[4] == c && board[5] == c) ||
-         (board[6] == c && board[7] == c && board[8] == c) ||
-         (board[0] == c && board[3] == c && board[6] == c) ||
-         (board[1] == c && board[4] == c && board[7] == c) ||
-         (board[2] == c && board[5] == c && board[8] == c) ||
-         (board[0] == c && board[4] == c && board[8] == c) ||
-         (board[2] == c && board[4] == c && board[6] == c);
+  return (board.At(0) == c && board.At(1) == c && board.At(2) == c) ||
+         (board.At(3) == c && board.At(4) == c && board.At(5) == c) ||
+         (board.At(6) == c && board.At(7) == c && board.At(8) == c) ||
+         (board.At(0) == c && board.At(3) == c && board.At(6) == c) ||
+         (board.At(1) == c && board.At(4) == c && board.At(7) == c) ||
+         (board.At(2) == c && board.At(5) == c && board.At(8) == c) ||
+         (board.At(0) == c && board.At(4) == c && board.At(8) == c) ||
+         (board.At(2) == c && board.At(4) == c && board.At(6) == c);
 }
 
 void TicTacToeState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
-  board_[move] = PlayerToState(CurrentPlayer());
+  SPIEL_CHECK_EQ(board_.At(move), CellState::kEmpty);
+  board_.At(move) = PlayerToState(CurrentPlayer());
   if (HasLine(current_player_)) {
     outcome_ = current_player_;
   }
@@ -106,7 +125,7 @@ std::vector<Action> TicTacToeState::LegalActions() const {
   // Can move in any empty cell.
   std::vector<Action> moves;
   for (int cell = 0; cell < kNumCells; ++cell) {
-    if (board_[cell] == CellState::kEmpty) {
+    if (board_.At(cell) == CellState::kEmpty) {
       moves.push_back(cell);
     }
   }
@@ -124,9 +143,7 @@ bool TicTacToeState::HasLine(Player player) const {
 
 bool TicTacToeState::IsFull() const { return num_moves_ == kNumCells; }
 
-TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
-}
+TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {}
 
 std::string TicTacToeState::ToString() const {
   std::string str;
@@ -175,12 +192,12 @@ void TicTacToeState::ObservationTensor(Player player,
   // Treat `values` as a 2-d tensor.
   TensorView<2> view(values, {kCellStates, kNumCells}, true);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
+    view[{static_cast<int>(board_.At(cell)), cell}] = 1.0;
   }
 }
 
 void TicTacToeState::UndoAction(Player player, Action move) {
-  board_[move] = CellState::kEmpty;
+  board_.At(move) = CellState::kEmpty;
   current_player_ = player;
   outcome_ = kInvalidPlayer;
   num_moves_ -= 1;

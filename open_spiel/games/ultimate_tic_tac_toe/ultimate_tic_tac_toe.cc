@@ -78,9 +78,9 @@ void UltimateTTTState::DoApplyAction(Action move) {
     if (local_states_[current_state_]->IsTerminal()) {
       Player local_outcome = local_state(current_state_)->outcome();
       if (local_outcome < 0) {
-        meta_board_[current_state_] = ttt::CellState::kEmpty;
+        meta_board_.At(current_state_) = ttt::CellState::kEmpty;
       } else {
-        meta_board_[current_state_] = ttt::PlayerToState(local_outcome);
+        meta_board_.At(current_state_) = ttt::PlayerToState(local_outcome);
       }
     }
     // Set the next potential local state.
@@ -137,7 +137,6 @@ UltimateTTTState::UltimateTTTState(std::shared_ptr<const Game> game)
       ttt_game_(
           static_cast<const UltimateTTTGame*>(game.get())->TicTacToeGame()),
       current_state_(-1) {
-  std::fill(meta_board_.begin(), meta_board_.end(), ttt::CellState::kEmpty);
   for (int i = 0; i < ttt::kNumCells; ++i) {
     local_states_[i] = ttt_game_->NewInitialState();
   }
@@ -220,9 +219,9 @@ UltimateTTTState::UltimateTTTState(const UltimateTTTState& other)
       current_player_(other.current_player_),
       outcome_(other.outcome_),
       ttt_game_(other.ttt_game_),
+      meta_board_(other.meta_board_),
       current_state_(other.current_state_) {
   for (int i = 0; i < ttt::kNumCells; ++i) {
-    meta_board_[i] = other.meta_board_[i];
     local_states_[i] = other.local_states_[i]->Clone();
   }
 }
