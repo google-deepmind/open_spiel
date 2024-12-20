@@ -93,7 +93,7 @@ class UltimateTTTGame : public Game {
             tic_tac_toe::kNumRows, tic_tac_toe::kNumCols};
   }
   int MaxGameLength() const override {
-    return tic_tac_toe::kNumCells * kNumSubgames;
+    return ttt_game_->MaxGameLength() * kNumSubgames;
   }
 
   const tic_tac_toe::TicTacToeGame* TicTacToeGame() const {
