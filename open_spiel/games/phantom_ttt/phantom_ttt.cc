@@ -103,12 +103,8 @@ ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  GameVersion game_version,
                                  ObservationType obs_type)
-    : State(game),
-      state_(game),
-      obs_type_(obs_type),
+    : State(game), state_(game), obs_type_(obs_type),
       game_version_(game_version) {
-  std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
-  std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
   if (obs_type_ == ObservationType::kRevealNumTurns) {
     // Reserve 0 for the player and 10 as "I don't know."
     bits_per_action_ = kNumCells + 2;
@@ -143,8 +139,8 @@ void PhantomTTTState::DoApplyAction(Action move) {
   }
 
   // Update current player's view, and action sequence.
-  SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
-  cur_view[move] = state_.BoardAt(move);
+  SPIEL_CHECK_EQ(cur_view.At(move), CellState::kEmpty);
+  cur_view.At(move) = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 
   // Note: do not modify player's turn here, it will have been done above
@@ -158,7 +154,7 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
   const auto& cur_view = player == 0 ? x_view_ : o_view_;
 
   for (Action move = 0; move < kNumCells; ++move) {
-    if (cur_view[move] == CellState::kEmpty) {
+    if (cur_view.At(move) == CellState::kEmpty) {
       moves.push_back(move);
     }
   }
@@ -171,7 +167,7 @@ std::string PhantomTTTState::ViewToString(Player player) const {
   std::string str;
   for (int r = 0; r < kNumRows; ++r) {
     for (int c = 0; c < kNumCols; ++c) {
-      absl::StrAppend(&str, StateToString(cur_view[r * kNumCols + c]));
+      absl::StrAppend(&str, StateToString(cur_view.At(r * kNumCols + c)));
     }
     if (r < (kNumRows - 1)) {
       absl::StrAppend(&str, "\n");
@@ -228,7 +224,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
                                     longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < kNumCells; ++cell) {
-    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+    values[kNumCells * static_cast<int>(player_view.At(cell)) + cell] = 1.0;
   }
 
   // Now encode the sequence. Each (player, action) pair uses 11 bits:
@@ -281,7 +277,7 @@ void PhantomTTTState::ObservationTensor(Player player,
   // First 27 bits encodes the player's view in the same way as TicTacToe.
   const auto& player_view = player == 0 ? x_view_ : o_view_;
   for (int cell = 0; cell < kNumCells; ++cell) {
-    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+    values[kNumCells * static_cast<int>(player_view.At(cell)) + cell] = 1.0;
   }
 
   // Then a one-hot to represent total number of turns.
@@ -306,7 +302,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
 
   // Undo the action from that player's view, and pop from the action seq
   auto& player_view = player == 0 ? x_view_ : o_view_;
-  player_view[move] = CellState::kEmpty;
+  player_view.At(move) = CellState::kEmpty;
   action_sequence_.pop_back();
 
   history_.pop_back();
