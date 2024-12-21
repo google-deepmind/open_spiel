@@ -100,14 +100,46 @@ CellState& GridBoard::At(size_t row, size_t col) {
 
 bool BoardHasLine(const GridBoard& board, const Player player) {
   CellState c = PlayerToState(player);
-  return (board.At(0) == c && board.At(1) == c && board.At(2) == c) ||
-         (board.At(3) == c && board.At(4) == c && board.At(5) == c) ||
-         (board.At(6) == c && board.At(7) == c && board.At(8) == c) ||
-         (board.At(0) == c && board.At(3) == c && board.At(6) == c) ||
-         (board.At(1) == c && board.At(4) == c && board.At(7) == c) ||
-         (board.At(2) == c && board.At(5) == c && board.At(8) == c) ||
-         (board.At(0) == c && board.At(4) == c && board.At(8) == c) ||
-         (board.At(2) == c && board.At(4) == c && board.At(6) == c);
+
+  // We assume that we have lines everywhere, and we will check if that stands
+  // after checking the contents of the cells
+  std::array<bool, kNumRows> is_row_line;
+  std::array<bool, kNumCols> is_col_line;
+  std::fill(is_row_line.begin(), is_row_line.end(), true);
+  std::fill(is_col_line.begin(), is_col_line.end(), true);
+
+  // Check if any row or column has a line
+  for (size_t row = 0; row < kNumRows; ++row) {
+    for (size_t col = 0; col < kNumCols; ++col) {
+      // If the cell does not match the player marker, then the line is
+      // no longer possible in this row/col
+      is_row_line[row] &= board.At(row, col) == c;
+      is_col_line[col] &= board.At(row, col) == c;
+    }
+
+    // By now we have processed all columns in this row, so end the search
+    // prematurely if we have a line in this row
+    if (is_row_line[row]) {
+      return true;
+    }
+  }
+
+  // If any of the columns has a line, we are done
+  if (std::find(is_col_line.cbegin(), is_col_line.cend(), true) !=
+      is_col_line.end()) {
+    return true;
+  }
+
+  // If no rows nor columns contain a line, we have to check the two
+  // possible diagonals
+  std::array<bool, 2> is_diag_line;
+  std::fill(is_diag_line.begin(), is_diag_line.end(), true);
+  for (size_t row = 0; row < kNumRows; ++row) {
+    is_diag_line[0] &= board.At(row, row) == c;
+    is_diag_line[1] &= board.At(kNumRows - row - 1, row) == c;
+  }
+
+  return is_diag_line[0] || is_diag_line[1];
 }
 
 void TicTacToeState::DoApplyAction(Action move) {
