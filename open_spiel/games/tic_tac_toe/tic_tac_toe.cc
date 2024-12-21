@@ -98,6 +98,10 @@ CellState& GridBoard::At(size_t row, size_t col) {
   return const_cast<CellState &>(std::as_const(*this).At(row, col));
 }
 
+size_t GridBoard::Size() const {
+  return board_.size();
+}
+
 bool BoardHasLine(const GridBoard& board, const Player player) {
   CellState c = PlayerToState(player);
 
@@ -156,7 +160,7 @@ std::vector<Action> TicTacToeState::LegalActions() const {
   if (IsTerminal()) return {};
   // Can move in any empty cell.
   std::vector<Action> moves;
-  for (int cell = 0; cell < kNumCells; ++cell) {
+  for (int cell = 0; cell < board_.Size(); ++cell) {
     if (board_.At(cell) == CellState::kEmpty) {
       moves.push_back(cell);
     }
@@ -173,7 +177,7 @@ bool TicTacToeState::HasLine(Player player) const {
   return BoardHasLine(board_, player);
 }
 
-bool TicTacToeState::IsFull() const { return num_moves_ == kNumCells; }
+bool TicTacToeState::IsFull() const { return num_moves_ == board_.Size(); }
 
 TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {}
 
@@ -222,8 +226,8 @@ void TicTacToeState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   // Treat `values` as a 2-d tensor.
-  TensorView<2> view(values, {kCellStates, kNumCells}, true);
-  for (int cell = 0; cell < kNumCells; ++cell) {
+  TensorView<2> view(values, {kCellStates, board_.Size()}, true);
+  for (int cell = 0; cell < board_.Size(); ++cell) {
     view[{static_cast<int>(board_.At(cell)), cell}] = 1.0;
   }
 }

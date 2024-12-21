@@ -62,6 +62,9 @@ class GridBoard {
   const CellState& At(size_t row, size_t col) const;
   CellState& At(size_t row, size_t col);
 
+  // Returns the total number of cells of the board
+  size_t Size() const;
+
  private:
   // The underlying container - i.e., the actual board
   std::array<CellState, kNumCells> board_;

@@ -133,7 +133,7 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
   const Player player = CurrentPlayer();
   const auto& cur_view = player == 0 ? x_view_ : o_view_;
 
-  for (Action move = 0; move < kNumCells; ++move) {
+  for (Action move = 0; move < cur_view.Size(); ++move) {
     if (cur_view.At(move) == CellState::kEmpty) {
       moves.push_back(move);
     }
@@ -203,7 +203,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
   SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
                                     longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
-  for (int cell = 0; cell < kNumCells; ++cell) {
+  for (int cell = 0; cell < player_view.Size(); ++cell) {
     values[kNumCells * static_cast<int>(player_view.At(cell)) + cell] = 1.0;
   }
 
@@ -256,7 +256,7 @@ void PhantomTTTState::ObservationTensor(Player player,
 
   // First 27 bits encodes the player's view in the same way as TicTacToe.
   const auto& player_view = player == 0 ? x_view_ : o_view_;
-  for (int cell = 0; cell < kNumCells; ++cell) {
+  for (int cell = 0; cell < player_view.Size(); ++cell) {
     values[kNumCells * static_cast<int>(player_view.At(cell)) + cell] = 1.0;
   }
 
