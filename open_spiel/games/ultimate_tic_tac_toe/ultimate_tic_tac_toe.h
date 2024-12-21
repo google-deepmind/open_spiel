@@ -71,7 +71,7 @@ class UltimateTTTState : public State {
 
   // The tic-tac-toe subgames, arranged in the same order as moves.
   const tic_tac_toe::TicTacToeGame* ttt_game_;
-  std::array<std::unique_ptr<State>, tic_tac_toe::kNumCells> local_states_;
+  std::array<std::unique_ptr<State>, kNumSubgames> local_states_;
   tic_tac_toe::GridBoard meta_board_;
   int current_state_;
 };
@@ -80,7 +80,7 @@ class UltimateTTTState : public State {
 class UltimateTTTGame : public Game {
  public:
   explicit UltimateTTTGame(const GameParameters& params);
-  int NumDistinctActions() const override { return tic_tac_toe::kNumCells; }
+  int NumDistinctActions() const override { return kNumSubgames; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new UltimateTTTState(shared_from_this()));
   }
@@ -89,7 +89,7 @@ class UltimateTTTGame : public Game {
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {tic_tac_toe::kCellStates, tic_tac_toe::kNumCells,
+    return {tic_tac_toe::kCellStates, kNumSubgames,
             tic_tac_toe::kNumRows, tic_tac_toe::kNumCols};
   }
   int MaxGameLength() const override {

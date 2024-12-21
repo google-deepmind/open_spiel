@@ -68,7 +68,7 @@ void UltimateTTTState::DoApplyAction(Action move) {
   if (current_state_ < 0) {
     // Choosing a board.
     SPIEL_CHECK_GE(move, 0);
-    SPIEL_CHECK_LT(move, ttt::kNumCells);
+    SPIEL_CHECK_LT(move, kNumSubgames);
     current_state_ = move;
   } else {
     // Apply action to local state, then apply that move.
@@ -137,7 +137,7 @@ UltimateTTTState::UltimateTTTState(std::shared_ptr<const Game> game)
       ttt_game_(
           static_cast<const UltimateTTTGame*>(game.get())->TicTacToeGame()),
       current_state_(-1) {
-  for (int i = 0; i < ttt::kNumCells; ++i) {
+  for (int i = 0; i < local_states_.size(); ++i) {
     local_states_[i] = ttt_game_->NewInitialState();
   }
 }
@@ -202,9 +202,10 @@ void UltimateTTTState::ObservationTensor(Player player,
   //   - empty versus x versus o, then
   //   - local state index, then
   //   - then 3x3 position within the local board.
-  TensorView<3> view(values, {ttt::kCellStates, ttt::kNumCells, ttt::kNumCells},
+  TensorView<3> view(values, {ttt::kCellStates, kNumSubgames,
+                              ttt::kNumCells},
                      /*reset*/true);
-  for (int state = 0; state < ttt::kNumCells; ++state) {
+  for (int state = 0; state < kNumSubgames; ++state) {
     for (int cell = 0; cell < ttt::kNumCells; ++cell) {
       view[{static_cast<int>(local_state(state)->BoardAt(cell)),
             state, cell}] = 1.0;
@@ -221,7 +222,8 @@ UltimateTTTState::UltimateTTTState(const UltimateTTTState& other)
       ttt_game_(other.ttt_game_),
       meta_board_(other.meta_board_),
       current_state_(other.current_state_) {
-  for (int i = 0; i < ttt::kNumCells; ++i) {
+  SPIEL_CHECK_EQ(local_states_.size(), other.local_states_.size());
+  for (int i = 0; i < local_states_.size(); ++i) {
     local_states_[i] = other.local_states_[i]->Clone();
   }
 }
