@@ -61,6 +61,12 @@ class GridBoard {
   const CellState& At(size_t row, size_t col) const;
   CellState& At(size_t row, size_t col);
 
+  // Returns the total number of rows of the board
+  size_t Rows() const;
+
+  // Returns the total number of columns of the board
+  size_t Cols() const;
+
   // Returns the total number of cells of the board
   size_t Size() const;
 
@@ -68,6 +74,12 @@ class GridBoard {
   // The underlying container - i.e., the actual board. Should be replaced
   // by inplace_vector when supported, since it should not be resizable
   std::vector<CellState> board_;
+
+  // The number of rows of the board
+  const size_t num_rows_;
+
+  // The number of columns of the board
+  const size_t num_cols_;
 };
 
 // State of an in-play game.

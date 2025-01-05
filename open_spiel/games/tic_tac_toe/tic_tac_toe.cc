@@ -81,7 +81,8 @@ std::string StateToString(CellState state) {
 
 GridBoard::GridBoard(size_t num_rows, size_t num_cols)
     // All cells on the board start empty
-    : board_(num_rows * num_cols, CellState::kEmpty) {}
+    : board_(num_rows * num_cols, CellState::kEmpty), num_rows_(num_rows),
+      num_cols_(num_cols) {}
 
 const CellState& GridBoard::At(size_t index) const { return board_.at(index); }
 
@@ -95,6 +96,14 @@ const CellState& GridBoard::At(size_t row, size_t col) const {
 
 CellState& GridBoard::At(size_t row, size_t col) {
   return const_cast<CellState &>(std::as_const(*this).At(row, col));
+}
+
+size_t GridBoard::Rows() const {
+  return num_rows_;
+}
+
+size_t GridBoard::Cols() const {
+  return num_cols_;
 }
 
 size_t GridBoard::Size() const {
