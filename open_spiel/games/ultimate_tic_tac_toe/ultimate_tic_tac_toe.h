@@ -33,7 +33,9 @@
 namespace open_spiel {
 namespace ultimate_tic_tac_toe {
 
-constexpr const int kNumSubgames = 9;
+constexpr const int kNumSubRows = 3;
+constexpr const int kNumSubCols = 3;
+constexpr const int kNumSubgames = kNumSubRows * kNumSubCols;
 constexpr Player kUnfinished = kInvalidPlayer - 1;
 
 // State of an in-play game.

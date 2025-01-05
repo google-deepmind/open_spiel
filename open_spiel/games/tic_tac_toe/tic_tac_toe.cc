@@ -79,10 +79,9 @@ std::string StateToString(CellState state) {
   }
 }
 
-GridBoard::GridBoard() {
-  // All cells on the board start empty
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
-}
+GridBoard::GridBoard(size_t num_rows, size_t num_cols)
+    // All cells on the board start empty
+    : board_(num_rows * num_cols, CellState::kEmpty) {}
 
 const CellState& GridBoard::At(size_t index) const { return board_.at(index); }
 
@@ -179,7 +178,8 @@ bool TicTacToeState::HasLine(Player player) const {
 
 bool TicTacToeState::IsFull() const { return num_moves_ == board_.Size(); }
 
-TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {}
+TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game)
+    : State(game), board_(kNumRows, kNumCols) {}
 
 std::string TicTacToeState::ToString() const {
   std::string str;

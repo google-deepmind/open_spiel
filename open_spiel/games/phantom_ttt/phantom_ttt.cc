@@ -94,7 +94,8 @@ ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
                                  ObservationType obs_type)
-    : State(game), state_(game), obs_type_(obs_type) {
+    : State(game), state_(game), obs_type_(obs_type),
+      x_view_(kNumRows, kNumCols), o_view_(kNumRows, kNumCols) {
   if (obs_type_ == ObservationType::kRevealNumTurns) {
     // Reserve 0 for the player and 10 as "I don't know."
     bits_per_action_ = kNumCells + 2;

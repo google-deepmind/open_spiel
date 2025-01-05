@@ -136,6 +136,7 @@ UltimateTTTState::UltimateTTTState(std::shared_ptr<const Game> game)
     : State(game),
       ttt_game_(
           static_cast<const UltimateTTTGame*>(game.get())->TicTacToeGame()),
+      meta_board_(kNumSubRows, kNumSubCols),
       current_state_(-1) {
   for (int i = 0; i < local_states_.size(); ++i) {
     local_states_[i] = ttt_game_->NewInitialState();

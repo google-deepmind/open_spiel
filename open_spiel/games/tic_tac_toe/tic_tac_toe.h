@@ -15,7 +15,6 @@
 #ifndef OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 #define OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 
-#include <array>
 #include <map>
 #include <memory>
 #include <string>
@@ -51,8 +50,8 @@ enum class CellState {
 // The game board is composed of a grid of cells
 class GridBoard {
  public:
-  // Constructs an empty board
-  GridBoard();
+  // Constructs an empty board of the given dimensions
+  GridBoard(size_t num_rows, size_t num_cols);
 
   // Get the contents of the board at a given index
   const CellState& At(size_t index) const;
@@ -66,8 +65,9 @@ class GridBoard {
   size_t Size() const;
 
  private:
-  // The underlying container - i.e., the actual board
-  std::array<CellState, kNumCells> board_;
+  // The underlying container - i.e., the actual board. Should be replaced
+  // by inplace_vector when supported, since it should not be resizable
+  std::vector<CellState> board_;
 };
 
 // State of an in-play game.
