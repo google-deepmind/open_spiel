@@ -145,27 +145,26 @@ UltimateTTTState::UltimateTTTState(std::shared_ptr<const Game> game)
 
 std::string UltimateTTTState::ToString() const {
   std::string str;
-  const int rows = ttt::kNumRows * 3;
-  const int cols = ttt::kNumCols * 3;
-  int meta_row = 0;
-  int meta_col = 0;
-  for (int r = 0; r < rows; ++r) {
-    meta_row = r / 3;
-    int local_row = r % 3;
-    for (int c = 0; c < cols; ++c) {
-      meta_col = c / 3;
-      int local_col = c % 3;
-      int state_idx = meta_row * 3 + meta_col;
-      SPIEL_CHECK_GE(state_idx, 0);
-      SPIEL_CHECK_LT(state_idx, local_states_.size());
-      absl::StrAppend(&str, ttt::StateToString(local_state(state_idx)->BoardAt(
-                                local_row, local_col)));
-      if (local_col == 2) {
-        absl::StrAppend(&str, c == 8 ? "\n" : " ");
+  // Each sub TTT is separated from the other sub TTTs in the same row by
+  // a space, and is separated from the other sub TTTs in the same col by
+  // a new line
+  for (int meta_row = 0; meta_row < kNumSubRows; ++meta_row) {
+    for (int local_row = 0; local_row < ttt::kNumRows; ++local_row) {
+      for (int meta_col = 0; meta_col < kNumSubCols; ++meta_col) {
+        for (int local_col = 0; local_col < ttt::kNumCols; ++local_col) {
+          int state_idx = meta_row * kNumSubCols + meta_col;
+          SPIEL_CHECK_GE(state_idx, 0);
+          SPIEL_CHECK_LT(state_idx, local_states_.size());
+          absl::StrAppend(&str,
+              ttt::StateToString(local_state(state_idx)->BoardAt(
+                                 local_row, local_col)));
+        }
+        absl::StrAppend(&str, (meta_col == (kNumSubCols - 1)) ? "\n" : " ");
       }
-      if (local_row == 2 && r < 8 && c == 8) {
-        absl::StrAppend(&str, "\n");
-      }
+    }
+
+    if (meta_row < (kNumSubRows - 1)) {
+      absl::StrAppend(&str, "\n");
     }
   }
   return str;
