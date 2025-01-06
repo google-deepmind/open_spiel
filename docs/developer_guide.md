@@ -183,12 +183,11 @@ Leduc poker. We will use an example based on this
 
 ## Language APIs
 
-There are currently four other language APIs that expose functionality from the
-C++ core.
+There are four other language APIs that expose functionality from the C++ core.
 
 -   [Python](https://github.com/deepmind/open_spiel/tree/master/open_spiel/python).
 -   [Julia](https://github.com/deepmind/open_spiel/tree/master/open_spiel/julia)
 -   [Go](https://github.com/deepmind/open_spiel/tree/master/open_spiel/go)
-    (experimental)
+    (unmaintained)
 -   [Rust](https://github.com/deepmind/open_spiel/tree/master/open_spiel/rust)
-    (experimental)
+    (unmaintained)

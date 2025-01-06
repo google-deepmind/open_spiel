@@ -1,3 +1,5 @@
+*Note:* This implementation is no longer maintained.
+
 This folder contains an single process implementation of [R-NaD]
 (https://arxiv.org/pdf/2206.15378.pdf)
 

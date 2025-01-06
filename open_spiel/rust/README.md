@@ -1,5 +1,7 @@
 # OpenSpiel Rust API
 
+*Note:* This API is no longer maintained.
+
 This is a basic [Rust](https://www.rust-lang.org/) API for OpenSpiel. Please
 note that it is currently experimental and may not work as expected. If you use
 it, please report any issues. Fixes and improvements are more than welcome!

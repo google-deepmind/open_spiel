@@ -1,5 +1,9 @@
 # OpenSpiel Go API
 
+*Note:* This API has issues and is no longer maintained. See
+[issue 1301](https://github.com/google-deepmind/open_spiel/issues/1301) for
+details.
+
 This is a basic [Go](https://golang.org/) API for OpenSpiel. Please note that it
 is currently experimental and may not work as expected. Please see the
 [announcement thread](https://github.com/deepmind/open_spiel/issues/541) and
