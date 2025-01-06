@@ -198,15 +198,19 @@ void UltimateTTTState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // Treat `values` as a 3-d tensor: 3 x 9 x 9:
+  SPIEL_CHECK_GT(local_states_.size(), 0);
+  const auto num_cells = local_state(0)->board_.Size();
+
+  // Treat `values` as a 3-d tensor: 3 x num meta cells x num sub cells:
   //   - empty versus x versus o, then
   //   - local state index, then
-  //   - then 3x3 position within the local board.
+  //   - then position within the local board.
   TensorView<3> view(values, {ttt::kCellStates, kNumSubgames,
-                              ttt::kNumCells},
+                              num_cells},
                      /*reset*/true);
   for (int state = 0; state < kNumSubgames; ++state) {
-    for (int cell = 0; cell < ttt::kNumCells; ++cell) {
+    SPIEL_CHECK_EQ(local_state(state)->board_.Size(), num_cells);
+    for (int cell = 0; cell < num_cells; ++cell) {
       view[{static_cast<int>(local_state(state)->BoardAt(cell)),
             state, cell}] = 1.0;
     }

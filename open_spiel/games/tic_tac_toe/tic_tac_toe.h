@@ -28,6 +28,11 @@
 // Parameters: none
 
 namespace open_spiel {
+
+namespace ultimate_tic_tac_toe {
+  class UltimateTTTState;
+}
+
 namespace tic_tac_toe {
 
 // Constants.
@@ -84,6 +89,10 @@ class GridBoard {
 
 // State of an in-play game.
 class TicTacToeState : public State {
+  // Since Ultimate TTT is a TTT, make sure it can access the protected
+  // members too
+  friend class ultimate_tic_tac_toe::UltimateTTTState;
+
  public:
   TicTacToeState(std::shared_ptr<const Game> game);
 
