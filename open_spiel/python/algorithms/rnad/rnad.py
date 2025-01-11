@@ -569,7 +569,7 @@ def get_loss_nerd(logit_list: Sequence[chex.Array],
     # loss policy
     adv_pi = q_vr - jnp.sum(pi * q_vr, axis=-1, keepdims=True)
     adv_pi = is_c * adv_pi  # importance sampling correction
-    adv_pi = jnp.clip(adv_pi, a_min=-clip, a_max=clip)
+    adv_pi = jnp.clip(adv_pi, min=-clip, max=clip)
     adv_pi = lax.stop_gradient(adv_pi)
 
     valid_logit_sum = jnp.sum(logit_pi * legal_actions, axis=-1, keepdims=True)
