@@ -66,6 +66,7 @@ EXPECTED_GAMES = frozenset([
     "hex",
     "hearts",
     "kriegspiel",
+    "kick_off",
     "kuhn_poker",
     "laser_tag",
     "lewis_signaling",

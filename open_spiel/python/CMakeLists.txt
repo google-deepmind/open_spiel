@@ -340,6 +340,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       egt/alpharank_visualizer_test.py
       egt/visualization_test.py
       games/kuhn_poker_test.py
+      games/kick_off_test.py
       voting/maximal_lotteries_test.py
       tests/matrix_game_utils_test.py
   )
@@ -352,6 +353,9 @@ set(WHEEL_EXCLUDED_PYTHON_TESTS
   games/tic_tac_toe_test.py
   ../integration_tests/playthrough_test.py)
 
+  add_test(NAME kick_off_test
+         COMMAND ${PYTHON_EXECUTABLE} -m unittest discover -s open_spiel/python/games)
+         
 # Create a python test.
 foreach(py_test_file IN LISTS PYTHON_TESTS)
   if (NOT (OPEN_SPIEL_BUILDING_WHEEL AND ${py_test_file} IN_LIST WHEEL_EXCLUDED_PYTHON_TESTS))

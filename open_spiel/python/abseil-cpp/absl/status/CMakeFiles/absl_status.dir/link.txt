@@ -1,0 +1,2 @@
+/usr/bin/ar qc libabsl_status.a CMakeFiles/absl_status.dir/status.cc.o CMakeFiles/absl_status.dir/status_payload_printer.cc.o
+/usr/bin/ranlib libabsl_status.a

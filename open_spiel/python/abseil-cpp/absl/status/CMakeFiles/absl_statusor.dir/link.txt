@@ -1,0 +1,2 @@
+/usr/bin/ar qc libabsl_statusor.a CMakeFiles/absl_statusor.dir/statusor.cc.o
+/usr/bin/ranlib libabsl_statusor.a

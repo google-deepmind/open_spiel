@@ -1,0 +1,2 @@
+/usr/bin/ar qc libabsl_cord.a CMakeFiles/absl_cord.dir/cord.cc.o CMakeFiles/absl_cord.dir/cord_analysis.cc.o CMakeFiles/absl_cord.dir/cord_buffer.cc.o
+/usr/bin/ranlib libabsl_cord.a

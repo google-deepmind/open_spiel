@@ -131,7 +131,7 @@ setuptools.setup(
     description="A Framework for Reinforcement Learning in Games",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/deepmind/open_spiel",
+    url="https://github.com/nier2kirito/open_spiel",
     install_requires=_get_requirements(req_file),
     python_requires=">=3.9",
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
