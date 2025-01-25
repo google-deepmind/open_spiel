@@ -148,11 +148,12 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
 std::string PhantomTTTState::ViewToString(Player player) const {
   const auto& cur_view = player == 0 ? x_view_ : o_view_;
   std::string str;
-  for (int r = 0; r < kNumRows; ++r) {
-    for (int c = 0; c < kNumCols; ++c) {
-      absl::StrAppend(&str, StateToString(cur_view.At(r * kNumCols + c)));
+  for (int r = 0; r < cur_view.Rows(); ++r) {
+    for (int c = 0; c < cur_view.Cols(); ++c) {
+      absl::StrAppend(&str,
+                      StateToString(cur_view.At(r * cur_view.Cols() + c)));
     }
-    if (r < (kNumRows - 1)) {
+    if (r < (cur_view.Rows() - 1)) {
       absl::StrAppend(&str, "\n");
     }
   }
