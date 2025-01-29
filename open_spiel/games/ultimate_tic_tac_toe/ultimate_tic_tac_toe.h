@@ -91,8 +91,9 @@ class UltimateTTTGame : public Game {
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kNumSubgames, tic_tac_toe::kCellStates,
-            tic_tac_toe::kNumRows, tic_tac_toe::kNumCols};
+    std::vector<int> shape{ttt_game_->ObservationTensorShape()};
+    shape.insert(shape.begin(), kNumSubgames);
+    return shape;
   }
   int MaxGameLength() const override {
     return ttt_game_->MaxGameLength() * kNumSubgames;
