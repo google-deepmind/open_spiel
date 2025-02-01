@@ -38,6 +38,30 @@ constexpr const int kNumSubCols = 3;
 constexpr const int kNumSubgames = kNumSubRows * kNumSubCols;
 constexpr Player kUnfinished = kInvalidPlayer - 1;
 
+// This is currently a helper class to allow manipulating strings that
+// represent graphics. This allows easily merging such strings together
+// in a 2D visual space.
+class Display {
+ public:
+  // Create the display based on its string representation.
+  Display(std::string str_representation = "");
+
+  // Add another display's contents to this display, starting the addition
+  // at the provided destination line. If the destination line does not exist
+  // yet it will be created.
+  void Add(size_t dest_line, const Display other);
+
+  // Get the number of lines in this display.
+  size_t Height() const;
+
+  // Convert this display into a string.
+  std::string ToString() const;
+
+ private:
+  // The actual line container.
+  std::vector<std::string> display_;
+};
+
 // State of an in-play game.
 class UltimateTTTState : public State {
  public:

@@ -143,31 +143,90 @@ UltimateTTTState::UltimateTTTState(std::shared_ptr<const Game> game)
   }
 }
 
-std::string UltimateTTTState::ToString() const {
+Display::Display(std::string str) {
+  // Convert the line from newline-separated lines to actual tracked lines
+  std::stringstream ss(str);
+  std::string line;
+  while (std::getline(ss, line, '\n')) {
+    display_.push_back(line + "\n");
+  }
+}
+
+void Display::Add(size_t dest_line, const Display other) {
+  // If the line number is within the current display vertical range the lines
+  // are appended to the end of the current line; otherwise, we need to expand
+  // current vertical range
+  if (dest_line + other.display_.size() > display_.size()) {
+    display_.resize(dest_line + other.display_.size());
+  }
+
+  // Merge the lines at the line number
+  for (size_t l = 0; l < other.display_.size(); ++l) {
+    auto &line = display_[dest_line + l];
+
+    // Remove the newline, if any, from the end of the current line, so
+    // that both lines can be merged
+    if (!line.empty() && (line.back() == '\n')) {
+      line = line.substr(0, line.size() - 1);
+    }
+    line += other.display_[l];
+  }
+}
+
+size_t Display::Height() const {
+  return display_.size();
+}
+
+std::string Display::ToString() const {
   std::string str;
+  for (const auto &line : display_) {
+    str += line;
+  }
+  return str;
+}
+
+std::string UltimateTTTState::ToString() const {
+  Display display;
+
   // Each sub TTT is separated from the other sub TTTs in the same row by
   // a space, and is separated from the other sub TTTs in the same col by
   // a new line
   for (int meta_row = 0; meta_row < kNumSubRows; ++meta_row) {
-    for (int local_row = 0; local_row < ttt::kNumRows; ++local_row) {
-      for (int meta_col = 0; meta_col < kNumSubCols; ++meta_col) {
-        for (int local_col = 0; local_col < ttt::kNumCols; ++local_col) {
-          int state_idx = meta_row * kNumSubCols + meta_col;
-          SPIEL_CHECK_GE(state_idx, 0);
-          SPIEL_CHECK_LT(state_idx, local_states_.size());
-          absl::StrAppend(&str,
-              ttt::StateToString(local_state(state_idx)->BoardAt(
-                                 local_row, local_col)));
+    for (int meta_col = 0; meta_col < kNumSubCols; ++meta_col) {
+      int state_idx = meta_row * kNumSubCols + meta_col;
+      SPIEL_CHECK_GE(state_idx, 0);
+      SPIEL_CHECK_LT(state_idx, local_states_.size());
+
+      // Get the corresponding subgame as a string so that we can add it
+      // to the current display
+      auto str = local_state(state_idx)->ToString();
+
+      // Add this subgame to the display. This assumes that all sub-games
+      // in this row have the same height
+      Display sub_display(str);
+      display.Add(display.Height() -
+                  ((meta_col == 0) ? 0 : sub_display.Height()), sub_display);
+
+      // If this is not the last subgame in this row we have to add a space
+      // to separate this subgame from the next one
+      if (meta_col != (kNumSubCols - 1)) {
+        Display space_display(" ");
+        const auto start_row = display.Height() - sub_display.Height();
+        for (size_t row = 0; row < sub_display.Height(); ++row) {
+          display.Add(start_row + row, space_display);
         }
-        absl::StrAppend(&str, (meta_col == (kNumSubCols - 1)) ? "\n" : " ");
       }
     }
 
+    // By the end of every row of subgames we add a space, so that each meta
+    // row is visually separated from the others
     if (meta_row < (kNumSubRows - 1)) {
-      absl::StrAppend(&str, "\n");
+      Display space_display("\n");
+      display.Add(display.Height(), space_display);
     }
   }
-  return str;
+
+  return display.ToString();
 }
 
 bool UltimateTTTState::IsTerminal() const { return outcome_ != kUnfinished; }
