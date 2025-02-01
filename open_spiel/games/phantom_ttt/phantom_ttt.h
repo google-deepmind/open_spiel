@@ -52,7 +52,8 @@ enum class ObservationType {
 // State of an in-play game.
 class PhantomTTTState : public State {
  public:
-  PhantomTTTState(std::shared_ptr<const Game> game, ObservationType obs_type);
+  PhantomTTTState(std::shared_ptr<const Game> game, ObservationType obs_type,
+                  size_t rows, size_t cols);
 
   // Forward to underlying game state
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
@@ -98,7 +99,8 @@ class PhantomTTTGame : public Game {
   PhantomTTTGame(const GameParameters& params, GameType game_type);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new PhantomTTTState(shared_from_this(), obs_type_));
+        new PhantomTTTState(shared_from_this(), obs_type_, game_->Rows(),
+                            game_->Cols()));
   }
   int NumDistinctActions() const override {
     return game_->NumDistinctActions();
@@ -121,8 +123,10 @@ class PhantomTTTGame : public Game {
 
   ObservationType obs_type() const { return obs_type_; }
 
- private:
+ protected:
   std::shared_ptr<const tic_tac_toe::TicTacToeGame> game_;
+
+ private:
   ObservationType obs_type_;
   int bits_per_action_;
   int longest_sequence_;
@@ -133,8 +137,8 @@ class PhantomTTTGame : public Game {
 class ImperfectRecallPTTTState : public PhantomTTTState {
  public:
   ImperfectRecallPTTTState(std::shared_ptr<const Game> game,
-                           ObservationType obs_type)
-      : PhantomTTTState(game, obs_type) {}
+                           ObservationType obs_type, size_t rows, size_t cols)
+      : PhantomTTTState(game, obs_type, rows, cols) {}
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
     SPIEL_CHECK_LT(player, num_players_);
@@ -150,7 +154,8 @@ class ImperfectRecallPTTTGame : public PhantomTTTGame {
   explicit ImperfectRecallPTTTGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(
-        new ImperfectRecallPTTTState(shared_from_this(), obs_type()));
+        new ImperfectRecallPTTTState(shared_from_this(), obs_type(),
+                                     game_->Rows(), game_->Cols()));
   }
 };
 

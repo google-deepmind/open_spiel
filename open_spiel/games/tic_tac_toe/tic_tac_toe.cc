@@ -41,7 +41,9 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
+    /*parameter_specification=*/
+    {{"rows", GameParameter(kDefaultRows)},
+     {"columns", GameParameter(kDefaultCols)}}
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -91,7 +93,7 @@ CellState& GridBoard::At(size_t index) {
 }
 
 const CellState& GridBoard::At(size_t row, size_t col) const {
-  return board_.at(row * kNumCols + col);
+  return board_.at(row * Cols() + col);
 }
 
 CellState& GridBoard::At(size_t row, size_t col) {
@@ -187,16 +189,17 @@ bool TicTacToeState::HasLine(Player player) const {
 
 bool TicTacToeState::IsFull() const { return num_moves_ == board_.Size(); }
 
-TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game)
-    : State(game), board_(kNumRows, kNumCols) {}
+TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game, size_t rows,
+                               size_t cols)
+    : State(game), board_(rows, cols) {}
 
 std::string TicTacToeState::ToString() const {
   std::string str;
-  for (int r = 0; r < kNumRows; ++r) {
-    for (int c = 0; c < kNumCols; ++c) {
+  for (int r = 0; r < board_.Rows(); ++r) {
+    for (int c = 0; c < board_.Cols(); ++c) {
       absl::StrAppend(&str, StateToString(BoardAt(r, c)));
     }
-    if (r < (kNumRows - 1)) {
+    if (r < (board_.Rows() - 1)) {
       absl::StrAppend(&str, "\n");
     }
   }
@@ -257,11 +260,22 @@ std::unique_ptr<State> TicTacToeState::Clone() const {
 std::string TicTacToeGame::ActionToString(Player player,
                                           Action action_id) const {
   return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id / kNumCols, ",", action_id % kNumCols, ")");
+                      action_id / cols_, ",", action_id % cols_, ")");
 }
 
 TicTacToeGame::TicTacToeGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      rows_(ParameterValue<int>("rows")),
+      cols_(ParameterValue<int>("columns")) {}
+
+size_t TicTacToeGame::Rows() const {
+  return rows_;
+}
+
+size_t TicTacToeGame::Cols() const {
+  return cols_;
+}
+
 
 }  // namespace tic_tac_toe
 }  // namespace open_spiel

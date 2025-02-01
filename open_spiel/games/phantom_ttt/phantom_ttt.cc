@@ -27,8 +27,6 @@ namespace phantom_ttt {
 namespace {
 
 using tic_tac_toe::kCellStates;
-using tic_tac_toe::kNumCols;
-using tic_tac_toe::kNumRows;
 
 using tic_tac_toe::CellState;
 
@@ -92,9 +90,10 @@ ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
     : PhantomTTTGame(params, kImperfectRecallGameType) {}
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
-                                 ObservationType obs_type)
-    : State(game), state_(game), obs_type_(obs_type),
-      x_view_(kNumRows, kNumCols), o_view_(kNumRows, kNumCols) {
+                                 ObservationType obs_type, size_t rows,
+                                 size_t cols)
+    : State(game), state_(game, rows, cols), obs_type_(obs_type),
+      x_view_(rows, cols), o_view_(rows, cols) {
   if (obs_type_ == ObservationType::kRevealNumTurns) {
     // Reserve 1 bit to select the player and another bit as "I don't know."
     bits_per_action_ = NumDistinctActions() + 2;

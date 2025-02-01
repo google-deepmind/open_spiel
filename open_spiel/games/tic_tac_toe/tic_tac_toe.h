@@ -25,7 +25,9 @@
 // Simple game of Noughts and Crosses:
 // https://en.wikipedia.org/wiki/Tic-tac-toe
 //
-// Parameters: none
+// Parameters:
+//       "columns"    int     number of columns on the board   (default = 3)
+//       "rows"       int     number of rows on the board      (default = 3)
 
 namespace open_spiel {
 
@@ -37,9 +39,8 @@ namespace tic_tac_toe {
 
 // Constants.
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kNumRows = 3;
-inline constexpr int kNumCols = 3;
-inline constexpr int kNumCells = kNumRows * kNumCols;
+inline constexpr int kDefaultRows = 3;
+inline constexpr int kDefaultCols = 3;
 inline constexpr int kCellStates = 1 + kNumPlayers;  // empty, 'x', and 'o'.
 
 // https://math.stackexchange.com/questions/485752/tictactoe-state-space-choose-calculation/485852
@@ -94,7 +95,7 @@ class TicTacToeState : public State {
   friend class ultimate_tic_tac_toe::UltimateTTTState;
 
  public:
-  TicTacToeState(std::shared_ptr<const Game> game);
+  TicTacToeState(std::shared_ptr<const Game> game, size_t rows, size_t cols);
 
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
@@ -138,19 +139,33 @@ class TicTacToeState : public State {
 class TicTacToeGame : public Game {
  public:
   explicit TicTacToeGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override { return rows_ * cols_; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new TicTacToeState(shared_from_this()));
+    return std::unique_ptr<State>(
+      new TicTacToeState(shared_from_this(), rows_, cols_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, kNumRows, kNumCols};
+    return {kCellStates, rows_, cols_};
   }
-  int MaxGameLength() const override { return kNumCells; }
+  int MaxGameLength() const override { return rows_ * cols_; }
   std::string ActionToString(Player player, Action action_id) const override;
+
+  // Returns the total number of rows of the board
+  size_t Rows() const;
+
+  // Returns the total number of columns of the board
+  size_t Cols() const;
+
+ private:
+  // The number of rows in the grid
+  int rows_ = -1;
+
+  // The number of columns in the grid
+  int cols_ = -1;
 };
 
 CellState PlayerToState(Player player);
