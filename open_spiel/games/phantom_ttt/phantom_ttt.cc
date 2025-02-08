@@ -31,7 +31,6 @@ using tic_tac_toe::kCellStates;
 using tic_tac_toe::CellState;
 
 using tic_tac_toe::PlayerToState;
-using tic_tac_toe::StateToString;
 
 // Facts about the game.
 const GameType kGameType{
@@ -146,17 +145,7 @@ std::vector<Action> PhantomTTTState::LegalActions() const {
 
 std::string PhantomTTTState::ViewToString(Player player) const {
   const auto& cur_view = player == 0 ? x_view_ : o_view_;
-  std::string str;
-  for (int r = 0; r < cur_view.Rows(); ++r) {
-    for (int c = 0; c < cur_view.Cols(); ++c) {
-      absl::StrAppend(&str,
-                      StateToString(cur_view.At(r * cur_view.Cols() + c)));
-    }
-    if (r < (cur_view.Rows() - 1)) {
-      absl::StrAppend(&str, "\n");
-    }
-  }
-  return str;
+  return cur_view.ToString();
 }
 
 std::string PhantomTTTState::ActionSequenceToString(Player player) const {

@@ -76,6 +76,9 @@ class GridBoard {
   // Returns the total number of cells of the board
   size_t Size() const;
 
+  // Get a visual representation of the board as text.
+  std::string ToString() const;
+
  private:
   // The underlying container - i.e., the actual board. Should be replaced
   // by inplace_vector when supported, since it should not be resizable

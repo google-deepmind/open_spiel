@@ -112,6 +112,19 @@ size_t GridBoard::Size() const {
   return board_.size();
 }
 
+std::string GridBoard::ToString() const {
+  std::string str;
+  for (int r = 0; r < Rows(); ++r) {
+    for (int c = 0; c < Cols(); ++c) {
+      absl::StrAppend(&str, StateToString(At(r, c)));
+    }
+    if (r < (Rows() - 1)) {
+      absl::StrAppend(&str, "\n");
+    }
+  }
+  return str;
+}
+
 bool BoardHasLine(const GridBoard& board, const Player player) {
   CellState c = PlayerToState(player);
 
@@ -194,16 +207,7 @@ TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game, size_t rows,
     : State(game), board_(rows, cols) {}
 
 std::string TicTacToeState::ToString() const {
-  std::string str;
-  for (int r = 0; r < board_.Rows(); ++r) {
-    for (int c = 0; c < board_.Cols(); ++c) {
-      absl::StrAppend(&str, StateToString(BoardAt(r, c)));
-    }
-    if (r < (board_.Rows() - 1)) {
-      absl::StrAppend(&str, "\n");
-    }
-  }
-  return str;
+  return board_.ToString();
 }
 
 bool TicTacToeState::IsTerminal() const {
