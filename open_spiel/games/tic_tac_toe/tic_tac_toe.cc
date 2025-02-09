@@ -179,16 +179,20 @@ void TicTacToeState::DoApplyAction(Action move) {
   num_moves_ += 1;
 }
 
-std::vector<Action> TicTacToeState::LegalActions() const {
-  if (IsTerminal()) return {};
+std::vector<Action> TicTacToeState::LegalActions(const GridBoard &board) const {
   // Can move in any empty cell.
   std::vector<Action> moves;
-  for (int cell = 0; cell < board_.Size(); ++cell) {
-    if (board_.At(cell) == CellState::kEmpty) {
+  for (int cell = 0; cell < board.Size(); ++cell) {
+    if (board.At(cell) == CellState::kEmpty) {
       moves.push_back(cell);
     }
   }
   return moves;
+}
+
+std::vector<Action> TicTacToeState::LegalActions() const {
+  if (IsTerminal()) return {};
+  return LegalActions(board_);
 }
 
 std::string TicTacToeState::ActionToString(Player player,

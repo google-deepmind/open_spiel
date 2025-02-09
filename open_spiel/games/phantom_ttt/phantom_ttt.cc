@@ -130,17 +130,8 @@ void PhantomTTTState::DoApplyAction(Action move) {
 
 std::vector<Action> PhantomTTTState::LegalActions() const {
   if (IsTerminal()) return {};
-  std::vector<Action> moves;
-  const Player player = CurrentPlayer();
-  const auto& cur_view = player == 0 ? x_view_ : o_view_;
-
-  for (Action move = 0; move < cur_view.Size(); ++move) {
-    if (cur_view.At(move) == CellState::kEmpty) {
-      moves.push_back(move);
-    }
-  }
-
-  return moves;
+  const auto& cur_view = CurrentPlayer() == 0 ? x_view_ : o_view_;
+  return state_.LegalActions(cur_view);
 }
 
 std::string PhantomTTTState::ViewToString(Player player) const {

@@ -117,6 +117,9 @@ class TicTacToeState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
+
+  // Get the possible legal actions for a given board state
+  std::vector<Action> LegalActions(const GridBoard &board) const;
   CellState BoardAt(int cell) const { return board_.At(cell); }
   CellState BoardAt(int row, int column) const {
     return board_.At(row, column);
