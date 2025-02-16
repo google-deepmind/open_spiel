@@ -56,16 +56,22 @@ RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 }  // namespace
 
-CellState PlayerToState(Player player) {
+Component PlayerToComponent(Player player) {
+  Component component;
   switch (player) {
     case 0:
-      return CellState::kCross;
+      component.state_ = CellState::kCross;
+      break;
     case 1:
-      return CellState::kNought;
+      component.state_ = CellState::kNought;
+      break;
     default:
       SpielFatalError(absl::StrCat("Invalid player id ", player));
-      return CellState::kEmpty;
+      component.state_ = CellState::kEmpty;
+      break;
   }
+
+  return component;
 }
 
 std::string StateToString(CellState state) {
@@ -130,7 +136,7 @@ std::string GridBoard::ToString() const {
 }
 
 bool BoardHasLine(const GridBoard& board, const Player player) {
-  CellState c = PlayerToState(player);
+  const auto c = PlayerToComponent(player).state_;
 
   // We assume that we have lines everywhere, and we will check if that stands
   // after checking the contents of the cells
@@ -175,7 +181,7 @@ bool BoardHasLine(const GridBoard& board, const Player player) {
 
 void TicTacToeState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_.At(move), CellState::kEmpty);
-  board_.At(move) = PlayerToState(CurrentPlayer());
+  board_.At(move) = PlayerToComponent(CurrentPlayer()).state_;
   if (HasLine(current_player_)) {
     outcome_ = current_player_;
   }
@@ -271,7 +277,7 @@ std::unique_ptr<State> TicTacToeState::Clone() const {
 
 std::string TicTacToeGame::ActionToString(Player player,
                                           Action action_id) const {
-  return absl::StrCat(StateToString(PlayerToState(player)), "(",
+  return absl::StrCat(StateToString(PlayerToComponent(player).state_), "(",
                       action_id / cols_, ",", action_id % cols_, ")");
 }
 

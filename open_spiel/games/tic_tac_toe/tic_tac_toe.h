@@ -191,7 +191,7 @@ class TicTacToeGame : public Game {
   int cols_ = -1;
 };
 
-CellState PlayerToState(Player player);
+Component PlayerToComponent(Player player);
 std::string StateToString(CellState state);
 
 // Does this player have a line?

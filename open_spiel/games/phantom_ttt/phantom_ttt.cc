@@ -30,8 +30,6 @@ using tic_tac_toe::kCellStates;
 
 using tic_tac_toe::CellState;
 
-using tic_tac_toe::PlayerToState;
-
 // Facts about the game.
 const GameType kGameType{
     /*short_name=*/"phantom_ttt",
@@ -259,7 +257,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   Action last_move = action_sequence_.back().second;
   SPIEL_CHECK_EQ(last_move, move);
 
-  if (state_.BoardAt(move) == PlayerToState(player)) {
+  if (state_.BoardAt(move) == tic_tac_toe::PlayerToComponent(player).state_) {
     // If the board has a mark that is the undoing player, then this was
     // a successful move. Undo as normal.
     state_.UndoAction(player, move);

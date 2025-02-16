@@ -80,7 +80,8 @@ void UltimateTTTState::DoApplyAction(Action move) {
       if (local_outcome < 0) {
         meta_board_.At(current_state_) = ttt::CellState::kEmpty;
       } else {
-        meta_board_.At(current_state_) = ttt::PlayerToState(local_outcome);
+        meta_board_.At(current_state_) =
+          ttt::PlayerToComponent(local_outcome).state_;
       }
     }
     // Set the next potential local state.
