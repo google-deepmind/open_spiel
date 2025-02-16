@@ -53,9 +53,26 @@ enum class CellState {
   kCross,   // X
 };
 
+// A component is a game piece
+class Component {
+ public:
+  Component();
+
+  CellState state_;
+};
+
 // The game board is composed of a grid of cells
 class GridBoard {
  public:
+  // A tile in a board is a position that can hold components
+  class Tile {
+   public:
+    Tile() = default;
+
+    // The component in this tile, if any
+    Component component_;
+  };
+
   // Constructs an empty board of the given dimensions
   GridBoard(size_t num_rows, size_t num_cols);
 
@@ -82,7 +99,7 @@ class GridBoard {
  private:
   // The underlying container - i.e., the actual board. Should be replaced
   // by inplace_vector when supported, since it should not be resizable
-  std::vector<CellState> board_;
+  std::vector<Tile> board_;
 
   // The number of rows of the board
   const size_t num_rows_;

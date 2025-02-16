@@ -81,19 +81,23 @@ std::string StateToString(CellState state) {
   }
 }
 
+Component::Component() : state_(CellState::kEmpty) {}
+
 GridBoard::GridBoard(size_t num_rows, size_t num_cols)
     // All cells on the board start empty
-    : board_(num_rows * num_cols, CellState::kEmpty), num_rows_(num_rows),
+    : board_(num_rows * num_cols), num_rows_(num_rows),
       num_cols_(num_cols) {}
 
-const CellState& GridBoard::At(size_t index) const { return board_.at(index); }
+const CellState& GridBoard::At(size_t index) const {
+  return board_.at(index).component_.state_;
+}
 
 CellState& GridBoard::At(size_t index) {
   return const_cast<CellState &>(std::as_const(*this).At(index));
 }
 
 const CellState& GridBoard::At(size_t row, size_t col) const {
-  return board_.at(row * Cols() + col);
+  return board_.at(row * Cols() + col).component_.state_;
 }
 
 CellState& GridBoard::At(size_t row, size_t col) {
