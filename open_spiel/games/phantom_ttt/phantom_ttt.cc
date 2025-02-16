@@ -28,8 +28,6 @@ namespace {
 
 using tic_tac_toe::kCellStates;
 
-using tic_tac_toe::CellState;
-
 // Facts about the game.
 const GameType kGameType{
     /*short_name=*/"phantom_ttt",
@@ -112,13 +110,13 @@ void PhantomTTTState::DoApplyAction(Action move) {
   auto& cur_view = cur_player == 0 ? x_view_ : o_view_;
 
   // Two cases: either there is a mark already there, or not.
-  if (state_.BoardAt(move) == CellState::kEmpty) {
+  if (state_.BoardAt(move).IsEmpty()) {
     // No mark on board, so play this normally.
     state_.ApplyAction(move);
   }
 
   // Update current player's view, and action sequence.
-  SPIEL_CHECK_EQ(cur_view.At(move), CellState::kEmpty);
+  SPIEL_CHECK_EQ(cur_view.At(move).IsEmpty(), true);
   cur_view.At(move) = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 
@@ -185,8 +183,8 @@ void PhantomTTTState::InformationStateTensor(Player player,
                                     longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
   for (int cell = 0; cell < player_view.Size(); ++cell) {
-    values[NumDistinctActions() * static_cast<int>(player_view.At(cell)) +
-           cell] = 1.0;
+    values[NumDistinctActions() * TileToState(player_view.At(cell)) + cell] =
+      1.0;
   }
 
   // Now encode the sequence. Each (player, action) pair uses 11 bits:
@@ -239,8 +237,8 @@ void PhantomTTTState::ObservationTensor(Player player,
   // First bits encodes the player's view in the same way as TicTacToe.
   const auto& player_view = player == 0 ? x_view_ : o_view_;
   for (int cell = 0; cell < player_view.Size(); ++cell) {
-    values[NumDistinctActions() * static_cast<int>(player_view.At(cell)) +
-           cell] = 1.0;
+    values[NumDistinctActions() * TileToState(player_view.At(cell)) + cell] =
+      1.0;
   }
 
   // Then a one-hot to represent total number of turns.
@@ -257,7 +255,8 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   Action last_move = action_sequence_.back().second;
   SPIEL_CHECK_EQ(last_move, move);
 
-  if (state_.BoardAt(move) == tic_tac_toe::PlayerToComponent(player).state_) {
+  if (state_.BoardAt(move).component_ ==
+      tic_tac_toe::PlayerToComponent(player)) {
     // If the board has a mark that is the undoing player, then this was
     // a successful move. Undo as normal.
     state_.UndoAction(player, move);
@@ -265,7 +264,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
 
   // Undo the action from that player's view, and pop from the action seq
   auto& player_view = player == 0 ? x_view_ : o_view_;
-  player_view.At(move) = CellState::kEmpty;
+  player_view.At(move).Clear();
   action_sequence_.pop_back();
 
   history_.pop_back();

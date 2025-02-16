@@ -60,6 +60,8 @@ class Component {
 
   std::string ToString() const;
 
+  friend bool operator==(const Component& lhs, const Component& rhs);
+
   CellState state_;
 };
 
@@ -73,6 +75,12 @@ class GridBoard {
 
     std::string ToString() const;
 
+    // Removes all components from this tile
+    void Clear();
+
+    // Verifies if the tile does not contain any component.
+    bool IsEmpty() const;
+
     // The component in this tile, if any
     Component component_;
   };
@@ -81,12 +89,12 @@ class GridBoard {
   GridBoard(size_t num_rows, size_t num_cols);
 
   // Get the contents of the board at a given index
-  const CellState& At(size_t index) const;
-  CellState& At(size_t index);
+  const Tile& At(size_t index) const;
+  Tile& At(size_t index);
 
   // Get the contents of the board at a given 2D position
-  const CellState& At(size_t row, size_t col) const;
-  CellState& At(size_t row, size_t col);
+  const Tile& At(size_t row, size_t col) const;
+  Tile& At(size_t row, size_t col);
 
   // Returns the total number of rows of the board
   size_t Rows() const;
@@ -141,8 +149,8 @@ class TicTacToeState : public State {
 
   // Get the possible legal actions for a given board state
   std::vector<Action> LegalActions(const GridBoard &board) const;
-  CellState BoardAt(int cell) const { return board_.At(cell); }
-  CellState BoardAt(int row, int column) const {
+  GridBoard::Tile BoardAt(int cell) const { return board_.At(cell); }
+  GridBoard::Tile BoardAt(int row, int column) const {
     return board_.At(row, column);
   }
   Player outcome() const { return outcome_; }
@@ -196,14 +204,10 @@ class TicTacToeGame : public Game {
 };
 
 Component PlayerToComponent(Player player);
-std::string StateToString(CellState state);
+int TileToState(const GridBoard::Tile &tile);
 
 // Does this player have a line?
 bool BoardHasLine(const GridBoard& board, const Player player);
-
-inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  return stream << StateToString(state);
-}
 
 }  // namespace tic_tac_toe
 }  // namespace open_spiel

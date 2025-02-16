@@ -78,8 +78,8 @@ void UltimateTTTState::DoApplyAction(Action move) {
     if (local_states_[current_state_]->IsTerminal()) {
       Player local_outcome = local_state(current_state_)->outcome();
       if (local_outcome >= 0) {
-        meta_board_.At(current_state_) =
-          ttt::PlayerToComponent(local_outcome).state_;
+        meta_board_.At(current_state_).component_ =
+          ttt::PlayerToComponent(local_outcome);
       }
     }
     // Set the next potential local state.
@@ -269,7 +269,7 @@ void UltimateTTTState::ObservationTensor(Player player,
   for (int state = 0; state < kNumSubgames; ++state) {
     SPIEL_CHECK_EQ(local_state(state)->board_.Size(), num_cells);
     for (int cell = 0; cell < num_cells; ++cell) {
-      view[{state, static_cast<int>(local_state(state)->BoardAt(cell)),
+      view[{state, TileToState(local_state(state)->BoardAt(cell)),
             cell}] = 1.0;
     }
   }
