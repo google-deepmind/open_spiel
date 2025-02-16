@@ -58,6 +58,8 @@ class Component {
  public:
   Component();
 
+  std::string ToString() const;
+
   CellState state_;
 };
 
@@ -68,6 +70,8 @@ class GridBoard {
   class Tile {
    public:
     Tile() = default;
+
+    std::string ToString() const;
 
     // The component in this tile, if any
     Component component_;

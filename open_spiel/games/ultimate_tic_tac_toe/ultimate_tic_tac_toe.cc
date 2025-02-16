@@ -77,9 +77,7 @@ void UltimateTTTState::DoApplyAction(Action move) {
     // Check if it's terminal and mark the outcome in the meta-game.
     if (local_states_[current_state_]->IsTerminal()) {
       Player local_outcome = local_state(current_state_)->outcome();
-      if (local_outcome < 0) {
-        meta_board_.At(current_state_) = ttt::CellState::kEmpty;
-      } else {
+      if (local_outcome >= 0) {
         meta_board_.At(current_state_) =
           ttt::PlayerToComponent(local_outcome).state_;
       }

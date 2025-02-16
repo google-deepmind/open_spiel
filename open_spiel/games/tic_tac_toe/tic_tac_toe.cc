@@ -89,6 +89,14 @@ std::string StateToString(CellState state) {
 
 Component::Component() : state_(CellState::kEmpty) {}
 
+std::string Component::ToString() const {
+  return StateToString(state_);
+}
+
+std::string GridBoard::Tile::ToString() const {
+  return component_.ToString();
+}
+
 GridBoard::GridBoard(size_t num_rows, size_t num_cols)
     // All cells on the board start empty
     : board_(num_rows * num_cols), num_rows_(num_rows),
@@ -126,7 +134,7 @@ std::string GridBoard::ToString() const {
   std::string str;
   for (int r = 0; r < Rows(); ++r) {
     for (int c = 0; c < Cols(); ++c) {
-      absl::StrAppend(&str, StateToString(At(r, c)));
+      absl::StrAppend(&str, board_.at(r * Cols() + c).ToString());
     }
     if (r < (Rows() - 1)) {
       absl::StrAppend(&str, "\n");
@@ -277,7 +285,7 @@ std::unique_ptr<State> TicTacToeState::Clone() const {
 
 std::string TicTacToeGame::ActionToString(Player player,
                                           Action action_id) const {
-  return absl::StrCat(StateToString(PlayerToComponent(player).state_), "(",
+  return absl::StrCat(PlayerToComponent(player).ToString(), "(",
                       action_id / cols_, ",", action_id % cols_, ")");
 }
 
