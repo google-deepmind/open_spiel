@@ -185,8 +185,8 @@ std::string DarkHexState::ViewToString(Player player) const {
 
   for (int r = 0; r < num_rows_; ++r) {
     for (int c = 0; c < num_cols_; ++c) {
-      absl::StrAppend(
-          &str, StateToString(cur_view[r * num_cols_ + c], state_.StringRep()));
+      absl::StrAppend(&str, StateToString(cur_view[r * num_cols_ + c],
+                                          state_.string_rep()));
     }
     if (r < (num_rows_ - 1)) {
       absl::StrAppend(&str, "\n");

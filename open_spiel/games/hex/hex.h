@@ -102,7 +102,7 @@ class HexState : public State {
 
   CellState BoardAt(int cell) const { return board_[cell]; }
   void ChangePlayer() { current_player_ = current_player_ == 0 ? 1 : 0; }
-  StringRep StringRep() const { return string_rep_; }
+  StringRep string_rep() const { return string_rep_; }
 
  protected:
   std::vector<CellState> board_;
