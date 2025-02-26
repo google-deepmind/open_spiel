@@ -120,6 +120,12 @@ function cached_clone() {
 DIR="./pybind11"
 if [[ ! -d ${DIR} ]]; then
   cached_clone -b smart_holder --single-branch --depth 1 https://github.com/pybind/pybind11.git ${DIR}
+  # Fix to a specific commit of the v2 smart_holder branch before merge into master for v3
+  # See discussion on https://github.com/pybind/pybind11/pull/5542
+  # We will wait for Google to pull in v3 to move this to v3 as there will be nontrivial fixes involved
+  pushd ${DIR}
+  git checkout 'aed215c4d49532a1b162ea11cd96f77bd3540fed'
+  popd
 fi
 
 # The official https://github.com/dds-bridge/dds.git seems to not accept PR,
