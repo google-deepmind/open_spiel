@@ -15,7 +15,6 @@
 #ifndef OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 #define OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 
-#include <array>
 #include <map>
 #include <memory>
 #include <string>
@@ -26,16 +25,22 @@
 // Simple game of Noughts and Crosses:
 // https://en.wikipedia.org/wiki/Tic-tac-toe
 //
-// Parameters: none
+// Parameters:
+//       "columns"    int     number of columns on the board   (default = 3)
+//       "rows"       int     number of rows on the board      (default = 3)
 
 namespace open_spiel {
+
+namespace ultimate_tic_tac_toe {
+  class UltimateTTTState;
+}
+
 namespace tic_tac_toe {
 
 // Constants.
 inline constexpr int kNumPlayers = 2;
-inline constexpr int kNumRows = 3;
-inline constexpr int kNumCols = 3;
-inline constexpr int kNumCells = kNumRows * kNumCols;
+inline constexpr int kDefaultRows = 3;
+inline constexpr int kDefaultCols = 3;
 inline constexpr int kCellStates = 1 + kNumPlayers;  // empty, 'x', and 'o'.
 
 // https://math.stackexchange.com/questions/485752/tictactoe-state-space-choose-calculation/485852
@@ -48,10 +53,81 @@ enum class CellState {
   kCross,   // X
 };
 
+// A component is a game piece
+class Component {
+ public:
+  Component();
+
+  std::string ToString() const;
+
+  friend bool operator==(const Component& lhs, const Component& rhs);
+
+  CellState state_;
+};
+
+// The game board is composed of a grid of cells
+class GridBoard {
+ public:
+  // A tile in a board is a position that can hold components
+  class Tile {
+   public:
+    Tile() = default;
+
+    std::string ToString() const;
+
+    // Removes all components from this tile
+    void Clear();
+
+    // Verifies if the tile does not contain any component.
+    bool IsEmpty() const;
+
+    // The component in this tile, if any
+    Component component_;
+  };
+
+  // Constructs an empty board of the given dimensions
+  GridBoard(size_t num_rows, size_t num_cols);
+
+  // Get the contents of the board at a given index
+  const Tile& At(size_t index) const;
+  Tile& At(size_t index);
+
+  // Get the contents of the board at a given 2D position
+  const Tile& At(size_t row, size_t col) const;
+  Tile& At(size_t row, size_t col);
+
+  // Returns the total number of rows of the board
+  size_t Rows() const;
+
+  // Returns the total number of columns of the board
+  size_t Cols() const;
+
+  // Returns the total number of cells of the board
+  size_t Size() const;
+
+  // Get a visual representation of the board as text.
+  std::string ToString() const;
+
+ private:
+  // The underlying container - i.e., the actual board. Should be replaced
+  // by inplace_vector when supported, since it should not be resizable
+  std::vector<Tile> board_;
+
+  // The number of rows of the board
+  const size_t num_rows_;
+
+  // The number of columns of the board
+  const size_t num_cols_;
+};
+
 // State of an in-play game.
 class TicTacToeState : public State {
+  // Since Ultimate TTT is a TTT, make sure it can access the protected
+  // members too
+  friend class ultimate_tic_tac_toe::UltimateTTTState;
+
  public:
-  TicTacToeState(std::shared_ptr<const Game> game);
+  TicTacToeState(std::shared_ptr<const Game> game, size_t rows, size_t cols);
 
   TicTacToeState(const TicTacToeState&) = default;
   TicTacToeState& operator=(const TicTacToeState&) = default;
@@ -70,9 +146,12 @@ class TicTacToeState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
-  CellState BoardAt(int cell) const { return board_[cell]; }
-  CellState BoardAt(int row, int column) const {
-    return board_[row * kNumCols + column];
+
+  // Get the possible legal actions for a given board state
+  std::vector<Action> LegalActions(const GridBoard &board) const;
+  GridBoard::Tile BoardAt(int cell) const { return board_.At(cell); }
+  GridBoard::Tile BoardAt(int row, int column) const {
+    return board_.At(row, column);
   }
   Player outcome() const { return outcome_; }
 
@@ -80,7 +159,7 @@ class TicTacToeState : public State {
   void SetCurrentPlayer(Player player) { current_player_ = player; }
 
  protected:
-  std::array<CellState, kNumCells> board_;
+  GridBoard board_;
   void DoApplyAction(Action move) override;
 
  private:
@@ -95,31 +174,40 @@ class TicTacToeState : public State {
 class TicTacToeGame : public Game {
  public:
   explicit TicTacToeGame(const GameParameters& params);
-  int NumDistinctActions() const override { return kNumCells; }
+  int NumDistinctActions() const override { return rows_ * cols_; }
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(new TicTacToeState(shared_from_this()));
+    return std::unique_ptr<State>(
+      new TicTacToeState(shared_from_this(), rows_, cols_));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -1; }
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {kCellStates, kNumRows, kNumCols};
+    return {kCellStates, rows_, cols_};
   }
-  int MaxGameLength() const override { return kNumCells; }
+  int MaxGameLength() const override { return rows_ * cols_; }
   std::string ActionToString(Player player, Action action_id) const override;
+
+  // Returns the total number of rows of the board
+  size_t Rows() const;
+
+  // Returns the total number of columns of the board
+  size_t Cols() const;
+
+ private:
+  // The number of rows in the grid
+  int rows_ = -1;
+
+  // The number of columns in the grid
+  int cols_ = -1;
 };
 
-CellState PlayerToState(Player player);
-std::string StateToString(CellState state);
+Component PlayerToComponent(Player player);
+int TileToState(const GridBoard::Tile &tile);
 
 // Does this player have a line?
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player);
-
-inline std::ostream& operator<<(std::ostream& stream, const CellState& state) {
-  return stream << StateToString(state);
-}
+bool BoardHasLine(const GridBoard& board, const Player player);
 
 }  // namespace tic_tac_toe
 }  // namespace open_spiel

@@ -41,7 +41,9 @@ const GameType kGameType{
     /*provides_information_state_tensor=*/false,
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
-    /*parameter_specification=*/{}  // no parameters
+    /*parameter_specification=*/
+    {{"rows", GameParameter(kDefaultRows)},
+     {"columns", GameParameter(kDefaultCols)}}
 };
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
@@ -54,20 +56,32 @@ RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 
 }  // namespace
 
-CellState PlayerToState(Player player) {
+Component PlayerToComponent(Player player) {
+  Component component;
   switch (player) {
     case 0:
-      return CellState::kCross;
+      component.state_ = CellState::kCross;
+      break;
     case 1:
-      return CellState::kNought;
+      component.state_ = CellState::kNought;
+      break;
     default:
       SpielFatalError(absl::StrCat("Invalid player id ", player));
-      return CellState::kEmpty;
+      component.state_ = CellState::kEmpty;
+      break;
   }
+
+  return component;
 }
 
-std::string StateToString(CellState state) {
-  switch (state) {
+int TileToState(const GridBoard::Tile &tile) {
+  return static_cast<int>(tile.component_.state_);
+}
+
+Component::Component() : state_(CellState::kEmpty) {}
+
+std::string Component::ToString() const {
+  switch (state_) {
     case CellState::kEmpty:
       return ".";
     case CellState::kNought:
@@ -79,22 +93,118 @@ std::string StateToString(CellState state) {
   }
 }
 
-bool BoardHasLine(const std::array<CellState, kNumCells>& board,
-                  const Player player) {
-  CellState c = PlayerToState(player);
-  return (board[0] == c && board[1] == c && board[2] == c) ||
-         (board[3] == c && board[4] == c && board[5] == c) ||
-         (board[6] == c && board[7] == c && board[8] == c) ||
-         (board[0] == c && board[3] == c && board[6] == c) ||
-         (board[1] == c && board[4] == c && board[7] == c) ||
-         (board[2] == c && board[5] == c && board[8] == c) ||
-         (board[0] == c && board[4] == c && board[8] == c) ||
-         (board[2] == c && board[4] == c && board[6] == c);
+bool operator==(const Component& lhs, const Component& rhs) {
+  return lhs.state_ == rhs.state_;
+}
+
+std::string GridBoard::Tile::ToString() const {
+  return component_.ToString();
+}
+
+void GridBoard::Tile::Clear() {
+  component_.state_ = CellState::kEmpty;
+}
+
+bool GridBoard::Tile::IsEmpty() const {
+  return component_.state_ == CellState::kEmpty;
+}
+
+GridBoard::GridBoard(size_t num_rows, size_t num_cols)
+    // All cells on the board start empty
+    : board_(num_rows * num_cols), num_rows_(num_rows),
+      num_cols_(num_cols) {}
+
+const GridBoard::Tile& GridBoard::At(size_t index) const {
+  return board_.at(index);
+}
+
+GridBoard::Tile& GridBoard::At(size_t index) {
+  return const_cast<Tile &>(std::as_const(*this).At(index));
+}
+
+const GridBoard::Tile& GridBoard::At(size_t row, size_t col) const {
+  return board_.at(row * Cols() + col);
+}
+
+GridBoard::Tile& GridBoard::At(size_t row, size_t col) {
+  return const_cast<Tile &>(std::as_const(*this).At(row, col));
+}
+
+size_t GridBoard::Rows() const {
+  return num_rows_;
+}
+
+size_t GridBoard::Cols() const {
+  return num_cols_;
+}
+
+size_t GridBoard::Size() const {
+  return board_.size();
+}
+
+std::string GridBoard::ToString() const {
+  std::string str;
+  for (int r = 0; r < Rows(); ++r) {
+    for (int c = 0; c < Cols(); ++c) {
+      absl::StrAppend(&str, board_.at(r * Cols() + c).ToString());
+    }
+    if (r < (Rows() - 1)) {
+      absl::StrAppend(&str, "\n");
+    }
+  }
+  return str;
+}
+
+bool BoardHasLine(const GridBoard& board, const Player player) {
+  const auto c = PlayerToComponent(player);
+
+  // We assume that we have lines everywhere, and we will check if that stands
+  // after checking the contents of the cells
+  std::vector<bool> is_row_line(board.Rows());
+  std::vector<bool> is_col_line(board.Cols());
+  std::fill(is_row_line.begin(), is_row_line.end(), true);
+  std::fill(is_col_line.begin(), is_col_line.end(), true);
+
+  // Check if any row or column has a line
+  for (size_t row = 0; row < is_row_line.size(); ++row) {
+    for (size_t col = 0; col < is_col_line.size(); ++col) {
+      // If the cell does not match the player marker, then the line is
+      // no longer possible in this row/col
+      is_row_line[row] =
+        is_row_line[row] && (board.At(row, col).component_ == c);
+      is_col_line[col] =
+        is_col_line[col] && (board.At(row, col).component_ == c);
+    }
+
+    // By now we have processed all columns in this row, so end the search
+    // prematurely if we have a line in this row
+    if (is_row_line[row]) {
+      return true;
+    }
+  }
+
+  // If any of the columns has a line, we are done
+  if (std::find(is_col_line.cbegin(), is_col_line.cend(), true) !=
+      is_col_line.end()) {
+    return true;
+  }
+
+  // If no rows nor columns contain a line, we have to check the two
+  // possible diagonals
+  std::array<bool, 2> is_diag_line;
+  std::fill(is_diag_line.begin(), is_diag_line.end(), true);
+  for (size_t row = 0; row < is_row_line.size(); ++row) {
+    is_diag_line[0] &= board.At(row, row).component_ == c;
+    is_diag_line[1] &=
+      board.At(is_row_line.size() - row - 1, row).component_ == c;
+  }
+
+  return is_diag_line[0] || is_diag_line[1];
 }
 
 void TicTacToeState::DoApplyAction(Action move) {
-  SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
-  board_[move] = PlayerToState(CurrentPlayer());
+  SPIEL_CHECK_EQ(board_.At(move).IsEmpty(), true);
+  board_.At(move).component_ = PlayerToComponent(CurrentPlayer());
   if (HasLine(current_player_)) {
     outcome_ = current_player_;
   }
@@ -102,16 +212,20 @@ void TicTacToeState::DoApplyAction(Action move) {
   num_moves_ += 1;
 }
 
-std::vector<Action> TicTacToeState::LegalActions() const {
-  if (IsTerminal()) return {};
+std::vector<Action> TicTacToeState::LegalActions(const GridBoard &board) const {
   // Can move in any empty cell.
   std::vector<Action> moves;
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    if (board_[cell] == CellState::kEmpty) {
+  for (int cell = 0; cell < board.Size(); ++cell) {
+    if (board.At(cell).IsEmpty()) {
       moves.push_back(cell);
     }
   }
   return moves;
+}
+
+std::vector<Action> TicTacToeState::LegalActions() const {
+  if (IsTerminal()) return {};
+  return LegalActions(board_);
 }
 
 std::string TicTacToeState::ActionToString(Player player,
@@ -123,23 +237,14 @@ bool TicTacToeState::HasLine(Player player) const {
   return BoardHasLine(board_, player);
 }
 
-bool TicTacToeState::IsFull() const { return num_moves_ == kNumCells; }
+bool TicTacToeState::IsFull() const { return num_moves_ == board_.Size(); }
 
-TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game) : State(game) {
-  std::fill(begin(board_), end(board_), CellState::kEmpty);
-}
+TicTacToeState::TicTacToeState(std::shared_ptr<const Game> game, size_t rows,
+                               size_t cols)
+    : State(game), board_(rows, cols) {}
 
 std::string TicTacToeState::ToString() const {
-  std::string str;
-  for (int r = 0; r < kNumRows; ++r) {
-    for (int c = 0; c < kNumCols; ++c) {
-      absl::StrAppend(&str, StateToString(BoardAt(r, c)));
-    }
-    if (r < (kNumRows - 1)) {
-      absl::StrAppend(&str, "\n");
-    }
-  }
-  return str;
+  return board_.ToString();
 }
 
 bool TicTacToeState::IsTerminal() const {
@@ -174,14 +279,14 @@ void TicTacToeState::ObservationTensor(Player player,
   SPIEL_CHECK_LT(player, num_players_);
 
   // Treat `values` as a 2-d tensor.
-  TensorView<2> view(values, {kCellStates, kNumCells}, true);
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    view[{static_cast<int>(board_[cell]), cell}] = 1.0;
+  TensorView<2> view(values, {kCellStates, board_.Size()}, true);
+  for (int cell = 0; cell < board_.Size(); ++cell) {
+    view[{TileToState(board_.At(cell)), cell}] = 1.0;
   }
 }
 
 void TicTacToeState::UndoAction(Player player, Action move) {
-  board_[move] = CellState::kEmpty;
+  board_.At(move).Clear();
   current_player_ = player;
   outcome_ = kInvalidPlayer;
   num_moves_ -= 1;
@@ -195,12 +300,23 @@ std::unique_ptr<State> TicTacToeState::Clone() const {
 
 std::string TicTacToeGame::ActionToString(Player player,
                                           Action action_id) const {
-  return absl::StrCat(StateToString(PlayerToState(player)), "(",
-                      action_id / kNumCols, ",", action_id % kNumCols, ")");
+  return absl::StrCat(PlayerToComponent(player).ToString(), "(",
+                      action_id / cols_, ",", action_id % cols_, ")");
 }
 
 TicTacToeGame::TicTacToeGame(const GameParameters& params)
-    : Game(kGameType, params) {}
+    : Game(kGameType, params),
+      rows_(ParameterValue<int>("rows")),
+      cols_(ParameterValue<int>("columns")) {}
+
+size_t TicTacToeGame::Rows() const {
+  return rows_;
+}
+
+size_t TicTacToeGame::Cols() const {
+  return cols_;
+}
+
 
 }  // namespace tic_tac_toe
 }  // namespace open_spiel

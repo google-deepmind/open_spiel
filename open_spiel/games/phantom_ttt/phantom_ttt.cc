@@ -27,14 +27,6 @@ namespace phantom_ttt {
 namespace {
 
 using tic_tac_toe::kCellStates;
-using tic_tac_toe::kNumCells;
-using tic_tac_toe::kNumCols;
-using tic_tac_toe::kNumRows;
-
-using tic_tac_toe::CellState;
-
-using tic_tac_toe::PlayerToState;
-using tic_tac_toe::StateToString;
 
 // Facts about the game.
 const GameType kGameType{
@@ -93,19 +85,22 @@ ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
     : PhantomTTTGame(params, kImperfectRecallGameType) {}
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
-                                 ObservationType obs_type)
-    : State(game), state_(game), obs_type_(obs_type) {
-  std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
-  std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
+                                 ObservationType obs_type, size_t rows,
+                                 size_t cols)
+    : State(game), state_(game, rows, cols), obs_type_(obs_type),
+      x_view_(rows, cols), o_view_(rows, cols) {
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    // Reserve 0 for the player and 10 as "I don't know."
-    bits_per_action_ = kNumCells + 2;
-    // Longest sequence is 17 moves, e.g. 0011223344556677889
-    longest_sequence_ = 2 * kNumCells - 1;
+    // Reserve 1 bit to select the player and another bit as "I don't know."
+    bits_per_action_ = NumDistinctActions() + 2;
+    // The longest sequence happens when each player perfectly mimics
+    // the moves of the other player, e.g. 0011223344556677889. Once
+    // the last possible action is taken by any of the players, the
+    // game ends (i.e., this action is not mimicable by the other player).
+    longest_sequence_ = 2 * NumDistinctActions() - 1;
   } else {
     SPIEL_CHECK_EQ(obs_type_, ObservationType::kRevealNothing);
-    bits_per_action_ = kNumCells;
-    longest_sequence_ = kNumCells;
+    bits_per_action_ = NumDistinctActions();
+    longest_sequence_ = NumDistinctActions();
   }
 }
 
@@ -115,14 +110,14 @@ void PhantomTTTState::DoApplyAction(Action move) {
   auto& cur_view = cur_player == 0 ? x_view_ : o_view_;
 
   // Two cases: either there is a mark already there, or not.
-  if (state_.BoardAt(move) == CellState::kEmpty) {
+  if (state_.BoardAt(move).IsEmpty()) {
     // No mark on board, so play this normally.
     state_.ApplyAction(move);
   }
 
   // Update current player's view, and action sequence.
-  SPIEL_CHECK_EQ(cur_view[move], CellState::kEmpty);
-  cur_view[move] = state_.BoardAt(move);
+  SPIEL_CHECK_EQ(cur_view.At(move).IsEmpty(), true);
+  cur_view.At(move) = state_.BoardAt(move);
   action_sequence_.push_back(std::pair<int, Action>(cur_player, move));
 
   // Note: do not modify player's turn here, it will have been done above
@@ -131,31 +126,13 @@ void PhantomTTTState::DoApplyAction(Action move) {
 
 std::vector<Action> PhantomTTTState::LegalActions() const {
   if (IsTerminal()) return {};
-  std::vector<Action> moves;
-  const Player player = CurrentPlayer();
-  const auto& cur_view = player == 0 ? x_view_ : o_view_;
-
-  for (Action move = 0; move < kNumCells; ++move) {
-    if (cur_view[move] == CellState::kEmpty) {
-      moves.push_back(move);
-    }
-  }
-
-  return moves;
+  const auto& cur_view = CurrentPlayer() == 0 ? x_view_ : o_view_;
+  return state_.LegalActions(cur_view);
 }
 
 std::string PhantomTTTState::ViewToString(Player player) const {
   const auto& cur_view = player == 0 ? x_view_ : o_view_;
-  std::string str;
-  for (int r = 0; r < kNumRows; ++r) {
-    for (int c = 0; c < kNumCols; ++c) {
-      absl::StrAppend(&str, StateToString(cur_view[r * kNumCols + c]));
-    }
-    if (r < (kNumRows - 1)) {
-      absl::StrAppend(&str, "\n");
-    }
-  }
-  return str;
+  return cur_view.ToString();
 }
 
 std::string PhantomTTTState::ActionSequenceToString(Player player) const {
@@ -197,22 +174,23 @@ void PhantomTTTState::InformationStateTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // First 27 bits encodes the player's view in the same way as TicTacToe.
+  // First bits encodes the player's view in the same way as TicTacToe.
   // Then the action sequence follows (one-hot encoded, per action).
   // Encoded in the same way as InformationStateAsString, so full sequences
   // which may contain action value 10 to represent "I don't know."
   const auto& player_view = player == 0 ? x_view_ : o_view_;
-  SPIEL_CHECK_EQ(values.size(), kNumCells * kCellStates +
+  SPIEL_CHECK_EQ(values.size(), NumDistinctActions() * kCellStates +
                                     longest_sequence_ * bits_per_action_);
   std::fill(values.begin(), values.end(), 0.);
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+  for (int cell = 0; cell < player_view.Size(); ++cell) {
+    values[NumDistinctActions() * TileToState(player_view.At(cell)) + cell] =
+      1.0;
   }
 
   // Now encode the sequence. Each (player, action) pair uses 11 bits:
   //   - first bit is the player taking the action (0 or 1)
   //   - next 10 bits is the one-hot encoded action (10 = "I don't know")
-  int offset = kNumCells * kCellStates;
+  int offset = NumDistinctActions() * kCellStates;
   for (const auto& player_with_action : action_sequence_) {
     if (player_with_action.first == player) {
       // Always include the observing player's actions.
@@ -230,7 +208,7 @@ void PhantomTTTState::InformationStateTensor(Player player,
       // If the number of turns are revealed, then each of the other player's
       // actions will show up as unknowns.
       values[offset] = player_with_action.first;
-      values[offset + 1 + kNumCells] = 1.0;  // I don't know.
+      values[offset + 1 + NumDistinctActions()] = 1.0;  // I don't know.
       offset += bits_per_action_;
     } else {
       // Do not reveal anything about the number of actions taken by opponent.
@@ -256,15 +234,16 @@ void PhantomTTTState::ObservationTensor(Player player,
   SPIEL_CHECK_EQ(values.size(), game_->ObservationTensorSize());
   std::fill(values.begin(), values.end(), 0.);
 
-  // First 27 bits encodes the player's view in the same way as TicTacToe.
+  // First bits encodes the player's view in the same way as TicTacToe.
   const auto& player_view = player == 0 ? x_view_ : o_view_;
-  for (int cell = 0; cell < kNumCells; ++cell) {
-    values[kNumCells * static_cast<int>(player_view[cell]) + cell] = 1.0;
+  for (int cell = 0; cell < player_view.Size(); ++cell) {
+    values[NumDistinctActions() * TileToState(player_view.At(cell)) + cell] =
+      1.0;
   }
 
   // Then a one-hot to represent total number of turns.
   if (obs_type_ == ObservationType::kRevealNumTurns) {
-    values[kNumCells * kCellStates + action_sequence_.size()] = 1.0;
+    values[NumDistinctActions() * kCellStates + action_sequence_.size()] = 1.0;
   }
 }
 
@@ -276,7 +255,8 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
   Action last_move = action_sequence_.back().second;
   SPIEL_CHECK_EQ(last_move, move);
 
-  if (state_.BoardAt(move) == PlayerToState(player)) {
+  if (state_.BoardAt(move).component_ ==
+      tic_tac_toe::PlayerToComponent(player)) {
     // If the board has a mark that is the undoing player, then this was
     // a successful move. Undo as normal.
     state_.UndoAction(player, move);
@@ -284,7 +264,7 @@ void PhantomTTTState::UndoAction(Player player, Action move) {
 
   // Undo the action from that player's view, and pop from the action seq
   auto& player_view = player == 0 ? x_view_ : o_view_;
-  player_view[move] = CellState::kEmpty;
+  player_view.At(move).Clear();
   action_sequence_.pop_back();
 
   history_.pop_back();
@@ -300,14 +280,17 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
   std::string obs_type = ParameterValue<std::string>("obstype");
   if (obs_type == "reveal-nothing") {
     obs_type_ = ObservationType::kRevealNothing;
-    bits_per_action_ = kNumCells;
-    longest_sequence_ = kNumCells;
+    bits_per_action_ = game_->NumDistinctActions();
+    longest_sequence_ = game_->NumDistinctActions();
   } else if (obs_type == "reveal-numturns") {
     obs_type_ = ObservationType::kRevealNumTurns;
-    // Reserve 0 for the player and 10 as "I don't know."
-    bits_per_action_ = kNumCells + 2;
-    // Longest sequence is 17 moves, e.g. 0011223344556677889
-    longest_sequence_ = 2 * kNumCells - 1;
+    // Reserve 1 bit to select the player and another bit as "I don't know."
+    bits_per_action_ = game_->NumDistinctActions() + 2;
+    // The longest sequence happens when each player perfectly mimics
+    // the moves of the other player, e.g. 0011223344556677889. Once
+    // the last possible action is taken by any of the players, the
+    // game ends (i.e., this action is not mimicable by the other player).
+    longest_sequence_ = 2 * game_->NumDistinctActions() - 1;
   } else {
     SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
   }
@@ -315,14 +298,15 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
 
 std::vector<int> PhantomTTTGame::InformationStateTensorShape() const {
   // Enc
-  return {1, kNumCells * kCellStates + longest_sequence_ * bits_per_action_};
+  return {1, game_->NumDistinctActions() * kCellStates +
+      longest_sequence_ * bits_per_action_};
 }
 
 std::vector<int> PhantomTTTGame::ObservationTensorShape() const {
   if (obs_type_ == ObservationType::kRevealNothing) {
-    return {kNumCells * kCellStates};
+    return {game_->NumDistinctActions() * kCellStates};
   } else if (obs_type_ == ObservationType::kRevealNumTurns) {
-    return {kNumCells * kCellStates + longest_sequence_};
+    return {game_->NumDistinctActions() * kCellStates + longest_sequence_};
   } else {
     SpielFatalError("Unknown observation type");
   }

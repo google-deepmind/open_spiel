@@ -33,8 +33,34 @@
 namespace open_spiel {
 namespace ultimate_tic_tac_toe {
 
-constexpr const int kNumSubgames = 9;
+constexpr const int kNumSubRows = 3;
+constexpr const int kNumSubCols = 3;
+constexpr const int kNumSubgames = kNumSubRows * kNumSubCols;
 constexpr Player kUnfinished = kInvalidPlayer - 1;
+
+// This is currently a helper class to allow manipulating strings that
+// represent graphics. This allows easily merging such strings together
+// in a 2D visual space.
+class Display {
+ public:
+  // Create the display based on its string representation.
+  Display(std::string str_representation = "");
+
+  // Add another display's contents to this display, starting the addition
+  // at the provided destination line. If the destination line does not exist
+  // yet it will be created.
+  void Add(size_t dest_line, const Display other);
+
+  // Get the number of lines in this display.
+  size_t Height() const;
+
+  // Convert this display into a string.
+  std::string ToString() const;
+
+ private:
+  // The actual line container.
+  std::vector<std::string> display_;
+};
 
 // State of an in-play game.
 class UltimateTTTState : public State {
@@ -71,8 +97,8 @@ class UltimateTTTState : public State {
 
   // The tic-tac-toe subgames, arranged in the same order as moves.
   const tic_tac_toe::TicTacToeGame* ttt_game_;
-  std::array<std::unique_ptr<State>, tic_tac_toe::kNumCells> local_states_;
-  std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> meta_board_;
+  std::array<std::unique_ptr<State>, kNumSubgames> local_states_;
+  tic_tac_toe::GridBoard meta_board_;
   int current_state_;
 };
 
@@ -80,7 +106,7 @@ class UltimateTTTState : public State {
 class UltimateTTTGame : public Game {
  public:
   explicit UltimateTTTGame(const GameParameters& params);
-  int NumDistinctActions() const override { return tic_tac_toe::kNumCells; }
+  int NumDistinctActions() const override { return kNumSubgames; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new UltimateTTTState(shared_from_this()));
   }
@@ -89,11 +115,12 @@ class UltimateTTTGame : public Game {
   absl::optional<double> UtilitySum() const override { return 0; }
   double MaxUtility() const override { return 1; }
   std::vector<int> ObservationTensorShape() const override {
-    return {tic_tac_toe::kCellStates, tic_tac_toe::kNumCells,
-            tic_tac_toe::kNumRows, tic_tac_toe::kNumCols};
+    std::vector<int> shape{ttt_game_->ObservationTensorShape()};
+    shape.insert(shape.begin(), kNumSubgames);
+    return shape;
   }
   int MaxGameLength() const override {
-    return tic_tac_toe::kNumCells * kNumSubgames;
+    return ttt_game_->MaxGameLength() * kNumSubgames;
   }
 
   const tic_tac_toe::TicTacToeGame* TicTacToeGame() const {

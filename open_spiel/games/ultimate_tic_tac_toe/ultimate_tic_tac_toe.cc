@@ -68,7 +68,7 @@ void UltimateTTTState::DoApplyAction(Action move) {
   if (current_state_ < 0) {
     // Choosing a board.
     SPIEL_CHECK_GE(move, 0);
-    SPIEL_CHECK_LT(move, ttt::kNumCells);
+    SPIEL_CHECK_LT(move, kNumSubgames);
     current_state_ = move;
   } else {
     // Apply action to local state, then apply that move.
@@ -77,10 +77,9 @@ void UltimateTTTState::DoApplyAction(Action move) {
     // Check if it's terminal and mark the outcome in the meta-game.
     if (local_states_[current_state_]->IsTerminal()) {
       Player local_outcome = local_state(current_state_)->outcome();
-      if (local_outcome < 0) {
-        meta_board_[current_state_] = ttt::CellState::kEmpty;
-      } else {
-        meta_board_[current_state_] = ttt::PlayerToState(local_outcome);
+      if (local_outcome >= 0) {
+        meta_board_.At(current_state_).component_ =
+          ttt::PlayerToComponent(local_outcome);
       }
     }
     // Set the next potential local state.
@@ -136,39 +135,97 @@ UltimateTTTState::UltimateTTTState(std::shared_ptr<const Game> game)
     : State(game),
       ttt_game_(
           static_cast<const UltimateTTTGame*>(game.get())->TicTacToeGame()),
+      meta_board_(kNumSubRows, kNumSubCols),
       current_state_(-1) {
-  std::fill(meta_board_.begin(), meta_board_.end(), ttt::CellState::kEmpty);
-  for (int i = 0; i < ttt::kNumCells; ++i) {
+  for (int i = 0; i < local_states_.size(); ++i) {
     local_states_[i] = ttt_game_->NewInitialState();
   }
 }
 
-std::string UltimateTTTState::ToString() const {
-  std::string str;
-  const int rows = ttt::kNumRows * 3;
-  const int cols = ttt::kNumCols * 3;
-  int meta_row = 0;
-  int meta_col = 0;
-  for (int r = 0; r < rows; ++r) {
-    meta_row = r / 3;
-    int local_row = r % 3;
-    for (int c = 0; c < cols; ++c) {
-      meta_col = c / 3;
-      int local_col = c % 3;
-      int state_idx = meta_row * 3 + meta_col;
-      SPIEL_CHECK_GE(state_idx, 0);
-      SPIEL_CHECK_LT(state_idx, local_states_.size());
-      absl::StrAppend(&str, ttt::StateToString(local_state(state_idx)->BoardAt(
-                                local_row, local_col)));
-      if (local_col == 2) {
-        absl::StrAppend(&str, c == 8 ? "\n" : " ");
-      }
-      if (local_row == 2 && r < 8 && c == 8) {
-        absl::StrAppend(&str, "\n");
-      }
+Display::Display(std::string str) {
+  // Convert the line from newline-separated lines to actual tracked lines
+  std::stringstream ss(str);
+  std::string line;
+  while (std::getline(ss, line, '\n')) {
+    display_.push_back(line + "\n");
+  }
+}
+
+void Display::Add(size_t dest_line, const Display other) {
+  // If the line number is within the current display vertical range the lines
+  // are appended to the end of the current line; otherwise, we need to expand
+  // current vertical range
+  if (dest_line + other.display_.size() > display_.size()) {
+    display_.resize(dest_line + other.display_.size());
+  }
+
+  // Merge the lines at the line number
+  for (size_t l = 0; l < other.display_.size(); ++l) {
+    auto &line = display_[dest_line + l];
+
+    // Remove the newline, if any, from the end of the current line, so
+    // that both lines can be merged
+    if (!line.empty() && (line.back() == '\n')) {
+      line = line.substr(0, line.size() - 1);
     }
+    line += other.display_[l];
+  }
+}
+
+size_t Display::Height() const {
+  return display_.size();
+}
+
+std::string Display::ToString() const {
+  std::string str;
+  for (const auto &line : display_) {
+    str += line;
   }
   return str;
+}
+
+std::string UltimateTTTState::ToString() const {
+  Display display;
+
+  // Each sub TTT is separated from the other sub TTTs in the same row by
+  // a space, and is separated from the other sub TTTs in the same col by
+  // a new line
+  for (int meta_row = 0; meta_row < kNumSubRows; ++meta_row) {
+    for (int meta_col = 0; meta_col < kNumSubCols; ++meta_col) {
+      int state_idx = meta_row * kNumSubCols + meta_col;
+      SPIEL_CHECK_GE(state_idx, 0);
+      SPIEL_CHECK_LT(state_idx, local_states_.size());
+
+      // Get the corresponding subgame as a string so that we can add it
+      // to the current display
+      auto str = local_state(state_idx)->ToString();
+
+      // Add this subgame to the display. This assumes that all sub-games
+      // in this row have the same height
+      Display sub_display(str);
+      display.Add(display.Height() -
+                  ((meta_col == 0) ? 0 : sub_display.Height()), sub_display);
+
+      // If this is not the last subgame in this row we have to add a space
+      // to separate this subgame from the next one
+      if (meta_col != (kNumSubCols - 1)) {
+        Display space_display(" ");
+        const auto start_row = display.Height() - sub_display.Height();
+        for (size_t row = 0; row < sub_display.Height(); ++row) {
+          display.Add(start_row + row, space_display);
+        }
+      }
+    }
+
+    // By the end of every row of subgames we add a space, so that each meta
+    // row is visually separated from the others
+    if (meta_row < (kNumSubRows - 1)) {
+      Display space_display("\n");
+      display.Add(display.Height(), space_display);
+    }
+  }
+
+  return display.ToString();
 }
 
 bool UltimateTTTState::IsTerminal() const { return outcome_ != kUnfinished; }
@@ -199,16 +256,21 @@ void UltimateTTTState::ObservationTensor(Player player,
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
 
-  // Treat `values` as a 3-d tensor: 3 x 9 x 9:
-  //   - empty versus x versus o, then
+  SPIEL_CHECK_GT(local_states_.size(), 0);
+  const auto num_cells = local_state(0)->board_.Size();
+
+  // Treat `values` as a 3-d tensor:
+  // num meta cells x number of states x num sub cells:
   //   - local state index, then
-  //   - then 3x3 position within the local board.
-  TensorView<3> view(values, {ttt::kCellStates, ttt::kNumCells, ttt::kNumCells},
+  //   - empty versus x versus o, then
+  //   - then position within the local board.
+  TensorView<3> view(values, {kNumSubgames, ttt::kCellStates, num_cells},
                      /*reset*/true);
-  for (int state = 0; state < ttt::kNumCells; ++state) {
-    for (int cell = 0; cell < ttt::kNumCells; ++cell) {
-      view[{static_cast<int>(local_state(state)->BoardAt(cell)),
-            state, cell}] = 1.0;
+  for (int state = 0; state < kNumSubgames; ++state) {
+    SPIEL_CHECK_EQ(local_state(state)->board_.Size(), num_cells);
+    for (int cell = 0; cell < num_cells; ++cell) {
+      view[{state, TileToState(local_state(state)->BoardAt(cell)),
+            cell}] = 1.0;
     }
   }
 }
@@ -220,9 +282,10 @@ UltimateTTTState::UltimateTTTState(const UltimateTTTState& other)
       current_player_(other.current_player_),
       outcome_(other.outcome_),
       ttt_game_(other.ttt_game_),
+      meta_board_(other.meta_board_),
       current_state_(other.current_state_) {
-  for (int i = 0; i < ttt::kNumCells; ++i) {
-    meta_board_[i] = other.meta_board_[i];
+  SPIEL_CHECK_EQ(local_states_.size(), other.local_states_.size());
+  for (int i = 0; i < local_states_.size(); ++i) {
     local_states_[i] = other.local_states_[i]->Clone();
   }
 }
