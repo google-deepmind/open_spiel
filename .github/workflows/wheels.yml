@@ -82,20 +82,23 @@ jobs:
           [[ "${OS_TYPE}" = "Darwin" ]] && ./install.sh `which python${OS_PYTHON_VERSION}`
           [[ "${OS_TYPE}" = "Linux" ]] && ./install.sh `which python3`
           # These are necessary to install what is necessary for the build and for the full tests below.
-          ${CI_PYBIN} -m pip install --upgrade pip
-          ${CI_PYBIN} -m pip --version
-          [[ "${OS_TYPE}" = "Darwin" ]] && ${CI_PYBIN} -m pip install pipx
-          ${CI_PYBIN} -m pip install --upgrade setuptools
-          ${CI_PYBIN} -m pip install --upgrade -r requirements.txt -q
-          source ./open_spiel/scripts/python_extra_deps.sh ${CI_PYBIN}
-          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
-          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
-          ${CI_PYBIN} -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
-          ${CI_PYBIN} -m pip install twine
-          ${CI_PYBIN} -m pip install cibuildwheel==2.22.0
+          ${CI_PYBIN} -m venv ./venv
+          source ./venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip --version
+          [[ "${OS_TYPE}" = "Darwin" ]] && python -m pip install pipx
+          python -m pip install --upgrade setuptools
+          python -m pip install --upgrade -r requirements.txt -q
+          source ./open_spiel/scripts/python_extra_deps.sh python
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
+          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
+          python -m pip install twine
+          python -m pip install cibuildwheel==2.22.0
       - name: Build sdist
         run: |
+          source ./venv/bin/activate
           pipx run build --sdist
           twine check dist/*.tar.gz
 
@@ -104,14 +107,17 @@ jobs:
       - name: Build bdist_wheel and run tests
         run: |
           [[ "${OS_TYPE}" = "Darwin" ]] && xcodebuild -version
-          ${CI_PYBIN} -m cibuildwheel --output-dir wheelhouse
+          source ./venv/bin/activate
+          python -m cibuildwheel --output-dir wheelhouse
           ls -l wheelhouse
 
       # Install the built wheel and run the full tests on this host. The full
       # tests include all the ones that use the machine learning libraries,
       # such as Tensorflow, PyTorch, and JAX.
       - name: Install bdist_wheel and full tests
-        run: ./open_spiel/scripts/test_wheel.sh full `pwd` ${CI_PYBIN}
+        run: |
+          source ./venv/bin/activate
+          ./open_spiel/scripts/test_wheel.sh full `pwd` python
 
       - uses: actions/upload-artifact@v4
         with:
