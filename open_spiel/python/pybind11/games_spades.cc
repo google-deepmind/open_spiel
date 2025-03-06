@@ -24,9 +24,6 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::spades::SpadesGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::spades::SpadesState);
-
 namespace open_spiel {
 
 namespace py = ::pybind11;

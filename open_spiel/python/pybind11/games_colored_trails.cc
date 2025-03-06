@@ -32,9 +32,6 @@ using open_spiel::colored_trails::kDefaultNumColors;
 using open_spiel::colored_trails::kNumChipsLowerBound;
 using open_spiel::colored_trails::kNumChipsUpperBound;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(ColoredTrailsGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(ColoredTrailsState);
-
 void open_spiel::init_pyspiel_games_colored_trails(py::module& m) {
   m.attr("NUM_COLORS") = py::int_(kDefaultNumColors);
   m.attr("NUM_CHIPS_LOWER_BOUND") = py::int_(kNumChipsLowerBound);

@@ -27,9 +27,6 @@
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11_abseil/absl_casters.h"
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::gin_rummy::GinRummyGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::gin_rummy::GinRummyState);
-
 namespace open_spiel {
 
 namespace py = ::pybind11;

@@ -24,8 +24,6 @@ using open_spiel::State;
 using open_spiel::backgammon::BackgammonState;
 using open_spiel::backgammon::CheckerMove;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(BackgammonState);
-
 void open_spiel::init_pyspiel_games_backgammon(py::module& m) {
   py::class_<CheckerMove>(m, "CheckerMove")
       .def_readwrite("pos", &CheckerMove::pos)
