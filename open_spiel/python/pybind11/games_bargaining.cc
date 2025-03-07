@@ -26,9 +26,6 @@ using open_spiel::bargaining::BargainingState;
 using open_spiel::bargaining::Instance;
 using open_spiel::bargaining::Offer;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(BargainingGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(BargainingState);
-
 void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
   py::class_<Instance>(m, "Instance")
       .def(py::init<>())

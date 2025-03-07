@@ -24,8 +24,6 @@ using open_spiel::State;
 using open_spiel::leduc_poker::LeducState;
 using open_spiel::leduc_poker::ActionType;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(LeducState);
-
 void open_spiel::init_pyspiel_games_leduc_poker(py::module& m) {
   py::module_ leduc_poker = m.def_submodule("leduc_poker");
 

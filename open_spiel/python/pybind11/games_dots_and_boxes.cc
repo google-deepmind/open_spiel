@@ -20,7 +20,6 @@
 
 #include "open_spiel/games/dots_and_boxes/dots_and_boxes.h"
 #include "open_spiel/spiel.h"
-#include "pybind11/include/pybind11/smart_holder.h"
 #include "pybind11/include/pybind11/pybind11.h"
 
 
@@ -28,8 +27,6 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::dots_and_boxes::DotsAndBoxesState;
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(DotsAndBoxesState);
 
 void open_spiel::init_pyspiel_games_dots_and_boxes(py::module& m) {
   py::classh<DotsAndBoxesState, State>(m, "DotsAndBoxesState")
