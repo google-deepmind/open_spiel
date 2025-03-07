@@ -23,8 +23,6 @@ using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::negotiation::NegotiationState;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(NegotiationState);
-
 void open_spiel::init_pyspiel_games_negotiation(py::module& m) {
   py::classh<NegotiationState, State>(m, "NegotiationState")
       .def("item_pool",

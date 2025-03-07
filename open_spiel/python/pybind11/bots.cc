@@ -34,7 +34,6 @@
 #include "pybind11/include/pybind11/detail/common.h"
 #include "pybind11/include/pybind11/pybind11.h"
 #include "pybind11/include/pybind11/pytypes.h"
-#include "pybind11/include/pybind11/smart_holder.h"
 
 // Optional headers.
 #if OPEN_SPIEL_BUILD_WITH_ROSHAMBO

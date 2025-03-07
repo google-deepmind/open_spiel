@@ -24,9 +24,6 @@ using open_spiel::State;
 using open_spiel::tiny_bridge::TinyBridgeAuctionState;
 using open_spiel::tiny_bridge::TinyBridgePlayState;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(TinyBridgePlayState);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(TinyBridgeAuctionState);
-
 void open_spiel::init_pyspiel_games_tiny_bridge(py::module& m) {
   py::classh<TinyBridgePlayState, State>(m, "TinyBridgePlayState")
       // Pickle support

@@ -27,8 +27,6 @@ using open_spiel::State;
 using open_spiel::tic_tac_toe::CellState;
 using open_spiel::tic_tac_toe::TicTacToeState;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(TicTacToeState);
-
 void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
   py::module_ tic_tac_toe = m.def_submodule("tic_tac_toe");
 
