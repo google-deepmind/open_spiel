@@ -20,9 +20,6 @@
 #include "open_spiel/python/pybind11/pybind11.h"
 #include "open_spiel/spiel.h"
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::bridge::BridgeGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::bridge::BridgeState);
-
 namespace open_spiel {
 
 namespace py = ::pybind11;

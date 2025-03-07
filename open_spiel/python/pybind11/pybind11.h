@@ -37,10 +37,6 @@
 #include "pybind11/include/pybind11/smart_holder.h"  // IWYU pragma: keep
 #include "pybind11/include/pybind11/stl.h"  // IWYU pragma: keep
 
-// Runtime errors happen if we're inconsistent about whether or not a type has
-// PYBIND11_SMART_HOLDER_TYPE_CASTERS applied to it or not. So we do it mostly
-// in one place to help with consistency.
-
 namespace open_spiel {
 
 class Policy;
@@ -66,20 +62,6 @@ class ISMCTSBot;
 }  // namespace algorithms
 
 }  // namespace open_spiel
-
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::State);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Game);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Policy);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::TabularPolicy);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::PartialTabularPolicy);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::UniformPolicy);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::PreferredActionPolicy);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::NormalFormGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::matrix_game::MatrixGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::tensor_game::TensorGame);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::Bot);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::algorithms::MCTSBot);
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(open_spiel::algorithms::ISMCTSBot);
 
 namespace open_spiel {
 // Trampoline helper class to allow implementing Bots in Python. See

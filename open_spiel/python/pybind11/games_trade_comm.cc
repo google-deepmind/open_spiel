@@ -23,7 +23,6 @@ using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::trade_comm::TradeCommState;
 
-PYBIND11_SMART_HOLDER_TYPE_CASTERS(TradeCommState);
 void open_spiel::init_pyspiel_games_trade_comm(py::module& m) {
   py::classh<TradeCommState, State>(m, "TradeCommState")
       // Pickle support
