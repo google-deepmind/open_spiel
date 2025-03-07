@@ -109,6 +109,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_spades.h
   pybind11/games_tarok.cc
   pybind11/games_tarok.h
+  pybind11/games_tic_tac_toe.cc
+  pybind11/games_tic_tac_toe.h
   pybind11/games_tiny_bridge.cc
   pybind11/games_tiny_bridge.h
   pybind11/games_trade_comm.cc
@@ -244,6 +246,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py
   tests/games_sim_test.py
+  tests/games_tic_tac_toe_test.py
   tests/policy_test.py
   tests/pyspiel_test.py
   tests/rl_environment_test.py

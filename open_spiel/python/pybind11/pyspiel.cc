@@ -44,6 +44,7 @@
 #include "open_spiel/python/pybind11/games_negotiation.h"
 #include "open_spiel/python/pybind11/games_spades.h"
 #include "open_spiel/python/pybind11/games_tarok.h"
+#include "open_spiel/python/pybind11/games_tic_tac_toe.h"
 #include "open_spiel/python/pybind11/games_tiny_bridge.h"
 #include "open_spiel/python/pybind11/games_trade_comm.h"
 #include "open_spiel/python/pybind11/observer.h"
@@ -656,6 +657,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_games_negotiation(m);  // Negotiation game.
   init_pyspiel_games_spades(m);       // Game-specific functions for spades.
   init_pyspiel_games_tarok(m);   // Game-specific functions for tarok.
+  init_pyspiel_games_tic_tac_toe(m);  // Tic-Tac-Toe game.
   init_pyspiel_games_tiny_bridge(
       m);                            // Game-specific functions for tiny_bridge.
   init_pyspiel_games_trade_comm(m);  // Game-specific functions for trade_comm.

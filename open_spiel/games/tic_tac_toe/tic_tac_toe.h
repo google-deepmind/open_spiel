@@ -70,6 +70,7 @@ class TicTacToeState : public State {
   std::unique_ptr<State> Clone() const override;
   void UndoAction(Player player, Action move) override;
   std::vector<Action> LegalActions() const override;
+  std::vector<CellState> Board() const;
   CellState BoardAt(int cell) const { return board_[cell]; }
   CellState BoardAt(int row, int column) const {
     return board_[row * kNumCols + column];

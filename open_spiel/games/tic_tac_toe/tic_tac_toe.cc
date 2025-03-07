@@ -92,6 +92,12 @@ bool BoardHasLine(const std::array<CellState, kNumCells>& board,
          (board[2] == c && board[4] == c && board[6] == c);
 }
 
+std::vector<CellState> TicTacToeState::Board() const {
+  std::vector<CellState> board(board_.begin(), board_.end());
+  return board;
+}
+
+
 void TicTacToeState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(board_[move], CellState::kEmpty);
   board_[move] = PlayerToState(CurrentPlayer());
