@@ -19,7 +19,9 @@
 #include <string>
 #include <vector>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // A simple game that includes chance and imperfect information
 // http://en.wikipedia.org/wiki/Blackjack
@@ -66,6 +68,7 @@ class BlackjackState : public State {
 
  private:
   void MaybeApplyDealerAction();
+  std::string StateToString(bool show_all_dealers_card) const;
 
   // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
 
