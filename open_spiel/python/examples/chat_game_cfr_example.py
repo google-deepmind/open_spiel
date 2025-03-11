@@ -37,18 +37,10 @@ from open_spiel.python.games import chat_game  # pylint: disable=unused-import
 from open_spiel.python.games.chat_games import chat_game_base
 
 from open_spiel.python.games.chat_games.configs import config_debate
-from open_spiel.python.games.chat_games.configs import config_debate_fixed
-
 from open_spiel.python.games.chat_games.configs import config_schedule_meeting_w_dow
-from open_spiel.python.games.chat_games.configs import config_schedule_meeting_w_dow_fixed
-
 from open_spiel.python.games.chat_games.configs import config_schedule_meeting_w_tone
-from open_spiel.python.games.chat_games.configs import config_schedule_meeting_w_tone_fixed
-
 from open_spiel.python.games.chat_games.configs import config_trade_fruit_w_tone
-from open_spiel.python.games.chat_games.configs import config_trade_fruit_w_tone_fixed
 
-from open_spiel.python.games.chat_games.envs.base_envs import debate_with_style_info as env_debate_with_style_info
 from open_spiel.python.games.chat_games.envs.comm_substrates import schedules
 
 from open_spiel.python.games.chat_games.utils import test_utils as chat_test_utils
@@ -72,15 +64,13 @@ class Domain(enum.StrEnum):
 
 def new_debate_scenario_config(
     config: ml_collections.config_dict.ConfigDict,
-    game: pyspiel.Game,
     game_id: int,
 ) -> ml_collections.config_dict.ConfigDict:
-  """Creates a new debate scenario config.
+  """Creates a new debate scenario config with a new topic.
 
   Arguments:
-    config: the original debate scenario config dict (contains
-      config.game.initial_scenario)
-    game: pyspiel.Game used for generating random names of debaters
+    config: the original debate scenario config dict (this should contain
+      examples for generating new scenarios)
     game_id: int, will index into set of 20 debate topics found in
       https://www.englishclub.com/speaking/agreeing-disagreeing-topics.php
   Returns:
@@ -110,45 +100,25 @@ def new_debate_scenario_config(
             "The government should pay for post secondary education."]
 
   topic = topics[game_id]
-  given_names, _, _ = game.generate_scenario()
-
-  config.game.given_names = list(given_names)
   config.game.given_private_info["topic"] = [topic, topic]
-  initial_scenario = env_debate_with_style_info.Scenario(
-      config.game.initial_scenario.msg,
-      given_names[0],
-      given_names[1],
-      config.game.initial_scenario.style,
-      topic,
-      config.game.initial_scenario.info)
-  config.game.initial_scenario = initial_scenario
 
   return config
 
 
-def new_scenario_config(
+def same_scenario_config(
     config: ml_collections.config_dict.ConfigDict,
-    game: pyspiel.Game,
     game_id: int,
 ) -> ml_collections.config_dict.ConfigDict:
-  """Creates a new scenario config.
+  """Dummy function for games that don't need any config modification.
 
   Arguments:
-    config: the original game scenario config dict (contains
-      config.game.initial_scenario)
-    game: pyspiel.Game, game.generate_scenario will be used to create new config
+    config: the original game scenario config dict (this should contain
+      examples for generating new scenarios)
     game_id: int, unused
   Returns:
-    new_config: game config with redefined initial scenario
+    new_config: original game config
   """
   del game_id
-
-  (given_names, given_private_info, initial_scenario
-   ) = game.generate_scenario()
-
-  config.game.given_names = list(given_names)
-  config.game.given_private_info = given_private_info
-  config.game.initial_scenario = initial_scenario
 
   return config
 
@@ -156,7 +126,6 @@ def new_scenario_config(
 def get_config_debate(config: ml_collections.config_dict.ConfigDict):
   """Get config for imitation dataset construction of debates."""
 
-  config.config_fixed = config_debate_fixed.get_config()
   config.config_rnd = config_debate.get_config()
   config.new_config = new_debate_scenario_config
 
@@ -168,9 +137,8 @@ def get_config_trade_fruit_w_tone(
 ):
   """Get config for imitation dataset construction of trading fruit."""
 
-  config.config_fixed = config_trade_fruit_w_tone_fixed.get_config()
   config.config_rnd = config_trade_fruit_w_tone.get_config()
-  config.new_config = new_scenario_config
+  config.new_config = same_scenario_config
 
   return config
 
@@ -180,9 +148,8 @@ def get_config_schedule_meeting_w_dow(
 ):
   """Get config for imitation dataset construction of meeting scheduling dow."""
 
-  config.config_fixed = config_schedule_meeting_w_dow_fixed.get_config()
   config.config_rnd = config_schedule_meeting_w_dow.get_config()
-  config.new_config = new_scenario_config
+  config.new_config = same_scenario_config
 
   return config
 
@@ -192,9 +159,8 @@ def get_config_schedule_meeting_w_tone(
 ):
   """Get config for imitation dataset construction of meeting scheduling dow."""
 
-  config.config_fixed = config_schedule_meeting_w_tone_fixed.get_config()
   config.config_rnd = config_schedule_meeting_w_tone.get_config()
-  config.new_config = new_scenario_config
+  config.new_config = same_scenario_config
 
   return config
 
@@ -346,9 +312,10 @@ class ImitationDatasetConstructor():
     self.num_demos = config.num_demos
     self.num_iters = config.num_iters
     self.domain = config.domain.value
-    self.config_fixed = config.config_fixed
     self.config_rnd = config.config_rnd
     self.new_config = config.new_config
+
+    self._rnd = np.random.RandomState(self.seed)
 
     self.reporting = ImitationDatasetConstructorReporting(
         save_path=self.save_path,
@@ -469,35 +436,21 @@ class ImitationDatasetConstructor():
   def construct_dataset(self):
     """Construct a dataset of (observation, optimal strategy) for imitation."""
 
-    np.random.seed(self.seed)
-
-    config = self.config_rnd
-
-    logging.info("Loading game %s", self.game_string)
-    game_rnd = pyspiel.load_game(self.game_string, config.params.to_dict())
-
     logging.info("Building vectorizer")
     vectorizer = chat_test_utils.MockVectorizer()
     vectorize = vectorizer.vectorize
 
-    logging.info("Loading chat game")
-    game_rnd.load_chat_game(llm_type=LLM_TYPE,
-                            vectorize=vectorize,
-                            seed=self.seed,
-                            **config.game)
-
-    config = self.config_fixed
-
     for demo in range(self.num_demos):
       logging.info("Creating new config for demo %d", demo)
 
-      config = self.new_config(config, game_rnd, self.game_id)
+      config = self.new_config(self.config_rnd, self.game_id)
 
       game = pyspiel.load_game(self.game_string, config.params.to_dict())
 
+      seed = self._rnd.randint(42, 12345 + 1)
       game.load_chat_game(llm_type=LLM_TYPE,
                           vectorize=vectorize,
-                          seed=self.seed,
+                          seed=seed,
                           **config.game)
 
       game_cached = pyspiel.convert_to_cached_tree(game)
