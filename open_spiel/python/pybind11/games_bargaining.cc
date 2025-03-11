@@ -27,6 +27,12 @@ using open_spiel::bargaining::Instance;
 using open_spiel::bargaining::Offer;
 
 void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
+  py::module_ bargaining = m.def_submodule("bargaining");
+  bargaining.attr("NumItemTypes") = &bargaining::kNumItemTypes;
+  bargaining.attr("PoolMinNumItems") = &bargaining::kPoolMinNumItems;
+  bargaining.attr("PoolMaxNumItems") = &bargaining::kPoolMaxNumItems;
+  bargaining.attr("TotalValueAllItems") = &bargaining::kTotalValueAllItems;
+
   py::class_<Instance>(m, "Instance")
       .def(py::init<>())
       .def_readwrite("pool", &Instance::pool)
@@ -55,7 +61,11 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
           }));
 
   py::classh<BargainingGame, Game>(m, "BargainingGame")
+    .def("max_turns", &BargainingGame::max_turns)
+    .def("discount", &BargainingGame::discount)
+    .def("prob_end", &BargainingGame::prob_end)
     .def("all_instances", &BargainingGame::AllInstances)
+    .def("all_offers", &BargainingGame::AllOffers)
     // get_offer_by_quantities(quantities: List[int]). Returns a tuple
     // of (offer, OpenSpiel action)
     .def("get_offer_by_quantities", &BargainingGame::GetOfferByQuantities)
