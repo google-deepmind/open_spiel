@@ -16,12 +16,21 @@
 
 #include <sys/types.h>
 
+#include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <numeric>
 #include <string>
-#include <utility>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace blackjack {
@@ -36,6 +45,9 @@ constexpr int kAceValue = 1;
 // without exceeding it.
 constexpr int kApproachScore = 21;
 constexpr int kInitialCardsPerPlayer = 2;
+
+const char kSuitNames[kNumSuits + 1] = "CDHS";
+const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
 
 // Facts about the game
 const GameType kGameType{/*short_name=*/"blackjack",
@@ -60,15 +72,27 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
+std::string CardToString(int card) {
+  return std::string(1, kSuitNames[card / kCardsPerSuit]) +
+         std::string(1, kRanks[card % kCardsPerSuit]);
+}
+
+std::vector<std::string> CardsToStrings(const std::vector<int>& cards,
+                                        int start_index = 0) {
+  std::vector<std::string> card_strings;
+  card_strings.reserve(cards.size());
+  for (int i = start_index; i < cards.size(); ++i) {
+    card_strings.push_back(CardToString(cards[i]));
+  }
+  return card_strings;
+}
 }  // namespace
 
 std::string BlackjackState::ActionToString(Player player,
                                            Action move_id) const {
   if (player == kChancePlayerId) {
-    const char kSuitNames[kNumSuits + 1] = "CDHS";
-    const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
-    return std::string(1, kSuitNames[move_id / kCardsPerSuit]) +
-           std::string(1, kRanks[move_id % kCardsPerSuit]);
+    return CardToString(move_id);
   } else if (move_id == ActionType::kHit) {
     return "Hit";
   } else {
@@ -106,7 +130,7 @@ std::vector<double> BlackjackState::Returns() const {
 std::string BlackjackState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, game_->NumPlayers());
-  return ToString();
+  return StateToString(cur_player_ < DealerId());
 }
 
 void BlackjackState::ObservationTensor(Player player,
@@ -300,10 +324,24 @@ ActionsAndProbs BlackjackState::ChanceOutcomes() const {
 }
 
 std::string BlackjackState::ToString() const {
-  return absl::StrCat("Non-Ace Total: ", absl::StrJoin(non_ace_total_, " "),
-                      " Num Aces: ", absl::StrJoin(num_aces_, " "),
-                      (cur_player_ == kChancePlayerId ? ", Chance Player\n"
-                                                      : ", Player's Turn\n"));
+  return StateToString(/*show_all_dealers_card=*/true);
+}
+
+std::string BlackjackState::StateToString(bool show_all_dealers_card) const {
+  std::vector<int> players;
+
+  std::string result = absl::StrCat("cur_player: ", cur_player_, "\n");
+  absl::StrAppend(&result, "Player(s) card info (Dealer is player 1)\n");
+  for (int p = 0; p <= NumPlayers(); ++p) {
+    absl::StrAppend(&result, "Player ", p, ":\n");
+    // Don't show dealer's first card if we're not showing all of them.
+    int start_index = (p == 1 && !show_all_dealers_card ? 1 : 0);
+    absl::StrAppend(&result, "Cards: ",
+                    absl::StrJoin(CardsToStrings(cards_[p], start_index), " "),
+                    "\n");
+  }
+
+  return result;
 }
 
 std::unique_ptr<State> BlackjackState::Clone() const {
