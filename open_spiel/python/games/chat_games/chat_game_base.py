@@ -65,6 +65,7 @@ VEC_SIZE = 100  # int, length of vector returned by `vectorize` on string input
 
 DEFAULT_PARAMS = {'num_distinct_actions': 2,
                   'num_llm_seeds': 1,
+                  'num_init_states': 1,
                   'num_players': MIN_PLAYERS,
                   'players': 0,  # open_spiel tests use this for `num_players`
                   'min_utility': -10.0,
@@ -95,28 +96,99 @@ GAME_TYPE = pyspiel.GameType(
         **GAME_TYPE_KWARGS)
 
 
+@dataclasses.dataclass(frozen=True)
+class InitialStateConfiguration:
+  """Constructor.
+
+  Attributes:
+    actions: dict, {'player_names': list of str,
+                    <prompt_action_i>: list of str,
+                    ...}
+    seeds: list of ints, llm seeds (chance nodes)
+    scenario_prompt: str, initial message with header (no tone)
+    private_info: dict mapping info-type to list of str, one for each player
+      i.e., private (prior) info available to each player
+  """
+  actions: OrderedDict[str, List[str]]
+  seeds: List[int]
+  scenario_prompt: str
+  private_info: OrderedDict[str, List[str]]
+
+
 class ChatGameState(pyspiel.State):
   """Chat game state."""
 
   def __init__(self,
                game: ...,
-               actions: OrderedDict[str, List[str]],
-               seeds: List[int],
-               scenario_prompt: str,
-               private_info: OrderedDict[str, List[str]]):
+               init_state_configs: Tuple[InitialStateConfiguration, ...]):
     """Constructor.
 
     Args:
       game: see ChatGame class (should inherit from BaseChatGame)
-      actions: dict, {'player_names': list of str,
-                      <prompt_action_i>: list of str,
-                      ...}
-      seeds: list of ints, llm seeds (chance nodes)
-      scenario_prompt: str, initial message with header (no tone)
-      private_info: dict mapping info-type to list of str, one for each player
-        i.e., private (prior) info available to each player
+      init_state_configs: tuple of InitialStateConfiguration objects
+        one will be selected at random to initialize the game
     """
     super().__init__(game)  # access game with self.get_game()
+
+    self._init_state_configs = init_state_configs
+
+    # Init empty game w/ init_state_configs[0]. Overwrite later in game setup.
+    self._init_empty_game(init_state_configs[0])
+    self._game_setup = False
+
+    self._llm_termination = False
+
+    self._rnd = self.get_game().rnd
+
+    self._played_actions = []
+    self._current_speaker = 1
+    self._current_player = 1
+    self._speakers = []
+    self._num_actions_played = 0
+    self._returns = None
+    self._player_action = None
+
+  def _init_empty_game(self, init_state_config: InitialStateConfiguration):
+    """Initialize an empty game.
+
+    Args:
+      init_state_config: InitialStateConfiguration object
+    """
+    actions = init_state_config.actions
+    seeds = init_state_config.seeds
+    private_info = init_state_config.private_info
+
+    self._num_actions = tuple([0 for _ in actions.values()])
+    prompt_action_vals = [
+        '' for _ in self.get_game().header.action_keys
+    ]
+    self._prompt_actions = OrderedDict(zip(self.get_game().header.action_keys,
+                                           prompt_action_vals))
+    self._names = ['' for _ in actions['player_names']]
+
+    self._llm_seeds = [0 for _ in seeds]
+    assert self.get_game().num_llm_seeds == len(self._llm_seeds)
+
+    self._scenario_prompt = ''
+
+    empty_pi_vals = []
+    for pi in private_info.values():
+      empty_player_pi = ['' for _ in pi]
+      empty_pi_vals.append(empty_player_pi)
+    self._private_info = OrderedDict(zip(private_info.keys(), empty_pi_vals))
+
+    self._dialogue = ['']
+
+  def _setup_game(self, init_state_config: InitialStateConfiguration):
+    """Set up the game.
+
+    Args:
+      init_state_config: InitialStateConfiguration object
+    """
+    actions = init_state_config.actions
+    seeds = init_state_config.seeds
+    scenario_prompt = init_state_config.scenario_prompt
+    private_info = init_state_config.private_info
 
     self._num_actions = tuple([len(a) for a in actions.values()])
     prompt_action_vals = [
@@ -133,26 +205,18 @@ class ChatGameState(pyspiel.State):
 
     self._private_info = private_info
 
-    self._llm_termination = False
-
-    self._rnd = self.get_game().rnd
-
-    self._played_actions = []
     self._dialogue = [scenario_prompt]
-    self._current_speaker = 1
-    self._current_player = 1
-    self._speakers = []
-    self._num_actions_played = 0
-    self._returns = None
-    self._player_action = None
 
   def __str__(self):
     """String for debug purposes. No particular semantics are required."""
-    return self._dialogue[-1]
+    if not self._game_setup:
+      return 'Setting up game...'
+    else:
+      return self._dialogue[-1]
 
   def _unravel_flat_action(self, action: int) -> Tuple[int, ...]:
     """Returns an action tuple with action types separated.
-    
+
     Args:
       action: int
     Returns:
@@ -167,7 +231,7 @@ class ChatGameState(pyspiel.State):
                           msg: str,
                           player_str: str) -> str:
     """Construct prompt for LLM to perform sentiment analysis.
-    
+
     Args:
       payoff_query: str, query to be formatted for llm
       msg: str, message to be analyzed
@@ -199,7 +263,7 @@ class ChatGameState(pyspiel.State):
   def _names_from_validated_receiver(self, receiver: int, speaker: int
                                      ) -> Tuple[Tuple[str, str, str], int]:
     """Modify receiver if sending to self. Then return names of all roles.
-    
+
     Args:
       receiver: integer action indicating receiver to send message to
       speaker: integer representing current message sender
@@ -240,24 +304,28 @@ class ChatGameState(pyspiel.State):
 
   def _apply_action(self, action: int):
     """Reply to dialogue (for agents).
-    
+
     Unravel action into to tuple (who to speak to, seed to use, etc.). Then
     simulate action.
-    
+
     Args:
       action: int
     """
     if self.is_chance_node():
-      # action is an index into the list of seeds
-      # use this to write the message for the previous player
-      seed = self._llm_seeds[action]
-      assert self._player_action is not None
-      self._player_action = self._player_action or 0
-      self._played_actions.append(self._player_action)
-      speaker_msg = self.action_to_msg(action=self._player_action, seed=seed)
-      self._apply_msg(speaker_msg)
-      if self.get_game().llm_termination_prompt:
-        self._llm_termination = self._llm_is_terminal()
+      if self._game_setup:
+        # action is an index into the list of seeds
+        # use this to write the message for the previous player
+        seed = self._llm_seeds[action]
+        assert self._player_action is not None
+        self._player_action = self._player_action or 0
+        self._played_actions.append(self._player_action)
+        speaker_msg = self.action_to_msg(action=self._player_action, seed=seed)
+        self._apply_msg(speaker_msg)
+        if self.get_game().llm_termination_prompt:
+          self._llm_termination = self._llm_is_terminal()
+      else:
+        self._setup_game(self._init_state_configs[action])
+        self._game_setup = True
     else:
       # record the action and save it to be played at chance node
       self._player_action = action
@@ -266,7 +334,7 @@ class ChatGameState(pyspiel.State):
 
   def _apply_msg(self, speaker_msg: str):
     """Update dialogue history, increment curr player, and update is_terminal.
-    
+
     Args:
       speaker_msg: str
     """
@@ -285,7 +353,7 @@ class ChatGameState(pyspiel.State):
 
   def apply_msg(self, speaker_msg: str):
     """Reply to dialogue (for human players and interventions).
-    
+
     Args:
       speaker_msg: str
     """
@@ -299,7 +367,7 @@ class ChatGameState(pyspiel.State):
                        header: header_utils.Header
                        ) -> Tuple[str, str]:
     """Unravel action int to multidimensional action tuple and construct prompt.
-    
+
     Args:
       action: int, the action taken in the game
       seed: int, llm seed
@@ -334,7 +402,7 @@ class ChatGameState(pyspiel.State):
 
   def action_to_msg(self, action: int, seed: int) -> str:
     """Unravel action int to multidimensional action tuple and construct msg.
-    
+
     Args:
       action: int, the action taken in the game
       seed: int, llm seed
@@ -379,7 +447,7 @@ class ChatGameState(pyspiel.State):
 
   def compute_rewards(self, dialogue: str) -> np.ndarray:
     """Compute rewards for each player from a given dialogue string.
-    
+
     Args:
       dialogue: str, a single string with the entire dialogue thus far
     Returns:
@@ -471,7 +539,8 @@ class ChatGameState(pyspiel.State):
     """Returns id of the next player to move, or TERMINAL if game is over."""
     if self.is_terminal():
       return pyspiel.PlayerId.TERMINAL
-    elif self._player_action is not None:  # if int, an LLM msg is to be sampled
+    elif (self._player_action is not None or  # if int, LLM msg is to be sampled
+          not self._game_setup):
       return pyspiel.PlayerId.CHANCE
     else:
       return self._current_player
@@ -487,14 +556,20 @@ class ChatGameState(pyspiel.State):
   def chance_outcomes(self):
     """Returns the possible chance outcomes and their probabilities."""
     assert self.is_chance_node()
-    outcomes = range(self.get_game().num_llm_seeds)
+    if self._game_setup:
+      outcomes = range(self.get_game().num_llm_seeds)
+    else:
+      outcomes = range(self.get_game().num_init_states)
     p = 1.0 / len(outcomes)
     return [(o, p) for o in outcomes]
 
   def _action_to_string(self, player, action):
     """Action -> string."""
     if player == pyspiel.PlayerId.CHANCE:
-      return f'Sampled LLM seed: {action}'
+      if self._game_setup:
+        return f'Sampled LLM seed: {action}'
+      else:
+        return f'Sampled init state: {action}'
     else:
       action_unraveled = self.unravel_flat_action_to_dict(player, action)
       action_dict = action_unraveled['action']
@@ -562,7 +637,7 @@ class ChatGameObserverBase:
                iig_obs_type: pyspiel.IIGObservationType,
                params: Union[Dict[str, Any], None]):
     """Initializes an empty observation tensor.
-    
+
     Args:
       iig_obs_type: a pyspiel.IIGObservationType
       params: unused
@@ -756,7 +831,7 @@ class BaseChatGame(pyspiel.Game):
       params: Dict[str, Any] = DEFAULT_PARAMS,
   ):
     """Constructor.
-    
+
     BaseChatGame is meant to be inherited from. Do not call its init directly.
 
     Args:
@@ -764,6 +839,7 @@ class BaseChatGame(pyspiel.Game):
 
         num_distinct_actions- int, # of actions at each info set
         num_llm_seeds- int, # of seeds to use for generating LLM response
+        num_init_states- int, # of game setups / configurations / scenarios
         num_players- int, # of speakers (action: recipient) on the message chain
         players- int, # of speakers (action: recipient) on the message chain
           OPTIONAL. ONLY USED FOR INTERNAL OPEN_SPIEL TESTING!
@@ -782,6 +858,7 @@ class BaseChatGame(pyspiel.Game):
     else:
       self._num_players = params['num_players']
     self._num_llm_seeds = params['num_llm_seeds']
+    self._num_init_states = params['num_init_states']
     self._min_utility = params['min_utility']
     self._max_utility = params['max_utility']
     self._num_max_replies = params['num_max_replies']
@@ -794,7 +871,7 @@ class BaseChatGame(pyspiel.Game):
 
     self._game_info = pyspiel.GameInfo(
         num_distinct_actions=self._num_distinct_actions,
-        max_chance_outcomes=self._num_llm_seeds,
+        max_chance_outcomes=max(self._num_llm_seeds, self._num_init_states),
         num_players=self._num_players,
         min_utility=self._min_utility,
         max_utility=self._max_utility,
@@ -842,7 +919,7 @@ class BaseChatGame(pyspiel.Game):
       payoffs: list of Payoff items used for constructing queries and scoring
         dialogue for each agent
       aggregate_payoffs: function that maps from vector to nonnegative scalar
-      
+
       given_names: list of strings representing names of players
       given_llm_seeds: list of ints to seed llm with to generate each message
       given_prompt_actions: ordered dict mapping action_keys
@@ -860,7 +937,7 @@ class BaseChatGame(pyspiel.Game):
         action_key (i.e., size of action space for each prompt action)
       num_private_info: tuple of int, # of private info states to consider for
         each info_key
-      
+
       examples_names: list of strings representing examples of names of players
       examples_prompt_actions: ordered dict mapping action_keys
         (see envs/utils/header) to list of strings representing examples of
@@ -871,7 +948,7 @@ class BaseChatGame(pyspiel.Game):
         of fruits). Overrides examples_private_info.
       examples_scenarios: list of Scenario items used for meta-generating new
         scenarios
-      
+
       llm_list_suffix: str, gets appended to a prompt to induce an llm to
         generate a list of items (different llms like different prompts).
         chinchilla likes ``, llmit likes `Continue the list from here.`
@@ -921,6 +998,7 @@ class BaseChatGame(pyspiel.Game):
                          'single formatting kwarg {msg}')
     self._llm_termination_prompt = llm_termination_prompt
 
+    self._seed = seed
     self._rnd = np.random.RandomState(seed)
 
     if self._given_names:
@@ -1066,6 +1144,8 @@ class BaseChatGame(pyspiel.Game):
       raise ValueError(f'Size of prompt action space ({na}) does not match ' +
                        f'num_distinct_actions ({self._num_distinct_actions})!')
 
+    self._initial_state_configs = self.new_initial_state_configs()
+
   def _generate_response(self, prompt: str, seed: int,
                          num_output_tokens: Union[int, None] = None) -> str:
     """Returns LLM generated string given prompt and seed."""
@@ -1179,7 +1259,7 @@ class BaseChatGame(pyspiel.Game):
                                        OrderedDict[str, List[str]],
                                        Any]:
     """Generates a new game config from examples.
-    
+
     Returns:
       given_names: list of str
       given_private_info: OrderedDict(str: list of str)
@@ -1225,12 +1305,12 @@ class BaseChatGame(pyspiel.Game):
     # 2) generate a single scenario by varying the LLM seed
     # 3) can rely on the randomness in names and private info to induce new
     #    scenarios
-    # we are currently going with option 3)
+    # we are currently going with a mix of options 2) and 3)
     logging.info('Generating initial scenario...')
     logging.info('Scenario prompt:\n%s', self._meta_query + header)
     response = self.generate_response(
         prompt=self._meta_query + header,
-        seed=DEFAULT_LLM_SEED,
+        seed=self._seed,
         num_output_tokens=LLM_LENGTH_MESSAGE_TOKENS
         )
     response = response[:LLM_LENGTH_MESSAGE_CHARS]
@@ -1266,31 +1346,39 @@ class BaseChatGame(pyspiel.Game):
 
     return (given_names, given_private_info, initial_scenario)
 
-  def new_initial_state_specs(self) -> Tuple[OrderedDict[str, List[str]],
-                                             List[int],
-                                             str,
-                                             OrderedDict[str, List[str]]]:
-    """Generates a new dialogue game.
-    
+  def new_initial_state_configs(self) -> Tuple[InitialStateConfiguration, ...]:
+    """Generates a tuple of new dialogue game(s).
+
     Returns:
-      ChatGameState (see ChatGameState class)
+      Tuple of InitialStateConfiguration(s)
     """
+    raw_setups = []
     if self._initial_scenario:
-      names = self._names
-      private_info = self._private_info
-      scenario = self._initial_scenario
+      raw_setups.append(
+          (self._names, self._private_info, self._initial_scenario))
     else:
-      names, private_info, scenario = self.generate_scenario()
+      for _ in range(self._num_init_states):
+        raw_setups.append(self.generate_scenario())
 
-    scenario_prompt_unformatted = self._header.plain + scenario.msg
-    scenario_prompt = scenario_prompt_unformatted.format(
-        sender=scenario.sender,
-        receiver=scenario.receiver,
-        others=ALL_PLAYERS)
-    actions = collections.OrderedDict(zip(['player_names'], [names]))
-    actions.update(self._prompt_actions)
+    initial_state_configs = []
+    for raw_setup in raw_setups:
+      names, private_info, scenario = raw_setup
+      scenario_prompt_unformatted = self._header.plain + scenario.msg
+      scenario_prompt = scenario_prompt_unformatted.format(
+          sender=scenario.sender,
+          receiver=scenario.receiver,
+          others=ALL_PLAYERS)
+      actions = collections.OrderedDict(zip(['player_names'], [names]))
+      actions.update(self._prompt_actions)
+      initial_state_config = InitialStateConfiguration(
+          actions=actions,
+          seeds=self._llm_seeds,
+          scenario_prompt=scenario_prompt,
+          private_info=private_info
+          )
+      initial_state_configs.append(initial_state_config)
 
-    return (actions, self._llm_seeds, scenario_prompt, private_info)
+    return tuple(initial_state_configs)
 
   @property
   def game_info(self) -> pyspiel.GameInfo:
@@ -1335,6 +1423,10 @@ class BaseChatGame(pyspiel.Game):
   @property
   def num_llm_seeds(self) -> int:
     return self._num_llm_seeds
+
+  @property
+  def num_init_states(self) -> int:
+    return self._num_init_states
 
   @property
   def given_prompt_actions(self) -> Union[OrderedDict[str, List[str]], None]:
