@@ -274,8 +274,7 @@ class ChatGame(chat_game_base.BaseChatGame):
       logging.warning('Loading chat_game with default config. Only meant for ' +
                       'open_spiel testing.')
 
-    return chat_game_base.ChatGameState(self,
-                                        *super().new_initial_state_specs())
+    return chat_game_base.ChatGameState(self, self._initial_state_configs)
 
 # Register the game with the OpenSpiel library
 
