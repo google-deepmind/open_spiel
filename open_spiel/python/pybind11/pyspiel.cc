@@ -147,8 +147,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def(py::init<std::string, std::string, GameType::Dynamics,
                     GameType::ChanceMode, GameType::Information,
                     GameType::Utility, GameType::RewardModel, int, int, bool,
-                    bool, bool, bool, GameParameters,
-                    bool, bool>(),
+                    bool, bool, bool, GameParameters, bool, bool>(),
            py::arg("short_name"), py::arg("long_name"), py::arg("dynamics"),
            py::arg("chance_mode"), py::arg("information"), py::arg("utility"),
            py::arg("reward_model"), py::arg("max_num_players"),
@@ -157,8 +156,7 @@ PYBIND11_MODULE(pyspiel, m) {
            py::arg("provides_information_state_tensor"),
            py::arg("provides_observation_string"),
            py::arg("provides_observation_tensor"),
-           py::arg("parameter_specification") =
-               GameParameters(),
+           py::arg("parameter_specification") = GameParameters(),
            py::arg("default_loadable") = true,
            py::arg("provides_factored_observation_string") = false)
       .def(py::init<const GameType&>())
@@ -184,6 +182,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("default_loadable", &GameType::default_loadable)
       .def_readonly("provides_factored_observation_string",
                     &GameType::provides_factored_observation_string)
+      .def_readonly("is_concrete", &GameType::is_concrete)
       .def("pretty_print",
            [](const GameType& value) { return GameTypeToString(value); })
       .def("__repr__",
@@ -597,8 +596,14 @@ PYBIND11_MODULE(pyspiel, m) {
   m.def("registered_names", GameRegisterer::RegisteredNames,
         "Returns the names of all available games.");
 
+  m.def("registered_concrete_names", GameRegisterer::RegisteredConcreteNames,
+        "Returns the names of all available concrete games.");
+
   m.def("registered_games", GameRegisterer::RegisteredGames,
-        "Returns the details of all available games.");
+        "Returns the GameType objects of all available games.");
+
+  m.def("registered_concrete_games", GameRegisterer::RegisteredConcreteGames,
+        "Returns the GameType objects of all available concrete games.");
 
   m.def("serialize_game_and_state", open_spiel::SerializeGameAndState,
         "A general implementation of game and state serialization.");

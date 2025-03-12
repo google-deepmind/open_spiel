@@ -174,6 +174,7 @@ class PyspielTest(absltest.TestCase):
         # Only add games here if there is no sensible default for a parameter.
         "add_noise",
         "cached_tree",
+        "coop_to_1p",
         "efg_game",
         "nfg_game",
         "misere",
