@@ -31,19 +31,16 @@ MaxGameLength() = 12
 ToString() = "blackjack()"
 
 # State 0
-# cur_player: -1
-# Player(s) card info (Dealer is player 1)
-# Player 0:
-# Cards:
-# Player 1:
-# Cards:
+# Current Player: -1
+# Player 0: Cards:
+# Dealer: Cards:
 IsTerminal() = False
 History() = []
 HistoryString() = ""
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-ObservationString(0) = "cur_player: -1\nPlayer(s) card info (Dealer is player 1)\nPlayer 0:\nCards: \nPlayer 1:\nCards: \n"
+ObservationString(0) = "Current Player: -1\nPlayer 0: Cards: \nDealer: Cards: \n"
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(0,0.0192308), (1,0.0192308), (2,0.0192308), (3,0.0192308), (4,0.0192308), (5,0.0192308), (6,0.0192308), (7,0.0192308), (8,0.0192308), (9,0.0192308), (10,0.0192308), (11,0.0192308), (12,0.0192308), (13,0.0192308), (14,0.0192308), (15,0.0192308), (16,0.0192308), (17,0.0192308), (18,0.0192308), (19,0.0192308), (20,0.0192308), (21,0.0192308), (22,0.0192308), (23,0.0192308), (24,0.0192308), (25,0.0192308), (26,0.0192308), (27,0.0192308), (28,0.0192308), (29,0.0192308), (30,0.0192308), (31,0.0192308), (32,0.0192308), (33,0.0192308), (34,0.0192308), (35,0.0192308), (36,0.0192308), (37,0.0192308), (38,0.0192308), (39,0.0192308), (40,0.0192308), (41,0.0192308), (42,0.0192308), (43,0.0192308), (44,0.0192308), (45,0.0192308), (46,0.0192308), (47,0.0192308), (48,0.0192308), (49,0.0192308), (50,0.0192308), (51,0.0192308)]
 LegalActions() = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
@@ -53,19 +50,16 @@ StringLegalActions() = ["CA", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C
 action: 1
 
 # State 1
-# cur_player: -1
-# Player(s) card info (Dealer is player 1)
-# Player 0:
-# Cards: C2
-# Player 1:
-# Cards:
+# Current Player: -1
+# Player 0: Cards: C2
+# Dealer: Cards:
 IsTerminal() = False
 History() = [1]
 HistoryString() = "1"
 IsChanceNode() = True
 IsSimultaneousNode() = False
 CurrentPlayer() = -1
-ObservationString(0) = "cur_player: -1\nPlayer(s) card info (Dealer is player 1)\nPlayer 0:\nCards: C2\nPlayer 1:\nCards: \n"
+ObservationString(0) = "Current Player: -1\nPlayer 0: Cards: C2\nDealer: Cards: \n"
 ObservationTensor(0): ◉◯◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯
 ChanceOutcomes() = [(0,0.0196078), (2,0.0196078), (3,0.0196078), (4,0.0196078), (5,0.0196078), (6,0.0196078), (7,0.0196078), (8,0.0196078), (9,0.0196078), (10,0.0196078), (11,0.0196078), (12,0.0196078), (13,0.0196078), (14,0.0196078), (15,0.0196078), (16,0.0196078), (17,0.0196078), (18,0.0196078), (19,0.0196078), (20,0.0196078), (21,0.0196078), (22,0.0196078), (23,0.0196078), (24,0.0196078), (25,0.0196078), (26,0.0196078), (27,0.0196078), (28,0.0196078), (29,0.0196078), (30,0.0196078), (31,0.0196078), (32,0.0196078), (33,0.0196078), (34,0.0196078), (35,0.0196078), (36,0.0196078), (37,0.0196078), (38,0.0196078), (39,0.0196078), (40,0.0196078), (41,0.0196078), (42,0.0196078), (43,0.0196078), (44,0.0196078), (45,0.0196078), (46,0.0196078), (47,0.0196078), (48,0.0196078), (49,0.0196078), (50,0.0196078), (51,0.0196078)]
 LegalActions() = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
@@ -83,19 +77,16 @@ action: 15
 action: 38
 
 # State 4
-# cur_player: 0
-# Player(s) card info (Dealer is player 1)
-# Player 0:
-# Cards: C2 S7
-# Player 1:
-# Cards: D3 HK
+# Current Player: 0
+# Player 0: Cards: C2 S7
+# Dealer: Cards: D3 HK
 IsTerminal() = False
 History() = [1, 45, 15, 38]
 HistoryString() = "1, 45, 15, 38"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "cur_player: 0\nPlayer(s) card info (Dealer is player 1)\nPlayer 0:\nCards: C2 S7\nPlayer 1:\nCards: D3 HK\n"
+ObservationString(0) = "Current Player: 0\nPlayer 0: Cards: C2 S7\nDealer: Cards: ?? HK\n"
 ObservationTensor(0): ◯◉◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0]
 Returns() = [0]
@@ -110,19 +101,16 @@ action: 0
 action: 49
 
 # State 6
-# cur_player: 0
-# Player(s) card info (Dealer is player 1)
-# Player 0:
-# Cards: C2 S7 SJ
-# Player 1:
-# Cards: D3 HK
+# Current Player: 0
+# Player 0: Cards: C2 S7 SJ
+# Dealer: Cards: D3 HK
 IsTerminal() = False
 History() = [1, 45, 15, 38, 0, 49]
 HistoryString() = "1, 45, 15, 38, 0, 49"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = 0
-ObservationString(0) = "cur_player: 0\nPlayer(s) card info (Dealer is player 1)\nPlayer 0:\nCards: C2 S7 SJ\nPlayer 1:\nCards: D3 HK\n"
+ObservationString(0) = "Current Player: 0\nPlayer 0: Cards: C2 S7 SJ\nDealer: Cards: ?? HK\n"
 ObservationTensor(0): ◯◉◯◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [0]
 Returns() = [0]
@@ -137,19 +125,16 @@ action: 1
 action: 17
 
 # State 8
-# cur_player: -4
-# Player(s) card info (Dealer is player 1)
-# Player 0:
-# Cards: C2 S7 SJ
-# Player 1:
-# Cards: D3 HK D5
+# Current Player: -4
+# Player 0: Cards: C2 S7 SJ
+# Dealer: Cards: D3 HK D5
 IsTerminal() = True
 History() = [1, 45, 15, 38, 0, 49, 1, 17]
 HistoryString() = "1, 45, 15, 38, 0, 49, 1, 17"
 IsChanceNode() = False
 IsSimultaneousNode() = False
 CurrentPlayer() = -4
-ObservationString(0) = "cur_player: -4\nPlayer(s) card info (Dealer is player 1)\nPlayer 0:\nCards: C2 S7 SJ\nPlayer 1:\nCards: D3 HK D5\n"
+ObservationString(0) = "Current Player: -4\nPlayer 0: Cards: C2 S7 SJ\nDealer: Cards: D3 HK D5\n"
 ObservationTensor(0): ◯◯◉◉◯◯◯◯◉◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◯◉◯◯◯◯◯◯◯◯◯◯◯◯◯
 Rewards() = [1]
 Returns() = [1]
