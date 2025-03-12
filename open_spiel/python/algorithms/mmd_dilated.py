@@ -35,14 +35,7 @@ import numpy as np
 from scipy import stats as scipy_stats
 
 from open_spiel.python import policy
-from open_spiel.python.algorithms.sequence_form_utils import _EMPTY_INFOSET_ACTION_KEYS
-from open_spiel.python.algorithms.sequence_form_utils import _EMPTY_INFOSET_KEYS
-from open_spiel.python.algorithms.sequence_form_utils import _get_action_from_key
-from open_spiel.python.algorithms.sequence_form_utils import construct_vars
-from open_spiel.python.algorithms.sequence_form_utils import is_root
-from open_spiel.python.algorithms.sequence_form_utils import policy_to_sequence
-from open_spiel.python.algorithms.sequence_form_utils import sequence_to_policy
-from open_spiel.python.algorithms.sequence_form_utils import uniform_random_seq
+from open_spiel.python.algorithms import sequence_form_utils as utils
 import pyspiel
 
 
@@ -136,9 +129,6 @@ class MMDDilatedEnt(object):
 
   """
 
-  empy_state_action_keys = _EMPTY_INFOSET_ACTION_KEYS[:]
-  empty_infoset_keys = _EMPTY_INFOSET_KEYS[:]
-
   def __init__(self, game, alpha, stepsize=None):
     """Initialize the solver object.
 
@@ -158,11 +148,20 @@ class MMDDilatedEnt(object):
             == pyspiel.GameType.ChanceMode.EXPLICIT_STOCHASTIC)
     assert alpha >= 0
 
+    npl = game.num_players()
+    self.empy_state_action_keys = [
+        f"***EMPTY_INFOSET_ACTION_P{player}***" for player in range(npl)
+    ]
+    self.empty_infoset_keys = [
+        f"***EMPTY_INFOSET_P{player}***" for player in range(npl)
+    ]
+
     self.game = game
     self.alpha = float(alpha)
     (self.infosets, self.infoset_actions_to_seq, self.infoset_action_maps,
      self.infoset_parent_map, self.payoff_mat,
-     self.infoset_actions_children) = construct_vars(game)
+     self.infoset_actions_children) = utils.construct_vars(game)
+    self.payoff_mat = -self.payoff_mat[0]  # payoff_mat is for min player
 
     if stepsize is not None:
       self.stepsize = stepsize
@@ -172,7 +171,7 @@ class MMDDilatedEnt(object):
     if self.stepsize == 0.:
       warnings.warn("MMD stepsize is 0, probably because alpha = 0.")
 
-    self.sequences = uniform_random_seq(game, self.infoset_actions_to_seq)
+    self.sequences = utils.uniform_random_seq(game, self.infoset_actions_to_seq)
     self.avg_sequences = copy.deepcopy(self.sequences)
     self.iteration_count = 1
 
@@ -219,7 +218,7 @@ class MMDDilatedEnt(object):
     for player in range(2):
       for infostate in self.infosets[player]:
 
-        if is_root(infostate):
+        if utils.is_root(infostate, player):
           continue
 
         parent_seq = self.get_parent_seq(player, infostate)
@@ -241,7 +240,7 @@ class MMDDilatedEnt(object):
       for infostate in self.infosets[player]:
 
         # infostates contain empty sequence for root variable
-        if is_root(infostate):
+        if utils.is_root(infostate, player):
           continue
 
         parent_seq = self.get_parent_seq(player, infostate)
@@ -276,8 +275,9 @@ class MMDDilatedEnt(object):
       self._update_state_sequences(self.empty_infoset_keys[player],
                                    grads[player], player, new_policy)
 
-    self.sequences = policy_to_sequence(self.game, new_policy,
-                                        self.infoset_actions_to_seq)
+    self.sequences = utils.policy_to_sequence(
+        self.game, new_policy, self.infoset_actions_to_seq
+    )
     self.update_avg_sequences()
 
   def _update_state_sequences(self, infostate, g, player, pol):
@@ -303,7 +303,7 @@ class MMDDilatedEnt(object):
         g_child = np.array([g[idx] for idx in child_seq_idx])
 
         actions_child = [
-            _get_action_from_key(child_isa_key)
+            utils.get_action_from_key(child_isa_key)
             for child_isa_key in child_isa_keys
         ]
         policy_child = pol.policy_for_key(child)[:]
@@ -312,12 +312,12 @@ class MMDDilatedEnt(object):
         g[isa_idx] += neg_entropy(policy_child)
 
     # no update needed for empty sequence
-    if is_root(infostate):
+    if utils.is_root(infostate, player):
       return
 
     state_policy = pol.policy_for_key(infostate)
     g_infostate = np.array([g[idx] for idx in seq_idx])
-    actions = [_get_action_from_key(isa_key) for isa_key in isa_keys]
+    actions = [utils.get_action_from_key(isa_key) for isa_key in isa_keys]
     new_state_policy = softmax(-g_infostate)
     for action, pr in zip(actions, new_state_policy):
       state_policy[action] = pr
@@ -340,8 +340,9 @@ class MMDDilatedEnt(object):
       self._update_state_sequences(self.empty_infoset_keys[player],
                                    grads[player], player, br_policy)
 
-    br_sequences = policy_to_sequence(self.game, br_policy,
-                                      self.infoset_actions_to_seq)
+    br_sequences = utils.policy_to_sequence(
+        self.game, br_policy, self.infoset_actions_to_seq
+    )
     curr_sequences = copy.deepcopy(self.sequences)
     self.sequences = br_sequences
     br_dgf_values = self.dgf_eval()
@@ -386,9 +387,12 @@ class MMDDilatedEnt(object):
     Returns:
         spiel TabularPolicy Object.
     """
-    return sequence_to_policy(self.sequences, self.game,
-                              self.infoset_actions_to_seq,
-                              self.infoset_action_maps)
+    return utils.sequence_to_policy(
+        self.sequences,
+        self.game,
+        self.infoset_actions_to_seq,
+        self.infoset_action_maps,
+    )
 
   def get_avg_policies(self):
     """Convert average sequences to equivalent behavioural form policies.
@@ -396,6 +400,9 @@ class MMDDilatedEnt(object):
     Returns:
         spiel TabularPolicy Object.
     """
-    return sequence_to_policy(self.avg_sequences, self.game,
-                              self.infoset_actions_to_seq,
-                              self.infoset_action_maps)
+    return utils.sequence_to_policy(
+        self.avg_sequences,
+        self.game,
+        self.infoset_actions_to_seq,
+        self.infoset_action_maps,
+    )
