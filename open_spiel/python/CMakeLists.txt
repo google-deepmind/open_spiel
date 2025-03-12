@@ -87,6 +87,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_backgammon.h
   pybind11/games_bargaining.cc
   pybind11/games_bargaining.h
+  pybind11/games_blackjack.cc
+  pybind11/games_blackjack.h
   pybind11/games_bridge.cc
   pybind11/games_bridge.h
   pybind11/games_chess.cc
@@ -241,6 +243,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/game_transforms_test.py
+  tests/games_blackjack_test.py
   tests/games_bridge_test.py
   tests/games_bargaining_test.py
   tests/games_chess_test.py

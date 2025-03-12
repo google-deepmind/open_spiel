@@ -35,10 +35,6 @@
 namespace open_spiel {
 namespace blackjack {
 
-namespace {
-// Moves.
-enum ActionType { kHit = 0, kStand = 1 };
-
 constexpr int kPlayerId = 0;
 constexpr int kAceValue = 1;
 // The max score to approach for any player, i.e. as close to this as possible
@@ -49,6 +45,9 @@ constexpr int kInitialCardsPerPlayer = 2;
 const char kSuitNames[kNumSuits + 1] = "CDHS";
 const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
 
+constexpr const char* kHiddenCardStr = "??";
+
+namespace {
 // Facts about the game
 const GameType kGameType{/*short_name=*/"blackjack",
                          /*long_name=*/"Blackjack",
@@ -72,22 +71,38 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+}  // namespace
 
 std::string CardToString(int card) {
   return std::string(1, kSuitNames[card / kCardsPerSuit]) +
          std::string(1, kRanks[card % kCardsPerSuit]);
 }
 
+int GetCardByString(std::string card_string) {
+  if (card_string.length() != 2) {
+    return -1;
+  }
+  int suit_idx = std::string(kSuitNames).find(card_string[0]);
+  int rank_idx = std::string(kRanks).find(card_string[1]);
+  if (suit_idx == std::string::npos || rank_idx == std::string::npos) {
+    return -1;
+  }
+  return suit_idx * kCardsPerSuit + rank_idx;
+}
+
 std::vector<std::string> CardsToStrings(const std::vector<int>& cards,
-                                        int start_index = 0) {
+                                        int start_index) {
   std::vector<std::string> card_strings;
   card_strings.reserve(cards.size());
-  for (int i = start_index; i < cards.size(); ++i) {
-    card_strings.push_back(CardToString(cards[i]));
+  for (int i = 0; i < cards.size(); ++i) {
+    if (i < start_index) {
+      card_strings.push_back(kHiddenCardStr);
+    } else {
+      card_strings.push_back(CardToString(cards[i]));
+    }
   }
   return card_strings;
 }
-}  // namespace
 
 std::string BlackjackState::ActionToString(Player player,
                                            Action move_id) const {
@@ -130,7 +145,13 @@ std::vector<double> BlackjackState::Returns() const {
 std::string BlackjackState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, game_->NumPlayers());
-  return StateToString(cur_player_ < DealerId());
+  if (player == 0 && cur_player_ == 0) {
+    // Don't show dealer's first card if it's the player's turn and they are
+    // the observer.
+    return StateToString(false);
+  } else {
+    return StateToString(true);
+  }
 }
 
 void BlackjackState::ObservationTensor(Player player,
@@ -330,10 +351,11 @@ std::string BlackjackState::ToString() const {
 std::string BlackjackState::StateToString(bool show_all_dealers_card) const {
   std::vector<int> players;
 
-  std::string result = absl::StrCat("cur_player: ", cur_player_, "\n");
-  absl::StrAppend(&result, "Player(s) card info (Dealer is player 1)\n");
+  std::string result = absl::StrCat("Current Player: ", cur_player_, "\n");
   for (int p = 0; p <= NumPlayers(); ++p) {
-    absl::StrAppend(&result, "Player ", p, ":\n");
+    absl::StrAppend(&result,
+                    p == DealerId() ? "Dealer" : absl::StrCat("Player ", p),
+                    ": ");
     // Don't show dealer's first card if we're not showing all of them.
     int start_index = (p == 1 && !show_all_dealers_card ? 1 : 0);
     absl::StrAppend(&result, "Cards: ",
