@@ -75,6 +75,9 @@
 namespace open_spiel {
 namespace hive {
 
+// There are 28 unique tiles and 7 directions a tile can be placed beside (the 6
+// hexagonal edges and "above"). So the total action space is 28 * 28 * 7 = 5488
+inline constexpr int kNumDistinctActions = 5488 + 1; // +1 for pass
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumBaseBugTypes = 5;
 inline constexpr const char* kUHPNotStarted = "NotStarted";
@@ -133,10 +136,18 @@ class HiveState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
 
-  // serializes this state into a valid Universal Hive Protocol game string:
-  // GameTypeString;GameStateString;TurnString;MoveString1;...;MoveStringN
-  // https://github.com/jonthysell/Mzinga/wiki/UniversalHiveProtocol#gamestring
+  // serializes state into a valid Universal Hive Protocol (UHP) game string.
+  // UHP provides an interface between other Hive-playing software. Inspired
+  // by the Universal Chess Interface protocol used for Chess software.
+  // https://github.com/jonthysell/Mzinga/wiki/UniversalHiveProtocol
+  // e.g. GameTypeString;GameStateString;TurnString;MoveString1;...;MoveStringN
   std::string Serialize() const override;
+
+  // see above
+  std::string UHPGameString() const;
+  std::string UHPProgressString() const;
+  std::string UHPTurnString() const;
+  std::string UHPMovesString() const;
 
   HiveBoard& Board() { return board_; }
   const HiveBoard& Board() const { return board_; }
@@ -144,10 +155,7 @@ class HiveState : public State {
   Move ActionToMove(Action action) const;
   Action MoveToAction(Move move) const;
   Action PassAction() const { return NumDistinctActions() - 1; }
-  std::string UHPGameString() const;
-  std::string UHPProgressString() const;
-  std::string UHPTurnString() const;
-  std::string UHPMovesString() const;
+
   inline bool WinConditionMet(Player player) const {
     return Board().IsQueenSurrounded(OtherColour(PlayerToColour(player)));
   }
@@ -178,7 +186,7 @@ class HiveGame : public Game {
   explicit HiveGame(const GameParameters& params);
 
   std::array<int, 3> ActionsShape() const { return {7, 28, 28}; }
-  int NumDistinctActions() const override { return 5488 + 1; }  // +1 for pass
+  int NumDistinctActions() const override { return kNumDistinctActions; }
   inline std::unique_ptr<State> NewInitialState() const override {
     return std::make_unique<HiveState>(shared_from_this(), board_radius_,
                                        expansions_, num_bug_types_,
