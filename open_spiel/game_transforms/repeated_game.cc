@@ -14,9 +14,18 @@
 
 #include "open_spiel/game_transforms/repeated_game.h"
 
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/simultaneous_move_game.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace {
@@ -46,7 +55,9 @@ const GameType kGameType{
      {"num_repetitions",
       GameParameter(GameParameter::Type::kInt, /*is_mandatory=*/true)},
      {"recall", GameParameter(kDefaultRecall)}},
-     /*default_loadable=*/false};
+    /*default_loadable=*/false,
+    /*provides_factored_observation_string=*/false,
+    /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return CreateRepeatedGame(*LoadGame(params.at("stage_game").game_value()),

@@ -14,9 +14,17 @@
 
 #include "open_spiel/game_transforms/normal_form_extensive_game.h"
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "open_spiel/algorithms/deterministic_policy.h"
 #include "open_spiel/algorithms/expected_returns.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
+#include "open_spiel/tensor_game.h"
 
 namespace open_spiel {
 
@@ -43,7 +51,9 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     {{"game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}},
-    /*default_loadable=*/false};
+    /*default_loadable=*/false,
+    /*provides_factored_observation_string=*/true,
+    /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return ExtensiveToTensorGame(*LoadGame(params.at("game").game_value()));

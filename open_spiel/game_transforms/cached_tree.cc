@@ -35,23 +35,24 @@ namespace {
 // all the interfaces.
 // This is used as a placeholder for game registration. The actual instantiated
 // game will have more accurate information.
-const GameType kGameType{
-    /*short_name=*/"cached_tree",
-    /*long_name=*/"Cached Tree Game Transform",
-    GameType::Dynamics::kSequential,
-    GameType::ChanceMode::kSampledStochastic,
-    GameType::Information::kImperfectInformation,
-    GameType::Utility::kGeneralSum,
-    GameType::RewardModel::kRewards,
-    /*max_num_players=*/100,
-    /*min_num_players=*/1,
-    /*provides_information_state_string=*/true,
-    /*provides_information_state_tensor=*/true,
-    /*provides_observation_string=*/true,
-    /*provides_observation_tensor=*/true,
-    {{"game",
-      GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}},
-    /*default_loadable=*/false};
+const GameType kGameType{/*short_name=*/"cached_tree",
+                         /*long_name=*/"Cached Tree Game Transform",
+                         GameType::Dynamics::kSequential,
+                         GameType::ChanceMode::kSampledStochastic,
+                         GameType::Information::kImperfectInformation,
+                         GameType::Utility::kGeneralSum,
+                         GameType::RewardModel::kRewards,
+                         /*max_num_players=*/100,
+                         /*min_num_players=*/1,
+                         /*provides_information_state_string=*/true,
+                         /*provides_information_state_tensor=*/true,
+                         /*provides_observation_string=*/true,
+                         /*provides_observation_tensor=*/true,
+                         {{"game", GameParameter(GameParameter::Type::kGame,
+                                                 /*is_mandatory=*/true)}},
+                         /*default_loadable=*/false,
+                         /*provides_factored_observation_string=*/false,
+                         /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return ConvertToCachedTree(*LoadGame(params.at("game").game_value()));

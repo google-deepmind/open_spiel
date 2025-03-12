@@ -14,6 +14,14 @@
 
 #include "open_spiel/game_transforms/zerosum.h"
 
+#include <memory>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/game_transforms/game_wrapper.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+
 namespace open_spiel {
 namespace {
 
@@ -36,7 +44,7 @@ const GameType kGameType{/*short_name=*/"zerosum",
                                                  /*is_mandatory=*/true)}},
                          /*default_loadable=*/false,
                          /*provides_factored_observation_string=*/true,
-                        };
+                         /*is_concrete=*/false};
 
 GameType ZeroSumGameType(GameType game_type) {
   game_type.short_name = kGameType.short_name;

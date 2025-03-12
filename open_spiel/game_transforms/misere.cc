@@ -14,6 +14,13 @@
 
 #include "open_spiel/game_transforms/misere.h"
 
+#include <memory>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/game_transforms/game_wrapper.h"
+#include "open_spiel/spiel.h"
+
 namespace open_spiel {
 namespace {
 
@@ -35,7 +42,7 @@ const GameType kGameType{/*short_name=*/"misere",
                                                  /*is_mandatory=*/true)}},
                          /*default_loadable=*/false,
                          /*provides_factored_observation_string=*/true,
-                        };
+                         /*is_concrete=*/false};
 
 GameType MisereGameType(GameType game_type) {
   game_type.short_name = kGameType.short_name;

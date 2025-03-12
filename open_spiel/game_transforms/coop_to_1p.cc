@@ -14,7 +14,18 @@
 
 #include "open_spiel/game_transforms/coop_to_1p.h"
 
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace coop_to_1p {
@@ -34,7 +45,10 @@ const GameType kGameType{/*short_name=*/"coop_to_1p",
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
-                         {{"game", GameParameter(GameParameter::Type::kGame)}}};
+                         {{"game", GameParameter(GameParameter::Type::kGame)}},
+                         /*default_loadable=*/false,
+                         /*provides_factored_observation_string=*/false,
+                         /*is_concrete=*/false};
 
 GameType CoopTo1pGameType(GameType underlying_game_type) {
   GameType game_type = kGameType;
