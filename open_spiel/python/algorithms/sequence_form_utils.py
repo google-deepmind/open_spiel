@@ -19,29 +19,27 @@ from open_spiel.python import policy
 
 
 _DELIMITER = " -=- "
-_EMPTY_INFOSET_KEYS = ["***EMPTY_INFOSET_P0***", "***EMPTY_INFOSET_P1***"]
-_EMPTY_INFOSET_ACTION_KEYS = [
-    "***EMPTY_INFOSET_ACTION_P0***", "***EMPTY_INFOSET_ACTION_P1***"
-]
 
 
-def _get_isa_key(info_state, action):
+def get_isa_key(info_state, action):
   return info_state + _DELIMITER + str(action)
 
 
-def _get_action_from_key(isa_key):
+def get_action_from_key(isa_key):
   _, action_str = isa_key.split(_DELIMITER)
   return int(action_str)
 
 
-def _get_infostate_from_key(isa_key):
-  assert not is_root(isa_key), "Cannot use this method for root nodes."
+def get_infostate_from_key(isa_key, player):
+  assert not is_root(isa_key, player), "Cannot use this method for root nodes."
   infostate, _ = isa_key.split(_DELIMITER)
   return infostate
 
 
-def is_root(key):
-  return True if key in _EMPTY_INFOSET_KEYS + _EMPTY_INFOSET_ACTION_KEYS else False
+def is_root(key, player):
+  empty_is_key = f"***EMPTY_INFOSET_P{player}***"
+  empty_isa_key = f"***EMPTY_INFOSET_ACTION_P{player}***"
+  return True if key in [empty_is_key, empty_isa_key] else False
 
 
 def construct_vars(game):
@@ -59,37 +57,29 @@ def construct_vars(game):
   """
 
   initial_state = game.new_initial_state()
+  npl = game.num_players()
+
+  empty_is_keys = [f"***EMPTY_INFOSET_P{player}***" for player in range(npl)]
+  empty_isa_keys = [
+      f"***EMPTY_INFOSET_ACTION_P{player}***" for player in range(npl)
+  ]
 
   # initialize variables
-  infosets = [{_EMPTY_INFOSET_KEYS[0]: 0}, {_EMPTY_INFOSET_KEYS[1]: 0}]
-  infoset_actions_to_seq = [{
-      _EMPTY_INFOSET_ACTION_KEYS[0]: 0
-  }, {
-      _EMPTY_INFOSET_ACTION_KEYS[1]: 0
-  }]
-  infoset_action_maps = [{
-      _EMPTY_INFOSET_KEYS[0]: [_EMPTY_INFOSET_ACTION_KEYS[0]]
-  }, {
-      _EMPTY_INFOSET_KEYS[1]: [_EMPTY_INFOSET_ACTION_KEYS[1]]
-  }]
+  infosets = [{empty_is_keys[p]: 0} for p in range(npl)]
+  infoset_actions_to_seq = [{empty_isa_keys[p]: 0} for p in range(npl)]
+  infoset_action_maps = [
+      {empty_is_keys[p]: [empty_isa_keys[p]]} for p in range(npl)
+  ]
 
   # infoset_action_maps = [{}, {}]
   payoff_dict = dict()
 
-  infoset_parent_map = [{
-      _EMPTY_INFOSET_ACTION_KEYS[0]: None
-  }, {
-      _EMPTY_INFOSET_ACTION_KEYS[1]: None
-  }]
-  infoset_actions_children = [{
-      _EMPTY_INFOSET_ACTION_KEYS[0]: []
-  }, {
-      _EMPTY_INFOSET_ACTION_KEYS[1]: []
-  }]
+  infoset_parent_map = [{empty_isa_keys[p]: None} for p in range(npl)]
+  infoset_actions_children = [{empty_isa_keys[p]: []} for p in range(npl)]
 
   _construct_vars(initial_state, infosets, infoset_actions_to_seq,
                   infoset_action_maps, infoset_parent_map, 1.0,
-                  _EMPTY_INFOSET_KEYS[:], _EMPTY_INFOSET_ACTION_KEYS[:],
+                  empty_is_keys[:], empty_isa_keys[:],
                   payoff_dict, infoset_actions_children)
 
   payoff_mat = _construct_numpy_vars(payoff_dict, infoset_actions_to_seq)
@@ -115,11 +105,15 @@ def uniform_random_seq(game, infoset_actions_to_seq):
   policies = policy.TabularPolicy(game)
   initial_state = game.new_initial_state()
   sequences = [
-      np.ones(len(infoset_actions_to_seq[0])),
-      np.ones(len(infoset_actions_to_seq[1]))
+      np.ones(len(infoset_actions_to_seq[i])) for i in range(game.num_players())
   ]
-  _policy_to_sequence(initial_state, policies, sequences,
-                      infoset_actions_to_seq, [1, 1])
+  _policy_to_sequence(
+      initial_state,
+      policies,
+      sequences,
+      infoset_actions_to_seq,
+      [1 for _ in range(game.num_players())],
+  )
   return sequences
 
 
@@ -136,7 +130,7 @@ def _construct_vars(state, infosets, infoset_actions_to_seq,
         contain root values.
       infoset_actions_to_seq: a list of dicts, one per player, that maps a
         string of (infostate, action) pair to an id. The dicts are filled by
-        this function and should inirially only contain the root values.
+        this function and should initially only contain the root values.
       infoset_action_maps: a list of dicts, one per player, that maps each
         info_state to a list of (infostate, action) string.
       infoset_parent_map: a list of dicts, one per player, that maps each
@@ -145,19 +139,17 @@ def _construct_vars(state, infosets, infoset_actions_to_seq,
         start at 1).
       parent_is_keys: a list of parent information state keys for this state
       parent_isa_keys: a list of parent (infostate, action) keys
-      payoff_dict: a dict that maps ((infostate, action), (infostate, action))
-        to the chance weighted reward
+      payoff_dict: a dict that maps sequences of players' (infostate, action)
+        tuples, e.g., ((infostate, action), ...) to the chance weighted reward.
       infoset_actions_children: a list of dicts, one for each player, mapping
         (infostate, action) keys to reachable infostates for each player
   """
 
   if state.is_terminal():
     returns = state.returns()
-    matrix_index = (parent_isa_keys[0], parent_isa_keys[1])
-    payoff_dict.setdefault(matrix_index, 0)
-    # note the payoff matrix A is for the min max problem x.T @ A y
-    # where x is player 0 in openspiel
-    payoff_dict[matrix_index] += -returns[0] * chance_reach
+    idx = tuple(parent_isa_keys_i for parent_isa_keys_i in parent_isa_keys)
+    payoff_dict.setdefault(idx, 0)
+    payoff_dict[idx] += np.asarray(returns) * chance_reach
     return
 
   if state.is_chance_node():
@@ -196,7 +188,7 @@ def _construct_vars(state, infosets, infoset_actions_to_seq,
   new_parent_is_keys[player] = info_state
 
   for action in legal_actions:
-    isa_key = _get_isa_key(info_state, action)
+    isa_key = get_isa_key(info_state, action)
     if isa_key not in infoset_actions_to_seq[player]:
       infoset_actions_to_seq[player][isa_key] = len(
           infoset_actions_to_seq[player])
@@ -216,23 +208,77 @@ def _construct_numpy_vars(payoff_dict, infoset_actions_to_seq):
   """Convert sequence form payoff dict to numpy array.
 
   Args:
-      payoff_dict: a dict that maps ((infostate, action), (infostate, action))
-        to the chance weighted reward.
+      payoff_dict: a dict that maps sequences of players' (infostate, action)
+        tuples, e.g., ((infostate, action), ...) to the chance weighted reward.
       infoset_actions_to_seq: a list of dicts, one per player, that maps a
         string of (infostate, action) pair to an id.
 
   Returns:
       A numpy array corresponding to the chance weighted rewards
-      i.e. the sequence form payoff matrix.
+      i.e. the sequence form payoff tensor.
 
   """
-  sequence_sizes = (len(infoset_actions_to_seq[0]),
-                    len(infoset_actions_to_seq[1]))
-  payoff_mat = np.zeros(sequence_sizes)
-  for p1_sequence, i in infoset_actions_to_seq[0].items():
-    for p2_sequence, j in infoset_actions_to_seq[1].items():
-      payoff_mat[i, j] = payoff_dict.get((p1_sequence, p2_sequence), 0)
-  return payoff_mat
+  npl = len(infoset_actions_to_seq)
+  pls = range(npl)  # player list
+  sequence_sizes = tuple(len(infoset_actions_to_seq[i]) for i in pls)
+  payoff_tensor = np.zeros((npl,) + sequence_sizes)
+  for player_isa_seqs, payoffs in payoff_dict.items():
+    idx = tuple(infoset_actions_to_seq[i][player_isa_seqs[i]] for i in pls)
+    payoff_tensor[(slice(None),) + idx] = np.asarray(payoffs)
+  return payoff_tensor
+
+
+def construct_constraint_vars(infoset_parent_map, infoset_actions_to_seq,
+                              infoset_action_maps):
+  """Construct useful sequence form variables from game.
+
+  Args:
+      infoset_parent_map: a list of dicts, one per player, that maps each
+        info_state to an (infostate, action) string.
+      infoset_actions_to_seq: a list of dicts, one per player, that maps a
+        string of (infostate, action) pair to an id.
+      infoset_action_maps: a list of dicts, one per player, that maps each
+        info_state to a list of (infostate, action) string.
+
+  Returns:
+      A dict mapping player to a tuple containing a numpy array of coefficients,
+      each of dimension # of player sequences, as well as a sparse vector
+      containing the constants, i.e., dict[player] = (A, b) as in Ax = b.
+  """
+  npl = len(infoset_actions_to_seq)
+  constraint_dict = {}
+
+  for player in range(npl):
+    num_seqs = len(infoset_actions_to_seq[player].values())
+
+    root_con = np.zeros(num_seqs)
+    root_con[0] = 1.0
+    constraints = [root_con]
+
+    for info_state in infoset_action_maps[player]:
+      if is_root(info_state, player):
+        continue
+
+      parent_isa_key = infoset_parent_map[player][info_state]
+      parent_seq_id = infoset_actions_to_seq[player][parent_isa_key]
+
+      # seq ids for children
+      children_isa_keys = infoset_action_maps[player][info_state]
+      children_seq_ids = [
+          infoset_actions_to_seq[player][isa_key]
+          for isa_key in children_isa_keys
+      ]
+
+      constraint = np.zeros(num_seqs)
+      constraint[parent_seq_id] = -1.0
+      constraint[children_seq_ids] = 1.0
+      constraints.append(constraint)
+
+    constant = np.zeros(len(constraints))
+    constant[0] = 1.0
+    constraint_dict[player] = (np.stack(constraints), constant)
+
+  return constraint_dict
 
 
 def sequence_to_policy(sequences, game, infoset_actions_to_seq,
@@ -254,7 +300,7 @@ def sequence_to_policy(sequences, game, infoset_actions_to_seq,
   policies = policy.TabularPolicy(game)
   for player in range(2):
     for info_state in infoset_action_maps[player]:
-      if is_root(info_state):
+      if is_root(info_state, player):
         continue
 
       state_policy = policies.policy_for_key(info_state)
@@ -331,7 +377,7 @@ def _policy_to_sequence(state, policies, sequences, infoset_actions_to_seq,
   legal_actions = state.legal_actions(player)
   state_policy = policies.policy_for_key(info_state)
   for action in legal_actions:
-    isa_key = _get_isa_key(info_state, action)
+    isa_key = get_isa_key(info_state, action)
     # update sequence form
     sequences[player][infoset_actions_to_seq[player]
                       [isa_key]] = parent_seq_val[player] * state_policy[action]
