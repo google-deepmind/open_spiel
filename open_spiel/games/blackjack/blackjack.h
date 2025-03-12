@@ -34,6 +34,9 @@ constexpr int kNumSuits = 4;
 constexpr int kCardsPerSuit = 13;
 constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
 
+// Moves.
+enum ActionType { kHit = 0, kStand = 1 };
+
 class BlackjackGame;
 
 class BlackjackState : public State {
@@ -62,6 +65,7 @@ class BlackjackState : public State {
   int CardValue(int card) const;
   void EndPlayerTurn(int player);
   void DealCardToPlayer(int player, int card);
+  std::vector<int> cards(int player) const { return cards_[player]; }
 
  protected:
   void DoApplyAction(Action move_id) override;
@@ -108,6 +112,14 @@ class BlackjackGame : public Game {
     };
   };
 };
+
+std::string CardToString(int card);
+std::vector<std::string> CardsToStrings(const std::vector<int>& cards,
+                                        int start_index = 0);
+
+// Gets a card id from a string representation. Returns -1 if the string is not
+// a valid card.
+int GetCardByString(std::string card_string);
 
 }  // namespace blackjack
 }  // namespace open_spiel
