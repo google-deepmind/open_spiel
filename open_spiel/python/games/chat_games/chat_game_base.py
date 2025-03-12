@@ -1225,7 +1225,8 @@ class BaseChatGame(pyspiel.Game):
               'Given a list of items from a given category, continue the list' +
               ' and generate an additional item from the same category. The ' +
               f'category is {key}s. Use `{ITEM_PREFIX}` to denote separate ' +
-              'items.']
+              'items. Do not include the list of items from the input prompt ' +
+              'in your output response.']
     prompt = '\n'.join(text.wrap(prompt)) + '\n'
     prompt += ('Input:\n' + ITEM_PREFIX +
                ('\n' + ITEM_PREFIX).join(examples) + '\n' +
