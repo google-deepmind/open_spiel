@@ -14,8 +14,19 @@
 
 #include "open_spiel/game_transforms/start_at.h"
 
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/game_transforms/game_wrapper.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -43,7 +54,7 @@ const GameType kGameType{
       GameParameter(GameParameter::Type::kString, /*is_mandatory=*/true)}},
     /*default_loadable=*/false,
     /*provides_factored_observation_string=*/true,
-};
+    /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   auto game = LoadGame(params.at("game").game_value());

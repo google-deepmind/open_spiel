@@ -15,9 +15,10 @@
 #include "open_spiel/games/efg_game/efg_game.h"
 
 #include <algorithm>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
@@ -25,15 +26,19 @@
 #include "open_spiel/abseil-cpp/absl/strings/numbers.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/file.h"
 
 namespace open_spiel {
 namespace efg_game {
 namespace {
-
-constexpr int kBuffSize = 1024;
 
 // Facts about the game. These are defaults that will differ depending on the
 // game's descriptions. Using dummy defaults just to register the game.
@@ -52,7 +57,9 @@ const GameType kGameType{/*short_name=*/"efg_game",
                          /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
                          {{"filename", GameParameter(std::string(""))}},
-                         /*default_loadable=*/false};
+                         /*default_loadable=*/false,
+                         /*provides_factored_observation_string=*/false,
+                         /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new EFGGame(params));

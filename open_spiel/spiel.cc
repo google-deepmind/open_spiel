@@ -171,12 +171,18 @@ std::shared_ptr<const Game> GameRegisterer::CreateByName(
   }
 }
 
-std::vector<std::string> GameRegisterer::RegisteredNames() {
+std::vector<std::string> GameRegisterer::GameTypesToShortNames(
+    const std::vector<GameType>& game_types) {
   std::vector<std::string> names;
-  for (const auto& key_val : factories()) {
-    names.push_back(key_val.first);
+  names.reserve(game_types.size());
+  for (const auto& game_type : game_types) {
+    names.push_back(game_type.short_name);
   }
   return names;
+}
+
+std::vector<std::string> GameRegisterer::RegisteredNames() {
+  return GameTypesToShortNames(RegisteredGames());
 }
 
 std::vector<std::string> GameRegisterer::GamesWithKnownIssues() {
@@ -189,6 +195,20 @@ std::vector<GameType> GameRegisterer::RegisteredGames() {
     games.push_back(key_val.second.first);
   }
   return games;
+}
+
+std::vector<GameType> GameRegisterer::RegisteredConcreteGames() {
+  std::vector<GameType> games;
+  for (const auto& key_val : factories()) {
+    if (key_val.second.first.is_concrete) {
+      games.push_back(key_val.second.first);
+    }
+  }
+  return games;
+}
+
+std::vector<std::string> GameRegisterer::RegisteredConcreteNames() {
+  return GameTypesToShortNames(RegisteredConcreteGames());
 }
 
 bool GameRegisterer::IsValidName(const std::string& short_name) {

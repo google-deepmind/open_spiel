@@ -18,9 +18,14 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 
@@ -46,7 +51,9 @@ const GameType kGameType{
     /*provides_observation_tensor=*/true,
     {{"game",
       GameParameter(GameParameter::Type::kGame, /*is_mandatory=*/true)}},
-    /*default_loadable=*/false};
+    /*default_loadable=*/false,
+    /*provides_factored_observation_string=*/false,
+    /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return ConvertToTurnBased(*LoadGame(params.at("game").game_value()));

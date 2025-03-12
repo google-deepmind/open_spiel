@@ -19,11 +19,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <numeric>
-#include <random>
-#include <sstream>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -150,6 +146,12 @@ struct GameType {
     return provides_observation_tensor
         || provides_observation_string;
   }
+
+  // Is this a concrete game, i.e. an actual game? Most games in OpenSpiel are
+  // concrete games. Some games that are registered are not concrete games; for
+  // example, game wrappers and other game transforms, or games that are
+  // constructed from a file (e.g. efg_game).
+  bool is_concrete = true;
 };
 
 // Information about a concrete Game instantiation.
@@ -1059,7 +1061,9 @@ class GameRegisterer {
 
   static std::vector<std::string> GamesWithKnownIssues();
   static std::vector<std::string> RegisteredNames();
+  static std::vector<std::string> RegisteredConcreteNames();
   static std::vector<GameType> RegisteredGames();
+  static std::vector<GameType> RegisteredConcreteGames();
   static bool IsValidName(const std::string& short_name);
   static void RegisterGame(const GameType& game_type, CreateFunc creator);
 
@@ -1072,6 +1076,9 @@ class GameRegisterer {
     static std::map<std::string, std::pair<GameType, CreateFunc>> impl;
     return impl;
   }
+
+  static std::vector<std::string> GameTypesToShortNames(
+      const std::vector<GameType>& game_types);
 };
 
 // Returns true if the game is registered, false otherwise.

@@ -14,7 +14,17 @@
 
 #include "open_spiel/game_transforms/add_noise.h"
 
+#include <memory>
+#include <random>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/game_transforms/game_wrapper.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace add_noise {
@@ -40,7 +50,7 @@ const GameType kGameType{
      {"seed", GameParameter(1, /*is_mandatory=*/true)}},
     /*default_loadable=*/false,
     /*provides_factored_observation_string=*/true,
-};
+    /*is_concrete=*/false};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   auto game = LoadGame(params.at("game").game_value());
