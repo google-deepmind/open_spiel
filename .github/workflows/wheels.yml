@@ -92,7 +92,6 @@ jobs:
           source ./open_spiel/scripts/python_extra_deps.sh python
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-          python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
           python -m pip install --no-cache-dir --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
           python -m pip install twine
           python -m pip install cibuildwheel==2.22.0
