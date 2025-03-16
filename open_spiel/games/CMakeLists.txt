@@ -49,6 +49,8 @@ set(GAME_SOURCES
   coordinated_mp/coordinated_mp.h
   crazy_eights/crazy_eights.cc
   crazy_eights/crazy_eights.h
+  cribbage/cribbage.cc
+  cribbage/cribbage.h
   cursor_go/cursor_go.cc
   cursor_go/cursor_go.h
   dark_chess/dark_chess.cc
@@ -372,6 +374,10 @@ add_test(coordinated_mp_test coordinated_mp_test)
 add_executable(crazy_eights_test crazy_eights/crazy_eights_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(crazy_eights_test crazy_eights_test)
+
+add_executable(cribbage_test cribbage/cribbage_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(cribbage_test cribbage_test)
 
 add_executable(crowd_modelling_test mfg/crowd_modelling_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
