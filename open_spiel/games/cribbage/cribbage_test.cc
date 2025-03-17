@@ -14,6 +14,11 @@
 
 #include "open_spiel/games/cribbage/cribbage.h"
 
+#include <algorithm>
+#include <cstddef>
+#include <string>
+#include <memory>
+
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -23,6 +28,43 @@ namespace {
 
 namespace testing = open_spiel::testing;
 
+void CardToStringTest() {
+	std::vector<std::string> card_strings;
+	card_strings.reserve(52);
+	std::string suit_names(kSuitNames);
+	std::string ranks(kRanks);
+
+  for (int i = 0; i < 52; ++i) {
+		Card card = GetCard(i);
+		std::string card_string = card.to_string();
+		size_t rank_pos = ranks.find(card_string[0]);
+		SPIEL_CHECK_TRUE(rank_pos != std::string::npos);
+		size_t suit_pos = suit_names.find(card_string[1]);
+		SPIEL_CHECK_TRUE(suit_pos != std::string::npos);
+		auto iter = std::find(card_strings.begin(), card_strings.end(),
+												  card_string);
+		SPIEL_CHECK_TRUE(iter == card_strings.end());
+		card_strings.push_back(card_string);
+	}
+}
+
+void BasicLoadTest() {
+	std::shared_ptr<const Game> game = LoadGame("cribbage");
+	std::unique_ptr<State> state = game->NewInitialState();
+	std::cout << state->ToString() << std::endl;
+	SPIEL_CHECK_EQ(game->NumPlayers(), 2);
+	
+	game = LoadGame("cribbage(players=3)");
+	state = game->NewInitialState();
+	std::cout << state->ToString() << std::endl;
+	SPIEL_CHECK_EQ(game->NumPlayers(), 3);
+	
+	game = LoadGame("cribbage(players=4)");
+	state = game->NewInitialState();
+	std::cout << state->ToString() << std::endl;
+	SPIEL_CHECK_EQ(game->NumPlayers(), 4);
+}
+
 void BasicCribbageTests() {}
 
 }  // namespace
@@ -30,5 +72,7 @@ void BasicCribbageTests() {}
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
+  open_spiel::cribbage::CardToStringTest();
+  open_spiel::cribbage::BasicLoadTest();
   open_spiel::cribbage::BasicCribbageTests();
 }

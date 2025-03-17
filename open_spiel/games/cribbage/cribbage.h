@@ -31,6 +31,22 @@ constexpr int kNumSuits = 4;
 constexpr int kCardsPerSuit = 13;
 constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
 
+// First 52 represents single-card actions.
+// Next 52*52 represents two-card actions.
+// 1 for the pass action.
+constexpr int kNumDistinctActions = 2757;
+constexpr int kPassAction = 2756;
+
+const char kSuitNames[kNumSuits + 1] = "CDHS";
+const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
+
+struct Card {
+  int id;
+	int rank;
+	int suit;
+  std::string to_string() const;
+};
+
 class CribbageGame;
 
 class CribbageState : public State {
@@ -56,16 +72,25 @@ class CribbageState : public State {
   void DoApplyAction(Action move_id) override;
 
  private:
+  int round_ = -1;
+	int dealer_ = -1;         // Who is the dealer?
+  int start_player_ = -1;   // Who is starting this round.
   Player cur_player_ = -1;  // Player to play.
-  int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
-                            // to remember whose is playing for next turns.
+	std::vector<int> score_;  // Current points for each player.
+
+	std::vector<Card> deck_;
+	std::vector<std::vector<Card>> hands_;
+	std::vector<Card> crib_;
+	std::vector<Card> played_cards_;
+
+	void NextRound();
 };
 
 class CribbageGame : public Game {
  public:
   explicit CribbageGame(const GameParameters& params);
 
-  int NumDistinctActions() const override { return 2; }
+  int NumDistinctActions() const override { return kNumDistinctActions; }
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new CribbageState(shared_from_this()));
   }
@@ -80,6 +105,8 @@ class CribbageGame : public Game {
  private:
   const int num_players_;
 };
+
+Card GetCard(int id);
 
 }  // namespace cribbage 
 }  // namespace open_spiel

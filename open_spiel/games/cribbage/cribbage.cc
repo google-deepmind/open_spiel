@@ -16,17 +16,43 @@
 
 #include <sys/types.h>
 
+#include <array>
 #include <string>
 #include <utility>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace cribbage {
 
 constexpr int kDefaultNumPlayers = 2;
+
+constexpr const std::array<Card, 52> kAllCards = {
+		// Clubs
+		Card{0, 0, 0}, Card{1, 1, 0}, Card{2, 2, 0}, Card{3, 3, 0},
+		Card{4, 4, 0}, Card{5, 5, 0}, Card{6, 6, 0}, Card{7, 7, 0},
+		Card{8, 8, 0}, Card{9, 9, 0}, Card{10, 10, 0}, Card{11, 11, 0},
+		Card{12, 12, 0},
+		// Diamonds
+		Card{13, 0, 1}, Card{14, 1, 1}, Card{15, 2, 1}, Card{16, 3, 1},
+		Card{17, 4, 1}, Card{18, 5, 1}, Card{19, 6, 1}, Card{20, 7, 1},
+		Card{21, 8, 1}, Card{22, 9, 1}, Card{23, 10, 1}, Card{24, 11, 1},
+		Card{25, 12, 1},
+		// Hearts
+		Card{26, 0, 2}, Card{27, 1, 2}, Card{28, 2, 2}, Card{29, 3, 2},
+		Card{30, 4, 2}, Card{31, 5, 2}, Card{32, 6, 2}, Card{33, 7, 2},
+		Card{34, 8, 2}, Card{35, 9, 2}, Card{36, 10, 2}, Card{37, 11, 2},
+		Card{38, 12, 2},
+		// Spades
+		Card{39, 0, 3}, Card{40, 1, 3}, Card{41, 2, 3}, Card{42, 3, 3},
+		Card{43, 4, 3}, Card{44, 5, 3}, Card{45, 6, 3}, Card{46, 7, 3},
+		Card{47, 8, 3}, Card{48, 9, 3}, Card{49, 10, 3}, Card{50, 11, 3},
+		Card{51, 12, 3},
+};
 
 namespace {
 
@@ -56,6 +82,20 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
+
+Card GetCard(int id) {
+  SPIEL_CHECK_GE(id, 0);
+	SPIEL_CHECK_LT(id, 52);
+	return kAllCards[id];
+}
+
+std::string Card::to_string() const {
+  std::string str = "XX";
+	str[0] = kRanks[rank];
+	str[1] = kSuitNames[suit];
+	return str;
+}
+
 std::string CribbageState::ActionToString(Player player,
                                           Action move_id) const {
 	return "";
@@ -73,13 +113,35 @@ std::string CribbageState::ObservationString(Player player) const {
   return "";
 }
 
+void CribbageState::NextRound() {
+	round_++;
+	dealer_++;
+	if (dealer_ >= num_players_) { dealer_ = 0; }
+	start_player_++;
+  if (start_player_ >= num_players_) { start_player_ = 0; }
+	cur_player_ = kChancePlayerId;	
+
+	deck_.clear();
+	deck_.resize(52);
+	for (int i = 0; i < 52; ++i) {
+		deck_[i] = kAllCards[i];
+	}
+
+	for (int p = 0; p < num_players_; ++p) {
+		hands_[p].clear();
+	}
+	crib_.clear();
+}
+
 void CribbageState::ObservationTensor(Player player,
                                        absl::Span<float> values) const {
 }
 
-CribbageState::CribbageState(std::shared_ptr<const Game> game) : State(game) {
-  cur_player_ = kChancePlayerId;
-  turn_player_ = 0;
+CribbageState::CribbageState(std::shared_ptr<const Game> game)
+		: State(game),
+			score_(num_players_, 0),
+			hands_(num_players_) {
+	NextRound();
 }
 
 int CribbageState::CurrentPlayer() const { return cur_player_; }
@@ -99,7 +161,17 @@ ActionsAndProbs CribbageState::ChanceOutcomes() const {
 }
 
 std::string CribbageState::ToString() const {
-	return "";
+	std::string str;
+	absl::StrAppend(&str, "Num players: ", num_players_, "\n");
+	absl::StrAppend(&str, "Round: ", round_, "\n");
+	absl::StrAppend(&str, "Dealer: ", dealer_, "\n");
+	absl::StrAppend(&str, "Cur player: ", cur_player_, "\n");
+	absl::StrAppend(&str, "Scores:");
+	for (int p = 0; p < num_players_; ++p) {
+		absl::StrAppend(&str, " ", score_[p]);
+	}
+
+	return str;
 }
 
 std::unique_ptr<State> CribbageState::Clone() const {
