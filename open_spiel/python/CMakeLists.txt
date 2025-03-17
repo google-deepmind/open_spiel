@@ -184,6 +184,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/action_value_vs_best_response_test.py
   algorithms/best_response_test.py
   algorithms/boltzmann_tabular_qlearner_test.py
+  algorithms/backward_induction_test.py
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/efr_test.py
