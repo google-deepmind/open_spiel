@@ -131,15 +131,11 @@ if (WIN32)
     "Enable JAX.")
   openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH          OFF
     "Enable PyTorch.")
-  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW       OFF
-    "Enable Tensorflow.")
 else()
   openspiel_optional_dependency(OPEN_SPIEL_ENABLE_JAX             AUTO
     "Enable JAX.")
   openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTORCH         AUTO
     "Enable PyTorch.")
-  openspiel_optional_dependency(OPEN_SPIEL_ENABLE_TENSORFLOW      AUTO
-    "Enable Tensorflow.")
 endif()
 
 openspiel_optional_dependency(OPEN_SPIEL_ENABLE_PYTHON_MISC       OFF
