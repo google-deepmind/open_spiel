@@ -515,7 +515,14 @@ BargainingGame::BargainingGame(const GameParameters& params)
 std::string BargainingGame::ActionToString(Player player,
                                            Action move_id) const {
   if (player == kChancePlayerId) {
-    return absl::StrCat("Chance outcome ", move_id);
+    if (move_id == ContinueOutcome()){
+      return "Continue";
+    }
+    if (move_id == EndOutcome()) {
+      return "End";
+    }
+    const Instance& instance = GetInstance(move_id);
+    return absl::StrCat("Sample game instance:\n", instance.ToPrettyString());
   } else if (move_id < all_offers_.size()) {
     return all_offers_[move_id].ToString();
   } else {
