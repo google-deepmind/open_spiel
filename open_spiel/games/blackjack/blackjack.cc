@@ -140,7 +140,6 @@ std::unique_ptr<State> BlackjackState::ResampleFromInfostate(
   // Collect all visible cards in a set.
   std::set<int> visible_cards = VisibleCards();
 
-  // Remove the dealer's first card from the set of visible cards.
   int dealer_down_card = cards_[DealerId()][0];
 
   // Pick a random card from the remaining cards.
