@@ -15,7 +15,9 @@
 #ifndef OPEN_SPIEL_GAMES_BLACKJACK_H_
 #define OPEN_SPIEL_GAMES_BLACKJACK_H_
 
+#include <functional>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -66,6 +68,11 @@ class BlackjackState : public State {
   void EndPlayerTurn(int player);
   void DealCardToPlayer(int player, int card);
   std::vector<int> cards(int player) const { return cards_[player]; }
+  std::string InformationStateString(Player player) const;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
+
+  std::set<int> VisibleCards() const;
 
  protected:
   void DoApplyAction(Action move_id) override;
