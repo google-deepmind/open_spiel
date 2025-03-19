@@ -18,8 +18,10 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <numeric>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -58,7 +60,7 @@ const GameType kGameType{/*short_name=*/"blackjack",
                          GameType::RewardModel::kTerminal,
                          /*max_num_players=*/1,
                          /*min_num_players=*/1,
-                         /*provides_information_state_string=*/false,
+                         /*provides_information_state_string=*/true,
                          /*provides_information_state_tensor=*/false,
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
@@ -113,6 +115,62 @@ std::string BlackjackState::ActionToString(Player player,
   } else {
     return "Stand";
   }
+}
+
+std::string BlackjackState::InformationStateString(Player player) const {
+  SPIEL_CHECK_GE(player, 0);
+  SPIEL_CHECK_LT(player, num_players_);
+  std::vector<Action> history = History();
+
+  if (!cards_[DealerId()].empty()) {
+    int dealer_first_card_index = 2 * DealerId();
+    SPIEL_CHECK_EQ(history[dealer_first_card_index], cards_[DealerId()][0]);
+    history.erase(history.begin() + dealer_first_card_index);
+  }
+  return absl::StrJoin(history, " ");
+}
+
+std::unique_ptr<State> BlackjackState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  if (IsTerminal() || cards_[DealerId()].empty()) {
+    return this->Clone();
+  }
+
+  // Dealer's first card is the only non-public information.
+  // Collect all visible cards in a set.
+  std::set<int> visible_cards = VisibleCards();
+
+  // Remove the dealer's first card from the set of visible cards.
+  int dealer_down_card = cards_[DealerId()][0];
+
+  // Pick a random card from the remaining cards.
+  std::vector<int> deck_cards;
+  for (int i = 0; i < kDeckSize; ++i) {
+    if (visible_cards.find(i) == visible_cards.end()) {
+      deck_cards.push_back(i);
+    }
+  }
+
+  std::vector<double> probs(deck_cards.size(),
+                            1.0 / static_cast<double>(deck_cards.size()));
+
+  int sampled_index = SamplerFromRng(rng)(probs);
+  int dealer_new_down_card = deck_cards[sampled_index];
+
+  std::unique_ptr<State> new_state = game_->NewInitialState();
+  std::vector<Action> history = History();
+
+  bool found_dealer_down_card = false;
+  for (auto& action : history) {
+    if (action == dealer_down_card && !found_dealer_down_card) {
+      found_dealer_down_card = true;
+      new_state->ApplyAction(dealer_new_down_card);
+    } else {
+      new_state->ApplyAction(action);
+    }
+  }
+  SPIEL_CHECK_TRUE(found_dealer_down_card);
+  return new_state;
 }
 
 bool BlackjackState::IsTerminal() const { return turn_over_[DealerId()]; }
@@ -366,8 +424,21 @@ std::string BlackjackState::StateToString(bool show_all_dealers_card) const {
   return result;
 }
 
+std::set<int> BlackjackState::VisibleCards() const {
+  std::set<int> visible_cards;
+  for (int i = 0; i < cards_.size(); ++i) {
+    for (int card_idx = 0; card_idx < cards_[i].size(); ++card_idx) {
+      // Hide dealer's first card if the game is not over.
+      if (IsTerminal() || i != DealerId() || card_idx != 0) {
+        visible_cards.insert(cards_[i][card_idx]);
+      }
+    }
+  }
+  return visible_cards;
+}
+
 std::unique_ptr<State> BlackjackState::Clone() const {
-  return std::unique_ptr<State>(new BlackjackState(*this));
+  return std::unique_ptr<BlackjackState>(new BlackjackState(*this));
 }
 
 BlackjackGame::BlackjackGame(const GameParameters& params)
