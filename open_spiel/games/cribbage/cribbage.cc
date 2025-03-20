@@ -16,6 +16,7 @@
 
 #include <sys/types.h>
 
+#include <algorithm>
 #include <array>
 #include <string>
 #include <utility>
@@ -30,6 +31,7 @@ namespace open_spiel {
 namespace cribbage {
 
 constexpr int kDefaultNumPlayers = 2;
+constexpr int kWinScore = 121;
 
 constexpr const std::array<Card, 52> kAllCards = {
 		// Clubs
@@ -101,7 +103,9 @@ std::string CribbageState::ActionToString(Player player,
 	return "";
 }
 
-bool CribbageState::IsTerminal() const { return false; }
+bool CribbageState::IsTerminal() const { 
+  return *std::max_element(scores_.begin(), scores_.end()) >= kWinScore;
+}
 
 std::vector<double> CribbageState::Returns() const {
 	return {0, 0};
@@ -130,16 +134,20 @@ void CribbageState::NextRound() {
 	for (int p = 0; p < num_players_; ++p) {
 		hands_[p].clear();
 	}
+
+	phase_ = Phase::kCardPhase;
 	crib_.clear();
 }
 
 void CribbageState::ObservationTensor(Player player,
-                                       absl::Span<float> values) const {
+                                      absl::Span<float> values) const {
 }
 
 CribbageState::CribbageState(std::shared_ptr<const Game> game)
 		: State(game),
-			score_(num_players_, 0),
+		  phase_(kCardPhase),
+			scores_(num_players_, 0),
+			starter_(std::nullopt),
 			hands_(num_players_) {
 	NextRound();
 }
@@ -157,6 +165,11 @@ std::vector<Action> CribbageState::LegalActions() const {
 ActionsAndProbs CribbageState::ChanceOutcomes() const {
   SPIEL_CHECK_TRUE(IsChanceNode());
   ActionsAndProbs outcomes;
+	outcomes.reserve(deck_.size());
+	double prob = 1.0 / deck_.size();
+	for (int o = 0; o < deck_.size(); ++o) {
+		outcomes.push_back({deck_[o].id, prob});
+	}
   return outcomes;
 }
 
@@ -168,7 +181,7 @@ std::string CribbageState::ToString() const {
 	absl::StrAppend(&str, "Cur player: ", cur_player_, "\n");
 	absl::StrAppend(&str, "Scores:");
 	for (int p = 0; p < num_players_; ++p) {
-		absl::StrAppend(&str, " ", score_[p]);
+		absl::StrAppend(&str, " ", scores_[p]);
 	}
 
 	return str;

@@ -16,6 +16,7 @@
 #define OPEN_SPIEL_GAMES_CRIBBAGE_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -47,6 +48,11 @@ struct Card {
   std::string to_string() const;
 };
 
+enum Phase {
+  kCardPhase = 0,
+  kPlayPhase = 1
+};
+
 class CribbageGame;
 
 class CribbageState : public State {
@@ -73,11 +79,13 @@ class CribbageState : public State {
 
  private:
   int round_ = -1;
-	int dealer_ = -1;         // Who is the dealer?
-  int start_player_ = -1;   // Who is starting this round.
-  Player cur_player_ = -1;  // Player to play.
-	std::vector<int> score_;  // Current points for each player.
+	int dealer_ = -1;          // Who is the dealer?
+  int start_player_ = -1;    // Who is starting this round.
+	Phase phase_;						   // Choosing cards or play phase?
+  Player cur_player_ = -1;   // Player to play.
+	std::vector<int> scores_;  // Current points for each player.
 
+	std::optional<Card> starter_;
 	std::vector<Card> deck_;
 	std::vector<std::vector<Card>> hands_;
 	std::vector<Card> crib_;
