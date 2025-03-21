@@ -6,7 +6,7 @@ GameType.information = Information.IMPERFECT_INFORMATION
 GameType.long_name = "Phantom Tic Tac Toe with Imperfect Recall"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["obstype"]
+GameType.parameter_specification = ["gameversion", "obstype"]
 GameType.provides_information_state_string = True
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = False
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 9
 PolicyTensorShape() = [9]
 MaxChanceOutcomes() = 0
-GetParameters() = {obstype=reveal-nothing}
+GetParameters() = {gameversion=classical,obstype=reveal-nothing}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
