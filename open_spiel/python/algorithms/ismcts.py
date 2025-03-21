@@ -153,11 +153,16 @@ class ISMCTSBot(pyspiel.Bot):
 
   def get_final_policy(self, state, node):
     assert node
-    if self._final_policy_type == ISMCTSFinalPolicyType.NORMALIZED_VISITED_COUNT:
+    if (
+        self._final_policy_type
+        == ISMCTSFinalPolicyType.NORMALIZED_VISITED_COUNT
+    ):
       assert node.total_visits > 0
       total_visits = node.total_visits
-      policy = [(action, child.visits / total_visits)
-                for action, child in node.child_info.items()]
+      policy = [
+          (action, child.visits / total_visits)
+          for action, child in node.child_info.items()
+      ]
     elif self._final_policy_type == ISMCTSFinalPolicyType.MAX_VISIT_COUNT:
       assert node.total_visits > 0
       max_visits = -float('inf')
@@ -258,29 +263,40 @@ class ISMCTSBot(pyspiel.Bot):
     else:
       return self.select_action(node)
 
-  def select_action(self, node):
+  def _action_value(self, node, child):
+    assert child.visits > 0
+    action_value = child.value()
+    if self._child_selection_policy == ChildSelectionPolicy.UCT:
+      action_value += self._uct_c * np.sqrt(
+          np.log(node.total_visits) / child.visits
+      )
+    elif self._child_selection_policy == ChildSelectionPolicy.PUCT:
+      action_value += (
+          self._uct_c
+          * child.prior
+          * np.sqrt(node.total_visits)
+          / (1 + child.visits)
+      )
+    else:
+      raise pyspiel.SpielError('Child selection policy unrecognized.')
+    return action_value
+
+  def _select_candidate_actions(self, node):
     candidates = []
-    max_value = -float('inf')
+
+    max_action_value = max(
+        [self._action_value(node, child) for child in node.child_info.values()]
+    )
+
+    # Select all the actions within the tolerance of the best action.
     for action, child in node.child_info.items():
-      assert child.visits > 0
-
-      action_value = child.value()
-      if self._child_selection_policy == ChildSelectionPolicy.UCT:
-        action_value += (self._uct_c *
-                         np.sqrt(np.log(node.total_visits)/child.visits))
-      elif self._child_selection_policy == ChildSelectionPolicy.PUCT:
-        action_value += (self._uct_c * child.prior *
-                         np.sqrt(node.total_visits)/(1 + child.visits))
-      else:
-        raise pyspiel.SpielError('Child selection policy unrecognized.')
-      if action_value > max_value + TIE_TOLERANCE:
-        candidates = [action]
-        max_value = action_value
-      elif (action_value > max_value - TIE_TOLERANCE and
-            action_value < max_value + TIE_TOLERANCE):
+      if self._action_value(node, child) > max_action_value - TIE_TOLERANCE:
         candidates.append(action)
-        max_value = action_value
 
+    return candidates
+
+  def select_action(self, node):
+    candidates = self._select_candidate_actions(node)
     assert len(candidates) >= 1
     return candidates[self._random_state.randint(len(candidates))]
 
