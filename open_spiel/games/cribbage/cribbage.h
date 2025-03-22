@@ -49,6 +49,7 @@ struct Card {
 };
 
 bool operator==(const Card& lhs, const Card& rhs);
+bool operator<(const Card& lhs, const Card& rhs);
 
 enum Phase {
   kCardPhase = 0,
@@ -80,6 +81,12 @@ class CribbageState : public State {
   void DoApplyAction(Action move_id) override;
 
  private:
+	std::vector<Action> LegalOneCardCribActions() const;
+	std::vector<Action> LegalTwoCardCribActions() const;
+	void SortHands();
+	void SortCrib();
+	void MoveCardToCrib(Player player, const Card& card);
+
   const CribbageGame& parent_game_;
   int round_ = -1;
 	int dealer_ = -1;          // Who is the dealer?

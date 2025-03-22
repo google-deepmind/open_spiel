@@ -89,6 +89,10 @@ bool operator==(const Card& lhs, const Card& rhs) {
   return lhs.id == rhs.id;
 }
 
+bool operator<(const Card& lhs, const Card& rhs) {
+  return lhs.id < rhs.id;
+}
+
 int CardsPerPlayer(int num_players) {
   switch (num_players) {
 	  case 2: return 6;
@@ -122,12 +126,29 @@ std::string Card::to_string() const {
 	return str;
 }
 
+Action ToAction(const Card& c1, const Card& c2) {
+  return 52 + (52*c1.id + c2.id);
+}
+
+std::pair<int, int> FromAction(Action action) {
+	action -= 52;
+	return {action / 52, action % 52};
+}
+
 std::string CribbageState::ActionToString(Player player,
                                           Action move_id) const {
 	if (player == kChancePlayerId) {
 	  return absl::StrCat("Deal ", kAllCards[move_id].to_string());
 	} else {
-	  return "";
+		if (move_id < 52) {
+			return absl::StrCat("Choose ", kAllCards[move_id].to_string());
+		} else if (move_id == kPassAction) {
+			return "Pass";
+		} else {
+			std::pair<int, int> card_ids = FromAction(move_id);
+			return absl::StrCat("Choose ", kAllCards[card_ids.first].to_string(), " ",
+			                               kAllCards[card_ids.second].to_string());
+		}																	  
 	}
 }
 
@@ -215,21 +236,90 @@ void CribbageState::DoApplyAction(Action move) {
 		if (p == (num_players_ - 1) &&
 		    hands_[p].size() == parent_game_.cards_per_player() &&
 				crib_.size() == parent_game_.cards_to_crib()) {
+			SortHands();
 			cur_player_ = 0;
 		} else {
 		  cur_player_ = kChancePlayerId;
 		}
 	} else {
 		// Decision node.
+		if (phase_ == Phase::kCardPhase) {
+			if (num_players_ == 3 || num_players_ == 4) {
+				SPIEL_CHECK_GE(move, 0);
+				SPIEL_CHECK_LT(move, 52);
+				MoveCardToCrib(cur_player_, kAllCards[move]);
+			} else {
+				std::pair<int, int> card_ids = FromAction(move);
+				for (int card_id : { card_ids.first, card_ids.second }) {
+					SPIEL_CHECK_GE(card_id, 0);
+					SPIEL_CHECK_LT(card_id, 52);
+					MoveCardToCrib(cur_player_, kAllCards[card_id]);
+				}
+			}
+
+			cur_player_ += 1;
+			if (cur_player_ >= num_players_) {
+				SortCrib();
+				phase_ = Phase::kPlayPhase;
+				cur_player_ = kChancePlayerId;  // starter
+			}
+		}
 	}
+}
+
+void CribbageState::MoveCardToCrib(Player player, const Card& card) {
+	auto iter = std::find(hands_[player].begin(), hands_[player].end(), card);
+	SPIEL_CHECK_TRUE(iter != hands_[player].end());
+	Card found_card = *iter;
+	hands_[player].erase(iter);
+	crib_.push_back(found_card);
+}
+	
+void CribbageState::SortHands() {
+	for (int p = 0; p < num_players_; ++p) {
+		std::sort(hands_[p].begin(), hands_[p].end());
+	}
+}
+
+void CribbageState::SortCrib() {
+	std::sort(crib_.begin(), crib_.end());
 }
 
 std::vector<Action> CribbageState::LegalActions() const {
 	if (IsChanceNode()) {
 		return LegalChanceOutcomes(); 
 	} else {
-		return {kPassAction};
+		if (phase_ == Phase::kCardPhase) {
+			switch (num_players_) {
+				case 2: return LegalTwoCardCribActions();
+				case 3:
+				case 4: return LegalOneCardCribActions();
+				default: SpielFatalError("Unknown number of players");
+			}
+		} else {
+			return {kPassAction};
+		}
 	}
+}
+	
+std::vector<Action> CribbageState::LegalOneCardCribActions() const {
+	std::vector<Action> legal_actions;
+	legal_actions.reserve(hands_[cur_player_].size());
+	for (int i = 0; i < hands_[cur_player_].size(); ++i) {
+		legal_actions.push_back(hands_[cur_player_][i].id);
+	}
+	return legal_actions;
+}
+
+std::vector<Action> CribbageState::LegalTwoCardCribActions() const {
+	std::vector<Action> legal_actions;
+	for (int i = 0; i < hands_[cur_player_].size(); ++i) {
+		for (int j = i+1; j < hands_[cur_player_].size(); ++j) {
+			legal_actions.push_back(ToAction(hands_[cur_player_][i],
+			                                 hands_[cur_player_][j]));
+		}
+	}
+	return legal_actions;
 }
 
 ActionsAndProbs CribbageState::ChanceOutcomes() const {

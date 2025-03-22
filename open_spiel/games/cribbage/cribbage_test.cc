@@ -86,6 +86,17 @@ void BasicOneTurnPlaythrough() {
 		state->ApplyAction(outcome);
 	}
 
+	for (int p = 0; p < game->NumPlayers(); ++p) {
+		std::cout << state->ToString() << std::endl;
+		std::vector<Action> legal_actions = state->LegalActions();
+		int idx = absl::Uniform<int>(rng, 0, legal_actions.size());
+		Action action = legal_actions[idx];
+		std::cout << "Sampled action: "
+		          << state->ActionToString(state->CurrentPlayer(), action)
+							<< std::endl;
+		state->ApplyAction(action);
+	}
+
 	std::cout << state->ToString() << std::endl;
 }
 
