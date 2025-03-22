@@ -16,11 +16,15 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <random>
 #include <string>
 #include <memory>
 
+#include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
+
+constexpr int kSeed = 2871611;
 
 namespace open_spiel {
 namespace cribbage {
@@ -29,6 +33,7 @@ namespace {
 namespace testing = open_spiel::testing;
 
 void CardToStringTest() {
+	std::cout << "CardToStringTest" << std::endl;
 	std::vector<std::string> card_strings;
 	card_strings.reserve(52);
 	std::string suit_names(kSuitNames);
@@ -49,6 +54,7 @@ void CardToStringTest() {
 }
 
 void BasicLoadTest() {
+	std::cout << "BasicLoadTest" << std::endl;
 	std::shared_ptr<const Game> game = LoadGame("cribbage");
 	std::unique_ptr<State> state = game->NewInitialState();
 	std::cout << state->ToString() << std::endl;
@@ -65,6 +71,24 @@ void BasicLoadTest() {
 	SPIEL_CHECK_EQ(game->NumPlayers(), 4);
 }
 
+void BasicOneTurnPlaythrough() {
+	std::cout << "BasicOneTurnPlaythroughTest" << std::endl;
+  std::mt19937 rng(kSeed);
+	std::shared_ptr<const Game> game = LoadGame("cribbage");
+	std::unique_ptr<State> state = game->NewInitialState();
+
+	while (state->IsChanceNode()) {
+		std::cout << state->ToString() << std::endl;
+		double z = absl::Uniform(rng, 0.0, 1.0);
+		Action outcome = SampleAction(state->ChanceOutcomes(), z).first;
+		std::cout << "Sampled outcome: "
+		          << state->ActionToString(kChancePlayerId, outcome) << std::endl;
+		state->ApplyAction(outcome);
+	}
+
+	std::cout << state->ToString() << std::endl;
+}
+
 void BasicCribbageTests() {}
 
 }  // namespace
@@ -75,4 +99,5 @@ int main(int argc, char **argv) {
   open_spiel::cribbage::CardToStringTest();
   open_spiel::cribbage::BasicLoadTest();
   open_spiel::cribbage::BasicCribbageTests();
+	open_spiel::cribbage::BasicOneTurnPlaythrough();
 }

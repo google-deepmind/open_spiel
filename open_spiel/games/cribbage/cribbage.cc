@@ -84,6 +84,30 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
+  
+bool operator==(const Card& lhs, const Card& rhs) {
+  return lhs.id == rhs.id;
+}
+
+int CardsPerPlayer(int num_players) {
+  switch (num_players) {
+	  case 2: return 6;
+		case 3: return 5;
+		case 4: return 5;
+		default: SpielFatalError(absl::StrCat("Unknown number of players: ",
+                                          num_players));
+	}
+}
+
+int CardsToCrib(int num_players) {
+  switch (num_players) {
+	  case 2: return 0;
+		case 3: return 1;
+		case 4: return 0;
+		default: SpielFatalError(absl::StrCat("Unknown number of players: ",
+                                          num_players));
+	}
+}
 
 Card GetCard(int id) {
   SPIEL_CHECK_GE(id, 0);
@@ -92,7 +116,7 @@ Card GetCard(int id) {
 }
 
 std::string Card::to_string() const {
-  std::string str = "XX";
+  std::string str("XX");
 	str[0] = kRanks[rank];
 	str[1] = kSuitNames[suit];
 	return str;
@@ -100,7 +124,11 @@ std::string Card::to_string() const {
 
 std::string CribbageState::ActionToString(Player player,
                                           Action move_id) const {
-	return "";
+	if (player == kChancePlayerId) {
+	  return absl::StrCat("Deal ", kAllCards[move_id].to_string());
+	} else {
+	  return "";
+	}
 }
 
 bool CribbageState::IsTerminal() const { 
@@ -145,6 +173,7 @@ void CribbageState::ObservationTensor(Player player,
 
 CribbageState::CribbageState(std::shared_ptr<const Game> game)
 		: State(game),
+		  parent_game_(static_cast<const CribbageGame&>(*game)),
 		  phase_(kCardPhase),
 			scores_(num_players_, 0),
 			starter_(std::nullopt),
@@ -156,10 +185,51 @@ int CribbageState::CurrentPlayer() const { return cur_player_; }
 
 void CribbageState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(IsTerminal(), false);
+
+	if (IsChanceNode()) {
+		SPIEL_CHECK_GE(move, 0);
+		SPIEL_CHECK_LT(move, 52);
+		auto iter = std::find(deck_.begin(), deck_.end(), kAllCards[move]);
+		SPIEL_CHECK_TRUE(iter != deck_.end());
+		Card card = *iter;
+		deck_.erase(iter);
+		bool card_dealt = false;
+
+		// Deal to players first
+		int p = 0;
+		for (p = 0; p < num_players_; ++p) {
+		  if (hands_[p].size() < parent_game_.cards_per_player()) {
+				hands_[p].push_back(card);
+				card_dealt = true;
+				break;
+			}
+		}
+
+		// Deal to crib if necessary
+		if (!card_dealt && crib_.size() < parent_game_.cards_to_crib()) {
+			crib_.push_back(card);
+			card_dealt = true;
+		}
+
+		// Check if we're ready to start choosing cards.
+		if (p == (num_players_ - 1) &&
+		    hands_[p].size() == parent_game_.cards_per_player() &&
+				crib_.size() == parent_game_.cards_to_crib()) {
+			cur_player_ = 0;
+		} else {
+		  cur_player_ = kChancePlayerId;
+		}
+	} else {
+		// Decision node.
+	}
 }
 
 std::vector<Action> CribbageState::LegalActions() const {
-	return {};
+	if (IsChanceNode()) {
+		return LegalChanceOutcomes(); 
+	} else {
+		return {kPassAction};
+	}
 }
 
 ActionsAndProbs CribbageState::ChanceOutcomes() const {
@@ -183,7 +253,19 @@ std::string CribbageState::ToString() const {
 	for (int p = 0; p < num_players_; ++p) {
 		absl::StrAppend(&str, " ", scores_[p]);
 	}
-
+	absl::StrAppend(&str, "\n");
+	for (int p = 0; p < num_players_; ++p) {
+		absl::StrAppend(&str, "P", p, " Hand:");
+		for (int i = 0; i < hands_[p].size(); ++i) {
+			absl::StrAppend(&str, " ", hands_[p][i].to_string());
+		}
+		absl::StrAppend(&str, "\n");
+	}
+	absl::StrAppend(&str, "Crib:");
+	for (int i = 0; i < crib_.size(); ++i) {
+		absl::StrAppend(&str, " ", crib_[i].to_string());
+	}
+	absl::StrAppend(&str, "\n");
 	return str;
 }
 
@@ -193,7 +275,9 @@ std::unique_ptr<State> CribbageState::Clone() const {
 
 CribbageGame::CribbageGame(const GameParameters& params)
     : Game(kGameType, params),
-      num_players_(ParameterValue<int>("players")) {}
+      num_players_(ParameterValue<int>("players", kDefaultNumPlayers)),
+			cards_per_player_(CardsPerPlayer(num_players_)),
+			cards_to_crib_(CardsToCrib(num_players_)) {}
 
 }  // namespace blackjack
 }  // namespace open_spiel

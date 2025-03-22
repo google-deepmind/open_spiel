@@ -48,6 +48,8 @@ struct Card {
   std::string to_string() const;
 };
 
+bool operator==(const Card& lhs, const Card& rhs);
+
 enum Phase {
   kCardPhase = 0,
   kPlayPhase = 1
@@ -78,6 +80,7 @@ class CribbageState : public State {
   void DoApplyAction(Action move_id) override;
 
  private:
+  const CribbageGame& parent_game_;
   int round_ = -1;
 	int dealer_ = -1;          // Who is the dealer?
   int start_player_ = -1;    // Who is starting this round.
@@ -110,8 +113,13 @@ class CribbageGame : public Game {
   double MaxUtility() const override { return +1; }
   std::vector<int> ObservationTensorShape() const override { return {}; }
 
+	int cards_per_player() const { return cards_per_player_; }
+	int cards_to_crib() const { return cards_to_crib_; }
+
  private:
   const int num_players_;
+	const int cards_per_player_;
+	const int cards_to_crib_;
 };
 
 Card GetCard(int id);
