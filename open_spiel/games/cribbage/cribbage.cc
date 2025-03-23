@@ -119,6 +119,14 @@ Card GetCard(int id) {
 	return kAllCards[id];
 }
 
+int Card::value() const {
+	if (rank >= kTen) {
+		return 10;
+	} else {
+		return rank+1;
+	}
+}
+
 std::string Card::to_string() const {
   std::string str("XX");
 	str[0] = kRanks[rank];
@@ -165,13 +173,29 @@ std::string CribbageState::ObservationString(Player player) const {
   SPIEL_CHECK_LT(player, game_->NumPlayers());
   return "";
 }
+	
+bool CribbageState::AllHandsAreEmpty() const {
+	for (Player p = 0; p < num_players_; ++p) {
+    if (!hands_[p].empty()) {
+      return false;
+    }
+	}
+  return true;
+}
+
+bool CribbageState::AllPlayersHavePassed() const {
+	for (Player p = 0; p < num_players_; ++p) {
+    if (!passed_[p]) {
+      return false;
+    }
+	}
+  return true;
+}
 
 void CribbageState::NextRound() {
 	round_++;
-	dealer_++;
-	if (dealer_ >= num_players_) { dealer_ = 0; }
-	start_player_++;
-  if (start_player_ >= num_players_) { start_player_ = 0; }
+	dealer_ = NextPlayerRoundRobin(dealer_, num_players_);
+	start_player_ = NextPlayerRoundRobin(start_player_, num_players_);
 	cur_player_ = kChancePlayerId;	
 
 	deck_.clear();
@@ -182,10 +206,17 @@ void CribbageState::NextRound() {
 
 	for (int p = 0; p < num_players_; ++p) {
 		hands_[p].clear();
+		discards_[p].clear();
 	}
+  std::fill(passed_.begin(), passed_.end(), false);
+	crib_.clear();
+	played_cards_.clear();
 
 	phase_ = Phase::kCardPhase;
-	crib_.clear();
+	starter_ = std::nullopt;
+	std::fill(rewards_.begin(), rewards_.end(), 0);
+	last_played_player_ = -1;
+	current_sum_ = 0;
 }
 
 void CribbageState::ObservationTensor(Player player,
@@ -198,7 +229,9 @@ CribbageState::CribbageState(std::shared_ptr<const Game> game)
 		  phase_(kCardPhase),
 			scores_(num_players_, 0),
 			starter_(std::nullopt),
-			hands_(num_players_) {
+			hands_(num_players_), 
+			discards_(num_players_),
+      passed_(num_players_) {
 	NextRound();
 }
 
@@ -210,40 +243,60 @@ void CribbageState::DoApplyAction(Action move) {
 	if (IsChanceNode()) {
 		SPIEL_CHECK_GE(move, 0);
 		SPIEL_CHECK_LT(move, 52);
-		auto iter = std::find(deck_.begin(), deck_.end(), kAllCards[move]);
-		SPIEL_CHECK_TRUE(iter != deck_.end());
-		Card card = *iter;
-		deck_.erase(iter);
-		bool card_dealt = false;
+		if (phase_ == Phase::kCardPhase) {
+			// In the card phase, the chance nodes correspond to the card deals to
+			// each player and to the crib.
+			auto iter = std::find(deck_.begin(), deck_.end(), kAllCards[move]);
+			SPIEL_CHECK_TRUE(iter != deck_.end());
+			Card card = *iter;
+			deck_.erase(iter);
+			bool card_dealt = false;
 
-		// Deal to players first
-		int p = 0;
-		for (p = 0; p < num_players_; ++p) {
-		  if (hands_[p].size() < parent_game_.cards_per_player()) {
-				hands_[p].push_back(card);
-				card_dealt = true;
-				break;
+			// Deal to players first
+			int p = 0;
+			for (p = 0; p < num_players_; ++p) {
+				if (hands_[p].size() < parent_game_.cards_per_player()) {
+					hands_[p].push_back(card);
+					card_dealt = true;
+					break;
+				}
 			}
-		}
 
-		// Deal to crib if necessary
-		if (!card_dealt && crib_.size() < parent_game_.cards_to_crib()) {
-			crib_.push_back(card);
-			card_dealt = true;
-		}
+			// Deal to crib if necessary
+			if (!card_dealt && crib_.size() < parent_game_.cards_to_crib()) {
+				crib_.push_back(card);
+				card_dealt = true;
+			}
 
-		// Check if we're ready to start choosing cards.
-		if (p == (num_players_ - 1) &&
-		    hands_[p].size() == parent_game_.cards_per_player() &&
-				crib_.size() == parent_game_.cards_to_crib()) {
-			SortHands();
-			cur_player_ = 0;
+			// Check if we're ready to start choosing cards.
+			if (p == (num_players_ - 1) &&
+					hands_[p].size() == parent_game_.cards_per_player() &&
+					crib_.size() == parent_game_.cards_to_crib()) {
+				SortHands();
+				cur_player_ = 0;
+			} else {
+				cur_player_ = kChancePlayerId;
+			}
 		} else {
-		  cur_player_ = kChancePlayerId;
+			// A chance node in the play phase corresponds to choosing the starter.
+			SPIEL_CHECK_FALSE(starter_.has_value());
+			auto iter = std::find(deck_.begin(), deck_.end(), kAllCards[move]);
+			SPIEL_CHECK_FALSE(iter == deck_.end());
+		  starter_ = *iter;
+			deck_.erase(iter);
+			if (starter_.value().rank == Rank::kJack) {
+				// His Nobs
+				Score(dealer_, 2);
+			}
+			// Player left of the dealer starts.
+			cur_player_ = NextPlayerRoundRobin(dealer_, num_players_);
 		}
 	} else {
 		// Decision node.
+		SPIEL_CHECK_GE(cur_player_, 0);
+		SPIEL_CHECK_LT(cur_player_, num_players_);
 		if (phase_ == Phase::kCardPhase) {
+			// Move the chose card(s) into the crib.
 			if (num_players_ == 3 || num_players_ == 4) {
 				SPIEL_CHECK_GE(move, 0);
 				SPIEL_CHECK_LT(move, 52);
@@ -263,8 +316,49 @@ void CribbageState::DoApplyAction(Action move) {
 				phase_ = Phase::kPlayPhase;
 				cur_player_ = kChancePlayerId;  // starter
 			}
+		} else {
+			// First, clear the intermediate rewards.
+			std::fill(rewards_.begin(), rewards_.end(), 0);
+			if (move == kPassAction) {
+        passed_[cur_player_] = true;
+        // Check for end of current play sequence (or round).
+				if (AllPlayersHavePassed()) {
+					// TODO: check & apply scoring
+					played_cards_.clear();
+					current_sum_ = 0;
+					std::fill(passed_.begin(), passed_.end(), false);
+          SPIEL_CHECK_GE(last_played_player_, 0);
+          SPIEL_CHECK_LT(last_played_player_, num_players_);
+				  cur_player_ = NextPlayerRoundRobin(last_played_player_, num_players_);
+					if (AllHandsAreEmpty()) {
+						// TODO: scoring
+						NextRound();
+					}
+				} else {
+				  cur_player_ = NextPlayerRoundRobin(cur_player_, num_players_);
+        }
+			} else {
+				// Play the chosen card.
+				auto iter = std::find(hands_[cur_player_].begin(),
+															hands_[cur_player_].end(), kAllCards[move]);
+				SPIEL_CHECK_TRUE(iter != hands_[cur_player_].end());
+				Card card = *iter;
+        current_sum_ += card.value();
+				hands_[cur_player_].erase(iter);
+				played_cards_.push_back(card);
+				discards_[cur_player_].push_back(card);
+				// TODO: check & apply scoring
+				last_played_player_ = cur_player_;
+				// TODO: check if the sum is 31 then no need for the passes
+				cur_player_ = NextPlayerRoundRobin(cur_player_, num_players_);
+			}
 		}
 	}
+}
+
+void CribbageState::Score(Player player, int points) {
+	rewards_[player] += points;
+	scores_[player] += points;
 }
 
 void CribbageState::MoveCardToCrib(Player player, const Card& card) {
@@ -296,8 +390,23 @@ std::vector<Action> CribbageState::LegalActions() const {
 				case 4: return LegalOneCardCribActions();
 				default: SpielFatalError("Unknown number of players");
 			}
+		} else if (phase_ == Phase::kPlayPhase) {
+			// The current player can play anything in their hand that does not bring
+			// the current sum over 31, or pass if they have no legal actions.
+			SPIEL_CHECK_GE(cur_player_, 0);
+			SPIEL_CHECK_LT(cur_player_, num_players_);
+			std::vector<Action> legal_actions;
+			for (const Card& card : hands_[cur_player_]) {
+				if ((current_sum_ + card.value()) <= 31) {
+					legal_actions.push_back(card.id);
+				}
+			}
+			if (legal_actions.empty()) {
+				legal_actions = {kPassAction};
+			}
+      return legal_actions;
 		} else {
-			return {kPassAction};
+			SpielFatalError("Unknown phase in LegalActions()");
 		}
 	}
 }
@@ -335,8 +444,11 @@ ActionsAndProbs CribbageState::ChanceOutcomes() const {
 
 std::string CribbageState::ToString() const {
 	std::string str;
+  absl::StrAppend(&str, "---------------------------------\n");
 	absl::StrAppend(&str, "Num players: ", num_players_, "\n");
 	absl::StrAppend(&str, "Round: ", round_, "\n");
+	absl::StrAppend(&str, "Phase: ", phase_ == Phase::kCardPhase ?
+                                   "Card" : "Play", "\n");
 	absl::StrAppend(&str, "Dealer: ", dealer_, "\n");
 	absl::StrAppend(&str, "Cur player: ", cur_player_, "\n");
 	absl::StrAppend(&str, "Scores:");
@@ -344,6 +456,15 @@ std::string CribbageState::ToString() const {
 		absl::StrAppend(&str, " ", scores_[p]);
 	}
 	absl::StrAppend(&str, "\n");
+  absl::StrAppend(&str, "---------------------------------\n");
+	absl::StrAppend(&str, "Crib:");
+	for (int i = 0; i < crib_.size(); ++i) {
+		absl::StrAppend(&str, " ", crib_[i].to_string());
+	}
+	absl::StrAppend(&str, "\n");
+	if (starter_.has_value()) {
+		absl::StrAppend(&str, "Starter: ", starter_.value().to_string(), "\n");
+	}
 	for (int p = 0; p < num_players_; ++p) {
 		absl::StrAppend(&str, "P", p, " Hand:");
 		for (int i = 0; i < hands_[p].size(); ++i) {
@@ -351,11 +472,15 @@ std::string CribbageState::ToString() const {
 		}
 		absl::StrAppend(&str, "\n");
 	}
-	absl::StrAppend(&str, "Crib:");
-	for (int i = 0; i < crib_.size(); ++i) {
-		absl::StrAppend(&str, " ", crib_[i].to_string());
+  absl::StrAppend(&str, "---------------------------------\n");
+  absl::StrAppend(&str, "Running total: ", current_sum_, "\n");
+  absl::StrAppend(&str, "Played cards: ");
+	for (int i = 0; i < played_cards_.size(); ++i) {
+		absl::StrAppend(&str, " ", played_cards_[i].to_string());
 	}
 	absl::StrAppend(&str, "\n");
+  absl::StrAppend(&str, "---------------------------------\n");
+
 	return str;
 }
 

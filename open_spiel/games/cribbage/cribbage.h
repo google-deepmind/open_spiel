@@ -38,6 +38,29 @@ constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
 constexpr int kNumDistinctActions = 2757;
 constexpr int kPassAction = 2756;
 
+enum Suit {
+  kClubs = 0,
+	kDiamonds = 1,
+	kHearts = 2,
+	kSpades = 3
+};
+
+enum Rank {
+  kAce = 0,
+	kTwo = 1,
+	kThree = 2,
+	kFour = 3,
+	kFive = 4,
+	kSix = 5,
+	kSeven = 6,
+	kEight = 7,
+	kNine = 8,
+	kTen = 9,
+	kJack = 10,
+	kQueen = 11,
+	kKing = 12,
+};
+
 const char kSuitNames[kNumSuits + 1] = "CDHS";
 const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
 
@@ -45,6 +68,7 @@ struct Card {
   int id;
 	int rank;
 	int suit;
+	int value() const;
   std::string to_string() const;
 };
 
@@ -77,6 +101,8 @@ class CribbageState : public State {
 
   std::vector<Action> LegalActions() const override;
 
+	int round() const { return round_; }
+
  protected:
   void DoApplyAction(Action move_id) override;
 
@@ -86,6 +112,9 @@ class CribbageState : public State {
 	void SortHands();
 	void SortCrib();
 	void MoveCardToCrib(Player player, const Card& card);
+	void Score(Player player, int points);
+	bool AllHandsAreEmpty() const;
+	bool AllPlayersHavePassed() const;
 
   const CribbageGame& parent_game_;
   int round_ = -1;
@@ -93,13 +122,18 @@ class CribbageState : public State {
   int start_player_ = -1;    // Who is starting this round.
 	Phase phase_;						   // Choosing cards or play phase?
   Player cur_player_ = -1;   // Player to play.
+	std::vector<int> rewards_; // Intermediate rewards
 	std::vector<int> scores_;  // Current points for each player.
 
 	std::optional<Card> starter_;
 	std::vector<Card> deck_;
 	std::vector<std::vector<Card>> hands_;
+	std::vector<std::vector<Card>> discards_;
 	std::vector<Card> crib_;
 	std::vector<Card> played_cards_;
+	std::vector<bool> passed_;
+	Player last_played_player_;   // Last player to have played a card.
+	int current_sum_ = -1;
 
 	void NextRound();
 };

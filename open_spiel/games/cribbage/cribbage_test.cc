@@ -76,7 +76,9 @@ void BasicOneTurnPlaythrough() {
   std::mt19937 rng(kSeed);
 	std::shared_ptr<const Game> game = LoadGame("cribbage");
 	std::unique_ptr<State> state = game->NewInitialState();
+	CribbageState* crib_state = static_cast<CribbageState*>(state.get());
 
+	// Deal.
 	while (state->IsChanceNode()) {
 		std::cout << state->ToString() << std::endl;
 		double z = absl::Uniform(rng, 0.0, 1.0);
@@ -86,7 +88,29 @@ void BasicOneTurnPlaythrough() {
 		state->ApplyAction(outcome);
 	}
 
+	// Card choices.
 	for (int p = 0; p < game->NumPlayers(); ++p) {
+		std::cout << state->ToString() << std::endl;
+		std::vector<Action> legal_actions = state->LegalActions();
+		int idx = absl::Uniform<int>(rng, 0, legal_actions.size());
+		Action action = legal_actions[idx];
+		std::cout << "Sampled action: "
+		          << state->ActionToString(state->CurrentPlayer(), action)
+							<< std::endl;
+		state->ApplyAction(action);
+	}
+
+	// Starter.
+	std::cout << state->ToString() << std::endl;
+	double z = absl::Uniform(rng, 0.0, 1.0);
+	Action outcome = SampleAction(state->ChanceOutcomes(), z).first;
+	std::cout << "Sampled outcome: "
+						<< state->ActionToString(kChancePlayerId, outcome) << std::endl;
+	state->ApplyAction(outcome);
+	SPIEL_CHECK_FALSE(state->IsChanceNode());
+
+	// Play phase.
+	while (crib_state->round() < 1) {
 		std::cout << state->ToString() << std::endl;
 		std::vector<Action> legal_actions = state->LegalActions();
 		int idx = absl::Uniform<int>(rng, 0, legal_actions.size());
