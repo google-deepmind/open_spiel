@@ -168,8 +168,13 @@ Card GetCardByString(const std::string& str);
 std::vector<Card> GetHandFromStrings(
     const std::vector<std::string>& card_strings);
 
-// Score a 5-card hand (including the starter).
+// Score a 5-card hand (i.e. including the starter). Assumes cards are
+// pre-sorted. Does not include checking the jack having the same suit as the
+// starter.
 int ScoreHand(const std::vector<Card>& hand);
+
+// Score a 4-card hand + starter. No sorting assumed.
+int ScoreHand(const std::vector<Card>& hand, const Card& starter);
 
 }  // namespace cribbage 
 }  // namespace open_spiel

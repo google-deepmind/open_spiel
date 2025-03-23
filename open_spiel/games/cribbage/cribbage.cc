@@ -181,7 +181,7 @@ std::pair<int, int> FromAction(Action action) {
 int CardsSum(const std::vector<Card>& hand, int combo_mask) {
   int sum = 0;
   int bit = 1;
-  for (int pos = 0; pos < 5; ++pos) {
+  for (int pos = 0; pos < hand.size(); ++pos) {
     if ((combo_mask & bit) > 0) {
       sum += hand[pos].value();
     }
@@ -189,6 +189,24 @@ int CardsSum(const std::vector<Card>& hand, int combo_mask) {
   }
   return sum;
 }
+
+bool IsPair(const std::vector<Card>& hand, int combo_mask) {
+  int bit = 1;
+  int rank = -1;
+
+  for (int pos = 0; pos < hand.size(); ++pos) {
+    if ((combo_mask & bit) > 0) {
+      if (rank == -1) {
+        rank = hand[pos].rank;
+      } else {
+        return (rank == hand[pos].rank);
+      }
+    }
+    bit <<= 1;
+  }
+  return false;
+}
+
 
 int ScoreHand15(const std::vector<Card>& hand) {
   int score = 0;
@@ -215,11 +233,38 @@ int ScoreHand15(const std::vector<Card>& hand) {
   return score;
 }
 
+int ScoreHandPairs(const std::vector<Card>& hand) {
+  int score = 0;
+  for (int mask : k2CardMasks) {
+    if (IsPair(hand, mask)) {
+      score += 2;
+    }
+  }
+  return score;
+}
+
 int ScoreHand(const std::vector<Card>& hand) {
   SPIEL_CHECK_EQ(hand.size(), 5);
   int score = 0;
   score += ScoreHand15(hand);
+  score += ScoreHandPairs(hand);
   return score;
+}
+
+int ScoreHand(const std::vector<Card>& hand, const Card& starter) {
+  SPIEL_CHECK_EQ(hand.size(), 4);
+  int score = 0;
+  // Check for jack of the same suit as the starter
+  for (int i = 0; i < hand.size(); ++i) {
+    if (hand[i].rank == Rank::kJack && hand[i].suit == starter.suit) {
+      score += 1;
+      break;
+    }
+  }
+  std::vector five_card_hand = hand;
+  five_card_hand.push_back(starter);
+  std::sort(five_card_hand.begin(), five_card_hand.end());
+  return score + ScoreHand(five_card_hand);
 }
 
 std::string CribbageState::ActionToString(Player player,

@@ -129,6 +129,12 @@ void HandScoringTests() {
   std::vector<Card> hand;
   hand = GetHandFromStrings({"QC", "TD", "7H", "9H", "5S"});
   SPIEL_CHECK_EQ(ScoreHand(hand), 4);
+  hand = GetHandFromStrings({"QC", "QD", "7H", "9H", "5S"});
+  SPIEL_CHECK_EQ(ScoreHand(hand), 6);
+  hand = GetHandFromStrings({"QC", "QD", "QH", "9H", "5S"});
+  SPIEL_CHECK_EQ(ScoreHand(hand), 12);
+  hand = GetHandFromStrings({"QC", "QD", "QH", "5S", "QS"});
+  SPIEL_CHECK_EQ(ScoreHand(hand), 20);
 }
 
 void BasicCribbageTests() {}
