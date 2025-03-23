@@ -164,6 +164,12 @@ class CribbageGame : public Game {
 };
 
 Card GetCard(int id);
+Card GetCardByString(const std::string& str);
+std::vector<Card> GetHandFromStrings(
+    const std::vector<std::string>& card_strings);
+
+// Score a 5-card hand (including the starter).
+int ScoreHand(const std::vector<Card>& hand);
 
 }  // namespace cribbage 
 }  // namespace open_spiel

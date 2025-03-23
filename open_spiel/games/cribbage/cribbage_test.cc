@@ -124,6 +124,13 @@ void BasicOneTurnPlaythrough() {
 	std::cout << state->ToString() << std::endl;
 }
 
+void HandScoringTests() {
+  // Suit order CDHS
+  std::vector<Card> hand;
+  hand = GetHandFromStrings({"QC", "TD", "7H", "9H", "5S"});
+  SPIEL_CHECK_EQ(ScoreHand(hand), 4);
+}
+
 void BasicCribbageTests() {}
 
 }  // namespace
@@ -135,4 +142,5 @@ int main(int argc, char **argv) {
   open_spiel::cribbage::BasicLoadTest();
   open_spiel::cribbage::BasicCribbageTests();
 	open_spiel::cribbage::BasicOneTurnPlaythrough();
+  open_spiel::cribbage::HandScoringTests();
 }

@@ -56,6 +56,22 @@ constexpr const std::array<Card, 52> kAllCards = {
 		Card{51, 12, 3},
 };
 
+// Scoring.
+constexpr int kNum5Combos = 1;
+constexpr int kNum4Combos = 5;
+constexpr int kNum3Combos = 10;
+constexpr int kNum2Combos = 10;
+
+// Bitmasks used to choose card combinations.
+constexpr const std::array<int, kNum5Combos> k5CardMasks = {31};
+constexpr const std::array<int, kNum4Combos> k4CardMasks = {30, 29, 27, 23, 15};
+constexpr const std::array<int, kNum3Combos> k3CardMasks = {
+  7, 11, 13, 14, 19, 21, 22, 25, 26, 28
+};
+constexpr const std::array<int, kNum2Combos> k2CardMasks = {
+  3, 5, 6, 9, 10, 12, 17, 18, 20, 24
+};
+
 namespace {
 
 // Facts about the game
@@ -119,6 +135,25 @@ Card GetCard(int id) {
 	return kAllCards[id];
 }
 
+Card GetCardByString(const std::string& str) {
+  for (int i = 0; i < 52; ++i) {
+    if (kAllCards[i].to_string() == str) {
+      return kAllCards[i];
+    }
+  }
+  return Card{-1, -1, -1};
+}
+
+std::vector<Card> GetHandFromStrings(
+    const std::vector<std::string>& card_strings) {
+  std::vector<Card> hand;
+  hand.reserve(card_strings.size());
+  for (const std::string& cstr : card_strings) {
+    hand.push_back(GetCardByString(cstr));
+  }
+  return hand;
+}
+
 int Card::value() const {
 	if (rank >= kTen) {
 		return 10;
@@ -141,6 +176,50 @@ Action ToAction(const Card& c1, const Card& c2) {
 std::pair<int, int> FromAction(Action action) {
 	action -= 52;
 	return {action / 52, action % 52};
+}
+
+int CardsSum(const std::vector<Card>& hand, int combo_mask) {
+  int sum = 0;
+  int bit = 1;
+  for (int pos = 0; pos < 5; ++pos) {
+    if ((combo_mask & bit) > 0) {
+      sum += hand[pos].value();
+    }
+    bit <<= 1;
+  }
+  return sum;
+}
+
+int ScoreHand15(const std::vector<Card>& hand) {
+  int score = 0;
+  for (int mask : k5CardMasks) {
+    if (CardsSum(hand, mask) == 15) {
+      score += 2;
+    }
+  }
+  for (int mask : k4CardMasks) {
+    if (CardsSum(hand, mask) == 15) {
+      score += 2;
+    }
+  }
+  for (int mask : k3CardMasks) {
+    if (CardsSum(hand, mask) == 15) {
+      score += 2;
+    }
+  }
+  for (int mask : k2CardMasks) {
+    if (CardsSum(hand, mask) == 15) {
+      score += 2;
+    }
+  }
+  return score;
+}
+
+int ScoreHand(const std::vector<Card>& hand) {
+  SPIEL_CHECK_EQ(hand.size(), 5);
+  int score = 0;
+  score += ScoreHand15(hand);
+  return score;
 }
 
 std::string CribbageState::ActionToString(Player player,
