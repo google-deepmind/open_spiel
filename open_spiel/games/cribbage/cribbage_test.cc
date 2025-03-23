@@ -137,6 +137,10 @@ void HandScoringTests() {
   SPIEL_CHECK_EQ(ScoreHand(hand), 20);
   hand = GetHandFromStrings({"5C", "QC", "5D", "5H", "5S"});
   SPIEL_CHECK_EQ(ScoreHand(hand), 28);  // 8 for 15s w/ Q, 12 4-of-K, 8 more 15s
+  hand = GetHandFromStrings({"QC", "JD", "7H", "9H"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("5D")), 5);  // 4 15s + jack
+  hand = GetHandFromStrings({"QC", "JD", "7H", "9H"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("5S")), 4);  // 4 15s
 }
 
 void BasicCribbageTests() {}
