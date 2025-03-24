@@ -243,16 +243,95 @@ int ScoreHandPairs(const std::vector<Card>& hand) {
   return score;
 }
 
+int ScoreHandFlush(const std::vector<Card>& hand) {
+  SPIEL_CHECK_TRUE(hand.size() == 4 || hand.size() == 5);
+  int suit = hand[0].suit;
+  for (int i = 1; i < hand.size(); ++i) {
+    if (hand[i].suit != suit) {
+      return 0;
+    }
+  }
+  return hand.size();
+}
+
+int ScoreHandRun(const std::vector<Card>& hand, int combo_mask) {
+  int rank = -1;
+  int bit = 1;
+  int length = 0;
+
+  for (int pos = 0; pos < hand.size(); ++pos) {
+    if ((combo_mask & bit) > 0) {
+      if (rank == -1) {
+        // First rank in the run.
+        rank = hand[pos].rank;
+      } else {
+        // Check that the next rank is one up, then move the rank up.
+        if (hand[pos].rank != (rank + 1)) {
+          return 0;
+        } else {
+          rank++;
+        }
+      }
+      length++;
+    }
+    bit <<= 1;
+  }
+  SPIEL_CHECK_GE(length, 3);
+  return length;
+}
+
+bool IsSubsetMask(const std::vector<int>& masks, int test_mask) {
+  if (masks.empty()) {
+    return false;
+  }
+  for (int mask : masks) {
+    if ((mask & test_mask) == test_mask) {
+      return true;
+    }
+  }
+  return false;
+}
+
 int ScoreHand(const std::vector<Card>& hand) {
   SPIEL_CHECK_EQ(hand.size(), 5);
   int score = 0;
+  
+  // 15s.
   score += ScoreHand15(hand);
+
+  // Pairs (and 3-of-a-kind and 4-of-a-kind).
   score += ScoreHandPairs(hand);
-  return score;
+
+  // Score the runs. When doing subsets of size 3, must check that the subset
+  // is not a smaller proper subset of a combination that has already been
+  // counted. So we keep a set of all the 4-card subsets that were counted
+  // for this purpose.
+  int score_run_5 = ScoreHandRun(hand, 31);
+  if (score_run_5 > 0) {
+    return score + score_run_5;
+  }
+
+  std::vector<int> combo_masks_scored;
+  for (int mask : k4CardMasks) {
+    int score_run_4 = ScoreHandRun(hand, mask);
+    if (score_run_4 > 0) {
+      score += score_run_4;
+      combo_masks_scored.push_back(mask);
+    }
+  }
+
+  for (int mask : k3CardMasks) {
+    if (!IsSubsetMask(combo_masks_scored, mask)) {
+      score += ScoreHandRun(hand, mask);
+    }
+  }
+
+  return score; 
 }
 
 int ScoreHand(const std::vector<Card>& hand, const Card& starter) {
   SPIEL_CHECK_EQ(hand.size(), 4);
+  
   int score = 0;
   // Check for jack of the same suit as the starter
   for (int i = 0; i < hand.size(); ++i) {
@@ -261,9 +340,20 @@ int ScoreHand(const std::vector<Card>& hand, const Card& starter) {
       break;
     }
   }
+
+  // Make the 5-card hand which includes the starter.
   std::vector five_card_hand = hand;
   five_card_hand.push_back(starter);
   std::sort(five_card_hand.begin(), five_card_hand.end());
+
+  // Check for flush.
+  int flush5 = ScoreHandFlush(five_card_hand);
+  if (flush5 != 0) {
+    score += flush5;
+  } else {
+    score += ScoreHandFlush(hand);
+  }
+
   return score + ScoreHand(five_card_hand);
 }
 

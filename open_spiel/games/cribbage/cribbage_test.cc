@@ -156,3 +156,4 @@ int main(int argc, char **argv) {
 	open_spiel::cribbage::BasicOneTurnPlaythrough();
   open_spiel::cribbage::HandScoringTests();
 }
+

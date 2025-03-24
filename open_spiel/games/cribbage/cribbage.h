@@ -169,11 +169,13 @@ std::vector<Card> GetHandFromStrings(
     const std::vector<std::string>& card_strings);
 
 // Score a 5-card hand (i.e. including the starter). Assumes cards are
-// pre-sorted. Does not include checking the jack having the same suit as the
-// starter.
+// pre-sorted. 
+// Does not include:
+//   - checking the jack having the same suit as the starter.
+//   - checking for flushes (both 4 and 5 card)
 int ScoreHand(const std::vector<Card>& hand);
 
-// Score a 4-card hand + starter. No sorting assumed.
+// Score a 4-card hand + starter. No sorting assumed. Includes all scoring.
 int ScoreHand(const std::vector<Card>& hand, const Card& starter);
 
 }  // namespace cribbage 
