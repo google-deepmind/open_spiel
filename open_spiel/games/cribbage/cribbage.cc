@@ -32,7 +32,7 @@ namespace cribbage {
 
 constexpr int kDefaultNumPlayers = 2;
 constexpr int kWinScore = 121;
-constexpr int kWinnerBonus = 1000;
+constexpr double kWinnerBonus = 1000;
 
 constexpr const std::array<Card, 52> kAllCards = {
 		// Clubs
@@ -383,7 +383,7 @@ bool CribbageState::IsTerminal() const {
 }
 
 int CribbageState::DetermineWinner() const {
-  for (Player p = 0; p < num_players_; ++p) {
+  for (int p = 0; p < num_players_; ++p) {
     if (scores_[p] >= kWinScore) {
       return p;
     }
@@ -391,15 +391,15 @@ int CribbageState::DetermineWinner() const {
   return -1;
 }
 
-std::vector<double> AddWinnerBonusLoserPenalty(std::vector<double>* values,
-                                               Player winner) {
-  if (winner > 0) {
-    double loser_penalty = (-kWinnerBonus)/(values->size() - 1);
+void AddWinnerBonusLoserPenalty(std::vector<double>* values, int winner) {
+  if (winner >= 0) {
+    double loser_penalty = (-kWinnerBonus)/
+        (static_cast<double>(values->size()) - 1.0);
     for (Player p = 0; p < values->size(); ++p) {
       if (p == winner) {
-        values->at(p) += kWinnerBonus;
+        (*values)[p] += kWinnerBonus;
       } else {
-        values->at(p) += loser_penalty;
+        (*values)[p] += loser_penalty;
       }
     }
   }
@@ -408,6 +408,7 @@ std::vector<double> AddWinnerBonusLoserPenalty(std::vector<double>* values,
 std::vector<double> CribbageState::Rewards() const {
   int winner = DetermineWinner();
   std::vector<double> ret = rewards_;
+  SPIEL_CHECK_EQ(ret.size(), num_players_);
   AddWinnerBonusLoserPenalty(&ret, winner);
   return ret;
 }
@@ -415,6 +416,7 @@ std::vector<double> CribbageState::Rewards() const {
 std::vector<double> CribbageState::Returns() const {
   int winner = DetermineWinner();
   std::vector<double> ret = scores_;
+  SPIEL_CHECK_EQ(ret.size(), num_players_);
   AddWinnerBonusLoserPenalty(&ret, winner);
   return ret;
 }
@@ -550,7 +552,6 @@ void CribbageState::DoApplyAction(Action move) {
 		}
 	} else {
 		// Decision node.
-    std::cout << "Applying move: " << move << std::endl;
 		SPIEL_CHECK_GE(cur_player_, 0);
 		SPIEL_CHECK_LT(cur_player_, num_players_);
 		// Applying action at decision node: First, clear the intermediate rewards.
