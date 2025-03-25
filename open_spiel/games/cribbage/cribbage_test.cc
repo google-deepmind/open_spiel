@@ -125,7 +125,7 @@ void BasicOneTurnPlaythrough() {
 }
 
 void HandScoringTests() {
-  // Suit order CDHS
+  // Suit order: CDHS
   std::vector<Card> hand;
   hand = GetHandFromStrings({"QC", "TD", "7H", "9H", "5S"});
   SPIEL_CHECK_EQ(ScoreHand(hand), 4);
@@ -141,9 +141,30 @@ void HandScoringTests() {
   SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("5D")), 5);  // 4 15s + jack
   hand = GetHandFromStrings({"QC", "JD", "7H", "9H"});
   SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("5S")), 4);  // 4 15s
+  // Flushes. 5-card flush, then a 4-card flush, then no flush.
+  hand = GetHandFromStrings({"QC", "TC", "8C", "4C"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("2C")), 5);
+  hand = GetHandFromStrings({"QC", "TC", "8C", "4C"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("2D")), 4);
+  hand = GetHandFromStrings({"QD", "TC", "8C", "4C"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("2C")), 0);
+  // 5-card flush and run of 5 + nobs = 11.
+  hand = GetHandFromStrings({"9C", "TC", "JC", "QC"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("KC")), 11);
+  // Examples of runs from the rule book.
+  hand = GetHandFromStrings({"5C", "6C", "7C", "8D"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("8S")), 14);
+  // 3 runs of 3 (9) + 3-of-a-kind (6) + three 15s (8) = 21.
+  hand = GetHandFromStrings({"4C", "4D", "4S", "5D"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("6S")), 21);
+  // 4 runs of 3 (12) + 2 pairs (4) + 2 15s (4) = 20.
+  hand = GetHandFromStrings({"6C", "6D", "7S", "7D"});
+  SPIEL_CHECK_EQ(ScoreHand(hand, GetCardByString("8S")), 20);
 }
 
-void BasicCribbageTests() {}
+void BasicCribbageTests() {
+  testing::RandomSimTestNoSerialize(*LoadGame("cribbage"), 10);
+}
 
 }  // namespace
 }  // namespace cribbage
@@ -155,5 +176,6 @@ int main(int argc, char **argv) {
   open_spiel::cribbage::BasicCribbageTests();
 	open_spiel::cribbage::BasicOneTurnPlaythrough();
   open_spiel::cribbage::HandScoringTests();
+  open_spiel::cribbage::BasicCribbageTests();
 }
 

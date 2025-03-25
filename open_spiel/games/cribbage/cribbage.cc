@@ -32,6 +32,7 @@ namespace cribbage {
 
 constexpr int kDefaultNumPlayers = 2;
 constexpr int kWinScore = 121;
+constexpr int kWinnerBonus = 1000;
 
 constexpr const std::array<Card, 52> kAllCards = {
 		// Clubs
@@ -105,8 +106,10 @@ bool operator==(const Card& lhs, const Card& rhs) {
   return lhs.id == rhs.id;
 }
 
+// Sort by rank first. This is needed for the proper scoring of runs.
 bool operator<(const Card& lhs, const Card& rhs) {
-  return lhs.id < rhs.id;
+  return (lhs.rank < rhs.rank ||
+          (lhs.rank == rhs.rank && lhs.suit < rhs.suit));
 }
 
 int CardsPerPlayer(int num_players) {
@@ -375,11 +378,45 @@ std::string CribbageState::ActionToString(Player player,
 }
 
 bool CribbageState::IsTerminal() const { 
-  return *std::max_element(scores_.begin(), scores_.end()) >= kWinScore;
+  return (round_ >= kMaxNumRounds ||
+          *std::max_element(scores_.begin(), scores_.end()) >= kWinScore);
+}
+
+int CribbageState::DetermineWinner() const {
+  for (Player p = 0; p < num_players_; ++p) {
+    if (scores_[p] >= kWinScore) {
+      return p;
+    }
+  }
+  return -1;
+}
+
+std::vector<double> AddWinnerBonusLoserPenalty(std::vector<double>* values,
+                                               Player winner) {
+  if (winner > 0) {
+    double loser_penalty = (-kWinnerBonus)/(values->size() - 1);
+    for (Player p = 0; p < values->size(); ++p) {
+      if (p == winner) {
+        values->at(p) += kWinnerBonus;
+      } else {
+        values->at(p) += loser_penalty;
+      }
+    }
+  }
+}                                             
+
+std::vector<double> CribbageState::Rewards() const {
+  int winner = DetermineWinner();
+  std::vector<double> ret = rewards_;
+  AddWinnerBonusLoserPenalty(&ret, winner);
+  return ret;
 }
 
 std::vector<double> CribbageState::Returns() const {
-	return {0, 0};
+  int winner = DetermineWinner();
+  std::vector<double> ret = scores_;
+  AddWinnerBonusLoserPenalty(&ret, winner);
+  return ret;
 }
 
 std::string CribbageState::ObservationString(Player player) const {
@@ -428,7 +465,6 @@ void CribbageState::NextRound() {
 
 	phase_ = Phase::kCardPhase;
 	starter_ = std::nullopt;
-	std::fill(rewards_.begin(), rewards_.end(), 0);
 	last_played_player_ = -1;
 	current_sum_ = 0;
 }
@@ -441,6 +477,7 @@ CribbageState::CribbageState(std::shared_ptr<const Game> game)
 		: State(game),
 		  parent_game_(static_cast<const CribbageGame&>(*game)),
 		  phase_(kCardPhase),
+			rewards_(num_players_, 0),
 			scores_(num_players_, 0),
 			starter_(std::nullopt),
 			hands_(num_players_), 
@@ -449,7 +486,13 @@ CribbageState::CribbageState(std::shared_ptr<const Game> game)
 	NextRound();
 }
 
-int CribbageState::CurrentPlayer() const { return cur_player_; }
+int CribbageState::CurrentPlayer() const { 
+  if (IsTerminal()) {
+    return kTerminalPlayerId;
+  } else {
+    return cur_player_; 
+  }
+}
 
 void CribbageState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(IsTerminal(), false);
@@ -507,8 +550,11 @@ void CribbageState::DoApplyAction(Action move) {
 		}
 	} else {
 		// Decision node.
+    std::cout << "Applying move: " << move << std::endl;
 		SPIEL_CHECK_GE(cur_player_, 0);
 		SPIEL_CHECK_LT(cur_player_, num_players_);
+		// Applying action at decision node: First, clear the intermediate rewards.
+		std::fill(rewards_.begin(), rewards_.end(), 0);
 		if (phase_ == Phase::kCardPhase) {
 			// Move the chose card(s) into the crib.
 			if (num_players_ == 3 || num_players_ == 4) {
@@ -531,8 +577,6 @@ void CribbageState::DoApplyAction(Action move) {
 				cur_player_ = kChancePlayerId;  // starter
 			}
 		} else {
-			// First, clear the intermediate rewards.
-			std::fill(rewards_.begin(), rewards_.end(), 0);
 			if (move == kPassAction) {
         passed_[cur_player_] = true;
         // Check for end of current play sequence (or round).
@@ -545,7 +589,13 @@ void CribbageState::DoApplyAction(Action move) {
           SPIEL_CHECK_LT(last_played_player_, num_players_);
 				  cur_player_ = NextPlayerRoundRobin(last_played_player_, num_players_);
 					if (AllHandsAreEmpty()) {
-						// TODO: scoring
+            // First, reset the hands to be the discards.
+            for (Player p = 0; p < num_players_; ++p) {
+              hands_[p] = discards_[p];
+              SPIEL_CHECK_EQ(hands_[p].size(), 4);
+            }
+            ScoreHands();
+            ScoreCrib();
 						NextRound();
 					}
 				} else {
@@ -573,6 +623,18 @@ void CribbageState::DoApplyAction(Action move) {
 void CribbageState::Score(Player player, int points) {
 	rewards_[player] += points;
 	scores_[player] += points;
+}
+
+void CribbageState::ScoreHands() {
+  for (Player p = 0; p < num_players_; ++p) {
+    int points = ScoreHand(hands_[p], starter_.value());
+    Score(p, points);
+  }
+}
+
+void CribbageState::ScoreCrib() {
+  int points = ScoreHand(crib_, starter_.value());
+  Score(dealer_, points);
 }
 
 void CribbageState::MoveCardToCrib(Player player, const Card& card) {
@@ -618,6 +680,7 @@ std::vector<Action> CribbageState::LegalActions() const {
 			if (legal_actions.empty()) {
 				legal_actions = {kPassAction};
 			}
+      std::sort(legal_actions.begin(), legal_actions.end());
       return legal_actions;
 		} else {
 			SpielFatalError("Unknown phase in LegalActions()");
@@ -631,17 +694,20 @@ std::vector<Action> CribbageState::LegalOneCardCribActions() const {
 	for (int i = 0; i < hands_[cur_player_].size(); ++i) {
 		legal_actions.push_back(hands_[cur_player_][i].id);
 	}
+  std::sort(legal_actions.begin(), legal_actions.end());
 	return legal_actions;
 }
 
 std::vector<Action> CribbageState::LegalTwoCardCribActions() const {
+  //std::cout << "here" << std::endl;
 	std::vector<Action> legal_actions;
 	for (int i = 0; i < hands_[cur_player_].size(); ++i) {
 		for (int j = i+1; j < hands_[cur_player_].size(); ++j) {
-			legal_actions.push_back(ToAction(hands_[cur_player_][i],
-			                                 hands_[cur_player_][j]));
+      Action action = ToAction(hands_[cur_player_][i], hands_[cur_player_][j]);
+			legal_actions.push_back(action);
 		}
 	}
+  std::sort(legal_actions.begin(), legal_actions.end());
 	return legal_actions;
 }
 

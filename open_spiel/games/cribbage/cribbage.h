@@ -31,6 +31,7 @@ namespace cribbage {
 constexpr int kNumSuits = 4;
 constexpr int kCardsPerSuit = 13;
 constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
+constexpr int kMaxNumRounds = 100;
 
 // First 52 represents single-card actions.
 // Next 52*52 represents two-card actions.
@@ -92,6 +93,7 @@ class CribbageState : public State {
   std::string ToString() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
+  std::vector<double> Rewards() const override;
   std::string ObservationString(Player player) const override;
   void ObservationTensor(Player player,
                          absl::Span<float> values) const override;
@@ -115,6 +117,9 @@ class CribbageState : public State {
 	void Score(Player player, int points);
 	bool AllHandsAreEmpty() const;
 	bool AllPlayersHavePassed() const;
+  void ScoreHands();
+  void ScoreCrib();
+  int DetermineWinner() const;
 
   const CribbageGame& parent_game_;
   int round_ = -1;
@@ -122,8 +127,8 @@ class CribbageState : public State {
   int start_player_ = -1;    // Who is starting this round.
 	Phase phase_;						   // Choosing cards or play phase?
   Player cur_player_ = -1;   // Player to play.
-	std::vector<int> rewards_; // Intermediate rewards
-	std::vector<int> scores_;  // Current points for each player.
+	std::vector<double> rewards_; // Intermediate rewards
+	std::vector<double> scores_;  // Current points for each player.
 
 	std::optional<Card> starter_;
 	std::vector<Card> deck_;
@@ -147,11 +152,14 @@ class CribbageGame : public Game {
     return std::unique_ptr<State>(new CribbageState(shared_from_this()));
   }
   int MaxChanceOutcomes() const override { return kDeckSize; }
-  int MaxGameLength() const { return 0; }
+  int MaxGameLength() const {
+    return 20 * kMaxNumRounds;
+  }
 
   int NumPlayers() const override { return num_players_; }
-  double MinUtility() const override { return -1; }
-  double MaxUtility() const override { return +1; }
+  // Win score + max points (getting 29 when you start at 120).
+  double MinUtility() const override { return -1149; }
+  double MaxUtility() const override { return +1149; }
   std::vector<int> ObservationTensorShape() const override { return {}; }
 
 	int cards_per_player() const { return cards_per_player_; }
