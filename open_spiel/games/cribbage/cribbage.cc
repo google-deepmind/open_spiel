@@ -496,6 +496,79 @@ int CribbageState::CurrentPlayer() const {
   }
 }
 
+bool SameRank(const std::vector<Card>& played_cards, int start_index) {
+  int rank = played_cards[start_index].rank;
+  for (int i = start_index+1; i < played_cards.size(); ++i) {
+    if (played_cards[i].rank != rank) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool IsUnsortedRun(const std::vector<Card>& played_cards, int start_index) {
+  std::vector<Card> played_cards_copy = played_cards;
+  std::sort(played_cards_copy.begin() + start_index,
+            played_cards_copy.end());
+  for (int i = start_index+1; i < played_cards_copy.size(); ++i) {
+    if (played_cards_copy[i].rank != (played_cards_copy[i-1].rank + 1)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void CribbageState::CheckAndApplyPlayScoring() {
+  if (current_sum_ == 15) {
+    Score(cur_player_, 2);
+  }
+
+  // Check 4ofk, 3ofk, pair.
+  if (played_cards_.size() >= 4 &&
+      SameRank(played_cards_, played_cards_.size() - 4)) {
+    Score(cur_player_, 12);
+  } else if (played_cards_.size() >= 3 &&
+             SameRank(played_cards_, played_cards_.size() - 3)) {
+    Score(cur_player_, 6);
+  } else if (played_cards_.size() >= 2 &&
+             SameRank(played_cards_, played_cards_.size() - 2)) {
+    Score(cur_player_, 2);
+  }
+
+  for (int num_cards = std::min<int>(played_cards_.size(), 7);
+       num_cards >= 3; --num_cards) {
+    if (IsUnsortedRun(played_cards_, played_cards_.size() - num_cards)) {
+      Score(cur_player_, num_cards);
+      break;
+    }
+  }
+}
+
+void CribbageState::DoEndOfPlayRound() {
+  // Apply end-of-play round scoring.
+  int end_of_round_points = current_sum_ == 31 ? 2 : 1;
+  Score(last_played_player_, end_of_round_points);
+
+  played_cards_.clear();
+  current_sum_ = 0;
+  std::fill(passed_.begin(), passed_.end(), false);
+  SPIEL_CHECK_GE(last_played_player_, 0);
+  SPIEL_CHECK_LT(last_played_player_, num_players_);
+  cur_player_ = NextPlayerRoundRobin(last_played_player_, num_players_);
+
+  // Check for end of play phase.
+  if (AllHandsAreEmpty()) {
+    // First, reset the hands to be the discards.
+    for (Player p = 0; p < num_players_; ++p) {
+      hands_[p] = discards_[p];
+      SPIEL_CHECK_EQ(hands_[p].size(), 4);
+    }
+    ScoreHands();
+    ScoreCrib();
+    NextRound();
+  }
+}
+
 void CribbageState::DoApplyAction(Action move) {
   SPIEL_CHECK_EQ(IsTerminal(), false);
 
@@ -510,6 +583,7 @@ void CribbageState::DoApplyAction(Action move) {
 			Card card = *iter;
 			deck_.erase(iter);
 			bool card_dealt = false;
+      bool crib_dealt = false;
 
 			// Deal to players first
 			int p = 0;
@@ -524,13 +598,14 @@ void CribbageState::DoApplyAction(Action move) {
 			// Deal to crib if necessary
 			if (!card_dealt && crib_.size() < parent_game_.cards_to_crib()) {
 				crib_.push_back(card);
-				card_dealt = true;
+				crib_dealt = true;
 			}
 
 			// Check if we're ready to start choosing cards.
-			if (p == (num_players_ - 1) &&
-					hands_[p].size() == parent_game_.cards_per_player() &&
-					crib_.size() == parent_game_.cards_to_crib()) {
+      std::cout << p << " " << crib_.size() << " " << parent_game_.cards_to_crib() << std::endl;
+			if (crib_dealt || (p == num_players_ - 1 &&
+                         hands_[p].size() == parent_game_.cards_per_player() &&
+                         crib_.size() == parent_game_.cards_to_crib())) {
 				SortHands();
 				cur_player_ = 0;
 			} else {
@@ -582,23 +657,7 @@ void CribbageState::DoApplyAction(Action move) {
         passed_[cur_player_] = true;
         // Check for end of current play sequence (or round).
 				if (AllPlayersHavePassed()) {
-					// TODO: check & apply scoring
-					played_cards_.clear();
-					current_sum_ = 0;
-					std::fill(passed_.begin(), passed_.end(), false);
-          SPIEL_CHECK_GE(last_played_player_, 0);
-          SPIEL_CHECK_LT(last_played_player_, num_players_);
-				  cur_player_ = NextPlayerRoundRobin(last_played_player_, num_players_);
-					if (AllHandsAreEmpty()) {
-            // First, reset the hands to be the discards.
-            for (Player p = 0; p < num_players_; ++p) {
-              hands_[p] = discards_[p];
-              SPIEL_CHECK_EQ(hands_[p].size(), 4);
-            }
-            ScoreHands();
-            ScoreCrib();
-						NextRound();
-					}
+          DoEndOfPlayRound();
 				} else {
 				  cur_player_ = NextPlayerRoundRobin(cur_player_, num_players_);
         }
@@ -612,10 +671,15 @@ void CribbageState::DoApplyAction(Action move) {
 				hands_[cur_player_].erase(iter);
 				played_cards_.push_back(card);
 				discards_[cur_player_].push_back(card);
-				// TODO: check & apply scoring
 				last_played_player_ = cur_player_;
-				// TODO: check if the sum is 31 then no need for the passes
-				cur_player_ = NextPlayerRoundRobin(cur_player_, num_players_);
+				CheckAndApplyPlayScoring();
+				// If the sum is 31 then no need for the passes, we can end the round
+        // round right away.
+        if (current_sum_ == 31) {
+          DoEndOfPlayRound();
+        } else {
+  				cur_player_ = NextPlayerRoundRobin(cur_player_, num_players_);
+        }
 			}
 		}
 	}

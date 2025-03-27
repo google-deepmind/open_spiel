@@ -104,6 +104,7 @@ class CribbageState : public State {
   std::vector<Action> LegalActions() const override;
 
 	int round() const { return round_; }
+  std::vector<double> scores() const { return scores_; }
 
  protected:
   void DoApplyAction(Action move_id) override;
@@ -120,6 +121,8 @@ class CribbageState : public State {
   void ScoreHands();
   void ScoreCrib();
   int DetermineWinner() const;
+  void DoEndOfPlayRound();
+  void CheckAndApplyPlayScoring();
 
   const CribbageGame& parent_game_;
   int round_ = -1;
@@ -171,6 +174,7 @@ class CribbageGame : public Game {
 	const int cards_to_crib_;
 };
 
+Action ToAction(const Card& c1, const Card& c2);
 Card GetCard(int id);
 Card GetCardByString(const std::string& str);
 std::vector<Card> GetHandFromStrings(

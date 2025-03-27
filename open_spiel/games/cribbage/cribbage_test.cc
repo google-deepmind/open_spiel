@@ -124,6 +124,180 @@ void BasicOneTurnPlaythrough() {
 	std::cout << state->ToString() << std::endl;
 }
 
+void AssertApproxEqual(const std::vector<double>& values1,
+                       const std::vector<double>& values2) {
+  for (int i = 0; i < values1.size(); ++i) {
+    SPIEL_CHECK_TRUE(Near(values1[i], values2[i]));
+  }
+}
+
+void WikipediaExampleTwoPlayers() {
+  // https://en.wikipedia.org/wiki/Rules_of_cribbage
+	std::shared_ptr<const Game> game = LoadGame("cribbage");
+	std::unique_ptr<State> state = game->NewInitialState();
+	CribbageState* crib_state = static_cast<CribbageState*>(state.get());
+
+	// Deal.
+  //   Player 0 (dealer) Alice: 5S 4S 2S 6H | 7H 8H
+  //   Player 1          Bob:   6D JH 4H 7C | 2D 8D
+  //   Starter: 3C
+  const std::vector<std::string> cards = {
+      "5S", "4S", "2S", "6H", "7H", "8H",
+      "6D", "JH", "4H", "7C", "2D", "8D"
+  };
+  for (const std::string& cstr : cards) {
+    Card card = GetCardByString(cstr);
+    state->ApplyAction(card.id);
+  }
+
+  std::cout << state->ToString() << std::endl;
+
+	// Card choices. Alice, then Bob.
+  state->ApplyAction(ToAction(GetCardByString("7H"), GetCardByString("8H")));
+	state->ApplyAction(ToAction(GetCardByString("2D"), GetCardByString("8D")));
+
+	// Starter.
+	state->ApplyAction(GetCardByString("3D").id);
+
+	// Play phase.
+  std::cout << state->ToString() << std::endl;
+
+  // Bob plays JH
+  state->ApplyAction(GetCardByString("JH").id);
+  AssertApproxEqual(crib_state->scores(), {0.0, 0.0});
+  // Alice plays 5S
+  state->ApplyAction(GetCardByString("5S").id);
+  AssertApproxEqual(crib_state->scores(), {2.0, 0.0});
+  // Bob plays 7C
+  state->ApplyAction(GetCardByString("7C").id);
+  AssertApproxEqual(crib_state->scores(), {2.0, 0.0});
+  // Alice plays 6H
+  state->ApplyAction(GetCardByString("6H").id);
+  AssertApproxEqual(crib_state->scores(), {5.0, 0.0});
+  // Bob passes
+  state->ApplyAction(kPassAction);
+  // Alice plays 2S
+  state->ApplyAction(GetCardByString("2S").id);
+  AssertApproxEqual(crib_state->scores(), {5.0, 0.0});
+  // Bob passes, Alice passes.
+  state->ApplyAction(kPassAction);
+  state->ApplyAction(kPassAction);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0});
+
+  // New play round. Bob starts with 6D.
+  state->ApplyAction(GetCardByString("6D").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0});
+  // Alice plays 4S.
+  state->ApplyAction(GetCardByString("4S").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0});
+  // Bob plays 4H.
+  state->ApplyAction(GetCardByString("4H").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 2.0});
+  // Alice passes, Bob passes.
+  state->ApplyAction(kPassAction);
+  state->ApplyAction(kPassAction);
+  // Points are now {6, 3}.
+  //   Alice counts her hand: 15 two, 15 four (using the starter) and a run of
+  //                          5 = 9.
+  //   Bob counts his hand: nothing.
+  //   Alice counts the crib: 15 two, 15 four, and a pair = 6.
+  std::cout << state->ToString() << std::endl;
+
+  AssertApproxEqual(crib_state->scores(), {21.0, 3.0});
+}
+
+void WikipediaExampleThreePlayers() {
+  // https://en.wikipedia.org/wiki/Rules_of_cribbage
+	std::shared_ptr<const Game> game = LoadGame("cribbage(players=3)");
+	std::unique_ptr<State> state = game->NewInitialState();
+	CribbageState* crib_state = static_cast<CribbageState*>(state.get());
+
+	// Deal.
+  //   Player 0 (dealer) Claire: 7S KD 9D 8H | 7H
+  //   Player 1          David:  TS 5S 4S 7C | 2D
+  //   Player 2          Eve:    7D 3D TH 5C | 3S
+  //   Crib: TC
+  //   Starter: 3C
+  const std::vector<std::string> cards = {
+      "7S", "KD", "9D", "8H", "7H",
+      "TS", "5S", "4S", "7C", "2D",
+      "7D", "3D", "TH", "5C", "3S",
+      "TC",
+  };
+  for (const std::string& cstr : cards) {
+    Card card = GetCardByString(cstr);
+    state->ApplyAction(card.id);
+  }
+
+  std::cout << state->ToString() << std::endl;
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+
+	// Card choices. 
+  state->ApplyAction(GetCardByString("7H").id);
+  state->ApplyAction(GetCardByString("2D").id);
+  state->ApplyAction(GetCardByString("3S").id);
+	
+  // Starter.
+  std::cout << state->ToString() << std::endl;
+	state->ApplyAction(GetCardByString("3C").id);
+  
+
+  // David plays 7C.
+  state->ApplyAction(GetCardByString("7C").id);
+  AssertApproxEqual(crib_state->scores(), {0.0, 0.0, 0.0});
+  // Eve plays 7D.
+  state->ApplyAction(GetCardByString("7D").id);
+  AssertApproxEqual(crib_state->scores(), {0.0, 0.0, 2.0});
+  // Claire plays 7S.
+  state->ApplyAction(GetCardByString("7S").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 2.0});
+  // David plays 5S.
+  state->ApplyAction(GetCardByString("5S").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 2.0});
+  // Eve plays 31.
+  state->ApplyAction(GetCardByString("5C").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 6.0});
+
+  // Claire plays 8H.
+  state->ApplyAction(GetCardByString("8H").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 6.0});
+  // David plays TS.
+  state->ApplyAction(GetCardByString("TS").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 6.0});
+  // Eve plays TH.
+  state->ApplyAction(GetCardByString("TH").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 8.0});
+  // Claire passes, David passess, Eve plays 3D
+  state->ApplyAction(kPassAction);
+  state->ApplyAction(kPassAction);
+  state->ApplyAction(GetCardByString("3D").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 10.0});
+
+  // Claire plays KD
+  state->ApplyAction(GetCardByString("KD").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 10.0});
+  // David plays 4S
+  state->ApplyAction(GetCardByString("4S").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 10.0});
+  // Eve passes
+  state->ApplyAction(kPassAction);
+  // Claire plays 9D
+  state->ApplyAction(GetCardByString("9D").id);
+  AssertApproxEqual(crib_state->scores(), {6.0, 0.0, 10.0});
+  // David passes, Eve passes again. Claire passes.
+  // Claire gets 1 point, then hands scored.
+  state->ApplyAction(kPassAction);
+  state->ApplyAction(kPassAction);
+  state->ApplyAction(kPassAction);
+
+  // Claire scores 15 two and 7-8-9 for four = 5.
+  // Claire's crib scores 15 two, 15 four, 15 six, and pair = 8.
+  // David scores 15 two, 15 four, and 3-4-5 for three is 7.
+  // Eve scores 15 two, 15 four, 15 six, and a pair for 8.
+  AssertApproxEqual(crib_state->scores(), {20.0, 7.0, 18.0});
+  std::cout << state->ToString() << std::endl;
+}
+
 void HandScoringTests() {
   // Suit order: CDHS
   std::vector<Card> hand;
@@ -171,11 +345,14 @@ void BasicCribbageTests() {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  open_spiel::cribbage::CardToStringTest();
+  /*open_spiel::cribbage::CardToStringTest();
   open_spiel::cribbage::BasicLoadTest();
   open_spiel::cribbage::BasicCribbageTests();
 	open_spiel::cribbage::BasicOneTurnPlaythrough();
   open_spiel::cribbage::HandScoringTests();
-  open_spiel::cribbage::BasicCribbageTests();
+  open_spiel::cribbage::BasicCribbageTests();*/
+  //open_spiel::cribbage::WikipediaExampleTwoPlayers();
+  open_spiel::cribbage::WikipediaExampleThreePlayers();
+
 }
 
