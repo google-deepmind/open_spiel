@@ -184,6 +184,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   ../integration_tests/playthrough_test.py
   algorithms/action_value_test.py
   algorithms/action_value_vs_best_response_test.py
+  algorithms/async_mcts_test.py
   algorithms/best_response_test.py
   algorithms/boltzmann_tabular_qlearner_test.py
   algorithms/cfr_br_test.py
