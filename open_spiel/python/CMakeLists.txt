@@ -83,6 +83,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc
   pybind11/bots.h
+  pybind11/evaluation_sco.cc
+  pybind11/evaluation_sco.h
   pybind11/games_backgammon.cc
   pybind11/games_backgammon.h
   pybind11/games_bargaining.cc
@@ -268,6 +270,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   voting/plurality_test.py
   voting/ranked_pairs_test.py
   voting/schulze_test.py
+  voting/soft_condorcet_optimization_test.py
   voting/stv_test.py
 )
 
