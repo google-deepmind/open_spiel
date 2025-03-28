@@ -214,6 +214,7 @@ set (OPEN_SPIEL_OBJECTS
   $<TARGET_OBJECTS:game_transforms>
   $<TARGET_OBJECTS:bridge_double_dummy_solver>
   $<TARGET_OBJECTS:algorithms>
+  $<TARGET_OBJECTS:evaluation>
   $<TARGET_OBJECTS:utils>
   $<TARGET_OBJECTS:tests>
 )
@@ -272,6 +273,7 @@ include_directories(..)
 
 add_subdirectory (algorithms)
 add_subdirectory (bots)
+add_subdirectory (evaluation)
 add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
