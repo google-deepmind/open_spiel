@@ -95,7 +95,7 @@ class PreferenceProfile(object):
       self._register_alternative(idx)
 
   def _register_alternative(self, alternative: AlternativeId):
-    """Add this alternative to interal recors if not already there."""
+    """Add this alternative to internal records if not already there."""
     idx = self._alternatives_dict.get(alternative)
     if idx is None:
       self._alternatives_ids.append(alternative)
@@ -331,6 +331,20 @@ class PreferenceProfile(object):
     for i in range(len(self._votes)):
       self.set_weight(i, value)
 
+  def to_list_of_tuples(
+      self, convert_alternatives_to_strings: bool = False
+  ) -> List[Tuple[float, PreferenceList]]:
+    """Returns a list of (alternative, score) tuples."""
+    list_of_tuples = []
+    for vote in self._votes:
+      vote_lst = (
+          [str(a) for a in vote.vote]
+          if convert_alternatives_to_strings
+          else vote.vote
+      )
+      list_of_tuples.append((vote.weight, vote_lst))
+    return list_of_tuples
+
 
 class RankOutcome(object):
   """Basic object for outcomes of the voting methods."""
@@ -490,4 +504,3 @@ class AbstractVotingMethod(metaclass=abc.ABCMeta):
       profile: the profile to check.
     """
     return profile.num_votes() > 0 and profile.num_alternatives() > 0
-
