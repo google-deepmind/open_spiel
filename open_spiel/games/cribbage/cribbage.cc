@@ -82,13 +82,13 @@ const GameType kGameType{/*short_name=*/"cribbage",
                          GameType::ChanceMode::kExplicitStochastic,
                          GameType::Information::kImperfectInformation,
                          GameType::Utility::kGeneralSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/2,
-                         /*min_num_players=*/4,
+                         GameType::RewardModel::kRewards,
+                         /*max_num_players=*/4,
+                         /*min_num_players=*/2,
                          /*provides_information_state_string=*/false,
                          /*provides_information_state_tensor=*/false,
-                         /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true,
+                         /*provides_observation_string=*/false,
+                         /*provides_observation_tensor=*/false,
                          /*parameter_specification=*/
 												 {{"players", GameParameter(kDefaultNumPlayers)}}};
 
@@ -391,16 +391,28 @@ int CribbageState::DetermineWinner() const {
   return -1;
 }
 
-void AddWinnerBonusLoserPenalty(std::vector<double>* values, int winner) {
-  if (winner >= 0) {
-    double loser_penalty = (-kWinnerBonus)/
-        (static_cast<double>(values->size()) - 1.0);
-    for (Player p = 0; p < values->size(); ++p) {
-      if (p == winner) {
-        (*values)[p] += kWinnerBonus;
-      } else {
-        (*values)[p] += loser_penalty;
-      }
+void AddWinnerBonusLoserPenalty(std::vector<double>* values, int winner,
+                                int num_players) {
+  if (winner < 0) {
+    return;
+  }
+
+  // For 2 and 3 player games, the loss penalty is -kWinBonus / (n-1) and
+  // winBonus is 
+  // For a 4-player game, the loss penalty is shared across losers.
+  double win_bonus_per_player = num_players <= 3 ? kWinnerBonus 
+                                                 : (kWinnerBonus / 2.0);
+
+  double loss_penalty_per_player = num_players <= 3 ?
+      (-kWinnerBonus / (static_cast<double>(values->size()) - 1.0)) :
+      (-kWinnerBonus / 2.0);
+
+  for (Player p = 0; p < values->size(); ++p) {
+    // In the 4-player games, the score is identical for players {0,2} and {1,3}
+    if (p == winner || (num_players == 4 && p == (winner + 2))) {
+      (*values)[p] += win_bonus_per_player;
+    } else {
+      (*values)[p] += loss_penalty_per_player;
     }
   }
 }                                             
@@ -409,7 +421,7 @@ std::vector<double> CribbageState::Rewards() const {
   int winner = DetermineWinner();
   std::vector<double> ret = rewards_;
   SPIEL_CHECK_EQ(ret.size(), num_players_);
-  AddWinnerBonusLoserPenalty(&ret, winner);
+  AddWinnerBonusLoserPenalty(&ret, winner, num_players_);
   return ret;
 }
 
@@ -417,7 +429,7 @@ std::vector<double> CribbageState::Returns() const {
   int winner = DetermineWinner();
   std::vector<double> ret = scores_;
   SPIEL_CHECK_EQ(ret.size(), num_players_);
-  AddWinnerBonusLoserPenalty(&ret, winner);
+  AddWinnerBonusLoserPenalty(&ret, winner, num_players_);
   return ret;
 }
 
@@ -602,7 +614,6 @@ void CribbageState::DoApplyAction(Action move) {
 			}
 
 			// Check if we're ready to start choosing cards.
-      std::cout << p << " " << crib_.size() << " " << parent_game_.cards_to_crib() << std::endl;
 			if (crib_dealt || (p == num_players_ - 1 &&
                          hands_[p].size() == parent_game_.cards_per_player() &&
                          crib_.size() == parent_game_.cards_to_crib())) {
@@ -686,8 +697,18 @@ void CribbageState::DoApplyAction(Action move) {
 }
 
 void CribbageState::Score(Player player, int points) {
-	rewards_[player] += points;
+  rewards_[player] += points;
 	scores_[player] += points;
+
+  // 4-player is a team game. Any scoring for p also counts for either (p+2)
+  // or (p-2).
+  if (num_players_ == 4) {
+    Player teammate = (player + 2 < num_players_ ? player + 2 : player - 2);
+    SPIEL_CHECK_GE(teammate, 0);
+    SPIEL_CHECK_LT(teammate, num_players_);
+    rewards_[teammate] += points;
+  	scores_[teammate] += points;
+  }
 }
 
 void CribbageState::ScoreHands() {
@@ -764,7 +785,6 @@ std::vector<Action> CribbageState::LegalOneCardCribActions() const {
 }
 
 std::vector<Action> CribbageState::LegalTwoCardCribActions() const {
-  //std::cout << "here" << std::endl;
 	std::vector<Action> legal_actions;
 	for (int i = 0; i < hands_[cur_player_].size(); ++i) {
 		for (int j = i+1; j < hands_[cur_player_].size(); ++j) {

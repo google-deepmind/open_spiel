@@ -337,7 +337,9 @@ void HandScoringTests() {
 }
 
 void BasicCribbageTests() {
-  testing::RandomSimTestNoSerialize(*LoadGame("cribbage"), 10);
+  testing::RandomSimTest(*LoadGame("cribbage"), 10);
+  testing::RandomSimTest(*LoadGame("cribbage(players=3)"), 10);
+  testing::RandomSimTest(*LoadGame("cribbage(players=4)"), 10);
 }
 
 }  // namespace
@@ -345,14 +347,13 @@ void BasicCribbageTests() {
 }  // namespace open_spiel
 
 int main(int argc, char **argv) {
-  /*open_spiel::cribbage::CardToStringTest();
+  open_spiel::cribbage::CardToStringTest();
   open_spiel::cribbage::BasicLoadTest();
   open_spiel::cribbage::BasicCribbageTests();
 	open_spiel::cribbage::BasicOneTurnPlaythrough();
   open_spiel::cribbage::HandScoringTests();
-  open_spiel::cribbage::BasicCribbageTests();*/
-  //open_spiel::cribbage::WikipediaExampleTwoPlayers();
+  open_spiel::cribbage::WikipediaExampleTwoPlayers();
   open_spiel::cribbage::WikipediaExampleThreePlayers();
-
+  open_spiel::cribbage::BasicCribbageTests();
 }
 
