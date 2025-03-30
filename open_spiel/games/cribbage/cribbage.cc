@@ -629,7 +629,7 @@ void CribbageState::DoApplyAction(Action move) {
 			SPIEL_CHECK_FALSE(iter == deck_.end());
 		  starter_ = *iter;
 			deck_.erase(iter);
-			if (starter_.value().rank == Rank::kJack) {
+			if ((*starter_).rank == Rank::kJack) {
 				// His Nobs
 				Score(dealer_, 2);
 			}
@@ -713,13 +713,13 @@ void CribbageState::Score(Player player, int points) {
 
 void CribbageState::ScoreHands() {
   for (Player p = 0; p < num_players_; ++p) {
-    int points = ScoreHand(hands_[p], starter_.value());
+    int points = ScoreHand(hands_[p], *starter_);
     Score(p, points);
   }
 }
 
 void CribbageState::ScoreCrib() {
-  int points = ScoreHand(crib_, starter_.value());
+  int points = ScoreHand(crib_, *starter_);
   Score(dealer_, points);
 }
 
@@ -830,7 +830,7 @@ std::string CribbageState::ToString() const {
 	}
 	absl::StrAppend(&str, "\n");
 	if (starter_.has_value()) {
-		absl::StrAppend(&str, "Starter: ", starter_.value().to_string(), "\n");
+		absl::StrAppend(&str, "Starter: ", (*starter_).to_string(), "\n");
 	}
 	for (int p = 0; p < num_players_; ++p) {
 		absl::StrAppend(&str, "P", p, " Hand:");
