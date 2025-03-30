@@ -744,6 +744,8 @@ void CribbageState::SortCrib() {
 std::vector<Action> CribbageState::LegalActions() const {
 	if (IsChanceNode()) {
 		return LegalChanceOutcomes(); 
+  } else if (IsTerminal()) {
+    return {};
 	} else {
 		if (phase_ == Phase::kCardPhase) {
 			switch (num_players_) {
