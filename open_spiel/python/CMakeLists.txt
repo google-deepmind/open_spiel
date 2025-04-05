@@ -57,23 +57,6 @@ if (OPEN_SPIEL_ENABLE_PYTORCH STREQUAL AUTO)
   endif()
 endif()
 
-if (OPEN_SPIEL_ENABLE_TENSORFLOW STREQUAL AUTO)
-  message(NOTICE "OPEN_SPIEL_ENABLE_TENSORFLOW set to AUTO. Detecting Tensorflow...")
-  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/find_tensorflow.sh ${Python3_EXECUTABLE}
-                  RESULT_VARIABLE TENSORFLOW_RET_VAL
-                  OUTPUT_VARIABLE TENSORFLOW_OUT
-                  ERROR_VARIABLE TENSORFLOW_ERR)
-  if (TENSORFLOW_RET_VAL EQUAL 0)
-    message(NOTICE "Found, version: ${TENSORFLOW_OUT}")
-    set(OPEN_SPIEL_ENABLE_TENSORFLOW ON)
-  else()
-    message(NOTICE "Not found. Enable printing errors in python/CMakeLists.txt to see output.")
-    set(OPEN_SPIEL_ENABLE_TENSORFLOW OFF)
-    # message(NOTICE "stdout: ${TENSORFLOW_OUT}, stderr: ${TENSORFLOW_ERR}")
-  endif()
-endif()
-
-
 # List of all Python bindings to add to pyspiel.
 include_directories (../pybind11_abseil ../../pybind11/include)
 set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
@@ -191,6 +174,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/boltzmann_tabular_qlearner_test.py
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
+  algorithms/discounted_cfr_test.py
   algorithms/efr_test.py
   algorithms/evaluate_bots_test.py
   algorithms/expected_game_score_test.py
@@ -208,6 +192,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/outcome_sampling_mccfr_test.py
   algorithms/policy_aggregator_joint_test.py
   algorithms/policy_aggregator_test.py
+  algorithms/psro_v2/strategy_selectors_test.py
   algorithms/projected_replicator_dynamics_test.py
   algorithms/random_agent_test.py
   algorithms/regret_matching_test.py
@@ -277,7 +262,6 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
 # Add Jax tests if it is enabled.
 if (OPEN_SPIEL_ENABLE_JAX)
   set (PYTHON_TESTS ${PYTHON_TESTS}
-    jax/deep_cfr_jax_test.py
     jax/dqn_jax_test.py
     jax/nfsp_jax_test.py
     jax/opponent_shaping_jax_test.py
@@ -301,35 +285,6 @@ if (OPEN_SPIEL_ENABLE_PYTORCH)
   )
 endif()
 
-# Add Tensorflow tests if is enabled.
-if (OPEN_SPIEL_ENABLE_TENSORFLOW)
-  set(PYTHON_TESTS ${PYTHON_TESTS}
-      algorithms/alpha_zero/evaluator_test.py
-      # Broken in Python 3.12. Must port to Keras 3. See https://github.com/google-deepmind/open_spiel/issues/1206.
-      # algorithms/alpha_zero/model_test.py
-      algorithms/deep_cfr_test.py
-      # Broken in Python 3.12. Must port to Keras 3. See https://github.com/google-deepmind/open_spiel/issues/1208.
-      # algorithms/deep_cfr_tf2_test.py
-      algorithms/discounted_cfr_test.py
-      algorithms/dqn_test.py
-      algorithms/eva_test.py
-      algorithms/exploitability_descent_test.py
-      algorithms/exploitability_test.py
-      algorithms/losses/rl_losses_test.py
-      algorithms/masked_softmax_test.py
-      algorithms/neurd_test.py
-      algorithms/nfsp_test.py
-      algorithms/policy_gradient_test.py
-      algorithms/psro_v2/strategy_selectors_test.py
-      algorithms/rcfr_test.py
-  )
-  if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
-    set(PYTHON_TESTS ${PYTHON_TESTS}
-        algorithms/psro_v2/best_response_oracle_test.py
-    )
-  endif()
-endif()
-
 # Add miscellaneous Python tests if enabled.
 # These require extra dependencies like cvxopt, nashpy, or matplotlib
 if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
@@ -340,6 +295,7 @@ if (OPEN_SPIEL_ENABLE_PYTHON_MISC)
       algorithms/lp_solver_test.py
       algorithms/nash_averaging_test.py
       algorithms/mip_nash_test.py
+      algorithms/psro_v2/best_response_oracle_test.py
       algorithms/response_graph_ucb_test.py
       algorithms/sequence_form_lp_test.py
       algorithms/stackelberg_lp_test.py
