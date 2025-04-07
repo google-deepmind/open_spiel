@@ -14,12 +14,18 @@
 
 #include "open_spiel/games/phantom_ttt/phantom_ttt.h"
 
+#include <algorithm>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -52,7 +58,8 @@ const GameType kGameType{
     /*provides_observation_string=*/true,
     /*provides_observation_tensor=*/true,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
+    {{"obstype", GameParameter(std::string(kDefaultObsType))},
+     {"gameversion", GameParameter(std::string(kDefaultGameVersion))}}};
 
 const GameType kImperfectRecallGameType{
     /*short_name=*/"phantom_ttt_ir",
@@ -69,7 +76,8 @@ const GameType kImperfectRecallGameType{
     /*provides_observation_string=*/false,
     /*provides_observation_tensor=*/false,
     /*parameter_specification=*/
-    {{"obstype", GameParameter(std::string(kDefaultObsType))}}};
+    {{"obstype", GameParameter(std::string(kDefaultObsType))},
+     {"gameversion", GameParameter(std::string(kDefaultGameVersion))}}};
 
 std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new PhantomTTTGame(params, kGameType));
@@ -93,8 +101,12 @@ ImperfectRecallPTTTGame::ImperfectRecallPTTTGame(const GameParameters& params)
     : PhantomTTTGame(params, kImperfectRecallGameType) {}
 
 PhantomTTTState::PhantomTTTState(std::shared_ptr<const Game> game,
+                                 GameVersion game_version,
                                  ObservationType obs_type)
-    : State(game), state_(game), obs_type_(obs_type) {
+    : State(game),
+      state_(game),
+      obs_type_(obs_type),
+      game_version_(game_version) {
   std::fill(begin(x_view_), end(x_view_), CellState::kEmpty);
   std::fill(begin(o_view_), end(o_view_), CellState::kEmpty);
   if (obs_type_ == ObservationType::kRevealNumTurns) {
@@ -114,10 +126,20 @@ void PhantomTTTState::DoApplyAction(Action move) {
   Player cur_player = CurrentPlayer();
   auto& cur_view = cur_player == 0 ? x_view_ : o_view_;
 
-  // Two cases: either there is a mark already there, or not.
-  if (state_.BoardAt(move) == CellState::kEmpty) {
-    // No mark on board, so play this normally.
-    state_.ApplyAction(move);
+  // Either occupied or not
+  if (game_version_ == GameVersion::kClassicalPhantomTicTacToe) {
+    if (state_.BoardAt(move) == CellState::kEmpty) {
+      state_.ApplyAction(move);
+    }
+  } else if (game_version_ == GameVersion::kAbruptPhantomTicTacToe) {
+    if (state_.BoardAt(move) == CellState::kEmpty) {
+      state_.ApplyAction(move);
+    } else {
+      // switch the current player
+      state_.ChangePlayer();
+    }
+  } else {
+    SpielFatalError("Unknown game version");
   }
 
   // Update current player's view, and action sequence.
@@ -310,6 +332,15 @@ PhantomTTTGame::PhantomTTTGame(const GameParameters& params, GameType game_type)
     longest_sequence_ = 2 * kNumCells - 1;
   } else {
     SpielFatalError(absl::StrCat("Unrecognized observation type: ", obs_type));
+  }
+
+  std::string game_version = ParameterValue<std::string>("gameversion");
+  if (game_version == "classical") {
+    game_version_ = GameVersion::kClassicalPhantomTicTacToe;
+  } else if (game_version == "abrupt") {
+    game_version_ = GameVersion::kAbruptPhantomTicTacToe;
+  } else {
+    SpielFatalError(absl::StrCat("Unrecognized game version: ", game_version));
   }
 }
 
