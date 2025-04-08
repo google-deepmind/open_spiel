@@ -57,7 +57,6 @@ if [[ "$MODE" = "full" ]]; then
   source $PROJDIR/open_spiel/scripts/python_extra_deps.sh $PYBIN
   $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_JAX_DEPS
   $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_PYTORCH_DEPS
-  $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_TENSORFLOW_DEPS
   $PYBIN -m pip install --upgrade $OPEN_SPIEL_PYTHON_MISC_DEPS
 fi
 

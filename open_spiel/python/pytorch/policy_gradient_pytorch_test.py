@@ -21,14 +21,42 @@ from absl.testing import parameterized
 import numpy as np
 import torch
 
+from open_spiel.python import policy
 from open_spiel.python import rl_environment
 from open_spiel.python.algorithms import exploitability
-from open_spiel.python.examples import kuhn_policy_gradient
 import pyspiel
 from open_spiel.python.pytorch import policy_gradient
 from open_spiel.python.pytorch.losses import rl_losses
 
 SEED = 24984617
+
+
+class PolicyGradientPolicies(policy.Policy):
+  """Joint policy to be evaluated."""
+
+  def __init__(self, env, nfsp_policies):
+    game = env.game
+    player_ids = [0, 1]
+    super(PolicyGradientPolicies, self).__init__(game, player_ids)
+    self._policies = nfsp_policies
+    self._obs = {"info_state": [None, None], "legal_actions": [None, None]}
+
+  def action_probabilities(self, state, player_id=None):
+    cur_player = state.current_player()
+    legal_actions = state.legal_actions(cur_player)
+
+    self._obs["current_player"] = cur_player
+    self._obs["info_state"][cur_player] = (
+        state.information_state_tensor(cur_player))
+    self._obs["legal_actions"][cur_player] = legal_actions
+
+    info_state = rl_environment.TimeStep(
+        observations=self._obs, rewards=None, discounts=None, step_type=None)
+
+    p = self._policies[cur_player].step(info_state, is_evaluation=True).probs
+    prob_dict = {action: p[action] for action in legal_actions}
+    return prob_dict
+
 
 
 class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
@@ -86,7 +114,7 @@ class PolicyGradientTest(parameterized.TestCase, absltest.TestCase):
             pi_learning_rate=0.01,
             num_critic_before_pi=4) for player_id in [0, 1]
     ]
-    expl_policies_avg = kuhn_policy_gradient.PolicyGradientPolicies(env, agents)
+    expl_policies_avg = PolicyGradientPolicies(env, agents)
 
     for _ in range(100):
       time_step = env.reset()
