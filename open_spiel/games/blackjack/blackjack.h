@@ -35,6 +35,7 @@ namespace blackjack {
 constexpr int kNumSuits = 4;
 constexpr int kCardsPerSuit = 13;
 constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
+constexpr const std::string kHiddenCardStr = "??";
 
 // Moves.
 enum ActionType { kHit = 0, kStand = 1 };
@@ -67,6 +68,7 @@ class BlackjackState : public State {
   int CardValue(int card) const;
   void EndPlayerTurn(int player);
   void DealCardToPlayer(int player, int card);
+  bool IsTurnOver(int player) const { return turn_over_[player]; }
   std::vector<int> cards(int player) const { return cards_[player]; }
   std::string InformationStateString(Player player) const;
   std::unique_ptr<State> ResampleFromInfostate(

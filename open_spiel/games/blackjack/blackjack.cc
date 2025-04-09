@@ -47,8 +47,6 @@ constexpr int kInitialCardsPerPlayer = 2;
 const char kSuitNames[kNumSuits + 1] = "CDHS";
 const char kRanks[kCardsPerSuit + 1] = "A23456789TJQK";
 
-constexpr const char* kHiddenCardStr = "??";
-
 namespace {
 // Facts about the game
 const GameType kGameType{/*short_name=*/"blackjack",
@@ -202,12 +200,11 @@ std::vector<double> BlackjackState::Returns() const {
 std::string BlackjackState::ObservationString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, game_->NumPlayers());
-  if (player == 0 && cur_player_ == 0) {
-    // Don't show dealer's first card if it's the player's turn and they are
-    // the observer.
-    return StateToString(false);
+  if (IsTurnOver(player)) {
+    // Show dealer's face-down card after player's hand is settled.
+    return StateToString(/*show_all_dealers_card=*/true);
   } else {
-    return StateToString(true);
+    return StateToString(/*show_all_dealers_card=*/false);
   }
 }
 
