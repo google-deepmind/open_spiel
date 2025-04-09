@@ -31,6 +31,8 @@ using open_spiel::blackjack::BlackjackState;
 void open_spiel::init_pyspiel_games_blackjack(py::module& m) {
   py::module_ blackjack = m.def_submodule("blackjack");
 
+  blackjack.attr("HIDDEN_CARD_STR") = &blackjack::kHiddenCardStr;
+
   py::enum_<ActionType>(blackjack, "ActionType")
     .value("HIT", ActionType::kHit)
     .value("STAND", ActionType::kStand)
@@ -50,6 +52,8 @@ void open_spiel::init_pyspiel_games_blackjack(py::module& m) {
       .def("get_best_player_total", &BlackjackState::GetBestPlayerTotal)
       // args: int player, returns: list of ints
       .def("cards", &BlackjackState::cards)
+      // args: int player
+      .def("is_turn_over", &BlackjackState::IsTurnOver)
       // Pickle support
       .def(py::pickle(
           [](const BlackjackState& state) {  // __getstate__
