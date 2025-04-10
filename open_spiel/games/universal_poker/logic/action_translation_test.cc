@@ -14,6 +14,7 @@
 
 #include "open_spiel/games/universal_poker/logic/action_translation.h"
 
+#include <cmath>
 #include <cstdlib>
 #include <vector>
 
@@ -26,41 +27,33 @@ namespace logic {
 // As per Table 1 in the paper, "Rand-psHar" holding 'B'=1 and 'x'=0.25, but
 // moving 'A' between various different values.
 void TestRandPSHarPaperResults() {
-  // Scale A B and x since OpenSpiel actions are always integer chips / cannot
-  // be < 2.
-  // (Assuming scale invariance holds this should give the same results!)
-  int scale = 10000;
-  int pot = 1 * scale;
-  int untranslated_bet = 0.25 * scale;
-  // Action 0 maps to fold, 1 maps to check/call, only 2+ are valid bets.
-  Action min_bet = 2;
-  // In this section the paper only goes as big as pot, so no need to consider
-  // larger sizes.
-  Action max_bet = pot;
-
   // The paper only calculated out to 3 decimal places.
   double tolerance = 0.001;
 
-  RandomizedPsuedoHarmonicActionTranslation result =
-      CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                     {0.001, 1});
-  SPIEL_CHECK_LT(std::abs(result.probability_a - 0.601), tolerance);
-  SPIEL_CHECK_LT(std::abs(result.probability_b - 0.399), tolerance);
+  int pot = 2000;
+  int untranslated_bet = 500;  // 0.25 * pot
 
-  result = CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet,
-                                          pot, {0.01, 1});
-  SPIEL_CHECK_LT(std::abs(result.probability_a - 0.612), tolerance);
-  SPIEL_CHECK_LT(std::abs(result.probability_b - 0.388), tolerance);
+  // Moving A in [0.001, 0.01, 0.05, 0.1]
+  RandomizedPsuedoHarmonicActionTranslation result_thousandth =
+      CalculatePsuedoHarmonicMapping(untranslated_bet, pot, {2, pot});
+  RandomizedPsuedoHarmonicActionTranslation result_hundredth
+      = CalculatePsuedoHarmonicMapping(untranslated_bet, pot, {20, pot});
+  RandomizedPsuedoHarmonicActionTranslation result_twentieth
+      = CalculatePsuedoHarmonicMapping(untranslated_bet, pot, {100, pot});
+  RandomizedPsuedoHarmonicActionTranslation result_tenth
+      = CalculatePsuedoHarmonicMapping(untranslated_bet, pot, {200, pot});
 
-  result = CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet,
-                                          pot, {0.05, 1});
-  SPIEL_CHECK_LT(std::abs(result.probability_a - 0.663), tolerance);
-  SPIEL_CHECK_LT(std::abs(result.probability_b - 0.337), tolerance);
+  // Direct values from the paper.
+  SPIEL_CHECK_LT(std::abs(result_thousandth.probability_a - 0.601), tolerance);
+  SPIEL_CHECK_LT(std::abs(result_hundredth.probability_a - 0.612), tolerance);
+  SPIEL_CHECK_LT(std::abs(result_twentieth.probability_a - 0.663), tolerance);
+  SPIEL_CHECK_LT(std::abs(result_tenth.probability_a - 0.733), tolerance);
 
-  result = CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet,
-                                          pot, {0.1, 1});
-  SPIEL_CHECK_LT(std::abs(result.probability_a - 0.733), tolerance);
-  SPIEL_CHECK_LT(std::abs(result.probability_b - 0.267), tolerance);
+  // Corresponding percentages calculated by subtracting each above from 1.
+  SPIEL_CHECK_LT(std::abs(result_thousandth.probability_b - 0.399), tolerance);
+  SPIEL_CHECK_LT(std::abs(result_hundredth.probability_b - 0.388), tolerance);
+  SPIEL_CHECK_LT(std::abs(result_twentieth.probability_b - 0.337), tolerance);
+  SPIEL_CHECK_LT(std::abs(result_tenth.probability_b - 0.267), tolerance);
 }
 
 // Again per the Table 1, Rand-psHar holding B=1 and x=0.25, with A=0.1. But
@@ -68,45 +61,42 @@ void TestRandPSHarPaperResults() {
 // and x by any constant multiplicative factor k > 0 that it doesn't change the
 // results.
 void TestRandPSHarPaperResultScaleInvariance() {
-  for (int multiplicative_factor : {1, 1000, 1000000}) {
-    int pot = 20 * multiplicative_factor;
-    // 20 chips => 10 BB
-    // 200 chips => 100 BB
-    // ...
-    int untranslated_bet = pot / 4;
-    std::vector<double> action_abstraction = {
-        0.1,  // 10% of the pot
-        1     // 100% of the pot
-    };
-    // The paper only calculated out to 3 decimal places.
-    double tolerance = 0.001;
-    // Action 0 maps to fold, 1 maps to check/call, only 2+ are valid bets.
-    Action min_bet = 2;
-    // In this section the paper only goes as big as pot, so no need to consider
-    // larger sizes.
-    Action max_bet = pot;
+  // The paper only calculated out to 3 decimal places.
+  const double tolerance = 0.001;
+
+  const Action opponent_bet = 5;
+  const int pot = 20;
+  const Action small_bet = 2;
+  const Action large_bet = 20;  // B = pot
+  for (int i = 1; i <= 8; ++i) {
+    // [10^1, 10^2, ..., 10^8]
+    int scale = pow(10, i);
+
+    Action scaled_opponent_bet = opponent_bet * scale;
+    Action scaled_small_bet = small_bet * scale;
+    int scaled_pot = pot * scale;
+    Action scaled_large_bet = large_bet * scale;
 
     RandomizedPsuedoHarmonicActionTranslation result =
-        CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                       action_abstraction);
-    SPIEL_CHECK_EQ(result.smaller_bet, pot * 0.1);
+      CalculatePsuedoHarmonicMapping(
+          scaled_opponent_bet,
+          scaled_pot,
+          {scaled_small_bet, scaled_large_bet});
+
+    SPIEL_CHECK_EQ(result.smaller_bet, scaled_small_bet);
     SPIEL_CHECK_LT(std::abs(result.probability_a - 0.733), tolerance);
-    SPIEL_CHECK_EQ(result.larger_bet, pot);
+    SPIEL_CHECK_EQ(result.larger_bet, scaled_large_bet);
     SPIEL_CHECK_LT(std::abs(result.probability_b - 0.267), tolerance);
   }
 }
 
 void TestRandPSHarMappingExactMatch() {
-  Action min_bet = 2;
-  Action max_bet = 99999;
-
-  std::vector<double> action_abstraction = {0.5, 1.0, 2.0, 3.0, 100.0};
-  int pot = 200;
   int untranslated_bet = 200;  // pot sized bet => matches 1.0
+  int pot = 200;
+  std::vector<Action> action_abstraction = {100, 200, 400, 600, 20000};
 
   RandomizedPsuedoHarmonicActionTranslation result =
-      CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                     action_abstraction);
+      CalculatePsuedoHarmonicMapping(untranslated_bet, pot, action_abstraction);
 
   SPIEL_CHECK_EQ(result.smaller_bet, 200);
   SPIEL_CHECK_EQ(result.probability_a, 1.0);
@@ -115,25 +105,23 @@ void TestRandPSHarMappingExactMatch() {
 }
 
 void TestCalculatesMedianFiftyFifty() {
-  // For f_A,B (x) = (B - x)(1 + A) / (B - A)(1 + x), the "median" of f where
-  // each translated action should be 50% chance is (as per the paper):
+  // For f_A,B (x) = (B - x)(1 + A) / (B - A)(1 + x), the "median" of f `x*`
+  // where each translated action should be 50% chance is (as per the paper):
+  //
   // x* = (A + B + 2AB) / (A + B + 2)
   //
-  // Using A=0.2, B=0.5, x* = .9/2.7 = 1/3.
-  std::vector<double> action_abstraction = {0.01, 0.1, 0.2, 0.5, 1.0};
-  int untranslated_bet = 100;
+  // Using A=0.2 B=0.5, x* = .9/2.7 = 1/3.
   int pot = 300;
-
-  Action min_bet = 2;
-  Action max_bet = 9999999;
+  int untranslated_bet = 100;
+  std::vector<Action> action_abstraction = {3, 30, 60, 150, 300};
 
   // Only imprecision should be that inherent to using doubles. Since in reality
   // this bet size should result in _exactly_ choosing each at 50% frequency.
   double tolerance = 1E-12;
 
   RandomizedPsuedoHarmonicActionTranslation result =
-      CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                     action_abstraction);
+      CalculatePsuedoHarmonicMapping(untranslated_bet, pot, action_abstraction);
+
   SPIEL_CHECK_EQ(result.smaller_bet, 60);  // 0.2 * 300 = 60
   SPIEL_CHECK_LT(std::abs(result.probability_a - 0.5), tolerance);
   SPIEL_CHECK_EQ(result.larger_bet, 150);  // 0.5 * 300 = 150
@@ -141,17 +129,13 @@ void TestCalculatesMedianFiftyFifty() {
 }
 
 void TestShortCircuitsBelowMinAbstractionBet() {
-  int untranslated_bet = 2;
+  int untranslated_bet = 25;
   int pot = 300;
-  // Deliberately set so smallest translated bet is 0.5 * pot = 150
-  std::vector<double> action_abstraction = {0.5, 1.0};
-
-  Action min_bet = 2;
-  Action max_bet = 99999;
+  std::vector<Action> action_abstraction = {150, 300};
 
   RandomizedPsuedoHarmonicActionTranslation result =
-      CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                     action_abstraction);
+      CalculatePsuedoHarmonicMapping(untranslated_bet, pot, action_abstraction);
+
   SPIEL_CHECK_EQ(result.smaller_bet, 150);
   SPIEL_CHECK_EQ(result.probability_a, 1.0);
   // Don't care what the larger bet is, just that it's never used.
@@ -161,38 +145,29 @@ void TestShortCircuitsBelowMinAbstractionBet() {
 void TestShortCircuitsAboveMaxAbstractionBet() {
   int untranslated_bet = 600;
   int pot = 300;
-  // Deliberately set so largest translated bet is 1.25 * pot = 375
-  std::vector<double> action_abstraction = {0.75, 1.0, 1.25};
-
-  Action min_bet = 2;
-  Action max_bet = 99999;
+  std::vector<Action> action_abstraction = {225, 300, 375};
 
   RandomizedPsuedoHarmonicActionTranslation result =
-      CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                     action_abstraction);
-  // Don't care what the smaller bet is, just that it's never used.
+    CalculatePsuedoHarmonicMapping(untranslated_bet, pot, action_abstraction);
+
   SPIEL_CHECK_EQ(result.probability_a, 0.0);
+  // Don't care what the smaller bet is, just that it's never used.
   SPIEL_CHECK_EQ(result.larger_bet, 375);
   SPIEL_CHECK_EQ(result.probability_b, 1.0);
 }
 
-
 void TestUnsortedNonUniqueActionAbstraction() {
-  Action min_bet = 2;
-  Action max_bet = 999;
-
-  std::vector<double> action_abstraction = {2.0, 1.5, 0.5, 1.0, 0.5, 1.5};
-  int pot = 200;
-  int untranslated_bet = 375;
   double tolerance = 0.001;
+  int untranslated_bet = 375;
+  int pot = 200;
+  std::vector<Action> action_abstraction = {400, 300, 150, 200, 150, 300};
 
   RandomizedPsuedoHarmonicActionTranslation result =
-      CalculatePsuedoHarmonicMapping(untranslated_bet, min_bet, max_bet, pot,
-                                     action_abstraction);
+      CalculatePsuedoHarmonicMapping(untranslated_bet, pot, action_abstraction);
 
-  SPIEL_CHECK_EQ(result.smaller_bet, 300);  // 1.5 times pot
+  SPIEL_CHECK_EQ(result.smaller_bet, 300);
   SPIEL_CHECK_LT(std::abs(result.probability_a - 0.217), tolerance);
-  SPIEL_CHECK_EQ(result.larger_bet, 400);  // 2.0 times pot
+  SPIEL_CHECK_EQ(result.larger_bet, 400);
   SPIEL_CHECK_LT(std::abs(result.probability_b - 0.783), tolerance);
 }
 

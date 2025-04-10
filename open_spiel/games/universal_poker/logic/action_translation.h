@@ -50,31 +50,31 @@ struct RandomizedPsuedoHarmonicActionTranslation {
 // - the 2013 paper "Action Translation in Extensive-Form Games with Large
 //   Action Spaces: Axioms, Paradoxes, and the Pseudo-Harmonic Mapping" by Sam
 //   Ganzfried and Tuomas Sandholm.
+//
+// If the opponent's bet is outside the bounds of the action abstraction, or
+// exactly equal to one of the translated actions, it will be translated to the
+// singular closest such value at 100% frequency. Specifically:
+// - 'smaller_bet' will be arbitrarily set to 100% frequency if the opponent's
+//    bet is equal to an Action in the action abstraction, or less than the
+//    smallest Action in the action abstraction.
+// - 'larger_bet' will be arbitrarily set to 100% frequency if the opponent's
+//    bet is greater than the larget Action in the action abstraction.
 RandomizedPsuedoHarmonicActionTranslation CalculatePsuedoHarmonicMapping(
-    // The original bet size in chips of the opponent that we want to translate.
-    // Must be between untranslated_min_bet and untranslated_max_bet.
+    // The original bet size in chips of the opponent to be translated. If
+    // outside the bounds of the action abstraction, will be translated to the
+    // closest value. If equal to one of the translated actions, will be
+    // translated to that action at 100% frequency.
     int opponent_bet,
-    // The smallest bet size in chips that the opponent could have made at this
-    // point. Assumed to always be >= 2 (the minimum bet size in all
-    // configurations of universal poker), and must be <= untranslated_max_bet
-    // and opponent_bet.
-    Action untranslated_min_bet,
-    // The largest bet size in chips that the opponent could have made at this
-    // point. Must be >= untranslated_min_bet and >= opponent_bet.
-    Action untranslated_max_bet,
     // Number of_chips currently in the pot.
-    // Used to provide "scale invariance" property. Specifically, we use this to
-    // scale the untranslated size of the translated actions + the opponent's
-    // bet to that everything is calculated relative to a pot size of 1 when
-    // doing the math.
+    // Used to provide "scale invariance" property. Specifically, we scale down
+    // everything so that it's calculated relative to a pot size of 1 when doing
+    // the math.
     int pot_size,
-    // The sorted list of 'buckets' relative to a pot size to choose between.
-    // Used to determine which values in valid_actions we should actually
-    // translate to.
-    // E.g. 1.0 is a whole-pot bet, 0.5 is a half-pot bet, 1.5 is a 150%
-    // over-bet, etc.
-    // Assumed to be sorted in ascending order.
-    std::vector<double> action_abstraction);
+    // A subset of the valid Action-s for the game.
+    // Used to determine which Actions to translate the opponent's bet to.
+    // Must contain at least two unique values, and must contain only values
+    // that are >=2 (ie no fold or check/call Action).
+    std::vector<Action> action_abstraction);
 
 }  // namespace logic
 }  // namespace universal_poker
