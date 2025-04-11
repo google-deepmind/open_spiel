@@ -16,6 +16,8 @@
 from absl.testing import absltest
 from absl.testing import parameterized
 
+import jax
+
 from open_spiel.python import policy
 from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
@@ -29,6 +31,8 @@ from open_spiel.python.mfg.algorithms import nash_conv
 from open_spiel.python.mfg.algorithms import policy_value
 from open_spiel.python.mfg.games import crowd_modelling
 import pyspiel
+
+jax.config.update("jax_threefry_partitionable", False)
 
 
 class FictitiousPlayTest(parameterized.TestCase):
