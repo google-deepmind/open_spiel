@@ -11,14 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Tests for open_spiel.python.jax.dqn."""
 
 from absl.testing import absltest
+
+import jax
 
 from open_spiel.python import rl_agent_policy
 from open_spiel.python import rl_environment
 from open_spiel.python.jax import boltzmann_dqn
 import pyspiel
+
+jax.config.update("jax_threefry_partitionable", False)
 
 # A simple two-action game encoded as an EFG game. Going left gets -1, going
 # right gets a +1.
