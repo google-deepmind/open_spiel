@@ -10,4 +10,4 @@ jax
 # the cuda version depending on your nvidia-driver version and you might need
 # to upgrade jax afterwards.
 
-# jax[cuda12_pip] -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+# jax[cuda12] -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
