@@ -35,6 +35,7 @@ namespace blackjack {
 constexpr int kNumSuits = 4;
 constexpr int kCardsPerSuit = 13;
 constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
+constexpr int kMaxSum = 30;  // player busts by hitting on 20 and receiving a 10
 constexpr const std::string kHiddenCardStr = "??";
 
 // Moves.
@@ -118,10 +119,11 @@ class BlackjackGame : public Game {
   double MaxUtility() const override { return +1; }
   std::vector<int> ObservationTensorShape() const override {
     return {
-        NumPlayers() + 1 +                      // turn  (incl. chance)
-        1 +                                     // is terminal?
-        (kNumSuits + 1) * (NumPlayers() + 1) +  // num_aces_ for every player
-        kDeckSize * (NumPlayers() + 1)  // many-hot of the cards for each player
+        NumPlayers() + 1 +              // turn  (incl. chance)
+        1 +                             // is terminal?
+        kMaxSum +                       // player best sum
+        kDeckSize +                     // dealer's initial visible card
+        kDeckSize * (NumPlayers() + 1)  // many-hot of the visible cards
     };
   };
 };
