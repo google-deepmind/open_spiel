@@ -40,6 +40,8 @@ constexpr const std::string kHiddenCardStr = "??";
 // Moves.
 enum ActionType { kHit = 0, kStand = 1 };
 
+enum Phase { kInitialDeal = 0, kPlayerTurn = 1, kDealerTurn = 2 };
+
 class BlackjackGame;
 
 class BlackjackState : public State {
@@ -74,6 +76,7 @@ class BlackjackState : public State {
   std::unique_ptr<State> ResampleFromInfostate(
       int player_id, std::function<double()> rng) const override;
 
+  Phase phase() const { return phase_; }
   std::set<int> VisibleCards() const;
 
  protected:
@@ -85,6 +88,7 @@ class BlackjackState : public State {
 
   // Initialize to bad/invalid values. Use open_spiel::NewInitialState()
 
+  Phase phase_ = kInitialDeal;
   int total_moves_ = -1;    // Total num moves taken during the game.
   Player cur_player_ = -1;  // Player to play.
   int turn_player_ = -1;    // Whose actual turn is it. At chance nodes, we need
@@ -123,12 +127,14 @@ class BlackjackGame : public Game {
 };
 
 std::string CardToString(int card);
+std::string PhaseToString(Phase phase);
 std::vector<std::string> CardsToStrings(const std::vector<int>& cards,
                                         int start_index = 0);
 
 // Gets a card id from a string representation. Returns -1 if the string is not
 // a valid card.
 int GetCardByString(std::string card_string);
+
 
 }  // namespace blackjack
 }  // namespace open_spiel

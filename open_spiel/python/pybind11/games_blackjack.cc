@@ -25,6 +25,7 @@ namespace py = ::pybind11;
 using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::blackjack::ActionType;
+using open_spiel::blackjack::Phase;
 using open_spiel::blackjack::BlackjackGame;
 using open_spiel::blackjack::BlackjackState;
 
@@ -38,13 +39,21 @@ void open_spiel::init_pyspiel_games_blackjack(py::module& m) {
     .value("STAND", ActionType::kStand)
     .export_values();
 
+  py::enum_<Phase>(blackjack, "Phase")
+    .value("INITIAL_DEAL", Phase::kInitialDeal)
+    .value("PLAYER_TURN", Phase::kPlayerTurn)
+    .value("DEALER_TURN", Phase::kDealerTurn)
+    .export_values();
+
   // args: int card; returns: string
   blackjack.def("card_to_string", open_spiel::blackjack::CardToString)
       // args: list of ints and a start index; returns: list of strings
       .def("cards_to_strings", open_spiel::blackjack::CardsToStrings,
            py::arg("cards"), py::arg("start_index") = 0)
       // args: string; returns: int  (-1 if invalid)
-      .def("get_card_by_string", open_spiel::blackjack::GetCardByString);
+      .def("get_card_by_string", open_spiel::blackjack::GetCardByString)
+      // args: phase; returns: string
+      .def("phase_to_string", open_spiel::blackjack::PhaseToString);
 
   py::classh<BlackjackState, State>(blackjack, "BlackjackState")
       .def("dealer_id", &BlackjackState::DealerId)  // no args
@@ -52,6 +61,8 @@ void open_spiel::init_pyspiel_games_blackjack(py::module& m) {
       .def("get_best_player_total", &BlackjackState::GetBestPlayerTotal)
       // args: int player, returns: list of ints
       .def("cards", &BlackjackState::cards)
+      // args: none; returns: phase
+      .def("phase", &BlackjackState::phase)
       // args: int player
       .def("is_turn_over", &BlackjackState::IsTurnOver)
       // Pickle support

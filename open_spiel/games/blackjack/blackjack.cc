@@ -73,6 +73,19 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
+std::string PhaseToString(Phase phase) {
+  switch (phase) {
+    case kInitialDeal:
+      return "Initial Deal";
+    case kPlayerTurn:
+      return "Player Turn";
+    case kDealerTurn:
+      return "Dealer Turn";
+    default:
+      SpielFatalError("Unknown phase");
+  }
+}
+
 std::string CardToString(int card) {
   return std::string(1, kSuitNames[card / kCardsPerSuit]) +
          std::string(1, kRanks[card % kCardsPerSuit]);
@@ -273,6 +286,7 @@ void BlackjackState::DealCardToPlayer(int player, int card) {
 }
 
 BlackjackState::BlackjackState(std::shared_ptr<const Game> game) : State(game) {
+  phase_ = kInitialDeal;
   total_moves_ = 0;
   cur_player_ = kChancePlayerId;
   turn_player_ = kPlayerId;
@@ -317,6 +331,7 @@ void BlackjackState::EndPlayerTurn(int player) {
   turn_over_[player] = true;
   turn_player_ = NextTurnPlayer();
   cur_player_ = turn_player_;
+  phase_ = kDealerTurn;
 }
 
 void BlackjackState::DoApplyAction(Action move) {
@@ -335,6 +350,7 @@ void BlackjackState::DoApplyAction(Action move) {
         // Hit/stand part of the game commences.
         turn_player_ = kPlayerId;
         cur_player_ = kPlayerId;
+        phase_ = kPlayerTurn;
       }
     }
     return;
@@ -405,7 +421,10 @@ std::string BlackjackState::ToString() const {
 std::string BlackjackState::StateToString(bool show_all_dealers_card) const {
   std::vector<int> players;
 
-  std::string result = absl::StrCat("Current Player: ", cur_player_, "\n");
+  std::string result = absl::StrCat(
+    "Current Phase: ", PhaseToString(phase_), "\n",
+    "Current Player: ", cur_player_, "\n");
+
   for (int p = 0; p <= NumPlayers(); ++p) {
     absl::StrAppend(&result,
                     p == DealerId() ? "Dealer" : absl::StrCat("Player ", p),
