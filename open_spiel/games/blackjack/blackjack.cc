@@ -71,6 +71,17 @@ static std::shared_ptr<const Game> Factory(const GameParameters& params) {
 REGISTER_SPIEL_GAME(kGameType, Factory);
 
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
+
+std::vector<int> SetToSortedVector(const std::set<int>& set) {
+  std::vector<int> vec;
+  vec.reserve(set.size());
+  for (int i : set) {
+    vec.push_back(i);
+  }
+  std::sort(vec.begin(), vec.end());
+  return vec;
+}
+
 }  // namespace
 
 std::string PhaseToString(Phase phase) {
@@ -462,6 +473,24 @@ std::set<int> BlackjackState::VisibleCards() const {
     }
   }
   return visible_cards;
+}
+
+std::vector<int> BlackjackState::VisibleCardsSortedVector() const {
+  return SetToSortedVector(VisibleCards());
+}
+
+int BlackjackState::DealersVisibleCard() const {
+  if (cards_[DealerId()].size() < 2) {
+    return -1;
+  } else {
+    return cards_[DealerId()][1];
+  }
+}
+
+std::vector<int> BlackjackState::PlayerCardsSortedVector() const {
+  std::vector<int> player_visible_cards = cards_[0];
+  std::sort(player_visible_cards.begin(), player_visible_cards.end());
+  return player_visible_cards;
 }
 
 std::unique_ptr<State> BlackjackState::Clone() const {

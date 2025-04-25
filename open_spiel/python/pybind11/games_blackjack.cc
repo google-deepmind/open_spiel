@@ -64,6 +64,14 @@ void open_spiel::init_pyspiel_games_blackjack(py::module& m) {
       // args: none; returns: phase
       .def("phase", &BlackjackState::phase)
       // args: int player
+      .def("visible_cards_sorted_vector",
+           &BlackjackState::VisibleCardsSortedVector)
+      // args: none, returns: int
+      .def("dealers_visible_card", &BlackjackState::DealersVisibleCard)
+      // args: none, returns: list of ints
+      .def("player_cards_sorted_vector",
+           &BlackjackState::PlayerCardsSortedVector)
+      // args: int player
       .def("is_turn_over", &BlackjackState::IsTurnOver)
       // Pickle support
       .def(py::pickle(

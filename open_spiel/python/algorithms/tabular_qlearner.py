@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tabular Q-learning agent."""
+"""Tabular Q-learning agent.
+
+Note: supports single-player games only.
+"""
 
 import collections
+
 import numpy as np
 
 from open_spiel.python import rl_agent
 from open_spiel.python import rl_tools
+import pyspiel
 
 
 def valuedict():
@@ -34,13 +39,16 @@ class QLearner(rl_agent.AbstractAgent):
   See open_spiel/python/examples/tic_tac_toe_qlearner.py for an usage example.
   """
 
-  def __init__(self,
-               player_id,
-               num_actions,
-               step_size=0.1,
-               epsilon_schedule=rl_tools.ConstantSchedule(0.2),
-               discount_factor=1.0,
-               centralized=False):
+  def __init__(
+      self,
+      player_id,
+      num_actions,
+      step_size=0.1,
+      epsilon_schedule=rl_tools.ConstantSchedule(0.2),
+      discount_factor=1.0,
+      centralized=False,
+      info_state_to_string_override=None,
+  ):
     """Initialize the Q-Learning agent."""
     self._player_id = player_id
     self._num_actions = num_actions
@@ -52,6 +60,8 @@ class QLearner(rl_agent.AbstractAgent):
     self._q_values = collections.defaultdict(valuedict)
     self._prev_info_state = None
     self._last_loss_value = None
+    self._prev_action = None
+    self._info_state_to_string_override = info_state_to_string_override
 
   def _epsilon_greedy(self, info_state, legal_actions, epsilon):
     """Returns a valid epsilon-greedy action and valid action probs.
@@ -106,6 +116,13 @@ class QLearner(rl_agent.AbstractAgent):
       info_state = str(time_step.observations["info_state"])
     else:
       info_state = str(time_step.observations["info_state"][self._player_id])
+
+    if self._info_state_to_string_override is not None:
+      _, state = pyspiel.deserialize_game_and_state(
+          time_step.observations["serialized_state"]
+      )
+      info_state = self._info_state_to_string_override(state)
+
     legal_actions = time_step.observations["legal_actions"][self._player_id]
 
     # Prevent undefined errors if this agent never plays until terminal step
@@ -123,6 +140,7 @@ class QLearner(rl_agent.AbstractAgent):
         target += self._discount_factor * max(
             [self._q_values[info_state][a] for a in legal_actions])
 
+      assert self._prev_action is not None
       prev_q_value = self._q_values[self._prev_info_state][self._prev_action]
       self._last_loss_value = target - prev_q_value
       self._q_values[self._prev_info_state][self._prev_action] += (
