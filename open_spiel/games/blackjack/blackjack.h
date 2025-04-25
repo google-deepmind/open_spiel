@@ -36,7 +36,7 @@ constexpr int kNumSuits = 4;
 constexpr int kCardsPerSuit = 13;
 constexpr int kDeckSize = kCardsPerSuit * kNumSuits;
 constexpr int kMaxSum = 30;  // player busts by hitting on 20 and receiving a 10
-constexpr const std::string kHiddenCardStr = "??";
+constexpr const char* kHiddenCardStr = "??";
 
 // Moves.
 enum ActionType { kHit = 0, kStand = 1 };
