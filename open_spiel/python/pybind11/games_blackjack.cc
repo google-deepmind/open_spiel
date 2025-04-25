@@ -32,7 +32,7 @@ using open_spiel::blackjack::BlackjackState;
 void open_spiel::init_pyspiel_games_blackjack(py::module& m) {
   py::module_ blackjack = m.def_submodule("blackjack");
 
-  blackjack.attr("HIDDEN_CARD_STR") = &blackjack::kHiddenCardStr;
+  blackjack.attr("HIDDEN_CARD_STR") = py::str(blackjack::kHiddenCardStr);
 
   py::enum_<ActionType>(blackjack, "ActionType")
     .value("HIT", ActionType::kHit)
