@@ -91,6 +91,28 @@ class BasicStats(object):
         self._sum, self.avg, self.std_dev, self.min, self.max, self.num)
 
 
+class SlidingWindowAccumulator(object):
+  """A utility object to compute the mean of a sliding window of values."""
+
+  def __init__(self, max_window_size: int):
+    self._max_window_size = max_window_size
+    self._index = -1
+    self._values = []
+
+  def add(self, value: float):
+    if len(self._values) < self._max_window_size:
+      self._values.append(value)
+      self._index += 1
+    else:
+      self._values[self._index] = value
+      self._index += 1
+      if self._index >= self._max_window_size:
+        self._index = 0
+
+  def mean(self):
+    return sum(self._values) / len(self._values)
+
+
 class HistogramNumbered:
   """Track a histogram of occurences for `count` buckets.
 

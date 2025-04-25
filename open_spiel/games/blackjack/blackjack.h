@@ -79,6 +79,12 @@ class BlackjackState : public State {
 
   Phase phase() const { return phase_; }
   std::set<int> VisibleCards() const;
+  std::vector<int> VisibleCardsSortedVector() const;
+  std::vector<int> PlayerCardsSortedVector() const;
+
+  // Returns the dealer's initial visible card, if it's been dealt. Otherwise
+  // returns -1.
+  int DealersVisibleCard() const;
 
  protected:
   void DoApplyAction(Action move_id) override;
