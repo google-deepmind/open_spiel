@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -20,6 +23,21 @@ namespace phantom_ttt {
 namespace {
 
 namespace testing = open_spiel::testing;
+
+void ClassicalVsAbrubptTest() {
+  std::shared_ptr<const Game> classical_game =
+      LoadGame("phantom_ttt(gameversion=classical)");
+  std::shared_ptr<const Game> abrupt_game =
+      LoadGame("phantom_ttt(gameversion=abrupt)");
+  std::unique_ptr<State> classical_state = classical_game->NewInitialState();
+  classical_state->ApplyAction(4);
+  classical_state->ApplyAction(4);
+  SPIEL_CHECK_EQ(classical_state->CurrentPlayer(), 1);
+  std::unique_ptr<State> abrupt_state = abrupt_game->NewInitialState();
+  abrupt_state->ApplyAction(4);
+  abrupt_state->ApplyAction(4);
+  SPIEL_CHECK_EQ(abrupt_state->CurrentPlayer(), 0);
+}
 
 void BasicPhantomTTTTests() {
   testing::LoadGameTest("phantom_ttt");
@@ -34,4 +52,5 @@ void BasicPhantomTTTTests() {
 
 int main(int argc, char** argv) {
   open_spiel::phantom_ttt::BasicPhantomTTTTests();
+  open_spiel::phantom_ttt::ClassicalVsAbrubptTest();
 }
