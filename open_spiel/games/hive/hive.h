@@ -1,4 +1,4 @@
-// Copyright 2024 DeepMind Technologies Limited
+// Copyright 2025 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@
 #define OPEN_SPIEL_GAMES_HIVE_H_
 
 #include <array>
-#include <cstdint>
-#include <map>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/hive/hive_board.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 // from https://en.wikipedia.org/wiki/Hive_(game):
 //
@@ -48,7 +51,7 @@
 //
 // This implementation aims to minimize the effects of such problems by
 // providing bounded grid sizes to reduce computational complexity (most games
-// stay within ~6 units of the inital tile in practice). More information can
+// stay within ~6 units of the initial tile in practice). More information can
 // be found under the HiveBoard class.
 //
 // Another important feature is the support of the Universal Hive Protocol (UHP)
@@ -77,9 +80,10 @@ namespace hive {
 
 // There are 28 unique tiles and 7 directions a tile can be placed beside (the 6
 // hexagonal edges and "above"). So the total action space is 28 * 28 * 7 = 5488
-inline constexpr int kNumDistinctActions = 5488 + 1; // +1 for pass
+inline constexpr int kNumDistinctActions = 5488 + 1;  // +1 for pass
 inline constexpr int kNumPlayers = 2;
 inline constexpr int kNumBaseBugTypes = 5;
+inline constexpr int kMaxGameLength = 500;
 inline constexpr const char* kUHPNotStarted = "NotStarted";
 inline constexpr const char* kUHPInProgress = "InProgress";
 inline constexpr const char* kUHPWhiteWins = "WhiteWins";
@@ -102,7 +106,7 @@ class HiveState : public State {
     return IsTerminal() ? kTerminalPlayerId : current_player_;
   }
 
-  // prettyprints the board state when using ansi_color_output_, and
+  // pretty prints the board state when using ansi_color_output_, and
   // prints the UHP string representation otherwise
   std::string ToString() const override;
 
@@ -207,9 +211,9 @@ class HiveGame : public Game {
             2 * board_radius_ + 1};
   }
 
-  int MaxGameLength() const override { return 500; }
+  int MaxGameLength() const override { return kMaxGameLength; }
   std::unique_ptr<State> DeserializeState(
-      const std::string& str) const override;
+      const std::string& uhp_string) const override;
 
   ExpansionInfo GetExpansionInfo() const { return expansions_; }
 
@@ -222,7 +226,7 @@ class HiveGame : public Game {
 
 // helper to construct a game and state from a properly formed UHP string
 std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
-DeserializeUHPGameAndState(const std::string& uhp_state);
+DeserializeUHPGameAndState(const std::string& uhp_string);
 
 }  // namespace hive
 }  // namespace open_spiel

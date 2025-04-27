@@ -1,4 +1,4 @@
-// Copyright 2024 DeepMind Technologies Limited
+// Copyright 2025 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #include <array>
 #include <cstdint>
-#include <map>
-#include <memory>
+#include <cstdlib>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -26,7 +26,9 @@
 #include "open_spiel/abseil-cpp/absl/base/attributes.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
-#include "open_spiel/spiel.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace hive {
@@ -141,12 +143,12 @@ class HivePosition {
 
   std::array<HivePosition, Direction::kNumCardinalDirections> Neighbours()
       const {
-    return {{{q_ + 1, r_ - 1},
-             {q_ + 1, r_},
-             {q_, r_ + 1},
-             {q_ - 1, r_ + 1},
-             {q_ - 1, r_},
-             {q_, r_ - 1}}};
+    return {{{static_cast<int8_t>(q_ + 1), static_cast<int8_t>(r_ - 1)},
+             {static_cast<int8_t>(q_ + 1), static_cast<int8_t>(r_)},
+             {static_cast<int8_t>(q_), static_cast<int8_t>(r_ + 1)},
+             {static_cast<int8_t>(q_ - 1), static_cast<int8_t>(r_ + 1)},
+             {static_cast<int8_t>(q_ - 1), static_cast<int8_t>(r_)},
+             {static_cast<int8_t>(q_), static_cast<int8_t>(r_ - 1)}}};
   }
 
   HivePosition NeighbourAt(Direction dir) const;
@@ -325,23 +327,35 @@ class HiveTile {
 
   static Value UHPToTile(const std::string& uhp) {
     static absl::flat_hash_map<std::string, Value> string_mapping = {
-        {"wQ",  wQ},
-        {"wA1", wA1}, {"wA2", wA2}, {"wA3", wA3},
-        {"wG1", wG1}, {"wG2", wG2}, {"wG3", wG3},
-        {"wS1", wS1}, {"wS2", wS2},
-        {"wB1", wB1}, {"wB2", wB2},
-        {"wM",  wM},
-        {"wL",  wL},
-        {"wP",  wP},
+        {"wQ", wQ},
+        {"wA1", wA1},
+        {"wA2", wA2},
+        {"wA3", wA3},
+        {"wG1", wG1},
+        {"wG2", wG2},
+        {"wG3", wG3},
+        {"wS1", wS1},
+        {"wS2", wS2},
+        {"wB1", wB1},
+        {"wB2", wB2},
+        {"wM", wM},
+        {"wL", wL},
+        {"wP", wP},
         //
-        {"bQ",  bQ},
-        {"bA1", bA1}, {"bA2", bA2}, {"bA3", bA3},
-        {"bG1", bG1}, {"bG2", bG2}, {"bG3", bG3},
-        {"bS1", bS1}, {"bS2", bS2},
-        {"bB1", bB1}, {"bB2", bB2},
-        {"bM",  bM},
-        {"bL",  bL},
-        {"bP",  bP}};
+        {"bQ", bQ},
+        {"bA1", bA1},
+        {"bA2", bA2},
+        {"bA3", bA3},
+        {"bG1", bG1},
+        {"bG2", bG2},
+        {"bG3", bG3},
+        {"bS1", bS1},
+        {"bS2", bS2},
+        {"bB1", bB1},
+        {"bB2", bB2},
+        {"bM", bM},
+        {"bL", bL},
+        {"bP", bP}};
 
     auto it = string_mapping.find(uhp);
     SPIEL_CHECK_TRUE(it != string_mapping.end());
@@ -349,24 +363,35 @@ class HiveTile {
   }
 
   static std::string TileToUHP(HiveTile tile) {
-    static absl::flat_hash_map<Value, std::string> enum_mapping = {
-        {wQ,  "wQ"},
-        {wA1, "wA1"}, {wA2, "wA2"}, {wA3, "wA3"},
-        {wG1, "wG1"}, {wG2, "wG2"}, {wG3, "wG3"},
-        {wS1, "wS1"}, {wS2, "wS2"},
-        {wB1, "wB1"}, {wB2, "wB2"},
-        {wM,  "wM"},
-        {wL,  "wL"},
-        {wP,  "wP"},
-        //
-        {bQ,  "bQ"},
-        {bA1, "bA1"}, {bA2, "bA2"}, {bA3, "bA3"},
-        {bG1, "bG1"}, {bG2, "bG2"}, {bG3, "bG3"},
-        {bS1, "bS1"}, {bS2, "bS2"},
-        {bB1, "bB1"}, {bB2, "bB2"},
-        {bM,  "bM"},
-        {bL,  "bL"},
-        {bP,  "bP"}};
+    static absl::flat_hash_map<Value, std::string> enum_mapping = {{wQ, "wQ"},
+                                                                   {wA1, "wA1"},
+                                                                   {wA2, "wA2"},
+                                                                   {wA3, "wA3"},
+                                                                   {wG1, "wG1"},
+                                                                   {wG2, "wG2"},
+                                                                   {wG3, "wG3"},
+                                                                   {wS1, "wS1"},
+                                                                   {wS2, "wS2"},
+                                                                   {wB1, "wB1"},
+                                                                   {wB2, "wB2"},
+                                                                   {wM, "wM"},
+                                                                   {wL, "wL"},
+                                                                   {wP, "wP"},
+                                                                   //
+                                                                   {bQ, "bQ"},
+                                                                   {bA1, "bA1"},
+                                                                   {bA2, "bA2"},
+                                                                   {bA3, "bA3"},
+                                                                   {bG1, "bG1"},
+                                                                   {bG2, "bG2"},
+                                                                   {bG3, "bG3"},
+                                                                   {bS1, "bS1"},
+                                                                   {bS2, "bS2"},
+                                                                   {bB1, "bB1"},
+                                                                   {bB2, "bB2"},
+                                                                   {bM, "bM"},
+                                                                   {bL, "bL"},
+                                                                   {bP, "bP"}};
 
     auto it = enum_mapping.find(tile);
     SPIEL_CHECK_TRUE(it != enum_mapping.end());
@@ -378,17 +403,29 @@ class HiveTile {
       case wQ:
       case bQ:
         return BugType::kQueen;
-      case wA1: case wA2: case wA3:
-      case bA1: case bA2: case bA3:
+      case wA1:
+      case wA2:
+      case wA3:
+      case bA1:
+      case bA2:
+      case bA3:
         return BugType::kAnt;
-      case wG1: case wG2: case wG3:
-      case bG1: case bG2: case bG3:
+      case wG1:
+      case wG2:
+      case wG3:
+      case bG1:
+      case bG2:
+      case bG3:
         return BugType::kGrasshopper;
-      case wS1: case wS2:
-      case bS1: case bS2:
+      case wS1:
+      case wS2:
+      case bS1:
+      case bS2:
         return BugType::kSpider;
-      case wB1: case wB2:
-      case bB1: case bB2:
+      case wB1:
+      case wB2:
+      case bB1:
+      case bB2:
         return BugType::kBeetle;
       case wM:
       case bM:
@@ -406,11 +443,35 @@ class HiveTile {
 
   constexpr Colour GetColour() const {
     switch (tile_name_) {
-      case wQ: case wA1: case wA2: case wA3: case wG1: case wG2: case wG3:
-      case wS1: case wS2: case wB1: case wB2: case wM: case wL: case wP:
+      case wQ:
+      case wA1:
+      case wA2:
+      case wA3:
+      case wG1:
+      case wG2:
+      case wG3:
+      case wS1:
+      case wS2:
+      case wB1:
+      case wB2:
+      case wM:
+      case wL:
+      case wP:
         return Colour::kWhite;
-      case bQ: case bA1: case bA2: case bA3: case bG1: case bG2: case bG3:
-      case bS1: case bS2: case bB1: case bB2: case bM: case bL: case bP:
+      case bQ:
+      case bA1:
+      case bA2:
+      case bA3:
+      case bG1:
+      case bG2:
+      case bG3:
+      case bS1:
+      case bS2:
+      case bB1:
+      case bB2:
+      case bM:
+      case bL:
+      case bP:
         return Colour::kBlack;
       default:
         SpielFatalError("GetColour() - invalid enum value");
@@ -421,11 +482,19 @@ class HiveTile {
     switch (tile_name_) {
       case kNoneTile:
         return 0;
-      case wA2: case wG2: case wS2: case wB2:
-      case bA2: case bG2: case bS2: case bB2:
+      case wA2:
+      case wG2:
+      case wS2:
+      case wB2:
+      case bA2:
+      case bG2:
+      case bS2:
+      case bB2:
         return 2;
-      case wA3: case wG3:
-      case bA3: case bG3:
+      case wA3:
+      case wG3:
+      case bA3:
+      case bG3:
         return 3;
       default:
         return 1;

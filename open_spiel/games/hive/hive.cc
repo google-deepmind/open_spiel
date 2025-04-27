@@ -1,4 +1,4 @@
-// Copyright 2024 DeepMind Technologies Limited
+// Copyright 2025 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,16 +15,29 @@
 #include "open_spiel/games/hive/hive.h"
 
 #include <algorithm>
-#include <iomanip>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <iterator>
 #include <memory>
 #include <set>
+#include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/games/hive/hive_board.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
@@ -73,8 +86,8 @@ HiveState::HiveState(std::shared_ptr<const Game> game, int board_size,
                      ExpansionInfo expansions, int num_bug_types,
                      bool ansi_color_output)
     : State(game),
-      expansions_(expansions),
       board_(std::min(board_size, kMaxBoardRadius), expansions),
+      expansions_(expansions),
       num_bug_types_(num_bug_types),
       ansi_color_output_(ansi_color_output),
       force_terminal_(false) {}
@@ -110,7 +123,8 @@ std::string HiveState::ToString() const {
     // print each tile on row r by iterating valid q indices
     for (int q = std::max(-radius, -r - radius);
          q <= std::min(radius, -r + radius); ++q) {
-      HiveTile tile = Board().GetTopTileAt({q, r});
+      HiveTile tile = Board().GetTopTileAt(
+          {static_cast<int8_t>(q), static_cast<int8_t>(r)});
 
       std::ostringstream oss;
       if (tile.HasValue()) {
@@ -201,7 +215,7 @@ Action HiveState::StringToAction(Player player,
 
   Move move;
   move.direction = Direction::kNumAllDirections;
-  std::vector<std::string> bugs = absl::StrSplit(move_str, " ");
+  std::vector<std::string> bugs = absl::StrSplit(move_str, ' ');
   SPIEL_DCHECK_GT(bugs.size(), 0);
   SPIEL_DCHECK_LE(bugs.size(), 2);
 
@@ -327,7 +341,7 @@ void HiveState::ObservationTensor(Player player,
   int radius = Board().Radius();
   for (int r = -radius; r <= radius; ++r) {
     for (int q = -radius; q <= radius; ++q) {
-      HivePosition pos = {q, r, 0};
+      HivePosition pos = {static_cast<int8_t>(q), static_cast<int8_t>(r), 0};
       std::array<int, 2> indices = AxialToTensorIndex(pos);
 
       // current player's turn
@@ -365,7 +379,7 @@ std::vector<Action> HiveState::LegalActions() const {
   std::vector<Action> actions(unique_actions.begin(), unique_actions.end());
 
   // if a player has no legal actions, then they must pass
-  if (actions.size() == 0) {
+  if (actions.empty()) {
     actions.push_back(PassAction());
   }
 
@@ -494,8 +508,8 @@ void HiveState::DoApplyAction(Action action) {
 HiveGame::HiveGame(const GameParameters& params)
     : Game(kGameType, params),
       board_radius_(ParameterValue<int>("board_size")),
-      ansi_color_output_(ParameterValue<bool>("ansi_color_output")),
       num_bug_types_(kNumBaseBugTypes),
+      ansi_color_output_(ParameterValue<bool>("ansi_color_output")),
       expansions_({ParameterValue<bool>("uses_mosquito"),
                    ParameterValue<bool>("uses_ladybug"),
                    ParameterValue<bool>("uses_pillbug")}) {
@@ -513,22 +527,22 @@ HiveGame::HiveGame(const GameParameters& params)
 }
 
 std::unique_ptr<State> HiveGame::DeserializeState(
-    const std::string& str) const {
-  std::vector<absl::string_view> tokens = absl::StrSplit(str, ';');
+    const std::string& uhp_string) const {
+  std::vector<absl::string_view> tokens = absl::StrSplit(uhp_string, ';');
   SPIEL_DCHECK_GE(tokens.size(), 3);
 
   // first substring is the game string (e.g. "Base+MLP" for all expansions).
   // since we are already inside a const game object, verify that the UHP game
   // string matches what we expect it to be at this point
-  SPIEL_DCHECK_TRUE(tokens[0].find("Base") != absl::string_view::npos);
+  SPIEL_DCHECK_TRUE(absl::StrContains(tokens[0], "Base"));
   if (expansions_.uses_mosquito) {
-    SPIEL_DCHECK_TRUE(tokens[0].find('M') != absl::string_view::npos);
+    SPIEL_DCHECK_TRUE(absl::StrContains(tokens[0], "M"));
   }
   if (expansions_.uses_ladybug) {
-    SPIEL_DCHECK_TRUE(tokens[0].find('L') != absl::string_view::npos);
+    SPIEL_DCHECK_TRUE(absl::StrContains(tokens[0], "L"));
   }
   if (expansions_.uses_pillbug) {
-    SPIEL_DCHECK_TRUE(tokens[0].find('P') != absl::string_view::npos);
+    SPIEL_DCHECK_TRUE(absl::StrContains(tokens[0], "P"));
   }
 
   std::unique_ptr<State> state = NewInitialState();
@@ -561,16 +575,13 @@ std::pair<std::shared_ptr<const Game>, std::unique_ptr<State>>
 DeserializeUHPGameAndState(const std::string& uhp_string) {
   auto pos = uhp_string.find(';');
   auto game_str = uhp_string.substr(0, pos);
-  SPIEL_DCHECK_TRUE(game_str.find("Base") != std::string::npos);
+  SPIEL_DCHECK_TRUE(absl::StrContains(game_str, "Base"));
 
   GameParameters params{};
   params["name"] = GameParameter(kGameType.short_name);
-  params["uses_mosquito"] =
-      GameParameter(game_str.find('M') != std::string::npos);
-  params["uses_ladybug"] =
-      GameParameter(game_str.find('L') != std::string::npos);
-  params["uses_pillbug"] =
-      GameParameter(game_str.find('P') != std::string::npos);
+  params["uses_mosquito"] = GameParameter(absl::StrContains(game_str, "M"));
+  params["uses_ladybug"] = GameParameter(absl::StrContains(game_str, "L"));
+  params["uses_pillbug"] = GameParameter(absl::StrContains(game_str, "P"));
 
   auto game = LoadGame(params);
   return {game, game->DeserializeState(uhp_string)};

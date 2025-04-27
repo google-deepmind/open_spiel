@@ -16,14 +16,17 @@
 #define OPEN_SPIEL_GAMES_PHANTOM_TTT_H_
 
 #include <array>
-#include <map>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // Phantom Tic-Tac-Toe is a phantom version of the classic game of Tic-Tac-Toe
 // (Noughts and Crosses). For some perfect information game X", the game
@@ -36,6 +39,11 @@
 // Common phantom games include Kriegspiel (Phantom chess), e.g. see
 // https://en.wikipedia.org/wiki/Kriegspiel_(chess), and Phantom Go.
 // See also http://mlanctot.info/files/papers/PhD_Thesis_MarcLanctot.pdf, Ch 3.
+//
+// In the classical version, if a move fails, the player is allowed to take
+// another turn. In the abrupt version, the player loses their turn. This
+// version was recently used in Rudolph et al. '25, Reevaluating Policy Gradient
+// Methods for Imperfect Information Games, https://arxiv.org/abs/2502.08938.
 //
 // Parameters:
 ///    "obstype", string, "reveal-nothing" (default) or "reveal-numturns"
@@ -60,7 +68,8 @@ enum class GameVersion {
 // State of an in-play game.
 class PhantomTTTState : public State {
  public:
-  PhantomTTTState(std::shared_ptr<const Game> game, GameVersion game_version, ObservationType obs_type);
+  PhantomTTTState(std::shared_ptr<const Game> game, GameVersion game_version,
+                  ObservationType obs_type);
 
   // Forward to underlying game state
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
@@ -123,7 +132,7 @@ class PhantomTTTGame : public Game {
   }
 
 
-  // These will depend on the obstype parameter.
+  // These will depend on the obs_type parameter.
   std::vector<int> InformationStateTensorShape() const override;
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return game_->MaxGameLength() * 2 - 1; }
@@ -143,7 +152,8 @@ class PhantomTTTGame : public Game {
 // http://mlanctot.info/files/papers/12icml-ir.pdf
 class ImperfectRecallPTTTState : public PhantomTTTState {
  public:
-  ImperfectRecallPTTTState(std::shared_ptr<const Game> game, GameVersion game_version, ObservationType obs_type)
+  ImperfectRecallPTTTState(std::shared_ptr<const Game> game,
+                           GameVersion game_version, ObservationType obs_type)
       : PhantomTTTState(game, game_version, obs_type) {}
   std::string InformationStateString(Player player) const override {
     SPIEL_CHECK_GE(player, 0);
@@ -159,8 +169,8 @@ class ImperfectRecallPTTTGame : public PhantomTTTGame {
  public:
   explicit ImperfectRecallPTTTGame(const GameParameters& params);
   std::unique_ptr<State> NewInitialState() const override {
-    return std::unique_ptr<State>(
-        new ImperfectRecallPTTTState(shared_from_this(), game_version(), obs_type()));
+    return std::unique_ptr<State>(new ImperfectRecallPTTTState(
+        shared_from_this(), game_version(), obs_type()));
   }
 };
 

@@ -1,4 +1,4 @@
-// Copyright 2024 DeepMind Technologies Limited
+// Copyright 2025 DeepMind Technologies Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,18 @@
 #include "open_spiel/games/hive/hive_board.h"
 
 #include <algorithm>
-#include <memory>
-#include <utility>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <string>
 #include <vector>
 
-#include "open_spiel/spiel.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace hive {
@@ -171,6 +178,9 @@ void HiveBoard::GenerateMovesFor(std::vector<Move>* out, HiveTile tile,
       GenerateValidSlides(&positions, tile, start_pos, 1);
       GenerateValidPillbugSpecials(out, tile, start_pos);
       break;
+
+    default:
+      SpielFatalError("Unrecognized BugType");
   }
 
   // turn each position into moves by finding neighbouring tiles as reference
@@ -543,7 +553,6 @@ bool HiveBoard::MoveTile(Move move) {
   last_moved_ = move.from;
 
   // potentially reinstate a covered tile at the old position
-  HiveTile old_tile = GetTopTileAt(old_pos);
   if (old_pos.H() > 0) {
     // reverse iterating guarantees the first tile found has the next highest H
     for (int i = covered_tiles_.size() - 1; i >= 0; --i) {
@@ -643,7 +652,7 @@ bool HiveBoard::RecenterBoard(HivePosition new_pos) {
     return false;
   }
 
-  // re-calculate grid indices
+  // recalculate grid indices
   std::fill(tile_grid_.begin(), tile_grid_.end(), HiveTile::kNoneTile);
   for (uint8_t i = HiveTile::wQ; i < HiveTile::kNumTiles; ++i) {
     if (IsInPlay(i) && !IsCovered(i)) {
@@ -722,7 +731,7 @@ bool HiveBoard::IsGated(HivePosition pos, Direction d,
 }
 
 bool HiveBoard::IsConnected(HivePosition pos, HivePosition to_ignore) const {
-  return NeighboursOf(pos, to_ignore).size() > 0;
+  return !NeighboursOf(pos, to_ignore).empty();
 }
 
 bool HiveBoard::IsCovered(HivePosition pos) const {
@@ -855,6 +864,8 @@ std::string HiveTile::ToUHP() const {
     case BugType::kPillbug:
       absl::StrAppend(&uhp, "P");
       break;
+    default:
+      SpielFatalError("HiveTile::ToUHP() - HiveTile has an invalid bug type!");
   }
 
   // bug type ordinal (for bugs where there can be more than 1)
