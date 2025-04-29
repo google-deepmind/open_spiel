@@ -350,13 +350,13 @@ class MetaCFRRegretAgent:
     first_history_node, infostate_nodes = game_tree_utils.build_tree_dfs(
         world_state, all_infostates_map)
 
-    _, _, player_2_best_response_values = cfr_br_meta_data(
+    _, _, player_2_best_response_values = cfr_br_meta_data(  # pytype: disable=wrong-arg-types
         history_tree_node=first_history_node,
         infostate_nodes=infostate_nodes,
         all_infostates_map=all_infostates_map,
         epochs=self._meta_learner_training_epochs,
-        net_apply=self.optimizer.net_apply,
-        net_params=self.optimizer.net_params,
+        net_apply=self.optimizer.net_apply,  # pytype: disable=attribute-error
+        net_params=self.optimizer.net_params,  # pytype: disable=attribute-error
         all_actions=self._all_actions,
         infostate_map=self._infostate_map,
         key=self._rng)
@@ -374,17 +374,17 @@ class MetaCFRRegretAgent:
       rng: Next random seed.
     """
     grads = jax.grad(
-        utils.meta_loss, has_aux=False)(self.optimizer.net_params, cfvalues,
-                                        self.optimizer.net_apply,
+        utils.meta_loss, has_aux=False)(self.optimizer.net_params, cfvalues,  # pytype: disable=attribute-error
+                                        self.optimizer.net_apply,  # pytype: disable=attribute-error
                                         self._meta_learner_training_epochs,
                                         len(self._all_actions), infoset,
                                         infostate_map, FLAGS.batch_size,
                                         next(rng),
                                         FLAGS.use_infostate_representation)
-    updates, self.optimizer.opt_state = self.optimizer.opt_update(
-        grads, self.optimizer.opt_state)
+    updates, self.optimizer.opt_state = self.optimizer.opt_update(  # pytype: disable=attribute-error
+        grads, self.optimizer.opt_state)  # pytype: disable=attribute-error
 
-    self.optimizer.net_params = optax.apply_updates(self.optimizer.net_params,
+    self.optimizer.net_params = optax.apply_updates(self.optimizer.net_params,  # pytype: disable=attribute-error
                                                     updates)
 
   def training_optimizer(self):
@@ -415,7 +415,7 @@ class MetaCFRRegretAgent:
         all_infostates_map = [{}, {}, {}]
         first_history_node, infostate_nodes = game_tree_utils.build_tree_dfs(
             self._world_state, all_infostates_map)
-        cfr_values_player1, cfr_values_player2, _ = cfr_br_meta_data(
+        cfr_values_player1, cfr_values_player2, _ = cfr_br_meta_data(  # pytype: disable=wrong-arg-types
             history_tree_node=first_history_node,
             infostate_nodes=infostate_nodes,
             all_infostates_map=all_infostates_map,
@@ -448,7 +448,7 @@ class MetaCFRRegretAgent:
           cfvalues = np.array(list(cfvalues), dtype=object)
           cfvalues = utils.mask(cfvalues, infoset, len(self._all_actions),
                                 FLAGS.batch_size)
-          self.optimize_infoset(cfvalues, infoset, self._infostate_map,
+          self.optimize_infoset(cfvalues, infoset, self._infostate_map,  # pytype: disable=wrong-arg-types
                                 self._rng)
       logging.info("Game: %d", self._step)
       self._step += 1
