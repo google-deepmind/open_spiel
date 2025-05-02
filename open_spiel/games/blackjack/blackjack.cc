@@ -155,42 +155,32 @@ std::string BlackjackState::InformationStateString(Player player) const {
 std::unique_ptr<State> BlackjackState::ResampleFromInfostate(
     int player_id, std::function<double()> rng) const {
   if (IsTerminal() || cards_[DealerId()].empty()) {
-    return this->Clone();
+    return Clone();
   }
 
-  // Dealer's first card is the only non-public information.
-  // Collect all visible cards in a set.
-  std::set<int> visible_cards = VisibleCards();
-
+  // The possible cards to choose from are the cards in the deck, plus the
+  // dealer's current card.
+  std::vector<int> possible_cards = deck_;
   int dealer_down_card = cards_[DealerId()][0];
+  possible_cards.push_back(dealer_down_card);
 
-  // Pick a random card from the remaining cards.
-  std::vector<int> deck_cards;
-  for (int i = 0; i < kDeckSize; ++i) {
-    if (visible_cards.find(i) == visible_cards.end()) {
-      deck_cards.push_back(i);
-    }
-  }
-
-  std::vector<double> probs(deck_cards.size(),
-                            1.0 / static_cast<double>(deck_cards.size()));
-
-  int sampled_index = SamplerFromRng(rng)(probs);
-  int dealer_new_down_card = deck_cards[sampled_index];
+  double z = rng();
+  int sampled_index = static_cast<int>(z * possible_cards.size());
+  int dealer_new_down_card = possible_cards[sampled_index];
 
   std::unique_ptr<State> new_state = game_->NewInitialState();
   std::vector<Action> history = History();
 
-  bool found_dealer_down_card = false;
-  for (auto& action : history) {
-    if (action == dealer_down_card && !found_dealer_down_card) {
-      found_dealer_down_card = true;
+  // The dealer down card is always the third action in the history.
+  int dealer_down_card_index = 2;
+  SPIEL_CHECK_EQ(history[dealer_down_card_index], dealer_down_card);
+  for (int i = 0; i < history.size(); ++i) {
+    if (i == dealer_down_card_index) {
       new_state->ApplyAction(dealer_new_down_card);
     } else {
-      new_state->ApplyAction(action);
+      new_state->ApplyAction(history[i]);
     }
   }
-  SPIEL_CHECK_TRUE(found_dealer_down_card);
   return new_state;
 }
 
