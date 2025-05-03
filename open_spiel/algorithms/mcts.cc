@@ -112,8 +112,9 @@ double SearchNode::PUCTValue(int parent_explore_count, double uct_c) const {
 }
 
 bool SearchNode::CompareFinal(const SearchNode& b) const {
-  double out = (outcome.empty() ? 0 : outcome[player]);
-  double out_b = (b.outcome.empty() ? 0 : b.outcome[b.player]);
+  double out = (player >= 0 && player < outcome.size() ? outcome[player] : 0);
+  double out_b =
+      (b.player >= 0 && b.player < b.outcome.size() ? b.outcome[b.player] : 0);
   if (out != out_b) {
     return out < out_b;
   }
