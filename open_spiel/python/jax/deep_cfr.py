@@ -26,6 +26,9 @@ This implementation uses skip connections as described in the paper if two
 consecutive layers of the advantage or policy network have the same number
 of units, except for the last connection. Before the last hidden layer
 a layer normalization is applied.
+
+NOTE: the deep_cfr_jax_test.py is no longer run on github CI as TF1 is no
+longer supported yet still required in this file.
 """
 
 import collections
