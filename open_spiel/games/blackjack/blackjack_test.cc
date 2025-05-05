@@ -14,10 +14,12 @@
 
 #include "open_spiel/games/blackjack/blackjack.h"
 
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
 
+#include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
@@ -174,6 +176,7 @@ void ResamplingHistoryTest() {
   state->ApplyAction(4);
 
   auto b_original = dynamic_cast<BlackjackState *>(state.get());
+  std::string original_observation_string = b_original->ObservationString(0);
 
   std::vector<float> random_seeds = {0.12345, 0.6123, 0.0101};
   // Resample from infostate.
@@ -194,6 +197,10 @@ void ResamplingHistoryTest() {
     std::set<int> visible_cards = b_resampled->VisibleCards();
     SPIEL_CHECK_TRUE(visible_cards.find(b_resampled->cards(1)[0]) ==
                      visible_cards.end());
+
+    // Observation strings should be the same.
+    SPIEL_CHECK_TRUE(original_observation_string ==
+                     b_resampled->ObservationString(0));
   }
 }
 
