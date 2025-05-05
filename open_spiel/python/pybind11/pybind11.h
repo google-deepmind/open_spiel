@@ -59,14 +59,13 @@ namespace algorithms {
 class MCTSBot;
 class ISMCTSBot;
 }  // namespace algorithms
-
 }  // namespace open_spiel
 
 namespace open_spiel {
 // Trampoline helper class to allow implementing Bots in Python. See
 // https://pybind11.readthedocs.io/en/stable/advanced/classes.html#overriding-virtual-functions-in-python
 template <class BotBase = Bot>
-class PyBot : public BotBase {
+class PyBot : public BotBase, public ::pybind11::trampoline_self_life_support {
  public:
   // We need the bot constructor
   using BotBase::BotBase;

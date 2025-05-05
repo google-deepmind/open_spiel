@@ -34,7 +34,7 @@ namespace open_spiel {
 namespace py = ::pybind11;
 
 // Trampoline for using Python-defined games from C++.
-class PyGame : public Game {
+class PyGame : public Game, public py::trampoline_self_life_support {
  public:
   PyGame(GameType game_type, GameInfo game_info,
          GameParameters game_parameters);
