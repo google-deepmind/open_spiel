@@ -15,8 +15,6 @@ add_library (utils OBJECT
   lru_cache.h
   random.h
   random.cc
-  run_python.h
-  run_python.cc
   serializable_circular_buffer.h
   serialization.h
   stats.h
