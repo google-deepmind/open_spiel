@@ -6,6 +6,9 @@ TF-based implementation and common components. For the Libtorch-based
 implementation,
 [see here](https://github.com/deepmind/open_spiel/tree/master/open_spiel/algorithms/alpha_zero_torch).
 
+**Note**: as of OpenSpiel 1.6, the Tensorflow version (based on TF1) is no
+longer maintained.
+
 **Disclaimer**: this is not the code that was used for the Go challenge matches
 or the AlphaZero paper results. It is a re-implementation for illustrative
 purposes, and although it can handle games like Connect Four, it is not designed
@@ -49,7 +52,7 @@ significantly faster.
 
 The model defined in
 [open_spiel/python/algorithms/alpha_zero/model.py](https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/algorithms/alpha_zero/model.py) is used by
-both the python and C++ implementations. 
+both the python and C++ implementations.
 
 The model defines three architectures in decreasing complexity:
 

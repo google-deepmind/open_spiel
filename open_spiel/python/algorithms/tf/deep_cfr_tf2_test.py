@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.deep_cfr."""
-
 from absl.testing import parameterized
 import tensorflow as tf
 

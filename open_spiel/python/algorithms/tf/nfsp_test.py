@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.nfsp."""
-
 import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_environment

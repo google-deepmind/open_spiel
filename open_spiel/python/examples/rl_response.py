@@ -22,14 +22,13 @@ directly rather than RL+Search.
 from absl import app
 from absl import flags
 import numpy as np
-import tensorflow.compat.v1 as tf
 
 from open_spiel.python import rl_agent
 from open_spiel.python import rl_environment
 from open_spiel.python import rl_tools
-from open_spiel.python.algorithms import dqn
 from open_spiel.python.algorithms import random_agent
 from open_spiel.python.algorithms import tabular_qlearner
+from open_spiel.python.jax import dqn
 
 FLAGS = flags.FLAGS
 
@@ -94,8 +93,9 @@ def eval_against_fixed_bots(env, trained_agents, fixed_agents, num_episodes):
   return sum_episode_rewards / num_episodes
 
 
-def create_training_agents(num_players, sess, num_actions, info_state_size,
-                           hidden_layers_sizes):
+def create_training_agents(
+    num_players, num_actions, info_state_size, hidden_layers_sizes
+):
   """Create the agents we want to use for learning."""
   if FLAGS.learner == "qlearning":
     # pylint: disable=g-complex-comprehension
@@ -113,7 +113,6 @@ def create_training_agents(num_players, sess, num_actions, info_state_size,
     # pylint: disable=g-complex-comprehension
     return [
         dqn.DQN(
-            session=sess,
             player_id=idx,
             state_representation_size=info_state_size,
             num_actions=num_actions,
@@ -173,7 +172,6 @@ class RollingAverage(object):
 
 def main(_):
   np.random.seed(FLAGS.seed)
-  tf.random.set_random_seed(FLAGS.seed)
 
   num_players = FLAGS.num_players
 
@@ -202,55 +200,62 @@ def main(_):
   total_value = 0
   total_value_n = 0
 
-  with tf.Session() as sess:
-    hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
-    # pylint: disable=g-complex-comprehension
-    learning_agents = create_training_agents(num_players, sess, num_actions,
-                                             info_state_size,
-                                             hidden_layers_sizes)
-    sess.run(tf.global_variables_initializer())
+  hidden_layers_sizes = [int(l) for l in FLAGS.hidden_layers_sizes]
+  # pylint: disable=g-complex-comprehension
+  learning_agents = create_training_agents(
+      num_players, num_actions, info_state_size, hidden_layers_sizes
+  )
 
-    print("Starting...")
+  print("Starting...")
 
-    for ep in range(FLAGS.num_train_episodes):
-      if (ep + 1) % FLAGS.eval_every == 0:
-        r_mean = eval_against_fixed_bots(env, learning_agents, exploitee_agents,
-                                         FLAGS.eval_episodes)
-        value = r_mean[0] + r_mean[1]
-        rolling_averager.add(value)
-        rolling_averager_p0.add(r_mean[0])
-        rolling_averager_p1.add(r_mean[1])
-        rolling_value = rolling_averager.mean()
-        rolling_value_p0 = rolling_averager_p0.mean()
-        rolling_value_p1 = rolling_averager_p1.mean()
-        total_value += value
-        total_value_n += 1
-        avg_value = total_value / total_value_n
-        print(("[{}] Mean episode rewards {}, value: {}, " +
-               "rval: {} (p0/p1: {} / {}), aval: {}").format(
-                   ep + 1, r_mean, value, rolling_value, rolling_value_p0,
-                   rolling_value_p1, avg_value))
+  for ep in range(FLAGS.num_train_episodes):
+    if (ep + 1) % FLAGS.eval_every == 0:
+      r_mean = eval_against_fixed_bots(
+          env, learning_agents, exploitee_agents, FLAGS.eval_episodes
+      )
+      value = r_mean[0] + r_mean[1]
+      rolling_averager.add(value)
+      rolling_averager_p0.add(r_mean[0])
+      rolling_averager_p1.add(r_mean[1])
+      rolling_value = rolling_averager.mean()
+      rolling_value_p0 = rolling_averager_p0.mean()
+      rolling_value_p1 = rolling_averager_p1.mean()
+      total_value += value
+      total_value_n += 1
+      avg_value = total_value / total_value_n
+      print(
+          (
+              "[{}] Mean episode rewards {}, value: {}, "
+              + "rval: {} (p0/p1: {} / {}), aval: {}"
+          ).format(
+              ep + 1,
+              r_mean,
+              value,
+              rolling_value,
+              rolling_value_p0,
+              rolling_value_p1,
+              avg_value,
+          )
+      )
 
-      agents_round1 = [learning_agents[0], exploitee_agents[1]]
-      agents_round2 = [exploitee_agents[0], learning_agents[1]]
+    agents_round1 = [learning_agents[0], exploitee_agents[1]]
+    agents_round2 = [exploitee_agents[0], learning_agents[1]]
 
-      for agents in [agents_round1, agents_round2]:
-        time_step = env.reset()
-        while not time_step.last():
-          player_id = time_step.observations["current_player"]
-          if env.is_turn_based:
-            agent_output = agents[player_id].step(time_step)
-            action_list = [agent_output.action]
-          else:
-            agents_output = [agent.step(time_step) for agent in agents]
-            action_list = [
-                agent_output.action for agent_output in agents_output
-            ]
-          time_step = env.step(action_list)
+    for agents in [agents_round1, agents_round2]:
+      time_step = env.reset()
+      while not time_step.last():
+        player_id = time_step.observations["current_player"]
+        if env.is_turn_based:
+          agent_output = agents[player_id].step(time_step)
+          action_list = [agent_output.action]
+        else:
+          agents_output = [agent.step(time_step) for agent in agents]
+          action_list = [agent_output.action for agent_output in agents_output]
+        time_step = env.step(action_list)
 
-        # Episode is over, step all agents with final info state.
-        for agent in agents:
-          agent.step(time_step)
+      # Episode is over, step all agents with final info state.
+      for agent in agents:
+        agent.step(time_step)
 
 
 if __name__ == "__main__":

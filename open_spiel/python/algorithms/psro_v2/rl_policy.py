@@ -21,8 +21,10 @@ different types of oracles.
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
-from open_spiel.python.algorithms import dqn
-from open_spiel.python.algorithms import policy_gradient
+from open_spiel.python.jax import dqn
+from open_spiel.python.jax import policy_gradient
+
+# pylint: disable=protected-access
 
 
 def rl_policy_factory(rl_class):
@@ -133,8 +135,18 @@ def rl_policy_factory(rl_class):
       super(RLPolicy, copied_object).__init__(self.game, self.player_ids)
       setattr(copied_object, "_rl_class", self._rl_class)
       setattr(copied_object, "_obs", self._obs)
-      setattr(copied_object, "_policy",
-              self._policy.copy_with_noise(sigma=sigma))
+      if hasattr(self._policy, "copy_with_noise"):
+        setattr(
+            copied_object, "_policy", self._policy.copy_with_noise(sigma=sigma)
+        )
+      else:
+        # Make a new one from scratch
+        _ = self._policy._kwargs.pop("self", None)
+        setattr(
+            copied_object,
+            "_policy",
+            self._policy.__class__(**self._policy._kwargs),
+        )
       setattr(copied_object, "_env", self._env)
       copied_object.unfreeze()
 

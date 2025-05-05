@@ -33,8 +33,6 @@ import numpy as np
 
 # pylint: disable=g-bad-import-order
 import pyspiel
-import tensorflow.compat.v1 as tf
-# pylint: enable=g-bad-import-order
 
 from open_spiel.python import policy
 from open_spiel.python import rl_environment
@@ -115,7 +113,7 @@ flags.DEFINE_bool("local_launch", False, "Launch locally or not.")
 flags.DEFINE_bool("verbose", True, "Enables verbose printing and profiling.")
 
 
-def init_pg_responder(sess, env):
+def init_pg_responder(env):
   """Initializes the Policy Gradient-based responder and agents."""
   info_state_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
@@ -123,13 +121,11 @@ def init_pg_responder(sess, env):
   agent_class = rl_policy.PGPolicy
 
   agent_kwargs = {
-      "session": sess,
       "info_state_size": info_state_size,
       "num_actions": num_actions,
       "loss_str": FLAGS.loss_str,
       "loss_class": False,
       "hidden_layers_sizes": [FLAGS.hidden_layer_size] * FLAGS.n_hidden_layers,
-      "batch_size": FLAGS.batch_size,
       "entropy_cost": FLAGS.entropy_cost,
       "critic_learning_rate": FLAGS.critic_learning_rate,
       "pi_learning_rate": FLAGS.pi_learning_rate,
@@ -165,14 +161,13 @@ def init_br_responder(env):
   return oracle, agents
 
 
-def init_dqn_responder(sess, env):
+def init_dqn_responder(env):
   """Initializes the Policy Gradient-based responder and agents."""
   state_representation_size = env.observation_spec()["info_state"][0]
   num_actions = env.action_spec()["num_actions"]
 
   agent_class = rl_policy.DQNPolicy
   agent_kwargs = {
-      "session": sess,
       "state_representation_size": state_representation_size,
       "num_actions": num_actions,
       "hidden_layers_sizes": [FLAGS.hidden_layer_size] * FLAGS.n_hidden_layers,
@@ -244,7 +239,8 @@ def print_policy_analysis(policies, game, verbose=False):
 def gpsro_looper(env, oracle, agents):
   """Initializes and executes the GPSRO training loop."""
   sample_from_marginals = True  # TODO(somidshafiei) set False for alpharank
-  training_strategy_selector = FLAGS.training_strategy_selector or strategy_selectors.probabilistic
+  training_strategy_selector = (FLAGS.training_strategy_selector or
+                                strategy_selectors.probabilistic)
 
   g_psro_solver = psro_v2.PSROSolver(
       env.game,
@@ -300,15 +296,14 @@ def main(argv):
   env = rl_environment.Environment(game)
 
   # Initialize oracle and agents
-  with tf.Session() as sess:
-    if FLAGS.oracle_type == "DQN":
-      oracle, agents = init_dqn_responder(sess, env)
-    elif FLAGS.oracle_type == "PG":
-      oracle, agents = init_pg_responder(sess, env)
-    elif FLAGS.oracle_type == "BR":
-      oracle, agents = init_br_responder(env)
-    sess.run(tf.global_variables_initializer())
-    gpsro_looper(env, oracle, agents)
+  if FLAGS.oracle_type == "DQN":
+    oracle, agents = init_dqn_responder(env)
+  elif FLAGS.oracle_type == "PG":
+    oracle, agents = init_pg_responder(env)
+  elif FLAGS.oracle_type == "BR":
+    oracle, agents = init_br_responder(env)
+  gpsro_looper(env, oracle, agents)
+
 
 if __name__ == "__main__":
   app.run(main)

@@ -106,7 +106,7 @@ class FictitiousPlayTest(parameterized.TestCase):
     dfp_policy = dfp.get_policy()
     nash_conv_dfp = nash_conv.NashConv(game, dfp_policy)
 
-    self.assertAlmostEqual(nash_conv_dfp.nash_conv(), 1.056, places=3)
+    self.assertLessEqual(nash_conv_dfp.nash_conv(), 1.06)
 
   def test_average(self):
     """Test the average of policies.

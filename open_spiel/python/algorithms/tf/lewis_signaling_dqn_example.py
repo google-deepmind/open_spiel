@@ -41,7 +41,7 @@ flags.DEFINE_integer("eps_decay_steps", 49000,
 flags.DEFINE_integer("replay_buffer_capacity", int(1e4),
                      "Size of replay buffer")
 
-# Misc paramters
+# Misc parameters
 flags.DEFINE_integer("num_runs", 10, "Number of repetitions")
 flags.DEFINE_integer("log_interval", 100,
                      "Number of episodes between each logging")
@@ -72,7 +72,8 @@ def main(_):
       payoffs = np.array(payoffs_list).reshape((num_states, num_states))
     except ValueError:
       raise ValueError(
-          "There should be {} (states * actions) elements in payoff. Found {} elements"
+          "There should be {} (states * actions) elements in payoff. "
+          "Found {} elements"
           .format(num_states * num_states, len(payoffs_list))) from None
 
   env_configs = {

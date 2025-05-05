@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for open_spiel.python.algorithms.masked_softmax."""
-
 import math
 
 from absl.testing import absltest
