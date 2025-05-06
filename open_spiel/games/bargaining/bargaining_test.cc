@@ -34,7 +34,7 @@ namespace bargaining {
 namespace {
 
 constexpr const char* kInstancesFilename =
-    "third_party/open_spiel/games/bargaining_instances1000.txt";
+    "open_spiel/games/bargaining/bargaining_instances1000.txt";
 constexpr int kFileNumInstances = 1000;
 
 namespace testing = open_spiel::testing;

@@ -24,6 +24,7 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -49,7 +50,7 @@ const GameType kGameType{/*short_name=*/"bargaining",
                          /*provides_observation_string=*/true,
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
-                         {{"instances_file", GameParameter("")},
+                         {{"instances_file", GameParameter(kInstancesFilename)},
                           {"max_turns", GameParameter(kDefaultMaxTurns)},
                           {"discount", GameParameter(kDefaultDiscount)},
                           {"prob_end", GameParameter(kDefaultProbEnd)}}};
@@ -504,9 +505,12 @@ BargainingGame::BargainingGame(const GameParameters& params)
       discount_(ParameterValue<double>("discount", kDefaultDiscount)),
       prob_end_(ParameterValue<double>("prob_end", kDefaultProbEnd)) {
   std::string filename = ParameterValue<std::string>("instances_file", "");
-  if (!filename.empty()) {
+  if (open_spiel::file::Exists(filename)) {
     ParseInstancesFile(filename);
   } else {
+    if (!filename.empty()) {
+      std::cerr << "Failed to parse instances file: " << filename << " ";
+    }
     ParseInstancesString(kDefaultInstancesString);
   }
   CreateOffers();

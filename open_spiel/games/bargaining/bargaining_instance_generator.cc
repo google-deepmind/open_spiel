@@ -20,6 +20,7 @@
 #include <numeric>
 #include <random>
 #include <string>
+#include <unordered_set>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
@@ -98,16 +99,23 @@ void GenerateInstances(int num) {
   std::string filename = absl::GetFlag(FLAGS_filename);
   int seed = absl::GetFlag(FLAGS_seed);
   std::mt19937 rng(seed);
+  std::unordered_set<std::string> generated_instance_strings;
 
   std::cout << "Opening file: " << filename << std::endl;
   open_spiel::file::File outfile(filename, "w");
-  for (int i = 0; i < num; ++i) {
+  int num_generated_instances = 0;
+  while (num_generated_instances < num) {
     Instance instance = GenerateInstance(&rng);
     std::string instance_line = instance.ToString();
-    instance_line.push_back('\n');
-    std::cout << i << std::endl << instance_line;
-    outfile.Write(instance_line);
+    if (generated_instance_strings.find(instance_line) ==
+        generated_instance_strings.end()) {
+      generated_instance_strings.insert(instance_line);
+      num_generated_instances++;
+      instance_line.push_back('\n');
+      std::cout << num_generated_instances << std::endl << instance_line;
+      outfile.Write(instance_line);
   }
+}
   std::cout << "Wrote to file: " << filename << std::endl;
 }
 
