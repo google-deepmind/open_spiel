@@ -79,7 +79,7 @@ constexpr const char* kDefaultInstancesString =
     "1,3,1 2,2,2 10,0,0\n"
     "1,2,2 2,3,1 4,0,3\n";
 // Default 1000-instance database.
-constexpr const char* kInstancesFilename =
+constexpr const char* kDefaultInstancesFilename =
     "open_spiel/games/bargaining/bargaining_instances1000.txt";
 
 struct Instance {
