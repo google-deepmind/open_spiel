@@ -64,23 +64,12 @@ constexpr int kNumPlayers = 2;
 constexpr double kDefaultDiscount = 1.0;
 constexpr int kDefaultMaxTurns = 10;
 constexpr double kDefaultProbEnd = 0.0;
+constexpr int kDefaultNumInstances = 1000;
 // Default 10-instance database used for tests. See
 // bargaining_instance_generator.cc to create your own.
 // Format is: pool items, p1 values, p2 values.
-constexpr const char* kDefaultInstancesString =
-    "1,2,3 8,1,0 4,0,2\n"
-    "1,4,1 4,1,2 2,2,0\n"
-    "2,2,1 1,1,6 0,4,2\n"
-    "1,4,1 9,0,1 2,2,0\n"
-    "1,4,1 5,1,1 0,1,6\n"
-    "4,1,1 2,1,1 1,0,6\n"
-    "3,1,1 1,4,3 0,2,8\n"
-    "1,1,3 0,1,3 1,3,2\n"
-    "1,3,1 2,2,2 10,0,0\n"
-    "1,2,2 2,3,1 4,0,3\n";
+const char* BargainingInstances1000();
 // Default 1000-instance database.
-constexpr const char* kDefaultInstancesFilename =
-    "open_spiel/games/bargaining/bargaining_instances1000.txt";
 
 struct Instance {
   std::vector<std::vector<int>> values;

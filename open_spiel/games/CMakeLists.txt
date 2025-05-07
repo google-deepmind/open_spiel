@@ -5,6 +5,7 @@ set(GAME_SOURCES
   backgammon/backgammon.h
   bargaining/bargaining.cc
   bargaining/bargaining.h
+  bargaining/bargaining_instances1000.cc
   battleship/battleship.cc
   battleship/battleship.h
   battleship/battleship_types.h

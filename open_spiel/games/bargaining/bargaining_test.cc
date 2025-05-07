@@ -134,6 +134,13 @@ void BasicBargainingFromInstancesFileTests() {
   testing::RandomSimTest(*game, 100);
 }
 
+void BasicBargainingFromCCInstancesTests() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining");
+
+  const auto* bargaining_game = static_cast<const BargainingGame*>(game.get());
+  SPIEL_CHECK_EQ(bargaining_game->AllInstances().size(), kDefaultNumInstances);
+}
+
 }  // namespace
 }  // namespace bargaining
 }  // namespace open_spiel
@@ -149,4 +156,5 @@ int main(int argc, char** argv) {
   open_spiel::bargaining::BargainingDiscountTest();
   open_spiel::bargaining::BargainingProbEndContinueTest();
   open_spiel::bargaining::BargainingProbEndEndTest();
+  open_spiel::bargaining::BasicBargainingFromCCInstancesTests();
 }

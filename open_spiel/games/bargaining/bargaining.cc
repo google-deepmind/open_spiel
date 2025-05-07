@@ -51,7 +51,7 @@ const GameType kGameType{/*short_name=*/"bargaining",
                          /*provides_observation_tensor=*/true,
                          /*parameter_specification=*/
                          {{"instances_file",
-                           GameParameter(kDefaultInstancesFilename)},
+                           GameParameter("")},
                           {"max_turns", GameParameter(kDefaultMaxTurns)},
                           {"discount", GameParameter(kDefaultDiscount)},
                           {"prob_end", GameParameter(kDefaultProbEnd)}}};
@@ -506,7 +506,7 @@ BargainingGame::BargainingGame(const GameParameters& params)
       discount_(ParameterValue<double>("discount", kDefaultDiscount)),
       prob_end_(ParameterValue<double>("prob_end", kDefaultProbEnd)) {
   std::string filename = ParameterValue<std::string>(
-      "instances_file", kDefaultInstancesFilename
+      "instances_file", ""
   );
   if (open_spiel::file::Exists(filename)) {
     ParseInstancesFile(filename);
@@ -514,7 +514,7 @@ BargainingGame::BargainingGame(const GameParameters& params)
     if (!filename.empty()) {
       std::cerr << "Failed to parse instances file: " << filename << " ";
     }
-    ParseInstancesString(kDefaultInstancesString);
+    ParseInstancesString(BargainingInstances1000());
   }
   CreateOffers();
 }
