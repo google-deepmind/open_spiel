@@ -69,6 +69,8 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
     // get_offer_by_quantities(quantities: List[int]). Returns a tuple
     // of (offer, OpenSpiel action)
     .def("get_offer_by_quantities", &BargainingGame::GetOfferByQuantities)
+    .def("get_instance_index", &BargainingGame::GetInstanceIndex)
+    .def("get_offer_index", &BargainingGame::GetOfferIndex)
     // Pickle support
     .def(py::pickle(
         [](std::shared_ptr<const BargainingGame> game) {  // __getstate__

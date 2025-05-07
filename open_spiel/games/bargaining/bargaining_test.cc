@@ -141,6 +141,24 @@ void BasicBargainingFromCCInstancesTests() {
   SPIEL_CHECK_EQ(bargaining_game->AllInstances().size(), kDefaultNumInstances);
 }
 
+void BasicBargainingInstanceMapTests() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining");
+  const auto* bargaining_game = static_cast<const BargainingGame*>(game.get());
+  for (int i = 0; i < bargaining_game->AllInstances().size(); ++i) {
+    const Instance& instance = bargaining_game->GetInstance(i);
+    SPIEL_CHECK_EQ(bargaining_game->GetInstanceIndex(instance), i);
+  }
+}
+
+void BasicBargainingOfferMapTests() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining");
+  const auto* bargaining_game = static_cast<const BargainingGame*>(game.get());
+  for (int i = 0; i < bargaining_game->AllOffers().size(); ++i) {
+    const Offer& offer = bargaining_game->GetOffer(i);
+    SPIEL_CHECK_EQ(bargaining_game->GetOfferIndex(offer), i);
+  }
+}
+
 }  // namespace
 }  // namespace bargaining
 }  // namespace open_spiel
@@ -157,4 +175,6 @@ int main(int argc, char** argv) {
   open_spiel::bargaining::BargainingProbEndContinueTest();
   open_spiel::bargaining::BargainingProbEndEndTest();
   open_spiel::bargaining::BasicBargainingFromCCInstancesTests();
+  open_spiel::bargaining::BasicBargainingInstanceMapTests();
+  open_spiel::bargaining::BasicBargainingOfferMapTests();
 }

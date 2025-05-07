@@ -77,6 +77,14 @@ class GamesBargainingTest(absltest.TestCase):
     for item1, item2 in zip(cur_instance, new_instance):
       self.assertEqual(item1, item2)
 
+  def test_offer_and_instance_map(self):
+    game = pyspiel.load_game("bargaining")
+    all_offers = game.all_offers()
+    for i, offer in enumerate(all_offers):
+      self.assertEqual(game.get_offer_index(offer), i)
+    for i, instance in enumerate(game.all_instances()):
+      self.assertEqual(game.get_instance_index(instance), i)
+
 
 if __name__ == "__main__":
   absltest.main()

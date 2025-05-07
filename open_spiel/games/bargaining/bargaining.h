@@ -19,6 +19,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
 #include "open_spiel/spiel.h"
@@ -172,6 +173,12 @@ class BargainingGame : public Game {
   const Offer& GetOffer(int num) const { return all_offers_[num]; }
   std::pair<Offer, Action> GetOfferByQuantities(
       const std::vector<int>& quantities) const;
+  int GetInstanceIndex(const Instance& instance) const {
+    return instance_map_.at(instance.ToString());
+  }
+  int GetOfferIndex(const Offer& offer) const {
+    return offer_map_.at(offer.ToString());
+  }
 
  private:
   void ParseInstancesFile(const std::string& filename);
@@ -180,6 +187,8 @@ class BargainingGame : public Game {
 
   std::vector<Instance> all_instances_;
   std::vector<Offer> all_offers_;
+  std::unordered_map<std::string, int> offer_map_;
+  std::unordered_map<std::string, int> instance_map_;
   const int max_turns_;
   const double discount_;
   const double prob_end_;

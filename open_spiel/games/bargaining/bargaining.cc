@@ -471,6 +471,7 @@ void BargainingGame::ParseInstancesString(const std::string& instances_string) {
             absl::SimpleAtoi(p2values_parts[i], &instance.values[1][i]));
       }
       all_instances_.push_back(instance);
+      instance_map_[instance.ToString()] = all_instances_.size() - 1;
     }
   }
 }
@@ -482,6 +483,7 @@ void BargainingGame::CreateOffers() {
     if (std::accumulate(cur_offer.begin(), cur_offer.end(), 0) <=
         kPoolMaxNumItems) {
       all_offers_.push_back(Offer(cur_offer));
+      offer_map_[all_offers_.back().ToString()] = all_offers_.size() - 1;
     }
 
     // Try adding a digit to the left-most, keep going until you can. Then
