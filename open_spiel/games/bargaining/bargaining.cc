@@ -472,6 +472,18 @@ void BargainingGame::ParseInstancesString(const std::string& instances_string) {
       }
       all_instances_.push_back(instance);
       instance_map_[instance.ToString()] = all_instances_.size() - 1;
+      std::vector<std::pair<int, std::string>> player_data = {
+        {0, absl::StrCat("player_0,", parts[0], ",", parts[1])},
+        {1, absl::StrCat("player_1,", parts[0], ",", parts[2])}
+      };
+
+      for (const auto& [player, key] : player_data) {
+        if (possible_opponent_values_.contains(key)) {
+          possible_opponent_values_[key].push_back(instance.values[1-player]);
+        } else {
+          possible_opponent_values_[key] = {instance.values[1-player]};
+        }
+      }
     }
   }
 }
@@ -576,5 +588,17 @@ std::vector<int> BargainingGame::InformationStateTensorShape() const {
   };
 }
 
+std::vector<std::vector<int>> BargainingGame::GetPossibleOpponentValues(
+    int player_id,
+    const std::vector<int>& pool,
+    const std::vector<int>& values) const {
+  std::string key = absl::StrCat(
+      "player_", player_id, ",", absl::StrJoin(pool, ","),
+      ",", absl::StrJoin(values, "," ));
+  if (possible_opponent_values_.contains(key)) {
+    return possible_opponent_values_.at(key);
+  }
+  return {};
+}
 }  // namespace bargaining
 }  // namespace open_spiel

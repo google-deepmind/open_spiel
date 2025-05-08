@@ -73,6 +73,8 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
     .def("get_offer_by_quantities", &BargainingGame::GetOfferByQuantities)
     .def("get_instance_index", &BargainingGame::GetInstanceIndex)
     .def("get_offer_index", &BargainingGame::GetOfferIndex)
+    .def("get_possible_opponent_values",
+          &BargainingGame::GetPossibleOpponentValues)
     // Pickle support
     .def(py::pickle(
         [](std::shared_ptr<const BargainingGame> game) {  // __getstate__

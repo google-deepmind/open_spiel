@@ -66,11 +66,10 @@ constexpr double kDefaultDiscount = 1.0;
 constexpr int kDefaultMaxTurns = 10;
 constexpr double kDefaultProbEnd = 0.0;
 constexpr int kDefaultNumInstances = 1000;
-// Default 10-instance database used for tests. See
-// bargaining_instance_generator.cc to create your own.
+// Default 1000-instance database. See
+// bargaining_instances1000.cc to create your own.
 // Format is: pool items, p1 values, p2 values.
 const char* BargainingInstances1000();
-// Default 1000-instance database.
 
 struct Instance {
   std::vector<std::vector<int>> values;
@@ -179,6 +178,9 @@ class BargainingGame : public Game {
   int GetOfferIndex(const Offer& offer) const {
     return offer_map_.at(offer.ToString());
   }
+  std::vector<std::vector<int>> GetPossibleOpponentValues(
+      int player_id, const std::vector<int>& pool,
+      const std::vector<int>& values) const;
 
  private:
   void ParseInstancesFile(const std::string& filename);
@@ -189,6 +191,8 @@ class BargainingGame : public Game {
   std::vector<Offer> all_offers_;
   std::unordered_map<std::string, int> offer_map_;
   std::unordered_map<std::string, int> instance_map_;
+  std::unordered_map<std::string, std::vector<std::vector<int>>>
+      possible_opponent_values_;
   const int max_turns_;
   const double discount_;
   const double prob_end_;

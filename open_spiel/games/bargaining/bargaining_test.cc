@@ -159,6 +159,20 @@ void BasicBargainingOfferMapTests() {
   }
 }
 
+void BasicBargainingOpponentValuesTests() {
+  std::shared_ptr<const Game> game = LoadGame("bargaining");
+  const auto* bargaining_game = static_cast<const BargainingGame*>(game.get());
+  std::vector<std::vector<int>> expected_values = {
+    {4, 0, 2}, {7, 0, 1}, {1, 3, 1}
+  };
+  std::vector<int> player_values = {1, 2, 3};
+  std::vector<int> opponent_values = {8, 1, 0};
+  std::vector<std::vector<int>> actual_values =
+      bargaining_game->GetPossibleOpponentValues(
+          0, player_values, opponent_values);
+  SPIEL_CHECK_EQ(actual_values, expected_values);
+}
+
 }  // namespace
 }  // namespace bargaining
 }  // namespace open_spiel
@@ -177,4 +191,5 @@ int main(int argc, char** argv) {
   open_spiel::bargaining::BasicBargainingFromCCInstancesTests();
   open_spiel::bargaining::BasicBargainingInstanceMapTests();
   open_spiel::bargaining::BasicBargainingOfferMapTests();
+  open_spiel::bargaining::BasicBargainingOpponentValuesTests();
 }

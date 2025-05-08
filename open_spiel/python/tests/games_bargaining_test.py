@@ -85,6 +85,17 @@ class GamesBargainingTest(absltest.TestCase):
     for i, instance in enumerate(game.all_instances()):
       self.assertEqual(game.get_instance_index(instance), i)
 
+  def test_get_possible_opponent_values(self):
+    game = pyspiel.load_game("bargaining")
+    self.assertEqual(
+        game.get_possible_opponent_values(0, [1, 2, 3], [8, 1, 0]),
+        [
+            [4, 0, 2],
+            [7, 0, 1],
+            [1, 3, 1],
+        ],
+    )
+
 
 if __name__ == "__main__":
   absltest.main()
