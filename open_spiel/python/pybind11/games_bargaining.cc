@@ -36,11 +36,13 @@ void open_spiel::init_pyspiel_games_bargaining(py::module& m) {
   py::class_<Instance>(m, "Instance")
       .def(py::init<>())
       .def_readwrite("pool", &Instance::pool)
-      .def_readwrite("values", &Instance::values);
+      .def_readwrite("values", &Instance::values)
+      .def("__str__", &Instance::ToString);
 
   py::class_<Offer>(m, "Offer")
       .def(py::init<>())
-      .def_readwrite("quantities", &Offer::quantities);
+      .def_readwrite("quantities", &Offer::quantities)
+      .def("__str__", &Offer::ToString);
 
   py::classh<BargainingState, State>(m, "BargainingState")
       .def("instance", &BargainingState::GetInstance)
