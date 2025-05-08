@@ -15,14 +15,17 @@
 #ifndef OPEN_SPIEL_GAMES_BARGAINING_H_
 #define OPEN_SPIEL_GAMES_BARGAINING_H_
 
+#include <functional>
 #include <memory>
-#include <random>
 #include <string>
+#include <utility>
 #include <vector>
-#include <unordered_map>
 
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_map.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
+#include "open_spiel/game_parameters.h"
 
 // A simple multi-issue bargaining game, based on [1,2]. The rules are based
 // on the description of Section 2.2 of [1]:
@@ -195,9 +198,9 @@ class BargainingGame : public Game {
 
   std::vector<Instance> all_instances_;
   std::vector<Offer> all_offers_;
-  std::unordered_map<std::string, int> offer_map_;
-  std::unordered_map<std::string, int> instance_map_;
-  std::unordered_map<std::string, std::vector<std::vector<int>>>
+  absl::flat_hash_map<std::string, int> offer_map_;
+  absl::flat_hash_map<std::string, int> instance_map_;
+  absl::flat_hash_map<std::string, std::vector<std::vector<int>>>
       possible_opponent_values_;
   const int max_turns_;
   const double discount_;
