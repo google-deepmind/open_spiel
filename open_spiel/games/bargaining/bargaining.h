@@ -173,9 +173,15 @@ class BargainingGame : public Game {
   std::pair<Offer, Action> GetOfferByQuantities(
       const std::vector<int>& quantities) const;
   int GetInstanceIndex(const Instance& instance) const {
+    if (!instance_map_.contains(instance.ToString())) {
+      return -1;
+    }
     return instance_map_.at(instance.ToString());
   }
   int GetOfferIndex(const Offer& offer) const {
+    if (!offer_map_.contains(offer.ToString())) {
+      return -1;
+    }
     return offer_map_.at(offer.ToString());
   }
   std::vector<std::vector<int>> GetPossibleOpponentValues(
