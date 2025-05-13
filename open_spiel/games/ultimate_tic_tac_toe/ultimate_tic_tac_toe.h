@@ -72,7 +72,7 @@ class UltimateTTTState : public State {
   // The tic-tac-toe subgames, arranged in the same order as moves.
   const tic_tac_toe::TicTacToeGame* ttt_game_;
   std::array<std::unique_ptr<State>, tic_tac_toe::kNumCells> local_states_;
-  std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> meta_board_;
+  tic_tac_toe::GridBoard meta_board_;
   int current_state_;
 };
 
