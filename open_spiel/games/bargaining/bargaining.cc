@@ -19,7 +19,9 @@
 #include <memory>
 #include <numeric>
 #include <random>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
@@ -65,20 +67,27 @@ REGISTER_SPIEL_GAME(kGameType, Factory);
 RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
+
+std::string format_values(const std::vector<int>& values) {
+  return absl::StrCat("Book: ", values[0], ", ",
+                      "Hat: ", values[1], ", ",
+                      "Basketball: ", values[2]);
+}
+
 std::string Instance::ToString() const {
-  return absl::StrCat(absl::StrJoin(pool, ","), " ",
-                      absl::StrJoin(values[0], ","), " ",
-                      absl::StrJoin(values[1], ","));
+  return absl::StrCat(format_values(pool), " ",
+                      format_values(values[0]), " ",
+                      format_values(values[1]));
 }
 
 std::string Instance::ToPrettyString() const {
-  return absl::StrCat("Pool:    ", absl::StrJoin(pool, " "), "\n",
-                      "P0 vals: ", absl::StrJoin(values[0], " "), "\n",
-                      "P1 vals: ", absl::StrJoin(values[1], " "), "\n");
+  return absl::StrCat("Pool:    ", format_values(pool), "\n",
+                      "P0 vals: ", format_values(values[0]), "\n",
+                      "P1 vals: ", format_values(values[1]), "\n");
 }
 
 std::string Offer::ToString() const {
-  return absl::StrCat("Offer: ", absl::StrJoin(quantities, " "));
+  return absl::StrCat("Offer: ", format_values(quantities));
 }
 
 std::string BargainingState::ActionToString(Player player,
@@ -123,9 +132,9 @@ std::string BargainingState::ObservationString(Player player) const {
     return "Initial chance node";
   }
 
-  std::string str = absl::StrCat("Pool: ", absl::StrJoin(instance_.pool, " "));
+  std::string str = absl::StrCat("Pool: ", format_values(instance_.pool));
   absl::StrAppend(&str,
-                  "\nMy values: ", absl::StrJoin(instance_.values[player], " "),
+                  "\nMy values: ", format_values(instance_.values[player]),
                   "\n");
   absl::StrAppend(&str, "Agreement reached? ", agreement_reached_, "\n");
   absl::StrAppend(&str, "Number of offers: ", offers_.size(), "\n");
@@ -145,9 +154,9 @@ std::string BargainingState::InformationStateString(Player player) const {
     return "Initial chance node";
   }
 
-  std::string str = absl::StrCat("Pool: ", absl::StrJoin(instance_.pool, " "));
+  std::string str = absl::StrCat("Pool: ", format_values(instance_.pool));
   absl::StrAppend(&str,
-                  "\nMy values: ", absl::StrJoin(instance_.values[player], " "),
+                  "\nMy values: ", format_values(instance_.values[player]),
                   "\n");
   absl::StrAppend(&str, "Agreement reached? ", agreement_reached_, "\n");
   for (int i = 0; i < offers_.size(); ++i) {
