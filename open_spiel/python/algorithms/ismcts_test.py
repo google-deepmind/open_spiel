@@ -14,7 +14,17 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
+import numpy as np
 from open_spiel.python.algorithms import ismcts
+from open_spiel.python.algorithms import mcts
+import pyspiel
+
+
+NOLIMIT_GAME_STRING = (
+    "universal_poker(betting=nolimit,bettingAbstraction=fullgame,blind=50 100,"
+    "firstPlayer=1 1,numBoardCards=0 3 1 1,numHoleCards=2,numPlayers=2,"
+    "numRanks=13,numRounds=2,numSuits=4,stack=20000 20000)"
+)
 
 
 class IsmctsTest(parameterized.TestCase):
@@ -51,6 +61,40 @@ class IsmctsTest(parameterized.TestCase):
 
     # Child 2 is not selected because it is outside the tie tolerance.
     self.assertNotIn(2, candidates)
+
+  def play_game(self, game: pyspiel.Game, ismcts_bot: ismcts.ISMCTSBot):
+    state = game.new_initial_state()
+    while not state.is_terminal():
+      if state.is_chance_node():
+        outcomes = state.chance_outcomes()
+        action_list, prob_list = zip(*outcomes)
+        action = np.random.choice(action_list, p=prob_list)
+        state.apply_action(action)
+      else:
+        action = ismcts_bot.step(state)
+        state.apply_action(action)
+
+  def test_play_kuhn_poker(self):
+    game = pyspiel.load_game("kuhn_poker")
+    ismcts_bot = ismcts.ISMCTSBot(
+        game=game,
+        uct_c=4.0,
+        evaluator=mcts.RandomRolloutEvaluator(),
+        max_simulations=10,
+    )
+    self.play_game(game, ismcts_bot)
+
+  @absltest.skip("Skipping. This one does not work.")
+  def test_play_universal_poker(self):
+    if "universal_poker" in pyspiel.registered_names():
+      game = pyspiel.load_game(NOLIMIT_GAME_STRING)
+      ismcts_bot = ismcts.ISMCTSBot(
+          game=game,
+          uct_c=4.0,
+          evaluator=mcts.RandomRolloutEvaluator(),
+          max_simulations=10,
+      )
+      self.play_game(game, ismcts_bot)
 
 
 if __name__ == "__main__":
