@@ -913,7 +913,9 @@ constexpr const char* kDefaultInstances1000 =
 1,3,1 5,1,2 5,1,2
 1,4,1 2,1,4 6,1,0
 1,1,4 7,3,0 2,4,1
-1,1,3 4,0,2 9,1,0
+1,1,3 4,0,2 9,1,0)"
+// MSVC can't handle string longer than 16,384 bytes
+R"(
 2,4,1 1,0,8 1,1,4
 1,4,1 3,1,3 6,1,0
 1,1,5 2,3,1 10,0,0

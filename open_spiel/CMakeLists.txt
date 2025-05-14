@@ -70,7 +70,9 @@ if(APPLE)
   set (CMAKE_FIND_FRAMEWORK LAST)
 elseif(WIN32)
   # Setup for MSVC 2022.
-  # No changes needed. In particular: do not use -Wno-everything.
+  if(MSVC)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /utf-8 /bigobj /DWIN32 /D_WINDOWS /GR /EHsc")
+  endif()
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
 endif()

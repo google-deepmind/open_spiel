@@ -307,7 +307,9 @@ nbbrknqr/pppppppp/8/8/8/8/PPPPPPPP/NBBRKNQR w KQkq - 0 1
 nbbrkrqn/pppppppp/8/8/8/8/PPPPPPPP/NBBRKRQN w KQkq - 0 1
 rbbnnkqr/pppppppp/8/8/8/8/PPPPPPPP/RBBNNKQR w KQkq - 0 1
 rbbnknqr/pppppppp/8/8/8/8/PPPPPPPP/RBBNKNQR w KQkq - 0 1
-rbbnkrqn/pppppppp/8/8/8/8/PPPPPPPP/RBBNKRQN w KQkq - 0 1
+rbbnkrqn/pppppppp/8/8/8/8/PPPPPPPP/RBBNKRQN w KQkq - 0 1)"
+// MSVC can't handle string longer than 16,384 bytes
+R"(
 rbbknnqr/pppppppp/8/8/8/8/PPPPPPPP/RBBKNNQR w KQkq - 0 1
 rbbknrqn/pppppppp/8/8/8/8/PPPPPPPP/RBBKNRQN w KQkq - 0 1
 rbbkrnqn/pppppppp/8/8/8/8/PPPPPPPP/RBBKRNQN w KQkq - 0 1
@@ -594,7 +596,9 @@ rkqbbrnn/pppppppp/8/8/8/8/PPPPPPPP/RKQBBRNN w KQkq - 0 1
 nnrbbqkr/pppppppp/8/8/8/8/PPPPPPPP/NNRBBQKR w KQkq - 0 1
 nrnbbqkr/pppppppp/8/8/8/8/PPPPPPPP/NRNBBQKR w KQkq - 0 1
 nrkbbqnr/pppppppp/8/8/8/8/PPPPPPPP/NRKBBQNR w KQkq - 0 1
-nrkbbqrn/pppppppp/8/8/8/8/PPPPPPPP/NRKBBQRN w KQkq - 0 1
+nrkbbqrn/pppppppp/8/8/8/8/PPPPPPPP/NRKBBQRN w KQkq - 0 1)"
+// MSVC can't handle string longer than 16,384 bytes
+R"(
 rnnbbqkr/pppppppp/8/8/8/8/PPPPPPPP/RNNBBQKR w KQkq - 0 1
 rnkbbqnr/pppppppp/8/8/8/8/PPPPPPPP/RNKBBQNR w KQkq - 0 1
 rnkbbqrn/pppppppp/8/8/8/8/PPPPPPPP/RNKBBQRN w KQkq - 0 1
@@ -881,7 +885,9 @@ rqnkrbbn/pppppppp/8/8/8/8/PPPPPPPP/RQNKRBBN w KQkq - 0 1
 rqknnbbr/pppppppp/8/8/8/8/PPPPPPPP/RQKNNBBR w KQkq - 0 1
 rqknrbbn/pppppppp/8/8/8/8/PPPPPPPP/RQKNRBBN w KQkq - 0 1
 rqkrnbbn/pppppppp/8/8/8/8/PPPPPPPP/RQKRNBBN w KQkq - 0 1
-nnqrkbbr/pppppppp/8/8/8/8/PPPPPPPP/NNQRKBBR w KQkq - 0 1
+nnqrkbbr/pppppppp/8/8/8/8/PPPPPPPP/NNQRKBBR w KQkq - 0 1)"
+// MSVC can't handle string longer than 16,384 bytes
+R"(
 nrqnkbbr/pppppppp/8/8/8/8/PPPPPPPP/NRQNKBBR w KQkq - 0 1
 nrqknbbr/pppppppp/8/8/8/8/PPPPPPPP/NRQKNBBR w KQkq - 0 1
 nrqkrbbn/pppppppp/8/8/8/8/PPPPPPPP/NRQKRBBN w KQkq - 0 1
