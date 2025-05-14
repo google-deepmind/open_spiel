@@ -413,7 +413,7 @@ Move HiveState::ActionToMove(Action action) const {
     to = HiveTile::kNoneTile;
   }
 
-  return Move{from, to, static_cast<Direction>(direction)};
+  return Move{HiveTile(from), HiveTile(to), static_cast<Direction>(direction)};
 }
 
 Action HiveState::MoveToAction(Move move) const {
