@@ -330,17 +330,15 @@ class State {
   // implemented. The default is to return 0 except at terminal states, where
   // the terminal returns are returned.
   //
-  // Note 1: should not be called at chance nodes (undefined and crashes).
-  // Note 2: This must agree with Returns(). That is, for any state S_t,
-  //         Returns(St) = Sum(Rewards(S_0), Rewards(S_1)... Rewards(S_t)).
-  //         The default implementation is only correct for games that only
-  //         have a final reward. Games with intermediate rewards must override
-  //         both this method and Returns().
+  // Note: This must agree with Returns(). That is, for any state S_t,
+  //       Returns(St) = Sum(Rewards(S_0), Rewards(S_1)... Rewards(S_t)).
+  //       The default implementation is only correct for games that only
+  //       have a final reward. Games with intermediate rewards must override
+  //       both this method and Returns().
   virtual std::vector<double> Rewards() const {
     if (IsTerminal()) {
       return Returns();
     } else {
-      SPIEL_CHECK_FALSE(IsChanceNode());
       return std::vector<double>(num_players_, 0.0);
     }
   }
