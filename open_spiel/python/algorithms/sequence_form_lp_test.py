@@ -16,7 +16,10 @@
 
 from absl.testing import absltest
 
-from open_spiel.python.algorithms import sequence_form_lp
+from open_spiel.python.algorithms import exploitability, sequence_form_lp
+from open_spiel.python import policy
+from open_spiel.python.games import data
+
 import pyspiel
 
 
@@ -61,6 +64,32 @@ class SFLPTest(absltest.TestCase):
     # symmetric game, should be 0
     self.assertAlmostEqual(val1, 0)
     self.assertAlmostEqual(val2, 0)
+
+  def test_exploitablity(self):
+    # exploitability test for a player's / joint policies
+    # loading the game from Kuhn 1950 or https://en.wikipedia.org/wiki/Kuhn_poker
+    game = pyspiel.load_game('kuhn_poker')
+    #solving the game as the linear programme
+    (_, _, pi1, pi2) = sequence_form_lp.solve_zero_sum_game(game)
+    # getting an approximately optimal policy `pi_kuhn`
+    pi_kuhn = data.kuhn_nash_equilibrium(0.219434553)
+    # computing exploitability of the said policy, should be around zero ≈ -5.6e-17
+    expl_true = exploitability.exploitability(game, pi_kuhn)
+
+    # computing the exploitablity for the policy of the player 1 
+    # which is wrong, see the issue https://github.com/google-deepmind/open_spiel/issues/1215
+    # getting a large number ≈ 0.28
+    expl_pi1 = exploitability.exploitability(game, pi1)
+
+    # the way to do it is to merge the policies to get the joint policy of the game
+    merged_policy = policy.merge_tabular_policies([pi1, pi2], game)
+    expl_pi = exploitability.exploitability(game, merged_policy)
+
+    #the right way
+    self.assertAlmostEqual(expl_true, expl_pi)
+    #not the way at all
+    self.assertNotAlmostEqual(expl_true, expl_pi1)
+
 
   # TODO(author5): currently does not work because TTT's information state is
   # not perfect recall. Enable this test when fixed.
