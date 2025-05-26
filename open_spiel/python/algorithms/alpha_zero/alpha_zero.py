@@ -47,7 +47,7 @@ import numpy as np
 
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero import model as model_lib
+from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
 import pyspiel
 from open_spiel.python.utils import data_logger
 from open_spiel.python.utils import file_logger
