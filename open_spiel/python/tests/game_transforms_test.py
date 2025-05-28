@@ -20,13 +20,14 @@ import numpy as np
 
 from open_spiel.python.algorithms import cfr
 from open_spiel.python.algorithms import expected_game_score
+from open_spiel.python.games import iterated_prisoners_dilemma as ipd  # pylint: disable=unused-import
 import pyspiel
 
 
 SEED = 1098097
 
 
-class RepeatedGameTest(absltest.TestCase):
+class GameTransformsTest(absltest.TestCase):
 
   def setUp(self):
     super().setUp()
@@ -80,6 +81,55 @@ class RepeatedGameTest(absltest.TestCase):
     # 1/18 is the Nash value. See https://en.wikipedia.org/wiki/Kuhn_poker
     np.testing.assert_allclose(
         average_policy_values, [-1 / 18, 1 / 18], atol=1e-3)
+
+  def test_turn_based_simultaneous_game(self):
+    tb_game = pyspiel.load_game(
+        "turn_based_simultaneous_game(game="
+        "goofspiel(num_cards=13,players=2,points_order=descending))")
+    state = tb_game.new_initial_state()
+    # Play 11 moves. This gets to the decision right before the game is over.
+    # Because the last action is taken automatically there are only 12 moves
+    # total.
+    for _ in range(11):
+      state.apply_action(state.legal_actions()[0])
+      state.apply_action(state.legal_actions()[0])
+    sim_state = state.simultaneous_game_state()
+    assert not state.is_terminal()
+    assert not sim_state.is_terminal()
+    # For the last joint action, pull out the simultaneous state from inside the
+    # wrapper and and apply joint action to it. Both the wrapped state and
+    # the simultaneous state should be terminal after this.
+    sim_state.apply_actions([sim_state.legal_actions(0)[0],
+                             sim_state.legal_actions(1)[0]])
+    assert state.is_terminal()
+    assert sim_state.is_terminal()
+
+  def test_turn_based_simultaneous_python_game(self):
+    tb_game = pyspiel.load_game(
+        "turn_based_simultaneous_game(game="
+        "python_iterated_prisoners_dilemma())"
+    )
+    state = tb_game.new_initial_state()
+    # Play 10 rounds, then continue.
+    for _ in range(10):
+      state.apply_action(state.legal_actions()[0])
+      state.apply_action(state.legal_actions()[0])
+      if state.is_chance_node():
+        state.apply_action(ipd.Chance.CONTINUE)
+    # Pull out the simultaneous state from inside the wrapper.
+    sim_state = state.simultaneous_game_state()
+    assert not state.is_terminal()
+    assert not sim_state.is_terminal()
+    sim_state.apply_actions([sim_state.legal_actions(0)[0],
+                             sim_state.legal_actions(1)[0]])
+    assert not state.is_terminal()
+    assert not sim_state.is_terminal()
+    # Cannot properly check is_chance_node() because the wrapper is still in
+    # rollout mode, so this would fail: assert state.is_chance_node()
+    assert sim_state.is_chance_node()
+    sim_state.apply_action(ipd.Chance.STOP)
+    assert state.is_terminal()
+    assert sim_state.is_terminal()
 
 
 if __name__ == "__main__":

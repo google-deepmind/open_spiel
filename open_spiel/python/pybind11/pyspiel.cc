@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
+#include <exception>  // NOLINT
+#include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/algorithms/matrix_game_utils.h"
 #include "open_spiel/algorithms/nfg_writer.h"
 #include "open_spiel/algorithms/tensor_game_utils.h"
@@ -24,6 +30,7 @@
 #include "open_spiel/games/efg_game/efg_game.h"
 #include "open_spiel/games/efg_game/efg_game_data.h"
 #include "open_spiel/games/nfg_game/nfg_game.h"
+#include "open_spiel/game_transforms/turn_based_simultaneous_game.h"
 #include "open_spiel/matrix_game.h"
 #include "open_spiel/normal_form_game.h"
 #include "open_spiel/observer.h"
@@ -57,6 +64,7 @@
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/tensor_game.h"
 #include "open_spiel/tests/basic_tests.h"
 
 // Includes needed for absl::optional.
@@ -426,6 +434,23 @@ PYBIND11_MODULE(pyspiel, m) {
                 std::static_pointer_cast<const NormalFormGame>(LoadGame(data)));
           }));
 
+  // Put this here rather than in game_transforms.cc because it depends on
+  // State, which is defined above.
+  py::classh<TurnBasedSimultaneousState> tbs_state(m,
+      "TurnBasedSimultaneousState", state);
+  tbs_state.def("simultaneous_game_state",
+                &TurnBasedSimultaneousState::SimultaneousGameState,
+                py::return_value_policy::reference)
+      .def(py::pickle(              // Pickle support
+        [](const TurnBasedSimultaneousState& state) {  // __getstate__
+          return SerializeGameAndState(*state.GetGame(), state);
+        },
+        [](const std::string& data) {  // __setstate__
+          auto state = DeserializeGameAndState(data).second;
+          auto pydict = PyDict(*state);
+          return std::make_pair(std::move(state), pydict);
+        }));
+
   py::classh<MatrixGame> matrix_game(m, "MatrixGame", normal_form_game);
   matrix_game
       .def(py::init<GameType, GameParameters, std::vector<std::string>,
@@ -651,7 +676,7 @@ PYBIND11_MODULE(pyspiel, m) {
   init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
   init_pyspiel_evaluation_sco(m);           // Soft Condorcet Optimization.
-  init_pyspiel_game_transforms(m);          // Game transformations.
+  init_pyspiel_game_transforms(m);  // Game transformations.
   init_pyspiel_games_backgammon(m);         // Backgammon game.
   init_pyspiel_games_bargaining(m);         // Bargaining game.
   init_pyspiel_games_blackjack(m);          // Blackjack game.
