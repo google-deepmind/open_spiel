@@ -93,7 +93,10 @@ class UltimateTTTGame : public Game {
             tic_tac_toe::kNumRows, tic_tac_toe::kNumCols};
   }
   int MaxGameLength() const override {
-    return ttt_game_->MaxGameLength() * kNumSubgames;
+    // A n action in the game can be either to make a move in a subboard,
+    // when only one specific sub board is available, or selecting a sub board,
+    // in which the next move will be made, if the user has the choice. => twice the game size
+    return ttt_game_->MaxGameLength() * kNumSubgames * 2;
   }
 
   const tic_tac_toe::TicTacToeGame* TicTacToeGame() const {
