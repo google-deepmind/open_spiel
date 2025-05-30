@@ -1,4 +1,10 @@
 
+<!-- disableFinding(IMAGE_ALT_TEXT_INACCESSIBLE) -->
+<!-- disableFinding(HEADING_REPEAT_H1) -->
+<!-- disableFinding(SNIPPET_INVALID_LANGUAGE) -->
+<!-- disableFinding("github") -->
+<!-- disableFinding(LINK_CL_HEAD) -->
+
 # OpenSpiel: A Framework for Reinforcement Learning in Games
 
 [![Documentation Status](https://readthedocs.org/projects/openspiel/badge/?version=latest)](https://openspiel.readthedocs.io/en/latest/?badge=latest)

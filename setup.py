@@ -124,7 +124,7 @@ else:
 
 setuptools.setup(
     name="open_spiel",
-    version="1.5",
+    version="1.6",
     license="Apache 2.0",
     author="The OpenSpiel authors",
     author_email="open_spiel@google.com",
@@ -137,4 +137,5 @@ setuptools.setup(
     ext_modules=[CMakeExtension("pyspiel", sourcedir="open_spiel")],
     cmdclass={"build_ext": BuildExt},
     zip_safe=False,
-    packages=setuptools.find_packages(include=["open_spiel", "open_spiel.*"]))
+    packages=setuptools.find_packages(include=["open_spiel", "open_spiel.*"]),
+)

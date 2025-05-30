@@ -82,6 +82,8 @@
 #include "open_spiel/python/pybind11/games_universal_poker.h"
 #endif
 
+#define PYSPIEL_VERSION "1.6"
+
 // Flags governing Open Spiel behaviour
 ABSL_FLAG(bool, log_exceptions_to_stderr, true,
           "Log all exceptions raised in OpenSpiel C++ code to stderr.");
@@ -117,6 +119,7 @@ class SpielException : public std::exception {
 // Definition of our Python module.
 PYBIND11_MODULE(pyspiel, m) {
   m.doc() = "Open Spiel";
+  m.attr("__version__") = PYSPIEL_VERSION;
 
   m.def("game_parameters_from_string", GameParametersFromString,
         "Parses a string as a GameParameter dictionary.");
