@@ -19,7 +19,7 @@ from absl.testing import parameterized
 
 import numpy as np
 
-from open_spiel.python.algorithms.alpha_zero import model as model_lib
+from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
 import pyspiel
 
 solved = {}

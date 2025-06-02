@@ -1,34 +1,77 @@
 import collections
 import functools
 import os
-from typing import Any, Dict, Sequence, Tuple, Optional
+from typing import Any, Dict, Sequence, NamedTuple, Tuple, Optional
 import warnings
 
+from datetime import datetime
 import numpy as np
+import flax
 import jax
 import jax.numpy as jnp
 import flax.linen as nn
 import optax
-from flax.training import checkpoints, train_state
+import chex
+import orbax
+from flax.training import train_state, orbax_utils
+import orbax.checkpoint
+
+flax.config.update('flax_use_orbax_checkpointing', True)
+
+activations_dict = {
+    "celu": nn.celu,
+    "elu": nn.elu,
+    "gelu": nn.gelu,
+    "glu": nn.glu,
+    "hard_sigmoid": nn.hard_sigmoid,
+    "hard_silu": nn.hard_silu, # Alias for hard_swish
+    "hard_swish": nn.hard_swish, # Alias for hard_silu
+    "hard_tanh": nn.hard_tanh,
+    "leaky_relu": nn.leaky_relu,
+    "log_sigmoid": nn.log_sigmoid,
+    "log_softmax": nn.log_softmax,
+    "logsumexp": nn.logsumexp,
+    "one_hot": nn.one_hot,
+    "relu": nn.relu,
+    "selu": nn.selu,
+    "sigmoid": nn.sigmoid,
+    "silu": nn.silu,
+    "soft_sign": nn.soft_sign,
+    "softmax": nn.softmax,
+    "softplus": nn.softplus,
+    "standardize": nn.standardize,
+    "swish": nn.swish,
+    "tanh": nn.tanh,
+}
 
 def flatten(x):
   return x.reshape((x.shape[0], -1))
 
-class TrainInput(collections.namedtuple(
-    "TrainInput", "observation legals_mask policy value")):
+class TrainInput(NamedTuple): 
+  """Inputs of the neural networks
+  """
+  observation: chex.Array
+  legals_mask: chex.Array 
+  policy: chex.Array 
+  value: chex.Array
 
   @staticmethod
   def stack(train_inputs):
     observation, legals_mask, policy, value = zip(*train_inputs)
     return TrainInput(
-        np.array(observation, dtype=np.float32),
-        np.array(legals_mask, dtype=bool),
-        np.array(policy, dtype=np.float32),
-        np.expand_dims(np.array(value, dtype=np.float32), 1))
+        jnp.array(observation, dtype=jnp.float32),
+        jnp.array(legals_mask, dtype=jnp.bool),
+        jnp.array(policy, dtype=jnp.float32),
+        jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
 
 
-class Losses(collections.namedtuple("Losses", "policy value l2")):
-
+class Losses(NamedTuple):
+  """Losses that are updated
+  """
+  policy: chex.Array
+  value: chex.Array 
+  l2: chex.Array 
+  
   @property
   def total(self):
     return self.policy + self.value + self.l2
@@ -45,6 +88,31 @@ class Losses(collections.namedtuple("Losses", "policy value l2")):
   def __truediv__(self, n):
     return Losses(self.policy / n, self.value / n, self.l2 / n)
 
+class Activation(nn.Module):
+  activation_name: str
+
+  @nn.compact
+  def __call__(self, x):
+    return activations_dict[self.activation_name](x)
+
+class MLPBlock(nn.Module):
+  features: int
+
+  @nn.compact
+  def __call__(self, x):
+    y = nn.Dense(features=self.features)(x)
+    y = Activation("relu")(y)
+    return y
+  
+class ConvBlock(nn.Module):
+  features: int
+
+  @nn.compact
+  def __call__(self, x, training: bool = False):
+    y = nn.Conv(features=self.features, kernel_size=(3, 3), padding='SAME')(x)
+    y = nn.BatchNorm(use_running_average=not training)(y)
+    y = Activation("relu")(y)
+    return y
 
 class ResidualBlock(nn.Module):
   filters: int
@@ -55,11 +123,11 @@ class ResidualBlock(nn.Module):
     residual = x
     y = nn.Conv(features=self.filters, kernel_size=(self.kernel_size, self.kernel_size), padding='SAME')(x)
     y = nn.BatchNorm(use_running_average=not training)(y)
-    y = nn.relu(y)
+    y = Activation("relu")(y)
     y = nn.Conv(features=self.filters, kernel_size=(self.kernel_size, self.kernel_size), padding='SAME')(y)
     y = nn.BatchNorm(use_running_average=not training)(y)
     y = y + residual
-    y = nn.relu(y)
+    y = Activation("relu")(y)
     return y
 
 
@@ -72,11 +140,11 @@ class PolicyHead(nn.Module):
   def __call__(self, x, training: bool = False):
     if self.model_type == "mlp":
       x = nn.Dense(features=self.nn_width)(x)
-      x = nn.relu(x)
+      x = Activation("relu")(x)
     else:
       x = nn.Conv(features=2, kernel_size=(1, 1), padding='SAME')(x)
       x = nn.BatchNorm(use_running_average=not training)(x)
-      x = nn.relu(x)
+      x = Activation("relu")(x)
       x = flatten(x)
 
     policy_logits = nn.Dense(features=self.output_size)(x)
@@ -92,13 +160,13 @@ class ValueHead(nn.Module):
     if self.model_type != "mlp":
       x = nn.Conv(features=1, kernel_size=(1, 1), padding='SAME')(x)
       x = nn.BatchNorm(use_running_average=not training)(x)
-      x = nn.relu(x)
+      x = Activation("relu")(x)
       x = flatten(x)
     
     x = nn.Dense(features=self.nn_width)(x)
-    x = nn.relu(x)
+    x = Activation("relu")(x)
     x = nn.Dense(features=1)(x)
-    x = nn.tanh(x)
+    x = Activation("tanh")(x)
     return x
 
 
@@ -111,25 +179,19 @@ class AlphaZeroModel(nn.Module):
   
   @nn.compact
   def __call__(self, observations, training: bool = False):
-    #input_size = int(np.prod(self.input_shape))
-    
+
     # torso
     if self.model_type == "mlp":
       x = observations
-      for i in range(self.nn_depth):
-        x = nn.Dense(features=self.nn_width)(x)
-        x = nn.relu(x)
+      for i in range(self.nn_depth): #leave the for-loop of let it go?
+        x = MLPBlock(features=self.nn_width)(x)
     elif self.model_type == "conv2d":
       x = observations.reshape((-1,) + self.input_shape)
       for i in range(self.nn_depth):
-        x = nn.Conv(features=self.nn_width, kernel_size=(3, 3), padding='SAME')(x)
-        x = nn.BatchNorm(use_running_average=not training)(x)
-        x = nn.relu(x)
+        x = ConvBlock(features=self.nn_width)(x, training)
     elif self.model_type == "resnet":
       x = observations.reshape((-1,) + self.input_shape)
-      x = nn.Conv(features=self.nn_width, kernel_size=(3, 3), padding='SAME')(x)
-      x = nn.BatchNorm(use_running_average=not training)(x)
-      x = nn.relu(x)
+      x = ConvBlock(features=self.nn_width)(x, training)
       for i in range(self.nn_depth):
         x = ResidualBlock(filters=self.nn_width, kernel_size=3)(x, training)
 
@@ -146,19 +208,62 @@ class TrainState(train_state.TrainState):
   batch_stats: Any
 
 
-class Model(object):
+class Model:
   valid_model_types = ['mlp', 'conv2d', 'resnet']
 
-  def __init__(self, model, state, path, loss_fn, update_step_fn):
+  def __init__(
+    self, 
+    model, 
+    state, 
+    path, 
+    loss_fn, 
+    update_step_fn,
+    checkpoint_uid=None,
+    checkpoint_saving_interval=None,
+    max_checkpoints_to_keep=None,
+    checkpoint_rotation_period=None
+  ):
+    
     self._model = model
     self._state = state
     self._path = path
     self._loss_fn = loss_fn
     self._update_step_fn = update_step_fn
+    
+    #we're using the latest checkpointing API
+    # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
+    orbax_checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+    checkpoint_str = (
+      checkpoint_uid if checkpoint_uid is not None else datetime.now().strftime("%Y%m%d%H%M%S")
+    )
+
+    options = orbax.checkpoint.CheckpointManagerOptions(
+        create=True,
+        save_interval_steps=checkpoint_saving_interval,
+        max_to_keep=max_checkpoints_to_keep,
+        keep_period=checkpoint_rotation_period,
+    )
+    if self._path is not None:
+      self._manager = orbax.checkpoint.CheckpointManager(
+        directory=os.path.join(self._path, checkpoint_str),
+        checkpointers=orbax_checkpointer,
+        options=options
+      )
+
+  @classmethod
+  def _create_train_state(cls, apply_fn, variables, optimizer) -> TrainState:
+    return TrainState.create(
+      apply_fn=apply_fn, 
+      params=variables['params'], 
+      tx=optimizer, 
+      batch_stats=variables.get('batch_stats', {})
+    )
+    
 
   @classmethod
   def build_model(cls, model_type, input_shape, output_size, nn_width, nn_depth,
-                  weight_decay, learning_rate, path):
+                  weight_decay, learning_rate, path, seed=0):
+    
     if model_type not in cls.valid_model_types:
       raise ValueError(f"Invalid model type: {model_type}, "
                        f"expected one of: {cls.valid_model_types}")
@@ -171,27 +276,33 @@ class Model(object):
     while len(input_shape) < 3:
       input_shape = input_shape + (1,)
     
-    model = AlphaZeroModel(model_type = model_type, input_shape = input_shape, output_size = output_size, nn_width = nn_width, nn_depth = nn_depth)
+    model = AlphaZeroModel(
+      model_type = model_type, 
+      input_shape = input_shape, 
+      output_size = output_size, 
+      nn_width = nn_width, 
+      nn_depth = nn_depth
+    )
     
     optimizer = optax.adam(learning_rate=learning_rate)
-    rng = jax.random.PRNGKey(0)
+    rng = jax.random.PRNGKey(seed)
     input_shape_with_batch = (1, int(np.prod(input_shape)))
     variables = model.init(rng, jnp.ones(input_shape_with_batch), training=False)
 
-    state = TrainState.create(apply_fn=model.apply, params=variables['params'], tx=optimizer, batch_stats=variables.get('batch_stats', {}))
-    
+    state = cls._create_train_state(model.apply, variables, optimizer)
+
     def loss_fn(params, batch_stats, observations, legals_mask, policy_targets, value_targets):
       variables = {'params': params, 'batch_stats': batch_stats}
-      (policy_logits, value_preds), new_model_state = model.apply(variables, observations, training=True, mutable=['batch_stats'])
+      (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, training=True, mutable=['batch_stats'])
       
       policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
 
       policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
 
-      value_loss = jnp.mean(jnp.square(value_preds - value_targets))
+      value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
       
       l2_reg_loss = 0.0
-      for p in jax.tree_util.tree_leaves(params):
+      for p in jax.tree.leaves(params):
         l2_reg_loss += weight_decay * jnp.sum(jnp.square(p))
 
       total_loss = policy_loss + value_loss + l2_reg_loss      
@@ -214,41 +325,45 @@ class Model(object):
       raise ValueError("model_args must be provided for checkpoint loading")
     
     model = cls.build_model(**model_args)
-    model._state = checkpoints.restore_checkpoint(checkpoint_path, model._state)
+    
+    model._state = cls.load_checkpoint(checkpoint_path, model._state)
   
     return model
   
   @property
   def num_trainable_variables(self):
-    return sum(np.prod(p.shape) for p in jax.tree_util.tree_leaves(self._state.params))
+    return sum(np.prod(p.shape) for p in jax.tree.leaves(self._state.params))
   
   def print_trainable_variables(self):
-    flat_params = jax.tree_util.tree_flatten(self._state.params)[0]
+    flat_params, _ = jax.tree.flatten(self._state.params)
     for i, p in enumerate(flat_params):
       print(f"Param {i}: {p.shape}")
   
   def inference(self, observation, legals_mask):
-    observation = np.array(observation, dtype=np.float32)
-    legals_mask = np.array(legals_mask, dtype=bool)
+    observation = jnp.array(observation, dtype=jnp.float32)
+    legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
     policy_logits, value = self._model.apply(
         {'params': self._state.params, 'batch_stats': self._state.batch_stats}, observation, training=False, mutable=False)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
-    policy = jax.nn.softmax(policy_logits, axis=-1)
+    policy = nn.softmax(policy_logits, axis=-1)
 
     return value, policy
   
   def update(self, train_inputs: Sequence[TrainInput]):
     batch = TrainInput.stack(train_inputs)
-    
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
     return Losses(policy_loss, value_loss, l2_reg_loss)
   
   def save_checkpoint(self, step):
-    return checkpoints.save_checkpoint(ckpt_dir=self._path, target=self._state, step=step, keep=10)
-  
-  def load_checkpoint(self, path):
-    self._state = checkpoints.restore_checkpoint(path, self._state)
+    self._manager.save(step, self._state, save_kwargs={'save_args': orbax_utils.save_args_from_target(self._state)})
+    self._manager.wait_until_finished()
+    return step
+   
+  def load_checkpoint(self, step):
+    target = self._state
+    self._state = self._manager.restore(step, items=target)
+    self._manager.wait_until_finished()
     return self._state
