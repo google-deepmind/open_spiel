@@ -1,6 +1,8 @@
 set(GAME_SOURCES
   amazons/amazons.cc
   amazons/amazons.h
+  azul/azul.cc
+  azul/azul.h
   backgammon/backgammon.cc
   backgammon/backgammon.h
   bargaining/bargaining.cc
@@ -297,6 +299,10 @@ add_test(2048_test 2048_test)
 add_executable(amazons_test amazons/amazons_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
 add_test(amazons_test amazons_test)
+
+add_executable(azul_test azul/azul_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(azul_test azul_test)
 
 add_executable(backgammon_test backgammon/backgammon_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)
