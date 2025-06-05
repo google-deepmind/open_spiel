@@ -34,7 +34,7 @@ const GameType kGameType{
     GameType::Dynamics::kSequential,
     GameType::ChanceMode::kExplicitStochastic,
     GameType::Information::kPerfectInformation,
-    GameType::Utility::kGeneralSum,
+    GameType::Utility::kZeroSum,
     GameType::RewardModel::kTerminal,
     /*max_num_players=*/kMaxNumPlayers,
     /*min_num_players=*/kMinNumPlayers,
@@ -717,9 +717,79 @@ std::vector<double> AzulState::Returns() const {
   }
   
   std::vector<double> returns(num_players_);
+  std::vector<int> scores(num_players_);
+  std::vector<int> completed_rows(num_players_);
+  int max_score = -1000;
+  
+  // Calculate all scores and completed rows, find maximum score
   for (int player = 0; player < num_players_; ++player) {
-    returns[player] = CalculateScore(player);
+    scores[player] = CalculateScore(player);
+    max_score = std::max(max_score, scores[player]);
+    
+    // Count completed horizontal lines (rows)
+    completed_rows[player] = 0;
+    const PlayerBoard& board = player_boards_[player];
+    for (int row = 0; row < kWallSize; ++row) {
+      bool complete = true;
+      for (int col = 0; col < kWallSize; ++col) {
+        if (!board.wall[row][col]) {
+          complete = false;
+          break;
+        }
+      }
+      if (complete) completed_rows[player]++;
+    }
   }
+  
+  // Find players with max score
+  std::vector<int> score_tied_players;
+  for (int player = 0; player < num_players_; ++player) {
+    if (scores[player] == max_score) {
+      score_tied_players.push_back(player);
+    }
+  }
+  
+  // Apply tiebreaker: among score-tied players, find max completed rows
+  int max_completed_rows = -1;
+  for (int player : score_tied_players) {
+    max_completed_rows = std::max(max_completed_rows, completed_rows[player]);
+  }
+  
+  // Final winners: max score AND max completed rows among score-tied players
+  std::vector<int> final_winners;
+  for (int player : score_tied_players) {
+    if (completed_rows[player] == max_completed_rows) {
+      final_winners.push_back(player);
+    }
+  }
+  
+  int num_winners = final_winners.size();
+  
+  // Zero-sum assignment: 
+  // If all players tie, everyone gets 0
+  // Otherwise, winners split +1, losers split -1
+  if (num_winners == num_players_) {
+    // All players tied - everyone gets 0
+    for (int player = 0; player < num_players_; ++player) {
+      returns[player] = 0.0;
+    }
+  } else {
+    // Some players won, others lost
+    double winner_utility = 1.0 / num_winners;
+    int num_losers = num_players_ - num_winners;
+    double loser_utility = -1.0 / num_losers;
+    
+    // Initialize all as losers
+    for (int player = 0; player < num_players_; ++player) {
+      returns[player] = loser_utility;
+    }
+    
+    // Set winners
+    for (int winner : final_winners) {
+      returns[winner] = winner_utility;
+    }
+  }
+  
   return returns;
 }
 

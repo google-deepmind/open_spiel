@@ -216,9 +216,9 @@ class AzulGame : public Game {
     return std::make_unique<AzulState>(shared_from_this(), num_players_);
   }
   int NumPlayers() const override { return num_players_; }
-  double MinUtility() const override { return -100; }  // Worst possible score
-  absl::optional<double> UtilitySum() const override { return absl::nullopt; }  // Not zero-sum
-  double MaxUtility() const override { return 100; }   // Best possible score
+  double MinUtility() const override { return -1; }  // Losing player utility
+  absl::optional<double> UtilitySum() const override { return 0.0; }  // Zero-sum
+  double MaxUtility() const override { return 1; }   // Winning player utility
   std::vector<int> ObservationTensorShape() const override;
   int MaxGameLength() const override { return kMaxGameLength; }
   int MaxChanceOutcomes() const override { return kTotalTilesPerColor * kNumTileColors; }  // Max tiles that can be shuffled
