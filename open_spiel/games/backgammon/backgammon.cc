@@ -16,13 +16,20 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <memory>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -232,8 +239,7 @@ std::string BackgammonState::ActionToString(Player player,
       if (cmoves[1].num == kPassPos) {  // Player can't move at all!
         returnVal = "Pass";
       } else {
-        returnVal = absl::StrCat(move_id, " - ",
-                                 PositionToStringHumanReadable(cmove0_start),
+        returnVal = absl::StrCat(PositionToStringHumanReadable(cmove0_start),
                                  "/", PositionToStringHumanReadable(cmove0_end),
                                  cmoves[0].hit ? "*" : "", "(2)");
       }
@@ -248,13 +254,13 @@ std::string BackgammonState::ActionToString(Player player,
         // Check to see if the same piece is moving for both
         // moves, as this changes the format of the output.
         returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
+            PositionToStringHumanReadable(cmove1_start), "/",
             PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
             "/", PositionToStringHumanReadable(cmove0_end),
             cmoves[0].hit ? "*" : "");
       } else {
         returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove1_start), "/",
+            PositionToStringHumanReadable(cmove1_start), "/",
             PositionToStringHumanReadable(cmove1_end), cmoves[1].hit ? "*" : "",
             " ",
             (cmoves[0].num != kPassPos)
@@ -269,13 +275,13 @@ std::string BackgammonState::ActionToString(Player player,
         // Check to see if the same piece is moving for both
         // moves, as this changes the format of the output.
         returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove0_start), "/",
+            PositionToStringHumanReadable(cmove0_start), "/",
             PositionToStringHumanReadable(cmove0_end), cmoves[0].hit ? "*" : "",
             "/", PositionToStringHumanReadable(cmove1_end),
             cmoves[1].hit ? "*" : "");
       } else {
         returnVal = absl::StrCat(
-            move_id, " - ", PositionToStringHumanReadable(cmove0_start), "/",
+            PositionToStringHumanReadable(cmove0_start), "/",
             PositionToStringHumanReadable(cmove0_end), cmoves[0].hit ? "*" : "",
             " ",
             (cmoves[1].num != kPassPos)
@@ -1097,6 +1103,8 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
         {{kPassPos, -1, false}, {kPassPos, -1, false}})};
   }
 
+  absl::flat_hash_set<std::string> legal_action_strings;
+
   // Rule 2 in Movement of Checkers:
   // A player must use both numbers of a roll if this is legally possible (or
   // all four numbers of a double). When only one number can be played, the
@@ -1104,13 +1112,27 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
   // both, the player must play the larger one. When neither number can be used,
   // the player loses his turn. In the case of doubles, when all four numbers
   // cannot be played, the player must play as many numbers as he can.
+
+  // TODO(author5): below we filter out actions that are mapped to the same
+  // string representation as they have the same effect, even when applied in
+  // different orders. A better fix would be to remove the duplicate actions
+  // from the action space altogether.
   std::vector<Action> legal_actions;
   int max_roll = -1;
   for (const auto& move : movelist) {
     if (max_moves == 2) {
       // Only add moves that are size 2.
       if (move.size() == 2) {
-        legal_actions.push_back(CheckerMovesToSpielMove(move));
+        int action = CheckerMovesToSpielMove(move);
+        std::string action_string = ActionToString(CurrentPlayer(), action);
+        // Do not add duplicate actions. E.g. 24/21 24/20 and 24/20 24/21 are
+        // represented as two different integer actions, but due to the logic
+        // in the action string they have the same string representation.
+        // So we only include one of them in the legal action set.
+        if (!legal_action_strings.contains(action_string)) {
+          legal_action_strings.insert(action_string);
+          legal_actions.push_back(action);
+        }
       }
     } else if (max_moves == 1) {
       // We are just finding the maximum roll.
@@ -1122,7 +1144,16 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
     // Another round to add those that have the max die roll.
     for (const auto& move : movelist) {
       if (move[0].num == max_roll) {
-        legal_actions.push_back(CheckerMovesToSpielMove(move));
+        int action = CheckerMovesToSpielMove(move);
+        std::string action_string = ActionToString(CurrentPlayer(), action);
+        // Do not add duplicate actions. E.g. 24/21 24/20 and 24/20 24/21 are
+        // represented as two different integer actions, but due to the logic
+        // in the action string they have the same string representation.
+        // So we only include one of them in the legal action set.
+        if (!legal_action_strings.contains(action_string)) {
+          legal_action_strings.insert(action_string);
+          legal_actions.push_back(action);
+        }
       }
     }
   }
