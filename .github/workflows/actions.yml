@@ -32,6 +32,13 @@ jobs:
         # Standard (most current) platforms and versions.
         - os: ubuntu-22.04
           OS_PYTHON_VERSION: "3.10"
+          DEFAULT_OPTIONAL_DEPENDENCY: "ON"
+          BUILD_SHARED_LIB: "OFF"
+          OPEN_SPIEL_ABSL_VERSION: "20230125.0"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS: "ON"
+          OPEN_SPIEL_BUILD_WITH_ORTOOLS_DOWNLOAD_URL: "https://github.com/google/or-tools/releases/download/v9.6/or-tools_amd64_ubuntu-22.04_cpp_v9.6.2534.tar.gz"
+        - os: ubuntu-22.04
+          OS_PYTHON_VERSION: "3.10"
           DEFAULT_OPTIONAL_DEPENDENCY: "OFF"
           BUILD_SHARED_LIB: "OFF"
           OPEN_SPIEL_BUILD_WITH_ORTOOLS: "OFF"
@@ -49,6 +56,7 @@ jobs:
       OPEN_SPIEL_ENABLE_JAX: ON
       OPEN_SPIEL_ENABLE_PYTORCH: ON
       OPEN_SPIEL_ENABLE_PYTHON_MISC: ON
+      OPEN_SPIEL_ABSL_VERSION: ${{ matrix.OPEN_SPIEL_ABSL_VERSION }}
       OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
       DEFAULT_OPTIONAL_DEPENDENCY: ${{ matrix.DEFAULT_OPTIONAL_DEPENDENCY }}
       OPEN_SPIEL_BUILD_WITH_JULIA: ${{ matrix.OPEN_SPIEL_BUILD_WITH_JULIA }}

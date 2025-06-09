@@ -32,14 +32,25 @@ jobs:
           OS_TYPE: "Linux"
           CI_PYBIN: python3
           OS_PYTHON_VERSION: 3.10
+          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
           CIBW_ENVIRONMENT: "CXX=$(which g++) OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64
+        # These must use the old abseil
         - os: macOS-13
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           OS_PYTHON_VERSION: 3.9
+          OPEN_SPIEL_ABSL_VERSION: "20230125.0"
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
-          CIBW_BUILD: cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64 cp312-macosx_x86_64 cp313-macosx_x86_64
+          CIBW_BUILD: cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64
+        # These use the new abseil
+        - os: macOS-13
+          OS_TYPE: "Darwin"
+          CI_PYBIN: python3.9
+          OPEN_SPIEL_ABSL_VERSION: "20250127.1"
+          OS_PYTHON_VERSION: 3.9
+          CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
+          CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64
         # Setting to the new M1 runners to build the _arm64 wheels
         # https://github.blog/2023-10-02-introducing-the-new-apple-silicon-powered-m1-macos-larger-runner-for-github-actions/
         # Disabling now that the OpenSpiel 1.4 wheels are on PyPI because these xlarge machines are
@@ -56,6 +67,7 @@ jobs:
       OPEN_SPIEL_BUILD_WITH_ACPC: ON
       OPEN_SPIEL_BUILD_WITH_HANABI: ON
       OPEN_SPIEL_BUILD_WITH_ROSHAMBO: ON
+      OPEN_SPIEL_ABSL_VERSION: ${{ matrix.OPEN_SPIEL_ABSL_VERSION }}
       OS_TYPE: ${{ matrix.OS_TYPE }}
       OS_PYTHON_VERSION: ${{ matrix.OS_PYTHON_VERSION }}
       CI_PYBIN: ${{ matrix.CI_PYBIN }}
