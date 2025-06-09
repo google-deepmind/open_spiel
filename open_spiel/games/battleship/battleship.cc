@@ -88,7 +88,7 @@ std::vector<Action> BattleshipState::LegalActions() const {
       for (const auto& move : moves_) {
         if (move.player == player &&
             absl::holds_alternative<ShipPlacement>(move.action)) {
-          partial_placement.push_back(absl::get<ShipPlacement>(move.action));
+          partial_placement.push_back(std::get<ShipPlacement>(move.action));
         }
       }
 
@@ -194,10 +194,10 @@ std::string BattleshipState::ToString() const {
     }
     if (absl::holds_alternative<ShipPlacement>(move.action)) {
       absl::StrAppend(&state_str,
-                      absl::get<ShipPlacement>(move.action).ToString());
+                      std::get<ShipPlacement>(move.action).ToString());
     } else {
       SPIEL_DCHECK_TRUE(absl::holds_alternative<Shot>(move.action));
-      absl::StrAppend(&state_str, absl::get<Shot>(move.action).ToString());
+      absl::StrAppend(&state_str, std::get<Shot>(move.action).ToString());
     }
   }
   absl::StrAppend(&state_str, "\n");
@@ -274,10 +274,10 @@ std::string BattleshipState::InformationStateString(Player player) const {
       if (move.player == player) {
         absl::StrAppend(&information_state, "/");
         absl::StrAppend(&information_state,
-                        absl::get<ShipPlacement>(move.action).ToString());
+                        std::get<ShipPlacement>(move.action).ToString());
       }
     } else {
-      const Shot& shot = absl::get<Shot>(move.action);
+      const Shot& shot = std::get<Shot>(move.action);
 
       if (move.player != player) {
         // If the shot came from the opponent, the player has seen it.
@@ -353,7 +353,7 @@ void BattleshipState::InformationStateTensor(
     if (absl::holds_alternative<ShipPlacement>(move.action)) {
       // The player observed *their own* ship placements.
       if (move.player == player) {
-        const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+        const ShipPlacement& placement = std::get<ShipPlacement>(move.action);
         if (placement.direction == CellAndDirection::Horizontal) {
           values[offset] = 1;
         } else {
@@ -367,7 +367,7 @@ void BattleshipState::InformationStateTensor(
         offset += width;
       }
     } else {
-      const Shot& shot = absl::get<Shot>(move.action);
+      const Shot& shot = std::get<Shot>(move.action);
 
       values[offset + move.player] = 1;
       offset += bs_game_->NumPlayers();
@@ -462,7 +462,7 @@ std::string BattleshipState::OwnBoardString(const Player player) const {
   for (const auto& move : moves_) {
     if (move.player == player &&
         absl::holds_alternative<ShipPlacement>(move.action)) {
-      const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+      const ShipPlacement& placement = std::get<ShipPlacement>(move.action);
 
       // We now iterate over all the cells that the ship covers on the board
       // and fill in the `player_board` string representation.
@@ -493,7 +493,7 @@ std::string BattleshipState::OwnBoardString(const Player player) const {
   // We now include the opponent's shots on the player's board.
   for (const auto& move : moves_) {
     if (move.player == opponent && absl::holds_alternative<Shot>(move.action)) {
-      const Shot& shot = absl::get<Shot>(move.action);
+      const Shot& shot = std::get<Shot>(move.action);
 
       if (player_board[shot.row][shot.col] == ' ' ||
           player_board[shot.row][shot.col] == '*') {
@@ -542,7 +542,7 @@ std::string BattleshipState::ShotsBoardString(const Player player) const {
   // to ship-hit marks '#' in a shortly.
   for (const auto& move : moves_) {
     if (move.player == player && absl::holds_alternative<Shot>(move.action)) {
-      const Shot& shot = absl::get<Shot>(move.action);
+      const Shot& shot = std::get<Shot>(move.action);
 
       if (conf.allow_repeated_shots) {
         SPIEL_DCHECK_TRUE(shots_board[shot.row][shot.col] == ' ' ||
@@ -559,7 +559,7 @@ std::string BattleshipState::ShotsBoardString(const Player player) const {
   for (const auto& move : moves_) {
     if (move.player == opponent &&
         absl::holds_alternative<ShipPlacement>(move.action)) {
-      const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+      const ShipPlacement& placement = std::get<ShipPlacement>(move.action);
 
       // We now iterate over all the cells that the ship covers on the board
       // and fill in the `player_board` string representation.
@@ -624,7 +624,7 @@ void BattleshipState::DoApplyAction(Action action_id) {
       bs_game_->DeserializeAction(action_id);
 
   if (absl::holds_alternative<CellAndDirection>(action)) {
-    const CellAndDirection& cell_and_dir = absl::get<CellAndDirection>(action);
+    const CellAndDirection& cell_and_dir = std::get<CellAndDirection>(action);
     const ShipPlacement placement(
         /* direction = */ cell_and_dir.direction,
         /* ship = */ NextShipToPlace(player),
@@ -634,7 +634,7 @@ void BattleshipState::DoApplyAction(Action action_id) {
   } else {
     SPIEL_DCHECK_TRUE(absl::holds_alternative<Shot>(action));
 
-    moves_.push_back(GameMove{CurrentPlayer(), absl::get<Shot>(action)});
+    moves_.push_back(GameMove{CurrentPlayer(), std::get<Shot>(action)});
   }
 }  // namespace battleship
 
@@ -658,7 +658,7 @@ bool BattleshipState::IsShipPlaced(const Ship& ship,
   for (const auto& move : moves_) {
     if (move.player == player &&
         absl::holds_alternative<ShipPlacement>(move.action) &&
-        absl::get<ShipPlacement>(move.action).ship.id == ship.id) {
+        std::get<ShipPlacement>(move.action).ship.id == ship.id) {
       return true;
     }
   }
@@ -691,7 +691,7 @@ ShipPlacement BattleshipState::FindShipPlacement(const Ship& ship,
   for (const auto& move : moves_) {
     if (move.player == player &&
         absl::holds_alternative<ShipPlacement>(move.action)) {
-      const ShipPlacement& placement = absl::get<ShipPlacement>(move.action);
+      const ShipPlacement& placement = std::get<ShipPlacement>(move.action);
       if (placement.ship.id == ship.id) {
         return placement;
       }
@@ -719,7 +719,7 @@ bool BattleshipState::PlacementDoesNotOverlap(const ShipPlacement& proposed,
     if (move.player == player &&
         absl::holds_alternative<ShipPlacement>(move.action)) {
       const ShipPlacement& prior_placement =
-          absl::get<ShipPlacement>(move.action);
+          std::get<ShipPlacement>(move.action);
 
       if (proposed.OverlapsWith(prior_placement)) {
         return false;
@@ -744,7 +744,7 @@ bool BattleshipState::DidShipSink(const Ship& ship, const Player player) const {
   const ShipPlacement placement = FindShipPlacement(ship, player);
   for (const auto& move : moves_) {
     if (move.player != player && absl::holds_alternative<Shot>(move.action)) {
-      const Shot& shot = absl::get<Shot>(move.action);
+      const Shot& shot = std::get<Shot>(move.action);
       if (placement.CoversCell(shot)) {
         hits.push_back(shot);
       }
@@ -782,7 +782,7 @@ bool BattleshipState::AlreadyShot(const Shot& shot, const Player player) const {
                       [player, shot](const GameMove& move) {
                         return move.player == player &&
                                absl::holds_alternative<Shot>(move.action) &&
-                               absl::get<Shot>(move.action) == shot;
+                               std::get<Shot>(move.action) == shot;
                       }) != moves_.end();
 }
 
@@ -1003,12 +1003,12 @@ std::string BattleshipGame::ActionToString(Player player,
       DeserializeAction(action_id);
 
   if (absl::holds_alternative<Shot>(action)) {
-    const Shot& shot = absl::get<Shot>(action);
+    const Shot& shot = std::get<Shot>(action);
     return absl::StrCat("Pl", player, ": shoot at (", shot.row, ", ", shot.col,
                         ")");
   } else {
     SPIEL_DCHECK_TRUE(absl::holds_alternative<CellAndDirection>(action));
-    const CellAndDirection& cell_and_dir = absl::get<CellAndDirection>(action);
+    const CellAndDirection& cell_and_dir = std::get<CellAndDirection>(action);
     absl::string_view direction_str;
     if (cell_and_dir.direction == CellAndDirection::Direction::Horizontal) {
       direction_str = "horizontally";

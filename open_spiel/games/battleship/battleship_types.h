@@ -15,9 +15,10 @@
 #ifndef OPEN_SPIEL_GAMES_BATTLESHIP_TYPES_H_
 #define OPEN_SPIEL_GAMES_BATTLESHIP_TYPES_H_
 
+#include <variant>
+
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
-#include "open_spiel/abseil-cpp/absl/types/variant.h"
 #include "open_spiel/spiel.h"
 
 namespace open_spiel {
@@ -97,7 +98,7 @@ class ShipPlacement final : public CellAndDirection {
 
 struct GameMove {
   Player player;
-  absl::variant<ShipPlacement, Shot> action;
+  std::variant<ShipPlacement, Shot> action;
 };
 
 struct BattleshipConfiguration {
