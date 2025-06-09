@@ -42,7 +42,7 @@ def solve_game(state):
   best_actions = np.where((values == value) & act_mask)
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
-  solved[state_str] = model_lib.TrainInput(obs, act_mask, policy, value)
+  solved[state_str] = model_lib.TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=value)
   return value
 
 
@@ -69,7 +69,7 @@ class ModelTest(parameterized.TestCase):
       action = state.legal_actions()[0]
       policy = np.zeros(len(act_mask), dtype=float)
       policy[action] = 1
-      train_inputs.append(model_lib.TrainInput(obs, act_mask, policy, value=1))
+      train_inputs.append(model_lib.TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=1))
       state.apply_action(action)
       value, policy = model.inference([obs], [act_mask])
       self.assertLen(policy, 1)

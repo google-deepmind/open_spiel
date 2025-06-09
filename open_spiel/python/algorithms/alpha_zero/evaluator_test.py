@@ -42,7 +42,13 @@ class EvaluatorTest(absltest.TestCase):
     action = state.legal_actions()[0]
     policy = np.zeros(len(act_mask), dtype=float)
     policy[action] = 1
-    train_inputs = [model_lib.TrainInput(obs, act_mask, policy, value=1)]
+    train_inputs = [
+      model_lib.TrainInput(
+        observation=obs, 
+        mask=act_mask, 
+        policy=policy, 
+        value=1
+      )]
 
     value = evaluator.evaluate(state)
     self.assertEqual(value[0], -value[1])

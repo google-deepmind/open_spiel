@@ -36,21 +36,20 @@ flags.mark_flag_as_required("path")
 flags.mark_flag_as_required("graph_def")
 
 
-def main(_):
+def main():
   game = pyspiel.load_game(FLAGS.game)
   model = model_lib.Model.build_model(
       FLAGS.nn_model, game.observation_tensor_shape(),
       game.num_distinct_actions(), FLAGS.nn_width, FLAGS.nn_depth,
       FLAGS.weight_decay, FLAGS.learning_rate, FLAGS.path)
-  model.write_graph(FLAGS.graph_def)
+  #save checkpoint
+  model.export(FLAGS.graph_def) #TODO
 
   if FLAGS.verbose:
-    print("Game:", FLAGS.game)
-    print("Model type: %s(%s, %s)" % (FLAGS.nn_model, FLAGS.nn_width,
-                                      FLAGS.nn_depth))
-    print("Model size:", model.num_trainable_variables, "variables")
-    print("Variables:")
-    model.print_trainable_variables()
+    print(f"Game: {FLAGS.game}")
+    print(f"Model type: {FLAGS.nn_model}(width={FLAGS.nn_width}, depth={FLAGS.nn_depth}")
+    print(f"Model size:\n {model.parameters_per_layer}")
+    print(f"Overall {model.num_trainable_variables} variables")
 
 
 if __name__ == "__main__":

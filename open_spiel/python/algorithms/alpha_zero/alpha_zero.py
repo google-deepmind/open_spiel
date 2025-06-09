@@ -383,7 +383,11 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
       replay_buffer.extend(
           model_lib.TrainInput(
-              s.observation, s.legals_mask, s.policy, p1_outcome)
+              observation=s.observation, 
+              legals_mask=s.legals_mask, 
+              policy=s.policy, 
+              value=p1_outcome
+            )
           for s in trajectory.states)
 
       for stage in range(stage_count):
@@ -409,7 +413,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     # the actors. It only allows numbers, so use -1 as "latest".
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1)
-    losses = sum(losses, model_lib.Losses(0, 0, 0)) / len(losses)
+    losses = sum(losses, model_lib.Losses(policy=0, value=0, l2=0)) / len(losses)
     logger.print(losses)
     logger.print("Checkpoint saved:", save_path)
     return save_path, losses

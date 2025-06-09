@@ -1,4 +1,3 @@
-import collections
 import functools
 import os
 from typing import Any, Dict, Sequence, NamedTuple, Tuple, Optional
@@ -47,8 +46,9 @@ activations_dict = {
 def flatten(x):
   return x.reshape((x.shape[0], -1))
 
-class TrainInput(NamedTuple): 
-  """Inputs of the neural networks
+@chex.dataclass(frozen=True)
+class TrainInput: 
+  """Inputs of the model: o_t, mask_t, π(a_t|o_t), v_t
   """
   observation: chex.Array
   legals_mask: chex.Array 
@@ -57,16 +57,18 @@ class TrainInput(NamedTuple):
 
   @staticmethod
   def stack(train_inputs):
-    observation, legals_mask, policy, value = zip(*train_inputs)
+    observation, legals_mask, policy, value = zip(*[
+      (ti.observation, ti.legals_mask, ti.policy, ti.value) for ti in train_inputs
+    ])
     return TrainInput(
-        jnp.array(observation, dtype=jnp.float32),
-        jnp.array(legals_mask, dtype=jnp.bool),
-        jnp.array(policy, dtype=jnp.float32),
-        jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
+        observation=jnp.array(observation, dtype=jnp.float32),
+        legals_mask=jnp.array(legals_mask, dtype=jnp.bool),
+        policy=jnp.array(policy, dtype=jnp.float32),
+        value=jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
 
-
-class Losses(NamedTuple):
-  """Losses that are updated
+@chex.dataclass(frozen=True)
+class Losses:
+  """Losses: policy, value, L2
   """
   policy: chex.Array
   value: chex.Array 
@@ -81,12 +83,14 @@ class Losses(NamedTuple):
             "l2: {:.3f})").format(self.total, self.policy, self.value, self.l2)
 
   def __add__(self, other):
-    return Losses(self.policy + other.policy,
-                  self.value + other.value,
-                  self.l2 + other.l2)
+    return Losses(
+      policy=self.policy + other.policy,
+      value=self.value + other.value,
+      l2=self.l2 + other.l2
+    )
 
   def __truediv__(self, n):
-    return Losses(self.policy / n, self.value / n, self.l2 / n)
+    return Losses(policy=self.policy / n, value=self.value / n, l2=self.l2 / n)
 
 class Activation(nn.Module):
   activation_name: str
@@ -222,7 +226,7 @@ class Model:
     checkpoint_saving_interval=None,
     max_checkpoints_to_keep=None,
     checkpoint_rotation_period=None
-  ):
+  ): 
     
     self._model = model
     self._state = state
@@ -243,6 +247,7 @@ class Model:
         max_to_keep=max_checkpoints_to_keep,
         keep_period=checkpoint_rotation_period,
     )
+    
     if self._path is not None:
       self._manager = orbax.checkpoint.CheckpointManager(
         directory=os.path.join(self._path, checkpoint_str),
@@ -334,6 +339,11 @@ class Model:
   def num_trainable_variables(self):
     return sum(np.prod(p.shape) for p in jax.tree.leaves(self._state.params))
   
+  @property
+  def parameters_per_layer(self):
+    flat_params = flax.traverse_util.flatten_dict(self._state.params, sep='/')
+    return jax.tree.map(jnp.shape, flat_params)
+  
   def print_trainable_variables(self):
     flat_params, _ = jax.tree.flatten(self._state.params)
     for i, p in enumerate(flat_params):
@@ -355,7 +365,7 @@ class Model:
     batch = TrainInput.stack(train_inputs)
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
-    return Losses(policy_loss, value_loss, l2_reg_loss)
+    return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
   def save_checkpoint(self, step):
     self._manager.save(step, self._state, save_kwargs={'save_args': orbax_utils.save_args_from_target(self._state)})
