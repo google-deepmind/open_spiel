@@ -44,11 +44,11 @@ jobs:
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
-        - os: macOS-13
+        - os: macOS-14
           OS_TYPE: "Darwin"
-          CI_PYBIN: python3.9
+          CI_PYBIN: python3.12
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
-          OS_PYTHON_VERSION: 3.9
+          OS_PYTHON_VERSION: 3.12
           CIBW_ENVIRONMENT: "OPEN_SPIEL_BUILDING_WHEEL='ON' OPEN_SPIEL_BUILD_WITH_ACPC='ON' OPEN_SPIEL_BUILD_WITH_HANABI='ON' OPEN_SPIEL_BUILD_WITH_ROSHAMBO='ON'"
           CIBW_BUILD: cp312-macosx_x86_64 cp313-macosx_x86_64
         # Setting to the new M1 runners to build the _arm64 wheels
