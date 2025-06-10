@@ -69,7 +69,7 @@ if [[ "$MODE" = "full" ]]; then
     # Run on the xlarge macs for arm64
     ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp311-cp311-macosx_11_0_arm64.whl
   elif [[ "$OS" = "Darwin" && "$OS_PYTHON_VERSION" = "3.12" ]]; then
-    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp313-cp313-macosx_10_13_x86_64.whl
+    ${PYBIN} -m pip install wheelhouse/open_spiel-*-cp312-cp312-macosx_10_13_x86_64.whl
   else
     echo "Config not found for full tests"
     exit -1
