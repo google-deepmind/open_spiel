@@ -23,12 +23,13 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels on ${{ matrix.os }} ${{ matrix.NAME }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
         - os: ubuntu-22.04
+          NAME: "Linux"
           OS_TYPE: "Linux"
           CI_PYBIN: python3
           OS_PYTHON_VERSION: 3.10
@@ -37,6 +38,7 @@ jobs:
           CIBW_BUILD: cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64
         # These must use the old abseil
         - os: macOS-13
+          NAME: "MacOS-13 Python <= 3.11"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           OS_PYTHON_VERSION: 3.9
@@ -45,6 +47,7 @@ jobs:
           CIBW_BUILD: cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
         - os: macOS-13
+          NAME: "MacOS-13 Python >= 3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
