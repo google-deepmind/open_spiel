@@ -245,6 +245,10 @@ class GamesSimTest(parameterized.TestCase):
           "reward_matrix": " ".join(str(v) for v in reward_matrix.flatten()),
           "init_distrib": " ".join(str(v) for v in init_distrib.flatten()),
       }
+    elif game_info.short_name == "quoridor" and num_players == 4:
+      print("Skipping 4P Quoridor in tests as it has known problems.")
+      print("See https://github.com/google-deepmind/open_spiel/issues/1349")
+      return
     else:
       dict_args = {"players": num_players}
     game = pyspiel.load_game(game_info.short_name, dict_args)

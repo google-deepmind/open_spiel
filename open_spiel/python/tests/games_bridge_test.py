@@ -213,13 +213,15 @@ class GamesBridgeTest(absltest.TestCase):
     def make_obs_copy():
       inputs = np.zeros(obs_shape)
       for i in range(batch_size):
-        inputs[i, :] = states[i].observation_tensor()
+        if not states[i].is_terminal():
+          inputs[i, :] = states[i].observation_tensor()
       return inputs
 
     def make_obs_inplace():
       inputs = np.zeros(obs_shape, np.float32)
       for i in range(batch_size):
-        states[i].write_observation_tensor(inputs[i])
+        if not states[i].is_terminal():
+          states[i].write_observation_tensor(inputs[i])
       return inputs
 
     repeat = 2

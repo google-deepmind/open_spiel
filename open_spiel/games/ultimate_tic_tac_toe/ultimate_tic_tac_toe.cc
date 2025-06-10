@@ -59,7 +59,7 @@ RegisterSingleTensorObserver single_tensor(kGameType.short_name);
 }  // namespace
 
 bool UltimateTTTState::AllLocalStatesTerminal() const {
-  return std::any_of(
+  return std::all_of(
       local_states_.begin(), local_states_.end(),
       [](const std::unique_ptr<State>& state) { return state->IsTerminal(); });
 }

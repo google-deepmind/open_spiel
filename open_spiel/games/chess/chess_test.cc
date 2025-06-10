@@ -92,6 +92,66 @@ void BasicChess960Tests() {
   // testing::RandomSimTestWithUndo(*LoadGame(chess960_game_string), 10);
 }
 
+void Chess960SerializationRootIsChanceNodeTest() {
+  std::shared_ptr<const Game> game = LoadGame("chess(chess960=true)");
+
+  std::unique_ptr<State> state = game->NewInitialState();
+  SPIEL_CHECK_TRUE(state->IsChanceNode());
+  state->ApplyAction(0);
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyAction(state->LegalActions()[0]);
+  SPIEL_CHECK_EQ(state->History().size(), 2);
+
+  // Do one round-trip serialization -> deserialization.
+  // State should be the same after serialization and deserialization, and
+  // the chance node should be removed from the history.
+  std::string state_string = state->ToString();
+  std::string serialized_state = state->Serialize();
+  std::unique_ptr<State> deserialized_state =
+      game->DeserializeState(serialized_state);
+  SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
+  // Chance node is removed from the history.
+  SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+
+  // Do a second round-trip serialization -> deserialization.
+  // State should be the same after serialization and deserialization, and
+  // the chance node should still be removed from the history.
+  serialized_state = deserialized_state->Serialize();
+  deserialized_state = game->DeserializeState(serialized_state);
+  SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
+  SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+}
+
+void Chess960SerializationRootIsSpecificStartingPositionTest() {
+  std::shared_ptr<const Game> game = LoadGame("chess(chess960=true)");
+
+  std::unique_ptr<State> state = game->NewInitialState(
+      "qrbkrnnb/pppppppp/8/8/8/8/PPPPPPPP/QRBKRNNB w KQkq - 0 1"
+  );
+  SPIEL_CHECK_FALSE(state->IsChanceNode());
+  state->ApplyAction(state->LegalActions()[0]);
+  SPIEL_CHECK_EQ(state->History().size(), 1);
+
+  // Do one round-trip serialization -> deserialization.
+  // State should be the same after serialization and deserialization, and
+  // the chance node should be removed from the history.
+  std::string state_string = state->ToString();
+  std::string serialized_state = state->Serialize();
+  std::unique_ptr<State> deserialized_state =
+      game->DeserializeState(serialized_state);
+  SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
+  SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+
+  // Do a second round-trip serialization -> deserialization.
+  // State should be the same after serialization and deserialization, and
+  // the chance node should still be removed from the history.
+  serialized_state = deserialized_state->Serialize();
+  deserialized_state = game->DeserializeState(serialized_state);
+  SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
+  SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+}
+
+
 void MoveGenerationTests() {
   // These perft positions and results are from here:
   // https://www.chessprogramming.org/Perft_Results
@@ -361,5 +421,7 @@ int main(int argc, char** argv) {
   open_spiel::chess::MoveConversionTests();
   open_spiel::chess::SerializaitionTests();
   open_spiel::chess::BasicChess960Tests();
+  open_spiel::chess::Chess960SerializationRootIsChanceNodeTest();
+  open_spiel::chess::Chess960SerializationRootIsSpecificStartingPositionTest();
   open_spiel::chess::ThreeFoldRepetitionTestWithEnPassant();
 }

@@ -5,6 +5,12 @@
 # See the main ../../CMakeLists for more instructions for setup, and
 # https://github.com/deepmind/open_spiel/issues/398 for details and discussion
 # of C++ optimization in OpenSpiel.
+#
+# Note: OR-Tools is no longer tested on Github Actions CI, so it may no longer
+# work with the latest version of Abseil. Note that for this code to work with
+# a binary release of OR-Tools, the version of Abseil downloaded and compiled 
+# with OpenSpiel (see install.sh) must match the version of the one used in the
+# OR-Tools release, otherwise there will be missing or duplicate symbols.
 
 add_library(open_spiel_ortools OBJECT
   lp_solver.cc

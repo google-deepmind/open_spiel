@@ -15,9 +15,15 @@
 #include "open_spiel/games/backgammon/backgammon.h"
 
 #include <algorithm>
+#include <iostream>
+#include <memory>
 #include <random>
+#include <string>
+#include <vector>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -196,11 +202,11 @@ void NormalBearOffSituation() {
   // (18-6 21-1)
   // (18-6 22-1)
   // (18-6 23-1)
-  // (20-1 18-6)
-  // (21-1 18-6)
-  // (22-1 18-6)
-  // (23-1 18-6)
-  SPIEL_CHECK_EQ(legal_actions.size(), 9);
+  // (20-1 18-6)  // 20-1 is a duplicate of 18-6 20-1 (not listed)
+  // (21-1 18-6)  // 21-1 is a duplicate of 18-6 21-1 (not listed)
+  // (22-1 18-6)  // 22-1 is a duplicate of 18-6 22-1 (not listed)
+  // (23-1 18-6)  // 23-1 is a duplicate of 18-6 23-1 (not listed)
+  SPIEL_CHECK_EQ(legal_actions.size(), 5);
   SPIEL_CHECK_TRUE(ActionsContains(
       legal_actions,
       bstate->CheckerMovesToSpielMove({{18, 1, false}, {19, 6, false}})));
@@ -216,18 +222,6 @@ void NormalBearOffSituation() {
   SPIEL_CHECK_TRUE(ActionsContains(
       legal_actions,
       bstate->CheckerMovesToSpielMove({{18, 6, false}, {23, 1, false}})));
-  SPIEL_CHECK_TRUE(ActionsContains(
-      legal_actions,
-      bstate->CheckerMovesToSpielMove({{20, 1, false}, {18, 6, false}})));
-  SPIEL_CHECK_TRUE(ActionsContains(
-      legal_actions,
-      bstate->CheckerMovesToSpielMove({{21, 1, false}, {18, 6, false}})));
-  SPIEL_CHECK_TRUE(ActionsContains(
-      legal_actions,
-      bstate->CheckerMovesToSpielMove({{22, 1, false}, {18, 6, false}})));
-  SPIEL_CHECK_TRUE(ActionsContains(
-      legal_actions,
-      bstate->CheckerMovesToSpielMove({{23, 1, false}, {18, 6, false}})));
 }
 
 // +------|------+
@@ -266,15 +260,11 @@ void NormalBearOffSituation2() {
 
   // Legal actions here are:
   // (18-4 20-4)
-  // (20-4 18-4)
   // (20-4 20-4)
-  SPIEL_CHECK_EQ(legal_actions.size(), 3);
+  SPIEL_CHECK_EQ(legal_actions.size(), 2);
   SPIEL_CHECK_TRUE(ActionsContains(
       legal_actions,
       bstate->CheckerMovesToSpielMove({{18, 4, false}, {20, 4, false}})));
-  SPIEL_CHECK_TRUE(ActionsContains(
-      legal_actions,
-      bstate->CheckerMovesToSpielMove({{20, 4, false}, {18, 4, false}})));
   SPIEL_CHECK_TRUE(ActionsContains(
       legal_actions,
       bstate->CheckerMovesToSpielMove({{20, 4, false}, {20, 4, false}})));
@@ -399,7 +389,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   std::string notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - Bar/24(2)"));
+  SPIEL_CHECK_EQ(notation, "Bar/24(2)");
 
   // Check hits displayed correctly
   bstate->SetState(
@@ -412,8 +402,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation,
-                 absl::StrCat(legal_actions[0], " - Bar/24* Bar/23*"));
+  SPIEL_CHECK_EQ(notation, "Bar/24* Bar/23*");
 
   // Check moving off displayed correctly
   bstate->SetState(
@@ -426,9 +415,9 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 2/Off 1/Off"));
+  SPIEL_CHECK_EQ(notation, "2/Off 1/Off");
 
-  // Check die order doesnt impact narrative
+  // Check die order doesn't impact narrative
   bstate->SetState(
       kXPlayerId, false, {1, 2}, {0, 0}, {13, 5},
       {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
@@ -439,7 +428,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 2/Off 1/Off"));
+  SPIEL_CHECK_EQ(notation, "2/Off 1/Off");
 
   // Check double move
   bstate->SetState(
@@ -452,7 +441,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/18/13"));
+  SPIEL_CHECK_EQ(notation, "24/18/13");
 
   // Check double move with hit
   bstate->SetState(
@@ -465,7 +454,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/18*/13"));
+  SPIEL_CHECK_EQ(notation, "24/18*/13");
 
   // Check double move with double hit
   bstate->SetState(
@@ -478,7 +467,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/18*/13*"));
+  SPIEL_CHECK_EQ(notation, "24/18*/13*");
 
   // Check ordinary move!
   bstate->SetState(
@@ -491,7 +480,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/19 24/18"));
+  SPIEL_CHECK_EQ(notation, "24/19 24/18");
 
   // Check ordinary move with die reversed
   bstate->SetState(
@@ -504,7 +493,7 @@ void HumanReadableNotation() {
   std::cout << "First legal actions:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/19 24/18"));
+  SPIEL_CHECK_EQ(notation, "24/19 24/18");
 
   // Check ordinary move with 1st hit
   bstate->SetState(
@@ -517,7 +506,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/19* 24/18"));
+  SPIEL_CHECK_EQ(notation, "24/19* 24/18");
 
   // Check ordinary move with 2nd hit
   bstate->SetState(
@@ -530,7 +519,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/19 24/18*"));
+  SPIEL_CHECK_EQ(notation, "24/19 24/18*");
 
   // Check ordinary move with double hit
   bstate->SetState(
@@ -543,7 +532,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/19* 24/18*"));
+  SPIEL_CHECK_EQ(notation, "24/19* 24/18*");
 
   // Check double pass
   bstate->SetState(
@@ -569,7 +558,7 @@ void HumanReadableNotation() {
   std::cout << "First legal action:" << std::endl;
   notation = bstate->ActionToString(kXPlayerId, legal_actions[0]);
   std::cout << notation << std::endl;
-  SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 24/18 Pass"));
+  SPIEL_CHECK_EQ(notation, "24/18 Pass");
 }
 
 void BasicHyperBackgammonTest() {

@@ -53,7 +53,7 @@ We call this loss the "sigmoid loss", and it is implemented in the
 SoftCondorcetOptimizer class. There is also the Fenchel-Young loss, as described
 in Section 3.3 of the paper, which uses a similar gradient descent form but
 optimizes a different loss based on perturbed optimizers in machine learning.
-The optimizer uisng the Fenchel-Young loss is implemented in the
+The optimizer using the Fenchel-Young loss is implemented in the
 FenchelYoungOptimizer class.
 
 Note: this python implementation was the one used for the results in the
@@ -90,8 +90,8 @@ class Optimizer(abc.ABC):
     self._num_alternatives = self._profile.num_alternatives()
     if rating_upper_bound <= rating_lower_bound:
       raise ValueError(
-          "Upper bound ({rating_upper_bound}) must be higher than lower"
-          " bound ({rating_lower_bound})."
+          f"Upper bound ({rating_upper_bound}) must be higher than lower"
+          f" bound ({rating_lower_bound})."
       )
 
     self._rating_ub = rating_upper_bound

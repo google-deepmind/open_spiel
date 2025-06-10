@@ -537,14 +537,18 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
 
 std::string ChessState::Serialize() const {
   std::string state_str = "";
+  // Write the FEN of the start board, then all the moves in the history.
   absl::StrAppend(&state_str, "FEN: ",
                   start_board_.ToFEN(ParentGame()->IsChess960()), "\n");
-  if (ParentGame()->IsChess960()) {
-    absl::StrAppend(&state_str,
-                    "CHESS960_RANDOM_START_FEN: ", chess960_random_start_fen_,
-                    "\n");
+  // Remove the first chance node from the history because we're storing the
+  // fen as the start_board_ in DoApplyAction at the chance node.
+  std::vector<Action> history = History();
+  if (ParentGame()->IsChess960() && !chess960_random_start_fen_.empty()) {
+    if (!history.empty()) {
+      history.erase(history.begin());
+    }
   }
-  absl::StrAppend(&state_str, absl::StrJoin(History(), "\n"), "\n");
+  absl::StrAppend(&state_str, absl::StrJoin(history, "\n"), "\n");
   return state_str;
 }
 
@@ -569,21 +573,6 @@ std::unique_ptr<State> ChessGame::DeserializeState(
   std::unique_ptr<State> state =
       NewInitialState(lines[line_num].substr(prefix.length()));
   line_num += 1;
-  ChessState* chess_state = down_cast<ChessState*>(state.get());
-  if (IsChess960()) {
-    const std::string chess960_prefix("CHESS960_RANDOM_START_FEN: ");
-    std::string chess960_random_start_fen =
-        lines[line_num].substr(chess960_prefix.length());
-    chess_state->SetChess960RandomStartFEN(chess960_random_start_fen);
-    line_num += 1;
-    if (!chess960_random_start_fen.empty()) {
-      // If the random start fen is not empty, it means that it was randomly
-      // generated at the start of the game, so the history contains a chance
-      // node outcome for the first move. We need to skip it because we
-      // initialize the state directly using NewInitialState(fen).
-      line_num += 1;
-    }
-  }
   for (int i = line_num; i < lines.size(); ++i) {
     if (lines[i].empty()) {
       break;
