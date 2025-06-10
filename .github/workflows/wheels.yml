@@ -38,7 +38,7 @@ jobs:
           CIBW_BUILD: cp39-manylinux_x86_64 cp310-manylinux_x86_64 cp311-manylinux_x86_64 cp312-manylinux_x86_64 cp313-manylinux_x86_64
         # These must use the old abseil
         - os: macOS-13
-          NAME: "MacOS-13 Python <= 3.11"
+          NAME: "MacOS13_Python_lte_3.11"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.9
           OS_PYTHON_VERSION: 3.9
@@ -47,7 +47,7 @@ jobs:
           CIBW_BUILD: cp39-macosx_x86_64 cp310-macosx_x86_64 cp311-macosx_x86_64
         # These use the new abseil
         - os: macOS-13
-          NAME: "MacOS-13 Python >= 3.12"
+          NAME: "MacOS13_Python_gte_3.12"
           OS_TYPE: "Darwin"
           CI_PYBIN: python3.12
           OPEN_SPIEL_ABSL_VERSION: "20250127.1"
@@ -135,7 +135,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: artifact-${{ matrix.os }}
+          name: artifact-${{ matrix.os }}-${{ matrix.NAME }}
           path: |
             dist/*.tar.gz
             ./wheelhouse/*.whl
