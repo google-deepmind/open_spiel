@@ -17,6 +17,8 @@
 # The following should be easy to setup as a submodule:
 # https://git-scm.com/docs/git-submodule
 
+export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250127.1"}
+
 die() {
   echo "$*" 1>&2
   exit 1
@@ -131,7 +133,7 @@ fi
 
 DIR="open_spiel/abseil-cpp"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b '20230125.0' --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
+  cached_clone -b "${OPEN_SPIEL_ABSL_VERSION}" --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
 fi
 
 DIR="open_spiel/pybind11_abseil"
