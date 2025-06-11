@@ -552,6 +552,11 @@ std::string ChessState::Serialize() const {
   return state_str;
 }
 
+std::string ChessState::StartFEN() const {
+    return start_board_.ToFEN(ParentGame()->IsChess960());
+}
+
+
 ChessGame::ChessGame(const GameParameters& params)
     : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")) {
   if (chess960_) {

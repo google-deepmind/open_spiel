@@ -205,6 +205,8 @@ class ChessState : public State {
     chess960_random_start_fen_ = fen;
   }
 
+  std::string StartFEN() const;
+
  protected:
   void DoApplyAction(Action action) override;
 
