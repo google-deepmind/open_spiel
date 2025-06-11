@@ -99,27 +99,29 @@ void Chess960SerializationRootIsChanceNodeTest() {
   SPIEL_CHECK_TRUE(state->IsChanceNode());
   state->ApplyAction(0);
   SPIEL_CHECK_FALSE(state->IsChanceNode());
-  state->ApplyAction(state->LegalActions()[0]);
-  SPIEL_CHECK_EQ(state->History().size(), 2);
+  Action action = state->LegalActions()[0];
+  state->ApplyAction(action);
+  SPIEL_CHECK_EQ(state->History().size(), 2);  // chance outcome + move
 
   // Do one round-trip serialization -> deserialization.
-  // State should be the same after serialization and deserialization, and
-  // the chance node should be removed from the history.
+  // State should be the same after serialization and deserialization and
+  // histories the same length (one chance node + one move).
   std::string state_string = state->ToString();
   std::string serialized_state = state->Serialize();
   std::unique_ptr<State> deserialized_state =
       game->DeserializeState(serialized_state);
   SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
-  // Chance node is removed from the history.
-  SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+  SPIEL_CHECK_EQ(deserialized_state->History().size(), 2);
+  SPIEL_CHECK_EQ(deserialized_state->History()[0], 0);
+  SPIEL_CHECK_EQ(deserialized_state->History()[1], action);
 
   // Do a second round-trip serialization -> deserialization.
   // State should be the same after serialization and deserialization, and
-  // the chance node should still be removed from the history.
+  // histories should be the same length as before.
   serialized_state = deserialized_state->Serialize();
   deserialized_state = game->DeserializeState(serialized_state);
   SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
-  SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+  SPIEL_CHECK_EQ(deserialized_state->History().size(), 2);
 }
 
 void Chess960SerializationRootIsSpecificStartingPositionTest() {
@@ -129,22 +131,24 @@ void Chess960SerializationRootIsSpecificStartingPositionTest() {
       "qrbkrnnb/pppppppp/8/8/8/8/PPPPPPPP/QRBKRNNB w KQkq - 0 1"
   );
   SPIEL_CHECK_FALSE(state->IsChanceNode());
-  state->ApplyAction(state->LegalActions()[0]);
+  Action action = state->LegalActions()[0];
+  state->ApplyAction(action);
   SPIEL_CHECK_EQ(state->History().size(), 1);
 
   // Do one round-trip serialization -> deserialization.
-  // State should be the same after serialization and deserialization, and
-  // the chance node should be removed from the history.
+  // State should be the same after serialization and deserialization.
+  // History should be the same length as before (one move).
   std::string state_string = state->ToString();
   std::string serialized_state = state->Serialize();
   std::unique_ptr<State> deserialized_state =
       game->DeserializeState(serialized_state);
   SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
   SPIEL_CHECK_EQ(deserialized_state->History().size(), 1);
+  SPIEL_CHECK_EQ(deserialized_state->History()[0], action);
 
   // Do a second round-trip serialization -> deserialization.
   // State should be the same after serialization and deserialization, and
-  // the chance node should still be removed from the history.
+  // History should be the same length as before (one move).
   serialized_state = deserialized_state->Serialize();
   deserialized_state = game->DeserializeState(serialized_state);
   SPIEL_CHECK_EQ(state_string, deserialized_state->ToString());
