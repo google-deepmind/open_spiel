@@ -836,6 +836,23 @@ void State::InformationStateTensor(Player player,
   InformationStateTensor(player, absl::MakeSpan(*values));
 }
 
+bool State::IsInitialNonChanceState() const {
+  if (IsChanceNode()) {
+    return false;
+  }
+  SPIEL_CHECK_EQ(GetGame()->GetType().chance_mode,
+                 GameType::ChanceMode::kExplicitStochastic);
+  std::vector<Action> history = History();
+  std::unique_ptr<State> state = GetGame()->NewInitialState();
+  for (Action action : history) {
+    if (!state->IsChanceNode()) {
+      return false;
+    }
+    state->ApplyAction(action);
+  }
+  return true;
+}
+
 bool State::PlayerAction::operator==(const PlayerAction& other) const {
   return player == other.player && action == other.action;
 }

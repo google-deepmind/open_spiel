@@ -308,6 +308,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("to_string", &State::ToString)
       .def("is_terminal", &State::IsTerminal)
       .def("is_initial_state", &State::IsInitialState)
+      .def("is_initial_non_chance_state", &State::IsInitialNonChanceState)
       .def("move_number", &State::MoveNumber)
       .def("rewards", &State::Rewards)
       .def("returns", &State::Returns)

@@ -430,6 +430,11 @@ class State {
   // Is this a first state in the game, i.e. the initial state (root node)?
   bool IsInitialState() const { return history_.empty(); }
 
+  // Is this a first non-chance node in the game, i.e. the first decision or
+  // simultaneous move node (or terminal). Note: only works with
+  // ChanceMode::kExplicitStochastic.
+  bool IsInitialNonChanceState() const;
+
   // For imperfect information games. Returns an identifier for the current
   // information state for the specified player.
   // Different ground states can yield the same information state for a player
