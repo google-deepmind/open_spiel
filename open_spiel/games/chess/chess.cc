@@ -117,7 +117,7 @@ ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
 }
 
 Player ChessState::CurrentPlayer() const {
-  if (ParentGame()->IsChess960() && specific_initial_fen_ == "" &&
+  if (ParentGame()->IsChess960() && specific_initial_fen_.empty() &&
       move_number_ == 0) {
     return kChancePlayerId;
   }
