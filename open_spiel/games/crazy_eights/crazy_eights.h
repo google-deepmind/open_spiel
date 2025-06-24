@@ -71,6 +71,12 @@
 // (3) starting from (my_idx + 1), the numbers of cards others have
 // (4) whether currently it goes counterclockwise or not
 
+#include <array>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/spiel.h"
 
@@ -112,6 +118,9 @@ class CrazyEightsState : public State {
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
 
+  // Gets the dealer's deck of cards.
+  std::array<int, kNumCards> GetDealerDeck() const { return dealer_deck_; }
+
  protected:
   void DoApplyAction(Action action) override;
 
@@ -148,7 +157,7 @@ class CrazyEightsState : public State {
   // if num_passes = num_players_ + 1, then the game ends
   int num_passes_ = 0;
 
-  // the current accmulated +2 cards to be drawn
+  // the current accumulated +2 cards to be drawn
   int num_draws_from_twos_left_ = 0;
 
   // the number of consecutive draws for current_player_ so far
