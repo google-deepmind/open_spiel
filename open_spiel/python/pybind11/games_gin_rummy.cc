@@ -15,8 +15,11 @@
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/python/pybind11/pybind11.h"

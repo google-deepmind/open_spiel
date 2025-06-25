@@ -15,15 +15,25 @@
 #include "open_spiel/games/gin_rummy/gin_rummy.h"
 
 #include <algorithm>
+#include <functional>
 #include <map>
+#include <memory>
+#include <random>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/algorithms/observation_history.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -843,6 +853,85 @@ std::vector<std::vector<int>> GinRummyState::KnownCards() const {
     }
   }
   return known_cards;
+}
+
+// This function samples the opponent's hand uniformly from the set of unseen
+// cards. It preserves cards that are known to be in the opponent's hand from
+// them having drawn a public upcard. Aside from that, it does not consider the
+// history of actions that might reveal information about the opponent's hand.
+// This function also invalidates the state history. It is non-trivial to sample
+// starting hands and play through the hand consistent with the history.
+// Approaches such as particle filtering may require an exceedingly large number
+// of samples, and the resulting hand distribution may be skewed.
+std::unique_ptr<State> GinRummyState::ResampleFromInfostate(
+    int player_id, std::function<double()> rng) const {
+  // If the game is in the layoff phase, all hands are public. If the opponent
+  // has knocked, their hand is public. In these cases, resampling is
+  // unnecessary.
+  if (phase_ == Phase::kLayoff ||
+      (phase_ == Phase::kKnock && cur_player_ != player_id)) {
+    return std::make_unique<GinRummyState>(*this);
+  }
+  auto new_state = std::make_unique<GinRummyState>(*this);
+  Player opponent = Opponent(player_id);
+
+  // The cards that are known to be in the opponent's hand must remain there.
+  std::vector<int> opponent_known_cards;
+  for (int card : hands_[opponent]) {
+    if (known_cards_[opponent][card]) {
+      opponent_known_cards.push_back(card);
+    }
+  }
+
+  // The pool of cards to sample from consists of the stock and the cards in
+  // the opponent's hand that are not known to the player.
+  std::vector<int> sample_pool;
+  for (int card : hands_[opponent]) {
+    if (!known_cards_[opponent][card]) {
+      sample_pool.push_back(card);
+    }
+  }
+  for (int card = 0; card < num_cards_; ++card) {
+    if (deck_[card]) {
+      sample_pool.push_back(card);
+    }
+  }
+
+  // Shuffle the sample pool.
+  std::shuffle(sample_pool.begin(), sample_pool.end(), std::mt19937(rng()));
+
+  // Clear opponent's hand and stock in the new state.
+  new_state->hands_[opponent].clear();
+  std::fill(new_state->deck_.begin(), new_state->deck_.end(), false);
+
+  // Re-deal the cards. The opponent's hand is reconstituted with the known
+  // cards and then filled with cards from the sample pool.
+  new_state->hands_[opponent] = opponent_known_cards;
+  const int opponent_hand_size = hands_[opponent].size();
+  const int num_cards_to_draw =
+      opponent_hand_size - opponent_known_cards.size();
+  for (int i = 0; i < num_cards_to_draw; ++i) {
+    new_state->hands_[opponent].push_back(sample_pool[i]);
+  }
+
+  // The rest of the sample pool becomes the new stock.
+  for (int i = num_cards_to_draw; i < sample_pool.size(); ++i) {
+    new_state->deck_[sample_pool[i]] = true;
+  }
+  std::sort(new_state->hands_[opponent].begin(),
+            new_state->hands_[opponent].end());
+
+  // The deadwood for the opponent needs to be recalculated.
+  if (phase_ < Phase::kKnock) {
+    new_state->deadwood_[opponent] =
+        utils_.MinDeadwood(new_state->hands_[opponent]);
+  } else {
+    // After a knock, deadwood is the total card value of unmelded cards.
+    new_state->deadwood_[opponent] =
+        utils_.TotalCardValue(new_state->hands_[opponent]);
+  }
+
+  return new_state;
 }
 
 GinRummyGame::GinRummyGame(const GameParameters& params)

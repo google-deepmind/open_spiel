@@ -39,16 +39,22 @@
 //  "num_suits"       int    num suits in deck             (default = 4)
 //  "hand_size"       int    num cards in player hand      (default = 10)
 
+#include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/algorithms/observation_history.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -117,6 +123,8 @@ class GinRummyState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
 
   // Used for Python bindings.
   Phase CurrentPhase() const { return phase_; }
