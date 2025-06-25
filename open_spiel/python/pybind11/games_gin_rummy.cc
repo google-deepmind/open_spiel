@@ -81,6 +81,7 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .def("upcard", &GinRummyState::Upcard)
       .def("stock_size", &GinRummyState::StockSize)
       .def("hands", &GinRummyState::Hands)
+      .def("known_cards", &GinRummyState::KnownCards)
       .def("discard_pile", &GinRummyState::DiscardPile)
       .def("deadwood", &GinRummyState::Deadwood)
       .def("knocked", &GinRummyState::Knocked)

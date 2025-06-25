@@ -124,6 +124,7 @@ class GinRummyState : public State {
   absl::optional<int> Upcard() const { return upcard_; }
   int StockSize() const { return stock_size_; }
   std::vector<std::vector<int>> Hands() const { return hands_; }
+  std::vector<std::vector<int>> KnownCards() const;
   std::vector<int> DiscardPile() const { return discard_pile_; }
   std::vector<int> Deadwood() const { return deadwood_; }
   std::vector<bool> Knocked() const { return knocked_; }
@@ -194,6 +195,8 @@ class GinRummyState : public State {
   // Each player's hand. Indexed by pid.
   std::vector<std::vector<int>> hands_ =
       std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
+  std::vector<std::vector<bool>> known_cards_ = std::vector<std::vector<bool>>(
+      kNumPlayers, std::vector<bool>(kDefaultNumCards, false));
   // True if the card is still in the deck. Cards from 0-51 using the suit order
   // "scdh".
   std::vector<bool> deck_{};
@@ -216,7 +219,7 @@ class GinRummyState : public State {
       std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
   // Cards that have been layed off onto knocking player's layed melds.
   std::vector<int> layoffs_{};
-  // cached ActionObservationHistory for each player
+  // Cached ActionObservationHistory for each player.
   std::vector<open_spiel::ActionObservationHistory> aohs_;
 };
 

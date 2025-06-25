@@ -799,7 +799,9 @@ void GinRummyState::StockToUpcard(Action card) {
 
 void GinRummyState::UpcardToHand(Player player) {
   SPIEL_CHECK_TRUE(upcard_.has_value());
-  hands_[player].push_back(upcard_.value());
+  int card = upcard_.value();
+  hands_[player].push_back(card);
+  known_cards_[player][card] = true;
   upcard_ = absl::nullopt;
 }
 
@@ -807,6 +809,7 @@ void GinRummyState::RemoveFromHand(Player player, Action card) {
   hands_[player].erase(
       std::remove(hands_[player].begin(), hands_[player].end(), card),
       hands_[player].end());
+  known_cards_[player][card] = false;
 }
 
 std::unique_ptr<State> GinRummyState::Clone() const {
@@ -828,6 +831,18 @@ void GinRummyState::ObservationTensor(Player player,
   ContiguousAllocator allocator(values);
   const GinRummyGame& game = open_spiel::down_cast<const GinRummyGame&>(*game_);
   game.default_observer_->WriteTensor(*this, player, &allocator);
+}
+
+std::vector<std::vector<int>> GinRummyState::KnownCards() const {
+  std::vector<std::vector<int>> known_cards(kNumPlayers);
+  for (Player p = 0; p < kNumPlayers; ++p) {
+    for (int card = 0; card < num_cards_; ++card) {
+      if (known_cards_[p][card]) {
+        known_cards[p].push_back(card);
+      }
+    }
+  }
+  return known_cards;
 }
 
 GinRummyGame::GinRummyGame(const GameParameters& params)

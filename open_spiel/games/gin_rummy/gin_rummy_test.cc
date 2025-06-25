@@ -563,6 +563,30 @@ void ObserverTest() {
   }
 }
 
+void KnownCardsTest() {
+  GameParameters params;
+  std::shared_ptr<const Game> game = LoadGame("gin_rummy", params);
+  std::unique_ptr<State> state = game->NewInitialState();
+  GinRummyState* gr_state = static_cast<GinRummyState*>(state.get());
+  std::vector<Action> initial_actions;
+  // Deal hands
+  initial_actions = {0,  1,  2,  13, 14, 15, 26, 27, 28, 39, 9,
+                     10, 11, 12, 23, 24, 25, 36, 37, 38, 40};
+  for (auto action : initial_actions) {
+    gr_state->ApplyAction(action);
+  }
+  gr_state->ApplyAction(52);
+  SPIEL_CHECK_TRUE(absl::c_linear_search(gr_state->KnownCards()[0], 40));
+  state->ApplyAction(0);
+  state->ApplyAction(52);
+  SPIEL_CHECK_TRUE(absl::c_linear_search(gr_state->KnownCards()[1], 0));
+  state->ApplyAction(12);
+  state->ApplyAction(52);
+  SPIEL_CHECK_TRUE(absl::c_linear_search(gr_state->KnownCards()[0], 12));
+  state->ApplyAction(40);
+  SPIEL_CHECK_FALSE(absl::c_linear_search(gr_state->KnownCards()[0], 40));
+}
+
 // TODO(jhtschultz) Add more extensive testing of parameterized deck size.
 void DeckSizeTests() {
   const int kNumRanks = 10;
@@ -604,6 +628,7 @@ int main(int argc, char** argv) {
   open_spiel::gin_rummy::WallTest();
   open_spiel::gin_rummy::OklahomaTest();
   open_spiel::gin_rummy::ObserverTest();
+  open_spiel::gin_rummy::KnownCardsTest();
   open_spiel::gin_rummy::DeckSizeTests();
   std::cout << "Gin rummy tests passed!" << std::endl;
 }
