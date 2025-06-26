@@ -451,6 +451,7 @@ void CrazyEightsState::ApplyDealAction(int action) {
       redraw_ = false;
       last_card_ = action;
       last_suit_ = GetSuit(action);
+      hands_[current_player_][action]--;
       // if it is special card, act as if the dealer played this card
       if (use_special_cards_) {
         if (rank == kSkipRank) {
