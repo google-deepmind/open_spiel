@@ -23,7 +23,7 @@ class MCTSAgent(rl_agent.AbstractAgent):
 
   Important note: this agent requires the environment to provide the full state
   in its TimeStep objects. Hence, the environment must be created with the
-  use_full_state flag set to True, and the state must be serializable.
+  include_full_state flag set to True, and the state must be serializable.
   """
 
   def __init__(self, player_id, num_actions, mcts_bot, name="mcts_agent"):
