@@ -190,6 +190,11 @@ include_directories (abseil-cpp)
 add_subdirectory (json)
 include_directories (json/include)
 
+if (OPEN_SPIEL_BUILD_WITH_PYTHON)
+  # Needed prematurely here by pybind11_json for some of the games.
+  include_directories (pybind11/include)
+endif()
+
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (
