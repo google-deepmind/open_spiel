@@ -146,7 +146,7 @@ fi
 
 DIR="open_spiel/pybind11_json"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b 'master' https://github.com/pybind/pybind11_json.git${DIR}
+  cached_clone -b 'master' https://github.com/pybind/pybind11_json.git ${DIR}
   pushd ${DIR}
   git checkout 'd0bf434be9d287d73a963ff28745542daf02c08f'
   popd
