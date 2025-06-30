@@ -186,6 +186,15 @@ set(ABSL_PROPAGATE_CXX_STD ON)
 add_subdirectory (abseil-cpp)
 include_directories (abseil-cpp)
 
+# Similarly for json and pybind11_json
+add_subdirectory (json)
+include_directories (json)
+
+if (OPEN_SPIEL_BUILD_WITH_PYTHON)
+  add_subdirectory (pybind11_json)
+  include_directories (pybind11_json)
+endif()
+
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
 target_include_directories (
