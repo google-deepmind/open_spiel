@@ -138,7 +138,7 @@ fi
 
 DIR="open_spiel/json"
 if [[ ! -d ${DIR} ]]; then
-  cached_clone -b 'master' $https://github.com/nlohmann/json.git ${DIR}
+  cached_clone -b 'master' https://github.com/nlohmann/json.git ${DIR}
   pushd ${DIR}
   git checkout '9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03'
   popd
