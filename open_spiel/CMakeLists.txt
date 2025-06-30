@@ -190,9 +190,9 @@ include_directories (abseil-cpp)
 add_subdirectory (json)
 include_directories (json/include)
 
+# Try adding here early because we need it for pybind11_json
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
-  # Needed prematurely here by pybind11_json for some of the games.
-  include_directories (../pybind11/include)
+  add_subdirectory (python)
 endif()
 
 # Just the core without any of the games
@@ -285,9 +285,9 @@ add_subdirectory (examples)
 add_subdirectory (games)
 add_subdirectory (game_transforms)
 
-if (OPEN_SPIEL_BUILD_WITH_PYTHON)
-  add_subdirectory (python)
-endif()
+#if (OPEN_SPIEL_BUILD_WITH_PYTHON)
+#  add_subdirectory (python)
+#endif()
 
 add_subdirectory (utils)
 
