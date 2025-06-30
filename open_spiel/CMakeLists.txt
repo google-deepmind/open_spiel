@@ -187,7 +187,7 @@ add_subdirectory (abseil-cpp)
 include_directories (abseil-cpp)
 
 # Similarly for json
-add_subdirectory (json/include)
+add_subdirectory (json)
 include_directories (json/include)
 
 # Just the core without any of the games
