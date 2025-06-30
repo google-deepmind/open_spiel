@@ -192,7 +192,7 @@ include_directories (json/include)
 
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
   # Needed prematurely here by pybind11_json for some of the games.
-  include_directories (pybind11/include)
+  include_directories (../pybind11/include)
 endif()
 
 # Just the core without any of the games
