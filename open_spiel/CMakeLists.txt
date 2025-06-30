@@ -187,8 +187,8 @@ add_subdirectory (abseil-cpp)
 include_directories (abseil-cpp)
 
 # Similarly for json
-add_subdirectory (json)
-include_directories (json)
+add_subdirectory (json/include)
+include_directories (json/include)
 
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})
