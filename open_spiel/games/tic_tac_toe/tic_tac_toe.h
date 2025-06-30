@@ -22,6 +22,8 @@
 #include <vector>
 
 #include "open_spiel/spiel.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/pybind11_json/include/pybind11_json/pybind11_json.hpp"
 
 // Simple game of Noughts and Crosses:
 // https://en.wikipedia.org/wiki/Tic-tac-toe
