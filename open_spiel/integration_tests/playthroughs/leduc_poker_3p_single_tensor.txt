@@ -38,8 +38,8 @@ ToString() = "leduc_poker(players=3)"
 # Round: 1
 # Player: -1
 # Pot: 3
-# Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 -10000 -10000 -10000
+# Money (player_0 player_1 [...]): 99 99 99
+# Cards (public player_0 player_1 [...]): -10000 -10000 -10000 -10000
 # Round 1 sequence:
 # Round 2 sequence:
 IsTerminal() = False
@@ -105,8 +105,8 @@ action: 4
 # Round: 1
 # Player: -1
 # Pot: 3
-# Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 -10000 -10000
+# Money (player_0 player_1 [...]): 99 99 99
+# Cards (public player_0 player_1 [...]): -10000 4 -10000 -10000
 # Round 1 sequence:
 # Round 2 sequence:
 IsTerminal() = False
@@ -176,8 +176,8 @@ action: 3
 # Round: 1
 # Player: 0
 # Pot: 3
-# Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 2 3
+# Money (player_0 player_1 [...]): 99 99 99
+# Cards (public player_0 player_1 [...]): -10000 4 2 3
 # Round 1 sequence:
 # Round 2 sequence:
 IsTerminal() = False
@@ -244,8 +244,8 @@ action: 1
 # Round: 1
 # Player: 1
 # Pot: 3
-# Money (p1 p2 ...): 99 99 99
-# Cards (public p1 p2 ...): -10000 4 2 3
+# Money (player_0 player_1 [...]): 99 99 99
+# Cards (public player_0 player_1 [...]): -10000 4 2 3
 # Round 1 sequence: Call
 # Round 2 sequence:
 IsTerminal() = False
@@ -312,8 +312,8 @@ action: 2
 # Round: 1
 # Player: 2
 # Pot: 5
-# Money (p1 p2 ...): 99 97 99
-# Cards (public p1 p2 ...): -10000 4 2 3
+# Money (player_0 player_1 [...]): 99 97 99
+# Cards (public player_0 player_1 [...]): -10000 4 2 3
 # Round 1 sequence: Call, Raise
 # Round 2 sequence:
 IsTerminal() = False
@@ -380,8 +380,8 @@ action: 1
 # Round: 1
 # Player: 0
 # Pot: 7
-# Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): -10000 4 2 3
+# Money (player_0 player_1 [...]): 99 97 97
+# Cards (public player_0 player_1 [...]): -10000 4 2 3
 # Round 1 sequence: Call, Raise, Call
 # Round 2 sequence:
 IsTerminal() = False
@@ -452,8 +452,8 @@ action: 1
 # Round: 2
 # Player: 1
 # Pot: 7
-# Money (p1 p2 ...): 99 97 97
-# Cards (public p1 p2 ...): 1 4 2 3
+# Money (player_0 player_1 [...]): 99 97 97
+# Cards (public player_0 player_1 [...]): 1 4 2 3
 # Round 1 sequence: Call, Raise, Call, Fold
 # Round 2 sequence:
 IsTerminal() = False
@@ -520,8 +520,8 @@ action: 2
 # Round: 2
 # Player: 2
 # Pot: 11
-# Money (p1 p2 ...): 99 93 97
-# Cards (public p1 p2 ...): 1 4 2 3
+# Money (player_0 player_1 [...]): 99 93 97
+# Cards (public player_0 player_1 [...]): 1 4 2 3
 # Round 1 sequence: Call, Raise, Call, Fold
 # Round 2 sequence: Raise
 IsTerminal() = False
@@ -588,8 +588,8 @@ action: 1
 # Round: 2
 # Player: 2
 # Pot: 0
-# Money (p1 p2 ...): 99 100.5 100.5
-# Cards (public p1 p2 ...): 1 4 2 3
+# Money (player_0 player_1 [...]): 99 100.5 100.5
+# Cards (public player_0 player_1 [...]): 1 4 2 3
 # Round 1 sequence: Call, Raise, Call, Fold
 # Round 2 sequence: Raise, Call
 IsTerminal() = True

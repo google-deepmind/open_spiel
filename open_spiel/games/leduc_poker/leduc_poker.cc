@@ -15,15 +15,13 @@
 #include "open_spiel/games/leduc_poker/leduc_poker.h"
 
 #include <algorithm>
-#include <array>
-#include <cstdint>
 #include <memory>
 #include <numeric>
+#include <string>
 #include <utility>
 
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/memory/memory.h"
-#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
@@ -460,11 +458,16 @@ std::string LeducState::ToString() const {
   std::string result;
 
   absl::StrAppend(&result, "Round: ", round_, "\nPlayer: ", cur_player_,
-                  "\nPot: ", pot_, "\nMoney (p1 p2 ...):");
+                  "\nPot: ", pot_, "\nMoney (player_0 player_1",
+                  num_players_ > 2 ? " [...]):"  : "):");
   for (auto p = Player{0}; p < num_players_; p++) {
     absl::StrAppend(&result, " ", money_[p]);
   }
-  absl::StrAppend(&result, "\nCards (public p1 p2 ...): ", public_card_, " ");
+  absl::StrAppend(
+      &result,
+      "\nCards (public player_0 player_1",
+      num_players_ > 2 ? " [...]): "  : "): ",
+      public_card_, " ");
   for (Player player_index = 0; player_index < num_players_; player_index++) {
     absl::StrAppend(&result, private_cards_[player_index], " ");
   }
