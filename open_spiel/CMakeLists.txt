@@ -190,12 +190,11 @@ include_directories (abseil-cpp)
 add_subdirectory (json)
 include_directories (json/include)
 
-# Include Python bindings
+# Find basic Python paths needed by C++ code (e.g. pybind11_json and pybind11_abseil).
 if (OPEN_SPIEL_BUILD_WITH_PYTHON)
-  add_subdirectory (python/pybind11)
   find_package(Python3 COMPONENTS Interpreter Development)
   include_directories(pybind11_abseil pybind11_json ../pybind11/include)
-  include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
+  include_directories(${Python3_INCLUDE_DIRS})
 endif()
 
 # Include pybind11_abseil and pybind11_json
