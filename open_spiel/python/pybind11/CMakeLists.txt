@@ -11,7 +11,7 @@ if (OPEN_SPIEL_BUILDING_WHEEL)
 else()
   message(NOTICE "Not building wheel. Finding Python normally...")
   find_package(Python3 COMPONENTS Interpreter Development)
-  set(OPEN_SPIEL_PYTHONPATH ${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;)
+  set(OPEN_SPIEL_PYTHONPATH ${CMAKE_CURRENT_BINARY_DIR}/..:${CMAKE_CURRENT_SOURCE_DIR}/../../..;)
 endif()
 
 message(NOTICE "Python executable: ${Python3_EXECUTABLE}")

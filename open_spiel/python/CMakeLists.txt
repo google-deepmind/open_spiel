@@ -1,4 +1,21 @@
 
+if (OPEN_SPIEL_BUILDING_WHEEL)
+  # When building a wheel, need to use this. See:
+  # https://github.com/joerick/cibuildwheel/issues/639#issuecomment-817872369
+  message(NOTICE "Building Wheel Detected. Finding Python Interpeter Development.Module")
+  find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+  # find_package(Python3 COMPONENTS Interpreter Development)
+  unset(OPEN_SPIEL_PYTHONPATH)
+  if(DEFINED ENV{PYTHONPATH})
+    set (OPEN_SPIEL_PYTHONPATH $ENV{PYTHONPATH})
+  endif()
+else()
+  message(NOTICE "Not building wheel. Finding Python normally...")
+  find_package(Python3 COMPONENTS Interpreter Development)
+  set(OPEN_SPIEL_PYTHONPATH ${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/../..;)
+endif()
+
+
 # Detect the Python ML frameworks.
 if (OPEN_SPIEL_ENABLE_JAX STREQUAL AUTO)
   message(NOTICE "OPEN_SPIEL_ENABLE_JAX set to AUTO. Detecting Jax...")
