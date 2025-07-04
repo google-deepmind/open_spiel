@@ -1,9 +1,9 @@
+
 if (OPEN_SPIEL_BUILDING_WHEEL)
   # When building a wheel, need to use this. See:
   # https://github.com/joerick/cibuildwheel/issues/639#issuecomment-817872369
   message(NOTICE "Building Wheel Detected. Finding Python Interpeter Development.Module")
   find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
-  # find_package(Python3 COMPONENTS Interpreter Development)
   unset(OPEN_SPIEL_PYTHONPATH)
   if(DEFINED ENV{PYTHONPATH})
     set (OPEN_SPIEL_PYTHONPATH $ENV{PYTHONPATH})
@@ -17,44 +17,11 @@ endif()
 message(NOTICE "Python executable: ${Python3_EXECUTABLE}")
 message(NOTICE "Python include dirs: ${Python3_INCLUDE_DIRS}")
 message(NOTICE "Python library dirs: ${Python3_LIBRARY_DIRS}")
-include_directories(SYSTEM ${Python3_INCLUDE_DIRS})
+include_directories(${Python3_INCLUDE_DIRS})
 
 if(Python3_VERSION VERSION_LESS "3.8.0")
   message(FATAL_ERROR
     "Python found ${Python3_VERSION} < 3.8.0")
-endif()
-
-# Detect the Python ML frameworks.
-if (OPEN_SPIEL_ENABLE_JAX STREQUAL AUTO)
-  message(NOTICE "OPEN_SPIEL_ENABLE_JAX set to AUTO. Detecting Jax...")
-  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/find_jax.sh ${Python3_EXECUTABLE}
-                  RESULT_VARIABLE JAX_RET_VAL
-                  OUTPUT_VARIABLE JAX_OUT
-                  ERROR_VARIABLE JAX_ERR)
-  if (JAX_RET_VAL EQUAL 0)
-    message(NOTICE "Found, version: ${JAX_OUT}")
-    set(OPEN_SPIEL_ENABLE_JAX ON)
-  else()
-    message(NOTICE "Not found. Enable printing errors in python/CMakeLists.txt to see output.")
-    set(OPEN_SPIEL_ENABLE_JAX OFF)
-    # message(NOTICE "stdout: ${JAX_OUT}, stderr: ${JAX_ERR}")
-  endif()
-endif()
-
-if (OPEN_SPIEL_ENABLE_PYTORCH STREQUAL AUTO)
-  message(NOTICE "OPEN_SPIEL_ENABLE_PYTORCH set to AUTO. Detecting PyTorch...")
-  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/find_pytorch.sh ${Python3_EXECUTABLE}
-                  RESULT_VARIABLE PYTORCH_RET_VAL
-                  OUTPUT_VARIABLE PYTORCH_OUT
-                  ERROR_VARIABLE PYTORCH_ERR)
-  if (PYTORCH_RET_VAL EQUAL 0)
-    message(NOTICE "Found, version: ${PYTORCH_OUT}")
-    set(OPEN_SPIEL_ENABLE_PYTORCH ON)
-  else()
-    message(NOTICE "Not found. Enable printing errors in python/CMakeLists.txt to see output.")
-    set(OPEN_SPIEL_ENABLE_PYTORCH OFF)
-    # message(NOTICE "stdout: ${PYTORCH_OUT}, stderr: ${PYTORCH_ERR}")
-  endif()
 endif()
 
 # List of all Python bindings to add to pyspiel.
@@ -118,7 +85,7 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/python_policy.h
   pybind11/utils.cc
   pybind11/utils.h
-  )
+)
 
 if (OPEN_SPIEL_BUILD_WITH_ACPC)
   set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
@@ -141,6 +108,7 @@ if (OPEN_SPIEL_BUILD_WITH_XINXIN)
       )
 endif()
 
+
 add_library(pyspiel MODULE ${PYTHON_BINDINGS} ${OPEN_SPIEL_OBJECTS})
 target_link_directories(pyspiel PUBLIC ${Python3_LIBRARY_DIRS})
 
@@ -151,18 +119,46 @@ if (WIN32)
   set_target_properties(pyspiel PROPERTIES SUFFIX ".pyd")
 endif()
 
+
+# Detect the Python ML frameworks.
+if (OPEN_SPIEL_ENABLE_JAX STREQUAL AUTO)
+  message(NOTICE "OPEN_SPIEL_ENABLE_JAX set to AUTO. Detecting Jax...")
+  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/find_jax.sh ${Python3_EXECUTABLE}
+                  RESULT_VARIABLE JAX_RET_VAL
+                  OUTPUT_VARIABLE JAX_OUT
+                  ERROR_VARIABLE JAX_ERR)
+  if (JAX_RET_VAL EQUAL 0)
+    message(NOTICE "Found, version: ${JAX_OUT}")
+    set(OPEN_SPIEL_ENABLE_JAX ON)
+  else()
+    message(NOTICE "Not found. Enable printing errors in python/CMakeLists.txt to see output.")
+    set(OPEN_SPIEL_ENABLE_JAX OFF)
+    # message(NOTICE "stdout: ${JAX_OUT}, stderr: ${JAX_ERR}")
+  endif()
+endif()
+
+if (OPEN_SPIEL_ENABLE_PYTORCH STREQUAL AUTO)
+  message(NOTICE "OPEN_SPIEL_ENABLE_PYTORCH set to AUTO. Detecting PyTorch...")
+  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/find_pytorch.sh ${Python3_EXECUTABLE}
+                  RESULT_VARIABLE PYTORCH_RET_VAL
+                  OUTPUT_VARIABLE PYTORCH_OUT
+                  ERROR_VARIABLE PYTORCH_ERR)
+  if (PYTORCH_RET_VAL EQUAL 0)
+    message(NOTICE "Found, version: ${PYTORCH_OUT}")
+    set(OPEN_SPIEL_ENABLE_PYTORCH ON)
+  else()
+    message(NOTICE "Not found. Enable printing errors in python/CMakeLists.txt to see output.")
+    set(OPEN_SPIEL_ENABLE_PYTORCH OFF)
+    # message(NOTICE "stdout: ${PYTORCH_OUT}, stderr: ${PYTORCH_ERR}")
+  endif()
+endif()
+
 if (OPEN_SPIEL_BUILD_WITH_XINXIN)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../bots/xinxin/xinxin_bot_test.py)
 endif()
 if (OPEN_SPIEL_BUILD_WITH_GAMUT)
   set(PYTHON_TESTS ${PYTHON_TESTS} ../games/gamut/gamut_test.py)
 endif()
-
-# Note: cvxopt does not yet support binary wheels for Python 3.11.
-# It has been temporary removed from the python_extra_deps.
-# As a result, several tests are disabled until a cvxopt wheel becomes
-# available for Python 3.11.
-# See https://github.com/cvxopt/cvxopt/issues/228 for discussion.
 
 # Python tests to run. Start with all the core tests here first, then
 # conditionally add other tests based on what has been enabled/detected.

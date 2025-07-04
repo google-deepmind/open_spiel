@@ -136,6 +136,22 @@ if [[ ! -d ${DIR} ]]; then
   cached_clone -b "${OPEN_SPIEL_ABSL_VERSION}" --single-branch --depth 1 https://github.com/abseil/abseil-cpp.git ${DIR}
 fi
 
+DIR="open_spiel/json"
+if [[ ! -d ${DIR} ]]; then
+  cached_clone -b 'master' https://github.com/nlohmann/json.git ${DIR}
+  pushd ${DIR}
+  git checkout '9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03'
+  popd
+fi
+
+DIR="open_spiel/pybind11_json"
+if [[ ! -d ${DIR} ]]; then
+  cached_clone -b 'master' https://github.com/pybind/pybind11_json.git ${DIR}
+  pushd ${DIR}
+  git checkout 'd0bf434be9d287d73a963ff28745542daf02c08f'
+  popd
+fi
+
 DIR="open_spiel/pybind11_abseil"
 if [[ ! -d ${DIR} ]]; then
   cached_clone -b 'master' https://github.com/pybind/pybind11_abseil.git ${DIR}
