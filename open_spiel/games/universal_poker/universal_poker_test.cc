@@ -15,9 +15,12 @@
 #include "open_spiel/games/universal_poker/universal_poker.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <iostream>
 #include <memory>
+#include <random>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -26,13 +29,18 @@
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/strings/match.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/algorithms/evaluate_bots.h"
 #include "open_spiel/canonical_game_strings.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/policy.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "open_spiel/utils/file.h"
@@ -1000,6 +1008,25 @@ void Bet4ConfusedForHalfPotRegressionTest() {
   SPIEL_CHECK_EQ(state->ActionToString(4), "player=2 move=Bet4");
 }
 
+void TestToStringAtChanceNodesFullGame() {
+  std::string game_str = (
+    "universal_poker(betting=nolimit,numPlayers=2,stack=20000 20000,"
+    "numRounds=2,blind=50 100,firstPlayer=1 1,numSuits=4,numRanks=13,"
+    "numHoleCards=2,numBoardCards=0 3 1 1,bettingAbstraction=fullgame)"
+  );
+  std::shared_ptr<const Game> game = LoadGame(game_str);
+  std::unique_ptr<State> state = game->NewInitialState();
+
+  std::vector<Action> action_sequence = {10, 11, 12, 13};
+  for (Action action : action_sequence) {
+    std::cout << "Applying action " << action
+              << "(" << state->ActionToString(kChancePlayerId, action) << ")"
+              << std::endl;
+    state->ApplyAction(action);
+    std::cout << "state: " << state->ToString() << std::endl;
+  }
+}
+
 }  // namespace
 }  // namespace universal_poker
 }  // namespace open_spiel
@@ -1007,6 +1034,7 @@ void Bet4ConfusedForHalfPotRegressionTest() {
 int main(int argc, char **argv) {
   open_spiel::Init("", &argc, &argv, true);
   absl::ParseCommandLine(argc, argv);
+
   open_spiel::universal_poker::ChanceDealRegressionTest();
   open_spiel::universal_poker::LoadKuhnLimitWithAndWithoutGameDef();
   open_spiel::universal_poker::LoadHoldemNoLimit6PWithAndWithoutGameDef();
@@ -1037,4 +1065,5 @@ int main(int argc, char **argv) {
   open_spiel::universal_poker::TestFixedPreferenceBots();
   open_spiel::universal_poker::TestTensorsRecordsSizings();
   open_spiel::universal_poker::Bet4ConfusedForHalfPotRegressionTest();
+  open_spiel::universal_poker::TestToStringAtChanceNodesFullGame();
 }

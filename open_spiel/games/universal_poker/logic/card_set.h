@@ -44,13 +44,14 @@ class CardSet {
   // Returns a set containing num_ranks cards per suit for num_suits.
   CardSet(uint16_t num_suits, uint16_t num_ranks);
 
+  std::string CardToString(uint8_t card) const;
   std::string ToString() const;
   // Returns the cards present in this set in ascending order.
   std::vector<uint8_t> ToCardArray() const;
 
   // Add a card, as MAX_RANKS * <suite> + <rank> to the CardSet.
   void AddCard(uint8_t card);
-  // Toogle (does not remove) the bit associated to `card`.
+  // Toggle (does not remove) the bit associated to `card`.
   void RemoveCard(uint8_t card);
   bool ContainsCards(uint8_t card) const;
 
