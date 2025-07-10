@@ -267,6 +267,10 @@ PYBIND11_MODULE(pyspiel, m) {
       .def_readonly("utility_sum", &GameInfo::utility_sum)
       .def_readonly("max_game_length", &GameInfo::max_game_length);
 
+  py::class_<StateStruct> state_struct(m, "StateStruct");
+  state_struct
+      .def("to_json", &StateStruct::ToJson);
+
   m.attr("INVALID_ACTION") = py::int_(open_spiel::kInvalidAction);
 
   py::enum_<open_spiel::TensorLayout>(m, "TensorLayout")
@@ -307,6 +311,8 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("__str__", &State::ToString)
       .def("__repr__", &State::ToString)
       .def("to_string", &State::ToString)
+      .def("to_struct", &State::ToStruct)
+      .def("to_json", &State::ToJson)
       .def("is_terminal", &State::IsTerminal)
       .def("is_initial_state", &State::IsInitialState)
       .def("is_initial_non_chance_state", &State::IsInitialNonChanceState)

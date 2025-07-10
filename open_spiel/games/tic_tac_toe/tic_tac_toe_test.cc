@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
+
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -27,10 +32,27 @@ void BasicTicTacToeTests() {
   testing::RandomSimTest(*LoadGame("tic_tac_toe"), 100);
 }
 
+void TestStateStruct() {
+  auto game = LoadGame("tic_tac_toe");
+  auto state = game->NewInitialState();
+  TicTacToeState* ttt_state = static_cast<TicTacToeState*>(state.get());
+  auto state_struct = ttt_state->ToStruct();
+  // Test state/state_struct -> json string.
+  SPIEL_CHECK_EQ(state_struct->ToJson(), ttt_state->ToJson());
+  std::string state_json =
+      "{\"board\":[\".\",\".\",\".\",\".\",\".\",\".\",\".\",\".\",\".\"],"
+      "\"current_player\":\"x\"}";
+  SPIEL_CHECK_EQ(state_struct->ToJson(), state_json);
+  // Test json string -> state_struct.
+  SPIEL_CHECK_EQ(nlohmann::json::parse(state_json).dump(),
+                 TicTacToeStateStruct(state_json).ToJson());
+}
+
 }  // namespace
 }  // namespace tic_tac_toe
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
   open_spiel::tic_tac_toe::BasicTicTacToeTests();
+  open_spiel::tic_tac_toe::TestStateStruct();
 }

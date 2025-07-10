@@ -28,6 +28,7 @@
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel_globals.h"
@@ -208,6 +209,24 @@ using HistoryDistribution =
 class Game;
 class Observer;
 
+// Structured information specifying the state of a game.
+// Added to the API as part of Open Spiel 2.0:
+// https://github.com/google-deepmind/open_spiel/issues/1340.
+// The StateStruct makes explicit and provides an easy interface to the
+// information encoded in the state string. Accessible via the State::ToStruct
+// and State::ToJson methods.
+struct StateStruct {
+  virtual ~StateStruct() = default;
+  StateStruct() = default;
+  StateStruct(std::string json);
+
+  std::string ToJson() const {
+    return to_json_base().dump();
+  }
+
+  virtual nlohmann::json to_json_base() const = 0;
+};
+
 // An abstract class that represents a state of the game.
 class State {
  public:
@@ -319,6 +338,17 @@ class State {
   // Tic-Tac-Toe, where only the current board state is necessary.
   virtual bool operator==(const State& other) const {
     return ToString() == other.ToString();
+  }
+
+  // Returns a StateStruct representation of the state.
+  virtual std::unique_ptr<StateStruct> ToStruct() const {
+    SpielFatalError("ToStruct is not implemented.");
+    return nullptr;
+  }
+
+  // Returns a JSON string representation of the state.
+  std::string ToJson() const {
+    return ToStruct()->ToJson();
   }
 
   // Is this a terminal state? (i.e. has the game ended?)

@@ -15,10 +15,17 @@
 #include "open_spiel/games/tic_tac_toe/tic_tac_toe.h"
 
 #include <algorithm>
+#include <array>
 #include <memory>
-#include <utility>
+#include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
@@ -147,6 +154,19 @@ std::string TicTacToeState::ToString() const {
   }
   return str;
 }
+
+std::unique_ptr<StateStruct> TicTacToeState::ToStruct() const {
+  TicTacToeStateStruct rv;
+  std::vector<std::string> board;
+  board.reserve(board_.size());
+  for (const CellState& cell : board_) {
+    board.push_back(StateToString(cell));
+  }
+  rv.current_player = CurrentPlayer() == 0 ? "x" : "o";
+  rv.board = board;
+  return std::make_unique<TicTacToeStateStruct>(rv);
+}
+
 
 bool TicTacToeState::IsTerminal() const {
   return outcome_ != kInvalidPlayer || IsFull();
