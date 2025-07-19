@@ -1,6 +1,6 @@
 import functools
 import os
-from typing import Any, Dict, Sequence, NamedTuple, Tuple, Optional
+from typing import Any, Sequence, Tuple
 import warnings
 
 from datetime import datetime
@@ -16,6 +16,8 @@ from flax.training import train_state, orbax_utils
 import orbax.checkpoint
 
 flax.config.update('flax_use_orbax_checkpointing', True)
+
+warnings.WarningMessage("This implementation follows the API for `flax.linen` for `flax.nnx` API")
 
 activations_dict = {
     "celu": nn.celu,
@@ -42,6 +44,7 @@ activations_dict = {
     "swish": nn.swish,
     "tanh": nn.tanh,
 }
+
 
 def flatten(x):
   return x.reshape((x.shape[0], -1))
@@ -110,25 +113,26 @@ class MLPBlock(nn.Module):
   
 class ConvBlock(nn.Module):
   features: int
+  kernel_size: tuple[int, int]
 
   @nn.compact
   def __call__(self, x, training: bool = False):
-    y = nn.Conv(features=self.features, kernel_size=(3, 3), padding='SAME')(x)
+    y = nn.Conv(features=self.features, kernel_size=self.kernel_size, padding='SAME')(x)
     y = nn.BatchNorm(use_running_average=not training)(y)
     y = Activation("relu")(y)
     return y
 
 class ResidualBlock(nn.Module):
   filters: int
-  kernel_size: int
+  kernel_size: tuple[int, int]
   
   @nn.compact
   def __call__(self, x, training: bool = False):
     residual = x
-    y = nn.Conv(features=self.filters, kernel_size=(self.kernel_size, self.kernel_size), padding='SAME')(x)
+    y = nn.Conv(features=self.filters, kernel_size=self.kernel_size, padding='SAME')(x)
     y = nn.BatchNorm(use_running_average=not training)(y)
     y = Activation("relu")(y)
-    y = nn.Conv(features=self.filters, kernel_size=(self.kernel_size, self.kernel_size), padding='SAME')(y)
+    y = nn.Conv(features=self.filters, kernel_size=self.kernel_size, padding='SAME')(y)
     y = nn.BatchNorm(use_running_average=not training)(y)
     y = y + residual
     y = Activation("relu")(y)
@@ -146,9 +150,7 @@ class PolicyHead(nn.Module):
       x = nn.Dense(features=self.nn_width)(x)
       x = Activation("relu")(x)
     else:
-      x = nn.Conv(features=2, kernel_size=(1, 1), padding='SAME')(x)
-      x = nn.BatchNorm(use_running_average=not training)(x)
-      x = Activation("relu")(x)
+      x = ConvBlock(features = 2, kernel_size = (1, 1))(x, training)
       x = flatten(x)
 
     policy_logits = nn.Dense(features=self.output_size)(x)
@@ -162,9 +164,7 @@ class ValueHead(nn.Module):
   @nn.compact
   def __call__(self, x, training: bool = False):
     if self.model_type != "mlp":
-      x = nn.Conv(features=1, kernel_size=(1, 1), padding='SAME')(x)
-      x = nn.BatchNorm(use_running_average=not training)(x)
-      x = Activation("relu")(x)
+      x = ConvBlock(features = 1, kernel_size = (1, 1))(x)
       x = flatten(x)
     
     x = nn.Dense(features=self.nn_width)(x)
@@ -192,12 +192,12 @@ class AlphaZeroModel(nn.Module):
     elif self.model_type == "conv2d":
       x = observations.reshape((-1,) + self.input_shape)
       for i in range(self.nn_depth):
-        x = ConvBlock(features=self.nn_width)(x, training)
+        x = ConvBlock(features=self.nn_width, kernel_size=(3, 3))(x, training)
     elif self.model_type == "resnet":
       x = observations.reshape((-1,) + self.input_shape)
-      x = ConvBlock(features=self.nn_width)(x, training)
+      x = ConvBlock(features=self.nn_width, kernel_size=(3, 3))(x, training)
       for i in range(self.nn_depth):
-        x = ResidualBlock(filters=self.nn_width, kernel_size=3)(x, training)
+        x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3))(x, training)
 
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
