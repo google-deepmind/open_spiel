@@ -82,6 +82,8 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .def("current_player", &GinRummyState::CurrentPlayer)
       .def("finished_layoffs", &GinRummyState::FinishedLayoffs)
       .def("upcard", &GinRummyState::Upcard)
+      .def("prev_upcard", &GinRummyState::PrevUpcard)
+      .def("knock_card", &GinRummyState::KnockCard)
       .def("stock_size", &GinRummyState::StockSize)
       .def("hands", &GinRummyState::Hands)
       .def("known_cards", &GinRummyState::KnownCards)

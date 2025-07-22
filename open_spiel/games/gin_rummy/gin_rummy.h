@@ -130,6 +130,8 @@ class GinRummyState : public State {
   Phase CurrentPhase() const { return phase_; }
   bool FinishedLayoffs() const { return finished_layoffs_ ; }
   absl::optional<int> Upcard() const { return upcard_; }
+  absl::optional<int> PrevUpcard() const { return prev_upcard_; }
+  absl::optional<int> KnockCard() const { return knock_card_; }
   int StockSize() const { return stock_size_; }
   std::vector<std::vector<int>> Hands() const { return hands_; }
   std::vector<std::vector<int>> KnownCards() const;
