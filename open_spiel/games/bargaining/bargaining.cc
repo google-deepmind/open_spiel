@@ -14,19 +14,19 @@
 #include "open_spiel/games/bargaining/bargaining.h"
 
 #include <algorithm>
-#include <cmath>
-#include <cstdint>
+#include <iostream>
 #include <memory>
 #include <numeric>
-#include <random>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/numbers.h"  // For absl::SimpleAtoi
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -38,25 +38,26 @@ namespace bargaining {
 namespace {
 
 // Facts about the game
-const GameType kGameType{/*short_name=*/"bargaining",
-                         /*long_name=*/"Bargaining",
-                         GameType::Dynamics::kSequential,
-                         GameType::ChanceMode::kExplicitStochastic,
-                         GameType::Information::kImperfectInformation,
-                         GameType::Utility::kGeneralSum,
-                         GameType::RewardModel::kTerminal,
-                         /*max_num_players=*/kNumPlayers,
-                         /*min_num_players=*/kNumPlayers,
-                         /*provides_information_state_string=*/true,
-                         /*provides_information_state_tensor=*/true,
-                         /*provides_observation_string=*/true,
-                         /*provides_observation_tensor=*/true,
-                         /*parameter_specification=*/
-                         {{"instances_file",
-                           GameParameter("")},
-                          {"max_turns", GameParameter(kDefaultMaxTurns)},
-                          {"discount", GameParameter(kDefaultDiscount)},
-                          {"prob_end", GameParameter(kDefaultProbEnd)}}};
+const GameType kGameType{
+    /*short_name=*/"bargaining",
+    /*long_name=*/"Bargaining",
+    GameType::Dynamics::kSequential,
+    GameType::ChanceMode::kExplicitStochastic,
+    GameType::Information::kImperfectInformation,
+    GameType::Utility::kGeneralSum,
+    GameType::RewardModel::kTerminal,
+    /*max_num_players=*/kNumPlayers,
+    /*min_num_players=*/kNumPlayers,
+    /*provides_information_state_string=*/true,
+    /*provides_information_state_tensor=*/true,
+    /*provides_observation_string=*/true,
+    /*provides_observation_tensor=*/true,
+    /*parameter_specification=*/
+    {{"instances_file", GameParameter("")},
+     {"max_num_instances", GameParameter(kDefaultNumInstances)},
+     {"max_turns", GameParameter(kDefaultMaxTurns)},
+     {"discount", GameParameter(kDefaultDiscount)},
+     {"prob_end", GameParameter(kDefaultProbEnd)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BargainingGame(params));
@@ -493,6 +494,11 @@ void BargainingGame::ParseInstancesString(const std::string& instances_string) {
           possible_opponent_values_[key] = {instance.values[1-player]};
         }
       }
+
+      // Stop parsing instances once we've reached the max number.
+      if (all_instances_.size() >= max_num_instances_) {
+        break;
+      }
     }
   }
 }
@@ -525,6 +531,8 @@ void BargainingGame::CreateOffers() {
 
 BargainingGame::BargainingGame(const GameParameters& params)
     : Game(kGameType, params),
+      max_num_instances_(
+          ParameterValue<int>("max_num_instances", kDefaultNumInstances)),
       max_turns_(ParameterValue<int>("max_turns", kDefaultMaxTurns)),
       discount_(ParameterValue<double>("discount", kDefaultDiscount)),
       prob_end_(ParameterValue<double>("prob_end", kDefaultProbEnd)) {

@@ -47,15 +47,20 @@
 //     2015. Toward Natural Turn-taking in a Virtual Human Negotiation Agent
 //
 // Parameters:
-//     "instances_file" string    The file containing the boards (default: "")
-//     "discount"       double    Discount factor multiplied each turn after
-//                                turn 2, applied to (multiplied to reduce) the
-//                                returns (default = 1.0).
-//     "max_turns"      integer   Maximum total turns before the game ends
-//                                (default = 10).
-//     "prob_end"       double    Probability of the game ending after each
-//                                action (only after each player has taken
-//                                one turn each)  (default = 0.0).
+//     "instances_file"    string   The file containing the boards (default: "")
+//     "max_num_instances" int      The maximum number of instances to use from
+//                                  the file or the builtin default database
+//                                  (default = 1000). Cannot be greater than the
+//                                  number of instances in the file or default
+//                                  database.
+//     "discount"         double    Discount factor multiplied each turn after
+//                                  turn 2, applied to (multiplied to reduce)
+//                                  the returns (default = 1.0).
+//     "max_turns"        integer   Maximum total turns before the game ends
+//                                  (default = 10).
+//     "prob_end"          double   Probability of the game ending after each
+//                                  action (only after each player has taken
+//                                  one turn each)  (default = 0.0).
 
 namespace open_spiel {
 namespace bargaining {
@@ -69,9 +74,14 @@ constexpr double kDefaultDiscount = 1.0;
 constexpr int kDefaultMaxTurns = 10;
 constexpr double kDefaultProbEnd = 0.0;
 constexpr int kDefaultNumInstances = 1000;
-// Default 1000-instance database. See
-// bargaining_instances1000.cc to create your own.
-// Format is: pool items, p1 values, p2 values.
+
+// Default 1000-instance. See bargaining_instances1000.cc for details or
+// bargaining_instances_generator to create your own.
+//
+// Format is, one per line <pool values> <p1 values> <p2 values>
+// where <pool values> is a comma-separated list of integers, and
+// <p1 values> and <p2 values> are also comma-separated lists of integers.
+// E.g. "1,2,3 8,1,0 4,0,2"
 const char* BargainingInstances1000();
 
 struct Instance {
@@ -202,6 +212,7 @@ class BargainingGame : public Game {
   absl::flat_hash_map<std::string, int> instance_map_;
   absl::flat_hash_map<std::string, std::vector<std::vector<int>>>
       possible_opponent_values_;
+  const int max_num_instances_;
   const int max_turns_;
   const double discount_;
   const double prob_end_;
