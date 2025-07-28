@@ -49,6 +49,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/games_crazy_eights.h
   pybind11/games_colored_trails.cc
   pybind11/games_colored_trails.h
+  pybind11/games_connect_four.cc
+  pybind11/games_connect_four.h
   pybind11/games_dots_and_boxes.cc
   pybind11/games_dots_and_boxes.h
   pybind11/games_euchre.cc
@@ -229,10 +231,11 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   tests/mfg_implementation_test/mfg_test.py
   tests/bot_test.py
   tests/game_transforms_test.py
+  tests/games_bargaining_test.py
   tests/games_blackjack_test.py
   tests/games_bridge_test.py
-  tests/games_bargaining_test.py
   tests/games_chess_test.py
+  tests/games_connect_four_test.py
   tests/games_crazy_eights_test.py
   tests/games_euchre_test.py
   tests/games_gin_rummy_test.py

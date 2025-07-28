@@ -16,8 +16,15 @@
 
 #include <algorithm>
 #include <memory>
-#include <utility>
+#include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/utils/tensor_view.h"
 
 namespace open_spiel {
@@ -58,6 +65,17 @@ CellState PlayerToState(Player player) {
       return CellState::kNought;
     default:
       SpielFatalError(absl::StrCat("Invalid player id ", player));
+  }
+}
+
+std::string PlayerToString(Player player) {
+  switch (player) {
+    case 0:
+      return "x";
+    case 1:
+      return "o";
+    default:
+      return DefaultPlayerString(player);
   }
 }
 
@@ -175,6 +193,41 @@ std::string ConnectFourState::ToString() const {
   }
   return str;
 }
+
+std::unique_ptr<StateStruct> ConnectFourState::ToStruct() const {
+  std::vector<std::vector<std::string>> board(
+      kRows, std::vector<std::string>(kCols));
+  for (int r = 0; r < kRows; ++r) {
+    for (int c = 0; c < kCols; ++c) {
+      board[r][c] = StateToString(CellAt(r, c));
+    }
+  }
+  std::string current_player = PlayerToString(CurrentPlayer());
+  bool is_terminal = IsTerminal();
+  std::string winner = "";
+  if (is_terminal) {
+    switch (outcome_) {
+      case Outcome::kPlayer1:
+        winner = "x";
+        break;
+      case Outcome::kPlayer2:
+        winner = "o";
+        break;
+      case Outcome::kDraw:
+        winner = "draw";
+        break;
+      default:
+        SpielFatalError("Game is terminal but outcome is unknown.");
+    }
+  }
+  ConnectFourStateStruct rv;
+  rv.board = board;
+  rv.current_player = current_player;
+  rv.is_terminal = is_terminal;
+  rv.winner = winner;
+  return std::make_unique<ConnectFourStateStruct>(rv);
+}
+
 bool ConnectFourState::IsTerminal() const {
   return outcome_ != Outcome::kUnknown;
 }

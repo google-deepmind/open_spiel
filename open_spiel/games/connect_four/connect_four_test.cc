@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include "open_spiel/games/connect_four/connect_four.h"
+#include <string>
 
+#include "open_spiel/json/include/nlohmann/json.hpp"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
@@ -79,6 +81,42 @@ void CheckFullBoardDraw() {
   SPIEL_CHECK_EQ(state.Returns(), (std::vector<double>{0, 0}));
 }
 
+void TestStateStruct() {
+  auto game = LoadGame("connect_four");
+  auto state = game->NewInitialState();
+  ConnectFourState* cf_state = static_cast<ConnectFourState*>(state.get());
+  SPIEL_CHECK_EQ(cf_state->ToStruct()->ToJson(), cf_state->ToJson());
+  cf_state->ApplyAction(3);
+  cf_state->ApplyAction(4);
+  std::string state_json =
+      R"({"board":[)"
+      R"([".",".",".","x","o",".","."],)"
+      R"([".",".",".",".",".",".","."],)"
+      R"([".",".",".",".",".",".","."],)"
+      R"([".",".",".",".",".",".","."],)"
+      R"([".",".",".",".",".",".","."],)"
+      R"([".",".",".",".",".",".","."]],)"
+      R"("current_player":"x","is_terminal":false,"winner":""})";
+  SPIEL_CHECK_EQ(cf_state->ToJson(), state_json);
+  cf_state->ApplyAction(3);
+  cf_state->ApplyAction(4);
+  cf_state->ApplyAction(3);
+  cf_state->ApplyAction(4);
+  cf_state->ApplyAction(3);
+  state_json =
+      R"({"board":[)"
+      R"([".",".",".","x","o",".","."],)"
+      R"([".",".",".","x","o",".","."],)"
+      R"([".",".",".","x","o",".","."],)"
+      R"([".",".",".","x",".",".","."],)"
+      R"([".",".",".",".",".",".","."],)"
+      R"([".",".",".",".",".",".","."]],)"
+      R"("current_player":"Terminal","is_terminal":true,"winner":"x"})";
+  SPIEL_CHECK_EQ(cf_state->ToJson(), state_json);
+  SPIEL_CHECK_EQ(nlohmann::json::parse(state_json).dump(),
+                 ConnectFourStateStruct(state_json).ToJson());
+}
+
 }  // namespace
 }  // namespace connect_four
 }  // namespace open_spiel
@@ -88,4 +126,5 @@ int main(int argc, char **argv) {
   open_spiel::connect_four::FastLoss();
   open_spiel::connect_four::BasicSerializationTest();
   open_spiel::connect_four::CheckFullBoardDraw();
+  open_spiel::connect_four::TestStateStruct();
 }
