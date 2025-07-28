@@ -357,6 +357,17 @@ void ConcreteGamesTest() {
   }
 }
 
+void PlayerIdToStringTest() {
+  SPIEL_CHECK_EQ(DefaultPlayerString(0), "Player_0");
+  SPIEL_CHECK_EQ(DefaultPlayerString(1), "Player_1");
+  SPIEL_CHECK_EQ(DefaultPlayerString(10), "Player_10");
+  SPIEL_CHECK_EQ(DefaultPlayerString(kChancePlayerId), "Chance");
+  SPIEL_CHECK_EQ(DefaultPlayerString(kSimultaneousPlayerId), "Simultaneous");
+  SPIEL_CHECK_EQ(DefaultPlayerString(kInvalidPlayer), "Invalid");
+  SPIEL_CHECK_EQ(DefaultPlayerString(kTerminalPlayerId), "Terminal");
+  SPIEL_CHECK_EQ(DefaultPlayerString(kMeanFieldPlayerId), "MeanField");
+}
+
 }  // namespace
 }  // namespace testing
 }  // namespace open_spiel
@@ -372,4 +383,5 @@ int main(int argc, char** argv) {
   open_spiel::testing::GameParametersTest();
   open_spiel::testing::PolicySerializationTest();
   open_spiel::testing::ConcreteGamesTest();
+  open_spiel::testing::PlayerIdToStringTest();
 }
