@@ -73,6 +73,17 @@ CellState PlayerToState(Player player) {
   }
 }
 
+std::string PlayerToString(Player player) {
+  switch (player) {
+    case 0:
+      return "x";
+    case 1:
+      return "o";
+    default:
+      return DefaultPlayerString(player);
+  }
+}
+
 std::string StateToString(CellState state) {
   switch (state) {
     case CellState::kEmpty:
@@ -162,7 +173,7 @@ std::unique_ptr<StateStruct> TicTacToeState::ToStruct() const {
   for (const CellState& cell : board_) {
     board.push_back(StateToString(cell));
   }
-  rv.current_player = CurrentPlayer() == 0 ? "x" : "o";
+  rv.current_player = PlayerToString(CurrentPlayer());
   rv.board = board;
   return std::make_unique<TicTacToeStateStruct>(rv);
 }
