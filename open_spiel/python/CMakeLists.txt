@@ -177,6 +177,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   algorithms/cfr_br_test.py
   algorithms/cfr_test.py
   algorithms/discounted_cfr_test.py
+  algorithms/elo_test.py
   algorithms/efr_test.py
   algorithms/evaluate_bots_test.py
   algorithms/expected_game_score_test.py
