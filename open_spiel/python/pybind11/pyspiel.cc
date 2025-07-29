@@ -50,6 +50,7 @@
 #include "open_spiel/python/pybind11/games_dots_and_boxes.h"
 #include "open_spiel/python/pybind11/games_euchre.h"
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
+#include "open_spiel/python/pybind11/games_go.h"
 #include "open_spiel/python/pybind11/games_kuhn_poker.h"
 #include "open_spiel/python/pybind11/games_leduc_poker.h"
 #include "open_spiel/python/pybind11/games_negotiation.h"
@@ -683,34 +684,35 @@ PYBIND11_MODULE(pyspiel, m) {
   py::register_exception<SpielException>(m, "SpielError", PyExc_RuntimeError);
 
   // Register other bits of the API.
-  init_pyspiel_bots(m);                   // Bots and bot-related algorithms.
-  init_pyspiel_policy(m);           // Policies and policy-related algorithms.
+  init_pyspiel_bots(m);                     // Bots and bot-related algorithms.
+  init_pyspiel_policy(m);                   // Policies and related algorithms.
   init_pyspiel_algorithms_corr_dist(m);     // Correlated eq. distance funcs
   init_pyspiel_algorithms_trajectories(m);  // Trajectories.
   init_pyspiel_evaluation_sco(m);           // Soft Condorcet Optimization.
-  init_pyspiel_game_transforms(m);  // Game transformations.
-  init_pyspiel_games_backgammon(m);         // Backgammon game.
-  init_pyspiel_games_bargaining(m);         // Bargaining game.
-  init_pyspiel_games_blackjack(m);          // Blackjack game.
-  init_pyspiel_games_bridge(m);  // Game-specific functions for bridge.
-  init_pyspiel_games_chess(m);   // Chess game.
-  init_pyspiel_games_colored_trails(m);   // Colored Trails game.
-  init_pyspiel_games_connect_four(m);   // Connect Four game.
-  init_pyspiel_games_crazy_eights(m);   // Crazy Eights game.
-  init_pyspiel_games_dots_and_boxes(m);   // Dots-and-Boxes game.
-  init_pyspiel_games_euchre(m);  // Game-specific functions for euchre.
-  init_pyspiel_games_gin_rummy(m);  // Game-specific functions for gin_rummy.
-  init_pyspiel_games_kuhn_poker(m);   // Kuhn Poker game.
-  init_pyspiel_games_leduc_poker(m);  // Leduc poker game.
-  init_pyspiel_games_negotiation(m);  // Negotiation game.
-  init_pyspiel_games_spades(m);       // Game-specific functions for spades.
-  init_pyspiel_games_tarok(m);   // Game-specific functions for tarok.
-  init_pyspiel_games_tic_tac_toe(m);  // Tic-Tac-Toe game.
-  init_pyspiel_games_tiny_bridge(
-      m);                            // Game-specific functions for tiny_bridge.
-  init_pyspiel_games_trade_comm(m);  // Game-specific functions for trade_comm.
-  init_pyspiel_observer(m);      // Observers and observations.
-  init_pyspiel_utils(m);         // Utilities.
+  init_pyspiel_game_transforms(m);          // Game transformations.
+  // Game-specific functions.
+  init_pyspiel_games_backgammon(m);
+  init_pyspiel_games_bargaining(m);
+  init_pyspiel_games_blackjack(m);
+  init_pyspiel_games_bridge(m);
+  init_pyspiel_games_chess(m);
+  init_pyspiel_games_colored_trails(m);
+  init_pyspiel_games_connect_four(m);
+  init_pyspiel_games_crazy_eights(m);
+  init_pyspiel_games_dots_and_boxes(m);
+  init_pyspiel_games_euchre(m);
+  init_pyspiel_games_gin_rummy(m);
+  init_pyspiel_games_go(m);
+  init_pyspiel_games_kuhn_poker(m);
+  init_pyspiel_games_leduc_poker(m);
+  init_pyspiel_games_negotiation(m);
+  init_pyspiel_games_spades(m);
+  init_pyspiel_games_tarok(m);
+  init_pyspiel_games_tic_tac_toe(m);
+  init_pyspiel_games_tiny_bridge(m);
+  init_pyspiel_games_trade_comm(m);
+  init_pyspiel_observer(m);                 // Observers and observations.
+  init_pyspiel_utils(m);                    // Utilities.
 
   // List of optional python submodules.
 #if OPEN_SPIEL_BUILD_WITH_GAMUT
