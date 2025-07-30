@@ -257,6 +257,7 @@ set(PYTHON_TESTS ${PYTHON_TESTS}
   voting/base_test.py
   voting/borda_test.py
   voting/copeland_test.py
+  voting/elo_test.py
   voting/kemeny_young_test.py
   voting/plurality_test.py
   voting/ranked_pairs_test.py

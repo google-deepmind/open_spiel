@@ -12,39 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Elo rating system.
+"""A helpful wrapper for the Elo rating system."""
 
-There are two ways to compute the Elo ratings:
-  1. From a win matrix and a draw matrix.
-  2. From a list of match records.
-
-The function here is a wrapper to method (1) that simply converts numpy arrays
-to lists of lists and then calls the pybind11 wrapper. For examples of (2),
-please see elo_test.py.
-
-Both are wrappers around the C++ implementation in evaluation/elo.cc, which is
-based on the algorithm of Hunter, MM Algorithms for Generalized Bradley-Terry
-Models, The Annals of Statistics 2004, Vol. 32, No. 1, 384--406.
-"""
-
-import numpy as np
 import pyspiel
+from open_spiel.python.voting import base
 
 
-def compute_ratings_from_matrices(
-    win_matrix: np.ndarray,
-    draw_matrix: np.ndarray | None = None,
+def compute_ratings_from_preference_profile(
+    profile: base.PreferenceProfile,
     smoothing_factor: float = pyspiel.elo.DEFAULT_SMOOTHING_FACTOR,
     max_iterations: int = pyspiel.elo.DEFAULT_MAX_ITERATIONS,
     convergence_delta: float = pyspiel.elo.DEFAULT_CONVERGENCE_DELTA,
-) -> np.ndarray:
+) -> dict[str, float]:
   """Compute Elo ratings from a win matrix and a draw matrix."""
   options = pyspiel.elo.default_elo_options()
   options.smoothing_factor = smoothing_factor
   options.max_iterations = max_iterations
   options.convergence_delta = convergence_delta
-  return pyspiel.elo.compute_ratings_from_matrices(
-      win_matrix=win_matrix.tolist(),
-      draw_matrix=(draw_matrix.tolist() if draw_matrix is not None else []),
-      options=options,
-  )
+  match_records = []
+  for vote in profile.votes:
+    for i in range(len(vote.vote)):
+      for j in range(i + 1, len(vote.vote)):
+        for _ in range(vote.weight):
+          match_records.append(
+              pyspiel.elo.MatchRecord(
+                  str(vote.vote[i]),
+                  str(vote.vote[j]),
+                  pyspiel.elo.MatchOutcome.FIRST_PLAYER_WIN,
+              )
+          )
+  return pyspiel.elo.compute_ratings_from_match_records(match_records, options)

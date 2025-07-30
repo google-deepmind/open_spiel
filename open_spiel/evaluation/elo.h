@@ -15,6 +15,8 @@
 #ifndef OPEN_SPIEL_EVALUATION_ELO_H_
 #define OPEN_SPIEL_EVALUATION_ELO_H_
 
+#include <map>
+#include <string>
 #include <vector>
 
 namespace open_spiel {
@@ -28,12 +30,42 @@ constexpr double kDefaultSmoothingFactor = 0.1;
 constexpr double kDefaultConvergenceDelta = 1e-10;
 constexpr double kStandardScaleFactor = 400.0;
 
-std::vector<double> ComputeElo(
+enum MatchOutcome {
+  kFirstPlayerWin = 0,
+  kFirstPlayerLoss = 1,  // second player won
+  kDraw = 2,
+};
+
+// A record of a match between two players. Default outcome is kFirstPlayerWin,
+// so adding records of type A beats B is equivalent to simply constructing as
+// MatchRecord("A", "B").
+struct MatchRecord {
+  std::string first_player_name;
+  std::string second_player_name;
+  MatchOutcome outcome;
+  MatchRecord(std::string _first_player_name, std::string _second_player_name,
+              MatchOutcome _outcome = kFirstPlayerWin)
+      : first_player_name(_first_player_name),
+        second_player_name(_second_player_name),
+        outcome(_outcome) {}
+};
+
+struct EloOptions {
+  double smoothing_factor = kDefaultSmoothingFactor;
+  int max_iterations = kDefaultMaxIterations;
+  double convergence_delta = kDefaultConvergenceDelta;
+  double scale_factor = kStandardScaleFactor;
+};
+
+EloOptions DefaultEloOptions();
+
+std::vector<double> ComputeRatingsFromMatrices(
     const IntArray2D& win_matrix, const IntArray2D& draw_matrix = {},
-    double smoothing_factor = kDefaultSmoothingFactor,
-    int max_iterations = kDefaultMaxIterations,
-    double convergence_delta = kDefaultConvergenceDelta,
-    double scale_factor = kStandardScaleFactor);
+    const EloOptions& options = DefaultEloOptions());
+
+std::map<std::string, double> ComputeRatingsFromMatchRecords(
+    const std::vector<MatchRecord>& match_records,
+    const EloOptions& options = DefaultEloOptions());
 
 }  // namespace evaluation
 }  // namespace open_spiel

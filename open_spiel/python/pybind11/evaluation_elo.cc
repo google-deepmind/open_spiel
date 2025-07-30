@@ -14,12 +14,21 @@
 
 #include "open_spiel/python/pybind11/evaluation_elo.h"
 
+#include <string>
+
 #include "open_spiel/evaluation/elo.h"
 
 namespace py = ::pybind11;
-using open_spiel::evaluation::ComputeElo;
+
+using open_spiel::evaluation::ComputeRatingsFromMatchRecords;
+using open_spiel::evaluation::ComputeRatingsFromMatrices;
+using open_spiel::evaluation::DefaultEloOptions;
 using open_spiel::evaluation::DoubleArray2D;
+using open_spiel::evaluation::EloOptions;
 using open_spiel::evaluation::IntArray2D;
+using open_spiel::evaluation::MatchOutcome;
+using open_spiel::evaluation::MatchRecord;
+
 using open_spiel::evaluation::kDefaultConvergenceDelta;
 using open_spiel::evaluation::kDefaultMaxIterations;
 using open_spiel::evaluation::kDefaultSmoothingFactor;
@@ -35,13 +44,38 @@ void init_pyspiel_evaluation_elo(py::module& m) {
   elo.attr("DEFAULT_CONVERGENCE_DELTA") = py::float_(kDefaultConvergenceDelta);
   elo.attr("STANDARD_SCALE_FACTOR") = py::float_(kStandardScaleFactor);
 
-  elo.def("compute_elo", ComputeElo,
+  py::class_<EloOptions>(elo, "EloOptions")
+      .def_readwrite("smoothing_factor", &EloOptions::smoothing_factor)
+      .def_readwrite("max_iterations", &EloOptions::max_iterations)
+      .def_readwrite("convergence_delta", &EloOptions::convergence_delta)
+      .def_readwrite("scale_factor", &EloOptions::scale_factor);
+
+  py::enum_<MatchOutcome>(elo, "MatchOutcome")
+      .value("FIRST_PLAYER_WIN", MatchOutcome::kFirstPlayerWin)
+      .value("FIRST_PLAYER_LOSS", MatchOutcome::kFirstPlayerLoss)
+      .value("DRAW", MatchOutcome::kDraw)
+      .export_values();
+
+  py::class_<MatchRecord>(elo, "MatchRecord")
+      .def(py::init<std::string, std::string, MatchOutcome>(),
+              py::arg("first_player_name"),
+              py::arg("second_player_name"),
+              py::arg("outcome") = MatchOutcome::kFirstPlayerWin)
+      .def_readwrite("first_player_name", &MatchRecord::first_player_name)
+      .def_readwrite("second_player_name", &MatchRecord::second_player_name)
+      .def_readwrite("outcome", &MatchRecord::outcome);
+
+  elo.def("default_elo_options", DefaultEloOptions,
+          "Return default EloOptions (see elo.h for values).");
+
+  elo.def("compute_ratings_from_matrices", ComputeRatingsFromMatrices,
           "Compute Elo ratings from a win matrix and a draw matrix.",
           py::arg("win_matrix"), py::arg("draw_matrix") = py::list({}),
-          py::arg("smoothing_factor") = kDefaultSmoothingFactor,
-          py::arg("max_iterations") = kDefaultMaxIterations,
-          py::arg("convergence_delta") = kDefaultConvergenceDelta,
-          py::arg("scale_factor") = kStandardScaleFactor);
+          py::arg("options") = DefaultEloOptions());
+
+  elo.def("compute_ratings_from_match_records", ComputeRatingsFromMatchRecords,
+          "Compute Elo ratings from a list of match records.",
+          py::arg("match_records"), py::arg("options") = DefaultEloOptions());
 }
 
 }  // namespace open_spiel

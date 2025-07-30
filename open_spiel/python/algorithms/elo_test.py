@@ -33,22 +33,37 @@ class EloTest(absltest.TestCase):
     #    1: B > C > A
     # Here, the first and last player have provably equal Elo ratings.
     win_matrix = np.asarray([[0, 4, 2], [1, 0, 2], [3, 3, 0]])
-    ratings = elo.compute_elo(win_matrix)
+    ratings = elo.compute_ratings_from_matrices(win_matrix)
     self.assertAlmostEqual(ratings[0], ratings[2])
     self.assertLess(ratings[1], ratings[0])
     self.assertLess(ratings[1], ratings[2])
 
+    # Now, from match records.
+    match_records = []
+    match_records.extend([pyspiel.elo.MatchRecord("A", "B")] * 4)
+    match_records.extend([pyspiel.elo.MatchRecord("A", "C")] * 2)
+    match_records.extend([pyspiel.elo.MatchRecord("B", "A")] * 1)
+    match_records.extend([pyspiel.elo.MatchRecord("B", "C")] * 2)
+    match_records.extend([pyspiel.elo.MatchRecord("C", "A")] * 3)
+    match_records.extend([pyspiel.elo.MatchRecord("C", "B")] * 3)
+    ratings_map = pyspiel.elo.compute_ratings_from_match_records(match_records)
+    self.assertAlmostEqual(ratings_map["A"], ratings[0])
+    self.assertAlmostEqual(ratings_map["B"], ratings[1])
+    self.assertAlmostEqual(ratings_map["C"], ratings[2])
+
   def test_simple_case_direct_pyspiel(self):
     # Simple case: a > b. First, specify the draws matrix. Calls the Elo
     # wrapper directly.
-    ratings1 = pyspiel.elo.compute_elo(
+    ratings1 = pyspiel.elo.compute_ratings_from_matrices(
         win_matrix=[[0, 2], [1, 0]], draw_matrix=[[0, 0], [0, 0]]
     )
     self.assertGreater(ratings1[0], ratings1[1])
     self.assertAlmostEqual(ratings1[1], 0.0, places=6)
 
     # Testing default when excluding draws matrix.
-    ratings2 = pyspiel.elo.compute_elo(win_matrix=[[0, 2], [1, 0]])
+    ratings2 = pyspiel.elo.compute_ratings_from_matrices(
+        win_matrix=[[0, 2], [1, 0]]
+    )
     self.assertAlmostEqual(ratings1[0], ratings2[0], places=6)
     self.assertAlmostEqual(ratings1[1], ratings2[1], places=6)
 
