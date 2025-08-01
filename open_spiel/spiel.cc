@@ -379,13 +379,12 @@ void State::ApplyAction(Action action_id) {
 
 void State::ApplyActionWithLegalityCheck(Action action_id) {
   std::vector<Action> legal_actions = LegalActions();
-  if (absl::c_find(legal_actions, action_id) == legal_actions.end()) {
-    Player cur_player = CurrentPlayer();
-    SpielFatalError(
-        absl::StrCat("Current player ", cur_player, " calling ApplyAction ",
-                     "with illegal action (", action_id, "): ",
-                     ActionToString(cur_player, action_id)));
-  }
+  SPIEL_CHECK_TRUE_WSI(
+      absl::c_find(legal_actions, action_id) != legal_actions.end(),
+      absl::StrCat("Current player ", CurrentPlayer(), " calling ApplyAction ",
+                   "with illegal action (", action_id,
+                   "): ", ActionToString(CurrentPlayer(), action_id)),
+      *this->GetGame(), *this);
   ApplyAction(action_id);
 }
 
@@ -403,13 +402,15 @@ void State::ApplyActions(const std::vector<Action>& actions) {
 void State::ApplyActionsWithLegalityChecks(const std::vector<Action>& actions) {
   for (Player player = 0; player < actions.size(); ++player) {
     std::vector<Action> legal_actions = LegalActions(player);
-    if (!legal_actions.empty() &&
-        absl::c_find(legal_actions, actions[player]) == legal_actions.end()) {
-      SpielFatalError(
-          absl::StrCat("Player ", player, " calling ApplyAction ",
-                       "with illegal action (", actions[player], "): ",
-                       ActionToString(player, actions[player])));
+    if (legal_actions.empty()) {
+      continue;
     }
+    SPIEL_CHECK_TRUE_WSI(
+        absl::c_find(legal_actions, actions[player]) != legal_actions.end(),
+        absl::StrCat("Player ", player, " calling ApplyActions ",
+                     "with illegal action (", actions[player],
+                     "): ", ActionToString(player, actions[player])),
+        *this->GetGame(), *this);
   }
   ApplyActions(actions);
 }
