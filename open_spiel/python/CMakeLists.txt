@@ -33,6 +33,8 @@ set(PYTHON_BINDINGS ${PYTHON_BINDINGS}
   pybind11/algorithms_trajectories.h
   pybind11/bots.cc
   pybind11/bots.h
+  pybind11/evaluation_elo.cc
+  pybind11/evaluation_elo.h
   pybind11/evaluation_sco.cc
   pybind11/evaluation_sco.h
   pybind11/games_backgammon.cc
