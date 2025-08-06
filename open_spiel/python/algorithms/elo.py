@@ -27,13 +27,14 @@ based on the algorithm of Hunter, MM Algorithms for Generalized Bradley-Terry
 Models, The Annals of Statistics 2004, Vol. 32, No. 1, 384--406.
 """
 
+from typing import Optional
 import numpy as np
 import pyspiel
 
 
 def compute_ratings_from_matrices(
     win_matrix: np.ndarray,
-    draw_matrix: np.ndarray | None = None,
+    draw_matrix: Optional[np.ndarray] = None,
     smoothing_factor: float = pyspiel.elo.DEFAULT_SMOOTHING_FACTOR,
     max_iterations: int = pyspiel.elo.DEFAULT_MAX_ITERATIONS,
     convergence_delta: float = pyspiel.elo.DEFAULT_CONVERGENCE_DELTA,
