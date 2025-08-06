@@ -26,7 +26,7 @@ using IntArray2D = std::vector<std::vector<int>>;
 using DoubleArray2D = std::vector<std::vector<double>>;
 
 constexpr int kDefaultMaxIterations = 2000;
-constexpr double kDefaultSmoothingFactor = 0.1;
+constexpr double kDefaultSmoothingFactor = 0.01;
 constexpr double kDefaultConvergenceDelta = 1e-10;
 constexpr double kStandardScaleFactor = 400.0;
 constexpr double kDefaultMinimumRating = 0.0;
