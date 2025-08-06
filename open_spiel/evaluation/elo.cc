@@ -148,10 +148,12 @@ std::vector<double> ComputeRatingsFromMatrices(const IntArray2D& win_matrix,
     ratings[i] = options.scale_factor * std::log10(gammas_t[i]);
   }
 
-  // Define the minimum Elo to be zero.
-  double min_elo = *std::min_element(ratings.begin(), ratings.end());
+  // Subtract the minimum computed rating (which shifts everything to
+  // be relative to 0), then shift upward by the specified minimum rating.
+  double min_computed_rating = *std::min_element(ratings.begin(),
+                                                 ratings.end());
   for (int i = 0; i < num_players; ++i) {
-    ratings[i] -= min_elo;
+    ratings[i] = ratings[i] - min_computed_rating + options.minimum_rating;
   }
 
   return ratings;

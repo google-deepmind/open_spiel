@@ -33,6 +33,7 @@ using open_spiel::evaluation::kDefaultConvergenceDelta;
 using open_spiel::evaluation::kDefaultMaxIterations;
 using open_spiel::evaluation::kDefaultSmoothingFactor;
 using open_spiel::evaluation::kStandardScaleFactor;
+using open_spiel::evaluation::kDefaultMinimumRating;
 
 namespace open_spiel {
 
@@ -43,12 +44,14 @@ void init_pyspiel_evaluation_elo(py::module& m) {
   elo.attr("DEFAULT_MAX_ITERATIONS") = py::int_(kDefaultMaxIterations);
   elo.attr("DEFAULT_CONVERGENCE_DELTA") = py::float_(kDefaultConvergenceDelta);
   elo.attr("STANDARD_SCALE_FACTOR") = py::float_(kStandardScaleFactor);
+  elo.attr("DEFAULT_MINIMUM_RATING") = py::float_(kDefaultMinimumRating);
 
   py::class_<EloOptions>(elo, "EloOptions")
       .def_readwrite("smoothing_factor", &EloOptions::smoothing_factor)
       .def_readwrite("max_iterations", &EloOptions::max_iterations)
       .def_readwrite("convergence_delta", &EloOptions::convergence_delta)
-      .def_readwrite("scale_factor", &EloOptions::scale_factor);
+      .def_readwrite("scale_factor", &EloOptions::scale_factor)
+      .def_readwrite("minimum_rating", &EloOptions::minimum_rating);
 
   py::enum_<MatchOutcome>(elo, "MatchOutcome")
       .value("FIRST_PLAYER_WIN", MatchOutcome::kFirstPlayerWin)

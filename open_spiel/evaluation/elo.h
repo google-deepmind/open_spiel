@@ -29,6 +29,7 @@ constexpr int kDefaultMaxIterations = 2000;
 constexpr double kDefaultSmoothingFactor = 0.1;
 constexpr double kDefaultConvergenceDelta = 1e-10;
 constexpr double kStandardScaleFactor = 400.0;
+constexpr double kDefaultMinimumRating = 0.0;
 
 enum MatchOutcome {
   kFirstPlayerWin = 0,
@@ -55,6 +56,7 @@ struct EloOptions {
   int max_iterations = kDefaultMaxIterations;
   double convergence_delta = kDefaultConvergenceDelta;
   double scale_factor = kStandardScaleFactor;
+  double minimum_rating = kDefaultMinimumRating;
 };
 
 EloOptions DefaultEloOptions();
