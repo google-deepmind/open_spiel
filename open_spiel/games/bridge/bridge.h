@@ -177,6 +177,7 @@ class BridgeState : public State {
   }
   std::array<absl::optional<Player>, kNumCards> OriginalDeal() const;
   std::string FormatDeal() const;
+  std::string FormatDealer() const;
   std::string FormatVulnerability() const;
   std::string FormatAuction(bool trailing_query) const;
   std::string FormatPlay() const;

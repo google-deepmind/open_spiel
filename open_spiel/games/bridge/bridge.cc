@@ -168,7 +168,8 @@ std::string BridgeState::ActionToString(Player player, Action action) const {
 }
 
 std::string BridgeState::ToString() const {
-  std::string rv = absl::StrCat(FormatVulnerability(), FormatDeal());
+  std::string rv =
+      absl::StrCat(FormatDealer(), FormatVulnerability(), FormatDeal());
   if (history_.size() > kNumCards)
     absl::StrAppend(&rv, FormatAuction(/*trailing_query=*/false));
   if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay());
@@ -293,6 +294,12 @@ std::string BridgeState::FormatDeal() const {
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, padding, cards[kSouth][suit], "\n");
   return rv;
+}
+
+std::string BridgeState::FormatDealer() const {
+  static std::array<std::string, kNumPlayers> kPlayerNames = {"North", "East",
+                                                              "South", "West"};
+  return absl::StrCat("Dealer ", kPlayerNames[dealer_], "\n");
 }
 
 std::string BridgeState::FormatVulnerability() const {
