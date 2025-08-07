@@ -78,6 +78,8 @@ const GameType kGameType{/*short_name=*/"bridge",
                              // If true, replace the play phase with a computed
                              // result based on perfect-information play.
                              {"use_double_dummy_result", GameParameter(true)},
+                             // Which player is the dealer (0..3).
+                             {"dealer", GameParameter(0)},
                              // If true, the dealer's side is vulnerable.
                              {"dealer_vul", GameParameter(false)},
                              // If true, the non-dealer's side is vulnerable.
@@ -147,10 +149,15 @@ BridgeGame::BridgeGame(const GameParameters& params)
 BridgeState::BridgeState(std::shared_ptr<const Game> game,
                          bool use_double_dummy_result,
                          bool is_dealer_vulnerable,
-                         bool is_non_dealer_vulnerable, int num_tricks)
+                         bool is_non_dealer_vulnerable, Player dealer,
+                         int num_tricks)
     : State(game),
       use_double_dummy_result_(use_double_dummy_result),
-      is_vulnerable_{is_dealer_vulnerable, is_non_dealer_vulnerable},
+      dealer_(dealer),
+      is_vulnerable_{
+          Partnership(dealer) ? is_non_dealer_vulnerable : is_dealer_vulnerable,
+          Partnership(dealer) ? is_dealer_vulnerable : is_non_dealer_vulnerable,
+      },
       num_tricks_(num_tricks) {
   possible_contracts_.fill(true);
 }
@@ -297,9 +304,13 @@ std::string BridgeState::FormatVulnerability() const {
 
 std::string BridgeState::FormatAuction(bool trailing_query) const {
   SPIEL_CHECK_GT(history_.size(), kNumCards);
-  std::string rv = "\nWest  North East  South\n      ";
+  std::string rv = "\nWest  North East  South\n";
+  for (int i = 0; i < (dealer_ + 1) % kNumPlayers; ++i) {
+    absl::StrAppend(&rv, "      ");
+  }
   for (int i = kNumCards; i < history_.size() - num_cards_played_; ++i) {
-    if (i % kNumPlayers == kNumPlayers - 1) rv.push_back('\n');
+    if ((i > kNumCards) && (i + dealer_) % kNumPlayers == kNumPlayers - 1)
+      rv.push_back('\n');
     absl::StrAppend(
         &rv, absl::StrFormat(
                  "%-6s", BidString(history_[i].action - kBiddingActionBase)));
@@ -810,7 +821,7 @@ void BridgeState::ApplyDealAction(int card) {
   if (history_.size() == kNumCards - 1) {
     if (use_double_dummy_result_) ComputeDoubleDummyTricks();
     phase_ = Phase::kAuction;
-    current_player_ = kFirstPlayer;
+    current_player_ = dealer_;
   }
 }
 
@@ -1009,7 +1020,7 @@ std::unique_ptr<State> BridgeGame::DeserializeState(
   if (!UseDoubleDummyResult()) return Game::DeserializeState(str);
   auto state = std::make_unique<BridgeState>(
       shared_from_this(), UseDoubleDummyResult(), IsDealerVulnerable(),
-      IsNonDealerVulnerable(), NumTricks());
+      IsNonDealerVulnerable(), Dealer(), NumTricks());
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
   const auto separator = absl::c_find(lines, "Double Dummy Results");
   // Double-dummy results.

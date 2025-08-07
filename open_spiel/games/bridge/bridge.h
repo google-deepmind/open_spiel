@@ -75,7 +75,6 @@ inline constexpr int kPublicInfoTensorSize =
     + kNumPlayers;      // Plus trailing passes
 inline constexpr int kMaxAuctionLength =
     kNumBids * (1 + kNumPlayers * 2) + kNumPlayers;
-inline constexpr Player kFirstPlayer = 0;
 enum class Suit { kClubs = 0, kDiamonds = 1, kHearts = 2, kSpades = 3 };
 
 // State of a single trick.
@@ -102,7 +101,7 @@ class BridgeState : public State {
  public:
   BridgeState(std::shared_ptr<const Game> game, bool use_double_dummy_result,
               bool is_dealer_vulnerable, bool is_non_dealer_vulnerable,
-              int num_tricks);
+              Player dealer, int num_tricks);
   Player CurrentPlayer() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
@@ -185,6 +184,7 @@ class BridgeState : public State {
   std::string FormatResult() const;
 
   const bool use_double_dummy_result_;
+  const Player dealer_;
   const bool is_vulnerable_[kNumPartnerships];
   const int num_tricks_;
 
@@ -215,7 +215,7 @@ class BridgeGame : public Game {
   std::unique_ptr<State> NewInitialState() const override {
     return std::unique_ptr<State>(new BridgeState(
         shared_from_this(), UseDoubleDummyResult(), IsDealerVulnerable(),
-        IsNonDealerVulnerable(), NumTricks()));
+        IsNonDealerVulnerable(), Dealer(), NumTricks()));
   }
   int NumPlayers() const override { return kNumPlayers; }
   double MinUtility() const override { return -kMaxScore; }
@@ -274,6 +274,7 @@ class BridgeGame : public Game {
   bool IsNonDealerVulnerable() const {
     return ParameterValue<bool>("non_dealer_vul", false);
   }
+  Player Dealer() const { return ParameterValue<Player>("dealer", 0); }
   int NumTricks() const { return ParameterValue<int>("num_tricks", 2); }
 };
 
