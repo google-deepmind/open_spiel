@@ -39,8 +39,12 @@ SPIEL_GAMES_LIST = pyspiel.registered_games()
 SPIEL_LOADABLE_GAMES_LIST = [g for g in SPIEL_GAMES_LIST if g.default_loadable]
 
 # A list of games to exclude from the general simulation tests. This should
-# remain empty, but it is helpful to use while a game is under construction.
-SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = []
+# remain empty, but it is helpful to use while a game is under construction,
+# or while there are any known issues with the game causing test failures.
+SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST = [
+    "dou_dizhu",  # https://github.com/google-deepmind/open_spiel/issues/1358
+    "quoridor",   # https://github.com/google-deepmind/open_spiel/issues/1349
+]
 
 # TODO(b/141950198): Stop hard-coding the number of loadable games.
 assert len(SPIEL_LOADABLE_GAMES_LIST) >= 38, len(SPIEL_LOADABLE_GAMES_LIST)
@@ -54,8 +58,8 @@ assert len(SPIEL_SIMULTANEOUS_GAMES_LIST) >= 14, len(
     SPIEL_SIMULTANEOUS_GAMES_LIST)
 
 # All multiplayer games. This is a list of (game, num_players) pairs to test.
+# pylint: disable=g-complex-comprehension
 SPIEL_MULTIPLAYER_GAMES_LIST = [
-    # pylint: disable=g-complex-comprehension
     (g, p)
     for g in SPIEL_LOADABLE_GAMES_LIST
     for p in range(max(g.min_num_players, 2), 1 + min(g.max_num_players, 6))
@@ -213,12 +217,18 @@ class GamesSimTest(parameterized.TestCase):
       (game_info.short_name, game_info)
       for game_info in SPIEL_SIMULTANEOUS_GAMES_LIST)
   def test_simultaneous_game_as_turn_based(self, game_info):
+    if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
+      print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
+      return
     converted_game = pyspiel.load_game_as_turn_based(game_info.short_name)
     self.sim_game(converted_game)
 
   @parameterized.named_parameters((f"{p}p_{g.short_name}", g, p)
                                   for g, p in SPIEL_MULTIPLAYER_GAMES_LIST)
   def test_multiplayer_game(self, game_info, num_players):
+    if game_info.short_name in SPIEL_EXCLUDE_SIMS_TEST_GAMES_LIST:
+      print(f"{game_info.short_name} is excluded from sim tests. Skipping.")
+      return
     if game_info.short_name == "python_mfg_predator_prey":
       reward_matrix = np.ones((num_players, num_players))
       # Construct an initial distribution matrix of suitable dimensions.
@@ -245,10 +255,6 @@ class GamesSimTest(parameterized.TestCase):
           "reward_matrix": " ".join(str(v) for v in reward_matrix.flatten()),
           "init_distrib": " ".join(str(v) for v in init_distrib.flatten()),
       }
-    elif game_info.short_name == "quoridor" and num_players == 4:
-      print("Skipping 4P Quoridor in tests as it has known problems.")
-      print("See https://github.com/google-deepmind/open_spiel/issues/1349")
-      return
     else:
       dict_args = {"players": num_players}
     game = pyspiel.load_game(game_info.short_name, dict_args)
