@@ -154,7 +154,8 @@ std::shared_ptr<const Game> GameRegisterer::CreateByName(
     const std::string& short_name, const GameParameters& params) {
   // Check if it's a game with a known issue. If so, output a warning.
   if (absl::c_linear_search(GamesWithKnownIssues(), short_name)) {
-    std::cerr << "Warning! This game has known issues. Please see the games "
+    std::cerr << "Warning! The implementation of '" << short_name
+              << "' has known issues. Please see the games "
               << "list on github or the code for details." << std::endl;
   }
 
