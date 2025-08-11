@@ -70,6 +70,18 @@ void CheckHits(const State &state) {
   }
 }
 
+void CheckNumTurnsLt10(const State &state) {
+  const BackgammonState &bstate = down_cast<const BackgammonState &>(state);
+  SPIEL_CHECK_LE(bstate.player_turns(), 20);
+}
+
+
+void BasicBackgammonTestsMaxTurns() {
+  std::shared_ptr<const Game> game = LoadGame(
+      "backgammon(max_player_turns=20)");
+  testing::RandomSimTest(*game, 10, true, true, &CheckNumTurnsLt10);
+}
+
 void BasicBackgammonTestsCheckHits() {
   std::shared_ptr<const Game> game = LoadGame("backgammon");
   testing::RandomSimTest(*game, 10, true, true, &CheckHits);
@@ -595,6 +607,7 @@ void BasicHyperBackgammonTest() {
 int main(int argc, char** argv) {
   open_spiel::testing::LoadGameTest("backgammon");
   open_spiel::backgammon::BasicBackgammonTestsCheckHits();
+  open_spiel::backgammon::BasicBackgammonTestsMaxTurns();
   open_spiel::backgammon::BasicBackgammonTestsDoNotStartWithDoubles();
   open_spiel::backgammon::BasicBackgammonTestsVaryScoring();
   open_spiel::backgammon::BasicHyperBackgammonTestsVaryScoring();

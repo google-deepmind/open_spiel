@@ -93,7 +93,8 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"hyper_backgammon", GameParameter(kDefaultHyperBackgammon)},
      {"scoring_type",
-      GameParameter(static_cast<std::string>(kDefaultScoringType))}}};
+      GameParameter(static_cast<std::string>(kDefaultScoringType))},
+     {"max_player_turns", GameParameter(kDefaultMaxPlayerTurns)}}};
 
 static std::shared_ptr<const Game> Factory(const GameParameters& params) {
   return std::shared_ptr<const Game>(new BackgammonGame(params));
@@ -1253,8 +1254,13 @@ std::string BackgammonState::ToString() const {
 }
 
 bool BackgammonState::IsTerminal() const {
-  return (scores_[kXPlayerId] == NumCheckersPerPlayer(game_.get()) ||
-          scores_[kOPlayerId] == NumCheckersPerPlayer(game_.get()));
+  const BackgammonGame* game = static_cast<const BackgammonGame*>(game_.get());
+  if (turns_ > game->MaxPlayerTurns()) {
+    return true;
+  } else {
+    return (scores_[kXPlayerId] == NumCheckersPerPlayer(game_.get()) ||
+            scores_[kOPlayerId] == NumCheckersPerPlayer(game_.get()));
+  }
 }
 
 std::vector<double> BackgammonState::Returns() const {
@@ -1318,7 +1324,9 @@ BackgammonGame::BackgammonGame(const GameParameters& params)
     : Game(kGameType, params),
       scoring_type_(
           ParseScoringType(ParameterValue<std::string>("scoring_type"))),
-      hyper_backgammon_(ParameterValue<bool>("hyper_backgammon")) {}
+      hyper_backgammon_(ParameterValue<bool>("hyper_backgammon")),
+      max_player_turns_(ParameterValue<int>("max_player_turns",
+                                            kDefaultMaxPlayerTurns)) {}
 
 double BackgammonGame::MaxUtility() const {
   if (hyper_backgammon_) {

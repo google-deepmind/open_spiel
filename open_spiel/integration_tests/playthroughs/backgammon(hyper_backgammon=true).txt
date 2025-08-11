@@ -6,7 +6,7 @@ GameType.information = Information.PERFECT_INFORMATION
 GameType.long_name = "Backgammon"
 GameType.max_num_players = 2
 GameType.min_num_players = 2
-GameType.parameter_specification = ["hyper_backgammon", "scoring_type"]
+GameType.parameter_specification = ["hyper_backgammon", "max_player_turns", "scoring_type"]
 GameType.provides_information_state_string = False
 GameType.provides_information_state_tensor = False
 GameType.provides_observation_string = True
@@ -19,7 +19,7 @@ GameType.utility = Utility.ZERO_SUM
 NumDistinctActions() = 1352
 PolicyTensorShape() = [1352]
 MaxChanceOutcomes() = 30
-GetParameters() = {hyper_backgammon=True,scoring_type=winloss_scoring}
+GetParameters() = {hyper_backgammon=True,max_player_turns=500,scoring_type=winloss_scoring}
 NumPlayers() = 2
 MinUtility() = -1.0
 MaxUtility() = 1.0
@@ -27,7 +27,7 @@ UtilitySum() = 0.0
 ObservationTensorShape() = [200]
 ObservationTensorLayout() = TensorLayout.CHW
 ObservationTensorSize() = 200
-MaxGameLength() = 1000
+MaxGameLength() = 1500
 ToString() = "backgammon(hyper_backgammon=True)"
 
 # State 0
