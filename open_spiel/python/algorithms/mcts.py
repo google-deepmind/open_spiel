@@ -47,8 +47,9 @@ class RandomRolloutEvaluator(Evaluator):
   outcomes to be considered.
   """
 
-  def __init__(self, n_rollouts=1, random_state=None):
+  def __init__(self, n_rollouts=1, random_state=None, max_length=None):
     self.n_rollouts = n_rollouts
+    self.max_length = max_length
     self._random_state = random_state or np.random.RandomState()
 
   def evaluate(self, state):
@@ -56,6 +57,7 @@ class RandomRolloutEvaluator(Evaluator):
     result = None
     for _ in range(self.n_rollouts):
       working_state = state.clone()
+      length = 0
       while not working_state.is_terminal():
         if working_state.is_chance_node():
           outcomes = working_state.chance_outcomes()
@@ -64,6 +66,9 @@ class RandomRolloutEvaluator(Evaluator):
         else:
           action = self._random_state.choice(working_state.legal_actions())
         working_state.apply_action(action)
+        length += 1
+        if self.max_length is not None and length >= self.max_length:
+          break
       returns = np.array(working_state.returns())
       result = returns if result is None else result + returns
 
