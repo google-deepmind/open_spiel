@@ -165,7 +165,7 @@ std::map<std::string, double> ComputeRatingsFromMatchRecords(
   std::vector<std::string> player_names;
   BuildPlayerNameMap(match_records, &name_to_index_map, &player_names);
   const int num_players = player_names.size();
-  SPIEL_CHECK_GT(num_players, 2);
+  SPIEL_CHECK_GE(num_players, 2);
   IntArray2D win_matrix(num_players, std::vector<int>(num_players, 0));
   IntArray2D draw_matrix(num_players, std::vector<int>(num_players, 0));
   for (const MatchRecord& match_record : match_records) {
