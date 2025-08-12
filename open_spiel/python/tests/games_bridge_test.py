@@ -15,6 +15,7 @@
 """Tests for the game-specific functions for bridge."""
 
 import random
+import textwrap
 import timeit
 
 from absl.testing import absltest
@@ -233,6 +234,30 @@ class GamesBridgeTest(absltest.TestCase):
     print(f'In-place {times.mean():.4}s, min {times.min():.4}s')
 
     np.testing.assert_array_equal(make_obs_copy(), make_obs_inplace())
+
+  def test_new_duplicate_bridge_initial_state(self):
+    game = pyspiel.load_game('bridge')
+    state = game.new_initial_state(tournament_seed=1234, board_number=7)
+    self.assertEqual(
+        str(state),
+        textwrap.dedent("""\
+          Dealer South
+          Vul: All
+                  S 643
+                  H T6
+                  D A8
+                  C KJ8752
+          S A7            S KQT
+          H AJ872         H KQ5
+          D KJT92         D Q43
+          C T             C Q943
+                  S J9852
+                  H 943
+                  D 765
+                  C A6
+          """),
+    )
+    self.assertEqual(state.current_player(), 2)
 
 
 if __name__ == '__main__':

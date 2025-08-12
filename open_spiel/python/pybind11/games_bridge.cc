@@ -58,6 +58,9 @@ void init_pyspiel_games_bridge(py::module& m) {
           }));
 
   py::classh<BridgeGame, Game>(m, "BridgeGame")
+      .def("new_initial_state", &BridgeGame::NewInitialState)
+      .def("new_initial_state", &BridgeGame::NewDuplicateBridgeInitialState,
+           py::arg("tournament_seed"), py::arg("board_number"))
       .def("num_possible_contracts", &BridgeGame::NumPossibleContracts)
       .def("contract_string", &BridgeGame::ContractString)
       .def("private_observation_tensor_size",

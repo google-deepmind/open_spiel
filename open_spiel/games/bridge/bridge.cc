@@ -19,6 +19,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <random>
 #include <set>
 #include <string>
 #include <utility>
@@ -1062,6 +1063,44 @@ int BridgeState::ContractIndex() const {
 
 std::string BridgeGame::ContractString(int index) const {
   return kAllContracts[index].ToString();
+}
+
+std::unique_ptr<State> BridgeGame::NewDuplicateBridgeInitialState(
+    int tournament_seed, int board_number) const {
+  // Standard assignments of dealer and vulnerability based on the board number.
+  const Player dealer = (board_number - 1) % kNumPlayers;
+  const bool
+      dealer_vul =
+          std::array<bool, 16>{false, false, false, true, true,  true,
+                               true,  false, false, true, false, false,
+                               true,  false, true,  true}[(board_number - 1) %
+                                                          16];
+  const bool
+      non_dealer_vul =
+          std::array<bool, 16>{false, true,  true,  true, false, false,
+                               true,  false, true,  true, false, true,
+                               true,  false, false, false}[(board_number - 1) %
+                                                           16];
+
+  // Create the initial state with the standard dealer and vulnerability.
+  auto state = std::make_unique<BridgeState>(shared_from_this(), false,
+                                             dealer_vul, non_dealer_vul, dealer,
+                                             NumTricksInObservation());
+
+  // Combine tournament seed and board number to get a seed for the deal.
+  int64_t seed = (static_cast<int64_t>(tournament_seed) << 10) ^ board_number;
+
+  // Deal out the cards using a reproducible random number generator.
+  std::mt19937_64 rng(seed);
+  while (state->CurrentPhase() == 0) {
+    const auto actions = state->LegalActions();
+    std::uniform_int_distribution<> distrib(0, actions.size() - 1);
+    const int action_index = distrib(rng);
+    state->ApplyAction(actions[action_index]);
+  }
+
+  // State is now ready for the first player action.
+  return state;
 }
 
 }  // namespace bridge
