@@ -243,18 +243,18 @@ class GamesBridgeTest(absltest.TestCase):
         textwrap.dedent("""\
           Dealer South
           Vul: All
-                  S 643
-                  H T6
-                  D A8
-                  C KJ8752
-          S A7            S KQT
-          H AJ872         H KQ5
-          D KJT92         D Q43
-          C T             C Q943
-                  S J9852
-                  H 943
-                  D 765
-                  C A6
+                          ♠ 6 4 3
+                          ♥ 10 6
+                          ♦ A 8
+                          ♣ K J 8 7 5 2
+          ♠ A 7                         ♠ K Q 10
+          ♥ A J 8 7 2                   ♥ K Q 5
+          ♦ K J 10 9 2                  ♦ Q 4 3
+          ♣ 10                          ♣ Q 9 4 3
+                          ♠ J 9 8 5 2
+                          ♥ 9 4 3
+                          ♦ 7 6 5
+                          ♣ A 6
           """),
     )
     self.assertEqual(state.current_player(), 2)

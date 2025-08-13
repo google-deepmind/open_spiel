@@ -31,7 +31,6 @@
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
-#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/synchronization/mutex.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/abseil-cpp/absl/types/span.h"
@@ -118,24 +117,39 @@ int Card(Suit suit, int rank) {
   return rank * kNumSuits + static_cast<int>(suit);
 }
 
-constexpr char kRankChar[] = "23456789TJQKA";
-constexpr char kSuitChar[] = "CDHS";
-
-// Ours, Left hand opponent, Partner, Right hand opponent
-constexpr std::array<absl::string_view, kNumPlayers> kRelativePlayer{  // NOLINT
-    "Us", "LH", "Pd", "RH"};
+constexpr std::array<std::string, kNumCardsPerSuit> kRankNames = {
+    "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+constexpr std::array<std::string, kNumSuits> kSuitNames = {"♣", "♦", "♥", "♠"};
 
 std::string CardString(int card) {
-  return {kSuitChar[static_cast<int>(CardSuit(card))],
-          kRankChar[CardRank(card)]};
+  return absl::StrCat(kSuitNames[static_cast<int>(CardSuit(card))],
+                      kRankNames[CardRank(card)]);
 }
 
-constexpr char kLevelChar[] = "-1234567";
+constexpr std::array<std::string, 1 + kNumBidLevels> kLevelString = {
+    "-", "1", "2", "3", "4", "5", "6", "7"};
+constexpr std::array<std::string, kNumDenominations> kDenominationString = {
+    "♣", "♦", "♥", "♠", "NT"};
+constexpr std::array<std::string, kNumDenominations> kDenominationStringAscii =
+    {"C", "D", "H", "S", "NT"};
+
+constexpr std::array<std::string, kNumPlayers> kPlayerNames = {"North", "East",
+                                                               "South", "West"};
+
 std::string BidString(int bid) {
   if (bid == kPass) return "Pass";
   if (bid == kDouble) return "Dbl";
   if (bid == kRedouble) return "RDbl";
-  return {kLevelChar[BidLevel(bid)], kDenominationChar[BidSuit(bid)]};
+  return absl::StrCat(kLevelString[BidLevel(bid)],
+                      kDenominationString[BidSuit(bid)]);
+}
+
+std::string BidStringAscii(int bid) {
+  if (bid == kPass) return "Pass";
+  if (bid == kDouble) return "Dbl";
+  if (bid == kRedouble) return "RDbl";
+  return absl::StrCat(kLevelString[BidLevel(bid)],
+                      kDenominationStringAscii[BidSuit(bid)]);
 }
 
 // There are two partnerships: players 0 and 2 versus players 1 and 3.
@@ -173,8 +187,8 @@ std::string BridgeState::ToString() const {
       absl::StrCat(FormatDealer(), FormatVulnerability(), FormatDeal());
   if (history_.size() > kNumCards)
     absl::StrAppend(&rv, FormatAuction(/*trailing_query=*/false));
-  if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay());
-  if (IsTerminal()) absl::StrAppend(&rv, FormatResult());
+  if (num_cards_played_ > 0) absl::StrAppend(&rv, "\n\n", FormatPlay());
+  if (IsTerminal()) absl::StrAppend(&rv, "\n\n", FormatResult());
   return rv;
 }
 
@@ -183,16 +197,15 @@ std::array<std::string, kNumSuits> FormatHand(
     const std::array<absl::optional<Player>, kNumCards>& deal) {
   std::array<std::string, kNumSuits> cards;
   for (int suit = 0; suit < kNumSuits; ++suit) {
-    cards[suit].push_back(kSuitChar[suit]);
-    cards[suit].push_back(' ');
+    absl::StrAppend(&cards[suit], kSuitNames[suit]);
     bool is_void = true;
     for (int rank = kNumCardsPerSuit - 1; rank >= 0; --rank) {
       if (player == deal[Card(Suit(suit), rank)]) {
-        cards[suit].push_back(kRankChar[rank]);
+        absl::StrAppend(&cards[suit], " ", kRankNames[rank]);
         is_void = false;
       }
     }
-    if (is_void && mark_voids) absl::StrAppend(&cards[suit], "none");
+    if (is_void && mark_voids) absl::StrAppend(&cards[suit], " none");
   }
   return cards;
 }
@@ -225,41 +238,72 @@ std::unique_ptr<State> BridgeState::ResampleFromInfostate(
   return new_state;
 }
 
+std::string ContractString(const Contract& contract) {
+  if (contract.level == 0) return "Passed Out";
+  std::string str =
+      absl::StrCat(contract.level, kDenominationString[contract.trumps]);
+  if (contract.double_status == kDoubled) absl::StrAppend(&str, " Doubled");
+  if (contract.double_status == kRedoubled) absl::StrAppend(&str, " Redoubled");
+  absl::StrAppend(&str, " by ", std::string{kPlayerNames[contract.declarer]});
+  return str;
+}
+
 std::string BridgeState::InformationStateString(Player player) const {
   SPIEL_CHECK_GE(player, 0);
   SPIEL_CHECK_LT(player, num_players_);
   if (IsTerminal()) return ToString();
-  std::string rv = FormatVulnerability();
+  std::string rv = absl::StrCat(FormatDealer(), FormatVulnerability(), "\n");
   auto cards = FormatHand(player, /*mark_voids=*/true, holder_);
+  absl::StrAppend(&rv, "You are ", kPlayerNames[player], "; you hold:\n");
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, cards[suit], "\n");
-  if (history_.size() > kNumCards)
+  if (phase_ == Phase::kPlay && num_cards_played_ > 0) {
+    Player dummy = contract_.declarer ^ 2;
+    auto dummy_cards = FormatHand(dummy, /*mark_voids=*/true, holder_);
+    absl::StrAppend(&rv, "\nDummy is ", kPlayerNames[dummy], "; it holds:\n");
+    for (int suit = kNumSuits - 1; suit >= 0; --suit)
+      absl::StrAppend(&rv, dummy_cards[suit], "\n");
+  }
+  if (phase_ == Phase::kPlay) {
+    absl::StrAppend(&rv, "\nContract: ", ContractString(contract_), "\n");
+  }
+  if (phase_ == Phase::kAuction || phase_ == Phase::kPlay)
     absl::StrAppend(
         &rv, FormatAuction(/*trailing_query=*/phase_ == Phase::kAuction &&
                            player == CurrentPlayer()));
-  if (num_cards_played_ > 0) absl::StrAppend(&rv, FormatPlay());
+  if (phase_ == Phase::kPlay) {
+    if (num_cards_played_ == 0) {
+      absl::StrAppend(&rv, "\n\nIt is your opening lead.");
+    } else {
+      absl::StrAppend(&rv, "\n\n", FormatPlay());
+      const bool is_dummy_turn = (current_player_ == (contract_.declarer ^ 2));
+      if (num_cards_played_ % kNumPlayers == 0) {
+        if (is_dummy_turn) {
+          absl::StrAppend(&rv, "\n\nIt is dummy's lead.");
+        } else {
+          absl::StrAppend(&rv, "\n\nIt is your lead.");
+        }
+      } else {
+        if (is_dummy_turn) {
+          absl::StrAppend(&rv, "\n\nIt is dummy's turn to play.");
+        } else {
+          absl::StrAppend(&rv, "\n\nIt is your turn to play.");
+        }
+      }
+    }
+  }
+  if (phase_ == Phase::kAuction) {
+    absl::StrAppend(&rv, "\n\nIt is your turn to bid.");
+  }
   return rv;
 }
 
 std::string BridgeState::ObservationString(Player player) const {
-  SPIEL_CHECK_GE(player, 0);
-  SPIEL_CHECK_LT(player, num_players_);
-  if (IsTerminal()) return ToString();
-  std::string rv = FormatVulnerability();
-  auto cards = FormatHand(player, /*mark_voids=*/true, holder_);
-  for (int suit = kNumSuits - 1; suit >= 0; --suit)
-    absl::StrAppend(&rv, cards[suit], "\n");
-  if (phase_ == Phase::kPlay) {
-    absl::StrAppend(&rv, "Contract: ", contract_.ToString(), "\n");
-  } else if (phase_ == Phase::kAuction && history_.size() > kNumCards) {
-    absl::StrAppend(
-        &rv, FormatAuction(/*trailing_query=*/player == CurrentPlayer()));
-  }
-  if (num_cards_played_ > 0) {
-    absl::StrAppend(&rv, FormatPlayObservation(/*trailing_query=*/player ==
-                                               CurrentPlayer()));
-  }
-  return rv;
+  // We can't exactly replicate the game dynamics where the previous trick is
+  // quitted when it is completed, since this would require the player to look
+  // at their observation when it isn't their turn. So we just show everything
+  // instead.
+  return InformationStateString(player);
 }
 
 std::array<absl::optional<Player>, kNumCards> BridgeState::OriginalDeal()
@@ -284,13 +328,13 @@ std::string BridgeState::FormatDeal() const {
       cards[player] = FormatHand(player, /*mark_voids=*/false, holder_);
     }
   }
-  constexpr int kColumnWidth = 8;
+  constexpr int kColumnWidth = 16;
   std::string padding(kColumnWidth, ' ');
   std::string rv;
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, padding, cards[kNorth][suit], "\n");
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
-    absl::StrAppend(&rv, absl::StrFormat("%-8s", cards[kWest][suit]), padding,
+    absl::StrAppend(&rv, absl::StrFormat("%-32s", cards[kWest][suit]),
                     cards[kEast][suit], "\n");
   for (int suit = kNumSuits - 1; suit >= 0; --suit)
     absl::StrAppend(&rv, padding, cards[kSouth][suit], "\n");
@@ -298,8 +342,6 @@ std::string BridgeState::FormatDeal() const {
 }
 
 std::string BridgeState::FormatDealer() const {
-  static std::array<std::string, kNumPlayers> kPlayerNames = {"North", "East",
-                                                              "South", "West"};
   return absl::StrCat("Dealer ", kPlayerNames[dealer_], "\n");
 }
 
@@ -311,7 +353,7 @@ std::string BridgeState::FormatVulnerability() const {
 }
 
 std::string BridgeState::FormatAuction(bool trailing_query) const {
-  SPIEL_CHECK_GT(history_.size(), kNumCards);
+  SPIEL_CHECK_GE(history_.size(), kNumCards);
   std::string rv = "\nWest  North East  South\n";
   for (int i = 0; i < (dealer_ + 1) % kNumPlayers; ++i) {
     absl::StrAppend(&rv, "      ");
@@ -319,12 +361,14 @@ std::string BridgeState::FormatAuction(bool trailing_query) const {
   for (int i = kNumCards; i < history_.size() - num_cards_played_; ++i) {
     if ((i > kNumCards) && (i + dealer_) % kNumPlayers == kNumPlayers - 1)
       rv.push_back('\n');
-    absl::StrAppend(
-        &rv, absl::StrFormat(
-                 "%-6s", BidString(history_[i].action - kBiddingActionBase)));
+    int bid = history_[i].action - kBiddingActionBase;
+    absl::StrAppend(&rv, BidString(bid));
+    int padding = 6 - BidStringAscii(bid).size();
+    absl::StrAppend(&rv, std::string(padding, ' '));
   }
   if (trailing_query) {
-    if ((history_.size() - num_cards_played_) % kNumPlayers == kNumPlayers - 1)
+    if ((history_.size() - num_cards_played_ + dealer_) % kNumPlayers ==
+        kNumPlayers - 1)
       rv.push_back('\n');
     rv.push_back('?');
   }
@@ -333,13 +377,12 @@ std::string BridgeState::FormatAuction(bool trailing_query) const {
 
 std::string BridgeState::FormatPlay() const {
   SPIEL_CHECK_GT(num_cards_played_, 0);
-  std::string rv = "\n\nN  E  S  W  N  E  S";
   Trick trick{kInvalidPlayer, kNoTrump, 0};
+  std::string rv;
   Player player = (1 + contract_.declarer) % kNumPlayers;
   for (int i = 0; i < num_cards_played_; ++i) {
     if (i % kNumPlayers == 0) {
-      if (i > 0) player = trick.Winner();
-      absl::StrAppend(&rv, "\n", std::string(3 * player, ' '));
+      absl::StrAppend(&rv, "Trick ", i / kNumPlayers + 1, ".");
     } else {
       player = (1 + player) % kNumPlayers;
     }
@@ -349,45 +392,16 @@ std::string BridgeState::FormatPlay() const {
     } else {
       trick.Play(player, card);
     }
-    absl::StrAppend(&rv, CardString(card), " ");
-  }
-  absl::StrAppend(&rv, "\n\nDeclarer tricks: ", num_declarer_tricks_);
-  return rv;
-}
-
-std::string BridgeState::FormatPlayObservation(bool trailing_query) const {
-  SPIEL_CHECK_GT(num_cards_played_, 0);
-  std::string rv;
-  Trick trick{kInvalidPlayer, kNoTrump, 0};
-  Player player = (1 + contract_.declarer) % kNumPlayers;
-  // Previous tricks
-  const int completed_tricks = num_cards_played_ / kNumPlayers;
-  for (int i = 0; i < completed_tricks * kNumPlayers; ++i) {
-    if (i % kNumPlayers == 0) {
-      if (i > 0) player = trick.Winner();
-    } else {
-      player = (1 + player) % kNumPlayers;
+    absl::StrAppend(&rv, " ", kPlayerNames[player], ": ", CardString(card));
+    if (i % kNumPlayers == 3) {
+      player = trick.Winner();
+      absl::StrAppend(&rv, ". Won by ", kPlayerNames[player], ".\n");
     }
-    const int card = history_[history_.size() - num_cards_played_ + i].action;
-    if (i % kNumPlayers == 0) {
-      trick = Trick(player, contract_.trumps, card);
-    } else {
-      trick.Play(player, card);
-    }
-    if (i % kNumPlayers == 0 && i > 0)
-      absl::StrAppend(&rv, "Trick ", (i / kNumPlayers), " won by ");
-    if (Partnership(trick.Winner()) == Partnership(contract_.declarer))
-      absl::StrAppend(&rv, "declarer\n");
-    else
-      absl::StrAppend(&rv, "defence\n");
   }
-  // Current trick
-  absl::StrAppend(&rv, "Current trick: ");
-  for (int i = completed_tricks * kNumPlayers; i < num_cards_played_; ++i) {
-    const int card = history_[history_.size() - num_cards_played_ + i].action;
-    absl::StrAppend(&rv, CardString(card), " ");
-  }
-  if (trailing_query) absl::StrAppend(&rv, "?");
+  if (num_cards_played_ % kNumPlayers > 0) absl::StrAppend(&rv, "\n");
+  absl::StrAppend(&rv, "\nDeclarer tricks won: ", num_declarer_tricks_);
+  absl::StrAppend(&rv, "\nDedefence tricks won: ",
+                  num_cards_played_ / 4 - num_declarer_tricks_);
   return rv;
 }
 
@@ -395,9 +409,9 @@ std::string BridgeState::FormatResult() const {
   SPIEL_CHECK_TRUE(IsTerminal());
   std::string rv;
   if (use_double_dummy_result_ && contract_.level) {
-    absl::StrAppend(&rv, "\n\nDeclarer tricks: ", num_declarer_tricks_);
+    absl::StrAppend(&rv, "Declarer tricks: ", num_declarer_tricks_, "\n");
   }
-  absl::StrAppend(&rv, "\nScore: N/S ", returns_[kNorth], " E/W ",
+  absl::StrAppend(&rv, "Score: N/S ", returns_[kNorth], " E/W ",
                   returns_[kEast]);
   return rv;
 }
