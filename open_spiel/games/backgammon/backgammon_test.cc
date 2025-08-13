@@ -25,6 +25,7 @@
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
+#include "open_spiel/utils/init.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -605,6 +606,7 @@ void BasicHyperBackgammonTest() {
 }  // namespace open_spiel
 
 int main(int argc, char** argv) {
+  open_spiel::Init(argv[0], &argc, &argv, true);
   open_spiel::testing::LoadGameTest("backgammon");
   open_spiel::backgammon::BasicBackgammonTestsCheckHits();
   open_spiel::backgammon::BasicBackgammonTestsMaxTurns();

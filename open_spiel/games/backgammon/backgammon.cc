@@ -40,36 +40,16 @@ namespace {
 // header).
 constexpr int kNumBarPosHumanReadable = 25;
 constexpr int kNumOffPosHumanReadable = -2;
-constexpr int kNumNonDoubleOutcomes = 15;
-
-const std::vector<std::pair<Action, double>> kChanceOutcomes = {
-    std::pair<Action, double>(0, 1.0 / 18),
-    std::pair<Action, double>(1, 1.0 / 18),
-    std::pair<Action, double>(2, 1.0 / 18),
-    std::pair<Action, double>(3, 1.0 / 18),
-    std::pair<Action, double>(4, 1.0 / 18),
-    std::pair<Action, double>(5, 1.0 / 18),
-    std::pair<Action, double>(6, 1.0 / 18),
-    std::pair<Action, double>(7, 1.0 / 18),
-    std::pair<Action, double>(8, 1.0 / 18),
-    std::pair<Action, double>(9, 1.0 / 18),
-    std::pair<Action, double>(10, 1.0 / 18),
-    std::pair<Action, double>(11, 1.0 / 18),
-    std::pair<Action, double>(12, 1.0 / 18),
-    std::pair<Action, double>(13, 1.0 / 18),
-    std::pair<Action, double>(14, 1.0 / 18),
-    std::pair<Action, double>(15, 1.0 / 36),
-    std::pair<Action, double>(16, 1.0 / 36),
-    std::pair<Action, double>(17, 1.0 / 36),
-    std::pair<Action, double>(18, 1.0 / 36),
-    std::pair<Action, double>(19, 1.0 / 36),
-    std::pair<Action, double>(20, 1.0 / 36),
-};
+constexpr int kNumNonDoubleOutcomes = 30;  // 5*6
 
 const std::vector<std::vector<int>> kChanceOutcomeValues = {
-    {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}, {2, 3}, {2, 4},
-    {2, 5}, {2, 6}, {3, 4}, {3, 5}, {3, 6}, {4, 5}, {4, 6},
-    {5, 6}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}};
+    {1, 2}, {2, 1}, {1, 3}, {3, 1}, {1, 4}, {4, 1},
+    {1, 5}, {5, 1}, {1, 6}, {6, 1}, {2, 3}, {3, 2},
+    {2, 4}, {4, 2}, {2, 5}, {5, 2}, {2, 6}, {6, 2},
+    {3, 4}, {4, 3}, {3, 5}, {5, 3}, {3, 6}, {6, 3},
+    {4, 5}, {5, 4}, {4, 6}, {6, 4}, {5, 6}, {6, 5},
+    {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}
+};
 
 int NumCheckersPerPlayer(const Game* game) {
   return static_cast<const BackgammonGame*>(game)->NumCheckersPerPlayer();
@@ -183,10 +163,7 @@ std::string BackgammonState::ActionToString(Player player,
     } else {
       // Initial roll to determine who starts.
       const char* starter =
-          (move_id < kNumNonDoubleOutcomes ? "X starts" : "O starts");
-      if (move_id >= kNumNonDoubleOutcomes) {
-        move_id -= kNumNonDoubleOutcomes;
-      }
+          (move_id % 2 == 0 ? "X starts" : "O starts");
       return absl::StrCat("chance outcome ", move_id, " ", starter, ", ",
                           "(roll: ", kChanceOutcomeValues[move_id][0],
                           kChanceOutcomeValues[move_id][1], ")");
@@ -401,9 +378,17 @@ Player BackgammonState::CurrentPlayer() const {
 int BackgammonState::Opponent(int player) const { return 1 - player; }
 
 void BackgammonState::RollDice(int outcome) {
-  dice_.push_back(kChanceOutcomeValues[outcome][0]);
-  dice_.push_back(kChanceOutcomeValues[outcome][1]);
+  SPIEL_CHECK_TRUE(dice_.empty());
+  SetDice(kChanceOutcomeValues[outcome]);
 }
+
+void BackgammonState::SetDice(const std::vector<int>& dice) {
+  dice_ = dice;
+  if (dice_[0] >= dice_[1]) {
+    std::swap(dice_[0], dice_[1]);
+  }
+}
+
 
 int BackgammonState::DiceValue(int i) const {
   SPIEL_CHECK_GE(i, 0);
@@ -434,13 +419,12 @@ void BackgammonState::DoApplyAction(Action move) {
       // starts with (see RollDice(move) below). These 30 possibilities are
       // constructed in GetChanceOutcomes().
       SPIEL_CHECK_TRUE(dice_.empty());
-      if (move < kNumNonDoubleOutcomes) {
+      if (move % 2 == 0) {
         // X starts.
         cur_player_ = kXPlayerId;
       } else {
         // O Starts
         cur_player_ = kOPlayerId;
-        move -= kNumNonDoubleOutcomes;
       }
       prev_player_ = kChancePlayerId;
       RollDice(move);
@@ -1172,15 +1156,20 @@ std::vector<std::pair<Action, double>> BackgammonState::ChanceOutcomes() const {
     // Doubles not allowed for the initial roll to determine who goes first.
     // Range 0-14: X goes first, range 15-29: O goes first.
     std::vector<std::pair<Action, double>> outcomes;
-    int num_outcomes = kNumNonDoubleOutcomes * 2;
-    outcomes.reserve(num_outcomes);
-    const double uniform_prob = 1.0 / num_outcomes;
-    for (Action action = 0; action < num_outcomes; ++action) {
+    outcomes.reserve(kNumNonDoubleOutcomes);
+    const double uniform_prob = 1.0 / kNumNonDoubleOutcomes;
+    for (Action action = 0; action < kNumNonDoubleOutcomes; ++action) {
       outcomes.push_back({action, uniform_prob});
     }
     return outcomes;
   } else {
-    return kChanceOutcomes;
+    std::vector<std::pair<Action, double>> outcomes;
+    outcomes.reserve(kNumChanceOutcomes);
+    const double uniform_prob = 1.0 / kNumChanceOutcomes;
+    for (Action action = 0; action < kNumChanceOutcomes; ++action) {
+      outcomes.push_back({action, uniform_prob});
+    }
+    return outcomes;
   }
 }
 
@@ -1309,7 +1298,7 @@ void BackgammonState::SetState(int cur_player, bool double_turn,
                                const std::vector<std::vector<int>>& board) {
   cur_player_ = cur_player;
   double_turn_ = double_turn;
-  dice_ = dice;
+  SetDice(dice);
   bar_ = bar;
   scores_ = scores;
   board_ = board;

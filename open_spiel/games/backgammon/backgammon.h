@@ -48,7 +48,7 @@ namespace open_spiel {
 namespace backgammon {
 
 inline constexpr const int kNumPlayers = 2;
-inline constexpr const int kNumChanceOutcomes = 21;
+inline constexpr const int kNumChanceOutcomes = 36;
 inline constexpr const int kNumPoints = 24;
 inline constexpr const int kNumDiceOutcomes = 6;
 inline constexpr const int kXPlayerId = 0;
@@ -217,6 +217,7 @@ class BackgammonState : public State {
  private:
   void SetupInitialBoard();
   void RollDice(int outcome);
+  void SetDice(const std::vector<int>& dice);
   bool IsPosInHome(int player, int pos) const;
   bool AllInHome(int player) const;
   int CheckersInHome(int player) const;
@@ -276,8 +277,8 @@ class BackgammonGame : public Game {
   }
 
   // On the first turn there are 30 outcomes: 15 for each player (rolls without
-  // the doubles).
-  int MaxChanceOutcomes() const override { return 30; }
+  // the doubles). On subsequent turns, there are 36 outcomes.
+  int MaxChanceOutcomes() const override { return 36; }
 
   // For each player turn, there's a chance node, and every turn could be a
   // a double.
