@@ -71,7 +71,6 @@ EXPECTED_GAMES = frozenset(
         "kriegspiel",
         "kuhn_poker",
         "laser_tag",
-        "latent_ttt",
         "lewis_signaling",
         "leduc_poker",
         "liars_dice",
