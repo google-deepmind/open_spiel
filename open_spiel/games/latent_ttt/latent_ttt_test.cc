@@ -18,8 +18,6 @@
 namespace open_spiel {
 namespace latent_ttt {
 
-// Basic API tests and visibility tests under latent rules.
-
 void RunBasicTests() {
   testing::LoadGameTest("latent_ttt");
   testing::RandomSimTest(*LoadGame("latent_ttt"), 100);

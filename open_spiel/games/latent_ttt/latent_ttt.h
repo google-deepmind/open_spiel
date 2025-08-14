@@ -43,9 +43,7 @@ class LatentTTTState : public State {
   LatentTTTState(const LatentTTTState&) = default;
   LatentTTTState& operator=(const LatentTTTState&) = default;
 
-  // Forward to underlying game state to keep players synchronized.
   Player CurrentPlayer() const override { return state_.CurrentPlayer(); }
-
   std::string ActionToString(Player player, Action action_id) const override {
     return state_.ActionToString(player, action_id);
   }
@@ -66,9 +64,7 @@ class LatentTTTState : public State {
   std::string ViewToString(Player player) const;
 
   tic_tac_toe::TicTacToeState state_;
-  // Keep attempted actions to support information state masking.
   std::vector<std::pair<int, Action>> action_sequence_;
-  // Private views, like phantom_ttt: each player's perceived board.
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> x_view_;
   std::array<tic_tac_toe::CellState, tic_tac_toe::kNumCells> o_view_;
 };
