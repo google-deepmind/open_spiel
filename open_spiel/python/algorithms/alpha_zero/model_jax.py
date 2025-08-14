@@ -15,9 +15,12 @@ import orbax
 from flax.training import train_state, orbax_utils
 import orbax.checkpoint
 
-flax.config.update('flax_use_orbax_checkpointing', True)
+"""implementation of the AlphaZero model, using `flax.linen` API
+"""
 
-warnings.WarningMessage("This implementation follows the API for `flax.linen` for `flax.nnx` API")
+flax.config.update('flax_use_orbax_checkpointing', True)
+warnings.warn("Pay attention that you've been using the `linen` api")
+
 
 activations_dict = {
     "celu": nn.celu,

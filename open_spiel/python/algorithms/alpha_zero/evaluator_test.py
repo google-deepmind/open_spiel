@@ -19,7 +19,8 @@ import numpy as np
 
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
+#rewrite with the API Selector, i.e. with a parametrised test case
+from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib 
 import pyspiel
 
 

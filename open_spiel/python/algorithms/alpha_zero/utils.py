@@ -1,6 +1,16 @@
 import jax.numpy as jnp
 import chex
-import jax
+
+def api_selector(api_version):
+  if api_version == "nnx":
+    from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
+  elif api_version == "linen":
+    from open_spiel.python.algorithms.alpha_zero import model_nnx as model_lib
+  else:
+    raise ValueError("Only `linen` and `nnx` APIs are implmented")
+  
+  return model_lib
+
 
 def flatten(x):
   return x.reshape((x.shape[0], -1))
@@ -16,9 +26,6 @@ class TrainInput:
 
   @staticmethod
   def stack(train_inputs):
-
-    #todo: compare with the existing method
-    resulting_tree = jax.tree.map(jnp.stack, *train_inputs) 
 
     observation, legals_mask, policy, value = zip(*[
       (ti.observation, ti.legals_mask, ti.policy, ti.value) for ti in train_inputs

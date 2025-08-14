@@ -27,6 +27,10 @@ Empty = queue.Empty
 multiprocessing.set_start_method("fork")
 
 
+def multiprocessing_for_jax(force: bool = True):
+  multiprocessing.set_start_method("spawn", force=force)
+
+
 # For compatibility so that it works inside Google.
 @contextlib.contextmanager
 def main_handler():

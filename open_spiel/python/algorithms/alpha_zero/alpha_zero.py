@@ -31,13 +31,11 @@ Links to relevant articles/papers:
     has an open access link to the AlphaZero science paper.
 """
 
-import collections
 import datetime
 import functools
 import itertools
 import json
 import os
-import random
 import sys
 import tempfile
 import time
@@ -46,106 +44,91 @@ import traceback
 import numpy as np
 
 from open_spiel.python.algorithms import mcts
+
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
+from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, Losses
+from open_spiel.python.algorithms.alpha_zero import replay_buffer as buffer_lib
+
 import pyspiel
 from open_spiel.python.utils import data_logger
 from open_spiel.python.utils import file_logger
 from open_spiel.python.utils import spawn
 from open_spiel.python.utils import stats
 
+import chex
+import jax
+import jax.numpy as jnp
+
 # Time to wait for processes to join.
 JOIN_WAIT_DELAY = 0.001
 
+spawn.multiprocessing_for_jax(True) 
 
-class TrajectoryState(object):
+@chex.dataclass(frozen=True)
+class TrajectoryState:
   """A particular point along a trajectory."""
+  observation: chex.Array
+  current_player: chex.Array
+  legals_mask: chex.Array
+  action: chex.Array
+  policy: chex.Array
+  value: chex.Array
 
-  def __init__(self, observation, current_player, legals_mask, action, policy,
-               value):
-    self.observation = observation
-    self.current_player = current_player
-    self.legals_mask = legals_mask
-    self.action = action
-    self.policy = policy
-    self.value = value
-
-
-class Trajectory(object):
-  """A sequence of observations, actions and policies, and the outcomes."""
-
-  def __init__(self):
-    self.states = []
-    self.returns = None
-
-  def add(self, information_state, action, policy):
-    self.states.append((information_state, action, policy))
+@chex.dataclass(frozen=True)
+class Trajectory:
+  information_state: chex.Array
+  action: chex.Array
+  policy: chex.Array
+  returns: chex.Array
 
 
-class Buffer(object):
-  """A fixed size buffer that keeps the newest values."""
+# TODO: remove
+# class Trajectory(object):
+#   """A sequence of observations, actions and policies, and the outcomes."""
 
-  def __init__(self, max_size):
-    self.max_size = max_size
-    self.data = []
-    self.total_seen = 0  # The number of items that have passed through.
+#   def __init__(self):
+#     self.states = []
+#     self.returns = None
 
-  def __len__(self):
-    return len(self.data)
+#   def add(self, information_state, action, policy):
+#     self.states.append((information_state, action, policy))
 
-  def __bool__(self):
-    return bool(self.data)
-
-  def append(self, val):
-    return self.extend([val])
-
-  def extend(self, batch):
-    batch = list(batch)
-    self.total_seen += len(batch)
-    self.data.extend(batch)
-    self.data[:-self.max_size] = []
-
-  def sample(self, count):
-    return random.sample(self.data, count)
-
-
-class Config(collections.namedtuple(
-    "Config", [
-        "game",
-        "path",
-        "learning_rate",
-        "weight_decay",
-        "train_batch_size",
-        "replay_buffer_size",
-        "replay_buffer_reuse",
-        "max_steps",
-        "checkpoint_freq",
-        "actors",
-        "evaluators",
-        "evaluation_window",
-        "eval_levels",
-
-        "uct_c",
-        "max_simulations",
-        "policy_alpha",
-        "policy_epsilon",
-        "temperature",
-        "temperature_drop",
-
-        "nn_model",
-        "nn_width",
-        "nn_depth",
-        "observation_shape",
-        "output_size",
-
-        "quiet",
-    ])):
+@chex.dataclass(frozen=True)
+class Config:
   """A config for the model/experiment."""
-  pass
+  game: str
+  path: str
+  learning_rate: float
+  weight_decay: float
+  train_batch_size: int
+  replay_buffer_size: int
+  replay_buffer_reuse: bool
+  max_steps: int
+  checkpoint_freq: int
+  actors: int
+  
+  evaluators: int
+  evaluation_window: int
+  eval_levels: int
+  uct_c: float
+  max_simulations: int
+  
+  policy_alpha: float
+  policy_epsilon: float
+  temperature: float
+  temperature_drop: float
 
+  nn_model: str
+  nn_api_version: str
+  nn_width: int
+  nn_depth: int
+  observation_shape: tuple[int, ...]
+  output_size: int
 
-def _init_model_from_config(config):
-  return model_lib.Model.build_model(
+  quiet: bool
+
+def _init_model_from_config(config: Config):
+  return api_selector(config.nn_api_version).Model.build_model(
       config.nn_model,
       config.observation_shape,
       config.output_size,
@@ -201,7 +184,7 @@ def _init_bot(config, game, evaluator_, evaluation):
 
 def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
   """Play one game, return the trajectory."""
-  trajectory = Trajectory()
+  trajectory = []
   actions = []
   state = game.new_initial_state()
   random_state = np.random.RandomState()
@@ -228,10 +211,12 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
         action = root.best_child().action
       else:
         action = np.random.choice(len(policy), p=policy)
-      trajectory.states.append(
+      trajectory.append(
           TrajectoryState(state.observation_tensor(), state.current_player(),
                           state.legal_actions_mask(), action, policy,
                           root.total_reward / root.explore_count))
+      #TODO: scan the states into the tractory
+
       action_str = state.action_to_string(state.current_player(), action)
       actions.append(action_str)
       logger.opt_print("Player {} sampled action: {}".format(
@@ -239,7 +224,7 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
 
-  trajectory.returns = state.returns()
+  trajectory.returns = trajectory._replace(returns=state.returns())
   logger.print("Game {}: Returns: {}; Actions: {}".format(
       game_num, " ".join(map(str, trajectory.returns)), " ".join(actions)))
   return trajectory
@@ -284,7 +269,9 @@ def actor(*, config, game, logger, queue):
 @watcher
 def evaluator(*, game, config, logger, queue):
   """A process that plays the latest checkpoint vs standard MCTS."""
-  results = Buffer(config.evaluation_window)
+  buffer = buffer_lib.make_flat_buffer(config.evaluation_window)
+  #TODO add a mock transtiion
+  buffer_state = buffer.init(...)
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Initializing bots")
@@ -314,20 +301,20 @@ def evaluator(*, game, config, logger, queue):
 
     trajectory = _play_game(logger, game_num, game, bots, temperature=1,
                             temperature_drop=0)
-    results.append(trajectory.returns[az_player])
+    buffer_state = buffer.add(trajectory.returns[az_player], ...)
     queue.put((difficulty, trajectory.returns[az_player]))
 
     logger.print("AZ: {}, MCTS: {}, AZ avg/{}: {:.3f}".format(
         trajectory.returns[az_player],
         trajectory.returns[1 - az_player],
-        len(results), np.mean(results.data)))
+        len(buffer_state), jax.tree.map(jnp.mean, buffer_state.experience)))
 
 
 @watcher
 def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
-  replay_buffer = Buffer(config.replay_buffer_size)
+  replay_buffer = buffer_lib.make_flat_buffer(config.replay_buffer_size)
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
@@ -346,7 +333,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   game_lengths = stats.BasicStats()
   game_lengths_hist = stats.HistogramNumbered(game.max_game_length() + 1)
   outcomes = stats.HistogramNamed(["Player1", "Player2", "Draw"])
-  evals = [Buffer(config.evaluation_window) for _ in range(config.eval_levels)]
+  evals = [buffer_lib.make_flat_buffer(config.evaluation_window) for _ in range(config.eval_levels)]
   total_trajectories = 0
 
   def trajectory_generator():
@@ -382,7 +369,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         outcomes.add(2)
 
       replay_buffer.extend(
-          model_lib.TrainInput(
+          TrainInput(
               observation=s.observation, 
               legals_mask=s.legals_mask, 
               policy=s.policy, 
@@ -413,7 +400,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     # the actors. It only allows numbers, so use -1 as "latest".
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1)
-    losses = sum(losses, model_lib.Losses(policy=0, value=0, l2=0)) / len(losses)
+    losses = sum(losses, Losses(policy=0, value=0, l2=0)) / len(losses)
     logger.print(losses)
     logger.print("Checkpoint saved:", save_path)
     return save_path, losses

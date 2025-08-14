@@ -1,10 +1,6 @@
-"""
-Placeholder for the NNX implementation
-"""
-
 import functools
 import os
-from typing import Any, Dict, Sequence, NamedTuple, Tuple, Optional
+from typing import Any, Sequence, Optional
 import warnings
 
 from datetime import datetime
@@ -21,7 +17,12 @@ import orbax.checkpoint as orbax
 
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
+"""implementation of the AlphaZero model, using `flax.nnx` API
+"""
+
 flax.config.update('flax_use_orbax_checkpointing', True)
+warnings.warn("Pay attention that you've been using the `linen` api")
+
 
 activations_dict = {
     "celu": nn.celu,
@@ -56,34 +57,76 @@ def get_layer_parameters(layer: nn.Module):
   return nn.state(layer, nn.Param)
 
 class Activation(nn.Module):
+  def __init__(self, activation_name: str) -> None:
+    """_summary_
 
-  def __init__(self, activation_name):
-    super().__init__()
+    Args:
+        activation_name (str): _description_
+    """
     self.activation_name = activation_name
 
-  def __call__(self, x):
+  def __call__(self, x: chex.Array) -> chex.Array:
+    """_summary_
+
+    Args:
+        x (chex.Array): _description_
+
+    Returns:
+        chex.Array: _description_
+    """
     return activations_dict[self.activation_name](x)
 
 class MLPBlock(nn.Module):
 
   def __init__(self, in_features: int, out_features: int, activation: str, seed: int = 0):
-    super().__init__()
+    """_summary_
+
+    Args:
+        in_features (int): _description_
+        out_features (int): _description_
+        activation (str): _description_
+        seed (int, optional): _description_. Defaults to 0.
+    """
     self.activation = Activation(activation)
     self.dense_layer = nn.Linear(in_features, out_features, rngs=nn.Rngs(seed))
 
-  def __call__(self, x):
+  def __call__(self, x: chex.Array) -> chex.Array:
+    """_summary_
+
+    Args:
+        x (chex.Array): _description_
+
+    Returns:
+        chex.Array: _description_
+    """
     y = self.dense_layer(x)
     y = self.activation(y)
     return y
   
 class ConvBlock(nn.Module):
   def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
-    super().__init__()
+    """_summary_
+
+    Args:
+        in_features (int): _description_
+        out_features (int): _description_
+        kernel_size (tuple[int, int]): _description_
+        activation (str): _description_
+        seed (int, optional): _description_. Defaults to 0.
+    """
     self.conv = nn.Conv(in_features, out_features, kernel_size=kernel_size, padding="SAME", rngs=nn.Rngs(seed))
     self.activation = Activation(activation) if activation is not None else lambda x: x
     self.bn = nn.BatchNorm(out_features, rngs=nn.Rngs(seed))
 
-  def __call__(self, x):
+  def __call__(self, x: chex.Array) -> chex.Array:
+    """_summary_
+
+    Args:
+        x (chex.Array): _description_
+
+    Returns:
+        chex.Array: _description_
+    """
     y = self.conv(x)
     y = self.bn(y)
     y = self.activation(y)
@@ -91,12 +134,28 @@ class ConvBlock(nn.Module):
 
 class ResidualBlock(nn.Module):
   def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
-    super().__init__()
+    """_summary_
+
+    Args:
+        in_features (int): _description_
+        out_features (int): _description_
+        kernel_size (tuple[int, int]): _description_
+        activation (str): _description_
+        seed (int, optional): _description_. Defaults to 0.
+    """
     self.conv1 = ConvBlock(in_features, out_features, kernel_size, activation, seed) 
     self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed) #activation's applied separately
     self.activation = Activation(activation)
 
-  def __call__(self, x, training: bool = False):
+  def __call__(self, x: chex.Array) -> chex.Array:
+    """_summary_
+
+    Args:
+        x (chex.Array): _description_
+
+    Returns:
+        chex.Array: _description_
+    """
     residual = x
     y = self.conv1(x)
     y = self.conv2(y)
@@ -152,14 +211,21 @@ class ValueHead(nn.Module):
     return policy_logits
 
 class AlphaZeroModel(nn.Module):
-  model_type: str
-  input_shape: chex.Array
-  output_size: int
-  nn_width: int
-  nn_depth: int
+  
+  def __init__(
+    self,
+    model_type: str,
+    input_shape: chex.Array,
+    output_size: int,
+    nn_width: int,
+    nn_depth: int
+  ) -> None:
+    
+    """_summary_
 
-  def __init__(self):
-    super().__init__()
+    Returns:
+        _type_: _description_
+    """
     
     @nn.split_rngs(splits=self.nn_depth)
     @nn.vmap(axis_size=self.nn_depth)
@@ -179,11 +245,11 @@ class AlphaZeroModel(nn.Module):
 
 
   
-  def __call__(self, observations, training: bool = False):
+  def __call__(self, observations):
 
     @nn.split_rngs(splits=self.nn_depth)
     @nn.scan
-    def scan_fn(x: jax.Array, block: Block):
+    def scan_fn(x: jax.Array, block: MLPBlock | ConvBlock | ResidualBlock):
       x = block(x)
       return x, None
 
