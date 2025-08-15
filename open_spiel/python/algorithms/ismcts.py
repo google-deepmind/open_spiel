@@ -74,7 +74,7 @@ class ISMCTSBot(pyspiel.Bot):
                final_policy_type=ISMCTSFinalPolicyType.MAX_VISIT_COUNT,
                use_observation_string=False,
                allow_inconsistent_action_sets=False,
-               child_selection_policy=ChildSelectionPolicy.PUCT):
+               child_selection_policy=ChildSelectionPolicy.UCT):
 
     pyspiel.Bot.__init__(self)
     self._game = game

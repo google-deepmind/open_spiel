@@ -50,7 +50,8 @@ class IsmctsTest(parameterized.TestCase):
     }
     node.total_visits = 4
     self.assertAlmostEqual(
-        ismcts_bot._action_value(node, node.child_info[0]).item(), 8.0
+        ismcts_bot._action_value(node, node.child_info[0]).item(),
+        8.177410022515474,
     )
     candidates = ismcts_bot._select_candidate_actions(node)
     self.assertLen(candidates, 2)
