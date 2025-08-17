@@ -42,14 +42,8 @@ def main():
       FLAGS.nn_model, game.observation_tensor_shape(),
       game.num_distinct_actions(), FLAGS.nn_width, FLAGS.nn_depth,
       FLAGS.weight_decay, FLAGS.learning_rate, FLAGS.path)
-  #save checkpoint
-  model.export(FLAGS.graph_def) #TODO
-
-  if FLAGS.verbose:
-    print(f"Game: {FLAGS.game}")
-    print(f"Model type: {FLAGS.nn_model}(width={FLAGS.nn_width}, depth={FLAGS.nn_depth}")
-    print(f"Model size:\n {model.parameters_per_layer}")
-    print(f"Overall {model.num_trainable_variables} variables")
+  #TODO: add export linen <-> nnx and export to onnx for the models to be
+  #compatible with pytorch API
 
 
 if __name__ == "__main__":

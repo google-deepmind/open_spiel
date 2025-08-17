@@ -1,8 +1,9 @@
 import chex
 import jax
 import jax.numpy as jnp
+from functools import partial
 
-from typing import Callable, TypeVar, Optional, Generic
+from typing import Callable, TypeVar, Generic, Any
 
 Experience = TypeVar("Experience", bound=chex.ArrayTree)
 
@@ -23,8 +24,10 @@ def get_tree_shape_prefix(tree: chex.ArrayTree, n_axes: int = 1) -> chex.Shape:
 @chex.dataclass(frozen=True)
 class BufferState(Generic[Experience]):
   experience: Experience
-  current_index: chex.Array
   is_full: chex.Array
+  total_seen: chex.Array
+  current_index: chex.Array
+
 
 @chex.dataclass(frozen=True)
 class BufferSample(Generic[Experience]):
@@ -33,15 +36,17 @@ class BufferSample(Generic[Experience]):
 
 def init(
     experience: Experience,
-    add_batch_size: int,
+    max_size: int,
 ) -> BufferState:
+    """Instanting a buffer state from the mock transition
+    """
    
     # Set experience value to be empty.
     experience = jax.tree.map(jnp.empty_like, experience)
     # Broadcast to [add_batch_size, ...]
     experience = jax.tree.map(
         lambda x: jnp.broadcast_to(
-            x[None, ...], (add_batch_size, *x.shape)
+            x[None, ...], (max_size, *x.shape)
         ),
         experience,
     )
@@ -49,75 +54,96 @@ def init(
     return BufferState(
         experience=experience,
         is_full=jnp.array(False, dtype=bool),
+        total_seen=jnp.array(0),
         current_index=jnp.array(0),
     )
 
 
-def add(
+def extend(
     state: BufferState,
     batch: Experience,
 ) -> BufferState:
+    
+    """Adding a batch of experience to the buffer state.
+    """
+
     # Check that the batch has the correct shape and dtypes.
-    chex.assert_tree_shape_prefix(batch, get_tree_shape_prefix(state.experience))
+    max_size = get_tree_shape_prefix(state.experience)[0]
+    batch_size = get_tree_shape_prefix(batch)[0]
+
     chex.assert_trees_all_equal_dtypes(batch, state.experience)
 
-    # Get the length of the time axis of the buffer state.
-    max_length_time_axis = get_tree_shape_prefix(state.experience, n_axes=2)[1]
-    # Check that the sequence length is less than or equal the maximum length of the time axis.
-    chex.assert_axis_dimension_lteq(
-        jax.tree_util.tree_leaves(batch)[0], 1, max_length_time_axis
-    )
-    # Determine how many timesteps are in this batch.
-    seq_len = get_tree_shape_prefix(batch, n_axes=2)[1]
-    # Compute the time indices where the new data will be written.
-    indices = (jnp.arange(seq_len) + state.current_index) % max_length_time_axis
+    indices = (jnp.arange(batch_size) + state.current_index) % max_size
 
-    # Update the buffer state.
     new_experience = jax.tree.map(
-        lambda exp_field, batch_field: exp_field.at[:, indices].set(batch_field),
+        lambda exp_field, batch_field: exp_field.at[indices].set(batch_field),
         state.experience,
         batch,
     )
 
-    new_current_index = state.current_index + seq_len
-    new_is_full = state.is_full | (new_current_index >= max_length_time_axis)
-    new_current_index = new_current_index % max_length_time_axis
+    new_total_seen = state.total_seen + batch_size
+    new_is_full = state.is_full | (new_total_seen >= max_size)
+    new_current_index = new_total_seen % max_size
 
     return state.replace(  # type: ignore
         experience=new_experience,
-        current_index=new_current_index,
+        total_seen=new_total_seen,
         is_full=new_is_full,
+        current_index=new_current_index
     )
 
 def sample(
     state: BufferState,
     rng_key: chex.PRNGKey,
-    batch_size: int
+    count: int
 ) -> BufferSample:
+    
+    """Sampling count examples from the buffer
+    """
+
     # Get add_batch_size and the full size of the time axis.
-    add_batch_size = get_tree_shape_prefix(state.experience, n_axes=1)
+    max_size = get_tree_shape_prefix(state.experience)[0]
+    # When full, the max  index is the right itertator otherwise it is current index.
+    max_size = jnp.where(state.is_full, max_size, state.current_index)
+    # When full, the oldest valid data is current_index otherwise it is zero.
+    head = jnp.where(state.is_full, state.current_index, 0)
 
+    # Given no wrap around, the last valid starting index is:
+    max_start = max_size - count
+    # If max_start is negative then we cannot sample yet.
+    num_valid_items = jnp.where(max_start >= 0, max_start + 1, 0)
+    # (num_valid_items is the number of candidate subsequences—each starting at a
+    # multiple of period that lie entirely in the valid region.)
+
+    # Split the RNG key for sampling items and batch indices.
     rng_key, subkey_batch = jax.random.split(rng_key)
-
-    sampled_batch_indices = jax.random.randint(
-        subkey_batch, (batch_size,), 0, add_batch_size
+    # Sample an item index in [0, num_valid_items). (This is the index in the candidate list.)
+    sampled_item_idx = jax.random.randint(
+        subkey_batch, (count,), 0, num_valid_items
     )
 
-    batch_trajectory = jax.tree.map(
-        lambda x: x[sampled_batch_indices[:, None]],
-        state.experience,
-    )
+    # Compute the logical start time index: ls = (sampled_item_idx * period).
+    logical_start = sampled_item_idx
+    # Map logical time to physical index in the buffer given there is wrap around.
+    physical_start = (head + logical_start) % max_size
+
+    # Create indices for the full subsequence.
+    traj_time_indices = (
+        physical_start + jnp.arange(count)
+    ) % max_size
+
+    batch_trajectory = jax.tree.map(lambda x: x[traj_time_indices], state.experience)
 
     return BufferSample(experience=batch_trajectory)
 
 
 
 def can_sample(
-    state: BufferState, min_length_time_axis: int
+    state: BufferState
 ) -> chex.Array:
     """Indicates whether the buffer has been filled above the minimum length, such that it
     may be sampled from."""
-    return state.is_full | (state.current_index >= min_length_time_axis)
+    return state.is_full | state.current_index
 
 
 TBufferState = TypeVar("TBufferState", bound=BufferState)
@@ -126,23 +152,78 @@ TBufferSample = TypeVar("TBufferSample", bound=BufferSample)
 @chex.dataclass(frozen=True)
 class FlatBuffer(Generic[Experience, TBufferState, TBufferSample]):
 
-
     init: Callable[[Experience], BufferState]
-    add: Callable[
+    extend: Callable[
         [BufferState, Experience],
         BufferState,
     ]
+
     sample: Callable[
         [BufferState, chex.PRNGKey],
         BufferSample,
     ]
     can_sample: Callable[[BufferState], chex.Array]
 
-def make_flat_buffer(
-    max_length: int,
-    min_length: int,
-    sample_batch_size: int,
-    add_sequences: bool = False,
-    add_batch_size: Optional[int] = None,
-) -> FlatBuffer:
-   return FlatBuffer(...)
+def make_flat_buffer(max_size: int) -> FlatBuffer:
+   return FlatBuffer(
+      init=partial(init, max_size=max_size),
+      extend=extend,
+      sample=sample,
+      can_sample=can_sample
+   )
+
+
+class Buffer:
+  """A fixed size buffer that keeps the newest values."""
+
+  def __init__(self, max_size: int, force_cpu: bool = False, seed: int = 0) -> None:
+    self.max_size = max_size
+    self.buffer = make_flat_buffer(max_size=max_size)
+    self.total_seen = 0
+    self._rng = jax.random.PRNGKey(seed)
+    if force_cpu:
+        #jit-compling all the methods for cpu
+        self.buffer = self.buffer.replace(
+            init=jax.jit(self.buffer.init, backend="cpu"),
+            extend=jax.jit(self.buffer.extend, backend="cpu"),
+            sample=jax.jit(self.buffer.sample, backend="cpu", static_argnames="count"),
+            can_sample=jax.jit(self.buffer.can_sample, backend="cpu"),
+        )
+    self.buffer_state = None
+
+  @property
+  def data(self):
+    if self.buffer_state is not None:
+        return self.buffer_state.experience
+  
+  def __len__(self) -> int:
+    if self.buffer_state is None:
+       return 0
+    return self.buffer_state.current_index.item()
+
+  def __bool__(self) -> bool:
+    if self.buffer_state is None:
+        return False
+    
+    return bool(self.buffer.can_sample(self.buffer_state))
+
+  def append(self, val: Any) -> None:
+    
+    if self.buffer_state is None:
+       self.buffer_state = self.buffer.init(val)
+
+    batched_val = jax.tree.map(lambda x: x[None, ...], val)
+
+    self.buffer_state = self.buffer.extend(self.buffer_state, batched_val)
+
+  def extend(self, val: Any) -> None:
+    if self.buffer_state is None:
+       self.buffer_state = self.buffer.init(val)
+
+    self.buffer_state = self.buffer.extend(self.buffer_state, val)
+    self.total_seen = self.buffer_state.total_seen
+
+  def sample(self, count: int) -> Any:
+    if self.buffer.can_sample(self.buffer_state):
+       self._rng, _ = jax.random.split(self._rng)
+       return self.buffer.sample(self.buffer_state, self._rng, count).experience

@@ -43,6 +43,7 @@ import traceback
 
 import numpy as np
 
+import multiprocessing
 from open_spiel.python.algorithms import mcts
 
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
@@ -56,13 +57,34 @@ from open_spiel.python.utils import spawn
 from open_spiel.python.utils import stats
 
 import chex
-import jax
 import jax.numpy as jnp
+
+# Set TF environment variables for GPU memory management and device visibility.
+# This must be done BEFORE TensorFlow is imported.
+os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
+
+# Set the start method to 'spawn' for CUDA compatibility and monkey-patch
+# to prevent OpenSpiel from overriding it.
+# See:
+# https://github.com/google-deepmind/open_spiel/issues/1326
+try:
+    # jax and TF aren't compatible with the `fork` strategy due to the inner multitheading
+    # see:
+    # https://github.com/jax-ml/jax/issues/1805
+    multiprocessing.set_start_method("spawn", force=True)
+
+    # Monkey-patch to prevent OpenSpiel from changing the start method.
+    def _do_nothing_set_start_method(method, force=False):
+        pass
+
+    multiprocessing.set_start_method = _do_nothing_set_start_method
+except RuntimeError:
+    # This may be raised in child processes where the context is already set.
+    pass
 
 # Time to wait for processes to join.
 JOIN_WAIT_DELAY = 0.001
 
-spawn.multiprocessing_for_jax(True) 
 
 @chex.dataclass(frozen=True)
 class TrajectoryState:
@@ -76,22 +98,8 @@ class TrajectoryState:
 
 @chex.dataclass(frozen=True)
 class Trajectory:
-  information_state: chex.Array
-  action: chex.Array
-  policy: chex.Array
+  states: list[TrajectoryState]
   returns: chex.Array
-
-
-# TODO: remove
-# class Trajectory(object):
-#   """A sequence of observations, actions and policies, and the outcomes."""
-
-#   def __init__(self):
-#     self.states = []
-#     self.returns = None
-
-#   def add(self, information_state, action, policy):
-#     self.states.append((information_state, action, policy))
 
 @chex.dataclass(frozen=True)
 class Config:
@@ -119,13 +127,16 @@ class Config:
   temperature_drop: float
 
   nn_model: str
-  nn_api_version: str
   nn_width: int
   nn_depth: int
   observation_shape: tuple[int, ...]
   output_size: int
 
   quiet: bool
+
+  #yet, fixed
+  #TODO: remove
+  nn_api_version: str = "linen" 
 
 def _init_model_from_config(config: Config):
   return api_selector(config.nn_api_version).Model.build_model(
@@ -211,20 +222,29 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
         action = root.best_child().action
       else:
         action = np.random.choice(len(policy), p=policy)
-      trajectory.append(
-          TrajectoryState(state.observation_tensor(), state.current_player(),
-                          state.legal_actions_mask(), action, policy,
-                          root.total_reward / root.explore_count))
-      #TODO: scan the states into the tractory
 
+      trajectory.append(
+          TrajectoryState(
+            observation=jnp.array(state.observation_tensor()), 
+            current_player=jnp.array(state.current_player()),
+            legals_mask=jnp.array(state.legal_actions_mask(), dtype=jnp.bool), 
+            action=jnp.array(action), 
+            policy=jnp.array(policy),
+            value=jnp.array(root.total_reward / root.explore_count)
+          )
+        )
+      
       action_str = state.action_to_string(state.current_player(), action)
       actions.append(action_str)
       logger.opt_print("Player {} sampled action: {}".format(
           state.current_player(), action_str))
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
-
-  trajectory.returns = trajectory._replace(returns=state.returns())
+  #it's not good to do like that but it's python.
+  trajectory =  Trajectory(
+    states=trajectory,
+    returns=state.returns()
+  )
   logger.print("Game {}: Returns: {}; Actions: {}".format(
       game_num, " ".join(map(str, trajectory.returns)), " ".join(actions)))
   return trajectory
@@ -269,9 +289,8 @@ def actor(*, config, game, logger, queue):
 @watcher
 def evaluator(*, game, config, logger, queue):
   """A process that plays the latest checkpoint vs standard MCTS."""
-  buffer = buffer_lib.make_flat_buffer(config.evaluation_window)
-  #TODO add a mock transtiion
-  buffer_state = buffer.init(...)
+  results = buffer_lib.Buffer(config.evaluation_window, force_cpu=True)
+
   logger.print("Initializing model")
   model = _init_model_from_config(config)
   logger.print("Initializing bots")
@@ -301,20 +320,20 @@ def evaluator(*, game, config, logger, queue):
 
     trajectory = _play_game(logger, game_num, game, bots, temperature=1,
                             temperature_drop=0)
-    buffer_state = buffer.add(trajectory.returns[az_player], ...)
+    results.append(trajectory.returns[az_player])
     queue.put((difficulty, trajectory.returns[az_player]))
 
     logger.print("AZ: {}, MCTS: {}, AZ avg/{}: {:.3f}".format(
         trajectory.returns[az_player],
         trajectory.returns[1 - az_player],
-        len(buffer_state), jax.tree.map(jnp.mean, buffer_state.experience)))
+        len(results), jnp.mean(results.data)))
 
 
 @watcher
 def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
-  replay_buffer = buffer_lib.make_flat_buffer(config.replay_buffer_size)
+  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size) #only this
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
@@ -333,7 +352,8 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   game_lengths = stats.BasicStats()
   game_lengths_hist = stats.HistogramNumbered(game.max_game_length() + 1)
   outcomes = stats.HistogramNamed(["Player1", "Player2", "Draw"])
-  evals = [buffer_lib.make_flat_buffer(config.evaluation_window) for _ in range(config.eval_levels)]
+  #evaluation is yet on cpu
+  evals = [buffer_lib.Buffer(config.evaluation_window, force_cpu=True) for _ in range(config.eval_levels)]
   total_trajectories = 0
 
   def trajectory_generator():
@@ -368,14 +388,15 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
       else:
         outcomes.add(2)
 
-      replay_buffer.extend(
-          TrainInput(
-              observation=s.observation, 
-              legals_mask=s.legals_mask, 
-              policy=s.policy, 
-              value=p1_outcome
-            )
-          for s in trajectory.states)
+      buffer_inputs = [
+        TrainInput(
+          observation=s.observation, 
+          legals_mask=s.legals_mask, 
+          policy=s.policy, 
+          value=p1_outcome
+        ) for s in trajectory.states
+      ]
+      replay_buffer.extend(TrainInput.stack(buffer_inputs))
 
       for stage in range(stage_count):
         # Scale for the length of the game
@@ -491,7 +512,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 def alpha_zero(config: Config):
   """Start all the worker processes for a full alphazero setup."""
   game = pyspiel.load_game(config.game)
-  config = config._replace(
+  config = config.replace(
       observation_shape=game.observation_tensor_shape(),
       output_size=game.num_distinct_actions())
 
@@ -508,7 +529,7 @@ def alpha_zero(config: Config):
   if not path:
     path = tempfile.mkdtemp(prefix="az-{}-{}-".format(
         datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"), config.game))
-    config = config._replace(path=path)
+    config = config.replace(path=path)
 
   if not os.path.exists(path):
     os.makedirs(path)
@@ -519,7 +540,7 @@ def alpha_zero(config: Config):
                                     config.nn_depth))
 
   with open(os.path.join(config.path, "config.json"), "w") as fp:
-    fp.write(json.dumps(config._asdict(), indent=2, sort_keys=True) + "\n")
+    fp.write(json.dumps(config.__dict__, indent=2, sort_keys=True) + "\n")
 
   actors = [spawn.Process(actor, kwargs={"game": game, "config": config,
                                          "num": i})

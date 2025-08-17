@@ -19,6 +19,7 @@ from absl.testing import parameterized
 
 import numpy as np
 
+#TODO: add parametrised tests for the selection of the API
 from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
 import pyspiel
 

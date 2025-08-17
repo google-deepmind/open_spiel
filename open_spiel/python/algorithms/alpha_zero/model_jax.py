@@ -1,6 +1,6 @@
 import functools
 import os
-from typing import Any, Sequence, Tuple
+from typing import Any, Sequence, Tuple, Callable
 import warnings
 
 from datetime import datetime
@@ -15,8 +15,7 @@ import orbax
 from flax.training import train_state, orbax_utils
 import orbax.checkpoint
 
-"""implementation of the AlphaZero model, using `flax.linen` API
-"""
+from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
 flax.config.update('flax_use_orbax_checkpointing', True)
 warnings.warn("Pay attention that you've been using the `linen` api")
@@ -48,97 +47,50 @@ activations_dict = {
     "tanh": nn.tanh,
 }
 
-
-def flatten(x):
-  return x.reshape((x.shape[0], -1))
-
-@chex.dataclass(frozen=True)
-class TrainInput: 
-  """Inputs of the model: o_t, mask_t, π(a_t|o_t), v_t
-  """
-  observation: chex.Array
-  legals_mask: chex.Array 
-  policy: chex.Array 
-  value: chex.Array
-
-  @staticmethod
-  def stack(train_inputs):
-    observation, legals_mask, policy, value = zip(*[
-      (ti.observation, ti.legals_mask, ti.policy, ti.value) for ti in train_inputs
-    ])
-    return TrainInput(
-        observation=jnp.array(observation, dtype=jnp.float32),
-        legals_mask=jnp.array(legals_mask, dtype=jnp.bool),
-        policy=jnp.array(policy, dtype=jnp.float32),
-        value=jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
-
-@chex.dataclass(frozen=True)
-class Losses:
-  """Losses: policy, value, L2
-  """
-  policy: chex.Array
-  value: chex.Array 
-  l2: chex.Array 
-  
-  @property
-  def total(self):
-    return self.policy + self.value + self.l2
-
-  def __str__(self):
-    return ("Losses(total: {:.3f}, policy: {:.3f}, value: {:.3f}, "
-            "l2: {:.3f})").format(self.total, self.policy, self.value, self.l2)
-
-  def __add__(self, other):
-    return Losses(
-      policy=self.policy + other.policy,
-      value=self.value + other.value,
-      l2=self.l2 + other.l2
-    )
-
-  def __truediv__(self, n):
-    return Losses(policy=self.policy / n, value=self.value / n, l2=self.l2 / n)
-
 class Activation(nn.Module):
+  """A simple `nn.Module` class wrapper for the activations
+  """
   activation_name: str
 
   @nn.compact
-  def __call__(self, x):
-    return activations_dict[self.activation_name](x)
+  def __call__(self, x: chex.Array) -> chex.Array:
+    #if the activation not found or None just passes the identity function
+    return activations_dict.get(self.activation_name, lambda x: x)(x)
 
 class MLPBlock(nn.Module):
   features: int
+  activation: str = "relu"
 
   @nn.compact
-  def __call__(self, x):
+  def __call__(self, x: chex.Array) -> chex.Array:
     y = nn.Dense(features=self.features)(x)
-    y = Activation("relu")(y)
+    y = Activation(self.activation)(y)
     return y
   
 class ConvBlock(nn.Module):
   features: int
   kernel_size: tuple[int, int]
+  activation: str = "relu"
 
   @nn.compact
-  def __call__(self, x, training: bool = False):
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     y = nn.Conv(features=self.features, kernel_size=self.kernel_size, padding='SAME')(x)
     y = nn.BatchNorm(use_running_average=not training)(y)
-    y = Activation("relu")(y)
+    y = Activation(self.activation)(y)
     return y
 
 class ResidualBlock(nn.Module):
   filters: int
   kernel_size: tuple[int, int]
+  activation: str = "relu"
   
   @nn.compact
-  def __call__(self, x, training: bool = False):
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     residual = x
-    y = nn.Conv(features=self.filters, kernel_size=self.kernel_size, padding='SAME')(x)
-    y = nn.BatchNorm(use_running_average=not training)(y)
-    y = Activation("relu")(y)
-    y = nn.Conv(features=self.filters, kernel_size=self.kernel_size, padding='SAME')(y)
-    y = nn.BatchNorm(use_running_average=not training)(y)
+    y = ConvBlock(self.filters, self.kernel_size, self.activation)(x, training)
+    y = ConvBlock(self.filters, self.kernel_size, None)(x, training)
     y = y + residual
-    y = Activation("relu")(y)
+    y = Activation(self.activation)(y)
     return y
 
 
@@ -146,12 +98,12 @@ class PolicyHead(nn.Module):
   model_type: str
   nn_width: int
   output_size: int
+  activation: str = "relu"
   
   @nn.compact
-  def __call__(self, x, training: bool = False):
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     if self.model_type == "mlp":
-      x = nn.Dense(features=self.nn_width)(x)
-      x = Activation("relu")(x)
+      x = MLPBlock(self.nn_width, activation=self.activation)(x)
     else:
       x = ConvBlock(features = 2, kernel_size = (1, 1))(x, training)
       x = flatten(x)
@@ -163,44 +115,77 @@ class PolicyHead(nn.Module):
 class ValueHead(nn.Module):
   model_type: str
   nn_width: int
+  activation: str = "relu"
   
   @nn.compact
-  def __call__(self, x, training: bool = False):
+  def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
+
     if self.model_type != "mlp":
-      x = ConvBlock(features = 1, kernel_size = (1, 1))(x)
+      x = ConvBlock(features = 1, kernel_size = (1, 1), activation=self.activation)(x, training)
       x = flatten(x)
     
-    x = nn.Dense(features=self.nn_width)(x)
-    x = Activation("relu")(x)
-    x = nn.Dense(features=1)(x)
-    x = Activation("tanh")(x)
-    return x
+    x = MLPBlock(self.nn_width, self.activation)(x)
+    values = MLPBlock(1, "tanh")(x)
+    return values
 
 
 class AlphaZeroModel(nn.Module):
+  """An AlphaZero style model with a policy and value head.
+
+  This supports three types of models: mlp, conv2d and resnet.
+
+  All models have a shared torso stack with two output heads: policy and value.
+  They have same meaning as in the AlphaGo Zero and AlphaZero papers. The resnet
+  model copies the one in that paper when set with width 256 and depth 20. The
+  conv2d model is the same as the resnet except uses a conv+batchnorm+relu
+  instead of the res blocks. The mlp model uses dense layers instead of conv,
+  and drops batch norm.
+
+  Links to relevant articles/papers:
+    https://deepmind.com/blog/article/alphago-zero-starting-scratch has an open
+      access link to the AlphaGo Zero nature paper.
+    https://deepmind.com/blog/article/alphazero-shedding-new-light-grand-games-chess-shogi-and-go
+      has an open access link to the AlphaZero science paper.
+
+  All are parameterized by their input (observation) shape and output size
+  (number of actions), though the conv2d and resnet might only work with games
+  that have spatial data (ie 3 non-batch dimensions, eg: connect four would
+  work, but not poker).
+
+  The depth is the number of blocks in the torso, where the definition of a
+  block varies by model. For a resnet it's a resblock which is two conv2ds,
+  batch norms and relus, and an addition. For conv2d it's a conv2d, a batch norm
+  and a relu. For mlp it's a dense plus relu.
+
+  The width is the number of filters for any conv2d and the number of hidden
+  units for any dense layer.
+
+  """
+  
   model_type: str
   input_shape: Tuple[int, ...]
   output_size: int
   nn_width: int
   nn_depth: int
+  activation: str = "relu"
   
   @nn.compact
-  def __call__(self, observations, training: bool = False):
+  def __call__(self, observations: chex.Array, training: bool = False) -> tuple[chex.Array, chex.Array]:
 
     # torso
     if self.model_type == "mlp":
       x = observations
       for i in range(self.nn_depth): #leave the for-loop of let it go?
-        x = MLPBlock(features=self.nn_width)(x)
+        x = MLPBlock(features=self.nn_width, activation=self.activation)(x)
     elif self.model_type == "conv2d":
       x = observations.reshape((-1,) + self.input_shape)
       for i in range(self.nn_depth):
-        x = ConvBlock(features=self.nn_width, kernel_size=(3, 3))(x, training)
+        x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
     elif self.model_type == "resnet":
       x = observations.reshape((-1,) + self.input_shape)
-      x = ConvBlock(features=self.nn_width, kernel_size=(3, 3))(x, training)
+      x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
       for i in range(self.nn_depth):
-        x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3))(x, training)
+        x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
 
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
@@ -220,40 +205,31 @@ class Model:
 
   def __init__(
     self, 
-    model, 
-    state, 
-    path, 
-    loss_fn, 
-    update_step_fn,
-    checkpoint_uid=None,
-    checkpoint_saving_interval=None,
-    max_checkpoints_to_keep=None,
-    checkpoint_rotation_period=None
+    model: nn.Module, 
+    state: TrainState, 
+    path: str, 
+    update_step_fn: Callable,
+    checkpoint_uid: str = None,
   ): 
     
     self._model = model
     self._state = state
     self._path = path
-    self._loss_fn = loss_fn
     self._update_step_fn = update_step_fn
     
     #we're using the latest checkpointing API
     # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
-    orbax_checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+    orbax_checkpointer = orbax.checkpoint.AsyncCheckpointer(orbax.checkpoint.StandardCheckpointHandler())
     checkpoint_str = (
       checkpoint_uid if checkpoint_uid is not None else datetime.now().strftime("%Y%m%d%H%M%S")
     )
 
-    options = orbax.checkpoint.CheckpointManagerOptions(
-        create=True,
-        save_interval_steps=checkpoint_saving_interval,
-        max_to_keep=max_checkpoints_to_keep,
-        keep_period=checkpoint_rotation_period,
-    )
-    
+    options = orbax.checkpoint.CheckpointManagerOptions(create=True)
+  
+    self._manager = None
     if self._path is not None:
       self._manager = orbax.checkpoint.CheckpointManager(
-        directory=os.path.join(self._path, checkpoint_str),
+        directory=self._path,
         checkpointers=orbax_checkpointer,
         options=options
       )
@@ -299,25 +275,24 @@ class Model:
 
     state = cls._create_train_state(model.apply, variables, optimizer)
 
-    def loss_fn(params, batch_stats, observations, legals_mask, policy_targets, value_targets):
-      variables = {'params': params, 'batch_stats': batch_stats}
-      (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, training=True, mutable=['batch_stats'])
-      
-      policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
-
-      policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
-
-      value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
-      
-      l2_reg_loss = 0.0
-      for p in jax.tree.leaves(params):
-        l2_reg_loss += weight_decay * jnp.sum(jnp.square(p))
-
-      total_loss = policy_loss + value_loss + l2_reg_loss      
-      return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state['batch_stats'])
-    
     @jax.jit
     def update_step_fn(state, observations, legals_mask, policy_targets, value_targets):
+      
+      def loss_fn(params, batch_stats, observations, legals_mask, policy_targets, value_targets):
+        variables = {'params': params, 'batch_stats': batch_stats}
+        (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, training=True, mutable=['batch_stats'])
+        
+        policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
+        policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
+        value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
+        
+        l2_reg_loss = 0.0
+        for p in jax.tree.leaves(params):
+          l2_reg_loss += weight_decay * jnp.sum(jnp.square(p))
+
+        total_loss = policy_loss + value_loss + l2_reg_loss      
+        return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state['batch_stats'])
+    
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
       
@@ -325,7 +300,7 @@ class Model:
       new_state = new_state.replace(batch_stats=new_batch_stats)
       return new_state, (policy_loss, value_loss, l2_reg_loss)
     
-    return cls(model, state, path, loss_fn, update_step_fn)
+    return cls(model, state, path, update_step_fn)
   
   @classmethod
   def from_checkpoint(cls, checkpoint_path, model_args=None):
@@ -333,8 +308,7 @@ class Model:
       raise ValueError("model_args must be provided for checkpoint loading")
     
     model = cls.build_model(**model_args)
-    
-    model._state = cls.load_checkpoint(checkpoint_path, model._state)
+    model._state = cls.load_checkpoint(checkpoint_path)
   
     return model
   
@@ -364,18 +338,18 @@ class Model:
 
     return value, policy
   
-  def update(self, train_inputs: Sequence[TrainInput]):
+  def update(self, train_inputs: Sequence[TrainInput]) -> Losses:
     batch = TrainInput.stack(train_inputs)
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
-  def save_checkpoint(self, step):
+  def save_checkpoint(self, step: int) -> int:
     self._manager.save(step, self._state, save_kwargs={'save_args': orbax_utils.save_args_from_target(self._state)})
     self._manager.wait_until_finished()
     return step
    
-  def load_checkpoint(self, step):
+  def load_checkpoint(self, step: int) -> TrainState:
     target = self._state
     self._state = self._manager.restore(step, items=target)
     self._manager.wait_until_finished()
