@@ -201,9 +201,7 @@ class ChessState : public State {
     return down_cast<const ChessGame*>(GetGame().get());
   }
 
-  void SetChess960RandomStartFEN(const std::string& fen) {
-    chess960_random_start_fen_ = fen;
-  }
+  std::string StartFEN() const;
 
  protected:
   void DoApplyAction(Action action) override;
@@ -225,12 +223,9 @@ class ChessState : public State {
   ChessBoard start_board_;
   // We store the current board position as an optimization.
   ChessBoard current_board_;
-
-  // Used for Chess960. Set to the fen that was randomly chosen at the start of
-  // the game only when it was drawn randomly using a chance node. This remains
-  // empty if chance nodes are not used to determine the start position (i.e.
-  // when the start position passed in using NewInitialState(fen)).
-  std::string chess960_random_start_fen_;
+  // This FEN string is used only when NewInitialState is called with a specific
+  // initial FEN.
+  std::string specific_initial_fen_;
 
   // RepetitionTable records how many times the given hash exists in the history
   // stack (including the current board).

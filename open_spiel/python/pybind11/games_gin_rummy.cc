@@ -15,8 +15,11 @@
 #include "open_spiel/python/pybind11/games_gin_rummy.h"
 
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/games/gin_rummy/gin_rummy.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/python/pybind11/pybind11.h"
@@ -79,8 +82,11 @@ void init_pyspiel_games_gin_rummy(py::module& m) {
       .def("current_player", &GinRummyState::CurrentPlayer)
       .def("finished_layoffs", &GinRummyState::FinishedLayoffs)
       .def("upcard", &GinRummyState::Upcard)
+      .def("prev_upcard", &GinRummyState::PrevUpcard)
+      .def("knock_card", &GinRummyState::KnockCard)
       .def("stock_size", &GinRummyState::StockSize)
       .def("hands", &GinRummyState::Hands)
+      .def("known_cards", &GinRummyState::KnownCards)
       .def("discard_pile", &GinRummyState::DiscardPile)
       .def("deadwood", &GinRummyState::Deadwood)
       .def("knocked", &GinRummyState::Knocked)

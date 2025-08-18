@@ -37,8 +37,8 @@ ToString() = "leduc_poker()"
 # Round: 1
 # Player: -1
 # Pot: 2
-# Money (p1 p2 ...): 99 99
-# Cards (public p1 p2 ...): -10000 -10000 -10000
+# Money (player_0 player_1): 99 99
+# Cards (public player_0 player_1): -10000 -10000 -10000
 # Round 1 sequence:
 # Round 2 sequence:
 IsTerminal() = False
@@ -89,8 +89,8 @@ action: 5
 # Round: 1
 # Player: -1
 # Pot: 2
-# Money (p1 p2 ...): 99 99
-# Cards (public p1 p2 ...): -10000 5 -10000
+# Money (player_0 player_1): 99 99
+# Cards (public player_0 player_1): -10000 5 -10000
 # Round 1 sequence:
 # Round 2 sequence:
 IsTerminal() = False
@@ -141,8 +141,8 @@ action: 1
 # Round: 1
 # Player: 0
 # Pot: 2
-# Money (p1 p2 ...): 99 99
-# Cards (public p1 p2 ...): -10000 5 1
+# Money (player_0 player_1): 99 99
+# Cards (public player_0 player_1): -10000 5 1
 # Round 1 sequence:
 # Round 2 sequence:
 IsTerminal() = False
@@ -194,8 +194,8 @@ action: 2
 # Round: 1
 # Player: 1
 # Pot: 4
-# Money (p1 p2 ...): 97 99
-# Cards (public p1 p2 ...): -10000 5 1
+# Money (player_0 player_1): 97 99
+# Cards (public player_0 player_1): -10000 5 1
 # Round 1 sequence: Raise
 # Round 2 sequence:
 IsTerminal() = False
@@ -247,8 +247,8 @@ action: 0
 # Round: 1
 # Player: 1
 # Pot: 0
-# Money (p1 p2 ...): 101 99
-# Cards (public p1 p2 ...): -10000 5 1
+# Money (player_0 player_1): 101 99
+# Cards (public player_0 player_1): -10000 5 1
 # Round 1 sequence: Raise, Fold
 # Round 2 sequence:
 IsTerminal() = True

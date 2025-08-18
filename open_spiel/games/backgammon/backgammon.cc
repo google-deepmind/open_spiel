@@ -16,13 +16,19 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <memory>
 #include <set>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -175,8 +181,8 @@ std::string BackgammonState::ActionToString(Player player,
                           kChanceOutcomeValues[move_id][1], ")");
     } else {
       // Initial roll to determine who starts.
-      const char* starter = (move_id < kNumNonDoubleOutcomes ?
-                             "X starts" : "O starts");
+      const char* starter =
+          (move_id < kNumNonDoubleOutcomes ? "X starts" : "O starts");
       if (move_id >= kNumNonDoubleOutcomes) {
         move_id -= kNumNonDoubleOutcomes;
       }
@@ -429,12 +435,13 @@ void BackgammonState::DoApplyAction(Action move) {
       SPIEL_CHECK_TRUE(dice_.empty());
       if (move < kNumNonDoubleOutcomes) {
         // X starts.
-        cur_player_ = prev_player_ = kXPlayerId;
+        cur_player_ = kXPlayerId;
       } else {
         // O Starts
-        cur_player_ = prev_player_ = kOPlayerId;
+        cur_player_ = kOPlayerId;
         move -= kNumNonDoubleOutcomes;
       }
+      prev_player_ = kChancePlayerId;
       RollDice(move);
       turns_ = 0;
       return;
@@ -630,7 +637,7 @@ std::vector<CheckerMove> BackgammonState::SpielMoveToCheckerMoves(
 }
 
 std::vector<CheckerMove> BackgammonState::AugmentWithHitInfo(
-    int player, const std::vector<CheckerMove> &cmoves) const {
+    int player, const std::vector<CheckerMove>& cmoves) const {
   std::vector<CheckerMove> new_cmoves = cmoves;
   for (int i = 0; i < 2; ++i) {
     new_cmoves[i].hit = IsHit(player, cmoves[i].pos, cmoves[i].num);
@@ -1104,13 +1111,19 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
   // both, the player must play the larger one. When neither number can be used,
   // the player loses his turn. In the case of doubles, when all four numbers
   // cannot be played, the player must play as many numbers as he can.
+
+  // TODO(author5): below we filter out actions that are mapped to the same
+  // string representation as they have the same effect, even when applied in
+  // different orders. A better fix would be to remove the duplicate actions
+  // from the action space altogether.
   std::vector<Action> legal_actions;
   int max_roll = -1;
   for (const auto& move : movelist) {
     if (max_moves == 2) {
       // Only add moves that are size 2.
       if (move.size() == 2) {
-        legal_actions.push_back(CheckerMovesToSpielMove(move));
+        int action = CheckerMovesToSpielMove(move);
+        legal_actions.push_back(action);
       }
     } else if (max_moves == 1) {
       // We are just finding the maximum roll.
@@ -1122,7 +1135,8 @@ std::vector<Action> BackgammonState::ProcessLegalMoves(
     // Another round to add those that have the max die roll.
     for (const auto& move : movelist) {
       if (move[0].num == max_roll) {
-        legal_actions.push_back(CheckerMovesToSpielMove(move));
+        int action = CheckerMovesToSpielMove(move);
+        legal_actions.push_back(action);
       }
     }
   }
@@ -1217,6 +1231,8 @@ std::string BackgammonState::ToString() const {
   absl::StrAppend(&board_str, "Turn: ");
   absl::StrAppend(&board_str, CurPlayerToString(cur_player_));
   absl::StrAppend(&board_str, "\n");
+  absl::StrAppend(&board_str, "Previous player: ", prev_player_, "\n");
+  absl::StrAppend(&board_str, "Extra turn: ", double_turn_ ? 1 : 0, "\n");
   absl::StrAppend(&board_str, "Dice: ");
   absl::StrAppend(&board_str, !dice_.empty() ? DiceToString(dice_[0]) : "");
   absl::StrAppend(&board_str, dice_.size() > 1 ? DiceToString(dice_[1]) : "");

@@ -15,15 +15,21 @@
 #include "open_spiel/tests/basic_tests.h"
 
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <numeric>
 #include <random>
-#include <set>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "open_spiel/abseil-cpp/absl/container/btree_set.h"
+#include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
@@ -60,8 +66,8 @@ struct HistoryItem {
 void ApplyActionTestClone(const Game& game, State* state,
                           const std::vector<Action>& joint_action) {
   std::unique_ptr<State> clone = state->Clone();
-  state->ApplyActions(joint_action);
-  clone->ApplyActions(joint_action);
+  state->ApplyActionsWithLegalityChecks(joint_action);
+  clone->ApplyActionsWithLegalityChecks(joint_action);
   SPIEL_CHECK_EQ(state->ToString(), clone->ToString());
   SPIEL_CHECK_EQ(state->History(), clone->History());
 }
@@ -72,8 +78,8 @@ void ApplyActionTestClone(const Game& game, State* state,
 // representation.
 void ApplyActionTestClone(const Game& game, State* state, Action action) {
   std::unique_ptr<State> clone = state->Clone();
-  state->ApplyAction(action);
-  clone->ApplyAction(action);
+  state->ApplyActionWithLegalityCheck(action);
+  clone->ApplyActionWithLegalityCheck(action);
   SPIEL_CHECK_EQ(state->ToString(), clone->ToString());
   SPIEL_CHECK_EQ(state->History(), clone->History());
 }
@@ -383,7 +389,7 @@ void RandomSimulation(std::mt19937* rng, const Game& game, bool undo,
                   << std::endl;
       }
       history.emplace_back(state->Clone(), kChancePlayerId, action);
-      state->ApplyAction(action);
+      state->ApplyActionWithLegalityCheck(action);
 
       if (undo && (history.size() < 10 || IsPowerOfTwo(history.size()))) {
         TestUndo(state->Clone(), history);
@@ -681,7 +687,7 @@ void ResampleInfostateTest(const Game& game, int num_sims) {
       std::vector<Action> actions = state->LegalActions();
       std::uniform_int_distribution<int> dis(0, actions.size() - 1);
       Action action = actions[dis(rng)];
-      state->ApplyAction(action);
+      state->ApplyActionWithLegalityCheck(action);
     }
   }
 }

@@ -15,7 +15,7 @@
 #ifndef OPEN_SPIEL_GAMES_GO_H_
 #define OPEN_SPIEL_GAMES_GO_H_
 
-#include <array>
+#include <cstdint>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -23,8 +23,13 @@
 #include <unordered_set>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 // Game of Go:
@@ -55,13 +60,38 @@ inline int NumDistinctActions(int board_size) {
 
 // In theory Go games have no length limit, but we limit them to twice the
 // number of points on the board for practicality - only random games last
-// this long. This value can also be overriden when creating the game.
+// this long. This value can also be overridden when creating the game.
 inline int DefaultMaxGameLength(int board_size) {
   return board_size * board_size * 2;
 }
 
 inline int ColorToPlayer(GoColor c) { return static_cast<int>(c); }
 inline GoColor PlayerToColor(Player p) { return static_cast<GoColor>(p); }
+
+
+struct GoStateStruct : StateStruct {
+  int board_size;
+  float komi;
+  std::string current_player;
+  int move_number;
+  std::string previous_move_a1;
+  std::vector<std::vector<std::map<std::string, std::string>>> board_grid;
+  bool is_terminal;
+  std::string winner;
+
+  GoStateStruct() = default;
+  explicit GoStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override {
+    return *this;
+  }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(
+      GoStateStruct, board_size, komi, current_player, move_number,
+      previous_move_a1, board_grid, is_terminal, winner);
+};
+
 
 // State of an in-play game.
 // Actions are contiguous from 0 to board_size * board_size - 1, row-major, i.e.
@@ -79,6 +109,7 @@ class GoState : public State {
   std::vector<Action> LegalActions() const override;
   std::string ActionToString(Player player, Action action) const override;
   std::string ToString() const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
 
   bool IsTerminal() const override;
 

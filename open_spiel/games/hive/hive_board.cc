@@ -735,7 +735,7 @@ bool HiveBoard::IsConnected(HivePosition pos, HivePosition to_ignore) const {
 }
 
 bool HiveBoard::IsCovered(HivePosition pos) const {
-  return std::find_if(
+  return std::any_of(
       covered_tiles_.begin(), covered_tiles_.end(),
       [this, pos](HiveTile tile) { return GetPositionOf(tile) == pos; });
 }

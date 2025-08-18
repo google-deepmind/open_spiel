@@ -61,6 +61,27 @@ class GamesTicTacToeTest(absltest.TestCase):
         ttt.CellState.CROSS,
         ttt.CellState.NOUGHT] + [ttt.CellState.EMPTY] * 7)
 
+  def test_json(self):
+    game = make_game()
+    state = game.new_initial_state()
+    state.apply_action(4)
+    state_struct = state.to_struct()
+    self.assertEqual(
+        state_struct.board,
+        [".", ".", ".", ".", "x", ".", ".", ".", "."],
+    )
+    self.assertEqual(state_struct.current_player, "o")
+    json_from_struct = state_struct.to_json()
+    state_json = state.to_json()
+    self.assertEqual(
+        state_json,
+        '{"board":[".",".",".",".","x",".",".",".","."],"current_player":"o"}',
+    )
+    self.assertEqual(json_from_struct, state_json)
+    state_struct = ttt.TicTacToeStateStruct(state_json)
+    self.assertEqual(state_struct.to_json(), state_json)
+
+
 if __name__ == "__main__":
   absltest.main()
 

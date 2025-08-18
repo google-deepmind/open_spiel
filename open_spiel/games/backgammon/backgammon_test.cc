@@ -15,9 +15,16 @@
 #include "open_spiel/games/backgammon/backgammon.h"
 
 #include <algorithm>
+#include <iostream>
+#include <memory>
 #include <random>
+#include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 
 namespace open_spiel {
@@ -428,7 +435,7 @@ void HumanReadableNotation() {
   std::cout << notation << std::endl;
   SPIEL_CHECK_EQ(notation, absl::StrCat(legal_actions[0], " - 2/Off 1/Off"));
 
-  // Check die order doesnt impact narrative
+  // Check die order doesn't impact narrative
   bstate->SetState(
       kXPlayerId, false, {1, 2}, {0, 0}, {13, 5},
       {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},

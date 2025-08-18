@@ -70,7 +70,9 @@ if(APPLE)
   set (CMAKE_FIND_FRAMEWORK LAST)
 elseif(WIN32)
   # Setup for MSVC 2022.
-  # No changes needed. In particular: do not use -Wno-everything.
+  if(MSVC)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /utf-8 /bigobj /DWIN32 /D_WINDOWS /GR /EHsc")
+  endif()
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
 endif()
@@ -183,6 +185,20 @@ set (OPEN_SPIEL_CORE_FILES
 set(ABSL_PROPAGATE_CXX_STD ON)
 add_subdirectory (abseil-cpp)
 include_directories (abseil-cpp)
+
+# Similarly for json
+add_subdirectory (json)
+include_directories (json/include)
+
+# Find basic Python paths needed by C++ code (e.g. pybind11_json and pybind11_abseil).
+if (OPEN_SPIEL_BUILD_WITH_PYTHON)
+  find_package(Python3 COMPONENTS Interpreter Development)
+  include_directories(pybind11_abseil pybind11_json ../pybind11/include)
+  include_directories(${Python3_INCLUDE_DIRS})
+endif()
+
+# Include pybind11_abseil and pybind11_json
+include_directories (pybind11_json/include)
 
 # Just the core without any of the games
 add_library(open_spiel_core OBJECT ${OPEN_SPIEL_CORE_FILES})

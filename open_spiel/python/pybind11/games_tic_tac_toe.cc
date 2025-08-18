@@ -26,6 +26,7 @@ using open_spiel::Game;
 using open_spiel::State;
 using open_spiel::tic_tac_toe::CellState;
 using open_spiel::tic_tac_toe::TicTacToeState;
+using open_spiel::tic_tac_toe::TicTacToeStateStruct;
 
 void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
   py::module_ tic_tac_toe = m.def_submodule("tic_tac_toe");
@@ -36,6 +37,13 @@ void open_spiel::init_pyspiel_games_tic_tac_toe(py::module& m) {
   tic_tac_toe.attr("NUM_ROWS") = &tic_tac_toe::kNumRows;
   tic_tac_toe.attr("NUM_COLS") = &tic_tac_toe::kNumCols;
   tic_tac_toe.attr("NUM_CELLS") = &tic_tac_toe::kNumCells;
+
+  py::class_<TicTacToeStateStruct, open_spiel::StateStruct>(
+      tic_tac_toe, "TicTacToeStateStruct")
+      .def(py::init<>())
+      .def(py::init<std::string>())
+      .def_readwrite("current_player", &TicTacToeStateStruct::current_player)
+      .def_readwrite("board", &TicTacToeStateStruct::board);
 
   py::enum_<CellState>(tic_tac_toe, "CellState")
       .value("EMPTY", CellState::kEmpty)

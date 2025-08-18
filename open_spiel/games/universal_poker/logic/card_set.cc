@@ -14,11 +14,11 @@
 
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 
-#include <bitset>
-#include <iostream>
-#include <sstream>
+#include <cstdint>
 #include <string>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/spiel_utils.h"
 
@@ -76,6 +76,13 @@ CardSet::CardSet(uint16_t num_suits, uint16_t num_ranks) : cs() {
       cs.bySuit[s] |= ((uint16_t)1 << r);
     }
   }
+}
+
+std::string CardSet::CardToString(uint8_t card) const {
+  int rank = rankOfCard(card);
+  int suit = suitOfCard(card);
+  return absl::StrCat(std::string(1, kRankChars[rank]),
+                      std::string(1, kSuitChars[suit]));
 }
 
 std::string CardSet::ToString() const {

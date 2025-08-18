@@ -15,6 +15,7 @@
 #ifndef OPEN_SPIEL_SPIEL_CONSTANTS_H_
 #define OPEN_SPIEL_SPIEL_CONSTANTS_H_
 
+#include <string>
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -35,6 +36,29 @@ enum PlayerId {
   // player id of a mean field node
   kMeanFieldPlayerId = -5
 };
+
+// Default string representation of player ids. Game implementations may
+// override this to provide more descriptive strings, e.g. "x" instead of
+// "Player_0" in tic_tac_toe.
+inline std::string DefaultPlayerString(int player_id) {
+  switch (player_id) {
+    case kChancePlayerId:
+      return "Chance";
+    case kSimultaneousPlayerId:
+      return "Simultaneous";
+    case kInvalidPlayer:
+      return "Invalid";
+    case kTerminalPlayerId:
+      return "Terminal";
+    case kMeanFieldPlayerId:
+      return "MeanField";
+    default:
+      if (player_id >= 0) {
+        return "Player_" + std::to_string(player_id);
+      }
+      SpielFatalError("Unrecognized PlayerId: " + std::to_string(player_id));
+  }
+}
 
 // Constant representing an invalid action.
 inline constexpr Action kInvalidAction = -1;

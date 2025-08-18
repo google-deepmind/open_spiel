@@ -14,14 +14,15 @@
 
 #include "open_spiel/games/bargaining/bargaining.h"
 
-#include <array>
-#include <iostream>
+#include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "open_spiel/abseil-cpp/absl/flags/flag.h"
 #include "open_spiel/abseil-cpp/absl/flags/parse.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/tests/basic_tests.h"
 #include "open_spiel/utils/init.h"
 
@@ -159,17 +160,40 @@ void BasicBargainingOfferMapTests() {
   }
 }
 
+void BasicMaxNumInstancesTests() {
+  for (int max_num_instances : {10, 100, 1000, 2000}) {
+    std::shared_ptr<const Game> game = LoadGame(
+        absl::StrCat("bargaining(max_num_instances=", max_num_instances, ")"));
+    const auto* bargaining_game =
+        static_cast<const BargainingGame*>(game.get());
+    // Can't have more instances than what is available.
+    int expected_num_instances =
+        std::min(max_num_instances, kDefaultNumInstances);
+    SPIEL_CHECK_EQ(bargaining_game->AllInstances().size(),
+                   expected_num_instances);
+  }
+}
+
 void BasicBargainingOpponentValuesTests() {
+  // 1000 instance default.
   std::shared_ptr<const Game> game = LoadGame("bargaining");
   const auto* bargaining_game = static_cast<const BargainingGame*>(game.get());
   std::vector<std::vector<int>> expected_values = {
     {4, 0, 2}, {7, 0, 1}, {1, 3, 1}
   };
-  std::vector<int> player_values = {1, 2, 3};
+  std::vector<int> pool_values = {1, 2, 3};
   std::vector<int> opponent_values = {8, 1, 0};
   std::vector<std::vector<int>> actual_values =
-      bargaining_game->GetPossibleOpponentValues(
-          0, player_values, opponent_values);
+      bargaining_game->GetPossibleOpponentValues(0, pool_values,
+                                                 opponent_values);
+  SPIEL_CHECK_EQ(actual_values, expected_values);
+
+  // 100 instances default has one less possible opponent value.
+  game = LoadGame("bargaining(max_num_instances=100)");
+  bargaining_game = static_cast<const BargainingGame*>(game.get());
+  expected_values.pop_back();
+  actual_values = bargaining_game->GetPossibleOpponentValues(0, pool_values,
+                                                             opponent_values);
   SPIEL_CHECK_EQ(actual_values, expected_values);
 }
 
@@ -191,5 +215,6 @@ int main(int argc, char** argv) {
   open_spiel::bargaining::BasicBargainingFromCCInstancesTests();
   open_spiel::bargaining::BasicBargainingInstanceMapTests();
   open_spiel::bargaining::BasicBargainingOfferMapTests();
+  open_spiel::bargaining::BasicMaxNumInstancesTests();
   open_spiel::bargaining::BasicBargainingOpponentValuesTests();
 }

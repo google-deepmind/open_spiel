@@ -112,6 +112,8 @@ set(GAME_SOURCES
   lewis_signaling/lewis_signaling.h
   liars_dice/liars_dice.cc
   liars_dice/liars_dice.h
+  lines_of_action/lines_of_action.cc
+  lines_of_action/lines_of_action.h
   maedn/maedn.cc
   maedn/maedn.h
   mancala/mancala.cc
@@ -217,6 +219,9 @@ endif()
 add_library (games OBJECT ${GAME_SOURCES})
 
 target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}../pybind11_abseil)
+target_include_directories (games PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}../pybind11_json)
+target_include_directories (games PUBLIC ${Python3_INCLUDE_DIRS})
 
 if (${OPEN_SPIEL_BUILD_WITH_HANABI})
   add_subdirectory(hanabi)
@@ -508,6 +513,10 @@ add_executable(liars_dice_test liars_dice/liars_dice_test.cc ${OPEN_SPIEL_OBJECT
                $<TARGET_OBJECTS:tests>
                $<TARGET_OBJECTS:algorithms>)
 add_test(liars_dice_test liars_dice_test)
+
+add_executable(lines_of_action_test lines_of_action/lines_of_action_test.cc ${OPEN_SPIEL_OBJECTS}
+               $<TARGET_OBJECTS:tests>)
+add_test(lines_of_action_test lines_of_action_test)
 
 add_executable(maedn_test maedn/maedn_test.cc ${OPEN_SPIEL_OBJECTS}
                $<TARGET_OBJECTS:tests>)

@@ -232,6 +232,15 @@ class PreferenceProfile(object):
           mat[idx_i, idx_j] += vote.weight
     return mat
 
+  def pairwise_count_matrix(self) -> np.ndarray:
+    """Returns a matrix of pairwise for this profile.
+
+    For each entry (i,j) in the matrix, entry[i,j] is the number of votes in
+    the profile that contain both alternative i and alternative j.
+    """
+    pref_matrix = self.pref_matrix()
+    return pref_matrix + pref_matrix.T
+
   def margin_matrix(self) -> np.ndarray:
     """Returns the margin matrix for this profile.
 

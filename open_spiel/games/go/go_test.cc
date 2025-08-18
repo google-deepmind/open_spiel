@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include "open_spiel/games/go/go.h"
+#include <memory>
 
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_utils.h"
@@ -63,6 +65,22 @@ void ConcreteActionsAreUsedInTheAPI() {
   }
 }
 
+void TestStateStruct() {
+  auto game = LoadGame("go");
+  auto state = game->NewInitialState();
+  GoState* go_state = static_cast<GoState*>(state.get());
+  SPIEL_CHECK_EQ(go_state->ToStruct()->ToJson(), go_state->ToJson());
+  GoStateStruct go_state_struct(go_state->ToJson());
+  SPIEL_CHECK_EQ(go_state_struct.current_player, "B");
+  SPIEL_CHECK_EQ(go_state_struct.komi, 7.5);
+  SPIEL_CHECK_EQ(go_state_struct.board_size, 19);
+  SPIEL_CHECK_EQ(go_state_struct.board_grid[0][0]["a1"], "EMPTY");
+  go_state->ApplyAction(0);
+  go_state_struct = GoStateStruct(go_state->ToJson());
+  SPIEL_CHECK_EQ(go_state_struct.current_player, "W");
+  SPIEL_CHECK_EQ(go_state_struct.board_grid[0][0]["a1"], "B");
+}
+
 }  // namespace
 }  // namespace go
 }  // namespace open_spiel
@@ -71,4 +89,5 @@ int main(int argc, char** argv) {
   open_spiel::go::BasicGoTests();
   open_spiel::go::HandicapTest();
   open_spiel::go::ConcreteActionsAreUsedInTheAPI();
+  open_spiel::go::TestStateStruct();
 }

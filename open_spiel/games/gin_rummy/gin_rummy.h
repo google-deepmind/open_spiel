@@ -39,16 +39,22 @@
 //  "num_suits"       int    num suits in deck             (default = 4)
 //  "hand_size"       int    num cards in player hand      (default = 10)
 
+#include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
 #include "open_spiel/abseil-cpp/absl/types/optional.h"
 #include "open_spiel/algorithms/observation_history.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/games/gin_rummy/gin_rummy_utils.h"
 #include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
+#include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
 namespace gin_rummy {
@@ -117,13 +123,18 @@ class GinRummyState : public State {
   std::unique_ptr<State> Clone() const override;
   std::vector<Action> LegalActions() const override;
   std::vector<std::pair<Action, double>> ChanceOutcomes() const override;
+  std::unique_ptr<State> ResampleFromInfostate(
+      int player_id, std::function<double()> rng) const override;
 
   // Used for Python bindings.
   Phase CurrentPhase() const { return phase_; }
   bool FinishedLayoffs() const { return finished_layoffs_ ; }
   absl::optional<int> Upcard() const { return upcard_; }
+  absl::optional<int> PrevUpcard() const { return prev_upcard_; }
+  absl::optional<int> KnockCard() const { return knock_card_; }
   int StockSize() const { return stock_size_; }
   std::vector<std::vector<int>> Hands() const { return hands_; }
+  std::vector<std::vector<int>> KnownCards() const;
   std::vector<int> DiscardPile() const { return discard_pile_; }
   std::vector<int> Deadwood() const { return deadwood_; }
   std::vector<bool> Knocked() const { return knocked_; }
@@ -194,6 +205,8 @@ class GinRummyState : public State {
   // Each player's hand. Indexed by pid.
   std::vector<std::vector<int>> hands_ =
       std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
+  std::vector<std::vector<bool>> known_cards_ = std::vector<std::vector<bool>>(
+      kNumPlayers, std::vector<bool>(kDefaultNumCards, false));
   // True if the card is still in the deck. Cards from 0-51 using the suit order
   // "scdh".
   std::vector<bool> deck_{};
@@ -216,7 +229,7 @@ class GinRummyState : public State {
       std::vector<std::vector<int>>(kNumPlayers, std::vector<int>());
   // Cards that have been layed off onto knocking player's layed melds.
   std::vector<int> layoffs_{};
-  // cached ActionObservationHistory for each player
+  // Cached ActionObservationHistory for each player.
   std::vector<open_spiel::ActionObservationHistory> aohs_;
 };
 

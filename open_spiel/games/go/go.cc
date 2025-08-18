@@ -14,10 +14,21 @@
 
 #include "open_spiel/games/go/go.h"
 
+#include <algorithm>
+#include <array>
+#include <memory>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/game_parameters.h"
 #include "open_spiel/games/go/go_board.h"
+#include "open_spiel/observer.h"
+#include "open_spiel/spiel.h"
+#include "open_spiel/spiel_globals.h"
 #include "open_spiel/spiel_utils.h"
 
 namespace open_spiel {
@@ -80,6 +91,23 @@ std::vector<VirtualPoint> HandicapStones(int num_handicap) {
 
   return points;
 }
+
+std::string PlayerToString(Player player) {
+  if (player >= 0) {
+    GoColor color = PlayerToColor(player);
+    switch (color) {
+      case GoColor::kBlack:
+        return "B";
+      case GoColor::kWhite:
+        return "W";
+      default:
+        SpielFatalError("Invalid player color");
+    }
+  } else {
+    return DefaultPlayerString(player);
+  }
+}
+
 
 }  // namespace
 
@@ -152,6 +180,45 @@ std::string GoState::ToString() const {
      << ", history.size()=" << history_.size() << ")\n";
   ss << board_;
   return ss.str();
+}
+
+std::unique_ptr<StateStruct> GoState::ToStruct() const {
+  auto rv = std::make_unique<GoStateStruct>();
+  rv->board_size = board_.board_size();
+  rv->komi = komi_;
+  rv->current_player = PlayerToString(CurrentPlayer());
+  rv->move_number = history_.size() + 1;
+  if (history_.empty()) {
+    rv->previous_move_a1 = "";
+  } else {
+    rv->previous_move_a1 = VirtualPointToString(
+        board_.ActionToVirtualAction(history_.back().action));
+  }
+  rv->board_grid.resize(board_.board_size());
+  for (int y = 0; y < board_.board_size(); ++y) {
+    rv->board_grid[y].resize(board_.board_size());
+    for (int x = 0; x < board_.board_size(); ++x) {
+      VirtualPoint point = VirtualPointFrom2DPoint(std::make_pair(y, x));
+      std::string color = GoColorToString(board_.PointColor(point));
+      rv->board_grid[y][x][VirtualPointToString(point)] = color;
+    }
+  }
+  rv->is_terminal = IsTerminal();
+  if (IsTerminal()) {
+    std::vector<double> returns = Returns();
+    Player black_player = ColorToPlayer(GoColor::kBlack);
+    Player white_player = ColorToPlayer(GoColor::kWhite);
+    if (returns[black_player] > 0) {
+      rv->winner = "B";
+    } else if (returns[white_player] > 0) {
+      rv->winner = "W";
+    } else {
+      rv->winner = "Draw";
+    }
+  } else {
+    rv->winner = "";
+  }
+  return rv;
 }
 
 bool GoState::IsTerminal() const {

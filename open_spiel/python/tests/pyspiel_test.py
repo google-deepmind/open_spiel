@@ -74,6 +74,7 @@ EXPECTED_GAMES = frozenset([
     "leduc_poker",
     "liars_dice",
     "liars_dice_ir",
+    "lines_of_action",
     "maedn",
     "mancala",
     "markov_soccer",

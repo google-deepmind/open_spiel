@@ -16,12 +16,18 @@
 #define OPEN_SPIEL_GAMES_CONNECT_FOUR_H_
 
 #include <array>
-#include <map>
+#include <functional>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // Simple game of Connect Four
 // https://en.wikipedia.org/wiki/Connect_Four
@@ -57,6 +63,26 @@ enum class CellState {
   kCross,
 };
 
+
+struct ConnectFourStateStruct : StateStruct {
+  std::vector<std::vector<std::string>> board;
+  std::string current_player;
+  bool is_terminal;
+  std::string winner;
+
+  ConnectFourStateStruct() = default;
+  explicit ConnectFourStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override {
+    return *this;
+  }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConnectFourStateStruct, board, current_player,
+                                 is_terminal, winner);
+};
+
+
 // State of an in-play game.
 class ConnectFourState : public State {
  public:
@@ -69,6 +95,7 @@ class ConnectFourState : public State {
   std::vector<Action> LegalActions() const override;
   std::string ActionToString(Player player, Action action_id) const override;
   std::string ToString() const override;
+  std::unique_ptr<StateStruct> ToStruct() const override;
   bool IsTerminal() const override;
   std::vector<double> Returns() const override;
   std::string InformationStateString(Player player) const override;

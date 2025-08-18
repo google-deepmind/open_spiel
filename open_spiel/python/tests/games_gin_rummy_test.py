@@ -62,6 +62,17 @@ class GamesGinRummyTest(absltest.TestCase):
     self.assertEqual(state.layed_melds(), [[], []])
     self.assertEqual(state.layoffs(), [])
     self.assertFalse(state.finished_layoffs())
+    for _ in range(25):  # 25 actions is sufficient to deal out all cards
+      state.apply_action(state.legal_actions()[0])
+    p0_resampled_state = state.resample_from_infostate(
+        0, pyspiel.UniformProbabilitySampler(0., 1.))
+    self.assertEqual(state.observation_string(0),
+                     p0_resampled_state.observation_string(0))
+    p1_resampled_state = state.resample_from_infostate(
+        1, pyspiel.UniformProbabilitySampler(0., 1.))
+    self.assertEqual(state.observation_string(1),
+                     p1_resampled_state.observation_string(1))
+
     # Utils
     utils = gin_rummy.GinRummyUtils(gin_rummy.DEFAULT_NUM_RANKS,
                                     gin_rummy.DEFAULT_NUM_SUITS,

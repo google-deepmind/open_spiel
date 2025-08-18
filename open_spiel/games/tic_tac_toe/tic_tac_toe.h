@@ -16,11 +16,13 @@
 #define OPEN_SPIEL_GAMES_TIC_TAC_TOE_H_
 
 #include <array>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/types/span.h"
+#include "open_spiel/json/include/nlohmann/json.hpp"
+#include "open_spiel/spiel_utils.h"
 #include "open_spiel/spiel.h"
 
 // Simple game of Noughts and Crosses:
@@ -46,6 +48,22 @@ enum class CellState {
   kEmpty,
   kNought,  // O
   kCross,   // X
+};
+
+
+struct TicTacToeStateStruct : StateStruct {
+  std::string current_player;
+  std::vector<std::string> board;
+
+  TicTacToeStateStruct() = default;
+  explicit TicTacToeStateStruct(const std::string& json_str) {
+    nlohmann::json::parse(json_str).get_to(*this);
+  }
+
+  nlohmann::json to_json_base() const override {
+    return *this;
+  }
+  NLOHMANN_DEFINE_TYPE_INTRUSIVE(TicTacToeStateStruct, current_player, board);
 };
 
 // State of an in-play game.
@@ -80,6 +98,8 @@ class TicTacToeState : public State {
 
   // Only used by Ultimate Tic-Tac-Toe.
   void SetCurrentPlayer(Player player) { current_player_ = player; }
+
+  std::unique_ptr<StateStruct> ToStruct() const override;
 
  protected:
   std::array<CellState, kNumCells> board_;

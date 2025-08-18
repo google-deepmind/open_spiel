@@ -93,6 +93,7 @@ void open_spiel::init_pyspiel_games_chess(py::module& m) {
       // num_repetitions(state: ChessState) -> int
       .def("num_repetitions", &ChessState::NumRepetitions)
       .def("parse_move_to_action", &ChessState::ParseMoveToAction)
+      .def("start_fen", &ChessState::StartFEN)
       // Pickle support
       .def(py::pickle(
           [](const ChessState& state) {  // __getstate__

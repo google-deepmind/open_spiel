@@ -17,20 +17,34 @@
 #include <sys/types.h>
 
 #include <algorithm>
-#include <array>
+#include <cassert>
+#include <cmath>
 #include <cstdint>
+#include <functional>
+#include <memory>
+#include <numeric>
+#include <ostream>
 #include <random>
+#include <sstream>
+#include <string>
+#include <vector>
 #include <utility>
 
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/memory/memory.h"
+#include "open_spiel/abseil-cpp/absl/strings/match.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_join.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
+#include "open_spiel/abseil-cpp/absl/strings/string_view.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/game_parameters.h"
+#include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/games/universal_poker/logic/gamedef.h"
+#include "open_spiel/observer.h"
 #include "open_spiel/spiel.h"
 #include "open_spiel/spiel_bots.h"
 #include "open_spiel/spiel_globals.h"
@@ -256,6 +270,7 @@ UniversalPokerState::UniversalPokerState(std::shared_ptr<const Game> game)
       handReaches_.push_back(number);
     }
     SPIEL_CHECK_EQ(handReaches_.size(), kSubgameUniqueHands * 2);
+    SPIEL_CHECK_TRUE(IsSubgame());
   }
 }
 
@@ -310,7 +325,17 @@ std::string UniversalPokerState::ActionToString(Player player,
                                                 Action move) const {
   std::string move_str;
   if (IsChanceNode()) {
-    move_str = absl::StrCat("Deal(", move, ")");
+    if (IsSubgame()) {
+      // In subgames, there is a single large chance node that encodes the
+      // card combination of all players. So we don't decode it here.
+      move_str = absl::StrCat("Deal(", move, ")");
+    } else {
+      uint8_t card = ChanceOutcomeToCard(move);
+      std::string card_str = logic::CardSet(
+          acpc_game_->NumSuitsDeck(),
+          acpc_game_->NumRanksDeck()).CardToString(card);
+      move_str = absl::StrCat("Deal ", card_str);
+    }
   } else if (static_cast<ActionType>(move) == ActionType::kFold) {
     move_str = "Fold";
   } else if (static_cast<ActionType>(move) == ActionType::kCall) {
@@ -643,7 +668,7 @@ void DistributeHands(const logic::CardSet& full_deck,
   SPIEL_CHECK_EQ(n_choose_k, 270725);
 }
 
-const std::vector <int> UniversalPokerState::GetEncodingBase() const {
+std::vector <int> UniversalPokerState::GetEncodingBase() const {
   const int num_hole_cards = acpc_game_->GetNbHoleCardsRequired();
   SPIEL_CHECK_EQ(num_hole_cards, 2);  // Only this case is implemented.
   const int num_distribute_cards = num_hole_cards * num_players_;
@@ -727,15 +752,79 @@ UniversalPokerState::DistributeHandCardsInSubgame() const {
 }
 
 bool UniversalPokerState::IsDistributingSingleCard() const {
-  return handReaches_.empty() || MoveNumber() > 0;
+  return !IsSubgame() || MoveNumber() > 0;
 }
 
+void UniversalPokerState::AddHoleCard(uint8_t card) {
+  Player p = hole_cards_dealt_ / acpc_game_->GetNbHoleCardsRequired();
+  const int card_index =
+      hole_cards_dealt_ % acpc_game_->GetNbHoleCardsRequired();
+  acpc_state_.AddHoleCard(p, card_index, card);
+  ++hole_cards_dealt_;
+}
+
+void UniversalPokerState::AddBoardCard(uint8_t card) {
+  acpc_state_.AddBoardCard(board_cards_dealt_, card);
+  ++board_cards_dealt_;
+}
+
+logic::CardSet UniversalPokerState::HoleCards(Player player) const {
+  SPIEL_CHECK_LT(player, acpc_game_->GetNbPlayers());
+
+  logic::CardSet hole_cards;
+  const int num_hole_cards_req = acpc_game_->GetNbHoleCardsRequired();
+
+  // All hole cards are dealt to each player, before moving to the next
+  // player. We do it in this order to be consistent with the order in
+  // AddHoldCard().
+  //
+  // So, suppose we have 5 hole cards dealt, 2 are required to deal to each
+  // player, and 3 players:
+  //   - player 0 has 2 hole cards
+  //   - player 1 has 2 hole cards
+  //   - player 2 has 1 hole card
+
+  // There are three cases:
+  // Let k = hole_cards_dealt_ / (num required)
+  //   1. If player < k, then player has all of their hole cards
+  //   2. If player == k, then player has hole cards up to but excluding
+  //      hole_cards_dealt_ % num_hole_cards_req
+  //   3. If player > k, then player has none of their hole cards
+  const int k = hole_cards_dealt_ / num_hole_cards_req;
+  if (player < k) {
+    for (int i = 0; i < num_hole_cards_req; ++i) {
+      hole_cards.AddCard(acpc_state_.hole_cards(player, i));
+    }
+  } else if (player == k) {
+    for (int i = 0; i < hole_cards_dealt_ % num_hole_cards_req; ++i) {
+      hole_cards.AddCard(acpc_state_.hole_cards(player, i));
+    }
+  } else {
+    // Player has no hole cards yet.
+  }
+  return hole_cards;
+}
+
+logic::CardSet UniversalPokerState::BoardCards() const {
+  logic::CardSet board_cards;
+  const int num_board_cards =
+      std::min(board_cards_dealt_,
+               static_cast<int>(acpc_game_->GetTotalNbBoardCards()));
+  for (int i = 0; i < num_board_cards; ++i) {
+    board_cards.AddCard(acpc_state_.board_cards(i));
+  }
+  return board_cards;
+}
 
 std::vector<std::pair<Action, double>> UniversalPokerState::ChanceOutcomes()
     const {
   SPIEL_CHECK_TRUE(IsChanceNode());
+
+  // Two cases:
+  //   - Normal case: we are distributing a single card.
+  //   - Subgame case: we are distributing all the hole cards to every player.
   if (IsDistributingSingleCard()) {
-    auto available_cards = LegalActions();
+    std::vector<Action> available_cards = LegalActions();
     const int num_cards = available_cards.size();
     const double p = 1.0 / num_cards;
 
@@ -834,6 +923,11 @@ int UniversalPokerState::AllInSize() const {
   return all_in_size;
 }
 
+uint8_t UniversalPokerState::ChanceOutcomeToCard(Action outcome) const {
+  return logic::CardSet(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck())
+      .ToCardArray()[outcome];
+}
+
 // We first deal the cards to each player, dealing all the cards to the first
 // player first, then the second player, until all players have their private
 // cards.
@@ -841,9 +935,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
   if (IsChanceNode()) {
     if (IsDistributingSingleCard()) {
       // In chance nodes, the action_id is an index into the full deck.
-      uint8_t card =
-          logic::CardSet(acpc_game_->NumSuitsDeck(), acpc_game_->NumRanksDeck())
-              .ToCardArray()[action_id];
+      uint8_t card = ChanceOutcomeToCard(action_id);
       deck_.RemoveCard(card);
       actionSequence_ += 'd';
       actionSequenceSizings_.push_back(0);
@@ -865,6 +957,7 @@ void UniversalPokerState::DoApplyAction(Action action_id) {
     } else {
       // We are creating the subgame: therefore we distribute the hole cards
       // to each player.
+      SPIEL_CHECK_TRUE(IsSubgame());
       std::vector<int> base = GetEncodingBase();
       std::vector<int> cards = UnrankActionMixedBase(action_id, base);
       int num_hole_cards = acpc_game_->GetNbHoleCardsRequired();
@@ -1179,7 +1272,7 @@ int UniversalPokerGame::MaxGameLength() const {
   // We cache this as this is very slow to calculate.
   if (max_game_length_) return *max_game_length_;
 
-  // Make a good guess here because bruteforcing the tree is far too slow
+  // Make a good guess here because brute forcing the tree is far too slow
   // One Terminal Action
   int length = 1;
 
@@ -1400,7 +1493,7 @@ void UniversalPokerState::_CalculateActionsAndNodeType() {
   }
 }
 
-const int UniversalPokerState::GetPossibleActionCount() const {
+int UniversalPokerState::GetPossibleActionCount() const {
   // _builtin_popcount(int) function is used to count the number of one's
   return __builtin_popcount(possibleActions_);
 }

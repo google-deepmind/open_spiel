@@ -133,7 +133,7 @@ class StatCounter:
     self._min = math.inf
 
   def add(self, value: float):
-    self.sum = self._sum + value
+    self._sum = self._sum + value
     self._n += 1
 
     delta = value - self._mean

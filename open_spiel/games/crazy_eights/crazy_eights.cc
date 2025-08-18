@@ -30,6 +30,7 @@ constexpr int kDefaultPlayers = 5;
 constexpr int kDefaultMaxDrawCards = 5;
 constexpr int kNumInitialCardsForTwoPlayers = 7;
 constexpr int kNumInitialCards = 5;
+constexpr int kDefaultMaxTurns = 100;
 
 constexpr int kEightRank = 6;     // 8
 constexpr int kSkipRank = 10;     // Q
@@ -53,6 +54,7 @@ const GameType kGameType{
     /*parameter_specification=*/
     {{"players", GameParameter(kDefaultPlayers)},
      {"max_draw_cards", GameParameter(kDefaultMaxDrawCards)},
+     {"max_turns", GameParameter(kDefaultMaxTurns)},
      {"use_special_cards", GameParameter(false)},
      {"reshuffle", GameParameter(false)}},
     /*default_loadable=*/true,
@@ -99,17 +101,20 @@ CrazyEightsGame::CrazyEightsGame(const GameParameters& params)
     : Game(kGameType, params),
       num_players_(ParameterValue<int>("players")),
       max_draw_cards_(ParameterValue<int>("max_draw_cards")),
+      max_turns_(ParameterValue<int>("max_turns")),
       use_special_cards_(ParameterValue<bool>("use_special_cards")),
       reshuffle_(ParameterValue<bool>("reshuffle")) {}
 
 CrazyEightsState::CrazyEightsState(std::shared_ptr<const Game> game,
                                    int num_players, int max_draw_cards,
+                                   int max_turns,
                                    bool use_special_cards, bool reshuffle)
     : State(game),
-      reshuffle_(reshuffle),
       num_players_(num_players),
       max_draw_cards_(max_draw_cards),
-      use_special_cards_(use_special_cards) {
+      max_turns_(max_turns),
+      use_special_cards_(use_special_cards),
+      reshuffle_(reshuffle){
   num_initial_cards_ =
       num_players == 2 ? kNumInitialCardsForTwoPlayers : kNumInitialCards;
   num_decks_ = num_players > 5 ? 2 : 1;
@@ -446,6 +451,7 @@ void CrazyEightsState::ApplyDealAction(int action) {
       redraw_ = false;
       last_card_ = action;
       last_suit_ = GetSuit(action);
+      hands_[current_player_][action]--;
       // if it is special card, act as if the dealer played this card
       if (use_special_cards_) {
         if (rank == kSkipRank) {
@@ -636,7 +642,7 @@ void CrazyEightsState::ApplyPlayAction(int action) {
     can_pass_action_ = false;
     num_draws_before_play_ = 0;
     bool all_played = CheckAllCardsPlayed(action);
-    if (all_played || num_plays >= kMaxTurnLimit) {
+    if (all_played || num_plays >= max_turns_) {
       phase_ = kGameOver;
       ScoreUp();
     }

@@ -15,19 +15,26 @@
 #ifndef OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 #define OPEN_SPIEL_GAMES_UNIVERSAL_POKER_H_
 
-#include <algorithm>
-#include <array>
+#include <cstdint>
+#include <functional>
 #include <memory>
+#include <ostream>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "open_spiel/games/universal_poker/acpc/project_acpc_server/game.h"
 #include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/container/flat_hash_set.h"
+#include "open_spiel/abseil-cpp/absl/types/optional.h"
+#include "open_spiel/abseil-cpp/absl/types/span.h"
 #include "open_spiel/games/universal_poker/acpc_cpp/acpc_game.h"
 #include "open_spiel/games/universal_poker/logic/card_set.h"
 #include "open_spiel/policy.h"
+#include "open_spiel/game_parameters.h"
 #include "open_spiel/spiel.h"
+#include "open_spiel/spiel_utils.h"
 
 // This is a wrapper around the Annual Computer Poker Competition bot (ACPC)
 // environment. See http://www.computerpokercompetition.org/. The code is
@@ -53,7 +60,6 @@ inline constexpr int kNumActionsFCHPA =
 
 enum BettingAbstraction { kFCPA = 0, kFC = 1, kFULLGAME = 2, kFCHPA = 3 };
 
-// TODO(author1): Remove StateActionType and use ActionType instead.
 enum StateActionType {
   ACTION_DEAL = 1,
   ACTION_FOLD = 2,
@@ -104,9 +110,6 @@ class UniversalPokerState : public State {
   const acpc_cpp::ACPCState &acpc_state() const { return acpc_state_; }
   const BettingAbstraction &betting() const { return betting_abstraction_; }
 
-  // TODO(author1): If this is slow, cache it.
-  // Returns the raise-to size of a pot bet. Multiple determines the size; e.g.
-  // a double pot bet would have multiple = 2.
   int PotSize(double multiple = 1.) const;
 
   // Returns the raise-to size of the current player going all-in.
@@ -122,7 +125,7 @@ class UniversalPokerState : public State {
   double GetTotalReward(Player player) const;
 
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
-  const int GetPossibleActionCount() const;
+  int GetPossibleActionCount() const;
 
   // Note: might want to update the action sequence in the future to track
   // everything per-round.
@@ -132,50 +135,13 @@ class UniversalPokerState : public State {
     return actionSequenceSizings_;
   }
 
-  void AddHoleCard(uint8_t card) {
-    Player p = hole_cards_dealt_ / acpc_game_->GetNbHoleCardsRequired();
-    const int card_index =
-        hole_cards_dealt_ % acpc_game_->GetNbHoleCardsRequired();
-    acpc_state_.AddHoleCard(p, card_index, card);
-    ++hole_cards_dealt_;
-  }
-
-  void AddBoardCard(uint8_t card) {
-    acpc_state_.AddBoardCard(board_cards_dealt_, card);
-    ++board_cards_dealt_;
-  }
-
-  logic::CardSet HoleCards(Player player) const {
-    logic::CardSet hole_cards;
-    const int num_players = acpc_game_->GetNbPlayers();
-    const int num_cards_dealt_to_all = hole_cards_dealt_ / num_players;
-    int num_cards_dealt_to_player = num_cards_dealt_to_all;
-    // We deal to players in order from 0 to n - 1. So if the number of cards
-    // dealt % num_players is > the player, we haven't dealt them a card yet;
-    // otherwise we have.
-    if (player < (hole_cards_dealt_ % num_players) &&
-        num_cards_dealt_to_all < acpc_game_->GetNbHoleCardsRequired()) {
-      ++num_cards_dealt_to_player;
-    }
-    SPIEL_CHECK_LT(player, acpc_game_->GetNbPlayers());
-    SPIEL_CHECK_LE(num_cards_dealt_to_player,
-                   static_cast<int>(acpc_game_->GetNbHoleCardsRequired()));
-    for (int i = 0; i < num_cards_dealt_to_player; ++i) {
-      hole_cards.AddCard(acpc_state_.hole_cards(player, i));
-    }
-    return hole_cards;
-  }
-
-  logic::CardSet BoardCards() const {
-    logic::CardSet board_cards;
-    const int num_board_cards =
-        std::min(board_cards_dealt_,
-                 static_cast<int>(acpc_game_->GetTotalNbBoardCards()));
-    for (int i = 0; i < num_board_cards; ++i) {
-      board_cards.AddCard(acpc_state_.board_cards(i));
-    }
-    return board_cards;
-  }
+  // Helper functions for dealing cards and getting the cards that have been
+  // dealt.
+  void AddBoardCard(uint8_t card);
+  void AddHoleCard(uint8_t card);
+  logic::CardSet HoleCards(Player player) const;
+  logic::CardSet BoardCards() const;
+  uint8_t ChanceOutcomeToCard(Action outcome) const;
 
   const acpc_cpp::ACPCGame *acpc_game_;
   mutable acpc_cpp::ACPCState acpc_state_;
@@ -195,11 +161,16 @@ class UniversalPokerState : public State {
 
   BettingAbstraction betting_abstraction_;
 
-  // Used for custom implementation of subgames.
+  // Used for custom implementation of subgames. Subgames are hand-constructed
+  // endgames that have been used a lot in the Poker AI literature. To build
+  // a subgame the handReaches_ vector must be populated with the reach
+  // probabilities of each player for each of the possible hands. Please see
+  // universal_poker_test.cc for an example of how to construct custom subgames.
   std::vector<double> handReaches_;
+  bool IsSubgame() const { return !handReaches_.empty(); }
   std::vector <std::pair <Action, double>> DistributeHandCardsInSubgame() const;
   bool IsDistributingSingleCard() const;
-  const std::vector <int> GetEncodingBase() const;
+  std::vector <int> GetEncodingBase() const;
 };
 
 class UniversalPokerGame : public Game {

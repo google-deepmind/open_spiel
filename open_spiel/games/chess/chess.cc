@@ -104,13 +104,11 @@ ChessState::ChessState(std::shared_ptr<const Game> game)
       start_board_(MakeDefaultBoard()),
       current_board_(start_board_) {
   repetitions_[current_board_.HashValue()] = 1;
-  if (ParentGame()->IsChess960()) {
-    chess960_random_start_fen_ = "UNINITIALIZED";
-  }
 }
 
 ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
     : State(game) {
+  specific_initial_fen_ = fen;
   auto maybe_board = ChessBoard::BoardFromFEN(fen);
   SPIEL_CHECK_TRUE(maybe_board);
   start_board_ = *maybe_board;
@@ -119,8 +117,8 @@ ChessState::ChessState(std::shared_ptr<const Game> game, const std::string& fen)
 }
 
 Player ChessState::CurrentPlayer() const {
-  if (ParentGame()->IsChess960() &&
-      chess960_random_start_fen_ == "UNINITIALIZED") {
+  if (ParentGame()->IsChess960() && specific_initial_fen_.empty() &&
+      move_number_ == 0) {
     return kChancePlayerId;
   }
   return IsTerminal() ? kTerminalPlayerId : ColorToPlayer(Board().ToPlay());
@@ -155,8 +153,8 @@ void ChessState::DoApplyAction(Action action) {
     repetitions_ = RepetitionTable();
 
     // Then get the initial fen and set the board.
-    chess960_random_start_fen_ = ParentGame()->Chess960LookupFEN(action);
-    auto maybe_board = ChessBoard::BoardFromFEN(chess960_random_start_fen_);
+    std::string fen = ParentGame()->Chess960LookupFEN(action);
+    auto maybe_board = ChessBoard::BoardFromFEN(fen);
     SPIEL_CHECK_TRUE(maybe_board);
     start_board_ = *maybe_board;
     current_board_ = start_board_;
@@ -537,16 +535,19 @@ absl::optional<std::vector<double>> ChessState::MaybeFinalReturns() const {
 
 std::string ChessState::Serialize() const {
   std::string state_str = "";
-  absl::StrAppend(&state_str, "FEN: ",
-                  start_board_.ToFEN(ParentGame()->IsChess960()), "\n");
-  if (ParentGame()->IsChess960()) {
-    absl::StrAppend(&state_str,
-                    "CHESS960_RANDOM_START_FEN: ", chess960_random_start_fen_,
-                    "\n");
-  }
-  absl::StrAppend(&state_str, absl::StrJoin(History(), "\n"), "\n");
+  // If the specific_initial_fen is empty, the deserializer will use the
+  // default NewInitialState(). Otherwise, the deserializer will specify
+  // the specific initial fen by calling NewInitialState(string).
+  absl::StrAppend(&state_str, "FEN: ", specific_initial_fen_, "\n");
+  std::vector<Action> history = History();
+  absl::StrAppend(&state_str, absl::StrJoin(history, "\n"), "\n");
   return state_str;
 }
+
+std::string ChessState::StartFEN() const {
+  return start_board_.ToFEN(ParentGame()->IsChess960());
+}
+
 
 ChessGame::ChessGame(const GameParameters& params)
     : Game(kGameType, params), chess960_(ParameterValue<bool>("chess960")) {
@@ -563,27 +564,16 @@ std::unique_ptr<State> ChessGame::DeserializeState(
     // Backward compatibility.
     return Game::DeserializeState(str);
   }
-  int line_num = 0;
   std::vector<std::string> lines = absl::StrSplit(str, '\n');
-  // Create initial state from FEN (first line of serialized state).
-  std::unique_ptr<State> state =
-      NewInitialState(lines[line_num].substr(prefix.length()));
-  line_num += 1;
-  ChessState* chess_state = down_cast<ChessState*>(state.get());
-  if (IsChess960()) {
-    const std::string chess960_prefix("CHESS960_RANDOM_START_FEN: ");
-    std::string chess960_random_start_fen =
-        lines[line_num].substr(chess960_prefix.length());
-    chess_state->SetChess960RandomStartFEN(chess960_random_start_fen);
-    line_num += 1;
-    if (!chess960_random_start_fen.empty()) {
-      // If the random start fen is not empty, it means that it was randomly
-      // generated at the start of the game, so the history contains a chance
-      // node outcome for the first move. We need to skip it because we
-      // initialize the state directly using NewInitialState(fen).
-      line_num += 1;
-    }
+  int line_num = 0;
+  std::string fen = lines[line_num].substr(prefix.length());
+  std::unique_ptr<State> state = nullptr;
+  if (fen.empty()) {
+    state = NewInitialState();
+  } else {
+    state = NewInitialState(fen);
   }
+  line_num += 1;
   for (int i = line_num; i < lines.size(); ++i) {
     if (lines[i].empty()) {
       break;

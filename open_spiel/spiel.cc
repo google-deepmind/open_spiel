@@ -154,7 +154,8 @@ std::shared_ptr<const Game> GameRegisterer::CreateByName(
     const std::string& short_name, const GameParameters& params) {
   // Check if it's a game with a known issue. If so, output a warning.
   if (absl::c_linear_search(GamesWithKnownIssues(), short_name)) {
-    std::cerr << "Warning! This game has known issues. Please see the games "
+    std::cerr << "Warning! The implementation of '" << short_name
+              << "' has known issues. Please see the games "
               << "list on github or the code for details." << std::endl;
   }
 
@@ -379,13 +380,12 @@ void State::ApplyAction(Action action_id) {
 
 void State::ApplyActionWithLegalityCheck(Action action_id) {
   std::vector<Action> legal_actions = LegalActions();
-  if (absl::c_find(legal_actions, action_id) == legal_actions.end()) {
-    Player cur_player = CurrentPlayer();
-    SpielFatalError(
-        absl::StrCat("Current player ", cur_player, " calling ApplyAction ",
-                     "with illegal action (", action_id, "): ",
-                     ActionToString(cur_player, action_id)));
-  }
+  SPIEL_CHECK_TRUE_WSI(
+      absl::c_find(legal_actions, action_id) != legal_actions.end(),
+      absl::StrCat("Current player ", CurrentPlayer(), " calling ApplyAction ",
+                   "with illegal action (", action_id,
+                   "): ", ActionToString(CurrentPlayer(), action_id)),
+      *this->GetGame(), *this);
   ApplyAction(action_id);
 }
 
@@ -403,13 +403,15 @@ void State::ApplyActions(const std::vector<Action>& actions) {
 void State::ApplyActionsWithLegalityChecks(const std::vector<Action>& actions) {
   for (Player player = 0; player < actions.size(); ++player) {
     std::vector<Action> legal_actions = LegalActions(player);
-    if (!legal_actions.empty() &&
-        absl::c_find(legal_actions, actions[player]) == legal_actions.end()) {
-      SpielFatalError(
-          absl::StrCat("Player ", player, " calling ApplyAction ",
-                       "with illegal action (", actions[player], "): ",
-                       ActionToString(player, actions[player])));
+    if (legal_actions.empty()) {
+      continue;
     }
+    SPIEL_CHECK_TRUE_WSI(
+        absl::c_find(legal_actions, actions[player]) != legal_actions.end(),
+        absl::StrCat("Player ", player, " calling ApplyActions ",
+                     "with illegal action (", actions[player],
+                     "): ", ActionToString(player, actions[player])),
+        *this->GetGame(), *this);
   }
   ApplyActions(actions);
 }
@@ -834,6 +836,23 @@ void State::InformationStateTensor(Player player,
   // Retained for backwards compatibility.
   values->resize(game_->InformationStateTensorSize());
   InformationStateTensor(player, absl::MakeSpan(*values));
+}
+
+bool State::IsInitialNonChanceState() const {
+  if (IsChanceNode()) {
+    return false;
+  }
+  SPIEL_CHECK_EQ(GetGame()->GetType().chance_mode,
+                 GameType::ChanceMode::kExplicitStochastic);
+  std::vector<Action> history = History();
+  std::unique_ptr<State> state = GetGame()->NewInitialState();
+  for (Action action : history) {
+    if (!state->IsChanceNode()) {
+      return false;
+    }
+    state->ApplyAction(action);
+  }
+  return true;
 }
 
 bool State::PlayerAction::operator==(const PlayerAction& other) const {

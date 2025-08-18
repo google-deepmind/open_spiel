@@ -29,6 +29,9 @@ export DEFAULT_OPTIONAL_DEPENDENCY=${DEFAULT_OPTIONAL_DEPENDENCY:-"OFF"}
 # Building the Python API can be disabled by setting this to OFF.
 export OPEN_SPIEL_BUILD_WITH_PYTHON=${OPEN_SPIEL_BUILD_WITH_PYTHON:-"ON"}
 
+# Abseil version. Must support older versions for previous wheels on MacOS.
+export OPEN_SPIEL_ABSL_VERSION=${OPEN_SPIEL_ABSL_VERSION:-"20250127.1"}
+
 # Each optional dependency has their own flag, that defaults to the global
 # "$DEFAULT_OPTIONAL_DEPENDENCY" if undefined. To enable an optional dependency,
 # we recomment defining the associated environment variable in your bashrc or
