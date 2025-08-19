@@ -408,6 +408,7 @@ PYBIND11_MODULE(pyspiel, m) {
       .def("max_chance_nodes_in_history", &Game::MaxChanceNodesInHistory)
       .def("max_move_number", &Game::MaxMoveNumber)
       .def("max_history_length", &Game::MaxHistoryLength)
+      .def("serialize", &Game::Serialize)
       .def("make_observer",
            [](std::shared_ptr<const Game> game, IIGObservationType iig_obs_type,
               const GameParameters& params) {
@@ -656,6 +657,12 @@ PYBIND11_MODULE(pyspiel, m) {
       },
       "A general implementation of deserialization of a game and state "
       "string serialized by serialize_game_and_state.");
+
+  m.def("deserialize_game",
+      [](const std::string& data) {
+        return open_spiel::DeserializeGame(data);
+      },
+      "A general implementation of deserialization of a game.");
 
   m.def("register_game", RegisterPyGame,
         "Register a Python game implementation");
