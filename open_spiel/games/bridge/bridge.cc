@@ -117,23 +117,23 @@ int Card(Suit suit, int rank) {
   return rank * kNumSuits + static_cast<int>(suit);
 }
 
-constexpr std::array<std::string, kNumCardsPerSuit> kRankNames = {
+constexpr std::array<const char*, kNumCardsPerSuit> kRankNames = {
     "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
-constexpr std::array<std::string, kNumSuits> kSuitNames = {"♣", "♦", "♥", "♠"};
+constexpr std::array<const char*, kNumSuits> kSuitNames = {"♣", "♦", "♥", "♠"};
 
 std::string CardString(int card) {
   return absl::StrCat(kSuitNames[static_cast<int>(CardSuit(card))],
                       kRankNames[CardRank(card)]);
 }
 
-constexpr std::array<std::string, 1 + kNumBidLevels> kLevelString = {
+constexpr std::array<const char*, 1 + kNumBidLevels> kLevelString = {
     "-", "1", "2", "3", "4", "5", "6", "7"};
-constexpr std::array<std::string, kNumDenominations> kDenominationString = {
+constexpr std::array<const char*, kNumDenominations> kDenominationString = {
     "♣", "♦", "♥", "♠", "NT"};
-constexpr std::array<std::string, kNumDenominations> kDenominationStringAscii =
+constexpr std::array<const char*, kNumDenominations> kDenominationStringAscii =
     {"C", "D", "H", "S", "NT"};
 
-constexpr std::array<std::string, kNumPlayers> kPlayerNames = {"North", "East",
+constexpr std::array<const char*, kNumPlayers> kPlayerNames = {"North", "East",
                                                                "South", "West"};
 
 std::string BidString(int bid) {
