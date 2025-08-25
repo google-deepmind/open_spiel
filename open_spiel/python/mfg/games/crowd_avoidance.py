@@ -96,8 +96,10 @@ def grid_to_forbidden_states(grid):
 def pairs_string_to_list(positions: str) -> List[np.ndarray]:
   """Converts a string representing positions into a list of positions."""
   pos = positions[1:-1]  # remove [ and ]
+  if not pos:
+    return []
   split = pos.split(";")
-  return [np.array([i for i in s.split("|")]) for s in split]
+  return [np.array([int(i) for i in s.split("|")], dtype=int) for s in split]
 
 
 forbidden_states_grid = [
