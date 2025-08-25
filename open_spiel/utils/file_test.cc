@@ -15,21 +15,39 @@
 #include "open_spiel/utils/file.h"
 
 #include <cstdlib>
+#include <ctime>
+#include <random>
 #include <string>
+#include <utility>
 
+
+#include "open_spiel/abseil-cpp/absl/random/distributions.h"
 #include "open_spiel/spiel_utils.h"
+
+constexpr int kMaxNumAttempts = 100;
+constexpr int kMaxRandomVal = 1000000000;
 
 namespace open_spiel::file {
 namespace {
 
 void TestFile() {
-  std::string val = std::to_string(std::rand());  // NOLINT
+  std::mt19937 rng(std::time(nullptr));
+  std::string val = std::to_string(absl::Uniform<int>(rng, 0, kMaxRandomVal));
   std::string tmp_dir = file::GetTmpDir();
   std::string dir = tmp_dir + "/open_spiel-test-" + val;
   std::string filename = dir + "/test-file.txt";
 
   SPIEL_CHECK_TRUE(Exists(tmp_dir));
   SPIEL_CHECK_TRUE(IsDirectory(tmp_dir));
+
+  // Create a directory with a random name. Sometimes this directory happens
+  // to already exist. So we keep trying until we succeed or run
+  // out of directories.
+  int attempts = 0;
+  while (Exists(dir) && attempts < kMaxNumAttempts) {
+    val = std::to_string(absl::Uniform<int>(rng, 0, kMaxRandomVal));
+    dir = tmp_dir + "/open_spiel-test-" + val;
+  }
 
   SPIEL_CHECK_FALSE(Exists(dir));
   SPIEL_CHECK_TRUE(Mkdir(dir));
