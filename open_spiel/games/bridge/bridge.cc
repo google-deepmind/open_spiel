@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -1079,6 +1080,8 @@ std::string BridgeGame::ContractString(int index) const {
   return kAllContracts[index].ToString();
 }
 
+// Note that uniform_int_distribution here may not generate a sequence of states
+// that is consistent across compilers.
 std::unique_ptr<State> BridgeGame::NewDuplicateBridgeInitialState(
     int tournament_seed, int board_number) const {
   // Standard assignments of dealer and vulnerability based on the board number.
