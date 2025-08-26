@@ -17,6 +17,7 @@
 import math
 import time
 
+from absl import logging
 import numpy as np
 
 import pyspiel
@@ -264,7 +265,22 @@ class MCTSBot(pyspiel.Bot):
     pass
 
   def step_with_policy(self, state):
-    """Returns bot's policy and action at given state."""
+    """Returns bot's policy and action at given state.
+
+    Returns an invalid action policy and action if the state is a chance node.
+
+    Args:
+      state: pyspiel.State object, state to search from
+
+    Returns:
+      policy: A list of (action, probability) pairs.
+      action: The action the bot takes.
+    """
+    if state.is_chance_node():
+      logging.info("Chance node, returning invalid action policy.")
+      policy = [(pyspiel.INVALID_ACTION, 1.0)]
+      return policy, pyspiel.INVALID_ACTION
+
     t1 = time.time()
     root = self.mcts_search(state)
 
