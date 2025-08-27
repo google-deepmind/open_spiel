@@ -19,6 +19,7 @@ def flatten(x):
   return x.reshape(-1)
 
 def tree_sum(tree: Any, initialiser: Any):
+  """Sum of all elements in a tree. Re-used from `optax`."""
   sums = jax.tree.map(jnp.sum, tree)
   return jax.tree.reduce(lambda x, y: x+y, sums, initializer=initialiser)
 
@@ -37,14 +38,6 @@ class TrainInput:
     stacked_states = jax.tree.map(lambda *x: jnp.stack(x), *train_inputs)
     stacked_states = stacked_states.replace(value=jnp.expand_dims(stacked_states.value, 1))
 
-    # observation, legals_mask, policy, value = zip(*[
-    #   (ti.observation, ti.legals_mask, ti.policy, ti.value) for ti in train_inputs
-    # ])
-    # return TrainInput(
-    #     observation=jnp.array(observation, dtype=jnp.float32),
-    #     legals_mask=jnp.array(legals_mask, dtype=jnp.bool),
-    #     policy=jnp.array(policy, dtype=jnp.float32),
-    #     value=jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
     return stacked_states
 
 @chex.dataclass(frozen=True)
@@ -60,8 +53,8 @@ class Losses:
     return self.policy + self.value + self.l2
 
   def __str__(self):
-    return ("Losses(total: {:.3f}, policy: {:.3f}, value: {:.3f}, "
-            "l2: {:.3f})").format(self.total, self.policy, self.value, self.l2)
+    return (f"Losses(total: {self.total:.3f}, policy: {self.policy:.3f}, value: {self.value:.3f}, "
+            f"l2: {self.l2:.3f})")
 
   def __add__(self, other):
     return Losses(

@@ -21,11 +21,19 @@ from open_spiel.python.algorithms.alpha_zero import alpha_zero
 from open_spiel.python.algorithms.alpha_zero.utils import api_selector, AVIALABLE_APIS
 from open_spiel.python.utils import spawn
 
+flags.DEFINE_enum("device", "cpu", ["cpu", "gpu", "mps"],
+                  "What type of device should be used for training?.\
+                  The corresponding jax version has to be installed")
+
+flags.DEFINE_enum("nn_api_version", "linen", ["linen", "nnx"],
+                  "What type of flax api should be used for training?.\
+                  Currently, linen and nnx are supported")
+
 flags.DEFINE_string("game", "connect_four", "Name of the game.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("max_simulations", 300, "How many simulations to run.")
-flags.DEFINE_integer("train_batch_size", 2 ** 10, "Batch size for learning.")
-flags.DEFINE_integer("replay_buffer_size", 2 ** 16,
+flags.DEFINE_integer("train_batch_size", 2 ** 3, "Batch size for learning.")
+flags.DEFINE_integer("replay_buffer_size", 2 ** 8,
                      "How many states to store in the replay buffer.")
 flags.DEFINE_integer("replay_buffer_reuse", 3,
                      "How many times to learn from each state.")
@@ -57,7 +65,7 @@ flags.DEFINE_bool("quiet", True, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
 
 FLAGS = flags.FLAGS
-
+#TODO: api
 
 def main(unused_argv):
   config = alpha_zero.Config(
@@ -89,9 +97,11 @@ def main(unused_argv):
       output_size=None,
 
       quiet=FLAGS.quiet,
+      nn_api_version=FLAGS.nn_api_version,
+      device=FLAGS.device
   )
-  alpha_zero.alpha_zero(config)
 
+  alpha_zero.alpha_zero(config)
 
 if __name__ == "__main__":
   with spawn.main_handler():

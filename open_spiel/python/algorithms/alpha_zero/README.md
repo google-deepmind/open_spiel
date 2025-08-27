@@ -40,10 +40,5 @@ Currently, the framework supports two APIs:
 2. Rewritten utils like replay buffer and configuation classes to support the device-agnostic implementation
 
 
-### TODOs:
-
-1. Add complete tests for both APIs and conduct study that benchmarks the implementations on a selection of games
-2. Fix multiprocessing/vectorisation overlap, enhancing the performance.
-
 
 

@@ -15,7 +15,6 @@ class FakeTransition:
   reward: chex.Array 
 
 
-
 def get_fake_batch(fake_transition: chex.ArrayTree, batch_size) -> chex.ArrayTree:
     """Create a fake batch with differing values for each transition."""
     return jax.tree.map(

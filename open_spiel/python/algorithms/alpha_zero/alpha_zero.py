@@ -58,6 +58,7 @@ from open_spiel.python.utils import stats
 
 import chex
 import jax.numpy as jnp
+import jax
 
 # Set TF environment variables for GPU memory management and device visibility.
 # This must be done BEFORE TensorFlow is imported.
@@ -84,7 +85,6 @@ except RuntimeError:
 
 # Time to wait for processes to join.
 JOIN_WAIT_DELAY = 0.001
-
 
 @chex.dataclass(frozen=True)
 class TrajectoryState:
@@ -135,6 +135,10 @@ class Config:
   quiet: bool
 
   nn_api_version: str = "nnx" 
+  # device can be 'cpu', 'gpu', or 'mps'
+  # NOTE: the corresponding `jax` version has to be installed. See
+  # https://docs.jax.dev/en/latest/installation.html#supported-platforms
+  device: str = "cpu"
 
 def _init_model_from_config(config: Config):
   return api_selector(config.nn_api_version).Model.build_model(
@@ -189,7 +193,8 @@ def _init_bot(config, game, evaluator_, evaluation):
       dirichlet_noise=noise,
       child_selection_fn=mcts.SearchNode.puct_value,
       verbose=False,
-      dont_return_chance_node=True)
+      dont_return_chance_node=True
+    )
 
 
 def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
@@ -242,7 +247,7 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
   #it's not good to do like that but it's python.
   trajectory = Trajectory(
     states=trajectory,
-    returns=np.array(state.returns())
+    returns=jnp.array(state.returns())
   )
   logger.print("Game {}: Returns: {}; Actions: {}".format(
       game_num, " ".join(map(str, trajectory.returns)), " ".join(actions)))
@@ -322,10 +327,10 @@ def evaluator(*, game, config, logger, queue):
     results.append(trajectory.returns[az_player])
     queue.put((difficulty, trajectory.returns[az_player]))
 
-    logger.print("AZ: {}, MCTS: {}, AZ avg/{}: {:.3f}".format(
-        trajectory.returns[az_player],
-        trajectory.returns[1 - az_player],
-        len(results), jnp.mean(results.data)))
+    logger.print(f"AZ: {trajectory.returns[az_player]},\
+      MCTS: {trajectory.returns[1 - az_player]},\
+      AZ avg/{len(results)}: {jnp.mean(results.data):.3f}"
+    )
 
 
 @watcher
@@ -360,7 +365,6 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     while True:
       found = 0
       for actor_process in actors:
-        # print(actor_process.queue.get_nowait())
         try:
           yield actor_process.queue.get_nowait()
         except spawn.Empty:
@@ -371,7 +375,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         time.sleep(0.01)  # 10ms
 
   def collect_trajectories():
-    print("Collecting trajectories")
+    logger.print("Collecting trajectories")
     """Collects the trajectories from actors into the replay buffer."""
     num_trajectories = 0
     num_states = 0
@@ -418,17 +422,22 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     losses = [] 
     #TODO: why not to replace replace with `jax.lax.scan`, 
     # but the model state does not explicitly states
-    logger.print("Updating the model")
+    logger.print("Updating the model", len(replay_buffer), config.train_batch_size)
     for _ in range(len(replay_buffer) // config.train_batch_size):
       data = replay_buffer.sample(config.train_batch_size)
       losses.append(model.update(data))
 
     # Always save a checkpoint, either for keeping or for loading the weights to
-    # the actors. It only allows numbers, so use -1 as "latest".
+    # the actors. We only allow numbers, so use -1 as "latest".
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1)
+    
+    # for an unlucky case when the agent didn't collect enough transitions
+    if len(losses):
+      losses = sum(losses, Losses(policy=0, value=0, l2=0)) / len(losses)
+    else:
+      losses = Losses(policy=0, value=0, l2=0)
 
-    losses = sum(losses, Losses(policy=0, value=0, l2=0)) / len(losses)
     logger.print(losses)
     logger.print("Checkpoint saved:", save_path)
     return save_path, losses
@@ -456,8 +465,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
              num_states, num_trajectories, num_states / seconds,
              num_states / (config.actors * seconds),
              num_states / num_trajectories))
-    logger.print("Buffer size: {}. States seen: {}".format(
-        len(replay_buffer), replay_buffer.total_seen))
+    logger.print(f"Buffer size: {len(replay_buffer)}. States seen: {replay_buffer.total_seen}")
 
     save_path, losses = learn(step)
 
@@ -487,15 +495,15 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         "value_prediction": [v.as_dict for v in value_predictions],
         "eval": {
             "count": evals[0].total_seen,
-            "results": [tree_sum(e.data).item() / len(e) if e else 0 for e in evals],
+            "results": [tree_sum(e.data, 0).item() / len(e) if e else 0 for e in evals],
         },
         "batch_size": batch_size_stats.as_dict,
         "batch_size_hist": [0, 1],
         "loss": {
-            "policy": float(losses.policy.item()),
-            "value": float(losses.value.item()),
-            "l2reg": float(losses.l2.item()),
-            "sum": float(losses.total.item()),
+            "policy": float(losses.policy),
+            "value": float(losses.value),
+            "l2reg": float(losses.l2),
+            "sum": float(losses.total),
         },
         "cache": {  # Null stats because it's hard to report between processes.
             "size": 0,
@@ -518,63 +526,65 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
 
 def alpha_zero(config: Config):
-  """Start all the worker processes for a full alphazero setup."""
-  game = pyspiel.load_game(config.game)
-  config = config.replace(
-      observation_shape=game.observation_tensor_shape(),
-      output_size=game.num_distinct_actions())
+  # NOTE: a single device accelearation is currently supported
+  with jax.default_device(jax.devices(config.device)[0]):
 
-  print("Starting game", config.game)
-  if game.num_players() != 2:
-    sys.exit("AlphaZero can only handle 2-player games.")
-  game_type = game.get_type()
-  if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
-    raise ValueError("Game must have terminal rewards.")
-  if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
-    raise ValueError("Game must have sequential turns.")
+    """Start all the worker processes for a full alphazero setup."""
+    game = pyspiel.load_game(config.game)
+    config = config.replace(
+        observation_shape=game.observation_tensor_shape(),
+        output_size=game.num_distinct_actions())
 
-  path = config.path
-  if not path:
-    path = tempfile.mkdtemp(prefix="az-{}-{}-".format(
-        datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"), config.game))
-    config = config.replace(path=path)
+    print("Starting game", config.game)
+    if game.num_players() != 2:
+      sys.exit("AlphaZero can only handle 2-player games.")
+    game_type = game.get_type()
+    if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
+      raise ValueError("Game must have terminal rewards.")
+    if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
+      raise ValueError("Game must have sequential turns.")
 
-  if not os.path.exists(path):
-    os.makedirs(path)
-  if not os.path.isdir(path):
-    sys.exit("{} isn't a directory".format(path))
-  print("Writing logs and checkpoints to:", path)
-  print("Model type: %s(%s, %s)" % (config.nn_model, config.nn_width,
-                                    config.nn_depth))
+    path = config.path
+    if not path:
+      path = tempfile.mkdtemp(prefix="az-{}-{}-".format(
+          datetime.datetime.now().strftime("%Y-%m-%d-%H-%M"), config.game))
+      config = config.replace(path=path)
 
-  with open(os.path.join(config.path, "config.json"), "w") as fp:
-    fp.write(json.dumps(config.__dict__, indent=2, sort_keys=True) + "\n")
+    if not os.path.exists(path):
+      os.makedirs(path)
+    if not os.path.isdir(path):
+      sys.exit(f"{path} isn't a directory")
+    print(f"Writing logs and checkpoints to: {path}")
+    print(f"Model type: {config.nn_model}(width={config.nn_width}, depth={config.nn_depth})")
 
-  actors = [spawn.Process(actor, kwargs={"game": game, "config": config,
-                                         "num": i})
-            for i in range(config.actors)]
-  
-  evaluators = [spawn.Process(evaluator, kwargs={"game": game, "config": config,
-                                                 "num": i})
-                for i in range(config.evaluators)]
+    with open(os.path.join(config.path, "config.json"), "w") as fp:
+      fp.write(json.dumps(config.__dict__, indent=2, sort_keys=True) + "\n")
 
-  def broadcast(msg):
-    for proc in actors+evaluators:
-      proc.queue.put(msg)
+    actors = [spawn.Process(actor, kwargs={"game": game, "config": config,
+                                          "num": i})
+              for i in range(config.actors)]
+    
+    evaluators = [spawn.Process(evaluator, kwargs={"game": game, "config": config,
+                                                  "num": i})
+                  for i in range(config.evaluators)]
 
-  try:
-    learner(game=game, config=config, actors=actors,  # pylint: disable=missing-kwoa
-            evaluators=evaluators, broadcast_fn=broadcast)
-  except (KeyboardInterrupt, EOFError):
-    print("Caught a KeyboardInterrupt, stopping early.")
-  finally:
-    broadcast("")
-    # for actor processes to join we have to make sure that their q_in is empty,
-    # including backed up items
-    for proc in actors:
-      while proc.exitcode is None:
-        while not proc.queue.empty():
-          proc.queue.get_nowait()
-        proc.join(JOIN_WAIT_DELAY)
-    for proc in evaluators:
-      proc.join()
+    def broadcast(msg):
+      for proc in actors+evaluators:
+        proc.queue.put(msg)
+
+    try:
+      learner(game=game, config=config, actors=actors,  # pylint: disable=missing-kwoa
+              evaluators=evaluators, broadcast_fn=broadcast)
+    except (KeyboardInterrupt, EOFError):
+      print("Caught a KeyboardInterrupt, stopping early.")
+    finally:
+      broadcast("")
+      # for actor processes to join we have to make sure that their q_in is empty,
+      # including backed up items
+      for proc in actors:
+        while proc.exitcode is None:
+          while not proc.queue.empty():
+            proc.queue.get_nowait()
+          proc.join(JOIN_WAIT_DELAY)
+      for proc in evaluators:
+        proc.join()

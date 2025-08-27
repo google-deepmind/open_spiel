@@ -19,7 +19,6 @@ from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, fl
 flax.config.update('flax_use_orbax_checkpointing', True)
 warnings.warn("Pay attention that you've been using the `linen` api")
 
-
 activations_dict = {
     "celu": nn.celu,
     "elu": nn.elu,
@@ -180,11 +179,12 @@ class AlphaZeroModel(nn.Module):
   @nn.compact
   def __call__(self, observations: chex.Array, training: bool = False) -> tuple[chex.Array, chex.Array]:
 
-    # torso
+    # torso:
+    # TODO: may also in the future replace the for-loop iteration with nn.scan
     x = observations
     if self.model_type == "mlp":
       x = flatten(observations)
-      for ind in range(self.nn_depth): #leave the for-loop of let it go?
+      for _ in range(self.nn_depth):
         x = MLPBlock(features=self.nn_width, activation=self.activation)(x)
     elif self.model_type == "conv2d":
       x = observations.reshape(self.input_shape)
@@ -193,7 +193,7 @@ class AlphaZeroModel(nn.Module):
     elif self.model_type == "resnet":
       x = observations.reshape(self.input_shape)
       x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
-      for _ in range(self.nn_depth-1):
+      for _ in range(1, self.nn_depth):
         x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
 
     else:
@@ -218,16 +218,16 @@ class Model:
     state: TrainState, 
     path: str, 
     update_step_fn: Callable,
-    checkpoint_uid: str = None,
-  ): 
+  ) -> None: 
     
     self._model = model
     self._state = state
     self._path = path
     self._update_step_fn = update_step_fn
     
-    #we're using the latest checkpointing API
+    # we're using the latest checkpointing API
     # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
+
     self._checkpointer = None
     if self._path is not None:
       self._checkpointer = orbax.checkpoint.PyTreeCheckpointer()
@@ -335,8 +335,7 @@ class Model:
 
     return value, policy
   
-  def update(self, train_inputs: Sequence[TrainInput]) -> Losses:
-    batch = TrainInput.stack(train_inputs)
+  def update(self, batch: Sequence[TrainInput]) -> Losses:
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
@@ -344,12 +343,10 @@ class Model:
   def save_checkpoint(self, step: int) -> int:
     path = os.path.join(self._path, f"checkpoint-{step}")
     self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state), force=True)
-    # self._checkpointer.wait_until_finished()
     return step
    
   def load_checkpoint(self, step: int | str) -> TrainState:
     target = self._state
-    path = os.path.join(self._path, str(step)) if isinstance(step, int) else step
+    path = os.path.join(self._path, f"checkpoint-{step}")
     self._state = self._checkpointer.restore(path, item=target)
-    # self._checkpointer.wait_until_finished()
     return self._state

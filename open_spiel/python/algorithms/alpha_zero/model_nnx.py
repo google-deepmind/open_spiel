@@ -183,10 +183,8 @@ class ValueHead(nn.Module):
         nn.Linear(np.prod(space_features) * 1, nn_width, rngs=nn.Rngs(seed))
       )
 
-    self.value_head = nn.Sequential(
-      MLPBlock(nn_width, nn_width, "relu", seed=seed),
-      MLPBlock(nn_width, 1, "tanh", seed=seed),
-    )
+    self.value_head = MLPBlock(nn_width, 1, "tanh", seed=seed)
+    
     
   
   def __call__(self, x: chex.Array) -> chex.Array:
@@ -254,7 +252,7 @@ class AlphaZeroModel(nn.Module):
       self.torso = nn.Sequential(
         Flatten(),
         MLPBlock(np.prod(input_shape), nn_width, activation=activation, seed=seed), *[
-        MLPBlock(nn_width, nn_width, activation=activation, seed=seed) for _ in range(nn_depth)
+        MLPBlock(nn_width, nn_width, activation=activation, seed=seed) for _ in range(1, nn_depth)
       ])
     elif model_type == "conv2d":
       self.torso = nn.Sequential( 
@@ -267,7 +265,7 @@ class AlphaZeroModel(nn.Module):
      self.torso = nn.Sequential( 
         lambda x: x.reshape(input_shape),
         ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed), *[
-        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(nn_depth)
+        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(1, nn_depth)
       ])
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
@@ -287,7 +285,6 @@ class AlphaZeroModel(nn.Module):
     return policy_logits, value_out
 
 
-
 #modified train state
 class TrainState(train_state.TrainState):
   batch_stats: nn.State
@@ -302,11 +299,7 @@ class Model:
     model: nn.Module, 
     state: TrainState, 
     path: str, 
-    update_step_fn: Callable,
-    checkpoint_uid=None,
-    checkpoint_saving_interval=None,
-    max_checkpoints_to_keep=None,
-    checkpoint_rotation_period=None
+    update_step_fn: Callable
   ) -> None: 
     
     self._model = model
@@ -314,8 +307,8 @@ class Model:
     self._path = path
     self._update_step_fn = update_step_fn
     
-    #we're using the latest checkpointing API
-    # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
+    # we're using the latest checkpointing API, see:
+    # https://flax.readthedocs.io/en/latest/guides/checkpointing.html
     
     self._checkpointer = None
     if self._path is not None:
@@ -334,7 +327,6 @@ class Model:
       graphdef=graphdef
     )
     
-
   @classmethod
   def build_model(cls, model_type, input_shape, output_size, nn_width, nn_depth,
                   weight_decay, learning_rate, path, seed=0):
@@ -373,7 +365,8 @@ class Model:
         policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
 
-        l2_reg_loss = weight_decay * jax.tree.reduce(operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0)
+        l2_reg_loss = jax.tree.reduce(
+          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0) * weight_decay
         
         total_loss = policy_loss + value_loss + l2_reg_loss
 
@@ -381,7 +374,8 @@ class Model:
         return total_loss, (policy_loss, value_loss, l2_reg_loss, batch_stats)
 
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
-      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(state.params, observations, legals_mask, policy_targets, value_targets)
+      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
+        state.params, observations, legals_mask, policy_targets, value_targets)
       
       new_state = state.apply_gradients(grads=grads)
       new_state = new_state.replace(batch_stats=new_batch_stats)
@@ -396,7 +390,7 @@ class Model:
       raise ValueError("model_args must be provided for checkpoint loading")
     
     model = cls.build_model(**model_args)
-    model._state = cls.load_checkpoint(checkpoint_path, model._state)
+    model._state = cls.load_checkpoint(checkpoint_path)
   
     return model
   
@@ -427,23 +421,28 @@ class Model:
 
     return value, policy
   
-  def update(self, batch: Sequence[TrainInput]):
+  def update(self, batch: Sequence[TrainInput] | chex.ArrayTree):
     self._model.train()
-    # batch = TrainInput.stack(train_inputs)
-    self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
+    self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
+      self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
   def save_checkpoint(self, step: int) -> int:
     path = os.path.join(self._path, f"checkpoint-{step}")
-    self._checkpointer.save(path, self._state, force=True)
+    if self._checkpointer:
+      self._checkpointer.save(path, self._state, force=True)
+    else:
+      print("No checkpoint path provided. Skipping.")
     return step
    
   def load_checkpoint(self, step: int) -> TrainState:
 
     model = nn.eval_shape(lambda: self._model)
     state = nn.state(model)
-    self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), item=self._state)
-    # update the model with the loaded state
-    nn.update(model, state)
+    if self._checkpointer:
+      self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), item=self._state)
+      # update the model with the loaded state
+      nn.update(model, state)
+      model.train()
     return self._state

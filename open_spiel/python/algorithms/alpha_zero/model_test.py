@@ -19,6 +19,7 @@ from absl.testing import parameterized
 import itertools
 
 import numpy as np
+import jax.numpy as jnp
 
 #TODO: add parametrised tests for the selection of the API
 from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, AVIALABLE_APIS
@@ -44,7 +45,12 @@ def solve_game(state):
   best_actions = np.where((values == value) & act_mask)
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
-  solved[state_str] = TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=value)
+  solved[state_str] = TrainInput(
+    observation=jnp.array(obs), 
+    legals_mask=jnp.array(act_mask), 
+    policy=jnp.array(policy), 
+    value=jnp.array(value)
+  )
   return value
 
 
@@ -73,7 +79,12 @@ class ModelTest(parameterized.TestCase):
       action = state.legal_actions()[0]
       policy = np.zeros(len(act_mask), dtype=float)
       policy[action] = 1
-      train_inputs.append(TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=1))
+      train_inputs.append(TrainInput(
+        observation=jnp.array(obs), 
+        legals_mask=jnp.array(act_mask), 
+        policy=jnp.array(policy), 
+        value=jnp.array(1))
+      )
       state.apply_action(action)
       value, policy = model.inference([obs], [act_mask])
       self.assertLen(policy, 1)

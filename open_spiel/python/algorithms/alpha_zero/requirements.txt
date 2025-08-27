@@ -1,0 +1,4 @@
+# The core OpenSpiel pip dependencies and AlphaZero
+matplotlib
+pandas
+#your favourite jax[cuda, mps, etc.] versio
