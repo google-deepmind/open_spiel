@@ -3,7 +3,6 @@ import os
 from typing import Sequence, Optional, Callable
 import warnings
 
-from datetime import datetime
 import numpy as np
 import flax
 import jax
@@ -13,10 +12,11 @@ import optax
 import chex
 from flax.training import train_state
 import orbax.checkpoint as orbax
+import operator
 
-from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten, conv_output_size
+from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
-warnings.warn("Pay attention that you've been using the `linen` api")
+warnings.warn("Pay attention that you've been using the `nnx` api")
 
 
 activations_dict = {
@@ -51,9 +51,24 @@ def get_batch_stats(layer: nn.Module):
 def get_layer_parameters(layer: nn.Module):
   return nn.state(layer, nn.Param)
 
+class Flatten(nn.Module):
+  """A simple `nn.Module` class wrapper for the flattening the output 
+  """
+  def __init__(self):
+    self.layer = flatten
+  
+  def __call__(self, x: chex.Array) -> chex.Array:
+    return self.layer(x)
+
 class Activation(nn.Module):
+  """A simple `nn.Module` class wrapper for the activations
+  """
   def __init__(self, activation_name: str) -> None:
-    """A simple `nn.Module` class wrapper for the activations
+    f"""Intialises the activation function
+
+    Args:
+        activation_name (str): a name of the activation.
+          The following are available: {", ".join(list(activations_dict.keys()))}
     """
     self.activation_name = activation_name
 
@@ -74,11 +89,19 @@ class MLPBlock(nn.Module):
     return y
   
 class ConvBlock(nn.Module):
+  
   def __init__(self, in_features: int, out_features: int, kernel_size: tuple[int, int], activation: str, seed: int = 0):
 
     self.conv = nn.Conv(in_features, out_features, kernel_size=kernel_size, padding="SAME", rngs=nn.Rngs(seed))
     self.activation = Activation(activation) 
-    self.bn = nn.BatchNorm(out_features, rngs=nn.Rngs(seed))
+    self.bn = nn.BatchNorm(out_features, rngs=nn.Rngs(seed), axis_name='batch')
+
+  def output_shape(self, x: chex.Array) -> tuple[int, int, int]:
+    # NOTE: for the given settings: padding="SAME" and strides=(1,1)
+    # output size is equal to the input size, otherwise the layer should implement this method.
+    # for more, see:
+    # https://blog.mlreview.com/a-guide-to-receptive-field-arithmetic-for-convolutional-neural-networks-e0f514068807
+    return x.shape
 
   def __call__(self, x: chex.Array) -> chex.Array:
     y = self.conv(x)
@@ -93,6 +116,9 @@ class ResidualBlock(nn.Module):
     self.conv2 = ConvBlock(out_features, out_features, kernel_size, None, seed) #activation's applied separately
     self.activation = Activation(activation)
 
+  def output_shape(self, x: chex.Array) -> tuple[int, int, int]:
+    return self.conv2.output_shape(x)
+  
   def __call__(self, x: chex.Array) -> chex.Array:
 
     residual = x
@@ -104,8 +130,18 @@ class ResidualBlock(nn.Module):
 
 
 class PolicyHead(nn.Module):
-  
-  def __init__(self, in_features: int, nn_width: int, out_features: int, model_type: str, activation: str, seed: int = 0) -> None:
+  """Policy network"""
+
+  def __init__(
+      self, 
+      input_shape: tuple[int, ...], 
+      nn_width: int,
+      out_features: int, 
+      model_type: str, 
+      activation: str, 
+      seed: int = 0
+    ) -> None:
+    *space_features, in_features = input_shape
 
     self.torso = None
     if model_type == "mlp":
@@ -113,35 +149,43 @@ class PolicyHead(nn.Module):
     else:
       self.torso = nn.Sequential(
         ConvBlock(in_features, 2, (1, 1), activation, seed),
-        flatten
+        Flatten(),
+        nn.Linear(np.prod(space_features) * 2, nn_width, rngs=nn.Rngs(seed))
       )
-
+    
     self.policy_head = nn.Linear(nn_width, out_features, rngs=nn.Rngs(seed))
   
   def __call__(self, x: chex.Array) -> chex.Array:
     y = self.torso(x)
     policy_logits = self.policy_head(y)
-
     return policy_logits
 
 
 class ValueHead(nn.Module):
-  model_type: str
-  nn_width: int
-
-  def __init__(self, in_features: str, nn_width, model_type, activation, seed):
+  """Value network"""
+  def __init__(
+      self, 
+      input_shape: tuple[int, ...], 
+      nn_width: str, 
+      model_type: str, 
+      activation: str, 
+      seed: int
+    ) -> None:
     
-    self.torso = lambda x: x
-    
-    if self.model_type != "mlp":
+    *space_features, in_features = input_shape
+    self.torso = None
+    if model_type == "mlp":
+      self.torso = MLPBlock(in_features, nn_width, activation, seed)
+    else:
       self.torso = nn.Sequential(
         ConvBlock(in_features, 1, kernel_size = (1, 1), activation=activation),
-        flatten
+        Flatten(),
+        nn.Linear(np.prod(space_features) * 1, nn_width, rngs=nn.Rngs(seed))
       )
 
     self.value_head = nn.Sequential(
-      MLPBlock(1, nn_width, "relu", rngs=seed),
-      MLPBlock(nn_width, 1, "tanh", rngs=seed),
+      MLPBlock(nn_width, nn_width, "relu", seed=seed),
+      MLPBlock(nn_width, 1, "tanh", seed=seed),
     )
     
   
@@ -149,6 +193,8 @@ class ValueHead(nn.Module):
     y = self.torso(x)
     values = self.value_head(y)
     return values
+
+
 
 class AlphaZeroModel(nn.Module):
   """An AlphaZero style model with a policy and value head.
@@ -190,8 +236,8 @@ class AlphaZeroModel(nn.Module):
     output_size: int,
     nn_width: int,
     nn_depth: int,
-    activation: str = "relu",
-    seed: int = 0
+    activation: Optional[str] = "relu",
+    seed: Optional[int] = 0
   ) -> None:
     """
 
@@ -202,42 +248,42 @@ class AlphaZeroModel(nn.Module):
         nn_width (int): hidden layers dimensionality
         nn_depth (int): number of hidden layers
     """
-
-
+    
     # torso
-    if self.model_type == "mlp":
+    if model_type == "mlp":
       self.torso = nn.Sequential(
-        *[ MLPBlock(np.prod(input_shape), nn_width, activation=activation, seed=i+seed) for i in range(nn_depth)
+        Flatten(),
+        MLPBlock(np.prod(input_shape), nn_width, activation=activation, seed=seed), *[
+        MLPBlock(nn_width, nn_width, activation=activation, seed=seed) for _ in range(nn_depth)
       ])
-    elif self.model_type == "conv2d":
-
-        self.torso = nn.Sequential( 
-          lambda x: x.reshape(input_shape),
-          ConvBlock(input_shape, nn_width, (3, 3), activation, seed=seed), *[
-            ConvBlock(nn_width, nn_width, (3, 3), activation, seed=i+seed) for i in range(1, nn_depth)
-          ]
-        )
-    elif self.model_type == "resnet":
+    elif model_type == "conv2d":
+      self.torso = nn.Sequential( 
+        #by default any observation may be flat
+        lambda x: x.reshape(input_shape),
+        ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed), *[
+        ConvBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(nn_depth)
+      ])
+    elif model_type == "resnet":
      self.torso = nn.Sequential( 
-          lambda x: x.reshape(input_shape),
-          ConvBlock(input_shape, nn_width, (3, 3), activation, seed=seed), *[
-            ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=i+seed) for i in range(1, nn_depth)
-          ]
-        )
+        lambda x: x.reshape(input_shape),
+        ConvBlock(input_shape[-1], nn_width, (3, 3), activation, seed=seed), *[
+        ResidualBlock(nn_width, nn_width, (3, 3), activation, seed=seed) for _ in range(nn_depth)
+      ])
     else:
       raise ValueError(f"Unknown model type: {self.model_type}")
     
-    
-    self.policy_head = PolicyHead(nn_width, nn_width, output_size, model_type, activation, seed=seed)
-    self.value_head = ValueHead(nn_width, nn_width, model_type, activation, seed=seed)
+    self.policy_head = PolicyHead((*input_shape[:-1], nn_width), nn_width, output_size, model_type, activation, seed=seed)
+    self.value_head = ValueHead((*input_shape[:-1], nn_width), nn_width, model_type, activation, seed=seed)
 
-  
+  @functools.partial(
+    nn.vmap, in_axes=(None, 0), axis_name='batch', out_axes=(0, 0)
+  )
   def __call__(self, observations: chex.Array) -> tuple[chex.Array, chex.Array]:
 
     x = self.torso(observations)
     policy_logits = self.policy_head(x)
     value_out = self.value_head(x)
-    
+
     return policy_logits, value_out
 
 
@@ -270,20 +316,10 @@ class Model:
     
     #we're using the latest checkpointing API
     # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
-    orbax_checkpointer = orbax.checkpoint.PyTreeCheckpointer()
-    checkpoint_str = (
-      checkpoint_uid if checkpoint_uid is not None else datetime.now().strftime("%Y%m%d%H%M%S")
-    )
-
-    options = orbax.CheckpointManagerOptions(create=True)
     
-    self._manager = None
+    self._checkpointer = None
     if self._path is not None:
-      self._manager = orbax.CheckpointManager(
-        directory=os.path.join(self._path, checkpoint_str),
-        checkpointers=orbax_checkpointer,
-        options=options
-      )
+      self._checkpointer = orbax.PyTreeCheckpointer()
 
 
   @classmethod
@@ -291,7 +327,7 @@ class Model:
     graphdef, variables, batch_stats = nn.split(model, nn.Param, nn.BatchStat)
 
     return TrainState.create(
-      apply_fn=model.forward, 
+      apply_fn=model, 
       params=variables, 
       tx=optimizer, 
       batch_stats=batch_stats,
@@ -336,14 +372,16 @@ class Model:
         policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
         policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
-      
-        total_loss = policy_loss + value_loss   
+
+        l2_reg_loss = weight_decay * jax.tree.reduce(operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0)
+        
+        total_loss = policy_loss + value_loss + l2_reg_loss
 
         batch_stats = get_batch_stats(model)   
-        return total_loss, (policy_loss, value_loss, batch_stats)
+        return total_loss, (policy_loss, value_loss, l2_reg_loss, batch_stats)
 
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
-      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
+      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(state.params, observations, legals_mask, policy_targets, value_targets)
       
       new_state = state.apply_gradients(grads=grads)
       new_state = new_state.replace(batch_stats=new_batch_stats)
@@ -378,6 +416,7 @@ class Model:
       print(f"Param {i}: {p.shape}")
   
   def inference(self, observation, legals_mask):
+    self._model.eval()
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
@@ -388,23 +427,23 @@ class Model:
 
     return value, policy
   
-  def update(self, train_inputs: Sequence[TrainInput]):
-    batch = TrainInput.stack(train_inputs)
+  def update(self, batch: Sequence[TrainInput]):
+    self._model.train()
+    # batch = TrainInput.stack(train_inputs)
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
   def save_checkpoint(self, step: int) -> int:
-    self._manager.save(step, self._state)
-    self._manager.wait_until_finished()
+    path = os.path.join(self._path, f"checkpoint-{step}")
+    self._checkpointer.save(path, self._state, force=True)
     return step
    
   def load_checkpoint(self, step: int) -> TrainState:
 
     model = nn.eval_shape(lambda: self._model)
     state = nn.state(model)
-    self._state = self._manager.restore(step, items=self._state)
+    self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), item=self._state)
     # update the model with the loaded state
     nn.update(model, state)
-    self._manager.wait_until_finished()
     return self._state

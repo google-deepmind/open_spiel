@@ -47,7 +47,7 @@ import multiprocessing
 from open_spiel.python.algorithms import mcts
 
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
-from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, Losses
+from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, Losses, tree_sum
 from open_spiel.python.algorithms.alpha_zero import replay_buffer as buffer_lib
 
 import pyspiel
@@ -134,9 +134,7 @@ class Config:
 
   quiet: bool
 
-  #yet, fixed
-  #TODO: remove
-  nn_api_version: str = "linen" 
+  nn_api_version: str = "nnx" 
 
 def _init_model_from_config(config: Config):
   return api_selector(config.nn_api_version).Model.build_model(
@@ -147,7 +145,8 @@ def _init_model_from_config(config: Config):
       config.nn_depth,
       config.weight_decay,
       config.learning_rate,
-      config.path)
+      config.path
+    )
 
 
 def watcher(fn):
@@ -226,11 +225,11 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       trajectory.append(
           TrajectoryState(
             observation=jnp.array(state.observation_tensor()), 
-            current_player=jnp.array(state.current_player()),
+            current_player=jnp.array(state.current_player(), dtype=int),
             legals_mask=jnp.array(state.legal_actions_mask(), dtype=jnp.bool), 
-            action=jnp.array(action), 
-            policy=jnp.array(policy),
-            value=jnp.array(root.total_reward / root.explore_count)
+            action=jnp.array(action, dtype=int), 
+            policy=jnp.array(policy, dtype=jnp.float32),
+            value=jnp.array(root.total_reward / root.explore_count, dtype=jnp.float32)
           )
         )
       
@@ -241,9 +240,9 @@ def _play_game(logger, game_num, game, bots, temperature, temperature_drop):
       state.apply_action(action)
   logger.opt_print("Next state:\n{}".format(state))
   #it's not good to do like that but it's python.
-  trajectory =  Trajectory(
+  trajectory = Trajectory(
     states=trajectory,
-    returns=state.returns()
+    returns=np.array(state.returns())
   )
   logger.print("Game {}: Returns: {}; Actions: {}".format(
       game_num, " ".join(map(str, trajectory.returns)), " ".join(actions)))
@@ -269,7 +268,7 @@ def update_checkpoint(logger, queue, model, az_evaluator):
 
 
 @watcher
-def actor(*, config, game, logger, queue):
+def actor(*, config: Config, game, logger, queue):
   """An actor process runner that generates games and returns trajectories."""
   logger.print("Initializing model")
   model = _init_model_from_config(config)
@@ -342,7 +341,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   logger.print("Model size:", model.num_trainable_variables, "variables")
   save_path = model.save_checkpoint(0)
   logger.print("Initial checkpoint:", save_path)
-  broadcast_fn(save_path)
+  broadcast_fn(str(save_path))
 
   data_log = data_logger.DataLoggerJsonLines(config.path, "learner", True)
 
@@ -361,6 +360,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     while True:
       found = 0
       for actor_process in actors:
+        # print(actor_process.queue.get_nowait())
         try:
           yield actor_process.queue.get_nowait()
         except spawn.Empty:
@@ -371,10 +371,12 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         time.sleep(0.01)  # 10ms
 
   def collect_trajectories():
+    print("Collecting trajectories")
     """Collects the trajectories from actors into the replay buffer."""
     num_trajectories = 0
     num_states = 0
     for trajectory in trajectory_generator():
+
       num_trajectories += 1
       num_states += len(trajectory.states)
       game_lengths.add(len(trajectory.states))
@@ -393,11 +395,12 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
           observation=s.observation, 
           legals_mask=s.legals_mask, 
           policy=s.policy, 
-          value=p1_outcome
+          value=jnp.array(p1_outcome, dtype=jnp.float32)
         ) for s in trajectory.states
       ]
-      replay_buffer.extend(TrainInput.stack(buffer_inputs))
 
+      replay_buffer.extend(TrainInput.stack(buffer_inputs))
+            
       for stage in range(stage_count):
         # Scale for the length of the game
         index = (len(trajectory.states) - 1) * stage // (stage_count - 1)
@@ -412,7 +415,10 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
   def learn(step):
     """Sample from the replay buffer, update weights and save a checkpoint."""
-    losses = []
+    losses = [] 
+    #TODO: why not to replace replace with `jax.lax.scan`, 
+    # but the model state does not explicitly states
+    logger.print("Updating the model")
     for _ in range(len(replay_buffer) // config.train_batch_size):
       data = replay_buffer.sample(config.train_batch_size)
       losses.append(model.update(data))
@@ -421,6 +427,7 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     # the actors. It only allows numbers, so use -1 as "latest".
     save_path = model.save_checkpoint(
         step if step % config.checkpoint_freq == 0 else -1)
+
     losses = sum(losses, Losses(policy=0, value=0, l2=0)) / len(losses)
     logger.print(losses)
     logger.print("Checkpoint saved:", save_path)
@@ -464,9 +471,10 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
 
     batch_size_stats = stats.BasicStats()  # Only makes sense in C++.
     batch_size_stats.add(1)
+
     data_log.write({
         "step": step,
-        "total_states": replay_buffer.total_seen,
+        "total_states": replay_buffer.total_seen.item(),
         "states_per_s": num_states / seconds,
         "states_per_s_actor": num_states / (config.actors * seconds),
         "total_trajectories": total_trajectories,
@@ -479,15 +487,15 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
         "value_prediction": [v.as_dict for v in value_predictions],
         "eval": {
             "count": evals[0].total_seen,
-            "results": [sum(e.data) / len(e) if e else 0 for e in evals],
+            "results": [tree_sum(e.data).item() / len(e) if e else 0 for e in evals],
         },
         "batch_size": batch_size_stats.as_dict,
         "batch_size_hist": [0, 1],
         "loss": {
-            "policy": float(losses.policy),
-            "value": float(losses.value),
-            "l2reg": float(losses.l2),
-            "sum": float(losses.total),
+            "policy": float(losses.policy.item()),
+            "value": float(losses.value.item()),
+            "l2reg": float(losses.l2.item()),
+            "sum": float(losses.total.item()),
         },
         "cache": {  # Null stats because it's hard to report between processes.
             "size": 0,
@@ -545,12 +553,13 @@ def alpha_zero(config: Config):
   actors = [spawn.Process(actor, kwargs={"game": game, "config": config,
                                          "num": i})
             for i in range(config.actors)]
+  
   evaluators = [spawn.Process(evaluator, kwargs={"game": game, "config": config,
                                                  "num": i})
                 for i in range(config.evaluators)]
 
   def broadcast(msg):
-    for proc in actors + evaluators:
+    for proc in actors+evaluators:
       proc.queue.put(msg)
 
   try:

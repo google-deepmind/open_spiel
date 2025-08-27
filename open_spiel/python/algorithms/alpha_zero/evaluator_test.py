@@ -20,12 +20,12 @@ import numpy as np
 from open_spiel.python.algorithms import mcts
 from open_spiel.python.algorithms.alpha_zero import evaluator as evaluator_lib
 #TODO: rewrite with the API Selector, i.e. with a parametrised test case
-from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib 
+from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, AVIALABLE_APIS
 import pyspiel
 
 
-def build_model(game):
-  return model_lib.Model.build_model(
+def build_model(api_version, game):
+  return api_selector(api_version).Model.build_model(
       "mlp", game.observation_tensor_shape(), game.num_distinct_actions(),
       nn_width=64, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 
@@ -34,7 +34,7 @@ class EvaluatorTest(absltest.TestCase):
 
   def test_evaluator_caching(self):
     game = pyspiel.load_game("tic_tac_toe")
-    model = build_model(game)
+    model = build_model(AVIALABLE_APIS[0], game)
     evaluator = evaluator_lib.AlphaZeroEvaluator(game, model)
 
     state = game.new_initial_state()
@@ -44,7 +44,7 @@ class EvaluatorTest(absltest.TestCase):
     policy = np.zeros(len(act_mask), dtype=float)
     policy[action] = 1
     train_inputs = [
-      model_lib.TrainInput(
+      TrainInput(
         observation=obs, 
         mask=act_mask, 
         policy=policy, 

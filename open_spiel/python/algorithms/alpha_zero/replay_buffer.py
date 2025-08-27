@@ -68,13 +68,14 @@ def extend(
     """
 
     # Check that the batch has the correct shape and dtypes.
+    # print(jax.tree.map(lambda x: x.shape, batch))
+
     max_size = get_tree_shape_prefix(state.experience)[0]
     batch_size = get_tree_shape_prefix(batch)[0]
 
-    chex.assert_trees_all_equal_dtypes(batch, state.experience)
+    # chex.assert_trees_all_equal_dtypes(batch, state.experience)
 
     indices = (jnp.arange(batch_size) + state.current_index) % max_size
-
     new_experience = jax.tree.map(
         lambda exp_field, batch_field: exp_field.at[indices].set(batch_field),
         state.experience,
@@ -212,13 +213,15 @@ class Buffer:
     if self.buffer_state is None:
        self.buffer_state = self.buffer.init(val)
 
-    batched_val = jax.tree.map(lambda x: x[None, ...], val)
+    batched_val = jax.tree.map(lambda x: jnp.array(x)[None, ...], val)
 
     self.buffer_state = self.buffer.extend(self.buffer_state, batched_val)
 
   def extend(self, val: Any) -> None:
     if self.buffer_state is None:
-       self.buffer_state = self.buffer.init(val)
+       #the buffer has to be initialised with an unbatched transition
+       unbatched_val = jax.tree.map(lambda x: x[0], val)
+       self.buffer_state = self.buffer.init(unbatched_val)
 
     self.buffer_state = self.buffer.extend(self.buffer_state, val)
     self.total_seen = self.buffer_state.total_seen

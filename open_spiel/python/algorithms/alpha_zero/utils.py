@@ -1,6 +1,9 @@
 import jax.numpy as jnp
 import chex
+import jax
+from typing import Any
 
+AVIALABLE_APIS = ["nnx", "linen"]
 
 def api_selector(api_version):
   if api_version == "nnx":
@@ -8,33 +11,16 @@ def api_selector(api_version):
   elif api_version == "linen":
     from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
   else:
-    raise ValueError("Only `linen` and `nnx` APIs are implmented")
+    raise ValueError(f"Only {AVIALABLE_APIS} APIs are implmented")
   
   return model_lib
 
-
 def flatten(x):
-  return x.reshape((x.shape[0], -1))
+  return x.reshape(-1)
 
-def conv_output_size(input_size: int, out_channels: int, kernel_size: int, stride: int=1, padding: int=1) -> tuple[int, int]:
-
-    if isinstance(padding, int):
-        padding = (padding, ) * 2
-    if isinstance(kernel_size, int):
-        kernel_size = (kernel_size, ) * 2
-    if isinstance(stride, int):
-        stride = (stride, ) * 2
-
-    output_size = (
-        out_channels,
-        jnp.floor((input_size[1] + 2 * padding[0] * (kernel_size[0] - 1) - 1) /
-                 stride[0] + 1).astype(int),
-        jnp.floor((input_size[2] + 2 * padding[1] * (kernel_size[1] - 1) - 1) /
-                 stride[1] + 1).astype(int)
-    )
-    return output_size
-
-
+def tree_sum(tree: Any, initialiser: Any):
+  sums = jax.tree.map(jnp.sum, tree)
+  return jax.tree.reduce(lambda x, y: x+y, sums, initializer=initialiser)
 
 @chex.dataclass(frozen=True)
 class TrainInput: 
@@ -47,15 +33,19 @@ class TrainInput:
 
   @staticmethod
   def stack(train_inputs):
-    
-    observation, legals_mask, policy, value = zip(*[
-      (ti.observation, ti.legals_mask, ti.policy, ti.value) for ti in train_inputs
-    ])
-    return TrainInput(
-        observation=jnp.array(observation, dtype=jnp.float32),
-        legals_mask=jnp.array(legals_mask, dtype=jnp.bool),
-        policy=jnp.array(policy, dtype=jnp.float32),
-        value=jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
+
+    stacked_states = jax.tree.map(lambda *x: jnp.stack(x), *train_inputs)
+    stacked_states = stacked_states.replace(value=jnp.expand_dims(stacked_states.value, 1))
+
+    # observation, legals_mask, policy, value = zip(*[
+    #   (ti.observation, ti.legals_mask, ti.policy, ti.value) for ti in train_inputs
+    # ])
+    # return TrainInput(
+    #     observation=jnp.array(observation, dtype=jnp.float32),
+    #     legals_mask=jnp.array(legals_mask, dtype=jnp.bool),
+    #     policy=jnp.array(policy, dtype=jnp.float32),
+    #     value=jnp.expand_dims(jnp.array(value, dtype=jnp.float32), 1))
+    return stacked_states
 
 @chex.dataclass(frozen=True)
 class Losses:

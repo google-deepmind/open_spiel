@@ -16,11 +16,12 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
+import itertools
 
 import numpy as np
 
 #TODO: add parametrised tests for the selection of the API
-from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
+from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, AVIALABLE_APIS
 import pyspiel
 
 solved = {}
@@ -43,22 +44,24 @@ def solve_game(state):
   best_actions = np.where((values == value) & act_mask)
   policy = np.zeros_like(act_mask)
   policy[best_actions[0][0]] = 1  # Choose the first for a deterministic policy.
-  solved[state_str] = model_lib.TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=value)
+  solved[state_str] = TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=value)
   return value
 
 
-def build_model(game, model_type):
-  return model_lib.Model.build_model(
+def build_model(game, api_version, model_type):
+  return api_selector(api_version).Model.build_model(
       model_type, game.observation_tensor_shape(), game.num_distinct_actions(),
       nn_width=32, nn_depth=2, weight_decay=1e-4, learning_rate=0.01, path=None)
 
 
 class ModelTest(parameterized.TestCase):
 
-  @parameterized.parameters(model_lib.Model.valid_model_types)
-  def test_model_learns_simple(self, model_type):
+  @parameterized.parameters(itertools.product(
+    AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
+  )
+  def test_model_learns_simple(self, api_version, model_type):
     game = pyspiel.load_game("tic_tac_toe")
-    model = build_model(game, model_type)
+    model = build_model(game, api_version, model_type)
     print("Num variables:", model.num_trainable_variables)
     model.print_trainable_variables()
 
@@ -70,7 +73,7 @@ class ModelTest(parameterized.TestCase):
       action = state.legal_actions()[0]
       policy = np.zeros(len(act_mask), dtype=float)
       policy[action] = 1
-      train_inputs.append(model_lib.TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=1))
+      train_inputs.append(TrainInput(observation=obs, legals_mask=act_mask, policy=policy, value=1))
       state.apply_action(action)
       value, policy = model.inference([obs], [act_mask])
       self.assertLen(policy, 1)
@@ -82,7 +85,7 @@ class ModelTest(parameterized.TestCase):
     policy_loss_goal = 0.05
     value_loss_goal = 0.05
     for i in range(200):
-      loss = model.update(train_inputs)
+      loss = model.update(TrainInput.stack(train_inputs))
       print(i, loss)
       losses.append(loss)
       if loss.policy < policy_loss_goal and loss.value < value_loss_goal:
@@ -94,12 +97,15 @@ class ModelTest(parameterized.TestCase):
     self.assertLess(losses[-1].value, value_loss_goal)
     self.assertLess(losses[-1].policy, policy_loss_goal)
 
-  @parameterized.parameters(model_lib.Model.valid_model_types)
-  def test_model_learns_optimal(self, model_type):
+  @parameterized.parameters(itertools.product(
+    AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
+  )
+  def test_model_learns_optimal(self, api_version, model_type):
+    print(api_version, model_type)
     game = pyspiel.load_game("tic_tac_toe")
     solve_game(game.new_initial_state())
 
-    model = build_model(game, model_type)
+    model = build_model(game, api_version, model_type)
     print("Num variables:", model.num_trainable_variables)
     model.print_trainable_variables()
 
@@ -109,7 +115,7 @@ class ModelTest(parameterized.TestCase):
     policy_loss_goal = 0.12
     value_loss_goal = 0.12
     for i in range(500):
-      loss = model.update(train_inputs)
+      loss = model.update(TrainInput.stack(train_inputs))
       print(i, loss)
       losses.append(loss)
       if loss.policy < policy_loss_goal and loss.value < value_loss_goal:

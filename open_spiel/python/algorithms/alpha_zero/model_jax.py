@@ -1,9 +1,8 @@
 import functools
 import os
-from typing import Any, Sequence, Tuple, Callable
+from typing import Any, Sequence, Tuple, Callable, Optional
 import warnings
 
-from datetime import datetime
 import numpy as np
 import flax
 import jax
@@ -70,7 +69,7 @@ class MLPBlock(nn.Module):
 class ConvBlock(nn.Module):
   features: int
   kernel_size: tuple[int, int]
-  activation: str = "relu"
+  activation: Optional[str] = "relu"
 
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
@@ -82,7 +81,7 @@ class ConvBlock(nn.Module):
 class ResidualBlock(nn.Module):
   filters: int
   kernel_size: tuple[int, int]
-  activation: str = "relu"
+  activation: Optional[str] = "relu"
   
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
@@ -98,7 +97,7 @@ class PolicyHead(nn.Module):
   model_type: str
   nn_width: int
   output_size: int
-  activation: str = "relu"
+  activation: Optional[str] = "relu"
   
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
@@ -115,7 +114,7 @@ class PolicyHead(nn.Module):
 class ValueHead(nn.Module):
   model_type: str
   nn_width: int
-  activation: str = "relu"
+  activation: Optional[str] = "relu"
   
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
@@ -128,7 +127,16 @@ class ValueHead(nn.Module):
     values = MLPBlock(1, "tanh")(x)
     return values
 
-
+# https://github.com/google/flax/discussions/1675
+# Define a vmapped MLP class
+@functools.partial(
+  nn.vmap,
+  in_axes=0,
+  out_axes=0,
+  variable_axes={'params': None, 'batch_stats': None}, # `None` means these collections are shared
+  split_rngs={'params': False,}, # Rngs for params are shared, but for dropout, they are split
+  axis_name='batch' # The name for the batch dimension
+)
 class AlphaZeroModel(nn.Module):
   """An AlphaZero style model with a policy and value head.
 
@@ -167,24 +175,25 @@ class AlphaZeroModel(nn.Module):
   output_size: int
   nn_width: int
   nn_depth: int
-  activation: str = "relu"
+  activation: Optional[str] = "relu"
   
   @nn.compact
   def __call__(self, observations: chex.Array, training: bool = False) -> tuple[chex.Array, chex.Array]:
 
     # torso
+    x = observations
     if self.model_type == "mlp":
-      x = observations
-      for i in range(self.nn_depth): #leave the for-loop of let it go?
+      x = flatten(observations)
+      for ind in range(self.nn_depth): #leave the for-loop of let it go?
         x = MLPBlock(features=self.nn_width, activation=self.activation)(x)
     elif self.model_type == "conv2d":
-      x = observations.reshape((-1,) + self.input_shape)
-      for i in range(self.nn_depth):
+      x = observations.reshape(self.input_shape)
+      for _ in range(self.nn_depth):
         x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
     elif self.model_type == "resnet":
-      x = observations.reshape((-1,) + self.input_shape)
+      x = observations.reshape(self.input_shape)
       x = ConvBlock(features=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
-      for i in range(self.nn_depth):
+      for _ in range(self.nn_depth-1):
         x = ResidualBlock(filters=self.nn_width, kernel_size=(3, 3), activation=self.activation)(x, training)
 
     else:
@@ -219,25 +228,14 @@ class Model:
     
     #we're using the latest checkpointing API
     # https://flax-linen.readthedocs.io/en/latest/guides/training_techniques/use_checkpointing.html
-    orbax_checkpointer = orbax.checkpoint.AsyncCheckpointer(orbax.checkpoint.StandardCheckpointHandler())
-    checkpoint_str = (
-      checkpoint_uid if checkpoint_uid is not None else datetime.now().strftime("%Y%m%d%H%M%S")
-    )
-
-    options = orbax.checkpoint.CheckpointManagerOptions(create=True)
-  
-    self._manager = None
+    self._checkpointer = None
     if self._path is not None:
-      self._manager = orbax.checkpoint.CheckpointManager(
-        directory=self._path,
-        checkpointers=orbax_checkpointer,
-        options=options
-      )
+      self._checkpointer = orbax.checkpoint.PyTreeCheckpointer()
 
   @classmethod
   def _create_train_state(cls, apply_fn, variables, optimizer) -> TrainState:
     return TrainState.create(
-      apply_fn=apply_fn, 
+      apply_fn=apply_fn,
       params=variables['params'], 
       tx=optimizer, 
       batch_stats=variables.get('batch_stats', {})
@@ -270,8 +268,7 @@ class Model:
     
     optimizer = optax.adam(learning_rate=learning_rate)
     rng = jax.random.PRNGKey(seed)
-    input_shape_with_batch = (1, int(np.prod(input_shape)))
-    variables = model.init(rng, jnp.ones(input_shape_with_batch), training=False)
+    variables = model.init(rng, jnp.ones((1, *input_shape)), training=False)
 
     state = cls._create_train_state(model.apply, variables, optimizer)
 
@@ -345,12 +342,14 @@ class Model:
     return Losses(policy=policy_loss, value=value_loss, l2=l2_reg_loss)
   
   def save_checkpoint(self, step: int) -> int:
-    self._manager.save(step, self._state, save_kwargs={'save_args': orbax_utils.save_args_from_target(self._state)})
-    self._manager.wait_until_finished()
+    path = os.path.join(self._path, f"checkpoint-{step}")
+    self._checkpointer.save(path, self._state, save_args=orbax_utils.save_args_from_target(self._state), force=True)
+    # self._checkpointer.wait_until_finished()
     return step
    
-  def load_checkpoint(self, step: int) -> TrainState:
+  def load_checkpoint(self, step: int | str) -> TrainState:
     target = self._state
-    self._state = self._manager.restore(step, items=target)
-    self._manager.wait_until_finished()
+    path = os.path.join(self._path, str(step)) if isinstance(step, int) else step
+    self._state = self._checkpointer.restore(path, item=target)
+    # self._checkpointer.wait_until_finished()
     return self._state
