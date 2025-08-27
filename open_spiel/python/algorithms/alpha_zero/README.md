@@ -14,10 +14,13 @@ The code is arranged in the following way:
 ├── evaluator_test.py
 ├── evaluator.py
 ├── export_model.py
-├── model_jax.py
-├── model_nnx.py #not yet fine
+├── model_linen.py
+├── model_nnx.py
 ├── model_test.py
-├── model.py
+├── replay_buffer_test.py
+├── replay_buffer.py
+├── requirements.txt
+└── utils.py
 ```
 
 Each file implements the following parts of the main documentation:
