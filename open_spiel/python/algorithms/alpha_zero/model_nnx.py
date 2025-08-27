@@ -18,6 +18,7 @@ from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, fl
 
 warnings.warn("Pay attention that you've been using the `nnx` api")
 
+nn.MultiMetric
 
 activations_dict = {
     "celu": nn.celu,
@@ -414,7 +415,7 @@ class Model:
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
-    policy_logits, value = self._model(observation)
+    policy_logits, value = self._state.apply_fn(observation)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
     policy = nn.softmax(policy_logits, axis=-1)

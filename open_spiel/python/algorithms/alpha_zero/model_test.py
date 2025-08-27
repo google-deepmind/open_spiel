@@ -20,9 +20,14 @@ import itertools
 
 import numpy as np
 import jax.numpy as jnp
+import flax.linen as linen
+import flax.nnx as nnx
 
 #TODO: add parametrised tests for the selection of the API
-from open_spiel.python.algorithms.alpha_zero.utils import api_selector, TrainInput, AVIALABLE_APIS
+from open_spiel.python.algorithms.alpha_zero.utils import (
+  AVIALABLE_APIS, TrainInput, api_selector, linen_to_nnx, nnx_to_linen)
+
+
 import pyspiel
 
 solved = {}
@@ -65,7 +70,7 @@ class ModelTest(parameterized.TestCase):
   @parameterized.parameters(itertools.product(
     AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
   )
-  def test_model_learns_simple(self, api_version, model_type):
+  def test_model_learns_simple(self, api_version: str, model_type: str):
     game = pyspiel.load_game("tic_tac_toe")
     model = build_model(game, api_version, model_type)
     print("Num variables:", model.num_trainable_variables)
@@ -111,7 +116,7 @@ class ModelTest(parameterized.TestCase):
   @parameterized.parameters(itertools.product(
     AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
   )
-  def test_model_learns_optimal(self, api_version, model_type):
+  def test_model_learns_optimal(self, api_version: str, model_type: str):
     print(api_version, model_type)
     game = pyspiel.load_game("tic_tac_toe")
     solve_game(game.new_initial_state())
@@ -137,6 +142,49 @@ class ModelTest(parameterized.TestCase):
     self.assertGreater(losses[0].total, losses[-1].total)
     self.assertLess(losses[-1].value, value_loss_goal)
     self.assertLess(losses[-1].policy, policy_loss_goal)
+
+  @parameterized.parameters(itertools.product(
+    AVIALABLE_APIS, api_selector(AVIALABLE_APIS[0]).Model.valid_model_types)
+  )
+  def test_conversions(self, api_version: str, model_type: str):
+    game = pyspiel.load_game("tic_tac_toe")
+    model = build_model(game, api_version, model_type)
+
+    if isinstance(model, linen.Module):
+      nnx_model = build_model(game, "nnx", model_type)
+      nnx_model._state = api_selector("linen").Model._create_train_state(linen_to_nnx(model._model), model._state.tx) 
+      model = nnx_model
+    elif isinstance(model, nnx.Module):
+      game.num_distinct_actions(),
+      config = {
+        "model_type": model_type, 
+        "input_shape": game.observation_tensor_shape(), 
+        "output_size": game.num_distinct_actions(), 
+        "nn_width": 32, 
+        "nn_depth": 2,
+      }
+
+      apply_fn, variables = nnx_to_linen(model._model, game.observation_tensor_shape(), **config)
+      linen_model = build_model(game, "linen", model_type)
+      linen_model._state = api_selector("nnx").Model._create_train_state(apply_fn, variables, model._state.tx) 
+      model = linen_model
+
+    state = game.new_initial_state()
+    while not state.is_terminal():
+      obs = state.observation_tensor()
+      act_mask = state.legal_actions_mask()
+      action = state.legal_actions()[0]
+      policy = np.zeros(len(act_mask), dtype=float)
+      policy[action] = 1
+      state.apply_action(action)
+      value, policy = model.inference([obs], [act_mask])
+      self.assertLen(policy, 1)
+      self.assertLen(value, 1)
+      self.assertLen(policy[0], game.num_distinct_actions())
+      self.assertLen(value[0], 1)
+
+
+
 
 
 if __name__ == "__main__":

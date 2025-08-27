@@ -291,7 +291,8 @@ class Model:
         return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state['batch_stats'])
     
       grad_fn = jax.value_and_grad(loss_fn, has_aux=True)
-      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
+      (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
+        state.params, state.batch_stats, observations, legals_mask, policy_targets, value_targets)
       
       new_state = state.apply_gradients(grads=grads)
       new_state = new_state.replace(batch_stats=new_batch_stats)
@@ -327,7 +328,7 @@ class Model:
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
-    policy_logits, value = self._model.apply(
+    policy_logits, value = self._state.apply_fn(
         {'params': self._state.params, 'batch_stats': self._state.batch_stats}, observation, training=False, mutable=False)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))

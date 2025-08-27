@@ -1,19 +1,51 @@
+from typing import Any, Callable
+
 import jax.numpy as jnp
 import chex
 import jax
-from typing import Any
+import flax.linen as linen
+import flax.nnx as nnx
+
 
 AVIALABLE_APIS = ["nnx", "linen"]
 
 def api_selector(api_version):
+  f"""Allows to choose an implementation API.
+
+  Args:
+    api_version (str): either of {AVIALABLE_APIS}
+
+  Raises:
+    ValueError: if the user used smth different
+  """
   if api_version == "nnx":
     from open_spiel.python.algorithms.alpha_zero import model_nnx as model_lib
   elif api_version == "linen":
-    from open_spiel.python.algorithms.alpha_zero import model_jax as model_lib
+    from open_spiel.python.algorithms.alpha_zero import model_linen as model_lib
   else:
     raise ValueError(f"Only {AVIALABLE_APIS} APIs are implmented")
   
   return model_lib
+
+# These should be importable modes for inference only.
+# I.e., you should call the inference using a saved checkpoint to use 
+# the APIs interchangeably
+# See examples in `model_test.py`
+def linen_to_nnx(model: linen.Module, seed: int=0) -> nnx.bridge.ToNNX:
+  # NOTE: could be issues with handling_randomness
+  model = nnx.bridge.ToNNX(model, rngs=nnx.Rngs(seed))  
+  return model              
+
+def nnx_to_linen(
+    model_class: nnx.Module, 
+    sample_shape: tuple[int, ...], 
+    seed: int = 0, 
+    *args: Any,
+    **kwargs: Any
+  ) -> tuple[Callable, nnx.bridge.ToLinen]:
+  new_model = nnx.bridge.ToLinen(model_class, *args, **kwargs)
+  variables = new_model.init(jax.random.key(seed), (1, *sample_shape), train=False)
+  return new_model.apply, variables
 
 def flatten(x):
   return x.reshape(-1)

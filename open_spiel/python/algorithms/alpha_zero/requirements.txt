@@ -1,4 +1,5 @@
 # The core OpenSpiel pip dependencies and AlphaZero
 matplotlib
 pandas
+tensorboard
 #your favourite jax[cuda, mps, etc.] versio
