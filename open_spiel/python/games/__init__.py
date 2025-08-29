@@ -34,3 +34,15 @@ from open_spiel.python.games import kuhn_poker
 from open_spiel.python.games import liars_poker
 from open_spiel.python.games import team_dominoes
 from open_spiel.python.games import tic_tac_toe
+
+# Optional game modules with additional dependencies
+try:
+  # pylint: disable=g-import-not-at-top
+  from open_spiel.python.games import pokerkit_wrapper
+  # pylint: enable=g-import-not-at-top
+except ImportError as e:
+  # Initialize to None on failure to ensure that this won't trigger NameError
+  # later if someone tries to check for the module's presence.
+  print(f"Optional module pokerkit_wrapper was not importable: {e}")
+  pokerkit_wrapper = None
+  pass

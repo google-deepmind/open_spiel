@@ -13,7 +13,9 @@
 # limitations under the License.
 """General tests for pyspiel python bindings."""
 
+import importlib
 import os
+
 from absl.testing import absltest
 from absl.testing import parameterized
 
@@ -21,6 +23,36 @@ from open_spiel.python import games  # pylint: disable=unused-import
 from open_spiel.python import policy
 from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 import pyspiel
+
+
+def _try_importing_game(fully_qualified_module_name):
+  try:
+    importlib.import_module(fully_qualified_module_name)
+    return True
+  except ImportError:
+    return False
+  except (SyntaxError, TypeError, ValueError, RuntimeError) as e:
+    print(
+        f"Failed to import {fully_qualified_module_name}, but with common"
+        f" non-import error: {e}"
+    )
+    return False
+
+
+_PYTHON_OPTIONAL_GAMES = frozenset([
+    game
+    for game, fully_qualified_module_name in [
+        # TODO: b/437724266 - enable once we've finished implemention here.
+        # tuple(["python_pokerkit_wrapper",
+        #        "google3.third_party.open_spiel.python.games.pokerkit_wrapper",
+        #        ]),
+        tuple([
+            "python_pokerkit_wrapper_acpc_style",
+            "google3.third_party.open_spiel.python.games.pokerkit_wrapper",
+        ])
+    ]
+    if _try_importing_game(fully_qualified_module_name)
+])
 
 # Specify game names in alphabetical order, to make the test easier to read.
 EXPECTED_GAMES = frozenset([
@@ -147,7 +179,7 @@ EXPECTED_GAMES = frozenset([
     "ultimate_tic_tac_toe",
     "y",
     "zerosum",
-])
+]).union(_PYTHON_OPTIONAL_GAMES)
 
 
 class PyspielTest(parameterized.TestCase):
@@ -361,6 +393,12 @@ class PyspielTest(parameterized.TestCase):
 
   @parameterized.parameters(
       ("universal_poker", pyspiel.hunl_game_string("fullgame")),
+      (
+          "python_pokerkit_wrapper_acpc_style",
+          "python_pokerkit_wrapper_acpc_style(variant=NoLimitTexasHoldem,"
+          + "num_players=2,blinds=5 10,stack_sizes=10000 10000,min_bet=100,"
+          + "bring_in=100,small_bet=100,big_bet=100)",
+      ),
       ("kuhn_poker", "kuhn_poker(players=3)"),
       ("tic_tac_toe", "tic_tac_toe"),
       ("breakthrough", "breakthrough(rows=6,columns=6)"))
