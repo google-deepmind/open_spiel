@@ -2,4 +2,6 @@
 matplotlib
 pandas
 tensorboard
+flax
+chex
 #your favourite jax[cuda, mps, etc.] versio

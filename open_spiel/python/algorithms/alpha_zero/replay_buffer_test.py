@@ -1,5 +1,5 @@
 
-"""Tests for open_spiel.python.algorithms.alpha_zero.model."""
+"""Tests for open_spiel.python.algorithms.alpha_zero.replay_buffer."""
 
 from absl.testing import absltest
 import jax.numpy as jnp
@@ -50,21 +50,32 @@ class FlatBufferTest(absltest.TestCase):
       big_batch = get_fake_batch(batch, 4)
       buffer.extend(big_batch)
       self.assertEqual(buffer.total_seen, 1 + 4 * (iter+1))
-      self.assertEqual(buffer.buffer_state.current_index, (1 + 4 * (iter+1))%10)
+      self.assertEqual(buffer.buffer_state.write_index, (1 + 4 * (iter+1))%10)
     self.assertTrue(buffer.buffer_state.is_full.item())
-
-
      
   def test_sample(self):
     buffer = Buffer(5, force_cpu=True)
     batch = get_fake_transition()
-    for _ in range(5):
+    for _ in range(4):
       buffer.append(batch)
 
     bs1 = buffer.sample(2)
+
     self.assertEqual(get_tree_shape_prefix(bs1, 1)[0], 2)
     self.assertEqual(jax.tree.map(lambda x: x.shape[1:], bs1), jax.tree.map(lambda x: x.shape, batch))
 
+  def test_queue_sample(self):
+    buffer = Buffer(10, force_cpu=True)
+    batch = get_fake_transition()
+    
+    for iter in range(3):
+      big_batch = get_fake_batch(batch, 4)
+      buffer.extend(big_batch)
+      self.assertEqual(buffer.buffer_state.write_index, (4 * (iter+1))%10)
+    
+    for iter in range(3):
+      _ = buffer.sample(4)
+      self.assertEqual(buffer.buffer_state.read_index, (4 * (iter+1))%10)
 
 if __name__ == "__main__":
   absltest.main()

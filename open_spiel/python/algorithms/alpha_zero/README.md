@@ -3,7 +3,7 @@
 This is a pure python implementation of the AlphaZero algorithm.For more information, please take a look at the
 [full documentation](https://github.com/deepmind/open_spiel/blob/master/docs/alpha_zero.md). 
 
-This is a pure python implementation of the AlphaZero algorithm. It's based on `flax` library for neural networks in `jax` and provides.
+This is a pure python implementation of the AlphaZero algorithm. It's based on `flax` library for neural networks in `jax`.
 
 The code is arranged in the following way:
 
@@ -23,12 +23,18 @@ The code is arranged in the following way:
 └── utils.py
 ```
 
+> [!NOTE]
+> Before running the code, you might want to install additional requirements, via `pip install -r requirement.txt`.
+> `jax` has to be installed beforehand, see: [jax documentation](https://docs.jax.dev/en/latest/installation.html)
+
 Each file implements the following parts of the main documentation:
-* [model](model.py)
-* [export_model](export_model.py)
-* [MCTS evaluator](evaluator.py)
-* [analysis script](analysis.py)
+* [model (with linen)](model_linen.py) or [model (with nnx)](model_nnx.py) 
+* [export_model](export_model.py), to be able save or initialise the model
+* [MCTS evaluator](evaluator.py), to run evaluation
+* [analysis script](analysis.py), to plot the results of the experiment in the visual form
 * [the main script](alpha_zero.py)
+* [the utility script](alpha_zero.py) that contains important utility functions and classes
+
 
 
 ## Note of `flax` APIs
@@ -43,13 +49,13 @@ Currently, the framework supports two APIs:
 2. Rewritten utils like replay buffer and configuation classes to support the device-agnostic implementation
 3. Added `vmap` to the modules for the batched computation
 4. Added full test coverage for the utility
-5. [TODO] Added a Tensorboard support for the loggning
+
 
 ## Challenges (contributions are open!)
 1. Implement sharding for multi-processing or multi-hostage (`xmap, jax.shard_map`) training and inference
 2. Compile learning process (`model.update`) using a parallel associative scan (`jax.lax.scan`)
 3. Add support of different logging methods, like `wandb` and such
-
+4. Add Tensorboard support for a "on-line" logging
 
 
 

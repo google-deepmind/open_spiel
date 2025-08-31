@@ -65,7 +65,6 @@ flags.DEFINE_bool("quiet", True, "Don't show the moves as they're played.")
 flags.DEFINE_bool("verbose", False, "Show the MCTS stats of possible moves.")
 
 FLAGS = flags.FLAGS
-#TODO: api
 
 def main(unused_argv):
   config = alpha_zero.Config(

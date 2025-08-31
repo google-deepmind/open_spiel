@@ -337,7 +337,7 @@ def evaluator(*, game, config, logger, queue):
 def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
   """A learner that consumes the replay buffer and trains the network."""
   logger.also_to_stdout = True
-  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size) #only this
+  replay_buffer = buffer_lib.Buffer(config.replay_buffer_size, sequential=True) #only this
   learn_rate = config.replay_buffer_size // config.replay_buffer_reuse
   logger.print("Initializing model")
   model = _init_model_from_config(config)
