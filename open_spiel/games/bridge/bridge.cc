@@ -26,9 +26,10 @@
 #include <utility>
 #include <vector>
 
+#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
 #include "open_spiel/abseil-cpp/absl/base/attributes.h"
 #include "open_spiel/abseil-cpp/absl/base/const_init.h"
-#include "open_spiel/abseil-cpp/absl/algorithm/container.h"
+#include "open_spiel/abseil-cpp/absl/random/random.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_cat.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_format.h"
 #include "open_spiel/abseil-cpp/absl/strings/str_split.h"
@@ -1080,8 +1081,6 @@ std::string BridgeGame::ContractString(int index) const {
   return kAllContracts[index].ToString();
 }
 
-// Note that uniform_int_distribution here may not generate a sequence of states
-// that is consistent across compilers.
 std::unique_ptr<State> BridgeGame::NewDuplicateBridgeInitialState(
     int tournament_seed, int board_number) const {
   // Standard assignments of dealer and vulnerability based on the board number.
@@ -1111,8 +1110,8 @@ std::unique_ptr<State> BridgeGame::NewDuplicateBridgeInitialState(
   std::mt19937_64 rng(seed);
   while (state->CurrentPhase() == 0) {
     const auto actions = state->LegalActions();
-    std::uniform_int_distribution<> distrib(0, actions.size() - 1);
-    const int action_index = distrib(rng);
+    const int action_index =
+        absl::Uniform(rng, 0, static_cast<int>(actions.size() - 1));
     state->ApplyAction(actions[action_index]);
   }
 
