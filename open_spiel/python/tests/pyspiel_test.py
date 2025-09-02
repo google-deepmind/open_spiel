@@ -25,7 +25,18 @@ from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 import pyspiel
 
 
-def _try_importing_game(fully_qualified_module_name):
+def _try_importing_game(import_statement):
+  # First get the fully-qualified module name from the import statement.
+  parts = import_statement.split(" ")
+  if len(parts) == 2:
+    # "import module" -> "module"
+    fully_qualified_module_name = import_statement.split(" ")[-1]
+  elif len(parts) == 4 and parts[0] == "from" and parts[2] == "import":
+    # "from this import that" -> "this.that"
+    fully_qualified_module_name = f"{parts[1]}.{parts[3]}"
+  else:
+    raise ValueError(f"Invalid import statement: {import_statement}")
+  # Now try to import the module and return True if it worked.
   try:
     importlib.import_module(fully_qualified_module_name)
     return True
@@ -38,20 +49,20 @@ def _try_importing_game(fully_qualified_module_name):
     )
     return False
 
-
+# pylint: disable=line-too-long
 _PYTHON_OPTIONAL_GAMES = frozenset([
     game
-    for game, fully_qualified_module_name in [
+    for game, import_statement in [
         # TODO: b/437724266 - enable once we've finished implemention here.
         # tuple(["python_pokerkit_wrapper",
-        #        "google3.third_party.open_spiel.python.games.pokerkit_wrapper",
+        #        "from open_spiel.python.games import pokerkit_wrapper",
         #        ]),
         tuple([
             "python_pokerkit_wrapper_acpc_style",
-            "google3.third_party.open_spiel.python.games.pokerkit_wrapper",
+            "from open_spiel.python.games import pokerkit_wrapper",
         ])
     ]
-    if _try_importing_game(fully_qualified_module_name)
+    if _try_importing_game(import_statement)
 ])
 
 # Specify game names in alphabetical order, to make the test easier to read.

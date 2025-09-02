@@ -757,16 +757,27 @@ class PokerkitWrapperAcpcStyle(PokerkitWrapper):
   def game_type(self):
     return _GAME_TYPE_ACPC_STYLE
 
+  def information_state_tensor_size(self):
+    num_players = self.num_players()
+    max_game_length = self.max_game_length()
+    max_chance_outcomes = self.max_chance_outcomes()
+    # --- Initialize the tensor (with length matching universal_poker's) ---
+    #
+    # Specifically: shape should match InformationStateTensorShape() in
+    # universal_poker.cc.
+    return (
+        num_players + 2 * max_chance_outcomes + (2 + 1) * max_game_length
+    )
+
 
 class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
   """State class for PokerkitWrapperAcpcStyle."""
 
   def information_state_tensor(self, player):
-    """See google3/third_party/open_spiel/spiel.h.
+    """See spiel.h.
 
-    Deliberately matches
-    https://source.corp.google.com/piper///depot/google3/third_party/open_spiel/games/universal_poker/universal_poker.cc;l=400
-    as much as realistically possible.
+    Deliberately matches UniversalPokerState::InformationStateTensor in
+    universal_poker.cc as much as realistically possible.
 
     Layout is as follows:
 
@@ -786,7 +797,14 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
 
     Returns:
       A numpy array representing the information state for the given player.
+
+    Raises:
+      RuntimeError: If player is out of range.
     """
+    if player < 0:
+      raise RuntimeError("player >= 0")
+    elif player >= self.get_game().num_players():
+      raise RuntimeError("player <")
     game = self.get_game()
     game.raise_error_if_player_out_of_range(player)
 
@@ -794,15 +812,9 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     num_players = game.num_players()
     deck_size = game.deck_size
     max_game_length = game.max_game_length()
-    max_chance_outcomes = game.max_chance_outcomes()
 
-    # --- Initialize the tensor (with length matching universal_poker's) ---
-    #
-    # Specifically: shape should match InformationStateTensorShape() in
-    # http://google3/third_party/open_spiel/games/universal_poker/universal_poker.cc?l=1131
-    tensor_length = (
-        num_players + 2 * max_chance_outcomes + (2 + 1) * max_game_length
-    )
+    tensor_length = game.information_state_tensor_size()
+
     # TODO: b/437724266 - consider adding this back in later if supporting
     # other variants in this fashion
     # if game.is_bring_in_variant():
@@ -871,10 +883,9 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
       if isinstance(operation, pokerkit.CheckingOrCalling):
         self.tensor[offset + i * 2] = 1.0
         self.tensor[offset + (i * 2) + 1] = 0.0
-        # Judging by
-        # https://source.corp.google.com/piper///depot/google3/third_party/open_spiel/games/universal_poker/universal_poker.h;l=160;bpv=1;bpt=1;rcl=796286203
-        # it sounds like universal_poker only records '0' for call sizings??
-        # In which case, we should actaully *NOT* record the size here...
+        # Judging by universal_poker.h, it sounds like universal_poker only
+        # records '0' for call sizings?? In which case, we should actaully *NOT*
+        # record the size here...
         #
         # self.tensor[
         #     offset + choice_index + max_game_length*2] = operation.amount
@@ -934,12 +945,10 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     return self.tensor
 
   def information_state_string(self, player):
-    if player < 0 or player >= self.get_game().num_players():
-      raise ValueError(
-          f"Player {player} is out of range [0,"
-          f" {self.get_game().num_players()})."
-      )
-
+    if player < 0:
+      raise RuntimeError("player >= 0")
+    elif player >= self.get_game().num_players():
+      raise RuntimeError("player <")
     pot = 0
     for p in self._wrapped_state.pots:
       if player in p.player_indices:
