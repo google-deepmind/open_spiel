@@ -55,11 +55,11 @@ _PYTHON_OPTIONAL_GAMES = frozenset([
     for game, import_statement in [
         # TODO: b/437724266 - enable once we've finished implemention here.
         # tuple(["python_pokerkit_wrapper",
-        #        "from open_spiel.python.games import pokerkit_wrapper",
+        #        "import google3.third_party.open_spiel.python.games.pokerkit_wrapper",
         #        ]),
         tuple([
             "python_pokerkit_wrapper_acpc_style",
-            "from open_spiel.python.games import pokerkit_wrapper",
+            "import google3.third_party.open_spiel.python.games.pokerkit_wrapper",
         ])
     ]
     if _try_importing_game(import_statement)

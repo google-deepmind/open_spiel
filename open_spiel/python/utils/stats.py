@@ -168,7 +168,7 @@ class StatCounter:
 
   @property
   def n(self):
-    return self.n
+    return self._n
 
   def ci95(self):
     if self._n == 0: return 0
