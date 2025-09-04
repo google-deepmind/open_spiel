@@ -13,7 +13,6 @@
 # limitations under the License.
 """General tests for pyspiel python bindings."""
 
-import importlib
 import os
 
 from absl.testing import absltest
@@ -25,48 +24,12 @@ from open_spiel.python.mfg import games as mfgs  # pylint: disable=unused-import
 import pyspiel
 
 
-def _try_importing_game(import_statement):
-  # First get the fully-qualified module name from the import statement.
-  parts = import_statement.split(" ")
-  if len(parts) == 2:
-    # "import module" -> "module"
-    fully_qualified_module_name = import_statement.split(" ")[-1]
-  elif len(parts) == 4 and parts[0] == "from" and parts[2] == "import":
-    # "from this import that" -> "this.that"
-    fully_qualified_module_name = f"{parts[1]}.{parts[3]}"
-  else:
-    raise ValueError(f"Invalid import statement: {import_statement}")
-  # Now try to import the module and return True if it worked.
-  try:
-    importlib.import_module(fully_qualified_module_name)
-    return True
-  except ImportError:
-    return False
-  except (SyntaxError, TypeError, ValueError, RuntimeError) as e:
-    print(
-        f"Failed to import {fully_qualified_module_name}, but with common"
-        f" non-import error: {e}"
-    )
-    return False
-
-# pylint: disable=line-too-long
-_PYTHON_OPTIONAL_GAMES = frozenset([
-    game
-    for game, import_statement in [
-        # TODO: b/437724266 - enable once we've finished implemention here.
-        # tuple(["python_pokerkit_wrapper",
-        #        "import google3.third_party.open_spiel.python.games.pokerkit_wrapper",
-        #        ]),
-        tuple([
-            "python_pokerkit_wrapper_acpc_style",
-            "import google3.third_party.open_spiel.python.games.pokerkit_wrapper",
-        ])
-    ]
-    if _try_importing_game(import_statement)
+_FULLY_OPTIONAL_PYTHON_GAMES = frozenset([
+    "python_pokerkit_wrapper_acpc_style"
 ])
-
 # Specify game names in alphabetical order, to make the test easier to read.
-EXPECTED_GAMES = frozenset([
+# "Mandatory" = neither optional nor included only if certain flags are set.
+EXPECTED_MANDATORY_GAMES = frozenset([
     "2048",
     "add_noise",
     "amazons",
@@ -190,15 +153,19 @@ EXPECTED_GAMES = frozenset([
     "ultimate_tic_tac_toe",
     "y",
     "zerosum",
-]).union(_PYTHON_OPTIONAL_GAMES)
+])
 
 
 class PyspielTest(parameterized.TestCase):
 
-  def test_registered_names(self):
+  def test_registered_names_is_sorted(self):
+    game_names = pyspiel.registered_names()
+    self.assertSequenceEqual(game_names, sorted(game_names))
+
+  def test_registered_names_contains_expected_games(self):
     game_names = pyspiel.registered_names()
 
-    expected = list(EXPECTED_GAMES)
+    expected = list(EXPECTED_MANDATORY_GAMES)
     if (os.environ.get("OPEN_SPIEL_BUILD_WITH_HANABI", "OFF") == "ON" and
         "hanabi" not in expected):
       expected.append("hanabi")
@@ -206,8 +173,15 @@ class PyspielTest(parameterized.TestCase):
         "universal_poker" not in expected):
       expected.append("universal_poker")
       expected.append("repeated_poker")
-    expected = sorted(expected)
-    self.assertCountEqual(game_names, expected)
+    # Verify we have registered all mandatory games + games added via flags
+    self.assertContainsSubset(expected, game_names)
+
+    # Check that the contents of the remainder are all fully optional games.
+    # (If this fails, it likely means that someone added a game but forgot to
+    # update either EXPECTED_MANDATORY_GAMES or _FULLY_OPTIONAL_PYTHON_GAMES.)
+    remaining_games = set(game_names).difference(set(expected))
+    self.assertContainsSubset(expected_subset=remaining_games,
+                              actual_set=_FULLY_OPTIONAL_PYTHON_GAMES)
 
   def test_default_loadable(self):
     # Games which cannmot be loaded with default parameters will be skipped by
