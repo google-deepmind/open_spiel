@@ -205,6 +205,7 @@ class PyspielTest(parameterized.TestCase):
     if (os.environ.get("OPEN_SPIEL_BUILD_WITH_ACPC", "OFF") == "ON" and
         "universal_poker" not in expected):
       expected.append("universal_poker")
+      expected.append("repeated_poker")
     expected = sorted(expected)
     self.assertCountEqual(game_names, expected)
 
@@ -229,6 +230,7 @@ class PyspielTest(parameterized.TestCase):
         "turn_based_simultaneous_game",
         "normal_form_extensive_game",
         "repeated_game",
+        "repeated_poker",
         "restricted_nash_response",
         "start_at",
         "zerosum",
@@ -404,6 +406,14 @@ class PyspielTest(parameterized.TestCase):
 
   @parameterized.parameters(
       ("universal_poker", pyspiel.hunl_game_string("fullgame")),
+      (
+          "repeated_poker",
+          "repeated_poker(max_num_hands=10,reset_stacks=True,"
+          + "rotate_dealer=True,universal_poker_game_string=universal_poker("
+          + "betting=nolimit,bettingAbstraction=fullgame,blind=100 50,"
+          + "firstPlayer=2 1 1 1,numBoardCards=0 3 1 1,numHoleCards=2,"
+          + "numPlayers=2,numRanks=13,numRounds=4,numSuits=4,stack=20000 20000"
+          + "))"),
       (
           "python_pokerkit_wrapper_acpc_style",
           "python_pokerkit_wrapper_acpc_style(variant=NoLimitTexasHoldem,"

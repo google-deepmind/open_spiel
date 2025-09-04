@@ -111,9 +111,8 @@ class UniversalPokerState : public State {
   const BettingAbstraction &betting() const { return betting_abstraction_; }
 
   int PotSize(double multiple = 1.) const;
-
-  // Returns the raise-to size of the current player going all-in.
-  int AllInSize() const;
+  int AllInSize() const;  // Raise-to size of the current player going all-in.
+  double GetTotalReward(Player player) const;
   void ApplyChoiceAction(StateActionType action_type, int size);
 
  protected:
@@ -121,8 +120,6 @@ class UniversalPokerState : public State {
 
  private:
   void _CalculateActionsAndNodeType();
-
-  double GetTotalReward(Player player) const;
 
   const uint32_t &GetPossibleActionsMask() const { return possibleActions_; }
   int GetPossibleActionCount() const;

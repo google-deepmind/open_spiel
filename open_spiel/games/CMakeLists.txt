@@ -215,6 +215,7 @@ if (${OPEN_SPIEL_BUILD_WITH_HANABI})
 endif()
 if (${OPEN_SPIEL_BUILD_WITH_ACPC})
   set(GAME_SOURCES ${GAME_SOURCES} universal_poker/universal_poker.cc universal_poker/universal_poker.h)
+  set(GAME_SOURCES ${GAME_SOURCES} universal_poker/repeated_poker.cc universal_poker/repeated_poker.h)
 endif()
 
 
@@ -676,6 +677,10 @@ if (${OPEN_SPIEL_BUILD_WITH_ACPC})
           $<TARGET_OBJECTS:algorithms>)
   add_test(universal_poker_test universal_poker_test
            --subgames_data_dir=${CMAKE_CURRENT_SOURCE_DIR}/universal_poker/endgames)
+  add_executable(repeated_poker_test universal_poker/repeated_poker_test.cc ${OPEN_SPIEL_OBJECTS}
+          $<TARGET_OBJECTS:tests>
+          $<TARGET_OBJECTS:algorithms>)
+  add_test(repeated_poker_test repeated_poker_test)
 endif()
 
 add_executable(y_test y/y_test.cc ${OPEN_SPIEL_OBJECTS}
