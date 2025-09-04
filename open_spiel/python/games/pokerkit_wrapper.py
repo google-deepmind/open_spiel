@@ -66,6 +66,16 @@ _SUPPORTED_VARIANT_MAP = {
     for variant in _SUPPORTED_VARIANT_CLASSES
 }
 
+_SHORT_DECK_VARIANTS = [
+    pokerkit.NoLimitShortDeckHoldem.__name__,
+]
+
+_STANDARD_DECK_VARIANTS = [
+    v.__name__
+    for v in _SUPPORTED_VARIANT_CLASSES
+    if v.__name__ not in _SHORT_DECK_VARIANTS
+]
+
 # pylint: disable=unused-private-name
 _VARIANTS_SUPPORTING_ACPC_STYLE = [
     pokerkit.NoLimitTexasHoldem.__name__,
@@ -304,25 +314,18 @@ class PokerkitWrapper(pyspiel.Game):
           f"({self.params['blinds']})"
       )
 
-    # --- Card, and Deck Information ---
-    # TODO: b/437724266 - depending on game variant we may want to use a
-    # different deck in the future (e.g. Kuhn, shortdeck, etc).
+    # --- Card and Deck Information ---
     self._deck = pokerkit.Deck.STANDARD
-    # TODO: b/437724266 - probably should make accessors for all of these to
-    # avoid people mutating them out from underneath us.
+    if variant in _SHORT_DECK_VARIANTS:
+      self._deck = pokerkit.Deck.SHORT_DECK_HOLDEM
+    else:
+      assert variant in _STANDARD_DECK_VARIANTS
     self.deck_size = len(self._deck)
     self.card_to_int = {card: i for i, card in enumerate(self._deck)}
     self.int_to_card = {i: card for i, card in enumerate(self._deck)}
     self.num_streets = self.params.get("num_streets")
 
     # --- GameInfo and GameType Setup ---
-    # TODO: b/437724266 - Add support for calculating a tighter max_action
-    # bound, e.g. in limit games where the player cannot bet their entire stack
-    # at once.
-    #
-    # See FOLD / CHECK actions defined above for more details.
-    num_distinct_actions = max(self.stack_sizes) + 1
-    total_chips = sum(self.stack_sizes)
 
     # Initialize to None since the function is going to attempt to check this
     # to see if we cached it already.
@@ -330,31 +333,73 @@ class PokerkitWrapper(pyspiel.Game):
     self._max_game_length_estimate = self._calculate_max_game_length()
 
     self._game_info = pyspiel.GameInfo(
-        num_distinct_actions=num_distinct_actions,
+        num_distinct_actions=self._calculate_num_distinct_actions(),
         max_chance_outcomes=self.deck_size,
         num_players=num_players,
-        # TODO: b/437724266 - Add support for calculating tighter utility
-        # bounds rather than this very rough estimate. This estimate currently
-        # assumes that all games will always be able to get all the chips in,
-        # even in e.g. limit games (where the stack sizes can be too large
-        # relative to the bet limits for doing so to actually be possible).
-        min_utility=float(-max(self.stack_sizes)),
-        max_utility=float(total_chips - min(self.stack_sizes)),
+        min_utility=self._calculate_min_utility(),
+        max_utility=self._calculate_max_utility(),
         utility_sum=0.0,
         max_game_length=self._calculate_max_game_length(),
     )
     super().__init__(game_type, self._game_info, self.params)
 
+  def _calculate_num_distinct_actions(self):
+    """Returns an upper bound on the number of distinct player actions.
+
+    NOTE: This could be a bit tighter, e.g. depending on the value of min_bet
+    or specifics of the game variant. That said, this just needs to be an upper
+    bound, so it should be entirely fine.
+    """
+    # +1 is to account for ACTION_FOLD being 0
+    return max(self.stack_sizes) + 1
+
+  def _calculate_min_utility(self):
+    """Returns an upper-bound (magnitude) on minimum utility for the game.
+
+    NOTE: for sake of simplicity, this base class utility estimate assumes that
+    in all games the deepest-stack will always be able to get all the chips in
+    AND actually lose them. This is not as tight as it could be in many cases,
+    e.g. where effective stack sizes or bet limits prevent the deepest-stack
+    from actually doing so. If you need tighter bounds, consider subclassing and
+    overriding.
+    """
+    # TODO: b/437724266 - use effective stack size instead of raw stack size.
+    return float(-max(self.stack_sizes))
+
+  def _calculate_max_utility(self):
+    """Returns an upper-bound on maximum utility for the game.
+
+    NOTE: for sake of simplicity, this base class utility estimate assumes that
+    in all games the deepest-stack will always be able to win all other players'
+    chips. This is not as tight as it could be in many cases, e.g. where
+    bet limits prevent the deepest-stack from actually doing so. If you need
+    tighter bounds, consider subclassing and overriding.
+    """
+    return float(sum(self.stack_sizes) - max(self.stack_sizes))
+
   def game_info(self):
     return self._game_info
 
   def _calculate_max_game_length(self):
-    """Estimate the maximum game length based on the input parameters."""
+    """Provides a (very rough) upper bound on the maximum game length."""
     if self._max_game_length_estimate is not None:
       return self._max_game_length_estimate
-    # TODO: b/437724266 - Add support for calculating a tighter max_game_length
-    # bound.
-    return 1000
+
+    # Both theoretically and in practice, games will be MUCH shorter than this.
+    # However, this does set an ironclad upper bounds on the game length,
+    # which is 'good enough' for our purposes.
+    # NOTE: Assumes that in nolimit games, min_bet is exactly one big blind.
+    min_reraise_amount = max(self.blinds)
+    return (
+        # Upper bound on check actions from players not betting, on all streets.
+        self.params.get("num_players") * max(self.params.get("num_streets"), 1)
+        # Upper bound on reraises + calls by the other players. (This is a
+        # factor of total chips, and so doesn't need to consider streets.)
+        + (max(self.stack_sizes) // min_reraise_amount)
+        * max(1, self.params.get("num_players") - 1)
+        # Upper bound on performing all deal actions
+        + self.deck_size
+    )
 
   def new_initial_state(self):
     return PokerkitWrapperState(self)

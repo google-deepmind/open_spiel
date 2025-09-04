@@ -255,6 +255,84 @@ class PokerkitWrapperTest(absltest.TestCase):
     for street in wrapped_state_copy.streets:
       self.assertFalse(street.card_burning_status)
 
+  def test_utility_equal_stacks_multiway(self):
+    scenarios = [
+        {
+            "params": {
+                "variant": "NoLimitTexasHoldem",
+                "num_players": 3,
+                "blinds": "50 100",
+                "stack_sizes": "200 200 200",
+            },
+            "expected_max_utility": 400.0,
+            "expected_min_utility": -200.0,
+        },
+        {
+            "params": {
+                "variant": "NoLimitTexasHoldem",
+                "num_players": 6,
+                "blinds": "50 100",
+                "stack_sizes": "6 6 6 6 6 6",
+            },
+            "expected_max_utility": 30.0,
+            "expected_min_utility": -6.0,
+        },
+        {
+            "params": {
+                "variant": "NoLimitTexasHoldem",
+                "num_players": 6,
+                "blinds": "50 100",
+                "stack_sizes": "10000 10000 10000 10000 10000 10000",
+            },
+            "expected_max_utility": 50000.0,
+            "expected_min_utility": -10000.0,
+        },
+    ]
+
+    for scenario in scenarios:
+      with self.subTest(params=scenario["params"]):
+        game = PokerkitWrapper(params=scenario["params"])
+        self.assertEqual(game.max_utility(), scenario["expected_max_utility"])
+        self.assertEqual(game.min_utility(), scenario["expected_min_utility"])
+
+  def test_utility_unequal_stacks_headsup(self):
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 2,
+        "blinds": "50 100",
+        "stack_sizes": "300 200",
+    }
+    game = PokerkitWrapper(params=params)
+    self.assertEqual(game.max_utility(), 200.0)
+    # min_utility is technically just upper bound anyways (in magnitude), so it
+    # doesn't have to be exact. But, whatever this bound is, it at least needs
+    # to avoid *underestimating* how many chips could be lost here.
+    self.assertLessEqual(game.min_utility(), -200.0)
+    # Even if it technically *could* be even less tight (e.g. -500 is still
+    # 'correct'), in practice it'd be concerning for this to be any lower given
+    # how easy it is to reason that the minimum utility will be no 'larger' (in
+    # magnitude) than the largest stack's size.
+    self.assertGreaterEqual(game.min_utility(), -300.0)
+
+  def test_utility_unequal_stacks_multiway(self):
+    params = {
+        "variant": "NoLimitTexasHoldem",
+        "num_players": 4,
+        "blinds": "50 100",
+        "stack_sizes": "300 200 300 400",
+    }
+    game = PokerkitWrapper(params=params)
+    self.assertEqual(game.max_utility(), 800.0)
+    # min_utility is technically just upper bound anyways (in magnitude), so it
+    # doesn't have to be exact. But, whatever this bound is, it at least needs
+    # to avoid *underestimating* how many chips could be lost here.
+    self.assertLessEqual(game.min_utility(), -300.0)
+    # Even if it technically *could* be even less tight (e.g. -500 is still
+    # 'correct'), in practice it'd be concerning for this to be any lower given
+    # how easy it is to reason that the minimum utility will be no 'larger' (in
+    # magnitude) than the largest stack's size.
+    self.assertGreaterEqual(game.min_utility(), -400.0)
+
   def test_returns_correct_legal_actions(self):
     params = {
         "variant": "NoLimitTexasHoldem",
