@@ -417,8 +417,8 @@ class PyspielTest(parameterized.TestCase):
       (
           "python_pokerkit_wrapper_acpc_style",
           "python_pokerkit_wrapper_acpc_style(variant=NoLimitTexasHoldem,"
-          + "num_players=2,blinds=5 10,stack_sizes=10000 10000,min_bet=100,"
-          + "bring_in=100,small_bet=100,big_bet=100)",
+          + "num_players=2,blinds=5 10,stack_sizes=1000 1000,"
+          + "bring_in=5,small_bet=10,big_bet=20)",
       ),
       ("kuhn_poker", "kuhn_poker(players=3)"),
       ("tic_tac_toe", "tic_tac_toe"),

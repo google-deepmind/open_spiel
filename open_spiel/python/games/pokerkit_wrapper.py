@@ -51,13 +51,13 @@ _DEFAULT_AUTOMATIONS = (
 _SUPPORTED_VARIANT_CLASSES = [
     pokerkit.NoLimitTexasHoldem,
     pokerkit.NoLimitShortDeckHoldem,
-    # Conversationally: "Limit Texas Hold'em"
+    # "Limit Texas Hold'em"
     pokerkit.FixedLimitTexasHoldem,
-    # Conversationally: "Seven Card Stud"
+    # "Seven Card Stud"
     pokerkit.FixedLimitSevenCardStud,
-    # Conversationally: "Razz"
+    # "Razz"
     pokerkit.FixedLimitRazz,
-    # Conversationally: "Pot Limit Omaha (PLO)"
+    # "Pot Limit Omaha (PLO)"
     pokerkit.PotLimitOmahaHoldem,
 ]
 _SUPPORTED_VARIANT_MAP = {
@@ -84,7 +84,13 @@ def _get_variants_supporting_param(param_name: str) -> list[str]:
 
 _VARIANT_PARAM_USAGE = {
     param: _get_variants_supporting_param(param)
-    for param in ["min_bet", "bring_in", "small_bet", "big_bet"]
+    for param in [
+        "bring_in",
+        "small_bet",
+        "big_bet",
+        "raw_blinds_or_straddles",
+        "max_completion_betting_or_raising_count",
+    ]
 }
 
 # WARNING: do not use comma-containing string param values here. Also, do not
@@ -102,15 +108,12 @@ _DEFAULT_PARAMS = {
     "variant": "NoLimitTexasHoldem",
     "num_players": 2,
     # Assumed to be "<SB> <BB>", i.e. space-separated numbers (within the
-    # string). Leave as empty string for any games where blinds are irrelevant,
-    # such as games using a "bring_in" (e.g. limit_razz and
-    # limit_seven_card_stud).
-    "blinds": "50 100",
-    # Minimum bet size for no-limit games. Even if set, this will be ignored for
-    # all other games (e.g. 'fixed limit' games).
-    # As a convienence, if unset for no-limit games where `blinds` param was
-    # set, we will attempt to default to the BigBlind instead of this default 2.
-    "min_bet": 2,
+    # string).
+    # NOTE: Small Blind must be >= 1, Big Blind must be >= 2, and SB <= BB.
+    # TODO: b/437724266 - Add support for any N blinds where 0 < N < num_players
+    # instead of requiring exactly "<SB> <BB>". (Pokerkit already supports this,
+    # we just need to ensure we're handling things properly on our end.)
+    "blinds": "5 10",
     "num_streets": 4,
     # Relevant for games with public hole cards. Will be ignored by all
     # other games (including the default NoLimitTexasHoldem).
@@ -135,7 +138,7 @@ _DEFAULT_PARAMS = {
     # left of the dealer should be in the zeroth position while the player to
     # the immediate right of the dealer should be in the last position.
     # """
-    "stack_sizes": "20000 20000",
+    "stack_sizes": "2000 2000",
 }
 
 _GAME_TYPE = pyspiel.GameType(
@@ -148,11 +151,11 @@ _GAME_TYPE = pyspiel.GameType(
     reward_model=pyspiel.GameType.RewardModel.TERMINAL,
     max_num_players=10,  # Arbitrarily chosen to match universal_poker
     min_num_players=2,  # Arbitrarily chosen to match universal_poker
+    provides_information_state_string=True,
+    provides_observation_string=True,
     # See discussion in cl/798600930 for justification on not implementing them.
-    provides_information_state_string=False,
     provides_information_state_tensor=False,
     provides_observation_tensor=False,
-    provides_observation_string=True,
     # TODO: b/437724266 - determine what this value does and whether it should
     # be True or False / what functionality it's actually controlling.
     provides_factored_observation_string=False,
@@ -170,8 +173,10 @@ _GAME_TYPE_ACPC_STYLE = pyspiel.GameType(
     reward_model=pyspiel.GameType.RewardModel.TERMINAL,
     max_num_players=10,  # Arbitrarily chosen to match universal_poker
     min_num_players=2,  # Arbitrarily chosen to match universal_poker
-    provides_information_state_string=True,
-    provides_information_state_tensor=True,
+    # TODO: b/434776281 - Toggle True again once *properly* supported via the
+    # Observer class when its iig_obs_type.perfect_recall is True.
+    provides_information_state_string=False,
+    provides_information_state_tensor=False,
     provides_observation_tensor=True,
     provides_observation_string=True,
     # It might be possible this should be True, unfortunately we're not actually
@@ -188,6 +193,7 @@ ACTION_FOLD = 0
 # TODO: b/437724266 - this inherently limits our ability to ever raise / perform
 # a completion bet to a size of 1 chip.
 ACTION_CHECK_OR_CALL = 1
+FOLD_AND_CHECK_OR_CALL_ACTIONS = [ACTION_FOLD, ACTION_CHECK_OR_CALL]
 
 # NOTE: any other play actions >1 will be interpreted as part of a raise,
 # reraise, or completion bet. Generally this follows typical poker assumptions
@@ -262,35 +268,9 @@ class PokerkitWrapper(pyspiel.Game):
           f" min_players ({game_type.min_num_players})."
       )
 
-    if variant in _VARIANT_PARAM_USAGE["min_bet"]:
-      # As described in the docstring for _DEFAULT_PARAMS, if the user didn't
-      # specify a min_bet but *did* specify blinds, we will attempt to set
-      # min_bet to the Big Blind instead of the default like most other params.
-      # TODO: b/437724266 - Clean up or simplify some of this logic.
-      if "min_bet" in params:  # NOTE: Checking the *original* params.
-        self.params["min_bet"] = params["min_bet"]
-      # In most nolimit games this will just be the big blind, so it's
-      # annoying and counterintuitive for users to have to specify it just to
-      # avoid getting the default value we defined above.
-      else:
-        # NOTE: As above, checking the ORIGINAL params - not the self.params we
-        # created inside this __init__().
-        if "blinds" in params:
-          parsed_blinds = _parse_values(params.get("blinds"))
-          if parsed_blinds is None or len(parsed_blinds) != 2:
-            raise ValueError(
-                "blinds must be a space-separated list [Small Blind, Big"
-                f" Blind]): ({params['blinds']})"
-            )
-          # NOTE: setting it on the self.params we created, meaning it will
-          # (correctly) override the default values we pulled in iniiially.
-          self.params["min_bet"] = parsed_blinds[1]
-        # else: we will just use the default's param like everything else.
-
-    else:  # variant not in _VARIANT_PARAM_USAGE["min_bet"]
-      del self.params["min_bet"]
-
-    self._is_bring_in_variant = variant in _VARIANT_PARAM_USAGE["bring_in"]
+    assert self.params["small_bet"] < self.params["big_bet"]
+    if variant in _VARIANT_PARAM_USAGE["bring_in"]:
+      assert self.params["bring_in"] < self.params["small_bet"]
 
     for param in ["bring_in", "small_bet", "big_bet"]:
       if variant in _VARIANT_PARAM_USAGE[param]:
@@ -380,7 +360,7 @@ class PokerkitWrapper(pyspiel.Game):
     return PokerkitWrapperState(self)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
-    return PokerkitWrapperObserver(self, params)
+    return PokerkitWrapperObserver(self, iig_obs_type, params)
 
   def raise_error_if_player_out_of_range(self, player):
     if player < 0 or player >= self.num_players():
@@ -388,15 +368,30 @@ class PokerkitWrapper(pyspiel.Game):
           f"Player {player} is out of range [0, {self.num_players()})"
       )
 
-  def wrapped_state_factory(self):
-    """Creates the "wrapped" (not "PokerkitWrapper...") pokerkit.state object.
+  def _wrapped_game_template_factory(self):
+    """Creates a default pokerkit 'template' that can easily construct states.
 
-    This is used for both the 'real' wrapped pokerkit state object, AND also as
-    needed to create 'dummy' Pokerkit objects for other purposes. (Hence why
-    this is inside the main 'game' class and not the 'State' class below it.)
+    For more details, see:
+    https://pokerkit.readthedocs.io/en/stable/simulation.html#pre-defined-games
+    ```
+    In certain use cases, one may want to create a template from which just the
+    starting stacks and the number of players can be specified. In PokerKit,
+    this can be done by creating an instance of the game that acts as a state
+    factory from which states are initialized.
+    ```
+
+    NOTE: By definition, this CANNOT disable card burning, as it's using the
+    default pokerkit game variants (all of which have card burning enabled /
+    do not allow custom Street inputs). If using this to create a
+    wrapped_state you'll want to pass in a custom Streets to disable it!
+
+    WARNING: Don't attempt to merge this into wrapped_state_factory(). You'll
+    need this for multiple reasons, including those other than creating a game
+    object to track game state. Notably, we have to pass the Pokerkit.Poker into
+    calls to HandHistory.from_game_state(...) to construct PHHs.
 
     Returns:
-      A `pokerkit.State` object configured with the game parameters.
+      A "variant" sub-class pokerkit.Poker object.
     """
     # TODO: b/437724266 - Stop directly accessing values from the params and
     # instead grab the values we need via getters.
@@ -406,82 +401,117 @@ class PokerkitWrapper(pyspiel.Game):
     if not poker_variant_class:
       raise ValueError(f"Unknown / unsupported poker variant: {variant}")
 
-    args = {
-        "automations": _DEFAULT_AUTOMATIONS,
-        "ante_trimming_status": False,
-        # Deliberately skipping the following since they vary by game variant:
-        # - raw_blinds_or_straddles, min_bet
-        # - bring_in, small_bet, big_bet
-        # As per pokerkit docs:
-        # """
-        # In Pokerkit, the term ``raw`` is used to denote the fact that
-        # they can be supplied in many forms and will be "parsed" or
-        # "evaluated" further to convert them into a more ideal form.
-        # For instance, ``0`` will be interpreted as no ante for all
-        # players. Another value will be interpreted as that value as the
-        # antes for all. ``[0, 2]`` and ``{1: 2} will be considered as the
-        # big blind ante whereas ``{-1: 2}`` will be considered as the
-        # button ante.
-        # """
-        "raw_antes": _parse_values(params.get("antes")),
-        "raw_starting_stacks": _parse_values(params.get("stack_sizes")),
-        "player_count": params.get("num_players"),
-    }
-    if not self.is_bring_in_variant():
-      blinds_or_straddles = _parse_values(params.get("blinds"))
-      args["raw_blinds_or_straddles"] = blinds_or_straddles
+    def in_scope_for_variant(k):
+      return k in inspect.signature(poker_variant_class).parameters.keys()
 
-    for param in ["min_bet", "bring_in", "small_bet", "big_bet"]:
-      assert not (
-          param in params and variant not in _VARIANT_PARAM_USAGE[param]
-      )
-      assert not (
-          param not in params and variant in _VARIANT_PARAM_USAGE[param]
-      )
-      if param in params:
-        args[param] = params.get(param)
+    game_args = {
+        k: v
+        for k, v in {
+            "automations": _DEFAULT_AUTOMATIONS,
+            "ante_trimming_status": False,
+            "player_count": params.get("num_players"),
+            # As per pokerkit docs:
+            # """
+            # In Pokerkit, the term ``raw`` is used to denote the fact that
+            # they can be supplied in many forms and will be "parsed" or
+            # "evaluated" further to convert them into a more ideal form.
+            # For instance, ``0`` will be interpreted as no ante for all
+            # players. Another value will be interpreted as that value as the
+            # antes for all. ``[0, 2]`` and ``{1: 2} will be considered as the
+            # big blind ante whereas ``{-1: 2}`` will be considered as the
+            # button ante.
+            # """
+            "raw_antes": _parse_values(params.get("antes")),
+            "raw_starting_stacks": _parse_values(params.get("stack_sizes")),
+            "raw_blinds_or_straddles": self.blinds,
+            # Unlike most other args, we don't support custom user inputs for
+            # this. Despite the name, it's only used in nolimit games (NOT any
+            # of the fixed limit variants, which compute their minimum bet size
+            # in other ways). And in practice, almost everyone just uses the big
+            # blind as the minimum bet size in nolimit games.
+            "min_bet": max(self.blinds),  # Always set to the big blind
+            # All remaining args we need line up exactly with the params
+            # key/values.
+        }.items()
+        if in_scope_for_variant(k)
+    } | {k: v for k, v in params.items() if in_scope_for_variant(k)}
 
-    # Disable card burning everywhere. Card burning has no purpose here since
-    # our cards's backs cannot be marked, unlike with e.g. real physical poker
-    # cards).
+    # Double check that we didn't somehow end up in a situation where we are
+    # allowing bet sizes that could conflict with the reserved values for our
+    # fold / check actions.
+    min_bet = game_args.get("min_bet")
+    if min_bet is not None:
+      assert min_bet > 0
+      assert min_bet not in FOLD_AND_CHECK_OR_CALL_ACTIONS
+    # TODO: b/434776281 - consider moving additional validation checks out of
+    # the constructor and into this spot here right before we actually use them.
+
+    return poker_variant_class(**game_args)
+
+  def wrapped_state_factory(self) -> pokerkit.State:
+    """Creates the "wrapped" (not "PokerkitWrapper...") pokerkit.state object.
+
+    As a convienence, this method additionally disables card burning on all
+    streets. (Card burning would have no purpose here since our cards' backs
+    cannot be marked, unlike with e.g. real physical poker cards).
+
+    Returns:
+      A `pokerkit.State` object configured with the game parameters.
+    """
+    # For more details on why this works (i.e. only two arguments), see
+    # the docstring in the _wrapped_game_template_factory() method.
     #
-    # We use this funny-looking 'call create_state() then pass streets back into
-    # State() constructor' rather than setting anything directly / maually using
-    # 'replace' on the top-level state object as per guidance in
-    # https://pokerkit.readthedocs.io/en/latest/tips.html#read-only-and-read-write-values
-    helper_state = poker_variant_class.create_state(**args)
-    streets_override = list(helper_state.streets)
-    for i in range(len(streets_override)):
-      streets_override[i] = dataclasses.replace(
-          streets_override[i], card_burning_status=False
-      )
-    # (The purpose of this is creating a fresh identical State object to the
-    # above line `helper_state = poker_variant_class.create_state(**args)`,
-    # except with different street inputs controlling card burning as discussed
-    # above, and WITHOUT directly mutating any of the internal pokerkit.State
-    # fields - as requested by the pokerkit docs.)
-    #
-    # NOTE: This is NOT a PokerkitWrapperState object, but a pokerkit.State
-    # object (ie the 'wrapped' object).
-    returned_state = pokerkit.State(
-        automations=helper_state.automations,
-        deck=helper_state.deck,
-        hand_types=helper_state.hand_types,
-        streets=streets_override,  # Note that this uses the 'override' version!
-        betting_structure=helper_state.betting_structure,
-        ante_trimming_status=helper_state.ante_trimming_status,
-        raw_antes=helper_state.antes,
-        raw_blinds_or_straddles=helper_state.blinds_or_straddles,
-        bring_in=helper_state.bring_in,
-        raw_starting_stacks=helper_state.starting_stacks,
-        player_count=helper_state.player_count,
-        mode=helper_state.mode,
-        starting_board_count=helper_state.starting_board_count,
-        divmod=helper_state.divmod,
-        rake=helper_state.rake,
+    # NOTE: All default pokerkit games have card burning enabled. **This
+    # cannot be prevented, whether via create_state OR via the 'template'
+    # approach we use here.** We'll need to create our own state object
+    # directly using the pokerkit.State constructor to (properly) disable it.
+    game_template = self._wrapped_game_template_factory()
+    stacks = _parse_values(self.params.get("stack_sizes"))
+    number_players = self.params.get("num_players")
+    helper_state = game_template(stacks, number_players)
+
+    # Doing this instead of just directly mutating state.streets as per
+    # https://pokerkit.readthedocs.io/en/stable/tips.html#read-only-and-read-write-values
+    # """
+    #  [The attributes of pokerkit.state.State... should never be modified...
+    #  [I]nstead let PokerKit modify them through public method calls. In other
+    #  words, the user must only read from the state’s attributes or call public
+    #  methods (which may modify them).
+    # """
+    streets_override = [
+        pokerkit.state.Street(
+            **dataclasses.asdict(street)
+            | {
+                "card_burning_status": False,
+            }
+        )
+        for street in helper_state.streets
+    ]
+    args = copy.deepcopy(
+        {
+            # A select few args have "raw_" prefixes in the State constructor.
+            # Unfortunately, although the constructed State objects have both
+            # versions, in practice the non-"raw_" versions are the only ones
+            # that are actually (reliably) set to non-None values.
+            # As such we have to source these "raw_" args from the equivalent
+            # non-"raw_" versions.
+            #
+            # For example:
+            # - giving `raw_starting_stacks` arg `state.starting_stacks`'s value
+            # - giving `raw_antes` arg `state.antes`'s value
+            # - giving `raw_blinds_or_straddles` arg `state.blinds`'s value
+            arg: helper_state.__dict__.get(arg.replace("raw_", ""))
+            for arg in inspect.signature(pokerkit.State).parameters.keys()
+        }
+        | {"streets": streets_override}
     )
-
-    # Double check that we didn't make mistakes when disabing card burning just
+    assert len(args) == len(inspect.signature(pokerkit.State).parameters.keys())
+    assert None not in args.values()
+    # NOTE: CANNOT USE THE "template" APPROACH, NOR .create_state() HERE
+    # (without allowing card burning - since neither of these options accept an
+    # input 'streets').
+    returned_state: pokerkit.State = pokerkit.State(**args)
+    # Double checks that we didn't make mistakes when disabing card burning just
     # now. (This is a bit overkill, but we REALLY don't want there to be any
     # chance of accidentally leaving card burning enabled anywhere).
     for street in returned_state.streets:
@@ -490,9 +520,6 @@ class PokerkitWrapper(pyspiel.Game):
 
   def _game_type(self):
     return _GAME_TYPE
-
-  def is_bring_in_variant(self):
-    return self._is_bring_in_variant
 
 
 class PokerkitWrapperState(pyspiel.State):
@@ -652,9 +679,7 @@ class PokerkitWrapperState(pyspiel.State):
     return payoffs
 
   def clone(self):
-    raise NotImplementedError(
-        "Cloning is not yet supported for PokerkitWrapperState."
-    )
+    return copy.deepcopy(self)
 
   def deepcopy_wrapped_state(self) -> pokerkit.State:
     """Create and return a deepcopy of the 'wrapped' pokerkit.state."""
@@ -667,8 +692,10 @@ class PokerkitWrapperState(pyspiel.State):
     parts.append(f"Stacks: {state.stacks}")
     parts.append(f"Bets: {state.bets}")
     parts.append(f"Board: {state.board_cards}")
+    # WARNING: Will include private hole cards for all players!
     parts.append(f"Hole Cards: {state.hole_cards}")
     parts.append(f"Pots: {list(state.pots)}")
+    # WARNING: Will include private hole cards for all players!
     parts.append(f"Operations: {state.operations}")
     return " | ".join(parts)
 
@@ -676,40 +703,201 @@ class PokerkitWrapperState(pyspiel.State):
 class PokerkitWrapperObserver:
   """Pokerkit "Observer" for creating per-player state tensors and strings."""
 
-  def __init__(self, game, params):
+  def __init__(self, game, iig_obs_types, params):
     """Initializes the PokerkitWrapperObserver."""
     if params:
       raise ValueError(
           f"Observation parameters not supported; passed {params}."
       )
     self.game = game
+    self.iig_obs_types = iig_obs_types
+    if self.iig_obs_types is None:
+      # Effectively: default to returning observation_* instead of
+      # information_state_* if not specified. Since `perfect_recall` in practice
+      # chooses between information_state_* vs observation_* from the
+      # perspective of OpenSpiel. See e.g.
+      # google3/third_party/open_spiel/python/algorithms/generate_playthrough.py
+      self.iig_obs_types = pyspiel.IIGObservationType(perfect_recall=False)
+    self.params = params
+
+    # Not actually used since `provides_observation_tensor=False`, but necessary
+    # since some tests (incorrectly?) assume these always have been created /
+    # test for the attribute's existence.
+    self.tensor = np.array([])
+    self.dict = {}
+
+  def _poker_hand_history_actions(self, state, player) -> list[str]:
+    """Returns PHH (Poker Hand History) actions from player's perspective."""
+    game = state.get_game()
+    game.raise_error_if_player_out_of_range(player)
+
+    # For context see
+    # https://pokerkit.readthedocs.io/en/stable/notation.html#writing-hands
+    # and https://phh.readthedocs.io/en/stable/required.html
+    hand_history = pokerkit.HandHistory.from_game_state(
+        # pylint: disable=protected-access
+        # NOTE: Technically has card burning enabled! But should be close enough
+        # for our purposes here - in practice still results in the same string.
+        game._wrapped_game_template_factory(),
+        # Used as an alternative to .deepcopy_wrapped_state() as an efficiency
+        # optimization; is safe so long as we don't modify the wrapped state.
+        state._wrapped_state,
+        # pylint: enable=protected-access
+    )
+    # Censoring other players' hole cards; see e.g.
+    # https://screenshot.googleplex.com/AHBiteaBwkyseNr
+    per_player_action_view: list[str] = []
+    for action in hand_history.actions:
+      # If not dealing a hole card no need to censor.
+      if not action.startswith("d dh p"):
+        per_player_action_view.append(action)
+        continue
+      assert action.startswith("d dh p")
+
+      # Dealing with hole cards, but still current player, so no need to censor.
+      if action.startswith(f"d dh p{player + 1}"):
+        per_player_action_view.append(action)
+        continue
+      assert not action.startswith(f"d dh p{player + 1}")
+
+      # else: dealing hole cards for another player. This may (and usually will)
+      # contain private hole cards, so censor it.
+      # (We _could_ try to censor just *private* hole cards, i.e. 'down' cards
+      # but not 'up' cards in games with them, but out of an abundance of
+      # caution we instead just censor all of them to be sure.)
+
+      action_components = action.split(" ")
+      # for example: d, dh, p1 => d, dh, p1
+      public_info = action_components[0:3]
+      # for example:
+      #  9hTs => ????
+      #  9hTs AhTd => ???? ????
+      #  7h6c4c3d2c => ??????????
+      censored = ["?" * len(s) for s in action_components[3:]]
+      per_player_action_view.append(" ".join(public_info + censored))
+    return per_player_action_view
+
+  def _observation_string(self, state, player):
+    """Returns a string representation of the observation for a given player."""
+    # pylint: disable=protected-access
+    # Directly using for readonly access as an efficiency optimization. Could
+    # also use deepcopy_wrapped_state() to ensure we don't accidentally mutate
+    # the underlying state here, at the cost of performing the deepcopy every
+    # time this method is called.
+    wrapped_state_do_not_mutate: pokerkit.State = state._wrapped_state
+    # pylint: enable=protected-access
+
+    starting_stacks: list[int] = wrapped_state_do_not_mutate.starting_stacks
+    stacks: list[int] = wrapped_state_do_not_mutate.stacks
+
+    current_street_index: int | None = wrapped_state_do_not_mutate.street_index
+    # Generator returning True IFF discard/draw has been performed for a given
+    # street. For more details see:
+    # https://pokerkit.readthedocs.io/en/stable/reference.html#pokerkit.state.State.draw_statuses
+    draw_statuses: list[bool] = [
+        s for s in wrapped_state_do_not_mutate.draw_statuses
+    ]
+    draw_status: bool | None = (
+        None
+        if current_street_index is None
+        else draw_statuses[current_street_index]
+    )
+    pots: pokerkit.Pot = [p for p in wrapped_state_do_not_mutate.pots]
+    player_next_to_act: int = wrapped_state_do_not_mutate.actor_index
+
+    # --- NOTE: the following '_cards' on the state here are all generators, so
+    # we need to wrap them all in list() to actually grab any values. ---
+
+    # Unlike below, board cards are always public to everyone, so this is
+    # striaghtforward.
+    public_board_cards: list[pokerkit.Card] = list(
+        wrapped_state_do_not_mutate.board_cards
+    )
+
+    # Hole cards for this current player that only this current player can see.
+    private_down_cards: list[pokerkit.Card] = list(
+        wrapped_state_do_not_mutate.get_down_cards(player)
+    )
+
+    # Creates a list containing 1. any Public (face-up) hole cards for player p,
+    # plus '??'s for any of their facedown cards (**even if player p is the
+    # current player or the 'observing' player**).
+    # As such, this will look identical in all players' observations.
+    per_player_censored_cards: list[pokerkit.Card] = [
+        list(wrapped_state_do_not_mutate.get_censored_hole_cards(p))
+        for p in range(wrapped_state_do_not_mutate.player_count)
+    ]
+    return (
+        f"Player: {player}\n"
+        f"||Current Street: {current_street_index}\n"
+        f"||Current Street discard/draw performed: {draw_status}\n"
+        f"||Next Player to act: {player_next_to_act}\n"
+        f"||Pot(s): {pots} \n"
+        f"||Board Cards: {public_board_cards}\n"
+        f"||Player's Private Hole Cards: {private_down_cards}\n"
+        # NOTE: This is intentionally the same for all observing players. I.e.
+        # even for player {player}, the private hole cards will be ??-censored.
+        f"||Per-player Hole Cards (public view): {per_player_censored_cards}\n"
+        f"||Per-player Starting Stacks: {starting_stacks}\n"
+        f"||Per-player Current Stacks: {stacks}"
+    )
 
   def set_from(self, state, player) -> None:
-    """Updates `tensor` and `dict` to reflect `state` from PoV of `player`."""
+    """No-op; see `provides_observation_tensor=False,` above.
+
+    Defined only because some tests (incorrectly?) assume this method will
+    always be defined.
+
+    Args:
+      state: The state to extract the observation from.
+      player: The player to extract the observation for.
+    """
     state.get_game().raise_error_if_player_out_of_range(player)
-    # TODO: b/437724266 - Add full support for othe game variants.
-    raise NotImplementedError("Not implemented yet.")
+    pass
 
   def string_from(self, state, player) -> str:
-    """Observation of `state` from the PoV of `player`, as a string."""
-    state.get_game().raise_error_if_player_out_of_range(player)
-    # TODO: b/437724266 - Add full support for othe game variants.
-    raise NotImplementedError("Not implemented yet.")
+    """An observation of `state` from the PoV of `player`, as a string.
+
+    If the Observer's iig_obs_types `perfect_recall` is True, then this is
+    equivalent to returning an `information_state_string`. If `perfect_recall`
+    is False, then this is equivalent to returning an `observation_string`.
+
+    Args:
+      state: The state to extract the observation from.
+      player: The player to extract the observation for.
+
+    Returns:
+      A string representation of the observation.
+    """
+    observation_string = self._observation_string(state, player)
+    if self.iig_obs_types.perfect_recall:
+      # I.e. construct the 'information state string' (by simply merging the
+      # observation string with the PHH actions).
+      phh_action_string = ",".join(
+          self._poker_hand_history_actions(state, player)
+      )
+      return f"{observation_string}\n||PHH Actions: {phh_action_string}"
+    else:
+      return self._observation_string(state, player)
 
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+# TODO: b/434776281 - extract out PokerkitWrapperAcpcStyle into a separate file.
+
+
 # --- "ACPC-style" PokerkitWrapper subclass to mimick UniversalPoker ---
 class PokerkitWrapperAcpcStyle(PokerkitWrapper):
   """A subclass of PokerkitWrapper that mimicks ACPC-wrapping UniversalPoker."""
 
   def __init__(self, params=None):
-    if not params:
-      params = _DEFAULT_PARAMS
-
-    variant = params.get("variant")
-    if not variant:
-      variant = _DEFAULT_PARAMS.get("variant")
-    if variant not in _VARIANTS_SUPPORTING_ACPC_STYLE:
+    if (
+        params
+        and "variant" in params
+        and params["variant"] not in _VARIANTS_SUPPORTING_ACPC_STYLE
+    ):
       raise ValueError(
           "PokerkitWrapperAcpcStyle only supports 'limit_holdem' and "
           "'nolimit_holdem' variants."
@@ -752,7 +940,7 @@ class PokerkitWrapperAcpcStyle(PokerkitWrapper):
     return PokerkitWrapperAcpcStyleState(self)
 
   def make_py_observer(self, iig_obs_type=None, params=None):
-    return PokerkitWrapperAcpcStyleObserver(self, params)
+    return PokerkitWrapperAcpcStyleObserver(self, iig_obs_type, params)
 
   def game_type(self):
     return _GAME_TYPE_ACPC_STYLE
@@ -765,9 +953,7 @@ class PokerkitWrapperAcpcStyle(PokerkitWrapper):
     #
     # Specifically: shape should match InformationStateTensorShape() in
     # universal_poker.cc.
-    return (
-        num_players + 2 * max_chance_outcomes + (2 + 1) * max_game_length
-    )
+    return num_players + 2 * max_chance_outcomes + (2 + 1) * max_game_length
 
 
 class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
@@ -775,6 +961,9 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
 
   def information_state_tensor(self, player):
     """See spiel.h.
+
+    TODO: b/434776281 - Move this into the Observer and use it properly for
+    games that have specified their iig_obs_types.perfect_recall to True.
 
     Deliberately matches UniversalPokerState::InformationStateTensor in
     universal_poker.cc as much as realistically possible.
@@ -817,7 +1006,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
 
     # TODO: b/437724266 - consider adding this back in later if supporting
     # other variants in this fashion
-    # if game.is_bring_in_variant():
+    # if <game is bring in variant>:
     # tensor_length += num_players * max_chance_outcomes
     self.tensor = np.zeros(tensor_length, dtype=np.float32)
 
@@ -911,7 +1100,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
       # WARNING: THIS MAKES IT VERY DIFFICULT TO TELL FOLDING FROM DEALING IN
       # THE TENSOR HERE.
       #
-      # See also this TODO from universal_poker.cc:
+      # See also this comment from universal_poker.cc:
       # """"
       # TODO(author2): Should this be 11?
       # """"
@@ -933,7 +1122,7 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
 
     # TODO: b/437724266 - consider adding this back in later if supporting
     # other variants in this fashion
-    # if game.is_bring_in_variant():
+    # if <game is bring in variant>:
     #   for p in range(num_players):
     #     up_cards = wrapped_state.get_up_cards(p)
     #     for card, i in game.card_to_int.items():
@@ -944,6 +1133,8 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
     assert tensor_length == offset
     return self.tensor
 
+  # TODO: b/434776281 - Move this into the Observer and use it properly for
+  # games that have specified their iig_obs_types.perfect_recall to True.
   def information_state_string(self, player):
     if player < 0:
       raise RuntimeError("player >= 0")
@@ -995,8 +1186,8 @@ class PokerkitWrapperAcpcStyleState(PokerkitWrapperState):
 class PokerkitWrapperAcpcStyleObserver(PokerkitWrapperObserver):
   """Observer class for PokerkitWrapperAcpcStyle."""
 
-  def __init__(self, game, params):
-    super().__init__(game, params)
+  def __init__(self, game, iig_obs_type, params):
+    super().__init__(game, iig_obs_type, params)
     # Reinitialize tensor based on ACPC game shape
     self.tensor_size = game.observation_tensor_shape()
     self.tensor = np.zeros(self.tensor_size, dtype=np.float32)
@@ -1004,6 +1195,10 @@ class PokerkitWrapperAcpcStyleObserver(PokerkitWrapperObserver):
 
   def set_from(self, state, player) -> None:
     """Updates `tensor` and `dict` to reflect `state` from PoV of `player`.
+
+    TODO: b/434776281 - Add proper support for iig_obs_types.perfect_recall
+    to return the information state tensor here instead of always just returning
+    the observation tensor.
 
     WARNING: THIS OCCURS VIA MUTATION! Note how unlike with the C++ functions,
     this function doesn't return anything (here, and generally all the other
@@ -1057,7 +1252,20 @@ class PokerkitWrapperAcpcStyleObserver(PokerkitWrapperObserver):
     return
 
   def string_from(self, state, player) -> str:
-    """Observation of `state` from the PoV of `player`, as a string."""
+    """Observation of `state` from the PoV of `player`, as a string.
+
+    TODO: b/434776281 - Add proper support for iig_obs_types.perfect_recall
+    to return the information state tensor here instead of always just returning
+    the observation tensor.
+
+    Args:
+      state: The `PokerkitWrapperState` to observe.
+      player: The player ID for whom to generate the observation. (Private hole
+        cards may be 'censored' for all other players.)
+
+    Returns:
+      A string representation of the observation from the player's perspective.
+    """
     game = state.get_game()
     game.raise_error_if_player_out_of_range(player)
 
