@@ -5,6 +5,7 @@ import warnings
 
 import numpy as np
 import flax
+import operator
 import jax
 import jax.numpy as jnp
 import flax.linen as nn
@@ -73,7 +74,7 @@ class ConvBlock(nn.Module):
   @nn.compact
   def __call__(self, x: chex.Array, training: bool = False) -> chex.Array:
     y = nn.Conv(features=self.features, kernel_size=self.kernel_size, padding='SAME')(x)
-    y = nn.BatchNorm(use_running_average=not training)(y)
+    y = nn.BatchNorm(use_running_average=not training, axis_name="batch")(y)
     y = Activation(self.activation)(y)
     return y
 
@@ -130,11 +131,11 @@ class ValueHead(nn.Module):
 # Define a vmapped MLP class
 @functools.partial(
   nn.vmap,
-  in_axes=0,
+  in_axes=(0, None),
   out_axes=0,
   variable_axes={'params': None, 'batch_stats': None}, # `None` means these collections are shared
   split_rngs={'params': False,}, # Rngs for params are shared, but for dropout, they are split
-  axis_name='batch' # The name for the batch dimension
+  axis_name="batch"
 )
 class AlphaZeroModel(nn.Module):
   """An AlphaZero style model with a policy and value head.
@@ -268,7 +269,7 @@ class Model:
     
     optimizer = optax.adam(learning_rate=learning_rate)
     rng = jax.random.PRNGKey(seed)
-    variables = model.init(rng, jnp.ones((1, *input_shape)), training=False)
+    variables = model.init(rng, jnp.ones((1, *input_shape)), False)
 
     state = cls._create_train_state(model.apply, variables, optimizer)
 
@@ -277,16 +278,14 @@ class Model:
       
       def loss_fn(params, batch_stats, observations, legals_mask, policy_targets, value_targets):
         variables = {'params': params, 'batch_stats': batch_stats}
-        (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, training=True, mutable=['batch_stats'])
-        
+        (policy_logits, value_preds), new_model_state = state.apply_fn(variables, observations, True, mutable=['batch_stats'])
         policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
         policy_loss = optax.softmax_cross_entropy(policy_logits, policy_targets).mean()
         value_loss = jax.vmap(optax.l2_loss)(value_preds - value_targets).mean()
         
-        l2_reg_loss = 0.0
-        for p in jax.tree.leaves(params):
-          l2_reg_loss += weight_decay * jnp.sum(jnp.square(p))
-
+        l2_reg_loss = jax.tree.reduce(
+          operator.add, jax.tree.map(jnp.sum, jax.tree.map(jnp.square, params)), initializer=0) * weight_decay
+        
         total_loss = policy_loss + value_loss + l2_reg_loss      
         return total_loss, (policy_loss, value_loss, l2_reg_loss, new_model_state['batch_stats'])
     
@@ -329,7 +328,7 @@ class Model:
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
     policy_logits, value = self._state.apply_fn(
-        {'params': self._state.params, 'batch_stats': self._state.batch_stats}, observation, training=False, mutable=False)
+        {'params': self._state.params, 'batch_stats': self._state.batch_stats}, observation, False, mutable=False)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
     policy = nn.softmax(policy_logits, axis=-1)

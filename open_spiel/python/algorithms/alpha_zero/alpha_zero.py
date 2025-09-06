@@ -421,11 +421,11 @@ def learner(*, game, config, actors, evaluators, broadcast_fn, logger):
     """Sample from the replay buffer, update weights and save a checkpoint."""
     losses = [] 
     #TODO: why not to replace replace with `jax.lax.scan`, 
-    # but the model state does not explicitly states
-    logger.print("Updating the model", len(replay_buffer), config.train_batch_size)
+    # but the model state is not explicit
     for _ in range(len(replay_buffer) // config.train_batch_size):
       data = replay_buffer.sample(config.train_batch_size)
-      losses.append(model.update(data))
+      if data:
+        losses.append(model.update(data))
 
     # Always save a checkpoint, either for keeping or for loading the weights to
     # the actors. We only allow numbers, so use -1 as "latest".

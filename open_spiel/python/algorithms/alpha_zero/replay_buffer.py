@@ -70,12 +70,13 @@ def init(
 def can_add(
     state: BufferState[Experience],
     add_batch_size: int,
-    max_size: int
 ) -> chex.Array:
   """Check if the queue state can be written to.
   Fully taken from 
   https://github.com/instadeepai/flashbax/blob/main/flashbax/buffers/trajectory_queue.py
   """
+
+  max_size = get_tree_shape_prefix(state.experience)[0]
 
   new_write_index = state.write_index + add_batch_size
   read_index_lt_eq_to_write = state.read_index <= state.write_index
@@ -233,7 +234,7 @@ class FlatBuffer(Generic[Experience, TBufferState, TBufferSample]):
   ]
   # Checkers
   can_sample: Callable[[BufferState, int], chex.Array]
-  can_add: Callable[[int, int], chex.Array]
+  can_add: Callable[[BufferState, int], chex.Array]
 
 
 def make_flat_buffer(max_size: int) -> FlatBuffer:
@@ -254,6 +255,8 @@ class Buffer:
     self.buffer = make_flat_buffer(max_size=max_size)
     self.total_seen = 0
     self.sequential = sequential
+
+    #TODO: debug `can_*` checks.
     
     self._rng = jax.random.PRNGKey(seed)
     # jit-compling all the methods for cpu if forced otherwise automatically
@@ -301,6 +304,8 @@ class Buffer:
        self.buffer_state = self.buffer.init(unbatched_val)
 
     #TODO: add `can_add` check
+    batch_size = get_tree_shape_prefix(val)[0] # pylint: disable=possibly-unused-variable  # noqa: F841
+    # if self.buffer.can_add(self.buffer_state, batch_size):
     self.buffer_state = self.buffer.extend(self.buffer_state, val)
     self.total_seen = self.buffer_state.total_seen
 

@@ -33,7 +33,7 @@ flags.DEFINE_string("game", "connect_four", "Name of the game.")
 flags.DEFINE_integer("uct_c", 2, "UCT's exploration constant.")
 flags.DEFINE_integer("max_simulations", 300, "How many simulations to run.")
 flags.DEFINE_integer("train_batch_size", 2 ** 3, "Batch size for learning.")
-flags.DEFINE_integer("replay_buffer_size", 2 ** 8,
+flags.DEFINE_integer("replay_buffer_size", 2 ** 9,
                      "How many states to store in the replay buffer.")
 flags.DEFINE_integer("replay_buffer_reuse", 3,
                      "How many times to learn from each state.")

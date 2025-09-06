@@ -19,6 +19,7 @@ import numpy as np
 from open_spiel.python.algorithms import mcts
 import pyspiel
 from open_spiel.python.utils import lru_cache
+import jax
 
 
 class AlphaZeroEvaluator(mcts.Evaluator):
@@ -41,6 +42,8 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     return self._cache.info()
 
   def clear_cache(self):
+    # Clear all compilation and staging caches.
+    jax.clear_caches()
     self._cache.clear()
 
   def _inference(self, state):
@@ -48,11 +51,11 @@ class AlphaZeroEvaluator(mcts.Evaluator):
     obs = np.expand_dims(state.observation_tensor(), 0)
     mask = np.expand_dims(state.legal_actions_mask(), 0)
 
-    # ndarray isn't hashable
+    # np.ndarray isn't hashable
     cache_key = obs.tobytes() + mask.tobytes()
 
     value, policy = self._cache.make(
-        cache_key, lambda: self._model.inference(obs, mask))
+      cache_key, lambda: self._model.inference(obs, mask))
 
     return value[0, 0], policy[0]  # Unpack batch
 

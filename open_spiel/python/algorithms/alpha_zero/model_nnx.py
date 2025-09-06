@@ -17,8 +17,7 @@ import operator
 from open_spiel.python.algorithms.alpha_zero.utils import TrainInput, Losses, flatten
 
 warnings.warn("Pay attention that you've been using the `nnx` api")
-
-nn.MultiMetric
+state_axes = nn.StateAxes({nn.RngState: 0, (nn.Param, nn.BatchStat): None})
 
 activations_dict = {
     "celu": nn.celu,
@@ -239,7 +238,6 @@ class AlphaZeroModel(nn.Module):
     seed: Optional[int] = 0
   ) -> None:
     """
-
     Args:
         model_type (str): underlying model type: conv2d, mlp, or resnet
         input_shape (tuple[int, ...]): input spec
@@ -313,7 +311,7 @@ class Model:
     
     self._checkpointer = None
     if self._path is not None:
-      self._checkpointer = orbax.PyTreeCheckpointer()
+      self._checkpointer = orbax.Checkpointer(orbax.StandardCheckpointHandler())
 
 
   @classmethod
@@ -360,6 +358,7 @@ class Model:
       
       def loss_fn(params, observations, legals_mask, policy_targets, value_targets):
         model = nn.merge(state.graphdef, params, state.batch_stats)
+        model.train()
 
         policy_logits, value_preds = model(observations)
         policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
@@ -378,8 +377,7 @@ class Model:
       (_, (policy_loss, value_loss, l2_reg_loss, new_batch_stats)), grads = grad_fn(
         state.params, observations, legals_mask, policy_targets, value_targets)
       
-      new_state = state.apply_gradients(grads=grads)
-      new_state = new_state.replace(batch_stats=new_batch_stats)
+      new_state = state.apply_gradients(grads=grads, batch_stats=new_batch_stats)
   
       return new_state, (policy_loss, value_loss, l2_reg_loss)
     
@@ -411,11 +409,13 @@ class Model:
       print(f"Param {i}: {p.shape}")
   
   def inference(self, observation, legals_mask):
-    self._model.eval()
+    model = nn.merge(self._state.graphdef, self._state.params, self._state.batch_stats)
+    model.eval()
+
     observation = jnp.array(observation, dtype=jnp.float32)
     legals_mask = jnp.array(legals_mask, dtype=jnp.bool)
 
-    policy_logits, value = self._state.apply_fn(observation)
+    policy_logits, value = model(observation)
     
     policy_logits = jnp.where(legals_mask, policy_logits, jnp.full_like(policy_logits, -1e32))
     policy = nn.softmax(policy_logits, axis=-1)
@@ -423,7 +423,7 @@ class Model:
     return value, policy
   
   def update(self, batch: Sequence[TrainInput] | chex.ArrayTree):
-    self._model.train()
+
     self._state, (policy_loss, value_loss, l2_reg_loss) = self._update_step_fn(
       self._state, batch.observation, batch.legals_mask, batch.policy, batch.value)
     
@@ -438,12 +438,7 @@ class Model:
     return step
    
   def load_checkpoint(self, step: int) -> TrainState:
-
-    model = nn.eval_shape(lambda: self._model)
-    state = nn.state(model)
+    # model = nn.eval_shape(lambda: self._model)
     if self._checkpointer:
-      self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), item=self._state)
-      # update the model with the loaded state
-      nn.update(model, state)
-      model.train()
+      self._state = self._checkpointer.restore(os.path.join(self._path, f"checkpoint-{step}"), self._state)
     return self._state
